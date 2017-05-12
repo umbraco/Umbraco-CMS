@@ -47,9 +47,7 @@ namespace Umbraco.Web.Models
         {
             var route = umbracoContext == null
                 ? null // for tests only
-                : umbracoContext.ContentCache.GetRouteById(contentId); // cached
-
-            if (route != null && route.StartsWith("err/")) route = null;
+                : umbracoContext.ContentCache.GetRouteById(contentId); // may be cached
 
             var domainCache = umbracoContext == null
                 ? new PublishedCache.XmlPublishedCache.DomainCache(domainService) // for tests only
@@ -77,7 +75,7 @@ namespace Umbraco.Web.Models
             }
             else
             {
-                // if content is published then we have a (cached) route
+                // if content is published then we have a route
                 // from which we can figure out the domain
 
                 var pos = route.IndexOf('/');

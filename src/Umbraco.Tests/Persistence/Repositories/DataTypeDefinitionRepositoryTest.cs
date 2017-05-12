@@ -57,37 +57,20 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        private IDataTypeDefinitionRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        private IDataTypeDefinitionRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
-            return Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
+            return Container.GetInstance<IScopeUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
         }
 
-        private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork)
+        private EntityContainerRepository CreateContainerRepository(IScopeUnitOfWork unitOfWork)
         {
             return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Constants.ObjectTypes.DataTypeContainerGuid);
-        }
-
-        [TestCase("UmbracoPreVal87-21,3,48", 3, true)]
-        [TestCase("UmbracoPreVal87-21,33,48", 3, false)]
-        [TestCase("UmbracoPreVal87-21,33,48", 33, true)]
-        [TestCase("UmbracoPreVal87-21,3,48", 33, false)]
-        [TestCase("UmbracoPreVal87-21,3,48", 21, true)]
-        [TestCase("UmbracoPreVal87-21,3,48", 48, true)]
-        [TestCase("UmbracoPreVal87-22,33,48", 2, false)]
-        [TestCase("UmbracoPreVal87-22,33,48", 22, true)]
-        [TestCase("UmbracoPreVal87-22,33,44", 4, false)]
-        [TestCase("UmbracoPreVal87-22,33,44", 44, true)]
-        [TestCase("UmbracoPreVal87-22,333,44", 33, false)]
-        [TestCase("UmbracoPreVal87-22,333,44", 333, true)]
-        public void Pre_Value_Cache_Key_Tests(string cacheKey, int preValueId, bool outcome)
-        {
-            Assert.AreEqual(outcome, Regex.IsMatch(cacheKey, DataTypeDefinitionRepository.GetCacheKeyRegex(preValueId)));
         }
 
         [Test]
         public void Can_Move()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
@@ -134,7 +117,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Container()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
@@ -151,7 +134,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete_Container()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
@@ -171,7 +154,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Container_Containing_Data_Types()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
@@ -191,7 +174,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete_Container_Containing_Data_Types()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
@@ -220,7 +203,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -246,7 +229,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -264,7 +247,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -284,7 +267,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -304,7 +287,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -324,7 +307,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -342,7 +325,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -372,7 +355,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -405,7 +388,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -436,7 +419,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_DataTypeDefinitionRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -454,7 +437,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Pre_Value_Collection()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -474,7 +457,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Pre_Value_As_String()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -494,7 +477,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Pre_Value_Collection_With_Cache()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             DataTypeDefinition dtd;
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
@@ -524,7 +507,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Pre_Value_As_String_With_Cache()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             DataTypeDefinition dtd;
             object id;
             using (var unitOfWork = provider.CreateUnitOfWork())

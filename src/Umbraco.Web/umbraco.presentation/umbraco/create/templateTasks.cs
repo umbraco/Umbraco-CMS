@@ -6,8 +6,7 @@ using Umbraco.Web._Legacy.UI;
 namespace umbraco
 {
     public class templateTasks : LegacyDialogTask
-    {
-       
+    {  
         public override bool PerformSave()
         {
             var masterId = ParentID;

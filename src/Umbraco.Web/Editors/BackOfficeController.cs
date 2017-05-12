@@ -251,7 +251,7 @@ namespace Umbraco.Web.Editors
                             },
                             {
                                 "treeApplicationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
-                                    controller => controller.GetApplicationTrees(null, null, null))
+                                    controller => controller.GetApplicationTrees(null, null, null, true))
                             },
                             {
                                 "contentTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
@@ -334,6 +334,10 @@ namespace Umbraco.Web.Editors
                                     controller => controller.GetAllTags(null))
                             },
                             {
+                                "templateApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TemplateController>(
+                                    controller => controller.GetById(0))
+                            },
+                            {
                                 "memberTreeBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberTreeController>(
                                     controller => controller.GetNodes("-1", null))
                             },
@@ -360,6 +364,14 @@ namespace Umbraco.Web.Editors
                             {
                                 "healthCheckBaseUrl", Url.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
                                     controller => controller.GetAllHealthChecks())
+                            },
+                            {
+                                "templateQueryApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TemplateQueryController>(
+                                    controller => controller.PostTemplateQuery(null))
+                            },
+                            {
+                                "codeFileApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<CodeFileController>(
+                                    controller => controller.GetByPath("", ""))
                             },
                             {
                                 "facadeStatusBaseUrl", Url.GetUmbracoApiServiceBaseUrl<FacadeStatusController>(
@@ -392,6 +404,7 @@ namespace Umbraco.Web.Editors
                             {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
                             {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
                             {"allowPasswordReset", UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset},
+                            {"loginBackgroundImage",  UmbracoConfig.For.UmbracoSettings().Content.LoginBackgroundImage},
                         }
                     },
                     {
@@ -471,7 +484,7 @@ namespace Umbraco.Web.Editors
                 if (result)
                 {
                     //Add a flag and redirect for it to be displayed
-                    TempData[TokenPasswordResetCode] = new ValidatePasswordResetCodeModel {UserId = userId, ResetCode = resetCode};
+                    TempData[TokenPasswordResetCode] = new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode };
                     return RedirectToLocal(Url.Action("Default", "BackOffice"));
                 }
             }

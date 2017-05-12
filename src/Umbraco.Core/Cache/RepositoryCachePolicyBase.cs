@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Cache
 {
@@ -14,9 +15,10 @@ namespace Umbraco.Core.Cache
     {
         protected RepositoryCachePolicyBase(IRuntimeCacheProvider cache)
         {
-            if (cache == null) throw new ArgumentNullException(nameof(cache));
-            Cache = cache;
-        } 
+            Cache = cache ?? throw new ArgumentNullException(nameof(cache));
+        }
+
+        public abstract IRepositoryCachePolicy<TEntity, TId> Scoped(IRuntimeCacheProvider runtimeCache, IScope scope);
 
         protected IRuntimeCacheProvider Cache { get; }
 

@@ -18,21 +18,13 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private IRepositoryCachePolicy<IDomain, int> _cachePolicy;
 
-        public DomainRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
+        public DomainRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
-        {           
-        }
+        { }
 
-        protected override IRepositoryCachePolicy<IDomain, int> CachePolicy
+        protected override IRepositoryCachePolicy<IDomain, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                if (_cachePolicy != null) return _cachePolicy;
-
-                _cachePolicy = new FullDataSetRepositoryCachePolicy<IDomain, int>(RuntimeCache, GetEntityId, /*expires:*/ false);
-
-                return _cachePolicy;
-            }
+            return new FullDataSetRepositoryCachePolicy<IDomain, int>(runtimeCache, GetEntityId, /*expires:*/ false);
         }
 
         protected override IDomain PerformGet(int id)

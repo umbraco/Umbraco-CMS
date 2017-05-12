@@ -14,9 +14,9 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Manages server registrations in the database.
     /// </summary>
-    public sealed class ServerRegistrationService : RepositoryService, IServerRegistrationService
+    public sealed class ServerRegistrationService : ScopeRepositoryService, IServerRegistrationService
     {
-        private readonly static string CurrentServerIdentityValue = NetworkHelper.MachineName // eg DOMAIN\SERVER
+        private static readonly string CurrentServerIdentityValue = NetworkHelper.MachineName // eg DOMAIN\SERVER
                                                             + "/" + HttpRuntime.AppDomainAppId; // eg /LM/S3SVC/11/ROOT
 
         private ServerRole _currentServerRole = ServerRole.Unknown;
@@ -27,7 +27,7 @@ namespace Umbraco.Core.Services
         /// <param name="uowProvider">A UnitOfWork provider.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="eventMessagesFactory"></param>
-        public ServerRegistrationService(IDatabaseUnitOfWorkProvider uowProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        public ServerRegistrationService(IScopeUnitOfWorkProvider uowProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(uowProvider, logger, eventMessagesFactory)
         { }
 
@@ -131,14 +131,12 @@ namespace Umbraco.Core.Services
         /// from the database.</remarks>
         public IEnumerable<IServerRegistration> GetActiveServers(bool refresh = false)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 uow.ReadLock(Constants.Locks.Servers);
                 var repo = uow.CreateRepository<IServerRegistrationRepository>();
                 if (refresh) ((ServerRegistrationRepository) repo).ClearCache();
-                var servers = repo.GetAll().Where(x => x.IsActive).ToArray(); // fast, cached
-                uow.Complete();
-                return servers;
+                return repo.GetAll().Where(x => x.IsActive).ToArray(); // fast, cached
             }
         }
 

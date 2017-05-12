@@ -9,29 +9,14 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Settings, Constants.Trees.Xslt, "XSLT Files", "icon-folder", "icon-folder", sortOrder: 2)]
     public class XsltTreeController : FileSystemTreeController
     {
-        protected override string FilePath
-        {
-            get { return SystemDirectories.Xslt + "/"; }
-        }
+        protected override IFileSystem FileSystem => Current.FileSystems.XsltFileSystem; // fixme inject
 
-        protected override IEnumerable<string> FileSearchPattern
-        {
-            get { return new [] {"xslt"}; }
-        }
+        private static readonly string[] ExtensionsStatic = { "xslt" };
 
-        protected override string EditFormUrl
-        {
-            get { return "developer/xslt/editXslt.aspx?file={0}"; }
-        }
+        protected override string[] Extensions => ExtensionsStatic;
 
-        protected override bool EnableCreateOnFolder
-        {
-            get { return false; }
-        }
+        protected override string FileIcon => "icon-code";
 
-        protected override void OnRenderFileNode(TreeNode treeNode, FileInfo file)
-        {
-            treeNode.Icon = "icon-code";
-        }
+        protected override bool EnableCreateOnFolder => true;
     }
 }

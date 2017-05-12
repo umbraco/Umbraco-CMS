@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Components
             var testObjects = new TestObjects(null);
             var logger = Mock.Of<ILogger>();
             var s = testObjects.GetDefaultSqlSyntaxProviders(logger);
-            var f = new UmbracoDatabaseFactory(s, logger, new TestDatabaseScopeAccessor(), new MapperCollection(Enumerable.Empty<BaseMapper>()));
+            var f = new UmbracoDatabaseFactory(s, logger, new MapperCollection(Enumerable.Empty<BaseMapper>()));
 
             var mock = new Mock<IServiceContainer>();
             mock.Setup(x => x.GetInstance<ILogger>()).Returns(logger);

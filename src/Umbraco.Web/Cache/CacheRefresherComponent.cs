@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -6,6 +8,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services;
 using System.Linq;
+using System.Reflection;
 using Umbraco.Core.Components;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services.Changes;
@@ -22,166 +25,209 @@ namespace Umbraco.Web.Cache
     [RequiredComponent(typeof(IUmbracoCoreComponent))] // runs before every other IUmbracoCoreComponent!
     public class CacheRefresherComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
+        private static readonly ConcurrentDictionary<IEventDefinition, MethodInfo> FoundHandlers = new ConcurrentDictionary<IEventDefinition, MethodInfo>();
+        private List<Action> _unbinders;
+
+        public CacheRefresherComponent()
+        { }
+
+        // for tests
+        public CacheRefresherComponent(bool supportUnbinding)
+        {
+            if (supportUnbinding)
+                _unbinders = new List<Action>();
+        }
+
         public void Initialize()
         {
             Current.Logger.Info<CacheRefresherComponent>("Initializing Umbraco internal event handlers for cache refreshing.");
-            AddHandlers();
-        }
 
-        internal void AddHandlers()
-        {
             // bind to application tree events
-            ApplicationTreeService.Deleted += ApplicationTreeDeleted;
-            ApplicationTreeService.Updated += ApplicationTreeUpdated;
-            ApplicationTreeService.New += ApplicationTreeNew;
+            Bind(() => ApplicationTreeService.Deleted += ApplicationTreeService_Deleted,
+                () => ApplicationTreeService.Deleted -= ApplicationTreeService_Deleted);
+            Bind(() => ApplicationTreeService.Updated += ApplicationTreeService_Updated,
+                () => ApplicationTreeService.Updated -= ApplicationTreeService_Updated);
+            Bind(() => ApplicationTreeService.New += ApplicationTreeService_New,
+                () => ApplicationTreeService.New -= ApplicationTreeService_New);
 
             // bind to application events
-            SectionService.Deleted += ApplicationDeleted;
-            SectionService.New += ApplicationNew;
+            Bind(() => SectionService.Deleted += SectionService_Deleted,
+                () => SectionService.Deleted -= SectionService_Deleted);
+            Bind(() => SectionService.New += SectionService_New,
+                () => SectionService.New -= SectionService_New);
 
-            // bind to user / user type events
-            UserService.SavedUserType += UserServiceSavedUserType;
-            UserService.DeletedUserType += UserServiceDeletedUserType;
-            UserService.SavedUser += UserServiceSavedUser;
-            UserService.DeletedUser += UserServiceDeletedUser;
+            // bind to user and user type events
+            Bind(() => UserService.SavedUserType += UserService_SavedUserType,
+                () => UserService.SavedUserType -= UserService_SavedUserType);
+            Bind(() => UserService.DeletedUserType += UserService_DeletedUserType,
+                () => UserService.DeletedUserType -= UserService_DeletedUserType);
+            Bind(() => UserService.SavedUser += UserService_SavedUser,
+                () => UserService.SavedUser -= UserService_SavedUser);
+            Bind(() => UserService.DeletedUser += UserService_DeletedUser,
+                () => UserService.DeletedUser -= UserService_DeletedUser);
 
             // bind to dictionary events
-            LocalizationService.DeletedDictionaryItem += LocalizationServiceDeletedDictionaryItem;
-            LocalizationService.SavedDictionaryItem += LocalizationServiceSavedDictionaryItem;
+            Bind(() => LocalizationService.DeletedDictionaryItem += LocalizationService_DeletedDictionaryItem,
+                () => LocalizationService.DeletedDictionaryItem -= LocalizationService_DeletedDictionaryItem);
+            Bind(() => LocalizationService.SavedDictionaryItem += LocalizationService_SavedDictionaryItem,
+                () => LocalizationService.SavedDictionaryItem -= LocalizationService_SavedDictionaryItem);
 
             // bind to data type events
-            // NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
-            DataTypeService.Deleted += DataTypeServiceDeleted;
-            DataTypeService.Saved += DataTypeServiceSaved;
+            Bind(() => DataTypeService.Deleted += DataTypeService_Deleted,
+                () => DataTypeService.Deleted -= DataTypeService_Deleted);
+            Bind(() => DataTypeService.Saved += DataTypeService_Saved,
+                () => DataTypeService.Saved -= DataTypeService_Saved);
 
             // bind to stylesheet events
-            //FileService.SavedStylesheet += FileServiceSavedStylesheet;
-            //FileService.DeletedStylesheet += FileServiceDeletedStylesheet;
+            // fixme why not in v8?
+            //Bind(() => FileService.SavedStylesheet += FileService_SavedStylesheet,
+            //    () => FileService.SavedStylesheet -= FileService_SavedStylesheet);
+            //Bind(() => FileService.DeletedStylesheet += FileService_DeletedStylesheet,
+            //    () => FileService.DeletedStylesheet -= FileService_DeletedStylesheet);
 
             // bind to domain events
-            DomainService.Saved += DomainServiceSaved;
-            DomainService.Deleted += DomainServiceDeleted;
+            Bind(() => DomainService.Saved += DomainService_Saved,
+                () => DomainService.Saved -= DomainService_Saved);
+            Bind(() => DomainService.Deleted += DomainService_Deleted,
+                () => DomainService.Deleted -= DomainService_Deleted);
 
             // bind to language events
-            LocalizationService.SavedLanguage += LocalizationServiceSavedLanguage;
-            LocalizationService.DeletedLanguage += LocalizationServiceDeletedLanguage;
+            Bind(() => LocalizationService.SavedLanguage += LocalizationService_SavedLanguage,
+                () => LocalizationService.SavedLanguage -= LocalizationService_SavedLanguage);
+            Bind(() => LocalizationService.DeletedLanguage += LocalizationService_DeletedLanguage,
+                () => LocalizationService.DeletedLanguage -= LocalizationService_DeletedLanguage);
 
             // bind to content type events
-            ContentTypeService.Changed += ContentTypeServiceChanged;
-            MediaTypeService.Changed += ContentTypeServiceChanged;
-            MemberTypeService.Changed += ContentTypeServiceChanged;
+            Bind(() => ContentTypeService.Changed += ContentTypeService_Changed,
+                () => ContentTypeService.Changed -= ContentTypeService_Changed);
+            Bind(() => MediaTypeService.Changed += ContentTypeService_Changed,
+                () => MediaTypeService.Changed -= ContentTypeService_Changed);
+            Bind(() => MemberTypeService.Changed += ContentTypeService_Changed,
+                () => MemberTypeService.Changed -= ContentTypeService_Changed);
 
             // bind to permission events
-            PermissionRepository<IContent>.AssignedPermissions += PermissionRepositoryAssignedPermissions;
+            // fixme see v7 events? the PermissionNew/Updated/Deleted are not supported here?
+            Bind(() => PermissionRepository<IContent>.AssignedPermissions += PermissionRepository_AssignedPermissions,
+                () => PermissionRepository<IContent>.AssignedPermissions -= PermissionRepository_AssignedPermissions);
 
             // bind to template events
-            FileService.SavedTemplate += FileServiceSavedTemplate;
-            FileService.DeletedTemplate += FileServiceDeletedTemplate;
+            Bind(() => FileService.SavedTemplate += FileService_SavedTemplate,
+                () => FileService.SavedTemplate -= FileService_SavedTemplate);
+            Bind(() => FileService.DeletedTemplate += FileService_DeletedTemplate,
+                () => FileService.DeletedTemplate -= FileService_DeletedTemplate);
 
             // bind to macro events
-            MacroService.Saved += MacroServiceSaved;
-            MacroService.Deleted += MacroServiceDeleted;
+            Bind(() => MacroService.Saved += MacroService_Saved,
+                () => MacroService.Saved -= MacroService_Saved);
+            Bind(() => MacroService.Deleted += MacroService_Deleted,
+                () => MacroService.Deleted -= MacroService_Deleted);
 
             // bind to member events
-            MemberService.Saved += MemberServiceSaved;
-            MemberService.Deleted += MemberServiceDeleted;
-            MemberGroupService.Saved += MemberGroupServiceSaved;
-            MemberGroupService.Deleted += MemberGroupServiceDeleted;
+            Bind(() => MemberService.Saved += MemberService_Saved,
+                () => MemberService.Saved -= MemberService_Saved);
+            Bind(() => MemberService.Deleted += MemberService_Deleted,
+                () => MemberService.Deleted -= MemberService_Deleted);
+            Bind(() => MemberGroupService.Saved += MemberGroupService_Saved,
+                () => MemberGroupService.Saved -= MemberGroupService_Saved);
+            Bind(() => MemberGroupService.Deleted += MemberGroupService_Deleted,
+                () => MemberGroupService.Deleted -= MemberGroupService_Deleted);
 
-            // bind to media events
-            MediaService.TreeChanged += MediaServiceChanged; // handles all media changes
+            // bind to media events - handles all media changes
+            Bind(() => MediaService.TreeChanged += MediaService_Changed,
+                () => MediaService.TreeChanged -= MediaService_Changed);
 
             // bind to content events
-            ContentService.Saved += ContentServiceSaved; // needed for permissions
-            ContentService.Copied += ContentServiceCopied; // needed for permissions
-            ContentService.TreeChanged += ContentServiceChanged; // handles all content changes
+            Bind(() => ContentService.Saved += ContentService_Saved, // needed for permissions
+                () => ContentService.Saved -= ContentService_Saved);
+            Bind(() => ContentService.Copied += ContentService_Copied, // needed for permissions
+                () => ContentService.Copied -= ContentService_Copied);
+            Bind(() => ContentService.TreeChanged += ContentService_Changed,// handles all content changes
+                () => ContentService.TreeChanged -= ContentService_Changed);
 
             // bind to public access events
-            PublicAccessService.Saved += PublicAccessServiceSaved;
-            PublicAccessService.Deleted += PublicAccessServiceDeleted;
+            Bind(() => PublicAccessService.Saved += PublicAccessService_Saved,
+                () => PublicAccessService.Saved -= PublicAccessService_Saved);
+            Bind(() => PublicAccessService.Deleted += PublicAccessService_Deleted,
+                () => PublicAccessService.Deleted -= PublicAccessService_Deleted);
+
+            // bind to relation type events
+            Bind(() => RelationService.SavedRelationType += RelationService_SavedRelationType,
+                () => RelationService.SavedRelationType -= RelationService_SavedRelationType);
+            Bind(() => RelationService.DeletedRelationType += RelationService_DeletedRelationType,
+                () => RelationService.DeletedRelationType -= RelationService_DeletedRelationType);
         }
 
-        internal void RemoveHandlers()
+        #region Events binding and handling
+
+        private void Bind(Action binder, Action unbinder)
         {
-            // bind to application tree events
-            ApplicationTreeService.Deleted -= ApplicationTreeDeleted;
-            ApplicationTreeService.Updated -= ApplicationTreeUpdated;
-            ApplicationTreeService.New -= ApplicationTreeNew;
+            // bind now
+            binder();
 
-            // bind to application events
-            SectionService.Deleted -= ApplicationDeleted;
-            SectionService.New -= ApplicationNew;
-
-            // bind to user / user type events
-            UserService.SavedUserType -= UserServiceSavedUserType;
-            UserService.DeletedUserType -= UserServiceDeletedUserType;
-            UserService.SavedUser -= UserServiceSavedUser;
-            UserService.DeletedUser -= UserServiceDeletedUser;
-
-            // bind to dictionary events
-            LocalizationService.DeletedDictionaryItem -= LocalizationServiceDeletedDictionaryItem;
-            LocalizationService.SavedDictionaryItem -= LocalizationServiceSavedDictionaryItem;
-
-            // bind to data type events
-            // NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
-            DataTypeService.Deleted -= DataTypeServiceDeleted;
-            DataTypeService.Saved -= DataTypeServiceSaved;
-
-            // bind to stylesheet events
-            //FileService.SavedStylesheet -= FileServiceSavedStylesheet;
-            //FileService.DeletedStylesheet -= FileServiceDeletedStylesheet;
-
-            // bind to domain events
-            DomainService.Saved -= DomainServiceSaved;
-            DomainService.Deleted -= DomainServiceDeleted;
-
-            // bind to language events
-            LocalizationService.SavedLanguage -= LocalizationServiceSavedLanguage;
-            LocalizationService.DeletedLanguage -= LocalizationServiceDeletedLanguage;
-
-            // bind to content type events
-            ContentTypeService.Changed -= ContentTypeServiceChanged;
-            MediaTypeService.Changed -= ContentTypeServiceChanged;
-            MemberTypeService.Changed -= ContentTypeServiceChanged;
-
-            // bind to permission events
-            PermissionRepository<IContent>.AssignedPermissions -= PermissionRepositoryAssignedPermissions;
-
-            // bind to template events
-            FileService.SavedTemplate -= FileServiceSavedTemplate;
-            FileService.DeletedTemplate -= FileServiceDeletedTemplate;
-
-            // bind to macro events
-            MacroService.Saved -= MacroServiceSaved;
-            MacroService.Deleted -= MacroServiceDeleted;
-
-            // bind to member events
-            MemberService.Saved -= MemberServiceSaved;
-            MemberService.Deleted -= MemberServiceDeleted;
-            MemberGroupService.Saved -= MemberGroupServiceSaved;
-            MemberGroupService.Deleted -= MemberGroupServiceDeleted;
-
-            // bind to media events
-            MediaService.TreeChanged -= MediaServiceChanged; // handles all media changes
-
-            // bind to content events
-            ContentService.Saved -= ContentServiceSaved; // needed for permissions
-            ContentService.Copied -= ContentServiceCopied; // needed for permissions
-            ContentService.TreeChanged -= ContentServiceChanged; // handles all content changes
-
-            // bind to public access events
-            PublicAccessService.Saved -= PublicAccessServiceSaved;
-            PublicAccessService.Deleted -= PublicAccessServiceDeleted;
+            // and register unbinder for later, if needed
+            _unbinders?.Add(unbinder);
         }
+
+        // for tests
+        internal void Unbind()
+        {
+            if (_unbinders == null)
+                throw new NotSupportedException();
+            foreach (var unbinder in _unbinders)
+                unbinder();
+            _unbinders = null;
+        }
+
+        internal static MethodInfo FindHandler(IEventDefinition eventDefinition)
+        {
+            var name = eventDefinition.Sender.GetType().Name + "_" + eventDefinition.EventName;
+
+            return FoundHandlers.GetOrAdd(eventDefinition, _ => CandidateHandlers.Value.FirstOrDefault(x => x.Name == name));
+        }
+
+        private static readonly Lazy<MethodInfo[]> CandidateHandlers = new Lazy<MethodInfo[]>(() =>
+        {
+            var underscore = new[] { '_' };
+
+            return typeof(CacheRefresherComponent)
+                .GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                .Select(x =>
+                {
+                    if (x.Name.Contains("_") == false) return null;
+
+                    var parts = x.Name.Split(underscore, StringSplitOptions.RemoveEmptyEntries).Length;
+                    if (parts != 2) return null;
+
+                    var parameters = x.GetParameters();
+                    if (parameters.Length != 2) return null;
+                    if (typeof(EventArgs).IsAssignableFrom(parameters[1].ParameterType) == false) return null;
+                    return x;
+                })
+                .WhereNotNull()
+                .ToArray();
+        });
+
+        internal static void HandleEvents(IEnumerable<IEventDefinition> events)
+        {
+            foreach (var e in events)
+            {
+                var handler = FindHandler(e);
+                if (handler == null) continue;
+
+                handler.Invoke(null, new[] { e.Sender, e.Args });
+            }
+        }
+
+        #endregion
 
         #region PublicAccessService
 
-        static void PublicAccessServiceSaved(IPublicAccessService sender, SaveEventArgs<PublicAccessEntry> e)
+        private static void PublicAccessService_Saved(IPublicAccessService sender, SaveEventArgs<PublicAccessEntry> e)
         {
             DistributedCache.Instance.RefreshPublicAccess();
         }
 
-        private void PublicAccessServiceDeleted(IPublicAccessService sender, DeleteEventArgs<PublicAccessEntry> e)
+        private static void PublicAccessService_Deleted(IPublicAccessService sender, DeleteEventArgs<PublicAccessEntry> e)
         {
             DistributedCache.Instance.RefreshPublicAccess();
         }
@@ -199,7 +245,7 @@ namespace Umbraco.Web.Cache
         /// When an entity is copied new permissions may be assigned to it based on it's parent, if that is the
         /// case then we need to clear all user permissions cache.
         /// </remarks>
-        static void ContentServiceCopied(IContentService sender, CopyEventArgs<IContent> e)
+        private static void ContentService_Copied(IContentService sender, CopyEventArgs<IContent> e)
         {
             //check if permissions have changed
             var permissionsChanged = ((Content)e.Copy).WasPropertyDirty("PermissionsChanged");
@@ -221,22 +267,22 @@ namespace Umbraco.Web.Cache
         /// When an entity is created new permissions may be assigned to it based on it's parent, if that is the
         /// case then we need to clear all user permissions cache.
         /// </remarks>
-        static void ContentServiceSaved(IContentService sender, SaveEventArgs<IContent> e)
+        private static void ContentService_Saved(IContentService sender, SaveEventArgs<IContent> e)
         {
             var clearUserPermissions = false;
-            e.SavedEntities.ForEach(x =>
+            foreach (var entity in e.SavedEntities)
             {
                 //check if it is new
-                if (x.IsNewEntity())
+                if (entity.IsNewEntity())
                 {
                     //check if permissions have changed
-                    var permissionsChanged = ((Content)x).WasPropertyDirty("PermissionsChanged");
+                    var permissionsChanged = ((Content)entity).WasPropertyDirty("PermissionsChanged");
                     if (permissionsChanged)
                     {
                         clearUserPermissions = true;
                     }
                 }
-            });
+            }
 
             if (clearUserPermissions)
             {
@@ -244,7 +290,7 @@ namespace Umbraco.Web.Cache
             }
         }
 
-        private static void ContentServiceChanged(IContentService sender, TreeChange<IContent>.EventArgs args)
+        private static void ContentService_Changed(IContentService sender, TreeChange<IContent>.EventArgs args)
         {
             DistributedCache.Instance.RefreshContentCache(args.Changes.ToArray());
         }
@@ -253,29 +299,30 @@ namespace Umbraco.Web.Cache
 
         #region ApplicationTreeService
 
-        static void ApplicationTreeNew(ApplicationTree sender, EventArgs e)
+        private static void ApplicationTreeService_New(ApplicationTree sender, EventArgs e)
         {
             DistributedCache.Instance.RefreshAllApplicationTreeCache();
         }
 
-        static void ApplicationTreeUpdated(ApplicationTree sender, EventArgs e)
+        private static void ApplicationTreeService_Updated(ApplicationTree sender, EventArgs e)
         {
             DistributedCache.Instance.RefreshAllApplicationTreeCache();
         }
 
-        static void ApplicationTreeDeleted(ApplicationTree sender, EventArgs e)
+        private static void ApplicationTreeService_Deleted(ApplicationTree sender, EventArgs e)
         {
             DistributedCache.Instance.RefreshAllApplicationTreeCache();
         }
         #endregion
 
         #region Application event handlers
-        static void ApplicationNew(Section sender, EventArgs e)
+
+        private static void SectionService_New(Section sender, EventArgs e)
         {
             DistributedCache.Instance.RefreshAllApplicationCache();
         }
 
-        static void ApplicationDeleted(Section sender, EventArgs e)
+        private static void SectionService_Deleted(Section sender, EventArgs e)
         {
             DistributedCache.Instance.RefreshAllApplicationCache();
         }
@@ -284,68 +331,79 @@ namespace Umbraco.Web.Cache
 
         #region UserService / UserType
 
-        static void UserServiceDeletedUserType(IUserService sender, DeleteEventArgs<IUserType> e)
+        private static void UserService_DeletedUserType(IUserService sender, DeleteEventArgs<IUserType> e)
         {
-            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserTypeCache(x.Id));
+            foreach (var entity in e.DeletedEntities)
+                DistributedCache.Instance.RemoveUserTypeCache(entity.Id);
         }
 
-        static void UserServiceSavedUserType(IUserService sender, SaveEventArgs<IUserType> e)
+        private static void UserService_SavedUserType(IUserService sender, SaveEventArgs<IUserType> e)
         {
-            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshUserTypeCache(x.Id));
+            foreach (var entity in e.SavedEntities)
+                DistributedCache.Instance.RefreshUserTypeCache(entity.Id);
         }
 
         #endregion
 
         #region LocalizationService / Dictionary
 
-        static void LocalizationServiceSavedDictionaryItem(ILocalizationService sender, SaveEventArgs<IDictionaryItem> e)
+        private static void LocalizationService_SavedDictionaryItem(ILocalizationService sender, SaveEventArgs<IDictionaryItem> e)
         {
-            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshDictionaryCache(x.Id));
+            foreach (var entity in e.SavedEntities)
+                DistributedCache.Instance.RefreshDictionaryCache(entity.Id);
         }
 
-        static void LocalizationServiceDeletedDictionaryItem(ILocalizationService sender, DeleteEventArgs<IDictionaryItem> e)
+        private static void LocalizationService_DeletedDictionaryItem(ILocalizationService sender, DeleteEventArgs<IDictionaryItem> e)
         {
-            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveDictionaryCache(x.Id));
+            foreach (var entity in e.DeletedEntities)
+                DistributedCache.Instance.RemoveDictionaryCache(entity.Id);
         }
 
         #endregion
 
         #region DataTypeService
-        static void DataTypeServiceSaved(IDataTypeService sender, SaveEventArgs<IDataTypeDefinition> e)
+
+        private static void DataTypeService_Saved(IDataTypeService sender, SaveEventArgs<IDataTypeDefinition> e)
         {
-            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshDataTypeCache(x));
+            foreach (var entity in e.SavedEntities)
+                DistributedCache.Instance.RefreshDataTypeCache(entity);
         }
 
-        static void DataTypeServiceDeleted(IDataTypeService sender, DeleteEventArgs<IDataTypeDefinition> e)
+        private static void DataTypeService_Deleted(IDataTypeService sender, DeleteEventArgs<IDataTypeDefinition> e)
         {
-            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveDataTypeCache(x));
+            foreach (var entity in e.DeletedEntities)
+                DistributedCache.Instance.RemoveDataTypeCache(entity);
         }
 
         #endregion
 
         #region DomainService
 
-        static void DomainServiceSaved(IDomainService sender, SaveEventArgs<IDomain> e)
+        private static void DomainService_Saved(IDomainService sender, SaveEventArgs<IDomain> e)
         {
-            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshDomainCache(x));
+            foreach (var entity in e.SavedEntities)
+                DistributedCache.Instance.RefreshDomainCache(entity);
         }
 
-        static void DomainServiceDeleted(IDomainService sender, DeleteEventArgs<IDomain> e)
+        private static void DomainService_Deleted(IDomainService sender, DeleteEventArgs<IDomain> e)
         {
-            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveDomainCache(x));
+            foreach (var entity in e.DeletedEntities)
+                DistributedCache.Instance.RemoveDomainCache(entity);
         }
 
         #endregion
 
         #region LocalizationService / Language
+
         /// <summary>
         /// Fires when a langauge is deleted
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void LocalizationServiceDeletedLanguage(ILocalizationService sender, DeleteEventArgs<ILanguage> e)
+        private static void LocalizationService_DeletedLanguage(ILocalizationService sender, DeleteEventArgs<ILanguage> e)
         {
-            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveLanguageCache(x));
+            foreach (var entity in e.DeletedEntities)
+                DistributedCache.Instance.RemoveLanguageCache(entity);
         }
 
         /// <summary>
@@ -353,26 +411,27 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void LocalizationServiceSavedLanguage(ILocalizationService sender, SaveEventArgs<ILanguage> e)
+        private static void LocalizationService_SavedLanguage(ILocalizationService sender, SaveEventArgs<ILanguage> e)
         {
-            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshLanguageCache(x));
+            foreach (var entity in e.SavedEntities)
+                DistributedCache.Instance.RefreshLanguageCache(entity);
         }
 
         #endregion
 
         #region Content|Media|MemberTypeService
 
-        private void ContentTypeServiceChanged(IContentTypeService sender, ContentTypeChange<IContentType>.EventArgs args)
+        private static void ContentTypeService_Changed(IContentTypeService sender, ContentTypeChange<IContentType>.EventArgs args)
         {
             DistributedCache.Instance.RefreshContentTypeCache(args.Changes.ToArray());
         }
 
-        private void ContentTypeServiceChanged(IMediaTypeService sender, ContentTypeChange<IMediaType>.EventArgs args)
+        private static void ContentTypeService_Changed(IMediaTypeService sender, ContentTypeChange<IMediaType>.EventArgs args)
         {
             DistributedCache.Instance.RefreshContentTypeCache(args.Changes.ToArray());
         }
 
-        private void ContentTypeServiceChanged(IMemberTypeService sender, ContentTypeChange<IMemberType>.EventArgs args)
+        private static void ContentTypeService_Changed(IMemberTypeService sender, ContentTypeChange<IMemberType>.EventArgs args)
         {
             DistributedCache.Instance.RefreshContentTypeCache(args.Changes.ToArray());
         }
@@ -381,20 +440,23 @@ namespace Umbraco.Web.Cache
 
         #region UserService & PermissionRepository
 
-        static void PermissionRepositoryAssignedPermissions(PermissionRepository<IContent> sender, SaveEventArgs<EntityPermission> e)
+        private static void PermissionRepository_AssignedPermissions(PermissionRepository<IContent> sender, SaveEventArgs<EntityPermission> e)
         {
             var userIds = e.SavedEntities.Select(x => x.UserId).Distinct();
-            userIds.ForEach(x => DistributedCache.Instance.RefreshUserPermissionsCache(x));
+            foreach (var id in userIds)
+                DistributedCache.Instance.RefreshUserPermissionsCache(id);
         }
 
-        static void UserServiceSavedUser(IUserService sender, SaveEventArgs<IUser> e)
+        private static void UserService_SavedUser(IUserService sender, SaveEventArgs<IUser> e)
         {
-            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshUserCache(x.Id));
+            foreach (var entity in e.SavedEntities)
+                DistributedCache.Instance.RefreshUserCache(entity.Id);
         }
 
-        static void UserServiceDeletedUser(IUserService sender, DeleteEventArgs<IUser> e)
+        private static void UserService_DeletedUser(IUserService sender, DeleteEventArgs<IUser> e)
         {
-            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserCache(x.Id));
+            foreach (var entity in e.DeletedEntities)
+                DistributedCache.Instance.RemoveUserCache(entity.Id);
         }
 
         #endregion
@@ -406,9 +468,10 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void FileServiceDeletedTemplate(IFileService sender, DeleteEventArgs<ITemplate> e)
+        private static void FileService_DeletedTemplate(IFileService sender, DeleteEventArgs<ITemplate> e)
         {
-            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveTemplateCache(x.Id));
+            foreach (var entity in e.DeletedEntities)
+                DistributedCache.Instance.RemoveTemplateCache(entity.Id);
         }
 
         /// <summary>
@@ -416,36 +479,33 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void FileServiceSavedTemplate(IFileService sender, SaveEventArgs<ITemplate> e)
+        private static void FileService_SavedTemplate(IFileService sender, SaveEventArgs<ITemplate> e)
         {
-            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshTemplateCache(x.Id));
+            foreach (var entity in e.SavedEntities)
+                DistributedCache.Instance.RefreshTemplateCache(entity.Id);
         }
 
         #endregion
 
         #region MacroService
 
-        void MacroServiceDeleted(IMacroService sender, DeleteEventArgs<IMacro> e)
+        private static void MacroService_Deleted(IMacroService sender, DeleteEventArgs<IMacro> e)
         {
             foreach (var entity in e.DeletedEntities)
-            {
                 DistributedCache.Instance.RemoveMacroCache(entity);
-            }
         }
 
-        void MacroServiceSaved(IMacroService sender, SaveEventArgs<IMacro> e)
+        private static void MacroService_Saved(IMacroService sender, SaveEventArgs<IMacro> e)
         {
             foreach (var entity in e.SavedEntities)
-            {
                 DistributedCache.Instance.RefreshMacroCache(entity);
-            }
         }
 
         #endregion
 
         #region MediaService
 
-        private static void MediaServiceChanged(IMediaService sender, TreeChange<IMedia>.EventArgs args)
+        private static void MediaService_Changed(IMediaService sender, TreeChange<IMedia>.EventArgs args)
         {
             DistributedCache.Instance.RefreshMediaCache(args.Changes.ToArray());
         }
@@ -454,12 +514,12 @@ namespace Umbraco.Web.Cache
 
         #region MemberService
 
-        static void MemberServiceDeleted(IMemberService sender, DeleteEventArgs<IMember> e)
+        private static void MemberService_Deleted(IMemberService sender, DeleteEventArgs<IMember> e)
         {
             DistributedCache.Instance.RemoveMemberCache(e.DeletedEntities.ToArray());
         }
 
-        static void MemberServiceSaved(IMemberService sender, SaveEventArgs<IMember> e)
+        private static void MemberService_Saved(IMemberService sender, SaveEventArgs<IMember> e)
         {
             DistributedCache.Instance.RefreshMemberCache(e.SavedEntities.ToArray());
         }
@@ -468,7 +528,7 @@ namespace Umbraco.Web.Cache
 
         #region MemberGroupService
 
-        static void MemberGroupServiceDeleted(IMemberGroupService sender, DeleteEventArgs<IMemberGroup> e)
+        private static void MemberGroupService_Deleted(IMemberGroupService sender, DeleteEventArgs<IMemberGroup> e)
         {
             foreach (var m in e.DeletedEntities.ToArray())
             {
@@ -476,13 +536,31 @@ namespace Umbraco.Web.Cache
             }
         }
 
-        static void MemberGroupServiceSaved(IMemberGroupService sender, SaveEventArgs<IMemberGroup> e)
+        private static void MemberGroupService_Saved(IMemberGroupService sender, SaveEventArgs<IMemberGroup> e)
         {
             foreach (var m in e.SavedEntities.ToArray())
             {
                 DistributedCache.Instance.RemoveMemberGroupCache(m.Id);
             }
         }
+        #endregion
+
+        #region RelationType
+
+        private static void RelationService_SavedRelationType(IRelationService sender, SaveEventArgs<IRelationType> args)
+        {
+            var dc = DistributedCache.Instance;
+            foreach (var e in args.SavedEntities)
+                dc.RefreshRelationTypeCache(e.Id);
+        }
+
+        private static void RelationService_DeletedRelationType(IRelationService sender, DeleteEventArgs<IRelationType> args)
+        {
+            var dc = DistributedCache.Instance;
+            foreach (var e in args.DeletedEntities)
+                dc.RemoveRelationTypeCache(e.Id);
+        }
+        
         #endregion
     }
 }

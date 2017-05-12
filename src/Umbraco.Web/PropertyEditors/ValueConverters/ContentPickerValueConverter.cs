@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -10,38 +12,65 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     {
         private readonly IFacadeAccessor _facadeAccessor;
 
+        private static readonly List<string> PropertiesToExclude = new List<string>
+        {
+            Constants.Conventions.Content.InternalRedirectId.ToLower(CultureInfo.InvariantCulture),
+            Constants.Conventions.Content.Redirect.ToLower(CultureInfo.InvariantCulture)
+        };
+
         public ContentPickerValueConverter(IFacadeAccessor facadeAccessor)
         {
             _facadeAccessor = facadeAccessor;
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.ContentPickerAlias);
-        }
+            => propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.ContentPickerAlias)
+            || propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.ContentPicker2Alias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof (IPublishedContent);
-        }
+            => typeof (IPublishedContent);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-        {
-            return PropertyCacheLevel.Snapshot;
-        }
+            => PropertyCacheLevel.Snapshot;
 
         public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
 
-            int id;
-            return int.TryParse(source.ToString(), out id) ? id : -1;
+            var attemptConvertInt = source.TryConvertTo<int>();
+            if (attemptConvertInt.Success)
+                return attemptConvertInt.Result;
+            var attemptConvertUdi = source.TryConvertTo<Udi>();
+            if (attemptConvertUdi.Success)
+                return attemptConvertUdi.Result;
+            return null;
         }
 
         public override object ConvertInterToObject(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
-            var id = (int) inter;
-            return id < 0 ? null : _facadeAccessor.Facade.ContentCache.GetById(id);
+            if (inter == null)
+                return null;
+
+            if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.Contains(propertyType.PropertyTypeAlias.ToLower(CultureInfo.InvariantCulture))) == false)
+            {
+                IPublishedContent content;
+                if (inter is int)
+                {
+                    var id = (int) inter;
+                    content = _facadeAccessor.Facade.ContentCache.GetById(id);
+                    if (content != null)
+                        return content;
+                }
+                else
+                {
+                    var udi = inter as GuidUdi;
+                    content = _facadeAccessor.Facade.ContentCache.GetById(udi.Guid);
+                    if (content != null)
+                        return content;
+                }
+            }
+
+            return inter;
         }
 
         public override object ConvertInterToXPath(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)

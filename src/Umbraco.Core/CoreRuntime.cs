@@ -18,6 +18,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Plugins;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core
@@ -224,13 +225,12 @@ namespace Umbraco.Core
             // register database factory - required to check for migrations
             // will be initialized with syntax providers and a logger, and will try to configure
             // from the default connection string name, if possible, else will remain non-configured
-            // until the database context configures it properly (eg when installing)
+            // until properly configured (eg when installing)
             container.RegisterSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
 
-            // register a database accessor - required by database factory
-            // will be replaced by HybridUmbracoDatabaseAccessor in the web runtime
-            // fixme - we should NOT be using thread static at all + will NOT get replaced = wtf?
-            container.RegisterSingleton<IDatabaseScopeAccessor, ThreadStaticDatabaseScopeAccessor>();
+            // register the scope provider
+            container.RegisterSingleton<IScopeProviderInternal, ScopeProvider>();
+            container.RegisterSingleton<IScopeProvider>(f => f.GetInstance<IScopeProviderInternal>());
 
             // register MainDom
             container.RegisterSingleton<MainDom>();
@@ -342,7 +342,7 @@ namespace Umbraco.Core
                 var sql = databaseFactory.Sql()
                     .Select<MigrationDto>()
                     .From<MigrationDto>()
-                    .Where<MigrationDto>(x => x.Name.InvariantEquals(GlobalSettings.UmbracoMigrationName) && x.Version == codeVersionString);
+                    .Where<MigrationDto>(x => x.Name.InvariantEquals(Constants.System.UmbracoMigrationName) && x.Version == codeVersionString);
                 return database.FirstOrDefault<MigrationDto>(sql) != null;
             }
         }

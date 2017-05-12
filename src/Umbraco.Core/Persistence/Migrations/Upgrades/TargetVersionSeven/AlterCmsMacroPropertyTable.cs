@@ -8,6 +8,7 @@ using Umbraco.Core.Persistence.Migrations.Syntax.Execute;
 using Umbraco.Core.Persistence.Migrations.Syntax.Execute.Expressions;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 {
@@ -16,13 +17,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     /// needs to be changed to editorAlias, we'll do this by removing the constraint,changing the macroPropertyType to the new
     /// editorAlias column (and maintaing data so we can reference it)
     /// </summary>
-    [Migration("7.0.0", 6, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.0.0", 6, Constants.System.UmbracoMigrationName)]
     public class AlterCmsMacroPropertyTable : MigrationBase
     {
         public AlterCmsMacroPropertyTable(IMigrationContext context)
             : base(context)
         { }
-
 
         public override void Up()
         {
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 //If we are on SQLServer, we need to delete default constraints by name, older versions of umbraco did not name these default constraints
                 // consistently so we need to look up the constraint name to delete, this only pertains to SQL Server and this issue:
                 // http://issues.umbraco.org/issue/U4-4133
-                var sqlServerSyntaxProvider = new SqlServerSyntaxProvider(new Lazy<IUmbracoDatabaseFactory>(() => null));
+                var sqlServerSyntaxProvider = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null));
                 var defaultConstraints = sqlServerSyntaxProvider.GetDefaultConstraintsPerColumn(Context.Database).Distinct();
 
                 //lookup the constraint we want to delete, normally would be called "DF_cmsMacroProperty_macroPropertyHidden" but

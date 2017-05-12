@@ -12,36 +12,27 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class FileRepository<TId, TEntity> : DisposableObject, IUnitOfWorkRepository, IRepository<TId, TEntity> 
         where TEntity : IFile
     {
-        private IUnitOfWork _work;
-        private readonly IFileSystem _fileSystem;
-
         protected FileRepository(IUnitOfWork work, IFileSystem fileSystem)
         {
-            _work = work;
-            _fileSystem = fileSystem;
+            UnitOfWork = work;
+            FileSystem = fileSystem;
         }
 
         /// <summary>
         /// Returns the Unit of Work added to the repository
         /// </summary>
-        protected IUnitOfWork UnitOfWork
-        {
-            get { return _work; }
-        }
+        protected IUnitOfWork UnitOfWork { get; }
 
-        protected IFileSystem FileSystem
-        {
-            get { return _fileSystem; }
-        }
+        protected IFileSystem FileSystem { get; }
 
         public virtual void AddFolder(string folderPath)
         {
-            _work.RegisterCreated(new Folder(folderPath), this);
+            UnitOfWork.RegisterCreated(new Folder(folderPath), this);
         }
 
         public virtual void DeleteFolder(string folderPath)
         {
-            _work.RegisterDeleted(new Folder(folderPath), this);
+            UnitOfWork.RegisterDeleted(new Folder(folderPath), this);
         }
 
         #region Implementation of IRepository<TId,TEntity>
@@ -50,19 +41,19 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (FileSystem.FileExists(entity.OriginalPath) == false)
             {
-                _work.RegisterCreated(entity, this);
+                UnitOfWork.RegisterCreated(entity, this);
             }
             else
             {
-                _work.RegisterUpdated(entity, this);
+                UnitOfWork.RegisterUpdated(entity, this);
             }
         }
 
         public virtual void Delete(TEntity entity)
         {
-            if (_work != null)
+            if (UnitOfWork != null)
             {
-                _work.RegisterDeleted(entity, this);
+                UnitOfWork.RegisterDeleted(entity, this);
             }
         }
 
@@ -72,12 +63,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual bool Exists(TId id)
         {
-            return _fileSystem.FileExists(id.ToString());
-        }
-
-        public void SetUnitOfWork(IUnitOfWork work)
-        {
-            _work = work;
+            return FileSystem.FileExists(id.ToString());
         }
 
         #endregion
@@ -121,12 +107,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         internal virtual void PersistNewFolder(Folder entity)
         {
-            _fileSystem.CreateFolder(entity.Path);
+            FileSystem.CreateFolder(entity.Path);
         }
 
         internal virtual void PersistDeletedFolder(Folder entity)
         {
-            _fileSystem.DeleteDirectory(entity.Path);
+            FileSystem.DeleteDirectory(entity.Path);
         }
 
         #region Abstract IUnitOfWorkRepository Methods
@@ -170,9 +156,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected virtual void PersistDeletedItem(TEntity entity)
         {
-            if (_fileSystem.FileExists(entity.Path))
+            if (FileSystem.FileExists(entity.Path))
             {
-                _fileSystem.DeleteFile(entity.Path);
+                FileSystem.DeleteFile(entity.Path);
             }
         }
 
@@ -234,15 +220,31 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-		/// <summary>
-		/// Dispose any disposable properties
-		/// </summary>
-		/// <remarks>
-		/// Dispose the unit of work
-		/// </remarks>
-		protected override void DisposeResources()
+        public long GetFileSize(string filename)
+        {
+            if (FileSystem.FileExists(filename) == false)
+                return -1;
+
+            try
+            {
+                return FileSystem.GetSize(filename);
+            }
+            catch
+            {
+                return -1; // deal with race conds
+            }
+        }
+
+        /// <summary>
+        /// Dispose any disposable properties
+        /// </summary>
+        /// <remarks>
+        /// Dispose the unit of work
+        /// </remarks>
+        protected override void DisposeResources()
 		{
-			_work.DisposeIfDisposable();
+            // fixme - wtf in v8?
+			UnitOfWork.DisposeIfDisposable();
 		}
     }
 }

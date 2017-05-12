@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Data.Common;
 using Moq;
 using NPoco;
 using NUnit.Framework;
@@ -15,6 +13,7 @@ using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Index;
 using Umbraco.Core.Persistence.Migrations.Syntax.Expressions;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.SyntaxProvider
@@ -22,7 +21,6 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
     [TestFixture]
     public class SqlCeSyntaxProviderTests : BaseUsingSqlCeSyntax
     {
-
         [Test]
         public void Can_Generate_Delete_SubQuery_Statement()
         {
@@ -75,7 +73,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         [Test]
         public void Format_SqlServer_NonClusteredIndexDefinition_AddsNonClusteredDirective()
         {
-            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IUmbracoDatabaseFactory>(() => null));
+            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null));
             
             var indexDefinition = CreateIndexDefinition();
             indexDefinition.IndexType = IndexTypes.NonClustered;
@@ -87,7 +85,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         [Test]
         public void Format_SqlServer_NonClusteredIndexDefinition_UsingIsClusteredFalse_AddsClusteredDirective()
         {
-            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IUmbracoDatabaseFactory>(() => null));
+            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null));
 
             var indexDefinition = CreateIndexDefinition();
             indexDefinition.IsClustered = false;
@@ -99,7 +97,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         [Test]
         public void CreateIndexBuilder_SqlServer_NonClustered_CreatesNonClusteredIndex()
         {
-            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IUmbracoDatabaseFactory>(() => null));
+            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null));
             var logger = Mock.Of<ILogger>();
             var db = TestObjects.GetUmbracoSqlServerDatabase(logger);
             var context = new MigrationContext(db, logger);
@@ -115,7 +113,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         [Test]
         public void CreateIndexBuilder_SqlServer_Unique_CreatesUniqueNonClusteredIndex()
         {
-            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IUmbracoDatabaseFactory>(() => null));
+            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null));
             var logger = Mock.Of<ILogger>();
             var db = TestObjects.GetUmbracoSqlServerDatabase(logger);
             var context = new MigrationContext(db, logger);
@@ -129,9 +127,25 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         }
 
         [Test]
+        public void CreateIndexBuilder_SqlServer_Unique_CreatesUniqueNonClusteredIndex_Multi_Columnn()
+        {
+            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null));
+            var logger = Mock.Of<ILogger>();
+            var db = TestObjects.GetUmbracoSqlServerDatabase(logger);
+            var context = new MigrationContext(db, logger);
+            var createExpression = new CreateIndexExpression(context, new[] { DatabaseType.SqlServer2005 })
+            {
+                Index = { Name = "IX_AB" }
+            };
+            var builder = new CreateIndexBuilder(createExpression);
+            builder.OnTable("TheTable").OnColumn("A").Ascending().OnColumn("B").Ascending().WithOptions().Unique();
+            Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_AB] ON [TheTable] ([A],[B])", createExpression.ToString());
+        }
+
+        [Test]
         public void CreateIndexBuilder_SqlServer_Clustered_CreatesClusteredIndex()
         {
-            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IUmbracoDatabaseFactory>(() => null));
+            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null));
             var logger = Mock.Of<ILogger>();
             var db = TestObjects.GetUmbracoSqlServerDatabase(logger);
             var context = new MigrationContext(db, logger);

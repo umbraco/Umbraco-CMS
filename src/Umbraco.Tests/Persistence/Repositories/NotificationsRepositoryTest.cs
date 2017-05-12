@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CreateNotification()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new NotificationsRepository(unitOfWork);
@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetUserNotifications()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
 
@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetEntityNotifications()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
 
@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Delete_By_Entity()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
 
@@ -132,7 +132,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Delete_By_User()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
 

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Mvc;
@@ -15,17 +16,17 @@ namespace Umbraco.Web.Scheduling
     {
         private readonly IRuntimeState _runtime;
         private readonly IUserService _userService;
-        private readonly IUmbracoDatabaseFactory _databaseFactory;
+        private readonly IScopeProvider _scopeProvider;
         private readonly ILogger _logger;
         private readonly ProfilingLogger _proflog;
 
         public ScheduledPublishing(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IUserService userService, IUmbracoDatabaseFactory databaseFactory, ILogger logger, ProfilingLogger proflog)
+            IRuntimeState runtime, IUserService userService, IScopeProvider scopeProvider, ILogger logger, ProfilingLogger proflog)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
             _userService = userService;
-            _databaseFactory = databaseFactory;
+            _scopeProvider = scopeProvider;
             _logger = logger;
             _proflog = proflog;
         }
@@ -83,12 +84,14 @@ namespace Umbraco.Web.Scheduling
                             Content = new StringContent(string.Empty)
                         };
 
-                        // running on a background task, requires a database scope
+                        // running on a background task, requires its own (safe) scope
                         // (GetAuthenticationHeaderValue uses UserService to load the current user, hence requires a database)
-                        using (_databaseFactory.CreateScope())
+                        // (might not need a scope but we don't know really)
+                        using (var scope = _scopeProvider.CreateScope())
                         {
                             //pass custom the authorization header
-                        request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_userService);
+                            request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_userService);
+                            scope.Complete();
                         }
 
                         var result = await wc.SendAsync(request, token);

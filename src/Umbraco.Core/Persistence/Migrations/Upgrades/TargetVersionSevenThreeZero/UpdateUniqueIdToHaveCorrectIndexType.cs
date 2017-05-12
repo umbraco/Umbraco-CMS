@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
 {
     //see: http://issues.umbraco.org/issue/U4-6188, http://issues.umbraco.org/issue/U4-6187
 
-    [Migration("7.3.0", 5, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.3.0", 5, Constants.System.UmbracoMigrationName)]
     public class UpdateUniqueIdToHaveCorrectIndexType : MigrationBase
     {
         public UpdateUniqueIdToHaveCorrectIndexType(IMigrationContext context)

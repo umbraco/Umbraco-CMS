@@ -30,7 +30,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Callback required to get count for GetAllCacheValidateCount
         /// </summary>
-        public Func<int> PerformCount { get; private set; }
+        public Func<int> PerformCount { get; set; }
 
         /// <summary>
         /// True/false as to validate the total item count when all items are returned from cache, the default is true but this
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Cache
         /// setting this to return false will improve performance of GetAll cache with no params but should only be used
         /// for specific circumstances
         /// </remarks>
-        public bool GetAllCacheValidateCount { get; private set; }
+        public bool GetAllCacheValidateCount { get; set; }
 
         /// <summary>
         /// True if the GetAll method will cache that there are zero results so that the db is not hit when there are no results found

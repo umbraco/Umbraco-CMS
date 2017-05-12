@@ -353,7 +353,6 @@ namespace umbraco.presentation.developer.packages
             //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.
             ClientTools.ClearClientTreeCache().RefreshTree("packager");
             TreeDefinitionCollection.Instance.ReRegisterTrees();
-            BizLogicAction.ReRegisterActionsAndHandlers();
         }
 
         //this accepts the package, creates the manifest and then installs the files.

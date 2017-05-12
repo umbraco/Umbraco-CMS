@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Web;
 using Umbraco.Core.Configuration;
 
@@ -11,57 +7,39 @@ namespace Umbraco.Core.IO
 {
     public class SystemFiles
     {
-        public static string CreateUiXml
-        {
-            get
-            {
-                return SystemDirectories.Umbraco + "/config/create/UI.xml";
-            }
-        }
+        public static string CreateUiXml => SystemDirectories.Umbraco + "/config/create/UI.xml";
 
-        public static string TinyMceConfig
-        {
-            get
-            {
-                return SystemDirectories.Config + "/tinyMceConfig.config";
-            }
-        }
+        public static string TinyMceConfig => SystemDirectories.Config + "/tinyMceConfig.config";
 
-        public static string DashboardConfig
-        {
-            get
-            {
-                return SystemDirectories.Config + "/dashboard.config";
-            }
-        }
+        public static string DashboardConfig => SystemDirectories.Config + "/dashboard.config";
 
-        public static string NotFoundhandlersConfig
-        {
-            get
-            {
-                return SystemDirectories.Config + "/404handlers.config";
-            }
-        }
+        public static string NotFoundhandlersConfig => SystemDirectories.Config + "/404handlers.config";
 
-        public static string FeedProxyConfig
-        {
-            get
-            {
-                return string.Concat(SystemDirectories.Config, "/feedProxy.config");
-            }
-        }
+        public static string FeedProxyConfig => string.Concat(SystemDirectories.Config, "/feedProxy.config");
 
+        // fixme - kill
         public static string ContentCacheXml
         {
             get
             {
-                if (GlobalSettings.ContentCacheXmlStoredInCodeGen && SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
+                switch (GlobalSettings.ContentCacheXmlStorageLocation)
                 {
-                    return Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco.config");
+                    case ContentXmlStorage.AspNetTemp:
+                        return Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco.config");
+                    case ContentXmlStorage.EnvironmentTemp:
+                        var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
+                        var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoXml",
+                            //include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                            // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
+                            // utilizing an old path
+                            appDomainHash);
+                        return Path.Combine(cachePath, "umbraco.config");
+                    case ContentXmlStorage.Default:
+                        return IOHelper.ReturnPath("umbracoContentXML", "~/App_Data/umbraco.config");
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
-                return IOHelper.ReturnPath("umbracoContentXML", "~/App_Data/umbraco.config");
             }
-        }
-        
+        }        
     }
 }

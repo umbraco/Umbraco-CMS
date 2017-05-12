@@ -23,11 +23,11 @@ namespace Umbraco.Web.Dictionary
     /// The ILocalizationService is the service used for interacting with this data from the database which isn't all that fast 
     /// (even though there is caching involved, if there's lots of dictionary items the caching is not great)
     /// </remarks>
-	public class DefaultCultureDictionary : Umbraco.Core.Dictionary.ICultureDictionary
+	public class DefaultCultureDictionary : Core.Dictionary.ICultureDictionary
 	{
 	    private readonly ILocalizationService _localizationService;
         private readonly ICacheProvider _requestCacheProvider;
-        private readonly CultureInfo _specificCulture = null;
+        private readonly CultureInfo _specificCulture;
 
 	    public DefaultCultureDictionary()
             : this(Current.Services.LocalizationService, Current.ApplicationCache.RequestCache)
@@ -37,27 +37,21 @@ namespace Umbraco.Web.Dictionary
 
 	    public DefaultCultureDictionary(ILocalizationService localizationService, ICacheProvider requestCacheProvider)
 	    {
-	        if (localizationService == null) throw new ArgumentNullException("localizationService");
-	        if (requestCacheProvider == null) throw new ArgumentNullException("requestCacheProvider");
-	        _localizationService = localizationService;
-	        _requestCacheProvider = requestCacheProvider;
+	        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+	        _requestCacheProvider = requestCacheProvider ?? throw new ArgumentNullException(nameof(requestCacheProvider));
 	    }
 
         public DefaultCultureDictionary(CultureInfo specificCulture)
             : this(Current.Services.LocalizationService, Current.ApplicationCache.RequestCache)
         {
-            if (specificCulture == null) throw new ArgumentNullException("specificCulture");
-            _specificCulture = specificCulture;
+            _specificCulture = specificCulture ?? throw new ArgumentNullException(nameof(specificCulture));
         }
 
         public DefaultCultureDictionary(CultureInfo specificCulture, ILocalizationService localizationService, ICacheProvider requestCacheProvider)
         {
-            if (specificCulture == null) throw new ArgumentNullException("specificCulture");
-            if (localizationService == null) throw new ArgumentNullException("localizationService");
-            if (requestCacheProvider == null) throw new ArgumentNullException("requestCacheProvider");
-            _localizationService = localizationService;
-            _requestCacheProvider = requestCacheProvider;
-            _specificCulture = specificCulture;
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+            _requestCacheProvider = requestCacheProvider ?? throw new ArgumentNullException(nameof(requestCacheProvider));
+            _specificCulture = specificCulture ?? throw new ArgumentNullException(nameof(specificCulture));
         }
 
 	    /// <summary>
@@ -88,12 +82,9 @@ namespace Umbraco.Web.Dictionary
 		/// <summary>
 		/// Returns the current culture
 		/// </summary>
-		public CultureInfo Culture
-		{
-		    get { return _specificCulture ?? System.Threading.Thread.CurrentThread.CurrentUICulture; }
-		}
+		public CultureInfo Culture => _specificCulture ?? System.Threading.Thread.CurrentThread.CurrentUICulture;
 
-        /// <summary>
+	    /// <summary>
         /// Returns the child dictionary entries for a given key
         /// </summary>
         /// <param name="key"></param>
@@ -137,10 +128,9 @@ namespace Umbraco.Web.Dictionary
             {
                 //ensure it's stored/retrieved from request cache
                 //NOTE: This is no longer necessary since these are cached at the runtime level, but we can leave it here for now.
-                return _requestCacheProvider.GetCacheItem<ILanguage>(typeof (DefaultCultureDictionary).Name + "Culture",
+                return _requestCacheProvider.GetCacheItem<ILanguage>(typeof (DefaultCultureDictionary).Name + "Culture" + Culture.Name,
                     () => _localizationService.GetLanguageByIsoCode(Culture.Name));
             }
 		}
 	}
-
 }

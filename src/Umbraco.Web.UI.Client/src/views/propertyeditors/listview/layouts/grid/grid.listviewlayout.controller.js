@@ -37,7 +37,8 @@
       function activate() {
           vm.itemsWithoutFolders = filterOutFolders($scope.items);
 
-          if($scope.entityType === 'media') {
+          //no need to make another REST/DB call if this data is not used when we are browsing the bin
+          if ($scope.entityType === 'media' && !vm.isRecycleBin) {
             mediaTypeHelper.getAllowedImagetypes(vm.nodeId).then(function (types) {
                 vm.acceptedMediatypes = types;
             });

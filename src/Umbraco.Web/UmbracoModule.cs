@@ -83,10 +83,7 @@ namespace Umbraco.Web
 			// write the trace output for diagnostics at the end of the request
 			httpContext.Trace.Write("UmbracoModule", "Umbraco request begins");
 
-            // process
-
-            // create the database scope which will be disposed with http context
-		    var scope = DatabaseFactory.CreateScope();
+            // ok, process
 
             // create the LegacyRequestInitializer
             // and initialize legacy stuff
@@ -345,7 +342,7 @@ namespace Umbraco.Web
             logger.Debug<UmbracoModule>("Response status: Redirect={0}, Is404={1}, StatusCode={2}",
                 () => pcr.IsRedirect ? (pcr.IsRedirectPermanent ? "permanent" : "redirect") : "none",
                 () => pcr.Is404 ? "true" : "false", () => pcr.ResponseStatusCode);
-            
+
             if(pcr.Cacheability != default(HttpCacheability))
                 response.Cache.SetCacheability(pcr.Cacheability);
 
@@ -506,7 +503,7 @@ namespace Umbraco.Web
             if (Core.DI.Current.RuntimeState.Level == RuntimeLevel.BootFailed)
             {
                 // there's nothing we can do really
-                app.BeginRequest += (sender, args) => { throw new BootFailedException("Boot failed. Umbraco cannot run. Umbraco's log file contains details about what caused the boot to fail."); };
+                app.BeginRequest += (sender, args) => throw new BootFailedException("Boot failed. Umbraco cannot run. Umbraco's log file contains details about what caused the boot to fail.");
                 return;
             }
 

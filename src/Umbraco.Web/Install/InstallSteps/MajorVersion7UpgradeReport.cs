@@ -4,23 +4,28 @@ using System.Linq;
 using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Install.Models;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep(InstallationType.Upgrade,
-        "MajorVersion7UpgradeReport", 1, "")]
+    [InstallSetupStep(InstallationType.Upgrade, "MajorVersion7UpgradeReport", 1, "")]
     internal class MajorVersion7UpgradeReport : InstallSetupStep<object>
     {
         private readonly DatabaseBuilder _databaseBuilder;
+        private readonly IDatabaseContext _databaseContext;
+        private readonly IScopeProvider _scopeProvider;
         private readonly IRuntimeState _runtime;
 
-        public MajorVersion7UpgradeReport(DatabaseBuilder databaseBuilder, IRuntimeState runtime)
+        public MajorVersion7UpgradeReport(DatabaseBuilder databaseBuilder, IRuntimeState runtime, IDatabaseContext databaseContext, IScopeProvider scopeProvider)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
+            _databaseContext = databaseContext;
+            _scopeProvider = scopeProvider;
         }
 
         public override InstallSetupResult Execute(object model)
@@ -81,7 +86,7 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             var errorReport = new List<string>();
 
-            var sqlSyntax = _databaseBuilder.SqlSyntax;
+            var sqlSyntax = _databaseContext.SqlSyntax;
 
             var sql = new Sql();
             sql
@@ -94,7 +99,12 @@ namespace Umbraco.Web.Install.InstallSteps
                     sqlSyntax.GetQuotedColumn("cmsDataType", "nodeId") + " = " +
                     sqlSyntax.GetQuotedColumn("umbracoNode", "id"));
 
-            var list = _databaseBuilder.Database.Fetch<dynamic>(sql);
+            List<dynamic> list;
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                list = scope.Database.Fetch<dynamic>(sql);
+                scope.Complete();
+            }
             foreach (var item in list)
             {
                 Guid legacyId = item.controlId;

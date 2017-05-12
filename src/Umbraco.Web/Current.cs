@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models.PublishedContent;
@@ -13,6 +14,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
@@ -230,7 +232,11 @@ namespace Umbraco.Web
 
         public static ServiceContext Services => CoreCurrent.Services;
 
-        public static IUmbracoDatabaseFactory DatabaseFactory => CoreCurrent.DatabaseFactory;
+        public static IScopeProvider ScopeProvider => CoreCurrent.ScopeProvider;
+
+        public static FileSystems FileSystems => CoreCurrent.FileSystems;
+
+        public static IDatabaseContext DatabaseContext => CoreCurrent.DatabaseContext;
 
         #endregion
     }

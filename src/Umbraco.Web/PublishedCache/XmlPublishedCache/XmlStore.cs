@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using NPoco;
@@ -18,6 +17,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
@@ -52,7 +52,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly RoutesCache _routesCache;
         private readonly ServiceContext _serviceContext; // fixme WHY
-        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
+        private readonly IScopeUnitOfWorkProvider _uowProvider;
+        private readonly IScopeProviderInternal _scopeProvider;
 
         #region Constructors
 
@@ -60,15 +61,15 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// Initializes a new instance of the <see cref="XmlStore"/> class.
         /// </summary>
         /// <remarks>The default constructor will boot the cache, load data from file or database, /// wire events in order to manage changes, etc.</remarks>
-        public XmlStore(ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
+        public XmlStore(ServiceContext serviceContext, IScopeProviderInternal scopeProvider, IScopeUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders, IFacadeAccessor facadeAccessor, MainDom mainDom)
-            : this(serviceContext, uowProvider, routesCache, contentTypeCache, segmentProviders, facadeAccessor, mainDom, false, false)
+            : this(serviceContext, scopeProvider, uowProvider, routesCache, contentTypeCache, segmentProviders, facadeAccessor, mainDom, false, false)
         { }
 
         // internal for unit tests
         // no file nor db, no config check
         // fixme - er, we DO have a DB?
-        internal XmlStore(ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
+        internal XmlStore(ServiceContext serviceContext, IScopeProviderInternal scopeProvider, IScopeUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders, IFacadeAccessor facadeAccessor, MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
         {
@@ -76,6 +77,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 EnsureConfigurationIsValid();
 
             _serviceContext = serviceContext;
+            _scopeProvider = scopeProvider;
             _uowProvider = uowProvider;
             _routesCache = routesCache;
             _contentTypeCache = contentTypeCache;
@@ -111,9 +113,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // no events, no file nor db, no config check
         internal XmlStore(Func<XmlDocument> getXmlDocument)
         {
-            if (getXmlDocument == null)
-                throw new ArgumentNullException(nameof(getXmlDocument));
-            GetXmlDocument = getXmlDocument;
+            GetXmlDocument = getXmlDocument ?? throw new ArgumentNullException(nameof(getXmlDocument));
             _xmlFileEnabled = false;
 
             // do not plug events, we may not have what it takes to handle them
@@ -162,7 +162,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             if (registered == false)
                 runner.Shutdown(false, true);
 
-            _released = (registered == false);
+            _released = registered == false;
         }
 
         private void Initialize(bool testing, bool enableRepositoryEvents)
@@ -236,13 +236,17 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             if (_xml != null) return;
 
             // and populate the cache
-            using (var safeXml = GetSafeXmlWriter(false))
+            using (var safeXml = GetSafeXmlWriter())
             {
                 if (_xml != null) return; // double-check
 
-                bool registerXmlChange;
-                LoadXmlLocked(safeXml, out registerXmlChange);
-                safeXml.Commit(registerXmlChange);
+                // if we don't use the file then LoadXmlLocked will not even
+                // read from the file and will go straight to database
+                LoadXmlLocked(safeXml, out bool registerXmlChange);
+
+                // if we use the file and registerXmlChange is true this will
+                // write to file, else it will not
+                safeXml.AcceptChanges(registerXmlChange);
             }
         }
 
@@ -343,11 +347,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 return;
 
             _persisterTask = _persisterTask?.Touch();
-        }
-
-        private static XmlDocument Clone(XmlDocument xmlDoc)
-        {
-            return (XmlDocument) xmlDoc?.CloneNode(true);
         }
 
         private static XmlDocument EnsureSchema(string contentTypeAlias, XmlDocument xml)
@@ -455,8 +454,8 @@ AND (umbracoNode.id=@id)";
                 var xmlDtos = uow.Database.Query<XmlDto>(sql,
                     new
                     {
-                        @nodeObjectType = new Guid(Constants.ObjectTypes.Media),
-                        @id = mediaId
+                        nodeObjectType = new Guid(Constants.ObjectTypes.Media),
+                        id = mediaId
                     });
                 xmlDto = xmlDtos.FirstOrDefault();
                 uow.Complete();
@@ -487,8 +486,8 @@ AND (umbracoNode.id=@id)";
                 var xmlDtos = uow.Database.Query<XmlDto>(sql,
                     new
                     {
-                        @nodeObjectType = new Guid(Constants.ObjectTypes.Member),
-                        @id = memberId
+                        nodeObjectType = new Guid(Constants.ObjectTypes.Member),
+                        id = memberId
                     });
                 xmlDto = xmlDtos.FirstOrDefault();
                 uow.Complete();
@@ -518,8 +517,8 @@ AND (umbracoNode.id=@id)";
                 var xmlDtos = uow.Database.Query<XmlDto>(sql,
                     new
                     {
-                        @nodeObjectType = new Guid(Constants.ObjectTypes.Document),
-                        @id = contentId
+                        nodeObjectType = new Guid(Constants.ObjectTypes.Document),
+                        id = contentId
                     });
                 xmlDto = xmlDtos.FirstOrDefault();
                 uow.Complete();
@@ -573,8 +572,8 @@ AND (umbracoNode.id=@id)";
                 var xmlDtos = uow.Database.Query<XmlDto>(sql,
                     new
                     {
-                        @nodeObjectType = new Guid(Constants.ObjectTypes.Document),
-                        @path = content.Path,
+                        nodeObjectType = new Guid(Constants.ObjectTypes.Document),
+                        path = content.Path,
                     });
 
                 foreach (var xmlDto in xmlDtos)
@@ -595,101 +594,34 @@ AND (umbracoNode.id=@id)";
         // NOTE
         // - this is NOT a reader/writer lock and each lock is exclusive
         // - these locks are NOT reentrant / recursive
+        //
+        // should we have async versions that would do: ?
+        // var releaser = await _xmlLock.LockAsync();
+        //
+        // fixme - not sure about the "resync current facade" thing here, see 7.6...
 
         // gets a locked safe read access to the main xml
         private SafeXmlReaderWriter GetSafeXmlReader()
         {
-            var releaser = _xmlLock.Lock();
-            return SafeXmlReaderWriter.GetReader(this, releaser);
-        }
-
-        // gets a locked safe read accses to the main xml
-        private async Task<SafeXmlReaderWriter> GetSafeXmlReaderAsync()
-        {
-            var releaser = await _xmlLock.LockAsync();
-            return SafeXmlReaderWriter.GetReader(this, releaser);
+            return SafeXmlReaderWriter.Get(_scopeProvider, _xmlLock, _xmlDocument,
+                _ => ResyncCurrentFacade(),
+                (xml, registerXmlChange) =>
+                {
+                    SetXmlLocked(xml, registerXmlChange);
+                    ResyncCurrentFacade();
+                }, false);
         }
 
         // gets a locked safe write access to the main xml (cloned)
-        private SafeXmlReaderWriter GetSafeXmlWriter(bool auto = true)
+        private SafeXmlReaderWriter GetSafeXmlWriter()
         {
-            var releaser = _xmlLock.Lock();
-            return SafeXmlReaderWriter.GetWriter(this, releaser, auto);
-        }
-
-        private class SafeXmlReaderWriter : IDisposable
-        {
-            private readonly XmlStore _store;
-            private IDisposable _releaser;
-            private bool _isWriter;
-            private bool _auto;
-            private bool _committed;
-            private XmlDocument _xml;
-
-            private SafeXmlReaderWriter(XmlStore store, IDisposable releaser, bool isWriter, bool auto)
-            {
-                _store = store;
-                _releaser = releaser;
-                _isWriter = isWriter;
-                _auto = auto;
-
-                // cloning for writer is not an option anymore (see XmlIsImmutable)
-                _xml = _isWriter ? Clone(store._xml) : store._xml;
-            }
-
-            public static SafeXmlReaderWriter GetReader(XmlStore store, IDisposable releaser)
-            {
-                return new SafeXmlReaderWriter(store, releaser, false, false);
-            }
-
-            public static SafeXmlReaderWriter GetWriter(XmlStore store, IDisposable releaser, bool auto)
-            {
-                return new SafeXmlReaderWriter(store, releaser, true, auto);
-            }
-
-            public void UpgradeToWriter(bool auto)
-            {
-                if (_isWriter)
-                    throw new InvalidOperationException("Already writing.");
-                _isWriter = true;
-                _auto = auto;
-                _xml = Clone(_xml); // cloning for writer is not an option anymore (see XmlIsImmutable)
-            }
-
-            public XmlDocument Xml
-            {
-                get
+            return SafeXmlReaderWriter.Get(_scopeProvider, _xmlLock, _xmlDocument,
+                _ => ResyncCurrentFacade(),
+                (xml, registerXmlChange) =>
                 {
-                    return _xml;
-                }
-                set
-                {
-                    if (_isWriter == false)
-                        throw new InvalidOperationException("Not writing.");
-                    _xml = value;
-                }
-            }
-
-            // registerXmlChange indicates whether to do what should be done when Xml changes,
-            // that is, to request that the file be written to disk - something we don't want
-            // to do if we're committing Xml precisely after we've read from disk!
-            public void Commit(bool registerXmlChange = true)
-            {
-                if (_isWriter == false)
-                    throw new InvalidOperationException("Not writing.");
-                _store.SetXmlLocked(_xml, registerXmlChange);
-                _committed = true;
-            }
-
-            public void Dispose()
-            {
-                if (_releaser == null)
-                    return;
-                if (_isWriter && _auto && _committed == false)
-                    Commit();
-                _releaser.Dispose();
-                _releaser = null;
-            }
+                    SetXmlLocked(xml, registerXmlChange);
+                    ResyncCurrentFacade();
+                }, true);
         }
 
         private const string ChildNodesXPath = "./* [@id]";
@@ -811,7 +743,7 @@ AND (umbracoNode.id=@id)";
             }
         }
 
-        private string SaveXmlToString(XmlDocument xml)
+        private static string SaveXmlToString(XmlDocument xml)
         {
             // using that one method because we want to have proper indent
             // and in addition, writing async is never fully async because
@@ -865,7 +797,15 @@ AND (umbracoNode.id=@id)";
             catch (Exception e)
             {
                 Current.Logger.Error<XmlStore>("Failed to load Xml from file.", e);
-                DeleteXmlFile();
+                try
+                {
+                    DeleteXmlFile();
+                }
+                catch
+                {
+                    // don't make it worse: could be that we failed to read because we cannot
+                    // access the file, in which case we won't be able to delete it either
+                }
                 return null;
             }
         }
@@ -892,11 +832,10 @@ AND (umbracoNode.id=@id)";
 
             // time to read
 
-            using (var safeXml = GetSafeXmlWriter(false))
+            using (var safeXml = GetSafeXmlWriter())
             {
-                bool registerXmlChange;
-                LoadXmlLocked(safeXml, out registerXmlChange); // updates _lastFileRead
-                safeXml.Commit(registerXmlChange);
+                LoadXmlLocked(safeXml, out bool registerXmlChange); // updates _lastFileRead
+                safeXml.AcceptChanges(registerXmlChange);
             }
         }
 
@@ -904,7 +843,7 @@ AND (umbracoNode.id=@id)";
 
         #region Database
 
-        const string ReadTreeCmsContentXmlSql = @"SELECT
+        private const string ReadTreeCmsContentXmlSql = @"SELECT
     umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, umbracoNode.level, umbracoNode.path,
     cmsContentXml.xml, cmsContentXml.rv, cmsDocument.published
 FROM umbracoNode
@@ -913,7 +852,7 @@ JOIN cmsDocument ON (cmsDocument.nodeId=umbracoNode.id)
 WHERE umbracoNode.nodeObjectType = @nodeObjectType AND cmsDocument.published=1
 ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
-        const string ReadBranchCmsContentXmlSql = @"SELECT
+        private const string ReadBranchCmsContentXmlSql = @"SELECT
     umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, umbracoNode.level, umbracoNode.path,
     cmsContentXml.xml, cmsContentXml.rv, cmsDocument.published
 FROM umbracoNode
@@ -922,7 +861,7 @@ JOIN cmsDocument ON (cmsDocument.nodeId=umbracoNode.id)
 WHERE umbracoNode.nodeObjectType = @nodeObjectType AND cmsDocument.published=1 AND (umbracoNode.id = @id OR umbracoNode.path LIKE @path)
 ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
-        const string ReadCmsContentXmlForContentTypesSql = @"SELECT
+        private const string ReadCmsContentXmlForContentTypesSql = @"SELECT
     umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, umbracoNode.level, umbracoNode.path,
     cmsContentXml.xml, cmsContentXml.rv, cmsDocument.published
 FROM umbracoNode
@@ -932,7 +871,7 @@ JOIN cmsContent ON (cmsDocument.nodeId=cmsContent.nodeId)
 WHERE umbracoNode.nodeObjectType = @nodeObjectType AND cmsDocument.published=1 AND cmsContent.contentType IN (@ids)
 ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
-        const string ReadMoreCmsContentXmlSql = @"SELECT
+        private const string ReadMoreCmsContentXmlSql = @"SELECT
     umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, umbracoNode.level, umbracoNode.path,
     cmsContentXml.xml, cmsContentXml.rv, 1 AS published
 FROM umbracoNode
@@ -948,7 +887,8 @@ JOIN cmsPreviewXml ON (cmsPreviewXml.nodeId=umbracoNode.id)
 JOIN cmsDocument ON (cmsDocument.nodeId=umbracoNode.id)
 WHERE umbracoNode.nodeObjectType = @nodeObjectType AND cmsDocument.newest=1
 AND (umbracoNode.path=@path OR"; // @path LIKE concat(umbracoNode.path, ',%')";
-        const string ReadCmsPreviewXmlSql2 = @")
+
+        private const string ReadCmsPreviewXmlSql2 = @")
 ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         // ReSharper disable once ClassNeverInstantiated.Local
@@ -987,7 +927,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
                 // get xml
                 var xmlDtos = uow.Database.Query<XmlDto>(ReadTreeCmsContentXmlSql,
-                    new { @nodeObjectType = new Guid(Constants.ObjectTypes.Document) });
+                    new { nodeObjectType = new Guid(Constants.ObjectTypes.Document) });
 
                 foreach (var xmlDto in xmlDtos)
                 {
@@ -1073,6 +1013,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             using (var safeXml = GetSafeXmlWriter())
             {
                 LoadXmlTreeFromDatabaseLocked(safeXml);
+                safeXml.AcceptChanges();
             }
         }
 
@@ -1094,7 +1035,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 return;
 
             // process all changes on one xml clone
-            using (var safeXml = GetSafeXmlWriter(false)) // not auto-commit
+            using (var safeXml = GetSafeXmlWriter())
             {
                 foreach (var payload in payloads)
                 {
@@ -1154,9 +1095,9 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                         var xmlDtos = uow.Database.Query<XmlDto>(ReadBranchCmsContentXmlSql,
                             new
                             {
-                                @nodeObjectType = new Guid(Constants.ObjectTypes.Document),
-                                @path = content.Path + ",%",
-                                @id = content.Id
+                                nodeObjectType = new Guid(Constants.ObjectTypes.Document),
+                                path = content.Path + ",%",
+                                id = content.Id
                             });
 
                         // 'using' the enumerator ensures that the enumeration is properly terminated even if abandonned
@@ -1260,7 +1201,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
                 if (publishedChanged)
                 {
-                    safeXml.Commit(); // not auto!
+                    safeXml.AcceptChanges();
                     ResyncCurrentFacade();
                 }
             }
@@ -1336,7 +1277,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var xmlDtos = uow.Database.Query<XmlDto>(ReadCmsContentXmlForContentTypesSql,
-                    new { @nodeObjectType = new Guid(Constants.ObjectTypes.Document), /*@ids =*/ ids });
+                    new { nodeObjectType = new Guid(Constants.ObjectTypes.Document), /*@ids =*/ ids });
 
                 foreach (var xmlDto in xmlDtos)
                 {
@@ -1345,6 +1286,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 }
 
                 uow.Complete();
+                safeXml.AcceptChanges();
             }
         }
 
@@ -1533,22 +1475,22 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         // it is not the case at the moment, instead a global lock is used whenever content is modified - well,
         // almost: rollback or unpublish do not implement it - nevertheless
 
-        private void OnContentRemovingEntity(ContentRepository sender, ContentRepository.UnitOfWorkEntityEventArgs args)
+        private static void OnContentRemovingEntity(ContentRepository sender, ContentRepository.UnitOfWorkEntityEventArgs args)
         {
             OnRemovedEntity(args.UnitOfWork.Database, args.Entity);
         }
 
-        private void OnMediaRemovingEntity(MediaRepository sender, MediaRepository.UnitOfWorkEntityEventArgs args)
+        private static void OnMediaRemovingEntity(MediaRepository sender, MediaRepository.UnitOfWorkEntityEventArgs args)
         {
             OnRemovedEntity(args.UnitOfWork.Database, args.Entity);
         }
 
-        private void OnMemberRemovingEntity(MemberRepository sender, MemberRepository.UnitOfWorkEntityEventArgs args)
+        private static void OnMemberRemovingEntity(MemberRepository sender, MemberRepository.UnitOfWorkEntityEventArgs args)
         {
             OnRemovedEntity(args.UnitOfWork.Database, args.Entity);
         }
 
-        private void OnRemovedEntity(IUmbracoDatabase db, IContentBase item)
+        private static void OnRemovedEntity(IUmbracoDatabase db, IContentBase item)
         {
             var parms = new { id = item.Id };
             db.Execute("DELETE FROM cmsContentXml WHERE nodeId=@id", parms);
@@ -1557,22 +1499,22 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             // note: could be optimized by using "WHERE nodeId IN (...)" delete clauses
         }
 
-        private void OnContentRemovingVersion(ContentRepository sender, ContentRepository.UnitOfWorkVersionEventArgs args)
+        private static void OnContentRemovingVersion(ContentRepository sender, ContentRepository.UnitOfWorkVersionEventArgs args)
         {
             OnRemovedVersion(args.UnitOfWork.Database, args.EntityId, args.VersionId);
         }
 
-        private void OnMediaRemovingVersion(MediaRepository sender, MediaRepository.UnitOfWorkVersionEventArgs args)
+        private static void OnMediaRemovingVersion(MediaRepository sender, MediaRepository.UnitOfWorkVersionEventArgs args)
         {
             OnRemovedVersion(args.UnitOfWork.Database, args.EntityId, args.VersionId);
         }
 
-        private void OnMemberRemovingVersion(MemberRepository sender, MemberRepository.UnitOfWorkVersionEventArgs args)
+        private static void OnMemberRemovingVersion(MemberRepository sender, MemberRepository.UnitOfWorkVersionEventArgs args)
         {
             OnRemovedVersion(args.UnitOfWork.Database, args.EntityId, args.VersionId);
         }
 
-        private void OnRemovedVersion(IUmbracoDatabase db, int entityId, Guid versionId)
+        private static void OnRemovedVersion(IUmbracoDatabase db, int entityId, Guid versionId)
         {
             // we do not version cmsPreviewXml anymore - nothing to do here
         }
@@ -1668,7 +1610,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             OnRepositoryRefreshed(db, dto1);
         }
 
-        private void OnRepositoryRefreshed(IUmbracoDatabase db, ContentXmlDto dto)
+        private static void OnRepositoryRefreshed(IUmbracoDatabase db, ContentXmlDto dto)
         {
             // use a custom SQL to update row version on each update
             //db.InsertOrUpdate(dto);
@@ -1682,7 +1624,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 });
         }
 
-        private void OnRepositoryRefreshed(IUmbracoDatabase db, PreviewXmlDto dto)
+        private static void OnRepositoryRefreshed(IUmbracoDatabase db, PreviewXmlDto dto)
         {
             // cannot simply update because of PetaPoco handling of the composite key ;-(
             // read http://stackoverflow.com/questions/11169144/how-to-modify-petapoco-class-to-work-with-composite-key-comprising-of-non-numeri
@@ -1704,7 +1646,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 });
         }
 
-        private void OnDeletedContent(object sender, Content.ContentDeleteEventArgs args)
+        private static void OnDeletedContent(object sender, Content.ContentDeleteEventArgs args)
         {
             var db = args.Database;
             var parms = new { @nodeId = args.Id };
@@ -1747,26 +1689,34 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
 
+            // RepositoryCacheMode.Scoped because we do NOT want to use the L2 cache that may be out-of-sync
+            // hopefully this does not cause issues and we're not nested in another scope w/different mode
+            //
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                ((ContentRepository) repository).SetNoCachePolicy();
                 RebuildContentXmlLocked(uow, repository, groupSize, contentTypeIdsA);
                 RebuildPreviewXmlLocked(uow, repository, groupSize, contentTypeIdsA);
                 uow.Complete();
+                scope.Complete();
             }
         }
 
         public void RebuildContentXml(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
+            // RepositoryCacheMode.Scoped because we do NOT want to use the L2 cache that may be out-of-sync
+            // hopefully this does not cause issues and we're not nested in another scope w/different mode
+            //
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                ((ContentRepository) repository).SetNoCachePolicy();
                 RebuildContentXmlLocked(uow, repository, groupSize, contentTypeIds);
                 uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -1812,7 +1762,7 @@ WHERE cmsContentXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = _uowProvider.DatabaseFactory.Query<IContent>().Where(x => x.Published);
+            var query = _uowProvider.DatabaseContext.Query<IContent>().Where(x => x.Published);
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1832,13 +1782,17 @@ WHERE cmsContentXml.nodeId IN (
 
         public void RebuildPreviewXml(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
+            // RepositoryCacheMode.Scoped because we do NOT want to use the L2 cache that may be out-of-sync
+            // hopefully this does not cause issues and we're not nested in another scope w/different mode
+            //
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                ((ContentRepository) repository).SetNoCachePolicy();
                 RebuildPreviewXmlLocked(uow, repository, groupSize, contentTypeIds);
                 uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -1884,7 +1838,7 @@ WHERE cmsPreviewXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = _uowProvider.DatabaseFactory.Query<IContent>();
+            var query = _uowProvider.DatabaseContext.Query<IContent>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1908,13 +1862,17 @@ WHERE cmsPreviewXml.nodeId IN (
 
         public void RebuildMediaXml(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
+            // RepositoryCacheMode.Scoped because we do NOT want to use the L2 cache that may be out-of-sync
+            // hopefully this does not cause issues and we're not nested in another scope w/different mode
+            //
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.MediaTree);
                 var repository = uow.CreateRepository<IMediaRepository>();
-                ((MediaRepository) repository).SetNoCachePolicy();
                 RebuildMediaXmlLocked(uow, repository, groupSize, contentTypeIds);
                 uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -1960,7 +1918,7 @@ WHERE cmsContentXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = _uowProvider.DatabaseFactory.Query<IMedia>();
+            var query = _uowProvider.DatabaseContext.Query<IMedia>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1978,13 +1936,17 @@ WHERE cmsContentXml.nodeId IN (
 
         public void RebuildMemberXml(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
+            // RepositoryCacheMode.Scoped because we do NOT want to use the L2 cache that may be out-of-sync
+            // hopefully this does not cause issues and we're not nested in another scope w/different mode
+            //
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
-                ((MemberRepository) repository).SetNoCachePolicy();
                 RebuildMemberXmlLocked(uow, repository, groupSize, contentTypeIds);
                 uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -2030,7 +1992,7 @@ WHERE cmsContentXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = _uowProvider.DatabaseFactory.Query<IMember>();
+            var query = _uowProvider.DatabaseContext.Query<IMember>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -2058,7 +2020,7 @@ WHERE cmsContentXml.nodeId IN (
         }
 
         // assumes content tree lock
-        private bool VerifyContentAndPreviewXmlLocked(IDatabaseUnitOfWork unitOfWork)
+        private static bool VerifyContentAndPreviewXmlLocked(IDatabaseUnitOfWork unitOfWork)
         {
             // every published content item should have a corresponding row in cmsContentXml
             // every content item should have a corresponding row in cmsPreviewXml
@@ -2104,6 +2066,7 @@ AND cmsPreviewXml.nodeId IS NULL OR cmsPreviewXml.xml NOT LIKE '% key=""'
         {
             // every non-trashed media item should have a corresponding row in cmsContentXml
             // and that row should have the key="..." attribute
+            // fixme - where's the trashed test here?
 
             var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
             var db = unitOfWork.Database;

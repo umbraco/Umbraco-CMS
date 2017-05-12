@@ -1,12 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Semver;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -15,12 +11,11 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Manages migration entries in the database
     /// </summary>
-    public sealed class MigrationEntryService : RepositoryService, IMigrationEntryService
+    public sealed class MigrationEntryService : ScopeRepositoryService, IMigrationEntryService
     {
-        public MigrationEntryService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        public MigrationEntryService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, logger, eventMessagesFactory)
-        {
-        }
+        { }
 
         /// <summary>
         /// Creates a migration entry, will throw an exception if it already exists
@@ -54,12 +49,10 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IMigrationEntry FindEntry(string migrationName, SemVersion version)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repo = uow.CreateRepository<IMigrationEntryRepository>();
-                var entry = repo.FindEntry(migrationName, version);
-                uow.Complete();
-                return entry;
+                return repo.FindEntry(migrationName, version);
             }
         }
 
@@ -70,14 +63,12 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<IMigrationEntry> GetAll(string migrationName)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repo = uow.CreateRepository<IMigrationEntryRepository>();
                 var query = repo.QueryT
                     .Where(x => x.MigrationName.ToUpper() == migrationName.ToUpper());
-                var entries = repo.GetByQuery(query);
-                uow.Complete();
-                return entries;
+                return repo.GetByQuery(query);
             }
         }
 

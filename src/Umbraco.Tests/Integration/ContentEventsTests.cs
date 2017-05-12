@@ -30,8 +30,8 @@ namespace Umbraco.Tests.Integration
         {
             base.SetUp();
 
-            _h1 = new CacheRefresherComponent();
-            _h1.AddHandlers();
+            _h1 = new CacheRefresherComponent(true);
+            _h1.Initialize();
 
             _events = new List<EventInstance>();
 
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Integration
         {
             base.TearDown();
 
-            _h1.RemoveHandlers();
+            _h1.Unbind();
 
             // clear ALL events
 

@@ -457,14 +457,13 @@ namespace Umbraco.Core.Models
             return content.Properties
                           .Where(property => propertyGroup.PropertyTypes
                                                           .Select(propertyType => propertyType.Id)
-                                                          .Contains(property.PropertyTypeId))
-                          .OrderBy(x => x.PropertyType.SortOrder);
+                                                          .Contains(property.PropertyTypeId));
         }
 
         /// <summary>
         /// Set property values by alias with an annonymous object
         /// </summary>
-        public static void PropertyValues(this IContent content, object value)
+        public static void PropertyValues(this IContentBase content, object value)
         {
             if (value == null)
                 throw new Exception("No properties has been passed in");
@@ -520,7 +519,7 @@ namespace Umbraco.Core.Models
         /// <param name="value">The uploaded <see cref="HttpPostedFileBase"/>.</param>
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value)
         {
-            // ensure we get the filename without the path in IE in intranet mode 
+            // ensure we get the filename without the path in IE in intranet mode
             // http://stackoverflow.com/questions/382464/httppostedfile-filename-different-from-ie
             var filename = value.FileName;
             var pos = filename.LastIndexOf(@"\", StringComparison.InvariantCulture);
@@ -532,7 +531,7 @@ namespace Umbraco.Core.Models
             if (pos > 0)
                 filename = filename.Substring(pos + 1);
 
-            // get a safe filename - should this be done by MediaHelper?
+            // get a safe & clean filename
             filename = IOHelper.SafeFileName(filename);
             if (string.IsNullOrWhiteSpace(filename)) return;
             filename = filename.ToLower(); // fixme - er... why?
@@ -578,7 +577,7 @@ namespace Umbraco.Core.Models
         {
             if (filename == null || filestream == null) return;
 
-            // get a safe filename - should this be done by MediaHelper?
+            // get a safe & clean filename
             filename = IOHelper.SafeFileName(filename);
             if (string.IsNullOrWhiteSpace(filename)) return;
             filename = filename.ToLower(); // fixme - er... why?

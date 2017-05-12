@@ -76,7 +76,7 @@ namespace Umbraco.Web.UI.JavaScript {
         ///    &apos;lib/angular/angular-ui-sortable.js&apos;,
         ///
         ///    &apos;lib/angular-dynamic-locale/tmhDynamicLocale.min.js&apos;,
-        ///    &apos;lib/ng-file-upload/ng-file-upload. [rest of string was truncated]&quot;;.
+        ///    &apos;lib/ng-file-upload/ng-file-upload.min. [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string JsInitialize {
             get {

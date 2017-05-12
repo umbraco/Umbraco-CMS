@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web.Security;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Routing
@@ -57,8 +60,8 @@ namespace Umbraco.Web.Routing
                     parent = parent.ParentId > 0 ? parent.Parent(ContentService) : null;
                 }
                 while (parent != null && parent.Published);
-                
-                urls.Add(parent == null 
+
+                urls.Add(parent == null
                     ? TextService.Localize("content/parentNotPublishedAnomaly") // oops - internal error
                     : TextService.Localize("content/parentNotPublished", new[] { parent.Name }));
             }
@@ -66,34 +69,46 @@ namespace Umbraco.Web.Routing
             {
                 urls.Add(TextService.Localize("content/getUrlException"));
             }
-            else if (url.StartsWith("#err-"))
+            else
             {
-                // route error, report
-                var id = int.Parse(url.Substring(5));
-                var o = umbracoContext.ContentCache.GetById(id);
-                string s;
-                if (o == null)
+                // test for collisions
+                var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
+                if (uri.IsAbsoluteUri == false) uri = uri.MakeAbsolute(UmbracoContext.Current.CleanedUmbracoUrl);
+                var r = Core.DI.Current.Container.GetInstance<FacadeRouter>(); // fixme inject or ?
+                var pcr = r.CreateRequest(UmbracoContext.Current, uri);
+                r.TryRouteRequest(pcr);
+
+                if (pcr.HasPublishedContent == false)
                 {
-                    s = "(unknown)";
+                    urls.Add(TextService.Localize("content/routeError", new[] { "(error)" }));
+                }
+                else if (pcr.PublishedContent.Id != content.Id)
+                {
+                    var o = pcr.PublishedContent;
+                    string s;
+                    if (o == null)
+                    {
+                        s = "(unknown)";
+                    }
+                    else
+                    {
+                        var l = new List<string>();
+                        while (o != null)
+                        {
+                            l.Add(o.Name);
+                            o = o.Parent;
+                        }
+                        l.Reverse();
+                        s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent.Id + ")";
+
+                    }
+                    urls.Add(TextService.Localize("content/routeError", s));
                 }
                 else
                 {
-                    var l = new List<string>();
-                    while (o != null)
-                    {
-                        l.Add(o.Name);
-                        o = o.Parent;
-                    }
-                    l.Reverse();
-                    s = "/" + string.Join("/", l) + " (id=" + id + ")";
-
+                    urls.Add(url);
+                    urls.AddRange(urlProvider.GetOtherUrls(content.Id));
                 }
-                urls.Add(TextService.Localize("content/routeError", s));
-            }
-            else
-            {
-                urls.Add(url);
-                urls.AddRange(urlProvider.GetOtherUrls(content.Id));
             }
             return urls;
         }

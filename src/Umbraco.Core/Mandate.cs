@@ -8,6 +8,7 @@ namespace Umbraco.Core
 	/// <summary>
 	/// Helper class for mandating values, for example on method parameters.
 	/// </summary>
+	[Obsolete]
 	public static class Mandate
 	{
 		/// <summary>

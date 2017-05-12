@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web.Models.Trees;
 
@@ -12,29 +10,21 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Settings, Constants.Trees.PartialViews, "Partial Views", sortOrder: 2)]
     public class PartialViewsTreeController : FileSystemTreeController
     {
-        protected override string FilePath
-        {
-            get { return SystemDirectories.MvcViews + "/Partials/"; }
-        }
+        protected override IFileSystem FileSystem => Current.FileSystems.PartialViewsFileSystem;
 
-        protected override IEnumerable<string> FileSearchPattern
-        {
-            get { return new[] {"cshtml"}; }
-        }
+        private static readonly string[] ExtensionsStatic = { "cshtml" };
 
-        protected override string EditFormUrl
-        {
-            get { return "Settings/Views/EditView.aspx?treeType=partialViews&file={0}"; }
-        }
+        protected override string[] Extensions => ExtensionsStatic;
 
-        protected override bool EnableCreateOnFolder
-        {
-            get { return true; }
-        }
+        protected override string FileIcon => "icon-article";
 
-        protected override void OnRenderFileNode(TreeNode treeNode, FileInfo file)
+        protected override void OnRenderFolderNode(ref TreeNode treeNode)
         {
+            //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
+            treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
             treeNode.Icon = "icon-article";
         }
+
+        protected override bool EnableCreateOnFolder => true;
     }
 }

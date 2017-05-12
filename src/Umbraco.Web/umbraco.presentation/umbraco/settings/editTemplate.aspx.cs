@@ -10,6 +10,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.template;
 using umbraco.uicontrols;
+using Umbraco.Web;
 using Umbraco.Web.UI.Pages;
 
 namespace umbraco.cms.presentation.settings
@@ -217,12 +218,14 @@ namespace umbraco.cms.presentation.settings
 
 		public string DoesMacroHaveSettings(string macroId)
 		{
-			if (
-                DatabaseFactory.Database.ExecuteScalar<int>(string.Format("select 1 from cmsMacroProperty where macro = {0}", macroId)) ==
-				    1)
-				    return "1";
-			    else
-				    return "0";
+		    int val;
+		    using (var scope = Current.ScopeProvider.CreateScope())
+		    {
+		        val = scope.Database.ExecuteScalar<int>("select 1 from cmsMacroProperty where macro = @macroId", new { macroId });
+		        scope.Complete();
+		    }
+
+		    return val == 1 ? "1" : "0";
 		}
 
 		/// <summary>

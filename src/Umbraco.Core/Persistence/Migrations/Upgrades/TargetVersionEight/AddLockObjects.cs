@@ -5,7 +5,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
 {
-    [Migration("8.0.0", 101, GlobalSettings.UmbracoMigrationName)]
+    [Migration("8.0.0", 101, Constants.System.UmbracoMigrationName)]
     public class AddLockObjects : MigrationBase
     {
         public AddLockObjects(IMigrationContext context)

@@ -19,6 +19,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Web.Cache;
@@ -36,7 +37,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
     class FacadeService : FacadeServiceBase
     {
         private readonly ServiceContext _serviceContext;
-        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
+        private readonly IScopeProvider _scopeProvider;
+        private readonly IScopeUnitOfWorkProvider _uowProvider;
         private readonly Database _dataSource;
         private readonly ILogger _logger;
         private readonly Options _options;
@@ -75,7 +77,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         //private static int _singletonCheck;
 
-        public FacadeService(Options options, MainDom mainDom, IRuntimeState runtime, ServiceContext serviceContext, IDatabaseUnitOfWorkProvider uowProvider, IFacadeAccessor facadeAccessor, ILogger logger)
+        public FacadeService(Options options, MainDom mainDom, IRuntimeState runtime, ServiceContext serviceContext, IScopeUnitOfWorkProvider uowProvider, IFacadeAccessor facadeAccessor, ILogger logger, IScopeProvider scopeProvider)
             : base(facadeAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -85,6 +87,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _uowProvider = uowProvider;
             _dataSource = new Database();
             _logger = logger;
+            _scopeProvider = scopeProvider;
             _options = options;
 
             // we always want to handle repository events, configured or not
@@ -1180,11 +1183,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public void RebuildContentDbCache(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 RebuildContentDbCacheLocked(uow, groupSize, contentTypeIds);
                 uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -1221,8 +1226,7 @@ WHERE cmsContentNu.nodeId IN (
 
             // insert back - if anything fails the transaction will rollback
             var repository = uow.CreateRepository<IContentRepository>();
-            ((ContentRepository) repository).SetNoCachePolicy();
-            var query = _uowProvider.DatabaseFactory.Query<IContent>();
+            var query = _uowProvider.DatabaseContext.Query<IContent>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1250,11 +1254,13 @@ WHERE cmsContentNu.nodeId IN (
 
         public void RebuildMediaDbCache(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.ReadLock(Constants.Locks.MediaTree);
                 RebuildMediaDbCacheLocked(uow, groupSize, contentTypeIds);
                 uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -1291,8 +1297,7 @@ WHERE cmsContentNu.nodeId IN (
 
             // insert back - if anything fails the transaction will rollback
             var repository = uow.CreateRepository<IMediaRepository>();
-            ((MediaRepository)repository).SetNoCachePolicy();
-            var query = _uowProvider.DatabaseFactory.Query<IMedia>();
+            var query = _uowProvider.DatabaseContext.Query<IMedia>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1310,11 +1315,13 @@ WHERE cmsContentNu.nodeId IN (
 
         public void RebuildMemberDbCache(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.ReadLock(Constants.Locks.MemberTree);
                 RebuildMemberDbCacheLocked(uow, groupSize, contentTypeIds);
                 uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -1351,8 +1358,7 @@ WHERE cmsContentNu.nodeId IN (
 
             // insert back - if anything fails the transaction will rollback
             var repository = uow.CreateRepository<IMemberRepository>();
-            ((MemberRepository)repository).SetNoCachePolicy();
-            var query = _uowProvider.DatabaseFactory.Query<IMember>();
+            var query = _uowProvider.DatabaseContext.Query<IMember>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 

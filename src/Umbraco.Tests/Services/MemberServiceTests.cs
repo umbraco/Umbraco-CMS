@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.DI;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -149,7 +151,7 @@ namespace Umbraco.Tests.Services
             IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             ServiceContext.MemberService.Save(member);
 
-            ServiceContext.MemberService.AddRole("MyTestRole1");            
+            ServiceContext.MemberService.AddRole("MyTestRole1");
             ServiceContext.MemberService.AssignRoles(new[] { member.Id }, new[] { "MyTestRole1", "MyTestRole2" });
 
             Assert.Throws<InvalidOperationException>(() => ServiceContext.MemberService.DeleteRole("MyTestRole1", true));
@@ -159,7 +161,12 @@ namespace Umbraco.Tests.Services
         public void Can_Get_Members_In_Role()
         {
             ServiceContext.MemberService.AddRole("MyTestRole1");
-            var roleId = DatabaseFactory.Database.ExecuteScalar<int>("SELECT id from umbracoNode where [text] = 'MyTestRole1'");
+            int roleId;
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                roleId = scope.Database.ExecuteScalar<int>("SELECT id from umbracoNode where [text] = 'MyTestRole1'");
+                scope.Complete();
+            }
 
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
             ServiceContext.MemberTypeService.Save(memberType);
@@ -168,11 +175,27 @@ namespace Umbraco.Tests.Services
             var member2 = MockedMember.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
             ServiceContext.MemberService.Save(member2);
 
-            DatabaseFactory.Database.Insert(new Member2MemberGroupDto {MemberGroup = roleId, Member = member1.Id});
-            DatabaseFactory.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member2.Id });
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                scope.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member1.Id });
+                scope.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member2.Id });
+                scope.Complete();
+            }
 
             var membersInRole = ServiceContext.MemberService.GetMembersInRole("MyTestRole1");
             Assert.AreEqual(2, membersInRole.Count());
+        }
+
+        [Test]
+        public void Cannot_Save_Member_With_Empty_Name()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, string.Empty, "test@test.com", "pass", "test");
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => ServiceContext.MemberService.Save(member));
+
         }
 
         [TestCase("MyTestRole1", "test1", StringPropertyMatchType.StartsWith, 1)]
@@ -209,6 +232,10 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(member1);
             var member2 = MockedMember.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
             ServiceContext.MemberService.Save(member2);
+
+            // temp make sure they exist
+            Assert.IsNotNull(ServiceContext.MemberService.GetById(member1.Id));
+            Assert.IsNotNull(ServiceContext.MemberService.GetById(member2.Id));
 
             ServiceContext.MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "MyTestRole1" });
 
@@ -337,8 +364,12 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberTypeService.Save(memberType);
             IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             ServiceContext.MemberService.Save(member);
-
-            var xml = DatabaseFactory.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = member.Id });
+            ContentXmlDto xml;
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                xml = scope.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = member.Id });
+                scope.Complete();
+            }
             Assert.IsNotNull(xml);
         }
 
@@ -474,13 +505,36 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Get_All_Paged_Members_With_Filter()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10);
+            ServiceContext.MemberService.Save(members);
+
+            long totalRecs;
+            var found = ServiceContext.MemberService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, true, null, "Member No-");
+
+            Assert.AreEqual(2, found.Count());
+            Assert.AreEqual(10, totalRecs);
+            Assert.AreEqual("test0", found.First().Username);
+            Assert.AreEqual("test1", found.Last().Username);
+
+            found = ServiceContext.MemberService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, true, null, "Member No-5");
+
+            Assert.AreEqual(1, found.Count());
+            Assert.AreEqual(1, totalRecs);
+            Assert.AreEqual("test5", found.First().Username);
+        }
+
+        [Test]
         public void Find_By_Name_Starts_With()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
             ServiceContext.MemberTypeService.Save(memberType);
             var members = MockedMember.CreateSimpleMember(memberType, 10);
             ServiceContext.MemberService.Save(members);
-            
+
             var customMember = MockedMember.CreateSimpleMember(memberType, "Bob", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
@@ -632,7 +686,7 @@ namespace Umbraco.Tests.Services
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
             ServiceContext.MemberTypeService.Save(memberType);
             var members = MockedMember.CreateSimpleMember(memberType, 10);
-            ServiceContext.MemberService.Save(members);            
+            ServiceContext.MemberService.Save(members);
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
@@ -648,7 +702,7 @@ namespace Umbraco.Tests.Services
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
             ServiceContext.MemberTypeService.Save(memberType);
             var members = MockedMember.CreateSimpleMember(memberType, 10);
-            ServiceContext.MemberService.Save(members);            
+            ServiceContext.MemberService.Save(members);
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
@@ -904,7 +958,7 @@ namespace Umbraco.Tests.Services
             var found = ServiceContext.MemberService.GetMembersByPropertyValue(
                 "date", new DateTime(2013, 12, 20, 1, 5, 0), ValuePropertyMatchType.LessThan);
 
-            Assert.AreEqual(6, found.Count());            
+            Assert.AreEqual(6, found.Count());
         }
 
         [Test]
@@ -934,7 +988,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Count_All_Members()
         {
-            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();            
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
             ServiceContext.MemberTypeService.Save(memberType);
             var members = MockedMember.CreateSimpleMember(memberType, 10);
             ServiceContext.MemberService.Save(members);
@@ -949,7 +1003,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Count_All_Online_Members()
         {
-            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();            
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
             ServiceContext.MemberTypeService.Save(memberType);
             var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.LastLoginDate = DateTime.Now.AddMinutes(i * -2));
             ServiceContext.MemberService.Save(members);
@@ -1000,7 +1054,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Setting_Property_On_Built_In_Member_Property_When_Property_Doesnt_Exist_On_Type_Is_Ok()
         {
-            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();            
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
             ServiceContext.MemberTypeService.Save(memberType);
             memberType.RemovePropertyType(Constants.Conventions.Member.Comments);
             ServiceContext.MemberTypeService.Save(memberType);
@@ -1018,7 +1072,7 @@ namespace Umbraco.Tests.Services
 
         /// <summary>
         /// Because we are forcing some of the built-ins to be Labels which have an underlying db type as nvarchar but we need
-        /// to ensure that the dates/int get saved to the correct column anyways. 
+        /// to ensure that the dates/int get saved to the correct column anyways.
         /// </summary>
         [Test]
         public void Setting_DateTime_Property_On_Built_In_Member_Property_Saves_To_Correct_Column()
@@ -1027,23 +1081,28 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberTypeService.Save(memberType);
             var member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "test", "test");
             var date = DateTime.Now;
-            member.LastLoginDate = DateTime.Now;            
+            member.LastLoginDate = DateTime.Now;
             ServiceContext.MemberService.Save(member);
 
             var result = ServiceContext.MemberService.GetById(member.Id);
             Assert.AreEqual(
-                date.TruncateTo(DateTimeExtensions.DateTruncate.Second), 
+                date.TruncateTo(DateTimeExtensions.DateTruncate.Second),
                 result.LastLoginDate.TruncateTo(DateTimeExtensions.DateTruncate.Second));
 
             //now ensure the col is correct
-            var sql = DatabaseFactory.Sql().Select("cmsPropertyData.*")
+            var sql = Current.DatabaseContext.Sql().Select("cmsPropertyData.*")
                 .From<PropertyDataDto>()
                 .InnerJoin<PropertyTypeDto>()
                 .On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
                 .Where<PropertyDataDto>(dto => dto.NodeId == member.Id)
                 .Where<PropertyTypeDto>(dto => dto.Alias == Constants.Conventions.Member.LastLoginDate);
-            
-            var colResult = DatabaseFactory.Database.Fetch<PropertyDataDto>(sql);
+
+            List<PropertyDataDto> colResult;
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                colResult = scope.Database.Fetch<PropertyDataDto>(sql);
+                scope.Complete();
+            }
 
             Assert.AreEqual(1, colResult.Count);
             Assert.IsTrue(colResult.First().Date.HasValue);

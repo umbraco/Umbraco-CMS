@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Umbraco.Core.Models.Editors
 {
@@ -16,6 +12,10 @@ namespace Umbraco.Core.Models.Editors
     /// </remarks>
     public class ContentPropertyData
     {
+        public ContentPropertyData(object value, PreValueCollection preValues)
+            : this(value, preValues, new Dictionary<string, object>())
+        { }
+
         public ContentPropertyData(object value, PreValueCollection preValues, IDictionary<string, object> additionalData)
         {
             Value = value;
@@ -26,14 +26,17 @@ namespace Umbraco.Core.Models.Editors
         /// <summary>
         /// The value submitted for the property
         /// </summary>
-        public object Value { get; private set; }
+        public object Value { get; }
 
-        public PreValueCollection PreValues { get; private set; }
+        /// <summary>
+        /// The pre-value collection for the content property
+        /// </summary>
+        public PreValueCollection PreValues { get; }
 
         /// <summary>
         /// A dictionary containing any additional objects that are related to this property when saving
         /// </summary>
-        public ReadOnlyDictionary<string, object> AdditionalData { get; private set; }
-        
+        public ReadOnlyDictionary<string, object> AdditionalData { get; }
+
     }
 }

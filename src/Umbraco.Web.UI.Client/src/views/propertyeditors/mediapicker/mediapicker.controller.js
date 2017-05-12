@@ -40,7 +40,13 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                             }
 
                             $scope.images.push(media);
-                            $scope.ids.push(media.id);
+
+                            if ($scope.model.config.idType === "udi") {
+                                $scope.ids.push(media.udi);
+                            }
+                            else {
+                                $scope.ids.push(media.id);    
+                            }
                         }
                     });
 
@@ -80,7 +86,13 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                        }
 
                        $scope.images.push(media);
-                       $scope.ids.push(media.id);
+
+                       if ($scope.model.config.idType === "udi") {
+                           $scope.ids.push(media.udi);
+                       }
+                       else {
+                           $scope.ids.push(media.id);
+                       }
                    });
 
                    $scope.sync();

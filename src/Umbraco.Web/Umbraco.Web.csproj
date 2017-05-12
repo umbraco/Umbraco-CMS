@@ -162,8 +162,12 @@
     <Compile Include="Cache\ContentCacheRefresher.cs" />
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Current.cs" />
+    <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\EditorValidatorCollection.cs" />
     <Compile Include="Editors\EditorValidatorCollectionBuilder.cs" />
+    <Compile Include="Editors\FromJsonPathAttribute.cs" />
+    <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
+    <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="HealthCheck\HealthCheckCollection.cs" />
     <Compile Include="HealthCheck\HeathCheckCollectionBuilder.cs" />
     <Compile Include="HybridAccessorBase.cs" />
@@ -212,6 +216,7 @@
     <Compile Include="HealthCheck\StatusResultType.cs" />
     <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
     <Compile Include="Media\ImageUrlProviderCollection.cs" />
+    <Compile Include="Models\ContentEditing\CodeFileDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentRedirectUrl.cs" />
     <Compile Include="Media\ImageUrlProviderCollectionBuilder.cs" />
     <Compile Include="Media\ThumbnailProviders\ThumbnailProviderCollection.cs" />
@@ -220,10 +225,30 @@
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
+    <Compile Include="Models\ContentEditing\SnippetDisplay.cs" />
+    <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
+    <Compile Include="Models\Mapping\CodeFileDisplayMapper.cs" />
+    <Compile Include="Models\Mapping\ContentTypeUdiResolver.cs" />
+    <Compile Include="Models\Mapping\TemplateModelMapper.cs" />
+    <Compile Include="Models\RelatedLink.cs" />
+    <Compile Include="Models\RelatedLinkBase.cs" />
+    <Compile Include="Models\RelatedLinks.cs" />
+    <Compile Include="Models\RelatedLinkType.cs" />
+    <Compile Include="Models\SendCodeViewModel.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollection.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
+    <Compile Include="PropertyEditors\ContentPicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MediaPicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MemberPicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MultiNodeTreePicker2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorsComponent.cs" />
+    <Compile Include="PropertyEditors\RelatedLinks2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\RelatedLinksLegacyValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MediaPickerPropertyConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MemberPickerPropertyConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerPropertyConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MultipleMediaPickerPropertyConverter.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheComponent.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedFragmentProperty.cs" />
     <Compile Include="PublishedCache\PublishedFragment.cs" />
@@ -269,10 +294,12 @@
     <Compile Include="PublishedCache\XmlPublishedCache\FacadeService.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PreviewContent.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedMemberCache.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\SafeXmlReaderWriter.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlCacheComponent.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStore.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStoreFilePersister.cs" />
     <Compile Include="PublishedFragmentExtensions.cs" />
+    <Compile Include="RelatedLinksTypeConverter.cs" />
     <Compile Include="Routing\ContentFinderCollection.cs" />
     <Compile Include="Routing\ContentFinderCollectionBuilder.cs" />
     <Compile Include="Routing\Domain.cs" />
@@ -303,6 +330,7 @@
     <Compile Include="umbraco.presentation\umbraco\endPreview.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
     <Compile Include="WebApi\UmbracoApiControllerTypeCollection.cs" />
     <Compile Include="WebRuntimeComponent.cs" />
     <Compile Include="WebServices\FacadeStatusController.cs" />
@@ -386,7 +414,7 @@
     <Compile Include="PropertyEditors\DateTimePreValueEditor.cs" />
     <Compile Include="PropertyEditors\DecimalPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleContentPickerParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\ImageCropDataSetConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\ImageCropDataSetTypeConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
     <Compile Include="Routing\RedirectTrackingComponent.cs" />
     <Compile Include="Editors\RedirectUrlManagementController.cs" />
@@ -466,7 +494,6 @@
     <Compile Include="Editors\DashboardSecurity.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
-    <Compile Include="Editors\EntityControllerActionSelector.cs" />
     <Compile Include="Editors\EntityControllerConfigurationAttribute.cs" />
     <Compile Include="Editors\ImagesController.cs" />
     <Compile Include="Editors\PackageInstallController.cs" />
@@ -637,7 +664,7 @@
     <Compile Include="PropertyEditors\TagsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\UploadFileTypeValidator.cs" />
     <Compile Include="PropertyEditors\UserPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\RelatedLinksEditorValueConvertor.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\RelatedLinksValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueListPreValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PublishValueValueEditor.cs" />

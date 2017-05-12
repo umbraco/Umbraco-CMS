@@ -45,7 +45,17 @@ namespace Umbraco.Web.WebServices
             }
             catch (Exception ee)
             {
-                Logger.Error<ScheduledPublishController>("Error executing scheduled task", ee);
+                var errorMessage = "Error executing scheduled task";
+                if (HttpContext != null && HttpContext.Request != null)
+                {
+                    if (HttpContext.Request.Url != null)
+                        errorMessage = string.Format("{0} | Request to {1}", errorMessage, HttpContext.Request.Url);
+                    if (HttpContext.Request.UserHostAddress != null)
+                        errorMessage = string.Format("{0} | Coming from {1}", errorMessage, HttpContext.Request.UserHostAddress);
+                    if (HttpContext.Request.UrlReferrer != null)
+                        errorMessage = string.Format("{0} | Referrer {1}", errorMessage, HttpContext.Request.UrlReferrer);    
+                }
+                Logger.Error<ScheduledPublishController>(errorMessage, ee);
 
                 Response.StatusCode = 400; 
 

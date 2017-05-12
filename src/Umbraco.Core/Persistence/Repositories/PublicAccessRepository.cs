@@ -14,22 +14,13 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class PublicAccessRepository : NPocoRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
     {
-        private IRepositoryCachePolicy<PublicAccessEntry, Guid> _cachePolicy;
-
-        public PublicAccessRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
+        public PublicAccessRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         { }
 
-        protected override IRepositoryCachePolicy<PublicAccessEntry, Guid> CachePolicy
+        protected override IRepositoryCachePolicy<PublicAccessEntry, Guid> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                if (_cachePolicy != null) return _cachePolicy;
-
-                _cachePolicy = new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(RuntimeCache, GetEntityId, /*expires:*/ false);
-
-                return _cachePolicy;
-            }
+            return new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(runtimeCache, GetEntityId, /*expires:*/ false);
         }
 
         protected override PublicAccessEntry PerformGet(Guid id)
@@ -44,7 +35,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (ids.Any())
             {
-                sql.Where("umbracoAccess.id IN (@ids)", new { ids = ids });
+                sql.Where("umbracoAccess.id IN (@ids)", new { ids });
             }
 
             sql.OrderBy<AccessDto>(x => x.NodeId);
@@ -89,15 +80,13 @@ namespace Umbraco.Core.Persistence.Repositories
             return list;
         }
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
-        }
+        protected override Guid NodeObjectTypeId => throw new NotImplementedException();
 
         protected override void PersistNewItem(PublicAccessEntry entity)
         {
             entity.AddingEntity();
-            entity.Rules.ForEach(x => x.AddingEntity());
+            foreach (var rule in entity.Rules)
+                rule.AddingEntity();
 
             var factory = new PublicAccessEntryFactory();
             var dto = factory.BuildDto(entity);
@@ -118,8 +107,13 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void PersistUpdatedItem(PublicAccessEntry entity)
         {
             entity.UpdatingEntity();
-            entity.Rules.Where(x => x.HasIdentity).ForEach(x => x.UpdatingEntity());
-            entity.Rules.Where(x => x.HasIdentity == false).ForEach(x => x.AddingEntity());
+            foreach (var rule in entity.Rules)
+            {
+                if (rule.HasIdentity)
+                    rule.UpdatingEntity();
+                else
+                    rule.AddingEntity();
+            }
 
             var factory = new PublicAccessEntryFactory();
             var dto = factory.BuildDto(entity);

@@ -22,12 +22,10 @@ namespace Umbraco.Web.PropertyEditors
         public FileUploadPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentSettings, ILocalizedTextService textService)
             : base(logger)
         {
-            if (mediaFileSystem == null) throw new ArgumentNullException(nameof(mediaFileSystem));
-            if (contentSettings == null) throw new ArgumentNullException(nameof(contentSettings));
-            if (textService == null) throw new ArgumentNullException(nameof(textService));
+            if (contentSettings == null) throw new ArgumentNullException(nameof(contentSettings)); // fixme wtf?
 
-            _mediaFileSystem = mediaFileSystem;
-            _textService = textService;
+            _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+            _textService = textService ?? throw new ArgumentNullException(nameof(textService));
         }
 
         /// <summary>

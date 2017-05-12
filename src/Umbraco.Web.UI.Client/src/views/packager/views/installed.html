@@ -12,8 +12,8 @@
                 <div class="umb-package-list__item" ng-repeat="installedPackage in vm.installedPackages">
 
                     <div class="umb-package-list__item-icon">
-                        <i ng-if="!installedPackage.icon" class="icon-box"></i>
-                        <img ng-if="installedPackage.icon" ng-src="{{installedPackage.icon}}" />
+                        <i ng-if="!installedPackage.iconUrl" class="icon-box"></i>
+                        <img ng-if="installedPackage.iconUrl" ng-src="{{installedPackage.iconUrl}}" />
                     </div>
 
                     <div class="umb-package-list__item-content">
@@ -24,7 +24,7 @@
                     </div>
 
                     <div class="umb-package-list__item-actions">
-                        <button type="button" class="umb-era-button" ng-click="vm.confirmUninstall(installedPackage)">Uninstall</button>
+                        <a class="umb-package-list__item-action" href="" ng-click="vm.confirmUninstall(installedPackage)">Uninstall</a>
                     </div>
 
                 </div>
@@ -94,7 +94,7 @@
                             <button type="button"
                                     ng-class="{'-inactive' : uninstallForm.$invalid}"
                                     ng-disabled="uninstallForm.$invalid"
-                                    class="umb-era-button -blue flex-inline mt3"
+                                    class="umb-era-button -green flex-inline mt3"
                                     ng-click="vm.uninstallPackage(vm.package)">
                                 Uninstall package
                             </button>

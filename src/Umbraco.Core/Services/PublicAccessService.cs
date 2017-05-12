@@ -9,9 +9,9 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    public class PublicAccessService : RepositoryService, IPublicAccessService
+    public class PublicAccessService : ScopeRepositoryService, IPublicAccessService
     {
-        public PublicAccessService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        public PublicAccessService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, logger, eventMessagesFactory)
         {
         }
@@ -22,12 +22,10 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<PublicAccessEntry> GetAll()
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
-                var entries = repo.GetAll();
-                uow.Complete();
-                return entries;
+                return repo.GetAll();
             }
         }
 
@@ -54,15 +52,7 @@ namespace Umbraco.Core.Services
             //Get all ids in the path for the content item and ensure they all
             // parse to ints that are not -1.
             var ids = contentPath.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x =>
-                {
-                    int val;
-                    if (int.TryParse(x, out val))
-                    {
-                        return val;
-                    }
-                    return -1;
-                })
+                .Select(x => int.TryParse(x, out int val) ? val : -1)
                 .Where(x => x != -1)
                 .ToList();
 

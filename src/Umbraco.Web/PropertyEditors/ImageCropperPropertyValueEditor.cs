@@ -4,10 +4,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
@@ -29,16 +27,14 @@ namespace Umbraco.Web.PropertyEditors
         public ImageCropperPropertyValueEditor(PropertyValueEditor wrapped, ILogger logger, MediaFileSystem mediaFileSystem)
             : base(wrapped)
         {
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
-            if (mediaFileSystem == null) throw new ArgumentNullException(nameof(mediaFileSystem));
-            _logger = logger;
-            _mediaFileSystem = mediaFileSystem;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
         }
 
         /// <summary>
         /// This is called to merge in the prevalue crops with the value that is saved - similar to the property value converter for the front-end
         /// </summary>
-           
+
         public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
             var val = base.ConvertDbToEditor(property, propertyType, dataTypeService);
@@ -60,12 +56,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns>The converted value.</returns>
         /// <remarks>
         /// <para>The <paramref name="currentValue"/> is used to re-use the folder, if possible.</para>
-        /// <para>FIXME this is ?!
-        /// This is value passed in from the editor. We normally don't care what the editorValue.Value is set to because
-        /// we are more interested in the files collection associated with it, however we do care about the value if we 
-        /// are clearing files. By default the editorValue.Value will just be set to the name of the file (but again, we
-        /// just ignore this and deal with the file collection in editorValue.AdditionalData.ContainsKey("files") )
-        /// </para>
+        /// <para>editorValue.Value is used to figure out editorFile and, if it has been cleared, remove the old file - but
+        /// it is editorValue.AdditionalData["files"] that is used to determine the actual file that has been uploaded.</para>
         /// </remarks>
         public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
         {
@@ -124,7 +116,7 @@ namespace Umbraco.Web.PropertyEditors
                 // value is unchanged.
                 if (string.IsNullOrWhiteSpace(editorFile) && string.IsNullOrWhiteSpace(currentPath) == false)
                 {
-                    _mediaFileSystem.DeleteFile(currentPath, true);
+                    _mediaFileSystem.DeleteFile(currentPath);
                     return null; // clear
                 }
 
@@ -140,7 +132,7 @@ namespace Umbraco.Web.PropertyEditors
 
             // remove current file if replaced
             if (currentPath != filepath && string.IsNullOrWhiteSpace(currentPath) == false)
-                _mediaFileSystem.DeleteFile(currentPath, true);
+                _mediaFileSystem.DeleteFile(currentPath);
 
             // update json and return
             if (editorJson == null) return null;
@@ -162,25 +154,13 @@ namespace Umbraco.Web.PropertyEditors
             using (var filestream = File.OpenRead(file.TempFilePath))
             {
                 _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
-
-                var ext = _mediaFileSystem.GetExtension(filepath);
-                if (_mediaFileSystem.IsImageFile(ext))
-                {
-                    var preValues = editorValue.PreValues.FormatAsDictionary();
-                    var sizes = preValues.Any() ? preValues.First().Value.Value : string.Empty;
-                    using (var image = Image.FromStream(filestream))
-                        _mediaFileSystem.GenerateThumbnails(image, filepath, sizes);
-                }
-
-                // all related properties (auto-fill) are managed by ImageCropperPropertyEditor
-                // when the content is saved (through event handlers)
             }
 
             return filepath;
         }
 
-        
-        public override string ConvertDbToString(Property property, PropertyType propertyType, Core.Services.IDataTypeService dataTypeService)
+
+        public override string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
             if (property.Value == null || string.IsNullOrEmpty(property.Value.ToString()))
                 return null;

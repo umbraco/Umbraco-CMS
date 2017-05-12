@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 
@@ -17,16 +18,16 @@ namespace Umbraco.Web.Scheduling
         private readonly IUmbracoSettingsSection _settings;
         private readonly ILogger _logger;
         private readonly ProfilingLogger _proflog;
-        private readonly IUmbracoDatabaseFactory _databaseFactory;
+        private readonly IScopeProvider _scopeProvider;
 
         public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IAuditService auditService, IUmbracoSettingsSection settings, IUmbracoDatabaseFactory databaseFactory, ILogger logger, ProfilingLogger proflog)
+            IRuntimeState runtime, IAuditService auditService, IUmbracoSettingsSection settings, IScopeProvider scopeProvider, ILogger logger, ProfilingLogger proflog)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
             _auditService = auditService;
             _settings = settings;
-            _databaseFactory = databaseFactory;
+            _scopeProvider = scopeProvider;
             _logger = logger;
             _proflog = proflog;
         }
@@ -82,11 +83,13 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
-            // running on a background task, requires a database scope
-            using (_databaseFactory.CreateScope())
+            // running on a background task, and Log.CleanLogs uses the old SqlHelper,
+            // better wrap in a scope and ensure it's all cleaned up and nothing leaks
+            using (var scope = _scopeProvider.CreateScope())
             using (_proflog.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
                 _auditService.CleanLogs(GetLogScrubbingMaximumAge(_settings));
+                scope.Complete();
             }
 
             return true; // repeat

@@ -197,9 +197,12 @@ namespace umbraco.cms.businesslogic
                 if (_versionDateInitialized) return _versionDate;
 
                 // content & media have a version date in cmsContentVersion that is updated when saved - use it
-                var db = Current.DatabaseFactory.Database;
-                _versionDate = db.ExecuteScalar<DateTime>("SELECT versionDate FROM cmsContentVersion WHERE versionId=@versionId",
-                    new { @versionId = Version });
+                using (var scope = Current.ScopeProvider.CreateScope())
+                {
+                    _versionDate = scope.Database.ExecuteScalar<DateTime>("SELECT versionDate FROM cmsContentVersion WHERE versionId=@versionId",
+                        new { versionId = Version });
+                    scope.Complete();
+                }
                 _versionDateInitialized = true;
                 return _versionDate;
             }
@@ -260,7 +263,11 @@ namespace umbraco.cms.businesslogic
             // Delete all data associated with this content
             this.deleteAllProperties();
 
-            OnDeletedContent(new ContentDeleteEventArgs(Current.DatabaseFactory.Database, Id));
+            using (var scope = Current.ScopeProvider.CreateScope())
+            {
+                OnDeletedContent(new ContentDeleteEventArgs(scope.Database, Id));
+                scope.Complete();
+            }
 
             // Delete version history
             using (var sqlHelper = LegacySqlHelper.SqlHelper)

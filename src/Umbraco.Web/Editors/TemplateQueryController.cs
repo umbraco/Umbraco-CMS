@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Models.TemplateQuery;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
@@ -19,33 +20,44 @@ namespace Umbraco.Web.Editors
     [JsonCamelCaseFormatter]
     public class TemplateQueryController : UmbracoAuthorizedJsonController
     {
-        private static readonly IEnumerable<OperathorTerm> Terms = new List<OperathorTerm>()
+        private IEnumerable<OperathorTerm> Terms
+        {
+            get
             {
-                new OperathorTerm("is", Operathor.Equals, new [] {"string"}),
-                new OperathorTerm("is not", Operathor.NotEquals, new [] {"string"}),
-                new OperathorTerm("before", Operathor.LessThan, new [] {"datetime"}),
-                new OperathorTerm("before (including selected date)", Operathor.LessThanEqualTo, new [] {"datetime"}),
-                new OperathorTerm("after", Operathor.GreaterThan, new [] {"datetime"}),
-                new OperathorTerm("after (including selected date)", Operathor.GreaterThanEqualTo, new [] {"datetime"}),
-                new OperathorTerm("equals", Operathor.Equals, new [] {"int"}),
-                new OperathorTerm("does not equal", Operathor.NotEquals, new [] {"int"}),
-                new OperathorTerm("contains", Operathor.Contains, new [] {"string"}),
-                new OperathorTerm("does not contain", Operathor.NotContains, new [] {"string"}),
-                new OperathorTerm("greater than", Operathor.GreaterThan, new [] {"int"}),
-                new OperathorTerm("greater than or equal to", Operathor.GreaterThanEqualTo, new [] {"int"}),
-                new OperathorTerm("less than", Operathor.LessThan, new [] {"int"}),
-                new OperathorTerm("less than or equal to", Operathor.LessThanEqualTo, new [] {"int"})
-            };
+                return new List<OperathorTerm>()
+                {
+                    new OperathorTerm(Services.TextService.Localize("template/is"), Operathor.Equals, new [] {"string"}),
+                    new OperathorTerm(Services.TextService.Localize("template/isNot"), Operathor.NotEquals, new [] {"string"}),
+                    new OperathorTerm(Services.TextService.Localize("template/before"), Operathor.LessThan, new [] {"datetime"}),
+                    new OperathorTerm(Services.TextService.Localize("template/beforeIncDate"), Operathor.LessThanEqualTo, new [] {"datetime"}),
+                    new OperathorTerm(Services.TextService.Localize("template/after"), Operathor.GreaterThan, new [] {"datetime"}),
+                    new OperathorTerm(Services.TextService.Localize("template/afterIncDate"), Operathor.GreaterThanEqualTo, new [] {"datetime"}),
+                    new OperathorTerm(Services.TextService.Localize("template/equals"), Operathor.Equals, new [] {"int"}),
+                    new OperathorTerm(Services.TextService.Localize("template/doesNotEqual"), Operathor.NotEquals, new [] {"int"}),
+                    new OperathorTerm(Services.TextService.Localize("template/contains"), Operathor.Contains, new [] {"string"}),
+                    new OperathorTerm(Services.TextService.Localize("template/doesNotContain"), Operathor.NotContains, new [] {"string"}),
+                    new OperathorTerm(Services.TextService.Localize("template/greaterThan"), Operathor.GreaterThan, new [] {"int"}),
+                    new OperathorTerm(Services.TextService.Localize("template/greaterThanEqual"), Operathor.GreaterThanEqualTo, new [] {"int"}),
+                    new OperathorTerm(Services.TextService.Localize("template/lessThan"), Operathor.LessThan, new [] {"int"}),
+                    new OperathorTerm(Services.TextService.Localize("template/lessThanEqual"), Operathor.LessThanEqualTo, new [] {"int"})
+                };
+            }
+        }
 
-        private static readonly IEnumerable<PropertyModel> Properties = new List<PropertyModel>()
+        private IEnumerable<PropertyModel> Properties
+        {
+            get
             {
-                new PropertyModel() { Name = "Id", Alias = "Id", Type = "int"  },
-                new PropertyModel() { Name = "Name", Alias = "Name", Type = "string"  },
-                //new PropertyModel() { Name = "Url", Alias = "url", Type = "string"  },
-                new PropertyModel() { Name = "Created Date", Alias = "CreateDate", Type = "datetime"  },
-                new PropertyModel() { Name = "Last Updated Date", Alias = "UpdateDate", Type = "datetime"  }
-
-            };
+                return new List<PropertyModel>()
+                {
+                    new PropertyModel() {Name = Services.TextService.Localize("template/id"), Alias = "Id", Type = "int"},
+                    new PropertyModel() {Name = Services.TextService.Localize("template/name"), Alias = "Name", Type = "string"},
+                    //new PropertyModel() { Name = "Url", Alias = "url", Type = "string"  },
+                    new PropertyModel() {Name = Services.TextService.Localize("template/createdDate"), Alias = "CreateDate", Type = "datetime"},
+                    new PropertyModel() {Name = Services.TextService.Localize("template/lastUpdatedDate"), Alias = "UpdateDate", Type = "datetime"}
+                };
+            }
+        }
 
         public QueryResultModel PostTemplateQuery(QueryModel model)
         {
@@ -54,9 +66,10 @@ namespace Umbraco.Web.Editors
             var queryResult = new QueryResultModel();
 
             var sb = new StringBuilder();
-
-            sb.Append("CurrentPage.Site()");
-
+            var indention = Environment.NewLine + "\t\t\t\t\t\t";
+            
+            sb.Append("Model.Content.Site()");
+            
             var timer = new Stopwatch();
 
             timer.Start();
@@ -93,7 +106,7 @@ namespace Umbraco.Web.Editors
                     {
                         // we did not find the path
                         sb.Clear();
-                        sb.AppendFormat("Umbraco.Content({0})", model.Source.Id);
+                        sb.AppendFormat("Umbraco.TypedContent({0})", model.Source.Id);
                         pointerNode = targetNode;
                     }
                 }
@@ -116,10 +129,12 @@ namespace Umbraco.Web.Editors
                 timer.Start();
                 contents = pointerNode.Children;
                 timer.Stop();
-                sb.Append(".Children");
+                sb.Append(".Children()");
             }
 
+            //setup 2 clauses, 1 for returning, 1 for testing
             var clause = string.Empty;
+            var tokenizedClause = string.Empty;
 
             // WHERE
             var token = 0;
@@ -131,12 +146,13 @@ namespace Umbraco.Web.Editors
                 foreach (var condition in model.Filters)
                 {
                     if(string.IsNullOrEmpty( condition.ConstraintValue)) continue;
-
-
-
-                    var operation = condition.BuildCondition(token);
+                
+                    //x is passed in as the parameter alias for the linq where statement clause
+                    var operation = condition.BuildCondition("x");
+                    var tokenizedOperation = condition.BuildTokenizedCondition(token);
 
                     clause = string.IsNullOrEmpty(clause) ? operation : string.Concat(new[] { clause, " && ",  operation });
+                    tokenizedClause = string.IsNullOrEmpty(tokenizedClause) ? tokenizedOperation : string.Concat(new[] { tokenizedClause, " && ", tokenizedOperation });
 
                     token++;
                 }
@@ -146,21 +162,23 @@ namespace Umbraco.Web.Editors
 
                     timer.Start();
 
-                    //clause = "Visible && " + clause;
-
+                    //trial-run the tokenized clause to time the execution
+                    //for review - this uses a tonized query rather then the normal linq query. 
                     // fixme - that cannot work anymore now that we have killed dynamic support
                     //contents = contents.AsQueryable().Where(clause, model.Filters.Select(this.GetConstraintValue).ToArray());
+                    throw new NotImplementedException();
 
-                    // contents = contents.Where(clause, values.ToArray());
                     contents = contents.Where(x => x.IsVisible());
 
                     timer.Stop();
+                    
+                    //the query to output to the editor
+                    sb.Append(indention);
+                    sb.Append(".Where(x => x.IsVisible())");
 
-                    clause = string.Format("\"Visible && {0}\",{1}", clause,
-                        string.Join(",", model.Filters.Select(x => x.Property.Type == "string" ?
-                                                                       string.Format("\"{0}\"", x.ConstraintValue) : x.ConstraintValue).ToArray()));
+                    sb.Append(indention);
+                    sb.AppendFormat(".Where(x => {0})", clause);
 
-                    sb.AppendFormat(".Where({0})", clause);
                 }
                 else
                 {
@@ -170,7 +188,8 @@ namespace Umbraco.Web.Editors
 
                     timer.Stop();
 
-                    sb.Append(".Where(\"Visible\")");
+                    sb.Append(indention);
+                    sb.Append(".Where(x => x.IsVisible())");
 
                 }
 
@@ -184,6 +203,7 @@ namespace Umbraco.Web.Editors
 
                     var direction = model.Sort.Direction == "ascending" ? string.Empty : " desc";
 
+                    sb.Append(indention);
                     sb.AppendFormat(".OrderBy(\"{0}{1}\")", model.Sort.Property.Alias, direction);
                 }
 
@@ -195,6 +215,7 @@ namespace Umbraco.Web.Editors
 
                     timer.Stop();
 
+                    sb.Append(indention);
                     sb.AppendFormat(".Take({0})", model.Take);
                 }
             }
@@ -209,7 +230,7 @@ namespace Umbraco.Web.Editors
                                                                  });
 
 
-            return queryResult;
+            return queryResult; 
         }
 
         private object GetConstraintValue(QueryCondition condition)
@@ -280,9 +301,10 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ContentTypeModel> GetContentTypes()
         {
             var contentTypes = Services.ContentTypeService.GetAll()
-                .Select(x => new ContentTypeModel { Alias = x.Alias, Name = x.Name })
+                .Select(x => new ContentTypeModel { Alias = x.Alias, Name = Services.TextService.Localize("template/contentOfType", tokens: new string[] { x.Name } ) })
                 .OrderBy(x => x.Name).ToList();
-            contentTypes.Insert(0, new ContentTypeModel { Alias = string.Empty, Name = "Everything" });
+
+            contentTypes.Insert(0, new ContentTypeModel { Alias = string.Empty, Name = Services.TextService.Localize("template/allContent") });
 
             return contentTypes;
         }

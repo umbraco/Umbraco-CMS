@@ -9,10 +9,18 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     {
         private readonly Queue<Operation> _operations = new Queue<Operation>();
 
-        protected UnitOfWorkBase(RepositoryFactory repositoryFactory)
+        // fixme - explain readonly
+        // it means that the unit of work *will* complete no matter what
+        // but if an exception is thrown from within the 'using' block
+        // the calling code still can deal with it and cancel everything
+
+        protected UnitOfWorkBase(RepositoryFactory repositoryFactory, bool readOnly = false)
         {
             RepositoryFactory = repositoryFactory;
+            ReadOnly = readOnly;
         }
+
+        protected bool ReadOnly { get; }
 
         protected RepositoryFactory RepositoryFactory { get; }
 
@@ -26,7 +34,11 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <param name="repository">The repository in charge of the entity.</param>
         public void RegisterCreated(IEntity entity, IUnitOfWorkRepository repository)
         {
+            if (ReadOnly)
+                throw new NotSupportedException("This unit of work is read-only.");
+
             Completed = false;
+
             _operations.Enqueue(new Operation
             {
                 Entity = entity,
@@ -42,7 +54,11 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <param name="repository">The repository in charge of the entity.</param>
         public void RegisterUpdated(IEntity entity, IUnitOfWorkRepository repository)
         {
+            if (ReadOnly)
+                throw new NotSupportedException("This unit of work is read-only.");
+
             Completed = false;
+
             _operations.Enqueue(new Operation
             {
                 Entity = entity,
@@ -58,7 +74,11 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <param name="repository">The repository in charge of the entity.</param>
         public void RegisterDeleted(IEntity entity, IUnitOfWorkRepository repository)
         {
+            if (ReadOnly)
+                throw new NotSupportedException("This unit of work is read-only.");
+
             Completed = false;
+
             _operations.Enqueue(new Operation
             {
                 Entity = entity,
@@ -67,11 +87,15 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             });
         }
 
+        // fixme - we don't need Begin, really, or do we?
         public virtual void Begin()
         { }
 
         public virtual void Flush()
         {
+            if (ReadOnly)
+                throw new NotSupportedException("This unit of work is read-only.");
+
             Begin();
 
             while (_operations.Count > 0)
@@ -90,10 +114,19 @@ namespace Umbraco.Core.Persistence.UnitOfWork
                         break;
                 }
             }
+
+            // fixme - if any operation throws, the uow still contains the remaining ops
+            // should we clear the ops?
         }
 
         public virtual void Complete()
         {
+            if (ReadOnly)
+                throw new NotSupportedException("This unit of work is read-only.");
+
+            if (Completed)
+                throw new InvalidOperationException("This unit of work has already been completed.");
+
             Flush();
             Completed = true;
         }

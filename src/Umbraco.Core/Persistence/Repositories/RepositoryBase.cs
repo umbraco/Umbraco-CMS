@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.EntityBase;
-
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -17,21 +13,18 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private static readonly Dictionary<Type, string> CacheTypeKeys = new Dictionary<Type, string>();
 
-        protected RepositoryBase(IUnitOfWork work, CacheHelper cache, ILogger logger)
+        protected RepositoryBase(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
         {
-            if (work == null) throw new ArgumentNullException(nameof(work));
-            if (cache == null) throw new ArgumentNullException(nameof(cache));
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
-            Logger = logger;
-            UnitOfWork = work;
-            Cache = cache;
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            UnitOfWork = work ?? throw new ArgumentNullException(nameof(work));
+            GlobalCache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
 
-        protected IUnitOfWork UnitOfWork { get; }
+        protected IScopeUnitOfWork UnitOfWork { get; }
 
-        protected CacheHelper Cache { get; }
+        protected CacheHelper GlobalCache { get; }
 
-        protected virtual IRuntimeCacheProvider RuntimeCache => Cache.RuntimeCache;
+        protected abstract IRuntimeCacheProvider IsolatedCache { get; }
 
         protected ILogger Logger { get; }
 
@@ -39,190 +32,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public static string GetCacheTypeKey<T>()
         {
-            string key;
-            var type = typeof (T);
-            return CacheTypeKeys.TryGetValue(type, out key) ? key : (CacheTypeKeys[type] = "uRepo_" + type.Name + "_");
-        }
-    }
-
-    /// <summary>
-    /// Provides a base class to all repositories.
-    /// </summary>
-    /// <typeparam name="TEntity">The type of the entity managed by this repository.</typeparam>
-    /// <typeparam name="TId">The type of the entity's unique identifier.</typeparam>
-    internal abstract class RepositoryBase<TId, TEntity> : RepositoryBase, IReadRepository<TId, TEntity>, IWriteRepository<TEntity>, IQueryRepository<TId, TEntity>, IUnitOfWorkRepository
-        where TEntity : class, IAggregateRoot
-    {
-        private IRepositoryCachePolicy<TEntity, TId> _cachePolicy;
-
-        protected RepositoryBase(IUnitOfWork work, CacheHelper cache, ILogger logger)
-            : base(work, cache, logger)
-        { }
-
-        protected override IRuntimeCacheProvider RuntimeCache => Cache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
-
-        /// <summary>
-        /// Creates a new query.
-        /// </summary>
-        public virtual IQuery<TEntity> QueryT => Query<TEntity>();
-
-        /// <summary>
-        /// Creates a new query.
-        /// </summary>
-        public abstract IQuery<T> Query<T>();
-
-        #region Static Queries
-
-        private IQuery<TEntity> _hasIdQuery;
-
-        #endregion
-
-        protected virtual TId GetEntityId(TEntity entity)
-        {
-            return (TId) (object) entity.Id;
-        }
-
-        protected virtual IRepositoryCachePolicy<TEntity, TId> CachePolicy
-        {
-            get
-            {
-                if (_cachePolicy != null) return _cachePolicy;
-
-                var options = new RepositoryCachePolicyOptions(() =>
-                {
-                    // have to initialize query here, because some TEntity cannot create a query,
-                    // but for those TEntity we don't perform counts? all this is a bit weird
-                    if (_hasIdQuery == null) _hasIdQuery = QueryT.Where(x => x.Id != 0);
-                    return PerformCount(_hasIdQuery);
-                });
-                return _cachePolicy = new DefaultRepositoryCachePolicy<TEntity, TId>(RuntimeCache, options);
-            }
-            set
-            {
-                _cachePolicy = value; // ok to set to null, reverts to default
-            }
-        }
-
-        /// <summary>
-        /// Adds or Updates an entity of type TEntity
-        /// </summary>
-        /// <remarks>This method is backed by an <see cref="IRuntimeCacheProvider"/> cache</remarks>
-        /// <param name="entity"></param>
-        public void AddOrUpdate(TEntity entity)
-        {
-            if (entity.HasIdentity == false)
-                UnitOfWork.RegisterCreated(entity, this);
-            else
-                UnitOfWork.RegisterUpdated(entity, this);
-        }
-
-        /// <summary>
-        /// Deletes the passed in entity
-        /// </summary>
-        /// <param name="entity"></param>
-        public virtual void Delete(TEntity entity)
-        {
-            UnitOfWork?.RegisterDeleted(entity, this);
-        }
-
-        protected abstract TEntity PerformGet(TId id);
-        /// <summary>
-        /// Gets an entity by the passed in Id utilizing the repository's cache policy
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public TEntity Get(TId id)
-        {
-            return CachePolicy.Get(id, PerformGet, PerformGetAll);
-        }
-
-        protected abstract IEnumerable<TEntity> PerformGetAll(params TId[] ids);
-        /// <summary>
-        /// Gets all entities of type TEntity or a list according to the passed in Ids
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        public IEnumerable<TEntity> GetAll(params TId[] ids)
-        {
-            //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
-            ids = ids.Distinct()
-                //don't query by anything that is a default of T (like a zero)
-                //TODO: I think we should enabled this in case accidental calls are made to get all with invalid ids
-                //.Where(x => Equals(x, default(TId)) == false)
-                .ToArray();
-
-            if (ids.Length > 2000)
-            {
-                throw new InvalidOperationException("Cannot perform a query with more than 2000 parameters");
-            }
-
-            return CachePolicy.GetAll(ids, PerformGetAll);
-        }
-
-        protected abstract IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query);
-        protected abstract bool PerformExists(TId id);
-        protected abstract int PerformCount(IQuery<TEntity> query);
-        protected abstract void PersistNewItem(TEntity item);
-        protected abstract void PersistUpdatedItem(TEntity item);
-        protected abstract void PersistDeletedItem(TEntity item);
-
-        /// <summary>
-        /// Gets a list of entities by the passed in query
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public IEnumerable<TEntity> GetByQuery(IQuery<TEntity> query)
-        {
-            return PerformGetByQuery(query)
-                //ensure we don't include any null refs in the returned collection!
-                .WhereNotNull();
-        }
-
-        /// <summary>
-        /// Returns a boolean indicating whether an entity with the passed Id exists
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public bool Exists(TId id)
-        {
-            return CachePolicy.Exists(id, PerformExists, PerformGetAll);
-        }
-
-        /// <summary>
-        /// Returns an integer with the count of entities found with the passed in query
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public int Count(IQuery<TEntity> query)
-        {
-            return PerformCount(query);
-        }
-
-        /// <summary>
-        /// Unit of work method that tells the repository to persist the new entity
-        /// </summary>
-        /// <param name="entity"></param>
-        public virtual void PersistNewItem(IEntity entity)
-        {
-            CachePolicy.Create((TEntity) entity, PersistNewItem);
-        }
-
-        /// <summary>
-        /// Unit of work method that tells the repository to persist the updated entity
-        /// </summary>
-        /// <param name="entity"></param>
-        public virtual void PersistUpdatedItem(IEntity entity)
-        {
-            CachePolicy.Update((TEntity) entity, PersistUpdatedItem);
-        }
-
-        /// <summary>
-        /// Unit of work method that tells the repository to persist the deletion of the entity
-        /// </summary>
-        /// <param name="entity"></param>
-        public virtual void PersistDeletedItem(IEntity entity)
-        {
-            CachePolicy.Delete((TEntity) entity, PersistDeletedItem);
+            var type = typeof(T);
+            return CacheTypeKeys.TryGetValue(type, out string key) ? key : (CacheTypeKeys[type] = "uRepo_" + type.Name + "_");
         }
     }
 }

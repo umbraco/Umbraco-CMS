@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Semver;
 using Umbraco.Core;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Migrations;
@@ -13,7 +14,6 @@ using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Tests.Migrations
 {
@@ -27,80 +27,85 @@ namespace Umbraco.Tests.Migrations
             // make sure to create some content,
             // otherwise cannot get it to fail!
 
-            var n = new NodeDto
+            using (var scope = Current.ScopeProvider.CreateScope())
             {
-                Text = "text",
-                CreateDate = DateTime.Now,
-                Path = "-1",
-                ParentId = -1,
-                UniqueId = Guid.NewGuid()
-            };
-            DatabaseFactory.Database.Insert(n);
-            var ct = new ContentTypeDto
-            {
-                Alias = "alias",
-                NodeId = n.NodeId,
-                Thumbnail = "thumb"
-            };
-            DatabaseFactory.Database.Insert(ct);
-            n = new NodeDto
-            {
-                Text = "text",
-                CreateDate = DateTime.Now,
-                Path = "-1",
-                ParentId = -1,
-                UniqueId = Guid.NewGuid()
-            };
-            DatabaseFactory.Database.Insert(n);
-            var dt = new DataTypeDto
-            {
-                PropertyEditorAlias = Constants.PropertyEditors.RelatedLinksAlias,
-                DbType = "x",
-                DataTypeId = n.NodeId
-            };
-            DatabaseFactory.Database.Insert(dt);
-            var pt = new PropertyTypeDto
-            {
-                Alias = "alias",
-                ContentTypeId = ct.NodeId,
-                DataTypeId = dt.DataTypeId
-            };
-            DatabaseFactory.Database.Insert(pt);
-            n = new NodeDto
-            {
-                Text = "text",
-                CreateDate = DateTime.Now,
-                Path = "-1",
-                ParentId = -1,
-                UniqueId = Guid.NewGuid()
-            };
-            DatabaseFactory.Database.Insert(n);
-            var data = new PropertyDataDto
-            {
-                NodeId = n.NodeId,
-                PropertyTypeId = pt.Id,
-                Text = "text",
-                VersionId = Guid.NewGuid()
-            };
-            DatabaseFactory.Database.Insert(data);
-            data = new PropertyDataDto
-            {
-                NodeId = n.NodeId,
-                PropertyTypeId = pt.Id,
-                Text = "<root><node title=\"\" type=\"\" newwindow=\"\" link=\"\" /></root>",
-                VersionId = Guid.NewGuid()
-            };
-            DatabaseFactory.Database.Insert(data);
-            var migrationContext = new MigrationContext(DatabaseFactory.Database, Logger);
+                var database = scope.Database;
 
-            var migration = new UpdateRelatedLinksData(migrationContext);
-            migration.UpdateRelatedLinksDataDo(DatabaseFactory.Database);
+                var n = new NodeDto
+                {
+                    Text = "text",
+                    CreateDate = DateTime.Now,
+                    Path = "-1",
+                    ParentId = -1,
+                    UniqueId = Guid.NewGuid()
+                };
+                database.Insert(n);
+                var ct = new ContentTypeDto
+                {
+                    Alias = "alias",
+                    NodeId = n.NodeId,
+                    Thumbnail = "thumb"
+                };
+                database.Insert(ct);
+                n = new NodeDto
+                {
+                    Text = "text",
+                    CreateDate = DateTime.Now,
+                    Path = "-1",
+                    ParentId = -1,
+                    UniqueId = Guid.NewGuid()
+                };
+                database.Insert(n);
+                var dt = new DataTypeDto
+                {
+                    PropertyEditorAlias = Constants.PropertyEditors.RelatedLinksAlias,
+                    DbType = "x",
+                    DataTypeId = n.NodeId
+                };
+                database.Insert(dt);
+                var pt = new PropertyTypeDto
+                {
+                    Alias = "alias",
+                    ContentTypeId = ct.NodeId,
+                    DataTypeId = dt.DataTypeId
+                };
+                database.Insert(pt);
+                n = new NodeDto
+                {
+                    Text = "text",
+                    CreateDate = DateTime.Now,
+                    Path = "-1",
+                    ParentId = -1,
+                    UniqueId = Guid.NewGuid()
+                };
+                database.Insert(n);
+                var data = new PropertyDataDto
+                {
+                    NodeId = n.NodeId,
+                    PropertyTypeId = pt.Id,
+                    Text = "text",
+                    VersionId = Guid.NewGuid()
+                };
+                database.Insert(data);
+                data = new PropertyDataDto
+                {
+                    NodeId = n.NodeId,
+                    PropertyTypeId = pt.Id,
+                    Text = "<root><node title=\"\" type=\"\" newwindow=\"\" link=\"\" /></root>",
+                    VersionId = Guid.NewGuid()
+                };
+                database.Insert(data);
+                var migrationContext = new MigrationContext(database, Logger);
 
-            data = DatabaseFactory.Database.Fetch<PropertyDataDto>("SELECT * FROM cmsPropertyData WHERE id=" + data.Id).FirstOrDefault();
-            Assert.IsNotNull(data);
-            Debug.Print(data.Text);
-            Assert.AreEqual("[{\"title\":\"\",\"caption\":\"\",\"link\":\"\",\"newWindow\":false,\"type\":\"external\",\"internal\":null,\"edit\":false,\"isInternal\":false}]",
-                data.Text);
+                var migration = new UpdateRelatedLinksData(migrationContext);
+                migration.UpdateRelatedLinksDataDo(database);
+
+                data = database.Fetch<PropertyDataDto>("SELECT * FROM cmsPropertyData WHERE id=" + data.Id).FirstOrDefault();
+                Assert.IsNotNull(data);
+                Debug.Print(data.Text);
+                Assert.AreEqual("[{\"title\":\"\",\"caption\":\"\",\"link\":\"\",\"newWindow\":false,\"type\":\"external\",\"internal\":null,\"edit\":false,\"isInternal\":false}]",
+                    data.Text);
+            }
         }
 
         [Test]
@@ -108,27 +113,32 @@ namespace Umbraco.Tests.Migrations
         {
             var logger = new DebugDiagnosticsLogger();
 
-            var migrationContext = new MigrationContext(DatabaseFactory.Database, Logger);
+            using (var scope = Current.ScopeProvider.CreateScope())
+            {
+                var database = scope.Database;
 
-            //Setup the MigrationRunner
-            var migrationRunner = new MigrationRunner(
-                Mock.Of<IMigrationCollectionBuilder>(),
-                Mock.Of<IMigrationEntryService>(),
-                logger,
-                new SemVersion(7, 5, 0),
-                new SemVersion(8, 0, 0),
-                GlobalSettings.UmbracoMigrationName,
+                var migrationContext = new MigrationContext(database, Logger);
 
-                //pass in explicit migrations
-                new DeleteRedirectUrlTable(migrationContext),
-                new AddRedirectUrlTable(migrationContext)
-            );
+                //Setup the MigrationRunner
+                var migrationRunner = new MigrationRunner(
+                    Mock.Of<IMigrationCollectionBuilder>(),
+                    Mock.Of<IMigrationEntryService>(),
+                    logger,
+                    new SemVersion(7, 5, 0),
+                    new SemVersion(8, 0, 0),
+                    Constants.System.UmbracoMigrationName,
 
-            var upgraded = migrationRunner.Execute(migrationContext, true);
-            Assert.IsTrue(upgraded);
+                    //pass in explicit migrations
+                    new DeleteRedirectUrlTable(migrationContext),
+                    new AddRedirectUrlTable(migrationContext)
+                );
+
+                var upgraded = migrationRunner.Execute(migrationContext, true);
+                Assert.IsTrue(upgraded);
+            }
         }
 
-        [Migration("8.0.0", 99, GlobalSettings.UmbracoMigrationName)]
+        [Migration("8.0.0", 99, Constants.System.UmbracoMigrationName)]
         public class DeleteRedirectUrlTable : MigrationBase
         {
             public DeleteRedirectUrlTable(IMigrationContext context)

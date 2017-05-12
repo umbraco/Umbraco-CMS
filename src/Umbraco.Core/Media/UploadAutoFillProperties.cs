@@ -96,8 +96,7 @@ namespace Umbraco.Core.Media
         /// <param name="propertyTypeAlias">The property type alias.</param>
         /// <param name="filepath">The filesystem-relative filepath, or null to clear properties.</param>
         /// <param name="filestream">The stream containing the file data.</param>
-        /// <param name="image">The file data as an image object.</param>
-        public void Populate(IContentBase content, string propertyTypeAlias, string filepath, Stream filestream, Image image = null)
+        public void Populate(IContentBase content, string propertyTypeAlias, string filepath, Stream filestream)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (propertyTypeAlias == null) throw new ArgumentNullException(nameof(propertyTypeAlias));
@@ -110,7 +109,7 @@ namespace Umbraco.Core.Media
             if (autoFillConfig == null) return; // nothing
 
             // populate
-            Populate(content, autoFillConfig, filepath, filestream, image);
+            Populate(content, autoFillConfig, filepath, filestream);
         }
 
         /// <summary>
@@ -157,8 +156,7 @@ namespace Umbraco.Core.Media
         /// <param name="autoFillConfig"></param>
         /// <param name="filepath">The filesystem-relative filepath, or null to clear properties.</param>
         /// <param name="filestream">The stream containing the file data.</param>
-        /// <param name="image">The file data as an image object.</param>
-        public void Populate(IContentBase content, IImagingAutoFillUploadField autoFillConfig, string filepath, Stream filestream, Image image = null)
+        public void Populate(IContentBase content, IImagingAutoFillUploadField autoFillConfig, string filepath, Stream filestream)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (autoFillConfig == null) throw new ArgumentNullException(nameof(autoFillConfig));
@@ -171,11 +169,7 @@ namespace Umbraco.Core.Media
             else
             {
                 var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
-                Size? size;
-                if (image == null)
-                    size = _mediaFileSystem.IsImageFile(extension) ? (Size?) _mediaFileSystem.GetDimensions(filestream) : null;
-                else
-                    size = new Size(image.Width, image.Height);
+                var size = _mediaFileSystem.IsImageFile(extension) ? (Size?)_mediaFileSystem.GetDimensions(filestream) : null;
                 SetProperties(content, autoFillConfig, size, filestream.Length, extension);
             }
         }

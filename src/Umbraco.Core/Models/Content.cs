@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -287,8 +284,11 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets a value indicating whether the content has a published version.
         /// </summary>
-        public bool HasPublishedVersion { get { return PublishedVersionGuid != default(Guid); } }
-        
+        public bool HasPublishedVersion => PublishedVersionGuid != default(Guid);
+
+        [IgnoreDataMember]
+        internal DateTime PublishedDate { get; set; }
+
         public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
         {
             base.ResetDirtyProperties(rememberPreviouslyChangedProperties);

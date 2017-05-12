@@ -27,7 +27,7 @@ namespace Umbraco.Tests.TestHelpers
 		/// </summary>
 		public static void ClearDatabase()
 		{
-            var databaseSettings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
             var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false) as SqlCEHelper;
 			
 			if (dataHelper == null)
@@ -38,7 +38,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static void DropForeignKeys(string table)
         {
-            var databaseSettings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
             var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false) as SqlCEHelper;
 
             if (dataHelper == null)

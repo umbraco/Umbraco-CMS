@@ -5,6 +5,7 @@ using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Web.Routing;
 
@@ -25,7 +26,7 @@ namespace Umbraco.Web.Scheduling
         private IAuditService _auditService;
         private ILogger _logger;
         private ProfilingLogger _proflog;
-        private IUmbracoDatabaseFactory _databaseFactory;
+        private IScopeProvider _scopeProvider;
 
         private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
@@ -36,12 +37,12 @@ namespace Umbraco.Web.Scheduling
         private object _locker = new object();
         private IBackgroundTask[] _tasks;
 
-        public void Initialize(IRuntimeState runtime, IUserService userService, IAuditService auditService, IUmbracoDatabaseFactory databaseFactory, ILogger logger, ProfilingLogger proflog)
+        public void Initialize(IRuntimeState runtime, IUserService userService, IAuditService auditService, IScopeProvider scopeProvider, ILogger logger, ProfilingLogger proflog)
         {
             _runtime = runtime;
             _userService = userService;
             _auditService = auditService;
-            _databaseFactory = databaseFactory;
+            _scopeProvider = scopeProvider;
             _logger = logger;
             _proflog = proflog;
 
@@ -79,9 +80,9 @@ namespace Umbraco.Web.Scheduling
                 var tasks = new List<IBackgroundTask>
                 {
                     new KeepAlive(_keepAliveRunner, 60000, 300000, _runtime, _logger, _proflog),
-                    new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _userService, _databaseFactory, _logger, _proflog),
+                    new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _userService, _scopeProvider, _logger, _proflog),
                     new ScheduledTasks(_tasksRunner, 60000, 60000, _runtime, settings, _logger, _proflog),
-                    new LogScrubber(_scrubberRunner, 60000, LogScrubber.GetLogScrubbingInterval(settings, _logger), _runtime, _auditService, settings, _databaseFactory, _logger, _proflog)
+                    new LogScrubber(_scrubberRunner, 60000, LogScrubber.GetLogScrubbingInterval(settings, _logger), _runtime, _auditService, settings, _scopeProvider, _logger, _proflog)
                 };
 
                 // ping/keepalive

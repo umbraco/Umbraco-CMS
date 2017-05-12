@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
@@ -22,7 +17,7 @@ namespace Umbraco.Tests.Persistence.Repositories
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class UserRepositoryTest : TestWithDatabaseBase
     {
-        private UserRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out UserTypeRepository userTypeRepository)
+        private UserRepository CreateRepository(IScopeUnitOfWork unitOfWork, out UserTypeRepository userTypeRepository)
         {
             userTypeRepository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
             var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), userTypeRepository, Mock.Of<IMapperCollection>());
@@ -34,7 +29,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_UserRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 UserTypeRepository userTypeRepository;
@@ -55,7 +50,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Multiple_Adds_On_UserRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 UserTypeRepository userTypeRepository;
@@ -80,7 +75,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_Fresh_Entity_Is_Not_Dirty()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 UserTypeRepository userTypeRepository;
@@ -103,7 +98,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_UserRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 UserTypeRepository userTypeRepository;
@@ -154,7 +149,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_UserRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 UserTypeRepository userTypeRepository;
@@ -184,7 +179,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         //public void Can_Perform_Delete_On_UserRepository_With_Permissions_Assigned()
         //{
         //    // Arrange
-        //    var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+        //    var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
         //    using (var unitOfWork = provider.GetUnitOfWork())
         //    UserTypeRepository userTypeRepository;
         //using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -214,7 +209,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_UserRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 UserTypeRepository userTypeRepository;
@@ -236,7 +231,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_UserRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 UserTypeRepository userTypeRepository;
@@ -257,7 +252,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_By_Param_Ids_On_UserRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 UserTypeRepository userTypeRepository;
@@ -279,7 +274,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_UserRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 UserTypeRepository userTypeRepository;
@@ -301,7 +296,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_UserRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 UserTypeRepository userTypeRepository;
@@ -321,7 +316,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_UserRepository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 UserTypeRepository userTypeRepository;
@@ -342,7 +337,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Remove_Section_For_User()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 UserTypeRepository userTypeRepository;
@@ -378,7 +373,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Add_Section_For_User()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 UserTypeRepository userTypeRepository;
@@ -423,7 +418,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Update_Section_For_User()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 UserTypeRepository userTypeRepository;
@@ -452,7 +447,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Get_Users_Assigned_To_Section()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 UserTypeRepository userTypeRepository;
@@ -482,7 +477,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Default_User_Permissions_Based_On_User_Type()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger);
@@ -533,7 +528,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IUserType CreateAndCommitUserType()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger);

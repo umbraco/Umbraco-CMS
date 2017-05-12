@@ -21,9 +21,7 @@ namespace Umbraco.Core
         /// used.</remarks>
         public DatabaseContext(IUmbracoDatabaseFactory databaseFactory)
         {
-            if (databaseFactory == null) throw new ArgumentNullException(nameof(databaseFactory));
-
-            _databaseFactory = databaseFactory;
+            _databaseFactory = databaseFactory ?? throw new ArgumentNullException(nameof(databaseFactory));
         }
 
         /// <summary>
@@ -50,16 +48,7 @@ namespace Umbraco.Core
         /// Gets an ambient database for doing CRUD operations against custom tables that resides in the Umbraco database.
         /// </summary>
         /// <remarks>Should not be used for operation against standard Umbraco tables; as services should be used instead.</remarks>
-        public IUmbracoDatabase Database => _databaseFactory.GetDatabase();
-
-        /// <summary>
-        /// Gets an ambient database scope.
-        /// </summary>
-        /// <returns>A disposable object representing the scope.</returns>
-        public IDisposable CreateDatabaseScope() // fixme - move over to factory
-        {
-            return _databaseFactory.CreateScope();
-        }
+        public IUmbracoDatabase Database => throw new NotImplementedException(); // there's no magic?
 
         /// <summary>
         /// Gets a value indicating whether the database is configured.

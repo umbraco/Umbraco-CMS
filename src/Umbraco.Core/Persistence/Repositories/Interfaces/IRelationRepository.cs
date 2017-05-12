@@ -1,8 +1,9 @@
 ﻿using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IRelationRepository : IQueryRepository<int, IRelation>
+    public interface IRelationRepository : IUnitOfWorkRepository, IQueryRepository<int, IRelation>
     {
 
     }

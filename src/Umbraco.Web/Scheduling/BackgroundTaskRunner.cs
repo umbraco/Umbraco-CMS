@@ -180,15 +180,13 @@ namespace Umbraco.Web.Scheduling
             }
         }
 
-        // fixme should the above throw, return null, a completed task?
-
-        // fixme what's the diff?!
         /// <summary>
         /// Gets an awaitable used to await the runner running operation.
         /// </summary>
         /// <returns>An awaitable instance.</returns>
         /// <remarks>Used to wait until the runner is no longer running (IsRunning == false),
-        /// though the runner could be started again afterwards by adding tasks to it.</remarks>
+        /// though the runner could be started again afterwards by adding tasks to it. If
+        /// the runner is not running, returns a completed awaitable.</remarks>
         public ThreadingTaskImmutable StoppedAwaitable
         {
             get
@@ -307,7 +305,7 @@ namespace Umbraco.Web.Scheduling
         /// <remarks>Must be invoked within lock(_locker) and with _isCompleted being false.</remarks>
         private void StartUpLocked()
         {
-            // double check 
+            // double check
             if (_isRunning) return;
             _isRunning = true;
 
@@ -457,7 +455,7 @@ namespace Umbraco.Web.Scheduling
 
             try
             {
-                // A task that represents the asynchronous receive operation. When an item value is successfully 
+                // A task that represents the asynchronous receive operation. When an item value is successfully
                 // received from the source, the returned task is completed and its Result returns the received
                 // value. If an item value cannot be retrieved because the source is empty and completed, an
                 // InvalidOperationException exception is thrown in the returned task.

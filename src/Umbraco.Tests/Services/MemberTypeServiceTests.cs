@@ -113,17 +113,21 @@ namespace Umbraco.Tests.Services
             contentType1.Alias = "newAlias";
             ServiceContext.MemberTypeService.Save(contentType1);
 
-            foreach (var c in contentItems1)
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var xml = DatabaseFactory.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
-                Assert.IsNotNull(xml);
-                Assert.IsTrue(xml.Xml.StartsWith("<newAlias"));
-            }
-            foreach (var c in contentItems2)
-            {
-                var xml = DatabaseFactory.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
-                Assert.IsNotNull(xml);
-                Assert.IsTrue(xml.Xml.StartsWith("<test2")); //should remain the same
+                foreach (var c in contentItems1)
+                {
+                    var xml = scope.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
+                    Assert.IsNotNull(xml);
+                    Assert.IsTrue(xml.Xml.StartsWith("<newAlias"));
+                }
+                foreach (var c in contentItems2)
+                {
+                    var xml = scope.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
+                    Assert.IsNotNull(xml);
+                    Assert.IsTrue(xml.Xml.StartsWith("<test2")); //should remain the same
+                }
+                scope.Complete();
             }
         }
 
@@ -140,11 +144,15 @@ namespace Umbraco.Tests.Services
             var alias = contentType1.PropertyTypes.First(x => standardProps.ContainsKey(x.Alias) == false).Alias;
             var elementToMatch = "<" + alias + ">";
 
-            foreach (var c in contentItems1)
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var xml = DatabaseFactory.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
-                Assert.IsNotNull(xml);
-                Assert.IsTrue(xml.Xml.Contains(elementToMatch)); //verify that it is there before we remove the property
+                foreach (var c in contentItems1)
+                {
+                    var xml = scope.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
+                    Assert.IsNotNull(xml);
+                    Assert.IsTrue(xml.Xml.Contains(elementToMatch)); //verify that it is there before we remove the property
+                }
+                scope.Complete();
             }
 
             //remove a property (NOT ONE OF THE DEFAULTS)
@@ -153,13 +161,42 @@ namespace Umbraco.Tests.Services
 
             var reQueried = ServiceContext.MemberTypeService.Get(contentType1.Id);
             var reContent = ServiceContext.MemberService.GetById(contentItems1.First().Id);
-
-            foreach (var c in contentItems1)
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var xml = DatabaseFactory.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
-                Assert.IsNotNull(xml);
-                Assert.IsFalse(xml.Xml.Contains(elementToMatch)); //verify that it is no longer there
+                foreach (var c in contentItems1)
+                {
+                    var xml = scope.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
+                    Assert.IsNotNull(xml);
+                    Assert.IsFalse(xml.Xml.Contains(elementToMatch)); //verify that it is no longer there
+                }
+                scope.Complete();
             }
+        }
+
+        [Test]
+        public void Cannot_Save_MemberType_With_Empty_Name()
+        {
+            // Arrange
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType("memberTypeAlias", string.Empty);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => ServiceContext.MemberTypeService.Save(memberType));
+        }
+
+        [Test]
+        public void Empty_Description_Is_Always_Null_After_Saving_Member_Type()
+        {
+            var service = ServiceContext.MemberTypeService;
+            var memberType = MockedContentTypes.CreateSimpleMemberType();
+            memberType.Description = null;
+            service.Save(memberType);
+
+            var memberType2 = MockedContentTypes.CreateSimpleMemberType("memberType2", "Member Type 2");
+            memberType2.Description = string.Empty;
+            service.Save(memberType2);
+
+            Assert.IsNull(memberType.Description);
+            Assert.IsNull(memberType2.Description);
         }
 
         //[Test]

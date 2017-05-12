@@ -23,14 +23,14 @@ namespace Umbraco.Tests.Templates
         private readonly Mock<ITemplatesSection> _templateConfigMock = new Mock<ITemplatesSection>();
         private TemplateRepository _templateRepository;
 
-        private TestObjects TestObjects = new TestObjects(null);
+        private readonly TestObjects TestObjects = new TestObjects(null);
 
         [SetUp]
         public void Setup()
         {
             var logger = Mock.Of<ILogger>();
 
-            var unitOfWorkMock = new Mock<IDatabaseUnitOfWork>();
+            var unitOfWorkMock = new Mock<IScopeUnitOfWork>();
             var database = TestObjects.GetUmbracoSqlCeDatabase(logger);
             unitOfWorkMock.Setup(x => x.Database).Returns(database);
 

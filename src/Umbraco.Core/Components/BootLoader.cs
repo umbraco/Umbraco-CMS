@@ -7,6 +7,7 @@ using LightInject;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Components
 {
@@ -49,9 +50,10 @@ namespace Umbraco.Core.Components
             InstanciateComponents(orderedComponentTypes);
             ComposeComponents(level);
 
-            using (_container.GetInstance<IUmbracoDatabaseFactory>().CreateScope())
+            using (var scope = _container.GetInstance<IScopeProvider>().CreateScope())
             {
                 InitializeComponents();
+                scope.Complete();
             }
 
             // rejoice!

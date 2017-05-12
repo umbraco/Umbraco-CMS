@@ -138,7 +138,13 @@ namespace Umbraco.Web.UI.Controls
 
 		private bool DoesMacroHaveParameters(int macroId)
 		{
-            return DatabaseFactory.Database.ExecuteScalar<int>(string.Format("SELECT COUNT(*) from cmsMacroProperty where macro = {0}", macroId)) > 0;
+		    bool hasParameters;
+		    using (var scope = Current.ScopeProvider.CreateScope())
+		    {
+                hasParameters = scope.Database.ExecuteScalar<int>("SELECT COUNT(*) from cmsMacroProperty where macro=@macroId", new { macroId }) > 0;
+                scope.Complete();
+		    }
+		    return hasParameters;
 		}
 	}
 }

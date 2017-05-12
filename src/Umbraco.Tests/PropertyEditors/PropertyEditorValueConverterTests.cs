@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.PropertyEditors
 {
@@ -58,5 +58,44 @@ namespace Umbraco.Tests.PropertyEditors
 
             Assert.AreEqual(expected, result);
         }
-	}
+
+        [TestCase("apples", new[] { "apples" })]
+        [TestCase("apples,oranges", new[] { "apples", "oranges" })]
+        [TestCase(" apples, oranges, pears ", new[] { "apples", "oranges", "pears" })]
+        [TestCase("", new string[] { })]
+        [TestCase(null, new string[] { })]
+        public void CanConvertCheckboxListPropertyEditor(object value, IEnumerable<string> expected)
+        {
+            var converter = new CheckboxListValueConverter();
+            var result = converter.ConvertInterToObject(null, PropertyCacheLevel.Unknown, value, false);
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCase("apples", new[] { "apples" })]
+        [TestCase("apples,oranges", new[] { "apples", "oranges" })]
+        [TestCase("apples , oranges, pears ", new[] { "apples", "oranges", "pears" })]
+        [TestCase("", new string[] { })]
+        [TestCase(null, new string[] { })]
+        public void CanConvertDropdownListMultiplePropertyEditor(object value, IEnumerable<string> expected)
+        {
+            var converter = new DropdownListMultipleValueConverter();
+            var result = converter.ConvertInterToObject(null, PropertyCacheLevel.Unknown, value, false);
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCase("100", new[] { 100 })]
+        [TestCase("100,200", new[] { 100, 200 })]
+        [TestCase("100 , 200, 300 ", new[] { 100, 200, 300 })]
+        [TestCase("", new int[] { })]
+        [TestCase(null, new int[] { })]
+        public void CanConvertDropdownListMultipleWithKeysPropertyEditor(object value, IEnumerable<int> expected)
+        {
+            var converter = new DropdownListMultipleWithKeysValueConverter();
+            var result = converter.ConvertInterToObject(null, PropertyCacheLevel.Unknown, value, false);
+
+            Assert.AreEqual(expected, result);
+        }
+    }
 }

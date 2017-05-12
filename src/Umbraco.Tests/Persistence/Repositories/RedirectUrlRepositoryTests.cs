@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CanSaveAndGet()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
 
             using (var uow = provider.CreateUnitOfWork())
             {
@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CanSaveAndGetMostRecent()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
 
             Assert.AreNotEqual(_textpage.Id, _otherpage.Id);
 
@@ -103,7 +103,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CanSaveAndGetByContent()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
 
             using (var uow = provider.CreateUnitOfWork())
             {
@@ -147,7 +147,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CanSaveAndDelete()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
 
             using (var uow = provider.CreateUnitOfWork())
             {
@@ -185,7 +185,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        private IRedirectUrlRepository CreateRepository(IDatabaseUnitOfWork uow)
+        private IRedirectUrlRepository CreateRepository(IScopeUnitOfWork uow)
         {
             return new RedirectUrlRepository(uow, CacheHelper, Logger);
         }

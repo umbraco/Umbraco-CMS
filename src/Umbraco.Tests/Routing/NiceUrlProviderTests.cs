@@ -81,14 +81,7 @@ namespace Umbraco.Tests.Routing
 			}
 
 			var cachedIds = cache.RoutesCache.GetCachedIds();
-			Assert.AreEqual(8, cachedIds.Count);
-
-			foreach (var sample in samples)
-			{
-				var key = sample.Value;
-				Assert.IsTrue(cachedIds.ContainsKey(key));
-				Assert.AreEqual(sample.Key, cachedIds[key]);
-			}
+			Assert.AreEqual(0, cachedIds.Count);
 		}
 
 		// test hideTopLevelNodeFromPath false

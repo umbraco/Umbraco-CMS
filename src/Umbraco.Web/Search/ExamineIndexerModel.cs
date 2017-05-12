@@ -5,7 +5,6 @@ using Examine;
 
 namespace Umbraco.Web.Search
 {
-
     [DataContract(Name = "indexer", Namespace = "")]
     public class ExamineIndexerModel : ExamineSearcherModel
     {
@@ -41,6 +40,5 @@ namespace Umbraco.Web.Search
         /// </summary>
         [DataMember(Name = "isLuceneIndex")]
         public bool IsLuceneIndex { get; set; }
-
     }
 }

@@ -7,6 +7,23 @@ namespace Umbraco.Core
     {
         internal const string CycleDependencyError = "Cyclic dependency.";
         internal const string MissingDependencyError = "Missing dependency.";
+
+        public class Node<TKey, TItem>
+        {
+            public Node(TKey key, TItem item, IEnumerable<TKey> dependencies)
+            {
+                Key = key;
+                Item = item;
+                Dependencies = dependencies;
+            }
+
+            public TKey Key { get; }
+            public TItem Item { get; }
+            public IEnumerable<TKey> Dependencies { get; }
+        }
+
+        public static Node<TKey, TItem> CreateNode<TKey, TItem>(TKey key, TItem item, IEnumerable<TKey> dependencies)
+            => new Node<TKey, TItem>(key, item, dependencies);
     }
 
     /// <summary>

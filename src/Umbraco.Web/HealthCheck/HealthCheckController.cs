@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Editors;
 
 namespace Umbraco.Web.HealthCheck
@@ -12,11 +13,12 @@ namespace Umbraco.Web.HealthCheck
     public class HealthCheckController : UmbracoAuthorizedJsonController
     {
         private readonly HealthCheckCollection _checks;
+        private readonly ILogger _logger;
 
-        public HealthCheckController(HealthCheckCollection checks)
+        public HealthCheckController(HealthCheckCollection checks, ILogger logger)
         {
-            if (checks == null) throw new ArgumentNullException(nameof(checks));
-            _checks = checks;
+            _checks = checks ?? throw new ArgumentNullException(nameof(checks));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -44,12 +46,22 @@ namespace Umbraco.Web.HealthCheck
             return healthCheckGroups;
         }
 
+        [HttpGet]
         public object GetStatus(Guid id)
         {
             var check = _checks.FirstOrDefault(x => x.Id == id);
             if (check == null) throw new InvalidOperationException("No health check found with ID " + id);
 
-            return check.GetStatus();
+            try
+            {
+                //Core.Logging.LogHelper.Debug<HealthCheckController>("Running health check: " + check.Name);
+                return check.GetStatus();
+            }
+            catch (Exception e)
+            {
+                _logger.Error<HealthCheckController>("Exception in health check: " + check.Name, e);
+                throw;
+            }
         }
 
         [HttpPost]

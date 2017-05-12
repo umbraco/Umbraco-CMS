@@ -8,5 +8,6 @@ namespace Umbraco.Core.Persistence.Repositories
         bool ValidateStylesheet(Stylesheet stylesheet);
         Stream GetFileContentStream(string filepath);
         void SetFileContent(string filepath, Stream content);
+        long GetFileSize(string filepath);
     }
 }

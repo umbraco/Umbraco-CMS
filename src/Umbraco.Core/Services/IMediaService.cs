@@ -58,8 +58,9 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Defines the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
     /// </summary>
-    public interface IMediaService : IService
+    public interface IMediaService : IContentServiceBase
     {
+        int CountNotTrashed(string contentTypeAlias = null);
         int Count(string mediaTypeAlias = null);
         int CountChildren(int parentId, string mediaTypeAlias = null);
         int CountDescendants(int parentId, string mediaTypeAlias = null);
@@ -140,7 +141,23 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMedia> filter);
-        
+
+        /// <summary>
+        /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Children from</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter">Search text filter</param>
+        /// <param name="contentTypeFilter">A list of content type Ids to filter the list by</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter, int[] contentTypeFilter);
+
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
         /// </summary>
@@ -153,7 +170,7 @@ namespace Umbraco.Core.Services
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "");
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
@@ -223,6 +240,14 @@ namespace Umbraco.Core.Services
         /// <param name="mediaTypeId">Id of the <see cref="IMediaType"/></param>
         /// <param name="userId">Optional Id of the user deleting Media</param>
         void DeleteMediaOfType(int mediaTypeId, int userId = 0);
+
+        /// <summary>
+        /// Deletes all media of the specified types. All Descendants of deleted media that is not of these types is moved to Recycle Bin.
+        /// </summary>
+        /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
+        /// <param name="mediaTypeIds">Ids of the <see cref="IMediaType"/>s</param>
+        /// <param name="userId">Optional Id of the user issueing the delete operation</param>
+        void DeleteMediaOfTypes(IEnumerable<int> mediaTypeIds, int userId = 0);
 
         /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
@@ -400,17 +425,16 @@ namespace Umbraco.Core.Services
         void SetMediaFileContent(string filepath, Stream content);
 
         /// <summary>
-        /// Deletes a media file and all thumbnails.
+        /// Deletes a media file.
         /// </summary>
         /// <param name="filepath">The filesystem path to the media.</param>
         void DeleteMediaFile(string filepath);
 
         /// <summary>
-        /// Generates thumbnails.
+        /// Gets the size of a media.
         /// </summary>
-        /// <param name="filepath">The filesystem-relative path to the original image.</param>
-        /// <param name="propertyType">The property type.</param>
-        /// <remarks>This should be obsoleted, we should not generate thumbnails.</remarks>
-        void GenerateThumbnails(string filepath, PropertyType propertyType);
+        /// <param name="filepath">The filesystem path to the media.</param>
+        /// <returns>The size of the media.</returns>
+        long GetMediaFileSize(string filepath);
     }
 }

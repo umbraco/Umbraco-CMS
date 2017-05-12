@@ -16,6 +16,7 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
+using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -43,15 +44,17 @@ namespace Umbraco.Tests.Benchmarks
 
         public ModelToSqlExpressionHelperBenchmarks()
         {
-            _contentMapper = new ContentMapper();
-            // _contentMapper.BuildMap(); // fixme - protected?
+            var contentMapper = new ContentMapper();
             _cachedExpression = new CachedExpression();
+            var mapperCollection = new Mock<IMapperCollection>();
+            mapperCollection.Setup(x => x[It.IsAny<Type>()]).Returns(contentMapper);
+            _mapperCollection = mapperCollection.Object;
         }
         
         private readonly ISqlSyntaxProvider _syntaxProvider = new SqlCeSyntaxProvider();
-        private readonly BaseMapper _contentMapper;
         private readonly CachedExpression _cachedExpression;
-        
+        private readonly IMapperCollection _mapperCollection;
+
         [Benchmark(Baseline = true)]
         public void WithNonCached()
         {
@@ -62,15 +65,12 @@ namespace Umbraco.Tests.Benchmarks
                 Expression<Func<IContent, bool>> predicate = content =>
                 content.Path.StartsWith("-1") && content.Published && (content.ContentTypeId == a || content.ContentTypeId == b);
 
-                var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(_syntaxProvider, _contentMapper);
+                var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(_syntaxProvider, _mapperCollection);
                 var result = modelToSqlExpressionHelper.Visit(predicate);
-            }
-            
+            }            
         }
 
-        
-
-        [Benchmark()]
+        [Benchmark]
         public void WithCachedExpression()
         {
             for (int i = 0; i < 100; i++)
@@ -80,7 +80,7 @@ namespace Umbraco.Tests.Benchmarks
                 Expression<Func<IContent, bool>> predicate = content =>
                 content.Path.StartsWith("-1") && content.Published && (content.ContentTypeId == a || content.ContentTypeId == b);
                 
-                var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(_syntaxProvider, _contentMapper);
+                var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(_syntaxProvider, _mapperCollection);
 
                 //wrap it!
                 _cachedExpression.Wrap(predicate);

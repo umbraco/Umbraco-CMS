@@ -5,6 +5,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
+    [DefaultPropertyValueConverter]
     public class DatePickerValueConverter : PropertyValueConverterBase
 	{
 	    private static readonly string[] PropertyEditorAliases =

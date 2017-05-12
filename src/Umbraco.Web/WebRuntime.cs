@@ -46,8 +46,8 @@ namespace Umbraco.Web
             base.Boot(container);
 
             // now (and only now) is the time to switch over to perWebRequest scopes
-            var smp = container.ScopeManagerProvider as MixedScopeManagerProvider;
-            if (smp == null) throw new Exception("Container.ScopeManagerProvider is not MixedScopeManagerProvider.");
+            var smp = container.ScopeManagerProvider as MixedLightInjectScopeManagerProvider;
+            if (smp == null) throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
             smp.EnablePerWebRequestScope();
         }
 
@@ -73,7 +73,6 @@ namespace Umbraco.Web
                     new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
 
             container.RegisterSingleton<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
-            container.RegisterSingleton<IDatabaseScopeAccessor, HybridDatabaseScopeAccessor>(); // replace CoreRuntime's accessor
         }
 
         #region Getters

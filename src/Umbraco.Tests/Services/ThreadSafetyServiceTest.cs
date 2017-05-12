@@ -19,7 +19,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.DI;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
@@ -34,12 +34,6 @@ namespace Umbraco.Tests.Services
 			CreateTestData();
 		}
 
-        protected override void Compose()
-        {
-            base.Compose();
-            Container.RegisterSingleton<IDatabaseScopeAccessor>(f => new ThreadStaticDatabaseScopeAccessor()); // per-thread database scope
-        }
-
         private const int MaxThreadCount = 20;
 
 		[Test]
@@ -50,19 +44,25 @@ namespace Umbraco.Tests.Services
 			var threads = new List<Thread>();
             var exceptions = new List<Exception>();
 
-            Debug.WriteLine("Starting test");
+            Debug.WriteLine("Starting...");
 
             for (var i = 0; i < MaxThreadCount; i++)
 			{
 				var t = new Thread(() =>
 				{
-				    using (DatabaseFactory.CreateScope())
+                    using (var scope = ScopeProvider.CreateScope())
 				    {
                         try
                         {
+                            Debug.WriteLine("[{0}] Running...", Thread.CurrentThread.ManagedThreadId);
+
+                            var database = scope.Database;
+                            Debug.WriteLine("[{0}] Database {1}.", Thread.CurrentThread.ManagedThreadId, database.InstanceId);
+
                             //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Create 1st content.");
                             var content1 = contentService.CreateContent("test" + Guid.NewGuid(), -1, "umbTextpage", 0);
 
+                            Debug.WriteLine("[{0}] Saving content #1.", Thread.CurrentThread.ManagedThreadId);
                             //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Save 1st content.");
                             contentService.Save(content1);
                             //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Saved 1st content.");
@@ -73,6 +73,7 @@ namespace Umbraco.Tests.Services
                             var content2 = contentService.CreateContent("test" + Guid.NewGuid(), -1, "umbTextpage", 0);
 
                             //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Save 2nd content.");
+                            Debug.WriteLine("[{0}] Saving content #2.", Thread.CurrentThread.ManagedThreadId);
                             contentService.Save(content2);
                             //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Saved 2nd content.");
                         }
@@ -81,6 +82,8 @@ namespace Umbraco.Tests.Services
                             //Debug.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}] ({DateTime.Now.ToString("HH:mm:ss,FFF")}) Exception!");
                             lock (exceptions) { exceptions.Add(e); }
                         }
+
+				        scope.Complete();
                     }
                 });
 				threads.Add(t);
@@ -121,35 +124,40 @@ namespace Umbraco.Tests.Services
 			var threads = new List<Thread>();
             var exceptions = new List<Exception>();
 
-            Debug.WriteLine("Starting test...");
+            Debug.WriteLine("Starting...");
 
 			for (var i = 0; i < MaxThreadCount; i++)
 			{
 				var t = new Thread(() =>
 				{
-				    using (DatabaseFactory.CreateScope())
+				    using (var scope = ScopeProvider.CreateScope())
 				    {
                         try
                         {
-                            //Debug.WriteLine("Created content on thread: " + Thread.CurrentThread.ManagedThreadId);
+                            Debug.WriteLine("[{0}] Running...", Thread.CurrentThread.ManagedThreadId);
+
+                            var database = scope.Database;
+                            Debug.WriteLine("[{0}] Database {1}.", Thread.CurrentThread.ManagedThreadId, database.InstanceId);
 
                             //create 2 content items
 
                             var folder1 = mediaService.CreateMedia("test" + Guid.NewGuid(), -1, Constants.Conventions.MediaTypes.Folder, 0);
-                            //Debug.WriteLine("Saving folder1 on thread: " + Thread.CurrentThread.ManagedThreadId);
+                            Debug.WriteLine("[{0}] Saving content #1.", Thread.CurrentThread.ManagedThreadId);
                             mediaService.Save(folder1, 0);
 
                             Thread.Sleep(100); //quick pause for maximum overlap!
 
                             var folder2 = mediaService.CreateMedia("test" + Guid.NewGuid(), -1, Constants.Conventions.MediaTypes.Folder, 0);
-                            //Debug.WriteLine("Saving folder2 on thread: " + Thread.CurrentThread.ManagedThreadId);
+                            Debug.WriteLine("[{0}] Saving content #2.", Thread.CurrentThread.ManagedThreadId);
                             mediaService.Save(folder2, 0);
                         }
                         catch (Exception e)
                         {
                             lock (exceptions) { exceptions.Add(e); }
                         }
-                    }
+
+				        scope.Complete();
+				    }
                 });
 				threads.Add(t);
 			}
@@ -239,18 +247,13 @@ namespace Umbraco.Tests.Services
 
 			public IUmbracoDatabase GetDatabase()
 			{
-			    var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+			    var settings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
                 var sqlContext = new SqlContext(SqlSyntax, Mock.Of<IPocoDataFactory>(), DatabaseType);
                 return _databases.GetOrAdd(Thread.CurrentThread.ManagedThreadId,
                     i => new UmbracoDatabase(settings.ConnectionString, sqlContext, _dbProviderFactory, _logger));
 			}
 
 		    public IUmbracoDatabase CreateDatabase()
-		    {
-                throw new NotImplementedException();
-            }
-
-		    public IDatabaseScope CreateScope(IUmbracoDatabase database = null)
 		    {
                 throw new NotImplementedException();
             }
@@ -262,5 +265,5 @@ namespace Umbraco.Tests.Services
 			    _databases.Clear();
 			}
 		}
-	}
+    }
 }

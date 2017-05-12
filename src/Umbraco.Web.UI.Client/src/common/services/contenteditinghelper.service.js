@@ -522,6 +522,26 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 return true;
             }
             return false;
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.contentEditingHelper#redirectToRenamedContent
+         * @methodOf umbraco.services.contentEditingHelper
+         * @function
+         *
+         * @description
+         * For some editors like scripts or entites that have names as ids, these names can change and we need to redirect
+         * to their new paths, this is helper method to do that.
+         */
+        redirectToRenamedContent: function (id) {            
+            //clear the query strings
+            $location.search("");
+            //change to new path
+            $location.path("/" + $routeParams.section + "/" + $routeParams.tree + "/" + $routeParams.method + "/" + id);
+            //don't add a browser history for this
+            $location.replace();
+            return true;
         }
     };
 }

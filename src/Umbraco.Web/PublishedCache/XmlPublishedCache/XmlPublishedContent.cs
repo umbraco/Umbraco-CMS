@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Models;
 
@@ -105,7 +106,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			}
 		}
 
-		public override int Id
+        public override int Id
 		{
 			get
 			{
@@ -299,87 +300,129 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 		private void InitializeNode()
 		{
-		    if (_xmlNode == null) return;
+	        InitializeNode(_xmlNode, _isPreviewing,
+	            out _id, out _key, out _template, out _sortOrder, out _name, out _writerName,
+	            out _urlName, out _creatorName, out _creatorId, out _writerId, out _docTypeAlias, out _docTypeId, out _path,
+	            out _version, out _createDate, out _updateDate, out _level, out _isDraft, out _contentType, out _properties,
+	            _contentTypeCache.Get);
 
-		    if (_xmlNode.Attributes != null)
+	        // warn: this is not thread-safe...
+	        _nodeInitialized = true;
+	    }
+
+	    internal static void InitializeNode(XmlNode xmlNode, bool isPreviewing,
+	        out int id, out Guid key, out int template, out int sortOrder, out string name, out string writerName, out string urlName,
+	        out string creatorName, out int creatorId, out int writerId, out string docTypeAlias, out int docTypeId, out string path,
+	        out Guid version, out DateTime createDate, out DateTime updateDate, out int level, out bool isDraft,
+	        out PublishedContentType contentType, out Dictionary<string, IPublishedProperty> properties,
+	        Func<PublishedItemType, string, PublishedContentType> getPublishedContentType)
+	    {
+	        //initialize the out params with defaults:
+	        writerName = null;
+	        docTypeAlias = null;
+	        id = template = sortOrder = template = creatorId = writerId = docTypeId = level = default(int);
+	        key = version = default(Guid);
+	        name = writerName = urlName = creatorName = docTypeAlias = path = null;
+	        createDate = updateDate = default(DateTime);
+	        isDraft = false;
+	        contentType = null;
+	        properties = null;
+
+            if (xmlNode == null) return;
+
+		    if (xmlNode.Attributes != null)
 		    {
-		        _id = int.Parse(_xmlNode.Attributes.GetNamedItem("id").Value);
-                if (_xmlNode.Attributes.GetNamedItem("key") != null) // because, migration
-    		        _key = Guid.Parse(_xmlNode.Attributes.GetNamedItem("key").Value);
-		        if (_xmlNode.Attributes.GetNamedItem("template") != null)
-		            _template = int.Parse(_xmlNode.Attributes.GetNamedItem("template").Value);
-		        if (_xmlNode.Attributes.GetNamedItem("sortOrder") != null)
-		            _sortOrder = int.Parse(_xmlNode.Attributes.GetNamedItem("sortOrder").Value);
-		        if (_xmlNode.Attributes.GetNamedItem("nodeName") != null)
-		            _name = _xmlNode.Attributes.GetNamedItem("nodeName").Value;
-		        if (_xmlNode.Attributes.GetNamedItem("writerName") != null)
-		            _writerName = _xmlNode.Attributes.GetNamedItem("writerName").Value;
-		        if (_xmlNode.Attributes.GetNamedItem("urlName") != null)
-		            _urlName = _xmlNode.Attributes.GetNamedItem("urlName").Value;
-		        // Creatorname is new in 2.1, so published xml might not have it!
-		        try
-		        {
-		            _creatorName = _xmlNode.Attributes.GetNamedItem("creatorName").Value;
-		        }
-		        catch
-		        {
-		            _creatorName = _writerName;
-		        }
+		        id = int.Parse(xmlNode.Attributes.GetNamedItem("id").Value);
+                if (xmlNode.Attributes.GetNamedItem("key") != null) // because, migration
+    		        key = Guid.Parse(xmlNode.Attributes.GetNamedItem("key").Value);
+		        if (xmlNode.Attributes.GetNamedItem("template") != null)
+		            template = int.Parse(xmlNode.Attributes.GetNamedItem("template").Value);
+		        if (xmlNode.Attributes.GetNamedItem("sortOrder") != null)
+		            sortOrder = int.Parse(xmlNode.Attributes.GetNamedItem("sortOrder").Value);
+		        if (xmlNode.Attributes.GetNamedItem("nodeName") != null)
+		            name = xmlNode.Attributes.GetNamedItem("nodeName").Value;
+		        if (xmlNode.Attributes.GetNamedItem("writerName") != null)
+		            writerName = xmlNode.Attributes.GetNamedItem("writerName").Value;
+		        if (xmlNode.Attributes.GetNamedItem("urlName") != null)
+		            urlName = xmlNode.Attributes.GetNamedItem("urlName").Value;
+		        if (xmlNode.Attributes.GetNamedItem("creatorName") != null)
+		            creatorName = xmlNode.Attributes.GetNamedItem("creatorName").Value;
 
 		        //Added the actual userID, as a user cannot be looked up via full name only...
-		        if (_xmlNode.Attributes.GetNamedItem("creatorID") != null)
-		            _creatorId = int.Parse(_xmlNode.Attributes.GetNamedItem("creatorID").Value);
-		        if (_xmlNode.Attributes.GetNamedItem("writerID") != null)
-		            _writerId = int.Parse(_xmlNode.Attributes.GetNamedItem("writerID").Value);
+		        if (xmlNode.Attributes.GetNamedItem("creatorID") != null)
+		            creatorId = int.Parse(xmlNode.Attributes.GetNamedItem("creatorID").Value);
+		        if (xmlNode.Attributes.GetNamedItem("writerID") != null)
+		            writerId = int.Parse(xmlNode.Attributes.GetNamedItem("writerID").Value);
 
-                _docTypeAlias = _xmlNode.Name;
+                docTypeAlias = xmlNode.Name;
 
-		        if (_xmlNode.Attributes.GetNamedItem("nodeType") != null)
-		            _docTypeId = int.Parse(_xmlNode.Attributes.GetNamedItem("nodeType").Value);
-		        if (_xmlNode.Attributes.GetNamedItem("path") != null)
-		            _path = _xmlNode.Attributes.GetNamedItem("path").Value;
-		        if (_xmlNode.Attributes.GetNamedItem("version") != null)
-		            _version = new Guid(_xmlNode.Attributes.GetNamedItem("version").Value);
-		        if (_xmlNode.Attributes.GetNamedItem("createDate") != null)
-		            _createDate = DateTime.Parse(_xmlNode.Attributes.GetNamedItem("createDate").Value);
-		        if (_xmlNode.Attributes.GetNamedItem("updateDate") != null)
-		            _updateDate = DateTime.Parse(_xmlNode.Attributes.GetNamedItem("updateDate").Value);
-		        if (_xmlNode.Attributes.GetNamedItem("level") != null)
-		            _level = int.Parse(_xmlNode.Attributes.GetNamedItem("level").Value);
+		        if (xmlNode.Attributes.GetNamedItem("nodeType") != null)
+		            docTypeId = int.Parse(xmlNode.Attributes.GetNamedItem("nodeType").Value);
+		        if (xmlNode.Attributes.GetNamedItem("path") != null)
+		            path = xmlNode.Attributes.GetNamedItem("path").Value;
+		        if (xmlNode.Attributes.GetNamedItem("version") != null)
+		            version = new Guid(xmlNode.Attributes.GetNamedItem("version").Value);
+		        if (xmlNode.Attributes.GetNamedItem("createDate") != null)
+		            createDate = DateTime.Parse(xmlNode.Attributes.GetNamedItem("createDate").Value);
+		        if (xmlNode.Attributes.GetNamedItem("updateDate") != null)
+		            updateDate = DateTime.Parse(xmlNode.Attributes.GetNamedItem("updateDate").Value);
+		        if (xmlNode.Attributes.GetNamedItem("level") != null)
+		            level = int.Parse(xmlNode.Attributes.GetNamedItem("level").Value);
 
-                _isDraft = (_xmlNode.Attributes.GetNamedItem("isDraft") != null);
+                isDraft = xmlNode.Attributes.GetNamedItem("isDraft") != null;
             }
 
-		    // load data
-            const string dataXPath = "* [not(@isDoc)]";
-		    var nodes = _xmlNode.SelectNodes(dataXPath);
+	        //dictionary to store the property node data
+	        var propertyNodes = new Dictionary<string, XmlNode>();
 
-            _contentType = _contentTypeCache.Get(PublishedItemType.Content, _docTypeAlias);
+	        foreach (XmlNode n in xmlNode.ChildNodes)
+	        {
+	            var e = n as XmlElement;
+	            if (e == null) continue;
+	            if (e.HasAttribute("isDoc") == false)
+	            {
+	                PopulatePropertyNodes(propertyNodes, e, false);
+	            }
+	            else break; //we are not longer on property elements
+	        }
 
-		    var propertyNodes = new Dictionary<string, XmlNode>();
-            if (nodes != null)
-                foreach (XmlNode n in nodes)
-                {
-                    var alias = n.Name;
-                    propertyNodes[alias.ToLowerInvariant()] = n;
-                }
+	        //lookup the content type and create the properties collection
+	        try
+	        {
+	            contentType = getPublishedContentType(PublishedItemType.Content, docTypeAlias);
 
-            _properties = _contentType.PropertyTypes.Select(p =>
-            {
-                XmlNode n;
-                return propertyNodes.TryGetValue(p.PropertyTypeAlias.ToLowerInvariant(), out n)
-                    ? new XmlPublishedProperty(p, _isPreviewing, n)
-                    : new XmlPublishedProperty(p, _isPreviewing);
-            }).Cast<IPublishedProperty>().ToDictionary(
-                x => x.PropertyTypeAlias,
-                x => x,
-                StringComparer.OrdinalIgnoreCase);
+	        }
+	        catch (InvalidOperationException e)
+	        {
+                // fixme - enable!
+	            //content.Instance.RefreshContentFromDatabase();
+	            throw new InvalidOperationException($"{e.Message}. This usually indicates that the content cache is corrupt; the content cache has been rebuilt in an attempt to self-fix the issue.");
+	        }
 
-            // warn: this is not thread-safe...
-            _nodeInitialized = true;
+            //fill in the property collection
+	        properties = new Dictionary<string, IPublishedProperty>(StringComparer.OrdinalIgnoreCase);
+	        foreach (var propertyType in contentType.PropertyTypes)
+	        {
+                var val = propertyNodes.TryGetValue(propertyType.PropertyTypeAlias.ToLowerInvariant(), out XmlNode n)
+                    ? new XmlPublishedProperty(propertyType, isPreviewing, n)
+                    : new XmlPublishedProperty(propertyType, isPreviewing);
+
+                properties[propertyType.PropertyTypeAlias] = val;
+	        }
 		}
 
-	    private void InitializeChildren()
+	    private static void PopulatePropertyNodes(IDictionary<string, XmlNode> propertyNodes, XmlNode n, bool legacy)
+	    {
+	        var attrs = n.Attributes;
+	        if (attrs == null) return;
+
+	        var alias = legacy
+	            ? attrs.GetNamedItem("alias").Value
+	            : n.Name;
+	        propertyNodes[alias.ToLowerInvariant()] = n;
+	    }
+
+        private void InitializeChildren()
 	    {
 	        if (_xmlNode == null) return;
 

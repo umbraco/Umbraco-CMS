@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Add()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Update()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Get_By_Id()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             CreateTestData(false, 20);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
@@ -160,7 +160,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(false, 10);
             CreateTestData(true, 5);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
@@ -176,7 +176,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(false, 10, -20);
             CreateTestData(false, 5, -21);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
@@ -192,7 +192,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(false, 10);
             CreateTestData(true, 5);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
@@ -204,7 +204,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private void CreateTestData(bool closed, int count, int entityId = -1)
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);

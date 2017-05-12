@@ -1,6 +1,4 @@
-﻿using System;
-using System.Reflection;
-using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Running;
 
 namespace Umbraco.Tests.Benchmarks
 {
@@ -8,23 +6,17 @@ namespace Umbraco.Tests.Benchmarks
     {
         public static void Main(string[] args)
         {
-            if (args.Length == 1)
+            var switcher = new BenchmarkSwitcher(new[]
             {
-                var type = Assembly.GetExecutingAssembly().GetType("Umbraco.Tests.Benchmarks." +args[0]);
-                if (type == null)
-                {
-                    Console.WriteLine("Unknown benchmark.");
-                }
-                else
-                {
-                    var summary = BenchmarkRunner.Run(type);
-                    Console.ReadLine();
-                }
-            }
-            else
-            {
-                Console.WriteLine("?");
-            }
+                typeof(BulkInsertBenchmarks),
+                typeof(ModelToSqlExpressionHelperBenchmarks),
+                typeof(XmlBenchmarks),
+                typeof(LinqCastBenchmarks),
+                //typeof(DeepCloneBenchmarks),
+                typeof(XmlPublishedContentInitBenchmarks),
+
+            });
+            switcher.Run(args);            
         }
     }
 }

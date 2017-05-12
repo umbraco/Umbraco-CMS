@@ -4,9 +4,10 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
+    [DefaultPropertyValueConverter]
     public class TextStringValueConverter : PropertyValueConverterBase
     {
-        private readonly static string[] PropertyTypeAliases =
+        private static readonly string[] PropertyTypeAliases =
         {
             Constants.PropertyEditors.TextboxAlias,
             Constants.PropertyEditors.TextboxMultipleAlias

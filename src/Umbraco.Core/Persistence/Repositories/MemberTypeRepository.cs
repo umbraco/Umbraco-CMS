@@ -21,20 +21,13 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private IRepositoryCachePolicy<IMemberType, int> _cachePolicy;
 
-        public MemberTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
+        public MemberTypeRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         { }
 
-        protected override IRepositoryCachePolicy<IMemberType, int> CachePolicy
+        protected override IRepositoryCachePolicy<IMemberType, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                if (_cachePolicy != null) return _cachePolicy;
-
-                _cachePolicy = new FullDataSetRepositoryCachePolicy<IMemberType, int>(RuntimeCache, GetEntityId, /*expires:*/ true);
-
-                return _cachePolicy;
-            }
+            return new FullDataSetRepositoryCachePolicy<IMemberType, int>(runtimeCache, GetEntityId, /*expires:*/ true);
         }
 
         protected override IMemberType PerformGet(int id)

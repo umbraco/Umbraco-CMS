@@ -54,11 +54,17 @@ namespace Umbraco.Core.PropertyEditors
             Group = "common";
         }
 
-        public string Alias { get; private set; }
-        public string Name { get; private set; }
-        public string EditorView { get; private set; }
+        public string Alias { get; }
+        public string Name { get; }
+        public string EditorView { get; }
         public string ValueType { get; set; }
         public bool IsParameterEditor { get; set; }
+
+        /// <summary>
+        /// If set to true, this property editor will not show up in the DataType's drop down list
+        /// if there is not already one of them chosen for a DataType
+        /// </summary>
+        public bool IsDeprecated { get; set; } // fixme should just kill in v8
 
         /// <summary>
         /// If this is is true than the editor will be displayed full width without a label

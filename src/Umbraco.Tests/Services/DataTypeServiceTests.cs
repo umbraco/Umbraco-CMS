@@ -24,12 +24,15 @@ namespace Umbraco.Tests.Services
             var dataTypeService = ServiceContext.DataTypeService;
 
             // Act
-            var dataTypeDefinition = new DataTypeDefinition(-1, "Test.TestEditor") { Name = "Testing Textfield", DatabaseType = DataTypeDatabaseType.Ntext };
+            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, "Test.TestEditor") { Name = "Testing Textfield", DatabaseType = DataTypeDatabaseType.Ntext };
             dataTypeService.Save(dataTypeDefinition);
 
             // Assert
             Assert.That(dataTypeDefinition, Is.Not.Null);
             Assert.That(dataTypeDefinition.HasIdentity, Is.True);
+
+            dataTypeDefinition = dataTypeService.GetDataTypeDefinitionById(dataTypeDefinition.Id);
+            Assert.That(dataTypeDefinition, Is.Not.Null);
         }
 
         [Test]
@@ -197,8 +200,9 @@ namespace Umbraco.Tests.Services
             IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
             dataTypeService.Save(dataTypeDefinition);
             dataTypeService.SavePreValues(dataTypeDefinition.Id, new[] {"preVal1", "preVal2"});
-            
+
             //re-get            
+            dataTypeDefinition = dataTypeService.GetDataTypeDefinitionById(dataTypeDefinition.Id);
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
 
             // Assert
@@ -208,6 +212,19 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(2, preVals.PreValuesAsArray.Count());
             Assert.AreEqual("preVal1", preVals.PreValuesAsArray.First().Value);
             Assert.AreEqual("preVal2", preVals.PreValuesAsArray.Last().Value);            
+        }
+
+        [Test]
+        public void Cannot_Save_DataType_With_Empty_Name()
+        {
+            // Arrange
+            var dataTypeService = ServiceContext.DataTypeService;
+
+            // Act
+            var dataTypeDefinition = new DataTypeDefinition(-1, "Test.TestEditor") { Name = string.Empty, DatabaseType = DataTypeDatabaseType.Ntext };
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => dataTypeService.Save(dataTypeDefinition));
         }
     }
 }

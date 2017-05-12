@@ -72,9 +72,11 @@
       <HintPath>..\packages\LightInject.Annotation.1.1.0\lib\net46\LightInject.Annotation.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Log4Net.Async, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Log4Net.Async.2.0.4\lib\net40\Log4Net.Async.dll</HintPath>
     </Reference>
     <Reference Include="Lucene.Net, Version=3.0.3.0, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
       <HintPath>..\packages\Lucene.Net.3.0.3\lib\NET40\Lucene.Net.dll</HintPath>
@@ -135,13 +137,11 @@
     <Reference Include="Moq">
       <HintPath>..\packages\Moq.4.1.1309.0919\lib\net40\Moq.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="NPoco, Version=3.4.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NPoco.3.4.5\lib\net45\NPoco.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="NPoco, Version=3.5.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NPoco.3.5.1\lib\net45\NPoco.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -151,9 +151,8 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Semver, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\semver.1.1.2\lib\net451\Semver.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Semver, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Semver.2.0.4\lib\net452\Semver.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -169,6 +168,7 @@
       <HintPath>..\packages\SqlServerCE.4.0.0.1\lib\System.Data.SqlServerCe.Entity.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -177,6 +177,7 @@
     <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Text.Encoding" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -225,18 +226,32 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\CacheRefresherComponentTests.cs" />
     <Compile Include="Cache\RefresherTests.cs" />
     <Compile Include="Cache\SnapDictionaryTests.cs" />
+    <Compile Include="Collections\OrderedHashSetTests.cs" />
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
+    <Compile Include="Dependencies\NuGet.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
-    <Compile Include="Logging\ConsoleLogger.cs" />
+    <Compile Include="Issues\U9560.cs" />
     <Compile Include="Integration\ContentEventsTests.cs" />
+    <Compile Include="Migrations\CreateTableMigrationTests.cs" />
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
-    <Compile Include="Persistence\DatabaseScopeTests.cs" />
+    <Compile Include="Persistence\Repositories\EntityRepositoryTests.cs" />
+    <Compile Include="Routing\NiceUrlRoutesTests.cs" />
+    <Compile Include="Scheduling\BackgroundTaskRunnerTests2.cs" />
+    <Compile Include="Scoping\EventNameExtractorTests.cs" />
+    <Compile Include="Scoping\PassThroughEventDispatcherTests.cs" />
+    <Compile Include="Scoping\ScopedRepositoryTests.cs" />
+    <Compile Include="Scoping\ScopedXmlTests.cs" />
+    <Compile Include="Scoping\ScopeEventDispatcherTests.cs" />
+    <Compile Include="Scoping\ScopeFileSystemsTests.cs" />
+    <Compile Include="Scoping\ScopeTests.cs" />
+    <Compile Include="Services\CachedDataTypeServiceTests.cs" />
+    <Compile Include="TestHelpers\ConsoleLogger.cs" />
     <Compile Include="TestHelpers\NoHttpContextAccessor.cs" />
-    <Compile Include="TestHelpers\Stubs\TestDatabaseScopeAccessor.cs" />
     <Compile Include="Testing\TestingTests\NUnitTests.cs" />
     <Compile Include="Persistence\LocksTests.cs" />
     <Compile Include="Persistence\BulkDataReaderTests.cs" />
@@ -244,7 +259,6 @@
     <Compile Include="Persistence\NPocoExpressionsTests.cs" />
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
-    <Compile Include="Scheduling\DeployTest.cs" />
     <Compile Include="Testing\UmbracoTestAttribute.cs" />
     <Compile Include="Testing\UmbracoTestBase.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
@@ -255,6 +269,7 @@
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
     <Compile Include="TestHelpers\Stubs\TestUmbracoContextAccessor.cs" />
+    <Compile Include="UdiTests.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
     <Compile Include="Web\AngularIntegration\ContentModelSerializationTests.cs" />
     <Compile Include="Web\AngularIntegration\JsInitializationTests.cs" />
@@ -270,9 +285,6 @@
     <Compile Include="Collections\DeepCloneableListTests.cs" />
     <Compile Include="Web\Controllers\BackOfficeControllerUnitTests.cs" />
     <Compile Include="CoreThings\DelegateExtensionsTests.cs" />
-    <Compile Include="Logging\AsyncRollingFileAppenderTest.cs" />
-    <Compile Include="Logging\DebugAppender.cs" />
-    <Compile Include="Logging\ParallelForwarderTest.cs" />
     <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
     <Compile Include="Persistence\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
@@ -455,7 +467,7 @@
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
     <Compile Include="Misc\HashCodeCombinerTests.cs" />
     <Compile Include="Web\Mvc\HtmlHelperExtensionMethodsTests.cs" />
-    <Compile Include="IO\IOHelperTest.cs" />
+    <Compile Include="IO\IoHelperTests.cs" />
     <Compile Include="Misc\LibraryTests.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueConverterTests.cs" />
     <Compile Include="Models\ContentTests.cs" />
@@ -490,7 +502,6 @@
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Publishing\PublishingStrategyTests.cs" />
     <Compile Include="DependencyInjection\ActionCollectionTests.cs" />
-    <Compile Include="Logging\RingBufferTest.cs" />
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserType.cs" />
@@ -571,7 +582,7 @@
     <Compile Include="TestHelpers\TestHelper.cs" />
     <Compile Include="CoreThings\EnumerableExtensionsTests.cs" />
     <Compile Include="IO\AbstractFileSystemTests.cs" />
-    <Compile Include="IO\FileSystemProviderManagerTests.cs" />
+    <Compile Include="IO\FileSystemsTests.cs" />
     <Compile Include="IO\PhysicalFileSystemTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Strings\StringExtensionsTests.cs" />
@@ -579,6 +590,7 @@
     <Compile Include="Plugins\TypeFinderTests.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />
     <Compile Include="CoreThings\VersionExtensionTests.cs" />
+    <Compile Include="Web\TemplateUtilitiesTests.cs" />
     <Compile Include="Web\WebExtensionMethodTests.cs" />
     <Compile Include="CoreThings\XmlExtensionsTests.cs" />
     <Compile Include="Misc\XmlHelperTests.cs" />

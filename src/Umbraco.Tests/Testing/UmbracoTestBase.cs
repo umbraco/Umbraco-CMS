@@ -252,18 +252,17 @@ namespace Umbraco.Tests.Testing
                 .AddCore();
 
             Container.RegisterSingleton<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
-            Container.RegisterSingleton<IDatabaseScopeAccessor, TestDatabaseScopeAccessor>();
             var sqlSyntaxProviders = TestObjects.GetDefaultSqlSyntaxProviders(Logger);
             Container.RegisterSingleton<ISqlSyntaxProvider>(_ => sqlSyntaxProviders.OfType<SqlCeSyntaxProvider>().First());
             Container.RegisterSingleton<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(
-                Core.Configuration.GlobalSettings.UmbracoConnectionName,
+                Constants.System.UmbracoConnectionName,
                 sqlSyntaxProviders,
-                Logger, f.GetInstance<IDatabaseScopeAccessor>(),
+                Logger,
                 Mock.Of<IMapperCollection>()));
 
             Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
             Container.Register(factory
-                => TestObjects.GetDatabaseUnitOfWorkProvider(factory.GetInstance<ILogger>(), factory.TryGetInstance<IUmbracoDatabaseFactory>(), factory.TryGetInstance<RepositoryFactory>()));
+                => TestObjects.GetScopeUnitOfWorkProvider(factory.GetInstance<ILogger>(), factory.TryGetInstance<IUmbracoDatabaseFactory>(), factory.TryGetInstance<RepositoryFactory>()));
 
             Container.RegisterFrom<ServicesCompositionRoot>();
             // composition root is doing weird things, fix

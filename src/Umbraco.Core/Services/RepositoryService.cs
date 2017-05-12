@@ -11,20 +11,17 @@ namespace Umbraco.Core.Services
     /// </summary>
     public abstract class RepositoryService : IService
     {
-        protected ILogger Logger { get; private set; }
-        protected IEventMessagesFactory EventMessagesFactory { get; private set; }
-        protected IDatabaseUnitOfWorkProvider UowProvider { get; }
+        protected ILogger Logger { get; }
+        protected IEventMessagesFactory EventMessagesFactory { get; }
+        protected IScopeUnitOfWorkProvider UowProvider { get; }
 
-        protected RepositoryService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        protected RepositoryService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
         {
-            if (provider == null) throw new ArgumentNullException(nameof(provider));
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
-            if (eventMessagesFactory == null) throw new ArgumentNullException(nameof(eventMessagesFactory));
-            Logger = logger;
-            EventMessagesFactory = eventMessagesFactory;
-            UowProvider = provider;
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            EventMessagesFactory = eventMessagesFactory ?? throw new ArgumentNullException(nameof(eventMessagesFactory));
+            UowProvider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
 
-        protected IQuery<T> Query<T>() => UowProvider.DatabaseFactory.Query<T>();
+        protected IQuery<T> Query<T>() => UowProvider.DatabaseContext.Query<T>();
     }
 }

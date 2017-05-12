@@ -15,9 +15,9 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Warn(Type reporting, string message)
+        public void Warn(Type reporting, string format)
         {
-            System.Diagnostics.Debug.WriteLine(message, reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(format, reporting.FullName);
         }
 
         /// <inheritdoc/>

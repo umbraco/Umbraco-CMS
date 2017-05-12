@@ -26,7 +26,7 @@ namespace Umbraco.Web.Strategies.Migrations
 
         public void Migrated(MigrationRunner sender, MigrationEventArgs args)
         {
-            if (args.ProductName != GlobalSettings.UmbracoMigrationName) return;
+            if (args.ProductName != Constants.System.UmbracoMigrationName) return;
 
             var target70 = new Version(7, 0, 0);
 

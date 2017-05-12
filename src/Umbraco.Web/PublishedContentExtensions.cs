@@ -1058,6 +1058,17 @@ namespace Umbraco.Web
             return content.Children().FirstOrDefault();
         }
 
+        /// <summary>
+        /// Gets the first child of the content, of a given content type.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="alias">The content type alias.</param>
+        /// <returns>The first child of content, of the given content type.</returns>
+        public static IPublishedContent FirstChild(this IPublishedContent content, string alias)
+        {
+            return content.Children( alias ).FirstOrDefault();
+        }
+
         public static IPublishedContent FirstChild(this IPublishedContent content, Func<IPublishedContent, bool> predicate)
         {
             return content.Children(predicate).FirstOrDefault();

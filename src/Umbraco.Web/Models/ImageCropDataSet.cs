@@ -12,7 +12,7 @@ using Umbraco.Web.PropertyEditors.ValueConverters;
 namespace Umbraco.Web.Models
 {
     [JsonConverter(typeof(NoTypeConverterJsonConverter<ImageCropDataSet>))]
-    [TypeConverter(typeof(ImageCropDataSetConverter))]
+    [TypeConverter(typeof(ImageCropDataSetTypeConverter))]
     [DataContract(Name="imageCropDataSet")]
     public class ImageCropDataSet : IHtmlString, IEquatable<ImageCropDataSet>
     {   

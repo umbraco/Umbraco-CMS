@@ -41,20 +41,11 @@ namespace Umbraco.Web.Trees
             return node;
         }
 
-        protected override int RecycleBinId
-        {
-            get { return Constants.System.RecycleBinContent; }
-        }
+        protected override int RecycleBinId => Constants.System.RecycleBinContent;
 
-        protected override bool RecycleBinSmells
-        {
-            get { return Services.ContentService.RecycleBinSmells(); }
-        }
+        protected override bool RecycleBinSmells => Services.ContentService.RecycleBinSmells();
 
-        protected override int UserStartNode
-        {
-            get { return Security.CurrentUser.StartContentId; }
-        }
+        protected override int UserStartNode => Security.CurrentUser.StartContentId;
 
         /// <summary>
         /// Creates a tree node for a content item based on an UmbracoEntity
@@ -75,12 +66,11 @@ namespace Umbraco.Web.Trees
                 var isContainer = e.IsContainer();   // && (queryStrings.Get("isDialog") != "true");
 
                 var node = CreateTreeNode(
-                    e.Id.ToInvariantString(),
+                    entity,
+                    Constants.ObjectTypes.DocumentGuid,
                     parentId,
                     queryStrings,
-                    e.Name,
-                    entity.ContentTypeIcon,
-                    entity.HasChildren && (isContainer == false));
+                    entity.HasChildren && isContainer == false);
 
                 node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
 
@@ -192,11 +182,14 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected override bool HasPathAccess(string id, FormDataCollection queryStrings)
         {
-            var content = Services.ContentService.GetById(int.Parse(id));
-            if (content == null)
-            {
+            var entity = GetEntityFromId(id);
+            if (entity == null)
                 return false;
-            }
+
+            var content = Services.ContentService.GetById(entity.Id);
+            if (content == null)
+                return false;
+
             return Security.CurrentUser.HasPathAccess(content);
         }
 

@@ -35,6 +35,7 @@ namespace Umbraco.Core.Strategies
         private static void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e)
         {
             var relationService = Current.Services.RelationService;
+            var entityService = Current.Services.EntityService;
             const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
             var relationType = relationService.GetRelationTypeByAlias(relationTypeAlias);
 
@@ -55,14 +56,20 @@ namespace Umbraco.Core.Strategies
                     ? int.Parse(originalPath[originalPath.Count - 2])
                     : Constants.System.Root;
 
-                // Add a relation for the item being deleted, so that we can know the original parent for if we need to restore later
-                var relation = new Relation(originalParentId, item.Entity.Id, relationType);
-                relationService.Save(relation);
+                //before we can create this relation, we need to ensure that the original parent still exists which
+                //may not be the case if the encompassing transaction also deleted it when this item was moved to the bin
 
-                Current.Services.AuditService.Add(AuditType.Delete,
-                    $"Trashed content with Id: '{item.Entity.Id}' related to original parent content with Id: '{originalParentId}'",
-                    item.Entity.WriterId,
-                    item.Entity.Id);
+                if (entityService.Exists(originalParentId))
+                {
+                    // Add a relation for the item being deleted, so that we can know the original parent for if we need to restore later
+                    var relation = new Relation(originalParentId, item.Entity.Id, relationType);
+                    relationService.Save(relation);
+
+                    Current.Services.AuditService.Add(AuditType.Delete,
+                        $"Trashed content with Id: '{item.Entity.Id}' related to original parent content with Id: '{originalParentId}'",
+                        item.Entity.WriterId,
+                        item.Entity.Id);
+                }
             }
         }
     }

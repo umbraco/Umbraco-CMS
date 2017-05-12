@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero
 {
-    [MigrationAttribute("4.9.0", 0, GlobalSettings.UmbracoMigrationName)]
+    [MigrationAttribute("4.9.0", 0, Constants.System.UmbracoMigrationName)]
     public class RemoveUmbracoAppConstraints : MigrationBase
     {
         public RemoveUmbracoAppConstraints(IMigrationContext context) 

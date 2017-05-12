@@ -16,6 +16,7 @@ using Lucene.Net.Analysis;
 using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Scoping;
 using Directory = Lucene.Net.Store.Directory;
 
 namespace UmbracoExamine
@@ -27,7 +28,7 @@ namespace UmbracoExamine
     public class UmbracoMemberIndexer : BaseUmbracoIndexer
     {
         private readonly IMemberService _memberService;
-        private readonly IUmbracoDatabaseFactory _databaseFactory;
+        private readonly IScopeProvider _scopeProvider;
 
         /// <summary>
         /// Default constructor
@@ -36,7 +37,7 @@ namespace UmbracoExamine
             : base()
         {
             _memberService = Current.Services.MemberService;
-            _databaseFactory = Current.DatabaseFactory;
+            _scopeProvider = Current.ScopeProvider;
         }
 
         /// <summary>
@@ -135,7 +136,7 @@ namespace UmbracoExamine
 
             IMember[] members;
 
-            using (_databaseFactory.CreateScope())
+            using (var scope = _scopeProvider.CreateScope())
             {
                 if (IndexerData != null && IndexerData.IncludeNodeTypes.Any())
                 {
@@ -166,6 +167,7 @@ namespace UmbracoExamine
                         pageIndex++;
                     } while (members.Length == pageSize);
                 }
+                scope.Complete();
             }
         }
 

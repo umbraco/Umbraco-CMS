@@ -27,7 +27,7 @@ namespace umbraco.cms.businesslogic
 
                     try
                     {
-                        const string umbracoDsn = Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName;
+                        const string umbracoDsn = Constants.System.UmbracoConnectionName;
                     
                         var databaseSettings = ConfigurationManager.ConnectionStrings[umbracoDsn];
                         if (databaseSettings != null)

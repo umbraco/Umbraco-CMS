@@ -99,7 +99,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Get_Dictionary_Item_Descendants()
         {
-            try
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var en = ServiceContext.LocalizationService.GetLanguageById(_englishLangId);
                 var dk = ServiceContext.LocalizationService.GetLanguageById(_danishLangId);
@@ -130,24 +130,18 @@ namespace Umbraco.Tests.Services
                     currParentId = desc1.Key;
                 }
 
-                DatabaseFactory.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                DatabaseFactory.Database.AsUmbracoDatabase().EnableSqlCount = true;
+                scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
                 var items = ServiceContext.LocalizationService.GetDictionaryItemDescendants(_parentItemGuidId)
                     .ToArray();
 
-                Debug.WriteLine("SQL CALLS: " + DatabaseFactory.Database.AsUmbracoDatabase().SqlCount);
+                Debug.WriteLine("SQL CALLS: " + scope.Database.AsUmbracoDatabase().SqlCount);
 
                 Assert.AreEqual(51, items.Length);
                 //there's a call or two to get languages, so apart from that there should only be one call per level
-                Assert.Less(DatabaseFactory.Database.AsUmbracoDatabase().SqlCount, 30);
+                Assert.Less(scope.Database.AsUmbracoDatabase().SqlCount, 30);
             }
-            finally
-            {
-                DatabaseFactory.Database.AsUmbracoDatabase().EnableSqlTrace = false;
-                DatabaseFactory.Database.AsUmbracoDatabase().EnableSqlCount = false;
-            }
-           
         }
 
         [Test]

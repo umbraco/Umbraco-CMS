@@ -37,7 +37,6 @@ namespace Umbraco.Web.UI.Controls
             // fixme inject somehow
             Logger = Current.Logger;
             ProfilingLogger = Current.ProfilingLogger;
-            DatabaseFactory = Current.DatabaseFactory;
             Services = Current.Services;
         }
 
@@ -87,11 +86,6 @@ namespace Umbraco.Web.UI.Controls
         public ServiceContext Services { get; }
 
         /// <summary>
-        /// Gets the database context.
-        /// </summary>
-        public IUmbracoDatabaseFactory DatabaseFactory { get; }
-
-        /// <summary>
         /// Gets an instance of ClientTools for access to the pages client API.
         /// </summary>
         public ClientTools ClientTools
@@ -107,6 +101,6 @@ namespace Umbraco.Web.UI.Controls
         /// Gets a Url helper.
         /// </summary>
         /// <remarks>This URL helper is created without any route data and an empty request context.</remarks>
-        public UrlHelper Url => _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData())));
+        public UrlHelper Url => _url ?? (_url = new UrlHelper(Context.Request.RequestContext));
     }
 }

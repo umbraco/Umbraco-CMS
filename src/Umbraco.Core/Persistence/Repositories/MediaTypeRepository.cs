@@ -18,20 +18,13 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private IRepositoryCachePolicy<IMediaType, int> _cachePolicy;
 
-        public MediaTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
+        public MediaTypeRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         { }
 
-        protected override IRepositoryCachePolicy<IMediaType, int> CachePolicy
+        protected override IRepositoryCachePolicy<IMediaType, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                if (_cachePolicy != null) return _cachePolicy;
-
-                _cachePolicy = new FullDataSetRepositoryCachePolicy<IMediaType, int>(RuntimeCache, GetEntityId, /*expires:*/ true);
-
-                return _cachePolicy;
-            }
+            return new FullDataSetRepositoryCachePolicy<IMediaType, int>(runtimeCache, GetEntityId, /*expires:*/ true);
         }
 
         protected override IMediaType PerformGet(int id)

@@ -1,6 +1,8 @@
 ﻿using System;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 
 
@@ -52,6 +54,12 @@ namespace Umbraco.Web.Cache
             if (dataTypeCache)
                 foreach (var payload in payloads)
                     dataTypeCache.Result.ClearCacheByKeySearch($"{CacheKeys.DataTypePreValuesCacheKey}{payload.Id}");
+
+            // fixme - not sure I like these?
+            TagsValueConverter.ClearCaches();
+            MultipleMediaPickerPropertyConverter.ClearCaches();
+            SliderValueConverter.ClearCaches();
+            MediaPickerPropertyConverter.ClearCaches();
 
             // notify
             _facadeService.Notify(payloads);

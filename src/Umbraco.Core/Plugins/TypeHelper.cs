@@ -63,7 +63,7 @@ namespace Umbraco.Core.Plugins
             // ReSharper disable once LoopCanBeConvertedToQuery - no!
             foreach (var a in assembly.GetReferencedAssemblies())
             {
-                if (string.Equals(a.Name, name, StringComparison.OrdinalIgnoreCase)) return true;
+                if (string.Equals(a.Name, name, StringComparison.Ordinal)) return true;
             }
             return false;
         }

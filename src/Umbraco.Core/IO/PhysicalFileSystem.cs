@@ -361,6 +361,29 @@ namespace Umbraco.Core.IO
             return file.Exists ? file.Length : -1;
         }
 
+        public bool CanAddPhysical => true;
+
+        public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false)
+        {
+            var fullPath = GetFullPath(path);
+
+            if (File.Exists(fullPath))
+            {
+                if (overrideIfExists == false)
+                    throw new InvalidOperationException($"A file at path '{path}' already exists");
+                File.Delete(fullPath);
+            }
+
+            var directory = Path.GetDirectoryName(fullPath);
+            if (directory == null) throw new InvalidOperationException("Could not get directory.");
+            Directory.CreateDirectory(directory); // ensure it exists
+
+            if (copy)
+                File.Copy(physicalPath, fullPath);
+            else
+                File.Move(physicalPath, fullPath);
+        }
+
         #region Helper Methods
 
         protected virtual void EnsureDirectory(string path)

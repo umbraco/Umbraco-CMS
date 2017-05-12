@@ -1161,7 +1161,11 @@ namespace umbraco.cms.businesslogic
             {
                 //NOTE Changed from "DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == id)" to loading master contenttypes directly from the db.
                 //Related to http://issues.umbraco.org/issue/U4-1714
-                var dtos = Current.DatabaseFactory.Database.Fetch<ContentType2ContentTypeDto>("WHERE parentContentTypeId = @Id", new { Id = id });
+                IList<ContentType2ContentTypeDto> dtos;
+                using (var scope = Current.ScopeProvider.CreateScope())
+                {
+                    dtos = scope.Database.Fetch<ContentType2ContentTypeDto>("WHERE parentContentTypeId = @Id", new { Id = id });
+                }
                 foreach (var dto in dtos)
                 {
                     FlushFromCache(dto.ChildId);

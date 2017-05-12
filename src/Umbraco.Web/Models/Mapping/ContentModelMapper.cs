@@ -42,6 +42,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemDisplay
             config.CreateMap<IContent, ContentItemDisplay>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Document, content.Key)))
                 .ForMember(display => display.Owner, expression => expression.ResolveUsing(new OwnerResolver<IContent>(_userService)))
                 .ForMember(display => display.Updater, expression => expression.ResolveUsing(new CreatorResolver(_userService)))
                 .ForMember(display => display.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -50,7 +51,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.IsContainer, expression => expression.MapFrom(content => content.ContentType.IsContainer))
                 .ForMember(display => display.IsChildOfListView, expression => expression.Ignore())
                 .ForMember(display => display.Trashed, expression => expression.MapFrom(content => content.Trashed))
-                .ForMember(display => display.PublishDate, expression => expression.MapFrom(content => GetPublishedDate(_contentService, content)))
+                .ForMember(display => display.PublishDate, expression => expression.MapFrom(content => GetPublishedDate(content)))
                 .ForMember(display => display.TemplateAlias, expression => expression.MapFrom(content => content.Template.Alias))
                 .ForMember(display => display.HasPublishedVersion, expression => expression.MapFrom(content => content.HasPublishedVersion))
                 .ForMember(display => display.Urls,
@@ -71,6 +72,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Document, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IContent>(_userService)))
                 .ForMember(dto => dto.Updater, expression => expression.ResolveUsing(new CreatorResolver(_userService)))
                 .ForMember(dto => dto.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -81,11 +83,18 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemDto<IContent>
             config.CreateMap<IContent, ContentItemDto<IContent>>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Document, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IContent>(_userService)))
                 .ForMember(dto => dto.HasPublishedVersion, expression => expression.MapFrom(content => content.HasPublishedVersion))
                 .ForMember(dto => dto.Updater, expression => expression.Ignore())
                 .ForMember(dto => dto.Icon, expression => expression.Ignore())
                 .ForMember(dto => dto.Alias, expression => expression.Ignore());
+        }
+
+        private static DateTime? GetPublishedDate(IContent content)
+        {
+            var date = ((Content) content).PublishedDate;
+            return date == default (DateTime) ? (DateTime?) null : date;
         }
 
         /// <summary>
@@ -100,36 +109,14 @@ namespace Umbraco.Web.Models.Mapping
         private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService,
             ILocalizedTextService localizedText, IContentTypeService contentTypeService, IContentService contentService)
         {
-            //map the IsChildOfListView (this is actually if it is a descendant of a list view!)
-            //TODO: Fix this shorthand .Ancestors() lookup, at least have an overload to use the current
-            if (content.HasIdentity)
-            {
-                var ancesctorListView = content.Ancestors(contentService).FirstOrDefault(x => x.ContentType.IsContainer);
-                display.IsChildOfListView = ancesctorListView != null;
-            }
-            else
-            {
-                //it's new so it doesn't have a path, so we need to look this up by it's parent + ancestors
+            // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
                 var parent = content.Parent(contentService);
-                if (parent == null)
-                {
-                    display.IsChildOfListView = false;
-                }
-                else if (parent.ContentType.IsContainer)
-                {
-                    display.IsChildOfListView = true;
-                }
-                else
-                {
-                    var ancesctorListView = parent.Ancestors().FirstOrDefault(x => x.ContentType.IsContainer);
-                    display.IsChildOfListView = ancesctorListView != null;
-                }
-            }
+            display.IsChildOfListView = parent != null && (parent.ContentType.IsContainer || contentTypeService.HasContainerInPath(parent.Path));
 
             //map the tree node url
             if (HttpContext.Current != null)
             {
-                var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
+                var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
                 var url = urlHelper.GetUmbracoApiService<ContentTreeController>(controller => controller.GetTreeNode(display.Id.ToString(), null));
                 display.TreeNodeUrl = url;
             }
@@ -192,15 +179,9 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         {"items", templateItemConfig}
                     }
-                },
-                new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("content/urls"),
-                    Value = string.Join(",", display.Urls),
-                    View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                 }
             };
+
 
             TabsAndPropertiesResolver.MapGenericProperties(content, display, localizedText, properties.ToArray(),
                 genericProperties =>
@@ -233,30 +214,20 @@ namespace Umbraco.Web.Models.Mapping
                         //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                         docTypeProperty.View = "urllist";
                     }
+
+                    // inject 'Link to document' as the first generic property
+                    genericProperties.Insert(0, new ContentPropertyDisplay
+                    {
+                        Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = localizedText.Localize("content/urls"),
+                        Value = string.Join(",", display.Urls),
+                        View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                    });
                 });
         }
 
         /// <summary>
-        /// Gets the published date value for the IContent object
-        /// </summary>
-        /// <param name="contentService"></param>
-        /// <param name="content"></param>
-        /// <returns></returns>
-        private static DateTime? GetPublishedDate(IContentService contentService, IContent content)
-        {
-            if (content.Published)
-            {
-                return content.UpdateDate;
-            }
-            if (content.HasPublishedVersion)
-            {
-                var published = contentService.GetPublishedVersion(content.Id);
-                return published.UpdateDate;
-            }
-            return null;
-        }
-
-        /// <summary>
+                //TODO: This is horribly inneficient
         /// Creates the list of action buttons allowed for this user - Publish, Send to publish, save, unpublish returned as the button's 'letter'
         /// </summary>
         private class ActionButtonsResolver : ValueResolver<IContent, IEnumerable<char>>

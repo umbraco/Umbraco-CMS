@@ -18,7 +18,7 @@ namespace Umbraco.Web.Strategies.Migrations
     {
         public void Migrated(MigrationRunner sender, MigrationEventArgs args)
         {
-            if (args.ProductName != GlobalSettings.UmbracoMigrationName) return;
+            if (args.ProductName != Constants.System.UmbracoMigrationName) return;
 
             var target = new Version(6, 0, 0);
             if (args.ConfiguredVersion < target)

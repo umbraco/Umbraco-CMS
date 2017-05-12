@@ -1,11 +1,10 @@
-﻿using Umbraco.Core.DI;
+﻿using System;
+using System.Runtime.CompilerServices;
+using ImageProcessor.Common.Exceptions;
+using Umbraco.Core.DI;
 
 namespace Umbraco.Core.Logging
-{
-    using System;
-    using System.Runtime.CompilerServices;
-
-    using ImageProcessor.Common.Exceptions;
+{   
 
     /// <summary>
     /// A logger for explicitly logging ImageProcessor exceptions.

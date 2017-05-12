@@ -18,8 +18,7 @@ namespace Umbraco.Core.Persistence
         /// <param name="container">A container.</param>
         public RepositoryFactory(IServiceContainer container)
         {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            _container = container;
+            _container = container ?? throw new ArgumentNullException(nameof(container));
         }
 
         /// <summary>
@@ -29,27 +28,12 @@ namespace Umbraco.Core.Persistence
         /// <param name="uow">A unit of work.</param>
         /// <param name="name">The optional name of the repository.</param>
         /// <returns>The created repository for the unit of work.</returns>
-        public virtual TRepository CreateRepository<TRepository>(IDatabaseUnitOfWork uow, string name = null)
+        public virtual TRepository CreateRepository<TRepository>(IScopeUnitOfWork uow, string name = null)
             where TRepository : IRepository
         {
             return string.IsNullOrWhiteSpace(name)
-                ? _container.GetInstance<IDatabaseUnitOfWork, TRepository>(uow)
-                : _container.GetInstance<IDatabaseUnitOfWork, TRepository>(uow, name);
-        }
-
-        /// <summary>
-        /// Creates a repository.
-        /// </summary>
-        /// <typeparam name="TRepository">The type of the repository.</typeparam>
-        /// <param name="uow">A unit of work.</param>
-        /// <param name="name">The optional name of the repository.</param>
-        /// <returns>The created repository for the unit of work.</returns>
-        internal virtual TRepository CreateRepository<TRepository>(FileUnitOfWork uow, string name = null)
-            where TRepository : IRepository
-        {
-            return string.IsNullOrWhiteSpace(name)
-                ? _container.GetInstance<FileUnitOfWork, TRepository>(uow)
-                : _container.GetInstance<FileUnitOfWork, TRepository>(uow, name);
+                ? _container.GetInstance<IScopeUnitOfWork, TRepository>(uow)
+                : _container.GetInstance<IScopeUnitOfWork, TRepository>(uow, name);
         }
     }
 }

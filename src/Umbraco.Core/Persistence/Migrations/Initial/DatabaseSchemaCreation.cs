@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
     /// <summary>
     /// Represents the initial database schema creation by running CreateTable for all DTOs against the db.
     /// </summary>
-    internal class DatabaseSchemaCreation
+    public class DatabaseSchemaCreation
     {
         private readonly DatabaseSchemaHelper _schemaHelper;
         private readonly IUmbracoDatabase _database;
@@ -47,6 +47,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {7, typeof (DataTypeDto)},
                                                                               {8, typeof (DataTypePreValueDto)},
                                                                               {9, typeof (DictionaryDto)},
+
                                                                               {10, typeof (LanguageDto)},
                                                                               {11, typeof (LanguageTextDto)},
                                                                               {12, typeof (DomainDto)},
@@ -57,15 +58,19 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {17, typeof (MemberDto)},
                                                                               {18, typeof (Member2MemberGroupDto)},
                                                                               {19, typeof (ContentXmlDto)},
+
                                                                               {20, typeof (PreviewXmlDto)},
                                                                               {21, typeof (PropertyTypeGroupDto)},
                                                                               {22, typeof (PropertyTypeDto)},
                                                                               {23, typeof (PropertyDataDto)},
                                                                               {24, typeof (RelationTypeDto)},
                                                                               {25, typeof (RelationDto)},
-                                                                              
+                                                                              //removed: {26...
+                                                                              //removed: {27...
                                                                               {28, typeof (TagDto)},
                                                                               {29, typeof (TagRelationshipDto)},
+
+                                                                              //removed: {30...
                                                                               {31, typeof (UserTypeDto)},
                                                                               {32, typeof (UserDto)},
                                                                               {33, typeof (TaskTypeDto)},
@@ -75,16 +80,18 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {37, typeof (User2AppDto)},
                                                                               {38, typeof (User2NodeNotifyDto)},
                                                                               {39, typeof (User2NodePermissionDto)},
+
                                                                               {40, typeof (ServerRegistrationDto)},
                                                                               {41, typeof (AccessDto)},
                                                                               {42, typeof (AccessRuleDto)},
                                                                               {43, typeof (CacheInstructionDto)},
                                                                               {44, typeof (ExternalLoginDto)},
                                                                               {45, typeof (MigrationDto)},
-                                                                              {46, typeof (UmbracoDeployChecksumDto)},
-                                                                              {47, typeof (UmbracoDeployDependencyDto)},
+                                                                              //removed: {46, typeof (UmbracoDeployChecksumDto)},
+                                                                              //removed: {47, typeof (UmbracoDeployDependencyDto)},
                                                                               {48, typeof (RedirectUrlDto) },
                                                                               {49, typeof (LockDto) },
+
                                                                               {50, typeof (ContentNuDto) }
                                                                           };
         #endregion
@@ -338,12 +345,9 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         /// Raises the <see cref="BeforeCreation"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected internal virtual void FireBeforeCreation(DatabaseCreationEventArgs e)
+        internal virtual void FireBeforeCreation(DatabaseCreationEventArgs e)
         {
-            if (BeforeCreation != null)
-            {
-                BeforeCreation(e);
-            }
+            BeforeCreation?.Invoke(e);
         }
 
         /// <summary>
@@ -354,12 +358,9 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         /// Raises the <see cref="AfterCreation"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterCreation(DatabaseCreationEventArgs e)
+        internal virtual void FireAfterCreation(DatabaseCreationEventArgs e)
         {
-            if (AfterCreation != null)
-            {
-                AfterCreation(e);
-            }
+            AfterCreation?.Invoke(e);
         }
 
         #endregion

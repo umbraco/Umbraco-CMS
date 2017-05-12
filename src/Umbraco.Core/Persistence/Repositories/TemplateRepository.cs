@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -15,13 +13,9 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -35,9 +29,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ITemplatesSection _templateConfig;
         private readonly ViewHelper _viewHelper;
         private readonly MasterPageHelper _masterPageHelper;
-        private IRepositoryCachePolicy<ITemplate, int> _cachePolicy;
 
-        public TemplateRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig)
+        public TemplateRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig)
             : base(work, cache, logger)
         {
             _masterpagesFileSystem = masterpageFileSystem;
@@ -47,16 +40,9 @@ namespace Umbraco.Core.Persistence.Repositories
             _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
         }
 
-        protected override IRepositoryCachePolicy<ITemplate, int> CachePolicy
+        protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                if (_cachePolicy != null) return _cachePolicy;
-
-                _cachePolicy = new FullDataSetRepositoryCachePolicy<ITemplate, int>(RuntimeCache, GetEntityId, /*expires:*/ false);
-
-                return _cachePolicy;
-            }
+            return new FullDataSetRepositoryCachePolicy<ITemplate, int>(runtimeCache, GetEntityId, /*expires:*/ false);
         }
 
         #region Overrides of RepositoryBase<int,ITemplate>
@@ -229,7 +215,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     entity.Path = string.Concat(parent.Path, ",", entity.Id);
                 }
-
+                else
+                {
+                    //this means that the master template has been removed, so we need to reset the template's
+                    //path to be at the root
+                    entity.Path = string.Concat("-1,", entity.Id);
+                }
             }
 
             //Get TemplateDto from db to get the Primary key of the entity
@@ -286,12 +277,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // once content has been set, "template on disk" are not "on disk" anymore
             template.Content = content;
+            SetVirtualPath(template);
 
             if (dto.Design == content) return;
             dto.Design = content;
             Database.Update(dto); // though... we don't care about the db value really??!!
-
-            SetVirtualPath(template);
         }
 
         protected override void PersistDeletedItem(ITemplate entity)
@@ -516,6 +506,11 @@ namespace Umbraco.Core.Persistence.Repositories
         public void SetFileContent(string filepath, Stream content)
         {
             GetFileSystem(filepath).AddFile(filepath, content, true);
+        }
+
+        public long GetFileSize(string filepath)
+        {
+            return GetFileSystem(filepath).GetSize(filepath);
         }
 
         private IFileSystem GetFileSystem(string filepath)

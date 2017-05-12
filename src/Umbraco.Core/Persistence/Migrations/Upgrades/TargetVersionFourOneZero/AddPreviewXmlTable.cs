@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourOneZero
 {
-    [Migration("4.1.0", 0, GlobalSettings.UmbracoMigrationName)]
+    [Migration("4.1.0", 0, Constants.System.UmbracoMigrationName)]
     public class AddPreviewXmlTable : MigrationBase
     {
         public AddPreviewXmlTable(IMigrationContext context)

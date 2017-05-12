@@ -21,5 +21,10 @@ namespace Umbraco.Core.Persistence
         /// <remarks>UmbracoDatabase returns the first eight digits of its unique Guid and, in some 
         /// debug mode, the underlying database connection identifier (if any).</remarks>
         string InstanceId { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the database is currently in a transaction.
+        /// </summary>
+        bool InTransaction { get; }
     }
 }

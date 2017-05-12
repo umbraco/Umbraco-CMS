@@ -1103,38 +1103,46 @@ namespace umbraco
         ///</returns>
         public static XPathNodeIterator GetPreValues(int DataTypeId)
         {
-            XmlDocument xd = new XmlDocument();
+            var xd = new XmlDocument();
             xd.LoadXml("<preValues/>");
 
-            foreach (var dr in Current.DatabaseFactory.Database.Query<dynamic>(
-                "Select id, [value] from cmsDataTypeprevalues where DataTypeNodeId = @dataTypeId order by sortorder",
-                new { dataTypeId = DataTypeId }))
+            using (var scope = Current.ScopeProvider.CreateScope())
             {
-                XmlNode n = XmlHelper.AddTextNode(xd, "preValue", dr.value);
-                n.Attributes.Append(XmlHelper.AddAttribute(xd, "id", dr.id.ToString()));
-                xd.DocumentElement.AppendChild(n);
+                foreach (var dr in scope.Database.Query<dynamic>(
+                    "Select id, [value] from cmsDataTypeprevalues where DataTypeNodeId = @dataTypeId order by sortorder",
+                    new { dataTypeId = DataTypeId }))
+                {
+                    XmlNode n = XmlHelper.AddTextNode(xd, "preValue", dr.value);
+                    n.Attributes.Append(XmlHelper.AddAttribute(xd, "id", dr.id.ToString()));
+                    xd.DocumentElement.AppendChild(n);
+                }
+                scope.Complete();
             }
 
-            XPathNavigator xp = xd.CreateNavigator();
+            var xp = xd.CreateNavigator();
             return xp.Select("/preValues");
         }
 
         /// <summary>
         /// Gets the umbraco data type prevalue with the specified Id as string.
         /// </summary>
-        /// <param name="Id">The id.</param>
+        /// <param name="id">The id.</param>
         /// <returns>Returns the prevalue as a string</returns>
-        public static string GetPreValueAsString(int Id)
+        public static string GetPreValueAsString(int id)
         {
-            try
+            using (var scope = Current.ScopeProvider.CreateScope())
             {
-                return Current.DatabaseFactory.Database.ExecuteScalar<string>(
-                    "select [value] from cmsDataTypePreValues where id = @id",
-                    new {id = Id});
-            }
-            catch
-            {
-                return string.Empty;
+                string ret;
+                try
+                {
+                    ret = scope.Database.ExecuteScalar<string>("select [value] from cmsDataTypePreValues where id = @id", new { id });
+                }
+                catch
+                {
+                    ret = string.Empty;
+                }
+                scope.Complete();
+                return ret;
             }
         }
 

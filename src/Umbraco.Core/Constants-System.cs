@@ -21,13 +21,10 @@
             /// The integer identifier for media's recycle bin.
             /// </summary>
             public const int RecycleBinMedia = -21;
-        }
 
-        public static class DatabaseProviders
-        {
-            public const string SqlCe = "System.Data.SqlServerCe.4.0";
-            public const string SqlServer = "System.Data.SqlClient";
-            public const string MySql = "MySql.Data.MySqlClient";
+            public const string UmbracoConnectionName = "umbracoDbDSN";
+            public const string UmbracoMigrationName = "Umbraco";
 	    }
+        
     }
 }

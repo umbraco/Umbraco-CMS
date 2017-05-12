@@ -5,12 +5,8 @@ using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -22,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly Guid _containerObjectType;
 
-        public EntityContainerRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, Guid containerObjectType) 
+        public EntityContainerRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, Guid containerObjectType) 
             : base(work, cache, logger)
         {
             var allowedContainers = new[] {Constants.ObjectTypes.DocumentTypeContainerGuid, Constants.ObjectTypes.MediaTypeContainerGuid, Constants.ObjectTypes.DataTypeContainerGuid};
@@ -31,12 +27,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 throw new InvalidOperationException("No container type exists with ID: " + _containerObjectType);
         }
 
-        /// <summary>
-        /// Do not cache anything
-        /// </summary>
-        protected override IRuntimeCacheProvider RuntimeCache
+        // never cache
+        private static readonly IRuntimeCacheProvider NullCache = new NullCacheProvider();
+        protected override IRuntimeCacheProvider GetIsolatedCache(IsolatedRuntimeCache provider)
         {
-            get { return new NullCacheProvider(); }
+            return NullCache;
         }
 
         protected override EntityContainer PerformGet(int id)
@@ -64,17 +59,22 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<EntityContainer> PerformGetAll(params int[] ids)
         {
-            //we need to batch these in groups of 2000 so we don't exceed the max 2100 limit
-            return ids.InGroupsOf(2000).SelectMany(@group =>
+            if (ids.Any())
             {
-                var sql = GetBaseQuery(false)
-                    .Where("nodeObjectType=@umbracoObjectTypeId", new { umbracoObjectTypeId = NodeObjectTypeId })
-                    .Where(string.Format("{0} IN (@ids)", SqlSyntax.GetQuotedColumnName("id")), new { ids = @group });
+                return Database.FetchByGroups<NodeDto, int>(ids, 2000, batch =>
+                    GetBaseQuery(false)
+                        .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                        .WhereIn<NodeDto>(x => x.NodeId, batch))
+                    .Select(CreateEntity);
+            }
 
-                sql.OrderBy<NodeDto>(x => x.Level);
+            // else
 
-                return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
-            });
+            var sql = GetBaseQuery(false)
+                .Where("nodeObjectType=@umbracoObjectTypeId", new { umbracoObjectTypeId = NodeObjectTypeId })
+                .OrderBy<NodeDto>(x => x.Level);
+
+            return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
         }
 
         protected override IEnumerable<EntityContainer> PerformGetByQuery(IQuery<EntityContainer> query)

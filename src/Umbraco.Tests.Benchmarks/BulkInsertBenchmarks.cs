@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using ILogger = Umbraco.Core.Logging.ILogger;
 
@@ -46,17 +47,16 @@ namespace Umbraco.Tests.Benchmarks
 
         private IUmbracoDatabase GetSqlServerDatabase(ILogger logger)
         {
-            IUmbracoDatabaseFactory f = null;
-            var l = new Lazy<IUmbracoDatabaseFactory>(() => f);
+            IScopeProvider f = null;
+            var l = new Lazy<IScopeProvider>(() => f);
             var p = new SqlServerSyntaxProvider(l);
-            f = new UmbracoDatabaseFactory(
+            var factory = new UmbracoDatabaseFactory(
                 "server=.\\SQLExpress;database=YOURDB;user id=YOURUSER;password=YOURPASS",
                 Constants.DatabaseProviders.SqlServer,
                 new [] { p },
                 logger,
-                new ThreadStaticDatabaseScopeAccessor(), 
                 new MapperCollection(Enumerable.Empty<BaseMapper>()));
-            return f.GetDatabase();
+            return factory.CreateDatabase();
         }
 
         private IUmbracoDatabase GetSqlCeDatabase(string cstr, ILogger logger)
@@ -66,9 +66,8 @@ namespace Umbraco.Tests.Benchmarks
                 Constants.DatabaseProviders.SqlCe,
                 new[] { new SqlCeSyntaxProvider() },
                 logger,
-                new ThreadStaticDatabaseScopeAccessor(),
                 new MapperCollection(Enumerable.Empty<BaseMapper>()));
-            return f.GetDatabase();
+            return f.CreateDatabase();
         }
 
         [Setup]

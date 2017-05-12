@@ -38,27 +38,26 @@ namespace umbraco.cms.businesslogic.macro
         /// Unused, please do not use
         /// </summary>
         [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
-        protected static ISqlHelper SqlHelper
-        {
-            get { return LegacySqlHelper.SqlHelper; }
-        }
+        protected static ISqlHelper SqlHelper => LegacySqlHelper.SqlHelper;
 
-		/// <summary>
+	    /// <summary>
 		/// id
 		/// </summary>
-		public int Id
-		{
-			get { return MacroEntity.Id; }
-		}
+		public int Id => MacroEntity.Id;
 
-		/// <summary>
-		/// If set to true, the macro can be inserted on documents using the richtexteditor.
-		/// </summary>
-		public bool UseInEditor
+	    /// <summary>
+	    /// key
+	    /// </summary>
+	    public Guid Key => MacroEntity.Key;
+
+	    /// <summary>
+        /// If set to true, the macro can be inserted on documents using the richtexteditor.
+        /// </summary>
+        public bool UseInEditor
 		{
-            get { return MacroEntity.UseInEditor; }
-			set { MacroEntity.UseInEditor = value; }
-		}
+            get => MacroEntity.UseInEditor;
+	        set => MacroEntity.UseInEditor = value;
+	    }
 
 		/// <summary>
 		/// The cache refreshrate - the maximum amount of time the macro should remain cached in the umbraco
@@ -169,6 +168,7 @@ namespace umbraco.cms.businesslogic.macro
 	        {
 	            return MacroEntity.Properties.Select(x => new MacroProperty
 	                {
+                        Key = Key,
 	                    Alias = x.Alias,
 	                    Name = x.Name,
                         SortOrder = x.SortOrder,

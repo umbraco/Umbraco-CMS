@@ -98,7 +98,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Defines the ContentService, which is an easy access to operations involving <see cref="IContent"/>
     /// </summary>
-    public interface IContentService : IService
+    public interface IContentService : IContentServiceBase
     {
         int CountPublished(string contentTypeAlias = null);
         int Count(string contentTypeAlias = null);
@@ -239,7 +239,7 @@ namespace Umbraco.Core.Services
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "");
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by Parent Id
@@ -318,6 +318,14 @@ namespace Umbraco.Core.Services
         /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional Id of the user issueing the delete operation</param>
         void DeleteContentOfType(int contentTypeId, int userId = 0);
+
+        /// <summary>
+        /// Deletes all content of the specified types. All Descendants of deleted content that is not of these types is moved to Recycle Bin.
+        /// </summary>
+        /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
+        /// <param name="contentTypeIds">Ids of the <see cref="IContentType"/>s</param>
+        /// <param name="userId">Optional Id of the user issueing the delete operation</param>
+        void DeleteContentOfTypes(IEnumerable<int> contentTypeIds, int userId = 0);
 
         /// <summary>
         /// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
+using System.Data.SqlServerCe;
 using System.Linq;
+using MySql.Data.MySqlClient;
 using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
@@ -91,6 +94,38 @@ namespace Umbraco.Core.Persistence
             } while (c != unwrapped);
 
             return unwrapped;
+        }
+
+        public static string GetConnStringExSecurityInfo(this IDbConnection connection)
+        {
+            try
+            {
+                if (connection is SqlConnection)
+                {
+                    var builder = new SqlConnectionStringBuilder(connection.ConnectionString);
+                    return $"DataSource: {builder.DataSource}, InitialCatalog: {builder.InitialCatalog}";
+                }
+
+                if (connection is SqlCeConnection)
+                {
+                    var builder = new SqlCeConnectionStringBuilder(connection.ConnectionString);
+                    return $"DataSource: {builder.DataSource}";
+                }
+
+                if (connection is MySqlConnection)
+                {
+                    var builder = new MySqlConnectionStringBuilder(connection.ConnectionString);
+                    return $"Server: {builder.Server}, Database: {builder.Database}";
+                }
+            }
+            catch (Exception ex)
+            {
+                Current.Logger.Warn(typeof(DbConnectionExtensions),
+                    "Could not resolve connection string parameters", ex);
+                return "(Could not resolve)";
+            }
+
+            throw new ArgumentException($"The connection type {connection.GetType()} is not supported");
         }
     }
 }

@@ -1,22 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data.SqlServerCe;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
-using System.Xml.Linq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.DI;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
-
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -35,6 +28,8 @@ namespace Umbraco.Tests.Services
     [NUnit.Framework.Ignore("These should not be run by the server, only directly as they are only benchmark tests")]
     public class PerformanceTests : TestWithDatabaseBase
     {
+        // fixme probably making little sense in places due to scope creating a transaction?!
+
         protected override string GetDbConnectionString()
         {
             return @"server=.\SQLEXPRESS;database=UmbTest;user id=sa;password=test";
@@ -156,26 +151,30 @@ namespace Umbraco.Tests.Services
             //now we need to test the difference between truncating all records and re-inserting them as we do now,
             //vs updating them (which might result in checking if they exist for or listening on an exception).
             using (proflog.DebugDuration<PerformanceTests>("Starting truncate + normal insert test"))
+            using (var scope = ScopeProvider.CreateScope())
             {
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
                 {
                     //clear all the xml entries
-                    DatabaseFactory.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
-                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
-                                                    INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
+                    scope.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                            (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
+                                                INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
 
                     //now we insert each record for the ones we've deleted like we do in the content service.
                     var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
                     foreach (var xml in xmlItems)
                     {
-                        var result = DatabaseFactory.Database.Insert(xml);
+                        var result = scope.Database.Insert(xml);
                     }
                 }
+
+                scope.Complete();
             }
 
             //now, isntead of truncating, we'll attempt to update and if it doesn't work then we insert
             using (proflog.DebugDuration<PerformanceTests>("Starting update test"))
+            using (var scope = ScopeProvider.CreateScope())
             {
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
@@ -184,30 +183,34 @@ namespace Umbraco.Tests.Services
                     var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
                     foreach (var xml in xmlItems)
                     {
-                        var result = DatabaseFactory.Database.Update(xml);
+                        var result = scope.Database.Update(xml);
                     }
                 }
+
+                scope.Complete();
             }
 
             //now, test truncating but then do bulk insertion of records
             using (proflog.DebugDuration<PerformanceTests>("Starting truncate + bulk insert test"))
+            using (var scope = ScopeProvider.CreateScope())
             {
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
                 {
                     //clear all the xml entries
-                    DatabaseFactory.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
-                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
-                                                    INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
+                    scope.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                            (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
+                                                INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
 
                     //now we insert each record for the ones we've deleted like we do in the content service.
                     var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
-                    DatabaseFactory.Database.BulkInsertRecordsWithTransaction(xmlItems);
+                    scope.Database.BulkInsertRecordsWithTransaction(xmlItems);
                 }
             }
 
             //now, test truncating but then do bulk insertion of records
             using (proflog.DebugDuration<PerformanceTests>("Starting truncate + bulk insert test in one transaction"))
+            using (var scope = ScopeProvider.CreateScope())
             {
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
@@ -215,22 +218,20 @@ namespace Umbraco.Tests.Services
                     //now we insert each record for the ones we've deleted like we do in the content service.
                     var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
 
-                    using (var tr = DatabaseFactory.Database.GetTransaction())
+                    using (var tr = scope.Database.GetTransaction())
                     {
                         //clear all the xml entries
-                        DatabaseFactory.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
-                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
-                                                    INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
+                        scope.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                            (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
+                                                INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
 
 
-                        DatabaseFactory.Database.BulkInsertRecords(xmlItems);
+                        scope.Database.BulkInsertRecords(xmlItems);
 
                         tr.Complete();
                     }
                 }
             }
-
-
         }
 
         private IEnumerable<IContent> PrimeDbWithLotsOfContent()
@@ -291,21 +292,27 @@ namespace Umbraco.Tests.Services
                     Path = ""
                 });
             }
-            DatabaseFactory.Database.BulkInsertRecordsWithTransaction(nodes);
 
-            //re-get the nodes with ids
-            var sql = DatabaseFactory.Sql();
-            sql.SelectAll().From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == customObjectType);
-            nodes = DatabaseFactory.Database.Fetch<NodeDto>(sql);
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                scope.Database.BulkInsertRecordsWithTransaction(nodes);
 
-            //create the cmsContent data, each with a new content type id (so we can query on it later if needed)
-            var contentTypeId = 0;
-            var cmsContentItems = nodes.Select(node => new ContentDto { NodeId = node.NodeId, ContentTypeId = contentTypeId++ }).ToList();
-            DatabaseFactory.Database.BulkInsertRecordsWithTransaction(cmsContentItems);
+                //re-get the nodes with ids
+                var sql = Current.DatabaseContext.Sql();
+                sql.SelectAll().From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == customObjectType);
+                nodes = scope.Database.Fetch<NodeDto>(sql);
 
-            //create the xml data
-            var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = TestXmlStructure }).ToList();
-            DatabaseFactory.Database.BulkInsertRecordsWithTransaction(xmlItems);
+                //create the cmsContent data, each with a new content type id (so we can query on it later if needed)
+                var contentTypeId = 0;
+                var cmsContentItems = nodes.Select(node => new ContentDto { NodeId = node.NodeId, ContentTypeId = contentTypeId++ }).ToList();
+                scope.Database.BulkInsertRecordsWithTransaction(cmsContentItems);
+
+                //create the xml data
+                var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = TestXmlStructure }).ToList();
+                scope.Database.BulkInsertRecordsWithTransaction(xmlItems);
+
+                scope.Complete();
+            }
 
             return nodes;
         }

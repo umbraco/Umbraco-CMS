@@ -21,21 +21,17 @@ namespace Umbraco.Core.Services
 {
     public class NotificationService : INotificationService
     {
-        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
+        private readonly IScopeUnitOfWorkProvider _uowProvider;
         private readonly IUserService _userService;
         private readonly IContentService _contentService;
         private readonly ILogger _logger;
 
-        public NotificationService(IDatabaseUnitOfWorkProvider provider, IUserService userService, IContentService contentService, ILogger logger)
+        public NotificationService(IScopeUnitOfWorkProvider provider, IUserService userService, IContentService contentService, ILogger logger)
         {
-            if (provider == null) throw new ArgumentNullException(nameof(provider));
-            if (userService == null) throw new ArgumentNullException(nameof(userService));
-            if (contentService == null) throw new ArgumentNullException(nameof(contentService));
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
-            _uowProvider = provider;
-            _userService = userService;
-            _contentService = contentService;
-            _logger = logger;
+            _uowProvider = provider ?? throw new ArgumentNullException(nameof(provider));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -206,12 +202,10 @@ namespace Umbraco.Core.Services
 
         private IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string action, IEnumerable<int> nodeIds, Guid objectType)
         {
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var uow = _uowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<INotificationsRepository>();
-                var notifications = repository.GetUsersNotifications(userIds, action, nodeIds, objectType);
-                uow.Complete();
-                return notifications;
+                return repository.GetUsersNotifications(userIds, action, nodeIds, objectType);
             }
         }
         /// <summary>
@@ -221,12 +215,10 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<Notification> GetUserNotifications(IUser user)
         {
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var uow = _uowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<INotificationsRepository>();
-                var notifications = repository.GetUserNotifications(user);
-                uow.Complete();
-                return notifications;
+                return repository.GetUserNotifications(user);
             }
         }
 
@@ -263,12 +255,10 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         public IEnumerable<Notification> GetEntityNotifications(IEntity entity)
         {
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var uow = _uowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<INotificationsRepository>();
-                var notifications = repository.GetEntityNotifications(entity);
-                uow.Complete();
-                return notifications;
+                return repository.GetEntityNotifications(entity);
             }
         }
 
@@ -329,7 +319,6 @@ namespace Umbraco.Core.Services
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<INotificationsRepository>();
-                uow.Begin();
                 var notifications = repository.SetNotifications(user, entity, actions);
                 uow.Complete();
                 return notifications;

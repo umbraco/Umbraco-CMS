@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Core.DI;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Xml;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -36,6 +34,8 @@ namespace Umbraco.Core.Models.PublishedContent
             PropertyEditorAlias = propertyType.PropertyEditorAlias;
         }
 
+
+        // fixme remove
         /*
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with an existing <see cref="PublishedPropertyType"/>
@@ -136,7 +136,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets or sets a value indicating whether the property is an Umbraco-defined property.
         /// </summary>
-        internal bool IsUmbraco { get; private set; }
+        internal bool IsUmbraco { get; }
 
         #endregion
 

@@ -31,11 +31,12 @@ namespace Umbraco.Core.IO
         private long _folderCounter;
         private bool _folderCounterInitialized;
 
-        private static readonly Dictionary<int, string> DefaultSizes = new Dictionary<int, string>
-        {
-            { 100, "thumb" },
-            { 500, "big-thumb" }
-        };
+        // fixme - remove
+        //private static readonly Dictionary<int, string> DefaultSizes = new Dictionary<int, string>
+        //{
+        //    { 100, "thumb" },
+        //    { 500, "big-thumb" }
+        //};
 
         public MediaFileSystem(IFileSystem wrapped) 
             : base(wrapped)
@@ -95,7 +96,7 @@ namespace Umbraco.Core.IO
                     }
                     else
                     {
-                        DeleteFile(file, true);
+                        DeleteFile(file);
                     }
                 }
                 catch (Exception e)
@@ -107,6 +108,41 @@ namespace Umbraco.Core.IO
 
             return allsuccess;
         }
+
+	    public void DeleteMediaFiles(IEnumerable<string> files)
+	    {
+	        files = files.Distinct();
+
+	        Parallel.ForEach(files, file =>
+	        {
+	            try
+	            {
+	                if (file.IsNullOrWhiteSpace()) return;
+	                if (FileExists(file) == false) return;
+	                DeleteFile(file);
+
+	                if (UseTheNewMediaPathScheme == false)
+	                {
+	                    // old scheme: filepath is "<int>/<filename>" OR "<int>-<filename>"
+	                    // remove the directory if any
+	                    var dir = Path.GetDirectoryName(file);
+	                    if (string.IsNullOrWhiteSpace(dir) == false)
+	                        DeleteDirectory(dir, true);
+	                }
+	                else
+	                {
+	                    // new scheme: path is "<xuid>/<filename>" where xuid is a combination of cuid and puid
+	                    // remove the directory
+	                    var dir = Path.GetDirectoryName(file);
+	                    DeleteDirectory(dir, true);
+	                }
+	            }
+	            catch (Exception e)
+	            {
+	                Logger.Error<MediaFileSystem>("Failed to delete attached file \"" + file + "\".", e);
+	            }
+	        });
+	    }
 
         #region Media Path
 
@@ -133,7 +169,7 @@ namespace Umbraco.Core.IO
             }
             else
             {
-                // new scheme: path is "<cuid>-<puid>/<filename>" OR "<cuid>-<puid>-<filename>"
+                // new scheme: path is "<xuid>/<filename>" where xuid is a combination of cuid and puid
                 // default media filesystem maps to "~/media/<filepath>"
                 // assumes that cuid and puid keys can be trusted - and that a single property type
                 // for a single content cannot store two different files with the same name
@@ -255,22 +291,13 @@ namespace Umbraco.Core.IO
 
             // clear the old file, if any
             if (string.IsNullOrWhiteSpace(oldpath) == false)
-                DeleteFile(oldpath, true);
+                DeleteFile(oldpath);
 
             // get the filepath, store the data
             // use oldpath as "prevpath" to try and reuse the folder, in original number-based scheme
             var filepath = GetMediaPath(filename, oldpath, content.Key, propertyType.Key);
             AddFile(filepath, filestream);
             return filepath;
-        }
-
-        /// <summary>
-        /// Clears a media file.
-        /// </summary>
-        /// <param name="filepath">The filesystem-relative path to the media file.</param>
-        public new void DeleteFile(string filepath)
-        {
-            DeleteFile(filepath, true);
         }
 
         /// <summary>
@@ -293,7 +320,6 @@ namespace Umbraco.Core.IO
             var filename = Path.GetFileName(sourcepath);
             var filepath = GetMediaPath(filename, content.Key, propertyType.Key);
             this.CopyFile(sourcepath, filepath);
-            CopyThumbnails(sourcepath, filepath);
             return filepath;
         }
 
@@ -331,7 +357,7 @@ namespace Umbraco.Core.IO
             var svalue = property.Value as string;
             var oldpath = svalue == null ? null : GetRelativePath(svalue); // FIXME DELETE?
             if (string.IsNullOrWhiteSpace(oldpath) == false && oldpath != filepath)
-                DeleteFile(oldpath, true);
+                DeleteFile(oldpath);
             property.Value = GetUrl(filepath);
             using (var filestream = OpenFile(filepath))
             {
@@ -343,25 +369,8 @@ namespace Umbraco.Core.IO
         // ie generates thumbnails and populates autofill properties
         private void SetUploadFile(IContentBase content, Property property, string filepath, Stream filestream)
         {
-            // check if file is an image (and supports resizing and thumbnails etc)
-            var extension = Path.GetExtension(filepath);
-            var isImage = IsImageFile(extension);
-
-            // specific stuff for images (thumbnails etc)
-            if (isImage)
-            {
-                using (var image = Image.FromStream(filestream))
-                {
-                    // use one image for all
-                    GenerateThumbnails(image, filepath, property.PropertyType);
-                    UploadAutoFillProperties.Populate(content, property.Alias, filepath, filestream, image);
-                }
-            }
-            else
-            {
-                // will use filepath for extension, and filestream for length
-                UploadAutoFillProperties.Populate(content, property.Alias, filepath, filestream);
-            }
+            // will use filepath for extension, and filestream for length
+            UploadAutoFillProperties.Populate(content, property.Alias, filepath, filestream);
         }
 
         #endregion
@@ -424,279 +433,281 @@ namespace Umbraco.Core.IO
 
         #endregion
 
-        #region Manage thumbnails
+	    // fixme - remove
 
-        // note: this does not find 'custom' thumbnails?
-        // will find _thumb and _big-thumb but NOT _custom?
-        public IEnumerable<string> GetThumbnails(string path)
-        {
-            var parentDirectory = Path.GetDirectoryName(path);
-            var extension = Path.GetExtension(path);
+        //#region Manage thumbnails
 
-            return GetFiles(parentDirectory)
-                .Where(x => x.StartsWith(path.TrimEnd(extension) + "_thumb") || x.StartsWith(path.TrimEnd(extension) + "_big-thumb"))
-                .ToList();
-        }
+        //// note: this does not find 'custom' thumbnails?
+        //// will find _thumb and _big-thumb but NOT _custom?
+        //public IEnumerable<string> GetThumbnails(string path)
+        //{
+        //    var parentDirectory = Path.GetDirectoryName(path);
+        //    var extension = Path.GetExtension(path);
 
-        public void DeleteFile(string path, bool deleteThumbnails)
-        {
-            base.DeleteFile(path);
+        //    return GetFiles(parentDirectory)
+        //        .Where(x => x.StartsWith(path.TrimEnd(extension) + "_thumb") || x.StartsWith(path.TrimEnd(extension) + "_big-thumb"))
+        //        .ToList();
+        //}
 
-            if (deleteThumbnails == false)
-                return;
+        //public void DeleteFile(string path, bool deleteThumbnails)
+        //{
+        //    base.DeleteFile(path);
 
-            DeleteThumbnails(path);
-        }
+        //    if (deleteThumbnails == false)
+        //        return;
 
-        public void DeleteThumbnails(string path)
-        {
-            GetThumbnails(path)
-                .ForEach(x => base.DeleteFile(x));
-        }
+        //    DeleteThumbnails(path);
+        //}
 
-        public void CopyThumbnails(string sourcePath, string targetPath)
-        {
-            var targetPathBase = Path.GetDirectoryName(targetPath) ?? "";
-            foreach (var sourceThumbPath in GetThumbnails(sourcePath))
-            {
-                var sourceThumbFilename = Path.GetFileName(sourceThumbPath) ?? "";
-                var targetThumbPath = Path.Combine(targetPathBase, sourceThumbFilename);
-                this.CopyFile(sourceThumbPath, targetThumbPath);
-            }
-        }
+        //public void DeleteThumbnails(string path)
+        //{
+        //    GetThumbnails(path)
+        //        .ForEach(x => base.DeleteFile(x));
+        //}
 
-        #endregion
+        //public void CopyThumbnails(string sourcePath, string targetPath)
+        //{
+        //    var targetPathBase = Path.GetDirectoryName(targetPath) ?? "";
+        //    foreach (var sourceThumbPath in GetThumbnails(sourcePath))
+        //    {
+        //        var sourceThumbFilename = Path.GetFileName(sourceThumbPath) ?? "";
+        //        var targetThumbPath = Path.Combine(targetPathBase, sourceThumbFilename);
+        //        this.CopyFile(sourceThumbPath, targetThumbPath);
+        //    }
+        //}
 
-        #region GenerateThumbnails
+        //#endregion
 
-        public IEnumerable<ResizedImage> GenerateThumbnails(Image image, string filepath, string preValue)
-        {
-            if (string.IsNullOrWhiteSpace(preValue))
-                return GenerateThumbnails(image, filepath);
+        //#region GenerateThumbnails
 
-            var additionalSizes = new List<int>();
-            var sep = preValue.Contains(",") ? "," : ";";
-            var values = preValue.Split(new[] { sep }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var value in values)
-            {
-                int size;
-                if (int.TryParse(value, out size))
-                    additionalSizes.Add(size);
-            }
+        //public IEnumerable<ResizedImage> GenerateThumbnails(Image image, string filepath, string preValue)
+        //{
+        //    if (string.IsNullOrWhiteSpace(preValue))
+        //        return GenerateThumbnails(image, filepath);
 
-            return GenerateThumbnails(image, filepath, additionalSizes);
-        }
+        //    var additionalSizes = new List<int>();
+        //    var sep = preValue.Contains(",") ? "," : ";";
+        //    var values = preValue.Split(new[] { sep }, StringSplitOptions.RemoveEmptyEntries);
+        //    foreach (var value in values)
+        //    {
+        //        int size;
+        //        if (int.TryParse(value, out size))
+        //            additionalSizes.Add(size);
+        //    }
 
-        public IEnumerable<ResizedImage> GenerateThumbnails(Image image, string filepath, IEnumerable<int> additionalSizes = null)
-        {
-            var w = image.Width;
-            var h = image.Height;
+        //    return GenerateThumbnails(image, filepath, additionalSizes);
+        //}
 
-            var sizes = additionalSizes == null ? DefaultSizes.Keys : DefaultSizes.Keys.Concat(additionalSizes);
+        //public IEnumerable<ResizedImage> GenerateThumbnails(Image image, string filepath, IEnumerable<int> additionalSizes = null)
+        //{
+        //    var w = image.Width;
+        //    var h = image.Height;
 
-            // start with default sizes,
-            // add additional sizes,
-            // filter out duplicates,
-            // filter out those that would be larger that the original image
-            // and create the thumbnail
-            return sizes
-                .Distinct()
-                .Where(x => w >= x && h >= x)
-                .Select(x => GenerateResized(image, filepath, DefaultSizes.ContainsKey(x) ? DefaultSizes[x] : "", x))
-                .ToList(); // now
-        }
+        //    var sizes = additionalSizes == null ? DefaultSizes.Keys : DefaultSizes.Keys.Concat(additionalSizes);
 
-        public IEnumerable<ResizedImage> GenerateThumbnails(Stream filestream, string filepath, PropertyType propertyType)
-        {
-            // get the original image from the original stream
-            if (filestream.CanSeek) filestream.Seek(0, 0); // fixme - what if we cannot seek?
-            using (var image = Image.FromStream(filestream))
-            {
-                return GenerateThumbnails(image, filepath, propertyType);
-            }
-        }
+        //    // start with default sizes,
+        //    // add additional sizes,
+        //    // filter out duplicates,
+        //    // filter out those that would be larger that the original image
+        //    // and create the thumbnail
+        //    return sizes
+        //        .Distinct()
+        //        .Where(x => w >= x && h >= x)
+        //        .Select(x => GenerateResized(image, filepath, DefaultSizes.ContainsKey(x) ? DefaultSizes[x] : "", x))
+        //        .ToList(); // now
+        //}
 
-        public IEnumerable<ResizedImage> GenerateThumbnails(Image image, string filepath, PropertyType propertyType)
-        {
-            // if the editor is an upload field, check for additional thumbnail sizes
-            // that can be defined in the prevalue for the property data type. otherwise,
-            // just use the default sizes.
-            var sizes = propertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias
-                ? DataTypeService
-                    .GetPreValuesByDataTypeId(propertyType.DataTypeDefinitionId)
-                    .FirstOrDefault()
-                : string.Empty;
+        //public IEnumerable<ResizedImage> GenerateThumbnails(Stream filestream, string filepath, PropertyType propertyType)
+        //{
+        //    // get the original image from the original stream
+        //    if (filestream.CanSeek) filestream.Seek(0, 0); // fixme - what if we cannot seek?
+        //    using (var image = Image.FromStream(filestream))
+        //    {
+        //        return GenerateThumbnails(image, filepath, propertyType);
+        //    }
+        //}
 
-            return GenerateThumbnails(image, filepath, sizes);
-        }
+        //public IEnumerable<ResizedImage> GenerateThumbnails(Image image, string filepath, PropertyType propertyType)
+        //{
+        //    // if the editor is an upload field, check for additional thumbnail sizes
+        //    // that can be defined in the prevalue for the property data type. otherwise,
+        //    // just use the default sizes.
+        //    var sizes = propertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias
+        //        ? DataTypeService
+        //            .GetPreValuesByDataTypeId(propertyType.DataTypeDefinitionId)
+        //            .FirstOrDefault()
+        //        : string.Empty;
 
-        #endregion
+        //    return GenerateThumbnails(image, filepath, sizes);
+        //}
 
-        #region GenerateResized - Generate at resized filepath derived from origin filepath
+        //#endregion
 
-        public ResizedImage GenerateResized(Image originImage, string originFilepath, string sizeName, int maxWidthHeight)
-        {
-            return GenerateResized(originImage, originFilepath, sizeName, maxWidthHeight, -1, -1);
-        }
+        //#region GenerateResized - Generate at resized filepath derived from origin filepath
 
-        public ResizedImage GenerateResized(Image originImage, string originFilepath, string sizeName, int fixedWidth, int fixedHeight)
-        {
-            return GenerateResized(originImage, originFilepath, sizeName, -1, fixedWidth, fixedHeight);
-        }
+        //public ResizedImage GenerateResized(Image originImage, string originFilepath, string sizeName, int maxWidthHeight)
+        //{
+        //    return GenerateResized(originImage, originFilepath, sizeName, maxWidthHeight, -1, -1);
+        //}
 
-        public ResizedImage GenerateResized(Image originImage, string originFilepath, string sizeName, int maxWidthHeight, int fixedWidth, int fixedHeight)
-        {
-            if (string.IsNullOrWhiteSpace(sizeName))
-                sizeName = "UMBRACOSYSTHUMBNAIL";
-            var extension = Path.GetExtension(originFilepath) ?? string.Empty;
-            var filebase = originFilepath.TrimEnd(extension);
-            var resizedFilepath = filebase + "_" + sizeName + extension;
+        //public ResizedImage GenerateResized(Image originImage, string originFilepath, string sizeName, int fixedWidth, int fixedHeight)
+        //{
+        //    return GenerateResized(originImage, originFilepath, sizeName, -1, fixedWidth, fixedHeight);
+        //}
 
-            return GenerateResizedAt(originImage, resizedFilepath, maxWidthHeight, fixedWidth, fixedHeight);
-        }
+        //public ResizedImage GenerateResized(Image originImage, string originFilepath, string sizeName, int maxWidthHeight, int fixedWidth, int fixedHeight)
+        //{
+        //    if (string.IsNullOrWhiteSpace(sizeName))
+        //        sizeName = "UMBRACOSYSTHUMBNAIL";
+        //    var extension = Path.GetExtension(originFilepath) ?? string.Empty;
+        //    var filebase = originFilepath.TrimEnd(extension);
+        //    var resizedFilepath = filebase + "_" + sizeName + extension;
 
-        #endregion
+        //    return GenerateResizedAt(originImage, resizedFilepath, maxWidthHeight, fixedWidth, fixedHeight);
+        //}
 
-        #region GenerateResizedAt - Generate at specified resized filepath
+        //#endregion
 
-        public ResizedImage GenerateResizedAt(Image originImage, string resizedFilepath, int maxWidthHeight)
-        {
-            return GenerateResizedAt(originImage, resizedFilepath, maxWidthHeight, -1, -1);
-        }
+        //#region GenerateResizedAt - Generate at specified resized filepath
 
-        public ResizedImage GenerateResizedAt(Image originImage, int fixedWidth, int fixedHeight, string resizedFilepath)
-        {
-            return GenerateResizedAt(originImage, resizedFilepath, -1, fixedWidth, fixedHeight);
-        }
+        //public ResizedImage GenerateResizedAt(Image originImage, string resizedFilepath, int maxWidthHeight)
+        //{
+        //    return GenerateResizedAt(originImage, resizedFilepath, maxWidthHeight, -1, -1);
+        //}
 
-        public ResizedImage GenerateResizedAt(Image originImage, string resizedFilepath, int maxWidthHeight, int fixedWidth, int fixedHeight)
-        {
-            // target dimensions
-            int width, height;
+        //public ResizedImage GenerateResizedAt(Image originImage, int fixedWidth, int fixedHeight, string resizedFilepath)
+        //{
+        //    return GenerateResizedAt(originImage, resizedFilepath, -1, fixedWidth, fixedHeight);
+        //}
 
-            // if maxWidthHeight then get ratio
-            if (maxWidthHeight > 0)
-            {
-                var fx = (float)originImage.Size.Width / maxWidthHeight;
-                var fy = (float)originImage.Size.Height / maxWidthHeight;
-                var f = Math.Max(fx, fy); // fit in thumbnail size
-                width = (int)Math.Round(originImage.Size.Width / f);
-                height = (int)Math.Round(originImage.Size.Height / f);
-                if (width == 0) width = 1;
-                if (height == 0) height = 1;
-            }
-            else if (fixedWidth > 0 && fixedHeight > 0)
-            {
-                width = fixedWidth;
-                height = fixedHeight;
-            }
-            else
-            {
-                width = height = 1;
-            }
+        //public ResizedImage GenerateResizedAt(Image originImage, string resizedFilepath, int maxWidthHeight, int fixedWidth, int fixedHeight)
+        //{
+        //    // target dimensions
+        //    int width, height;
 
-            // create new image with best quality settings
-            using (var bitmap = new Bitmap(width, height))
-            using (var graphics = Graphics.FromImage(bitmap))
-            {
-                // if the image size is rather large we cannot use the best quality interpolation mode
-                // because we'll get out of mem exceptions. So we detect how big the image is and use
-                // the mid quality interpolation mode when the image size exceeds our max limit.
-                graphics.InterpolationMode = originImage.Width > 5000 || originImage.Height > 5000
-                    ? InterpolationMode.Bilinear // mid quality
-                    : InterpolationMode.HighQualityBicubic; // best quality
+        //    // if maxWidthHeight then get ratio
+        //    if (maxWidthHeight > 0)
+        //    {
+        //        var fx = (float)originImage.Size.Width / maxWidthHeight;
+        //        var fy = (float)originImage.Size.Height / maxWidthHeight;
+        //        var f = Math.Max(fx, fy); // fit in thumbnail size
+        //        width = (int)Math.Round(originImage.Size.Width / f);
+        //        height = (int)Math.Round(originImage.Size.Height / f);
+        //        if (width == 0) width = 1;
+        //        if (height == 0) height = 1;
+        //    }
+        //    else if (fixedWidth > 0 && fixedHeight > 0)
+        //    {
+        //        width = fixedWidth;
+        //        height = fixedHeight;
+        //    }
+        //    else
+        //    {
+        //        width = height = 1;
+        //    }
 
-                // everything else is best-quality
-                graphics.SmoothingMode = SmoothingMode.HighQuality;
-                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                graphics.CompositingQuality = CompositingQuality.HighQuality;
+        //    // create new image with best quality settings
+        //    using (var bitmap = new Bitmap(width, height))
+        //    using (var graphics = Graphics.FromImage(bitmap))
+        //    {
+        //        // if the image size is rather large we cannot use the best quality interpolation mode
+        //        // because we'll get out of mem exceptions. So we detect how big the image is and use
+        //        // the mid quality interpolation mode when the image size exceeds our max limit.
+        //        graphics.InterpolationMode = originImage.Width > 5000 || originImage.Height > 5000
+        //            ? InterpolationMode.Bilinear // mid quality
+        //            : InterpolationMode.HighQualityBicubic; // best quality
 
-                // copy the old image to the new and resize
-                var rect = new Rectangle(0, 0, width, height);
-                graphics.DrawImage(originImage, rect, 0, 0, originImage.Width, originImage.Height, GraphicsUnit.Pixel);
+        //        // everything else is best-quality
+        //        graphics.SmoothingMode = SmoothingMode.HighQuality;
+        //        graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+        //        graphics.CompositingQuality = CompositingQuality.HighQuality;
 
-                // copy metadata
-                // fixme - er... no?
+        //        // copy the old image to the new and resize
+        //        var rect = new Rectangle(0, 0, width, height);
+        //        graphics.DrawImage(originImage, rect, 0, 0, originImage.Width, originImage.Height, GraphicsUnit.Pixel);
 
-                // get an encoder - based upon the file type
-                var extension = (Path.GetExtension(resizedFilepath) ?? "").TrimStart('.').ToLowerInvariant();
-                var encoders = ImageCodecInfo.GetImageEncoders();
-                ImageCodecInfo encoder;
-                switch (extension)
-                {
-                    case "png":
-                        encoder = encoders.Single(t => t.MimeType.Equals("image/png"));
-                        break;
-                    case "gif":
-                        encoder = encoders.Single(t => t.MimeType.Equals("image/gif"));
-                        break;
-                    case "tif":
-                    case "tiff":
-                        encoder = encoders.Single(t => t.MimeType.Equals("image/tiff"));
-                        break;
-                    case "bmp":
-                        encoder = encoders.Single(t => t.MimeType.Equals("image/bmp"));
-                        break;
-                    // TODO: this is dirty, defaulting to jpg but the return value of this thing is used all over the
-                    // place so left it here, but it needs to not set a codec if it doesn't know which one to pick
-                    // Note: when fixing this: both .jpg and .jpeg should be handled as extensions
-                    default:
-                        encoder = encoders.Single(t => t.MimeType.Equals("image/jpeg"));
-                        break;
-                }
+        //        // copy metadata
+        //        // fixme - er... no?
 
-                // set compresion ratio to 90%
-                var encoderParams = new EncoderParameters();
-                encoderParams.Param[0] = new EncoderParameter(Encoder.Quality, 90L);
+        //        // get an encoder - based upon the file type
+        //        var extension = (Path.GetExtension(resizedFilepath) ?? "").TrimStart('.').ToLowerInvariant();
+        //        var encoders = ImageCodecInfo.GetImageEncoders();
+        //        ImageCodecInfo encoder;
+        //        switch (extension)
+        //        {
+        //            case "png":
+        //                encoder = encoders.Single(t => t.MimeType.Equals("image/png"));
+        //                break;
+        //            case "gif":
+        //                encoder = encoders.Single(t => t.MimeType.Equals("image/gif"));
+        //                break;
+        //            case "tif":
+        //            case "tiff":
+        //                encoder = encoders.Single(t => t.MimeType.Equals("image/tiff"));
+        //                break;
+        //            case "bmp":
+        //                encoder = encoders.Single(t => t.MimeType.Equals("image/bmp"));
+        //                break;
+        //            // TODO: this is dirty, defaulting to jpg but the return value of this thing is used all over the
+        //            // place so left it here, but it needs to not set a codec if it doesn't know which one to pick
+        //            // Note: when fixing this: both .jpg and .jpeg should be handled as extensions
+        //            default:
+        //                encoder = encoders.Single(t => t.MimeType.Equals("image/jpeg"));
+        //                break;
+        //        }
 
-                // save the new image
-                using (var stream = new MemoryStream())
-                {
-                    bitmap.Save(stream, encoder, encoderParams);
-                    stream.Seek(0, 0);
-                    if (resizedFilepath.Contains("UMBRACOSYSTHUMBNAIL"))
-                    {
-                        var filepath = resizedFilepath.Replace("UMBRACOSYSTHUMBNAIL", maxWidthHeight.ToInvariantString());
-                        AddFile(filepath, stream);
-                        if (extension != "jpg")
-                        {
-                            filepath = filepath.TrimEnd(extension) + "jpg";
-                            stream.Seek(0, 0);
-                            AddFile(filepath, stream);
-                        }
-                        // TODO: Remove this, this is ONLY here for backwards compatibility but it is essentially completely unusable see U4-5385
-                        stream.Seek(0, 0);
-                        resizedFilepath = resizedFilepath.Replace("UMBRACOSYSTHUMBNAIL", width + "x" + height);
-                    }
+        //        // set compresion ratio to 90%
+        //        var encoderParams = new EncoderParameters();
+        //        encoderParams.Param[0] = new EncoderParameter(Encoder.Quality, 90L);
 
-                    AddFile(resizedFilepath, stream);
-                }
+        //        // save the new image
+        //        using (var stream = new MemoryStream())
+        //        {
+        //            bitmap.Save(stream, encoder, encoderParams);
+        //            stream.Seek(0, 0);
+        //            if (resizedFilepath.Contains("UMBRACOSYSTHUMBNAIL"))
+        //            {
+        //                var filepath = resizedFilepath.Replace("UMBRACOSYSTHUMBNAIL", maxWidthHeight.ToInvariantString());
+        //                AddFile(filepath, stream);
+        //                if (extension != "jpg")
+        //                {
+        //                    filepath = filepath.TrimEnd(extension) + "jpg";
+        //                    stream.Seek(0, 0);
+        //                    AddFile(filepath, stream);
+        //                }
+        //                // TODO: Remove this, this is ONLY here for backwards compatibility but it is essentially completely unusable see U4-5385
+        //                stream.Seek(0, 0);
+        //                resizedFilepath = resizedFilepath.Replace("UMBRACOSYSTHUMBNAIL", width + "x" + height);
+        //            }
 
-                return new ResizedImage(resizedFilepath, width, height);
-            }
-        }
+        //            AddFile(resizedFilepath, stream);
+        //        }
 
-        #endregion
+        //        return new ResizedImage(resizedFilepath, width, height);
+        //    }
+        //}
 
-        #region Inner classes
+        //#endregion
 
-        public class ResizedImage
-        {
-            public ResizedImage()
-            { }
+        //#region Inner classes
 
-            public ResizedImage(string filepath, int width, int height)
-            {
-                Filepath = filepath;
-                Width = width;
-                Height = height;
-            }
+        //public class ResizedImage
+        //{
+        //    public ResizedImage()
+        //    { }
 
-            public string Filepath { get; set; }
-            public int Width { get; set; }
-            public int Height { get; set; }
-        }
+        //    public ResizedImage(string filepath, int width, int height)
+        //    {
+        //        Filepath = filepath;
+        //        Width = width;
+        //        Height = height;
+        //    }
 
-        #endregion
+        //    public string Filepath { get; set; }
+        //    public int Width { get; set; }
+        //    public int Height { get; set; }
+        //}
+
+        //#endregion
     }
 }

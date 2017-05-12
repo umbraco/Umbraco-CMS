@@ -103,10 +103,16 @@ namespace Umbraco.Core.IO
 			return Wrapped.GetCreated(path);
 		}
 
-        // explicitely implementing - not breaking
-	    long IFileSystem.GetSize(string path)
+	    public long GetSize(string path)
 	    {
 	        return Wrapped.GetSize(path);
 	    }
-    }
+
+	    public bool CanAddPhysical => Wrapped.CanAddPhysical;
+
+	    public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false)
+	    {
+	        Wrapped.AddFile(path, physicalPath, overrideIfExists, copy);
+	    }
+	}
 }

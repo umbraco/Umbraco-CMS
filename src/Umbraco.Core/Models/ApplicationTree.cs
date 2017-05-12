@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 
 namespace Umbraco.Core.Models
@@ -6,11 +7,12 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Tree - {Title} ({ApplicationAlias})")]
     public class ApplicationTree
     {
+        private static readonly ConcurrentDictionary<string, Type> ResolvedTypes = new ConcurrentDictionary<string, Type>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationTree"/> class.
         /// </summary>
         public ApplicationTree() { }
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationTree"/> class.
@@ -25,14 +27,14 @@ namespace Umbraco.Core.Models
         /// <param name="type">The tree type.</param>
         public ApplicationTree(bool initialize, int sortOrder, string applicationAlias, string alias, string title, string iconClosed, string iconOpened, string type)
         {
-            this.Initialize = initialize;
-            this.SortOrder = sortOrder;
-            this.ApplicationAlias = applicationAlias;
-            this.Alias = alias;
-            this.Title = title;
-            this.IconClosed = iconClosed;
-            this.IconOpened = iconOpened;
-            this.Type = type;
+            Initialize = initialize;
+            SortOrder = sortOrder;
+            ApplicationAlias = applicationAlias;
+            Alias = alias;
+            Title = title;
+            IconClosed = iconClosed;
+            IconOpened = iconOpened;
+            Type = type;
         }
 
         /// <summary>
@@ -51,13 +53,13 @@ namespace Umbraco.Core.Models
         /// Gets the application alias.
         /// </summary>
         /// <value>The application alias.</value>
-        public string ApplicationAlias { get; private set; }
+        public string ApplicationAlias { get; }
 
         /// <summary>
         /// Gets the tree alias.
         /// </summary>
         /// <value>The alias.</value>
-        public string Alias { get; private set; }
+        public string Alias { get; }
 
         /// <summary>
         /// Gets or sets the tree title.
@@ -93,7 +95,47 @@ namespace Umbraco.Core.Models
         {
             return _runtimeType ?? (_runtimeType = System.Type.GetType(Type));
         }
-            
 
+        /// <summary>
+        /// Used to try to get and cache the tree type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        internal static Type TryGetType(string type)
+        {
+            try
+            {
+                return ResolvedTypes.GetOrAdd(type, s =>
+                {
+                    var result = System.Type.GetType(type);
+                    if (result != null)
+                    {
+                        return result;
+                    }
+
+                    //we need to implement a bit of a hack here due to some trees being renamed and backwards compat
+                    var parts = type.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length != 2)
+                        throw new InvalidOperationException("Could not resolve type");
+                    if (parts[1].Trim() != "umbraco" || parts[0].StartsWith("Umbraco.Web.Trees") == false || parts[0].EndsWith("Controller"))
+                        throw new InvalidOperationException("Could not resolve type");
+
+                    //if it's one of our controllers but it's not suffixed with "Controller" then add it and try again
+                    var tempType = parts[0] + "Controller, umbraco";
+
+                    result = System.Type.GetType(tempType);
+                    if (result != null)
+                        return result;
+
+                    throw new InvalidOperationException("Could not resolve type");
+                });
+            }
+            catch (InvalidOperationException)
+            {
+                //swallow, this is our own exception, couldn't find the type
+                // fixme bad use of exceptions here!
+                return null;
+            }
+        }
     }
 }

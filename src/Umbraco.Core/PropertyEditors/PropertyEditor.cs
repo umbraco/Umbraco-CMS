@@ -21,17 +21,16 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Exposes a logger
         /// </summary>
-        protected ILogger Logger { get; private set; }
+        protected ILogger Logger { get; }
 
         private readonly PropertyEditorAttribute _attribute;
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public PropertyEditor(ILogger logger)             
+        public PropertyEditor(ILogger logger)
         {
-            if (logger == null) throw new ArgumentNullException("logger");
-            Logger = logger;
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             //defaults
             Icon = Constants.Icons.PropertyEditor;
             Group = "common";
@@ -46,6 +45,7 @@ namespace Umbraco.Core.PropertyEditors
                 IsParameterEditor = _attribute.IsParameterEditor;
                 Icon = _attribute.Icon;
                 Group = _attribute.Group;
+                IsDeprecated = _attribute.IsDeprecated;
             }
         }
 
@@ -92,32 +92,23 @@ namespace Umbraco.Core.PropertyEditors
         public string Group { get; internal set; }
 
 
-        [JsonProperty("editor", Required = Required.Always)]        
-        public PropertyValueEditor ValueEditor
-        {
-            get { return CreateValueEditor(); }
-        }
+        [JsonProperty("editor", Required = Required.Always)]
+        public PropertyValueEditor ValueEditor => CreateValueEditor();
 
         [JsonIgnore]
-        IValueEditor IParameterEditor.ValueEditor
-        {
-            get { return ValueEditor; }
-        }
+        public bool IsDeprecated { get; internal set; } // fixme kill it all in v8
+
+        [JsonIgnore]
+        IValueEditor IParameterEditor.ValueEditor => ValueEditor;
 
         [JsonProperty("prevalues")]
-        public PreValueEditor PreValueEditor
-        {
-            get { return CreatePreValueEditor(); }
-        }
+        public PreValueEditor PreValueEditor => CreatePreValueEditor();
 
         [JsonProperty("defaultConfig")]
         public virtual IDictionary<string, object> DefaultPreValues { get; set; }
 
         [JsonIgnore]
-        IDictionary<string, object> IParameterEditor.Configuration
-        {
-            get { return DefaultPreValues; }
-        }
+        IDictionary<string, object> IParameterEditor.Configuration => DefaultPreValues;
 
         /// <summary>
         /// Creates a value editor instance
@@ -155,7 +146,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <returns></returns>
         protected virtual PreValueEditor CreatePreValueEditor()
-        {      
+        {
             //This will not be null if it is a manifest defined editor
             if (ManifestDefinedPreValueEditor != null)
             {
@@ -165,7 +156,7 @@ namespace Umbraco.Core.PropertyEditors
                     if (f.View.StartsWith("~/"))
                     {
                         f.View = IOHelper.ResolveUrl(f.View);
-                    }    
+                    }
                 }
                 return ManifestDefinedPreValueEditor;
             }
@@ -183,7 +174,7 @@ namespace Umbraco.Core.PropertyEditors
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((PropertyEditor) obj);
         }
 
@@ -197,7 +188,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         protected virtual string DebuggerDisplay()
         {
-            return string.Format("Name: {0}, Alias: {1}, IsParameterEditor: {2}", Name, Alias, IsParameterEditor);
+            return $"Name: {Name}, Alias: {Alias}, IsParameterEditor: {IsParameterEditor}";
         }
     }
 }

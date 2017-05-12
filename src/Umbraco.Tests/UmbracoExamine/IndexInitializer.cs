@@ -18,6 +18,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using UmbracoExamine;
@@ -169,14 +170,15 @@ namespace Umbraco.Tests.UmbracoExamine
                 mediaTypeService = mediaTypeServiceMock.Object;
             }
 
-		    var query = new Mock<IQuery<IContent>>();
-            query
-                .Setup(x => x.GetWhereClauses())
-                .Returns(new List<Tuple<string, object[]>> { new Tuple<string, object[]>("cmsDocument.published", new object[] { 1 }) });
-		    var databaseFactory = new Mock<IUmbracoDatabaseFactory>();
-		    databaseFactory
-		        .Setup(x => x.Query<IContent>())
-		        .Returns(query.Object);
+            // fixme oops?!
+            //var query = new Mock<IQuery<IContent>>();
+            //query
+            //    .Setup(x => x.GetWhereClauses())
+            //    .Returns(new List<Tuple<string, object[]>> { new Tuple<string, object[]>("cmsDocument.published", new object[] { 1 }) });
+            var scopeProvider = new Mock<IScopeProvider>();
+		    //scopeProvider
+		    //    .Setup(x => x.Query<IContent>())
+		    //    .Returns(query.Object);
 
 		    var i = new UmbracoContentIndexer(
 		        new[] { new FieldDefinition("", FieldDefinitionTypes.FullText) },
@@ -189,7 +191,7 @@ namespace Umbraco.Tests.UmbracoExamine
 		        new[] {new DefaultUrlSegmentProvider()},
 		        new UmbracoContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),
 		        options,
-                databaseFactory.Object);
+                scopeProvider.Object);
 
 			i.IndexingError += IndexingError;
 

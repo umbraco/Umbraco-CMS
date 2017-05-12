@@ -45,7 +45,7 @@ namespace Umbraco.Web.Install
                 new NewInstallStep(_httpContext, Current.Services.UserService, _databaseBuilder),
                 new UpgradeStep(_databaseBuilder),
                 new FilePermissionsStep(),
-                new MajorVersion7UpgradeReport(_databaseBuilder, Current.RuntimeState),
+                new MajorVersion7UpgradeReport(_databaseBuilder, Current.RuntimeState, Current.DatabaseContext, Current.ScopeProvider),
                 new Version73FileCleanup(_httpContext, _logger),
                 new DatabaseConfigureStep(_databaseBuilder),
                 new DatabaseInstallStep(_databaseBuilder, Current.RuntimeState, Current.Logger),
@@ -116,13 +116,13 @@ namespace Umbraco.Web.Install
                     }
                 }
                 _httpContext.Response.Cookies.Set(new HttpCookie("umb_installId", "1"));
-                
+
                 var dbProvider = string.Empty;
                 if (IsBrandNewInstall == false)
                 {
                     // we don't have DatabaseProvider anymore... doing it differently
                     //dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
-                    dbProvider = GetDbProviderString(Current.DatabaseFactory);
+                    dbProvider = GetDbProviderString(Current.DatabaseContext);
                 }
 
                 var check = new org.umbraco.update.CheckForUpgrade();
@@ -144,7 +144,7 @@ namespace Umbraco.Web.Install
             }
         }
 
-        internal static string GetDbProviderString(IUmbracoDatabaseFactory factory)
+        internal static string GetDbProviderString(IDatabaseContext databaseContext)
         {
             var dbProvider = string.Empty;
 
@@ -152,7 +152,7 @@ namespace Umbraco.Web.Install
             //dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
             //
             // doing it differently
-            var syntax = factory.SqlSyntax;
+            var syntax = databaseContext.SqlSyntax;
             if (syntax is SqlCeSyntaxProvider)
                 dbProvider = "SqlServerCE";
             else if (syntax is MySqlSyntaxProvider)
@@ -170,7 +170,7 @@ namespace Umbraco.Web.Install
         {
             get
             {
-                var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
+                var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
                 if (GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace()
                     && _databaseBuilder.IsConnectionStringConfigured(databaseSettings) == false)
                 {
@@ -186,29 +186,7 @@ namespace Umbraco.Web.Install
                     return true;
                 }
 
-                //check if we have the default user configured already
-                var result = _databaseBuilder.Database.ExecuteScalar<int>(
-                    "SELECT COUNT(*) FROM umbracoUser WHERE id=0 AND userPassword='default'");
-                if (result == 1)
-                {
-                    //the user has not been configured
-                    //this is always true on UaaS, need to check if there's multiple users too
-                    var usersResult = _databaseBuilder.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser");
-                    return usersResult == 1;
-                }
-
-                //                //check if there are any content types configured, if there isn't then we will consider this a new install
-                //                result = _umbContext.Application.DatabaseContext.Database.ExecuteScalar<int>(
-                //                    @"SELECT COUNT(*) FROM cmsContentType 
-                //                        INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
-                //                        WHERE umbracoNode.nodeObjectType = @contentType", new {contentType = Constants.ObjectTypes.DocumentType});
-                //                if (result == 0)
-                //                {
-                //                    //no content types have been created
-                //                    return true;
-                //                }
-
-                return false;
+                return _databaseBuilder.HasSomeNonDefaultUser() == false;
             }
         }
 

@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IMapperCollection _mapperCollection;
         private PermissionRepository<IContent> _permissionRepository;
 
-        public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IUserTypeRepository userTypeRepository, IMapperCollection mapperCollection)
+        public UserRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IUserTypeRepository userTypeRepository, IMapperCollection mapperCollection)
             : base(work, cacheHelper, logger)
         {
             _userTypeRepository = userTypeRepository;

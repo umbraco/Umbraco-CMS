@@ -12,11 +12,11 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
-
     /// <summary>
-	/// A value converter for TinyMCE that will ensure any macro content is rendered properly even when 
-	/// used dynamically.
-	/// </summary>
+    /// A value converter for TinyMCE that will ensure any macro content is rendered properly even when 
+    /// used dynamically.
+    /// </summary>
+    [DefaultPropertyValueConverter]
     public class RteMacroRenderingValueConverter : TinyMceValueConverter
 	{
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -41,7 +41,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         // global UmbracoContext.Current.InPreviewMode status. So it
         // should never execute in // over the same UmbracoContext with
         // different preview modes.
-        string RenderRteMacros(string source, bool preview)
+	    private string RenderRteMacros(string source, bool preview)
         {
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
             using (umbracoContext.ForcedPreview(preview)) // force for macro rendering

@@ -79,7 +79,11 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         public IEnumerable<ExamineIndexerModel> GetIndexerDetails()
         {
-            return ExamineManager.Instance.IndexProviders.Select(CreateModel);
+            return ExamineManager.Instance.IndexProviders.Select(CreateModel).OrderBy(x =>
+            {
+                //order by name , but strip the "Indexer" from the end if it exists
+                return x.Name.TrimEnd("Indexer");
+            });
         }
 
         /// <summary>
@@ -91,7 +95,7 @@ namespace Umbraco.Web.WebServices
             var model = new List<ExamineSearcherModel>(
                 ExamineManager.Instance.SearchProviderCollection.Cast<BaseSearchProvider>().Select(searcher =>
                 {
-                    var indexerModel = new ExamineIndexerModel()
+                    var indexerModel = new ExamineSearcherModel()
                     {
                         Name = searcher.Name
                     };
@@ -104,6 +108,10 @@ namespace Umbraco.Web.WebServices
                         indexerModel.ProviderProperties.Add(p.Name, p.GetValue(searcher, null).ToString());
                     }
                     return indexerModel;
+                }).OrderBy(x =>
+                {
+                    //order by name , but strip the "Searcher" from the end if it exists
+                    return x.Name.TrimEnd("Searcher");
                 }));
             return model;
         }
@@ -172,6 +180,8 @@ namespace Umbraco.Web.WebServices
             var msg = ValidateLuceneIndexer(indexerName, out indexer);
             if (msg.IsSuccessStatusCode)
             {
+                Current.Logger.Info<ExamineManagementApiController>(string.Format("Rebuilding index '{0}'", indexerName));
+
                 //remove it in case there's a handler there alraedy
                 indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
                 //now add a single handler
@@ -206,6 +216,8 @@ namespace Umbraco.Web.WebServices
 
             //ensure it's not listening anymore
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
+
+            Current.Logger.Info<ExamineManagementApiController>($"Rebuilding index '{indexer.Name}' done, {indexer.CommitCount} items committed (can differ from the number of items in the index)");
 
             var cacheKey = "temp_indexing_op_" + indexer.Name;
             Current.ApplicationCache.RuntimeCache.ClearCacheItem(cacheKey);
@@ -262,6 +274,7 @@ namespace Umbraco.Web.WebServices
                 FieldDefinitions = indexer.Value.FieldDefinitions,
                 Name = indexer.Key
             };
+            
             var props = TypeHelper.CachedDiscoverableProperties(indexer.GetType(), mustWrite: false)
                 //ignore these properties
                                   .Where(x => new[] {"IndexerData", "Description", "WorkingFolder"}.InvariantContains(x.Name) == false)
@@ -272,7 +285,10 @@ namespace Umbraco.Web.WebServices
                 var val = p.GetValue(indexer, null);
                 if (val == null)
                 {
+                    // Do not warn for new new attribute that is optional
+                    if(string.Equals(p.Name, "DirectoryFactory", StringComparison.InvariantCultureIgnoreCase) == false)
                     Logger.Warn<ExamineManagementApiController>("Property value was null when setting up property on indexer: " + indexer.Key + " property: " + p.Name);
+
                     val = string.Empty;
                 }
                 indexerModel.ProviderProperties.Add(p.Name, val.ToString());
@@ -285,6 +301,16 @@ namespace Umbraco.Web.WebServices
 
                 if (luceneIndexer.IndexExists())
                 {
+                    Exception indexError;
+                    indexerModel.IsHealthy = luceneIndexer.IsHealthy(out indexError);
+
+                    if (indexerModel.IsHealthy == false)
+                    {
+                        //we cannot continue at this point
+                        indexerModel.Error = indexError.ToString();
+                        return indexerModel;
+                    }
+
                     indexerModel.DocumentCount = luceneIndexer.GetIndexDocumentCount();
                     indexerModel.FieldCount = luceneIndexer.GetIndexFieldCount();
                     indexerModel.IsOptimized = luceneIndexer.IsIndexOptimized();

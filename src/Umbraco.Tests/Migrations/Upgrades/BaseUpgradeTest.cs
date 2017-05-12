@@ -10,11 +10,8 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Plugins;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
-using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Tests.Migrations.Upgrades
 {
@@ -64,7 +61,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
                 logger,
                 configuredVersion,
                 targetVersion,
-                GlobalSettings.UmbracoMigrationName,
+                Constants.System.UmbracoMigrationName,
                 //pass in explicit migrations
                 new Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints(context),
                 new DeleteAppTables(context),

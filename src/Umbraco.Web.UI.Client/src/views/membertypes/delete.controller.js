@@ -4,7 +4,7 @@
  * @function
  *
  * @description
- * The controller for deleting content
+ * The controller for deleting member types
  */
 function MemberTypesDeleteController($scope, memberTypeResource, treeService, navigationService) {
 

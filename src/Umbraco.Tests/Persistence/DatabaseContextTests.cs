@@ -6,20 +6,15 @@ using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Stubs;
 
 namespace Umbraco.Tests.Persistence
 {
-
     [TestFixture, RequiresSTA]
     public class DatabaseContextTests
     {
@@ -30,7 +25,6 @@ namespace Umbraco.Tests.Persistence
         private IRuntimeState _runtime;
         private IMigrationEntryService _migrationEntryService;
 
-
         [SetUp]
 		public void Setup()
 		{
@@ -38,7 +32,7 @@ namespace Umbraco.Tests.Persistence
             _sqlCeSyntaxProvider = new SqlCeSyntaxProvider();
             _sqlSyntaxProviders = new[] { (ISqlSyntaxProvider) _sqlCeSyntaxProvider };
             _logger = Mock.Of<ILogger>();
-            _databaseFactory = new UmbracoDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, _sqlSyntaxProviders, _logger, new TestDatabaseScopeAccessor(), Mock.Of<IMapperCollection>());
+            _databaseFactory = new UmbracoDatabaseFactory(_sqlSyntaxProviders, _logger, Mock.Of<IMapperCollection>());
             _runtime = Mock.Of<IRuntimeState>();
             _migrationEntryService = Mock.Of<IMigrationEntryService>();
 		}
@@ -50,51 +44,11 @@ namespace Umbraco.Tests.Persistence
 		}
 
         [Test]
-        public void NoDatabaseWithoutScope()
-        {
-            Assert.Throws<InvalidOperationException>(() =>
-            {
-                var db = _databaseFactory.Database;
-            });
-        }
-
-        [Test]
-        public void SingleDatabaseInstancePerScope()
-        {
-            IUmbracoDatabase db1, db2;
-
-            using (_databaseFactory.CreateScope())
-            {
-                db1 = _databaseFactory.Database;
-                db2 = _databaseFactory.Database;
-            }
-
-            Assert.AreSame(db1, db2);
-        }
-
-        [Test]
-        public void DifferentDatabaseInstancePerScope()
-        {
-            IUmbracoDatabase db1, db2;
-
-            using (_databaseFactory.CreateScope())
-            {
-                db1 = _databaseFactory.Database;
-            }
-            using (_databaseFactory.CreateScope())
-            {
-                db2 = _databaseFactory.Database;
-            }
-
-            Assert.AreNotSame(db1, db2);
-        }
-
-        [Test]
         public void GetDatabaseType()
         {
-            using (_databaseFactory.CreateScope())
+            using (var database = _databaseFactory.CreateDatabase())
             {
-                var databaseType = _databaseFactory.Database.DatabaseType;
+                var databaseType = database.DatabaseType;
                 Assert.AreEqual(DatabaseType.SQLCe, databaseType);
             }
         }
@@ -112,7 +66,7 @@ namespace Umbraco.Tests.Persistence
                 File.Delete(filePath);
 
             // get the connectionstring settings from config
-            var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            var settings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
 
             // by default the conn string is: Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;
             // replace the SDF file with our own and create the sql ce database
@@ -123,7 +77,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             // re-create the database factory and database context with proper connection string
-            _databaseFactory = new UmbracoDatabaseFactory(connString, Constants.DbProviderNames.SqlCe, _sqlSyntaxProviders, _logger, new TestDatabaseScopeAccessor(), Mock.Of<IMapperCollection>());
+            _databaseFactory = new UmbracoDatabaseFactory(connString, Constants.DbProviderNames.SqlCe, _sqlSyntaxProviders, _logger, Mock.Of<IMapperCollection>());
 
             // create application context
             //var appCtx = new ApplicationContext(
@@ -134,9 +88,9 @@ namespace Umbraco.Tests.Persistence
 
             // create the umbraco database
             DatabaseSchemaHelper schemaHelper;
-            using (_databaseFactory.CreateScope())
+            using (var database = _databaseFactory.CreateDatabase())
             {
-                schemaHelper = new DatabaseSchemaHelper(_databaseFactory.Database, _logger);
+                schemaHelper = new DatabaseSchemaHelper(database, _logger);
                 schemaHelper.CreateDatabaseSchema(_runtime, _migrationEntryService, false);
             }
 

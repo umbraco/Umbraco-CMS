@@ -10,6 +10,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core._Legacy.PackageActions;
 using File = System.IO.File;
@@ -292,13 +293,35 @@ namespace Umbraco.Core.Plugins
         /// <remarks>Fails if the cache is missing or corrupt in any way.</remarks>
         internal Attempt<IEnumerable<string>> TryGetCached(Type baseType, Type attributeType)
         {
-            var cache = _runtimeCache.GetCacheItem<Dictionary<Tuple<string, string>, IEnumerable<string>>>(CacheKey, ReadCache, TimeSpan.FromMinutes(4));
+            var cache = _runtimeCache.GetCacheItem<Dictionary<Tuple<string, string>, IEnumerable<string>>>(CacheKey, ReadCacheSafe, TimeSpan.FromMinutes(4));
 
             IEnumerable<string> types;
             cache.TryGetValue(Tuple.Create(baseType == null ? string.Empty : baseType.FullName, attributeType == null ? string.Empty : attributeType.FullName), out types);
             return types == null
                 ? Attempt<IEnumerable<string>>.Fail()
                 : Attempt.Succeed(types);
+        }
+
+        internal Dictionary<Tuple<string, string>, IEnumerable<string>> ReadCacheSafe()
+        {
+            try
+            {
+                return ReadCache();
+            }
+            catch
+            {
+                try
+                {
+                    var filePath = GetPluginListFilePath();
+                    File.Delete(filePath);
+                }
+                catch
+                {
+                    // on-purpose, does not matter
+                }
+            }
+
+            return new Dictionary<Tuple<string, string>, IEnumerable<string>>();
         }
 
         internal Dictionary<Tuple<string, string>, IEnumerable<string>> ReadCache()
@@ -625,7 +648,9 @@ namespace Umbraco.Core.Plugins
                 if (added)
                 {
                     _types[listKey] = typeList;
-                    UpdateCache();
+                    //if we are scanning then update the cache file
+                    if (scan)
+                        UpdateCache();
                 }
 
                 _logger.Logger.Debug<PluginManager>("Resolved {0}, caching ({1}).", () => ResolvedName(baseType, attributeType), () => added.ToString().ToLowerInvariant());
@@ -720,6 +745,7 @@ namespace Umbraco.Core.Plugins
         #endregion
     }
 
+    // fixme - extract!
     internal static class PluginManagerExtensions
     {
         /// <summary>
@@ -776,6 +802,14 @@ namespace Umbraco.Core.Plugins
         public static IEnumerable<Type> ResolveAssignedMapperTypes(this PluginManager mgr)
         {
             return mgr.ResolveTypesWithAttribute<BaseMapper, MapperForAttribute>();
+        }
+
+        /// <summary>
+        /// Gets all classes implementing ISqlSyntaxProvider and marked with the SqlSyntaxProviderAttribute.
+        /// </summary>
+        public static IEnumerable<Type> ResolveSqlSyntaxProviders(this PluginManager mgr)
+        {
+            return mgr.ResolveTypesWithAttribute<ISqlSyntaxProvider, SqlSyntaxProviderAttribute>();
         }
     }
 }

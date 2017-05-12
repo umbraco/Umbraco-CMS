@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Cache
 {
@@ -23,16 +24,19 @@ namespace Umbraco.Core.Cache
         private readonly Func<TEntity, TId> _entityGetId;
         private readonly bool _expires;
 
-        public FullDataSetRepositoryCachePolicy(IRuntimeCacheProvider cache,
-            Func<TEntity, TId> entityGetId,
-            bool expires)
+        public FullDataSetRepositoryCachePolicy(IRuntimeCacheProvider cache, Func<TEntity, TId> entityGetId, bool expires)
             : base(cache)
         {
             _entityGetId = entityGetId;
             _expires = expires;
         }
 
-        protected static readonly TId[] EmptyIds = new TId[0];
+        public override IRepositoryCachePolicy<TEntity, TId> Scoped(IRuntimeCacheProvider runtimeCache, IScope scope)
+        {
+            return new ScopedRepositoryCachePolicy<TEntity, TId>(this, runtimeCache, scope);
+        }
+
+        protected static readonly TId[] EmptyIds = new TId[0]; // const
 
         protected string GetEntityTypeCacheKey()
         {

@@ -22,16 +22,25 @@ using System.Security;
 [assembly: Guid("ce9d3539-299e-40d3-b605-42ac423e24fa")]
 
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
+[assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]
 [assembly: InternalsVisibleTo("umbraco.MacroEngines")]
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]
 [assembly: InternalsVisibleTo("umbraco.webservices")]
 [assembly: InternalsVisibleTo("Concorde.Sync")]
 [assembly: InternalsVisibleTo("Umbraco.Courier.Core")]
 [assembly: InternalsVisibleTo("Umbraco.Courier.Persistence")]
+[assembly: InternalsVisibleTo("Umbraco.Deploy")]
+[assembly: InternalsVisibleTo("Umbraco.Deploy.UI")]
+[assembly: InternalsVisibleTo("Umbraco.Deploy.Cloud")]
 [assembly: InternalsVisibleTo("Umbraco.VisualStudio")]
 [assembly: InternalsVisibleTo("Umbraco.ModelsBuilder")]
 [assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.AspNet")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
+[assembly: InternalsVisibleTo("Umbraco.Forms.Core")]
+[assembly: InternalsVisibleTo("Umbraco.Forms.Core.Providers")]
+[assembly: InternalsVisibleTo("Umbraco.Forms.Web")]
+
 // v8
 [assembly: InternalsVisibleTo("Umbraco.Compat7")]
+

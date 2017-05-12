@@ -46,7 +46,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         int UmbracoLibraryCacheDuration { get; }
 
         MacroErrorBehaviour MacroErrorBehaviour { get; }
-        
+
         IEnumerable<string> DisallowedUploadFiles { get; }
 
         bool CloneXmlContent { get; }
@@ -58,5 +58,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool EnableInheritedDocumentTypes { get; }
 
         bool EnableInheritedMediaTypes { get; }
+
+        string LoginBackgroundImage { get; }
     }
 }

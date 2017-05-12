@@ -305,7 +305,7 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual(7, cachedRoutes.Count);
 
             var cachedIds = cache.RoutesCache.GetCachedIds();
-            Assert.AreEqual(7, cachedIds.Count);
+            Assert.AreEqual(0, cachedIds.Count);
 
             CheckRoute(cachedRoutes, cachedIds, 1001, "1001/");
             CheckRoute(cachedRoutes, cachedIds, 10011, "10011/");
@@ -327,12 +327,11 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual("http://domain1.com/fr/1001-2-1/", umbracoContext.UrlProvider.GetUrl(100121, new Uri("http://domain2.com"), false));
         }
 
-        void CheckRoute(IDictionary<int, string> routes, IDictionary<string, int> ids, int id, string route)
+        private static void CheckRoute(IDictionary<int, string> routes, IDictionary<string, int> ids, int id, string route)
         {
             Assert.IsTrue(routes.ContainsKey(id));
             Assert.AreEqual(route, routes[id]);
-            Assert.IsTrue(ids.ContainsKey(route));
-            Assert.AreEqual(id, ids[route]);
+            Assert.IsFalse(ids.ContainsKey(route));
         }
 
         [Test]

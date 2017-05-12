@@ -33,57 +33,60 @@ namespace umbraco.dialogs
 			pp_casing.Text = Services.TextService.Localize("templateEditor/casing");
 			pp_encode.Text = Services.TextService.Localize("templateEditor/encoding");
 
-
-
 			if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
 			{
 				tagName.Value = "umbraco:Item";
 			}
 
-			// either get page fields or dictionary items
-			string fieldSql = "";
-			if (Request.GetItemAsString("tagName") == "UMBRACOGETDICTIONARY")
-			{
-				fieldSql = "select '#'+[key] as alias from cmsDictionary order by alias";
-				m_IsDictionaryMode = true;
-				pp_insertField.Text = "Insert Dictionary Item";
-			}
-			else
-			{
-                //exclude built-in memberhip properties from showing up here
-			    var exclude = Constants.Conventions.Member.GetStandardPropertyTypeStubs()
-                    .Select(x => Current.DatabaseFactory.SqlSyntax.GetQuotedValue(x.Key)).ToArray();
+		    using (var scope = Current.ScopeProvider.CreateScope())
+		    {
+		        // either get page fields or dictionary items
+		        string fieldSql = "";
+		        if (Request.GetItemAsString("tagName") == "UMBRACOGETDICTIONARY")
+		        {
+		            fieldSql = "select '#'+[key] as alias from cmsDictionary order by alias";
+		            m_IsDictionaryMode = true;
+		            pp_insertField.Text = "Insert Dictionary Item";
+		        }
+		        else
+		        {
+		            //exclude built-in memberhip properties from showing up here
+		            var exclude = Constants.Conventions.Member.GetStandardPropertyTypeStubs()
+		                .Select(x => Current.DatabaseContext.SqlSyntax.GetQuotedValue(x.Key)).ToArray();
 
-				fieldSql = string.Format(
-                    "select distinct alias from cmsPropertyType where alias not in ({0}) order by alias",
-                    string.Join(",", exclude));
-				pp_insertField.Text = Services.TextService.Localize("templateEditor/chooseField");
-			}
+		            fieldSql = string.Format(
+		                "select distinct alias from cmsPropertyType where alias not in ({0}) order by alias",
+		                string.Join(",", exclude));
+		            pp_insertField.Text = Services.TextService.Localize("templateEditor/chooseField");
+		        }
 
-			fieldPicker.ChooseText = Services.TextService.Localize("templateEditor/chooseField");
-			fieldPicker.StandardPropertiesLabel = Services.TextService.Localize("templateEditor/standardFields");
-			fieldPicker.CustomPropertiesLabel = Services.TextService.Localize("templateEditor/customFields");
+		        fieldPicker.ChooseText = Services.TextService.Localize("templateEditor/chooseField");
+		        fieldPicker.StandardPropertiesLabel = Services.TextService.Localize("templateEditor/standardFields");
+		        fieldPicker.CustomPropertiesLabel = Services.TextService.Localize("templateEditor/customFields");
 
-			var dataTypes = DatabaseFactory.Database.Fetch<dynamic>(fieldSql);
-			fieldPicker.DataTextField = "alias";
-			fieldPicker.DataValueField = "alias";
-			fieldPicker.DataSource = dataTypes;
-			fieldPicker.DataBind();
-			fieldPicker.Attributes.Add("onChange", "document.forms[0].field.value = document.forms[0]." + fieldPicker.ClientID + "[document.forms[0]." + fieldPicker.ClientID + ".selectedIndex].value;");
+		        var dataTypes = scope.Database.Fetch<dynamic>(fieldSql);
+		        fieldPicker.DataTextField = "alias";
+		        fieldPicker.DataValueField = "alias";
+		        fieldPicker.DataSource = dataTypes;
+		        fieldPicker.DataBind();
+		        fieldPicker.Attributes.Add("onChange", "document.forms[0].field.value = document.forms[0]." + fieldPicker.ClientID + "[document.forms[0]." + fieldPicker.ClientID + ".selectedIndex].value;");
 
-			altFieldPicker.ChooseText = Services.TextService.Localize("templateEditor/chooseField");
-			altFieldPicker.StandardPropertiesLabel = Services.TextService.Localize("templateEditor/standardFields");
-			altFieldPicker.CustomPropertiesLabel = Services.TextService.Localize("templateEditor/customFields");
+		        altFieldPicker.ChooseText = Services.TextService.Localize("templateEditor/chooseField");
+		        altFieldPicker.StandardPropertiesLabel = Services.TextService.Localize("templateEditor/standardFields");
+		        altFieldPicker.CustomPropertiesLabel = Services.TextService.Localize("templateEditor/customFields");
 
-			var dataTypes2 = DatabaseFactory.Database.Fetch<dynamic>(fieldSql);
-			altFieldPicker.DataTextField = "alias";
-			altFieldPicker.DataValueField = "alias";
-			altFieldPicker.DataSource = dataTypes2;
-			altFieldPicker.DataBind();
-			altFieldPicker.Attributes.Add("onChange", "document.forms[0].useIfEmpty.value = document.forms[0]." + altFieldPicker.ClientID + "[document.forms[0]." + altFieldPicker.ClientID + ".selectedIndex].value;");
+		        var dataTypes2 = scope.Database.Fetch<dynamic>(fieldSql);
+		        altFieldPicker.DataTextField = "alias";
+		        altFieldPicker.DataValueField = "alias";
+		        altFieldPicker.DataSource = dataTypes2;
+		        altFieldPicker.DataBind();
+		        altFieldPicker.Attributes.Add("onChange", "document.forms[0].useIfEmpty.value = document.forms[0]." + altFieldPicker.ClientID + "[document.forms[0]." + altFieldPicker.ClientID + ".selectedIndex].value;");
 
-			// Pre values
-			if (!m_IsDictionaryMode)
+		        scope.Complete();
+		    }
+
+            // Pre values
+            if (!m_IsDictionaryMode)
 			{
 				foreach (string s in preValuesSource)
 				{
@@ -91,7 +94,6 @@ namespace umbraco.dialogs
 					altFieldPicker.Items.Add(new ListItem(s, s.Replace("@", "")));
 				}
 			}
-
 		}
 
 

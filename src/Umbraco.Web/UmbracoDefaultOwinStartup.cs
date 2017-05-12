@@ -49,8 +49,6 @@ namespace Umbraco.Web
             app.ConfigureUserManagerForUmbracoBackOffice(
                 services,
                 Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());
-
-            app.ConfigureSignalR();
         }
 
         /// <summary>
@@ -65,6 +63,7 @@ namespace Umbraco.Web
                 .UseUmbracoBackOfficeCookieAuthentication(Current.RuntimeState, PipelineStage.Authenticate)
                 .UseUmbracoBackOfficeExternalCookieAuthentication(Current.RuntimeState, PipelineStage.Authenticate)
                 .UseUmbracoPreviewAuthentication(Current.RuntimeState, PipelineStage.Authorize)
+                .UseSignalR()
                 .FinalizeMiddlewareConfiguration();
         }
 

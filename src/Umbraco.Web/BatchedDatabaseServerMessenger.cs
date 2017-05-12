@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Newtonsoft.Json;
+using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.Rdbms;
@@ -10,6 +11,7 @@ using Umbraco.Core.Sync;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Web
 {
@@ -21,11 +23,15 @@ namespace Umbraco.Web
     /// </remarks>
     public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
     {
+        private readonly IUmbracoDatabaseFactory _databaseFactory;
+
         public BatchedDatabaseServerMessenger(
-            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, ILogger logger, ProfilingLogger proflog,
+            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, IDatabaseContext databaseContext, ILogger logger, ProfilingLogger proflog,
             bool enableDistCalls, DatabaseServerMessengerOptions options)
-            : base(runtime, databaseFactory, logger, proflog, enableDistCalls, options)
-        { }
+            : base(runtime, scopeProvider, databaseContext, logger, proflog, enableDistCalls, options)
+        {
+            _databaseFactory = databaseFactory;
+        }
 
         // invoked by BatchedDatabaseServerMessengerStartup which is an ApplicationEventHandler
         // with default "ShouldExecute", so that method will run if app IsConfigured and database
@@ -35,7 +41,7 @@ namespace Umbraco.Web
             UmbracoModule.EndRequest += UmbracoModule_EndRequest;
             UmbracoModule.RouteAttempt += UmbracoModule_RouteAttempt;
 
-            if (DatabaseFactory.CanConnect == false)
+            if (_databaseFactory.CanConnect == false)
             {
                 Logger.Warn<BatchedDatabaseServerMessenger>(
                     "Cannot connect to the database, distributed calls will not be enabled for this server.");
@@ -105,7 +111,11 @@ namespace Umbraco.Web
                 OriginIdentity = LocalIdentity
             };
 
-            Database.Insert(dto);
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                scope.Database.Insert(dto);
+                scope.Complete();
+            }
         }
 
         protected ICollection<RefreshInstructionEnvelope> GetBatch(bool create)

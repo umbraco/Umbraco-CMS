@@ -28,7 +28,6 @@ namespace Umbraco.Core.Persistence
     /// </remarks>
     internal class UmbracoDatabaseFactory : DisposableObject, IUmbracoDatabaseFactory
     {
-        private readonly IDatabaseScopeAccessor _databaseScopeAccessor;
         private readonly ISqlSyntaxProvider[] _sqlSyntaxProviders;
         private readonly IMapperCollection _mappers;
         private readonly ILogger _logger;
@@ -51,8 +50,8 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used by LightInject.</remarks>
-        public UmbracoDatabaseFactory(IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IDatabaseScopeAccessor databaseScopeAccessor, IMapperCollection mappers)
-            : this(GlobalSettings.UmbracoConnectionName, sqlSyntaxProviders, logger, databaseScopeAccessor, mappers)
+        public UmbracoDatabaseFactory(IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IMapperCollection mappers)
+            : this(Constants.System.UmbracoConnectionName, sqlSyntaxProviders, logger, mappers)
         {
             if (Configured == false)
                 DatabaseBuilder.GiveLegacyAChance(this, logger);
@@ -62,18 +61,13 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used by the other ctor and in tests.</remarks>
-        public UmbracoDatabaseFactory(string connectionStringName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IDatabaseScopeAccessor databaseScopeAccessor, IMapperCollection mappers)
+        public UmbracoDatabaseFactory(string connectionStringName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IMapperCollection mappers)
         {
-            if (sqlSyntaxProviders == null) throw new ArgumentNullException(nameof(sqlSyntaxProviders));
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
-            if (databaseScopeAccessor == null) throw new ArgumentNullException(nameof(databaseScopeAccessor));
             if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentNullOrEmptyException(nameof(connectionStringName));
-            if (mappers == null) throw new ArgumentNullException(nameof(mappers));
 
-            _mappers = mappers;
-            _sqlSyntaxProviders = sqlSyntaxProviders.ToArray();
-            _logger = logger;
-            _databaseScopeAccessor = databaseScopeAccessor;
+            _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
+            _sqlSyntaxProviders = sqlSyntaxProviders?.ToArray() ?? throw new ArgumentNullException(nameof(sqlSyntaxProviders));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             var settings = ConfigurationManager.ConnectionStrings[connectionStringName];
             if (settings == null)
@@ -96,17 +90,11 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used in tests.</remarks>
-        public UmbracoDatabaseFactory(string connectionString, string providerName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IDatabaseScopeAccessor databaseScopeAccessor, IMapperCollection mappers)
+        public UmbracoDatabaseFactory(string connectionString, string providerName, IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IMapperCollection mappers)
         {
-            if (sqlSyntaxProviders == null) throw new ArgumentNullException(nameof(sqlSyntaxProviders));
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
-            if (databaseScopeAccessor == null) throw new ArgumentNullException(nameof(databaseScopeAccessor));
-            if (mappers == null) throw new ArgumentNullException(nameof(mappers));
-
-            _mappers = mappers;
-            _sqlSyntaxProviders = sqlSyntaxProviders.ToArray();
-            _logger = logger;
-            _databaseScopeAccessor = databaseScopeAccessor;
+            _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
+            _sqlSyntaxProviders = sqlSyntaxProviders?.ToArray() ?? throw new ArgumentNullException(nameof(sqlSyntaxProviders));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
             {
@@ -212,28 +200,9 @@ namespace Umbraco.Core.Persistence
         }
 
         /// <inheritdoc />
-        public IUmbracoDatabase Database => GetDatabase();
-
-        /// <inheritdoc />
-		public IUmbracoDatabase GetDatabase()
-        {
-            EnsureConfigured();
-
-            var scope = _databaseScopeAccessor.Scope;
-            if (scope == null) throw new InvalidOperationException("Out of scope.");
-            return scope.Database;
-        }
-
-        /// <inheritdoc />
         public IUmbracoDatabase CreateDatabase()
         {
             return (IUmbracoDatabase) _npocoDatabaseFactory.GetDatabase();
-        }
-
-        /// <inheritdoc />
-        public IDatabaseScope CreateScope(IUmbracoDatabase database = null)
-        {
-            return new DatabaseScope(_databaseScopeAccessor, this, database);
         }
 
         // gets the sql syntax provider that corresponds, from attribute
@@ -289,7 +258,7 @@ namespace Umbraco.Core.Persistence
             //var db = _umbracoDatabaseAccessor.UmbracoDatabase;
             //_umbracoDatabaseAccessor.UmbracoDatabase = null;
             //db?.Dispose();
-	        _databaseScopeAccessor.Scope = null;
+	        //_databaseScopeAccessor.Scope = null;
 	    }
     }
 }

@@ -29,29 +29,6 @@ namespace Umbraco.Web._Legacy.Actions
     {
         private static readonly Dictionary<string, string> ActionJs = new Dictionary<string, string>();
 
-        private static readonly object Lock = new object();
-
-        static Action()
-        {
-            ReRegisterActionsAndHandlers();
-        }
-
-        /// <summary>
-        /// This is used when an IAction or IActionHandler is installed into the system
-        /// and needs to be loaded into memory.
-        /// </summary>
-        /// <remarks>
-        /// TODO: this shouldn't be needed... we should restart the app pool when a package is installed!
-        /// </remarks>
-        public static void ReRegisterActionsAndHandlers()
-        {
-            lock (Lock)
-            {
-                // this will reset the collection
-                Current.ActionCollectionBuilder.SetProducer(() => TypeFinder.FindClassesOfType<IAction>(Current.PluginManager.AssembliesToScan));
-            }
-        }
-
         /// <summary>
         /// Jacascript for the contextmenu
         /// Suggestion: this method should be moved to the presentation layer.

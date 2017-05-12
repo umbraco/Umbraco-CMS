@@ -72,7 +72,7 @@ namespace Umbraco.Web.PropertyEditors
             if (clears)
             {
                 foreach (var pathToRemove in currentPaths)
-                    _mediaFileSystem.DeleteFile(pathToRemove, true);
+                    _mediaFileSystem.DeleteFile(pathToRemove);
                 return string.Empty; // no more files
             }
 
@@ -111,14 +111,15 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
 
-                    var ext = _mediaFileSystem.GetExtension(filepath);
-                    if (_mediaFileSystem.IsImageFile(ext))
-                    {
-                        var preValues = editorValue.PreValues.FormatAsDictionary();
-                        var sizes = preValues.Any() ? preValues.First().Value.Value : string.Empty;
-                        using (var image = Image.FromStream(filestream))
-                            _mediaFileSystem.GenerateThumbnails(image, filepath, sizes);
-                    }
+                    // fixme - remove this code
+                    //var ext = _mediaFileSystem.GetExtension(filepath);
+                    //if (_mediaFileSystem.IsImageFile(ext))
+                    //{
+                    //    var preValues = editorValue.PreValues.FormatAsDictionary();
+                    //    var sizes = preValues.Any() ? preValues.First().Value.Value : string.Empty;
+                    //    using (var image = Image.FromStream(filestream))
+                    //        _mediaFileSystem.GenerateThumbnails(image, filepath, sizes);
+                    //}
 
                     // all related properties (auto-fill) are managed by FileUploadPropertyEditor
                     // when the content is saved (through event handlers)
@@ -133,7 +134,7 @@ namespace Umbraco.Web.PropertyEditors
 
             // remove files that are not there anymore
             foreach (var pathToRemove in currentPaths.Except(newPaths))
-                _mediaFileSystem.DeleteFile(pathToRemove, true);
+                _mediaFileSystem.DeleteFile(pathToRemove);
 
 
             return string.Join(",", newPaths.Select(x => _mediaFileSystem.GetUrl(x)));

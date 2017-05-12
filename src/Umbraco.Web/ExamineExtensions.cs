@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
 
@@ -11,9 +9,9 @@ namespace Umbraco.Web
 	/// <summary>
 	/// Extension methods for Examine
 	/// </summary>
-	internal static class ExamineExtensions
+	public static class ExamineExtensions
 	{
-        internal static IEnumerable<IPublishedContent> ConvertSearchResultToPublishedContent(this IEnumerable<SearchResult> results, IPublishedCache cache)
+        public static IEnumerable<IPublishedContent> ConvertSearchResultToPublishedContent(this IEnumerable<SearchResult> results, IPublishedCache cache)
 		{
             // no need to think about creating the IPublishedContent from the Examine result
             // content cache is fast and optimized - use it!

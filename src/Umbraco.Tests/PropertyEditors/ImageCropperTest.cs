@@ -289,5 +289,17 @@ namespace Umbraco.Tests.PropertyEditors
             var urlString = MediaPath.GetCropUrl(imageCropperValue: cropperJson, height: 200);
             Assert.AreEqual(MediaPath + "?anchor=center&mode=crop&height=200", urlString);
         }
+
+        /// <summary>
+        /// Test to check result when using a background color with padding
+        /// </summary>
+        [Test]
+        public void GetCropUrl_BackgroundColorParameter()
+        {
+            var cropperJson = "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"" + MediaPath + "\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
+
+            var urlString = MediaPath.GetCropUrl(400, 400, cropperJson, imageCropMode: ImageCropMode.Pad, furtherOptions: "&bgcolor=fff");
+            Assert.AreEqual(MediaPath + "?mode=pad&width=400&height=400&bgcolor=fff", urlString);
+        }
     }
 }

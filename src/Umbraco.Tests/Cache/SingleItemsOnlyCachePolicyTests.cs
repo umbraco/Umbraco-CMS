@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Cache
 
             var defaultPolicy = new SingleItemsOnlyRepositoryCachePolicy<AuditItem, object>(cache.Object, new RepositoryCachePolicyOptions());
 
-            var found = defaultPolicy.GetAll(new object[] { }, ids => new[]
+            var unused = defaultPolicy.GetAll(new object[] { }, ids => new[]
                     {
                         new AuditItem(1, "blah", AuditType.Copy, 123),
                         new AuditItem(2, "blah2", AuditType.Copy, 123)
@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Cache
 
             var defaultPolicy = new SingleItemsOnlyRepositoryCachePolicy<AuditItem, object>(cache.Object, new RepositoryCachePolicyOptions());
 
-            var found = defaultPolicy.Get(1, id => new AuditItem(1, "blah", AuditType.Copy, 123), ids => null);
+            var unused = defaultPolicy.Get(1, id => new AuditItem(1, "blah", AuditType.Copy, 123), ids => null);
             Assert.IsTrue(isCached);
         }
     }

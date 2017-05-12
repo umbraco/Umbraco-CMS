@@ -50,15 +50,11 @@ namespace Umbraco.Web.Routing
 		{
 	        if (webRoutingSection == null) throw new ArgumentNullException(nameof(webRoutingSection)); // fixme usage?
 
-            if (contentFinders == null) throw new ArgumentNullException(nameof(contentFinders));
-            if (contentLastChanceFinder == null) throw new ArgumentNullException(nameof(contentLastChanceFinder));
-            if (services == null) throw new ArgumentNullException(nameof(services));
-            if (proflog == null) throw new ArgumentNullException(nameof(proflog));
-            _webRoutingSection = webRoutingSection;
-            _contentFinders = contentFinders;
-            _contentLastChanceFinder = contentLastChanceFinder;
-            _services = services;
-            _profilingLogger = proflog;
+		    _webRoutingSection = webRoutingSection;
+            _contentFinders = contentFinders ?? throw new ArgumentNullException(nameof(contentFinders));
+            _contentLastChanceFinder = contentLastChanceFinder ?? throw new ArgumentNullException(nameof(contentLastChanceFinder));
+            _services = services ?? throw new ArgumentNullException(nameof(services));
+            _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
 		    _logger = proflog.Logger;
 
 		    GetRolesForLogin = getRolesForLogin ?? (s => Roles.Provider.GetRolesForUser(s));
@@ -71,15 +67,41 @@ namespace Umbraco.Web.Routing
             return new PublishedContentRequest(this, umbracoContext, uri ?? umbracoContext.CleanedUmbracoUrl);
 	    }
 
-	    #region Request
+        #region Request
 
-		/// <summary>
-		/// Prepares the request.
-		/// </summary>
-		/// <returns>
-		/// Returns false if the request was not successfully prepared
-		/// </returns>
-		public bool PrepareRequest(PublishedContentRequest request)
+	    /// <summary>
+	    /// Tries to route the request.
+	    /// </summary>
+	    internal bool TryRouteRequest(PublishedContentRequest request)
+	    {
+	        // disabled - is it going to change the routing?
+	        //_pcr.OnPreparing();
+
+	        FindDomain(request);
+	        if (request.IsRedirect) return false;
+	        if (request.HasPublishedContent) return true;
+	        FindPublishedContent(request);
+	        if (request.IsRedirect) return false;
+
+	        // don't handle anything - we just want to ensure that we find the content
+	        //HandlePublishedContent();
+	        //FindTemplate();
+	        //FollowExternalRedirect();
+	        //HandleWildcardDomains();
+
+	        // disabled - we just want to ensure that we find the content
+	        //_pcr.OnPrepared();
+
+	        return request.HasPublishedContent;
+	    }
+		
+        /// <summary>
+        /// Prepares the request.
+        /// </summary>
+        /// <returns>
+        /// Returns false if the request was not successfully prepared
+        /// </returns>
+        public bool PrepareRequest(PublishedContentRequest request)
 		{
             // note - at that point the original legacy module did something do handle IIS custom 404 errors
             //   ie pages looking like /anything.aspx?404;/path/to/document - I guess the reason was to support

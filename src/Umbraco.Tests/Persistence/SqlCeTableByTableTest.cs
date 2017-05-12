@@ -1,4 +1,7 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NPoco;
+using NUnit.Framework;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Tests.TestHelpers;
@@ -10,576 +13,586 @@ namespace Umbraco.Tests.Persistence
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class SqlCeTableByTableTest : TestWithDatabaseBase
     {
-        private DatabaseSchemaHelper _schemaHelper;
-        
-        protected DatabaseSchemaHelper DatabaseSchemaHelper
-        {
-            get { return _schemaHelper ?? (_schemaHelper = new DatabaseSchemaHelper(DatabaseFactory.Database, Logger)); }
-        }
-
         [Test]
         public void Can_Create_umbracoNode_Table()
         {
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_umbracoAccess_Table()
         {
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<AccessDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<AccessDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_umbracoAccessRule_Table()
         {
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<AccessDto>();
-                DatabaseSchemaHelper.CreateTable<AccessRuleDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<AccessDto>();
+                helper.CreateTable<AccessRuleDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsContentType2ContentType_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentType2ContentTypeDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<ContentType2ContentTypeDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsContentTypeAllowedContentType_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeAllowedContentTypeDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<ContentTypeDto>();
+                helper.CreateTable<ContentTypeAllowedContentTypeDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsContentType_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<ContentTypeDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsContentVersion_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentDto>();
-                DatabaseSchemaHelper.CreateTable<ContentVersionDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<ContentTypeDto>();
+                helper.CreateTable<ContentDto>();
+                helper.CreateTable<ContentVersionDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsContentXml_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentDto>();
-                DatabaseSchemaHelper.CreateTable<ContentXmlDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<ContentTypeDto>();
+                helper.CreateTable<ContentDto>();
+                helper.CreateTable<ContentXmlDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsDataType_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<DataTypeDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<DataTypeDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsDataTypePreValues_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<DataTypeDto>();
-                DatabaseSchemaHelper.CreateTable<DataTypePreValueDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<DataTypeDto>();
+                helper.CreateTable<DataTypePreValueDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsDictionary_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<DictionaryDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<DictionaryDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsLanguageText_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<DictionaryDto>();
-                DatabaseSchemaHelper.CreateTable<LanguageDto>();
-                DatabaseSchemaHelper.CreateTable<LanguageTextDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<DictionaryDto>();
+                helper.CreateTable<LanguageDto>();
+                helper.CreateTable<LanguageTextDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsTemplate_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<TemplateDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<TemplateDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsDocument_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentDto>();
-                DatabaseSchemaHelper.CreateTable<TemplateDto>();
-                DatabaseSchemaHelper.CreateTable<DocumentDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<ContentTypeDto>();
+                helper.CreateTable<ContentDto>();
+                helper.CreateTable<TemplateDto>();
+                helper.CreateTable<DocumentDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsDocumentType_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
-                DatabaseSchemaHelper.CreateTable<TemplateDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeTemplateDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<ContentTypeDto>();
+                helper.CreateTable<TemplateDto>();
+                helper.CreateTable<ContentTypeTemplateDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_umbracoDomains_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<DomainDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<DomainDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_umbracoLanguage_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<LanguageDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<LanguageDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_umbracoLog_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<LogDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<LogDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsMacro_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<MacroDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<MacroDto>();
+
+                scope.Complete();
             }
         }
         
         [Test]
         public void Can_Create_cmsMember_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentDto>();
-                DatabaseSchemaHelper.CreateTable<MemberDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<ContentTypeDto>();
+                helper.CreateTable<ContentDto>();
+                helper.CreateTable<MemberDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsMember2MemberGroup_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentDto>();
-                DatabaseSchemaHelper.CreateTable<MemberDto>();
-                DatabaseSchemaHelper.CreateTable<Member2MemberGroupDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<ContentTypeDto>();
+                helper.CreateTable<ContentDto>();
+                helper.CreateTable<MemberDto>();
+                helper.CreateTable<Member2MemberGroupDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsMemberType_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
-                DatabaseSchemaHelper.CreateTable<MemberTypeDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<ContentTypeDto>();
+                helper.CreateTable<MemberTypeDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsPreviewXml_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentDto>();
-                DatabaseSchemaHelper.CreateTable<ContentVersionDto>();
-                DatabaseSchemaHelper.CreateTable<PreviewXmlDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<ContentTypeDto>();
+                helper.CreateTable<ContentDto>();
+                helper.CreateTable<ContentVersionDto>();
+                helper.CreateTable<PreviewXmlDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsPropertyData_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
-                DatabaseSchemaHelper.CreateTable<DataTypeDto>();
-                DatabaseSchemaHelper.CreateTable<PropertyTypeGroupDto>();
-                DatabaseSchemaHelper.CreateTable<PropertyTypeDto>();
-                DatabaseSchemaHelper.CreateTable<PropertyDataDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<ContentTypeDto>();
+                helper.CreateTable<DataTypeDto>();
+                helper.CreateTable<PropertyTypeGroupDto>();
+                helper.CreateTable<PropertyTypeDto>();
+                helper.CreateTable<PropertyDataDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsPropertyType_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
-                DatabaseSchemaHelper.CreateTable<DataTypeDto>();
-                DatabaseSchemaHelper.CreateTable<PropertyTypeGroupDto>();
-                DatabaseSchemaHelper.CreateTable<PropertyTypeDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<ContentTypeDto>();
+                helper.CreateTable<DataTypeDto>();
+                helper.CreateTable<PropertyTypeGroupDto>();
+                helper.CreateTable<PropertyTypeDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsPropertyTypeGroup_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
-                DatabaseSchemaHelper.CreateTable<PropertyTypeGroupDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<ContentTypeDto>();
+                helper.CreateTable<PropertyTypeGroupDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_umbracoRelation_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<RelationTypeDto>();
-                DatabaseSchemaHelper.CreateTable<RelationDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<RelationTypeDto>();
+                helper.CreateTable<RelationDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_umbracoRelationType_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<RelationTypeDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<RelationTypeDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsStylesheet_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<StylesheetDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<StylesheetDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsStylesheetProperty_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<StylesheetPropertyDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<StylesheetPropertyDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsTags_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<TagDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<TagDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsTagRelationship_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
-                DatabaseSchemaHelper.CreateTable<ContentDto>();
-                DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
-                DatabaseSchemaHelper.CreateTable<DataTypeDto>();
-                DatabaseSchemaHelper.CreateTable<PropertyTypeGroupDto>();
-                DatabaseSchemaHelper.CreateTable<PropertyTypeDto>();
-                DatabaseSchemaHelper.CreateTable<TagDto>();
-                DatabaseSchemaHelper.CreateTable<TagRelationshipDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<ContentTypeDto>();
+                helper.CreateTable<ContentDto>();
+                helper.CreateTable<ContentTypeDto>();
+                helper.CreateTable<DataTypeDto>();
+                helper.CreateTable<PropertyTypeGroupDto>();
+                helper.CreateTable<PropertyTypeDto>();
+                helper.CreateTable<TagDto>();
+                helper.CreateTable<TagRelationshipDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsTask_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<UserTypeDto>();
-                DatabaseSchemaHelper.CreateTable<UserDto>();
-                DatabaseSchemaHelper.CreateTable<TaskTypeDto>();
-                DatabaseSchemaHelper.CreateTable<TaskDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<UserTypeDto>();
+                helper.CreateTable<UserDto>();
+                helper.CreateTable<TaskTypeDto>();
+                helper.CreateTable<TaskDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_cmsTaskType_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<TaskTypeDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
-            }
-        }
+                helper.CreateTable<TaskTypeDto>();
 
-        [Test]
-        public void Can_Create_umbracoDeployDependency_Table()
-        {
-
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
-            {
-                DatabaseSchemaHelper.CreateTable<UmbracoDeployChecksumDto>();
-                DatabaseSchemaHelper.CreateTable<UmbracoDeployDependencyDto>();
-
-                //transaction.Complete();
-            }
-        }
-
-        [Test]
-        public void Can_Create_umbracoDeployChecksum_Table()
-        {
-
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
-            {
-                DatabaseSchemaHelper.CreateTable<UmbracoDeployChecksumDto>();
-
-                //transaction.Complete();
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_umbracoUser_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<UserTypeDto>();
-                DatabaseSchemaHelper.CreateTable<UserDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<UserTypeDto>();
+                helper.CreateTable<UserDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_umbracoUserType_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<UserTypeDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<UserTypeDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_umbracoUser2app_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<UserTypeDto>();
-                DatabaseSchemaHelper.CreateTable<UserDto>();
-                DatabaseSchemaHelper.CreateTable<User2AppDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<UserTypeDto>();
+                helper.CreateTable<UserDto>();
+                helper.CreateTable<User2AppDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_umbracoUser2NodeNotify_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<UserTypeDto>();
-                DatabaseSchemaHelper.CreateTable<UserDto>();
-                DatabaseSchemaHelper.CreateTable<User2NodeNotifyDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<UserTypeDto>();
+                helper.CreateTable<UserDto>();
+                helper.CreateTable<User2NodeNotifyDto>();
+
+                scope.Complete();
             }
         }
 
         [Test]
         public void Can_Create_umbracoUser2NodePermission_Table()
         {
-            
-            using (var transaction = DatabaseFactory.Database.GetTransaction())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                DatabaseSchemaHelper.CreateTable<NodeDto>();
-                DatabaseSchemaHelper.CreateTable<UserTypeDto>();
-                DatabaseSchemaHelper.CreateTable<UserDto>();
-                DatabaseSchemaHelper.CreateTable<User2NodePermissionDto>();
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                //transaction.Complete();
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<UserTypeDto>();
+                helper.CreateTable<UserDto>();
+                helper.CreateTable<User2NodePermissionDto>();
+
+                scope.Complete();
             }
         }
     }

@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Cache
 
             var policy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, false);
 
-            var found = policy.Get(1, id => new AuditItem(1, "blah", AuditType.Copy, 123), ids => getAll);
+            var unused = policy.Get(1, id => new AuditItem(1, "blah", AuditType.Copy, 123), ids => getAll);
             Assert.IsTrue(isCached);
         }
 

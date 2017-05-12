@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -22,9 +24,6 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void Can_Bulk_Insert_One_By_One()
         {
-            // Arrange
-            var db = DatabaseFactory.Database;
-
             var servers = new List<ServerRegistrationDto>();
             for (var i = 0; i < 1000; i++)
             {
@@ -41,23 +40,23 @@ namespace Umbraco.Tests.Persistence
             // Act
             using (ProfilingLogger.TraceDuration<NPocoExtensionsTest>("starting insert", "finished insert"))
             {
-                using (var tr = db.GetTransaction())
+                using (var scope = ScopeProvider.CreateScope())
                 {
-                    db.BulkInsertRecords(servers, false);
-                    tr.Complete();
+                    scope.Database.BulkInsertRecords(servers, false);
+                    scope.Complete();
                 }
             }
 
             // Assert
-            Assert.That(db.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(1000));
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                Assert.That(scope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(1000));
+            }
         }
 
         [Test]
         public void Can_Bulk_Insert_One_By_One_Transaction_Rollback()
         {
-            // Arrange
-            var db = DatabaseFactory.Database;
-
             var servers = new List<ServerRegistrationDto>();
             for (var i = 0; i < 1000; i++)
             {
@@ -74,15 +73,18 @@ namespace Umbraco.Tests.Persistence
             // Act
             using (ProfilingLogger.TraceDuration<NPocoExtensionsTest>("starting insert", "finished insert"))
             {
-                using (var tr = db.GetTransaction())
+                using (var scope = ScopeProvider.CreateScope())
                 {
-                    db.BulkInsertRecords(servers, false);
+                    scope.Database.BulkInsertRecords(servers, false);
                     //don't call complete here - the trans will be rolled back
                 }
             }
 
             // Assert
-            Assert.That(db.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(0));
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                Assert.That(scope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(0));
+            }
         }
 
 
@@ -138,9 +140,6 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void Can_Bulk_Insert_Native_Sql_Bulk_Inserts()
         {
-            // Arrange
-            var db = DatabaseFactory.Database;
-
             var servers = new List<ServerRegistrationDto>();
             for (var i = 0; i < 1000; i++)
             {
@@ -157,23 +156,23 @@ namespace Umbraco.Tests.Persistence
             // Act
             using (ProfilingLogger.TraceDuration<NPocoExtensionsTest>("starting insert", "finished insert"))
             {
-                using (var tr = db.GetTransaction())
+                using (var scope = ScopeProvider.CreateScope())
                 {
-                    db.BulkInsertRecords(servers);
-                    tr.Complete();
+                    scope.Database.BulkInsertRecords(servers);
+                    scope.Complete();
                 }
             }
 
             // Assert
-            Assert.That(db.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(1000));
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                Assert.That(scope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(1000));
+            }
         }
 
         [Test]
         public void Can_Bulk_Insert_Native_Sql_Bulk_Inserts_Transaction_Rollback()
         {
-            // Arrange
-            var db = DatabaseFactory.Database;
-
             var servers = new List<ServerRegistrationDto>();
             for (var i = 0; i < 1000; i++)
             {
@@ -190,23 +189,23 @@ namespace Umbraco.Tests.Persistence
             // Act
             using (ProfilingLogger.TraceDuration<NPocoExtensionsTest>("starting insert", "finished insert"))
             {
-                using (var tr = db.GetTransaction())
+                using (var scope = ScopeProvider.CreateScope())
                 {
-                    db.BulkInsertRecords(servers);
+                    scope.Database.BulkInsertRecords(servers);
                     //don't call complete here - the trans will be rolled back
                 }
             }
 
             // Assert
-            Assert.That(db.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(0));
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                Assert.That(scope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(0));
+            }
         }
 
         [Test]
         public void Generate_Bulk_Import_Sql()
         {
-            // Arrange
-            var db = DatabaseFactory.Database;
-
             var servers = new List<ServerRegistrationDto>();
             for (var i = 0; i < 2; i++)
             {
@@ -219,11 +218,13 @@ namespace Umbraco.Tests.Persistence
                     DateAccessed = DateTime.Now
                 });
             }
-            db.OpenSharedConnection();
 
-            // Act
-            var commands = db.GenerateBulkInsertCommands(servers.ToArray());
-            db.CloseSharedConnection();
+            IDbCommand[] commands;
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                commands = scope.Database.GenerateBulkInsertCommands(servers.ToArray());
+                scope.Complete();
+            }
 
             // Assert
             Assert.That(commands[0].CommandText,
@@ -234,9 +235,6 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void Generate_Bulk_Import_Sql_Exceeding_Max_Params()
         {
-            // Arrange
-            var db = DatabaseFactory.Database;
-
             var servers = new List<ServerRegistrationDto>();
             for (var i = 0; i < 1500; i++)
             {
@@ -250,11 +248,13 @@ namespace Umbraco.Tests.Persistence
                     IsMaster = true
                 });
             }
-            db.OpenSharedConnection();
 
-            // Act
-            var commands = db.GenerateBulkInsertCommands(servers.ToArray());
-            db.CloseSharedConnection();
+            IDbCommand[] commands;
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                commands = scope.Database.GenerateBulkInsertCommands(servers.ToArray());
+                scope.Complete();
+            }
 
             // Assert
             Assert.That(commands.Length, Is.EqualTo(5));

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-
 using System.Linq;
 using System.Xml;
 using Examine;
@@ -11,7 +10,6 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
-using Umbraco.Core.DI;
 using Umbraco.Tests.Testing;
 using Current = Umbraco.Web.Current;
 

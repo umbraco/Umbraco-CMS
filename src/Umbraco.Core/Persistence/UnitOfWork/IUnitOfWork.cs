@@ -30,6 +30,9 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <param name="repository">The repository in charge of the entity.</param>
         void RegisterDeleted(IEntity entity, IUnitOfWorkRepository repository);
 
+        // fixme - we should get rid of all references to database here, or merge IUnitOfWork with IDatabaseUnitOfWork
+        // fixme - do we have a scope.Begin()? or is it even automatic? and then do we need Begin() at all?
+
         /// <summary>
         /// Begins the unit of work.
         /// </summary>
@@ -75,6 +78,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <typeparam name="TRepository">The type of the repository.</typeparam>
         /// <param name="name">The optional name of the repository.</param>
         /// <returns>The created repository for the unit of work.</returns>
-        TRepository CreateRepository<TRepository>(string name = null) where TRepository : IRepository;
+        TRepository CreateRepository<TRepository>(string name = null) 
+            where TRepository : IRepository;
     }
 }

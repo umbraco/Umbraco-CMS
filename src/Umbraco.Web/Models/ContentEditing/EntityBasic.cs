@@ -6,7 +6,10 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Umbraco.Core;
 using Umbraco.Core.Models.Validation;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -25,7 +28,12 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
         public object Id { get; set; }
-        
+
+        [DataMember(Name = "udi")]
+        [ReadOnly(true)]
+        [JsonConverter(typeof(UdiJsonConverter))]
+        public Udi Udi { get; set; }
+
         [DataMember(Name = "icon")]
         public string Icon { get; set; }
 

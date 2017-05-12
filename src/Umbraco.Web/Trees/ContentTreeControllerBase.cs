@@ -121,10 +121,15 @@ namespace Umbraco.Web.Trees
 
         protected IEnumerable<IUmbracoEntity> GetChildEntities(string id)
         {
-            int iid;
-            if (int.TryParse(id, out iid) == false)
+            // use helper method to ensure we support both integer and guid lookups
+
+            if (int.TryParse(id, out int iid) == false)
             {
-                throw new InvalidCastException("The id for the media tree must be an integer");
+                var idEntity = GetEntityFromId(id);
+                if (idEntity == null)
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+
+                iid = idEntity.Id;
             }
 
             //if a request is made for the root node data but the user's start node is not the default, then
@@ -134,9 +139,8 @@ namespace Umbraco.Web.Trees
                 //just return their single start node, it will show up under the 'Content' label
                 var startNode = Services.EntityService.Get(UserStartNode, UmbracoObjectType);
                 if (startNode == null)
-                {
                     throw new EntityNotFoundException(UserStartNode, "User's start content node could not be found");
-                }
+
                 return new[] { startNode };
             }
 
@@ -209,8 +213,9 @@ namespace Umbraco.Web.Trees
         /// </remarks>
         private TreeNodeCollection GetTreeNodesInternal(string id, FormDataCollection queryStrings)
         {
-            //before we get the children we need to see if this is a container node
-            var current = Services.EntityService.Get(int.Parse(id), UmbracoObjectType);
+            IUmbracoEntity current = GetEntityFromId(id);
+
+            //before we get the children we need to see if this is a container node            
 
             //test if the parent is a listview / container
             if (current != null && current.IsContainer())
@@ -285,6 +290,37 @@ namespace Umbraco.Web.Trees
         internal bool CanUserAccessNode(IUmbracoEntity doc, IEnumerable<MenuItem> allowedUserOptions)
         {
             return allowedUserOptions.Select(x => x.Action).OfType<ActionBrowse>().Any();
+        }
+
+
+        /// <summary>
+        /// Get an entity via an id that can be either an integer, Guid or UDI
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        internal IUmbracoEntity GetEntityFromId(string id)
+        {
+            IUmbracoEntity entity;
+
+            if (Guid.TryParse(id, out Guid idGuid))
+            {
+                entity = Services.EntityService.GetByKey(idGuid, UmbracoObjectType);
+            }
+            else if (int.TryParse(id, out int idInt))
+            {
+                entity = Services.EntityService.Get(idInt, UmbracoObjectType);
+            }
+            else if (Udi.TryParse(id, out Udi idUdi))
+            {
+                var guidUdi = idUdi as GuidUdi;
+                entity = guidUdi != null ? Services.EntityService.GetByKey(guidUdi.Guid, UmbracoObjectType) : null;
+            }
+            else
+            {
+                return null;
+            }
+
+            return entity;
         }
     }
 }

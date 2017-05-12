@@ -27,6 +27,7 @@ using Umbraco.Web.Routing;
 using File = System.IO.File;
 using Umbraco.Core.DI;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 
@@ -47,14 +48,13 @@ namespace Umbraco.Tests.TestHelpers
     {
         private CacheHelper _disabledCacheHelper;
         private IFacadeService _facadeService;
-        private IDisposable _databaseScope;
 
         private string _databasePath;
         private static byte[] _databaseBytes;
 
         protected CacheHelper DisabledCache => _disabledCacheHelper ?? (_disabledCacheHelper = CacheHelper.CreateDisabledCacheHelper());
 
-        protected IDatabaseUnitOfWorkProvider UowProvider => Core.DI.Current.Container.GetInstance<IDatabaseUnitOfWorkProvider>();
+        protected IScopeUnitOfWorkProvider UowProvider => Core.DI.Current.Container.GetInstance<IScopeUnitOfWorkProvider>();
 
         protected PublishedContentTypeCache ContentTypesCache { get; private set; }
 
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected ServiceContext ServiceContext => Core.DI.Current.Services;
 
-        protected IUmbracoDatabaseFactory DatabaseFactory => Core.DI.Current.DatabaseFactory;
+        protected IScopeProvider ScopeProvider => Core.DI.Current.ScopeProvider;
 
         public override void SetUp()
         {
@@ -90,9 +90,8 @@ namespace Umbraco.Tests.TestHelpers
 
                 var sqlSyntaxProviders = new[] { new SqlCeSyntaxProvider() };
                 var logger = f.GetInstance<ILogger>();
-                var umbracoDatabaseAccessor = f.GetInstance<IDatabaseScopeAccessor>();
                 var mappers = f.GetInstance<IMapperCollection>();
-                var factory = new UmbracoDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, logger, umbracoDatabaseAccessor, mappers);
+                var factory = new UmbracoDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, logger, mappers);
                 factory.ResetForTests();
                 return factory;
             });
@@ -101,7 +100,7 @@ namespace Umbraco.Tests.TestHelpers
         [TestFixtureTearDown]
         public void FixtureTearDown()
         {
-            RemoveDatabaseFile(Core.DI.Current.HasContainer ? Core.DI.Current.DatabaseFactory.Database : null);
+            RemoveDatabaseFile();
         }
 
         public override void TearDown()
@@ -111,7 +110,7 @@ namespace Umbraco.Tests.TestHelpers
             try
             {
                 if (Options.Database == UmbracoTestOptions.Database.NewSchemaPerTest)
-                    RemoveDatabaseFile(Core.DI.Current.HasContainer ? Core.DI.Current.Container.TryGetInstance<IUmbracoDatabaseFactory>()?.Database : null);
+                    RemoveDatabaseFile();
 
                 AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
@@ -123,8 +122,6 @@ namespace Umbraco.Tests.TestHelpers
             {
                 timer?.Dispose();
             }
-
-            _databaseScope?.Dispose();
 
             base.TearDown();
         }
@@ -180,9 +177,9 @@ namespace Umbraco.Tests.TestHelpers
             var path = TestHelper.CurrentAssemblyDirectory;
 
             //Get the connectionstring settings from config
-            var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            var settings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
             ConfigurationManager.AppSettings.Set(
-                Core.Configuration.GlobalSettings.UmbracoConnectionName,
+                Constants.System.UmbracoConnectionName,
                 GetDbConnectionString());
 
             _databasePath = string.Concat(path, "\\UmbracoNPocoTests.sdf");
@@ -251,6 +248,7 @@ namespace Umbraco.Tests.TestHelpers
                 var facadeAccessor = new TestFacadeAccessor();
                 var service = new FacadeService(
                     Core.DI.Current.Services,
+                    (IScopeProviderInternal) Core.DI.Current.ScopeProvider,
                     UowProvider,
                     cache, facadeAccessor, Core.DI.Current.Logger, ContentTypesCache, null, true, Options.FacadeServiceRepositoryEvents);
 
@@ -274,8 +272,6 @@ namespace Umbraco.Tests.TestHelpers
             if (Options.Database == UmbracoTestOptions.Database.None || Options.Database == UmbracoTestOptions.Database.NewEmptyPerTest)
                 return;
 
-            _databaseScope = Core.DI.Current.DatabaseFactory.CreateScope();
-
             //create the schema and load default data if:
             // - is the first test in the session
             // - NewDbFileAndSchemaPerTest
@@ -284,21 +280,21 @@ namespace Umbraco.Tests.TestHelpers
             if (_databaseBytes == null &&
                 (FirstTestInSession
                 || Options.Database == UmbracoTestOptions.Database.NewSchemaPerTest
-                || (FirstTestInFixture && Options.Database == UmbracoTestOptions.Database.NewSchemaPerFixture)))
+                || FirstTestInFixture && Options.Database == UmbracoTestOptions.Database.NewSchemaPerFixture))
             {
-                var database = Core.DI.Current.DatabaseFactory.Database;
-                var schemaHelper = new DatabaseSchemaHelper(database, Logger);
-                //Create the umbraco database and its base data
-                schemaHelper.CreateDatabaseSchema(Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>());
-
-                //close the connections, we're gonna read this baby in as a byte array so we don't have to re-initialize the
-                // damn db for each test
-                CloseDbConnections(database);
+                using (var scope = ScopeProvider.CreateScope())
+                {
+                    var schemaHelper = new DatabaseSchemaHelper(scope.Database, Logger);
+                    //Create the umbraco database and its base data
+                    schemaHelper.CreateDatabaseSchema(Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>());
+                    scope.Complete();
+                }
 
                 _databaseBytes = File.ReadAllBytes(_databasePath);
             }
         }
 
+        // fixme is this needed?
         private void CloseDbConnections(IUmbracoDatabase database)
         {
             //Ensure that any database connections from a previous test is disposed.
@@ -310,6 +306,11 @@ namespace Umbraco.Tests.TestHelpers
         private void RemoveDatabaseFile(IUmbracoDatabase database, Action<Exception> onFail = null)
         {
             if (database != null) CloseDbConnections(database);
+            RemoveDatabaseFile(onFail);
+        }
+
+        private void RemoveDatabaseFile(Action<Exception> onFail = null)
+        {
             var path = TestHelper.CurrentAssemblyDirectory;
             try
             {

@@ -6,11 +6,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     public interface IDatabaseUnitOfWorkProvider
 	{
         /// <summary>
-        /// Gets the database factory.
-        /// </summary>
-        IUmbracoDatabaseFactory DatabaseFactory { get; }
-
-        /// <summary>
         /// Creates a unit of work.
         /// </summary>
         /// <returns>A new unit of work.</returns>

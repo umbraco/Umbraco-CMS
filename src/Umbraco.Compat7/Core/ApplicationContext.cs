@@ -1,6 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 
 // ReSharper disable once CheckNamespace
@@ -10,7 +11,7 @@ namespace Umbraco.Core
     {
         private ApplicationContext()
         {
-            DatabaseContext = new DatabaseContext(DI.Current.DatabaseFactory);
+            DatabaseContext = new DatabaseContext(DI.Current.Container.GetInstance<IUmbracoDatabaseFactory>());
         }
 
         public static ApplicationContext Current { get; } = new ApplicationContext();

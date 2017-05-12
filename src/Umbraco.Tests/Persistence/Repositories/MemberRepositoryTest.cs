@@ -25,19 +25,19 @@ namespace Umbraco.Tests.Persistence.Repositories
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class MemberRepositoryTest : TestWithDatabaseBase
     {
-        private MemberRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MemberTypeRepository memberTypeRepository, out MemberGroupRepository memberGroupRepository)
+        private MemberRepository CreateRepository(IScopeUnitOfWork unitOfWork, out MemberTypeRepository memberTypeRepository, out MemberGroupRepository memberGroupRepository)
         {
             memberTypeRepository = new MemberTypeRepository(unitOfWork, DisabledCache, Logger);
             memberGroupRepository = new MemberGroupRepository(unitOfWork, DisabledCache, Logger);
             var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger);
-            var repository = new MemberRepository(unitOfWork, DisabledCache, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<IContentSection>());
+            var repository = new MemberRepository(unitOfWork, DisabledCache, Logger, memberTypeRepository, memberGroupRepository, tagRepo);
             return repository;
         }
 
         [Test]
         public void MemberRepository_Can_Get_Member_By_Id()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Members_By_Ids()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void MemberRepository_Can_Get_All_Members()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -105,7 +105,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void MemberRepository_Can_Perform_GetByQuery_With_Key()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Persist_Member()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -154,7 +154,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void New_Member_Has_Built_In_Properties_By_Default()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -189,7 +189,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void MemberRepository_Does_Not_Replace_Password_When_Null()
         {
             IMember sut;
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -219,7 +219,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void MemberRepository_Can_Update_Email_And_Login_When_Changed()
         {
             IMember sut;
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -249,9 +249,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Correct_Subquery()
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             
-            var query = provider.DatabaseFactory.Query<IMember>().Where(x =>
+            var query = provider.DatabaseContext.Query<IMember>().Where(x =>
                         ((Member) x).LongStringPropertyValue.Contains("1095") &&
                         ((Member) x).PropertyTypeAlias == "headshot");
 
@@ -269,7 +269,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IMember CreateTestMember(IMemberType memberType = null, string name = null, string email = null, string password = null, string username = null, Guid? key = null)
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -293,7 +293,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IMemberType CreateTestMemberType(string alias = null)
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -309,9 +309,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private Sql<SqlContext> GetBaseQuery(bool isCount)
         {
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             if (isCount)
             {
-                var sqlCount = DatabaseFactory.Sql()
+                var sqlCount = provider.DatabaseContext.Sql()
                     .SelectCount()
                     .From<NodeDto>()
                     .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
@@ -322,7 +323,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 return sqlCount;
             }
 
-            var sql = DatabaseFactory.Sql();
+            var sql = provider.DatabaseContext.Sql();
             sql.Select("umbracoNode.*", "cmsContent.contentType", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
                 "cmsContentVersion.VersionDate", "cmsMember.Email",
                 "cmsMember.LoginName", "cmsMember.Password", "cmsPropertyData.id AS PropertyDataId", "cmsPropertyData.propertytypeid",
@@ -346,7 +347,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private Sql<SqlContext> GetSubquery()
         {
-            var sql = DatabaseFactory.Sql();
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
+            var sql = provider.DatabaseContext.Sql();
             sql.Select("umbracoNode.id")
                 .From<NodeDto>()
                 .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)

@@ -33,6 +33,7 @@ namespace Umbraco.Web.Security
         // fixme - inject!
         private readonly IMemberService _memberService = Current.Services.MemberService;
         private readonly IMemberTypeService _memberTypeService = Current.Services.MemberTypeService;
+        private readonly IUserService _userService = Current.Services.UserService;
         private readonly CacheHelper _applicationCache = Current.ApplicationCache;
 
         #region Constructors
@@ -272,6 +273,27 @@ namespace Umbraco.Web.Security
         public virtual IPublishedContent GetByEmail(string email)
         {
             return MemberCache.GetByEmail(email);
+        }
+
+        public virtual IPublishedContent Get(Udi udi)
+        {
+            var guidUdi = udi as GuidUdi;
+            if (guidUdi == null) return null;
+
+            var umbracoType = Constants.UdiEntityType.ToUmbracoObjectType(udi.EntityType);
+
+            var entityService = Current.Services.EntityService;
+            switch (umbracoType)
+            {
+                case UmbracoObjectTypes.Member:
+                    // fixme - need to implement Get(guid)!
+                    var memberAttempt = entityService.GetIdForKey(guidUdi.Guid, umbracoType);
+                    if (memberAttempt.Success)
+                        return GetById(memberAttempt.Result);
+                    break;
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -628,7 +650,8 @@ namespace Umbraco.Web.Security
             //Are we resetting the password??
             if (passwordModel.Reset.HasValue && passwordModel.Reset.Value)
             {
-                if (membershipProvider.EnablePasswordReset == false)
+                var canReset = membershipProvider.CanResetPassword(_userService);
+                if (canReset == false)
                 {
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password reset is not enabled", new[] { "resetPassword" }) });
                 }

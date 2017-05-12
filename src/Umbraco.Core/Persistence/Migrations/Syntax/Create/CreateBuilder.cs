@@ -7,6 +7,7 @@ using Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.ForeignKey;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Index;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Table;
+using Umbraco.Core.Persistence.Migrations.Syntax.Execute.Expressions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Expressions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -19,9 +20,28 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
 
         public CreateBuilder(IMigrationContext context, params DatabaseType[] supportedDatabaseTypes)
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));            
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
             _supportedDatabaseTypes = supportedDatabaseTypes;
+        }
+
+        private ISqlSyntaxProvider SqlSyntax => _context.Database.SqlSyntax;
+
+        public void Table<T>()
+        {
+            var tableDefinition = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+
+            AddSql(SqlSyntax.Format(tableDefinition));
+            AddSql(SqlSyntax.FormatPrimaryKey(tableDefinition));
+            foreach (var sql in SqlSyntax.Format(tableDefinition.ForeignKeys))
+                AddSql(sql);
+            foreach (var sql in SqlSyntax.Format(tableDefinition.Indexes))
+                AddSql(sql);
+        }
+
+        private void AddSql(string sql)
+        {
+            var expression = new ExecuteSqlStatementExpression(_context, _supportedDatabaseTypes) { SqlStatement = sql };
+            _context.Expressions.Add(expression);
         }
 
         public ICreateTableWithColumnSyntax Table(string tableName)

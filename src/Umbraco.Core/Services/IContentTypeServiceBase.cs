@@ -34,6 +34,12 @@ namespace Umbraco.Core.Services
 
         Attempt<string[]> ValidateComposition(TItem compo);
 
+        /// <summary>
+        /// Given the path of a content item, this will return true if the content item exists underneath a list view content item
+        /// </summary>
+        /// <param name="contentPath"></param>
+        /// <returns></returns>
+        bool HasContainerInPath(string contentPath);
 
         Attempt<OperationStatus<OperationStatusType, EntityContainer>> CreateContainer(int parentContainerId, string name, int userId = 0);
         Attempt<OperationStatus> SaveContainer(EntityContainer container, int userId = 0);

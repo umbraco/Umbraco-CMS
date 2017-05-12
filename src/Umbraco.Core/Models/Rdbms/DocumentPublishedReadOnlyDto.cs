@@ -1,6 +1,5 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Models.Rdbms
 {
@@ -20,5 +19,8 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("newest")]
         public bool Newest { get; set; }
+
+        [Column("updateDate")]
+        public DateTime VersionDate { get; set; }
     }
 }

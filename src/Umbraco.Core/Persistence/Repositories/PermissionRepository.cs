@@ -22,10 +22,10 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class PermissionRepository<TEntity>
         where TEntity : class, IAggregateRoot
     {
-        private readonly IDatabaseUnitOfWork _unitOfWork;
+        private readonly IScopeUnitOfWork _unitOfWork;
         private readonly IRuntimeCacheProvider _runtimeCache;
 
-        internal PermissionRepository(IDatabaseUnitOfWork unitOfWork, CacheHelper cache)
+        internal PermissionRepository(IScopeUnitOfWork unitOfWork, CacheHelper cache)
         {
             _unitOfWork = unitOfWork;
             //Make this repository use an isolated cache
@@ -148,8 +148,7 @@ namespace Umbraco.Core.Persistence.Repositories
             db.BulkInsertRecords(toInsert);
 
             //Raise the event
-            AssignedPermissions.RaiseEvent(
-                new SaveEventArgs<EntityPermission>(ConvertToPermissionList(toInsert), false), this);
+            _unitOfWork.Events.Dispatch(AssignedPermissions, this, new SaveEventArgs<EntityPermission>(ConvertToPermissionList(toInsert), false));
         }
 
         /// <summary>
@@ -180,8 +179,7 @@ namespace Umbraco.Core.Persistence.Repositories
             db.BulkInsertRecords(actions);
 
             //Raise the event
-            AssignedPermissions.RaiseEvent(
-                new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false), this);
+            _unitOfWork.Events.Dispatch(AssignedPermissions, this, new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false));
         }
 
         /// <summary>
@@ -212,8 +210,7 @@ namespace Umbraco.Core.Persistence.Repositories
             db.BulkInsertRecords(actions);
 
             //Raise the event
-            AssignedPermissions.RaiseEvent(
-                new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false), this);
+            _unitOfWork.Events.Dispatch(AssignedPermissions, this, new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false));
         }
 
         /// <summary>
@@ -240,8 +237,7 @@ namespace Umbraco.Core.Persistence.Repositories
             db.BulkInsertRecords(actions);
 
             //Raise the event
-            AssignedPermissions.RaiseEvent(
-                new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false), this);
+            _unitOfWork.Events.Dispatch(AssignedPermissions, this, new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false));
         }
 
         private static IEnumerable<EntityPermission> ConvertToPermissionList(IEnumerable<User2NodePermissionDto> result)

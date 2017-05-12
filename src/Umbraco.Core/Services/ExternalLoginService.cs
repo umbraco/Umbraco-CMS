@@ -3,15 +3,14 @@ using Microsoft.AspNet.Identity;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    public class ExternalLoginService : RepositoryService, IExternalLoginService
+    public class ExternalLoginService : ScopeRepositoryService, IExternalLoginService
     {
-        public ExternalLoginService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        public ExternalLoginService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, logger, eventMessagesFactory)
         { }
 
@@ -22,12 +21,10 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<IIdentityUserLogin> GetAll(int userId)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repo = uow.CreateRepository<IExternalLoginRepository>();
-                var ident = repo.GetByQuery(repo.QueryT.Where(x => x.UserId == userId));
-                uow.Complete();
-                return ident;
+                return repo.GetByQuery(repo.QueryT.Where(x => x.UserId == userId));
             }
         }
 
@@ -39,13 +36,11 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<IIdentityUserLogin> Find(UserLoginInfo login)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repo = uow.CreateRepository<IExternalLoginRepository>();
-                var idents = repo.GetByQuery(repo.QueryT
+                return repo.GetByQuery(repo.QueryT
                     .Where(x => x.ProviderKey == login.ProviderKey && x.LoginProvider == login.LoginProvider));
-                uow.Complete();
-                return idents;
             }
         }
 
@@ -58,7 +53,6 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.Begin();
                 var repo = uow.CreateRepository<IExternalLoginRepository>();
                 repo.SaveUserLogins(userId, logins);
                 uow.Complete();
@@ -73,7 +67,6 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                uow.Begin();
                 var repo = uow.CreateRepository<IExternalLoginRepository>();
                 repo.DeleteUserLogins(userId);
                 uow.Complete();

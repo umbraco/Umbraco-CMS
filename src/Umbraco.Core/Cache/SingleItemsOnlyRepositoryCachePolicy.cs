@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Cache
@@ -17,7 +15,7 @@ namespace Umbraco.Core.Cache
     internal class SingleItemsOnlyRepositoryCachePolicy<TEntity, TId> : DefaultRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IAggregateRoot
     {
-        public SingleItemsOnlyRepositoryCachePolicy(IRuntimeCacheProvider cache, RepositoryCachePolicyOptions options) 
+        public SingleItemsOnlyRepositoryCachePolicy(IRuntimeCacheProvider cache, RepositoryCachePolicyOptions options)
             : base(cache, options)
         { }
 

@@ -13,13 +13,13 @@ namespace Umbraco.Core.Services
     /// </summary>
     internal class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType, IContentTypeService>, IContentTypeService
     {
-        public ContentTypeService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IContentService contentService)
+        public ContentTypeService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IContentService contentService)
             : base(provider, logger, eventMessagesFactory)
         {
             ContentService = contentService;
         }
 
-        protected override IContentTypeService Instance => this;
+        protected override IContentTypeService This => this;
         // beware! order is important to avoid deadlocks
         protected override int[] ReadLockIds { get; } = { Constants.Locks.ContentTypes };
         protected override int[] WriteLockIds { get; } = { Constants.Locks.ContentTree, Constants.Locks.ContentTypes };
@@ -41,16 +41,12 @@ namespace Umbraco.Core.Services
         /// <remarks>Beware! Works accross content, media and member types.</remarks>
         public IEnumerable<string> GetAllPropertyTypeAliases()
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 // that one is special because it works accross content, media and member types
                 uow.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
                 var repo = uow.CreateRepository<IContentTypeRepository>();
-                var aliases = repo.GetAllPropertyTypeAliases();
-                uow.Complete();
-                return aliases;
-                    
-                    
+                return repo.GetAllPropertyTypeAliases();
             }
         }
 
@@ -62,14 +58,12 @@ namespace Umbraco.Core.Services
         /// <remarks>Beware! Works accross content, media and member types.</remarks>
         public IEnumerable<string> GetAllContentTypeAliases(params Guid[] guids)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 // that one is special because it works accross content, media and member types
                 uow.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
                 var repo = uow.CreateRepository<IContentTypeRepository>();
-                var aliases = repo.GetAllContentTypeAliases(guids);
-                uow.Complete();
-                return aliases;
+                return repo.GetAllContentTypeAliases(guids);
             }
         }
     }

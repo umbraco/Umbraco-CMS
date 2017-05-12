@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Xml.Linq;
+﻿using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -55,21 +52,5 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entityId"></param>
         /// <returns></returns>
         IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId);
-
-        /// <summary>
-        /// Gets paged content results
-        /// </summary>
-        /// <param name="query">Query to excute</param>
-        /// <param name="pageIndex">Page number</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="totalRecords">Total records query would return without paging</param>
-        /// <param name="orderBy">Field to order by</param>
-        /// <param name="orderDirection">Direction to order by</param>
-        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter"></param>
-        /// <param name="newest">A value indicating whether to get the 'newest' or all of them.</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter = null, bool newest = true);
     }
 }

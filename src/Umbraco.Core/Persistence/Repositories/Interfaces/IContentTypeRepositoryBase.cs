@@ -19,5 +19,13 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns>The original alias with a number appended to it, so that it is unique.</returns>
         /// <remarks>Unique accross all content, media and member types.</remarks>
         string GetUniqueAlias(string alias);
+
+
+        /// <summary>
+        /// Gets a value indicating whether there is a list view content item in the path.
+        /// </summary>
+        /// <param name="contentPath"></param>
+        /// <returns></returns>
+        bool HasContainerInPath(string contentPath);
     }
 }

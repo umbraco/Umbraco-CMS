@@ -18,12 +18,12 @@ namespace Umbraco.Tests.Persistence.Repositories
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class DomainRepositoryTest : TestWithDatabaseBase
     {
-        private DomainRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out ContentRepository contentRepository, out LanguageRepository languageRepository)
+        private DomainRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out ContentRepository contentRepository, out LanguageRepository languageRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository);
-            contentRepository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            contentRepository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository);
             languageRepository = new LanguageRepository(unitOfWork, DisabledCache, Logger);
             var domainRepository = new DomainRepository(unitOfWork, DisabledCache, Logger);
             return domainRepository;
@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private int CreateTestData(string isoName, out ContentType ct)
         {
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
@@ -155,7 +155,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
@@ -188,7 +188,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId1 = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
@@ -238,7 +238,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
@@ -269,7 +269,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
@@ -300,7 +300,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
@@ -331,7 +331,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
@@ -364,7 +364,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
@@ -399,7 +399,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;
@@ -450,7 +450,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 ContentRepository contentRepo;

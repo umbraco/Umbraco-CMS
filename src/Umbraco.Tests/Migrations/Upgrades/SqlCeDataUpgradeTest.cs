@@ -11,7 +11,6 @@ using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Web.Strategies.Migrations;
-using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Tests.Migrations.Upgrades
 {
@@ -34,7 +33,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             var migrationRunner = new MigrationRunner(
                 Mock.Of<IMigrationCollectionBuilder>(),
                 Mock.Of<IMigrationEntryService>(),
-                Mock.Of<ILogger>(), configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+                Mock.Of<ILogger>(), configuredVersion, targetVersion, Constants.System.UmbracoMigrationName);
 
             bool upgraded = migrationRunner.Execute(migrationContext /*, true*/);
 

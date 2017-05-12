@@ -42,6 +42,7 @@ namespace UmbracoExamine
         /// Used to store the path of a content object
         /// </summary>
         public const string IndexPathFieldName = "__Path";
+        public const string NodeKeyFieldName = "__Key";
         public const string IconFieldName = "__Icon";
         public const string PublishedFieldName = "__Published";
         /// <summary>
@@ -187,7 +188,13 @@ namespace UmbracoExamine
 
             base.Initialize(name, config);
 
-            if (config["useTempStorage"] != null)
+            //NOTES: useTempStorage is obsolete, tempStorageDirectory is obsolete, both have been superceded by Examine Core's IDirectoryFactory
+            //       tempStorageDirectory never actually got finished in Umbraco Core but accidentally got shipped (it's only enabled on the searcher
+            //       and not the indexer). So this whole block is just legacy
+
+            //detect if a dir factory has been specified, if so then useTempStorage will not be used (deprecated)
+
+            if (config["directoryFactory"] == null  && config["useTempStorage"] != null)
             {
                 throw new NotImplementedException("Fix how local temp storage works and is synced with Examine v2.0 - since a writer is always open we cannot snapshot it, we need to use the same logic in AzureDirectory");
 

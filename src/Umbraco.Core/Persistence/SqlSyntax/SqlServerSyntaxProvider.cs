@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
@@ -13,14 +14,19 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerSyntaxProvider>
     {
         // IUmbracoDatabaseFactory to be lazily injected
-        public SqlServerSyntaxProvider(Lazy<IUmbracoDatabaseFactory> lazyFactory)
+        public SqlServerSyntaxProvider(Lazy<IScopeProvider> lazyScopeProvider)
         {
             _serverVersion = new Lazy<ServerVersionInfo>(() =>
             {
-                var factory = lazyFactory.Value;
-                if (factory == null)
-                    throw new InvalidOperationException("Failed to determine Sql Server version (no database factory).");
-                return DetermineVersion(factory);
+                var scopeProvider = lazyScopeProvider.Value;
+                if (scopeProvider == null)
+                    throw new InvalidOperationException("Failed to determine Sql Server version (no scope provider).");
+                using (var scope = scopeProvider.CreateScope())
+                {
+                    var version = DetermineVersion(scope.Database);
+                    scope.Complete();
+                    return version;
+                }
             });
         }
 
@@ -99,7 +105,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             }
         }
 
-        private static ServerVersionInfo DetermineVersion(IUmbracoDatabaseFactory factory)
+        private static ServerVersionInfo DetermineVersion(IUmbracoDatabase database)
         {
             // Edition: "Express Edition", "Windows Azure SQL Database..."
             // EngineEdition: 1/Desktop 2/Standard 3/Enterprise 4/Express 5/Azure
@@ -119,7 +125,6 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
             try
             {
-                var database = factory.GetDatabase();
                 var version = database.Fetch<ServerVersionInfo>(sql).First();
                 version.Initialize();
                 return version;

@@ -4,10 +4,11 @@ using System.Linq.Expressions;
 using System.Reflection;
 using NPoco;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Plugins;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
-    public abstract class BaseMapper
+    public abstract class BaseMapper : IDiscoverable
     {
         protected BaseMapper()
         {

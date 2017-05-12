@@ -14,8 +14,11 @@ namespace Umbraco.Core.Cache
         private static readonly ICacheProvider NullRequestCache = new NullCacheProvider();
         private static readonly ICacheProvider NullStaticCache = new NullCacheProvider();
         private static readonly IRuntimeCacheProvider NullRuntimeCache = new NullCacheProvider();
-        
-        /// <summary>
+        private static readonly IsolatedRuntimeCache NullIsolatedCache = new IsolatedRuntimeCache(_ => NullRuntimeCache);
+
+	    public static CacheHelper NoCache { get; } = new CacheHelper(NullRuntimeCache, NullStaticCache, NullRequestCache, NullIsolatedCache);
+
+	    /// <summary>
         /// Creates a cache helper with disabled caches
         /// </summary>
         /// <returns></returns>
@@ -24,7 +27,10 @@ namespace Umbraco.Core.Cache
         /// </remarks>
         public static CacheHelper CreateDisabledCacheHelper()
         {
-            return new CacheHelper(NullRuntimeCache, NullStaticCache, NullRequestCache, new IsolatedRuntimeCache(t => NullRuntimeCache));
+            // do *not* return NoCache
+            // NoCache is a special instance that is detected by RepositoryBase and disables all cache policies
+            // CreateDisabledCacheHelper is used in tests to use no cache, *but* keep all cache policies
+            return new CacheHelper(NullRuntimeCache, NullStaticCache, NullRequestCache, NullIsolatedCache);
         }
 
 	    /// <summary>

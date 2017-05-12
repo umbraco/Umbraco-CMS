@@ -3,7 +3,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveFive
 {
-    [Migration("7.5.5", 101, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.5.5", 101, Constants.System.UmbracoMigrationName)]
     public class AddLockObjects : MigrationBase
     {
         public AddLockObjects(IMigrationContext context)

@@ -22,22 +22,15 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ITemplateRepository _templateRepository;
         private IRepositoryCachePolicy<IContentType, int> _cachePolicy;
 
-        public ContentTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ITemplateRepository templateRepository)
+        public ContentTypeRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ITemplateRepository templateRepository)
             : base(work, cache, logger)
         {
             _templateRepository = templateRepository;
         }
 
-        protected override IRepositoryCachePolicy<IContentType, int> CachePolicy
+        protected override IRepositoryCachePolicy<IContentType, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                if (_cachePolicy != null) return _cachePolicy;
-
-                _cachePolicy = new FullDataSetRepositoryCachePolicy<IContentType, int>(RuntimeCache, GetEntityId, /*expires:*/ true);
-
-                return _cachePolicy;
-            }
+            return new FullDataSetRepositoryCachePolicy<IContentType, int>(runtimeCache, GetEntityId, /*expires:*/ true);
         }
 
         protected override IContentType PerformGet(int id)

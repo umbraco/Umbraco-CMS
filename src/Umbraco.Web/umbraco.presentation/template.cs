@@ -90,19 +90,20 @@ namespace umbraco
                 string originalPath = IOHelper.MapPath(VirtualPathUtility.ToAbsolute(MasterPageFile));
                 string copyPath = IOHelper.MapPath(VirtualPathUtility.ToAbsolute(path));
 
-                FileStream fs = new FileStream(originalPath, FileMode.Open, FileAccess.ReadWrite);
-                StreamReader f = new StreamReader(fs);
-                String newfile = f.ReadToEnd();
-                f.Close();
-                fs.Close();
+                string newFile;
+                using (var fs = new FileStream(originalPath, FileMode.Open, FileAccess.ReadWrite))
+                using (var f = new StreamReader(fs))
+                {
+                    newFile = f.ReadToEnd();
+                }
 
-                newfile = newfile.Replace("MasterPageFile=\"~/masterpages/", "MasterPageFile=\"");
+                newFile = newFile.Replace("MasterPageFile=\"~/masterpages/", "MasterPageFile=\"");
 
-                fs = new FileStream(copyPath, FileMode.Create, FileAccess.Write);
-
-                StreamWriter replacement = new StreamWriter(fs);
-                replacement.Write(newfile);
-                replacement.Close();
+                using (var fs = new FileStream(copyPath, FileMode.Create, FileAccess.Write))
+                using (var replacement = new StreamWriter(fs))
+                {
+                    replacement.Write(newFile);
+                }
             }
 
             return path;
@@ -451,7 +452,6 @@ namespace umbraco
 
         #endregion
 
-
         #region constructors
 
         public static string GetMasterPageName(int templateID)
@@ -475,12 +475,16 @@ namespace umbraco
             var t = Current.ApplicationCache.RuntimeCache.GetCacheItem<template>(
                string.Format("{0}{1}", CacheKeys.TemplateFrontEndCacheKey, tId), () =>
                {
-                   var templateData = Current.DatabaseFactory.Database.FirstOrDefault<dynamic>(
-                       @"select nodeId, alias, node.parentID as master, text, design
+                   dynamic templateData;
+                   using (var scope = Current.ScopeProvider.CreateScope())
+                   {
+                       templateData = scope.Database.FirstOrDefault<dynamic>(
+                           @"select nodeId, alias, node.parentID as master, text, design
 from cmsTemplate
 inner join umbracoNode node on (node.id = cmsTemplate.nodeId)
 where nodeId = @templateID",
-                       new {templateID = templateID});
+                           new { templateID = templateID });
+                   }
                    if (templateData != null)
                    {
                        // Get template master and replace content where the template
@@ -552,7 +556,4 @@ where nodeId = @templateID",
 
         #endregion
     }
-
-
-
 }

@@ -10,6 +10,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Cache;
@@ -34,30 +35,33 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         // used in WebBootManager + tests
         public FacadeService(ServiceContext serviceContext,
-            IDatabaseUnitOfWorkProvider uowProvider, 
+            IScopeProviderInternal scopeProvider,
+            IScopeUnitOfWorkProvider uowProvider, 
             ICacheProvider requestCache, 
             IEnumerable<IUrlSegmentProvider> segmentProviders,
             IFacadeAccessor facadeAccessor,
             ILogger logger,
             MainDom mainDom,
             bool testing = false, bool enableRepositoryEvents = true)
-            : this(serviceContext, uowProvider, requestCache, segmentProviders, facadeAccessor, logger, null, mainDom, testing, enableRepositoryEvents)
+            : this(serviceContext, scopeProvider, uowProvider, requestCache, segmentProviders, facadeAccessor, logger, null, mainDom, testing, enableRepositoryEvents)
         { }
 
         // used in some tests
-        internal FacadeService(ServiceContext serviceContext, 
-            IDatabaseUnitOfWorkProvider uowProvider, 
+        internal FacadeService(ServiceContext serviceContext,
+            IScopeProviderInternal scopeProvider,
+            IScopeUnitOfWorkProvider uowProvider, 
             ICacheProvider requestCache,
             IFacadeAccessor facadeAccessor,
             ILogger logger,
             PublishedContentTypeCache contentTypeCache, 
             MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
-            : this(serviceContext, uowProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(), facadeAccessor, logger, contentTypeCache, mainDom, testing, enableRepositoryEvents)
+            : this(serviceContext, scopeProvider, uowProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(), facadeAccessor, logger, contentTypeCache, mainDom, testing, enableRepositoryEvents)
         { }
 
         private FacadeService(ServiceContext serviceContext, 
-            IDatabaseUnitOfWorkProvider uowProvider, 
+            IScopeProviderInternal scopeProvider,
+            IScopeUnitOfWorkProvider uowProvider, 
             ICacheProvider requestCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders,
             IFacadeAccessor facadeAccessor,
@@ -71,7 +75,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _contentTypeCache = contentTypeCache
                 ?? new PublishedContentTypeCache(serviceContext.ContentTypeService, serviceContext.MediaTypeService, serviceContext.MemberTypeService, logger);
 
-            _xmlStore = new XmlStore(serviceContext, uowProvider, _routesCache, _contentTypeCache, segmentProviders, facadeAccessor, mainDom, testing, enableRepositoryEvents);
+            _xmlStore = new XmlStore(serviceContext, scopeProvider, uowProvider, _routesCache, _contentTypeCache, segmentProviders, facadeAccessor, mainDom, testing, enableRepositoryEvents);
 
             _domainService = serviceContext.DomainService;
             _memberService = serviceContext.MemberService;

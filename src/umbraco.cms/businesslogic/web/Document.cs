@@ -157,8 +157,12 @@ namespace umbraco.cms.businesslogic.web
 
         public static void RemoveTemplateFromDocument(int templateId)
         {
-            Current.DatabaseFactory.Database.Execute(
-                "update cmsDocument set templateId = NULL where templateId = @TemplateId", new {TemplateId = templateId});
+            using (var scope = Current.ScopeProvider.CreateScope())
+            {
+                scope.Database.Execute(
+                    "update cmsDocument set templateId = NULL where templateId = @TemplateId", new { TemplateId = templateId });
+                scope.Complete();
+            }
             //We need to clear cache for Documents since this is touching the database directly
             Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IContent>();
         }

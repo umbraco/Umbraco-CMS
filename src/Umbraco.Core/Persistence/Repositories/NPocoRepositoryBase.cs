@@ -24,14 +24,14 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="work">A database unit of work.</param>
         /// <param name="cache">A cache helper.</param>
         /// <param name="logger">A logger.</param>
-        protected NPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
+        protected NPocoRepositoryBase(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         { }
 
         /// <summary>
 		/// Gets the repository's unit of work.
 		/// </summary>
-		protected internal new IDatabaseUnitOfWork UnitOfWork => (IDatabaseUnitOfWork) base.UnitOfWork;
+		protected internal new IScopeUnitOfWork UnitOfWork => base.UnitOfWork;
 
         /// <summary>
         /// Gets the repository's database.
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Abstract Methods
 
-        protected abstract Sql<SqlContext> GetBaseQuery(bool isCount);
+        protected abstract Sql<SqlContext> GetBaseQuery(bool isCount); // fixme obsolete, use QueryType instead everywhere
         protected abstract string GetBaseWhereClause();
         protected abstract IEnumerable<string> GetDeleteClauses();
         protected abstract Guid NodeObjectTypeId { get; }
@@ -89,11 +89,6 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 Database.Execute(delete, new { Id = GetEntityId(entity) });
             }
-        }
-
-        protected new virtual TId GetEntityId(TEntity entity)
-        {
-            return (TId)(object) entity.Id;
         }
     }
 }

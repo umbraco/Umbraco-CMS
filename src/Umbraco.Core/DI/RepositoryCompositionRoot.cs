@@ -16,9 +16,8 @@ namespace Umbraco.Core.DI
 
         public void Compose(IServiceRegistry container)
         {
-            // register IUnitOfWork providers
-            container.RegisterSingleton<IUnitOfWorkProvider, FileUnitOfWorkProvider>();
-            container.RegisterSingleton<IDatabaseUnitOfWorkProvider, NPocoUnitOfWorkProvider>();
+            // register the IUnitOfWork provider
+            container.RegisterSingleton<IScopeUnitOfWorkProvider, ScopeUnitOfWorkProvider>();
 
             // register repository factory
             container.RegisterSingleton<RepositoryFactory>();

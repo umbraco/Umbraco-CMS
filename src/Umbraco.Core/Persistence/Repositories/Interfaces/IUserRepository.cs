@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IUserRepository : IQueryRepository<int, IUser>
+    public interface IUserRepository : IUnitOfWorkRepository, IQueryRepository<int, IUser>
     {
         /// <summary>
         /// Gets the count of items based on a complex query

@@ -18,40 +18,40 @@ namespace Umbraco.Tests.Testing
         /// <para>This is for tests that inherited from TestWithApplicationBase.</para>
         /// <para>Implies AutoMapper = true (, ResetPluginManager = false).</para>
         /// </remarks>
-        public bool WithApplication { get { return _withApplication.ValueOrDefault(false); } set { _withApplication.Set(value); } }
+        public bool WithApplication { get => _withApplication.ValueOrDefault(false); set => _withApplication.Set(value); }
         private readonly Settable<bool> _withApplication = new Settable<bool>();
 
         /// <summary>
         /// Gets or sets a value indicating whether to compose and initialize AutoMapper.
         /// </summary>
         /// <remarks>Default is false unless WithApplication is true, in which case default is true.</remarks>
-        public bool AutoMapper { get { return _autoMapper.ValueOrDefault(WithApplication); } set { _autoMapper.Set(value);} }
+        public bool AutoMapper { get => _autoMapper.ValueOrDefault(WithApplication); set => _autoMapper.Set(value); }
         private readonly Settable<bool> _autoMapper = new Settable<bool>();
 
         /// <summary>
         /// Gets or sets a value indicating ... FIXME to be completed
         /// </summary>
-        public bool ResetPluginManager { get { return _resetPluginManager.ValueOrDefault(false); } set { _resetPluginManager.Set(value); } }
+        public bool ResetPluginManager { get => _resetPluginManager.ValueOrDefault(false); set => _resetPluginManager.Set(value); }
         private readonly Settable<bool> _resetPluginManager = new Settable<bool>();
 
         /// <summary>
         /// Gets or sets a value indicating ... FIXME to be completed
         /// </summary>
-        public bool FacadeServiceRepositoryEvents { get { return _facadeServiceRepositoryEvents.ValueOrDefault(false); } set { _facadeServiceRepositoryEvents.Set(value); } }
+        public bool FacadeServiceRepositoryEvents { get => _facadeServiceRepositoryEvents.ValueOrDefault(false); set => _facadeServiceRepositoryEvents.Set(value); }
         private readonly Settable<bool> _facadeServiceRepositoryEvents = new Settable<bool>();
 
         /// <summary>
         /// Gets or sets a value indicating the required logging support.
         /// </summary>
         /// <remarks>Default is to mock logging.</remarks>
-        public UmbracoTestOptions.Logger Logger { get { return _logger.ValueOrDefault(UmbracoTestOptions.Logger.Mock); } set { _logger.Set(value); } }
+        public UmbracoTestOptions.Logger Logger { get => _logger.ValueOrDefault(UmbracoTestOptions.Logger.Mock); set => _logger.Set(value); }
         private readonly Settable<UmbracoTestOptions.Logger> _logger = new Settable<UmbracoTestOptions.Logger>();
 
         /// <summary>
         /// Gets or sets a value indicating the required database support.
         /// </summary>
         /// <remarks>Default is no database support.</remarks>
-        public UmbracoTestOptions.Database Database { get { return _database.ValueOrDefault(UmbracoTestOptions.Database.None); } set { _database.Set(value); } }
+        public UmbracoTestOptions.Database Database { get => _database.ValueOrDefault(UmbracoTestOptions.Database.None); set => _database.Set(value); }
         private readonly Settable<UmbracoTestOptions.Database> _database = new Settable<UmbracoTestOptions.Database>();
 
         #endregion

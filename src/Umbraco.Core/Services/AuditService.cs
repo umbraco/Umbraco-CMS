@@ -3,19 +3,16 @@ using System.Collections.Generic;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    public sealed class AuditService : RepositoryService, IAuditService
+    public sealed class AuditService : ScopeRepositoryService, IAuditService
     {
-        public AuditService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        public AuditService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, logger, eventMessagesFactory)
-        {
-        }
+        { }
 
         public void Add(AuditType type, string comment, int userId, int objectId)
         {

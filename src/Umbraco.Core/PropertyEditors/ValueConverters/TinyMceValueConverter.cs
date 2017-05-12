@@ -4,9 +4,10 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
-	/// <summary>
-	/// Value converter for the RTE so that it always returns IHtmlString so that Html.Raw doesn't have to be used.
-	/// </summary>
+    /// <summary>
+    /// Value converter for the RTE so that it always returns IHtmlString so that Html.Raw doesn't have to be used.
+    /// </summary>
+    [DefaultPropertyValueConverter]
     public class TinyMceValueConverter : PropertyValueConverterBase
 	{
         public override bool IsConverter(PublishedPropertyType propertyType)

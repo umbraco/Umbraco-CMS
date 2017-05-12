@@ -1,11 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IPublicAccessRepository : IQueryRepository<Guid, PublicAccessEntry>
-    {
-    }
+    public interface IPublicAccessRepository : IUnitOfWorkRepository, IQueryRepository<Guid, PublicAccessEntry>
+    { }
 }

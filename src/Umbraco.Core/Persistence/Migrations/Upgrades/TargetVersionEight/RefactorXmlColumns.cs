@@ -5,7 +5,7 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
 {
-    [Migration("8.0.0", 100, GlobalSettings.UmbracoMigrationName)]
+    [Migration("8.0.0", 100, Constants.System.UmbracoMigrationName)]
     public class RefactorXmlColumns : MigrationBase
     {
         public RefactorXmlColumns(IMigrationContext context)

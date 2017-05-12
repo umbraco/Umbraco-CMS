@@ -21,8 +21,8 @@ namespace Umbraco.Core.Logging
         /// Logs a warning message.
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
-        /// <param name="message">A message.</param>
-        void Warn(Type reporting, string message);
+        /// <param name="format">A message.</param>
+        void Warn(Type reporting, string format);
 
         /// <summary>
         /// Logs a warning message.

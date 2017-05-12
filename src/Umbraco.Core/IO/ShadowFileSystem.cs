@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Umbraco.Core.IO
 {
@@ -30,8 +31,15 @@ namespace Umbraco.Core.IO
                     {
                         try
                         {
-                            using (var stream = _sfs.OpenFile(kvp.Key))
-                                _fs.AddFile(kvp.Key, stream, true);
+                            if (_fs.CanAddPhysical)
+                            {
+                                _fs.AddFile(kvp.Key, _sfs.GetFullPath(kvp.Key)); // overwrite, move
+                            }
+                            else
+                            {
+                                using (var stream = _sfs.OpenFile(kvp.Key))
+                                    _fs.AddFile(kvp.Key, stream, true);
+                            }
                         }
                         catch (Exception e)
                         {
@@ -198,19 +206,20 @@ namespace Umbraco.Core.IO
 
         public IEnumerable<string> GetFiles(string path)
         {
-            var normPath = NormPath(path);
-            var shadows = Nodes.Where(kvp => IsChild(normPath, kvp.Key)).ToArray();
-            var files = _fs.GetFiles(path);
-            return files
-                .Except(shadows.Where(kvp => (kvp.Value.IsFile && kvp.Value.IsDelete) || kvp.Value.IsDir)
-                    .Select(kvp => kvp.Key))
-                .Union(shadows.Where(kvp => kvp.Value.IsFile && kvp.Value.IsExist).Select(kvp => kvp.Key))
-                .Distinct();
+            return GetFiles(path, null);
         }
 
         public IEnumerable<string> GetFiles(string path, string filter)
         {
-            return _fs.GetFiles(path, filter);
+            var normPath = NormPath(path);
+            var shadows = Nodes.Where(kvp => IsChild(normPath, kvp.Key)).ToArray();
+            var files = filter != null ? _fs.GetFiles(path, filter) : _fs.GetFiles(path);
+            var wildcard = filter == null ? null : new WildcardExpression(filter);
+            return files
+                .Except(shadows.Where(kvp => (kvp.Value.IsFile && kvp.Value.IsDelete) || kvp.Value.IsDir)
+                    .Select(kvp => kvp.Key))
+                .Union(shadows.Where(kvp => kvp.Value.IsFile && kvp.Value.IsExist && (wildcard == null || wildcard.IsMatch(kvp.Key))).Select(kvp => kvp.Key))
+                .Distinct();
         }
 
         public Stream OpenFile(string path)
@@ -242,6 +251,9 @@ namespace Umbraco.Core.IO
 
         public string GetFullPath(string path)
         {
+            ShadowNode sf;
+            if (Nodes.TryGetValue(NormPath(path), out sf))
+                return sf.IsDir || sf.IsDelete ? null : _sfs.GetFullPath(path);
             return _fs.GetFullPath(path);
         }
 
@@ -274,6 +286,97 @@ namespace Umbraco.Core.IO
 
             if (sf.IsDelete || sf.IsDir) throw new InvalidOperationException("Invalid path.");
             return _sfs.GetSize(path);
+        }
+
+        public bool CanAddPhysical { get { return true; } }
+
+        public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false)
+        {
+            ShadowNode sf;
+            var normPath = NormPath(path);
+            if (Nodes.TryGetValue(normPath, out sf) && sf.IsExist && (sf.IsDir || overrideIfExists == false))
+                throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
+
+            var parts = normPath.Split('/');
+            for (var i = 0; i < parts.Length - 1; i++)
+            {
+                var dirPath = string.Join("/", parts.Take(i + 1));
+                ShadowNode sd;
+                if (Nodes.TryGetValue(dirPath, out sd))
+                {
+                    if (sd.IsFile) throw new InvalidOperationException("Invalid path.");
+                    if (sd.IsDelete) Nodes[dirPath] = new ShadowNode(false, true);
+                }
+                else
+                {
+                    if (_fs.DirectoryExists(dirPath)) continue;
+                    if (_fs.FileExists(dirPath)) throw new InvalidOperationException("Invalid path.");
+                    Nodes[dirPath] = new ShadowNode(false, true);
+                }
+            }
+
+            _sfs.AddFile(path, physicalPath, overrideIfExists, copy);
+            Nodes[normPath] = new ShadowNode(false, false);
+        }
+
+        // copied from System.Web.Util.Wildcard internal
+        internal class WildcardExpression
+        {
+            private readonly string _pattern;
+            private readonly bool _caseInsensitive;
+            private Regex _regex;
+
+            private static Regex metaRegex = new Regex("[\\+\\{\\\\\\[\\|\\(\\)\\.\\^\\$]");
+            private static Regex questRegex = new Regex("\\?");
+            private static Regex starRegex = new Regex("\\*");
+            private static Regex commaRegex = new Regex(",");
+            private static Regex slashRegex = new Regex("(?=/)");
+            private static Regex backslashRegex = new Regex("(?=[\\\\:])");
+
+            public WildcardExpression(string pattern, bool caseInsensitive = true)
+            {
+                _pattern = pattern;
+                _caseInsensitive = caseInsensitive;
+            }
+
+            private void EnsureRegex(string pattern)
+            {
+                if (_regex != null) return;
+
+                var options = RegexOptions.None;
+
+                // match right-to-left (for speed) if the pattern starts with a *
+
+                if (pattern.Length > 0 && pattern[0] == '*')
+                    options = RegexOptions.RightToLeft | RegexOptions.Singleline;
+                else
+                    options = RegexOptions.Singleline;
+
+                // case insensitivity
+
+                if (_caseInsensitive)
+                    options |= RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
+
+                // Remove regex metacharacters
+
+                pattern = metaRegex.Replace(pattern, "\\$0");
+
+                // Replace wildcard metacharacters with regex codes
+
+                pattern = questRegex.Replace(pattern, ".");
+                pattern = starRegex.Replace(pattern, ".*");
+                pattern = commaRegex.Replace(pattern, "\\z|\\A");
+
+                // anchor the pattern at beginning and end, and return the regex
+
+                _regex = new Regex("\\A" + pattern + "\\z", options);
+            }
+
+            public bool IsMatch(string input)
+            {
+                EnsureRegex(_pattern);
+                return _regex.IsMatch(input);
+            }
         }
     }
 }

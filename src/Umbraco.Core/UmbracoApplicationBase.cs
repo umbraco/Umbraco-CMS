@@ -71,6 +71,7 @@ namespace Umbraco.Core
             // now it is ok to use Current.Logger
 
             ConfigureUnhandledException(logger);
+            ConfigureAssemblyResolve(logger);
 
             // get runtime & boot
             _runtime = GetRuntime();
@@ -91,6 +92,20 @@ namespace Umbraco.Core
                 if (isTerminating) msg += " (terminating)";
                 msg += ".";
                 logger.Error<UmbracoApplicationBase>(msg, exception);
+            };
+        }
+
+        protected virtual void ConfigureAssemblyResolve(ILogger logger)
+        {
+            // When an assembly can't be resolved. In here we can do magic with the assembly name and try loading another.
+            // This is used for loading a signed assembly of AutoMapper (v. 3.1+) without having to recompile old code.
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                // ensure the assembly is indeed AutoMapper and that the PublicKeyToken is null before trying to Load again
+                // do NOT just replace this with 'return Assembly', as it will cause an infinite loop -> stackoverflow
+                if (args.Name.StartsWith("AutoMapper") && args.Name.EndsWith("PublicKeyToken=null"))
+                    return Assembly.Load(args.Name.Replace(", PublicKeyToken=null", ", PublicKeyToken=be96cd2c38ef1005"));
+                return null;
             };
         }
 

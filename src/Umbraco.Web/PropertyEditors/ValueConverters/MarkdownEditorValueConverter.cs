@@ -12,19 +12,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     public class MarkdownEditorValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return Constants.PropertyEditors.MarkdownEditorAlias.Equals(propertyType.PropertyEditorAlias);
-        }
+            => Constants.PropertyEditors.MarkdownEditorAlias == propertyType.PropertyEditorAlias;
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof (IHtmlString);
-        }
+            => typeof (IHtmlString);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-        {
-            return PropertyCacheLevel.Facade;
-        }
+            => PropertyCacheLevel.Facade;
 
         public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
         {
@@ -40,17 +34,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override object ConvertInterToObject(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
-            // Convert markup to html for frontend rendering.
-            Markdown mark = new Markdown();
-
+            // convert markup to html for frontend rendering.
             // source should come from ConvertSource and be a string (or null) already
+            var mark = new Markdown();
             return new HtmlString(inter == null ? string.Empty : mark.Transform((string)inter));
-        }
-
-        public override object ConvertInterToXPath(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
-        {
-            // source should come from ConvertSource and be a string (or null) already
-            return inter;
         }
     }
 }

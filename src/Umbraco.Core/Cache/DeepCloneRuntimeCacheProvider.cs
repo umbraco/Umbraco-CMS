@@ -22,14 +22,20 @@ namespace Umbraco.Core.Cache
     /// </summary>
     internal class DeepCloneRuntimeCacheProvider : IRuntimeCacheProvider, IRuntimeCacheProviderWrapper
     {
-        public IRuntimeCacheProvider InnerProvider { get; private set; }
+        public IRuntimeCacheProvider InnerProvider { get; }
 
         public DeepCloneRuntimeCacheProvider(IRuntimeCacheProvider innerProvider)
         {
+            var type = typeof (DeepCloneRuntimeCacheProvider);
+
+            if (innerProvider.GetType() == type)
+                throw new InvalidOperationException($"A {type} cannot wrap another instance of {type}.");
+
             InnerProvider = innerProvider;
         }
 
         #region Clear - doesn't require any changes
+
         public void ClearAllCache()
         {
             InnerProvider.ClearAllCache();
@@ -63,7 +69,8 @@ namespace Umbraco.Core.Cache
         public void ClearCacheByKeyExpression(string regexString)
         {
             InnerProvider.ClearCacheByKeyExpression(regexString);
-        } 
+        }
+
         #endregion
 
         public IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
@@ -105,9 +112,11 @@ namespace Umbraco.Core.Cache
                 var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
                 if (value == null) return null; // do not store null values (backward compat)
 
+                // clone / reset to go into the cache
                 return CheckCloneableAndTracksChanges(value);
             }, timeout, isSliding, priority, removedCallback, dependentFiles);
 
+            // clone / reset to go into the cache
             return CheckCloneableAndTracksChanges(cached);
         }
 
@@ -119,6 +128,7 @@ namespace Umbraco.Core.Cache
                 var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
                 if (value == null) return null; // do not store null values (backward compat)
 
+                // clone / reset to go into the cache
                 return CheckCloneableAndTracksChanges(value);
             }, timeout, isSliding, priority, removedCallback, dependentFiles);   
         }

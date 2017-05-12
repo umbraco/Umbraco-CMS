@@ -39,10 +39,8 @@ namespace Umbraco.Web.Routing
         /// <param name="uri">The request <c>Uri</c>.</param>
         internal PublishedContentRequest(FacadeRouter facadeRouter, UmbracoContext umbracoContext, Uri uri = null)
         {
-            if (facadeRouter == null) throw new ArgumentNullException(nameof(facadeRouter));
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
-            UmbracoContext = umbracoContext;
-            _facadeRouter = facadeRouter;
+            UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
+            _facadeRouter = facadeRouter ?? throw new ArgumentNullException(nameof(facadeRouter));
             Uri = uri ?? umbracoContext.CleanedUmbracoUrl;
             RenderingEngine = RenderingEngine.Unknown;
         }
@@ -58,10 +56,7 @@ namespace Umbraco.Web.Routing
         /// <remarks>The cleaned up Uri has no virtual directory, no trailing slash, no .aspx extension, etc.</remarks>
         public Uri Uri
         {
-            get
-            {
-                return _uri;
-            }
+            get => _uri;
             set
             {
                 if (_readonlyUri)

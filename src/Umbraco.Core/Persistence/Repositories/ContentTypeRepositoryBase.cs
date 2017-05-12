@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class ContentTypeRepositoryBase<TEntity> : NPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
         where TEntity : class, IContentTypeComposition
     {
-        protected ContentTypeRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
+        protected ContentTypeRepositoryBase(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         { }
 
@@ -103,8 +103,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId);
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
+            // fixme v8 are we sorting only for 7.6 relators?
             var sql = translator.Translate()
-                                .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
+                .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
 
             return Database
                 .FetchOneToMany<PropertyTypeGroupDto>(x => x.PropertyTypeDtos, sql)
@@ -1270,6 +1271,20 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
             string test;
             while (aliases.Contains(test = alias + i)) i++;
             return test;
+        }
+
+        /// <summary>
+        /// Given the path of a content item, this will return true if the content item exists underneath a list view content item
+        /// </summary>
+        /// <param name="contentPath"></param>
+        /// <returns></returns>
+        public bool HasContainerInPath(string contentPath)
+        {
+            var ids = contentPath.Split(',').Select(int.Parse);
+            var sql = new Sql(@"SELECT COUNT(*) FROM cmsContentType
+INNER JOIN cmsContent ON cmsContentType.nodeId=cmsContent.contentType 
+WHERE cmsContent.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", new { ids, isContainer = true });
+            return Database.ExecuteScalar<int>(sql) > 0;
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

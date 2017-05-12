@@ -6,8 +6,10 @@ using System.Web;
 using LightInject;
 using Moq;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
@@ -35,9 +37,9 @@ namespace Umbraco.Tests.TestHelpers
             databaseFactoryMock.Setup(x => x.Configured).Returns(configured);
             databaseFactoryMock.Setup(x => x.CanConnect).Returns(canConnect);
 
-            // can get a database - but don't try to use it!
+            // can create a database - but don't try to use it!
             if (configured && canConnect)
-                databaseFactoryMock.Setup(x => x.GetDatabase()).Returns(GetUmbracoSqlCeDatabase(Mock.Of<ILogger>()));
+                databaseFactoryMock.Setup(x => x.CreateDatabase()).Returns(GetUmbracoSqlCeDatabase(Mock.Of<ILogger>()));
 
             return databaseFactoryMock.Object;
         }
@@ -72,6 +74,14 @@ namespace Umbraco.Tests.TestHelpers
                 MockService<IDomainService>(),
                 MockService<ITaskService>(),
                 MockService<IMacroService>());
+        }
+
+        public static IScopeUnitOfWork GetUnitOfWorkMock()
+        {
+            var unitOfWorkMock = new Mock<IScopeUnitOfWork>();
+            unitOfWorkMock.Setup(x => x.Messages).Returns(() => new EventMessages());
+            unitOfWorkMock.Setup(x => x.Events).Returns(() => new PassThroughEventDispatcher());
+            return unitOfWorkMock.Object;
         }
 
         private T MockService<T>(IServiceFactory container = null)
@@ -163,7 +173,7 @@ namespace Umbraco.Tests.TestHelpers
             public override string ServerVersion { get; }
             public override ConnectionState State => ConnectionState.Open; // else NPoco reopens
         }
-        
+
         #endregion
     }
 }

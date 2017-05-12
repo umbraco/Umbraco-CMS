@@ -16,12 +16,13 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void DatabaseSchemaCreation_Produces_DatabaseSchemaResult_With_Zero_Errors()
         {
-            // Arrange
-            var db = DatabaseFactory.Database;
-            var schema = new DatabaseSchemaCreation(db, Logger);
+            DatabaseSchemaResult result;
 
-            // Act
-            var result = schema.ValidateSchema();
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var schema = new DatabaseSchemaCreation(scope.Database, Logger);
+                result = schema.ValidateSchema();
+            }
 
             // Assert
             Assert.That(result.Errors.Count, Is.EqualTo(0));

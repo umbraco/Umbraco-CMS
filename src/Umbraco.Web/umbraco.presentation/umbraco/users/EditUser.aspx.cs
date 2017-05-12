@@ -295,7 +295,6 @@ namespace umbraco.cms.presentation.user
             args.IsValid = false || lapps.SelectedIndex >= 0;
         }
 
-
         /// <summary>
         /// Setups the form.
         /// </summary>
@@ -344,7 +343,6 @@ namespace umbraco.cms.presentation.user
             lapps.RepeatLayout = RepeatLayout.Flow;
             lapps.RepeatDirection = RepeatDirection.Vertical;
         }
-
 
         /// <summary>
         /// This handles changing the password

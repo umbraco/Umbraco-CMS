@@ -51,16 +51,22 @@ namespace Umbraco.Web._Legacy.PackageActions
 				XmlNode section = xmlData.SelectSingleNode("./section");
 				XmlDocument dashboardFile = XmlHelper.OpenAsXmlDocument(dbConfig);
 
-				XmlNode importedSection = dashboardFile.ImportNode(section, true);
+			    //don't continue if it already exists
+			    var found = dashboardFile.SelectNodes("//section[@alias='" + sectionAlias + "']");
+			    if (found == null || found.Count <= 0)
+			    {
 
-                XmlAttribute alias = XmlHelper.AddAttribute(dashboardFile, "alias", sectionAlias);
-				importedSection.Attributes.Append(alias);
+			        XmlNode importedSection = dashboardFile.ImportNode(section, true);
 
-				dashboardFile.DocumentElement.AppendChild(importedSection);
+			        XmlAttribute alias = XmlHelper.AddAttribute(dashboardFile, "alias", sectionAlias);
+			        importedSection.Attributes.Append(alias);
 
-				dashboardFile.Save(IOHelper.MapPath(dbConfig));
+			        dashboardFile.DocumentElement.AppendChild(importedSection);
 
-				return true;
+			        dashboardFile.Save(IOHelper.MapPath(dbConfig));
+			    }
+
+			    return true;
 			}
 
 			return false;

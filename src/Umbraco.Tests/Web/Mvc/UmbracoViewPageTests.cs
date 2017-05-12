@@ -13,6 +13,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
@@ -418,8 +419,10 @@ namespace Umbraco.Tests.Web.Mvc
             //    new ProfilingLogger(logger, Mock.Of<IProfiler>())) { /*IsReady = true*/ };
 
             var cache = new NullCacheProvider();
-            var provider = new NPocoUnitOfWorkProvider(databaseFactory, new RepositoryFactory(Mock.Of<IServiceContainer>()));
-            _service = new FacadeService(svcCtx, provider, cache, Enumerable.Empty<IUrlSegmentProvider>(), null, Current.Logger, null, true, false); // no events
+            //var provider = new ScopeUnitOfWorkProvider(databaseFactory, new RepositoryFactory(Mock.Of<IServiceContainer>()));
+            var scopeProvider = TestObjects.GetScopeProvider(Mock.Of<ILogger>()) as IScopeProviderInternal;
+            var uowProvider = TestObjects.GetScopeUnitOfWorkProvider(Mock.Of<ILogger>(), scopeProvider: scopeProvider);
+            _service = new FacadeService(svcCtx, scopeProvider, uowProvider, cache, Enumerable.Empty<IUrlSegmentProvider>(), null, Current.Logger, null, true, false); // no events
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
 

@@ -102,6 +102,27 @@ namespace Umbraco.Core.Persistence
             }
         }
 
+        /// <inheritdoc />
+        public bool InTransaction { get; private set; }
+
+        protected override void OnBeginTransaction()
+        {
+            base.OnBeginTransaction();
+            InTransaction = true;
+        }
+
+        protected override void OnAbortTransaction()
+        {
+            InTransaction = false;
+            base.OnAbortTransaction();
+        }
+
+        protected override void OnCompleteTransaction()
+        {
+            InTransaction = false;
+            base.OnCompleteTransaction();
+        }
+
         /// <summary>
         /// Gets or sets a value indicating whether to log all executed Sql statements.
         /// </summary>
@@ -137,6 +158,7 @@ namespace Umbraco.Core.Persistence
             if (connection == null) throw new ArgumentNullException(nameof(connection));
 
 #if DEBUG_DATABASES
+            // determines the database connection SPID for debugging
             if (DatabaseType == DBType.MySql)
             {
                 using (var command = connection.CreateCommand())

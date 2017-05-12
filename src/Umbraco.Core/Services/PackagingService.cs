@@ -18,6 +18,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Packaging;
+using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
@@ -42,8 +43,7 @@ namespace Umbraco.Core.Services
         private readonly IFileService _fileService;
         private readonly ILocalizationService _localizationService;
         private readonly IEntityService _entityService;
-        private readonly RepositoryFactory _repositoryFactory;
-        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
+        private readonly IScopeUnitOfWorkProvider _uowProvider;
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
         private Dictionary<string, IContentType> _importedContentTypes;
         private IPackageInstallation _packageInstallation;
@@ -61,8 +61,7 @@ namespace Umbraco.Core.Services
             ILocalizationService localizationService,
             IEntityService entityService,
             IUserService userService,
-            RepositoryFactory repositoryFactory,
-            IDatabaseUnitOfWorkProvider uowProvider, 
+            IScopeUnitOfWorkProvider uowProvider, 
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
         {
             _logger = logger;
@@ -74,7 +73,6 @@ namespace Umbraco.Core.Services
             _fileService = fileService;
             _localizationService = localizationService;
             _entityService = entityService;
-            _repositoryFactory = repositoryFactory;
             _uowProvider = uowProvider;
             _urlSegmentProviders = urlSegmentProviders;
             _userService = userService;
@@ -244,39 +242,42 @@ namespace Umbraco.Core.Services
                                        SortOrder = int.Parse(sortOrder)
                                    };
 
-            foreach (var property in properties)
+            using (var uow = _uowProvider.CreateUnitOfWork(readOnly: true))
             {
-                string propertyTypeAlias = property.Name.LocalName;
-                if (content.HasProperty(propertyTypeAlias))
+                foreach (var property in properties)
                 {
-                    var propertyValue = property.Value;
-
-                    var propertyType = contentType.PropertyTypes.FirstOrDefault(pt => pt.Alias == propertyTypeAlias);
-
-                    //TODO: It would be heaps nicer if we didn't have to hard code references to specific property editors
-                    // we'd have to modify the packaging format to denote how to parse/store the value instead of relying on this
-
-                    if (propertyType != null)
+                    string propertyTypeAlias = property.Name.LocalName;
+                    if (content.HasProperty(propertyTypeAlias))
                     {
-                        if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.CheckBoxListAlias)
+                        var propertyValue = property.Value;
+
+                        var propertyType = contentType.PropertyTypes.FirstOrDefault(pt => pt.Alias == propertyTypeAlias);
+
+                        //TODO: It would be heaps nicer if we didn't have to hard code references to specific property editors
+                        // we'd have to modify the packaging format to denote how to parse/store the value instead of relying on this
+
+                        if (propertyType != null)
                         {
-
-                            //TODO: We need to refactor this so the packager isn't making direct db calls for an 'edge' case
-                            var database = Current.DatabaseFactory.Database;
-                            var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = propertyType.DataTypeDefinitionId });
-
-                            var propertyValueList = new List<string>();
-                            foreach (var preValue in propertyValue.Split(','))
+                            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.CheckBoxListAlias)
                             {
-                                propertyValueList.Add(dtos.Single(x => x.Value == preValue).Id.ToString(CultureInfo.InvariantCulture));
+
+                                //TODO: We need to refactor this so the packager isn't making direct db calls for an 'edge' case
+                                var database = uow.Database;
+                                var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = propertyType.DataTypeDefinitionId });
+
+                                var propertyValueList = new List<string>();
+                                foreach (var preValue in propertyValue.Split(','))
+                                {
+                                    propertyValueList.Add(dtos.Single(x => x.Value == preValue).Id.ToString(CultureInfo.InvariantCulture));
+                                }
+
+                                propertyValue = string.Join(",", propertyValueList.ToArray());
+
                             }
-
-                            propertyValue = string.Join(",", propertyValueList.ToArray());
-
                         }
+                        //set property value
+                        content.SetValue(propertyTypeAlias, propertyValue);
                     }
-                    //set property value
-                    content.SetValue(propertyTypeAlias, propertyValue);
                 }
             }
 
@@ -351,7 +352,7 @@ namespace Umbraco.Core.Services
 
             //When you are importing a single doc type we have to assume that the depedencies are already there.
             //Otherwise something like uSync won't work.
-            var fields = new List<TopologicalSorter.DependencyField<XElement>>();
+            var graph = new TopoGraph<string, TopoGraph.Node<string, XElement>>(x => x.Key, x => x.Dependencies);
             var isSingleDocTypeImport = unsortedDocumentTypes.Count == 1;
 
             var importedFolders = CreateContentTypeFolderStructure(unsortedDocumentTypes);
@@ -386,21 +387,14 @@ namespace Umbraco.Core.Services
                         }
                     }
 
-                    var field = new TopologicalSorter.DependencyField<XElement>
-                    {
-                        Alias = infoElement.Element("Alias").Value,
-                        Item = new Lazy<XElement>(() => elementCopy),
-                        DependsOn = dependencies.ToArray()
-                    };
-
-                    fields.Add(field);
+                    graph.AddItem(TopoGraph.CreateNode(infoElement.Element("Alias").Value, elementCopy, dependencies.ToArray()));
                 }
             }
 
             //Sorting the Document Types based on dependencies - if its not a single doc type import ref. #U4-5921
             var documentTypes = isSingleDocTypeImport
                 ? unsortedDocumentTypes.ToList()
-                : TopologicalSorter.GetSortedItems(fields).ToList();
+                : graph.GetSortedItems().Select(x => x.Item).ToList();
 
             //Iterate the sorted document types and create them as IContentType objects
             foreach (var documentType in documentTypes)
@@ -787,18 +781,10 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IContentTypeRepository>();
                 var query = repository.QueryT.Where(x => x.Alias == contentTypeAlias);
-                var types = repository.GetByQuery(query).ToArray();
-
-                if (types.Any() == false)
-                    throw new Exception(
-                        string.Format("No ContentType matching the passed in Alias: '{0}' was found",
-                                      contentTypeAlias)); // causes rollback
-
-                var contentType = types.FirstOrDefault();
+                var contentType = repository.GetByQuery(query).FirstOrDefault();
 
                 if (contentType == null)
-                    throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null",
-                                                      contentTypeAlias)); // causes rollback
+                    throw new Exception($"ContentType matching the passed in Alias: '{contentTypeAlias}' was null");
 
                 uow.Complete();
                 return contentType;
@@ -1500,7 +1486,8 @@ namespace Umbraco.Core.Services
                                        ? (from doc in element.Elements("Template") select doc).ToList()
                                        : new List<XElement> { element };
 
-            var fields = new List<TopologicalSorter.DependencyField<XElement>>();
+            var graph = new TopoGraph<string, TopoGraph.Node<string, XElement>>(x => x.Key, x => x.Dependencies);
+
             foreach (XElement tempElement in templateElements)
             {
                 var dependencies = new List<string>();
@@ -1517,19 +1504,15 @@ namespace Umbraco.Core.Services
                     _logger.Info<PackagingService>(string.Format("Template '{0}' has an invalid Master '{1}', so the reference has been ignored.", (string)elementCopy.Element("Alias"), (string)elementCopy.Element("Master")));
                 }
 
-                var field = new TopologicalSorter.DependencyField<XElement>
-                {
-                    Alias = (string)elementCopy.Element("Alias"),
-                    Item = new Lazy<XElement>(() => elementCopy),
-                    DependsOn = dependencies.ToArray()
-                };
-
-                fields.Add(field);
+                graph.AddItem(TopoGraph.CreateNode((string) elementCopy.Element("Alias"), elementCopy, dependencies));
             }
+
             //Sort templates by dependencies to a potential master template
-            var sortedElements = TopologicalSorter.GetSortedItems(fields);
-            foreach (var templateElement in sortedElements)
+            var sorted = graph.GetSortedItems();
+            foreach (var item in sorted)
             {
+                var templateElement = item.Item;
+
                 var templateName = templateElement.Element("Name").Value;
                 var alias = templateElement.Element("Alias").Value;
                 var design = templateElement.Element("Design").Value;
@@ -1688,6 +1671,24 @@ namespace Umbraco.Core.Services
 
         #region Package Building
         #endregion
+
+        /// <summary>
+        /// This method can be used to trigger the 'ImportedPackage' event when a package is installed by something else but this service.
+        /// </summary>
+        /// <param name="args"></param>
+        internal static void OnImportedPackage(ImportPackageEventArgs<InstallationSummary> args)
+        {
+            ImportedPackage.RaiseEvent(args, null);
+        }
+
+        /// <summary>
+        /// This method can be used to trigger the 'UninstalledPackage' event when a package is uninstalled by something else but this service.
+        /// </summary>
+        /// <param name="args"></param>
+        internal static void OnUninstalledPackage(UninstallPackageEventArgs<UninstallationSummary> args)
+        {
+            UninstalledPackage.RaiseEvent(args, null);
+        }
 
         #region Event Handlers
         /// <summary>
@@ -1849,9 +1850,14 @@ namespace Umbraco.Core.Services
         internal static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<string>> ImportingPackage;
 
         /// <summary>
-        /// Occurs after a apckage is imported
+        /// Occurs after a package is imported
         /// </summary>
         internal static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<InstallationSummary>> ImportedPackage;
+
+        /// <summary>
+        /// Occurs after a package is uninstalled
+        /// </summary>
+        internal static event TypedEventHandler<IPackagingService, UninstallPackageEventArgs<UninstallationSummary>> UninstalledPackage;
 
         #endregion
     }

@@ -3,7 +3,7 @@ using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
 {
-    [Migration("8.0.0", 100, GlobalSettings.UmbracoMigrationName)]
+    [Migration("8.0.0", 100, Constants.System.UmbracoMigrationName)]
     public class AddLockTable : MigrationBase
     {
         public AddLockTable(IMigrationContext context)

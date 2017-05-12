@@ -91,9 +91,9 @@ namespace Umbraco.Web
             composition.Container.RegisterSingleton<IExamineIndexCollectionAccessor, ExamineIndexCollectionAccessor>();
 
             // IoC setup for LightInject for MVC/WebApi
-            // see comments on MixedScopeManagerProvider for explainations of what we are doing here
-            var smp = composition.Container.ScopeManagerProvider as MixedScopeManagerProvider;
-            if (smp == null) throw new Exception("Container.ScopeManagerProvider is not MixedScopeManagerProvider.");
+            // see comments on MixedLightInjectScopeManagerProvider for explainations of what we are doing here
+            var smp = composition.Container.ScopeManagerProvider as MixedLightInjectScopeManagerProvider;
+            if (smp == null) throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
             composition.Container.EnableMvc(); // does container.EnablePerWebRequestScope()
             composition.Container.ScopeManagerProvider = smp; // reverts - we will do it last (in WebRuntime)
 

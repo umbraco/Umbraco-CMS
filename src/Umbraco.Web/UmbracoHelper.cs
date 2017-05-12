@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web
@@ -398,7 +399,40 @@ namespace Umbraco.Web
             return UrlProvider.GetUrl(contentId, true);
         }
 
-		#endregion
+        #endregion
+
+        #region Member/Content/Media from Udi
+
+        public IPublishedContent PublishedContent(Udi udi)
+        {
+            var guidUdi = udi as GuidUdi;
+            if (guidUdi == null) return null;
+
+            var umbracoType = Constants.UdiEntityType.ToUmbracoObjectType(udi.EntityType);
+
+            var entityService = Current.Services.EntityService;
+            switch (umbracoType)
+            {
+                case UmbracoObjectTypes.Document:
+                    return Content(guidUdi.Guid);
+                case UmbracoObjectTypes.Media:
+                    // fixme - need to implement Media(guid)!
+                    var mediaAttempt = entityService.GetIdForKey(guidUdi.Guid, umbracoType);
+                    if (mediaAttempt.Success)
+                        return Media(mediaAttempt.Result);
+                    break;
+                case UmbracoObjectTypes.Member:
+                    // fixme - need to implement Member(guid)!
+                    var memberAttempt = entityService.GetIdForKey(guidUdi.Guid, umbracoType);
+                    if (memberAttempt.Success)
+                        return Member(memberAttempt.Result);
+                    break;
+            }
+
+            return null;
+        }
+
+        #endregion
 
         #region Members
 
@@ -680,7 +714,6 @@ namespace Umbraco.Web
 		{
             return ContentQuery.Media(id);
 		}
-
 
 		public IPublishedContent Media(string id)
 		{
@@ -1021,6 +1054,5 @@ namespace Umbraco.Web
 
             return surfaceRouteParams.EncryptWithMachineKey();
         }
-
 	}
 }

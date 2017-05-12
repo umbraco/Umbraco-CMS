@@ -4,8 +4,6 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
 {
-
-
     /// <summary>
     /// An interface defining a validator
     /// </summary>

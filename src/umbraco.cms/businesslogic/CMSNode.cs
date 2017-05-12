@@ -986,10 +986,15 @@ order by level,sortOrder";
         protected virtual XmlNode GetPreviewXml(XmlDocument xd, Guid version)
         {
             var xmlDoc = new XmlDocument();
+            string xmlStr;
 
-            var xmlStr = Current.DatabaseFactory.Database.ExecuteScalar<string>(
-                "select xml from cmsPreviewXml where nodeID = @nodeId and versionId = @versionId",
-                new { nodeId = Id, versionId = version });
+            using (var scope = Current.ScopeProvider.CreateScope())
+            {
+                xmlStr = scope.Database.ExecuteScalar<string>(
+                    "select xml from cmsPreviewXml where nodeID = @nodeId and versionId = @versionId",
+                    new { nodeId = Id, versionId = version });
+                scope.Complete();
+            }
 
             if (xmlStr.IsNullOrWhiteSpace()) return null;
 
@@ -1000,10 +1005,14 @@ order by level,sortOrder";
 
         protected internal virtual bool PreviewExists(Guid versionId)
         {
-            return Current.DatabaseFactory.Database.ExecuteScalar<int>(
-                "SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId=@nodeId and versionId = @versionId",
-                new {nodeId = Id, versionId = versionId}) != 0;
-
+            using (var scope = Current.ScopeProvider.CreateScope())
+            {
+                var exists = scope.Database.ExecuteScalar<int>(
+                           "SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId=@nodeId and versionId = @versionId",
+                           new { nodeId = Id, versionId = versionId }) != 0;
+                scope.Complete();
+                return exists;
+            }
         }
 
         /// <summary>
@@ -1017,9 +1026,12 @@ order by level,sortOrder";
             var sql = PreviewExists(versionId) ? "UPDATE cmsPreviewXml SET xml = @xml, timestamp = @timestamp WHERE nodeId=@nodeId AND versionId = @versionId"
                                 : "INSERT INTO cmsPreviewXml(nodeId, versionId, timestamp, xml) VALUES (@nodeId, @versionId, @timestamp, @xml)";
 
-            Current.DatabaseFactory.Database.Execute(
-                sql, new {nodeId = Id, versionId = versionId, timestamp = DateTime.Now, xml = x.OuterXml});
-            
+            using (var scope = Current.ScopeProvider.CreateScope())
+            {
+                scope.Database.Execute(
+                    sql, new { nodeId = Id, versionId = versionId, timestamp = DateTime.Now, xml = x.OuterXml });
+                scope.Complete();
+            }           
         }
 
         protected void PopulateCMSNodeFromReader(IRecordsReader dr)

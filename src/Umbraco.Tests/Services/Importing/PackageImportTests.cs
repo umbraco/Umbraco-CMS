@@ -82,9 +82,10 @@ namespace Umbraco.Tests.Services.Importing
 
             // Assert
             var mRBasePage = contentTypes.First(x => x.Alias == "MRBasePage");
+            using (var scope = ScopeProvider.CreateScope())
             foreach (var propertyType in mRBasePage.PropertyTypes)
             {
-                var propertyTypeDto = this.DatabaseFactory.Database.First<PropertyTypeDto>("WHERE id = @id", new { id = propertyType.Id });
+                var propertyTypeDto = scope.Database.First<PropertyTypeDto>("WHERE id = @id", new { id = propertyType.Id });
                 Assert.AreEqual(propertyTypeDto.UniqueId, propertyType.Key);
             }
         }
@@ -307,11 +308,14 @@ namespace Umbraco.Tests.Services.Importing
                                 where (string)doc.Attribute("isDoc") == ""
                                 select doc).Count();
 
-            var database = Current.DatabaseFactory.Database;
-            var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { dataTypeDefinitions.First().Id });
-            int preValueId;
-            int.TryParse(contents.First().GetValue<string>("testList"), out preValueId);
-            var preValueKey = dtos.SingleOrDefault(x => x.Id == preValueId);
+            DataTypePreValueDto preValueKey;
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var dtos = scope.Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { dataTypeDefinitions.First().Id });
+                int preValueId;
+                int.TryParse(contents.First().GetValue<string>("testList"), out preValueId);
+                preValueKey = dtos.SingleOrDefault(x => x.Id == preValueId);
+            }
 
             // Assert
             Assert.That(dataTypeDefinitions, Is.Not.Null);

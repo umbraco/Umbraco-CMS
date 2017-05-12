@@ -633,7 +633,7 @@ Vennlig hilsen Umbraco roboten
   <area alias="publicAccess">
     <key alias="paAdvanced">Avansert: Beskytt ved å velge hvilke brukergrupper som har tilgang til siden</key>
     <key alias="paAdvancedHelp"><![CDATA[Om du ønsker å kontrollere tilgang til siden ved å bruke rolle-basert autentisering,<br /> ved å bruke Umbraco's medlems-grupper]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Du må opprette en medlemsgruppe før du kan bruke <br /> rollebasert autentikasjon.]]></key>
+    <key alias="paAdvancedNoGroups">Du må opprette en medlemsgruppe før du kan bruke rollebasert autentikasjon.</key>
     <key alias="paErrorPage">Feilside</key>
     <key alias="paErrorPageHelp">Brukt når personer logger på, men ikke har tilgang</key>
     <key alias="paHowWould">Hvordan vil du beskytte siden din?</key>

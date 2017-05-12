@@ -3,19 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -29,7 +24,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private IFileSystem _masterPageFileSystem;
         private IFileSystem _viewsFileSystem;
 
-        private ITemplateRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, ITemplatesSection templatesSection = null)
+        private ITemplateRepository CreateRepository(IScopeUnitOfWork unitOfWork, ITemplatesSection templatesSection = null)
         {
             return new TemplateRepository(unitOfWork, DisabledCache, Logger, _masterPageFileSystem, _viewsFileSystem,
                 templatesSection ?? Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
@@ -47,7 +42,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Instantiate_Repository()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -62,7 +57,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_MasterPage_Detect_Content()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -86,7 +81,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_MasterPage_With_Default_Content()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork, Mock.Of<ITemplatesSection>(x => x.DefaultRenderingEngine == RenderingEngine.WebForms));
@@ -113,7 +108,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_MasterPage_With_Default_Content_With_Parent()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork, Mock.Of<ITemplatesSection>(x => x.DefaultRenderingEngine == RenderingEngine.WebForms));
@@ -143,7 +138,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_View()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -164,7 +159,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_View_With_Default_Content()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -191,7 +186,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_View_With_Default_Content_With_Parent()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -220,7 +215,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_Unique_Alias()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -250,7 +245,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_Unique_Alias()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -286,7 +281,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_MasterPage()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -317,7 +312,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_View()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -346,7 +341,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_MasterPage()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -374,7 +369,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_View()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -402,14 +397,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_When_Assigned_To_Doc()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var templateRepository = CreateRepository(unitOfWork);
 
                 var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger);
                 var contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository);
-                var contentRepo = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+                var contentRepo = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository);
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 var textpage = MockedContent.CreateSimpleContent(contentType);
@@ -443,7 +438,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_Nested_Templates()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -483,7 +478,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Template_Tree()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -510,7 +505,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_All()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -538,7 +533,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Children()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -562,7 +557,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Children_At_Root()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -583,7 +578,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Descendants()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -608,7 +603,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Path_Is_Set_Correctly_On_Creation()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -671,7 +666,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Path_Is_Set_Correctly_On_Update()
         {
             // Arrange
-            var provider = TestObjects.GetDatabaseUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
@@ -704,10 +699,38 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Flush();
 
                 //Assert
-                Assert.AreEqual(string.Format("-1,{0},{1},{2}", parent.Id, child2.Id, toddler2.Id), toddler2.Path);
+                Assert.AreEqual($"-1,{parent.Id},{child2.Id},{toddler2.Id}", toddler2.Path);
             }
         }
 
+        [Test]
+        public void Path_Is_Set_Correctly_On_Update_With_Master_Template_Removal()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
+            {
+                var repository = CreateRepository(unitOfWork);
+
+                var parent = new Template("parent", "parent");
+                var child1 = new Template("child1", "child1");
+
+                child1.MasterTemplateAlias = parent.Alias;
+                child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
+
+                repository.AddOrUpdate(parent);
+                repository.AddOrUpdate(child1);
+                unitOfWork.Flush();
+
+                //Act
+                child1.SetMasterTemplate(null);
+                repository.AddOrUpdate(child1);
+                unitOfWork.Flush();
+
+                //Assert
+                Assert.AreEqual($"-1,{child1.Id}", child1.Path);
+            }
+        }
 
         [TearDown]
         public override void TearDown()

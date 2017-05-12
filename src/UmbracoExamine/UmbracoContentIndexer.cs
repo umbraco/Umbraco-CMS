@@ -18,6 +18,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Scoping;
 using IContentService = Umbraco.Core.Services.IContentService;
 using IMediaService = Umbraco.Core.Services.IMediaService;
 
@@ -34,7 +35,7 @@ namespace UmbracoExamine
         protected IUserService UserService { get; }
 
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
-        private readonly IUmbracoDatabaseFactory _databaseFactory;
+        private readonly IScopeProvider _scopeProvider;
         private int? _parentId;
 
         #region Constructors
@@ -48,7 +49,7 @@ namespace UmbracoExamine
             UserService = Current.Services.UserService;
 
             _urlSegmentProviders = Current.UrlSegmentProviders;
-            _databaseFactory = Current.DatabaseFactory;
+            _scopeProvider = Current.ScopeProvider;
 
             InitializeQueries();
         }
@@ -65,18 +66,13 @@ namespace UmbracoExamine
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
             IValueSetValidator validator,
             UmbracoContentIndexerOptions options,
-            IUmbracoDatabaseFactory databaseFactory,
+            IScopeProvider scopeProvider,
             FacetConfiguration facetConfiguration = null,
             IDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
             : base(fieldDefinitions, luceneDirectory, defaultAnalyzer, profilingLogger, validator, facetConfiguration, indexValueTypes)
         {
-            if (contentService == null) throw new ArgumentNullException(nameof(contentService));
-            if (mediaService == null) throw new ArgumentNullException(nameof(mediaService));
-            if (userService == null) throw new ArgumentNullException(nameof(userService));
-            if (urlSegmentProviders == null) throw new ArgumentNullException(nameof(urlSegmentProviders));
             if (validator == null) throw new ArgumentNullException(nameof(validator));
             if (options == null) throw new ArgumentNullException(nameof(options));
-            if (databaseFactory == null) throw new ArgumentNullException(nameof(databaseFactory));
 
             SupportProtectedContent = options.SupportProtectedContent;
             SupportUnpublishedContent = options.SupportUnpublishedContent;
@@ -86,11 +82,11 @@ namespace UmbracoExamine
                 //hack to set the parent Id for backwards compat, when using this ctor the IndexerData will (should) always be null
                 options.ParentId);
 
-            ContentService = contentService;
-            MediaService = mediaService;
-            UserService = userService;
-            _urlSegmentProviders = urlSegmentProviders;
-            _databaseFactory = databaseFactory;
+            ContentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
+            MediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
+            UserService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _urlSegmentProviders = urlSegmentProviders ?? throw new ArgumentNullException(nameof(urlSegmentProviders));
+            _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
 
             InitializeQueries();
         }
@@ -98,7 +94,7 @@ namespace UmbracoExamine
         private void InitializeQueries()
         {
             if (_publishedQuery == null)
-                _publishedQuery = _databaseFactory.Query<IContent>().Where(x => x.Published);
+                _publishedQuery = Current.DatabaseContext.Query<IContent>().Where(x => x.Published);
         }
 
         #endregion

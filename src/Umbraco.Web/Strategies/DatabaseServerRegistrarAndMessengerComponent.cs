@@ -9,6 +9,7 @@ using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
@@ -52,9 +53,11 @@ namespace Umbraco.Web.Strategies
                 var databaseFactory = factory.GetInstance<IUmbracoDatabaseFactory>();
                 var logger = factory.GetInstance<ILogger>();
                 var proflog = factory.GetInstance<ProfilingLogger>();
+                var scopeProvider = factory.GetInstance<IScopeProvider>();
+                var databaseContext = factory.GetInstance<IDatabaseContext>();
 
                 return new BatchedDatabaseServerMessenger(
-                    runtime, databaseFactory, logger, proflog,
+                    runtime, databaseFactory, scopeProvider, databaseContext, logger, proflog,
                     true,
                     //Default options for web including the required callbacks to build caches
                     new DatabaseServerMessengerOptions
@@ -206,11 +209,9 @@ namespace Umbraco.Web.Strategies
             {
                 try
                 {
-                    // running on a background task, requires a database scope
-                    using (_databaseFactory.CreateScope())
-                    {
-                        _svc.TouchServer(_serverAddress, _svc.CurrentServerIdentity, _registrar.Options.StaleServerTimeout);
-                    }
+                    // TouchServer uses a proper unit of work etc underneath so even in a
+                    // background task it is safe to call it without dealing with any scope
+                    _svc.TouchServer(_serverAddress, _svc.CurrentServerIdentity, _registrar.Options.StaleServerTimeout);
                     return true; // repeat
                 }
                 catch (Exception ex)

@@ -2,6 +2,7 @@
 using Umbraco.Core.Components;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PublishedCache.NuCache
@@ -18,9 +19,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 factory.GetInstance<MainDom>(),
                 factory.GetInstance<IRuntimeState>(),
                 factory.GetInstance<ServiceContext>(),
-                factory.GetInstance<IDatabaseUnitOfWorkProvider>(),
+                factory.GetInstance<IScopeUnitOfWorkProvider>(),
                 factory.GetInstance<IFacadeAccessor>(),
-                factory.GetInstance<ILogger>()));
+                factory.GetInstance<ILogger>(),
+                factory.GetInstance<IScopeProvider>()));
 
             // add the NuCache health check (hidden from type finder)
             // todo - no NuCache health check yet

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Cache
 {
@@ -19,14 +20,18 @@ namespace Umbraco.Core.Cache
     internal class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
         where TEntity : class, IAggregateRoot
     {
-        private static readonly TEntity[] EmptyEntities = new TEntity[0];
+        private static readonly TEntity[] EmptyEntities = new TEntity[0]; // const
         private readonly RepositoryCachePolicyOptions _options;
 
         public DefaultRepositoryCachePolicy(IRuntimeCacheProvider cache, RepositoryCachePolicyOptions options)
             : base(cache)
         {
-            if (options == null) throw new ArgumentNullException(nameof(options));
-            _options = options;
+            _options = options ?? throw new ArgumentNullException(nameof(options));
+        }
+
+        public override IRepositoryCachePolicy<TEntity, TId> Scoped(IRuntimeCacheProvider runtimeCache, IScope scope)
+        {
+            return new ScopedRepositoryCachePolicy<TEntity, TId>(this, runtimeCache, scope);
         }
 
         protected string GetEntityCacheKey(object id)

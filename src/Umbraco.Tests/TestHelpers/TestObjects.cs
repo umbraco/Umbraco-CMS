@@ -7,19 +7,17 @@ using Moq;
 using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.DI;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.TestHelpers
@@ -40,15 +38,15 @@ namespace Umbraco.Tests.TestHelpers
         /// Gets the default ISqlSyntaxProvider objects.
         /// </summary>
         /// <param name="logger">A logger.</param>
-        /// <param name="lazyFactory">A (lazy) database factory.</param>
+        /// <param name="lazyScopeProvider">A (lazy) scope provider.</param>
         /// <returns>The default ISqlSyntaxProvider objects.</returns>
-        public IEnumerable<ISqlSyntaxProvider> GetDefaultSqlSyntaxProviders(ILogger logger, Lazy<IUmbracoDatabaseFactory> lazyFactory = null)
+        public IEnumerable<ISqlSyntaxProvider> GetDefaultSqlSyntaxProviders(ILogger logger, Lazy<IScopeProvider> lazyScopeProvider = null)
         {
             return new ISqlSyntaxProvider[]
             {
                 new MySqlSyntaxProvider(logger),
                 new SqlCeSyntaxProvider(),
-                new SqlServerSyntaxProvider(lazyFactory ?? new Lazy<IUmbracoDatabaseFactory>(() => null))
+                new SqlServerSyntaxProvider(lazyScopeProvider ?? new Lazy<IScopeProvider>(() => null))
             };
         }
 
@@ -76,7 +74,7 @@ namespace Umbraco.Tests.TestHelpers
         /// that can begin a transaction.</remarks>
         public UmbracoDatabase GetUmbracoSqlServerDatabase(ILogger logger)
         {
-            var syntax = new SqlServerSyntaxProvider(new Lazy<IUmbracoDatabaseFactory>(() => null)); // do NOT try to get the server's version!
+            var syntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null)); // do NOT try to get the server's version!
             var connection = GetDbConnection();
             var sqlContext = new SqlContext(syntax, Mock.Of<IPocoDataFactory>(), DatabaseType.SqlServer2008);
             return new UmbracoDatabase(connection, sqlContext, logger);
@@ -90,7 +88,6 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         /// <param name="repositoryFactory">A repository factory.</param>
         /// <param name="dbUnitOfWorkProvider">A database unit of work provider.</param>
-        /// <param name="fileUnitOfWorkProvider">A file unit of work provider.</param>
         /// <param name="cache">A cache.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="eventMessagesFactory">An event messages factory.</param>
@@ -100,8 +97,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <remarks>Should be used sparingly for integration tests only - for unit tests
         /// just mock the services to be passed to the ctor of the ServiceContext.</remarks>
         public ServiceContext GetServiceContext(RepositoryFactory repositoryFactory,
-            IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider,
-            IUnitOfWorkProvider fileUnitOfWorkProvider,
+            IScopeUnitOfWorkProvider dbUnitOfWorkProvider,
             CacheHelper cache,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
@@ -110,13 +106,11 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (repositoryFactory == null) throw new ArgumentNullException(nameof(repositoryFactory));
             if (dbUnitOfWorkProvider == null) throw new ArgumentNullException(nameof(dbUnitOfWorkProvider));
-            if (fileUnitOfWorkProvider == null) throw new ArgumentNullException(nameof(fileUnitOfWorkProvider));
             if (cache == null) throw new ArgumentNullException(nameof(cache));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (eventMessagesFactory == null) throw new ArgumentNullException(nameof(eventMessagesFactory));
 
             var provider = dbUnitOfWorkProvider;
-            var fileProvider = fileUnitOfWorkProvider;
             var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>());
 
             var migrationEntryService = GetLazyService<IMigrationEntryService>(container, () => new MigrationEntryService(provider, logger, eventMessagesFactory));
@@ -168,7 +162,7 @@ namespace Umbraco.Tests.TestHelpers
             var mediaService = GetLazyService<IMediaService>(container, () => new MediaService(provider, mediaFileSystem, logger, eventMessagesFactory));
             var contentTypeService = GetLazyService<IContentTypeService>(container, () => new ContentTypeService(provider, logger, eventMessagesFactory, contentService.Value));
             var mediaTypeService = GetLazyService<IMediaTypeService>(container, () => new MediaTypeService(provider, logger, eventMessagesFactory, mediaService.Value));
-            var fileService = GetLazyService<IFileService>(container, () => new FileService(fileProvider, provider, logger, eventMessagesFactory));
+            var fileService = GetLazyService<IFileService>(container, () => new FileService(provider, logger, eventMessagesFactory));
             var localizationService = GetLazyService<ILocalizationService>(container, () => new LocalizationService(provider, logger, eventMessagesFactory));
 
             var memberTypeService = GetLazyService<IMemberTypeService>(container, () => new MemberTypeService(provider, logger, eventMessagesFactory, memberService.Value));
@@ -179,7 +173,7 @@ namespace Umbraco.Tests.TestHelpers
                     cache.RuntimeCache));
 
             var macroService = GetLazyService<IMacroService>(container, () => new MacroService(provider, logger, eventMessagesFactory));
-            var packagingService = GetLazyService<IPackagingService>(container, () => new PackagingService(logger, contentService.Value, contentTypeService.Value, mediaService.Value, macroService.Value, dataTypeService.Value, fileService.Value, localizationService.Value, entityService.Value, userService.Value, repositoryFactory, provider, urlSegmentProviders));
+            var packagingService = GetLazyService<IPackagingService>(container, () => new PackagingService(logger, contentService.Value, contentTypeService.Value, mediaService.Value, macroService.Value, dataTypeService.Value, fileService.Value, localizationService.Value, entityService.Value, userService.Value, provider, urlSegmentProviders));
             var relationService = GetLazyService<IRelationService>(container, () => new RelationService(provider, logger, eventMessagesFactory, entityService.Value));
             var treeService = GetLazyService<IApplicationTreeService>(container, () => new ApplicationTreeService(logger, cache));
             var tagService = GetLazyService<ITagService>(container, () => new TagService(provider, logger, eventMessagesFactory));
@@ -223,19 +217,43 @@ namespace Umbraco.Tests.TestHelpers
             return new Lazy<T>(() => container?.TryGetInstance<T>() ?? ctor());
         }
 
-        public IDatabaseUnitOfWorkProvider GetDatabaseUnitOfWorkProvider(ILogger logger, IUmbracoDatabaseFactory databaseFactory = null, RepositoryFactory repositoryFactory = null)
+        public IScopeProvider GetScopeProvider(ILogger logger, IUmbracoDatabaseFactory databaseFactory = null)
         {
             if (databaseFactory == null)
             {
-                var accessor = _container.TryGetInstance<IDatabaseScopeAccessor>() ?? new TestDatabaseScopeAccessor();
                 //var mappersBuilder = new MapperCollectionBuilder(Current.Container); // fixme
                 //mappersBuilder.AddCore();
                 //var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Container.GetInstance<IMapperCollection>();
-                databaseFactory = new UmbracoDatabaseFactory(GlobalSettings.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, accessor, mappers);
+                databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, mappers);
+            }
+            // fixme - how elegant ;(
+            FileSystems fileSystems = null;
+            var scopeProvider = new ScopeProvider(databaseFactory, new Lazy<FileSystems>(() => fileSystems), logger);
+            fileSystems = new FileSystems(scopeProvider, logger);
+            return scopeProvider;
+        }
+
+        public IScopeUnitOfWorkProvider GetScopeUnitOfWorkProvider(ILogger logger, IUmbracoDatabaseFactory databaseFactory = null, RepositoryFactory repositoryFactory = null, IScopeProvider scopeProvider = null)
+        {
+            if (databaseFactory == null)
+            {
+                //var mappersBuilder = new MapperCollectionBuilder(Current.Container); // fixme
+                //mappersBuilder.AddCore();
+                //var mappers = mappersBuilder.CreateCollection();
+                var mappers = Current.Container.GetInstance<IMapperCollection>();
+                databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, mappers);
+            }
+            if (scopeProvider == null)
+            {
+                // fixme - how elegant ;(
+                FileSystems fileSystems = null;
+                scopeProvider = new ScopeProvider(databaseFactory, new Lazy<FileSystems>(() => fileSystems), logger);
+                fileSystems = new FileSystems((IScopeProviderInternal) scopeProvider, logger);
             }
             repositoryFactory = repositoryFactory  ??  new RepositoryFactory(Mock.Of<IServiceContainer>());
-            return new NPocoUnitOfWorkProvider(databaseFactory, repositoryFactory);
+            IDatabaseContext databaseContext = databaseFactory;
+            return new ScopeUnitOfWorkProvider(scopeProvider, databaseContext, repositoryFactory);
         }
     }
 }

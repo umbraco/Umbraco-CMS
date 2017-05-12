@@ -14,14 +14,23 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class ServerRegistrationRepository : NPocoRepositoryBase<int, IServerRegistration>, IServerRegistrationRepository
     {
-        private IRepositoryCachePolicy<IServerRegistration, int> _cachePolicy;
-
-        public ServerRegistrationRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger)
+        // fixme - should we use NoCache instead of CreateDisabledCacheHelper?!
+        public ServerRegistrationRepository(IScopeUnitOfWork work, ILogger logger)
             : base(work, CacheHelper.CreateDisabledCacheHelper(), logger)
         { }
 
-        protected override IRepositoryCachePolicy<IServerRegistration, int> CachePolicy => _cachePolicy
-            ?? (_cachePolicy = new FullDataSetRepositoryCachePolicy<IServerRegistration, int>(RuntimeCache, GetEntityId, /*expires:*/ false));
+        protected override IRepositoryCachePolicy<IServerRegistration, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
+        {
+            // fixme - wtf are we doing with cache here?
+            // why are we using disabled cache helper up there?
+            //
+            // 7.6 says:
+            // note: this means that the ServerRegistrationRepository does *not* implement scoped cache,
+            // and this is because the repository is special and should not participate in scopes
+            // (cleanup in v8)
+            //
+            return new FullDataSetRepositoryCachePolicy<IServerRegistration, int>(GlobalCache.RuntimeCache, GetEntityId, /*expires:*/ false);
+        }
 
         public void ClearCache()
         {
@@ -80,15 +89,12 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                 {
-                    "DELETE FROM umbracoServer WHERE id = @Id"                               
+                    "DELETE FROM umbracoServer WHERE id = @Id"
                 };
             return list;
         }
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
-        }
+        protected override Guid NodeObjectTypeId => throw new NotImplementedException();
 
         protected override void PersistNewItem(IServerRegistration entity)
         {

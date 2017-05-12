@@ -23,25 +23,19 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public MacroContainerValueConverter(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, CacheHelper appCache)
         {
-            _umbracoContextAccessor = umbracoContextAccessor;
-            _services = services;
-            _appCache = appCache;
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _services = services ?? throw new ArgumentNullException(nameof(services));
+            _appCache = appCache ?? throw new ArgumentNullException(nameof(appCache));
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return propertyType.PropertyEditorAlias == Constants.PropertyEditors.MacroContainerAlias;
-        }
+            => propertyType.PropertyEditorAlias == Constants.PropertyEditors.MacroContainerAlias;
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof (IHtmlString);
-        }
+            => typeof (IHtmlString);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-        {
-            return PropertyCacheLevel.Facade;
-        }
+            => PropertyCacheLevel.Facade;
 
         // NOT thread-safe over a request because it modifies the
         // global UmbracoContext.Current.InPreviewMode status. So it

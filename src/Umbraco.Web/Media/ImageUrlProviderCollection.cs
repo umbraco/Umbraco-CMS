@@ -8,6 +8,7 @@ using Umbraco.Web.Media.ImageUrlProviders;
 
 namespace Umbraco.Web.Media
 {
+    // fixme - kill entirely we should not use this anymore
     internal class ImageUrlProviderCollection : BuilderCollectionBase<IImageUrlProvider>
     {
         public ImageUrlProviderCollection(IEnumerable<IImageUrlProvider> items) 

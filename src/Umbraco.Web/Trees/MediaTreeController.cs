@@ -40,20 +40,11 @@ namespace Umbraco.Web.Trees
             return node;
         }
 
-        protected override int RecycleBinId
-        {
-            get { return Constants.System.RecycleBinMedia; }
-        }
+        protected override int RecycleBinId => Constants.System.RecycleBinMedia;
 
-        protected override bool RecycleBinSmells
-        {
-            get { return Services.MediaService.RecycleBinSmells(); }
-        }
+        protected override bool RecycleBinSmells => Services.MediaService.RecycleBinSmells();
 
-        protected override int UserStartNode
-        {
-            get { return Security.CurrentUser.StartMediaId; }
-        }
+        protected override int UserStartNode => Security.CurrentUser.StartMediaId;
 
         /// <summary>
         /// Creates a tree node for a content item based on an UmbracoEntity
@@ -64,17 +55,16 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected override TreeNode GetSingleTreeNode(IUmbracoEntity e, string parentId, FormDataCollection queryStrings)
         {
-            var entity = (UmbracoEntity)e;
+            var entity = (UmbracoEntity) e;
 
             //Special check to see if it ia a container, if so then we'll hide children.
             var isContainer = e.IsContainer(); // && (queryStrings.Get("isDialog") != "true");
 
             var node = CreateTreeNode(
-                e.Id.ToInvariantString(),
+                entity,
+                Constants.ObjectTypes.MediaGuid,
                 parentId,
                 queryStrings,
-                e.Name,
-                entity.ContentTypeIcon,
                 entity.HasChildren && (isContainer == false));
 
             node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
@@ -136,10 +126,7 @@ namespace Umbraco.Web.Trees
             return menu;
         }
 
-        protected override UmbracoObjectTypes UmbracoObjectType
-        {
-            get { return UmbracoObjectTypes.Media; }
-        }
+        protected override UmbracoObjectTypes UmbracoObjectType => UmbracoObjectTypes.Media;
 
         /// <summary>
         /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
@@ -149,11 +136,14 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected override bool HasPathAccess(string id, FormDataCollection queryStrings)
         {
-            var media = Services.MediaService.GetById(int.Parse(id));
-            if (media == null)
-            {
+            var entity = GetEntityFromId(id);
+            if (entity == null)
                 return false;
-            }
+
+            var media = Services.MediaService.GetById(entity.Id);
+            if (media == null)
+                return false;
+
             return Security.CurrentUser.HasPathAccess(media);
         }
     }

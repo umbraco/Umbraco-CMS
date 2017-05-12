@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Xml.Linq;
+﻿using System.Collections.Generic;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IMemberRepository : IRepositoryVersionable<int, IMember>
+    public interface IMemberRepository : IUnitOfWorkRepository, IRepositoryVersionable<int, IMember>
     {
         /// <summary>
         /// Finds members in a given role
@@ -40,24 +36,5 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="query"></param>
         /// <returns></returns>
         int GetCountByQuery(IQuery<IMember> query);
-
-        /// <summary>
-        /// Gets paged member results
-        /// </summary>
-        /// <param name="query">The query.</param>
-        /// <param name="pageIndex">Index of the page.</param>
-        /// <param name="pageSize">Size of the page.</param>
-        /// <param name="totalRecords">The total records.</param>
-        /// <param name="orderBy">The order by column</param>
-        /// <param name="orderDirection">The order direction.</param>
-        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter">Search query</param>
-        /// <returns></returns>
-        IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "");
-
-        //IEnumerable<IMember> GetPagedResultsByQuery<TDto>(
-        //    Sql sql, int pageIndex, int pageSize, out int totalRecords,
-        //    Func<IEnumerable<TDto>, int[]> resolveIds);
     }
 }

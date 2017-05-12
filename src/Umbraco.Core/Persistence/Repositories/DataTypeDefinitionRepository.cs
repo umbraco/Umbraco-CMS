@@ -31,11 +31,11 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly DataTypePreValueRepository _preValRepository;
 
-        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IContentTypeRepository contentTypeRepository)
+        public DataTypeDefinitionRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, IContentTypeRepository contentTypeRepository)
             : base(work, cache, logger)
         {
             _contentTypeRepository = contentTypeRepository;
-            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger);
+            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.NoCache, logger);
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (ids.Any())
             {
-                dataTypeSql.Where("umbracoNode.id in (@ids)", new { ids = ids });
+                dataTypeSql.Where("umbracoNode.id in (@ids)", new { ids });
             }
             else
             {
@@ -252,7 +252,7 @@ AND umbracoNode.id <> @id",
 
             //NOTE: This is a special case, we need to clear the custom cache for pre-values here so they are not stale if devs
             // are querying for them in the Saved event (before the distributed call cache is clearing it)
-            RuntimeCache.ClearCacheItem(GetPrefixedCacheKey(entity.Id));
+            IsolatedCache.ClearCacheItem(GetPrefixedCacheKey(entity.Id));
 
             entity.ResetDirtyProperties();
         }
@@ -291,14 +291,7 @@ AND umbracoNode.id <> @id",
 
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId)
         {
-            var cached = RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
-            if (cached != null && cached.Any())
-            {
-                //return from the cache, ensure it's a cloned result
-                return (PreValueCollection)cached.First().DeepClone();
-            }
-
-            return GetAndCachePreValueCollection(dataTypeId);
+            return GetCachedPreValueCollection(dataTypeId);
         }
 
         internal static string GetCacheKeyRegex(int preValueId)
@@ -308,30 +301,22 @@ AND umbracoNode.id <> @id",
 
         public string GetPreValueAsString(int preValueId)
         {
-            //We need to see if we can find the cached PreValueCollection based on the cache key above
+            var collections = IsolatedCache.GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + "_");
 
-            var cached = RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(GetCacheKeyRegex(preValueId));
-            if (cached != null && cached.Any())
-            {
-                //return from the cache
-                var collection = cached.First();
-				var preVal = collection.FormatAsDictionary().Single(x => x.Value.Id == preValueId);
-				return preVal.Value.Value;
-            }
+            var preValue = collections.SelectMany(x => x.FormatAsDictionary().Values).FirstOrDefault(x => x.Id == preValueId);
+            if (preValue != null)
+                return preValue.Value;
 
-            //go and find the data type id for the pre val id passed in
-
-            var dto = Database.FirstOrDefault<DataTypePreValueDto>("WHERE id = @preValueId", new { preValueId = preValueId });
+            var dto = Database.FirstOrDefault<DataTypePreValueDto>("WHERE id = @preValueId", new { preValueId });
             if (dto == null)
-            {
                 return string.Empty;
-            }
-            // go cache the collection
-            var preVals = GetAndCachePreValueCollection(dto.DataTypeNodeId);
 
-            //return the single value for this id
-            var pv = preVals.FormatAsDictionary().Single(x => x.Value.Id == preValueId);
-            return pv.Value.Value;
+            var collection = GetCachedPreValueCollection(dto.DataTypeNodeId);
+            if (collection == null)
+                return string.Empty;
+
+            preValue = collection.FormatAsDictionary().Values.FirstOrDefault(x => x.Id == preValueId);
+            return preValue == null ? string.Empty : preValue.Value;
         }
 
         public void AddOrUpdatePreValues(int dataTypeId, IDictionary<string, PreValue> values)
@@ -460,32 +445,21 @@ AND umbracoNode.id <> @id",
 
         }
 
-        private string GetPrefixedCacheKey(int dataTypeId)
+        private static string GetPrefixedCacheKey(int dataTypeId)
         {
-            return CacheKeys.DataTypePreValuesCacheKey + dataTypeId + "-";
+            return CacheKeys.DataTypePreValuesCacheKey + "_" + dataTypeId;
         }
 
-        private PreValueCollection GetAndCachePreValueCollection(int dataTypeId)
+        private PreValueCollection GetCachedPreValueCollection(int dataTypeId)
         {
-            //go get the data
-            var dtos = Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = dataTypeId });
-            var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value, x.SortOrder), x.Alias, x.SortOrder)).ToList();
-            var collection = PreValueConverter.ConvertToPreValuesCollection(list);
-
-            //now create the cache key, this needs to include all pre-value ids so that we can use this cached item in the GetPreValuesAsString method
-            //the key will be: "UmbracoPreValDATATYPEID-CSVOFPREVALIDS
-
-            var key = GetPrefixedCacheKey(dataTypeId)
-                      + string.Join(",", collection.FormatAsDictionary().Select(x => x.Value.Id).ToArray());
-
-            //store into cache
-            RuntimeCache.InsertCacheItem(key, () => collection,
-                //30 mins
-                new TimeSpan(0, 0, 30),
-                //sliding is true
-                true);
-
-            return collection;
+            var key = GetPrefixedCacheKey(dataTypeId);
+            return IsolatedCache.GetCacheItem<PreValueCollection>(key, () =>
+            {
+                var dtos = Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = dataTypeId });
+                var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value, x.SortOrder), x.Alias, x.SortOrder)).ToList();
+                var collection = PreValueConverter.ConvertToPreValuesCollection(list);
+                return collection;
+            }, TimeSpan.FromMinutes(20), isSliding: true);
         }
 
         private string EnsureUniqueNodeName(string nodeName, int id = 0)
@@ -533,10 +507,9 @@ AND umbracoNode.id <> @id",
         /// </summary>
         private class DataTypePreValueRepository : NPocoRepositoryBase<int, PreValueEntity>
         {
-            public DataTypePreValueRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
+            public DataTypePreValueRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
                 : base(work, cache, logger)
-            {
-            }
+            { }
 
             #region Not implemented (don't need to for the purposes of this repo)
             protected override PreValueEntity PerformGet(int id)
@@ -577,9 +550,7 @@ AND umbracoNode.id <> @id",
 
             protected override void PersistDeletedItem(PreValueEntity entity)
             {
-                Database.Execute(
-                    "DELETE FROM cmsDataTypePreValues WHERE id=@Id",
-                    new { Id = entity.Id });
+                Database.Execute("DELETE FROM cmsDataTypePreValues WHERE id=@Id", new { Id = entity.Id });
             }
 
             protected override void PersistNewItem(PreValueEntity entity)

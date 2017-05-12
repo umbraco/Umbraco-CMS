@@ -10,13 +10,13 @@ namespace Umbraco.Core.Services
 {
     internal class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, IMemberType, IMemberTypeService>, IMemberTypeService
     {
-        public MemberTypeService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberService memberService)
+        public MemberTypeService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberService memberService)
             : base(provider, logger, eventMessagesFactory)
         {
             MemberService = memberService;
         }
 
-        protected override IMemberTypeService Instance => this;
+        protected override IMemberTypeService This => this;
 
         // beware! order is important to avoid deadlocks
         protected override int[] ReadLockIds { get; } = { Constants.Locks.MemberTypes };
@@ -34,19 +34,21 @@ namespace Umbraco.Core.Services
 
         public string GetDefault()
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 uow.ReadLock(ReadLockIds);
                 var repo = uow.CreateRepository<IMemberTypeRepository>();
-                var e = repo.GetAll(new int[0]).GetEnumerator();
-                if (e.MoveNext() == false)
-                    throw new InvalidOperationException("No member types could be resolved");
-                var first = e.Current.Alias;
-                var current = true;
-                while (e.Current.Alias.InvariantEquals("Member") == false && (current = e.MoveNext()))
-                { }
-                uow.Complete();
-                return current ? e.Current.Alias : first;
+
+                using (var e = repo.GetAll(new int[0]).GetEnumerator())
+                {
+                    if (e.MoveNext() == false)
+                        throw new InvalidOperationException("No member types could be resolved");
+                    var first = e.Current.Alias;
+                    var current = true;
+                    while (e.Current.Alias.InvariantEquals("Member") == false && (current = e.MoveNext()))
+                    { }
+                    return current ? e.Current.Alias : first;
+                }
             }
         }
     }

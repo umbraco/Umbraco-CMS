@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core
@@ -23,23 +24,21 @@ namespace Umbraco.Core
     public class DatabaseBuilder
     {
         private readonly IUmbracoDatabaseFactory _databaseFactory;
+        private readonly IScopeProvider _scopeProvider;
         private readonly IRuntimeState _runtime;
         private readonly IMigrationEntryService _migrationEntryService;
         private readonly ILogger _logger;
 
         private DatabaseSchemaResult _databaseSchemaValidationResult;
 
-        public DatabaseBuilder(IUmbracoDatabaseFactory databaseFactory, IRuntimeState runtime, IMigrationEntryService migrationEntryService, ILogger logger)
+        public DatabaseBuilder(IScopeProvider scopeProvider, IUmbracoDatabaseFactory databaseFactory, IRuntimeState runtime, IMigrationEntryService migrationEntryService, ILogger logger)
         {
+            _scopeProvider = scopeProvider;
             _databaseFactory = databaseFactory;
             _runtime = runtime;
             _migrationEntryService = migrationEntryService;
             _logger = logger;
         }
-
-        public IUmbracoDatabase Database => _databaseFactory.GetDatabase();
-
-        public ISqlSyntaxProvider SqlSyntax => _databaseFactory.SqlSyntax;
 
         #region Status
 
@@ -87,6 +86,25 @@ namespace Umbraco.Core
             }
 
             return DbConnectionExtensions.IsConnectionAvailable(connectionString, providerName);
+        }
+
+        public bool HasSomeNonDefaultUser()
+        {
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                // look for the default user with default password
+                var result = scope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser WHERE id=0 AND userPassword='default'");
+                var has = result != 1;
+                if (has == false)
+                {
+                    // found only 1 user == the default user with default password
+                    // however this always exists on uCloud, also need to check if there are other users too
+                    result = scope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser");
+                    has = result != 1;
+                }
+                scope.Complete();
+                return has;
+            }
         }
 
         #endregion
@@ -269,7 +287,7 @@ namespace Umbraco.Core
             if (string.IsNullOrWhiteSpace(providerName)) throw new ArgumentNullOrEmptyException(nameof(providerName));
 
             // set the connection string for the new datalayer
-            var connectionStringSettings = new ConnectionStringSettings(GlobalSettings.UmbracoConnectionName, connectionString, providerName);
+            var connectionStringSettings = new ConnectionStringSettings(Constants.System.UmbracoConnectionName, connectionString, providerName);
 
             var fileName = IOHelper.MapPath($"{SystemDirectories.Root}/web.config");
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
@@ -278,11 +296,11 @@ namespace Umbraco.Core
             if (connectionStrings == null) throw new Exception("Invalid web.config file.");
 
             // update connectionString if it exists, or else create a new connectionString
-            var setting = connectionStrings.Descendants("add").FirstOrDefault(s => s.Attribute("name").Value == GlobalSettings.UmbracoConnectionName);
+            var setting = connectionStrings.Descendants("add").FirstOrDefault(s => s.Attribute("name").Value == Constants.System.UmbracoConnectionName);
             if (setting == null)
             {
                 connectionStrings.Add(new XElement("add",
-                    new XAttribute("name", GlobalSettings.UmbracoConnectionName),
+                    new XAttribute("name", Constants.System.UmbracoConnectionName),
                     new XAttribute("connectionString", connectionStringSettings),
                     new XAttribute("providerName", providerName)));
             }
@@ -332,7 +350,7 @@ namespace Umbraco.Core
         internal static void GiveLegacyAChance(IUmbracoDatabaseFactory factory, ILogger logger)
         {
             // look for the legacy appSettings key
-            var legacyConnString = ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName];
+            var legacyConnString = ConfigurationManager.AppSettings[Constants.System.UmbracoConnectionName];
             if (string.IsNullOrWhiteSpace(legacyConnString)) return;
 
             var test = legacyConnString.ToLowerInvariant();
@@ -368,7 +386,7 @@ namespace Umbraco.Core
             }
 
             // remove the legacy connection string, so we don't end up in a loop if something goes wrong
-            GlobalSettings.RemoveSetting(GlobalSettings.UmbracoConnectionName);
+            GlobalSettings.RemoveSetting(Constants.System.UmbracoConnectionName);
         }
 
         #endregion
@@ -377,19 +395,40 @@ namespace Umbraco.Core
 
         internal DatabaseSchemaResult ValidateDatabaseSchema()
         {
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                var result = ValidateDatabaseSchema(scope);
+                scope.Complete();
+                return result;
+            }
+        }
+
+        private DatabaseSchemaResult ValidateDatabaseSchema(IScope scope)
+        {
             if (_databaseFactory.Configured == false)
                 return new DatabaseSchemaResult(_databaseFactory.SqlSyntax);
 
             if (_databaseSchemaValidationResult != null)
                 return _databaseSchemaValidationResult;
 
-            var database = _databaseFactory.GetDatabase();
+            var database = scope.Database;
             var dbSchema = new DatabaseSchemaCreation(database, _logger);
             _databaseSchemaValidationResult = dbSchema.ValidateSchema();
+            scope.Complete();
             return _databaseSchemaValidationResult;
         }
 
         internal Result CreateDatabaseSchemaAndData()
+        {
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                var result = CreateDatabaseSchemaAndData(scope);
+                scope.Complete();
+                return result;
+            }
+        }
+
+        private Result CreateDatabaseSchemaAndData(IScope scope)
         {
             try
             {
@@ -401,7 +440,7 @@ namespace Umbraco.Core
 
                 _logger.Info<DatabaseBuilder>("Database configuration status: Started");
 
-                var database = _databaseFactory.GetDatabase();
+                var database = scope.Database;
 
                 // If MySQL, we're going to ensure that database calls are maintaining proper casing as to remove the necessity for checks
                 // for case insensitive queries. In an ideal situation (which is what we're striving for), all calls would be case sensitive.
@@ -455,11 +494,18 @@ namespace Umbraco.Core
             }
         }
 
-        /// <summary>
-        /// This assumes all of the previous checks are done!
-        /// </summary>
-        /// <returns></returns>
         internal Result UpgradeSchemaAndData(IMigrationEntryService migrationEntryService, MigrationCollectionBuilder builder)
+        {
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                var result = UpgradeSchemaAndData(scope, migrationEntryService, builder);
+                scope.Complete();
+                return result;
+            }
+        }
+
+        // This assumes all of the previous checks are done!
+        private Result UpgradeSchemaAndData(IScope scope, IMigrationEntryService migrationEntryService, MigrationCollectionBuilder builder)
         {
             try
             {
@@ -471,7 +517,7 @@ namespace Umbraco.Core
 
                 _logger.Info<DatabaseBuilder>("Database upgrade started");
 
-                var database = _databaseFactory.GetDatabase();
+                var database = scope.Database;
                 //var supportsCaseInsensitiveQueries = SqlSyntax.SupportsCaseInsensitiveQueries(database);
 
                 var message = GetResultMessageForMySql();
@@ -511,7 +557,7 @@ namespace Umbraco.Core
 
                 //DO the upgrade!
 
-                var runner = new MigrationRunner(builder, migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.SemanticVersion, GlobalSettings.UmbracoMigrationName);
+                var runner = new MigrationRunner(builder, migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.SemanticVersion, Constants.System.UmbracoMigrationName);
 
                 var migrationContext = new MigrationContext(database, _logger);
                 var upgraded = runner.Execute(migrationContext /*, true*/);

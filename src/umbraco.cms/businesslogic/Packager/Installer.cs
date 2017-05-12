@@ -13,6 +13,9 @@ using umbraco.cms.businesslogic.web;
 using System.Diagnostics;
 using Umbraco.Core.Models;
 using Umbraco.Core.DI;
+using Umbraco.Core.Events;
+using Umbraco.Core.Models.Packaging;
+using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using File = System.IO.File;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
@@ -486,6 +489,7 @@ namespace umbraco.cms.businesslogic.packager
                 }
 
                 OnPackageBusinessLogicInstalled(insPack);
+                OnPackageInstalled(insPack);
             }
         }
 
@@ -778,6 +782,22 @@ namespace umbraco.cms.businesslogic.packager
         {
             EventHandler<InstalledPackage> handler = PackageBusinessLogicInstalled;
             if (handler != null) handler(null, e);
+        }
+
+        private void OnPackageInstalled(InstalledPackage insPack)
+        {
+            // getting an InstallationSummary for sending to the PackagingService.ImportedPackage event
+            var fileService = Current.Services.FileService;
+            var macroService = Current.Services.MacroService;
+            var contentTypeService = Current.Services.ContentTypeService;
+            var dataTypeService = Current.Services.DataTypeService;
+            var localizationService = Current.Services.LocalizationService;
+
+            var installationSummary = insPack.GetInstallationSummary(contentTypeService, dataTypeService, fileService, localizationService, macroService);
+            installationSummary.PackageInstalled = true;
+
+            var args = new ImportPackageEventArgs<InstallationSummary>(installationSummary, false);
+            PackagingService.OnImportedPackage(args);
         }
     }
 }

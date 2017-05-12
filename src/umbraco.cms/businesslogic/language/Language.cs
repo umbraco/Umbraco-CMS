@@ -242,15 +242,19 @@ namespace umbraco.cms.businesslogic.language
         /// </remarks>
         public void Delete()
         {
-            if (Current.DatabaseFactory.Database.ExecuteScalar<int>("SELECT count(id) FROM umbracoDomains where domainDefaultLanguage = @id", new { id = id }) == 0)
+            using (var scope = Current.ScopeProvider.CreateScope())
             {
-                Current.Services.LocalizationService.Delete(LanguageEntity);
-            }
-            else
-            {
-                var e = new DataException("Cannot remove language " + LanguageEntity.CultureInfo.DisplayName + " because it's attached to a domain on a node");
-                Current.Logger.Error<Language>("Cannot remove language " + LanguageEntity.CultureInfo.DisplayName + " because it's attached to a domain on a node", e);
-                throw e;
+                if (scope.Database.ExecuteScalar<int>("SELECT count(id) FROM umbracoDomains where domainDefaultLanguage = @id", new { id = id }) == 0)
+                {
+                    Current.Services.LocalizationService.Delete(LanguageEntity);
+                    scope.Complete();
+                }
+                else
+                {
+                    var e = new DataException("Cannot remove language " + LanguageEntity.CultureInfo.DisplayName + " because it's attached to a domain on a node");
+                    Current.Logger.Error<Language>("Cannot remove language " + LanguageEntity.CultureInfo.DisplayName + " because it's attached to a domain on a node", e);
+                    throw e;
+                }
             }
         }
 

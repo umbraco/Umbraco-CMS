@@ -8,7 +8,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
 {
-    [Migration("6.0.2", 0, GlobalSettings.UmbracoMigrationName)]
+    [Migration("6.0.2", 0, Constants.System.UmbracoMigrationName)]
     public class UpdatePropertyTypesAndGroups : MigrationBase
     {
         public UpdatePropertyTypesAndGroups(IMigrationContext context) 

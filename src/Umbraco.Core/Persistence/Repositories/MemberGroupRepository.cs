@@ -13,11 +13,9 @@ using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-
-
     internal class MemberGroupRepository : NPocoRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
     {
-        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
+        public MemberGroupRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         { }
 
@@ -120,7 +118,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IMemberGroup GetByName(string name)
         {
-            return RuntimeCache.GetCacheItem<IMemberGroup>(
+            return IsolatedCache.GetCacheItem<IMemberGroup>(
                 typeof (IMemberGroup).FullName + "." + name,
                 () =>
                 {
@@ -147,13 +145,10 @@ namespace Umbraco.Core.Persistence.Repositories
             };
             PersistNewItem(grp);
 
-            if (SavingMemberGroup.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(grp), this))
-            {
+            if (UnitOfWork.Events.DispatchCancelable(SavingMemberGroup, this, new SaveEventArgs<IMemberGroup>(grp)))
                 return null;
-            }
 
-            SavedMemberGroup.RaiseEvent(new SaveEventArgs<IMemberGroup>(grp), this);
-
+            UnitOfWork.Events.Dispatch(SavedMemberGroup, this, new SaveEventArgs<IMemberGroup>(grp));
             return grp;
         }
 
@@ -258,15 +253,13 @@ namespace Umbraco.Core.Persistence.Repositories
             var missingRoles = roleNames.Except(existingRoles);
             var missingGroups = missingRoles.Select(x => new MemberGroup {Name = x}).ToArray();
 
-            if (SavingMemberGroup.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(missingGroups), this))
-            {
+            if (UnitOfWork.Events.DispatchCancelable(SavingMemberGroup, this, new SaveEventArgs<IMemberGroup>(missingGroups)))
                 return;
-            }
+
             foreach (var m in missingGroups)
-            {
                 PersistNewItem(m);
-            }
-            SavedMemberGroup.RaiseEvent(new SaveEventArgs<IMemberGroup>(missingGroups), this);
+
+            UnitOfWork.Events.Dispatch(SavedMemberGroup, this, new SaveEventArgs<IMemberGroup>(missingGroups));
 
             //now go get all the dto's for roles with these role names
             var rolesForNames = Database.Fetch<NodeDto>(existingSql).ToArray();

@@ -6,6 +6,7 @@ using System.Net.Http.Formatting;
 using System.Web.Http;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models.Trees;
@@ -74,7 +75,9 @@ namespace Umbraco.Web.Trees
                     queryStrings,
                     member.Name,
                     "icon-user",
-                    false);
+                    false,
+                    "",
+                    Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(Constants.ObjectTypes.MemberGuid), member.Key));
 
                 node.AdditionalData.Add("contentType", member.ContentTypeAlias);
                 node.AdditionalData.Add("isContainer", true);

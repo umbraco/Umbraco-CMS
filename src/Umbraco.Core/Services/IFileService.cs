@@ -11,6 +11,8 @@ namespace Umbraco.Core.Services
     public interface IFileService : IService
     {
         IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames);
+        void CreatePartialViewFolder(string folderPath);
+        void CreatePartialViewMacroFolder(string folderPath);
         void DeletePartialViewFolder(string folderPath);
         void DeletePartialViewMacroFolder(string folderPath);
         IPartialView GetPartialView(string path);
@@ -255,6 +257,13 @@ namespace Umbraco.Core.Services
         void SetTemplateFileContent(string filepath, Stream content);
 
         /// <summary>
+        /// Gets the size of a template.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the template.</param>
+        /// <returns>The size of the template.</returns>
+        long GetTemplateFileSize(string filepath);
+
+        /// <summary>
         /// Gets the content of a stylesheet as a stream.
         /// </summary>
         /// <param name="filepath">The filesystem path to the stylesheet.</param>
@@ -267,6 +276,13 @@ namespace Umbraco.Core.Services
         /// <param name="filepath">The filesystem path to the stylesheet.</param>
         /// <param name="content">The content of the stylesheet.</param>
         void SetStylesheetFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the size of a stylesheet.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the stylesheet.</param>
+        /// <returns>The size of the stylesheet.</returns>
+        long GetStylesheetFileSize(string filepath);
 
         /// <summary>
         /// Gets the content of a script file as a stream.
@@ -283,6 +299,13 @@ namespace Umbraco.Core.Services
         void SetScriptFileContent(string filepath, Stream content);
 
         /// <summary>
+        /// Gets the size of a script file.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the script file.</param>
+        /// <returns>The size of the script file.</returns>
+        long GetScriptFileSize(string filepath);
+
+        /// <summary>
         /// Gets the content of a XSLT file as a stream.
         /// </summary>
         /// <param name="filepath">The filesystem path to the XSLT file.</param>
@@ -295,6 +318,13 @@ namespace Umbraco.Core.Services
         /// <param name="filepath">The filesystem path to the XSLT file.</param>
         /// <param name="content">The content of the XSLT file.</param>
         void SetXsltFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the size of a XSLT file.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the XSLT file.</param>
+        /// <returns>The size of the XSLT file.</returns>
+        long GetXsltFileSize(string filepath);
 
         /// <summary>
         /// Gets the content of a macro partial view as a stream.
@@ -311,6 +341,13 @@ namespace Umbraco.Core.Services
         void SetPartialViewMacroFileContent(string filepath, Stream content);
 
         /// <summary>
+        /// Gets the size of a macro partial view.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the macro partial view.</param>
+        /// <returns>The size of the macro partial view.</returns>
+        long GetPartialViewMacroFileSize(string filepath);
+
+        /// <summary>
         /// Gets the content of a partial view as a stream.
         /// </summary>
         /// <param name="filepath">The filesystem path to the partial view.</param>
@@ -323,5 +360,26 @@ namespace Umbraco.Core.Services
         /// <param name="filepath">The filesystem path to the partial view.</param>
         /// <param name="content">The content of the partial view.</param>
         void SetPartialViewFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the size of a partial view.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the partial view.</param>
+        /// <returns>The size of the partial view.</returns>
+        long GetPartialViewFileSize(string filepath);
+
+        /// <summary>
+        /// Gets the content of a macro partial view snippet as a string
+        /// </summary>
+        /// <param name="snippetName">The name of the snippet</param>
+        /// <returns></returns>
+        string GetPartialViewMacroSnippetContent(string snippetName);
+
+        /// <summary>
+        /// Gets the content of a partial view snippet as a string.
+        /// </summary>
+        /// <param name="snippetName">The name of the snippet</param>
+        /// <returns>The content of the partial view.</returns>
+        string GetPartialViewSnippetContent(string snippetName);
     }
 }

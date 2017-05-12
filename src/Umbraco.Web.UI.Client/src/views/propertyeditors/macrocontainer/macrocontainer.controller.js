@@ -3,7 +3,11 @@ angular.module('umbraco')
 .controller("Umbraco.PropertyEditors.MacroContainerController",
 	
 	function($scope, dialogService, entityResource, macroService){
+
 		$scope.renderModel = [];
+		$scope.allowOpenButton = true;
+		$scope.allowRemoveButton = true;
+		$scope.sortableOptions = {};
 		
 		if($scope.model.value){
 			var macros = $scope.model.value.split('>');
@@ -20,6 +24,7 @@ angular.module('umbraco')
 					parsed.syntax = syntax;
 					collectDetails(parsed);
 					$scope.renderModel.push(parsed);
+					setSortingState($scope.renderModel);
 				}
 			});
 		}
@@ -27,11 +32,12 @@ angular.module('umbraco')
 		
 		function collectDetails(macro){
 			macro.details = "";
+			macro.icon = "icon-settings-alt";
 			if(macro.macroParamsDictionary){
 				angular.forEach((macro.macroParamsDictionary), function(value, key){
 					macro.details += key + ": " + value + " ";	
 				});	
-			}		
+			}
 		}
 
 		function openDialog(index){
@@ -60,6 +66,8 @@ angular.module('umbraco')
 				} else {
 					$scope.renderModel.push(macroObject);
 				}
+
+				setSortingState($scope.renderModel);
 
 				$scope.macroPickerOverlay.show = false;
 				$scope.macroPickerOverlay = null;
@@ -90,6 +98,7 @@ angular.module('umbraco')
 
 		$scope.remove =function(index){
 			$scope.renderModel.splice(index, 1);
+			setSortingState($scope.renderModel);
 		};
 
 	    $scope.clear = function() {
@@ -116,5 +125,14 @@ angular.module('umbraco')
 			var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^'+chr+'+|'+chr+'+$', 'g');
 			return str.replace(rgxtrim, '');
 		}
+
+		function setSortingState(items) {
+			// disable sorting if the list only consist of one item
+			if(items.length > 1) {
+				$scope.sortableOptions.disabled = false;
+			} else {
+				$scope.sortableOptions.disabled = true;
+			}
+    	}
 
 });

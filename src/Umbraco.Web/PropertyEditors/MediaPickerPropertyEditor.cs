@@ -10,32 +10,19 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MediaPickerAlias, "Legacy Media Picker", PropertyEditorValueTypes.Integer, "mediapicker", Group="media", Icon="icon-picture")]
-    public class MediaPickerPropertyEditor : PropertyEditor
+    [Obsolete("This editor is obsolete, use ContentPicker2PropertyEditor instead which stores UDI")]
+    [PropertyEditor(Constants.PropertyEditors.MediaPickerAlias, "(Obsolete) Media Picker", PropertyEditorValueTypes.Integer, "mediapicker", Group="media", Icon="icon-picture", IsDeprecated = true)]
+    public class MediaPickerPropertyEditor : MediaPicker2PropertyEditor
     {
-        public MediaPickerPropertyEditor(ILogger logger) : base(logger)
+        public MediaPickerPropertyEditor(ILogger logger) 
+            : base(logger)
         {
             InternalPreValues = new Dictionary<string, object>
-                {
-                    {"multiPicker", "0"},
-                    {"onlyImages", "0"}
-                };
-        }
-
-        protected IDictionary<string, object> InternalPreValues;
-
-        protected override PropertyValueEditor CreateValueEditor()
-        {
-                //TODO: Need to add some validation to the ValueEditor to ensure that any media chosen actually exists!
-                return base.CreateValueEditor();    
-        }
-
-
-
-        public override IDictionary<string, object> DefaultPreValues
-        {
-            get { return InternalPreValues; }
-            set { InternalPreValues = value; }
+            {
+                {"multiPicker", "0"},
+                {"onlyImages", "0"},
+                {"idType", "int"}
+            };
         }
 
         protected override PreValueEditor CreatePreValueEditor()
@@ -45,8 +32,19 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class SingleMediaPickerPreValueEditor : PreValueEditor
         {
-            [PreValueField("startNodeId", "Start node", "mediapicker")]
-            public int StartNodeId { get; set; }
+            public SingleMediaPickerPreValueEditor()
+            {
+                Fields.Add(new PreValueField()
+                {
+                    Key = "startNodeId",
+                    View = "mediapicker",
+                    Name = "Start node",
+                    Config = new Dictionary<string, object>
+                    {
+                        {"idType", "int"}
+                    }
+                });
+            }
         }
     }
 }

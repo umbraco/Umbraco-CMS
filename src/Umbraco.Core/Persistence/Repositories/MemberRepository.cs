@@ -2,22 +2,16 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Xml.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -30,24 +24,15 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ITagRepository _tagRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
 
-        public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, IContentSection contentSection)
-            : base(work, cache, logger, contentSection)
+        public MemberRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository)
+            : base(work, cache, logger)
         {
-            if (memberTypeRepository == null) throw new ArgumentNullException(nameof(memberTypeRepository));
-            if (tagRepository == null) throw new ArgumentNullException(nameof(tagRepository));
-            _memberTypeRepository = memberTypeRepository;
-            _tagRepository = tagRepository;
+            _memberTypeRepository = memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
+            _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _memberGroupRepository = memberGroupRepository;
         }
 
-        public void SetNoCachePolicy()
-        {
-            // using NoCache here means that we are NOT updating the cache
-            // so this should be OK for reads but NOT for writes!
-            CachePolicy = new NoCacheRepositoryCachePolicy<IMember, int>();
-        }
-
-        protected override MemberRepository Instance => this;
+        protected override MemberRepository This => this;
 
         #region Overrides of RepositoryBase<int, IMembershipUser>
 
@@ -117,14 +102,29 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
+            return GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
+        }
+
+        protected override Sql<SqlContext> GetBaseQuery(QueryType queryType)
+        {
             var sql = Sql();
 
-            sql = isCount
-                ? sql.SelectCount()
-                : sql.Select<MemberDto>(r =>
-                        r.Select<ContentVersionDto>(rr =>
-                            rr.Select<ContentDto>(rrr =>
-                                rrr.Select<NodeDto>())));
+            switch (queryType)
+            {
+                case QueryType.Count:
+                    sql = sql.SelectCount();
+                    break;
+                case QueryType.Ids:
+                    sql = sql.Select("cmsMember.nodeId");
+                    break;
+                case QueryType.Many:
+                case QueryType.Single:
+                    sql = sql.Select<MemberDto>(r =>
+                                r.Select<ContentVersionDto>(rr =>
+                                    rr.Select<ContentDto>(rrr =>
+                                        rrr.Select<NodeDto>())));
+                    break;
+            }
 
             sql
                 .From<MemberDto>()
@@ -141,7 +141,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
             return sql;
-
         }
 
         protected override string GetBaseWhereClause()
@@ -215,7 +214,7 @@ namespace Umbraco.Core.Persistence.Repositories
             nodeDto.Path = parent.Path;
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
-            var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
+            var unused = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
             //Update with new correct path
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
@@ -302,7 +301,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Updates the (base) node data - umbracoNode
             var nodeDto = dto.ContentVersionDto.ContentDto.NodeDto;
-            var o = Database.Update(nodeDto);
+            var unused = Database.Update(nodeDto);
 
             //Only update this DTO if the contentType has actually changed
             if (contentDto.ContentTypeId != ((Member)entity).ContentTypeId)
@@ -411,18 +410,16 @@ namespace Umbraco.Core.Persistence.Repositories
                 return null;
 
             var memberType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
+            var member = MemberFactory.BuildEntity(dto, memberType);
 
-            var factory = new MemberFactory(memberType, NodeObjectTypeId, dto.NodeId);
-            var media = factory.BuildEntity(dto);
+            var properties = GetPropertyCollection(new List<TempContent> { new TempContent(dto.NodeId, dto.ContentVersionDto.VersionId, member.UpdateDate, member.CreateDate, memberType) });
 
-            var properties = GetPropertyCollection(new[] { new DocumentDefinition(dto.NodeId, dto.ContentVersionDto.VersionId, media.UpdateDate, media.CreateDate, memberType) });
-
-            media.Properties = properties[dto.NodeId];
+            member.Properties = properties[dto.ContentVersionDto.VersionId];
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)media).ResetDirtyProperties(false);
-            return media;
+            ((Entity)member).ResetDirtyProperties(false);
+            return member;
 
         }
 
@@ -553,15 +550,17 @@ namespace Umbraco.Core.Persistence.Repositories
         /// The query supplied will ONLY work with data specifically on the cmsMember table because we are using NPoco paging (SQL paging)
         /// </remarks>
         public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMember> filter = null, bool newest = true)
         {
-            var filterSql = filter.IsNullOrWhiteSpace()
-                ? null
-                : Sql().Append(GetPagedResultsByQueryWhere(), $"%{filter}%");
-
-            // note: need to test whether NPoco gets confused by the same parameter being used twice,
-            // as PetaPoco supposedly was, in which case we'd need to use two parameters. in any case,
-            // better to create the query text only once!
+            Sql<SqlContext> filterSql = null;
+            if (filter != null)
+            {
+                filterSql = Sql();
+                foreach (var clause in filter.GetWhereClauses())
+                {
+                    filterSql = filterSql.Append($"AND ({clause.Item1})", clause.Item2);
+                }
+            }
 
             return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
                 x => MapQueryDtos(x), orderBy, orderDirection, orderBySystemField, "cmsMember",
@@ -601,17 +600,18 @@ namespace Umbraco.Core.Persistence.Repositories
         private IEnumerable<IMember> MapQueryDtos(List<MemberDto> dtos, bool withCache = false)
         {
             var content = new IMember[dtos.Count];
-            var defs = new List<DocumentDefinition>();
+            var temps = new List<TempContent>();
+            var contentTypes = new Dictionary<int, IMemberType>();
 
             for (var i = 0; i < dtos.Count; i++)
             {
                 var dto = dtos[i];
 
-                // if the cache contains the item, use it
                 if (withCache)
                 {
-                    var cached = RuntimeCache.GetCacheItem<IMember>(GetCacheIdKey<IMember>(dto.NodeId));
-                    if (cached != null)
+                    // if the cache contains the (proper version of the) item, use it
+                    var cached = IsolatedCache.GetCacheItem<IMember>(GetCacheIdKey<IMember>(dto.NodeId));
+                    if (cached != null && cached.Version == dto.ContentVersionDto.VersionId)
                     {
                         content[i] = cached;
                         continue;
@@ -619,38 +619,46 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
 
                 // else, need to fetch from the database
-                // content type repository is full-cache so OK to get each one independently
-                var contentType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
-                var factory = new MemberFactory(contentType, NodeObjectTypeId, dto.NodeId);
-                content[i] = factory.BuildEntity(dto);
+
+                // get the content type - the repository is full cache *but* still deep-clones
+                // whatever comes out of it, so use our own local index here to avoid this
+                if (contentTypes.TryGetValue(dto.ContentVersionDto.ContentDto.ContentTypeId, out IMemberType contentType) == false)
+                    contentTypes[dto.ContentVersionDto.ContentDto.ContentTypeId] = contentType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
+
+                // fixme
+                //
+                // 7.6 ProcessQuery has an additional 'allVersions' flag that is false by default, meaning
+                // we should always get the latest version of each content item. meaning what what we
+                // are processing now is a more recent version than what we already processed, we need to
+                // replace
+                // but it has flaws: it's not dealing with what could be in the cache (should be the latest
+                // version, always) and it's not replacing the content that is already in the list...
+                // so considering it broken, not implementing now, MUST FIX
+
+                var c = content[i] = MemberFactory.BuildEntity(dto, contentType);
 
                 // need properties
-                defs.Add(new DocumentDefinition(
+                temps.Add(new TempContent(
                     dto.NodeId,
                     dto.ContentVersionDto.VersionId,
                     dto.ContentVersionDto.VersionDate,
                     dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
-                    contentType
+                    contentType,
+                    c
                 ));
             }
 
             // load all properties for all documents from database in 1 query
-            var propertyData = GetPropertyCollection(defs.ToArray());
+            var propertyData = GetPropertyCollection(temps);
 
             // assign
-            var dtoIndex = 0;
-            foreach (var def in defs)
+            foreach (var temp in temps)
             {
-                // move to corresponding item (which has to exist)
-                while (dtos[dtoIndex].NodeId != def.Id) dtoIndex++;
-
-                // complete the item
-                var cc = content[dtoIndex];
-                cc.Properties = propertyData[cc.Id];
+                temp.Content.Properties = propertyData[temp.Version];
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
-                ((Entity)cc).ResetDirtyProperties(false);
+                ((Entity) temp.Content).ResetDirtyProperties(false);
             }
 
             return content;
@@ -665,15 +673,11 @@ namespace Umbraco.Core.Persistence.Repositories
         private IMember CreateMemberFromDto(MemberDto dto, Guid versionId)
         {
             var memberType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
+            var member = MemberFactory.BuildEntity(dto, memberType);
+            var temp = new TempContent(dto.ContentVersionDto.NodeId, versionId, member.UpdateDate, member.CreateDate, memberType);
 
-            var factory = new MemberFactory(memberType, NodeObjectTypeId, dto.ContentVersionDto.NodeId);
-            var member = factory.BuildEntity(dto);
-
-            var docDef = new DocumentDefinition(dto.ContentVersionDto.NodeId, versionId, member.UpdateDate, member.CreateDate, memberType);
-
-            var properties = GetPropertyCollection(new[] { docDef });
-
-            member.Properties = properties[dto.ContentVersionDto.NodeId];
+            var properties = GetPropertyCollection(new List<TempContent> { temp });
+            member.Properties = properties[dto.ContentVersionDto.VersionId];
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946

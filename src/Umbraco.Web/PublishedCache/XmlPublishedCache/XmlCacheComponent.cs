@@ -5,6 +5,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Scoping;
 using Umbraco.Web.HealthCheck.Checks.DataIntegrity;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
@@ -19,7 +20,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // register the XML facade service
             composition.SetFacadeService(factory => new FacadeService(
                 factory.GetInstance<ServiceContext>(),
-                factory.GetInstance<IDatabaseUnitOfWorkProvider>(),
+                factory.GetInstance<IScopeProviderInternal>(),
+                factory.GetInstance<IScopeUnitOfWorkProvider>(),
                 factory.GetInstance<CacheHelper>().RequestCache,
                 factory.GetInstance<UrlSegmentProviderCollection>(),
                 factory.GetInstance<IFacadeAccessor>(),

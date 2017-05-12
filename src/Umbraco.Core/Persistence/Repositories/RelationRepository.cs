@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IRelationTypeRepository _relationTypeRepository;
 
-        public RelationRepository(IDatabaseUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger, IRelationTypeRepository relationTypeRepository)
+        public RelationRepository(IScopeUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger, IRelationTypeRepository relationTypeRepository)
             : base(work, cache, logger)
         {
             _relationTypeRepository = relationTypeRepository;
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (relationTypeId != x.RelationType)
                     factory = new RelationFactory(_relationTypeRepository.Get(relationTypeId = x.RelationType));
                 return DtoToEntity(x, factory);
-            });
+            }).ToList();
         }
 
         private static IRelation DtoToEntity(RelationDto dto, RelationFactory factory)

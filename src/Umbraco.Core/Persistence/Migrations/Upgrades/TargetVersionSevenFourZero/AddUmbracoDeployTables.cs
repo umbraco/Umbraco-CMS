@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZero
 {
-    [Migration("7.4.0", 5, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.4.0", 5, Constants.System.UmbracoMigrationName)]
     public class AddUmbracoDeployTables : MigrationBase
     {
         public AddUmbracoDeployTables(IMigrationContext context)

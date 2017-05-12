@@ -3,8 +3,12 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Threading;
 using log4net;
 using log4net.Config;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Diagnostics;
 using log4net.Util;
 
 namespace Umbraco.Core.Logging
@@ -45,15 +49,70 @@ namespace Umbraco.Core.Logging
 		public void Error(Type reporting, string message, Exception exception = null)
 		{
 			var logger = LogManager.GetLogger(reporting);
-		    logger?.Error(message, exception);
+		    if (logger == null) return;
+
+		    var dump = false;
+
+		    if (IsTimeoutThreadAbortException(exception))
+		    {
+		        message += "\r\nThe thread has been aborted, because the request has timed out.";
+
+                // dump if configured, or if stacktrace contains Monitor.ReliableEnter
+		        dump = UmbracoConfig.For.CoreDebug().DumpOnTimeoutThreadAbort || IsMonitorEnterThreadAbortException(exception);
+
+                // dump if it is ok to dump (might have a cap on number of dump...)
+		        dump &= MiniDump.OkToDump();
+		    }
+
+            if (dump)
+		    {
+                try
+                {
+                    var dumped = MiniDump.Dump(withException: true);
+                    message += dumped
+                        ? "\r\nA minidump was created in App_Data/MiniDump"
+                        : "\r\nFailed to create a minidump";
+                }
+                catch (Exception e)
+                {
+                    message += string.Format("\r\nFailed to create a minidump ({0}: {1})", e.GetType().FullName, e.Message);
+                }
+            }
+
+            logger.Error(message, exception);
 		}
 
+        private static bool IsMonitorEnterThreadAbortException(Exception exception)
+        {
+            var abort = exception as ThreadAbortException;
+            if (abort == null) return false;
+
+            var stacktrace = abort.StackTrace;
+            return stacktrace.Contains("System.Threading.Monitor.ReliableEnter");
+        }
+
+        private static bool IsTimeoutThreadAbortException(Exception exception)
+        {
+            var abort = exception as ThreadAbortException;
+            if (abort == null) return false;
+
+            if (abort.ExceptionState == null) return false;
+
+            var stateType = abort.ExceptionState.GetType();
+            if (stateType.FullName != "System.Web.HttpApplication+CancelModuleException") return false;
+
+            var timeoutField = stateType.GetField("_timeout", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (timeoutField == null) return false;
+
+            return (bool) timeoutField.GetValue(abort.ExceptionState);
+        }
+
         /// <inheritdoc/>
-        public void Warn(Type reporting, string message)
+        public void Warn(Type reporting, string format)
         {
             var logger = LogManager.GetLogger(reporting);
             if (logger == null || logger.IsWarnEnabled == false) return;
-            logger.Warn(message);
+            logger.Warn(format);
         }
 
         /// <inheritdoc/>

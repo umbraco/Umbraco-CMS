@@ -9,6 +9,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Plugins;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
@@ -147,8 +148,11 @@ namespace Umbraco.Core.DI
         public static ServiceContext Services
             => Container.GetInstance<ServiceContext>();
 
-        public static IUmbracoDatabaseFactory DatabaseFactory
-            => Container.GetInstance<IUmbracoDatabaseFactory>();
+        public static IScopeProvider ScopeProvider
+            => Container.GetInstance<IScopeProvider>();
+
+        public static IDatabaseContext DatabaseContext
+            => Container.GetInstance<IDatabaseContext>();
 
         #endregion
     }

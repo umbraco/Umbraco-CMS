@@ -10,13 +10,13 @@ namespace Umbraco.Core.Services
 {
     internal class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMediaType, IMediaTypeService>, IMediaTypeService
     {
-        public MediaTypeService(IDatabaseUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMediaService mediaService)
+        public MediaTypeService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMediaService mediaService)
             : base(provider, logger, eventMessagesFactory)
         {
             MediaService = mediaService;
         }
 
-        protected override IMediaTypeService Instance => this;
+        protected override IMediaTypeService This => this;
 
         // beware! order is important to avoid deadlocks
         protected override int[] ReadLockIds { get; } = { Constants.Locks.MediaTypes };
