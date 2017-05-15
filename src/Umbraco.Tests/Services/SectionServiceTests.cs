@@ -60,7 +60,8 @@ namespace Umbraco.Tests.Services
             };
             userGroupA.AddAllowedSection("media");
             userGroupA.AddAllowedSection("settings");
-            ServiceContext.UserService.SaveUserGroup(userGroupA, true, new[] { user.Id }, false);
+            //TODO: This is failing the test
+            ServiceContext.UserService.Save(userGroupA, new[] { user.Id }, false);
 
             var userGroupB = new UserGroup
             {
@@ -69,7 +70,7 @@ namespace Umbraco.Tests.Services
             };
             userGroupB.AddAllowedSection("settings");
             userGroupB.AddAllowedSection("developer");
-            ServiceContext.UserService.SaveUserGroup(userGroupB, true, new[] { user.Id }, false);
+            ServiceContext.UserService.Save(userGroupB, new[] { user.Id }, false);
 
             return ServiceContext.UserService.GetUserById(user.Id);
         }

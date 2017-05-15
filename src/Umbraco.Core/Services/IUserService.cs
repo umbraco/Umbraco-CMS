@@ -189,17 +189,19 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="id">Id of the UserGroup to retrieve</param>
         /// <returns><see cref="IUserGroup"/></returns>
-        IUserGroup GetUserGroupById(int id);        
+        IUserGroup GetUserGroupById(int id);
 
         /// <summary>
         /// Saves a UserGroup
         /// </summary>
         /// <param name="userGroup">UserGroup to save</param>
-        /// <param name="updateUsers">Flag for whether to update the list of users in the group</param>
-        /// <param name="userIds">List of user Ids</param>
+        /// <param name="userIds">
+        /// If null than no changes are made to the users who are assigned to this group, however if a value is passed in 
+        /// than all users will be removed from this group and only these users will be added
+        /// </param>
         /// <param name="raiseEvents">Optional parameter to raise events. 
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        void SaveUserGroup(IUserGroup userGroup, bool updateUsers = false, int[] userIds = null, bool raiseEvents = true);
+        void Save(IUserGroup userGroup, int[] userIds = null, bool raiseEvents = true);
 
         /// <summary>
         /// Deletes a UserGroup

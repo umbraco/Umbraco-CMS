@@ -19,17 +19,11 @@ namespace Umbraco.Core.Persistence.Repositories
         IEnumerable<IUserGroup> GetGroupsAssignedToSection(string sectionAlias);
 
         /// <summary>
-        /// Removes all users from a group
+        /// Used to add or update a user group and assign users to it
         /// </summary>
-        /// <param name="groupId">Id of group</param>
-        void RemoveAllUsersFromGroup(int groupId);
-
-        /// <summary>
-        /// Adds a set of users to a group
-        /// </summary>
-        /// <param name="groupId">Id of group</param>
-        /// <param name="userIds">Ids of users</param>
-        void AddUsersToGroup(int groupId, int[] userIds);
+        /// <param name="userGroup"></param>
+        /// <param name="userIds"></param>
+        void AddOrUpdateGroupWithUsers(IUserGroup userGroup, int[] userIds);
 
         /// <summary>
         /// Gets the group permissions for the specified entities

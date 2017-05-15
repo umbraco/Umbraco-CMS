@@ -339,16 +339,15 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private static User CreateAndCommitUserWithGroup(IUserRepository repository, IUserGroupRepository userGroupRepository, IDatabaseUnitOfWork unitOfWork)
         {
-            var group = MockedUserGroup.CreateUserGroup();
-            userGroupRepository.AddOrUpdate(@group);
-            unitOfWork.Commit();
-
+            
             var user = MockedUser.CreateUser();
             repository.AddOrUpdate(user);
             unitOfWork.Commit();
 
-            userGroupRepository.AddUsersToGroup(@group.Id, new[] { user.Id });
+            var group = MockedUserGroup.CreateUserGroup();
+            userGroupRepository.AddOrUpdateGroupWithUsers(@group, new[] {user.Id});
             unitOfWork.Commit();
+
             return user;
         }
 

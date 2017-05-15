@@ -24,12 +24,12 @@ function openUserGroups(id) {
 
         public override void Render(ref XmlTree tree)
         {
-            List<UserGroup> userGroups = UserGroup.GetAllUserGroups();
-            foreach (UserGroup userGroup in userGroups)
+            var userGroups = ApplicationContext.Current.Services.UserService.GetAllUserGroups();
+            foreach (var userGroup in userGroups)
             {
                 XmlTreeNode node = XmlTreeNode.Create(this);
                 node.NodeID = userGroup.Id.ToString();
-                node.Action = string.Format("javascript:openUserGroups({0})", userGroup.Id.ToString());
+                node.Action = string.Format("javascript:openUserGroups({0})", userGroup.Id);
                 node.Icon = "icon-users";
                 node.Text = userGroup.Name;
 

@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Web.UI.WebControls;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;
 using umbraco.interfaces;
 using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.presentation.user
 {
@@ -65,7 +68,7 @@ namespace umbraco.cms.presentation.user
                     actions += li.Value;
             }
 
-            userGroup.DefaultPermissions = actions;
+            userGroup.Permissions = actions.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture)); ;
 
             var userIds = new List<int>();
             foreach (ListItem li in lstUsersInGroup.Items)
@@ -73,13 +76,13 @@ namespace umbraco.cms.presentation.user
                 userIds.Add(int.Parse(li.Value));
             }
 
-            userGroup.ClearApplications();
+            userGroup.ClearAllowedSections();
             foreach (ListItem li in cbl_sections.Items)
             {
-                if (li.Selected) userGroup.AddApplication(li.Value);
+                if (li.Selected) userGroup.AddAllowedSection(li.Value);
             }
 
-            userGroup.SaveWithUsers(userIds.ToArray());
+            Services.UserService.Save(userGroup, userIds.ToArray());
 
             ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editUserGroupSaved", base.getUser()), "");
         }
@@ -89,22 +92,22 @@ namespace umbraco.cms.presentation.user
             get
             {
                 if (m_userGroupActions == null)
-                    m_userGroupActions = umbraco.BusinessLogic.Actions.Action.FromString(CurrentUserGroup.DefaultPermissions);
+                    m_userGroupActions = umbraco.BusinessLogic.Actions.Action.FromString(string.Join("", CurrentUserGroup.Permissions));
                 return m_userGroupActions;
             }
         }
 
-        protected UserGroup CurrentUserGroup
+        protected IUserGroup CurrentUserGroup
         {
             get
             {
                 if (m_userGroup == null)
-                    m_userGroup = UserGroup.GetUserGroup(m_userGroupID);
+                    m_userGroup = ApplicationContext.Current.Services.UserService.GetUserGroupById(m_userGroupID);
                 return m_userGroup;
             }
         }
 
-        private UserGroup m_userGroup;
+        private IUserGroup m_userGroup;
         private List<IAction> m_userGroupActions;
         private int m_userGroupID;
 
@@ -135,13 +138,17 @@ namespace umbraco.cms.presentation.user
             foreach (Application a in CurrentUser.Applications)
                 currentUserApps += a.alias + ";";
 
-            Application[] gapps = CurrentUserGroup.Applications;
+            var gapps = CurrentUserGroup.AllowedSections;
             foreach (Application app in BusinessLogic.Application.getAll())
             {
                 if (CurrentUser.IsAdmin() || currentUserApps.Contains(";" + app.alias + ";"))
                 {
                     ListItem li = new ListItem(ui.Text("sections", app.alias), app.alias);
-                    foreach (Application tmp in gapps) if (app.alias == tmp.alias) li.Selected = true;
+                    foreach (var tmp in gapps)
+                    {
+                        if (app.alias == tmp)
+                            li.Selected = true;
+                    }
                     cbl_sections.Items.Add(li);
                 }
             }

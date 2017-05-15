@@ -4,6 +4,7 @@ using System.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
@@ -20,11 +21,13 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class UserGroupRepository : PetaPocoRepositoryBase<int, IUserGroup>, IUserGroupRepository
     {
         private readonly CacheHelper _cacheHelper;
+        private readonly UserGroupWithUsersRepository _userGroupWithUsersRepository;
 
         public UserGroupRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cacheHelper, logger, sqlSyntax)
         {
             _cacheHelper = cacheHelper;
+            _userGroupWithUsersRepository = new UserGroupWithUsersRepository(this, work, cacheHelper, logger, sqlSyntax);
         }
 
         public const string GetByAliasCacheKeyPrefix = "UserGroupRepository_GetByAlias_";
@@ -80,32 +83,11 @@ namespace Umbraco.Core.Persistence.Repositories
             return ConvertFromDtos(Database.Fetch<UserGroupDto, UserGroup2AppDto, UserGroupDto>(new UserGroupSectionRelator().Map, sql));
         }
 
-        /// <summary>
-        /// Removes all users from a group
-        /// </summary>
-        /// <param name="groupId">Id of group</param>
-        public void RemoveAllUsersFromGroup(int groupId)
+        public void AddOrUpdateGroupWithUsers(IUserGroup userGroup, int[] userIds)
         {
-            Database.Delete<User2UserGroupDto>("WHERE userGroupId = @GroupId", new { GroupId = groupId });
+            _userGroupWithUsersRepository.AddOrUpdate(new UserGroupWithUsers(userGroup, userIds));
         }
 
-        /// <summary>
-        /// Adds a set of users to a group
-        /// </summary>
-        /// <param name="groupId">Id of group</param>
-        /// <param name="userIds">Ids of users</param>
-        public void AddUsersToGroup(int groupId, int[] userIds)
-        {
-            foreach (var userId in userIds)
-            {
-                var dto = new User2UserGroupDto
-                {
-                    UserGroupId = groupId,
-                    UserId = userId,
-                };
-                Database.Insert(dto);
-            }
-        }
         
         /// <summary>
         /// Gets the group permissions for the specified entities
@@ -286,6 +268,120 @@ namespace Umbraco.Core.Persistence.Repositories
         private static IEnumerable<IUserGroup> ConvertFromDtos(IEnumerable<UserGroupDto> dtos)
         {
             return dtos.Select(UserGroupFactory.BuildEntity);
+        }
+
+        /// <summary>
+        /// used to persist a user group with associated users at once
+        /// </summary>
+        private class UserGroupWithUsers : Entity, IAggregateRoot
+        {
+            public UserGroupWithUsers(IUserGroup userGroup, int[] userIds)
+            {
+                UserGroup = userGroup;
+                UserIds = userIds;
+            }
+
+            public IUserGroup UserGroup { get; private set; }
+            public int[] UserIds { get; private set; }
+            
+        }
+
+        /// <summary>
+        /// used to persist a user group with associated users at once
+        /// </summary>
+        private class UserGroupWithUsersRepository : PetaPocoRepositoryBase<int, UserGroupWithUsers>
+        {
+            private readonly UserGroupRepository _userGroupRepo;
+
+            public UserGroupWithUsersRepository(UserGroupRepository userGroupRepo, IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax) 
+                : base(work, cache, logger, sqlSyntax)
+            {
+                _userGroupRepo = userGroupRepo;
+            }
+
+            #region Not implemented (don't need to for the purposes of this repo)
+            protected override UserGroupWithUsers PerformGet(int id)
+            {
+                throw new NotImplementedException();
+            }
+            protected override IEnumerable<UserGroupWithUsers> PerformGetAll(params int[] ids)
+            {
+                throw new NotImplementedException();
+            }
+            protected override IEnumerable<UserGroupWithUsers> PerformGetByQuery(IQuery<UserGroupWithUsers> query)
+            {
+                throw new NotImplementedException();
+            }
+            protected override Sql GetBaseQuery(bool isCount)
+            {
+                throw new NotImplementedException();
+            }
+            protected override string GetBaseWhereClause()
+            {
+                throw new NotImplementedException();
+            }
+            protected override IEnumerable<string> GetDeleteClauses()
+            {
+                throw new NotImplementedException();
+            }
+            protected override Guid NodeObjectTypeId
+            {
+                get { throw new NotImplementedException(); }
+            } 
+            #endregion
+
+            protected override void PersistNewItem(UserGroupWithUsers entity)
+            {
+                //save the user group
+                _userGroupRepo.PersistNewItem(entity.UserGroup);
+                if (entity.UserIds != null)
+                {
+                    //now the user association
+                    RemoveAllUsersFromGroup(entity.UserGroup.Id);
+                    AddUsersToGroup(entity.UserGroup.Id, entity.UserIds);
+                }
+                
+            }
+
+            protected override void PersistUpdatedItem(UserGroupWithUsers entity)
+            {
+                //save the user group
+                _userGroupRepo.PersistUpdatedItem(entity.UserGroup);
+                if (entity.UserIds != null)
+                {
+                    //now the user association
+                    RemoveAllUsersFromGroup(entity.UserGroup.Id);
+                    AddUsersToGroup(entity.UserGroup.Id, entity.UserIds);
+                }
+            }
+
+            /// <summary>
+            /// Removes all users from a group
+            /// </summary>
+            /// <param name="groupId">Id of group</param>
+            private void RemoveAllUsersFromGroup(int groupId)
+            {
+                Database.Delete<User2UserGroupDto>("WHERE userGroupId = @GroupId", new { GroupId = groupId });
+            }
+
+            /// <summary>
+            /// Adds a set of users to a group
+            /// </summary>
+            /// <param name="groupId">Id of group</param>
+            /// <param name="userIds">Ids of users</param>
+            private void AddUsersToGroup(int groupId, int[] userIds)
+            {
+                //TODO: Check if the user exists?
+                foreach (var userId in userIds)
+                {
+                    var dto = new User2UserGroupDto
+                    {
+                        UserGroupId = groupId,
+                        UserId = userId,
+                    };
+                    Database.Insert(dto);
+                }
+            }
         }
     }
 }

@@ -242,7 +242,6 @@
     <Compile Include="User.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="UserGroup.cs" />
     <Compile Include="Utils\EncodedStringWriter.cs">
       <SubType>Code</SubType>
     </Compile>

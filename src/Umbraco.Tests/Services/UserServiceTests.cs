@@ -415,7 +415,7 @@ namespace Umbraco.Tests.Services
             };
             userGroup.AddAllowedSection("content");
             userGroup.AddAllowedSection("mediat");
-            ServiceContext.UserService.SaveUserGroup(userGroup);
+            ServiceContext.UserService.Save(userGroup);
 
             var result1 = ServiceContext.UserService.GetUserGroupById(userGroup.Id);
 
@@ -426,7 +426,7 @@ namespace Umbraco.Tests.Services
             userGroup.AddAllowedSection("test2");
             userGroup.AddAllowedSection("test3");
             userGroup.AddAllowedSection("test4");
-            ServiceContext.UserService.SaveUserGroup(userGroup);
+            ServiceContext.UserService.Save(userGroup);
 
             result1 = ServiceContext.UserService.GetUserGroupById(userGroup.Id);
 
@@ -441,7 +441,7 @@ namespace Umbraco.Tests.Services
             //now just re-add a couple
             result1.AddAllowedSection("test3");
             result1.AddAllowedSection("test4");
-            ServiceContext.UserService.SaveUserGroup(result1);
+            ServiceContext.UserService.Save(result1);
 
             //assert
             //re-get
@@ -464,14 +464,14 @@ namespace Umbraco.Tests.Services
                 Alias = "Group2",
                 Name = "Group 2"
             };
-            ServiceContext.UserService.SaveUserGroup(userGroup1);
-            ServiceContext.UserService.SaveUserGroup(userGroup2);
+            ServiceContext.UserService.Save(userGroup1);
+            ServiceContext.UserService.Save(userGroup2);
 
             //adds some allowed sections
             userGroup1.AddAllowedSection("test");
             userGroup2.AddAllowedSection("test");
-            ServiceContext.UserService.SaveUserGroup(userGroup1);
-            ServiceContext.UserService.SaveUserGroup(userGroup2);
+            ServiceContext.UserService.Save(userGroup1);
+            ServiceContext.UserService.Save(userGroup2);
 
             //now clear the section from all users
             ServiceContext.UserService.DeleteSectionFromAllUserGroups("test");
@@ -504,9 +504,9 @@ namespace Umbraco.Tests.Services
                 Alias = "Group3",
                 Name = "Group 3"
             };
-            ServiceContext.UserService.SaveUserGroup(userGroup1);
-            ServiceContext.UserService.SaveUserGroup(userGroup2);
-            ServiceContext.UserService.SaveUserGroup(userGroup3);
+            ServiceContext.UserService.Save(userGroup1);
+            ServiceContext.UserService.Save(userGroup2);
+            ServiceContext.UserService.Save(userGroup3);
 
             //now add the section to specific groups
             ServiceContext.UserService.AddSectionToAllUserGroups("test", userGroup1.Id, userGroup2.Id);
@@ -641,7 +641,7 @@ namespace Umbraco.Tests.Services
                 Name = "Test Group",
                 Permissions = "ABCDEFGHIJ1234567".ToCharArray().Select(x => x.ToString())
             };
-            ServiceContext.UserService.SaveUserGroup(userGroup);
+            ServiceContext.UserService.Save(userGroup);
             ServiceContext.UserService.AddSectionToAllUserGroups("content", 1);
             ServiceContext.UserService.AddSectionToAllUserGroups("media", 1);
             return userGroup;
