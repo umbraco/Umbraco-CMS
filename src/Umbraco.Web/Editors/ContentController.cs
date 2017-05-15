@@ -295,7 +295,8 @@ namespace Umbraco.Web.Editors
 
             //initialize this to successful
             var publishStatus = Attempt<PublishStatus>.Succeed();
-            var wasCancelled = false;
+            var wasCancelled = false;   //tracks if the operation was cancelled
+            var noop = false;           //tracks if the operation performed no operation (nothing to save)
 
             if (contentItem.Action == ContentSaveAction.Save || contentItem.Action == ContentSaveAction.SaveNew)
             {
@@ -303,6 +304,8 @@ namespace Umbraco.Web.Editors
                 var saveResult = Services.ContentService.WithResult().Save(contentItem.PersistedContent, Security.CurrentUser.Id);
 
                 wasCancelled = saveResult.Success == false && saveResult.Result.StatusType == OperationStatusType.FailedCancelledByEvent;
+
+                noop = saveResult.Result.StatusType == OperationStatusType.NoOperation;
             }
             else if (contentItem.Action == ContentSaveAction.SendPublish || contentItem.Action == ContentSaveAction.SendPublishNew)
             {
@@ -313,7 +316,7 @@ namespace Umbraco.Web.Editors
             {
                 //publish the item and check if it worked, if not we will show a diff msg below
                 publishStatus = Services.ContentService.SaveAndPublishWithStatus(contentItem.PersistedContent, Security.CurrentUser.Id);
-                wasCancelled = publishStatus.Result.StatusType == PublishStatusType.FailedCancelledByEvent;
+                wasCancelled = publishStatus.Result.StatusType == PublishStatusType.FailedCancelledByEvent;                
             }
 
             //return the updated model
@@ -327,28 +330,28 @@ namespace Umbraco.Web.Editors
             {
                 case ContentSaveAction.Save:
                 case ContentSaveAction.SaveNew:
-                    if (wasCancelled == false)
-                    {
-                        display.AddSuccessNotification(
-                                Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
-                                Services.TextService.Localize("speechBubbles/editContentSavedText"));
-                    }
-                    else
+                    if (wasCancelled)
                     {
                         AddCancelMessage(display);
+                    }
+                    else if (noop == false)
+                    {
+                        display.AddSuccessNotification(
+                            Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
+                            Services.TextService.Localize("speechBubbles/editContentSavedText"));
                     }
                     break;
                 case ContentSaveAction.SendPublish:
                 case ContentSaveAction.SendPublishNew:
-                    if (wasCancelled == false)
-                    {
-                        display.AddSuccessNotification(
-                                Services.TextService.Localize("speechBubbles/editContentSendToPublish"),
-                                Services.TextService.Localize("speechBubbles/editContentSendToPublishText"));
-                    }
-                    else
+                    if (wasCancelled)
                     {
                         AddCancelMessage(display);
+                    }                        
+                    else if (noop == false)
+                    {
+                        display.AddSuccessNotification(
+                            Services.TextService.Localize("speechBubbles/editContentSendToPublish"),
+                            Services.TextService.Localize("speechBubbles/editContentSendToPublishText"));
                     }
                     break;
                 case ContentSaveAction.Publish:

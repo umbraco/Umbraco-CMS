@@ -2225,6 +2225,8 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
+                var currVersion = content.Version;
+
                 var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
@@ -2250,8 +2252,10 @@ namespace Umbraco.Core.Services
                     Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false, evtMsgs), this);
 
                 Audit(AuditType.Save, "Save Content performed by user", userId, content.Id);
-
-                return OperationStatus.Success(evtMsgs);
+                
+                return currVersion == content.Version
+                    ? OperationStatus.NoOperation(evtMsgs)
+                    : OperationStatus.Success(evtMsgs);
             }
         }
 
