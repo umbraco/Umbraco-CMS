@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -24,11 +23,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
-            {
-                return PropertyTypeAliases.Contains(propertyType.PropertyEditorAlias);
-            }
-            return false
+            return PropertyTypeAliases.Contains(propertyType.PropertyEditorAlias);
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)

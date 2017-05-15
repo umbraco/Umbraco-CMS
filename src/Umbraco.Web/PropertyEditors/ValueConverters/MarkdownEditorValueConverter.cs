@@ -2,7 +2,6 @@
 using System;
 using System.Web;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Templates;
@@ -16,11 +15,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
-            {
-                return Constants.PropertyEditors.MarkdownEditorAlias.Equals(propertyType.PropertyEditorAlias);
-            }
-            return false;
+            return Constants.PropertyEditors.MarkdownEditorAlias.Equals(propertyType.PropertyEditorAlias);
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)

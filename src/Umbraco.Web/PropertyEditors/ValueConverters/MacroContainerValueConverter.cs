@@ -2,7 +2,6 @@ using System;
 using System.Text;
 using System.Web;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -20,11 +19,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
-            {
-                return propertyType.PropertyEditorAlias == Constants.PropertyEditors.MacroContainerAlias;
-            }
-            return false;
+            return propertyType.PropertyEditorAlias == Constants.PropertyEditors.MacroContainerAlias;
         }
 
         // NOT thread-safe over a request because it modifies the
