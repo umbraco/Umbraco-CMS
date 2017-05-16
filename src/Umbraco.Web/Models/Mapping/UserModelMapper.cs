@@ -18,13 +18,28 @@ namespace Umbraco.Web.Models.Mapping
         {
             config.CreateMap<IUser, UserDisplay>()
                 .ForMember(detail => detail.Id, opt => opt.MapFrom(user => user.Id))
-                //.ForMember(detail => detail.UserType, opt => opt.MapFrom(user => user.UserType.Alias))
+                .ForMember(detail => detail.UserGroups, opt => opt.MapFrom(user => user.Groups))
                 .ForMember(detail => detail.StartContentId, opt => opt.MapFrom(user => user.StartContentId))
                 .ForMember(detail => detail.StartMediaId, opt => opt.MapFrom(user => user.StartMediaId))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
                 .ForMember(
-                    detail => detail.AvailableUserTypes,
-                    opt => opt.MapFrom(user => applicationContext.Services.SectionService.GetSections().ToDictionary(x => x.Alias, x => x.Name)));
+                    detail => detail.AvailableUserGroups,
+                    opt => opt.MapFrom(user => applicationContext.Services.UserService.GetAllUserGroups().ToDictionary(x => x.Alias, x => x.Name)))
+                .ForMember(
+                    detail => detail.AvailableSections,
+                    opt => opt.MapFrom(user => applicationContext.Services.SectionService.GetSections().ToDictionary(x => x.Alias, x => x.Name)))
+                .ForMember(
+                    detail => detail.AvailableCultures,
+                    opt => opt.MapFrom(user => applicationContext.Services.TextService.GetSupportedCultures().ToDictionary(x => x.Name, x => x.DisplayName)))
+                .ForMember(detail => detail.ParentId, opt => opt.UseValue(-1))
+                .ForMember(detail => detail.Path, opt => opt.MapFrom(user => "-1," + user.Id))
+                .ForMember(detail => detail.Notifications, opt => opt.Ignore())
+                .ForMember(detail => detail.Udi, opt => opt.Ignore())
+                .ForMember(detail => detail.Icon, opt => opt.Ignore())
+                .ForMember(detail => detail.Trashed, opt => opt.Ignore())                
+                .ForMember(detail => detail.Alias, opt => opt.Ignore())                
+                .ForMember(detail => detail.Trashed, opt => opt.Ignore())
+                .ForMember(detail => detail.AdditionalData, opt => opt.Ignore());
 
             config.CreateMap<IUser, UserDetail>()
                 .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))

@@ -77,7 +77,7 @@ namespace Umbraco.Web.Editors
                     Id = startId,
                     //UserType = "writer",
                     AllowedSections = new[] {"content", "media"},
-                    AvailableUserTypes = userTypes,
+                    AvailableUserGroups = userTypes,
                     Email = "test" + startId + "@test.com",
                     Name = "User " + startId,
                     Culture = "en-US",
