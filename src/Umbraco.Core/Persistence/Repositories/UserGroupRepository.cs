@@ -281,6 +281,15 @@ namespace Umbraco.Core.Persistence.Repositories
                 UserIds = userIds;
             }
 
+            public override bool HasIdentity
+            {
+                get { return UserGroup.HasIdentity; }
+                protected set
+                {
+                    throw new NotSupportedException();
+                }
+            }
+
             public IUserGroup UserGroup { get; private set; }
             public int[] UserIds { get; private set; }
             

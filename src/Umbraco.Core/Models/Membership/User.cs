@@ -31,6 +31,7 @@ namespace Umbraco.Core.Models.Membership
             _startMediaId = -1;
             //cannot be null
             _rawPasswordValue = "";
+            _allowedSections = new List<string>();
         }
 
         /// <summary>
