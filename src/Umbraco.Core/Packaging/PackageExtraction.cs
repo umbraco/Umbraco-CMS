@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
-using ICSharpCode.SharpZipLib.Zip;
 
 namespace Umbraco.Core.Packaging
 {
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Packaging
             bool fileFound = false;
             string foundDir = null;
 
-            ReadZipfileEntries(packageFilePath, (entry, stream) =>
+            ReadZipfileEntries(packageFilePath, (entry) =>
             {
                 string fileName = Path.GetFileName(entry.Name);
 
@@ -24,7 +24,7 @@ namespace Umbraco.Core.Packaging
 
                     foundDir = entry.Name.Substring(0, entry.Name.Length - fileName.Length);
                     fileFound = true;
-                    using (var reader = new StreamReader(stream))
+                    using (var reader = new StreamReader(entry.Open()))
                     {
                         retVal = reader.ReadToEnd();
                         return false;
@@ -42,31 +42,6 @@ namespace Umbraco.Core.Packaging
             return retVal;
         }
 
-        private static void CheckPackageExists(string packageFilePath)
-        {
-            if (string.IsNullOrEmpty(packageFilePath))
-            {
-                throw new ArgumentNullException("packageFilePath");
-            }
-
-            if (File.Exists(packageFilePath) == false)
-            {
-                if (File.Exists(packageFilePath) == false)
-                    throw new ArgumentException(string.Format("Package file: {0} could not be found", packageFilePath));
-            }
-
-            string extension = Path.GetExtension(packageFilePath).ToLower();
-
-            var alowedExtension = new[] { ".umb", ".zip" };
-
-            // Check if the file is a valid package
-            if (alowedExtension.All(ae => ae.Equals(extension) == false))
-            {
-                throw new ArgumentException(
-                    string.Format("Error - file isn't a package. only extentions: \"{0}\" is allowed", string.Join(", ", alowedExtension)));
-            }
-        }
-        
         public void CopyFileFromArchive(string packageFilePath, string fileInPackageName, string destinationfilePath)
         {
             CopyFilesFromArchive(packageFilePath, new[]{new KeyValuePair<string, string>(fileInPackageName, destinationfilePath) } );
@@ -77,7 +52,7 @@ namespace Umbraco.Core.Packaging
             var d = sourceDestination.ToDictionary(k => k.Key.ToLower(), v => v.Value);
 
 
-            ReadZipfileEntries(packageFilePath, (entry, stream) =>
+            ReadZipfileEntries(packageFilePath, (entry) =>
             {
                 string fileName = (Path.GetFileName(entry.Name) ?? string.Empty).ToLower();
                 if (fileName == string.Empty) { return true; }
@@ -87,7 +62,7 @@ namespace Umbraco.Core.Packaging
                 {
                     using (var streamWriter = File.Open(destination, FileMode.Create))
                     {
-                        stream.CopyTo(streamWriter);
+                        entry.Open().CopyTo(streamWriter);
                     }
 
                     d.Remove(fileName);
@@ -106,7 +81,7 @@ namespace Umbraco.Core.Packaging
         {
             var retVal = expectedFiles.ToList();
 
-            ReadZipfileEntries(packageFilePath, (zipEntry, stream) =>
+            ReadZipfileEntries(packageFilePath, (zipEntry) =>
             {
                 string fileName = Path.GetFileName(zipEntry.Name);
 
@@ -125,7 +100,7 @@ namespace Umbraco.Core.Packaging
             var dictionary = new Dictionary<string, List<string>>();
 
 
-            ReadZipfileEntries(packageFilePath, (entry, stream) =>
+            ReadZipfileEntries(packageFilePath, (entry) =>
             {
                 string fileName = (Path.GetFileName(entry.Name) ?? string.Empty).ToLower();
 
@@ -152,49 +127,67 @@ namespace Umbraco.Core.Packaging
 
             using (var fs = File.OpenRead(packageFilePath))
             {
-                using (var zipInputStream = new ZipInputStream(fs))
+                using (var zipArchive = new ZipArchive(fs))
                 {
-                    ZipEntry zipEntry;
-                    while ((zipEntry = zipInputStream.GetNextEntry()) != null)
+                    foreach (var zipArchiveEntry in zipArchive.Entries)
                     {
-                        
-                        if (zipEntry.IsDirectory) continue;
 
-                        if (files.Contains(zipEntry.Name))
+                        if(zipArchiveEntry.Name.IsNullOrWhiteSpace() && zipArchiveEntry.FullName.EndsWith("/")) continue;
+
+                        if (files.Contains(zipArchiveEntry.Name))
                         {
                             using (var memStream = new MemoryStream())
                             {
-                                zipInputStream.CopyTo(memStream);
+                                zipArchiveEntry.Open().CopyTo(memStream);
                                 yield return memStream.ToArray();
-                                memStream.Close();
                             }
                         }
                     }
-
-                    zipInputStream.Close();
                 }
-                fs.Close();
             }
         }
 
-        private void ReadZipfileEntries(string packageFilePath, Func<ZipEntry, ZipInputStream, bool> entryFunc, bool skipsDirectories = true)
+        private void ReadZipfileEntries(string packageFilePath, Func<ZipArchiveEntry, bool> entryFunc, bool skipsDirectories = true)
         {
             CheckPackageExists(packageFilePath);
 
             using (var fs = File.OpenRead(packageFilePath))
             {
-                using (var zipInputStream = new ZipInputStream(fs))
+                using (var zipArchive = new ZipArchive(fs))
                 {
-                    ZipEntry zipEntry;
-                    while ((zipEntry = zipInputStream.GetNextEntry()) != null)
+                    foreach (var zipArchiveEntry in zipArchive.Entries)
                     {
-                        if (zipEntry.IsDirectory && skipsDirectories) continue;
-                        if (entryFunc(zipEntry, zipInputStream) == false) break;
+                        if(zipArchiveEntry.Name.IsNullOrWhiteSpace() && zipArchiveEntry.FullName.EndsWith("/") && skipsDirectories)
+                            continue;
+                        if(entryFunc(zipArchiveEntry) == false)
+                            break;
                     }
-
-                    zipInputStream.Close();
                 }
-                fs.Close();
+            }
+        }
+
+        private static void CheckPackageExists(string packageFilePath)
+        {
+            if(string.IsNullOrEmpty(packageFilePath))
+            {
+                throw new ArgumentNullException("packageFilePath");
+            }
+
+            if(File.Exists(packageFilePath) == false)
+            {
+                if(File.Exists(packageFilePath) == false)
+                    throw new ArgumentException(string.Format("Package file: {0} could not be found", packageFilePath));
+            }
+
+            string extension = Path.GetExtension(packageFilePath).ToLower();
+
+            var alowedExtension = new[] { ".umb", ".zip" };
+
+            // Check if the file is a valid package
+            if(alowedExtension.All(ae => ae.Equals(extension) == false))
+            {
+                throw new ArgumentException(
+                    string.Format("Error - file isn't a package. only extentions: \"{0}\" is allowed", string.Join(", ", alowedExtension)));
             }
         }
     }
