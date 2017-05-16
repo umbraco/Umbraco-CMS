@@ -80,7 +80,7 @@ namespace Umbraco.Core.Models
             var publishedChanged = entity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished;
             //check if any user prop has changed
             var propertyValueChanged = entity.IsAnyUserPropertyDirty();
-            
+
             //We need to know if any other property apart from Published was changed here
             //don't create a new version if the published state has changed to 'Save' but no data has actually been changed
             if (publishedChanged && entity.Published == false && propertyValueChanged == false)
@@ -312,7 +312,7 @@ namespace Umbraco.Core.Models
             return content.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                           .Contains(recycleBinId.ToInvariantString());
         }
-        
+
         /// <summary>
         /// Removes characters that are not valide XML characters from all entity properties 
         /// of type string. See: http://stackoverflow.com/a/961504/5018
@@ -520,7 +520,12 @@ namespace Umbraco.Core.Models
                                               ? Path.Combine(numberedFolder.ToString(CultureInfo.InvariantCulture), filename)
                                               : numberedFolder + "-" + filename;
 
-            var extension = Path.GetExtension(filename).Substring(1).ToLowerInvariant();
+            var extensionWithDotPrefix = Path.GetExtension(filename);
+            if (string.IsNullOrWhiteSpace(extensionWithDotPrefix))
+            {
+                throw new ArgumentOutOfRangeException("filename", string.Format("filename ({0}) without an extension on property {1}", fileName, property.Alias));
+            }
+            var extension = extensionWithDotPrefix.Substring(1).ToLowerInvariant();
 
             //the file size is the length of the stream in bytes
             var fileSize = fileStream.Length;
@@ -538,7 +543,7 @@ namespace Umbraco.Core.Models
             if (UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties != null)
             {
                 uploadFieldConfigNode = UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties
-                                    .FirstOrDefault(x => x.Alias == propertyTypeAlias);
+                    .FirstOrDefault(x => x.Alias == propertyTypeAlias);
 
             }
 
@@ -559,7 +564,7 @@ namespace Umbraco.Core.Models
                         //Additional thumbnails configured as prevalues on the DataType
                         if (thumbnailSizes != null)
                         {
-							foreach (var thumb in thumbnailSizes.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries))
+                            foreach (var thumb in thumbnailSizes.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries))
                             {
                                 int thumbSize;
                                 if (thumb != "" && int.TryParse(thumb, out thumbSize))
@@ -596,7 +601,7 @@ namespace Umbraco.Core.Models
         #endregion
 
         #region User/Profile methods
-        
+
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Creator of this media item.
         /// </summary>
