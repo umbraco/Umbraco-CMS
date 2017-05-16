@@ -154,7 +154,7 @@
                 </umb-badge>
                 <div class="umb-user__avatar">
                     <umb-avatar
-                            size="l"
+                        size="l"
                         color="secondary"
                         name="{{user.name}}"
                         img-src="{{user.avatar}}">
@@ -280,14 +280,16 @@
 
                 <umb-control-group label="User group">
 
-                    <umb-node-preview
-                        style="max-width: 100%;"
+                    <umb-user-role-preview
                         ng-repeat="group in vm.newUser.userGroups"
                         icon="group.icon"
                         name="group.name"
+                        sections="group.sections"
+                        content-start-nodes="group.startNodesContent"
+                        media-start-nodes="group.startNodesMedia"
                         allow-remove="true"
                         on-remove="vm.removeSelectedUserGroup($index, vm.newUser.userGroups)">
-                    </umb-node-preview>
+                    </umb-user-role-preview>
 
                     <a href=""
                         style="max-width: 100%;"
@@ -329,10 +331,10 @@
     </div>
 
     <umb-overlay
-        ng-if="vm.userGroupPicker.show"
-        model="vm.userGroupPicker"
-        view="vm.userGroupPicker.view"
-        position="target">
+        ng-if="vm.userRolePicker.show"
+        model="vm.userRolePicker"
+        view="vm.userRolePicker.view"
+        position="right">
     </umb-overlay>
 
 </div>

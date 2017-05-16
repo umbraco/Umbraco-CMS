@@ -247,25 +247,37 @@
                     "name": "Admin",
                     "alias": "admin",
                     "id": 1,
-                    "icon": "icon-medal"
+                    "icon": "icon-medal",
+                    "sections": [],
+                    "startNodesContent": [],
+                    "startNodesMedia": []
                 },
                 {
                     "name": "Writer",
                     "alias": "writer",
                     "id": 2,
-                    "icon": "icon-edit"
+                    "icon": "icon-edit",
+                    "sections": [{ "id": "1", "name": "Content"}, { "id": "2", "name": "Media"}],
+                    "startNodesContent": [],
+                    "startNodesMedia": []
                 },
                 {
                     "name": "Editor",
                     "alias": "editor",
                     "id": 3,
-                    "icon": "icon-tools"
+                    "icon": "icon-tools",
+                    "sections": [{ "id": "1", "name": "Content"}, { "id": "2", "name": "Media"}],
+                    "startNodesContent": [{ "id": "1", "name": "Start node 1"}, { "id": "2", "name": "Start node 2"}],
+                    "startNodesMedia": [{ "id": "1", "name": "Start node 1"}, { "id": "2", "name": "Start node 2"}]
                 },
                 {
                     "name": "Translator",
                     "alias": "translator",
                     "id": 4,
-                    "icon": "icon-globe"
+                    "icon": "icon-globe",
+                    "sections": [{ "id": "1", "name": "Content"}, { "id": "2", "name": "Translations"}],
+                    "startNodesContent": [{ "id": "1", "name": "Start node 1"}],
+                    "startNodesMedia": [{ "id": "1", "name": "Start node 1"}]
                 }
             ];
             deferred.resolve(userGroups);

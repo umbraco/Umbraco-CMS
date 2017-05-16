@@ -1,0 +1,67 @@
+<div ng-controller="Umbraco.Overlays.UserRolePickerController as vm">
+
+    <umb-load-indicator
+        ng-if="vm.loading">
+    </umb-load-indicator>
+
+    <div ng-if="!vm.loading">
+
+        <div class="form-search" style="margin-bottom: 15px;">
+            <i class="icon-search"></i>
+            <input type="text"
+                ng-model="searchTerm"
+                class="umb-search-field search-query input-block-level -full-width-input"
+                localize="placeholder"
+                placeholder="@placeholders_filter"
+                umb-auto-focus />
+        </div>
+        
+        <div class="umb-user-role-picker-list">
+
+            <a href="" class="umb-user-role-picker-list-item" ng-repeat="userRole in vm.userRoles | filter:searchTerm" ng-click="vm.selectUserRole(userRole)">
+                
+                <div class="umb-user-role-picker-list-item__icon">
+                    <i ng-if="!userRole.selected" class="{{userRole.icon}}"></i>
+                    <umb-checkmark ng-if="userRole.selected" checked="userRole.selected" size="xs"></umb-checkmark>
+                </div>
+
+                <div>
+                    <div class="umb-user-role-picker-list-item__name">{{ userRole.name }}</div>
+
+                    <div class="umb-user-role-picker-list-item__permission">
+                        <span>
+                            <span class="bold">Sections:</span>
+                            <span ng-repeat="section in userRole.sections">{{ section.name }}<span ng-if="!$last">, </span></span>
+                            <span ng-if="userRole.sections.length === 0">All sections</span>
+                        </span>
+                    </div>
+
+                    <div class="umb-user-role-picker-list-item__permission">
+                        <span>
+                            <span class="bold">Content start node:</span>
+                            <span ng-repeat="startNode in userRole.startNodesContent">{{ startNode.name }}<span ng-if="!$last">, </span></span>
+                            <span ng-if="userRole.startNodesContent.length === 0">Content root</span>
+                        </span>
+                    </div>
+                    
+                    <div class="umb-user-role-picker-list-item__permission">
+                        <span>
+                            <span class="bold">Media start node:</span>
+                            <span ng-repeat="startNode in userRole.startNodesMedia">{{ startNode.name }}<span ng-if="!$last">, </span></span>
+                            <span ng-if="userRole.startNodesMedia.length === 0">Media root</span>
+                        </span>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+
+        <umb-empty-state
+            ng-if="vm.userRoles.length === 0"
+            position="center">
+            No user roles have been added
+        </umb-empty-state>
+
+    </div>
+
+</div>

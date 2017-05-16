@@ -147,25 +147,27 @@
         }
 
         function openUserGroupPicker(event) {
-            vm.userGroupPicker = {
-                title: "Select user groups",
-                view: "itempicker",
-                event: event,
-                availableItems: vm.userGroups,
-                selectedItems: vm.newUser.userGroups,
+            vm.userRolePicker = {
+                title: "Select user roles",
+                view: "userrolepicker",
+                selection: vm.newUser.userGroups,
+                closeButtonLabel: "Cancel",
                 show: true,
                 submit: function(model) {
-
-                    if(model.selectedItem) {
-                        vm.newUser.userGroups.push(model.selectedItem);
+                    // apply changes
+                    if(model.selection) {
+                        vm.newUser.userGroups = model.selection;
                     }
-
-                    vm.userGroupPicker.show = false;
-                    vm.userGroupPicker = null;
+                    vm.userRolePicker.show = false;
+                    vm.userRolePicker = null;
                 },
                 close: function(oldModel) {
-                    vm.userGroupPicker.show = false;
-                    vm.userGroupPicker = null;
+                    // rollback on close
+                    if(oldModel.selection) {
+                        vm.newUser.userGroups = oldModel.selection;
+                    }
+                    vm.userRolePicker.show = false;
+                    vm.userRolePicker = null;
                 }
             };
         }
