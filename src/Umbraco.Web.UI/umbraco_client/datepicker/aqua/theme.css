@@ -97,7 +97,7 @@ div.calendar { position: relative;  border: 2px solid #CAC9C9;}
 .calendar tbody .rowhilite td.wn {
 }
 
-.calendar tbody td.today { font-weight: bold; /* background: url("today-bg.gif") no-repeat 70% 50%; */ }
+.calendar tbody td.today { font-weight: bold; }
 
 .calendar tbody td.hilite { /* Hovered cells <TD> */
   padding: 1px 3px 1px 1px;
