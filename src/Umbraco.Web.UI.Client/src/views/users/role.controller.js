@@ -28,7 +28,7 @@
         }
 
         function goBack() {
-            $location.path("users/users/overview");
+            $location.path("/users/users/overview").search("subview", "roles");
         }
  
         init();
