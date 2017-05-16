@@ -20,17 +20,7 @@ angular.module("umbraco")
             var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
             var allowedUploadFiles = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
             if ($scope.onlyImages) {
-                // If whitelist provided, use just images from that
-                if (allowedUploadFiles !== '') {
-                    var allowedUploadFilesArray = allowedUploadFiles.Split(',');
-                    var allowedImageFiles = umbracoSettings.imageFileTypes.split(',').filter(function (n) {
-                        return allowedUploadFilesArray.indexOf(n) > -1;
-                    });
-                    $scope.acceptedFileTypes = allowedImageFiles.join(',');
-                } else {
-                    // If no whitelist, allow all images
-                    $scope.acceptedFileTypes = mediaHelper.formatFileTypes(umbracoSettings.imageFileTypes);
-                }
+                $scope.acceptedFileTypes = mediaHelper.formatFileTypes(umbracoSettings.imageFileTypes);
             } else {
                 // Use whitelist of allowed file types if provided
                 if (allowedUploadFiles !== '') {
