@@ -16,6 +16,7 @@ using Examine;
 using Umbraco.Web.Dynamics;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Xml;
+using UmbracoExamine;
 
 namespace Umbraco.Web.Editors
 {
@@ -241,158 +242,175 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private IEnumerable<EntityBasic> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
         {
-            var sb = new StringBuilder();
+            string searcher = entityType == UmbracoEntityTypes.Member ? Constants.Examine.InternalMemberSearcher : Constants.Examine.InternalSearcher;
+            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
 
-            string type;
-            var searcher = Constants.Examine.InternalSearcher;            
-            var fields = new[] { "id", "__NodeId" };
-            
-            //TODO: WE should really just allow passing in a lucene raw query
-            switch (entityType)
+            string type = string.Empty;
+            switch(entityType)
             {
                 case UmbracoEntityTypes.Member:
-                    searcher = Constants.Examine.InternalMemberSearcher;
                     type = "member";
-                    fields = new[] { "id", "__NodeId", "email", "loginName"};
-                    if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
-                    {
-                        sb.Append("+__NodeTypeAlias:");
-                        sb.Append(searchFrom);
-                        sb.Append(" ");
-                    }
-                    break;
-                case UmbracoEntityTypes.Media:
-                    type = "media";
-
-                    var mediaSearchFrom = int.MinValue;
-
-                    if (Security.CurrentUser.StartMediaId > 0 ||
-                        //if searchFrom is specified and it is greater than 0
-                        (searchFrom != null && int.TryParse(searchFrom, out mediaSearchFrom) && mediaSearchFrom > 0))
-                    {
-                        sb.Append("+__Path: \\-1*\\,");
-                        sb.Append(mediaSearchFrom > 0
-                            ? mediaSearchFrom.ToString(CultureInfo.InvariantCulture)
-                            : Security.CurrentUser.StartMediaId.ToString(CultureInfo.InvariantCulture));
-                        sb.Append("\\,* ");
-                    }
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
-
-                    var contentSearchFrom = int.MinValue;
-
-                    if (Security.CurrentUser.StartContentId > 0 || 
-                        //if searchFrom is specified and it is greater than 0
-                        (searchFrom != null && int.TryParse(searchFrom, out contentSearchFrom) && contentSearchFrom > 0))
-                    {
-                        sb.Append("+__Path: \\-1*\\,");
-                        sb.Append(contentSearchFrom > 0
-                            ? contentSearchFrom.ToString(CultureInfo.InvariantCulture)
-                            : Security.CurrentUser.StartContentId.ToString(CultureInfo.InvariantCulture));
-                        sb.Append("\\,* ");
-                    }
                     break;
-                default:
-                    throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);                    
+                case UmbracoEntityTypes.Media:
+                    type = "media";
+                    break;
             }
 
-            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
-
-            //build a lucene query:
-            // the __nodeName will be boosted 10x without wildcards
-            // then __nodeName will be matched normally with wildcards
-            // the rest will be normal without wildcards
-            
-            
-            //check if text is surrounded by single or double quotes, if so, then exact match
-            var surroundedByQuotes = Regex.IsMatch(query, "^\".*?\"$")
-                                     || Regex.IsMatch(query, "^\'.*?\'$");
-            
-            if (surroundedByQuotes)
+            ISearchResults result;
+            if (internalSearcher.GetType() != typeof(UmbracoExamineSearcher))
             {
-                //strip quotes, escape string, the replace again
-                query = query.Trim(new[] { '\"', '\'' });
-
-                query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
-
-                if (query.IsNullOrWhiteSpace())
-                {
-                    return new List<EntityBasic>();
-                }
-
-                //add back the surrounding quotes
-                query = string.Format("{0}{1}{0}", "\"", query);
-
-                //node name exactly boost x 10
-                sb.Append("+(__nodeName: (");
-                sb.Append(query.ToLower());
-                sb.Append(")^10.0 ");
-
-                foreach (var f in fields)
-                {
-                    //additional fields normally
-                    sb.Append(f);
-                    sb.Append(": (");
-                    sb.Append(query);
-                    sb.Append(") ");
-                }
+                // Not the default search provider - so call a simple overload
+                result = internalSearcher.Search(query, true, type);
             }
             else
             {
-                if (query.Trim(new[] { '\"', '\'' }).IsNullOrWhiteSpace())
+                // DF: I'd like to move all of this to a method somewhere - but not sure on HQ policy for private methods in controllers etc.
+                var sb = new StringBuilder();
+                var fields = new[] { "id", "__NodeId" };
+
+                //TODO: WE should really just allow passing in a lucene raw query
+                switch (entityType)
                 {
-                    return new List<EntityBasic>();
+                    case UmbracoEntityTypes.Member:
+
+                        fields = new[] { "id", "__NodeId", "email", "loginName" };
+                        if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
+                        {
+                            sb.Append("+__NodeTypeAlias:");
+                            sb.Append(searchFrom);
+                            sb.Append(" ");
+                        }
+                        break;
+                    case UmbracoEntityTypes.Media:
+                        
+                        var mediaSearchFrom = int.MinValue;
+
+                        if (Security.CurrentUser.StartMediaId > 0 ||
+                            //if searchFrom is specified and it is greater than 0
+                            (searchFrom != null && int.TryParse(searchFrom, out mediaSearchFrom) && mediaSearchFrom > 0))
+                        {
+                            sb.Append("+__Path: \\-1*\\,");
+                            sb.Append(mediaSearchFrom > 0
+                                ? mediaSearchFrom.ToString(CultureInfo.InvariantCulture)
+                                : Security.CurrentUser.StartMediaId.ToString(CultureInfo.InvariantCulture));
+                            sb.Append("\\,* ");
+                        }
+                        break;
+                    case UmbracoEntityTypes.Document:
+
+                        var contentSearchFrom = int.MinValue;
+
+                        if (Security.CurrentUser.StartContentId > 0 ||
+                            //if searchFrom is specified and it is greater than 0
+                            (searchFrom != null && int.TryParse(searchFrom, out contentSearchFrom) && contentSearchFrom > 0))
+                        {
+                            sb.Append("+__Path: \\-1*\\,");
+                            sb.Append(contentSearchFrom > 0
+                                ? contentSearchFrom.ToString(CultureInfo.InvariantCulture)
+                                : Security.CurrentUser.StartContentId.ToString(CultureInfo.InvariantCulture));
+                            sb.Append("\\,* ");
+                        }
+                        break;
+                    default:
+                        throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);
                 }
                 
-                query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
+                //build a lucene query:
+                // the __nodeName will be boosted 10x without wildcards
+                // then __nodeName will be matched normally with wildcards
+                // the rest will be normal without wildcards
 
-                var querywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                //check if text is surrounded by single or double quotes, if so, then exact match
+                var surroundedByQuotes = Regex.IsMatch(query, "^\".*?\"$")
+                                         || Regex.IsMatch(query, "^\'.*?\'$");
 
-                //node name exactly boost x 10
-                sb.Append("+(__nodeName:");
-                sb.Append("\"");
-                sb.Append(query.ToLower());
-                sb.Append("\"");
-                sb.Append("^10.0 ");
-
-                //node name normally with wildcards
-                sb.Append(" __nodeName:");
-                sb.Append("(");
-                foreach (var w in querywords)
+                if (surroundedByQuotes)
                 {
-                    sb.Append(w.ToLower());
-                    sb.Append("* ");
+                    //strip quotes, escape string, the replace again
+                    query = query.Trim(new[] { '\"', '\'' });
+
+                    query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
+
+                    if (query.IsNullOrWhiteSpace())
+                    {
+                        return new List<EntityBasic>();
+                    }
+
+                    //add back the surrounding quotes
+                    query = string.Format("{0}{1}{0}", "\"", query);
+
+                    //node name exactly boost x 10
+                    sb.Append("+(__nodeName: (");
+                    sb.Append(query.ToLower());
+                    sb.Append(")^10.0 ");
+
+                    foreach (var f in fields)
+                    {
+                        //additional fields normally
+                        sb.Append(f);
+                        sb.Append(": (");
+                        sb.Append(query);
+                        sb.Append(") ");
+                    }
                 }
-                sb.Append(") ");
-
-
-                foreach (var f in fields)
+                else
                 {
-                    //additional fields normally
-                    sb.Append(f);
-                    sb.Append(":");
+                    if (query.Trim(new[] { '\"', '\'' }).IsNullOrWhiteSpace())
+                    {
+                        return new List<EntityBasic>();
+                    }
+
+                    query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
+
+                    var querywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    //node name exactly boost x 10
+                    sb.Append("+(__nodeName:");
+                    sb.Append("\"");
+                    sb.Append(query.ToLower());
+                    sb.Append("\"");
+                    sb.Append("^10.0 ");
+
+                    //node name normally with wildcards
+                    sb.Append(" __nodeName:");
                     sb.Append("(");
                     foreach (var w in querywords)
                     {
                         sb.Append(w.ToLower());
                         sb.Append("* ");
                     }
-                    sb.Append(")");
-                    sb.Append(" ");
+                    sb.Append(") ");
+
+
+                    foreach (var f in fields)
+                    {
+                        //additional fields normally
+                        sb.Append(f);
+                        sb.Append(":");
+                        sb.Append("(");
+                        foreach (var w in querywords)
+                        {
+                            sb.Append(w.ToLower());
+                            sb.Append("* ");
+                        }
+                        sb.Append(")");
+                        sb.Append(" ");
+                    }
                 }
+
+                //must match index type
+                sb.Append(") +__IndexType:");
+                sb.Append(type);
+
+                var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
+
+                //limit results to 200 to avoid huge over processing (CPU)
+                result = internalSearcher.Search(raw, 200);
             }
-
-            //must match index type
-            sb.Append(") +__IndexType:");
-            sb.Append(type);
-
             
-            var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
-            
-            //limit results to 200 to avoid huge over processing (CPU)
-            var result = internalSearcher.Search(raw, 200);
-
             switch (entityType)
             {
                 case UmbracoEntityTypes.Member:
