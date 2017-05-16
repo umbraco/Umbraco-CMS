@@ -1,0 +1,71 @@
+<div ng-controller="Umbraco.Editors.Users.RolesController as vm" class="clearfix">
+
+    <umb-editor-sub-header>
+            
+        <!-- No selection -->
+        <umb-editor-sub-header-content-left ng-if="vm.selection.length === 0">
+            <umb-button
+                type="button"
+                button-style="success"
+                action="vm.createUserRole()"
+                label="Create Role">
+            </umb-button>
+        </umb-editor-sub-header-content-left>
+
+        <umb-editor-sub-header-content-right ng-if="vm.selection.length === 0">
+
+            <umb-editor-sub-header-section>
+                <ng-form class="form-search -no-margin-bottom pull-right" novalidate>
+                    <div class="inner-addon left-addon">
+                        <i class="icon icon-search" ng-click="enterSearch($event)"></i>
+                        <input
+                            class="form-control search-input"
+                            type="text"
+                            localize="placeholder"
+                            placeholder="@general_typeToSearch"
+                            ng-model="options.filter"
+                            ng-change="enterSearch()"
+                            ng-keydown="forceSearch($event)"
+                            prevent-enter-submit
+                            no-dirty-check>
+                    </div>
+                </ng-form>
+            </umb-editor-sub-header-section>
+
+        </umb-editor-sub-header-content-right>
+
+        <!-- With selection -->
+        <umb-editor-sub-header-content-left ng-if="vm.selection.length > 0">
+            <umb-editor-sub-header-section>
+                <umb-button
+                    type="button"
+                    label="Clear selection"
+                    label-key="buttons_clearSelection"
+                    action="vm.clearSelection()"
+                    disabled="actionInProgress">
+                </umb-button>
+            </umb-editor-sub-header-section>
+            <umb-editor-sub-header-section>
+                <strong>{{ vm.selection.length }} <localize key="general_of">of</localize> {{ vm.userRoles.length }} <localize key="general_selected">selected</localize></strong>
+            </umb-editor-sub-header-section>
+        </umb-editor-sub-header-content-left>
+
+        <umb-editor-sub-header-content-right ng-if="vm.selection.length > 0">
+            <umb-button
+                type="button"
+                button-style="link"
+                label="Delete"
+                icon="icon-trash"
+                action="vm.deleteUserRole()">
+            </umb-button>
+        </umb-editor-sub-header-content-right>
+
+    </umb-editor-sub-header>
+
+    <div ng-repeat="userRole in vm.userRoles" class="flex items-center" ng-click="vm.selectUserRole(userRole, vm.selection)">
+        <i class="{{userRole.icon}}"></i>
+        <div class="bold" style="margin-right: 5px;">{{userRole.name}}</div>
+        <a href="" ng-click="vm.goToUserRole(userRole)">Edit</a>
+    </div>
+
+</div>

@@ -34,7 +34,8 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of all umbraco users into the users application tree
 	/// </summary>
-    [Tree(Constants.Applications.Users, "users", "Users")]
+    [Tree(Constants.Applications.Users, "users_old", "Users (Legacy)")]
+    //TODO: Remove this tree when ready
     public class loadUsers : BaseTree
 	{
         public loadUsers(string application) : base(application) { }

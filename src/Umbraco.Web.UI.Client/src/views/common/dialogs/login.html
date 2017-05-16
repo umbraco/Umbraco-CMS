@@ -1,5 +1,5 @@
 ﻿<div ng-controller="Umbraco.Dialogs.LoginController">
-    
+
     <div id="login" class="umb-modalcolumn umb-dialog" ng-class="{'show-validation': loginForm.$invalid}" ng-cloak konami-code="activateKonamiMode()">
         
         <div class="login-overlay__background-image" ng-if="backgroundImage" ng-style="{'background-image':'url(' + backgroundImage + ')'}"></div>
@@ -8,7 +8,61 @@
             <img ng-src="assets/img/application/logo.png" ng-srcset="assets/img/application/logo@2x.png 2x, assets/img/application/logo@3x.png 3x">
         </div>
 
-        <div class="umb-login-container">
+        <div ng-show="isInvite" class="umb-login-container">
+
+            <div class="form" ng-if="inviteSetPassword">
+                <h1 style="margin-bottom: 10px; text-align: left;">Hi, User</h1>
+                <p style="line-height: 1.6; margin-bottom: 25px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
+
+                <div class="control-group" ng-class="{error: setPasswordForm.password.$invalid}">
+                    <label>
+                        <localize key="user_newPassword">New password</localize>
+                        <small style="font-size: 13px;">Some hint here about the new password</small>
+                    </label>
+                    <input type="password" ng-model="password" name="password" class="-full-width-input" umb-auto-focus />
+                </div>
+
+                <div class="control-group" ng-class="{error: setPasswordForm.confirmPassword.$invalid}">
+                    <label><localize key="user_confirmNewPassword">Confirm new password</localize></label>
+                    <input type="password" ng-model="confirmPassword" name="confirmPassword" class="-full-width-input" />
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <umb-button
+                        type="button"
+                        button-style="success"
+                        action="inviteSavePassword()"
+                        label="Save password">
+                    </umb-button>
+                </div>
+
+            </div>
+
+            <div class="form" ng-if="inviteSetAvatar">
+
+                <div class="flex justify-center items-center">
+                    <div style="border-radius: 50%; width: 100px; height: 100px; font-size: 50px; text-align: center; display: flex; align-items: center; justify-content: center; background-color: #F3F3F5; border: 2px dashed #A2A1A6; color: #A2A1A6;">+</div>
+                </div>
+
+                <h1 style="margin-bottom: 10px;">Upload a photo</h1>
+                <p style="text-align: center; margin-bottom: 25px; line-height: 1.6em;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
+                <div class="flex justify-center items-center">
+                    <umb-button
+                        type="button"
+                        button-style="success"
+                        label="Get started">
+                    </umb-button>
+                    <umb-button
+                        type="button"
+                        button-style="link"
+                        label="Skip">
+                    </umb-button>
+                </div>
+            </div>
+
+        </div>
+
+        <div ng-show="!isInvite" class="umb-login-container">
 
             <div class="form">
                 <h1>{{greeting}}</h1>

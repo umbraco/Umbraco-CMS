@@ -1,0 +1,75 @@
+.umb-users {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: -10px;
+}
+
+.umb-user {
+    flex: 1 1 200px;
+    background-color: @gray-10;
+    border: 1px solid @gray-9;
+    border-radius: 3px;
+    padding: 15px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    cursor: pointer;
+    position: relative;
+    align-items: center;
+}
+
+.umb-user--selected {
+    border-color: @turquoise;
+}
+
+.umb-user:hover {
+    border-color: @turquoise;
+}
+
+.umb-user__avatar {
+    margin-bottom: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.umb-user__badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    text-transform: capitalize;
+}
+
+.umb-user__name {
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 2px;
+}
+
+.umb-user__checkmark {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.umb-user__group {
+    font-size: 14px;
+    text-align: center;
+}
+
+.umb-user__divider {
+    display: block;
+    width: 20px;
+    border-bottom: 1px solid @gray-7;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.umb-user__last-login {
+    font-size: 13px;
+    text-align: center;
+}

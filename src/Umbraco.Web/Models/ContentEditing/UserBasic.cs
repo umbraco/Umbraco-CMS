@@ -1,14 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
     /// <summary>
-    /// A basic structure the represents a user
+    /// A bare minimum structure that represents a user, usually attached to other objects
     /// </summary>
     [DataContract(Name = "user", Namespace = "")]
-    public class UserBasic : System.IComparable
+    public class UserBasic : IComparable
     {
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
@@ -19,9 +20,9 @@ namespace Umbraco.Web.Models.ContentEditing
         public string Name { get; set; }
 
 
-        int System.IComparable.CompareTo(object obj)
+        int IComparable.CompareTo(object obj)
         {
-            return Name.CompareTo(((UserBasic)obj).Name);
+            return String.Compare(Name, ((UserBasic)obj).Name, StringComparison.Ordinal);
        }
     }
 }

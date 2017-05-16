@@ -4,6 +4,9 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
+    /// <summary>
+    /// Represents information for the current user
+    /// </summary>
     [DataContract(Name = "user", Namespace = "")]
     public class UserDetail : UserBasic
     {

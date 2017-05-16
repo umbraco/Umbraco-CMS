@@ -1368,6 +1368,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="templates">Templates</key>
     <key alias="xslt">XSLT Files</key>
     <key alias="analytics">Analytics</key>
+    <key alias="users">Users</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">New update ready</key>
@@ -1422,6 +1423,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="yourProfile" version="7.0">Your profile</key>
     <key alias="yourHistory" version="7.0">Your recent history</key>
     <key alias="sessionExpires" version="7.0">Session expires in</key>
+  </area>
+  <area alias="users">
+      <key alias="inviteUser">Invite user</key>
+      <key alias="createUser">Create user</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validation</key>
