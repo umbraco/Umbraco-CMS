@@ -62,13 +62,17 @@ namespace Umbraco.Core.Persistence.Relators
                     //add the current (new) group
                     _currentUser.UserGroupDtos.Add(group);
                 }
-
+                
                 AddSection(section);
             }
         }
 
         private void AddSection(UserGroup2AppDto section)
         {
+            //this can be null since we are left joining
+            if (section == null || section.AppAlias.IsNullOrWhiteSpace())
+                return;
+
             var latestGroup = _currentUser.UserGroupDtos.Count > 0
                 ? _currentUser.UserGroupDtos[_currentUser.UserGroupDtos.Count - 1]
                 : null;
