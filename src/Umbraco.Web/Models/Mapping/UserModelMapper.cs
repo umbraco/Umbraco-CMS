@@ -18,7 +18,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             config.CreateMap<IUser, UserDisplay>()
                 .ForMember(detail => detail.Id, opt => opt.MapFrom(user => user.Id))
-                .ForMember(detail => detail.UserType, opt => opt.MapFrom(user => user.UserType.Alias))
+                //.ForMember(detail => detail.UserType, opt => opt.MapFrom(user => user.UserType.Alias))
                 .ForMember(detail => detail.StartContentId, opt => opt.MapFrom(user => user.StartContentId))
                 .ForMember(detail => detail.StartMediaId, opt => opt.MapFrom(user => user.StartMediaId))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))

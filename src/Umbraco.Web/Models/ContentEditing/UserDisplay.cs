@@ -21,8 +21,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "email", IsRequired = true)]
         public string Email { get; set; }
 
-        [DataMember(Name = "userType")]
-        public string UserType { get; set; }
+        //TODO: Should be user groups!
+        //[DataMember(Name = "userType")]
+        //public string UserType { get; set; }
 
         /// <summary>
         /// Gets the available user types (i.e. to populate a drop down)

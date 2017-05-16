@@ -68,14 +68,14 @@ namespace Umbraco.Web.Editors
             var startId = 100 + ((pageNumber -1) * pageSize);
             var numUsers = pageSize;
             var users = new List<UserDisplay>();
-            var userTypes = Services.UserService.GetAllUserTypes().ToDictionary(x => x.Alias, x => x.Name);
+            var userTypes = Services.UserService.GetAllUserGroups().ToDictionary(x => x.Alias, x => x.Name);
             var cultures = Services.TextService.GetSupportedCultures().ToDictionary(x => x.Name, x => x.DisplayName);
             for (int i = 0; i < numUsers; i++)
             {
                 var display = new UserDisplay
                 {
                     Id = startId,
-                    UserType = "writer",
+                    //UserType = "writer",
                     AllowedSections = new[] {"content", "media"},
                     AvailableUserTypes = userTypes,
                     Email = "test" + startId + "@test.com",
