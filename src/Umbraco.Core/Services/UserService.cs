@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Linq.Expressions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -202,7 +204,7 @@ namespace Umbraco.Core.Services
             }
             Save(membershipUser);
         }
-
+        
         /// <summary>
         /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
         /// </summary>
@@ -490,6 +492,55 @@ namespace Umbraco.Core.Services
                 }
 
                 return ret;
+            }
+        }
+
+        public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState? userState = null, string[] userGroups = null, string filter = "")
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                Expression<Func<IUser, object>> sort;
+                switch (orderBy.ToUpperInvariant())
+                {
+                    case "USERNAME":
+                        sort = member => member.Username;
+                        break;
+                    case "LANGUAGE":
+                        sort = member => member.Language;
+                        break;
+                    case "NAME":
+                        sort = member => member.Name;
+                        break;
+                    case "EMAIL":
+                        sort = member => member.Email;
+                        break;
+                    case "ID":
+                        sort = member => member.Id;
+                        break;
+                    case "CREATEDATE":
+                        sort = member => member.CreateDate;
+                        break;
+                    case "UPDATEDATE":
+                        sort = member => member.UpdateDate;
+                        break;
+                    case "ISAPPROVED":
+                        sort = member => member.IsApproved;
+                        break;
+                    case "ISLOCKEDOUT":
+                        sort = member => member.IsLockedOut;
+                        break;                    
+                    default:
+                        throw new IndexOutOfRangeException("The orderBy parameter " + orderBy + " is not valid");
+                }
+
+                IQuery<IUser> filterQuery = null;
+                if (filter.IsNullOrWhiteSpace() == false)
+                {
+                    filterQuery = Query<IUser>.Builder.Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
+                }
+
+                var repository = RepositoryFactory.CreateUserRepository(uow);
+                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, sort, orderDirection, userGroups, userState, filterQuery);
             }
         }
 

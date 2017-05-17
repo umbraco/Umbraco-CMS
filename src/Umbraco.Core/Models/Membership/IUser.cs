@@ -9,6 +9,8 @@ namespace Umbraco.Core.Models.Membership
     /// <remarks>Will be left internal until a proper Membership implementation is part of the roadmap</remarks>
     public interface IUser : IMembershipUser, IRememberBeingDirty, ICanBeDirty
     {
+        UserState UserState { get; }
+
         string Name { get; set; }
         int SessionTimeout { get; set; }
         int StartContentId { get; set; }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Services
 {
@@ -9,6 +10,10 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IUserService : IMembershipUserService
     {
+        IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection, 
+            UserState? userState = null, string[] userGroups = null, string filter = "");
+
         /// <summary>
         /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
         /// </summary>

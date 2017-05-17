@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq.Expressions;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -34,15 +36,23 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="groupId">Id of group</param>
         IEnumerable<IUser> GetAllNotInGroup(int groupId);
 
+        [Obsolete("Use the overload with long operators instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy);
+
         /// <summary>
-        /// Gets paged member results
+        /// Gets paged user results
         /// </summary>
         /// <param name="query"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <param name="totalRecords"></param>
         /// <param name="orderBy"></param>
+        /// <param name="filter"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="userGroups">Optional parameter to filter by specified user groups</param>
+        /// <param name="userState">Optional parameter to filter by specfied user state</param>
         /// <returns></returns>
-        IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy);
+        IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, Expression<Func<IUser, object>> orderBy, Direction orderDirection, string[] userGroups = null, UserState? userState = null, IQuery<IUser> filter = null);
     }
 }

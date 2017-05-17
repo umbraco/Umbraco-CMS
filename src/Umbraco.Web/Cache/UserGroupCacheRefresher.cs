@@ -59,6 +59,7 @@ namespace Umbraco.Web.Cache
 
             if (UserGroupPermissionsCache)
             {
+                //TODO: Is this good enough for all users attached to this?
                 var keyStartsWith = string.Format("{0}{1}", CacheKeys.UserGroupPermissionsCacheKey, id);
                 UserGroupPermissionsCache.Result.ClearCacheByKeySearch(keyStartsWith);
             }

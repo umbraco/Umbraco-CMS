@@ -225,6 +225,19 @@ namespace Umbraco.Core.Models.Membership
         
         #region Implementation of IUser
 
+        public UserState UserState
+        {
+            get
+            {
+                if (IsLockedOut)
+                    return UserState.LockedOut;
+                if (IsApproved == false)
+                    return UserState.Disabled;
+                //TODO: Fill in the invite details
+                return UserState.Active;
+            }
+        }
+
         [DataMember]
         public string Name
         {

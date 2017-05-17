@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
@@ -316,24 +318,45 @@ namespace Umbraco.Core.Persistence.Repositories
             return ConvertFromDtos(Database.Fetch<UserDto>(sql));
         }
 
+        [Obsolete("Use the overload with long operators instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy)
+        {
+            if (orderBy == null) throw new ArgumentNullException("orderBy");
+
+            // get the referenced column name and find the corresp mapped column name
+            var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
+            var mapper = MappingResolver.Current.ResolveMapperByType(typeof(IUser));
+            var mappedField = mapper.Map(expressionMember.Name);
+
+            if (mappedField.IsNullOrWhiteSpace())
+                throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
+            
+            long tr;
+            var results = GetPagedResultsByQuery(query, Convert.ToInt64(pageIndex), pageSize, out tr, mappedField, Direction.Ascending);
+            totalRecords = Convert.ToInt32(tr);
+            return results;
+        }
+
         /// <summary>
         /// Gets paged user results
         /// </summary>
-        /// <param name="query">
-        /// The where clause, if this is null all records are queried
-        /// </param>
+        /// <param name="query"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <param name="totalRecords"></param>
         /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="userGroups">Optional parameter to filter by specified user groups</param>
+        /// <param name="userState">Optional parameter to filter by specfied user state</param>
+        /// <param name="filter"></param>
         /// <returns></returns>
         /// <remarks>
         /// The query supplied will ONLY work with data specifically on the umbracoUser table because we are using PetaPoco paging (SQL paging)
         /// </remarks>
-        public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy)
+        public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, Expression<Func<IUser, object>> orderBy, Direction orderDirection, string[] userGroups = null, UserState? userState = null, IQuery<IUser> filter = null)
         {
-            if (orderBy == null)
-                throw new ArgumentNullException("orderBy");
+            if (orderBy == null) throw new ArgumentNullException("orderBy");
 
             // get the referenced column name and find the corresp mapped column name
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
@@ -343,29 +366,163 @@ namespace Umbraco.Core.Persistence.Repositories
             if (mappedField.IsNullOrWhiteSpace())
                 throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
 
-            var sql = new Sql()
-                .Select("umbracoUser.Id")
-                .From<UserDto>(SqlSyntax);
+            return GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, mappedField, orderDirection, userGroups, userState, filter);
+        }
 
-            var idsQuery = query == null ? sql : new SqlTranslator<IUser>(sql, query).Translate();
+        private IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, string[] userGroups = null, UserState? userState = null, IQuery<IUser> filter = null)
+        {
+            if (string.IsNullOrWhiteSpace(orderBy)) throw new ArgumentException("Value cannot be null or whitespace.", "orderBy");
+            
 
-            // need to ensure the order by is in brackets, see: https://github.com/toptensoftware/PetaPoco/issues/177
-            idsQuery.OrderBy("(" + mappedField + ")");
-            var page = Database.Page<int>(pageIndex + 1, pageSize, idsQuery);
-            totalRecords = Convert.ToInt32(page.TotalItems);
+            var filterSql = new Sql();
+            if (filter != null)
+            {
+                foreach (var filterClaus in filter.GetWhereClauses())
+                {
+                    filterSql.Append(string.Format("AND ({0})", filterClaus.Item1), filterClaus.Item2);
+                }
+            }
+            Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(filterSql.SQL, filterSql.Arguments);
+            
+            // Get base query for returning IDs
+            var sqlBaseIds = GetBaseQuery("id");
+            // Get base query for returning all data
+            var sqlBaseFull = GetBaseQuery(false);
 
-            if (totalRecords == 0)
-                return Enumerable.Empty<IUser>();
+            if (query == null) query = new Query<IUser>();
+            var translatorIds = new SqlTranslator<IUser>(sqlBaseIds, query);
+            var sqlQueryIds = translatorIds.Translate();
+            var translatorFull = new SqlTranslator<IUser>(sqlBaseFull, query);
+            var sqlQueryFull = translatorFull.Translate();            
 
-            // now get the actual users and ensure they are ordered properly (same clause)
-            var ids = page.Items.ToArray();
-            return ids.Length == 0 ? Enumerable.Empty<IUser>() : GetAll(ids).OrderBy(orderBy.Compile());
+            //get sorted and filtered sql
+            var sqlNodeIdsWithSort = GetSortedSqlForPagedResults(
+                GetFilteredSqlForPagedResults(sqlQueryIds, filterCallback),
+                orderDirection, orderBy);
+
+            // Get page of results and total count
+            IEnumerable<IUser> result;
+            var pagedResult = Database.Page<UserDto>(pageIndex + 1, pageSize, sqlNodeIdsWithSort);
+            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+
+            return Enumerable.Empty<IUser>();
+
+            ////NOTE: We need to check the actual items returned, not the 'totalRecords', that is because if you request a page number
+            //// that doesn't actually have any data on it, the totalRecords will still indicate there are records but there are none in
+            //// the pageResult, then the GetAll will actually return ALL records in the db.
+            //if (pagedResult.Items.Any())
+            //{
+            //    //Create the inner paged query that was used above to get the paged result, we'll use that as the inner sub query
+            //    var args = sqlNodeIdsWithSort.Arguments;
+            //    string sqlStringCount, sqlStringPage;
+            //    Database.BuildPageQueries<UserDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlStringCount, out sqlStringPage);
+
+            //    //We need to make this FULL query an inner join on the paged ID query
+            //    var splitQuery = sqlQueryFull.SQL.Split(new[] { "WHERE " }, StringSplitOptions.None);
+            //    var fullQueryWithPagedInnerJoin = new Sql(splitQuery[0])
+            //        .Append("INNER JOIN (")
+            //        //join the paged query with the paged query arguments
+            //        .Append(sqlStringPage, args)
+            //        .Append(") temp ")
+            //        .Append(string.Format("ON {0}.{1} = temp.{1}", nodeIdSelect.Item1, nodeIdSelect.Item2))
+            //        //add the original where clause back with the original arguments
+            //        .Where(splitQuery[1], sqlQueryIds.Arguments);
+
+            //    //get sorted and filtered sql
+            //    var fullQuery = GetSortedSqlForPagedResults(
+            //        GetFilteredSqlForPagedResults(fullQueryWithPagedInnerJoin, defaultFilter),
+            //        orderDirection, orderBy, orderBySystemField, nodeIdSelect);
+
+            //    return processQuery(fullQuery, new PagingSqlQuery<TDto>(Database, sqlNodeIdsWithSort, pageIndex, pageSize));
+            //}
+            //else
+            //{
+            //    result = Enumerable.Empty<TEntity>();
+            //}
+
+            //return result;
+
+
+            //return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
+            //    new Tuple<string, string>("cmsMember", "nodeId"),
+            //    (sqlFull, sqlIds) => ProcessQuery(sqlFull, sqlIds), orderBy, orderDirection, orderBySystemField,
+            //    filterCallback);
+
+
+            //var sql = new Sql()
+            //    .Select("umbracoUser.Id")
+            //    .From<UserDto>(SqlSyntax);
+
+            //var idsQuery = query == null ? sql : new SqlTranslator<IUser>(sql, query).Translate();
+
+            //// need to ensure the order by is in brackets, see: https://github.com/toptensoftware/PetaPoco/issues/177
+            //idsQuery.OrderBy("(" + orderBy + ")");
+            //var page = Database.Page<int>(pageIndex + 1, pageSize, idsQuery);
+            //totalRecords = Convert.ToInt32(page.TotalItems);
+
+            //if (totalRecords == 0)
+            //    return Enumerable.Empty<IUser>();
+
+            //// now get the actual users and ensure they are ordered properly (same clause)
+            //var ids = page.Items.ToArray();
+            //return ids.Length == 0 ? Enumerable.Empty<IUser>() : GetAll(ids).OrderBy(orderBy.Compile());
+        }
+
+        private Sql GetFilteredSqlForPagedResults(Sql sql, Func<Tuple<string, object[]>> defaultFilter = null)
+        {
+            Sql filteredSql;
+
+            // Apply filter
+            if (defaultFilter != null)
+            {
+                var filterResult = defaultFilter();
+
+                //NOTE: this is certainly strange - NPoco handles this much better but we need to re-create the sql
+                // instance a couple of times to get the parameter order correct, for some reason the first
+                // time the arguments don't show up correctly but the SQL argument parameter names are actually updated
+                // accordingly - so we re-create it again. In v8 we don't need to do this and it's already taken care of.
+
+                filteredSql = new Sql(sql.SQL, sql.Arguments);
+                var args = filteredSql.Arguments.Concat(filterResult.Item2).ToArray();
+                filteredSql = new Sql(
+                    string.Format("{0} {1}", filteredSql.SQL, filterResult.Item1),
+                    args);
+                filteredSql = new Sql(filteredSql.SQL, args);
+            }
+            else
+            {
+                //copy to var so that the original isn't changed
+                filteredSql = new Sql(sql.SQL, sql.Arguments);
+            }
+            return filteredSql;
+        }
+
+        private Sql GetSortedSqlForPagedResults(Sql sql, Direction orderDirection, string orderBy)
+        {
+            //copy to var so that the original isn't changed
+            var sortedSql = new Sql(sql.SQL, sql.Arguments);
+
+            // Apply order according to parameters
+            if (string.IsNullOrEmpty(orderBy) == false)
+            {
+                //each order by param needs to be in a bracket! see: https://github.com/toptensoftware/PetaPoco/issues/177
+                var orderByParams = new[] { string.Format("({0})", orderBy) };
+                if (orderDirection == Direction.Ascending)
+                {
+                    sortedSql.OrderBy(orderByParams);
+                }
+                else
+                {
+                    sortedSql.OrderByDescending(orderByParams);
+                }
+            }
+            return sortedSql;
         }
 
         internal IEnumerable<IUser> GetNextUsers(int id, int count)
         {
             var idsQuery = new Sql()
-                .Select("umbracoUser.Id")
+                .Select("umbracoUser.id")
                 .From<UserDto>(SqlSyntax)
                 .Where<UserDto>(x => x.Id >= id)
                 .OrderBy<UserDto>(x => x.Id, SqlSyntax);
