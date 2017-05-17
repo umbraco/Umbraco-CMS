@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -40,7 +41,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             //Create an app context using mocks
             var appContext = new ApplicationContext(
-                new DatabaseContext(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
+                new DatabaseContext(Mock.Of<IScopeProviderInternal>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
                 
                 //Create service context using mocks
                 new ServiceContext(

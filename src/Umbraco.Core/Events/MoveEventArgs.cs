@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Umbraco.Core.Events
 {
-    public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>
+    public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquatable<MoveEventArgs<TEntity>>
     {
         /// <summary>
         /// Constructor accepting a collection of MoveEventInfo objects
@@ -123,5 +123,38 @@ namespace Umbraco.Core.Events
         /// </summary>
         [Obsolete("Retrieve the ParentId from the MoveInfoCollection property instead")]
         public int ParentId { get; private set; }
+
+        public bool Equals(MoveEventArgs<TEntity> other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return base.Equals(other) && MoveInfoCollection.Equals(other.MoveInfoCollection);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((MoveEventArgs<TEntity>) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (base.GetHashCode() * 397) ^ MoveInfoCollection.GetHashCode();
+            }
+        }
+
+        public static bool operator ==(MoveEventArgs<TEntity> left, MoveEventArgs<TEntity> right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(MoveEventArgs<TEntity> left, MoveEventArgs<TEntity> right)
+        {
+            return !Equals(left, right);
+        }
     }
 }

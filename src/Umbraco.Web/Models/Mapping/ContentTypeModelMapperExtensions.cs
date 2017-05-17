@@ -31,6 +31,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.HasIdentity, map => map.Ignore())
                 .ForMember(dest => dest.CreateDate, map => map.Ignore())
                 .ForMember(dest => dest.UpdateDate, map => map.Ignore())
+                .ForMember(dest => dest.DeletedDate, map => map.Ignore())
                 .ForMember(dest => dest.PropertyTypes, map => map.Ignore());
         }
 
@@ -126,6 +127,7 @@ namespace Umbraco.Web.Models.Mapping
             where TPropertyTypeDisplay : PropertyTypeDisplay, new()
         {
             return mapping
+                .ForMember(x => x.Udi, expression => expression.ResolveUsing(new ContentTypeUdiResolver()))
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
                 .ForMember(display => display.Errors, expression => expression.Ignore())
                 .ForMember(display => display.AllowAsRoot, expression => expression.MapFrom(type => type.AllowedAsRoot))
@@ -174,6 +176,7 @@ namespace Umbraco.Web.Models.Mapping
                 //These get persisted as part of the saving procedure, nothing to do with the display model
                 .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
                 .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
+                .ForMember(dto => dto.DeletedDate, expression => expression.Ignore())
 
                 .ForMember(dto => dto.AllowedAsRoot, expression => expression.MapFrom(display => display.AllowAsRoot))
                 .ForMember(dto => dto.CreatorId, expression => expression.Ignore())

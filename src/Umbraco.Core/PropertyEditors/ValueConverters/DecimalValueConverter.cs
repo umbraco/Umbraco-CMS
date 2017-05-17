@@ -3,6 +3,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
+    [DefaultPropertyValueConverter]
     [PropertyValueType(typeof(decimal))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class DecimalValueConverter : PropertyValueConverterBase

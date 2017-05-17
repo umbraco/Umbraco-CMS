@@ -1,6 +1,4 @@
-﻿using System;
-using System.Reflection;
-using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Running;
 
 namespace Umbraco.Tests.Benchmarks
 {

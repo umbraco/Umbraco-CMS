@@ -17,11 +17,13 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
             hideheader: '@',
             cachekey: '@',
             isdialog: '@',
+            onlyinitialized: '@',
             //Custom query string arguments to pass in to the tree as a string, example: "startnodeid=123&something=value"
             customtreeparams: '@',
             eventhandler: '=',
             enablecheckboxes: '@',
-            enablelistviewsearch: '@'
+            enablelistviewsearch: '@',
+            enablelistviewexpand: '@'
         },
 
         compile: function(element, attrs) {
@@ -35,7 +37,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 '<a class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(tree.root, $event)" ng-swipe-right="options(tree.root, $event)"><i></i><i></i><i></i></a>' +
                 '</div>';
             template += '<ul>' +
-                '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" current-node="currentNode" tree="this" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
+                '<umb-tree-item ng-repeat="child in tree.root.children" enablelistviewexpand="{{enablelistviewexpand}}" eventhandler="eventhandler" node="child" current-node="currentNode" tree="this" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
                 '</ul>' +
                 '</li>' +
                 '</ul>';
@@ -251,7 +253,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         deleteAnimations = false;
 
                         //default args
-                        var args = { section: scope.section, tree: scope.treealias, cacheKey: scope.cachekey, isDialog: scope.isdialog ? scope.isdialog : false };
+                        var args = { section: scope.section, tree: scope.treealias, cacheKey: scope.cachekey, isDialog: scope.isdialog ? scope.isdialog : false, onlyinitialized: scope.onlyinitialized };
 
                         //add the extra query string params if specified
                         if (scope.customtreeparams) {
@@ -304,7 +306,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 scope.selectEnabledNodeClass = function (node) {
                     return node ?
                         node.selected ?
-                        'icon umb-tree-icon sprTree icon-check blue temporary' :
+                        'icon umb-tree-icon sprTree icon-check green temporary' :
                         '' :
                         '';
                 };

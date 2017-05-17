@@ -1,10 +1,27 @@
 ﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController",
-    function ($scope, $cookies, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource) {
+    function ($scope, $cookies, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, dialogService) {
 
         var setFieldFocus = function(form, field) {
             $timeout(function() {
                 $("form[name='" + form + "'] input[name='" + field + "']").focus();
             });
+        }
+
+        var twoFactorloginDialog = null;
+        function show2FALoginDialog(view, callback) {
+            if (!twoFactorloginDialog) {
+                twoFactorloginDialog = dialogService.open({
+
+                    //very special flag which means that global events cannot close this dialog
+                    manualClose: true,
+                    template: view,
+                    modalClass: "login-overlay",
+                    animation: "slide",
+                    show: true,
+                    callback: callback,
+
+                });
+            }
         }
 
         function resetInputValidation() {
@@ -64,6 +81,7 @@
         $scope.externalLoginProviders = externalLoginInfo.providers;
         $scope.externalLoginInfo = externalLoginInfo;
         $scope.resetPasswordCodeInfo = resetPasswordCodeInfo;
+        $scope.backgroundImage = Umbraco.Sys.ServerVariables.umbracoSettings.loginBackgroundImage;
 
         $scope.activateKonamiMode = function () {
             if ($cookies.konamiLogin == "1") {
@@ -94,15 +112,24 @@
             }
 
             userService.authenticate(login, password)
-                .then(function (data) {
-                    $scope.submit(true);
-                }, function (reason) {
-                    $scope.errorMsg = reason.errorMsg;
+                .then(function(data) {
+                        $scope.submit(true);
+                    },
+                    function(reason) {
 
-                    //set the form inputs to invalid
-                    $scope.loginForm.username.$setValidity("auth", false);
-                    $scope.loginForm.password.$setValidity("auth", false);
-                });
+                        //is Two Factor required?
+                        if (reason.status === 402) {
+                            $scope.errorMsg = "Additional authentication required";
+                            show2FALoginDialog(reason.data.twoFactorView, $scope.submit);
+                        }
+                        else {
+                            $scope.errorMsg = reason.errorMsg;
+
+                            //set the form inputs to invalid
+                            $scope.loginForm.username.$setValidity("auth", false);
+                            $scope.loginForm.password.$setValidity("auth", false);
+                        }
+                    });
 
             //setup a watch for both of the model values changing, if they change
             // while the form is invalid, then revalidate them so that the form can 

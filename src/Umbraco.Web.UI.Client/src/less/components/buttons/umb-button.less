@@ -1,16 +1,21 @@
 .umb-button {
    position: relative;
    overflow: hidden;
+   display: inline;
 }
 
  .umb-button__button:focus {
    outline: none;
 }
 
+ .umb-button__button {
+    position: relative;
+    z-index: 1;
+ }
+
 .umb-button__content {
    opacity: 1;
    transition: opacity 0.25s ease;
-
    display: flex;
    flex-wrap: wrap;
 }

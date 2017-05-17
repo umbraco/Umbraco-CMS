@@ -85,7 +85,7 @@ namespace Umbraco.Tests.Services
 
             Assert.IsTrue(moveResult.Success);
 
-            //re-get with the fixed/moved path 
+            //re-get with the fixed/moved path
             content = contentService.GetById(content.Id);
 
             Assert.AreEqual("-1,-20," + content.Id, content.Path);
@@ -274,7 +274,7 @@ namespace Umbraco.Tests.Services
             content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
             contentService.Publish(content2);
 
-            // Act            
+            // Act
             contentService.MoveToRecycleBin(content1);
 
             // Assert
@@ -310,7 +310,7 @@ namespace Umbraco.Tests.Services
             content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
             contentService.Publish(content2);
 
-            // Act            
+            // Act
             contentService.MoveToRecycleBin(content1);
             contentService.MoveToRecycleBin(content2);
 
@@ -343,7 +343,7 @@ namespace Umbraco.Tests.Services
             content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
             contentService.Publish(content2);
 
-            // Act            
+            // Act
             contentService.UnPublish(content1);
             contentService.UnPublish(content2);
 
@@ -379,7 +379,7 @@ namespace Umbraco.Tests.Services
             contentService.UnPublish(content1);
             contentService.UnPublish(content2);
 
-            // Act            
+            // Act
             contentService.Publish(content1);
 
             // Assert
@@ -415,7 +415,7 @@ namespace Umbraco.Tests.Services
             contentService.MoveToRecycleBin(content1);
             contentService.MoveToRecycleBin(content2);
 
-            // Act            
+            // Act
             contentService.Move(content1, -1);
             contentService.Publish(content1);
 
@@ -864,8 +864,10 @@ namespace Umbraco.Tests.Services
             bool published = contentService.Publish(content, 0);
 
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var uow = provider.GetUnitOfWork();
-            Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
+            using (var uow = provider.GetUnitOfWork())
+            {
+                Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
+            }
 
             // Act
             bool unpublished = contentService.UnPublish(content, 0);
@@ -875,8 +877,10 @@ namespace Umbraco.Tests.Services
             Assert.That(unpublished, Is.True);
             Assert.That(content.Published, Is.False);
 
-            uow = provider.GetUnitOfWork();
-            Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
+            using (var uow = provider.GetUnitOfWork())
+            {
+                Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
+            }
         }
 
         /// <summary>
@@ -972,7 +976,7 @@ namespace Umbraco.Tests.Services
             // Act
             contentService.RePublishAll(new int[] { allContent.Last().ContentTypeId });
 
-            // Assert            
+            // Assert
             using (var uow = provider.GetUnitOfWork())
             {
                 Assert.AreEqual(allContent.Count(), uow.Database.ExecuteScalar<int>("select count(*) from cmsContentXml"));
@@ -1329,7 +1333,7 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(content.ParentId, Is.EqualTo(-20));
             Assert.That(content.Trashed, Is.True);
-            Assert.That(descendants.Count(), Is.EqualTo(3));
+            Assert.That(descendants.Count, Is.EqualTo(3));
             Assert.That(descendants.Any(x => x.Path.Contains("-20") == false), Is.False);
 
             //Empty Recycle Bin
@@ -1553,7 +1557,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Save_Lazy_Content()
         {
-            var unitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
+            var provider = new PetaPocoUnitOfWorkProvider(Mock.Of<ILogger>());
+            var unitOfWork = provider.GetUnitOfWork();
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
 
@@ -1794,6 +1799,74 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(content.HasPublishedVersion());
         }
 
+        [Test]
+        public void Can_Get_Paged_Children()
+        {
+            var service = ServiceContext.ContentService;
+            // Start by cleaning the "db"
+            var umbTextPage = service.GetById(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+            service.Delete(umbTextPage);
+
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            ServiceContext.ContentTypeService.Save(contentType);
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedContent.CreateSimpleContent(contentType);
+                ServiceContext.ContentService.Save(c1);
+            }
+            
+            long total;
+            var entities = service.GetPagedChildren(-1, 0, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(6));
+            Assert.That(total, Is.EqualTo(10));
+            entities = service.GetPagedChildren(-1, 1, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(total, Is.EqualTo(10));
+        }
+
+        [Test]
+        public void Can_Get_Paged_Children_Dont_Get_Descendants()
+        {
+            var service = ServiceContext.ContentService;
+            // Start by cleaning the "db"
+            var umbTextPage = service.GetById(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+            service.Delete(umbTextPage);
+
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            ServiceContext.ContentTypeService.Save(contentType);
+            // only add 9 as we also add a content with children 
+            for (int i = 0; i < 9; i++)
+            {
+                var c1 = MockedContent.CreateSimpleContent(contentType);
+                ServiceContext.ContentService.Save(c1);
+            }
+
+            var willHaveChildren = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(willHaveChildren);
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedContent.CreateSimpleContent(contentType, "Content" + i, willHaveChildren.Id);
+                ServiceContext.ContentService.Save(c1);
+            }
+
+            long total;
+            // children in root including the folder - not the descendants in the folder
+            var entities = service.GetPagedChildren(-1, 0, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(6));
+            Assert.That(total, Is.EqualTo(10));
+            entities = service.GetPagedChildren(-1, 1, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(total, Is.EqualTo(10));
+
+            // children in folder
+            entities = service.GetPagedChildren(willHaveChildren.Id, 0, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(6));
+            Assert.That(total, Is.EqualTo(10));
+            entities = service.GetPagedChildren(willHaveChildren.Id, 1, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(total, Is.EqualTo(10));
+        }
+
         private IEnumerable<IContent> CreateContentHierarchy()
         {
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
@@ -1827,7 +1900,7 @@ namespace Umbraco.Tests.Services
             return list;
         }
 
-        private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
+        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);

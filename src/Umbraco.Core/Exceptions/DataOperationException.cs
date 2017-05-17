@@ -7,7 +7,7 @@ namespace Umbraco.Core.Exceptions
         public T Operation { get; private set; }
 
         public DataOperationException(T operation, string message)
-            :base(message)
+            : base(message)
         {
             Operation = operation;
         }

@@ -79,7 +79,9 @@ namespace Umbraco.Web.Trees
                     queryStrings,
                     member.Name,
                     "icon-user",
-                    false);
+                    false,
+                    "",
+                    Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(Constants.ObjectTypes.MemberGuid), member.Key));
 
                 node.AdditionalData.Add("contentType", member.ContentTypeAlias);
                 node.AdditionalData.Add("isContainer", true);

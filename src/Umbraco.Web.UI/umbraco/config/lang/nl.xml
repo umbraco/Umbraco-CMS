@@ -339,6 +339,7 @@
     <key alias="filter">Typ om te filteren...</key>
     <key alias="enterTags">Typ om tags toe te voegen (druk op enter na elke tag)...</key>
 	<key alias="email">Voer jouw email in</key>
+    <key alias="usernameHint">Jouw gebruikersnaam is meestal jouw email</key>
   </area>
 
   <area alias="editcontenttype">
@@ -828,7 +829,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   <area alias="publicAccess">
     <key alias="paAdvanced">Geavanceerd: Beveilig door de Member Groups te seecteren die toegang hebben op de pagina</key>
     <key alias="paAdvancedHelp"><![CDATA[Als je toegang tot pagina's wilt regelen met behulp van role-based authenticatie,<br /> gebruik makend van Umbraco's member groups.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Je moet eerst een membergroup maken voordat je kunt werken met <br />role-based authentication.]]></key>
+    <key alias="paAdvancedNoGroups">Je moet eerst een membergroup maken voordat je kunt werken met role-based authentication.</key>
     <key alias="paErrorPage">Error Pagina</key>
     <key alias="paErrorPageHelp">Gebruikt om te tonen als een gebruiker is ingelogd, maar geen rechten heeft om de pagina te bekijken</key>
     <key alias="paHowWould">Hoe wil je de pagina beveiligen?</key>

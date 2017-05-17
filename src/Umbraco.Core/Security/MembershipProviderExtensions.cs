@@ -9,12 +9,45 @@ using System.Web;
 using System.Web.Hosting;
 using System.Web.Security;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Security
 {
     public static class MembershipProviderExtensions
     {
+        /// <summary>
+        /// Extension method to check if a password can be reset based on a given provider and the current request (logged in user)
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="userService"></param>
+        /// <returns></returns>
+        internal static bool CanResetPassword(this MembershipProvider provider, IUserService userService)
+        {
+            if (provider == null) throw new ArgumentNullException("provider");
+            
+            var canReset = provider.EnablePasswordReset;
+
+            if (userService == null) return canReset;
+
+            //we need to check for the special case in which a user is an admin - in which acse they can reset the password even if EnablePasswordReset == false
+            if (provider.EnablePasswordReset == false)
+            {
+                var identity = Thread.CurrentPrincipal.GetUmbracoIdentity();
+                if (identity != null)
+                {
+                    var user = userService.GetByUsername(identity.Username);
+                    var userIsAdmin = user.IsAdmin();
+                    if (userIsAdmin)
+                    {
+                        canReset = true;
+                    }
+                }
+            }
+            return canReset;
+        }
+
         internal static MembershipUserCollection FindUsersByName(this MembershipProvider provider, string usernameToMatch)
         {
             int totalRecords = 0;

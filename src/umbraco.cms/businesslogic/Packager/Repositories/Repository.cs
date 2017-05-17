@@ -13,6 +13,7 @@ using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.packager.repositories
 {
+    [Obsolete("This should not be used and will be removed in future Umbraco versions")]
     public class Repository : DisposableObject
     {        
         public string Guid { get; private set; }

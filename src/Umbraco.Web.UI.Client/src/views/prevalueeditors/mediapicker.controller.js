@@ -13,8 +13,14 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
         multiPicker: false,
         entityType: "Media",
         section: "media",
-        treeAlias: "media"
+        treeAlias: "media",
+        idType: "int"
     };
+
+    //combine the dialogOptions with any values returned from the server
+    if ($scope.model.config) {
+        angular.extend(dialogOptions, $scope.model.config);
+    }
 
     $scope.openContentPicker = function() {
       $scope.contentPickerOverlay = dialogOptions;
@@ -53,18 +59,21 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
     };
 
     $scope.add = function (item) {
+
+        var itemId = dialogOptions.idType === "udi" ? item.udi : item.id;
+
         var currIds = _.map($scope.renderModel, function (i) {
-            return i.id;
+            return dialogOptions.idType === "udi" ? i.udi : i.id;
         });
-        if (currIds.indexOf(item.id) < 0) {
+        if (currIds.indexOf(itemId) < 0) {
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
+            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon, udi: item.udi });
         }	
     };
 
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
         var currIds = _.map($scope.renderModel, function (i) {
-            return i.id;
+            return dialogOptions.idType === "udi" ? i.udi : i.id;
         });
         $scope.model.value = trim(currIds.join(), ",");
     });
@@ -76,12 +85,15 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
 
     //load media data
     var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
-    entityResource.getByIds(modelIds, dialogOptions.entityType).then(function (data) {
-        _.each(data, function (item, i) {
-            item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon });
+    if (modelIds.length > 0) {
+        entityResource.getByIds(modelIds, dialogOptions.entityType).then(function (data) {
+            _.each(data, function (item, i) {
+                item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+                $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon, udi: item.udi });
+            });
         });
-    });
+    }
+    
     
 }
 

@@ -34,10 +34,15 @@
        xdt:Transform="SetAttributes()" />
   <add application="settings" alias="templates" title="Templates" type="Umbraco.Web.Trees.TemplatesTreeController, umbraco" iconClosed="icon-folder" iconOpen="icon-folder-open" sortOrder="1" 
        xdt:Locator="Match(application,alias)" 
-       xdt:Transform="SetAttributes()" />
-  <add application="settings" alias="partialViews" title="Partial Views" silent="false" initialize="true" iconClosed="icon-folder" iconOpen="icon-folder" type="Umbraco.Web.Trees.PartialViewsTree, umbraco" sortOrder="2" 
-       xdt:Locator="Match(application,alias)" 
-       xdt:Transform="SetAttributes()" />
+       xdt:Transform="SetAttributes()" /> 
+  
+  <add application="settings" alias="partialViews" type="Umbraco.Web.Trees.PartialViewsTree, umbraco"
+       xdt:Locator="Match(application,alias,type)"
+       xdt:Transform="Remove()" />
+  <add application="settings" alias="partialViews" title="Partial Views" silent="false" initialize="true" iconClosed="icon-folder" iconOpen="icon-folder" type="Umbraco.Web.Trees.PartialViewsTreeController, umbraco" sortOrder="2"
+       xdt:Locator="Match(application,alias)"
+       xdt:Transform="InsertIfMissing"  />
+  
   <add application="settings" alias="scripts" title="Scripts" type="umbraco.loadScripts, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="4" 
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="SetAttributes()" />
@@ -84,9 +89,14 @@
   <add application="developer" alias="xslt" title="XSLT Files" type="umbraco.loadXslt, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="5" 
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="SetAttributes()" />
-  <add application="developer" alias="partialViewMacros" type="Umbraco.Web.Trees.PartialViewMacrosTree, umbraco" silent="false" initialize="true" sortOrder="6" title="Partial View Macro Files" iconClosed="icon-folder" iconOpen="icon-folder" 
-       xdt:Locator="Match(application,alias)" 
-       xdt:Transform="SetAttributes()" />
+  
+  <add application="developer" alias="partialViewMacros" type="Umbraco.Web.Trees.PartialViewMacrosTree, umbraco"
+       xdt:Locator="Match(application,alias,type)" 
+       xdt:Transform="Remove()" />
+  <add application="developer" alias="partialViewMacros" type="Umbraco.Web.Trees.PartialViewMacrosTreeController, umbraco" silent="false" initialize="true" sortOrder="6" title="Partial View Macro Files" iconClosed="icon-folder" iconOpen="icon-folder"
+       xdt:Locator="Match(application,alias)"
+       xdt:Transform="InsertIfMissing"  />
+  
   <add application="developer" alias="python" 
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="Remove" />

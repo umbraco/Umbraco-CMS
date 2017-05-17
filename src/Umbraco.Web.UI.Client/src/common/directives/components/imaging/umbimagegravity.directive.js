@@ -112,7 +112,7 @@ angular.module("umbraco.directives")
 					        if (angular.isFunction(scope.onImageLoaded)) {
 					            scope.onImageLoaded();
 					        }
-					});
+					    });
 					});
 
 					$(window).on('resize.umbImageGravity', function(){

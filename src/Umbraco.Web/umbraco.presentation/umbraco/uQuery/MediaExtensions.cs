@@ -7,10 +7,11 @@ using Umbraco.Core;
 
 namespace umbraco
 {
-	/// <summary>
-	/// Extension methods for umbraco.cms.businesslogic.media.Media
-	/// </summary>
-	public static class MediaExtensions
+    /// <summary>
+    /// Extension methods for umbraco.cms.businesslogic.media.Media
+    /// </summary>
+    [Obsolete("Obsolete, Use Umbraco.Core.Models.Media", false)]
+    public static class MediaExtensions
 	{
 		/// <summary>
 		/// Functionally similar to the XPath axis 'ancestor'
@@ -203,12 +204,13 @@ namespace umbraco
 			return string.Empty;
 		}
 
-		/// <summary>
-		/// Gets the image thumbnail URL.
-		/// </summary>
-		/// <param name="media">an umbraco.cms.businesslogic.media.Media object</param>
-		/// <returns></returns>
-		public static string GetImageThumbnailUrl(this Media media)
+        /// <summary>
+        /// Gets the image thumbnail URL.
+        /// </summary>
+        /// <param name="media">an umbraco.cms.businesslogic.media.Media object</param>
+        /// <returns></returns>
+        [Obsolete("This should no longer be used, thumbnail generation should be done via ImageProcessor, Umbraco no longer generates '_thumb' files for media")]
+        public static string GetImageThumbnailUrl(this Media media)
 		{
 			if (media.ContentType.Alias.Equals(Constants.Conventions.MediaTypes.Image))
 			{
