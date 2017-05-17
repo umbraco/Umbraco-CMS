@@ -62,7 +62,8 @@ Use this directive to render an umbraco button. The directive can be used to gen
 @param {string=} shortcut Set a keyboard shortcut for the button ("ctrl+c").
 @param {string=} label Set the button label.
 @param {string=} labelKey Set a localization key to make a multi lingual button ("general_buttonText").
-@param {string=} icon Set a button icon. Can only be used when buttonStyle is "link".
+@param {string=} icon Set a button icon.
+@param {string=} size Set a button icon ("xs", "m", "l", "xl").
 @param {boolean=} disabled Set to <code>true</code> to disable the button.
 **/
 
@@ -122,7 +123,8 @@ Use this directive to render an umbraco button. The directive can be used to gen
             label: "@?",
             labelKey: "@?",
             icon: "@?",
-            disabled: "="
+            disabled: "=",
+            size: "@?"
          }
       };
 
