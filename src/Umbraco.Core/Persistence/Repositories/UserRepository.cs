@@ -111,13 +111,18 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //base query includes user groups
             var sql = GetBaseQuery("umbracoUser.*, umbracoUserGroup.*, umbracoUserGroup2App.*");
+            AddGroupLeftJoin(sql);
+            return sql;
+        }
+
+        private void AddGroupLeftJoin(Sql sql)
+        {
             sql.LeftJoin<User2UserGroupDto>(SqlSyntax)
                 .On<User2UserGroupDto, UserDto>(SqlSyntax, dto => dto.UserId, dto => dto.Id)
                 .LeftJoin<UserGroupDto>(SqlSyntax)
                 .On<UserGroupDto, User2UserGroupDto>(SqlSyntax, dto => dto.Id, dto => dto.UserGroupId)
                 .LeftJoin<UserGroup2AppDto>(SqlSyntax)
-                .On<UserGroup2AppDto, UserGroupDto>(SqlSyntax, dto => dto.UserGroupId, dto => dto.Id);                
-            return sql;
+                .On<UserGroup2AppDto, UserGroupDto>(SqlSyntax, dto => dto.UserGroupId, dto => dto.Id);
         }
 
         private Sql GetBaseQuery(string columns)
@@ -168,6 +173,24 @@ namespace Umbraco.Core.Persistence.Repositories
             var id = Convert.ToInt32(Database.Insert(userDto));
             entity.Id = id;
 
+            if (entity.IsPropertyDirty("Groups"))
+            {
+                //lookup all assigned
+                var assigned = entity.Groups == null || entity.Groups.Any() == false
+                    ? new List<UserGroupDto>()
+                    : Database.Fetch<UserGroupDto>("SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)", new { aliases = entity.Groups });
+                
+                foreach (var groupDto in assigned)
+                {
+                    var dto = new User2UserGroupDto
+                    {
+                        UserGroupId = groupDto.Id,
+                        UserId = entity.Id
+                    };
+                    Database.Insert(dto);
+                }
+            }
+
             entity.ResetDirtyProperties();
         }
 
@@ -182,9 +205,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             var userDto = userFactory.BuildDto(entity);
-
-            var dirtyEntity = (ICanBeDirty)entity;
-
+            
             //build list of columns to check for saving - we don't want to save the password if it hasn't changed!
             //List the columns to save, NOTE: would be nice to not have hard coded strings here but no real good way around that
             var colsToSave = new Dictionary<string, string>()
@@ -207,19 +228,19 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //create list of properties that have changed
             var changedCols = colsToSave
-                .Where(col => dirtyEntity.IsPropertyDirty(col.Value))
+                .Where(col => entity.IsPropertyDirty(col.Value))
                 .Select(col => col.Key)
                 .ToList();
 
             // DO NOT update the password if it has not changed or if it is null or empty
-            if (dirtyEntity.IsPropertyDirty("RawPasswordValue") && entity.RawPasswordValue.IsNullOrWhiteSpace() == false)
+            if (entity.IsPropertyDirty("RawPasswordValue") && entity.RawPasswordValue.IsNullOrWhiteSpace() == false)
             {
                 changedCols.Add("userPassword");
 
                 //special case - when using ASP.Net identity the user manager will take care of updating the security stamp, however
                 // when not using ASP.Net identity (i.e. old membership providers), we'll need to take care of updating this manually
                 // so we can just detect if that property is dirty, if it's not we'll set it manually
-                if (dirtyEntity.IsPropertyDirty("SecurityStamp") == false)
+                if (entity.IsPropertyDirty("SecurityStamp") == false)
                 {
                     userDto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
                     changedCols.Add("securityStampToken");
@@ -231,24 +252,27 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 Database.Update(userDto, changedCols);
             }
-            
-            //lookup all assigned
-            var assigned = entity.Groups == null || entity.Groups.Any() == false
-                ? new List<UserGroupDto>()
-                : Database.Fetch<UserGroupDto>("SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)", new {aliases = entity.Groups});
-            
-            //first delete all 
-            //TODO: We could do this a nicer way instead of "Nuke and Pave"
-            Database.Delete<User2UserGroupDto>("WHERE UserId = @UserId", new { UserId = entity.Id });
 
-            foreach (var groupDto in assigned)
+            if (entity.IsPropertyDirty("Groups"))
             {
-                var dto = new User2UserGroupDto
+                //lookup all assigned
+                var assigned = entity.Groups == null || entity.Groups.Any() == false
+                    ? new List<UserGroupDto>()
+                    : Database.Fetch<UserGroupDto>("SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)", new { aliases = entity.Groups });
+
+                //first delete all 
+                //TODO: We could do this a nicer way instead of "Nuke and Pave"
+                Database.Delete<User2UserGroupDto>("WHERE UserId = @UserId", new { UserId = entity.Id });
+
+                foreach (var groupDto in assigned)
                 {
-                    UserGroupId = groupDto.Id,
-                    UserId = entity.Id
-                };
-                Database.Insert(dto);
+                    var dto = new User2UserGroupDto
+                    {
+                        UserGroupId = groupDto.Id,
+                        UserId = entity.Id
+                    };
+                    Database.Insert(dto);
+                }
             }
 
             entity.ResetDirtyProperties();
@@ -372,9 +396,12 @@ namespace Umbraco.Core.Persistence.Repositories
         private IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, string[] userGroups = null, UserState? userState = null, IQuery<IUser> filter = null)
         {
             if (string.IsNullOrWhiteSpace(orderBy)) throw new ArgumentException("Value cannot be null or whitespace.", "orderBy");
-            
 
-            var filterSql = new Sql();
+
+            Sql filterSql = null;
+            if (filter != null || (userGroups != null && userGroups.Length > 0))
+                filterSql = new Sql();
+
             if (filter != null)
             {
                 foreach (var filterClaus in filter.GetWhereClauses())
@@ -382,100 +409,75 @@ namespace Umbraco.Core.Persistence.Repositories
                     filterSql.Append(string.Format("AND ({0})", filterClaus.Item1), filterClaus.Item2);
                 }
             }
-            Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(filterSql.SQL, filterSql.Arguments);
-            
+            if (userGroups != null && userGroups.Length > 0)
+            {
+                var subQuery = @"AND (umbracoUser.id IN (SELECT DISTINCT umbracoUser.id
+		            FROM umbracoUser
+		            INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
+		            INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
+		            WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
+                filterSql.Append(subQuery, new {userGroups=  userGroups});
+            }
+
             // Get base query for returning IDs
             var sqlBaseIds = GetBaseQuery("id");
-            // Get base query for returning all data
-            var sqlBaseFull = GetBaseQuery(false);
-
+            
             if (query == null) query = new Query<IUser>();
             var translatorIds = new SqlTranslator<IUser>(sqlBaseIds, query);
             var sqlQueryIds = translatorIds.Translate();
-            var translatorFull = new SqlTranslator<IUser>(sqlBaseFull, query);
-            var sqlQueryFull = translatorFull.Translate();            
-
+            
             //get sorted and filtered sql
             var sqlNodeIdsWithSort = GetSortedSqlForPagedResults(
-                GetFilteredSqlForPagedResults(sqlQueryIds, filterCallback),
+                GetFilteredSqlForPagedResults(sqlQueryIds, filterSql),
                 orderDirection, orderBy);
 
             // Get page of results and total count
-            IEnumerable<IUser> result;
             var pagedResult = Database.Page<UserDto>(pageIndex + 1, pageSize, sqlNodeIdsWithSort);
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);
 
+            //NOTE: We need to check the actual items returned, not the 'totalRecords', that is because if you request a page number
+            // that doesn't actually have any data on it, the totalRecords will still indicate there are records but there are none in
+            // the pageResult.
+            if (pagedResult.Items.Any())
+            {
+                //Create the inner paged query that was used above to get the paged result, we'll use that as the inner sub query
+                var args = sqlNodeIdsWithSort.Arguments;
+                string sqlStringCount, sqlStringPage;
+                Database.BuildPageQueries<UserDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlStringCount, out sqlStringPage);
+
+                var sqlQueryFull = GetBaseQuery("umbracoUser.*, umbracoUserGroup.*, umbracoUserGroup2App.*");
+                
+                var fullQueryWithPagedInnerJoin = sqlQueryFull
+                    .Append("INNER JOIN (")
+                    //join the paged query with the paged query arguments
+                    .Append(sqlStringPage, args)
+                    .Append(") temp ")
+                    .Append("ON umbracoUser.id = temp.id");
+
+                AddGroupLeftJoin(fullQueryWithPagedInnerJoin);
+
+                //get sorted and filtered sql
+                var fullQuery = GetSortedSqlForPagedResults(
+                    GetFilteredSqlForPagedResults(fullQueryWithPagedInnerJoin, filterSql),
+                    orderDirection, orderBy);
+
+                var users = ConvertFromDtos(Database.Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserDto>(new UserGroupRelator().Map, fullQuery))
+                    .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
+
+                return users;
+            }
+
             return Enumerable.Empty<IUser>();
-
-            ////NOTE: We need to check the actual items returned, not the 'totalRecords', that is because if you request a page number
-            //// that doesn't actually have any data on it, the totalRecords will still indicate there are records but there are none in
-            //// the pageResult, then the GetAll will actually return ALL records in the db.
-            //if (pagedResult.Items.Any())
-            //{
-            //    //Create the inner paged query that was used above to get the paged result, we'll use that as the inner sub query
-            //    var args = sqlNodeIdsWithSort.Arguments;
-            //    string sqlStringCount, sqlStringPage;
-            //    Database.BuildPageQueries<UserDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlStringCount, out sqlStringPage);
-
-            //    //We need to make this FULL query an inner join on the paged ID query
-            //    var splitQuery = sqlQueryFull.SQL.Split(new[] { "WHERE " }, StringSplitOptions.None);
-            //    var fullQueryWithPagedInnerJoin = new Sql(splitQuery[0])
-            //        .Append("INNER JOIN (")
-            //        //join the paged query with the paged query arguments
-            //        .Append(sqlStringPage, args)
-            //        .Append(") temp ")
-            //        .Append(string.Format("ON {0}.{1} = temp.{1}", nodeIdSelect.Item1, nodeIdSelect.Item2))
-            //        //add the original where clause back with the original arguments
-            //        .Where(splitQuery[1], sqlQueryIds.Arguments);
-
-            //    //get sorted and filtered sql
-            //    var fullQuery = GetSortedSqlForPagedResults(
-            //        GetFilteredSqlForPagedResults(fullQueryWithPagedInnerJoin, defaultFilter),
-            //        orderDirection, orderBy, orderBySystemField, nodeIdSelect);
-
-            //    return processQuery(fullQuery, new PagingSqlQuery<TDto>(Database, sqlNodeIdsWithSort, pageIndex, pageSize));
-            //}
-            //else
-            //{
-            //    result = Enumerable.Empty<TEntity>();
-            //}
-
-            //return result;
-
-
-            //return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
-            //    new Tuple<string, string>("cmsMember", "nodeId"),
-            //    (sqlFull, sqlIds) => ProcessQuery(sqlFull, sqlIds), orderBy, orderDirection, orderBySystemField,
-            //    filterCallback);
-
-
-            //var sql = new Sql()
-            //    .Select("umbracoUser.Id")
-            //    .From<UserDto>(SqlSyntax);
-
-            //var idsQuery = query == null ? sql : new SqlTranslator<IUser>(sql, query).Translate();
-
-            //// need to ensure the order by is in brackets, see: https://github.com/toptensoftware/PetaPoco/issues/177
-            //idsQuery.OrderBy("(" + orderBy + ")");
-            //var page = Database.Page<int>(pageIndex + 1, pageSize, idsQuery);
-            //totalRecords = Convert.ToInt32(page.TotalItems);
-
-            //if (totalRecords == 0)
-            //    return Enumerable.Empty<IUser>();
-
-            //// now get the actual users and ensure they are ordered properly (same clause)
-            //var ids = page.Items.ToArray();
-            //return ids.Length == 0 ? Enumerable.Empty<IUser>() : GetAll(ids).OrderBy(orderBy.Compile());
         }
 
-        private Sql GetFilteredSqlForPagedResults(Sql sql, Func<Tuple<string, object[]>> defaultFilter = null)
+        private Sql GetFilteredSqlForPagedResults(Sql sql, Sql filterSql)
         {
             Sql filteredSql;
 
             // Apply filter
-            if (defaultFilter != null)
+            if (filterSql != null)
             {
-                var filterResult = defaultFilter();
+                var sqlFilter = " WHERE " + filterSql.SQL.TrimStart("AND ");
 
                 //NOTE: this is certainly strange - NPoco handles this much better but we need to re-create the sql
                 // instance a couple of times to get the parameter order correct, for some reason the first
@@ -483,9 +485,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 // accordingly - so we re-create it again. In v8 we don't need to do this and it's already taken care of.
 
                 filteredSql = new Sql(sql.SQL, sql.Arguments);
-                var args = filteredSql.Arguments.Concat(filterResult.Item2).ToArray();
+                var args = filteredSql.Arguments.Concat(filterSql.Arguments).ToArray();
                 filteredSql = new Sql(
-                    string.Format("{0} {1}", filteredSql.SQL, filterResult.Item1),
+                    string.Format("{0} {1}", filteredSql.SQL, sqlFilter),
                     args);
                 filteredSql = new Sql(filteredSql.SQL, args);
             }

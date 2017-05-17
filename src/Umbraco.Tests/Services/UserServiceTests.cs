@@ -12,6 +12,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.BusinessLogic.Actions;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Tests.Services
 {
@@ -307,6 +308,72 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(11, totalRecs);
             Assert.AreEqual("admin", found.First().Username);
             Assert.AreEqual("test0", found.Last().Username);
+        }
+
+        [Test]
+        public void Get_All_Paged_Users_With_Filter()
+        {
+            var users = MockedUser.CreateMulipleUsers(10).ToArray();         
+            ServiceContext.UserService.Save(users);
+
+            long totalRecs;
+            var found = ServiceContext.UserService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, filter: "test");
+
+            Assert.AreEqual(2, found.Count());
+            Assert.AreEqual(10, totalRecs);
+            Assert.AreEqual("test0", found.First().Username);
+            Assert.AreEqual("test1", found.Last().Username);
+        }
+
+        [Test]
+        public void Get_All_Paged_Users_For_Group()
+        {
+            var userGroup = MockedUserGroup.CreateUserGroup();
+            ServiceContext.UserService.Save(userGroup);
+
+            var users = MockedUser.CreateMulipleUsers(10).ToArray();
+            for (var i = 0; i < 10;)
+            {
+                users[i].AddGroup(userGroup.Alias);
+                i = i + 2;
+            }
+            ServiceContext.UserService.Save(users);
+
+            long totalRecs;
+            var found = ServiceContext.UserService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, userGroups: new[] {userGroup.Alias});
+
+            Assert.AreEqual(2, found.Count());
+            Assert.AreEqual(5, totalRecs);
+            Assert.AreEqual("test0", found.First().Username);
+            Assert.AreEqual("test2", found.Last().Username);
+        }
+
+        [Test]
+        public void Get_All_Paged_Users_For_Group_With_Filter()
+        {
+            var userGroup = MockedUserGroup.CreateUserGroup();
+            ServiceContext.UserService.Save(userGroup);
+
+            var users = MockedUser.CreateMulipleUsers(10).ToArray();
+            for (var i = 0; i < 10;)
+            {
+                users[i].AddGroup(userGroup.Alias);
+                i = i + 2;
+            }
+            for (var i = 0; i < 10;)
+            {
+                users[i].Name = "blah" + users[i].Name;
+                i = i + 3;
+            }
+            ServiceContext.UserService.Save(users);
+
+            long totalRecs;
+            var found = ServiceContext.UserService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, userGroups: new[] { userGroup.Alias }, filter: "blah");
+
+            Assert.AreEqual(2, found.Count());
+            Assert.AreEqual(2, totalRecs);
+            Assert.AreEqual("test0", found.First().Username);
+            Assert.AreEqual("test6", found.Last().Username);
         }
 
         [Test]

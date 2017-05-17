@@ -59,6 +59,38 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Perform_Add_With_Group()
+        {
+            var group = MockedUserGroup.CreateUserGroup();
+
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateUserGroupRepository(unitOfWork))
+            {
+                repository.AddOrUpdate(group);
+                unitOfWork.Commit();
+            }
+
+            using (var repository = CreateRepository(unitOfWork))
+            {                
+                IUser user = MockedUser.CreateUser();
+                user.AddGroup(group.Alias);
+
+                // Act
+                repository.AddOrUpdate(user);
+                unitOfWork.Commit();
+
+                user = repository.Get(user.Id);
+
+                // Assert
+                Assert.That(user.HasIdentity, Is.True);
+                Assert.AreEqual(1, user.Groups.Count());
+                Assert.AreEqual(group.Alias, user.Groups.ElementAt(0));
+            }
+        }
+
+        [Test]
         public void Can_Perform_Multiple_Adds_On_UserRepository()
         {
             // Arrange
