@@ -14,8 +14,14 @@
         function getUser() {
             var deferred = $q.defer();
             var user = {
+                "id": 1,
                 "name": "Tammy Contreras",
-                "email": "tammy@contreras.com"
+                "email": "tammy@contreras.com",
+                "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/adellecharles/128.jpg",
+                "lastLogin": "2014-04-25T01:32:21.196Z",
+                "invitedBy": "Edward Flores",
+                "createdBy": "",
+                "state": "active"
             };
             deferred.resolve(user);
             return deferred.promise;
