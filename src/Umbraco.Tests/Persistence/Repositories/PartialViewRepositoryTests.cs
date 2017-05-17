@@ -37,14 +37,14 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             var repository = new PartialViewRepository(unitOfWork, _fileSystem);
 
-            var partialView = new PartialView("test-path-1.cshtml") { Content = "// partialView" };
+            var partialView = new PartialView(PartialViewType.PartialView, "test-path-1.cshtml") { Content = "// partialView" };
             repository.AddOrUpdate(partialView);
             unitOfWork.Commit();
             Assert.IsTrue(_fileSystem.FileExists("test-path-1.cshtml"));
             Assert.AreEqual("test-path-1.cshtml", partialView.Path);
             Assert.AreEqual("/Views/Partials/test-path-1.cshtml", partialView.VirtualPath);
 
-            partialView = new PartialView("path-2/test-path-2.cshtml") { Content = "// partialView" };
+            partialView = new PartialView(PartialViewType.PartialView, "path-2/test-path-2.cshtml") { Content = "// partialView" };
             repository.AddOrUpdate(partialView);
             unitOfWork.Commit();
             Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.cshtml"));
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.AreEqual("path-2\\test-path-2.cshtml", partialView.Path);
             Assert.AreEqual("/Views/Partials/path-2/test-path-2.cshtml", partialView.VirtualPath);
 
-            partialView = new PartialView("path-2\\test-path-3.cshtml") { Content = "// partialView" };
+            partialView = new PartialView(PartialViewType.PartialView, "path-2\\test-path-3.cshtml") { Content = "// partialView" };
             repository.AddOrUpdate(partialView);
             unitOfWork.Commit();
             Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.cshtml"));
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.AreEqual("path-2\\test-path-3.cshtml", partialView.Path);
             Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
 
-            partialView = new PartialView("\\test-path-4.cshtml") { Content = "// partialView" };
+            partialView = new PartialView(PartialViewType.PartialView, "\\test-path-4.cshtml") { Content = "// partialView" };
             Assert.Throws<FileSecurityException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
             {
                 repository.AddOrUpdate(partialView);
