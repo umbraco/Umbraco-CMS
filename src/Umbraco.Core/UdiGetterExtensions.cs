@@ -198,7 +198,13 @@ namespace Umbraco.Core
         public static StringUdi GetUdi(this IPartialView entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new StringUdi(Constants.UdiEntityType.PartialView, entity.Path.TrimStart('/')).EnsureClosed();
+
+            // we should throw on Unknown but for the time being, assume it means PartialView
+            var entityType = entity.ViewType == PartialViewType.PartialViewMacro 
+                ? Constants.UdiEntityType.PartialViewMacro 
+                : Constants.UdiEntityType.PartialView;
+
+            return new StringUdi(entityType, entity.Path.TrimStart('/')).EnsureClosed();
         }
 
         /// <summary>
