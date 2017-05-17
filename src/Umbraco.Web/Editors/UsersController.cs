@@ -19,12 +19,12 @@ namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
     [UmbracoApplicationAuthorize(Constants.Applications.Users)]
-    public class UserController : UmbracoAuthorizedJsonController
+    public class UsersController : UmbracoAuthorizedJsonController
     {
         /// <summary>
         /// Constructor
         /// </summary>
-        public UserController()
+        public UsersController()
             : this(UmbracoContext.Current)
         {
         }
@@ -33,7 +33,7 @@ namespace Umbraco.Web.Editors
         /// Constructor
         /// </summary>
         /// <param name="umbracoContext"></param>
-        public UserController(UmbracoContext umbracoContext)
+        public UsersController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
         }
@@ -53,47 +53,22 @@ namespace Umbraco.Web.Editors
             return Mapper.Map<IUser, UserDisplay>(user);
         }
 
-        //TODO: This will probably not be UserDisplay objects since there's probably too much data in the display object for a grid
         public PagedResult<UserDisplay> GetPagedUsers(
             int id,
             int pageNumber = 1,
             int pageSize = 0,
-            string orderBy = "SortOrder",
+            string orderBy = "username",
             Direction orderDirection = Direction.Ascending,
+            string[] userGroups = null,
             string filter = "")
         {
+            long pageIndex = pageNumber - 1;
+            long total;
+            var result = Services.UserService.GetAll(pageIndex, pageSize, out total, orderBy, orderDirection, null, userGroups, filter);
 
-            //TODO: Make this real, for now this is mock data
-
-            var startId = 100 + ((pageNumber -1) * pageSize);
-            var numUsers = pageSize;
-            var users = new List<UserDisplay>();
-            var userTypes = Services.UserService.GetAllUserGroups().ToDictionary(x => x.Alias, x => x.Name);
-            var cultures = Services.TextService.GetSupportedCultures().ToDictionary(x => x.Name, x => x.DisplayName);
-            for (int i = 0; i < numUsers; i++)
+            return new PagedResult<UserDisplay>(total, pageNumber, pageSize)
             {
-                var display = new UserDisplay
-                {
-                    Id = startId,
-                    //UserType = "writer",
-                    AllowedSections = new[] {"content", "media"},
-                    AvailableUserGroups = userTypes,
-                    Email = "test" + startId + "@test.com",
-                    Name = "User " + startId,
-                    Culture = "en-US",
-                    AvailableCultures = cultures,
-                    Path = "-1," + startId,
-                    ParentId = -1,
-                    StartContentId = -1,
-                    StartMediaId = -1
-                };
-                users.Add(display);
-                startId++;
-            }
-
-            return new PagedResult<UserDisplay>(100, pageNumber, pageSize)
-            {
-                Items = users
+                Items = Mapper.Map<IEnumerable<UserDisplay>>(result)
             };
         }
 

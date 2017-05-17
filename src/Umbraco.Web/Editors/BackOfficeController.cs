@@ -237,7 +237,7 @@ namespace Umbraco.Web.Editors
                                     controller => controller.GetEmbed("", 0, 0))
                             },
                             {
-                                "userApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<UserController>(
+                                "userApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<UsersController>(
                                     controller => controller.PostDisableUser(0))
                             },
                             {
