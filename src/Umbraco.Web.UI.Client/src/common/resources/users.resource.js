@@ -12,16 +12,63 @@
     function usersResource($http, umbRequestHelper, $q) {
 
         function disableUser(userId) {
-          if (!userId) {
-            throw "userId not specified";
+            if (!userId) {
+                throw "userId not specified";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "userApiBaseUrl",
+                        "PostDisableUser", [{ userId: userId }])),
+                'Failed to disable the user ' + userId);
+        }
+
+        function getPagedResults(options) {
+            var defaults = {
+                pageSize: 25,
+                pageNumber: 1,
+                filter: '',
+                orderDirection: "Ascending",
+                orderBy: "Username",
+                userGroups: []
+            };
+            if (options === undefined) {
+                options = {};
+            }
+            //overwrite the defaults if there are any specified
+            angular.extend(defaults, options);
+            //now copy back to the options we will use
+            options = defaults;
+            //change asc/desct
+            if (options.orderDirection === "asc") {
+                options.orderDirection = "Ascending";
+            }
+            else if (options.orderDirection === "desc") {
+                options.orderDirection = "Descending";
+            }
+
+          var params = {
+            pageNumber: options.pageNumber,
+            pageSize: options.pageSize,
+            orderBy: options.orderBy,
+            orderDirection: options.orderDirection,
+            filter: options.filter
+          };
+          //we need to create a custom query string for the usergroup array, so create it now and we can append the user groups if needed
+          var qry = umbRequestHelper.dictionaryToQueryString(params);
+          if (options.userGroups.length > 0) {
+            //we need to create a custom query string for an array
+            qry += "&" + options.userGroups.join("&");
           }
 
           return umbRequestHelper.resourcePromise(
-            $http.post(
+            $http.get(
               umbRequestHelper.getApiUrl(
                 "userApiBaseUrl",
-                "PostDisableUser", [{ userId: userId }])),
-            'Failed to disable the user ' + userId);
+                "GetPagedUsers",
+                qry)),
+            'Failed to retrieve users paged result');
         }
 
         function getUser() {
@@ -270,7 +317,7 @@
                     "alias": "writer",
                     "id": 2,
                     "icon": "icon-edit",
-                    "sections": [{ "id": "1", "name": "Content"}, { "id": "2", "name": "Media"}],
+                    "sections": [{ "id": "1", "name": "Content" }, { "id": "2", "name": "Media" }],
                     "startNodesContent": [],
                     "startNodesMedia": []
                 },
@@ -279,18 +326,18 @@
                     "alias": "editor",
                     "id": 3,
                     "icon": "icon-tools",
-                    "sections": [{ "id": "1", "name": "Content"}, { "id": "2", "name": "Media"}],
-                    "startNodesContent": [{ "id": "1", "name": "Start node 1"}, { "id": "2", "name": "Start node 2"}],
-                    "startNodesMedia": [{ "id": "1", "name": "Start node 1"}, { "id": "2", "name": "Start node 2"}]
+                    "sections": [{ "id": "1", "name": "Content" }, { "id": "2", "name": "Media" }],
+                    "startNodesContent": [{ "id": "1", "name": "Start node 1" }, { "id": "2", "name": "Start node 2" }],
+                    "startNodesMedia": [{ "id": "1", "name": "Start node 1" }, { "id": "2", "name": "Start node 2" }]
                 },
                 {
                     "name": "Translator",
                     "alias": "translator",
                     "id": 4,
                     "icon": "icon-globe",
-                    "sections": [{ "id": "1", "name": "Content"}, { "id": "2", "name": "Translations"}],
-                    "startNodesContent": [{ "id": "1", "name": "Start node 1"}],
-                    "startNodesMedia": [{ "id": "1", "name": "Start node 1"}]
+                    "sections": [{ "id": "1", "name": "Content" }, { "id": "2", "name": "Translations" }],
+                    "startNodesContent": [{ "id": "1", "name": "Start node 1" }],
+                    "startNodesMedia": [{ "id": "1", "name": "Start node 1" }]
                 }
             ];
             deferred.resolve(userGroups);
@@ -302,7 +349,8 @@
             getUsers: getUsers,
             getUserRole: getUserRole,
             getUserGroups: getUserGroups,
-            disableUser: disableUser
+            disableUser: disableUser,
+            getPagedResults: getPagedResults
         };
 
         return resource;

@@ -54,7 +54,6 @@ namespace Umbraco.Web.Editors
         }
 
         public PagedResult<UserDisplay> GetPagedUsers(
-            int id,
             int pageNumber = 1,
             int pageSize = 0,
             string orderBy = "username",

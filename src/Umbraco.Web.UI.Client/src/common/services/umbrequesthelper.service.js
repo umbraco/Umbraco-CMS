@@ -37,7 +37,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
          * @function
          *
          * @description
-         * This will turn an array of key/value pairs into a query string
+         * This will turn an array of key/value pairs or a standard dictionary into a query string
          * 
          * @param {Array} queryStrings An array of key/value pairs
          */
