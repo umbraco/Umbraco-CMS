@@ -11,6 +11,19 @@
 
     function usersResource($http, umbRequestHelper, $q) {
 
+        function disableUser(userId) {
+          if (!userId) {
+            throw "userId not specified";
+          }
+
+          return umbRequestHelper.resourcePromise(
+            $http.post(
+              umbRequestHelper.getApiUrl(
+                "userApiBaseUrl",
+                "PostDisableUser", [{ userId: userId }])),
+            'Failed to disable the user ' + userId);
+        }
+
         function getUser() {
             var deferred = $q.defer();
             var user = {
@@ -288,7 +301,8 @@
             getUser: getUser,
             getUsers: getUsers,
             getUserRole: getUserRole,
-            getUserGroups: getUserGroups
+            getUserGroups: getUserGroups,
+            disableUser: disableUser
         };
 
         return resource;
