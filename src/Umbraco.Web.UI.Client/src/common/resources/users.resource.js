@@ -21,7 +21,10 @@
                 "lastLogin": "2014-04-25T01:32:21.196Z",
                 "invitedBy": "Edward Flores",
                 "createdBy": "",
-                "state": "active"
+                "state": "active",
+                "userRoles": [],
+                "startNodesContent": [],
+                "startNodesMedia": []
             };
             deferred.resolve(user);
             return deferred.promise;
