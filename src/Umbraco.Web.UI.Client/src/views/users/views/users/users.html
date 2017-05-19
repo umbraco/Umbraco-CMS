@@ -61,30 +61,36 @@
             </umb-editor-sub-header-content-left>
 
             <umb-editor-sub-header-content-right ng-if="vm.selection.length > 0">
-                <umb-button
-                    ng-if="vm.allowSetUserRole"
-                    type="button"
+                <div style="margin-right: 5px;">
+                    <umb-button
+                        ng-if="vm.allowSetUserRole"
+                        type="button"
                     button-style="link"
-                    label="Set role"
-                    icon="icon-users"
-                    action="vm.setUserRoleUser()">
-                </umb-button>
-                <umb-button
-                    ng-if="vm.allowEnableUser"
-                    type="button"
+                        label="Set role"
+                        icon="icon-users"
+                        action="vm.setUserRoleUser()">
+                    </umb-button>
+                </div>
+                <div style="margin-right: 5px;">
+                    <umb-button
+                        ng-if="vm.allowEnableUser"
+                        type="button"
                     button-style="link"
-                    label="Enable"
-                    icon="icon-check"
-                    action="vm.enableUser()">
-                </umb-button>
-                <umb-button
-                    ng-if="vm.allowDisableUser"
-                    type="button"
+                        label="Enable"
+                        icon="icon-check"
+                        action="vm.enableUser()">
+                    </umb-button>
+                </div>
+                <div>
+                    <umb-button
+                        ng-if="vm.allowDisableUser"
+                        type="button"
                     button-style="link"
-                    label="Disable"
-                    icon="icon-block"
-                    action="vm.disableUser()">
-                </umb-button>
+                        label="Disable"
+                        icon="icon-block"
+                        action="vm.disableUser()">
+                    </umb-button>
+                </div>
             </umb-editor-sub-header-content-right>
 
         </umb-editor-sub-header>
@@ -100,7 +106,7 @@
                 <div class="dropdown pull-right">
                     <a style="text-decoration: none;" class="btn btn-link dropdown-toggle" href="" ng-click="vm.showFilter = !vm.showFilter">
                         Show:
-                        <span class="bold" style="text-decoration: underline; margin-left: 2px;">All</span>
+                        <span class="bold" style="margin-left: 2px;">All</span>
                         <span class="caret"></span>
                     </a>
                     <ul ng-if="vm.showFilter" on-outside-click="vm.showFilter = false;" style="display: block;" class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
@@ -129,7 +135,7 @@
                 <div class="dropdown pull-right">
                     <a style="text-decoration: none;" class="btn btn-link dropdown-toggle" href="" data-toggle="dropdown">
                         Order by:
-                        <span class="bold" style="text-decoration: underline; margin-left: 2px;">Last login</span>
+                        <span class="bold" style="margin-left: 2px;">Last login</span>
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
@@ -165,7 +171,6 @@
                 <div class="umb-user__group">
                     <span ng-repeat="group in user.userGroups">{{ group.name }}<span ng-if="!$last">, </span></span>
                 </div>
-                <div class="umb-user__divider"></div>
                 <div class="umb-user__last-login">
                     <div ng-if="user.formattedLastLogin">
                         <div>Last login on</div>
