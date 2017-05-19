@@ -34,9 +34,11 @@ namespace Umbraco.Web.WebApi.Filters
                 return true;
             }
 
-            return UmbracoContext.Current.Security.CurrentUser != null
+            var authorized = UmbracoContext.Current.Security.CurrentUser != null
                    && _appNames.Any(app => UmbracoContext.Current.Security.UserHasAppAccess(
                        app, UmbracoContext.Current.Security.CurrentUser));
+
+            return authorized;
         }
     }
 }

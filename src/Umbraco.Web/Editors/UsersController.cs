@@ -37,7 +37,7 @@ namespace Umbraco.Web.Editors
             : base(umbracoContext)
         {
         }
-
+        
         /// <summary>
         /// Gets a user by Id
         /// </summary>
@@ -55,15 +55,20 @@ namespace Umbraco.Web.Editors
 
         public PagedResult<UserDisplay> GetPagedUsers(
             int pageNumber = 1,
-            int pageSize = 0,
+            int pageSize = 10,
             string orderBy = "username",
             Direction orderDirection = Direction.Ascending,
-            string[] userGroups = null,
+            [FromUri]string[] userGroups = null,
             string filter = "")
         {
             long pageIndex = pageNumber - 1;
             long total;
             var result = Services.UserService.GetAll(pageIndex, pageSize, out total, orderBy, orderDirection, null, userGroups, filter);
+
+            if (total == 0)
+            {
+                return new PagedResult<UserDisplay>(0, 0, 0);
+            }
 
             return new PagedResult<UserDisplay>(total, pageNumber, pageSize)
             {

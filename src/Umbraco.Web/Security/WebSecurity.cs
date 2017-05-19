@@ -395,7 +395,7 @@ namespace Umbraco.Web.Security
         /// <param name="app"></param>
         /// <param name="user"></param>
         /// <returns></returns>
-        internal bool UserHasAppAccess(string app, IUser user)
+        internal virtual bool UserHasAppAccess(string app, IUser user)
         {
             var apps = user.AllowedSections;
             return apps.Any(uApp => uApp.InvariantEquals(app));
