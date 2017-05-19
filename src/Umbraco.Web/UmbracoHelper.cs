@@ -529,9 +529,21 @@ namespace Umbraco.Web
             return UrlProvider.GetUrl(contentId, true);
         }
 
-		#endregion
+        #endregion
 
         #region Members
+
+        public IPublishedContent TypedMember(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null) return null;
+            return TypedMember(guidUdi.Guid);
+        }
+
+        public IPublishedContent TypedMember(Guid id)
+        {
+            return MembershipHelper.GetByProviderKey(id);
+        }
 
         public IPublishedContent TypedMember(object id)
         {
@@ -593,6 +605,9 @@ namespace Umbraco.Web
             Guid guidId;
             if (ConvertIdObjectToGuid(id, out guidId))
                 return ContentQuery.TypedContent(guidId);
+            Udi udiId;
+            if (ConvertIdObjectToUdi(id, out udiId))
+                return ContentQuery.TypedContent(udiId);
             return null;
         }
 
@@ -612,6 +627,16 @@ namespace Umbraco.Web
         /// <param name="id">The key of the content item.</param>
         /// <returns>The content, or null of the content item is not in the cache.</returns>
         public IPublishedContent TypedContent(Guid id)
+        {
+            return ContentQuery.TypedContent(id);
+        }
+
+        /// <summary>
+        /// Gets a content item from the cache
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public IPublishedContent TypedContent(Udi id)
         {
             return ContentQuery.TypedContent(id);
         }
@@ -907,6 +932,22 @@ namespace Umbraco.Web
             return false;
         }
 
+        private static bool ConvertIdObjectToUdi(object id, out Udi guidId)
+        {
+            var s = id as string;
+            if (s != null)
+            {
+                return Udi.TryParse(s, out guidId);
+            }
+            if (id is Udi)
+            {
+                guidId = (Udi)id;
+                return true;
+            }
+            guidId = null;
+            return false;
+        }
+
         private static bool ConvertIdsObjectToInts(IEnumerable<object> ids, out IEnumerable<int> intIds)
         {
             var list = new List<int>();
@@ -939,27 +980,57 @@ namespace Umbraco.Web
             return true;
         }
 
-		#endregion
+        #endregion
 
-		#region Media
+        #region Media
 
-		/// <summary>
-		/// Overloaded method accepting an 'object' type
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass
-		/// this result in to this method.
-		/// This method will throw an exception if the value is not of type int or string.
-		/// </remarks>
-		public IPublishedContent TypedMedia(object id)
-		{
+        public IPublishedContent TypedMedia(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null) return null;
+            return TypedMedia(guidUdi.Guid);
+        }
+
+        public IPublishedContent TypedMedia(Guid id)
+        {
+            //TODO: This is horrible but until the media cache properly supports GUIDs we have no choice here and 
+            // currently there won't be any way to add this method correctly to `ITypedPublishedContentQuery` without breaking an interface and adding GUID support for media
+
+            var entityService = UmbracoContext.Application.Services.EntityService;
+            var mediaAttempt = entityService.GetIdForKey(id, UmbracoObjectTypes.Media);
+            return mediaAttempt.Success ? ContentQuery.TypedMedia(mediaAttempt.Result) : null;
+        }
+
+        /// <summary>
+        /// Overloaded method accepting an 'object' type
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass
+        /// this result in to this method.
+        /// This method will throw an exception if the value is not of type int or string.
+        /// </remarks>
+        public IPublishedContent TypedMedia(object id)
+        {
+            return TypedMediaForObject(id);
+        }
+
+        private IPublishedContent TypedMediaForObject(object id)
+        {
             int intId;
-            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.TypedMedia(intId) : null;
-		}
+            if (ConvertIdObjectToInt(id, out intId))
+                return ContentQuery.TypedMedia(intId);
+            Guid guidId;
+            if (ConvertIdObjectToGuid(id, out guidId))
+                return TypedMedia(guidId);
+            Udi udiId;
+            if (ConvertIdObjectToUdi(id, out udiId))
+                return TypedMedia(udiId);
+            return null;
+        }
 
-		public IPublishedContent TypedMedia(int id)
+        public IPublishedContent TypedMedia(int id)
 		{
             return ContentQuery.TypedMedia(id);
 		}

@@ -173,11 +173,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var udis = (Udi[])source;
             var mediaItems = new List<IPublishedContent>();
+            if (UmbracoContext.Current == null) return source;
+            var helper = new UmbracoHelper(UmbracoContext.Current);
             if (udis.Any())
             {
                 foreach (var udi in udis)
                 {
-                    var item = udi.ToPublishedContent();
+                    var item = helper.TypedMedia(udi);
                     if (item != null)
                         mediaItems.Add(item);
                 }

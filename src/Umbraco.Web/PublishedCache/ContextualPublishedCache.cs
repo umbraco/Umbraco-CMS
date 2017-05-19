@@ -13,6 +13,10 @@ namespace Umbraco.Web.PublishedCache
     /// </summary>
     public abstract class ContextualPublishedCache
     {
+        //TODO: We need to add:
+        //* GetById(Guid contentId)
+        //* GetById(UDI contentId)
+
         protected readonly UmbracoContext UmbracoContext;
 
         /// <summary>

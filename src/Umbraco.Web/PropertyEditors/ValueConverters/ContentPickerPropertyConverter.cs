@@ -106,25 +106,26 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 return null;
             }
 
-            if (UmbracoContext.Current != null)
+            if (UmbracoContext.Current == null) return source;
+
+            if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.Contains(propertyType.PropertyTypeAlias.ToLower(CultureInfo.InvariantCulture))) == false)
             {
-                if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.Contains(propertyType.PropertyTypeAlias.ToLower(CultureInfo.InvariantCulture))) == false)
+                IPublishedContent content;
+                if (source is int)
                 {
-                    IPublishedContent content;
-                    if (source is int)
-                    {
-                        var sourceInt = (int)source;
-                        content = UmbracoContext.Current.ContentCache.GetById(sourceInt);
-                        if(content != null)
-                            return content;
-                    }
-                    else
-                    {
-                        var sourceUdi = source as Udi;
-                        content = sourceUdi.ToPublishedContent();
-                        if (content != null)
-                            return content;
-                    }
+                    var sourceInt = (int)source;
+                    content = UmbracoContext.Current.ContentCache.GetById(sourceInt);
+                    if(content != null)
+                        return content;
+                }
+                else
+                {
+                    var sourceUdi = source as Udi;
+                    if (sourceUdi == null) return null;
+                    var umbHelper = new UmbracoHelper(UmbracoContext.Current);
+                    content = umbHelper.TypedContent(sourceUdi);
+                    if (content != null)
+                        return content;
                 }
             }
             return source;
