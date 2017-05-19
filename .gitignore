@@ -145,3 +145,4 @@ build/msbuild.log
 src/packages/
 src/PrecompiledWeb/*
 build/tools/
+src/PrecompiledWeb/*
