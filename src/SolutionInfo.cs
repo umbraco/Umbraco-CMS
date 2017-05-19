@@ -6,8 +6,7 @@ using System.Resources;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-[assembly: NeutralResourcesLanguageAttribute("en-US")]
-
+[assembly: NeutralResourcesLanguage("en-US")]
 
 [assembly: AssemblyVersion("1.0.*")]
 

@@ -1,17 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project ToolsVersion="15.0">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <ProjectGuid>{185E098F-5706-4B97-B404-EB974F05F633}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Umbraco.Compat7</RootNamespace>
     <AssemblyName>Umbraco.Compat7</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -44,74 +40,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SolutionInfo.cs">
-      <Link>Properties\SolutionInfo.cs</Link>
-    </Compile>
-    <Compile Include="Compat7Component.cs" />
-    <Compile Include="Core\ActionsResolver.cs" />
-    <Compile Include="Core\ApplicationContext.cs" />
-    <Compile Include="Core\ApplicationEventHandler.cs" />
-    <Compile Include="Core\Cache\CacheRefreshersResolver.cs" />
-    <Compile Include="Core\DatabaseContext.cs" />
-    <Compile Include="Core\Dictionary\CultureDictionaryFactoryResolver.cs" />
-    <Compile Include="Core\IApplicationEventHandler.cs" />
-    <Compile Include="Core\Logging\LoggerResolver.cs" />
-    <Compile Include="Core\Logging\LogHelper.cs" />
-    <Compile Include="Core\Logging\ProfilerResolver.cs" />
-    <Compile Include="Core\Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
-    <Compile Include="Core\ObjectResolution\LazyManyObjectsResolverBase.cs" />
-    <Compile Include="Core\ObjectResolution\ManyObjectsResolverBase.cs" />
-    <Compile Include="Core\ObjectResolution\WeightedObjectsResolverBase.cs" />
-    <Compile Include="Core\Persistence\Migrations\MigrationResolver.cs" />
-    <Compile Include="Core\PropertyEditors\PropertyEditorResolver.cs" />
-    <Compile Include="Core\PropertyEditors\PropertyValueConvertersResolver.cs" />
-    <Compile Include="Core\Strings\ShortStringHelperResolver.cs" />
-    <Compile Include="Core\Strings\UrlSegmentProviderResolver.cs" />
-    <Compile Include="Core\Sync\ServerMessengerResolver.cs" />
-    <Compile Include="Core\Sync\ServerRegistrarResolver.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Web\HealthCheck\HealthCheckResolver.cs" />
-    <Compile Include="Web\Media\ThumbnailProvidersResolver.cs" />
-    <Compile Include="Web\Models\IRenderModel.cs" />
-    <Compile Include="Web\Models\RenderModel.cs" />
-    <Compile Include="Web\Models\RenderModelOfTContent.cs" />
-    <Compile Include="Web\Mvc\DefaultRenderMvcControllerResolver.cs" />
-    <Compile Include="Web\Mvc\FilteredControllerFactoriesResolver.cs" />
-    <Compile Include="Web\Mvc\UmbracoTemplatePage.cs" />
-    <Compile Include="Web\Mvc\UmbracoTemplatePageOfTContent.cs" />
-    <Compile Include="Web\PublishedCache\FacadeServiceResolver.cs" />
-    <Compile Include="Web\Routing\ContentFinderResolver.cs" />
-    <Compile Include="Web\Routing\ContentLastChangeFinderResolver.cs" />
-    <Compile Include="Web\Routing\SiteDomainHelperResolver.cs" />
-    <Compile Include="Web\Routing\UrlProviderResolver.cs" />
-    <Compile Include="Web\UmbracoHelperExtensions.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="project.json" />
+    <!-- note: NuGet deals with transitive references now -->
+    <PackageReference Include="LightInject" Version="4.1.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
-      <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
       <Name>Umbraco.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
-      <Project>{651e1350-91b6-44b7-bd60-7207006d7003}</Project>
       <Name>Umbraco.Web</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="notes.txt" />
+    <Compile Include="**\*.cs" Exclude="obj\**\*.cs" />
+    <Compile Include="..\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Core\Persistence\Mappers\" />
+    <Content Include="notes.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  -->
   <Target Name="AfterBuild" Condition="'$(BuildingInsideVisualStudio)' == 'true' AND $([System.Text.RegularExpressions.Regex]::IsMatch($(DefineConstants), '^(.*;)*COMPAT7(;.*)*$'))">
     <Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\Umbraco.Compat7.dll" DestinationFolder="$(ProjectDir)..\Umbraco.Web.UI\bin" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
   </Target>
