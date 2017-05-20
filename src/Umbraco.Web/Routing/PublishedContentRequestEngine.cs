@@ -23,7 +23,9 @@ using RenderingEngine = Umbraco.Core.RenderingEngine;
 
 namespace Umbraco.Web.Routing
 {
-	internal class PublishedContentRequestEngine
+    using Core.Models;
+
+    internal class PublishedContentRequestEngine
 	{	    
 	    private readonly PublishedContentRequest _pcr;
 	    private readonly RoutingContext _routingContext;
@@ -518,7 +520,9 @@ namespace Umbraco.Web.Routing
 			const string tracePrefix = "FollowInternalRedirects: ";
 
 			if (_pcr.PublishedContent == null)
-				throw new InvalidOperationException("There is no PublishedContent.");
+			{
+			    throw new InvalidOperationException("There is no PublishedContent.");
+			}
 
 			bool redirect = false;
 			var internalRedirect = _pcr.PublishedContent.GetPropertyValue<string>(Constants.Conventions.Content.InternalRedirectId);
@@ -527,37 +531,51 @@ namespace Umbraco.Web.Routing
 			{
 				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Found umbracoInternalRedirectId={1}", () => tracePrefix, () => internalRedirect);
 
-				int internalRedirectId;
-				if (int.TryParse(internalRedirect, out internalRedirectId) == false)
-					internalRedirectId = -1;
+			    IPublishedContent internalRedirectNode = null;
+			    var udiInternalRedirectIdAttempt = internalRedirect.TryConvertTo<GuidUdi>();
+                var intInternalRedirectIdAttempt = internalRedirect.TryConvertTo<int>();
+			    
+			    if (udiInternalRedirectIdAttempt.Success)
+			    {
+			        // Try and get the redirect node from a UDI ID
+			        internalRedirectNode =
+			            _routingContext.UmbracoContext.ContentCache.GetById(udiInternalRedirectIdAttempt.Result.Guid);
+			    }
+                else if (intInternalRedirectIdAttempt.Success)
+			    {
+			        // Try and get the redirect node from a legacy integer ID
+                    internalRedirectNode =
+			            _routingContext.UmbracoContext.ContentCache.GetById(intInternalRedirectIdAttempt.Result);
+			    }
+                else
+                {
+                    // bad redirect - log and display the current page (legacy behavior)
+                    ProfilingLogger
+                        .Logger.Debug<PublishedContentRequestEngine>("{0}Failed to redirect to id={1}: invalid value",
+                                                                     () => tracePrefix, () => internalRedirect);
+                }
 
-				if (internalRedirectId <= 0)
-				{
-					// bad redirect - log and display the current page (legacy behavior)
-					//_pcr.Document = null; // no! that would be to force a 404
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Failed to redirect to id={1}: invalid value", () => tracePrefix, () => internalRedirect);
-				}
-				else if (internalRedirectId == _pcr.PublishedContent.Id)
-				{
-					// redirect to self
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Redirecting to self, ignore", () => tracePrefix);
-				}
-				else
-				{
-					// redirect to another page
-                    var node = _routingContext.UmbracoContext.ContentCache.GetById(internalRedirectId);
-                    
-                    if (node != null)
-					{
-                        _pcr.SetInternalRedirectPublishedContent(node); // don't use .PublishedContent here
-                        redirect = true;
-						ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Redirecting to id={1}", () => tracePrefix, () => internalRedirectId);
-					}
-					else
-					{
-						ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Failed to redirect to id={1}: no such published document", () => tracePrefix, () => internalRedirectId);
-					}
-				}
+			    if (internalRedirectNode == null)
+			    {
+			        ProfilingLogger
+			            .Logger
+			            .Debug<PublishedContentRequestEngine>("{0}Failed to redirect to id={1}: no such published document",
+			                                                  () => tracePrefix, () => internalRedirect);
+			    }
+                else if (internalRedirectNode.Id == _pcr.PublishedContent.Id)
+			    {
+			        // redirect to self
+			        ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Redirecting to self, ignore",
+			                                                                    () => tracePrefix);
+			    }
+			    else
+			    {
+                    // Redirect to another page
+			        _pcr.SetInternalRedirectPublishedContent(internalRedirectNode);
+			        redirect = true;
+			        ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Redirecting to id={1}", () => tracePrefix,
+			                                                                    () => internalRedirect);
+			    }
 			}
 
 			return redirect;
