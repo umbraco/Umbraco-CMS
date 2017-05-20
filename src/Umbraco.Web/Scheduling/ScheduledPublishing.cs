@@ -92,7 +92,9 @@ namespace Umbraco.Web.Scheduling
 
                         if (result.IsSuccessStatusCode)
                         {
-                            LogHelper.Debug<ScheduledPublishing>(() => "Request successfully send to url = " + url);
+                            LogHelper.Debug<ScheduledPublishing>(
+                                () => string.Format(
+                                    "Request successfully sent to url = \"{0}\". ", url));
                         }
                         else
                         {
