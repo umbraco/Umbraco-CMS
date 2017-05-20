@@ -178,5 +178,19 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             Assert.IsTrue(SettingsSection.Content.DisallowedUploadFiles.All(x => "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd".Split(',').Contains(x)));
         }
+
+        [Test]
+        public void AllowedUploadFiles()
+        {
+            Assert.IsTrue(SettingsSection.Content.AllowedUploadFiles.All(x => "jpg,gif,png".Split(',').Contains(x)));
+        }
+
+        [Test]
+        public void IsFileAllowedForUpload_WithWhitelist()
+        {
+            Assert.IsTrue(SettingsSection.Content.IsFileAllowedForUpload("png"));
+            Assert.IsFalse(SettingsSection.Content.IsFileAllowedForUpload("bmp"));
+            Assert.IsFalse(SettingsSection.Content.IsFileAllowedForUpload("php"));
+        }
     }
 }
