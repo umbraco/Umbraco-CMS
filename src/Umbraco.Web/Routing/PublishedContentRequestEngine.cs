@@ -17,14 +17,13 @@ using umbraco;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.member;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 using RenderingEngine = Umbraco.Core.RenderingEngine;
 
 namespace Umbraco.Web.Routing
 {
-    using Core.Models;
-
     internal class PublishedContentRequestEngine
 	{	    
 	    private readonly PublishedContentRequest _pcr;
@@ -520,67 +519,69 @@ namespace Umbraco.Web.Routing
 			const string tracePrefix = "FollowInternalRedirects: ";
 
 			if (_pcr.PublishedContent == null)
-			{
 			    throw new InvalidOperationException("There is no PublishedContent.");
-			}
 
-			bool redirect = false;
-			var internalRedirect = _pcr.PublishedContent.GetPropertyValue<string>(Constants.Conventions.Content.InternalRedirectId);
+            // don't try to find a redirect if the property doesn't exist
+		    if (_pcr.PublishedContent.HasProperty(Constants.Conventions.Content.InternalRedirectId) == false)
+		        return false;
 
-			if (string.IsNullOrWhiteSpace(internalRedirect) == false)
-			{
-				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Found umbracoInternalRedirectId={1}", () => tracePrefix, () => internalRedirect);
+            var redirect = false;
+		    IPublishedContent internalRedirectNode = null;
+		    var internalRedirectId =
+		        _pcr.PublishedContent.GetPropertyValue<int>(Constants.Conventions.Content.InternalRedirectId, -1);
+		    var valueValid = false;
+		    if (internalRedirectId > 0)
+		    {
+		        valueValid = true;
+		        // Try and get the redirect node from a legacy integer ID
+		        internalRedirectNode = _routingContext.UmbracoContext.ContentCache.GetById(internalRedirectId);
+		    }
+		    else
+		    {
+		        var udiInternalRedirectId =
+		            _pcr.PublishedContent.GetPropertyValue<GuidUdi>(Constants.Conventions.Content.InternalRedirectId);
+                if (udiInternalRedirectId != null)
+		        {
+		            valueValid = true;
+		            // Try and get the redirect node from a UDI Guid
+		            internalRedirectNode =
+		                _routingContext.UmbracoContext.ContentCache.GetById(udiInternalRedirectId.Guid);
+		        }
+		    }
 
-			    IPublishedContent internalRedirectNode = null;
-			    var udiInternalRedirectIdAttempt = internalRedirect.TryConvertTo<GuidUdi>();
-                var intInternalRedirectIdAttempt = internalRedirect.TryConvertTo<int>();
-			    
-			    if (udiInternalRedirectIdAttempt.Success)
-			    {
-			        // Try and get the redirect node from a UDI ID
-			        internalRedirectNode =
-			            _routingContext.UmbracoContext.ContentCache.GetById(udiInternalRedirectIdAttempt.Result.Guid);
-			    }
-                else if (intInternalRedirectIdAttempt.Success)
-			    {
-			        // Try and get the redirect node from a legacy integer ID
-                    internalRedirectNode =
-			            _routingContext.UmbracoContext.ContentCache.GetById(intInternalRedirectIdAttempt.Result);
-			    }
-                else
-                {
-                    // bad redirect - log and display the current page (legacy behavior)
-                    ProfilingLogger
-                        .Logger.Debug<PublishedContentRequestEngine>("{0}Failed to redirect to id={1}: invalid value",
-                                                                     () => tracePrefix, () => internalRedirect);
-                }
+            if (valueValid == false)
+		    {
+                // bad redirect - log and display the current page (legacy behavior)
+                ProfilingLogger
+		            .Logger.Debug<PublishedContentRequestEngine>(
+		                "{0}Failed to redirect, value of '{1}' is not an int nor a GuidUdi",
+		                () => tracePrefix, () => Constants.Conventions.Content.InternalRedirectId);
+		    }
 
-			    if (internalRedirectNode == null)
-			    {
-			        ProfilingLogger
-			            .Logger
-			            .Debug<PublishedContentRequestEngine>("{0}Failed to redirect to id={1}: no such published document",
-			                                                  () => tracePrefix, () => internalRedirect);
-			    }
-                else if (internalRedirectNode.Id == _pcr.PublishedContent.Id)
-			    {
-			        // redirect to self
-			        ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Redirecting to self, ignore",
-			                                                                    () => tracePrefix);
-			    }
-			    else
-			    {
-                    // Redirect to another page
-			        _pcr.SetInternalRedirectPublishedContent(internalRedirectNode);
-			        redirect = true;
-			        ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Redirecting to id={1}", () => tracePrefix,
-			                                                                    () => internalRedirect);
-			    }
-			}
+		    if (internalRedirectNode == null)
+		    {
+		        ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>(
+		            "{0}Failed to redirect, value of '{1}' does not lead to a published document", () => tracePrefix,
+		            () => Constants.Conventions.Content.InternalRedirectId);
+		    }
+		    else if (internalRedirectNode.Id == _pcr.PublishedContent.Id)
+		    {
+		        // redirect to self
+		        ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Redirecting to self, ignore",
+		            () => tracePrefix);
+		    }
+		    else
+		    {
+		        // Redirect to another page
+		        _pcr.SetInternalRedirectPublishedContent(internalRedirectNode);
+		        redirect = true;
+		        ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Redirecting to id={1}", () => tracePrefix,
+		            () => internalRedirectNode.Id);
+		    }
 
-			return redirect;
+		    return redirect;
 		}
-        
+
 		/// <summary>
 		/// Ensures that access to current node is permitted.
 		/// </summary>
@@ -739,14 +740,29 @@ namespace Umbraco.Web.Routing
 		{
 		    if (_pcr.HasPublishedContent == false) return;
 
-		    var redirectId = _pcr.PublishedContent.GetPropertyValue(Constants.Conventions.Content.Redirect, -1);
+		    // don't try to find a redirect if the property doesn't exist
+            if (_pcr.PublishedContent.HasProperty(Constants.Conventions.Content.Redirect) == false)
+		        return;
+
+           var redirectId = _pcr.PublishedContent.GetPropertyValue(Constants.Conventions.Content.Redirect, -1);
+
 		    var redirectUrl = "#";
 		    if (redirectId > 0)
-				redirectUrl = _routingContext.UrlProvider.GetUrl(redirectId);
+		    {
+		        redirectUrl = _routingContext.UrlProvider.GetUrl(redirectId);
+		    }
+		    else
+		    {
+                // might be a UDI instead of an int Id
+		        var redirectUdi = _pcr.PublishedContent.GetPropertyValue<GuidUdi>(Constants.Conventions.Content.Redirect);
+		        if (redirectUdi != null)
+		            redirectUrl = _routingContext.UrlProvider.GetUrl(redirectUdi.Guid);
+		    }
 		    if (redirectUrl != "#")
+		    {
 		        _pcr.SetRedirect(redirectUrl);
+		    }
 		}
-	
 		#endregion
 	}
 }
