@@ -9,10 +9,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
 {
     public abstract class UmbracoSettingsTests
     {
-        protected virtual bool TestingDefaults
-        {
-            get { return false; }
-        }
+        protected virtual bool TestingDefaults { get; set; }
 
         [SetUp]
         public void Init()

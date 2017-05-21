@@ -196,6 +196,9 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [TestCase("config", false)]
         public void IsFileAllowedForUpload_WithWhitelist(string extension, bool expected)
         {
+            // Make really sure that defaults are NOT used
+            TestingDefaults = false;
+
             Debug.WriteLine("Extension being tested", extension);
             Debug.WriteLine("AllowedUploadFiles: {0}", SettingsSection.Content.AllowedUploadFiles);
             Debug.WriteLine("DisallowedUploadFiles: {0}", SettingsSection.Content.DisallowedUploadFiles);
