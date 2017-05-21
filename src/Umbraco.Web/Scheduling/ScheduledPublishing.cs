@@ -88,6 +88,22 @@ namespace Umbraco.Web.Scheduling
                         }
 
                         var result = await wc.SendAsync(request, token);
+                        var content = await result.Content.ReadAsStringAsync();
+
+                        if (result.IsSuccessStatusCode)
+                        {
+                            LogHelper.Debug<ScheduledPublishing>(
+                                () => string.Format(
+                                    "Request successfully sent to url = \"{0}\". ", url));
+                        }
+                        else
+                        {
+                            var msg = string.Format(
+                                    "Request failed with status code \"{0}\". Request content = \"{1}\".",
+                                    result.StatusCode, content);
+                            var ex = new HttpRequestException(msg);
+                            LogHelper.Error<ScheduledPublishing>(msg, ex);
+                        }
                     }
                 }
                 catch (Exception e)
