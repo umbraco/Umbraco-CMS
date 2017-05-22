@@ -31,6 +31,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     detail => detail.AvailableCultures,
                     opt => opt.MapFrom(user => applicationContext.Services.TextService.GetSupportedCultures().ToDictionary(x => x.Name, x => x.DisplayName)))
+                .ForMember(
+                    detail => detail.EmailHash,
+                    opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().ToMd5()))
                 .ForMember(detail => detail.ParentId, opt => opt.UseValue(-1))
                 .ForMember(detail => detail.Path, opt => opt.MapFrom(user => "-1," + user.Id))
                 .ForMember(detail => detail.Notifications, opt => opt.Ignore())
@@ -39,6 +42,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Trashed, opt => opt.Ignore())                
                 .ForMember(detail => detail.Alias, opt => opt.Ignore())                
                 .ForMember(detail => detail.Trashed, opt => opt.Ignore())
+                //TODO: Enable this when we can!
+                .ForMember(detail => detail.CustomAvatar, opt => opt.Ignore())
                 .ForMember(detail => detail.AdditionalData, opt => opt.Ignore());
 
             config.CreateMap<IUser, UserDetail>()
