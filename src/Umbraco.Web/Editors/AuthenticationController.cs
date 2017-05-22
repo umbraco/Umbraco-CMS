@@ -310,15 +310,19 @@ namespace Umbraco.Web.Editors
                         "User {0} is currently locked out, unlocking and resetting AccessFailedCount",
                         () => model.UserId);
 
-                    var user = await UserManager.FindByIdAsync(model.UserId);
-                    if (user != null)
+                    //var user = await UserManager.FindByIdAsync(model.UserId);
+                    var unlockResult = await UserManager.SetLockoutEndDateAsync(model.UserId, DateTimeOffset.Now);
+                    if(unlockResult.Succeeded == false)
                     {
-                        user.LockoutEnabled = false;
-                        user.AccessFailedCount = 0;
-                        var setLockoutDisabled = await UserManager.UpdateAsync(user);
-                        if (setLockoutDisabled.Succeeded == false)
-                            Logger.Info<AuthenticationController>("Could not unlock for user {0} - error {1}",
-                                () => model.UserId, () => setLockoutDisabled.Errors.First());
+                        Logger.Warn<AuthenticationController>("Could not unlock for user {0} - error {1}",
+                                        () => model.UserId, () => unlockResult.Errors.First());
+                    }
+
+                    var resetAccessFailedCountResult = await UserManager.ResetAccessFailedCountAsync(model.UserId);
+                    if (resetAccessFailedCountResult.Succeeded == false)
+                    {
+                        Logger.Warn<AuthenticationController>("Could not reset access failed count {0} - error {1}",
+                            () => model.UserId, () => unlockResult.Errors.First());
                     }
                 }
 
