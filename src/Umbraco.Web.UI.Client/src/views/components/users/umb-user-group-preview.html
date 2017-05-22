@@ -1,11 +1,11 @@
-<div class="umb-user-role-preview">
+<div class="umb-user-group-preview">
     
-    <i ng-if="icon" class="umb-user-role-preview__icon {{ icon }}"></i>
+    <i ng-if="icon" class="umb-user-group-preview__icon {{ icon }}"></i>
     
-    <div class="umb-user-role-preview__content">
-        <div class="umb-user-role-preview__name">{{ name }}</div>
+    <div class="umb-user-group-preview__content">
+        <div class="umb-user-group-preview__name">{{ name }}</div>
 
-        <div class="umb-user-role-preview__permission">
+        <div class="umb-user-group-preview__permission">
             <span>
                 <span class="bold">Sections:</span>
                 <span ng-repeat="section in sections">{{ section.name }}<span ng-if="!$last">, </span></span>
@@ -13,7 +13,7 @@
             </span>
         </div>
 
-        <div class="umb-user-role-preview__permission">
+        <div class="umb-user-group-preview__permission">
             <span>
                 <span class="bold">Content start node:</span>
                 <span ng-repeat="startNode in contentStartNodes">{{ startNode.name }}<span ng-if="!$last">, </span></span>
@@ -21,7 +21,7 @@
             </span>
         </div>
         
-        <div class="umb-user-role-preview__permission">
+        <div class="umb-user-group-preview__permission">
             <span>
                 <span class="bold">Media start node:</span>
                 <span ng-repeat="startNode in mediaStartNodes">{{ startNode.name }}<span ng-if="!$last">, </span></span>
@@ -31,8 +31,8 @@
 
     </div>
 
-    <div class="umb-user-role-preview__actions">
-        <a class="umb-user-role-preview__action umb-user-role-preview__action--red" title="Remove" href="" ng-if="allowRemove" ng-click="onRemove()">Remove</i></a>
+    <div class="umb-user-group-preview__actions">
+        <a class="umb-user-group-preview__action umb-user-group-preview__action--red" title="Remove" href="" ng-if="allowRemove" ng-click="onRemove()">Remove</i></a>
     <div>
 
 </div>

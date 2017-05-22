@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function UserRolePreviewDirective() {
+    function UserGroupPreviewDirective() {
 
         function link(scope, el, attr, ctrl) {
 
@@ -10,7 +10,7 @@
         var directive = {
             restrict: 'E',
             replace: true,
-            templateUrl: 'views/components/users/umb-user-role-preview.html',
+            templateUrl: 'views/components/users/umb-user-group-preview.html',
             scope: {
                 icon: "=?",
                 name: "=",
@@ -28,6 +28,6 @@
 
     }
 
-    angular.module('umbraco.directives').directive('umbUserRolePreview', UserRolePreviewDirective);
+    angular.module('umbraco.directives').directive('umbUserGroupPreview', UserGroupPreviewDirective);
 
 })();

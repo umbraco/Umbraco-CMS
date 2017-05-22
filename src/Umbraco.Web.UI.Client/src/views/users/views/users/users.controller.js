@@ -16,7 +16,7 @@
         
         vm.allowDisableUser = true;
         vm.allowEnableUser = true;
-        vm.allowSetUserRole = true;
+        vm.allowSetUserGroup = true;
         
         vm.layouts = [
             {
@@ -136,9 +136,9 @@
         }
 
         function openUserGroupPicker(event) {
-            vm.userRolePicker = {
-                title: "Select user roles",
-                view: "userrolepicker",
+            vm.userGroupPicker = {
+                title: "Select user groups",
+                view: "usergrouppicker",
                 selection: vm.newUser.userGroups,
                 closeButtonLabel: "Cancel",
                 show: true,
@@ -147,16 +147,16 @@
                     if(model.selection) {
                         vm.newUser.userGroups = model.selection;
                     }
-                    vm.userRolePicker.show = false;
-                    vm.userRolePicker = null;
+                    vm.userGroupPicker.show = false;
+                    vm.userGroupPicker = null;
                 },
                 close: function(oldModel) {
                     // rollback on close
                     if(oldModel.selection) {
                         vm.newUser.userGroups = oldModel.selection;
                     }
-                    vm.userRolePicker.show = false;
-                    vm.userRolePicker = null;
+                    vm.userGroupPicker.show = false;
+                    vm.userGroupPicker = null;
                 }
             };
         }

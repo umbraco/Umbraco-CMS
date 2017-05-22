@@ -62,12 +62,12 @@
             <umb-editor-sub-header-content-right ng-if="vm.selection.length > 0">
                 <div style="margin-right: 5px;">
                     <umb-button
-                        ng-if="vm.allowSetUserRole"
+                        ng-if="vm.allowSetUserGroup"
                         type="button"
                     button-style="link"
-                        label="Set role"
+                        label="Set group"
                         icon="icon-users"
-                        action="vm.setUserRoleUser()">
+                        action="vm.setUserGroup()">
                     </umb-button>
                 </div>
                 <div style="margin-right: 5px;">
@@ -293,7 +293,7 @@
 
                 <umb-control-group label="User group">
 
-                    <umb-user-role-preview
+                    <umb-user-group-preview
                         ng-repeat="group in vm.newUser.userGroups"
                         icon="group.icon"
                         name="group.name"
@@ -302,7 +302,7 @@
                         media-start-nodes="group.startNodesMedia"
                         allow-remove="true"
                         on-remove="vm.removeSelectedUserGroup($index, vm.newUser.userGroups)">
-                    </umb-user-role-preview>
+                    </umb-user-group-preview>
 
                     <a href=""
                         style="max-width: 100%;"
@@ -344,9 +344,9 @@
     </div>
 
     <umb-overlay
-        ng-if="vm.userRolePicker.show"
-        model="vm.userRolePicker"
-        view="vm.userRolePicker.view"
+        ng-if="vm.userGroupPicker.show"
+        model="vm.userGroupPicker"
+        view="vm.userGroupPicker.view"
         position="right">
     </umb-overlay>
 

@@ -1,14 +1,14 @@
 (function () {
     "use strict";
 
-    function UserRolePickerController($scope, usersResource) {
+    function UserGroupPickerController($scope, usersResource) {
         
         var vm = this;
 
-        vm.userRoles = [];
+        vm.userGroups = [];
         vm.loading = false;
 
-        vm.selectUserRole = selectUserRole;
+        vm.selectUserGroup = selectUserGroup;
 
         //////////
 
@@ -22,8 +22,8 @@
             }
 
             // get venues
-            usersResource.getUserGroups().then(function(userRoles){
-                vm.userRoles = userRoles;
+            usersResource.getUserGroups().then(function(userGroups){
+                vm.userGroups = userGroups;
                 
                 if($scope.model.selection && $scope.model.selection.length > 0) {
                     preSelect($scope.model.selection);
@@ -39,27 +39,27 @@
 
             angular.forEach(selection, function(selected){
                 
-                angular.forEach(vm.userRoles, function(userRole){
-                    if(selected.id === userRole.id) {
-                        userRole.selected = true;
+                angular.forEach(vm.userGroups, function(userGroup){
+                    if(selected.id === userGroup.id) {
+                        userGroup.selected = true;
                     }
                 });
 
             });
         }
 
-        function selectUserRole(userRole) {
+        function selectUserGroup(userGroup) {
 
-            if(!userRole.selected) {
+            if(!userGroup.selected) {
                 
-                userRole.selected = true;
-                $scope.model.selection.push(userRole);
+                userGroup.selected = true;
+                $scope.model.selection.push(userGroup);
 
             } else {
 
-                angular.forEach($scope.model.selection, function(selectedUserRole, index){
-                    if(selectedUserRole.id === userRole.id) {
-                        userRole.selected = false;
+                angular.forEach($scope.model.selection, function(selectedUserGroup, index){
+                    if(selectedUserGroup.id === userGroup.id) {
+                        userGroup.selected = false;
                         $scope.model.selection.splice(index, 1);
                     }
                 });
@@ -72,6 +72,6 @@
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Overlays.UserRolePickerController", UserRolePickerController);
+    angular.module("umbraco").controller("Umbraco.Overlays.UserGroupPickerController", UserGroupPickerController);
 
 })();
