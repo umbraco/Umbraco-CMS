@@ -71,14 +71,16 @@
             'Failed to retrieve users paged result');
         }
 
-        function getUser() {
-            var deferred = $q.defer();
-            var user = {
-                "name": "Tammy Contreras",
-                "email": "tammy@contreras.com"
-            };
-            deferred.resolve(user);
-            return deferred.promise;
+        function getUser(userId) {
+
+          return umbRequestHelper.resourcePromise(
+            $http.get(
+              umbRequestHelper.getApiUrl(
+                "userApiBaseUrl",
+                "GetById",
+                { id: id })),
+            "Failed to retrieve data for user " + id);
+            
         }
 
         function getUsers() {
