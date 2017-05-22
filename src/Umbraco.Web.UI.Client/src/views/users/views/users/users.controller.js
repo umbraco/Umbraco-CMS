@@ -10,17 +10,13 @@
         vm.userStates = [];
         vm.selection = [];
         vm.newUser = {};
+        vm.usersOptions = {};
         vm.newUser.userGroups = [];
         vm.usersViewState = 'overview';
         
         vm.allowDisableUser = true;
         vm.allowEnableUser = true;
         vm.allowSetUserRole = true;
-        
-        vm.usersPagination = {
-            "pageNumber": 1,
-            "totalPages": 5
-        }
         
         vm.layouts = [
             {
@@ -68,27 +64,20 @@
         vm.removeSelectedUserGroup = removeSelectedUserGroup;
         vm.selectAll = selectAll;
         vm.areAllSelected = areAllSelected;
+        vm.searchUsers = searchUsers;
+        vm.setOrderByFilter = setOrderByFilter;
 
         function init() {
 
-            vm.loading = true;
+            vm.usersOptions.orderBy = "Name";
 
             // Get users
-            usersResource.getUsers().then(function (users) {
-                vm.users = users;
-                vm.userStates = getUserStates(vm.users);
-                formatDates(vm.users);
-            });
+            getUsers();
 
             // Get user groups
             usersResource.getUserGroups().then(function (userGroups) {
                 vm.userGroups = userGroups;
             });
-
-            // fake loading
-            $timeout(function () {
-                vm.loading = false;
-            }, 500);
 
         }
 
@@ -199,7 +188,44 @@
             }
         }
 
+        var search = _.debounce(function () {
+            $scope.$apply(function () {
+                getUsers();
+            });
+        }, 500);
+
+        function searchUsers() {
+            search();
+        }
+
+        function setOrderByFilter(value) {
+            vm.usersOptions.orderBy = value;
+            getUsers();
+        }
+
         // helpers
+        function getUsers() {
+
+            vm.loading = true;
+
+            // Get users
+            usersResource.getPagedResults(vm.usersOptions).then(function (users) {
+                
+                vm.users = users.items;
+
+                vm.usersOptions.pageNumber = users.pageNumber;
+                vm.usersOptions.pageSize = users.pageSize;
+                vm.usersOptions.totalItems = users.totalItems;
+                vm.usersOptions.totalPages = users.totalPages;
+
+                vm.userStates = getUserStates(vm.users);
+                formatDates(vm.users);
+
+                vm.loading = false;
+                
+            });
+        }
+
         function getUserStates(users) {
             var userStates = [];
             

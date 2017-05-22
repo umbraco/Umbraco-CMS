@@ -26,21 +26,20 @@
                     </umb-layout-selector>
                 </umb-editor-sub-header-section>
                 <umb-editor-sub-header-section>
-                    <ng-form class="form-search -no-margin-bottom pull-right" novalidate>
+                    <div class="form-search -no-margin-bottom pull-right">
                         <div class="inner-addon left-addon">
-                            <i class="icon icon-search" ng-click="enterSearch($event)"></i>
+                            <i class="icon icon-search"></i>
                             <input
                                 class="form-control search-input"
                                 type="text"
                                 localize="placeholder"
                                 placeholder="@general_typeToSearch"
-                                ng-model="options.filter"
-                                ng-change="enterSearch()"
-                                ng-keydown="forceSearch($event)"
+                                ng-model="vm.usersOptions.filter"
+                                ng-change="vm.searchUsers()"
                                 prevent-enter-submit
                                 no-dirty-check>
                         </div>
-                    </ng-form>
+                    </div>
                 </umb-editor-sub-header-section>
             </umb-editor-sub-header-content-right>
 
@@ -98,7 +97,7 @@
         <div style="margin-bottom: 20px;" class="flex items-center">
 
             <div style="font-size: 16px;">
-                <span class="bold">Users</span> <span>({{vm.users.length}})</span>
+                <span class="bold">Users</span> <span>({{vm.usersOptions.totalItems}})</span>
             </div>
 
             <div class="flex" style="margin-left: auto;">
@@ -135,50 +134,59 @@
                 <div class="dropdown pull-right">
                     <a style="text-decoration: none;" class="btn btn-link dropdown-toggle" href="" data-toggle="dropdown">
                         Order by:
-                        <span class="bold" style="margin-left: 2px;">Last login</span>
+                        <span class="bold" style="margin-left: 2px;">{{ vm.usersOptions.orderBy }} </span>
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                        <li><a tabindex="-1" href="#" prevent-default>Last login</a></li>
-                        <li><a tabindex="-1" href="#" prevent-default>Name</a></li>
+                        <li><a tabindex="-1" href="#" ng-click="vm.setOrderByFilter('lastLogin')" prevent-default>Last login</a></li>
+                        <li><a tabindex="-1" href="#" ng-click="vm.setOrderByFilter('Name')" prevent-default>Name</a></li>
                     </ul>
                 </div>
 
             </div>
 
         </div>
+
+        <!-- Empty states -->
+        <umb-empty-state
+            ng-if="!vm.users && vm.usersOptions.filter.length > 0"
+            position="center">
+            <localize key="general_searchNoResult"></localize>
+        </umb-empty-state>
         
         <!-- Layout: Cards -->
-        <div class="umb-users" ng-if="vm.activeLayout.path === '1'">
-            <div class="umb-user" ng-repeat="user in vm.users" ng-class="{'umb-user--selected': user.selected}" ng-click="vm.selectUser(user, vm.selection)">
-                <umb-badge
-                    class="umb-user__badge"
-                    size="xs"
-                    ng-if="user.state !== 'active'"
-                    color="{{vm.getUserStateType(user.state)}}">
-                    {{ user.state }}
-                </umb-badge>
-                <div class="umb-user__avatar">
-                    <umb-avatar
-                        size="l"
-                        color="secondary"
-                        name="{{user.name}}"
-                        img-src="{{user.avatar}}">
-                    </umb-avatar>
-                </div>
-                <div class="umb-user__checkmark" ng-if="user.selected"><umb-checkmark checked="user.selected" size="s"></umb-checkmark></div>
-                <a class="umb-user__name" href="" ng-click="vm.goToUser(user)">{{user.name}}</a>
-                <div class="umb-user__group">
-                    <span ng-repeat="group in user.userGroups">{{ group.name }}<span ng-if="!$last">, </span></span>
-                </div>
-                <div class="umb-user__last-login">
-                    <div ng-if="user.formattedLastLogin">
-                        <div>Last login on</div>
-                        {{ user.formattedLastLogin }}
+        <div class="umb-users" ng-if="vm.activeLayout.path === '1' && vm.loading === false">
+            <div class="umb-user" ng-repeat="user in vm.users" ng-click="vm.selectUser(user, vm.selection)">
+                <div class="umb-user__content" ng-class="{'umb-user__content--selected': user.selected}">
+                    <umb-badge
+                        class="umb-user__badge"
+                        size="xs"
+                        ng-if="user.state !== 'active'"
+                        color="{{vm.getUserStateType(user.state)}}">
+                        {{ user.state }}
+                    </umb-badge>
+                    <div class="umb-user__avatar">
+                        <umb-avatar
+                            size="l"
+                            color="secondary"
+                            name="{{user.name}}"
+                            img-src="{{user.avatar}}">
+                        </umb-avatar>
                     </div>
-                    <div ng-if="!user.formattedLastLogin">
-                        <div>{{ user.name | umbWordLimit:1 }} has</div> 
-                        not logged in yet
+                    <div class="umb-user__checkmark" ng-if="user.selected"><umb-checkmark checked="user.selected" size="s"></umb-checkmark></div>
+                    <a class="umb-user__name" href="" ng-click="vm.goToUser(user)">{{user.name}}</a>
+                    <div class="umb-user__group">
+                        <span ng-repeat="(key,value) in user.userGroups">{{ value }}<span ng-if="!$last">, </span></span>
+                    </div>
+                    <div class="umb-user__last-login">
+                        <div ng-if="user.formattedLastLogin">
+                            <div>Last login on</div>
+                            {{ user.formattedLastLogin }}
+                        </div>
+                        <div ng-if="!user.formattedLastLogin">
+                            <div>{{ user.name | umbWordLimit:1 }} has</div> 
+                            not logged in yet
+                        </div>
                     </div>
                 </div>
             </div>
@@ -217,7 +225,7 @@
                             </umb-avatar>
                         </td>
                         <td class="bold"><a href="" ng-click="vm.goToUser(user)">{{user.name}}</a></td>
-                        <td><span ng-repeat="group in user.userGroups">{{group.name}}<span ng-if="!$last">, </span></span></td>
+                        <td><span ng-repeat="(key,value) in user.userGroups">{{ value }}<span ng-if="!$last">, </span></span></td>
                         <td>{{ user.formattedLastLogin }}</td>
                         <td style="text-transform: capitalize;">
                             <umb-badge
@@ -236,9 +244,9 @@
         <!-- Pagination -->
         <div class="flex justify-center">
             <umb-pagination
-                ng-if="vm.usersPagination.totalPages"
-                page-number="vm.usersPagination.pageNumber"
-                total-pages="vm.usersPagination.totalPages">
+                ng-if="vm.usersOptions.totalPages"
+                page-number="vm.usersOptions.pageNumber"
+                total-pages="vm.usersOptions.totalPages">
             </umb-pagination>
         </div>
 

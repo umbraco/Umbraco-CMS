@@ -6,25 +6,74 @@
 }
 
 .umb-user {
-    flex: 1 1 200px;
+    padding: 10px;
+    box-sizing: border-box;
+    flex: 0 0 100%;
+    max-width: 100%;
+    display: flex;
+}
+
+@media (min-width: 768px) {
+    .umb-user {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .umb-user {
+        flex: 0 0 33.33%;
+        max-width: 33.33%;
+    }
+}
+
+@media (min-width: 1400px) {
+    .umb-user {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+}
+
+@media (min-width: 1700px) {
+    .umb-user {
+        flex: 0 0 20%;
+        max-width: 20%;
+    }
+}
+
+
+@media (min-width: 1900px) {
+    .umb-user {
+        flex: 0 0 16.66%;
+        max-width: 16.66%;
+    }
+}
+
+@media (min-width: 2200px) {
+    .umb-user {
+        flex: 0 0 14.28%;
+        max-width: 14.28%;
+    }
+}
+
+.umb-user__content {
+    position: relative;
+    padding: 15px;
+    flex: 1 1 auto;
     background-color: @gray-10;
     border: 1px solid @gray-9;
     border-radius: 3px;
-    padding: 15px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    margin: 10px;
     cursor: pointer;
-    position: relative;
-    align-items: center;
 }
 
-.umb-user--selected {
+.umb-user__content--selected {
     border-color: @turquoise;
 }
 
-.umb-user:hover {
+.umb-user__content:hover {
     border-color: @turquoise;
 }
 
@@ -63,4 +112,5 @@
 .umb-user__last-login {
     font-size: 13px;
     text-align: center;
+    margin-top: auto;
 }
