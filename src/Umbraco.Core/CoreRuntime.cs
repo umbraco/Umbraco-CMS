@@ -227,6 +227,7 @@ namespace Umbraco.Core
             // from the default connection string name, if possible, else will remain non-configured
             // until properly configured (eg when installing)
             container.RegisterSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
+            container.RegisterSingleton<IDatabaseContext>(f => f.GetInstance<IUmbracoDatabaseFactory>());
 
             // register the scope provider
             container.RegisterSingleton<IScopeProviderInternal, ScopeProvider>();

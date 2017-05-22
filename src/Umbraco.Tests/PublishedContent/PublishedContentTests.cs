@@ -11,6 +11,7 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.DI;
 using Current = Umbraco.Core.DI.Current;
+using LightInject;
 
 namespace Umbraco.Tests.PublishedContent
 {

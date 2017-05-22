@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Text;
 using NPoco;
 using StackExchange.Profiling;
@@ -24,7 +25,7 @@ namespace Umbraco.Core.Persistence
         // Umbraco's default isolation level is RepeatableRead
         private const IsolationLevel DefaultIsolationLevel = IsolationLevel.RepeatableRead;
 
-        private readonly ILogger _logger;        
+        private readonly ILogger _logger;
         private readonly RetryPolicy _connectionRetryPolicy;
         private readonly RetryPolicy _commandRetryPolicy;
         private readonly Guid _instanceGuid = Guid.NewGuid();
@@ -70,7 +71,7 @@ namespace Umbraco.Core.Persistence
 
         /// <inheritdoc />
         public ISqlSyntaxProvider SqlSyntax => SqlContext.SqlSyntax;
-        
+
         public Sql<SqlContext> Sql() => new Sql<SqlContext>(SqlContext);
 
         public Sql<SqlContext> Sql(string sql, params object[] args) => Sql().Append(sql, args);
@@ -203,8 +204,13 @@ namespace Umbraco.Core.Persistence
         protected override void OnException(Exception x)
         {
             _logger.Error<UmbracoDatabase>("Exception (" + InstanceId + ").", x);
+            _logger.Debug<UmbracoDatabase>("At:\r\n" + Environment.StackTrace);
+            if (EnableSqlTrace == false)
+                _logger.Debug<UmbracoDatabase>("Sql:\r\n" + CommandToString(_cmd));
             base.OnException(x);
         }
+
+        private DbCommand _cmd;
 
         protected override void OnExecutingCommand(DbCommand cmd)
         {
@@ -213,21 +219,7 @@ namespace Umbraco.Core.Persistence
                 cmd.CommandTimeout = cmd.Connection.ConnectionTimeout;
 
             if (EnableSqlTrace)
-            {
-                var sb = new StringBuilder();
-#if DEBUG_DATABASES
-                sb.Append(InstanceId);
-                sb.Append(": ");
-#endif
-                sb.Append(cmd.CommandText);
-                foreach (DbParameter p in cmd.Parameters)
-                {
-                    sb.Append(" - ");
-                    sb.Append(p.Value);
-                }
-
-                _logger.Debug<UmbracoDatabase>(sb.ToString().Replace("{", "{{").Replace("}", "}}"));
-            }
+                _logger.Debug<UmbracoDatabase>(CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // fixme these escapes should be builtin
 
 #if DEBUG_DATABASES
             // detects whether the command is already in use (eg still has an open reader...)
@@ -236,7 +228,30 @@ namespace Umbraco.Core.Persistence
             if (refsobj != null) _logger.Debug<UmbracoDatabase>("Oops!" + Environment.NewLine + refsobj);
 #endif
 
+            _cmd = cmd;
             base.OnExecutingCommand(cmd);
+        }
+
+        private static string CommandToString(DbCommand cmd)
+        {
+            var sb = new StringBuilder();
+#if DEBUG_DATABASES
+                sb.Append(InstanceId);
+                sb.Append(": ");
+#endif
+            sb.Append(cmd.CommandText);
+            if (cmd.Parameters.Count > 0)
+                sb.Append(" --");
+            var i = 0;
+            foreach (DbParameter p in cmd.Parameters)
+            {
+                sb.Append(" @");
+                sb.Append(i++);
+                sb.Append(":");
+                sb.Append(p.Value);
+            }
+
+            return sb.ToString();
         }
 
         protected override void OnExecutedCommand(DbCommand cmd)

@@ -31,10 +31,10 @@ namespace Umbraco.Core.DI
             // the container, 'info' describes the ctor argument, and 'args' contains the args that
             // were passed to GetInstance() - use first arg if it is the right type,
             //
-            // for IDatabaseUnitOfWork
-            container.RegisterConstructorDependency((factory, info, args) => args.Length > 0 ? args[0] as IDatabaseUnitOfWork : null);
+            // for IScopeUnitOfWork
+            container.RegisterConstructorDependency((factory, info, args) => args.Length > 0 ? args[0] as IScopeUnitOfWork : null);
             // for IUnitOfWork
-            container.RegisterConstructorDependency((factory, info, args) => args.Length > 0 ? args[0] as IUnitOfWork : null);
+            //container.RegisterConstructorDependency((factory, info, args) => args.Length > 0 ? args[0] as IUnitOfWork : null);
 
             // register repositories
             // repos depend on various things, and a IDatabaseUnitOfWork (registered above)

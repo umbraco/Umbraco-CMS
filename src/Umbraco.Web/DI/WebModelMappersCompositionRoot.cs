@@ -20,6 +20,7 @@ namespace Umbraco.Web.DI
             container.Register<TabModelMapper>();
             container.Register<UserModelMapper>();
             container.Register<DashboardModelsMapper>();
+            container.Register<TemplateModelMapper>();
         }
     }
 }

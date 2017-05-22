@@ -454,6 +454,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var allPropertyDataDtos = Database.FetchByGroups<PropertyDataDto, Guid>(versions, 2000, batch =>
                 Sql()
                     .Select<PropertyDataDto>()
+                    .From<PropertyDataDto>()
                     .WhereIn<PropertyDataDto>(x => x.VersionId, batch))
                 .ToList();
 
@@ -462,6 +463,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var allPropertyTypeDtos = Database.FetchByGroups<PropertyTypeDto, int>(allPropertyTypeIds, 2000, batch => 
                 Sql()
                     .Select<PropertyTypeDto>()
+                    .From<PropertyTypeDto>()
                     .WhereIn<PropertyTypeDto>(x => x.Id, batch));
 
             // index the types for perfs, and assign to PropertyDataDto

@@ -418,7 +418,7 @@ namespace Umbraco.Tests.DI
 
             AssertSameCollection(col1A, col1B);
 
-            _container.EndCurrentScope();
+            _container.ScopeManagerProvider.GetScopeManager(_container).CurrentScope.Dispose();
             var scope2 = _container.BeginScope();
 
             var col2 = _container.GetInstance<TestCollection>();
@@ -426,7 +426,7 @@ namespace Umbraco.Tests.DI
 
             AssertNotSameCollection(col1A, col2);
 
-            _container.EndCurrentScope();
+            _container.ScopeManagerProvider.GetScopeManager(_container).CurrentScope.Dispose();
         }
 
         [Test]

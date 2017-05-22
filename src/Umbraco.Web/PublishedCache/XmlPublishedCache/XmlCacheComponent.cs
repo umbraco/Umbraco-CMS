@@ -7,6 +7,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Web.HealthCheck.Checks.DataIntegrity;
+using LightInject;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {

@@ -6,6 +6,7 @@
     <ProjectGuid>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AssemblyName>umbraco.DataLayer</AssemblyName>
+    <RootNamespace>umbraco.DataLayer</RootNamespace>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
@@ -42,7 +43,7 @@
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
     <PackageReference Include="log4net" Version="2.0.8.0" />
-    <PackageReference Include="Microsoft.ApplicationBlocks.Data" Version="1.0.1559.20655" />
+    <PackageReference Include="Microsoft.ApplicationBlocks.Data" Version="2.0.0" />
     <PackageReference Include="MySql.Data" Version="6.9.9.0" />
   </ItemGroup>
   <ItemGroup>

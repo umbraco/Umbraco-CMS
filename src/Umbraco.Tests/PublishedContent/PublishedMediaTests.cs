@@ -18,8 +18,8 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using UmbracoExamine;
 using Current = Umbraco.Web.Current;
-using Umbraco.Core.DI;
 using Umbraco.Tests.Testing;
+using LightInject;
 
 namespace Umbraco.Tests.PublishedContent
 {

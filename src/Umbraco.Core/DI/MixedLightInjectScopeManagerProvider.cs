@@ -32,9 +32,9 @@ namespace Umbraco.Core.DI
             _provider = new PerWebRequestScopeManagerProvider();
         }
 
-        public ScopeManager GetScopeManager()
+        public IScopeManager GetScopeManager(IServiceFactory factory)
         {
-            return _provider.GetScopeManager();
+            return _provider.GetScopeManager(factory);
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </remarks>
     internal class EntityRepository : DisposableObject, IEntityRepository
     {
-        public EntityRepository(IDatabaseUnitOfWork work)
+        public EntityRepository(IScopeUnitOfWork work)
         {
             UnitOfWork = work;
         }

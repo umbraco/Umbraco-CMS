@@ -28,30 +28,44 @@ namespace Umbraco.Core.Exceptions
             if (ex == null || ex.Message.StartsWith(LightInjectUnableToResolveType) == false)
                 return;
 
-            var messages = new List<string> { ex.Message };
+            var sb = new StringBuilder();
+            sb.AppendLine("Unresolved type: " + ex.Message.Substring(LightInjectUnableToResolveType.Length));
+            WriteDetails(ex, sb);
+            throw new LightInjectException(sb.ToString(), e);
+        }
 
+        public static void TryThrow(Exception e, Type implementingType)
+        {
+            var ex = e as InvalidOperationException;
+            if (ex == null || ex.Message.StartsWith(LightInjectUnableToResolveType) == false)
+                return;
+
+            var sb = new StringBuilder();
+            sb.AppendLine("Unresolved type: " + ex.Message.Substring(LightInjectUnableToResolveType.Length));
+            sb.AppendLine("Implementing type: " + implementingType);
+            WriteDetails(ex, sb);
+            throw new LightInjectException(sb.ToString(), e);
+        }
+
+        private static void WriteDetails(InvalidOperationException ex, StringBuilder sb)
+        {
             ex = ex.InnerException as InvalidOperationException;
             while (ex != null)
             {
-                messages.Add(ex.Message);
+                var message = ex.Message;
+
+                if (message.StartsWith(LightInjectUnableToResolveType))
+                {
+                    sb.AppendLine("-> Unresolved type: " + message.Substring(LightInjectUnableToResolveType.Length));
+                }
+                else if (message.StartsWith(LightInjectUnresolvedDependency))
+                {
+                    var pos = message.InvariantIndexOf(LightInjectRequestedDependency);
+                    sb.AppendLine("-> Unresolved dependency: " + message.Substring(pos + LightInjectRequestedDependency.Length + 1).TrimEnd(']'));
+                }
+
                 ex = ex.InnerException as InvalidOperationException;
             }
-
-            var sb = new StringBuilder();
-            var last = messages.Last();
-            if (last.StartsWith(LightInjectUnableToResolveType))
-            {
-                sb.AppendLine("Unresolved type: " + last.Substring(LightInjectUnableToResolveType.Length));
-            }
-            else if (last.StartsWith(LightInjectUnresolvedDependency))
-            {
-                var pos = last.InvariantIndexOf(LightInjectRequestedDependency);
-                sb.AppendLine("Unresolved dependency: " + last.Substring(pos + LightInjectRequestedDependency.Length + 1).TrimEnd(']'));
-                sb.AppendLine(" (see inner exceptions for the entire dependencies chain).");
-            }
-            else return; // wtf?
-
-            throw new LightInjectException(sb.ToString(), e);
         }
     }
 }

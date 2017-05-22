@@ -3,19 +3,16 @@ using System.Collections.ObjectModel;
 using System.Web.Routing;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Plugins;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Core.DI;
-using Umbraco.Tests.TestHelpers;
 using Current = Umbraco.Core.DI.Current;
+using LightInject;
 
 namespace Umbraco.Tests.PublishedContent
 {

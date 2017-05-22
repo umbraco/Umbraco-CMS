@@ -11,6 +11,7 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using System.Collections.Generic;
 using Umbraco.Core.Plugins;
+using LightInject;
 
 namespace Umbraco.Web.Mvc
 {

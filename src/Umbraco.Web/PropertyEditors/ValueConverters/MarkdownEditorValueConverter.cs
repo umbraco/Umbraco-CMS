@@ -1,6 +1,6 @@
-﻿using MarkdownSharp;
-using System;
+﻿using System;
 using System.Web;
+using HeyRed.MarkdownSharp;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;

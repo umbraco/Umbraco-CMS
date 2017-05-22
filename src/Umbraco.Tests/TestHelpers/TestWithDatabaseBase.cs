@@ -30,6 +30,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
+using LightInject;
 
 namespace Umbraco.Tests.TestHelpers
 {

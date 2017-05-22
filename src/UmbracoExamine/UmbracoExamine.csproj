@@ -6,6 +6,7 @@
     <ProjectGuid>{07FBC26B-2927-4A22-8D96-D644C667FECC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AssemblyName>UmbracoExamine</AssemblyName>
+    <RootNamespace>UmbracoExamine</RootNamespace>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>

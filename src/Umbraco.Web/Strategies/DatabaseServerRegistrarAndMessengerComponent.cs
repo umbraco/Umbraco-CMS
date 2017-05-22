@@ -16,6 +16,7 @@ using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Scheduling;
+using LightInject;
 
 namespace Umbraco.Web.Strategies
 {

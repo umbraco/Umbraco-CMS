@@ -3,6 +3,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using LightInject;
 
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Core

@@ -2,6 +2,7 @@
 using Umbraco.Core.ObjectResolution;
 using CoreCurrent = Umbraco.Core.DI.Current;
 using WebCurrent = Umbraco.Web.Current;
+using LightInject;
 
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Web.Routing

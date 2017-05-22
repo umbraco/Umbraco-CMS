@@ -4,6 +4,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using LightInject;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {

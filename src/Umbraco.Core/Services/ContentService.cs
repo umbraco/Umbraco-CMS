@@ -1263,7 +1263,7 @@ namespace Umbraco.Core.Services
                 // but... UnPublishing event makes no sense (not going to cancel?) and no need to save
                 // just raise the event
                 if (content.Trashed == false && content.HasPublishedVersion)
-                    uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false));
+                    uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
 
                 DeleteLocked(uow, repository, content);
 
@@ -1841,7 +1841,7 @@ namespace Umbraco.Core.Services
                     uow.Events.Dispatch(Saved, this, new SaveEventArgs<IContent>(saved, false));
 
                 if (raiseEvents && published.Any())
-                    uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(published, false, false));
+                    uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(published, false, false), "Published");
 
                 uow.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
 
@@ -1952,7 +1952,7 @@ namespace Umbraco.Core.Services
                     publishedItems.Add(publishedItem);
                 }
 
-                uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedItems, false, false));
+                uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedItems, false, false), "Published");
                 uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 Audit(uow, AuditType.Publish, "Publish with Children performed by user", userId, content.Id);
 
@@ -1997,7 +1997,7 @@ namespace Umbraco.Core.Services
                 content.WriterId = userId;
                 repository.AddOrUpdate(content);
 
-                uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false));
+                uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
                 uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 Audit(uow, AuditType.UnPublish, "UnPublish performed by user", userId, content.Id);
 
@@ -2058,7 +2058,7 @@ namespace Umbraco.Core.Services
                     return status;
                 }
 
-                uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false));
+                uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false), "Published");
 
                 // if was not published and now is... descendants that were 'published' (but
                 // had an unpublished ancestor) are 're-published' ie not explicitely published
@@ -2068,7 +2068,7 @@ namespace Umbraco.Core.Services
                     if (HasChildren(content.Id))
                     {
                         var descendants = GetPublishedDescendants(content).ToArray();
-                        uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false));
+                        uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
                     }
                     changeType = TreeChangeTypes.RefreshBranch; // whole branch
                 }
@@ -2511,7 +2511,7 @@ namespace Umbraco.Core.Services
                     // but... UnPublishing event makes no sense (not going to cancel?) and no need to save
                     // just raise the event
                     if (content.Trashed == false && content.HasPublishedVersion)
-                        uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false));
+                        uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
 
                     // if current content has children, move them to trash
                     var c = content;

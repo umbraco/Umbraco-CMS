@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IDatabaseUnitOfWork _unitOfWork;
 
-        public NotificationsRepository(IDatabaseUnitOfWork unitOfWork)
+        public NotificationsRepository(IScopeUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }

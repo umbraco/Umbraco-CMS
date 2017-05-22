@@ -16,7 +16,7 @@ namespace Umbraco.Core.DI
         {
             // register a transient messages factory, which will be replaced by the web
             // boot manager when running in a web context
-            container.Register<IEventMessagesFactory, TransientEventMessagesFactory>();
+            container.RegisterSingleton<IEventMessagesFactory, TransientEventMessagesFactory>();
 
             // register the service context
             container.RegisterSingleton<ServiceContext>();

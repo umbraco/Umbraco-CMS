@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.DI;
 using Umbraco.Tests.Testing;
+using LightInject;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {

@@ -21,16 +21,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter(typeof(RelatedLinksLegacyValueConverter), typeof(JsonValueConverter))]
     public class RelatedLinksValueConverter : PropertyValueConverterBase
     {
-        private readonly UrlProvider _urlProvider;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ServiceContext _services;
         private readonly CacheHelper _appCache;
         private readonly ILogger _logger;
 
-        public RelatedLinksValueConverter(IUmbracoContextAccessor umbracoContextAccessor, UrlProvider urlProvider, ServiceContext services, CacheHelper appCache, ILogger logger)
+        public RelatedLinksValueConverter(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, CacheHelper appCache, ILogger logger)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
-            _urlProvider = urlProvider;
             _logger = logger;
             _services = services;
             _appCache = appCache;
@@ -122,10 +120,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             if (link.IsInternal && link.Id != null)
             {
-                if (_urlProvider == null && umbracoContext == null)
+                if (umbracoContext == null)
                     return null;
 
-                var urlProvider = _urlProvider ?? umbracoContext.UrlProvider;
+                var urlProvider = umbracoContext.UrlProvider;
 
                 link.Link = urlProvider.GetUrl((int)link.Id);
                 if (link.Link.Equals("#"))

@@ -31,7 +31,7 @@ namespace Umbraco.Web.Services
         public SectionService(
             IUserService userService,
             IApplicationTreeService applicationTreeService,
-            IDatabaseUnitOfWorkProvider uowProvider,
+            IScopeUnitOfWorkProvider uowProvider,
             CacheHelper cache)
         {
             if (applicationTreeService == null) throw new ArgumentNullException("applicationTreeService");

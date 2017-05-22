@@ -32,11 +32,19 @@ namespace Umbraco.Core.IO
 
         #region Constructor
 
-        // fixme - circular dependency on scope provider, refactor!
+        // fixme - circular dependency on scope provider
+        // managed via lazy-injecting FileSystems into ScopeProvider for now,
+        // but we must refactor this somehow!
+
+        // DI wants a public ctor
+        // but IScopeProviderInternal is not public
+        public FileSystems(/*IScopeProviderInternal scopeProvider,*/ ILogger logger)
+            : this(DI.Current.ScopeProvider as IScopeProviderInternal, logger)
+        { }
 
         internal FileSystems(IScopeProviderInternal scopeProvider, ILogger logger)
         {
-            _config = (FileSystemProvidersSection) ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
+            _config = (FileSystemProvidersSection)ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
             _scopeProvider = scopeProvider;
             _logger = logger;
             CreateWellKnownFileSystems();

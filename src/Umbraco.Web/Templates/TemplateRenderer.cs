@@ -13,6 +13,7 @@ using umbraco;
 using umbraco.cms.businesslogic.language;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Services;
+using LightInject;
 
 namespace Umbraco.Web.Templates
 {

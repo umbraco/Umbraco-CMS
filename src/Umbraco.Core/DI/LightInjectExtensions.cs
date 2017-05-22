@@ -289,7 +289,32 @@ namespace Umbraco.Core.DI
                 throw;
             }
         }
-        
+
+        /// <summary>
+        /// Gets an instance of a TService or throws a meaningful exception.
+        /// </summary>
+        /// <param name="factory">The container.</param>
+        /// <param name="tService">The type of the service.</param>
+        /// <param name="serviceName">The name of the service.</param>
+        /// <param name="implementingType">The implementing type.</param>
+        /// <param name="args">Arguments.</param>
+        /// <returns>The instance.</returns>
+        internal static object GetInstanceOrThrow(this IServiceFactory factory, Type tService, string serviceName, Type implementingType, object[] args)
+        {
+            if (factory == null)
+                throw new ArgumentNullException(nameof(factory));
+
+            try
+            {
+                return factory.GetInstance(tService, serviceName, args);
+            }
+            catch (Exception e)
+            {
+                LightInjectException.TryThrow(e, implementingType);
+                throw;
+            }
+        }
+
         // FIXME or just use names?!
         // this is what RegisterMany does => kill RegisterCollection!
 

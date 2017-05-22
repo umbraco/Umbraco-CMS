@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web.Security;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using LightInject;
 
 namespace Umbraco.Web.Routing
 {

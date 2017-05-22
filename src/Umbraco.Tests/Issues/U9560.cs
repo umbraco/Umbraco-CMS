@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Tests.Testing;
+using LightInject;
 
 namespace Umbraco.Tests.Issues
 {
