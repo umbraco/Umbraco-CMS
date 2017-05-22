@@ -15,12 +15,6 @@
 
             <umb-editor-container>
 
-                <umb-editor-sub-header>
-                    <umb-editor-sub-header-content-left>
-                        <a class="umb-package-details__back-link" href="" ng-click="vm.goBack()">&larr; Back to roles</a>
-                    </umb-editor-sub-header-content-left>
-                </umb-editor-sub-header>
-
                 <div class="umb-packages-view-wrapper" style="padding: 0;">
 
                     <div class="umb-package-details">
@@ -138,7 +132,24 @@
 
             <umb-editor-footer>
 
+                <umb-editor-footer-content-left>
+
+                    <umb-breadcrumbs
+                        ancestors="vm.breadcrumbs"
+                        allow-on-open="true"
+                        on-open="vm.goToPage(ancestor)">
+                    </umb-breadcrumbs>
+
+                </umb-editor-footer-content-left>
+
                 <umb-editor-footer-content-right>
+
+                    <umb-button
+                        type="button"
+                        action="vm.goToPage(vm.breadcrumbs[0])"
+                        label="Return to list"
+                        label-key="buttons_returnToList">
+                    </umb-button>
 
                     <umb-button
                         type="button"

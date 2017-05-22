@@ -9,7 +9,7 @@
         vm.page = {};
         vm.userRole = {};
 
-        vm.goBack = goBack;
+        vm.goToPage = goToPage;
         vm.openSectionPicker = openSectionPicker;
         vm.openContentPicker = openContentPicker;
         vm.openMediaPicker = openMediaPicker;
@@ -23,6 +23,7 @@
             // get user
             usersResource.getUserRole().then(function (userRole) {
                 vm.userRole = userRole;
+                makeBreadcrumbs();
             });
 
             // fake loading
@@ -32,8 +33,8 @@
             
         }
 
-        function goBack() {
-            $location.path("/users/users/overview").search("subview", "roles");
+        function goToPage(ancestor) {
+            $location.path(ancestor.path).search("subview", ancestor.subView);
         }
 
         function openSectionPicker() {
@@ -96,6 +97,19 @@
                 default:
                     return "success";
             }
+        }
+
+        function makeBreadcrumbs() {
+            vm.breadcrumbs = [
+                {
+                    "name": "Groups",
+                    "path": "/users/users/overview",
+                    "subView": "roles"
+                },
+                {
+                    "name": vm.userRole.name
+                }
+            ];
         }
  
         init();

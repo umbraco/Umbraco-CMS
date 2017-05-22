@@ -8,8 +8,9 @@
         vm.loading = false;
         vm.page = {};
         vm.user = {};
+        vm.breadcrumbs = [];
 
-        vm.goBack = goBack;
+        vm.goToPage = goToPage;
         vm.openUserRolePicker = openUserRolePicker;
         vm.openContentPicker = openContentPicker;
         vm.openMediaPicker = openMediaPicker;
@@ -26,6 +27,7 @@
             // get user
             usersResource.getUser().then(function (user) {
                 vm.user = user;
+                makeBreadcrumbs(vm.user);
             });
 
             // fake loading
@@ -35,8 +37,8 @@
             
         }
 
-        function goBack() {
-            $location.path("/users/users/overview").search("subview", "users");
+        function goToPage(ancestor) {
+            $location.path(ancestor.path).search("subview", ancestor.subView);
         }
 
         function openUserRolePicker() {
@@ -133,6 +135,19 @@
 
         function changeAvatar() {
             alert("change avatar");
+        }
+
+        function makeBreadcrumbs() {
+            vm.breadcrumbs = [
+                {
+                    "name": "Users",
+                    "path": "/users/users/overview",
+                    "subView": "users"
+                },
+                {
+                    "name": vm.user.name
+                }
+            ];
         }
  
         init();
