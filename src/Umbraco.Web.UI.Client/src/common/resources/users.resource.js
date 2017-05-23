@@ -162,7 +162,6 @@
 
         var resource = {
             getUser: getUser,
-            getUsers: getUsers,
             getUserRole: getUserRole,
             getUserGroups: getUserGroups,
             disableUsers: disableUsers,
