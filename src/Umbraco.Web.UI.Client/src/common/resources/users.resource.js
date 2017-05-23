@@ -78,8 +78,8 @@
               umbRequestHelper.getApiUrl(
                 "userApiBaseUrl",
                 "GetById",
-                { id: id })),
-            "Failed to retrieve data for user " + id);
+                { id: userId })),
+            "Failed to retrieve data for user " + userId);
             
         }
 

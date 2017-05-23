@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, $timeout, $location, usersResource) {
+    function UserEditController($scope, $timeout, $location, usersResource, $routeParams) {
 
         var vm = this;
 
@@ -16,7 +16,7 @@
             vm.loading = true;
 
             // get user
-            usersResource.getUser().then(function (user) {
+            usersResource.getUser($routeParams.id).then(function (user) {
                 vm.user = user;
             });
 
