@@ -57,12 +57,13 @@ Use this directive to render an umbraco button. The directive can be used to gen
 @param {callback} action The button action which should be performed when the button is clicked.
 @param {string=} href Url/Path to navigato to.
 @param {string=} type Set the button type ("button" or "submit").
-@param {string=} buttonStyle Set the style of the button. The directive uses the default bootstrap styles ("primary", "info", "success", "warning", "danger", "inverse", "link").
+@param {string=} buttonStyle Set the style of the button. The directive uses the default bootstrap styles ("primary", "info", "success", "warning", "danger", "inverse", "link", "block"). Pass in array to add multple styles [success,block].
 @param {string=} state Set a progress state on the button ("init", "busy", "success", "error").
 @param {string=} shortcut Set a keyboard shortcut for the button ("ctrl+c").
 @param {string=} label Set the button label.
 @param {string=} labelKey Set a localization key to make a multi lingual button ("general_buttonText").
-@param {string=} icon Set a button icon. Can only be used when buttonStyle is "link".
+@param {string=} icon Set a button icon.
+@param {string=} size Set a button icon ("xs", "m", "l", "xl").
 @param {boolean=} disabled Set to <code>true</code> to disable the button.
 **/
 
@@ -82,7 +83,24 @@ Use this directive to render an umbraco button. The directive can be used to gen
             }
 
             if (scope.buttonStyle) {
-               scope.style = "btn-" + scope.buttonStyle;
+
+                // make it possible to pass in multiple styles
+                if(scope.buttonStyle.startsWith("[") && scope.buttonStyle.endsWith("]")) {
+                    
+                    // when using an attr it will always be a string so we need to remove square brackets
+                    // and turn it into and array
+                    var withoutBrackets = scope.buttonStyle.replace(/[\[\]']+/g,'');
+                    // split array by , + make sure to catch whitespaces
+                    var array = withoutBrackets.split(/\s?,\s?/g);
+                    
+                    angular.forEach(array, function(item){
+                        scope.style = scope.style + " " + "btn-" + item;
+                    });
+
+                } else {
+                    scope.style = "btn-" + scope.buttonStyle;
+                }
+
             }
 
          }
@@ -122,7 +140,8 @@ Use this directive to render an umbraco button. The directive can be used to gen
             label: "@?",
             labelKey: "@?",
             icon: "@?",
-            disabled: "="
+            disabled: "=",
+            size: "@?"
          }
       };
 

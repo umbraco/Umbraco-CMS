@@ -8,24 +8,148 @@
 
             <umb-editor-header
                 name="vm.userRole.name"
-                hide-icon="true"
+                icon="vm.userRole.icon"
                 hide-description="true"
                 hide-alias="true">
             </umb-editor-header>
 
             <umb-editor-container>
 
-                <umb-editor-sub-header>
-                    <umb-editor-sub-header-content-left>
-                        <a class="umb-package-details__back-link" href="" ng-click="vm.goBack()">&larr; Back to roles</a>
-                    </umb-editor-sub-header-content-left>
-                </umb-editor-sub-header>
+                <div class="umb-packages-view-wrapper" style="padding: 0;">
+
+                    <div class="umb-package-details">
+
+                        <div class="umb-package-details__main-content">
+
+                            <div class="test-group">
+                                <div class="test-group-title">Something</div>
+                                <div class="test-group-content block-form">
+
+                                    <umb-control-group label="Sections" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
+                                        <umb-node-preview
+                                            style="max-width: 100%;"
+                                            ng-repeat="section in vm.userRole.sections"
+                                            icon="section.icon"
+                                            name="section.name"
+                                            allow-remove="true"
+                                            on-remove="vm.removeSelectedItem($index, vm.userRole.sections)">
+                                        </umb-node-preview>
+
+                                        <a href=""
+                                            style="max-width: 100%;"
+                                            class="umb-node-preview-add"
+                                            ng-click="vm.openUserRolePicker()"
+                                            prevent-default>
+                                            <localize key="general_add">Add</localize>
+                                        </a>
+                                    </umb-control-group>
+
+                                    <umb-control-group label="Content start nodes" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
+                                        <umb-node-preview
+                                            style="max-width: 100%;"
+                                            ng-repeat="node in vm.userRole.startNodesContent"
+                                            icon="node.icon"
+                                            name="node.name"
+                                            allow-remove="true"
+                                            on-remove="vm.removeSelectedItem($index, vm.userRole.startNodesContent)">
+                                        </umb-node-preview>
+
+                                        <a href=""
+                                            style="max-width: 100%;"
+                                            class="umb-node-preview-add"
+                                            ng-click="vm.openContentPicker()"
+                                            prevent-default>
+                                            <localize key="general_add">Add</localize>
+                                        </a>
+                                    </umb-control-group>
+
+                                    <umb-control-group label="Media start nodes" description="Donec quis lacinia ligula. Suspendisse ultrices risus ante">
+                                        <umb-node-preview
+                                            style="max-width: 100%;"
+                                            ng-repeat="node in vm.userRole.startNodesMedia"
+                                            icon="node.icon"
+                                            name="node.name"
+                                            allow-remove="true"
+                                            on-remove="vm.removeSelectedItem($index, vm.userRole.startNodesMedia)">
+                                        </umb-node-preview>
+
+                                        <a href=""
+                                            style="max-width: 100%;"
+                                            class="umb-node-preview-add"
+                                            ng-click="vm.openMediaPicker()"
+                                            prevent-default>
+                                            <localize key="general_add">Add</localize>
+                                        </a>
+                                    </umb-control-group>
+
+                                </div>
+                            </div>
+
+                            <div class="test-group">
+                                <div class="test-group-title">Default permissions</div>
+                                <div class="test-group-content">Some content here</div>
+                            </div>
+
+                            <div class="test-group">
+                                <div class="test-group-title">Granular permissions</div>
+                                <div class="test-group-content">Some content here</div>
+                            </div>
+
+                        </div>
+
+                        <div class="umb-package-details__sidebar">
+
+                            <div class="umb-package-details__section">
+
+                                <div class="umb-package-details__section-title">Users</div>
+
+                                <umb-user-preview
+                                    ng-repeat="user in vm.userRole.users"
+                                    name="user.name"
+                                    avatar="user.avatar"
+                                    allow-remove="true"
+                                    on-remove="vm.removeSelectedUser($index, vm.userRole.users)">
+                                </umb-user-preview>
+
+                                <a href=""
+                                    style="max-width: 100%;"
+                                    class="umb-node-preview-add"
+                                    ng-click="vm.openMediaPicker()"
+                                    prevent-default>
+                                    <localize key="general_add">Add</localize>
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
 
             </umb-editor-container>
 
             <umb-editor-footer>
 
+                <umb-editor-footer-content-left>
+
+                    <umb-breadcrumbs
+                        ancestors="vm.breadcrumbs"
+                        allow-on-open="true"
+                        on-open="vm.goToPage(ancestor)">
+                    </umb-breadcrumbs>
+
+                </umb-editor-footer-content-left>
+
                 <umb-editor-footer-content-right>
+
+                    <umb-button
+                        type="button"
+                        action="vm.goToPage(vm.breadcrumbs[0])"
+                        label="Return to list"
+                        label-key="buttons_returnToList">
+                    </umb-button>
 
                     <umb-button
                         type="button"
@@ -44,5 +168,26 @@
         </umb-editor-view>
 
     </form>
+
+    <umb-overlay
+        ng-if="vm.sectionPicker.show"
+        model="vm.sectionPicker"
+        view="vm.sectionPicker.view"
+        position="right">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.contentPicker.show"
+        model="vm.contentPicker"
+        view="vm.contentPicker.view"
+        position="right">
+    </umb-overlay>
+    
+    <umb-overlay
+        ng-if="vm.mediaPicker.show"
+        model="vm.mediaPicker"
+        view="vm.mediaPicker.view"
+        position="right">
+    </umb-overlay>
 
 </div>

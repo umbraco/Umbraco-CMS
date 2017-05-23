@@ -109,7 +109,33 @@
                 "name": "Admin",
                 "alias": "admin",
                 "id": 1,
-                "icon": "icon-medal"
+                "icon": "icon-medal",
+                "users": [
+                    {
+                        "id": "1",
+                        "name": "Angela Stone",
+                        "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/jina/128.jpg",
+                        "state": "active"
+                    },
+                    {
+                        "id": "1",
+                        "name": "Beverly Silva",
+                        "avatar": "",
+                        "state": "disabled"
+                    },
+                    {
+                        "id": "1",
+                        "name": "Ruth Turner",
+                        "avatar": "",
+                        "state": "pending"
+                    },
+                    {
+                        "id": "1",
+                        "name": "Arthur Welch",
+                        "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/ashleyford/128.jpg",
+                        "state": "active"
+                    }
+                ]
             };
             deferred.resolve(user);
             return deferred.promise;

@@ -15,17 +15,219 @@
 
             <umb-editor-container>
 
-                <umb-editor-sub-header>
-                    <umb-editor-sub-header-content-left>
-                        <a class="umb-package-details__back-link" href="" ng-click="vm.goBack()">&larr; Back to users</a>
-                    </umb-editor-sub-header-content-left>
-                </umb-editor-sub-header>
+                <div class="umb-packages-view-wrapper" style="padding: 0;">
+
+                    <div class="umb-package-details">
+
+                        <div class="umb-package-details__main-content">
+                            
+                            <div class="test-group">
+                                <div class="test-group-title">Meta</div>
+                                <div class="test-group-content block-form">
+                                    <umb-control-group label="Email" description="Orci varius natoque penatibus et magnis dis parturient montes">
+                                        <input type="text"
+                                            localize="placeholder" 
+                                            placeholder="@placeholders_entername" 
+                                            class="input-block-level" 
+                                            ng-model="vm.user.email"
+                                            umb-auto-focus />
+                                    </umb-control-group>
+
+                                    <umb-control-group label="Language" description="Orci varius natoque penatibus et magnis dis parturient montes">
+                                        <select class="input-block-level">
+                                            <option value="">Select language</option>
+                                        </select>
+                                    </umb-control-group>
+                                </div>
+                            </div>
+
+                            <div class="test-group">
+                                <div class="test-group-title">Permissions</div>
+                                <div class="test-group-content block-form">
+                                    
+                                    <umb-control-group style="margin-bottom: 25px;" label="Roles" description="Aliquam laoreet metus porta nisi pellentesque">
+
+                                        <umb-user-role-preview
+                                            ng-repeat="userRole in vm.user.userRoles"
+                                            icon="userRole.icon"
+                                            name="userRole.name"
+                                            sections="userRole.sections"
+                                            content-start-nodes="userRole.startNodesContent"
+                                            media-start-nodes="userRole.startNodesMedia"
+                                            allow-remove="true"
+                                            on-remove="vm.removeSelectedItem($index, vm.user.userRoles)">
+                                        </umb-user-role-preview>
+
+                                        <a href=""
+                                            style="max-width: 100%;"
+                                            class="umb-node-preview-add"
+                                            ng-click="vm.openUserRolePicker()"
+                                            prevent-default>
+                                            <localize key="general_add">Add</localize>
+                                        </a>
+                                        
+                                    </umb-control-group>
+
+                                    <umb-control-group style="margin-bottom: 25px;" label="Content start nodes" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
+                                        
+                                        <umb-node-preview
+                                            style="max-width: 100%;"
+                                            ng-repeat="node in vm.user.startNodesContent"
+                                            icon="node.icon"
+                                            name="node.name"
+                                            allow-remove="true"
+                                            on-remove="vm.removeSelectedItem($index, vm.user.startNodesContent)">
+                                        </umb-node-preview>
+
+                                        <a href=""
+                                            style="max-width: 100%;"
+                                            class="umb-node-preview-add"
+                                            ng-click="vm.openContentPicker()"
+                                            prevent-default>
+                                            <localize key="general_add">Add</localize>
+                                        </a>
+
+                                    </umb-control-group>
+
+                                    <umb-control-group label="Media start nodes" description="Donec quis lacinia ligula. Suspendisse ultrices risus ante">
+
+                                        <umb-node-preview
+                                            style="max-width: 100%;"
+                                            ng-repeat="node in vm.user.startNodesMedia"
+                                            icon="node.icon"
+                                            name="node.name"
+                                            allow-remove="true"
+                                            on-remove="vm.removeSelectedItem($index, vm.user.startNodesMedia)">
+                                        </umb-node-preview>
+
+                                        <a href=""
+                                            style="max-width: 100%;"
+                                            class="umb-node-preview-add"
+                                            ng-click="vm.openMediaPicker()"
+                                            prevent-default>
+                                            <localize key="general_add">Add</localize>
+                                        </a>
+
+                                    </umb-control-group>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="umb-package-details__sidebar">
+
+                            <div class="umb-package-details__section">
+
+                                <div class="flex flex-column justify-center items-center" style="margin-bottom: 20px;">
+                                    <umb-avatar
+                                        color="secondary"
+                                        size="xxl"
+                                        name="{{vm.user.name}}"
+                                        img-src="{{vm.user.avatar}}">
+                                    </umb-avatar>
+                                    <umb-button
+                                        type="button"
+                                        button-style="link"
+                                        action="vm.changeAvatar()"
+                                        label="Change avatar">
+                                    </umb-button>
+                                </div>
+
+                                <!--
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">Status</div>
+                                    <div class="umb-package-details__information-item-content">
+                                        <umb-badge
+                                            style="margin-top: 4px;"
+                                            size="s"
+                                            ng-if="user.state !== 'active'"
+                                            color="{{vm.getUserStateType(vm.user.state)}}">
+                                            {{ vm.user.state }}
+                                        </umb-badge>
+                                    </div>
+                                </div>
+                                -->
+
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">Last login:</div>
+                                    <div class="umb-package-details__information-item-content">
+                                        <span ng-if="vm.user.lastLogin">{{ vm.user.lastLogin }}</span>
+                                        <span ng-if="!vm.user.lastLogin">The user has not logged in yet</span>
+                                    </div>
+                                </div>
+
+                                <div class="umb-package-details__information-item" ng-if="vm.user.invitedBy">
+                                    <div class="umb-package-details__information-item-label">Invited by:</div>
+                                    <div class="umb-package-details__information-item-content">{{ vm.user.invitedBy }}</div>
+                                </div>
+
+                                 <div class="umb-package-details__information-item" ng-if="vm.user.createdBy">
+                                    <div class="umb-package-details__information-item-label">Created by:</div>
+                                    <div class="umb-package-details__information-item-content">{{ vm.user.createdBy }}</div>
+                                </div>
+
+                                <div style="margin-top: 20px;">
+                                    <div style="margin-bottom: 10px;">
+                                        <umb-button
+                                            ng-if="vm.user.state === 'active'"
+                                            type="button"
+                                            button-style="[danger,block]"
+                                            action="vm.disableUser()"
+                                            label="Disable user"
+                                            size="m">
+                                        </umb-button>
+                                    </div>
+
+                                    <div style="margin-bottom: 10px;">
+                                        <umb-button
+                                            ng-if="vm.user.state === 'disabled'"
+                                            type="button"
+                                            button-style="[success,block]"
+                                            action="vm.enableUser()"
+                                            label="Enable user"
+                                            size="m">
+                                        </umb-button>
+                                    </div>
+
+                                    <umb-button
+                                        type="button"
+                                        button-style="[info,block]"
+                                        action="vm.resetPassword()"
+                                        label="Reset password"
+                                        size="m">
+                                    </umb-button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
             </umb-editor-container>
 
             <umb-editor-footer>
 
+                <umb-editor-footer-content-left>
+
+                    <umb-breadcrumbs
+                        ancestors="vm.breadcrumbs"
+                        allow-on-open="true"
+                        on-open="vm.goToPage(ancestor)">
+                    </umb-breadcrumbs>
+
+                </umb-editor-footer-content-left>
+
                 <umb-editor-footer-content-right>
+
+                    <umb-button
+                        type="button"
+                        action="vm.goToPage(vm.breadcrumbs[0])"
+                        label="Return to list"
+                        label-key="buttons_returnToList">
+                    </umb-button>
 
                     <umb-button
                         type="button"
@@ -44,5 +246,26 @@
         </umb-editor-view>
 
     </form>
+
+    <umb-overlay
+        ng-if="vm.userRolePicker.show"
+        model="vm.userRolePicker"
+        view="vm.userRolePicker.view"
+        position="right">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.contentPicker.show"
+        model="vm.contentPicker"
+        view="vm.contentPicker.view"
+        position="right">
+    </umb-overlay>
+    
+    <umb-overlay
+        ng-if="vm.mediaPicker.show"
+        model="vm.mediaPicker"
+        view="vm.mediaPicker.view"
+        position="right">
+    </umb-overlay>
 
 </div>
