@@ -34,7 +34,7 @@
                                     </umb-control-group>
 
                                     <umb-control-group label="Language" description="Orci varius natoque penatibus et magnis dis parturient montes">
-                                        <select class="input-block-level">
+                                        <select class="input-block-level" ng-model="vm.user.culture" ng-options="key as value for (key, value) in vm.user.availableCultures">
                                             <option value="">Select language</option>
                                         </select>
                                     </umb-control-group>
