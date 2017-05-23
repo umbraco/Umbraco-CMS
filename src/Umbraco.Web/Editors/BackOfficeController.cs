@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Configuration;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -400,6 +401,7 @@ namespace Umbraco.Web.Editors
                             {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
                             {"allowPasswordReset", UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset},
                             {"loginBackgroundImage",  UmbracoConfig.For.UmbracoSettings().Content.LoginBackgroundImage},
+                            {"emailServerConfigured", HasSmtpServerConfigured()},
                         }
                     },
                     {
@@ -445,6 +447,18 @@ namespace Umbraco.Web.Editors
                     new TimeSpan(0, 10, 0));
 
             return JavaScript(result);
+        }
+
+        private bool HasSmtpServerConfigured()
+        {
+            var config = WebConfigurationManager.OpenWebConfiguration(HttpContext.Request.ApplicationPath);
+            var settings = (MailSettingsSectionGroup)config.GetSectionGroup("system.net/mailSettings");
+            if (settings == null || settings.Smtp == null) return false;
+            if (settings.Smtp.SpecifiedPickupDirectory != null && string.IsNullOrEmpty(settings.Smtp.SpecifiedPickupDirectory.PickupDirectoryLocation) == false)
+                return true;
+            if (settings.Smtp.Network != null && string.IsNullOrEmpty(settings.Smtp.Network.Host) == false)
+                return true;
+            return false;
         }
 
         [HttpPost]
