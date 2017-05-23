@@ -40,7 +40,8 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var userService = ServiceContext.UserService;
-            var user = CreateTestUser();
+            IUserGroup userGroup;
+            var user = CreateTestUser(out userGroup);
 
             var contentType = MockedContentTypes.CreateSimpleContentType();
             ServiceContext.ContentTypeService.Save(contentType);
@@ -67,7 +68,8 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var userService = ServiceContext.UserService;
-            var user = CreateTestUser();
+            IUserGroup userGroup;
+            var user = CreateTestUser(out userGroup);
 
             var contentType = MockedContentTypes.CreateSimpleContentType();
             ServiceContext.ContentTypeService.Save(contentType);
@@ -78,12 +80,12 @@ namespace Umbraco.Tests.Services
                     MockedContent.CreateSimpleContent(contentType)
                 };
             ServiceContext.ContentService.Save(content);
-            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(0), ActionBrowse.Instance.Letter, new int[] { 1 });
-            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(0), ActionDelete.Instance.Letter, new int[] { 1 });
-            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(0), ActionMove.Instance.Letter, new int[] { 1 });
-            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(1), ActionBrowse.Instance.Letter, new int[] { 1 });
-            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(1), ActionDelete.Instance.Letter, new int[] { 1 });
-            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(2), ActionBrowse.Instance.Letter, new int[] { 1 });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(0), ActionBrowse.Instance.Letter, new int[] { userGroup.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(0), ActionDelete.Instance.Letter, new int[] { userGroup.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(0), ActionMove.Instance.Letter, new int[] { userGroup.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(1), ActionBrowse.Instance.Letter, new int[] { userGroup.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(1), ActionDelete.Instance.Letter, new int[] { userGroup.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(2), ActionBrowse.Instance.Letter, new int[] { userGroup.Id });
 
             // Act
             var permissions = userService.GetPermissions(user, content.ElementAt(0).Id, content.ElementAt(1).Id, content.ElementAt(2).Id);
@@ -476,7 +478,6 @@ namespace Umbraco.Tests.Services
         {
             var userGroup = new UserGroup
             {
-                Id = 1,
                 Alias = "Group1",
                 Name = "Group 1"
             };
@@ -521,13 +522,11 @@ namespace Umbraco.Tests.Services
         {
             var userGroup1 = new UserGroup
             {
-                Id = 1,
                 Alias = "Group1",
                 Name = "Group 1"
             };
             var userGroup2 = new UserGroup
             {
-                Id = 2,
                 Alias = "Group2",
                 Name = "Group 2"
             };
@@ -555,29 +554,27 @@ namespace Umbraco.Tests.Services
         {
             var userGroup1 = new UserGroup
             {
-                Id = 1,
                 Alias = "Group1",
                 Name = "Group 1"
             };
+            userGroup1.AddAllowedSection("test");
+
             var userGroup2 = new UserGroup
             {
-                Id = 2,
                 Alias = "Group2",
                 Name = "Group 2"
             };
+            userGroup2.AddAllowedSection("test");
+
             var userGroup3 = new UserGroup
-            {
-                Id = 3,
+            {             
                 Alias = "Group3",
                 Name = "Group 3"
             };
             ServiceContext.UserService.Save(userGroup1);
             ServiceContext.UserService.Save(userGroup2);
             ServiceContext.UserService.Save(userGroup3);
-
-            //now add the section to specific groups
-            ServiceContext.UserService.AddSectionToAllUserGroups("test", userGroup1.Id, userGroup2.Id);
-
+            
             //assert
             var result1 = ServiceContext.UserService.GetUserGroupById(userGroup1.Id);
             var result2 = ServiceContext.UserService.GetUserGroupById(userGroup2.Id);
@@ -587,7 +584,11 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(result3.AllowedSections.Contains("test"));
 
             //now add the section to all groups
-            ServiceContext.UserService.AddSectionToAllUserGroups("test");
+            foreach (var userGroup in new[]{userGroup1, userGroup2, userGroup3})
+            {
+                userGroup.AddAllowedSection("test");
+                ServiceContext.UserService.Save(userGroup);
+            }
 
             //assert
             result1 = ServiceContext.UserService.GetUserGroupById(userGroup1.Id);
@@ -668,7 +669,8 @@ namespace Umbraco.Tests.Services
         public void Get_User_By_Username()
         {
             // Arrange
-            var originalUser = CreateTestUser();
+            IUserGroup userGroup;
+            var originalUser = CreateTestUser(out userGroup);
 
             // Act
 
@@ -689,9 +691,9 @@ namespace Umbraco.Tests.Services
             Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(2));
         }
 
-        private IUser CreateTestUser()
+        private IUser CreateTestUser(out IUserGroup userGroup)
         {
-            var userGroup = CreateTestUserGroup();
+            userGroup = CreateTestUserGroup();
 
             var user = ServiceContext.UserService.CreateUserWithIdentity("test1", "test1@test.com");
             user.AddGroup(userGroup.Alias);
@@ -703,14 +705,16 @@ namespace Umbraco.Tests.Services
         {
             var userGroup = new UserGroup
             {
-                Id = 1,
                 Alias = "testGroup",
                 Name = "Test Group",
                 Permissions = "ABCDEFGHIJ1234567".ToCharArray().Select(x => x.ToString())
             };
+
+            userGroup.AddAllowedSection("content");
+            userGroup.AddAllowedSection("media");
+
             ServiceContext.UserService.Save(userGroup);
-            ServiceContext.UserService.AddSectionToAllUserGroups("content", 1);
-            ServiceContext.UserService.AddSectionToAllUserGroups("media", 1);
+
             return userGroup;
         }
     }

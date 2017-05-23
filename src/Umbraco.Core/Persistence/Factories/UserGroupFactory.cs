@@ -24,6 +24,7 @@ namespace Umbraco.Core.Persistence.Factories
                     : dto.DefaultPermissions.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture));
                 userGroup.CreateDate = dto.CreateDate;
                 userGroup.UpdateDate = dto.UpdateDate;
+                userGroup.Icon = dto.Icon;
 
                 if (dto.UserGroup2AppDtos != null)
                 {
@@ -51,7 +52,8 @@ namespace Umbraco.Core.Persistence.Factories
                 Name = entity.Name,
                 UserGroup2AppDtos = new List<UserGroup2AppDto>(),
                 CreateDate = entity.CreateDate,
-                UpdateDate = entity.UpdateDate
+                UpdateDate = entity.UpdateDate,
+                Icon = entity.Icon
             };
 
             foreach (var app in entity.AllowedSections)

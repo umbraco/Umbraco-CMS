@@ -54,6 +54,15 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Returns all user groups
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<UserGroupDisplay> GetUserGroups()
+        {            
+            return Mapper.Map< IEnumerable<IUserGroup>, IEnumerable<UserGroupDisplay>>(Services.UserService.GetAllUserGroups());
+        }
+
+        /// <summary>
         /// Returns a paged users collection
         /// </summary>
         /// <param name="pageNumber"></param>
@@ -118,12 +127,13 @@ namespace Umbraco.Web.Editors
         /// <param name="userIds"></param>
         public bool PostDisableUsers([FromUri]int[] userIds)
         {
-            var users = Services.UserService.GetUsersById(userIds);
+            var users = Services.UserService.GetUsersById(userIds).ToArray();
             foreach (var u in users)
             {
-                //without the permanent flag, this will just disable
-                Services.UserService.Delete(u);
+                u.IsApproved = false;                
             }
+            Services.UserService.Save(users);
+
             return true;
         }
 

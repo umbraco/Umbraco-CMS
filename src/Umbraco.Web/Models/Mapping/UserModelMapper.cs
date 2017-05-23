@@ -16,8 +16,9 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
-            config.CreateMap<IUser, UserDisplay>()
-                .ForMember(detail => detail.Id, opt => opt.MapFrom(user => user.Id))
+            config.CreateMap<IUserGroup, UserGroupDisplay>();
+
+            config.CreateMap<IUser, UserDisplay>()                
                 .ForMember(detail => detail.UserGroups, opt => opt.MapFrom(user => user.Groups))
                 .ForMember(detail => detail.StartContentId, opt => opt.MapFrom(user => user.StartContentId))
                 .ForMember(detail => detail.StartMediaId, opt => opt.MapFrom(user => user.StartMediaId))

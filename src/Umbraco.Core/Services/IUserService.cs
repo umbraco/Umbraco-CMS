@@ -65,14 +65,6 @@ namespace Umbraco.Core.Services
         /// <remarks>This is useful when an entire section is removed from config</remarks>
         /// <param name="sectionAlias">Alias of the section to remove</param>
         void DeleteSectionFromAllUserGroups(string sectionAlias);
-
-        /// <summary>
-        /// Add a specific section to all user groups or those specified as parameters
-        /// </summary>
-        /// <remarks>This is useful when a new section is created to allow specific user groups to  access it</remarks>
-        /// <param name="sectionAlias">Alias of the section to add</param>
-        /// <param name="groupIds">Specifiying nothing will add the section to all user</param>
-        void AddSectionToAllUserGroups(string sectionAlias, params int[] groupIds);
         
         /// <summary>
         /// Get permissions set for a user and optional node ids

@@ -807,39 +807,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
                 //TODO: Events?
             }
-        }
-
-        /// <summary>
-        /// Add a specific section to all user groups or those specified as parameters
-        /// </summary>
-        /// <remarks>This is useful when a new section is created to allow specific user groups to  access it</remarks>
-        /// <param name="sectionAlias">Alias of the section to add</param>
-        /// <param name="groupIds">Specifiying nothing will add the section to all user</param>
-        public void AddSectionToAllUserGroups(string sectionAlias, params int[] groupIds)
-        {
-            using (var uow = UowProvider.GetUnitOfWork())
-            {
-                var repository = RepositoryFactory.CreateUserGroupRepository(uow);
-                IEnumerable<IUserGroup> groups;
-                if (groupIds.Any())
-                {
-                    groups = repository.GetAll(groupIds);
-                }
-                else
-                {
-                    groups = repository.GetAll();
-                }
-                foreach (var group in groups.Where(g => g.AllowedSections.InvariantContains(sectionAlias) == false))
-                {
-                    //now add the section for each group and commit
-                    group.AddAllowedSection(sectionAlias);
-                    repository.AddOrUpdate(group);
-                }
-
-                uow.Commit();
-                //TODO: Events?
-            }
-        }
+        }        
 
         /// <summary>
         /// Get permissions set for a user and node Id

@@ -39,7 +39,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "email", IsRequired = true)]
         public string Email { get; set; }
-        
+
         /// <summary>
         /// The list of group aliases assigned to the user
         /// </summary>
@@ -60,9 +60,11 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "availableCultures")]
         public IDictionary<string, string> AvailableCultures { get; set; }
 
+        //TODO: This will become StartContentIds as an array!
         [DataMember(Name = "startContentId")]
         public int StartContentId { get; set; }
 
+        //TODO: This will become StartMediaIds as an array!
         [DataMember(Name = "startMediaId")]
         public int StartMediaId { get; set; }
 

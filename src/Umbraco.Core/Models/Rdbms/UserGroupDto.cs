@@ -45,6 +45,10 @@ namespace Umbraco.Core.Models.Rdbms
         [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime UpdateDate { get; set; }
 
+        [Column("icon")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public string Icon { get; set; }
+
         [ResultColumn]
         public List<UserGroup2AppDto> UserGroup2AppDtos { get; set; }
     }

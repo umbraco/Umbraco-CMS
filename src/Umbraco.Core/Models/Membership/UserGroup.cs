@@ -14,7 +14,10 @@ namespace Umbraco.Core.Models.Membership
     [DataContract(IsReference = true)]
     internal class UserGroup : Entity, IUserGroup
     {
+        private int _startContentId;
+        private int _startMediaId;
         private string _alias;
+        private string _icon;
         private string _name;
         private IEnumerable<string> _permissions;
         private readonly List<string> _sectionCollection;
@@ -26,11 +29,35 @@ namespace Umbraco.Core.Models.Membership
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<UserGroup, string>(x => x.Name);
             public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<UserGroup, string>(x => x.Alias);
             public readonly PropertyInfo PermissionsSelector = ExpressionHelper.GetPropertyInfo<UserGroup, IEnumerable<string>>(x => x.Permissions);
+            public readonly PropertyInfo IconSelector = ExpressionHelper.GetPropertyInfo<UserGroup, string>(x => x.Icon);
+            public readonly PropertyInfo StartContentIdSelector = ExpressionHelper.GetPropertyInfo<UserGroup, int>(x => x.StartContentId);
+            public readonly PropertyInfo StartMediaIdSelector = ExpressionHelper.GetPropertyInfo<UserGroup, int>(x => x.StartMediaId);
         }
 
         public UserGroup()
         {
             _sectionCollection = new List<string>();
+        }
+
+        [DataMember]
+        public int StartMediaId
+        {
+            get { return _startMediaId; }
+            set { SetPropertyValueAndDetectChanges(value, ref _startMediaId, Ps.Value.StartMediaIdSelector); }
+        }
+
+        [DataMember]
+        public int StartContentId
+        {
+            get { return _startContentId; }
+            set { SetPropertyValueAndDetectChanges(value, ref _startContentId, Ps.Value.StartContentIdSelector); }
+        }
+
+        [DataMember]
+        public string Icon
+        {
+            get { return _icon; }
+            set { SetPropertyValueAndDetectChanges(value, ref _icon, Ps.Value.IconSelector); }
         }
 
         [DataMember]
