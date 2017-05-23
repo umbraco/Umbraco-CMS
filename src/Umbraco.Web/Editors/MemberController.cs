@@ -143,6 +143,9 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public MemberListDisplay GetListNodeDisplay(string listName)
         {
+            var userTicket = new HttpContextWrapper(HttpContext.Current).GetUmbracoAuthTicket();
+            var user = ApplicationContext.Current.Services.UserService.GetByUsername(userTicket.Name);
+    
             var display = new MemberListDisplay
             {
                 ContentTypeAlias = listName,
@@ -151,7 +154,8 @@ namespace Umbraco.Web.Editors
                 IsContainer = true,
                 Name = listName == Constants.Conventions.MemberTypes.AllMembersListId ? "All Members" : listName,
                 Path = "-1," + listName,
-                ParentId = -1
+                ParentId = -1,
+                AllowedActions = string.Join(",", user != null ? user.DefaultPermissions : new List<string>())
             };
 
             TabsAndPropertiesResolver.AddListView(display, "member", Services.DataTypeService, Services.TextService);
