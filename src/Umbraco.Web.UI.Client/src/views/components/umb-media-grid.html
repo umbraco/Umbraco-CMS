@@ -15,7 +15,7 @@
             <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="item.thumbnail" ng-src="{{item.thumbnail}}" alt="{{item.name}}" draggable="false" />
 
             <!-- SVG -->
-            <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="!item.thumbnail && item.extension == 'svg'" ng-src="{{item.file}}" alt="{{item.name}}" draggable="false" />
+            <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="!item.thumbnail && item.extension == 'svg'" ng-src="{{item.image}}" alt="{{item.name}}" draggable="false" />
 
             <!-- Transparent image - fallback - used to keep image proportions on wrapper-->
             <img class="umb-media-grid__item-image-placeholder" ng-if="!item.thumbnail && item.extension != 'svg'" src="assets/img/transparent.png" alt="{{item.name}}" draggable="false" />
