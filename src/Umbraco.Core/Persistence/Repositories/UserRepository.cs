@@ -160,15 +160,15 @@ namespace Umbraco.Core.Persistence.Repositories
         
         protected override void PersistNewItem(IUser entity)
         {
-            var userFactory = new UserFactory();
-
+            ((User)entity).AddingEntity();
+            
             //ensure security stamp if non
             if (entity.SecurityStamp.IsNullOrWhiteSpace())
             {
                 entity.SecurityStamp = Guid.NewGuid().ToString();
             }
             
-            var userDto = userFactory.BuildDto(entity);
+            var userDto = UserFactory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(userDto));
             entity.Id = id;
@@ -196,15 +196,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IUser entity)
         {
-            var userFactory = new UserFactory();
-
+            //Updates Modified date 
+            ((User)entity).UpdatingEntity();
+            
             //ensure security stamp if non
             if (entity.SecurityStamp.IsNullOrWhiteSpace())
             {
                 entity.SecurityStamp = Guid.NewGuid().ToString();
             }
 
-            var userDto = userFactory.BuildDto(entity);
+            var userDto = UserFactory.BuildDto(entity);
             
             //build list of columns to check for saving - we don't want to save the password if it hasn't changed!
             //List the columns to save, NOTE: would be nice to not have hard coded strings here but no real good way around that
@@ -224,6 +225,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 {"lastPasswordChangeDate", "LastPasswordChangeDate"},
                 {"lastLoginDate", "LastLoginDate"},
                 {"failedLoginAttempts", "FailedPasswordAttempts"},
+                {"createDate", "CreateDate"},
+                {"updateDate", "UpdateDate"}
             };
 
             //create list of properties that have changed

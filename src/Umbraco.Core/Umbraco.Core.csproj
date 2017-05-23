@@ -510,6 +510,7 @@
     <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
     <Compile Include="Persistence\Migrations\LocalMigrationContext.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourOneZero\AddPreviewXmlTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\UpdateUserTables.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddLockObjects.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddLockTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveFive\UpdateAllowedMediaTypesAtRoot.cs" />

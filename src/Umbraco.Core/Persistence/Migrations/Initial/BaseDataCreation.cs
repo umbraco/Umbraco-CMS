@@ -169,16 +169,16 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         private void CreateUmbracoUserData()
         {
-            _database.Insert("umbracoUser", "id", false, new UserDto { Id = 0, Disabled = false, NoConsole = false, ContentStartId = -1, MediaStartId = -1, UserName = "Administrator", Login = "admin", Password = "default", Email = "", UserLanguage = "en" });
+            _database.Insert("umbracoUser", "id", false, new UserDto { Id = 0, Disabled = false, NoConsole = false, ContentStartId = -1, MediaStartId = -1, UserName = "Administrator", Login = "admin", Password = "default", Email = "", UserLanguage = "en", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
             //_database.Update<UserDto>("SET id = @IdAfter WHERE id = @IdBefore AND userLogin = @Login", new { IdAfter = 0, IdBefore = 1, Login = "admin" });
         }
         
         private void CreateUmbracoUserGroupData()
         {
-            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 1, Alias = Constants.Security.AdminGroupAlias, Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F7" });
-            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 2, Alias = "writer", Name = "Writers", DefaultPermissions = "CAH:F" });
-            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 3, Alias = "editor", Name = "Editors", DefaultPermissions = "CADMOSKTPUZ:5F" });
-            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 4, Alias = "translator", Name = "Translators", DefaultPermissions = "AF" });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 1, Alias = Constants.Security.AdminGroupAlias, Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F7", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 2, Alias = "writer", Name = "Writers", DefaultPermissions = "CAH:F", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 3, Alias = "editor", Name = "Editors", DefaultPermissions = "CADMOSKTPUZ:5F", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 4, Alias = "translator", Name = "Translators", DefaultPermissions = "AF", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
         }
 
         private void CreateUmbracoUser2UserGroupData()

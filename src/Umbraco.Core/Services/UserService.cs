@@ -197,11 +197,7 @@ namespace Umbraco.Core.Services
         {
             //disable
             membershipUser.IsApproved = false;
-            //can't rename if it's going to take up too many chars
-            if (membershipUser.Username.Length + 9 <= 125)
-            {
-                membershipUser.Username = DateTime.Now.ToString("yyyyMMdd") + "_" + membershipUser.Username;
-            }
+            
             Save(membershipUser);
         }
         
@@ -634,6 +630,17 @@ namespace Umbraco.Core.Services
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
                 return repository.Get(id);
+            }
+        }
+
+        public IEnumerable<IUser> GetUsersById(params int[] ids)
+        {
+            if (ids.Length <= 0) return Enumerable.Empty<IUser>();
+
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateUserRepository(uow);
+                return repository.GetAll(ids);
             }
         }
 

@@ -208,7 +208,7 @@ AND umbracoNode.id <> @id",
                 throw new DuplicateNameException("A data type with the name " + entity.Name + " already exists");
             }
 
-            //Updates Modified date and Version Guid
+            //Updates Modified date 
             ((DataTypeDefinition)entity).UpdatingEntity();
 
             //Look up parent to get and set the correct Path if ParentId has changed

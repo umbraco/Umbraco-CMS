@@ -37,7 +37,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             {
                 var request = new HttpRequestMessage
                 {
-                    RequestUri = new Uri("http://testserver/"),
+                    RequestUri = new Uri("https://testserver/"),
                     Method = method,
                 };
 

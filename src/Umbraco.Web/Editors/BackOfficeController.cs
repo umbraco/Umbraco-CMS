@@ -239,7 +239,7 @@ namespace Umbraco.Web.Editors
                             },
                             {
                                 "userApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<UsersController>(
-                                    controller => controller.PostDisableUser(0))
+                                    controller => controller.PostSaveUser(null))
                             },
                             {
                                 "contentApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentController>(

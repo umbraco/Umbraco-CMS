@@ -6,10 +6,8 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class UserFactory 
+    internal static class UserFactory 
     {
-        #region Implementation of IEntityFactory<IUser,UserDto>
-
         public static IUser BuildEntity(UserDto dto)
         {
             var guidId = dto.Id.ToGuid();
@@ -43,6 +41,8 @@ namespace Umbraco.Core.Persistence.Factories
                 user.LastLockoutDate = dto.LastLockoutDate ?? DateTime.MinValue;
                 user.LastLoginDate = dto.LastLoginDate ?? DateTime.MinValue;
                 user.LastPasswordChangeDate = dto.LastPasswordChangeDate ?? DateTime.MinValue;
+                user.CreateDate = dto.CreateDate;
+                user.UpdateDate = dto.UpdateDate;
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Persistence.Factories
             }
         }
 
-        public UserDto BuildDto(IUser entity)
+        public static UserDto BuildDto(IUser entity)
         {
             var dto = new UserDto
             {
@@ -74,6 +74,8 @@ namespace Umbraco.Core.Persistence.Factories
                 LastLockoutDate = entity.LastLockoutDate == DateTime.MinValue ? (DateTime?)null : entity.LastLockoutDate,
                 LastLoginDate = entity.LastLoginDate == DateTime.MinValue ? (DateTime?)null : entity.LastLoginDate,
                 LastPasswordChangeDate = entity.LastPasswordChangeDate == DateTime.MinValue ? (DateTime?)null : entity.LastPasswordChangeDate,
+                CreateDate = entity.CreateDate,
+                UpdateDate = entity.UpdateDate
             };
 
             if (entity.HasIdentity)
@@ -82,8 +84,6 @@ namespace Umbraco.Core.Persistence.Factories
             }
 
             return dto;
-        }
-
-        #endregion
+        }        
     }
 }

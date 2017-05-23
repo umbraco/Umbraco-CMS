@@ -53,6 +53,16 @@ namespace Umbraco.Web.Editors
             return Mapper.Map<IUser, UserDisplay>(user);
         }
 
+        /// <summary>
+        /// Returns a paged users collection
+        /// </summary>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="userGroups"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         public PagedResult<UserDisplay> GetPagedUsers(
             int pageNumber = 1,
             int pageSize = 10,
@@ -76,6 +86,11 @@ namespace Umbraco.Web.Editors
             };
         }
 
+        /// <summary>
+        /// Saves a user
+        /// </summary>
+        /// <param name="userSave"></param>
+        /// <returns></returns>
         public UserDisplay PostSaveUser(UserSave userSave)
         {
             if (userSave == null) throw new ArgumentNullException("userSave");
@@ -98,18 +113,33 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Disables the user with the given user id
+        /// Disables the users with the given user ids
         /// </summary>
-        /// <param name="userId"></param>
-        public bool PostDisableUser([FromUri]int userId)
+        /// <param name="userIds"></param>
+        public bool PostDisableUsers([FromUri]int[] userIds)
         {
-            var user = Services.UserService.GetUserById(userId);
-            if (user == null)
+            var users = Services.UserService.GetUsersById(userIds);
+            foreach (var u in users)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                //without the permanent flag, this will just disable
+                Services.UserService.Delete(u);
             }
-            //without the permanent flag, this will just disable
-            Services.UserService.Delete(user);
+            return true;
+        }
+
+        /// <summary>
+        /// Enables the users with the given user ids
+        /// </summary>
+        /// <param name="userIds"></param>
+        public bool PostEnableUsers([FromUri]int[] userIds)
+        {
+            var users = Services.UserService.GetUsersById(userIds).ToArray();
+            foreach (var u in users)
+            {
+                u.IsApproved = true;                                
+            }
+            Services.UserService.Save(users);
+
             return true;
         }
     }

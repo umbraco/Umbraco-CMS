@@ -8,7 +8,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZero
 {
-    [Migration("7.6.0", 0, Constants.System.UmbracoMigrationName)]
+    [Migration("7.7.0", 1, Constants.System.UmbracoMigrationName)]
     public class AddUserGroupTables : MigrationBase
     {
         public AddUserGroupTables(ISqlSyntaxProvider sqlSyntax, ILogger logger)
@@ -20,33 +20,41 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
             var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
             var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
 
-            AddNewTables(tables);
-            MigrateUserPermissions();
-            MigrateUserTypesToGroups();
-            DeleteOldTables(tables, constraints);
+            if (AddNewTables(tables))
+            {
+                MigrateUserPermissions();
+                MigrateUserTypesToGroups();
+                DeleteOldTables(tables, constraints);
+            }
         }
 
-        private void AddNewTables(string[] tables)
+        private bool AddNewTables(string[] tables)
         {
+            var updated = false;
             if (tables.InvariantContains("umbracoUserGroup") == false)
             {
                 Create.Table<UserGroupDto>();
+                updated = true;
             }
 
             if (tables.InvariantContains("umbracoUser2UserGroup") == false)
             {
                 Create.Table<User2UserGroupDto>();
+                updated = true;
             }
 
             if (tables.InvariantContains("umbracoUserGroup2App") == false)
             {
-                Create.Table<UserGroup2AppDto>();                
+                Create.Table<UserGroup2AppDto>();
+                updated = true;
             }
 
             if (tables.InvariantContains("umbracoUserGroup2NodePermission") == false)
             {
                 Create.Table<UserGroup2NodePermissionDto>();
+                updated = true;
             }
+            return updated;
         }
 
         private void MigrateUserTypesToGroups()
