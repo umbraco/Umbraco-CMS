@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.Editors.Users.RoleController as vm" class="clearfix">
+<div ng-controller="Umbraco.Editors.Users.GroupController as vm" class="clearfix">
 
     <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
 
@@ -7,8 +7,8 @@
         <umb-editor-view>
 
             <umb-editor-header
-                name="vm.userRole.name"
-                icon="vm.userRole.icon"
+                name="vm.userGroup.name"
+                icon="vm.userGroup.icon"
                 hide-description="true"
                 hide-alias="true">
             </umb-editor-header>
@@ -28,17 +28,17 @@
                                     <umb-control-group label="Sections" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
                                         <umb-node-preview
                                             style="max-width: 100%;"
-                                            ng-repeat="section in vm.userRole.sections"
+                                            ng-repeat="section in vm.userGroup.sections"
                                             icon="section.icon"
                                             name="section.name"
                                             allow-remove="true"
-                                            on-remove="vm.removeSelectedItem($index, vm.userRole.sections)">
+                                            on-remove="vm.removeSelectedItem($index, vm.userGroup.sections)">
                                         </umb-node-preview>
 
                                         <a href=""
                                             style="max-width: 100%;"
                                             class="umb-node-preview-add"
-                                            ng-click="vm.openUserRolePicker()"
+                                            ng-click="vm.openUserGroupPicker()"
                                             prevent-default>
                                             <localize key="general_add">Add</localize>
                                         </a>
@@ -47,11 +47,11 @@
                                     <umb-control-group label="Content start nodes" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
                                         <umb-node-preview
                                             style="max-width: 100%;"
-                                            ng-repeat="node in vm.userRole.startNodesContent"
+                                            ng-repeat="node in vm.userGroup.startNodesContent"
                                             icon="node.icon"
                                             name="node.name"
                                             allow-remove="true"
-                                            on-remove="vm.removeSelectedItem($index, vm.userRole.startNodesContent)">
+                                            on-remove="vm.removeSelectedItem($index, vm.userGroup.startNodesContent)">
                                         </umb-node-preview>
 
                                         <a href=""
@@ -66,11 +66,11 @@
                                     <umb-control-group label="Media start nodes" description="Donec quis lacinia ligula. Suspendisse ultrices risus ante">
                                         <umb-node-preview
                                             style="max-width: 100%;"
-                                            ng-repeat="node in vm.userRole.startNodesMedia"
+                                            ng-repeat="node in vm.userGroup.startNodesMedia"
                                             icon="node.icon"
                                             name="node.name"
                                             allow-remove="true"
-                                            on-remove="vm.removeSelectedItem($index, vm.userRole.startNodesMedia)">
+                                            on-remove="vm.removeSelectedItem($index, vm.userGroup.startNodesMedia)">
                                         </umb-node-preview>
 
                                         <a href=""
@@ -104,11 +104,11 @@
                                 <div class="umb-package-details__section-title">Users</div>
 
                                 <umb-user-preview
-                                    ng-repeat="user in vm.userRole.users"
+                                    ng-repeat="user in vm.userGroup.users"
                                     name="user.name"
                                     avatar="user.avatar"
                                     allow-remove="true"
-                                    on-remove="vm.removeSelectedUser($index, vm.userRole.users)">
+                                    on-remove="vm.removeSelectedUser($index, vm.userGroup.users)">
                                 </umb-user-preview>
 
                                 <a href=""

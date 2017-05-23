@@ -11,7 +11,7 @@
         vm.breadcrumbs = [];
 
         vm.goToPage = goToPage;
-        vm.openUserRolePicker = openUserRolePicker;
+        vm.openUserGroupPicker = openUserGroupPicker;
         vm.openContentPicker = openContentPicker;
         vm.openMediaPicker = openMediaPicker;
         vm.removeSelectedItem = removeSelectedItem;
@@ -41,28 +41,28 @@
             $location.path(ancestor.path).search("subview", ancestor.subView);
         }
 
-        function openUserRolePicker() {
-            vm.userRolePicker = {
-                title: "Select user roles",
-                view: "userrolepicker",
-                selection: vm.user.userRoles,
+        function openUserGroupPicker() {
+            vm.userGroupPicker = {
+                title: "Select user groups",
+                view: "usergrouppicker",
+                selection: vm.user.userGroups,
                 closeButtonLabel: "Cancel",
                 show: true,
                 submit: function(model) {
                     // apply changes
                     if(model.selection) {
-                        vm.user.userRoles = model.selection;
+                        vm.user.userGroups = model.selection;
                     }
-                    vm.userRolePicker.show = false;
-                    vm.userRolePicker = null;
+                    vm.userGroupPicker.show = false;
+                    vm.userGroupPicker = null;
                 },
                 close: function(oldModel) {
                     // rollback on close
                     if(oldModel.selection) {
-                        vm.user.userRoles = oldModel.selection;
+                        vm.user.userGroups = oldModel.selection;
                     }
-                    vm.userRolePicker.show = false;
-                    vm.userRolePicker = null;
+                    vm.userGroupPicker.show = false;
+                    vm.userGroupPicker = null;
                 }
             };
         }

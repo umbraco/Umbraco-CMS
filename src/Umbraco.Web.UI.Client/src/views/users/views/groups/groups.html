@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.Editors.Users.RolesController as vm" class="clearfix">
+<div ng-controller="Umbraco.Editors.Users.GroupsController as vm" class="clearfix">
 
     <umb-editor-sub-header>
             
@@ -7,8 +7,8 @@
             <umb-button
                 type="button"
                 button-style="success"
-                action="vm.createUserRole()"
-                label="Create Role">
+                action="vm.createUserGroup()"
+                label="Create Group">
             </umb-button>
         </umb-editor-sub-header-content-left>
 
@@ -46,7 +46,7 @@
                 </umb-button>
             </umb-editor-sub-header-section>
             <umb-editor-sub-header-section>
-                <strong>{{ vm.selection.length }} <localize key="general_of">of</localize> {{ vm.userRoles.length }} <localize key="general_selected">selected</localize></strong>
+                <strong>{{ vm.selection.length }} <localize key="general_of">of</localize> {{ vm.userGroups.length }} <localize key="general_selected">selected</localize></strong>
             </umb-editor-sub-header-section>
         </umb-editor-sub-header-content-left>
 
@@ -56,16 +56,16 @@
                 button-style="link"
                 label="Delete"
                 icon="icon-trash"
-                action="vm.deleteUserRole()">
+                action="vm.deleteUserGroup()">
             </umb-button>
         </umb-editor-sub-header-content-right>
 
     </umb-editor-sub-header>
 
-    <div ng-repeat="userRole in vm.userRoles" class="flex items-center" ng-click="vm.selectUserRole(userRole, vm.selection)">
-        <i class="{{userRole.icon}}"></i>
-        <div class="bold" style="margin-right: 5px;">{{userRole.name}}</div>
-        <a href="" ng-click="vm.goToUserRole(userRole)">Edit</a>
+    <div ng-repeat="userGroup in vm.userGroups" class="flex items-center" ng-click="vm.selectUserGroup(userGroup, vm.selection)">
+        <i class="{{userGroup.icon}}"></i>
+        <div class="bold" style="margin-right: 5px;">{{userGroup.name}}</div>
+        <a href="" ng-click="vm.goToUserGroup(userGroup)">Edit</a>
     </div>
 
 </div>

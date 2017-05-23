@@ -1,13 +1,13 @@
 (function () {
     "use strict";
 
-    function UserRoleEditController($scope, $timeout, $location, usersResource) {
+    function UserGroupEditController($scope, $timeout, $location, usersResource) {
 
         var vm = this;
 
         vm.loading = false;
         vm.page = {};
-        vm.userRole = {};
+        vm.userGroup = {};
 
         vm.goToPage = goToPage;
         vm.openSectionPicker = openSectionPicker;
@@ -21,8 +21,8 @@
             vm.loading = true;
 
             // get user
-            usersResource.getUserRole().then(function (userRole) {
-                vm.userRole = userRole;
+            usersResource.getUserGroup().then(function (userGroup) {
+                vm.userGroup = userGroup;
                 makeBreadcrumbs();
             });
 
@@ -49,7 +49,7 @@
                 show: true,
                 submit: function(model) {
                     if(model.selection) {
-                        vm.userRole.startNodesContent = model.selection;
+                        vm.userGroup.startNodesContent = model.selection;
                     }
                     vm.contentPicker.show = false;
                     vm.contentPicker = null;
@@ -72,7 +72,7 @@
                 show: true,
                 submit: function(model) {
                     if(model.selection) {
-                        vm.userRole.startNodesMedia = model.selection;
+                        vm.userGroup.startNodesMedia = model.selection;
                     }
                     vm.contentPicker.show = false;
                     vm.contentPicker = null;
@@ -104,10 +104,10 @@
                 {
                     "name": "Groups",
                     "path": "/users/users/overview",
-                    "subView": "roles"
+                    "subView": "groups"
                 },
                 {
-                    "name": vm.userRole.name
+                    "name": vm.userGroup.name
                 }
             ];
         }
@@ -116,6 +116,6 @@
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Editors.Users.RoleController", UserRoleEditController);
+    angular.module("umbraco").controller("Umbraco.Editors.Users.GroupController", UserGroupEditController);
 
 })();

@@ -45,23 +45,23 @@
                                 <div class="test-group-title">Permissions</div>
                                 <div class="test-group-content block-form">
                                     
-                                    <umb-control-group style="margin-bottom: 25px;" label="Roles" description="Aliquam laoreet metus porta nisi pellentesque">
+                                    <umb-control-group style="margin-bottom: 25px;" label="Groups" description="Aliquam laoreet metus porta nisi pellentesque">
 
-                                        <umb-user-role-preview
-                                            ng-repeat="userRole in vm.user.userRoles"
-                                            icon="userRole.icon"
-                                            name="userRole.name"
-                                            sections="userRole.sections"
-                                            content-start-nodes="userRole.startNodesContent"
-                                            media-start-nodes="userRole.startNodesMedia"
+                                        <umb-user-group-preview
+                                            ng-repeat="userGroup in vm.user.userGroups"
+                                            icon="userGroup.icon"
+                                            name="userGroup.name"
+                                            sections="userGroup.sections"
+                                            content-start-nodes="userGroup.startNodesContent"
+                                            media-start-nodes="userGroup.startNodesMedia"
                                             allow-remove="true"
-                                            on-remove="vm.removeSelectedItem($index, vm.user.userRoles)">
-                                        </umb-user-role-preview>
+                                            on-remove="vm.removeSelectedItem($index, vm.user.userGroups)">
+                                        </umb-user-group-preview>
 
                                         <a href=""
                                             style="max-width: 100%;"
                                             class="umb-node-preview-add"
-                                            ng-click="vm.openUserRolePicker()"
+                                            ng-click="vm.openUserGroupPicker()"
                                             prevent-default>
                                             <localize key="general_add">Add</localize>
                                         </a>
@@ -248,9 +248,9 @@
     </form>
 
     <umb-overlay
-        ng-if="vm.userRolePicker.show"
-        model="vm.userRolePicker"
-        view="vm.userRolePicker.view"
+        ng-if="vm.userGroupPicker.show"
+        model="vm.userGroupPicker"
+        view="vm.userGroupPicker.view"
         position="right">
     </umb-overlay>
 

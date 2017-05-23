@@ -103,7 +103,7 @@
 
         }
         
-        function getUserRole() {
+        function getUserGroup() {
             var deferred = $q.defer();
             var user = {
                 "name": "Admin",
@@ -188,7 +188,7 @@
 
         var resource = {
             getUser: getUser,
-            getUserRole: getUserRole,
+            getUserGroup: getUserGroup,
             getUserGroups: getUserGroups,
             disableUsers: disableUsers,
             enableUsers: enableUsers,

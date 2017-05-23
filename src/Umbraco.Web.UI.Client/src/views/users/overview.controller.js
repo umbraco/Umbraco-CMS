@@ -16,10 +16,10 @@
                 "active": !usersUri || usersUri === "users"
             },
             {
-                "name": "Roles",
+                "name": "Groups",
                 "icon": "icon-users",
-                "view": "views/users/views/roles/roles.html",
-                "active": usersUri === "roles"
+                "view": "views/users/views/groups/groups.html",
+                "active": usersUri === "groups"
             }
         ];
 
