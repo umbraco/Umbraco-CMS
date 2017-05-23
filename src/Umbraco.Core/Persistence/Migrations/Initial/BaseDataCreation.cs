@@ -175,10 +175,10 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         
         private void CreateUmbracoUserGroupData()
         {
-            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 1, Alias = Constants.Security.AdminGroupAlias, Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F7", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
-            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 2, Alias = "writer", Name = "Writers", DefaultPermissions = "CAH:F", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
-            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 3, Alias = "editor", Name = "Editors", DefaultPermissions = "CADMOSKTPUZ:5F", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
-            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 4, Alias = "translator", Name = "Translators", DefaultPermissions = "AF", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 1, Alias = Constants.Security.AdminGroupAlias, Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F7", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-medal" });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 2, Alias = "writer", Name = "Writers", DefaultPermissions = "CAH:F", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-edit" });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 3, Alias = "editor", Name = "Editors", DefaultPermissions = "CADMOSKTPUZ:5F", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-tools" });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 4, Alias = "translator", Name = "Translators", DefaultPermissions = "AF", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-globe" });
         }
 
         private void CreateUmbracoUser2UserGroupData()

@@ -33,7 +33,9 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<UserGroup, UserGroupDto>(src => src.Id, dto => dto.Id);
             CacheMap<UserGroup, UserGroupDto>(src => src.Alias, dto => dto.Alias);
             CacheMap<UserGroup, UserGroupDto>(src => src.Name, dto => dto.Name);
-            CacheMap<UserGroup, UserGroupDto>(src => src.Permissions, dto => dto.DefaultPermissions);
+            CacheMap<UserGroup, UserGroupDto>(src => src.Icon, dto => dto.Icon);
+            CacheMap<UserGroup, UserGroupDto>(src => src.StartContentId, dto => dto.StartContentId);
+            CacheMap<UserGroup, UserGroupDto>(src => src.StartMediaId, dto => dto.StartMediaId);
         }
 
         #endregion

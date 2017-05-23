@@ -25,7 +25,16 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                 MigrateUserPermissions();
                 MigrateUserTypesToGroups();
                 DeleteOldTables(tables, constraints);
+                SetDefaultIcons();
             }
+        }
+
+        private void SetDefaultIcons()
+        {
+            Execute.Sql(string.Format("UPDATE umbracoUserGroup SET icon = '{0}' WHERE userGroupAlias = '{1}'", "", Constants.Security.AdminGroupAlias));
+            Execute.Sql(string.Format("UPDATE umbracoUserGroup SET icon = '{0}' WHERE userGroupAlias = '{1}'", "icon-edit", "writer"));
+            Execute.Sql(string.Format("UPDATE umbracoUserGroup SET icon = '{0}' WHERE userGroupAlias = '{1}'", "icon-tools", "editor"));
+            Execute.Sql(string.Format("UPDATE umbracoUserGroup SET icon = '{0}' WHERE userGroupAlias = '{1}'", "icon-globe", "translator"));
         }
 
         private bool AddNewTables(string[] tables)

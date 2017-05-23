@@ -16,7 +16,14 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
-            config.CreateMap<IUserGroup, UserGroupDisplay>();
+            config.CreateMap<IUserGroup, UserGroupDisplay>()
+                .ForMember(detail => detail.Notifications, opt => opt.Ignore())
+                .ForMember(detail => detail.Sections, opt => opt.MapFrom(x => x.AllowedSections))
+                .ForMember(detail => detail.Udi, opt => opt.Ignore())
+                .ForMember(detail => detail.Trashed, opt => opt.Ignore())
+                .ForMember(detail => detail.ParentId, opt => opt.UseValue(-1))
+                .ForMember(detail => detail.Path, opt => opt.MapFrom(user => "-1," + user.Id))
+                .ForMember(detail => detail.AdditionalData, opt => opt.Ignore());
 
             config.CreateMap<IUser, UserDisplay>()                
                 .ForMember(detail => detail.UserGroups, opt => opt.MapFrom(user => user.Groups))

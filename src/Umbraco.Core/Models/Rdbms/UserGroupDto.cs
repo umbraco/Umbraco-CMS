@@ -49,6 +49,14 @@ namespace Umbraco.Core.Models.Rdbms
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Icon { get; set; }
 
+        [Column("startContentId")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public int StartContentId { get; set; }
+
+        [Column("startMediaId")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public int StartMediaId { get; set; }
+
         [ResultColumn]
         public List<UserGroup2AppDto> UserGroup2AppDtos { get; set; }
     }
