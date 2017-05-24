@@ -401,7 +401,7 @@ namespace Umbraco.Web.Editors
                             {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
                             {"allowPasswordReset", UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset},
                             {"loginBackgroundImage",  UmbracoConfig.For.UmbracoSettings().Content.LoginBackgroundImage},
-                            {"emailServerConfigured", HasSmtpServerConfigured()},
+                            {"emailServerConfigured", GlobalSettings.HasSmtpServerConfigured(HttpContext.Request.ApplicationPath)},
                         }
                     },
                     {
@@ -449,17 +449,7 @@ namespace Umbraco.Web.Editors
             return JavaScript(result);
         }
 
-        private bool HasSmtpServerConfigured()
-        {
-            var config = WebConfigurationManager.OpenWebConfiguration(HttpContext.Request.ApplicationPath);
-            var settings = (MailSettingsSectionGroup)config.GetSectionGroup("system.net/mailSettings");
-            if (settings == null || settings.Smtp == null) return false;
-            if (settings.Smtp.SpecifiedPickupDirectory != null && string.IsNullOrEmpty(settings.Smtp.SpecifiedPickupDirectory.PickupDirectoryLocation) == false)
-                return true;
-            if (settings.Smtp.Network != null && string.IsNullOrEmpty(settings.Smtp.Network.Host) == false)
-                return true;
-            return false;
-        }
+        
 
         [HttpPost]
         public ActionResult ExternalLogin(string provider, string redirectUrl = null)

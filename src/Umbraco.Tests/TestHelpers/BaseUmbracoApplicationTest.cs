@@ -52,7 +52,10 @@ namespace Umbraco.Tests.TestHelpers
 
             SetupApplicationContext();
 
-            InitializeMappers();
+            if (GetType().GetCustomAttribute<RequiresAutoMapperMappingsAttribute>(false) != null)
+            {
+                InitializeMappers(ApplicationContext);
+            }            
 
             FreezeResolution();
 
@@ -98,24 +101,21 @@ namespace Umbraco.Tests.TestHelpers
         /// This is an opt-in option because initializing the mappers takes about 500ms which equates to quite a lot
         /// of time with every test.
         /// </remarks>
-        private void InitializeMappers()
+        protected virtual void InitializeMappers(ApplicationContext applicationContext)
         {
-            if (GetType().GetCustomAttribute<RequiresAutoMapperMappingsAttribute>(false) != null)
+            Mapper.Initialize(configuration =>
             {
-                Mapper.Initialize(configuration =>
-                {
-                    var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>(
-                        specificAssemblies: new[]
-                        {
-                            typeof(ContentModelMapper).Assembly,
-                            typeof(ApplicationRegistrar).Assembly
-                        });
-                    foreach (var mapper in mappers)
+                var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>(
+                    specificAssemblies: new[]
                     {
-                        mapper.ConfigureMappings(configuration, ApplicationContext);
-                    }
-                });
-            }
+                        typeof(ContentModelMapper).Assembly,
+                        typeof(ApplicationRegistrar).Assembly
+                    });
+                foreach (var mapper in mappers)
+                {
+                    mapper.ConfigureMappings(configuration, applicationContext);
+                }
+            });            
         }
 
         /// <summary>

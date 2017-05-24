@@ -26,9 +26,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [EmailAddress]
         public string Email { get; set; }
 
-        [DataMember(Name = "userType")]
+        [DataMember(Name = "userGroups")]
         [Required]
-        public string UserType { get; set; }
+        public IEnumerable<string> UserGroups { get; set; }
 
         [DataMember(Name = "startContentId")]
         public int StartContentId { get; set; }

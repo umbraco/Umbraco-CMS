@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using AutoMapper;
 using ClientDependency.Core;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
@@ -93,6 +96,44 @@ namespace Umbraco.Web.Editors
             {
                 Items = Mapper.Map<IEnumerable<UserDisplay>>(result)
             };
+        }
+
+        /// <summary>
+        /// Invites a user
+        /// </summary>
+        /// <param name="userSave"></param> 
+        /// <returns></returns>
+        /// <remarks>
+        /// This will email the user an invite and generate a token that will be validated in the email
+        /// </remarks>
+        public UserDisplay PostInviteUser(UserInvite userSave)
+        {
+            if (userSave == null) throw new ArgumentNullException("userSave");
+
+            if (ModelState.IsValid == false)
+            {
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+            }
+
+            var hasSmtp = GlobalSettings.HasSmtpServerConfigured(RequestContext.VirtualPathRoot);
+            if (hasSmtp == false)
+            {
+                throw new HttpResponseException(
+                    Request.CreateNotificationValidationErrorResponse("No Email server is configured"));
+            }
+
+            var existing = Services.UserService.GetByEmail(userSave.Email);
+            if (existing != null)
+            {
+                ModelState.AddModelError("Email", "A user with the email already exists");
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+            }
+
+            var user = Mapper.Map<IUser>(userSave);
+
+            Services.UserService.Save(user);
+
+            return Mapper.Map<UserDisplay>(user);
         }
 
         /// <summary>
