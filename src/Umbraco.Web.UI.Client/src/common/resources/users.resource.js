@@ -141,49 +141,13 @@
             return deferred.promise;
         }
 
-        //TODO: Change this over to the real resource
         function getUserGroups() {
-            var deferred = $q.defer();
-            var userGroups = [
-                {
-                    "name": "Admin",
-                    "alias": "admin",
-                    "id": 1,
-                    "icon": "icon-medal",
-                    "sections": [],
-                    "startNodesContent": [],
-                    "startNodesMedia": []
-                },
-                {
-                    "name": "Writer",
-                    "alias": "writer",
-                    "id": 2,
-                    "icon": "icon-edit",
-                    "sections": [{ "id": "1", "name": "Content" }, { "id": "2", "name": "Media" }],
-                    "startNodesContent": [],
-                    "startNodesMedia": []
-                },
-                {
-                    "name": "Editor",
-                    "alias": "editor",
-                    "id": 3,
-                    "icon": "icon-tools",
-                    "sections": [{ "id": "1", "name": "Content" }, { "id": "2", "name": "Media" }],
-                    "startNodesContent": [{ "id": "1", "name": "Start node 1" }, { "id": "2", "name": "Start node 2" }],
-                    "startNodesMedia": [{ "id": "1", "name": "Start node 1" }, { "id": "2", "name": "Start node 2" }]
-                },
-                {
-                    "name": "Translator",
-                    "alias": "translator",
-                    "id": 4,
-                    "icon": "icon-globe",
-                    "sections": [{ "id": "1", "name": "Content" }, { "id": "2", "name": "Translations" }],
-                    "startNodesContent": [{ "id": "1", "name": "Start node 1" }],
-                    "startNodesMedia": [{ "id": "1", "name": "Start node 1" }]
-                }
-            ];
-            deferred.resolve(userGroups);
-            return deferred.promise;
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "userApiBaseUrl",
+                        "GetUserGroups")),
+                "Failed to retrieve user groups");
         }
 
         var resource = {
