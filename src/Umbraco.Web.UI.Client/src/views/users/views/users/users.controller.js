@@ -1,9 +1,10 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, usersResource) {
+    function UsersController($scope, $timeout, $location, usersResource, localizationService, contentEditingHelper) {
 
         var vm = this;
+        var localizeSaving = localizationService.localize("general_saving");
 
         vm.users = [];
         vm.userGroups = [];
@@ -69,6 +70,7 @@
         vm.areAllSelected = areAllSelected;
         vm.searchUsers = searchUsers;
         vm.setOrderByFilter = setOrderByFilter;
+        vm.createUser = createUser;
 
         function init() {
 
@@ -206,6 +208,34 @@
             getUsers();
         }
 
+        function createUser() {
+
+            vm.newUser.id = -1;
+            vm.newUser.parentId = -1;
+            vm.page.createButtonState = "busy";
+
+            contentEditingHelper.contentEditorPerformSave({
+                statusMessage: localizeSaving,
+                saveMethod: usersResource.createUser,
+                scope: $scope,
+                content: vm.newUser,
+                // We do not redirect on failure for users - this is because it is not possible to actually save a user
+                // when server side validation fails - as opposed to content where we are capable of saving the content
+                // item if server side validation fails
+                redirectOnFailure: false,
+                rebindCallback: function (orignal, saved) {}
+            }).then(function (saved) {
+
+                vm.page.createButtonState = "success";
+
+            }, function (err) {
+
+                vm.page.createButtonState = "error";
+
+            });
+
+        }
+
         // helpers
         function getUsers() {
 
@@ -225,7 +255,7 @@
                 formatDates(vm.users);
 
                 vm.loading = false;
-                
+
             });
         }
 

@@ -100,7 +100,34 @@
                         "GetById",
                         { id: userId })),
                 "Failed to retrieve data for user " + userId);
+        }
 
+        function createUser(user) {
+            if (!user) {
+                throw "user not specified";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "userApiBaseUrl",
+                        "PostCreateUser"),
+                    user),
+                "Failed to save user");
+        }
+
+        function saveUser(user) {
+            if (!user) {
+                throw "user not specified";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "userApiBaseUrl",
+                        "PostSaveUser"),
+                    user),
+                "Failed to save user");
         }
         
         function getUserGroup() {
@@ -151,12 +178,14 @@
         }
 
         var resource = {
-            getUser: getUser,
-            getUserGroup: getUserGroup,
-            getUserGroups: getUserGroups,
             disableUsers: disableUsers,
             enableUsers: enableUsers,
-            getPagedResults: getPagedResults
+            getPagedResults: getPagedResults,
+            getUser: getUser,
+            createUser: createUser,
+            saveUser: saveUser,
+            getUserGroup: getUserGroup,
+            getUserGroups: getUserGroups
         };
 
         return resource;
