@@ -53,7 +53,8 @@ Use this directive to render an avatar.
     function AvatarDirective() {
 
         function link(scope, element, attrs, ctrl) {
-
+            
+            var eventBindings = [];
             scope.initials = "";
 
             function onInit() {
@@ -67,6 +68,12 @@ Use this directive to render an avatar.
                     return initials;
                 }
             }
+
+            eventBindings.push(scope.$watch('name', function (newValue, oldValue) {
+                if (newValue === oldValue) { return; }
+                if (oldValue === undefined || newValue === undefined) { return; }
+                scope.initials = getNameInitials(newValue);
+            }));
 
             onInit();
 
