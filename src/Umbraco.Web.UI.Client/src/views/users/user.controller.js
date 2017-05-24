@@ -5,7 +5,6 @@
 
         var vm = this;
 
-        vm.loading = false;
         vm.page = {};
         vm.user = {};
         vm.breadcrumbs = [];
@@ -28,12 +27,8 @@
             usersResource.getUser($routeParams.id).then(function (user) {
                 vm.user = user;
                 makeBreadcrumbs(vm.user);
-            });
-
-            // fake loading
-            $timeout(function () {
                 vm.loading = false;
-            }, 500);
+            });
             
         }
 
