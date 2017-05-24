@@ -153,8 +153,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 resolved.IsApproved = false;
                 resolved.RawPasswordValue = "new";
                 resolved.IsLockedOut = true;
-                resolved.StartContentId = 10;
-                resolved.StartMediaId = 11;
+                resolved.StartContentIds = new []{ 10 };
+                resolved.StartMediaIds = new []{ 11 };
                 resolved.Email = "new@new.com";
                 resolved.Username = "newName";
 
@@ -169,8 +169,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(updatedItem.IsApproved, Is.EqualTo(resolved.IsApproved));
                 Assert.That(updatedItem.RawPasswordValue, Is.EqualTo(resolved.RawPasswordValue));
                 Assert.That(updatedItem.IsLockedOut, Is.EqualTo(resolved.IsLockedOut));
-                Assert.That(updatedItem.StartContentId, Is.EqualTo(resolved.StartContentId));
-                Assert.That(updatedItem.StartMediaId, Is.EqualTo(resolved.StartMediaId));
+                Assert.IsTrue(updatedItem.StartContentIds.UnsortedSequenceEqual(resolved.StartContentIds));
+                Assert.IsTrue(updatedItem.StartMediaIds.UnsortedSequenceEqual(resolved.StartMediaIds));
                 Assert.That(updatedItem.Email, Is.EqualTo(resolved.Email));
                 Assert.That(updatedItem.Username, Is.EqualTo(resolved.Username));
                 Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(2));
@@ -360,8 +360,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
             Assert.That(updatedItem.RawPasswordValue, Is.EqualTo(originalUser.RawPasswordValue));
             Assert.That(updatedItem.IsLockedOut, Is.EqualTo(originalUser.IsLockedOut));
-            Assert.That(updatedItem.StartContentId, Is.EqualTo(originalUser.StartContentId));
-            Assert.That(updatedItem.StartMediaId, Is.EqualTo(originalUser.StartMediaId));
+            Assert.IsTrue(updatedItem.StartContentIds.UnsortedSequenceEqual(originalUser.StartContentIds));
+            Assert.IsTrue(updatedItem.StartMediaIds.UnsortedSequenceEqual(originalUser.StartMediaIds));
             Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));
             Assert.That(updatedItem.Username, Is.EqualTo(originalUser.Username));
             Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(2));

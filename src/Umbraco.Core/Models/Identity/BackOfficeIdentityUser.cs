@@ -14,8 +14,8 @@ namespace Umbraco.Core.Models.Identity
 
         public BackOfficeIdentityUser()
         {
-            StartMediaId = -1;
-            StartContentId = -1;
+            StartMediaIds = new int[] { };
+            StartContentIds = new int[] { };
             Culture = Configuration.GlobalSettings.DefaultUILanguage;
         }
 
@@ -31,8 +31,8 @@ namespace Umbraco.Core.Models.Identity
         /// Gets/sets the user's real name
         /// </summary>
         public string Name { get; set; }
-        public int StartContentId { get; set; }
-        public int StartMediaId { get; set; }
+        public int[] StartContentIds { get; set; }
+        public int[] StartMediaIds { get; set; }
         public string[] AllowedSections { get; set; }
         public string[] Groups { get; set; }
         public string Culture { get; set; }

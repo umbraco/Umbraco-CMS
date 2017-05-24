@@ -38,9 +38,10 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(GetBaseWhereClause(), new { Id = id });
             sql //must be included for relator to work
                 .OrderBy<UserDto>(d => d.Id, SqlSyntax)
-                .OrderBy<UserGroupDto>(d => d.Id, SqlSyntax);
+                .OrderBy<UserGroupDto>(d => d.Id, SqlSyntax)
+                .OrderBy<UserStartNodeDto>(d => d.Id, SqlSyntax);
 
-            var dto = Database.Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserDto>(new UserGroupRelator().Map, sql)
+            var dto = Database.Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(new UserGroupRelator().Map, sql)
                 .FirstOrDefault();
             
             if (dto == null)
@@ -49,7 +50,33 @@ namespace Umbraco.Core.Persistence.Repositories
             var user = UserFactory.BuildEntity(dto);
             return user;
         }
-        
+
+        public IProfile GetProfile(string username)
+        {
+            var sql = GetBaseQuery(false).Where<UserDto>(userDto => userDto.UserName == username, SqlSyntax);
+            
+            var dto = Database.Fetch<UserDto>(sql)
+                .FirstOrDefault();
+
+            if (dto == null)
+                return null;
+            
+            return new UserProfile(dto.Id, dto.UserName);
+        }
+
+        public IProfile GetProfile(int id)
+        {
+            var sql = GetBaseQuery(false).Where<UserDto>(userDto => userDto.Id == id, SqlSyntax);
+
+            var dto = Database.Fetch<UserDto>(sql)
+                .FirstOrDefault();
+
+            if (dto == null)
+                return null;
+
+            return new UserProfile(dto.Id, dto.UserName);
+        }
+
         protected override IEnumerable<IUser> PerformGetAll(params int[] ids)
         {
             var sql = GetQueryWithGroups();
@@ -59,9 +86,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             sql //must be included for relator to work
                 .OrderBy<UserDto>(d => d.Id, SqlSyntax)
-                .OrderBy<UserGroupDto>(d => d.Id, SqlSyntax);
+                .OrderBy<UserGroupDto>(d => d.Id, SqlSyntax)
+                .OrderBy<UserStartNodeDto>(d => d.Id, SqlSyntax);
 
-            var users = ConvertFromDtos(Database.Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserDto>(new UserGroupRelator().Map, sql))
+            var users = ConvertFromDtos(Database.Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(new UserGroupRelator().Map, sql))
                 .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
             
             return users;
@@ -74,9 +102,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate();
             sql //must be included for relator to work
                 .OrderBy<UserDto>(d => d.Id, SqlSyntax)
-                .OrderBy<UserGroupDto>(d => d.Id, SqlSyntax);
+                .OrderBy<UserGroupDto>(d => d.Id, SqlSyntax)
+                .OrderBy<UserStartNodeDto>(d => d.Id, SqlSyntax);
 
-            var dtos = Database.Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserDto>(new UserGroupRelator().Map, sql)
+            var dtos = Database.Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(new UserGroupRelator().Map, sql)
                 .DistinctBy(x => x.Id);
 
             var users = ConvertFromDtos(dtos)
@@ -110,7 +139,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private Sql GetQueryWithGroups()
         {
             //base query includes user groups
-            var sql = GetBaseQuery("umbracoUser.*, umbracoUserGroup.*, umbracoUserGroup2App.*");
+            var sql = GetBaseQuery("umbracoUser.*, umbracoUserGroup.*, umbracoUserGroup2App.*, umbracoUserStartNode.*");
             AddGroupLeftJoin(sql);
             return sql;
         }
@@ -122,7 +151,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 .LeftJoin<UserGroupDto>(SqlSyntax)
                 .On<UserGroupDto, User2UserGroupDto>(SqlSyntax, dto => dto.Id, dto => dto.UserGroupId)
                 .LeftJoin<UserGroup2AppDto>(SqlSyntax)
-                .On<UserGroup2AppDto, UserGroupDto>(SqlSyntax, dto => dto.UserGroupId, dto => dto.Id);
+                .On<UserGroup2AppDto, UserGroupDto>(SqlSyntax, dto => dto.UserGroupId, dto => dto.Id)
+                .LeftJoin<UserStartNodeDto>(SqlSyntax)
+                .On<UserStartNodeDto, UserDto>(SqlSyntax, dto => dto.UserId, dto => dto.Id);
         }
 
         private Sql GetBaseQuery(string columns)
@@ -396,6 +427,8 @@ namespace Umbraco.Core.Persistence.Repositories
             return GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, mappedField, orderDirection, userGroups, userState, filter);
         }
 
+        
+
         private IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, string[] userGroups = null, UserState? userState = null, IQuery<IUser> filter = null)
         {
             if (string.IsNullOrWhiteSpace(orderBy)) throw new ArgumentException("Value cannot be null or whitespace.", "orderBy");
@@ -448,7 +481,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 string sqlStringCount, sqlStringPage;
                 Database.BuildPageQueries<UserDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlStringCount, out sqlStringPage);
 
-                var sqlQueryFull = GetBaseQuery("umbracoUser.*, umbracoUserGroup.*, umbracoUserGroup2App.*");
+                var sqlQueryFull = GetBaseQuery("umbracoUser.*, umbracoUserGroup.*, umbracoUserGroup2App.*, umbracoUserStartNode.*");
                 
                 var fullQueryWithPagedInnerJoin = sqlQueryFull
                     .Append("INNER JOIN (")
@@ -464,7 +497,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     GetFilteredSqlForPagedResults(fullQueryWithPagedInnerJoin, filterSql),
                     orderDirection, orderBy);
 
-                var users = ConvertFromDtos(Database.Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserDto>(new UserGroupRelator().Map, fullQuery))
+                var users = ConvertFromDtos(Database.Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(new UserGroupRelator().Map, fullQuery))
                     .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
 
                 return users;

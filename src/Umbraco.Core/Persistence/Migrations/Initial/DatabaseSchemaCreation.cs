@@ -90,6 +90,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {51, typeof (User2UserGroupDto) },
                                                                               {52, typeof (UserGroup2NodePermissionDto) },
                                                                               {53, typeof (UserGroup2AppDto) },
+                                                                              {54, typeof (UserStartNodeDto) },
                                                                           };
         #endregion
         

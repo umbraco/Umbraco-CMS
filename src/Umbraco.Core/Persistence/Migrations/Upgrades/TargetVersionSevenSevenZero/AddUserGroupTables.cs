@@ -3,6 +3,7 @@ using System.Data;
 using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -63,8 +64,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                 Create.Table<UserGroup2NodePermissionDto>();
                 updated = true;
             }
+
+            
+
             return updated;
-        }
+        }       
 
         private void MigrateUserTypesToGroups()
         {
@@ -158,7 +162,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
             if (tables.InvariantContains("umbracoUserType") && tables.InvariantContains("umbracoUser"))
             {
                 if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser") && x.Item3.InvariantEquals("FK_umbracoUser_umbracoUserType_id")))
-                { 
+                {
                     Delete.ForeignKey("FK_umbracoUser_umbracoUserType_id").OnTable("umbracoUser");
                 }
 

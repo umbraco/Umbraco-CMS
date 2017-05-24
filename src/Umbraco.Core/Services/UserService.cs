@@ -107,9 +107,7 @@ namespace Umbraco.Core.Services
                     Language = GlobalSettings.DefaultUILanguage,
                     Name = username,
                     RawPasswordValue = passwordValue,
-                    Username = username,
-                    StartContentId = -1,
-                    StartMediaId = -1,
+                    Username = username,                    
                     IsLockedOut = false,
                     IsApproved = true
                 };
@@ -604,8 +602,11 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IProfile"/></returns>
         public IProfile GetProfileById(int id)
         {
-            var user = GetUserById(id);
-            return user.ProfileData;
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateUserRepository(uow);
+                return repository.GetProfile(id);
+            }
         }
 
         /// <summary>
@@ -615,8 +616,11 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IProfile"/></returns>
         public IProfile GetProfileByUserName(string username)
         {
-            var user = GetByUsername(username);
-            return user.ProfileData;
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateUserRepository(uow);
+                return repository.GetProfile(username);
+            }
         }
 
         /// <summary>

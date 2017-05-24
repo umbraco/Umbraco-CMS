@@ -42,7 +42,7 @@ namespace Umbraco.Web.Trees
         {
             var node = base.CreateRootNode(queryStrings); 
             //if the user's start node is not default, then ensure the root doesn't have a menu
-            if (Security.CurrentUser.StartContentId != Constants.System.Root)
+            if (Security.CurrentUser.StartContentIds.Length > 0 && Security.CurrentUser.StartContentIds.Contains(Constants.System.Root) == false)
             {
                 node.MenuUrl = "";
             }
@@ -60,9 +60,9 @@ namespace Umbraco.Web.Trees
             get { return Services.ContentService.RecycleBinSmells(); }
         }
 
-        protected override int UserStartNode
+        protected override int[] UserStartNodes
         {
-            get { return Security.CurrentUser.StartContentId; }
+            get { return Security.CurrentUser.StartContentIds; }
         }
         
         /// <summary>
@@ -121,7 +121,7 @@ namespace Umbraco.Web.Trees
                 var menu = new MenuItemCollection();
 
                 //if the user's start node is not the root then ensure the root menu is empty/doesn't exist
-                if (Security.CurrentUser.StartContentId != Constants.System.Root)
+                if (Security.CurrentUser.StartContentIds.Length > 0 && Security.CurrentUser.StartContentIds.Contains(Constants.System.Root) == false)
                 {
                     return menu;
                 }

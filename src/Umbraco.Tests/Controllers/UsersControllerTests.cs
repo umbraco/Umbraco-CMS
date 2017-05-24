@@ -37,6 +37,52 @@ namespace Umbraco.Tests.Controllers
     {
 
         [Test]
+        public async void Save_User()
+        {
+            var runner = new TestRunner((message, helper) =>
+            {
+                //setup some mocks
+                Umbraco.Core.Configuration.GlobalSettings.HasSmtpServer = true;
+
+                var userServiceMock = Mock.Get(helper.UmbracoContext.Application.Services.UserService);
+
+                userServiceMock.Setup(service => service.Save(It.IsAny<IUser>(), It.IsAny<bool>()))
+                    .Callback((IUser u, bool raiseEvents) =>
+                    {
+                        u.Id = 1234;
+                    });
+                userServiceMock.Setup(service => service.GetAllUserGroups(It.IsAny<int[]>()))
+                    .Returns(Enumerable.Empty<IUserGroup>);
+
+                //we need to manually apply automapper mappings with the mocked applicationcontext
+                InitializeMappers(helper.UmbracoContext.Application);
+
+                return new UsersController(helper.UmbracoContext);
+            });
+
+            var invite = new UserInvite
+            {
+                Id = -1,
+                Email = "test@test.com",
+                Message = "Hello test!",
+                Name = "Test",
+                UserGroups = new[] { "writers" }
+            };
+            var response = await runner.Execute("Users", "PostSaveUser", HttpMethod.Post,
+                new ObjectContent<UserInvite>(invite, new JsonMediaTypeFormatter()));
+
+            var obj = JsonConvert.DeserializeObject<UserDisplay>(response.Item2);
+
+            Assert.AreEqual(invite.Name, obj.Name);
+            Assert.AreEqual(1234, obj.Id);
+            Assert.AreEqual(invite.Email, obj.Email);
+            foreach (var group in invite.UserGroups)
+            {
+                Assert.IsTrue(obj.UserGroups.Contains(group));
+            }
+        }
+
+        [Test]
         public async void Invite_User()
         {
             var runner = new TestRunner((message, helper) =>

@@ -99,6 +99,34 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Creates a new user
+        /// </summary>
+        /// <param name="userSave"></param>
+        /// <returns></returns>
+        public UserDisplay PostCreateUser(UserInvite userSave)
+        {
+            if (userSave == null) throw new ArgumentNullException("userSave");
+
+            if (ModelState.IsValid == false)
+            {
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+            }
+            
+            var existing = Services.UserService.GetByEmail(userSave.Email);
+            if (existing != null)
+            {
+                ModelState.AddModelError("Email", "A user with the email already exists");
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+            }
+
+            var user = Mapper.Map<IUser>(userSave);
+
+            Services.UserService.Save(user);
+
+            return Mapper.Map<UserDisplay>(user);
+        }
+
+        /// <summary>
         /// Invites a user
         /// </summary>
         /// <param name="userSave"></param> 
@@ -158,8 +186,31 @@ namespace Umbraco.Web.Editors
             if (found == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
+            var hasErrors = false;
+
+            var existing = Services.UserService.GetByEmail(userSave.Email);
+            if (existing != null && existing.Id != (int)userSave.Id)
+            {
+                ModelState.AddModelError("Email", "A user with the email already exists");
+                hasErrors = true;
+            }
+            existing = Services.UserService.GetByUsername(userSave.Name);
+            if (existing != null && existing.Id != (int)userSave.Id)
+            {
+                ModelState.AddModelError("Email", "A user with the email already exists");
+                hasErrors = true;
+            }
+
+            if (hasErrors)
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+
             //TODO: More validation, password changing logic, persisting
-            return Mapper.Map<IUser, UserDisplay>(found);
+
+            var user = Mapper.Map<IUser>(userSave);
+
+            Services.UserService.Save(user);
+
+            return Mapper.Map<UserDisplay>(user);
         }
 
         /// <summary>

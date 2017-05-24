@@ -27,8 +27,8 @@ namespace Umbraco.Core.Models.Membership
             _language = GlobalSettings.DefaultUILanguage;
             _isApproved = true;
             _isLockedOut = false;
-            _startContentId = -1;
-            _startMediaId = -1;
+            _startContentIds = new int[] { };
+            _startMediaIds = new int[] { };
             //cannot be null
             _rawPasswordValue = "";
             _allowedSections = new List<string>();
@@ -57,8 +57,8 @@ namespace Umbraco.Core.Models.Membership
             _userGroups = new List<string>();
             _isApproved = true;
             _isLockedOut = false;
-            _startContentId = -1;
-            _startMediaId = -1;
+            _startContentIds = new int[] { };
+            _startMediaIds = new int[] { };
         }
 
         /// <summary>
@@ -88,15 +88,15 @@ namespace Umbraco.Core.Models.Membership
             _userGroups = new List<string>(userGroups);
             _isApproved = true;
             _isLockedOut = false;
-            _startContentId = -1;
-            _startMediaId = -1;
+            _startContentIds = new int[] { };
+            _startMediaIds = new int[] { };
         }
 
         private string _name;
         private string _securityStamp;
         private int _sessionTimeout;
-        private int _startContentId;
-        private int _startMediaId;
+        private int[] _startContentIds;
+        private int[] _startMediaIds;
         private int _failedLoginAttempts;
 
         private string _username;
@@ -124,8 +124,8 @@ namespace Umbraco.Core.Models.Membership
 
             public readonly PropertyInfo SecurityStampSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.SecurityStamp);
             public readonly PropertyInfo SessionTimeoutSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.SessionTimeout);
-            public readonly PropertyInfo StartContentIdSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.StartContentId);
-            public readonly PropertyInfo StartMediaIdSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.StartMediaId);
+            public readonly PropertyInfo StartContentIdSelector = ExpressionHelper.GetPropertyInfo<User, int[]>(x => x.StartContentIds);
+            public readonly PropertyInfo StartMediaIdSelector = ExpressionHelper.GetPropertyInfo<User, int[]>(x => x.StartMediaIds);
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Name);
 
             public readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Username);
@@ -138,6 +138,12 @@ namespace Umbraco.Core.Models.Membership
             public readonly PropertyInfo DefaultToLiveEditingSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.DefaultToLiveEditing);
 
             public readonly PropertyInfo UserGroupsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<string>>(x => x.Groups);
+
+            //Custom comparer for enumerable
+            public readonly DelegateEqualityComparer<IEnumerable<int>> IntegerEnumerableComparer =
+                new DelegateEqualityComparer<IEnumerable<int>>(
+                    (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
+                    enum1 => enum1.GetHashCode());
         }
         
         #region Implementation of IMembershipUser
@@ -252,7 +258,7 @@ namespace Umbraco.Core.Models.Membership
 
         public IProfile ProfileData
         {
-            get { return new UserProfile(this); }
+            get { return new WrappedUserProfile(this); }
         }
 
         /// <summary>
@@ -285,10 +291,11 @@ namespace Umbraco.Core.Models.Membership
         /// The start content id.
         /// </value>
         [DataMember]
-        public int StartContentId
+        [DoNotClone]
+        public int[] StartContentIds
         {
-            get { return _startContentId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _startContentId, Ps.Value.StartContentIdSelector); }
+            get { return _startContentIds; }
+            set { SetPropertyValueAndDetectChanges(value, ref _startContentIds, Ps.Value.StartContentIdSelector, Ps.Value.IntegerEnumerableComparer); }
         }
 
         /// <summary>
@@ -298,10 +305,11 @@ namespace Umbraco.Core.Models.Membership
         /// The start media id.
         /// </value>
         [DataMember]
-        public int StartMediaId
+        [DoNotClone]
+        public int[] StartMediaIds
         {
-            get { return _startMediaId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _startMediaId, Ps.Value.StartMediaIdSelector); }
+            get { return _startMediaIds; }
+            set { SetPropertyValueAndDetectChanges(value, ref _startMediaIds, Ps.Value.StartMediaIdSelector, Ps.Value.IntegerEnumerableComparer); }
         }
 
         [DataMember]
@@ -350,6 +358,9 @@ namespace Umbraco.Core.Models.Membership
         public override object DeepClone()
         {
             var clone = (User)base.DeepClone();
+            //manually clone the start node props
+            clone._startContentIds = _startContentIds.ToArray();
+            clone._startMediaIds = _startMediaIds.ToArray();
             //turn off change tracking
             clone.DisableChangeTracking();
             //need to create new collections otherwise they'll get copied by ref
@@ -367,28 +378,26 @@ namespace Umbraco.Core.Models.Membership
         /// <summary>
         /// Internal class used to wrap the user in a profile
         /// </summary>
-        private class UserProfile : IProfile
+        private class WrappedUserProfile : IProfile
         {
             private readonly IUser _user;
 
-            public UserProfile(IUser user)
+            public WrappedUserProfile(IUser user)
             {
                 _user = user;
             }
 
-            public object Id
+            public int Id
             {
                 get { return _user.Id; }
-                set { _user.Id = (int)value; }
             }
 
             public string Name
             {
                 get { return _user.Name; }
-                set { _user.Name = value; }
             }
 
-            protected bool Equals(UserProfile other)
+            private bool Equals(WrappedUserProfile other)
             {
                 return _user.Equals(other._user);
             }
@@ -398,7 +407,7 @@ namespace Umbraco.Core.Models.Membership
                 if (ReferenceEquals(null, obj)) return false;
                 if (ReferenceEquals(this, obj)) return true;
                 if (obj.GetType() != this.GetType()) return false;
-                return Equals((UserProfile) obj);
+                return Equals((WrappedUserProfile) obj);
             }
 
             public override int GetHashCode()

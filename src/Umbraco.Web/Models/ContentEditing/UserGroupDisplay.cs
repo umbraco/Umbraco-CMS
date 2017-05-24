@@ -9,7 +9,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public UserGroupDisplay()
         {
             Notifications = new List<Notification>();
-        }
+        }        
 
         /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
@@ -19,6 +19,13 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "sections")]
         public IEnumerable<string> Sections { get; set; }
+
+        /// <summary>
+        /// Gets the available sections (i.e. to populate a drop down)
+        /// The key is the Alias the value is the Name - the Alias is what is used in the AllowedSections property and for persistence
+        /// </summary>
+        [DataMember(Name = "availableSections")]
+        public IEnumerable<Section> AvailableSections { get; set; }
 
         [DataMember(Name = "startNodeContent")]
         public int StartContentId { get; set; }

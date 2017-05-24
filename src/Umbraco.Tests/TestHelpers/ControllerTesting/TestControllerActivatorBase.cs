@@ -90,8 +90,8 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                                                  && u.Id == (int) backofficeIdentity.Id
                                                  && u.Language == "en"
                                                  && u.Name == backofficeIdentity.RealName
-                                                 && u.StartContentId == backofficeIdentity.StartContentNode
-                                                 && u.StartMediaId == backofficeIdentity.StartMediaNode
+                                                 && u.StartContentIds == backofficeIdentity.StartContentNodes
+                                                 && u.StartMediaIds == backofficeIdentity.StartMediaNodes
                                                  && u.Username == backofficeIdentity.Username));
 
                 //mock Validate

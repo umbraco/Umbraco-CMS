@@ -31,9 +31,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                         Roles = new[] { "admin" },
                         AllowedApplications = new[] { "content", "media", "members" },
                         Culture = "en-US",
-                        RealName = "Admin",
-                        StartContentNode = -1,
-                        StartMediaNode = -1,
+                        RealName = "Admin",                        
                         Username = "admin"
                     });
 

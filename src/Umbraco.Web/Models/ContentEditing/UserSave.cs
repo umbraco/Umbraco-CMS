@@ -30,11 +30,11 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required]
         public IEnumerable<string> UserGroups { get; set; }
 
-        [DataMember(Name = "startContentId")]
-        public int StartContentId { get; set; }
+        [DataMember(Name = "startContentIds")]
+        public int[] StartContentIds { get; set; }
 
-        [DataMember(Name = "startMediaId")]
-        public int StartMediaId { get; set; }
+        [DataMember(Name = "startMediaIds")]
+        public int[] StartMediaIds { get; set; }
         
         [DataMember(Name = "allowedSections")]
         public IEnumerable<string> AllowedSections { get; set; }

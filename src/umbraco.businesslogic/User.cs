@@ -707,39 +707,38 @@ namespace umbraco.BusinessLogic
                 UserEntity.IsApproved = value == false;
             }
         }
-
-        /// <summary>
-        /// <summary>
-        /// Gets or sets the start content node id.
-        /// </summary>
-        /// <value>The start node id.</value>
+        
+        [Obsolete("This should not be used, it will return invalid data because a user can have multiple start nodes, this will only return the first")]
         public int StartNodeId
         {
             get
             {
                 if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return UserEntity.StartContentId;
+                return UserEntity.StartContentIds == null ? -1 : UserEntity.StartContentIds[0];
             }
             set
             {
-                UserEntity.StartContentId = value;
+                if (UserEntity.StartContentIds == null)
+                    UserEntity.StartContentIds = new int[] {value};
+                else if (UserEntity.StartContentIds.Contains(value) == false)
+                    UserEntity.StartContentIds = UserEntity.StartContentIds.Concat(new[] {value}).ToArray();
             }
         }
 
-        /// <summary>
-        /// Gets or sets the start media id.
-        /// </summary>
-        /// <value>The start media id.</value>
+        [Obsolete("This should not be used, it will return invalid data because a user can have multiple start nodes, this will only return the first")]
         public int StartMediaId
         {
             get
             {
                 if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return UserEntity.StartMediaId;
+                return UserEntity.StartMediaIds == null ? -1 : UserEntity.StartMediaIds[0];
             }
             set
             {
-                UserEntity.StartMediaId = value;
+                if (UserEntity.StartMediaIds == null)
+                    UserEntity.StartMediaIds = new int[] { value };
+                else if (UserEntity.StartMediaIds.Contains(value) == false)
+                    UserEntity.StartMediaIds = UserEntity.StartMediaIds.Concat(new[] { value }).ToArray();
             }
         }
 

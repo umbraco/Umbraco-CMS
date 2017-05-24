@@ -48,10 +48,9 @@ namespace Umbraco.Web.Models.ContentEditing
 
         /// <summary>
         /// Gets the available user groups (i.e. to populate a drop down)
-        /// The key is the Alias the value is the Name - the Alias is what is used in the UserGroup property and for persistence
         /// </summary>
         [DataMember(Name = "availableUserGroups")]
-        public IDictionary<string, string> AvailableUserGroups { get; set; }
+        public IEnumerable<UserGroupDisplay> AvailableUserGroups { get; set; }
 
         /// <summary>
         /// Gets the available cultures (i.e. to populate a drop down)
@@ -60,26 +59,17 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "availableCultures")]
         public IDictionary<string, string> AvailableCultures { get; set; }
 
-        //TODO: This will become StartContentIds as an array!
-        [DataMember(Name = "startContentId")]
-        public int StartContentId { get; set; }
+        [DataMember(Name = "startContentIds")]
+        public int[] StartContentIds { get; set; }
 
-        //TODO: This will become StartMediaIds as an array!
-        [DataMember(Name = "startMediaId")]
-        public int StartMediaId { get; set; }
+        [DataMember(Name = "startMediaIds")]
+        public int[] StartMediaIds { get; set; }
 
-        /// <summary>
-        /// A list of sections the user is allowed to view.
-        /// </summary>
-        [DataMember(Name = "allowedSections")]
-        public IEnumerable<string> AllowedSections { get; set; }
-
-        /// <summary>
-        /// Gets the available sections (i.e. to populate a drop down)
-        /// The key is the Alias the value is the Name - the Alias is what is used in the AllowedSections property and for persistence
-        /// </summary>
-        [DataMember(Name = "availableSections")]
-        public IDictionary<string, string> AvailableSections { get; set; }
+        ///// <summary>
+        ///// A list of sections the user is allowed to view based on their current groups assigned
+        ///// </summary>
+        //[DataMember(Name = "allowedSections")]
+        //public IEnumerable<string> AllowedSections { get; set; }        
 
         /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.

@@ -54,5 +54,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="userState">Optional parameter to filter by specfied user state</param>
         /// <returns></returns>
         IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, Expression<Func<IUser, object>> orderBy, Direction orderDirection, string[] userGroups = null, UserState? userState = null, IQuery<IUser> filter = null);
+
+        IProfile GetProfile(string username);
+        IProfile GetProfile(int id);
     }
 }

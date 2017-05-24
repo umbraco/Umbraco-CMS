@@ -18,6 +18,27 @@ namespace Umbraco.Web.Models.Mapping
         {
             config.CreateMap<UserInvite, IUser>()
                 .ConstructUsing(invite => new User(invite.Name, invite.Email, invite.Email, Guid.NewGuid().ToString("N")))
+                .ForMember(user => user.Id, expression => expression.Ignore())
+                .ForMember(user => user.SessionTimeout, expression => expression.Ignore())
+                .ForMember(user => user.StartContentIds, expression => expression.Ignore())
+                .ForMember(user => user.StartMediaIds, expression => expression.Ignore())
+                .ForMember(user => user.Language, expression => expression.Ignore())
+                .ForMember(user => user.SecurityStamp, expression => expression.Ignore())
+                .ForMember(user => user.ProviderUserKey, expression => expression.Ignore())
+                .ForMember(user => user.Username, expression => expression.Ignore())
+                .ForMember(user => user.RawPasswordValue, expression => expression.Ignore())
+                .ForMember(user => user.PasswordQuestion, expression => expression.Ignore())
+                .ForMember(user => user.RawPasswordAnswerValue, expression => expression.Ignore())
+                .ForMember(user => user.Comments, expression => expression.Ignore())
+                .ForMember(user => user.IsApproved, expression => expression.Ignore())
+                .ForMember(user => user.IsLockedOut, expression => expression.Ignore())
+                .ForMember(user => user.LastLoginDate, expression => expression.Ignore())
+                .ForMember(user => user.LastPasswordChangeDate, expression => expression.Ignore())
+                .ForMember(user => user.LastLockoutDate, expression => expression.Ignore())
+                .ForMember(user => user.FailedPasswordAttempts, expression => expression.Ignore())
+                .ForMember(user => user.DeletedDate, expression => expression.Ignore())
+                .ForMember(user => user.CreateDate, expression => expression.Ignore())
+                .ForMember(user => user.UpdateDate, expression => expression.Ignore())
                 .AfterMap((invite, user) =>
                 {
                     foreach (var group in invite.UserGroups)
@@ -27,8 +48,9 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             config.CreateMap<IUserGroup, UserGroupDisplay>()
-                .ForMember(detail => detail.Notifications, opt => opt.Ignore())
+                .ForMember(detail => detail.AvailableSections, opt => opt.MapFrom(x => applicationContext.Services.SectionService.GetSections()))
                 .ForMember(detail => detail.Sections, opt => opt.MapFrom(x => x.AllowedSections))
+                .ForMember(detail => detail.Notifications, opt => opt.Ignore())                
                 .ForMember(detail => detail.Udi, opt => opt.Ignore())
                 .ForMember(detail => detail.Trashed, opt => opt.Ignore())
                 .ForMember(detail => detail.ParentId, opt => opt.UseValue(-1))
@@ -37,15 +59,12 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<IUser, UserDisplay>()                
                 .ForMember(detail => detail.UserGroups, opt => opt.MapFrom(user => user.Groups))
-                .ForMember(detail => detail.StartContentId, opt => opt.MapFrom(user => user.StartContentId))
-                .ForMember(detail => detail.StartMediaId, opt => opt.MapFrom(user => user.StartMediaId))
+                .ForMember(detail => detail.StartContentIds, opt => opt.MapFrom(user => user.StartContentIds))
+                .ForMember(detail => detail.StartMediaIds, opt => opt.MapFrom(user => user.StartMediaIds))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
                 .ForMember(
                     detail => detail.AvailableUserGroups,
-                    opt => opt.MapFrom(user => applicationContext.Services.UserService.GetAllUserGroups().ToDictionary(x => x.Alias, x => x.Name)))
-                .ForMember(
-                    detail => detail.AvailableSections,
-                    opt => opt.MapFrom(user => applicationContext.Services.SectionService.GetSections().ToDictionary(x => x.Alias, x => x.Name)))
+                    opt => opt.MapFrom(user => applicationContext.Services.UserService.GetAllUserGroups()))               
                 .ForMember(
                     detail => detail.AvailableCultures,
                     opt => opt.MapFrom(user => applicationContext.Services.TextService.GetSupportedCultures().ToDictionary(x => x.Name, x => x.DisplayName)))
@@ -66,8 +85,8 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<IUser, UserDetail>()
                 .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))
-                .ForMember(detail => detail.StartContentId, opt => opt.MapFrom(user => user.StartContentId))
-                .ForMember(detail => detail.StartMediaId, opt => opt.MapFrom(user => user.StartMediaId))
+                .ForMember(detail => detail.StartContentIds, opt => opt.MapFrom(user => user.StartContentIds))
+                .ForMember(detail => detail.StartMediaIds, opt => opt.MapFrom(user => user.StartMediaIds))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
                 .ForMember(
                     detail => detail.EmailHash,
@@ -76,8 +95,8 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<BackOfficeIdentityUser, UserDetail>()
                 .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => user.Id))
-                .ForMember(detail => detail.StartContentId, opt => opt.MapFrom(user => user.StartContentId))
-                .ForMember(detail => detail.StartMediaId, opt => opt.MapFrom(user => user.StartMediaId))
+                .ForMember(detail => detail.StartContentIds, opt => opt.MapFrom(user => user.StartContentIds))
+                .ForMember(detail => detail.StartMediaIds, opt => opt.MapFrom(user => user.StartMediaIds))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.Culture))
                 .ForMember(detail => detail.AllowedSections, opt => opt.MapFrom(user => user.AllowedSections))
                 .ForMember(
@@ -94,8 +113,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections))
                 .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
                 .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups.ToArray()))
-                .ForMember(detail => detail.StartContentNode, opt => opt.MapFrom(user => user.StartContentId))
-                .ForMember(detail => detail.StartMediaNode, opt => opt.MapFrom(user => user.StartMediaId))
+                .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.StartContentIds))
+                .ForMember(detail => detail.StartMediaNodes, opt => opt.MapFrom(user => user.StartMediaIds))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
                 .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));

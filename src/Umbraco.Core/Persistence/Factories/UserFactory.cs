@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 
@@ -31,8 +32,8 @@ namespace Umbraco.Core.Persistence.Factories
                 user.DisableChangeTracking();
                 
                 user.Key = guidId;
-                user.StartContentId = dto.ContentStartId;
-                user.StartMediaId = dto.MediaStartId ?? -1;
+                user.StartContentIds = dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Content).Select(x => x.Id).ToArray();
+                user.StartMediaIds = dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int) UserStartNodeDto.StartNodeTypeValue.Media).Select(x => x.Id).ToArray();
                 user.IsLockedOut = dto.NoConsole;
                 user.IsApproved = dto.Disabled == false;
                 user.Language = dto.UserLanguage;
@@ -59,9 +60,7 @@ namespace Umbraco.Core.Persistence.Factories
         public static UserDto BuildDto(IUser entity)
         {
             var dto = new UserDto
-            {
-                ContentStartId = entity.StartContentId,
-                MediaStartId = entity.StartMediaId,
+            {                
                 Disabled = entity.IsApproved == false,
                 Email = entity.Email,
                 Login = entity.Username,
@@ -77,6 +76,26 @@ namespace Umbraco.Core.Persistence.Factories
                 CreateDate = entity.CreateDate,
                 UpdateDate = entity.UpdateDate
             };
+
+            foreach (var startNodeId in entity.StartContentIds)
+            {
+                dto.UserStartNodeDtos.Add(new UserStartNodeDto
+                {
+                    StartNode = startNodeId,
+                    StartNodeType = (int)UserStartNodeDto.StartNodeTypeValue.Content,
+                    UserId = entity.Id
+                });
+            }
+
+            foreach (var startNodeId in entity.StartMediaIds)
+            {
+                dto.UserStartNodeDtos.Add(new UserStartNodeDto
+                {
+                    StartNode = startNodeId,
+                    StartNodeType = (int)UserStartNodeDto.StartNodeTypeValue.Media,
+                    UserId = entity.Id
+                });
+            }
 
             if (entity.HasIdentity)
             {

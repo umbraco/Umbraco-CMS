@@ -4,7 +4,7 @@ angular.module("umbraco")
 
         if (!$scope.model.config.startNodeId) {
             userService.getCurrentUser().then(function (userData) {
-                $scope.model.config.startNodeId = userData.startMediaId;
+                $scope.model.config.startNodeId = userData.startMediaIds.length === 0 ? -1 : userData.startMediaIds[0];
             });
         }
 

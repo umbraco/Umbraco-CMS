@@ -143,7 +143,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             }
 
             //if the error is for umbracoUserGroup it must be the previous version to 7.7 since that is when it is added
-            if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.InvariantEquals("umbracoUserGroup"))))
+            if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.InvariantEquals("umbracoUserStartNode"))))
             {
                 return new Version(7, 6, 0);
             }

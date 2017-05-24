@@ -35,8 +35,8 @@ namespace Umbraco.Tests.Models
                 PasswordQuestion = "question",
                 //ProviderUserKey = "user key",
                 SessionTimeout = 5,
-                StartContentId = 3,
-                StartMediaId = 8,
+                StartContentIds = new []{ 3 },
+                StartMediaIds = new[]{ 8 },
                 Username = "username"                            
             };
           
@@ -82,8 +82,8 @@ namespace Umbraco.Tests.Models
                 PasswordQuestion = "question",
                 //ProviderUserKey = "user key",
                 SessionTimeout = 5,
-                StartContentId = 3,
-                StartMediaId = 8,
+                StartContentIds = new[]{ 3 },
+                StartMediaIds = new []{ 8 },
                 Username = "username"
             };
 

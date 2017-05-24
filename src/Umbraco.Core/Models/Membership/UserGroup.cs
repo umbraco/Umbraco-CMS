@@ -32,6 +32,12 @@ namespace Umbraco.Core.Models.Membership
             public readonly PropertyInfo IconSelector = ExpressionHelper.GetPropertyInfo<UserGroup, string>(x => x.Icon);
             public readonly PropertyInfo StartContentIdSelector = ExpressionHelper.GetPropertyInfo<UserGroup, int>(x => x.StartContentId);
             public readonly PropertyInfo StartMediaIdSelector = ExpressionHelper.GetPropertyInfo<UserGroup, int>(x => x.StartMediaId);
+
+            //Custom comparer for enumerable
+            public readonly DelegateEqualityComparer<IEnumerable<string>> StringEnumerableComparer =
+                new DelegateEqualityComparer<IEnumerable<string>>(
+                    (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
+                    enum1 => enum1.GetHashCode());
         }
 
         public UserGroup()
@@ -93,10 +99,7 @@ namespace Umbraco.Core.Models.Membership
             set
             {
                 SetPropertyValueAndDetectChanges(value, ref _permissions, Ps.Value.PermissionsSelector,
-                    //Custom comparer for enumerable
-                    new DelegateEqualityComparer<IEnumerable<string>>(
-                        (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
-                        enum1 => enum1.GetHashCode()));
+                    Ps.Value.StringEnumerableComparer);
             }
         }
 

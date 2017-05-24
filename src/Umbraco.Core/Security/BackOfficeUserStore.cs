@@ -75,8 +75,8 @@ namespace Umbraco.Core.Security
                 Language = user.Culture ?? Configuration.GlobalSettings.DefaultUILanguage,
                 Name = user.Name,
                 Username = user.UserName,
-                StartContentId = user.StartContentId == 0 ? -1 : user.StartContentId,
-                StartMediaId = user.StartMediaId == 0 ? -1 : user.StartMediaId,
+                StartContentIds = user.StartContentIds ?? new int[] { },
+                StartMediaIds = user.StartMediaIds ?? new int[] { },
                 IsLockedOut = user.IsLockedOut,
                 IsApproved = true
             };
@@ -673,15 +673,15 @@ namespace Umbraco.Core.Security
                 anythingChanged = true;
                 user.Language = identityUser.Culture;
             }
-            if (user.StartMediaId != identityUser.StartMediaId)
+            if (user.StartMediaIds.UnsortedSequenceEqual(identityUser.StartMediaIds) == false)
             {
                 anythingChanged = true;
-                user.StartMediaId = identityUser.StartMediaId;
+                user.StartMediaIds = identityUser.StartMediaIds;
             }
-            if (user.StartContentId != identityUser.StartContentId)
+            if (user.StartContentIds.UnsortedSequenceEqual(identityUser.StartContentIds))
             {
                 anythingChanged = true;
-                user.StartContentId = identityUser.StartContentId;
+                user.StartContentIds = identityUser.StartContentIds;
             }
             if (user.SecurityStamp != identityUser.SecurityStamp)
             {

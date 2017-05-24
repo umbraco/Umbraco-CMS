@@ -14,6 +14,7 @@ namespace Umbraco.Core.Models.Rdbms
         public UserDto()
         {
             UserGroupDtos = new List<UserGroupDto>();
+            UserStartNodeDtos = new List<UserStartNodeDto>();
         }
 
         [Column("id")]
@@ -27,14 +28,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("userNoConsole")]
         [Constraint(Default = "0")]
         public bool NoConsole { get; set; }
-
-        [Column("startStructureID")]
-        public int ContentStartId { get; set; }
-
-        [Column("startMediaID")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public int? MediaStartId { get; set; }
-
+        
         [Column("userName")]
         public string UserName { get; set; }
 
@@ -88,5 +82,8 @@ namespace Umbraco.Core.Models.Rdbms
 
         [ResultColumn]
         public List<UserGroupDto> UserGroupDtos { get; set; }
+
+        [ResultColumn]
+        public List<UserStartNodeDto> UserStartNodeDtos { get; set; }
     }
 }

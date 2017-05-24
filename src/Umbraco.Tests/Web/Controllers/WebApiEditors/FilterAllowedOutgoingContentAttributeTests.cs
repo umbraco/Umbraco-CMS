@@ -83,7 +83,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
 
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.StartContentId).Returns(5);
+            userMock.Setup(u => u.StartContentIds).Returns(new []{ 5 });
             var user = userMock.Object;
             
             att.FilterBasedOnStartNode(list, user);
@@ -105,7 +105,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.StartContentId).Returns(-1);
+            userMock.Setup(u => u.StartContentIds).Returns(new int[0]);
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();

@@ -21,8 +21,8 @@ namespace Umbraco.Core.Models.Identity
                 .ForMember(user => user.PasswordHash, expression => expression.MapFrom(user => GetPasswordHash(user.RawPasswordValue)))
                 .ForMember(user => user.Culture, expression => expression.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
                 .ForMember(user => user.Name, expression => expression.MapFrom(user => user.Name))
-                .ForMember(user => user.StartMediaId, expression => expression.MapFrom(user => user.StartMediaId))
-                .ForMember(user => user.StartContentId, expression => expression.MapFrom(user => user.StartContentId))
+                .ForMember(user => user.StartMediaIds, expression => expression.MapFrom(user => user.StartMediaIds))
+                .ForMember(user => user.StartContentIds, expression => expression.MapFrom(user => user.StartContentIds))
                 .ForMember(user => user.AccessFailedCount, expression => expression.MapFrom(user => user.FailedPasswordAttempts))
                 .ForMember(user => user.Groups, expression => expression.MapFrom(user => user.Groups.ToArray()))
                 .ForMember(user => user.AllowedSections, expression => expression.MapFrom(user => user.AllowedSections.ToArray()));
@@ -33,8 +33,8 @@ namespace Umbraco.Core.Models.Identity
                 .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections))
                 .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups))
                 .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
-                .ForMember(detail => detail.StartContentNode, opt => opt.MapFrom(user => user.StartContentId))
-                .ForMember(detail => detail.StartMediaNode, opt => opt.MapFrom(user => user.StartMediaId))
+                .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.StartContentIds))
+                .ForMember(detail => detail.StartMediaNodes, opt => opt.MapFrom(user => user.StartMediaIds))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.UserName))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.Culture))
                 .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));

@@ -294,8 +294,8 @@ namespace umbraco.BasePages
                 RealName = u.Name,
                 //currently we only have one user type!
                 Roles = u.GetGroups(),
-                StartContentNode = u.StartNodeId,
-                StartMediaNode = u.StartMediaId,
+                StartContentNodes = u.UserEntity.StartContentIds,
+                StartMediaNodes = u.UserEntity.StartMediaIds,
                 Username = u.LoginName,
                 Culture = ui.Culture(u)
 

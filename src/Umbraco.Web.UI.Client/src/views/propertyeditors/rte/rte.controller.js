@@ -250,7 +250,7 @@ angular.module("umbraco")
                             onlyImages: true,
                             showDetails: true,
                             disableFolderSelect: true,
-                            startNodeId: userData.startMediaId,
+                            startNodeId: userData.startMediaIds.length === 0 ? -1 : userData.startMediaIds[0],
                             view: "mediapicker",
                             show: true,
                             submit: function(model) {

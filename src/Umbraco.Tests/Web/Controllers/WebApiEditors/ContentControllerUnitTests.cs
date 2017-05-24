@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.StartContentId).Returns(-1);
+            userMock.Setup(u => u.StartContentIds).Returns(new int[0]);
             var user = userMock.Object;
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.StartContentId).Returns(-1);
+            userMock.Setup(u => u.StartContentIds).Returns(new int[0]);
             var user = userMock.Object;
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.StartContentId).Returns(9876);
+            userMock.Setup(u => u.StartContentIds).Returns(new[]{ 9876 });
             var user = userMock.Object;
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
@@ -89,7 +89,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.StartContentId).Returns(-1);
+            userMock.Setup(u => u.StartContentIds).Returns(new int[0]);
             var user = userMock.Object;
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
@@ -118,7 +118,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.StartContentId).Returns(-1);
+            userMock.Setup(u => u.StartContentIds).Returns(new int[0]);
             var user = userMock.Object;
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
@@ -147,7 +147,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.StartContentId).Returns(-1);
+            userMock.Setup(u => u.StartContentIds).Returns(new int[0]);
             var user = userMock.Object;
             
             //act
@@ -163,7 +163,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.StartContentId).Returns(-1);
+            userMock.Setup(u => u.StartContentIds).Returns(new int[0]);
             var user = userMock.Object;
             
             //act
@@ -179,7 +179,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.StartContentId).Returns(1234);
+            userMock.Setup(u => u.StartContentIds).Returns(new []{ 1234 });
             var user = userMock.Object;
 
             //act
@@ -195,7 +195,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.StartContentId).Returns(1234);
+            userMock.Setup(u => u.StartContentIds).Returns(new []{ 1234 });
             var user = userMock.Object;
 
             //act
@@ -211,7 +211,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.StartContentId).Returns(-1);
+            userMock.Setup(u => u.StartContentIds).Returns(new int[0]);
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
@@ -235,7 +235,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.StartContentId).Returns(-1);
+            userMock.Setup(u => u.StartContentIds).Returns(new int[0]);
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
@@ -259,7 +259,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.StartContentId).Returns(-1);
+            userMock.Setup(u => u.StartContentIds).Returns(new int[0]);
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
@@ -283,7 +283,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.StartContentId).Returns(-1);
+            userMock.Setup(u => u.StartContentIds).Returns(new int[0]);
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();

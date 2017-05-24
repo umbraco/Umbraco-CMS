@@ -44,9 +44,9 @@ namespace Umbraco.Web.WebApi.Filters
             FilterBasedOnPermissions(items, user, ApplicationContext.Current.Services.UserService);
         }
 
-        protected override int GetUserStartNode(IUser user)
+        protected override int[] GetUserStartNodes(IUser user)
         {
-            return user.StartContentId;
+            return user.StartContentIds;
         }
 
         protected override int RecycleBinId

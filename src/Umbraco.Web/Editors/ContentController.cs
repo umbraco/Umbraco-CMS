@@ -800,16 +800,16 @@ namespace Umbraco.Web.Editors
             }
 
             var hasPathAccess = (nodeId == Constants.System.Root)
-                                                            ? UserExtensions.HasPathAccess(
-                                                                    Constants.System.Root.ToInvariantString(),
-                                                                    user.StartContentId,
-                                                                    Constants.System.RecycleBinContent)
-                                                            : (nodeId == Constants.System.RecycleBinContent)
-                                                                        ? UserExtensions.HasPathAccess(
-                                                                                Constants.System.RecycleBinContent.ToInvariantString(),
-                                                                                user.StartContentId,
-                                                                                Constants.System.RecycleBinContent)
-                                                                        : user.HasPathAccess(contentItem);
+                ? UserExtensions.HasPathAccess(
+                    Constants.System.Root.ToInvariantString(),
+                    user.StartContentIds,
+                    Constants.System.RecycleBinContent)
+                : (nodeId == Constants.System.RecycleBinContent)
+                    ? UserExtensions.HasPathAccess(
+                        Constants.System.RecycleBinContent.ToInvariantString(),
+                        user.StartContentIds,
+                        Constants.System.RecycleBinContent)
+                    : user.HasPathAccess(contentItem);
 
             if (hasPathAccess == false)
             {

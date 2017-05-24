@@ -49,24 +49,34 @@ namespace Umbraco.Core.Models
         {
             if (user == null) throw new ArgumentNullException("user");
             if (content == null) throw new ArgumentNullException("content");
-            return HasPathAccess(content.Path, user.StartContentId, Constants.System.RecycleBinContent);
+            return HasPathAccess(content.Path, user.StartContentIds, Constants.System.RecycleBinContent);
         }
 
-        internal static bool HasPathAccess(string path, int startNodeId, int recycleBinId)
+        internal static bool HasPathAccess(string path, int[] startNodeIds, int recycleBinId)
         {
             Mandate.ParameterNotNullOrEmpty(path, "path");
 
             var formattedPath = "," + path + ",";
-            var formattedStartNodeId = "," + startNodeId.ToInvariantString() + ",";
             var formattedRecycleBinId = "," + recycleBinId.ToInvariantString() + ",";
 
             //only users with root access have access to the recycle bin
             if (formattedPath.Contains(formattedRecycleBinId))
             {
-                return startNodeId == Constants.System.Root;
+                var hasAccess = startNodeIds.Length == 0 || startNodeIds.Contains(Constants.System.Root);
+                return hasAccess;
             }
 
-            return formattedPath.Contains(formattedStartNodeId);
+            //check for normal paths
+            foreach (var startNodeId in startNodeIds)
+            {                
+                var formattedStartNodeId = "," + startNodeId.ToInvariantString() + ",";
+
+                var hasAccess = formattedPath.Contains(formattedStartNodeId);
+                if (hasAccess)
+                    return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -79,7 +89,7 @@ namespace Umbraco.Core.Models
         {
             if (user == null) throw new ArgumentNullException("user");
             if (media == null) throw new ArgumentNullException("media");
-            return HasPathAccess(media.Path, user.StartMediaId, Constants.System.RecycleBinMedia);
+            return HasPathAccess(media.Path, user.StartMediaIds, Constants.System.RecycleBinMedia);
         }
         
         /// <summary>

@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Relators
     {
         private UserDto _currentUser;
 
-        internal UserDto Map(UserDto user, UserGroupDto group, UserGroup2AppDto section)
+        internal UserDto Map(UserDto user, UserGroupDto group, UserGroup2AppDto section, UserStartNodeDto startNode)
         {
             // Terminating call.  Since we can return null from this function
             // we need to be ready for PetaPoco to callback later with null
@@ -20,6 +20,7 @@ namespace Umbraco.Core.Persistence.Relators
             if (_currentUser != null && _currentUser.Id == user.Id)
             {
                 AddOrUpdateGroup(group, section);
+                AddOrUpdateStartNode(startNode);
 
                 // Return null to indicate we're not done with this object yet
                 return null;
@@ -34,11 +35,31 @@ namespace Umbraco.Core.Persistence.Relators
             // Setup the new current user
             _currentUser = user;
             _currentUser.UserGroupDtos = new List<UserGroupDto>();
+            _currentUser.UserStartNodeDtos = new List<UserStartNodeDto>();
 
             AddOrUpdateGroup(group, section);
+            AddOrUpdateStartNode(startNode);
 
             // Return the now populated previous user (or null if first time through)
             return prev;
+        }
+
+        private void AddOrUpdateStartNode(UserStartNodeDto startNode)
+        {
+            //this can be null since we are left joining
+            if (startNode == null || startNode.Id == default(int))
+                return;
+
+            //check if this is a new start node
+            var latestStartNode = _currentUser.UserStartNodeDtos.Count > 0
+                ? _currentUser.UserStartNodeDtos[_currentUser.UserStartNodeDtos.Count - 1]
+                : null;
+
+            if (latestStartNode == null || latestStartNode.Id != startNode.Id)
+            {
+                //add the current (new) start node
+                _currentUser.UserStartNodeDtos.Add(startNode);
+            }            
         }
 
         private void AddOrUpdateGroup(UserGroupDto group, UserGroup2AppDto section)
@@ -50,21 +71,21 @@ namespace Umbraco.Core.Persistence.Relators
             }
 
             //this can be null since we are doing a left join
-            if (group != null && group.Alias.IsNullOrWhiteSpace() == false)
-            {
-                //check if this is a new group
-                var latestGroup = _currentUser.UserGroupDtos.Count > 0
-                    ? _currentUser.UserGroupDtos[_currentUser.UserGroupDtos.Count - 1]
-                    : null;
+            if (group == null || group.Alias.IsNullOrWhiteSpace())
+                return;
 
-                if (latestGroup == null || latestGroup.Id != group.Id)
-                {
-                    //add the current (new) group
-                    _currentUser.UserGroupDtos.Add(group);
-                }
-                
-                AddSection(section);
+            //check if this is a new group
+            var latestGroup = _currentUser.UserGroupDtos.Count > 0
+                ? _currentUser.UserGroupDtos[_currentUser.UserGroupDtos.Count - 1]
+                : null;
+
+            if (latestGroup == null || latestGroup.Id != group.Id)
+            {
+                //add the current (new) group
+                _currentUser.UserGroupDtos.Add(group);
             }
+                
+            AddSection(section);
         }
 
         private void AddSection(UserGroup2AppDto section)

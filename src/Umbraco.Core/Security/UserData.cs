@@ -48,10 +48,10 @@ namespace Umbraco.Core.Security
         public string RealName { get; set; }
 
         [DataMember(Name = "startContent")]
-        public int StartContentNode { get; set; }
+        public int[] StartContentNodes { get; set; }
 
         [DataMember(Name = "startMedia")]
-        public int StartMediaNode { get; set; }
+        public int[] StartMediaNodes { get; set; }
 
         [DataMember(Name = "allowedApps")]
         public string[] AllowedApplications { get; set; }

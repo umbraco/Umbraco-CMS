@@ -597,6 +597,36 @@ namespace Umbraco.Web.Editors
             return ExamineSearch(query, entityType, 200, 0, out total, searchFrom);
         }
 
+        private void AddExamineSearchFrom(string searchFrom, StringBuilder sb)
+        {
+            //if searchFrom is specified and it is greater than 0
+            int mediaSearchFrom;
+            if (searchFrom != null && int.TryParse(searchFrom, out mediaSearchFrom) && mediaSearchFrom > 0)
+            {
+                sb.Append("+__Path: \\-1*\\,");
+                sb.Append(mediaSearchFrom.ToString(CultureInfo.InvariantCulture));
+                sb.Append("\\,* ");
+            }
+        }
+
+        private void AddExamineUserStartNode(int[] startNodes, StringBuilder sb)
+        {
+            //make sure only what the user is configured to view is found
+            if (startNodes.Length > 0)
+                sb.Append("+(");
+            foreach (var startNode in startNodes)
+            {
+                if (startNode > 0)
+                {
+                    sb.Append("__Path: \\-1*\\,");
+                    sb.Append(startNode.ToString(CultureInfo.InvariantCulture));
+                    sb.Append("\\,* ");
+                }
+            }
+            if (startNodes.Length > 0)
+                sb.Append(")");
+        }
+
         /// <summary>
         /// Searches for results based on the entity type
         /// </summary>
@@ -636,34 +666,16 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Media:
                     type = "media";
 
-                    var mediaSearchFrom = int.MinValue;
+                    AddExamineSearchFrom(searchFrom, sb);
+                    AddExamineUserStartNode(Security.CurrentUser.StartMediaIds, sb);
 
-                    if (Security.CurrentUser.StartMediaId > 0 ||
-                        //if searchFrom is specified and it is greater than 0
-                        (searchFrom != null && int.TryParse(searchFrom, out mediaSearchFrom) && mediaSearchFrom > 0))
-                    {
-                        sb.Append("+__Path: \\-1*\\,");
-                        sb.Append(mediaSearchFrom > 0
-                            ? mediaSearchFrom.ToString(CultureInfo.InvariantCulture)
-                            : Security.CurrentUser.StartMediaId.ToString(CultureInfo.InvariantCulture));
-                        sb.Append("\\,* ");
-                    }
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
 
-                    var contentSearchFrom = int.MinValue;
-
-                    if (Security.CurrentUser.StartContentId > 0 || 
-                        //if searchFrom is specified and it is greater than 0
-                        (searchFrom != null && int.TryParse(searchFrom, out contentSearchFrom) && contentSearchFrom > 0))
-                    {
-                        sb.Append("+__Path: \\-1*\\,");
-                        sb.Append(contentSearchFrom > 0
-                            ? contentSearchFrom.ToString(CultureInfo.InvariantCulture)
-                            : Security.CurrentUser.StartContentId.ToString(CultureInfo.InvariantCulture));
-                        sb.Append("\\,* ");
-                    }
+                    AddExamineSearchFrom(searchFrom, sb);
+                    AddExamineUserStartNode(Security.CurrentUser.StartContentIds, sb);
+                    
                     break;
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);                    
