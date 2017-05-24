@@ -56,7 +56,28 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
         /// <returns>The return value of the command.</returns>
         protected override object ExecuteScalar(string commandText, MSC.MySqlParameter[] parameters)
         {
-            return MSC.MySqlHelper.ExecuteScalar(ConnectionString, commandText, parameters);
+            using (var cc = UseCurrentConnection)
+            {
+                return ExecuteScalar((MSC.MySqlConnection) cc.Connection, (MSC.MySqlTransaction) cc.Transaction, commandText, parameters);
+            }
+        }
+
+        // copied & adapted from MySqlHelper
+        private static object ExecuteScalar(MSC.MySqlConnection connection, MSC.MySqlTransaction trx, string commandText, params MSC.MySqlParameter[] commandParameters)
+        {
+            var mySqlCommand = new MSC.MySqlCommand();
+            mySqlCommand.Connection = connection;
+            if (trx != null) mySqlCommand.Transaction = trx;
+            mySqlCommand.CommandText = commandText;
+            mySqlCommand.CommandType = CommandType.Text;
+            if (commandParameters != null)
+            {
+                foreach (var commandParameter in commandParameters)
+                    mySqlCommand.Parameters.Add(commandParameter);
+            }
+            var obj = mySqlCommand.ExecuteScalar();
+            mySqlCommand.Parameters.Clear();
+            return obj;
         }
 
         /// <summary>Executes a command and returns the number of rows affected.</summary>
@@ -67,7 +88,28 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
         /// </returns>
         protected override int ExecuteNonQuery(string commandText, MSC.MySqlParameter[] parameters)
         {
-            return MSC.MySqlHelper.ExecuteNonQuery(ConnectionString, commandText, parameters);
+            using (var cc = UseCurrentConnection)
+            {
+                return ExecuteNonQuery((MSC.MySqlConnection) cc.Connection, (MSC.MySqlTransaction)cc.Transaction, commandText, parameters);
+            }
+        }
+
+        // copied & adapted from MySqlHelper
+        public static int ExecuteNonQuery(MSC.MySqlConnection connection, MSC.MySqlTransaction trx, string commandText, params MSC.MySqlParameter[] commandParameters)
+        {
+            var mySqlCommand = new MSC.MySqlCommand();
+            mySqlCommand.Connection = connection;
+            if (trx != null) mySqlCommand.Transaction = trx;
+            mySqlCommand.CommandText = commandText;
+            mySqlCommand.CommandType = CommandType.Text;
+            if (commandParameters != null)
+            {
+                foreach (var commandParameter in commandParameters)
+                    mySqlCommand.Parameters.Add(commandParameter);
+            }
+            var num = mySqlCommand.ExecuteNonQuery();
+            mySqlCommand.Parameters.Clear();
+            return num;
         }
 
         /// <summary>Executes a command and returns a records reader containing the results.</summary>
@@ -78,7 +120,28 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
         /// </returns>
         protected override IRecordsReader ExecuteReader(string commandText, MSC.MySqlParameter[] parameters)
         {
-            return new MySqlDataReader(MSC.MySqlHelper.ExecuteReader(ConnectionString, commandText, parameters));
+            using (var cc = UseCurrentConnection)
+            {
+                return new MySqlDataReader(ExecuteReader((MSC.MySqlConnection) cc.Connection, (MSC.MySqlTransaction) cc.Transaction, commandText, parameters));
+            }
+        }
+
+        // copied & adapted from MySqlHelper
+        private static MSC.MySqlDataReader ExecuteReader(MSC.MySqlConnection connection, MSC.MySqlTransaction trx, string commandText, MSC.MySqlParameter[] commandParameters)
+        {
+            MSC.MySqlCommand mySqlCommand = new MSC.MySqlCommand();
+            mySqlCommand.Connection = connection;
+            if (trx != null) mySqlCommand.Transaction = trx;
+            mySqlCommand.CommandText = commandText;
+            mySqlCommand.CommandType = CommandType.Text;
+            if (commandParameters != null)
+            {
+                foreach (var commandParameter in commandParameters)
+                    mySqlCommand.Parameters.Add(commandParameter);
+            }
+            MSC.MySqlDataReader mySqlDataReader = mySqlCommand.ExecuteReader();
+            mySqlCommand.Parameters.Clear();
+            return mySqlDataReader;
         }
 
         /// <summary>Converts the scalar value to the given type.</summary>

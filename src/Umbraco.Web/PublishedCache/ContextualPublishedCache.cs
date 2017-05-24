@@ -38,6 +38,18 @@ namespace Umbraco.Web.PublishedCache
         /// <summary>
         /// Gets a content identified by its unique identifier.
         /// </summary>
+        /// <param name="contentId">The content unique identifier.</param>
+        /// <returns>The content, or null.</returns>
+        /// <remarks>Considers published or unpublished content depending on context.</remarks>
+        public IPublishedContent GetById(Guid contentId)
+        {
+            var intId = UmbracoContext.Application.Services.EntityService.GetIdForKey(contentId, UmbracoObjectTypes.Document);
+            return GetById(intId.Success ? intId.Result : -1);
+        }
+
+        /// <summary>
+        /// Gets a content identified by its unique identifier.
+        /// </summary>
         /// <param name="preview">A value indicating whether to consider unpublished content.</param>
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The content, or null.</returns>

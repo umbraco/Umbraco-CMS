@@ -477,20 +477,20 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             }
 
             return umbRequestHelper.resourcePromise(
-                  $http.get(
-                        umbRequestHelper.getApiUrl(
-                              "contentApiBaseUrl",
-                              "GetChildren",
-                              [
-                                    { id: parentId },
-                                    { pageNumber: options.pageNumber },
-                                    { pageSize: options.pageSize },
-                                    { orderBy: options.orderBy },
-                                    { orderDirection: options.orderDirection },
-                                    { orderBySystemField: toBool(options.orderBySystemField) },
-                                    { filter: options.filter }
-                              ])),
-                  'Failed to retrieve children for content item ' + parentId);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetChildren",
+                        {
+                            id: parentId,
+                            pageNumber: options.pageNumber,
+                            pageSize: options.pageSize,
+                            orderBy: options.orderBy,
+                            orderDirection: options.orderDirection,
+                            orderBySystemField: toBool(options.orderBySystemField),
+                            filter: options.filter
+                        })),
+                'Failed to retrieve children for content item ' + parentId);
         },
 
         /**

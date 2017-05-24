@@ -48,6 +48,14 @@ namespace umbraco.cms.businesslogic.macro
 		{
 			get { return MacroEntity.Id; }
 		}
+
+        /// <summary>
+        /// key
+        /// </summary>
+	    public Guid Key
+	    {
+	        get { return MacroEntity.Key; }
+	    }
 		
 		/// <summary>
 		/// If set to true, the macro can be inserted on documents using the richtexteditor.
@@ -178,6 +186,7 @@ namespace umbraco.cms.businesslogic.macro
 	        {
 	            return MacroEntity.Properties.Select(x => new MacroProperty
 	                {
+                        Key = x.Key,
 	                    Alias = x.Alias,
 	                    Name = x.Name,
                         SortOrder = x.SortOrder,

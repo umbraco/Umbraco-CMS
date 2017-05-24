@@ -123,7 +123,6 @@
     <key alias="saveListView">Сохранить список</key>
     <key alias="select">Выбрать</key>
     <key alias="selectCurrentFolder">Выбрать текущую папку</key>
-    <key alias="selected">выбранные</key>
     <key alias="showPage">Предварительный просмотр</key>
     <key alias="showPageDisabled">Предварительный просмотр запрещен, так как документу не сопоставлен шаблон</key>
     <key alias="somethingElse">Другие действия</key>
@@ -285,6 +284,13 @@
     <key alias="noMediaTypes" version="7.0"><![CDATA[Нет ни одного разрешенного типа медиа-материалов для создания. Необходимо разрешить нужные Вам типы в секции "Установки" в дереве <strong>"Типы медиа-материалов"</strong>.]]></key>
     <key alias="updateData">Выберите тип и заголовок</key>
     <key alias="documentTypeWithoutTemplate">Тип документа без сопоставленного шаблона</key>
+    <key alias="newJavascriptFile">Новый файл javascript</key>
+    <key alias="newEmptyPartialView">Новое пустое частичное представление</key>
+    <key alias="newPartialViewMacro">Новый макрос-представление</key>
+    <key alias="newPartialViewFromSnippet">Новое частичное представление по образцу</key>
+    <key alias="newEmptyPartialViewMacro">Новый пустой макрос-представление</key>
+    <key alias="newPartialViewMacroFromSnippet">Новый макрос-представление по образцу</key>
+    <key alias="newPartialViewMacroNoMacro">Новый макрос-представление (без регистрации макроса)</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Обзор сайта</key>
@@ -409,6 +415,9 @@
     <key alias="rteRelatedStylesheets">Сопоставленные стили CSS</key>
     <key alias="rteShowLabel">Показать метку</key>
     <key alias="rteWidthAndHeight">Ширина и высота</key>
+  </area>
+  <area alias="emptyStates">
+    <key alias="emptyDictionaryTree">Нет доступных элементов словаря</key>
   </area>
   <area alias="errorHandling">
     <key alias="errorButDataWasSaved">Ваши данные сохранены, но для того, чтобы опубликовать этот документ, Вы должны сначала исправить следующие ошибки:</key>
@@ -993,6 +1002,7 @@
     <key alias="installStateInstalling">Установка...</key>
     <key alias="installStateRestarting">Перезапуск, подождите, пожалуйста...</key>
     <key alias="installStateComplete">Все готово, сейчас браузер перезагрузит страницу, подождите, пожалуйста...</key>
+    <key alias="installStateCompleted">Пожалуйста, нажмите кнопку 'finish' для завершения установки и перезагрузки страницы.</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Вставить, полностью сохранив форматирование (не рекомендуется)</key>
@@ -1012,6 +1022,7 @@
     <key alias="password">Укажите пароль</key>
     <key alias="search">Что искать...</key>
     <key alias="username">Укажите имя пользователя</key>
+    <key alias="usernameHint">Имя пользователя (часто это Ваш email-адрес)</key>
   </area>
   <area alias="prompt">
     <key alias="stay">Остаться</key>
@@ -1022,7 +1033,7 @@
   <area alias="publicAccess">
     <key alias="paAdvanced">Расширенный: Защита на основе ролей (групп)</key>
     <key alias="paAdvancedHelp"><![CDATA[Применяйте, если желаете контролировать доступ к документу на основе ролевой модели безопасности,<br /> с использованием групп участников Umbraco.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Вам необходимо создать хотя бы одну группу участников<br /> для применения ролевой модели безопасности.]]></key>
+    <key alias="paAdvancedNoGroups">Вам необходимо создать хотя бы одну группу участников для применения ролевой модели безопасности.</key>
     <key alias="paErrorPage">Страница сообщения об ошибке</key>
     <key alias="paErrorPageHelp">Используется в случае, когда пользователь авторизован в системе, но не имеет доступа к документу.</key>
     <key alias="paHowWould">Выберите способ ограничения доступа к документу</key>
@@ -1119,9 +1130,9 @@
     <key alias="statistics">Статистика</key>
     <key alias="translation">Перевод</key>
     <key alias="users">Пользователи</key>
-    <key alias="addIcon">Добавить значок</key>
   </area>
   <area alias="settings">
+    <key alias="addIcon">Добавить значок</key>
     <key alias="asAContentMasterType">в качестве родительского типа. Вкладки родительского типа не показаны и могут быть изменены непосредственно в родительском типе</key>
     <key alias="contentTypeEnabled">Родительский тип контента разрешен</key>
     <key alias="contentTypeUses">Данный тип контента использует</key>
@@ -1158,6 +1169,16 @@
 
     <key alias="toggleListView">В формате списка</key>
     <key alias="toggleAllowAsRoot">Разрешить в качестве корневого</key>
+
+    <key alias="commentLine">Закомментировать/раскомментировать строки</key>
+    <key alias="removeLine">Удалить строку</key>
+    <key alias="copyLineUp">Копировать строки вверх</key>
+    <key alias="copyLineDown">Копировать строки вниз</key>
+    <key alias="moveLineUp">Переместить строки вверх</key>
+    <key alias="moveLineDown">Переместить строки вниз</key>
+    
+    <key alias="generalHeader">Общее</key>
+    <key alias="editorHeader">Редактор</key>
   </area>
   <area alias="sort">
     <key alias="sortOrder">Порядок сортировки</key>
@@ -1178,6 +1199,7 @@
     <key alias="contentTypeTabDeletedText">Вкладка с идентификатором (id): %0% удалена</key>
     <key alias="contentUnpublished">Документ скрыт (публикация отменена)</key>
     <key alias="cssErrorHeader">Стиль CSS не сохранен</key>
+    <key alias="cssErrorText">При сохранении файла произошла ошибка.</key>
     <key alias="cssSavedHeader">Стиль CSS сохранен</key>
     <key alias="cssSavedText">Стиль CSS сохранен без ошибок</key>
     <key alias="dataTypeSaved">Тип данных сохранен</key>
@@ -1202,9 +1224,13 @@
     <key alias="fileErrorText">Файл не может быть сохранен. Пожалуйста, проверьте установки файловых разрешений</key>
     <key alias="fileSavedHeader">Файл сохранен</key>
     <key alias="fileSavedText">Файл сохранен без ошибок</key>
+    <key alias="invalidUserPermissionsText">У текущего пользователя недостаточно прав, невозможно завершить операцию</key>
     <key alias="languageSaved">Язык сохранен</key>
     <key alias="mediaTypeSavedHeader">Тип медиа сохранен</key>
     <key alias="memberTypeSavedHeader">Тип участника сохранен</key>
+    <key alias="operationCancelledHeader">Отменено</key>
+    <key alias="operationCancelledText">Операция отменена установленным сторонним расширением или блоком кода</key>
+    <key alias="operationFailedHeader">Ошибка</key>
     <key alias="partialViewErrorHeader">Представление не сохранено</key>
     <key alias="partialViewErrorText">Произошла ошибка при сохранении файла</key>
     <key alias="partialViewSavedHeader">Представление сохранено</key>
@@ -1213,10 +1239,16 @@
     <key alias="pythonErrorText">Cкрипт Python не может быть сохранен в связи с ошибками</key>
     <key alias="pythonSavedHeader">Cкрипт Python сохранен</key>
     <key alias="pythonSavedText">Cкрипт Python сохранен без ошибок</key>
+    <key alias="scriptErrorHeader">Скрипт не сохранен</key>
+    <key alias="scriptErrorText">При сохранении файла скрипта произошла ошибка</key>
+    <key alias="scriptSavedHeader">Скрипт сохранен</key>
+    <key alias="scriptSavedText">Файл скрипта сохранен без ошибок</key>
     <key alias="templateErrorHeader">Шаблон не сохранен</key>
     <key alias="templateErrorText">Пожалуйста, проверьте, что нет двух шаблонов с одним и тем же алиасом (названием)</key>
     <key alias="templateSavedHeader">Шаблон сохранен</key>
     <key alias="templateSavedText">Шаблон сохранен без ошибок</key>
+    <key alias="validationFailedHeader">Проверка значений</key>
+    <key alias="validationFailedMessage">Ошибки, найденные при проверке значений, должны быть исправлены, чтобы было возможно сохранить документ</key>
     <key alias="xsltErrorHeader">XSLT-документ не сохранен</key>
     <key alias="xsltErrorText">XSLT-документ содержит одну или несколько ошибок</key>
     <key alias="xsltPermissionErrorText">XSLT-документ не может быть сохранен, проверьте установки файловых разрешений</key>
@@ -1232,14 +1264,106 @@
     <key alias="styles">Стили</key>
   </area>
   <area alias="template">
-    <key alias="edittemplate">Править шаблон</key>
+    <key alias="edittemplate">Изменить шаблон</key>
+
+    <key alias="insertSections">Секции</key>
     <key alias="insertContentArea">Вставить контент-область</key>
     <key alias="insertContentAreaPlaceHolder">Вставить контейнер (placeholder)</key>
-    <key alias="insertDictionaryItem">Вставить статью словаря</key>
-    <key alias="insertMacro">Вставить макрос</key>
-    <key alias="insertPageField">Вставить поле документа</key>
+
+    <key alias="insert">Вставить</key>
+    <key alias="insertDesc">Выберите, что хотите вставить в шаблон</key>
+    
+    <key alias="insertDictionaryItem">Статью словаря</key>
+    <key alias="insertDictionaryItemDesc">Статья словаря - это контейнер для части текста, переводимой на разные языки, это позволяет упростить создание многоязычных сайтов.</key>
+    
+    <key alias="insertMacro">Макрос</key>
+    <key alias="insertMacroDesc">
+      Макросы - это настраиваемые компоненты, которые хорошо подходят для
+      реализации переиспользуемых блоков, (особенно, если необходимо менять их внешний вид и/или поведение при помощи параметров)
+      таких как галереи, формы, списки и т.п.
+    </key>
+
+    <key alias="insertPageField">Значение поля</key>
+    <key alias="insertPageFieldDesc">Отображает значение указанного поля данных текущей страницы,
+      с возможностью указать альтернативные поля и/или подстановку константы.
+    </key>
+    
+    <key alias="insertPartialView">Частичное представление</key>
+    <key alias="insertPartialViewDesc">
+      Частичное представление - это шаблон в отдельном файле, который может быть вызван для отображения внутри
+      другого шаблона, хорошо подходит для реализации переиспользуемых фрагментов разметки или для разбиения сложных шаблонов на составные части.
+    </key>
+    
     <key alias="mastertemplate">Мастер-шаблон</key>
-    <key alias="quickGuide">Краткая справка по тэгам шаблонов Umbraco</key>
+    <key alias="noMastertemplate">Без мастер-шаблона</key>
+    <key alias="noMaster">Не выбран</key>
+
+    <key alias="renderBody">Вставить дочерний шаблон</key>
+    <key alias="renderBodyDesc">
+      <![CDATA[
+     Отображает содержимое дочернего шаблона, при помощи вставки конструкции
+     <code>@RenderBody()</code> в выбранном месте.
+      ]]>
+    </key>   
+    
+    <key alias="defineSection">Определить именованную секцию</key>
+    <key alias="defineSectionDesc">
+      <![CDATA[
+         Определяет специальную область шаблона как именованную секцию путем оборачивания ее в конструкцию
+          <code>@section { ... }</code>. Такая секци может быть отображена в нужном месте родительского шаблона
+          при помощи конструкции <code>@RenderSection</code>.
+      ]]>
+    </key>
+
+    <key alias="renderSection">Вставить именованную секцию</key>
+    <key alias="renderSectionDesc">
+      <![CDATA[
+      Отображает содержимое именованной области дочернего шаблона, при помощи вставки конструкции <code>@RenderSection(name)</code>.
+      Таким образом из дочернего шаблона отображается содержимое внутри конструкции <code>@section [name]{ ... }</code>.
+      ]]>
+    </key>
+
+    <key alias="sectionName">Название секции</key>
+    <key alias="sectionMandatory">Секция обязательна</key>
+    <key alias="sectionMandatoryDesc">
+      Если секция помечена как обязательная, то дочерний шаблон должен обязательно содержать ее определение <code>@section</code>, в противном случае генерируется ошибка.
+    </key>   
+    
+    <key alias="queryBuilder">Генератор запросов</key>
+    <key alias="itemsReturned">элементов в результате, за</key>
+
+    <key alias="iWant">Мне нужны</key>   
+    <key alias="allContent">все документы</key>
+    <key alias="contentOfType">документы типа &quot;%0%&quot;</key>
+    <key alias="from">из</key>
+    <key alias="websiteRoot">всего сайта</key>
+    <key alias="where">где</key>
+    <key alias="and">и</key>
+    
+    <key alias="is">равна</key>
+    <key alias="isNot">не равна</key>
+    <key alias="before">до</key>
+    <key alias="beforeIncDate">до (включая выбранную дату)</key>
+    <key alias="after">после</key>
+    <key alias="afterIncDate">после (включая выбранную дату)</key>
+    <key alias="equals">равно</key>
+    <key alias="doesNotEqual">не равно</key>
+    <key alias="contains">содержит</key>
+    <key alias="doesNotContain">не содержит</key>
+    <key alias="greaterThan">больше, чем</key>
+    <key alias="greaterThanEqual">больше или равно</key>
+    <key alias="lessThan">меньше, чем</key>
+    <key alias="lessThanEqual">меньше или равно</key>
+
+    <key alias="id">Id</key>
+    <key alias="name">Название</key>
+    <key alias="createdDate">Создан</key>
+    <key alias="lastUpdatedDate">Обновлен</key>
+
+    <key alias="orderBy">сортировать</key>
+    <key alias="ascending">по возрастанию</key>
+    <key alias="descending">по убыванию</key>    
+    
     <key alias="template">Шаблон</key>
   </area>
   <area alias="templateEditor">
@@ -1343,6 +1467,7 @@
     <key alias="packager">Пакеты дополнений</key>
     <key alias="packages">Пакеты дополнений</key>
     <key alias="python">Скрипты Python</key>
+    <key alias="relationTypes">Типы связей</key>
     <key alias="repositories">Установить из репозитория</key>
     <key alias="runway">Установить Runway</key>
     <key alias="runwayModules">Модули Runway </key>
@@ -1361,6 +1486,7 @@
   <area alias="user">
     <key alias="administrators">Администратор</key>
     <key alias="categoryField">Поле категории</key>
+    <key alias="change">Изменить</key>
     <key alias="changePassword">Изменить пароль</key>
     <key alias="changePasswordDescription">Вы можете сменить свой пароль для доступа к административной панели Umbraco, заполнив нижеследующие поля и нажав на кнопку 'Изменить пароль'</key>
     <key alias="confirmNewPassword">Подтверждение нового пароля</key>

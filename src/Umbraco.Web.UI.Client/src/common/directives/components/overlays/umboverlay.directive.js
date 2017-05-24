@@ -478,8 +478,10 @@ Opens an overlay to show a custom YSOD. </br>
 
                   numberOfOverlays = overlayHelper.getNumberOfOverlays();
 
-                  if(numberOfOverlays === overlayNumber) {
-                     scope.closeOverLay();
+                  if (numberOfOverlays === overlayNumber) {
+                      scope.$apply(function () {
+                          scope.closeOverLay();
+                      });
                   }
 
                   event.preventDefault();

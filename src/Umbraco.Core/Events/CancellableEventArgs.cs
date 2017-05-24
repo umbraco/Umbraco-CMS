@@ -10,8 +10,8 @@ namespace Umbraco.Core.Events
 	/// Event args for that can support cancellation
 	/// </summary>
 	[HostProtection(SecurityAction.LinkDemand, SharedState = true)]
-	public class CancellableEventArgs : EventArgs
-	{
+	public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
+    {
 		private bool _cancel;
 
         public CancellableEventArgs(bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
@@ -98,6 +98,36 @@ namespace Umbraco.Core.Events
         /// This allows for a bit of flexibility in our event raising - it's not pretty but we need to maintain backwards compatibility 
         /// so we cannot change the strongly typed nature for some events.
         /// </remarks>
-        public ReadOnlyDictionary<string, object> AdditionalData { get; private set; } 
-    }
+        public ReadOnlyDictionary<string, object> AdditionalData { get; private set; }
+
+	    public bool Equals(CancellableEventArgs other)
+	    {
+	        if (ReferenceEquals(null, other)) return false;
+	        if (ReferenceEquals(this, other)) return true;
+	        return Equals(AdditionalData, other.AdditionalData);
+	    }
+
+	    public override bool Equals(object obj)
+	    {
+	        if (ReferenceEquals(null, obj)) return false;
+	        if (ReferenceEquals(this, obj)) return true;
+	        if (obj.GetType() != this.GetType()) return false;
+	        return Equals((CancellableEventArgs) obj);
+	    }
+
+	    public override int GetHashCode()
+	    {
+	        return (AdditionalData != null ? AdditionalData.GetHashCode() : 0);
+	    }
+
+	    public static bool operator ==(CancellableEventArgs left, CancellableEventArgs right)
+	    {
+	        return Equals(left, right);
+	    }
+
+	    public static bool operator !=(CancellableEventArgs left, CancellableEventArgs right)
+	    {
+	        return !Equals(left, right);
+	    }
+	}
 }

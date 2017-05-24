@@ -36,6 +36,7 @@ namespace UmbracoExamine
         private readonly IUserService _userService;
         private readonly IContentTypeService _contentTypeService;
         private readonly EntityXmlSerializer _serializer = new EntityXmlSerializer();
+        private const int PageSize = 10000;
 
         #region Constructors
 
@@ -183,6 +184,7 @@ namespace UmbracoExamine
         /// Used to store the path of a content object
         /// </summary>
         public const string IndexPathFieldName = "__Path";
+        public const string NodeKeyFieldName = "__Key";
         public const string NodeTypeAliasFieldName = "__NodeTypeAlias";
         public const string IconFieldName = "__Icon";
 
@@ -407,8 +409,7 @@ namespace UmbracoExamine
         {
             if (SupportedTypes.Contains(type) == false)
                 return;
-
-            const int pageSize = 10000;
+            
             var pageIndex = 0;
 
             DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - Start data queries - {0}", type));
@@ -444,6 +445,7 @@ namespace UmbracoExamine
 
                                     //sorted by: umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder
                                     var result = _contentService.GetPagedXmlEntries(path, pIndex, pSize, out totalContent).ToArray();
+                                    var more = result.Length == pSize;
 
                                     //then like we do in the ContentRepository.BuildXmlCache we need to track what Parents have been processed
                                     // already so that we can then exclude implicitly unpublished content items
@@ -479,7 +481,7 @@ namespace UmbracoExamine
                                         filtered.Add(xml);
                                     }
 
-                                    return new Tuple<long, XElement[]>(totalContent, filtered.ToArray());
+                                    return Tuple.Create(filtered.ToArray(), more);
                                 },
                                 i => _contentService.GetById(i));
                         }
@@ -497,13 +499,13 @@ namespace UmbracoExamine
                                 IContent[] descendants;
                                 if (SupportUnpublishedContent)
                                 {
-                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "umbracoNode.id").ToArray();
+                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, PageSize, out total, "umbracoNode.id").ToArray();
                                 }
                                 else
                                 {
                                     //get all paged records but order by level ascending, we need to do this because we need to track which nodes are not published so that we can determine
                                     // which descendent nodes are implicitly not published
-                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "level", Direction.Ascending, true, (string)null).ToArray();
+                                    descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, PageSize, out total, "level", Direction.Ascending, true, (string)null).ToArray();
                                 }
 
                                 // need to store decendants count before filtering, in order for loop to work correctly
@@ -527,7 +529,7 @@ namespace UmbracoExamine
                                     content, notPublished).WhereNotNull(), type);
 
                                 pageIndex++;
-                            } while (currentPageSize == pageSize);
+                            } while (currentPageSize == PageSize);
                         }
 
                         break;
@@ -545,7 +547,8 @@ namespace UmbracoExamine
                             {
                                 long totalMedia;
                                 var result = _mediaService.GetPagedXmlEntries(path, pIndex, pSize, out totalMedia).ToArray();
-                                return new Tuple<long, XElement[]>(totalMedia, result);
+                                var more = result.Length == pSize;
+                                return Tuple.Create(result, more);
                             },
                             i => _mediaService.GetById(i));
 
@@ -573,39 +576,37 @@ namespace UmbracoExamine
             string type, 
             int parentId,
             Func<TContentType[]> getContentTypes, 
-            Func<string, int, int, Tuple<long, XElement[]>> getPagedXmlEntries,
+            Func<string, int, int, Tuple<XElement[], bool>> getPagedXmlEntries,
             Func<int, IContentBase> getContent)
             where TContentType: IContentTypeComposition
         {
-            const int pageSize = 10000;
-            var pageIndex = 0;            
-
-            XElement[] xElements;
+            var pageIndex = 0;
 
             var contentTypes = getContentTypes();
             var icons = contentTypes.ToDictionary(x => x.Id, y => y.Icon);
+            var parent = parentId == -1 ? null : getContent(parentId);
+            bool more;
 
             do
             {
-                long total;
+                XElement[] xElements;
+
                 if (parentId == -1)
                 {
-                    var pagedElements = getPagedXmlEntries("-1", pageIndex, pageSize);
-                    total = pagedElements.Item1;
-                    xElements = pagedElements.Item2;
+                    var pagedElements = getPagedXmlEntries("-1", pageIndex, PageSize);
+                    xElements = pagedElements.Item1;
+                    more = pagedElements.Item2;
+                }
+                else if (parent == null)
+                {
+                    xElements = new XElement[0];
+                    more = false;
                 }
                 else
                 {
-                    //Get the parent
-                    var parent = getContent(parentId);
-                    if (parent == null)
-                        xElements = new XElement[0];
-                    else
-                    {
-                        var pagedElements = getPagedXmlEntries(parent.Path, pageIndex, pageSize);
-                        total = pagedElements.Item1;
-                        xElements = pagedElements.Item2;
-                    }
+                    var pagedElements = getPagedXmlEntries(parent.Path, pageIndex, PageSize);
+                    xElements = pagedElements.Item1;
+                    more = pagedElements.Item2;
                 }
 
                 //if specific types are declared we need to post filter them
@@ -626,7 +627,7 @@ namespace UmbracoExamine
 
                 AddNodesToIndex(xElements, type);
                 pageIndex++;
-            } while (xElements.Length == pageSize);
+            } while (more);
         }
 
         internal static IEnumerable<XElement> GetSerializedContent(
@@ -727,18 +728,23 @@ namespace UmbracoExamine
 
             //ensure the special path and node type alias fields is added to the dictionary to be saved to file
             var path = e.Node.Attribute("path").Value;
-            if (!e.Fields.ContainsKey(IndexPathFieldName))
+            if (e.Fields.ContainsKey(IndexPathFieldName) == false)
                 e.Fields.Add(IndexPathFieldName, path);
 
             //this needs to support both schema's so get the nodeTypeAlias if it exists, otherwise the name
             var nodeTypeAlias = e.Node.Attribute("nodeTypeAlias") == null ? e.Node.Name.LocalName : e.Node.Attribute("nodeTypeAlias").Value;
-            if (!e.Fields.ContainsKey(NodeTypeAliasFieldName))
+            if (e.Fields.ContainsKey(NodeTypeAliasFieldName) == false)
                 e.Fields.Add(NodeTypeAliasFieldName, nodeTypeAlias);
 
             //add icon 
             var icon = (string)e.Node.Attribute("icon");
-            if (!e.Fields.ContainsKey(IconFieldName))
-                e.Fields.Add(IconFieldName, icon);  
+            if (e.Fields.ContainsKey(IconFieldName) == false)
+                e.Fields.Add(IconFieldName, icon);
+
+            //add guid 
+            var guid = (string)e.Node.Attribute("key");
+            if (e.Fields.ContainsKey(NodeKeyFieldName) == false)
+                e.Fields.Add(NodeKeyFieldName, guid);
         }
 
         /// <summary>
@@ -769,10 +775,18 @@ namespace UmbracoExamine
             //adds the special node type alias property to the index
             fields.Add(NodeTypeAliasFieldName, allValuesForIndexing[NodeTypeAliasFieldName]);
 
-            //icon
-            if (allValuesForIndexing[IconFieldName].IsNullOrWhiteSpace() == false)
+            //guid
+            string guidVal;
+            if (allValuesForIndexing.TryGetValue(NodeKeyFieldName, out guidVal) && guidVal.IsNullOrWhiteSpace() == false)
             {
-                fields.Add(IconFieldName, allValuesForIndexing[IconFieldName]);    
+                fields.Add(NodeKeyFieldName, guidVal);
+            }
+
+            //icon
+            string iconVal;
+            if (allValuesForIndexing.TryGetValue(IconFieldName, out iconVal) && iconVal.IsNullOrWhiteSpace() == false)
+            {
+                fields.Add(IconFieldName, iconVal);    
             }
 
             return fields;

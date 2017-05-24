@@ -48,6 +48,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(type => type.Key, expression => expression.Ignore())
                 .ForMember(type => type.CreateDate, expression => expression.Ignore())
                 .ForMember(type => type.UpdateDate, expression => expression.Ignore())
+                .ForMember(type => type.DeletedDate, expression => expression.Ignore())
                 .ForMember(type => type.HasIdentity, expression => expression.Ignore());
 
             config.CreateMap<DocumentTypeSave, IContentType>()
@@ -72,7 +73,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<MediaTypeSave, IMediaType>()
                 //do the base mapping
                 .MapBaseContentTypeSaveToEntity<MediaTypeSave, PropertyTypeBasic, IMediaType>(applicationContext)
-                .ConstructUsing((source) => new MediaType(source.ParentId))                
+                .ConstructUsing((source) => new MediaType(source.ParentId))
                 .AfterMap((source, dest) =>
                 {
                     ContentTypeModelMapperExtensions.AfterMapMediaTypeSaveToEntity(source, dest, applicationContext);
@@ -161,9 +162,12 @@ namespace Umbraco.Web.Models.Mapping
 
                 });
 
-            config.CreateMap<IMemberType, ContentTypeBasic>();
-            config.CreateMap<IMediaType, ContentTypeBasic>();
-            config.CreateMap<IContentType, ContentTypeBasic>();
+            config.CreateMap<IMemberType, ContentTypeBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.MemberType, content.Key)));
+            config.CreateMap<IMediaType, ContentTypeBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.MediaType, content.Key)));
+            config.CreateMap<IContentType, ContentTypeBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.DocumentType, content.Key)));
 
             config.CreateMap<PropertyTypeBasic, PropertyType>()
 

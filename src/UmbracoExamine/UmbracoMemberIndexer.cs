@@ -117,7 +117,7 @@ namespace UmbracoExamine
                 if (indexerData.UserFields.Any(x => x.Name == "_searchEmail") == false)
                 {
                     var field = new IndexField { Name = "_searchEmail" };
-                    
+
                     StaticField policy;
                     if (IndexFieldPolicies.TryGetValue("_searchEmail", out policy))
                     {
@@ -173,7 +173,8 @@ namespace UmbracoExamine
                         {
                             long totalContent;
                             var result = _memberService.GetPagedXmlEntries(pIndex, pSize, out totalContent).ToArray();
-                            return new Tuple<long, XElement[]>(totalContent, result);
+                            var more = result.Length == pSize;
+                            return Tuple.Create(result, more);
                         },
                         i => _memberService.GetById(i));
                 }
@@ -219,7 +220,7 @@ namespace UmbracoExamine
             {
                 stopwatch.Stop();
             }
-            
+
             DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - End data queries - {0}, took {1}ms", type, stopwatch.ElapsedMilliseconds));
         }
 
@@ -232,27 +233,8 @@ namespace UmbracoExamine
         protected override XDocument GetXDocument(string xPath, string type)
         {
             throw new NotSupportedException();
-        }
-
-        protected override Dictionary<string, string> GetSpecialFieldsToIndex(Dictionary<string, string> allValuesForIndexing)
-        {
-            var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
-
-            //adds the special key property to the index
-            string valuesForIndexing;
-            if (allValuesForIndexing.TryGetValue("__key", out valuesForIndexing))
-            {
-                if (fields.ContainsKey("__key") == false)
-                {
-                    fields.Add("__key", valuesForIndexing);
-                }
-            }
-                
-
-            return fields;
-
-        }
-
+        }       
+        
         /// <summary>
         /// Add the special __key and _searchEmail fields
         /// </summary>
@@ -263,8 +245,8 @@ namespace UmbracoExamine
 
             if (e.Node.Attribute("key") != null)
             {
-                if (e.Fields.ContainsKey("__key") == false)
-                    e.Fields.Add("__key", e.Node.Attribute("key").Value);
+                if (e.Fields.ContainsKey(NodeKeyFieldName) == false)
+                    e.Fields.Add(NodeKeyFieldName, e.Node.Attribute("key").Value);
             }
 
             if (e.Node.Attribute("email") != null)

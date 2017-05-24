@@ -57,7 +57,7 @@ namespace Umbraco.Web.Editors
             where TPersisted : IContentBase
         {
             //Don't update the name if it is empty
-            if (!contentItem.Name.IsNullOrWhiteSpace())
+            if (contentItem.Name.IsNullOrWhiteSpace() == false)
             {
                 contentItem.PersistedContent.Name = contentItem.Name;
             }
@@ -97,13 +97,17 @@ namespace Umbraco.Web.Editors
                 var dictionary = new Dictionary<string, object>();
                 //add the files if any
                 var files = contentItem.UploadedFiles.Where(x => x.PropertyAlias == property.Alias).ToArray();
-
+                if (files.Length > 0)
+                {
+                    dictionary.Add("files", files);                    
+                }
                 foreach (var file in files)
                     file.FileName = file.FileName.ToSafeFileName();
 
-                if (files.Any())
-                    dictionary.Add("files", files);
-                
+                // add extra things needed to figure out where to put the files
+                dictionary.Add("cuid", contentItem.PersistedContent.Key);
+                dictionary.Add("puid", dboProperty.PropertyType.Key);
+
                 var data = new ContentPropertyData(property.Value, property.PreValues, dictionary);
 
                 //get the deserialized value from the property editor

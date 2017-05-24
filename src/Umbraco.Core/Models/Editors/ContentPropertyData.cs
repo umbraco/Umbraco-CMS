@@ -16,6 +16,11 @@ namespace Umbraco.Core.Models.Editors
     /// </remarks>
     public class ContentPropertyData
     {
+        public ContentPropertyData(object value, PreValueCollection preValues) 
+            : this(value, preValues, new Dictionary<string, object>())
+        {
+        }
+
         public ContentPropertyData(object value, PreValueCollection preValues, IDictionary<string, object> additionalData)
         {
             Value = value;
@@ -28,6 +33,9 @@ namespace Umbraco.Core.Models.Editors
         /// </summary>
         public object Value { get; private set; }
 
+        /// <summary>
+        /// The pre-value collection for the content property
+        /// </summary>
         public PreValueCollection PreValues { get; private set; }
 
         /// <summary>

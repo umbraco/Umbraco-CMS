@@ -217,20 +217,45 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected string GetFileContent(string filename)
         {
-            using (var stream = FileSystem.OpenFile(filename))
-            using (var reader = new StreamReader(stream, Encoding.UTF8, true))
+            if (FileSystem.FileExists(filename) == false)
+                return null;
+
+            try
             {
-                return reader.ReadToEnd();
+                using (var stream = FileSystem.OpenFile(filename))
+                using (var reader = new StreamReader(stream, Encoding.UTF8, true))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+            catch
+            {
+                return null; // deal with race conds
             }
         }
 
-		/// <summary>
-		/// Dispose any disposable properties
-		/// </summary>
-		/// <remarks>
-		/// Dispose the unit of work
-		/// </remarks>
-		protected override void DisposeResources()
+        public long GetFileSize(string filename)
+        {
+            if (FileSystem.FileExists(filename) == false)
+                return -1;
+
+            try
+            {
+                return FileSystem.GetSize(filename);
+            }
+            catch
+            {
+                return -1; // deal with race conds
+            }
+        }
+
+        /// <summary>
+        /// Dispose any disposable properties
+        /// </summary>
+        /// <remarks>
+        /// Dispose the unit of work
+        /// </remarks>
+        protected override void DisposeResources()
 		{
 			_work.DisposeIfDisposable();
 		}

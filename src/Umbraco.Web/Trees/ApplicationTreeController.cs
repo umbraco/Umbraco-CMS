@@ -30,16 +30,17 @@ namespace Umbraco.Web.Trees
         /// <param name="application">The application to load tree for</param>
         /// <param name="tree">An optional single tree alias, if specified will only load the single tree for the request app</param>
         /// <param name="queryStrings"></param>
+        /// <param name="onlyInitialized">An optional bool (defaults to true), if set to false it will also load uninitialized trees</param>
         /// <returns></returns>
         [HttpQueryStringFilter("queryStrings")]
-        public async Task<SectionRootNode> GetApplicationTrees(string application, string tree, FormDataCollection queryStrings)
+        public async Task<SectionRootNode> GetApplicationTrees(string application, string tree, FormDataCollection queryStrings, bool onlyInitialized = true)
         {
             if (string.IsNullOrEmpty(application)) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
 
             //find all tree definitions that have the current application alias
-            var appTrees = ApplicationContext.Current.Services.ApplicationTreeService.GetApplicationTrees(application, true).ToArray();
+            var appTrees = ApplicationContext.Current.Services.ApplicationTreeService.GetApplicationTrees(application, onlyInitialized).ToArray();
 
             if (appTrees.Count() == 1 || string.IsNullOrEmpty(tree) == false )
             {

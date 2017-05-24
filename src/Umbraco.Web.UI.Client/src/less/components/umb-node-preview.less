@@ -1,0 +1,99 @@
+.umb-node-preview {
+    padding: 5px 15px;
+    margin-bottom: 5px;
+    background: @gray-10;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    max-width: 66.6%;
+    box-sizing: border-box;
+}
+
+.umb-node-preview--sortable {
+    cursor: move;
+}
+
+.umb-node-preview--unpublished {
+    .umb-node-preview__icon,
+    .umb-node-preview__name,
+    .umb-node-preview__description {
+        opacity: 0.6;
+    }
+}
+
+.umb-node-preview__icon {
+    display: flex;
+    width: 25px;
+    height: 25px;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    margin-right: 10px;
+    flex: 0 0 auto;
+}
+
+.umb-node-preview__content {
+    flex: 1 1 auto;
+}
+
+.umb-node-preview__name {
+    font-size: 13px;
+    font-weight: bold;
+    color: @black;
+}
+
+.umb-node-preview__description {
+    font-size: 12px;
+    line-height: 1.5em;
+    color: @gray-3;
+}
+
+.umb-node-preview__actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+}
+
+.umb-node-preview__action {
+    margin-left: 5px;
+    margin-right: 5px;
+    font-size: 13px;
+    font-weight: bold;
+    color: @gray-5;
+}
+
+.umb-node-preview__action:hover {
+    color: @turquoise;
+    text-decoration: none;
+    opacity: 1;
+}
+
+.umb-node-preview__action--red:hover {
+    color: @red;
+}
+
+.umb-node-preview-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed @gray-8;
+    color: @turquoise-d1;
+    font-weight: bold;
+    padding: 5px 15px;
+    max-width: 66.6%;
+    box-sizing: border-box;
+}
+
+.umb-node-preview-add:hover {
+    color: @turquoise-d1;
+}
+
+.umb-overlay, 
+.umb-modal {
+    .umb-node-preview {
+        max-width: none;
+    }
+    .umb-node-preview-add {
+        max-width: none;
+    }
+}

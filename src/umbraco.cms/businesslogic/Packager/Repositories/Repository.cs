@@ -13,6 +13,7 @@ using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.packager.repositories
 {
+    [Obsolete("This should not be used and will be removed in future Umbraco versions")]
     public class Repository : DisposableObject
     {        
         public string Guid { get; private set; }
@@ -141,12 +142,12 @@ namespace umbraco.cms.businesslogic.packager.repositories
             return repository;
         }
 
+        
+
         //shortcut method to download pack from repo and place it on the server...
         public string fetch(string packageGuid)
         {
-
             return fetch(packageGuid, string.Empty);
-
         }
 
         public string fetch(string packageGuid, int userId)
@@ -156,6 +157,40 @@ namespace umbraco.cms.businesslogic.packager.repositories
                                     string.Format("Package {0} fetched from {1}", packageGuid, this.Guid),
                                     userId, -1);
             return fetch(packageGuid);
+        }
+
+        /// <summary>
+        /// Used to get the correct package file from the repo for the current umbraco version
+        /// </summary>
+        /// <param name="packageGuid"></param>
+        /// <param name="userId"></param>
+        /// <param name="currentUmbracoVersion"></param>
+        /// <returns></returns>
+        public string GetPackageFile(string packageGuid, int userId, System.Version currentUmbracoVersion)
+        {
+            // log
+            Audit.Add(AuditTypes.PackagerInstall,
+                string.Format("Package {0} fetched from {1}", packageGuid, this.Guid),
+                userId, -1);
+
+            var fileByteArray = Webservice.GetPackageFile(packageGuid, currentUmbracoVersion.ToString(3));
+
+            //successfull 
+            if (fileByteArray.Length > 0)
+            {
+                // Check for package directory
+                if (Directory.Exists(IOHelper.MapPath(Settings.PackagerRoot)) == false)
+                    Directory.CreateDirectory(IOHelper.MapPath(Settings.PackagerRoot));
+
+                using (var fs1 = new FileStream(IOHelper.MapPath(Settings.PackagerRoot + Path.DirectorySeparatorChar + packageGuid + ".umb"), FileMode.Create))
+                {
+                    fs1.Write(fileByteArray, 0, fileByteArray.Length);
+                    fs1.Close();
+                    return "packages\\" + packageGuid + ".umb";
+                }
+            }
+            
+            return "";
         }
 
         public bool HasConnection()
@@ -199,7 +234,19 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
             }
         }
+        
 
+        /// <summary>
+        /// This goes and fetches the Byte array for the package from OUR, but it's pretty strange
+        /// </summary>
+        /// <param name="packageGuid">
+        /// The package ID for the package file to be returned
+        /// </param>
+        /// <param name="key">
+        /// This is a strange Umbraco version parameter - but it's not really an umbraco version, it's a special/odd version format like Version41
+        /// but it's actually not used for the 7.5+ package installs so it's obsolete/unused.
+        /// </param>
+        /// <returns></returns>
         public string fetch(string packageGuid, string key)
         {
 
@@ -207,14 +254,17 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
             if (key == string.Empty)
             {
+                //SD: this is odd, not sure why it returns a different package depending on the legacy xml schema but I'll leave it for now
                 if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
-                    fileByteArray = this.Webservice.fetchPackage(packageGuid);
+                    fileByteArray = Webservice.fetchPackage(packageGuid);
                 else
-                    fileByteArray = this.Webservice.fetchPackageByVersion(packageGuid, Version.Version41);
+                {
+                    fileByteArray = Webservice.fetchPackageByVersion(packageGuid, Version.Version41);
+                }
             }
             else
             {
-                fileByteArray = this.Webservice.fetchProtectedPackage(packageGuid, key);
+                fileByteArray = Webservice.fetchProtectedPackage(packageGuid, key);
             }
 
             //successfull 

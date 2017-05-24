@@ -28,6 +28,7 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Manifest;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Core.Strings;
@@ -105,11 +106,14 @@ namespace Umbraco.Core
             LegacyParameterEditorAliasConverter.CreateMappingsForCoreEditors();
 
             //create database and service contexts for the app context
-            var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, ProfilingLogger.Logger);
+            var dbFactory = new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, ProfilingLogger.Logger);
             Database.Mapper = new PetaPocoMapper();
 
+            var scopeProvider = new ScopeProvider(dbFactory);
+            dbFactory.ScopeProvider = scopeProvider;
+
             var dbContext = new DatabaseContext(
-                dbFactory,
+                scopeProvider,
                 ProfilingLogger.Logger,
                 SqlSyntaxProviders.CreateDefault(ProfilingLogger.Logger));
 
@@ -117,7 +121,7 @@ namespace Umbraco.Core
             dbContext.Initialize();
 
             //get the service context
-            var serviceContext = CreateServiceContext(dbContext, dbFactory);
+            var serviceContext = CreateServiceContext(dbContext, scopeProvider);
 
             //set property and singleton from response
             ApplicationContext.Current = ApplicationContext = CreateApplicationContext(dbContext, serviceContext);
@@ -160,17 +164,15 @@ namespace Umbraco.Core
         /// Creates and returns the service context for the app
         /// </summary>
         /// <param name="dbContext"></param>
-        /// <param name="dbFactory"></param>
+        /// <param name="scopeProvider"></param>
         /// <returns></returns>
-        protected virtual ServiceContext CreateServiceContext(DatabaseContext dbContext, IDatabaseFactory dbFactory)
+        protected virtual ServiceContext CreateServiceContext(DatabaseContext dbContext, IScopeProvider scopeProvider)
         {
             //default transient factory
             var msgFactory = new TransientMessagesFactory();
             return new ServiceContext(
                 new RepositoryFactory(ApplicationCache, ProfilingLogger.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()),
-                new PetaPocoUnitOfWorkProvider(dbFactory),
-                new FileUnitOfWorkProvider(),
-                new PublishingStrategy(msgFactory, ProfilingLogger.Logger),
+                new PetaPocoUnitOfWorkProvider(scopeProvider),
                 ApplicationCache,
                 ProfilingLogger.Logger,
                 msgFactory);

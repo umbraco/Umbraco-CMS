@@ -22,17 +22,19 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	        $scope.target = dialogOptions.currentTarget;
 
 	        //if we have a node ID, we fetch the current node to build the form data
-	        if ($scope.target.id) {
+            if ($scope.target.id || $scope.target.udi) {
+
+                var id = $scope.target.udi ? $scope.target.udi : $scope.target.id;
 
 	            if (!$scope.target.path) {
-	                entityResource.getPath($scope.target.id, "Document").then(function (path) {
+	                entityResource.getPath(id, "Document").then(function (path) {
 	                    $scope.target.path = path;
 	                    //now sync the tree to this path
 	                    $scope.dialogTreeEventHandler.syncTree({ path: $scope.target.path, tree: "content" });
 	                });
 	            }
 
-	            contentResource.getNiceUrl($scope.target.id).then(function (url) {
+	            contentResource.getNiceUrl(id).then(function (url) {
 	                $scope.target.url = url;
 	            });
 	        }
@@ -59,7 +61,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 
 	            $scope.currentNode = args.node;
 	            $scope.currentNode.selected = true;
-	            $scope.target.id = args.node.id;
+                $scope.target.id = args.node.id;
+                $scope.target.udi = args.node.udi;
 	            $scope.target.name = args.node.name;
 
 	            if (args.node.id < 0) {

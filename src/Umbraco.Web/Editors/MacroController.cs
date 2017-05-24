@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -10,6 +11,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using umbraco;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Editors
 {
@@ -29,7 +31,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         /// <remarks>
-        /// Note that ALL logged in users have access to this method because editors will need to isnert macros into rte (content/media/members) and it's used for 
+        /// Note that ALL logged in users have access to this method because editors will need to isnert macros into rte (content/media/members) and it's used for
         /// inserting into templates/views/etc... it doesn't expose any sensitive data.
         /// </remarks>
         public IEnumerable<MacroParameter> GetMacroParameters(int macroId)
@@ -50,9 +52,9 @@ namespace Umbraco.Web.Editors
         /// <param name="pageId"></param>
         /// <param name="macroParams">
         /// To send a dictionary as a GET parameter the query should be structured like:
-        /// 
+        ///
         /// ?macroAlias=Test&pageId=3634&macroParams[0].key=myKey&macroParams[0].value=myVal&macroParams[1].key=anotherKey&macroParams[1].value=anotherVal
-        /// 
+        ///
         /// </param>
         /// <returns></returns>
         [HttpGet]
@@ -129,6 +131,31 @@ namespace Umbraco.Web.Editors
                 "text/html");
             return result;
         }
-        
+
+        [HttpPost]
+        public HttpResponseMessage CreatePartialViewMacroWithFile(CreatePartialViewMacroWithFileModel model)
+        {
+            if (model == null) throw new ArgumentNullException("model");
+            if (string.IsNullOrWhiteSpace(model.Filename)) throw new ArgumentException("Filename cannot be null or whitespace", "model.Filename");
+            if (string.IsNullOrWhiteSpace(model.VirtualPath)) throw new ArgumentException("VirtualPath cannot be null or whitespace", "model.VirtualPath");
+
+            var macroName = model.Filename.TrimEnd(".cshtml");
+
+            var macro = new Macro
+            {
+                Alias = macroName.ToSafeAlias(),
+                Name = macroName,
+                ScriptPath = model.VirtualPath.EnsureStartsWith("~")
+            };
+
+            Services.MacroService.Save(macro); // may throw
+            return new HttpResponseMessage(HttpStatusCode.OK);
+        }
+
+        public class CreatePartialViewMacroWithFileModel
+        {
+            public string Filename { get; set; }
+            public string VirtualPath { get; set; }
+        }
     }
 }

@@ -36,6 +36,8 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
         private System.Threading.SendOrPostCallback authenticateOperationCompleted;
 
+        private System.Threading.SendOrPostCallback GetPackageFileOperationCompleted;
+
         private System.Threading.SendOrPostCallback fetchPackageByVersionOperationCompleted;
 
         private System.Threading.SendOrPostCallback fetchPackageOperationCompleted;
@@ -82,6 +84,9 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
         /// <remarks/>
         public event authenticateCompletedEventHandler authenticateCompleted;
+
+        /// <remarks/>
+        public event GetPackageFileCompletedEventHandler GetPackageFileCompleted;
 
         /// <remarks/>
         public event fetchPackageByVersionCompletedEventHandler fetchPackageByVersionCompleted;
@@ -532,6 +537,76 @@ namespace umbraco.cms.businesslogic.packager.repositories
                 this.authenticateCompleted(this, new authenticateCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
+
+
+
+
+
+
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://packages.umbraco.org/webservices/GetPackageFile", RequestNamespace = "http://packages.umbraco.org/webservices/", ResponseNamespace = "http://packages.umbraco.org/webservices/", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        [return: System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        public byte[] GetPackageFile(string packageGuid, string umbracoVersion)
+        {
+            object[] results = this.Invoke("GetPackageFile", new object[] {
+                packageGuid,
+                umbracoVersion});
+            return ((byte[])(results[0]));
+        }
+
+        /// <remarks/>
+        public System.IAsyncResult BeginfetchPackageByVersion(string packageGuid, string umbracoVersion, System.AsyncCallback callback, object asyncState)
+        {
+            return this.BeginInvoke("GetPackageFile", new object[] {
+                packageGuid,
+                umbracoVersion}, callback, asyncState);
+        }
+
+        /// <remarks/>
+        public byte[] EndGetPackageFile(System.IAsyncResult asyncResult)
+        {
+            object[] results = this.EndInvoke(asyncResult);
+            return ((byte[])(results[0]));
+        }
+
+        /// <remarks/>
+        public void GetPackageFileAsync(string packageGuid, string umbracoVersion)
+        {
+            this.GetPackageFileAsync(packageGuid, umbracoVersion, null);
+        }
+
+        /// <remarks/>
+        public void GetPackageFileAsync(string packageGuid, string umbracoVersion, object userState)
+        {
+            if ((this.GetPackageFileOperationCompleted == null))
+            {
+                this.GetPackageFileOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetPackageFileOperationCompleted);
+            }
+            this.InvokeAsync("GetPackageFile", new object[] {
+                packageGuid,
+                umbracoVersion}, this.GetPackageFileOperationCompleted, userState);
+        }
+
+        private void OnGetPackageFileOperationCompleted(object arg)
+        {
+            if ((this.GetPackageFileCompleted != null))
+            {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetPackageFileCompleted(this, new GetPackageFileCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
 
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://packages.umbraco.org/webservices/fetchPackageByVersion", RequestNamespace = "http://packages.umbraco.org/webservices/", ResponseNamespace = "http://packages.umbraco.org/webservices/", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
@@ -1382,7 +1457,9 @@ namespace umbraco.cms.businesslogic.packager.repositories
         /// <remarks/>
         Version4,
 
-        /// <remarks/>
+        /// <summary>
+        /// This is apparently the version number we pass in for all installs
+        /// </summary>
         Version41,
 
         /// <remarks/>
@@ -1682,9 +1759,40 @@ namespace umbraco.cms.businesslogic.packager.repositories
         }
     }
 
+
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
-    public delegate void fetchPackageByVersionCompletedEventHandler(object sender, fetchPackageByVersionCompletedEventArgs e);
+    public delegate void GetPackageFileCompletedEventHandler(object sender, GetPackageFileCompletedEventArgs e);
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetPackageFileCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs
+    {
+
+        private object[] results;
+
+        internal GetPackageFileCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) :
+            base(exception, cancelled, userState)
+        {
+            this.results = results;
+        }
+
+        /// <remarks/>
+        public byte[] Result
+        {
+            get
+            {
+                this.RaiseExceptionIfNecessary();
+                return ((byte[])(this.results[0]));
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
+    public delegate void fetchPackageByVersionCompletedEventHandler(object sender, fetchPackageByVersionCompletedEventArgs e);    
 
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]

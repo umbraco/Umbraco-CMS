@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
 
@@ -6,6 +7,15 @@ namespace Umbraco.Core.Services
 {
     public interface IPackagingService : IService
     {
+        /// <summary>
+        /// This will fetch an Umbraco package file from the package repository and return the relative file path to the downloaded package file
+        /// </summary>
+        /// <param name="packageId"></param>
+        /// <param name="umbracoVersion"></param>
+        /// <param name="userId">The current user id performing the operation</param>
+        /// <returns></returns>
+        string FetchPackageFile(Guid packageId, Version umbracoVersion, int userId);
+
         /// <summary>
         /// Imports and saves package xml as <see cref="IContent"/>
         /// </summary>

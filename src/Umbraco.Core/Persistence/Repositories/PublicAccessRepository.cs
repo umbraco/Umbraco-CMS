@@ -15,19 +15,13 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class PublicAccessRepository : PetaPocoRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
     {
-        public PublicAccessRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public PublicAccessRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         { }
 
-        private FullDataSetRepositoryCachePolicyFactory<PublicAccessEntry, Guid> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<PublicAccessEntry, Guid> CachePolicyFactory
+        protected override IRepositoryCachePolicy<PublicAccessEntry, Guid> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<PublicAccessEntry, Guid>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(), false));
-            }
+            return new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(runtimeCache, GetEntityId, /*expires:*/ false);
         }
 
         protected override PublicAccessEntry PerformGet(Guid id)
@@ -46,7 +40,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             
             var factory = new PublicAccessEntryFactory();
+
             //MUST be ordered by this GUID ID for the AccessRulesRelator to work
+            sql.OrderBy<AccessDto>(dto => dto.Id, SqlSyntax);
+
             var dtos = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql);
             return dtos.Select(factory.BuildEntity);
         }
@@ -58,7 +55,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate();
 
             var factory = new PublicAccessEntryFactory();
+            
             //MUST be ordered by this GUID ID for the AccessRulesRelator to work
+            sql.OrderBy<AccessDto>(dto => dto.Id, SqlSyntax);
+
             var dtos = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql);
             return dtos.Select(factory.BuildEntity);
         }
@@ -69,9 +69,8 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Select("*")
                 .From<AccessDto>(SqlSyntax)
                 .LeftJoin<AccessRuleDto>(SqlSyntax)
-                .On<AccessDto, AccessRuleDto>(SqlSyntax, left => left.Id, right => right.AccessId)
-                //MUST be ordered by this GUID ID for the AccessRulesRelator to work
-                .OrderBy<AccessDto>(dto => dto.Id, SqlSyntax);
+                .On<AccessDto, AccessRuleDto>(SqlSyntax, left => left.Id, right => right.AccessId);
+                
 
             return sql;
         }
@@ -133,6 +132,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Database.Update(dto);
 
+            foreach (var removedRule in entity.RemovedRules)
+            {
+                Database.Delete<AccessRuleDto>("WHERE id=@Id", new { Id = removedRule });
+            }
+
             foreach (var rule in entity.Rules)
             {
                 if (rule.HasIdentity)
@@ -157,10 +161,6 @@ namespace Umbraco.Core.Persistence.Repositories
                     //update the id so HasEntity is correct
                     rule.Id = rule.Key.GetHashCode();
                 }
-            }
-            foreach (var removedRule in entity.RemovedRules)
-            {
-                Database.Delete<AccessRuleDto>("WHERE id=@Id", new {Id = removedRule});
             }
 
             entity.ClearRemovedRules();

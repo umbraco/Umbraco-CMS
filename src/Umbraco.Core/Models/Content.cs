@@ -274,6 +274,9 @@ namespace Umbraco.Core.Models
         /// </summary>
         public bool HasPublishedVersion { get { return PublishedVersionGuid != default(Guid); } }
 
+        [IgnoreDataMember]
+        internal DateTime PublishedDate { get; set; }
+
         /// <summary>
         /// Changes the Trashed state of the content object
         /// </summary>

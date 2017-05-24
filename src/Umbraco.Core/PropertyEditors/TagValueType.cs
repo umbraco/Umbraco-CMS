@@ -14,7 +14,8 @@
         /// The list of tags will be supplied by the property editor's ConvertEditorToDb method result which will need to return an IEnumerable{string} value
         /// </summary>        
         /// <remarks>
-        /// if the ConvertEditorToDb doesn't return an IEnumerable{string} then an exception will be thrown.
+        /// if the ConvertEditorToDb doesn't return an IEnumerable{string} then it will automatically try to be detected as either CSV or JSON and if neither of those match
+        /// an exception will be thrown.
         /// </remarks>
         CustomTagList
     }

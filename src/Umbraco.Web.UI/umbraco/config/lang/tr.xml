@@ -734,7 +734,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="publicAccess">
     <key alias="paAdvanced">Role based protection</key>
     <key alias="paAdvancedHelp"><![CDATA[If you wish to control access to the page using role-based authentication,<br /> using Umbraco's member groups.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[You need to create a membergroup before you can use <br />role-based authentication.]]></key>
+    <key alias="paAdvancedNoGroups">You need to create a membergroup before you can use role-based authentication.</key>
     <key alias="paErrorPage">Error Page</key>
     <key alias="paErrorPageHelp">Used when people are logged on, but do not have access</key>
     <key alias="paHowWould">Choose how to restrict access to this page</key>

@@ -2,10 +2,13 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Web;
 using log4net;
 using log4net.Config;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Diagnostics;
 
 namespace Umbraco.Core.Logging
 {
@@ -56,18 +59,72 @@ namespace Umbraco.Core.Logging
 		internal ILog LoggerFor(object getTypeFromInstance)
 		{
 			if (getTypeFromInstance == null) throw new ArgumentNullException("getTypeFromInstance");
-			
+
 			return LogManager.GetLogger(getTypeFromInstance.GetType());
 		}
-        
+
 		public void Error(Type callingType, string message, Exception exception)
 		{
-			var logger = LogManager.GetLogger(callingType);
-			if (logger != null)
-				logger.Error((message), exception);
+            var logger = LogManager.GetLogger(callingType);
+		    if (logger == null) return;
+
+		    var dump = false;
+
+		    if (IsTimeoutThreadAbortException(exception))
+		    {
+		        message += "\r\nThe thread has been aborted, because the request has timed out.";
+
+                // dump if configured, or if stacktrace contains Monitor.ReliableEnter
+		        dump = UmbracoConfig.For.CoreDebug().DumpOnTimeoutThreadAbort || IsMonitorEnterThreadAbortException(exception);
+
+                // dump if it is ok to dump (might have a cap on number of dump...)
+		        dump &= MiniDump.OkToDump();
+		    }
+
+            if (dump)
+		    {
+                try
+                {
+                    var dumped = MiniDump.Dump(withException: true);
+                    message += dumped
+                        ? "\r\nA minidump was created in App_Data/MiniDump"
+                        : "\r\nFailed to create a minidump";
+                }
+                catch (Exception e)
+                {
+                    message += string.Format("\r\nFailed to create a minidump ({0}: {1})", e.GetType().FullName, e.Message);
+                }
+            }
+
+            logger.Error(message, exception);
 		}
 
-		public void Warn(Type callingType, string message, params Func<object>[] formatItems)
+        private static bool IsMonitorEnterThreadAbortException(Exception exception)
+        {
+            var abort = exception as ThreadAbortException;
+            if (abort == null) return false;
+
+            var stacktrace = abort.StackTrace;
+            return stacktrace.Contains("System.Threading.Monitor.ReliableEnter");
+        }
+
+        private static bool IsTimeoutThreadAbortException(Exception exception)
+        {
+            var abort = exception as ThreadAbortException;
+            if (abort == null) return false;
+
+            if (abort.ExceptionState == null) return false;
+
+            var stateType = abort.ExceptionState.GetType();
+            if (stateType.FullName != "System.Web.HttpApplication+CancelModuleException") return false;
+
+            var timeoutField = stateType.GetField("_timeout", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (timeoutField == null) return false;
+
+            return (bool) timeoutField.GetValue(abort.ExceptionState);
+        }
+
+        public void Warn(Type callingType, string message, params Func<object>[] formatItems)
 		{
 			var logger = LogManager.GetLogger(callingType);
 			if (logger == null || logger.IsWarnEnabled == false) return;
@@ -82,7 +139,7 @@ namespace Umbraco.Core.Logging
 			if (showHttpTrace && HttpContext.Current != null)
 			{
 				HttpContext.Current.Trace.Warn(callingType.Name, string.Format(message, formatItems.Select(x => x.Invoke()).ToArray()));
-			}	
+			}
 
 			var logger = LogManager.GetLogger(callingType);
 			if (logger == null || logger.IsWarnEnabled == false) return;
@@ -99,7 +156,7 @@ namespace Umbraco.Core.Logging
             var logger = LogManager.GetLogger(callingType);
             if (logger == null || logger.IsWarnEnabled == false) return;
             var executedParams = formatItems.Select(x => x.Invoke()).ToArray();
-            logger.WarnFormat((message) + ". Exception: " + e, executedParams);		
+            logger.WarnFormat((message) + ". Exception: " + e, executedParams);
 		}
 
 		/// <summary>

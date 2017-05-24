@@ -5,6 +5,8 @@ using Umbraco.Core.Cache;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Web.PropertyEditors.ValueConverters;
 
 
 namespace Umbraco.Web.Cache
@@ -101,15 +103,21 @@ namespace Umbraco.Web.Cache
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
 
+            var dataTypeCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
             payloads.ForEach(payload =>
             {
                 //clears the prevalue cache
-                var dataTypeCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
                 if (dataTypeCache)
-                    dataTypeCache.Result.ClearCacheByKeySearch(string.Format("{0}{1}", CacheKeys.DataTypePreValuesCacheKey, payload.Id));
-                
+                    dataTypeCache.Result.ClearCacheByKeySearch(string.Format("{0}_{1}", CacheKeys.DataTypePreValuesCacheKey, payload.Id));
+
                 PublishedContentType.ClearDataType(payload.Id);
             });
+
+            TagsValueConverter.ClearCaches();
+            MultipleMediaPickerPropertyConverter.ClearCaches();
+            SliderValueConverter.ClearCaches();
+            MediaPickerPropertyConverter.ClearCaches();
+
 
             base.Refresh(jsonPayload);
         }

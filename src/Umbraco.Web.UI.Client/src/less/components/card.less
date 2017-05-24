@@ -7,7 +7,7 @@
 	padding: 5px 10px 5px 10px;
     background: white;
 
-    .title{padding: 12px; color: @gray; border-bottom: 1px solid @grayLight; font-weight: 400; font-size: 16px; text-transform: none; margin: 0 -10px 10px -10px;}
+    .title{padding: 12px; color: @gray-3; border-bottom: 1px solid @gray-8; font-weight: 400; font-size: 16px; text-transform: none; margin: 0 -10px 10px -10px;}
 
 }
 
@@ -26,12 +26,12 @@
 
 .umb-card-content{
     .item-title{color: @blackLight; font-weight: 400; border: none; font-size: 16px; text-transform: none; margin-bottom: 3px;}
-    p{color: @gray; margin-bottom: 1px;}
+    p{color: @gray-3; margin-bottom: 1px;}
 }
 
 .umb-card-actions{
     padding-top: 10px;
-    border-top: @grayLighter 1px solid;
+    border-top: @gray-10 1px solid;
     clear: both;
 }
 
@@ -71,7 +71,7 @@
  }
 
 .umb-card-list li{
-    border-bottom: @grayLighter 1px solid;
+    border-bottom: @gray-10 1px solid;
     padding-bottom: 3px;
     display: block;
 }
@@ -93,7 +93,7 @@
 .umb-card-grid li {
 	padding: 5px;
 	overflow: hidden;
-	font-size: 11px;
+	font-size: 12px;
 	text-align: center;
 
 	width: 100px;
@@ -114,6 +114,7 @@
 	display: block;
 	width: 100%;
 	height: 100%;
+	border-radius: 3px;
 }
 
 
@@ -121,14 +122,15 @@
  .umb-card-grid .umb-card-grid-item:focus,
  .umb-card-grid .umb-card-grid-item:hover > *,
  .umb-card-grid .umb-card-grid-item:focus > *  {
-	background: @blue;
-	color: white;
+	background: @gray-10;
+	//color: white;
 	cursor: pointer;
 	outline: none;
+	border-radius: 3px;
 }
 
 .umb-card-grid a {
-     color: #222;
+     color: @gray-2;
      text-decoration: none;
  }
 
@@ -136,7 +138,7 @@
      font-size: 30px;
      line-height: 50px;
      display: block;
-	  color: @grayDark;
+	  color: @gray-3;
  }
 
 
@@ -149,32 +151,32 @@
     display: inline-block;
     cursor: pointer;
     border-radius: 200px;
-    background: rgba(255,255,255, 1);
-    border:1px solid rgb(182, 182, 182);
+    background: @gray-10;
+    border:1px solid @gray-6;
     margin: 2px;
 }
 
 .umb-btn-round:hover, .umb-btn-round:hover *{
-  background: @blue !important;
-  color: white !important;
-  border-color: @blue !important;
+  background: @turquoise !important;
+  color: @white !important;
+  border-color: @turquoise !important;
   text-decoration:none;
  }
 
  .umb-btn-round a:hover {
      text-decoration:none;
-     color: white !important;
+     color: @white !important;
  }
 
  .umb-btn-round i {
      font-size:16px !important;
-     color: #grayLight;
+     color: @gray-8;
      display:block;
  }
 
  .umb-btn-round.alert:hover, .umb-btn-round.alert:hover *{
  	background: @red !important;
-  	color: white !important;
+  	color: @white !important;
   	border-color: @red !important;
   	text-decoration:none;
  }
