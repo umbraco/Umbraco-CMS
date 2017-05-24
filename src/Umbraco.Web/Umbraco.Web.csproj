@@ -369,6 +369,7 @@
     <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
     <Compile Include="Models\ContentEditing\UserDisplay.cs" />
     <Compile Include="Models\ContentEditing\UserGroupDisplay.cs" />
+    <Compile Include="Models\ContentEditing\UserInvite.cs" />
     <Compile Include="Models\ContentEditing\UserSave.cs" />
     <Compile Include="Models\LocalPackageInstallModel.cs" />
     <Compile Include="Models\Mapping\CodeFileDisplayMapper.cs" />

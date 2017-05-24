@@ -26,6 +26,7 @@ namespace Umbraco.Web.Security.Identity
             _defaultCulture = defaultCulture ?? GlobalSettings.DefaultUILanguage;
         }
 
+        //TODO: Change this - it will be different when we have user groups!
         private readonly string _defaultUserType;
 
         /// <summary>

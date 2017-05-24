@@ -22,7 +22,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             _controllerFactory = controllerFactory;
         }
 
-        public async Task<Tuple<HttpResponseMessage, string>> Execute(string controllerName, string actionName, HttpMethod method)
+        public async Task<Tuple<HttpResponseMessage, string>> Execute(string controllerName, string actionName, HttpMethod method, HttpContent content = null)
         {
             var startup = new TestStartup(
                 configuration =>
@@ -38,8 +38,11 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 var request = new HttpRequestMessage
                 {
                     RequestUri = new Uri("https://testserver/"),
-                    Method = method,
+                    Method = method
                 };
+
+                if (content != null)
+                    request.Content = content;
 
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 

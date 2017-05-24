@@ -49,7 +49,9 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 
                 var serviceContext = new ServiceContext(
                     userService: mockedUserService,
-                    migrationEntryService: mockedMigrationService.Object);
+                    migrationEntryService: mockedMigrationService.Object,
+                    localizedTextService:Mock.Of<ILocalizedTextService>(),
+                    sectionService:Mock.Of<ISectionService>());
 
                 //ensure the configuration matches the current version for tests
                 SettingsForTests.ConfigurationStatus = UmbracoVersion.GetSemanticVersion().ToSemanticString();

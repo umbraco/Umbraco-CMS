@@ -32,14 +32,66 @@ using Umbraco.Web.WebApi;
 namespace Umbraco.Tests.Controllers
 {
     [DatabaseTestBehavior(DatabaseBehavior.NoDatabasePerFixture)]
-    [RequiresAutoMapperMappings]
     [TestFixture]
     public class UsersControllerTests : BaseDatabaseFactoryTest
     {
+
+        [Test]
+        public async void Invite_User()
+        {
+            var runner = new TestRunner((message, helper) =>
+            {
+                //setup some mocks
+                Umbraco.Core.Configuration.GlobalSettings.HasSmtpServer = true;
+
+                var userServiceMock = Mock.Get(helper.UmbracoContext.Application.Services.UserService);
+
+                userServiceMock.Setup(service => service.Save(It.IsAny<IUser>(), It.IsAny<bool>()))
+                    .Callback((IUser u, bool raiseEvents) =>
+                    {
+                        u.Id = 1234;
+                    });
+                userServiceMock.Setup(service => service.GetAllUserGroups(It.IsAny<int[]>()))
+                    .Returns(Enumerable.Empty<IUserGroup>);
+
+                //we need to manually apply automapper mappings with the mocked applicationcontext
+                InitializeMappers(helper.UmbracoContext.Application);
+
+                return new UsersController(helper.UmbracoContext);
+            });
+
+            var invite = new UserInvite
+            {
+                Id = -1,
+                Email = "test@test.com",
+                Message = "Hello test!",
+                Name = "Test",
+                UserGroups = new[] {"writers"}
+            };
+            var response = await runner.Execute("Users", "PostInviteUser", HttpMethod.Post,
+                new ObjectContent<UserInvite>(invite, new JsonMediaTypeFormatter()));
+
+            var obj = JsonConvert.DeserializeObject<UserDisplay>(response.Item2);
+
+            Assert.AreEqual(invite.Name, obj.Name);
+            Assert.AreEqual(1234, obj.Id);
+            Assert.AreEqual(invite.Email, obj.Email);
+            foreach (var group in invite.UserGroups)
+            {
+                Assert.IsTrue(obj.UserGroups.Contains(group));
+            }
+        }
+
         [Test]
         public async void GetPagedUsers_Empty()
         {
-            var runner = new TestRunner((message, helper) => new UsersController(helper.UmbracoContext));
+            var runner = new TestRunner((message, helper) =>
+            {
+                //we need to manually apply automapper mappings with the mocked applicationcontext
+                InitializeMappers(helper.UmbracoContext.Application);
+
+                return new UsersController(helper.UmbracoContext);
+            });
             var response = await runner.Execute("Users", "GetPagedUsers", HttpMethod.Get);
 
             var obj = JsonConvert.DeserializeObject<PagedResult<UserDisplay>>(response.Item2);
@@ -57,6 +109,9 @@ namespace Umbraco.Tests.Controllers
                 long outVal = 10;
                 userServiceMock.Setup(service => service.GetAll(It.IsAny<long>(), It.IsAny<int>(), out outVal, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<UserState?>(), It.IsAny<string[]>(), It.IsAny<string>()))
                     .Returns(() => users);
+
+                //we need to manually apply automapper mappings with the mocked applicationcontext
+                InitializeMappers(helper.UmbracoContext.Application);
 
                 return new UsersController(helper.UmbracoContext);
             });

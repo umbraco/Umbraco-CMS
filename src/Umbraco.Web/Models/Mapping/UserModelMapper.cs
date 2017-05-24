@@ -16,6 +16,16 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
+            config.CreateMap<UserInvite, IUser>()
+                .ConstructUsing(invite => new User(invite.Name, invite.Email, invite.Email, Guid.NewGuid().ToString("N")))
+                .AfterMap((invite, user) =>
+                {
+                    foreach (var group in invite.UserGroups)
+                    {
+                        user.AddGroup(group);
+                    } 
+                });
+
             config.CreateMap<IUserGroup, UserGroupDisplay>()
                 .ForMember(detail => detail.Notifications, opt => opt.Ignore())
                 .ForMember(detail => detail.Sections, opt => opt.MapFrom(x => x.AllowedSections))
