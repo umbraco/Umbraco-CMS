@@ -718,10 +718,7 @@ namespace umbraco.BusinessLogic
             }
             set
             {
-                if (UserEntity.StartContentIds == null)
-                    UserEntity.StartContentIds = new int[] {value};
-                else if (UserEntity.StartContentIds.Contains(value) == false)
-                    UserEntity.StartContentIds = UserEntity.StartContentIds.Concat(new[] {value}).ToArray();
+                UserEntity.StartContentIds = new int[] { value };
             }
         }
 
@@ -735,10 +732,7 @@ namespace umbraco.BusinessLogic
             }
             set
             {
-                if (UserEntity.StartMediaIds == null)
-                    UserEntity.StartMediaIds = new int[] { value };
-                else if (UserEntity.StartMediaIds.Contains(value) == false)
-                    UserEntity.StartMediaIds = UserEntity.StartMediaIds.Concat(new[] { value }).ToArray();
+                UserEntity.StartMediaIds = new int[] { value };
             }
         }
 

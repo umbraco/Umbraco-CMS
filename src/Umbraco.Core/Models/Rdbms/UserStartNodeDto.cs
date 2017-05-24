@@ -24,7 +24,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("startNodeType")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
-        [Index(IndexTypes.UniqueNonClustered, ForColumns = "startNodeType, startNode", Name = "IX_umbracoUserStartNode_startNodeType")]
+        [Index(IndexTypes.UniqueNonClustered, ForColumns = "startNodeType, startNode, userId", Name = "IX_umbracoUserStartNode_startNodeType")]
         public int StartNodeType { get; set; }
 
         public enum StartNodeTypeValue

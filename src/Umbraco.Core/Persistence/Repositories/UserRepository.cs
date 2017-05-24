@@ -204,6 +204,18 @@ namespace Umbraco.Core.Persistence.Repositories
             var id = Convert.ToInt32(Database.Insert(userDto));
             entity.Id = id;
 
+            if (entity.IsPropertyDirty("StartContentIds") || entity.IsPropertyDirty("StartMediaIds"))
+            {
+                if (entity.IsPropertyDirty("StartContentIds"))
+                {
+                    AddingOrUpdateStartNodes(entity, Enumerable.Empty<UserStartNodeDto>(), UserStartNodeDto.StartNodeTypeValue.Content, entity.StartContentIds);
+                }
+                if (entity.IsPropertyDirty("StartMediaIds"))
+                {
+                    AddingOrUpdateStartNodes(entity, Enumerable.Empty<UserStartNodeDto>(), UserStartNodeDto.StartNodeTypeValue.Media, entity.StartMediaIds);
+                }
+            }
+
             if (entity.IsPropertyDirty("Groups"))
             {
                 //lookup all assigned
@@ -287,6 +299,19 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Update(userDto, changedCols);
             }
 
+            if (entity.IsPropertyDirty("StartContentIds") || entity.IsPropertyDirty("StartMediaIds"))
+            {
+                var assignedStartNodes = Database.Fetch<UserStartNodeDto>("SELECT * FROM umbracoUserStartNode WHERE userId = @userId", new { userId = entity.Id });
+                if (entity.IsPropertyDirty("StartContentIds"))
+                {
+                    AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Content, entity.StartContentIds);
+                }
+                if (entity.IsPropertyDirty("StartMediaIds"))
+                {
+                    AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Media, entity.StartMediaIds);
+                }
+            }
+
             if (entity.IsPropertyDirty("Groups"))
             {
                 //lookup all assigned
@@ -310,6 +335,28 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             entity.ResetDirtyProperties();
+        }
+
+        private void AddingOrUpdateStartNodes(IEntity entity, IEnumerable<UserStartNodeDto> current, UserStartNodeDto.StartNodeTypeValue startNodeType, int[] entityStartIds)
+        {
+            var assignedIds = current.Where(x => x.StartNodeType == (int)startNodeType).Select(x => x.StartNode).ToArray();
+
+            //remove the ones not assigned to the entity
+            var toDelete = assignedIds.Except(entityStartIds).ToArray();
+            if (toDelete.Length > 0)
+                Database.Delete<UserStartNodeDto>("WHERE UserId = @UserId AND startNode IN (@startNodes)", new {UserId = entity.Id, startNodes = toDelete});
+            //add the ones not currently in the db
+            var toAdd = entityStartIds.Except(assignedIds).ToArray();
+            foreach (var i in toAdd)
+            {
+                var dto = new UserStartNodeDto
+                {
+                    StartNode = i,
+                    StartNodeType = (int)startNodeType,
+                    UserId = entity.Id
+                };
+                Database.Insert(dto);
+            }
         }
 
         #endregion
