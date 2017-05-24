@@ -40,7 +40,7 @@
                         <span>
                             <span class="bold">Content start node:</span>
                             <span ng-repeat="startNode in userGroup.startNodesContent">{{ startNode.name }}<span ng-if="!$last">, </span></span>
-                            <span ng-if="userGroup.startNodesContent.length === 0">Content root</span>
+                            <span ng-if="userGroup.startNodeContent === 0">Content root</span>
                         </span>
                     </div>
                     
@@ -48,7 +48,7 @@
                         <span>
                             <span class="bold">Media start node:</span>
                             <span ng-repeat="startNode in userGroup.startNodesMedia">{{ startNode.name }}<span ng-if="!$last">, </span></span>
-                            <span ng-if="userGroup.startNodesMedia.length === 0">Media root</span>
+                            <span ng-if="userGroup.startNodeMedia === 0">Media root</span>
                         </span>
                     </div>
                 </div>
