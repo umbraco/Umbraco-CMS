@@ -43,14 +43,6 @@
       <delete assembly="umbraco" type="XsltTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="users">
-    <header>User</header>
-    <usercontrol>/create/user.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="userTasks" />
-      <delete assembly="umbraco" type="userTasks" />
-    </tasks>
-  </nodeType>
   <nodeType alias="user">
     <header>User</header>
     <usercontrol>/create/simple.ascx</usercontrol>

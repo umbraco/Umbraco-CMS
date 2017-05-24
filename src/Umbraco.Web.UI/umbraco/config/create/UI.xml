@@ -43,7 +43,7 @@
       <delete assembly="umbraco" type="XsltTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="users">
+  <nodeType alias="users_old">
     <header>User</header>
     <usercontrol>/create/user.ascx</usercontrol>
     <tasks>

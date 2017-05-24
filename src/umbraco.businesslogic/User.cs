@@ -714,7 +714,7 @@ namespace umbraco.BusinessLogic
             get
             {
                 if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return UserEntity.StartContentIds == null ? -1 : UserEntity.StartContentIds[0];
+                return UserEntity.StartContentIds == null || UserEntity.StartContentIds.Length == 0 ? -1 : UserEntity.StartContentIds[0];
             }
             set
             {
@@ -731,7 +731,7 @@ namespace umbraco.BusinessLogic
             get
             {
                 if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return UserEntity.StartMediaIds == null ? -1 : UserEntity.StartMediaIds[0];
+                return UserEntity.StartMediaIds == null || UserEntity.StartMediaIds.Length == 0 ? -1 : UserEntity.StartMediaIds[0];
             }
             set
             {
