@@ -74,11 +74,13 @@ namespace Umbraco.Core.Models.Membership
         public User(int id, string name, string email, string username, string rawPasswordValue, IEnumerable<string> allowedSections, IEnumerable<string> userGroups)
             : this()
         {
+            //we allow whitespace for this value so just check null
+            if (rawPasswordValue == null) throw new ArgumentNullException("rawPasswordValue");
             if (allowedSections == null) throw new ArgumentNullException("allowedSections");
             if (userGroups == null) throw new ArgumentNullException("userGroups");
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
-            if (string.IsNullOrWhiteSpace(rawPasswordValue)) throw new ArgumentException("Value cannot be null or whitespace.", "rawPasswordValue");
+            
 
             Id = id;
             _name = name;
