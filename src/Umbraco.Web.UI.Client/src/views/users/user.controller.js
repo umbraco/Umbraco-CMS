@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, $timeout, $location, $routeParams, usersResource, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper) {
+    function UserEditController($scope, $timeout, $location, $routeParams, usersResource, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -17,8 +17,8 @@
         vm.openMediaPicker = openMediaPicker;
         vm.removeSelectedItem = removeSelectedItem;
         vm.disableUser = disableUser;
+        vm.enableUser = enableUser;
         vm.resetPassword = resetPassword;
-        vm.getUserStateType = getUserStateType;
         vm.clearAvatar = clearAvatar;
         vm.save = save;
         vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB"
@@ -32,6 +32,7 @@
             usersResource.getUser($routeParams.id).then(function (user) {
                 vm.user = user;
                 makeBreadcrumbs(vm.user);
+                setUserDisplayState();
                 vm.loading = false;
             });
 
@@ -142,7 +143,25 @@
         }
 
         function disableUser() {
-            alert("disable user");
+            vm.disableUserButtonState = "busy";
+            usersResource.disableUsers([vm.user.id]).then(function (data) {
+                if (data === "true") {
+                    vm.disableUserButtonState = "success";
+                } else {
+                    vm.disableUserButtonState = "error";
+                }
+            });
+        }
+
+        function enableUser() {
+            vm.enableUserButtonState = "busy";
+            usersResource.enableUsers([vm.user.id]).then(function (data) {
+                if (data === "true") {
+                    vm.enableUserButtonState = "success";
+                } else {
+                    vm.enableUserButtonState = "error";
+                }
+            });
         }
 
         function resetPassword() {
@@ -154,17 +173,6 @@
             usersResource.clearAvatar(vm.user.id).then(function (data) {
               vm.user.avatars = data;
             });
-        }
-
-        function getUserStateType(state) {
-            switch (state) {
-                case "disabled" || "umbracoDisabled":
-                    return "danger";
-                case "pending":
-                    return "warning";
-                default:
-                    return "success";
-            }
         }
 
         $scope.changeAvatar = function (files, event) {
@@ -235,6 +243,10 @@
                     "name": vm.user.name
                 }
             ];
+        }
+
+        function setUserDisplayState() {
+            vm.user.userDisplayState = usersHelper.getUserStateFromValue(vm.user.userState);
         }
 
         init();

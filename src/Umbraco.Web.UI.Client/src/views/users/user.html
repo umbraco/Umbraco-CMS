@@ -145,20 +145,17 @@
                                     
                                 </div>
 
-                                <!--
                                 <div class="umb-package-details__information-item">
                                     <div class="umb-package-details__information-item-label">Status</div>
                                     <div class="umb-package-details__information-item-content">
                                         <umb-badge
                                             style="margin-top: 4px;"
                                             size="s"
-                                            ng-if="user.state !== 'active'"
-                                            color="{{vm.getUserStateType(vm.user.state)}}">
-                                            {{ vm.user.state }}
+                                            color="{{vm.user.userDisplayState.color}}">
+                                            {{vm.user.userDisplayState.name}}
                                         </umb-badge>
                                     </div>
                                 </div>
-                                -->
 
                                 <div class="umb-package-details__information-item">
                                     <div class="umb-package-details__information-item-label">Last login:</div>
@@ -181,10 +178,11 @@
                                 <div style="margin-top: 20px;">
                                     <div style="margin-bottom: 10px;">
                                         <umb-button
-                                            ng-if="vm.user.state === 'active'"
+                                            ng-if="vm.user.userDisplayState.alias === 'active'"
                                             type="button"
                                             button-style="[danger,block]"
                                             action="vm.disableUser()"
+                                            state="vm.disableUserButtonState"
                                             label="Disable user"
                                             size="m">
                                         </umb-button>
@@ -192,9 +190,10 @@
 
                                     <div style="margin-bottom: 10px;">
                                         <umb-button
-                                            ng-if="vm.user.state === 'disabled'"
+                                            ng-if="vm.user.userDisplayState.alias === 'disabled'"
                                             type="button"
                                             button-style="[success,block]"
+                                            state="vm.enableUserButtonState"
                                             action="vm.enableUser()"
                                             label="Enable user"
                                             size="m">
