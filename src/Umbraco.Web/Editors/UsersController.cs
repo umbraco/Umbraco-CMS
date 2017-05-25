@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using AutoMapper;
 using ClientDependency.Core;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -42,13 +45,89 @@ namespace Umbraco.Web.Editors
         {
         }
 
-        public IHttpActionResult SetAvatar(int id)
+        [FileUploadCleanupFilter(false)]
+        public async Task<HttpResponseMessage> SetAvatar(int id)
         {
-            return Ok();
+            if (Request.Content.IsMimeMultipartContent() == false)
+            {
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            }
+
+            var root = IOHelper.MapPath("~/App_Data/TEMP/FileUploads");
+            //ensure it exists
+            Directory.CreateDirectory(root);
+            var provider = new MultipartFormDataStreamProvider(root);
+
+            var result = await Request.Content.ReadAsMultipartAsync(provider);
+
+            //must have a file
+            if (result.FileData.Count == 0)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+
+            //get the string json from the request
+            var userId = result.FormData["userId"];
+            int intUserId;
+            if (int.TryParse(userId, out intUserId) == false)
+                return Request.CreateValidationErrorResponse("The request was not formatted correctly, the userId is not an integer");
+
+            var user = Services.UserService.GetUserById(intUserId);
+            if (user == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+
+            var tempFiles = new PostedFiles();
+
+            if (result.FileData.Count > 1)
+                return Request.CreateValidationErrorResponse("The request was not formatted correctly, only one file can be attached to the request");
+
+            //get the file info
+            var file = result.FileData[0];
+            var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' }).TrimEnd();
+            var safeFileName = fileName.ToSafeFileName();
+            var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
+
+            if (UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Contains(ext) == false)
+            {
+                if (user.Avatar.IsNullOrWhiteSpace())
+                {
+                    //we'll need to generate a new path!
+                    //make it a hash of known data, we don't want this path to be guessable
+                    user.Avatar =  "UserAvatars/" + (user.Id + user.CreateDate.ToString("yyyyMMdd")).ToSHA1() + ext;
+                }
+
+                using (var fs = System.IO.File.OpenRead(file.LocalFileName))
+                {
+                    FileSystemProviderManager.Current.MediaFileSystem.AddFile(user.Avatar, fs, true);
+                }
+
+                Services.UserService.Save(user);
+
+                //track the temp file so the cleanup filter removes it
+                tempFiles.UploadedFiles.Add(new ContentItemFile
+                {                             
+                    TempFilePath = file.LocalFileName
+                });
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, tempFiles);
         }
 
         public IHttpActionResult ClearAvatar(int id)
         {
+            var found = Services.UserService.GetUserById(id);
+            if (found == null)
+                return NotFound();
+
+            var filePath = found.Avatar;
+
+            found.Avatar = null;
+
+            Services.UserService.Save(found);
+
+            if (FileSystemProviderManager.Current.MediaFileSystem.FileExists(filePath))
+                FileSystemProviderManager.Current.MediaFileSystem.DeleteFile(filePath);
+
             return Ok();
         }
 

@@ -95,6 +95,7 @@ namespace Umbraco.Core.Models.Membership
 
         private string _name;
         private string _securityStamp;
+        private string _avatar;
         private int _sessionTimeout;
         private int[] _startContentIds;
         private int[] _startMediaIds;
@@ -124,6 +125,7 @@ namespace Umbraco.Core.Models.Membership
             public readonly PropertyInfo LastPasswordChangeDateSelector = ExpressionHelper.GetPropertyInfo<User, DateTime>(x => x.LastPasswordChangeDate);
 
             public readonly PropertyInfo SecurityStampSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.SecurityStamp);
+            public readonly PropertyInfo AvatarSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Avatar);
             public readonly PropertyInfo SessionTimeoutSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.SessionTimeout);
             public readonly PropertyInfo StartContentIdSelector = ExpressionHelper.GetPropertyInfo<User, int[]>(x => x.StartContentIds);
             public readonly PropertyInfo StartMediaIdSelector = ExpressionHelper.GetPropertyInfo<User, int[]>(x => x.StartMediaIds);
@@ -270,6 +272,13 @@ namespace Umbraco.Core.Models.Membership
         {
             get { return _securityStamp; }
             set { SetPropertyValueAndDetectChanges(value, ref _securityStamp, Ps.Value.SecurityStampSelector); }
+        }
+
+        [DataMember]
+        public string Avatar
+        {
+            get { return _avatar; }
+            set { SetPropertyValueAndDetectChanges(value, ref _avatar, Ps.Value.AvatarSelector); }
         }
 
         /// <summary>

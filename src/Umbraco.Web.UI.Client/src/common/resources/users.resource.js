@@ -9,7 +9,7 @@
 (function () {
     'use strict';
 
-    function usersResource($http, umbRequestHelper, $q) {
+    function usersResource($http, umbRequestHelper, $q, umbDataFormatter) {
 
         function disableUsers(userIds) {
             if (!userIds) {
@@ -121,15 +121,18 @@
                 throw "user not specified";
             }
 
+            //need to convert the user data into the correctly formatted save data - it is *not* the same and we don't want to over-post
+            var formattedSaveData = umbDataFormatter.formatUserPostData(user);
+
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "userApiBaseUrl",
                         "PostSaveUser"),
-                    user),
+                    formattedSaveData),
                 "Failed to save user");
         }
-        
+
         function getUserGroup() {
             var deferred = $q.defer();
             var user = {

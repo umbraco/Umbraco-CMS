@@ -19,6 +19,7 @@ namespace Umbraco.Web.Models.Mapping
             //Used for merging existing UserSave to an existing IUser instance - this will not create an IUser instance!
             config.CreateMap<UserSave, IUser>()
                 .ForMember(user => user.Language, expression => expression.MapFrom(save => save.Culture))                
+                .ForMember(user => user.Avatar, expression => expression.Ignore())
                 .ForMember(user => user.SessionTimeout, expression => expression.Ignore())
                 .ForMember(user => user.SecurityStamp, expression => expression.Ignore())
                 .ForMember(user => user.ProviderUserKey, expression => expression.Ignore())
@@ -47,6 +48,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<UserInvite, IUser>()
                 .ConstructUsing(invite => new User(invite.Name, invite.Email, invite.Email, Guid.NewGuid().ToString("N")))
                 .ForMember(user => user.Id, expression => expression.Ignore())
+                .ForMember(user => user.Avatar, expression => expression.Ignore())
                 .ForMember(user => user.SessionTimeout, expression => expression.Ignore())
                 .ForMember(user => user.StartContentIds, expression => expression.Ignore())
                 .ForMember(user => user.StartMediaIds, expression => expression.Ignore())

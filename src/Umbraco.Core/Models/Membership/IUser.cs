@@ -37,5 +37,10 @@ namespace Umbraco.Core.Models.Membership
         /// The security stamp used by ASP.Net identity
         /// </summary>
         string SecurityStamp { get; set; }
+
+        /// <summary>
+        /// Will hold the media file system relative path of the users custom avatar if they uploaded one
+        /// </summary>
+        string Avatar { get; set; }
     }
 }

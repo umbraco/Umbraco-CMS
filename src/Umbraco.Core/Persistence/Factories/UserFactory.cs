@@ -44,6 +44,7 @@ namespace Umbraco.Core.Persistence.Factories
                 user.LastPasswordChangeDate = dto.LastPasswordChangeDate ?? DateTime.MinValue;
                 user.CreateDate = dto.CreateDate;
                 user.UpdateDate = dto.UpdateDate;
+                user.Avatar = dto.Avatar;
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
@@ -74,7 +75,8 @@ namespace Umbraco.Core.Persistence.Factories
                 LastLoginDate = entity.LastLoginDate == DateTime.MinValue ? (DateTime?)null : entity.LastLoginDate,
                 LastPasswordChangeDate = entity.LastPasswordChangeDate == DateTime.MinValue ? (DateTime?)null : entity.LastPasswordChangeDate,
                 CreateDate = entity.CreateDate,
-                UpdateDate = entity.UpdateDate
+                UpdateDate = entity.UpdateDate,
+                Avatar = entity.Avatar
             };
 
             foreach (var startNodeId in entity.StartContentIds)

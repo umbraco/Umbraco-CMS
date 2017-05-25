@@ -4,7 +4,7 @@ function versionHelper() {
     return {
 
         //see: https://gist.github.com/TheDistantSea/8021359
-        versionCompare: function(v1, v2, options) {
+        versionCompare: function (v1, v2, options) {
             var lexicographical = options && options.lexicographical,
                 zeroExtend = options && options.zeroExtend,
                 v1parts = v1.split('.'),
@@ -61,15 +61,15 @@ angular.module('umbraco.services').factory('versionHelper', versionHelper);
 function dateHelper() {
 
     return {
-        
-        convertToServerStringTime: function(momentLocal, serverOffsetMinutes, format) {
+
+        convertToServerStringTime: function (momentLocal, serverOffsetMinutes, format) {
 
             //get the formatted offset time in HH:mm (server time offset is in minutes)
             var formattedOffset = (serverOffsetMinutes > 0 ? "+" : "-") +
                 moment()
-                .startOf('day')
-                .minutes(Math.abs(serverOffsetMinutes))
-                .format('HH:mm');
+                    .startOf('day')
+                    .minutes(Math.abs(serverOffsetMinutes))
+                    .format('HH:mm');
 
             var server = moment.utc(momentLocal).utcOffset(formattedOffset);
             return server.format(format ? format : "YYYY-MM-DD HH:mm:ss");
@@ -80,9 +80,9 @@ function dateHelper() {
             //get the formatted offset time in HH:mm (server time offset is in minutes)
             var formattedOffset = (serverOffsetMinutes > 0 ? "+" : "-") +
                 moment()
-                .startOf('day')
-                .minutes(Math.abs(serverOffsetMinutes))
-                .format('HH:mm');
+                    .startOf('day')
+                    .minutes(Math.abs(serverOffsetMinutes))
+                    .format('HH:mm');
 
             //convert to the iso string format
             var isoFormat = moment(strVal).format("YYYY-MM-DDTHH:mm:ss") + formattedOffset;
@@ -121,30 +121,30 @@ angular.module('umbraco.services').factory('packageHelper', packageHelper);
 function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, mediaHelper, umbRequestHelper) {
     return {
         /** sets the image's url, thumbnail and if its a folder */
-        setImageData: function(img) {
-            
+        setImageData: function (img) {
+
             img.isFolder = !mediaHelper.hasFilePropertyType(img);
 
-            if(!img.isFolder){
+            if (!img.isFolder) {
                 img.thumbnail = mediaHelper.resolveFile(img, true);
-                img.image = mediaHelper.resolveFile(img, false);    
+                img.image = mediaHelper.resolveFile(img, false);
             }
         },
 
         /** sets the images original size properties - will check if it is a folder and if so will just make it square */
-        setOriginalSize: function(img, maxHeight) {
+        setOriginalSize: function (img, maxHeight) {
             //set to a square by default
             img.originalWidth = maxHeight;
             img.originalHeight = maxHeight;
 
-            var widthProp = _.find(img.properties, function(v) { return (v.alias === "umbracoWidth"); });
+            var widthProp = _.find(img.properties, function (v) { return (v.alias === "umbracoWidth"); });
             if (widthProp && widthProp.value) {
                 img.originalWidth = parseInt(widthProp.value, 10);
                 if (isNaN(img.originalWidth)) {
                     img.originalWidth = maxHeight;
                 }
             }
-            var heightProp = _.find(img.properties, function(v) { return (v.alias === "umbracoHeight"); });
+            var heightProp = _.find(img.properties, function (v) { return (v.alias === "umbracoHeight"); });
             if (heightProp && heightProp.value) {
                 img.originalHeight = parseInt(heightProp.value, 10);
                 if (isNaN(img.originalHeight)) {
@@ -154,7 +154,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
         },
 
         /** sets the image style which get's used in the angular markup */
-        setImageStyle: function(img, width, height, rightMargin, bottomMargin) {
+        setImageStyle: function (img, width, height, rightMargin, bottomMargin) {
             img.style = { width: width + "px", height: height + "px", "margin-right": rightMargin + "px", "margin-bottom": bottomMargin + "px" };
             img.thumbStyle = {
                 "background-image": "url('" + img.thumbnail + "')",
@@ -162,10 +162,10 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
                 "background-position": "center",
                 "background-size": Math.min(width, img.originalWidth) + "px " + Math.min(height, img.originalHeight) + "px"
             };
-        }, 
+        },
 
         /** gets the image's scaled wdith based on the max row height */
-        getScaledWidth: function(img, maxHeight) {
+        getScaledWidth: function (img, maxHeight) {
             var scaled = img.originalWidth * maxHeight / img.originalHeight;
             return scaled;
             //round down, we don't want it too big even by half a pixel otherwise it'll drop to the next row
@@ -173,7 +173,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
         },
 
         /** returns the target row width taking into account how many images will be in the row and removing what the margin is */
-        getTargetWidth: function(imgsPerRow, maxRowWidth, margin) {
+        getTargetWidth: function (imgsPerRow, maxRowWidth, margin) {
             //take into account the margin, we will have 1 less margin item than we have total images
             return (maxRowWidth - ((imgsPerRow - 1) * margin));
         },
@@ -187,7 +187,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
 
             targetHeight = optional;
         */
-        getRowHeightForImages: function(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin, targetHeight) {
+        getRowHeightForImages: function (imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin, targetHeight) {
 
             var idealImages = imgs.slice(0, idealImgPerRow);
             //get the target row width without margin
@@ -195,8 +195,8 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
             //this gets the image with the smallest height which equals the maximum we can scale up for this image block
             var maxScaleableHeight = this.getMaxScaleableHeight(idealImages, maxRowHeight);
             //if the max scale height is smaller than the min display height, we'll use the min display height
-            targetHeight =  targetHeight !== undefined ? targetHeight : Math.max(maxScaleableHeight, minDisplayHeight);
-            
+            targetHeight = targetHeight !== undefined ? targetHeight : Math.max(maxScaleableHeight, minDisplayHeight);
+
             var attemptedRowHeight = this.performGetRowHeight(idealImages, targetRowWidth, minDisplayHeight, targetHeight);
 
             if (attemptedRowHeight != null) {
@@ -206,12 +206,12 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
                 if (attemptedRowHeight < minDisplayHeight) {
 
                     if (idealImages.length > 1) {
-                        
+
                         //we'll generate a new targetHeight that is halfway between the max and the current and recurse, passing in a new targetHeight                        
                         targetHeight += Math.floor((maxRowHeight - targetHeight) / 2);
                         return this.getRowHeightForImages(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow - 1, margin, targetHeight);
                     }
-                    else {                        
+                    else {
                         //this will occur when we only have one image remaining in the row but it's still going to be too wide even when 
                         // using the minimum display height specified. In this case we're going to have to just crop the image in it's center
                         // using the minimum display height and the full row width
@@ -241,7 +241,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
                 //if we're already dealing with the ideal images per row and it's not quite wide enough, we can scale up a little bit so 
                 // long as the targetHeight is currently less than the maxRowHeight. The scale up will be half-way between our current
                 // target height and the maxRowHeight (we won't loop forever though - if there's a difference of 5 px we'll just quit)
-                
+
                 while (targetHeight < maxRowHeight && (maxRowHeight - targetHeight) > 5) {
                     targetHeight += Math.floor((maxRowHeight - targetHeight) / 2);
                     attemptedRowHeight = this.performGetRowHeight(idealImages, targetRowWidth, minDisplayHeight, targetHeight);
@@ -273,7 +273,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
 
         },
 
-        performGetRowHeight: function(idealImages, targetRowWidth, minDisplayHeight, targetHeight) {
+        performGetRowHeight: function (idealImages, targetRowWidth, minDisplayHeight, targetHeight) {
 
             var currRowWidth = 0;
 
@@ -285,7 +285,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
             if (currRowWidth > targetRowWidth) {
                 //get the new scaled height to fit
                 var newHeight = targetRowWidth * targetHeight / currRowWidth;
-                
+
                 return newHeight;
             }
             else if (idealImages.length === 1 && (currRowWidth <= targetRowWidth) && !idealImages[0].isFolder) {
@@ -303,7 +303,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
         },
 
         /** builds an image grid row */
-        buildRow: function(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin, totalRemaining) {
+        buildRow: function (imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin, totalRemaining) {
             var currRowWidth = 0;
             var row = { images: [] };
 
@@ -315,11 +315,11 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
             for (var i = 0; i < imageRowHeight.imgCount; i++) {
                 //get the lower width to ensure it always fits
                 var scaledWidth = Math.floor(this.getScaledWidth(imgs[i], imageRowHeight.height));
-                
+
                 if (currRowWidth + scaledWidth <= targetWidth) {
-                    currRowWidth += scaledWidth;                    
+                    currRowWidth += scaledWidth;
                     sizes.push({
-                        width:scaledWidth,
+                        width: scaledWidth,
                         //ensure that the height is rounded
                         height: Math.round(imageRowHeight.height)
                     });
@@ -352,17 +352,17 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
 
             if (row.images.length === 1 && totalRemaining > 1) {
                 //if there's only one image on the row and there are more images remaining, set the container to max width
-                row.images[0].style.width = maxRowWidth + "px"; 
+                row.images[0].style.width = maxRowWidth + "px";
             }
-            
+
 
             return row;
         },
 
         /** Returns the maximum image scaling height for the current image collection */
-        getMaxScaleableHeight: function(imgs, maxRowHeight) {
+        getMaxScaleableHeight: function (imgs, maxRowHeight) {
 
-            var smallestHeight = _.min(imgs, function(item) { return item.originalHeight; }).originalHeight;
+            var smallestHeight = _.min(imgs, function (item) { return item.originalHeight; }).originalHeight;
 
             //adjust the smallestHeight if it is larger than the static max row height
             if (smallestHeight > maxRowHeight) {
@@ -372,10 +372,10 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
         },
 
         /** Creates the image grid with calculated widths/heights for images to fill the grid nicely */
-        buildGrid: function(images, maxRowWidth, maxRowHeight, startingIndex, minDisplayHeight, idealImgPerRow, margin,imagesOnly) {
+        buildGrid: function (images, maxRowWidth, maxRowHeight, startingIndex, minDisplayHeight, idealImgPerRow, margin, imagesOnly) {
 
             var rows = [];
-            var imagesProcessed = 0; 
+            var imagesProcessed = 0;
 
             //first fill in all of the original image sizes and URLs
             for (var i = startingIndex; i < images.length; i++) {
@@ -384,7 +384,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
                 this.setImageData(item);
                 this.setOriginalSize(item, maxRowHeight);
 
-                if(imagesOnly && !item.isFolder && !item.thumbnail){
+                if (imagesOnly && !item.isFolder && !item.thumbnail) {
                     images.splice(i, 1);
                     i--;
                 }
@@ -449,7 +449,7 @@ function umbModelMapper() {
 
         /** This converts the source model to a basic entity model, it will throw an exception if there isn't enough data to create the model */
         convertToEntityBasic: function (source) {
-            var required = ["id", "name", "icon", "parentId", "path"];            
+            var required = ["id", "name", "icon", "parentId", "path"];
             _.each(required, function (k) {
                 if (!_.has(source, k)) {
                     throw "The source object does not contain the property " + k;
@@ -485,11 +485,11 @@ function umbSessionStorage($window) {
         get: function (key) {
             return angular.fromJson(storage["umb_" + key]);
         },
-        
-        set : function(key, value) {
+
+        set: function (key, value) {
             storage["umb_" + key] = angular.toJson(value);
         }
-        
+
     };
 }
 angular.module('umbraco.services').factory('umbSessionStorage', umbSessionStorage);
@@ -504,26 +504,26 @@ angular.module('umbraco.services').factory('umbSessionStorage', umbSessionStorag
  */
 function updateChecker($http, umbRequestHelper) {
     return {
-        
-         /**
-          * @ngdoc function
-          * @name umbraco.services.updateChecker#check
-          * @methodOf umbraco.services.updateChecker
-          * @function
-          *
-          * @description
-          * Called to load in the legacy tree js which is required on startup if a user is logged in or 
-          * after login, but cannot be called until they are authenticated which is why it needs to be lazy loaded. 
-          */
-         check: function() {
-                
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.updateChecker#check
+         * @methodOf umbraco.services.updateChecker
+         * @function
+         *
+         * @description
+         * Called to load in the legacy tree js which is required on startup if a user is logged in or 
+         * after login, but cannot be called until they are authenticated which is why it needs to be lazy loaded. 
+         */
+        check: function () {
+
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "updateCheckApiBaseUrl",
-                       "GetCheck")),
-               'Failed to retrieve update status');
-        }  
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "updateCheckApiBaseUrl",
+                        "GetCheck")),
+                'Failed to retrieve update status');
+        }
     };
 }
 angular.module('umbraco.services').factory('updateChecker', updateChecker);
@@ -546,7 +546,7 @@ function umbPropEditorHelper() {
          * 
          * @param {string} input the view path currently stored for the property editor
          */
-        getViewPath: function(input, isPreValue) {
+        getViewPath: function (input, isPreValue) {
             var path = String(input);
 
             if (path.startsWith('/')) {
@@ -582,7 +582,7 @@ angular.module('umbraco.services').factory('umbPropEditorHelper', umbPropEditorH
 **/
 function umbDataFormatter() {
     return {
-        
+
         formatContentTypePostData: function (displayModel, action) {
 
             //create the save model from the display model
@@ -594,7 +594,7 @@ function umbDataFormatter() {
             //TODO: Map these
             saveModel.allowedTemplates = _.map(displayModel.allowedTemplates, function (t) { return t.alias; });
             saveModel.defaultTemplate = displayModel.defaultTemplate ? displayModel.defaultTemplate.alias : null;
-            var realGroups = _.reject(displayModel.groups, function(g) {
+            var realGroups = _.reject(displayModel.groups, function (g) {
                 //do not include these tabs
                 return g.tabState === "init";
             });
@@ -621,9 +621,9 @@ function umbDataFormatter() {
 
                 return saveGroup;
             });
-            
+
             //we don't want any null groups
-            saveModel.groups = _.reject(saveModel.groups, function(g) {
+            saveModel.groups = _.reject(saveModel.groups, function (g) {
                 return !g;
             });
 
@@ -631,7 +631,7 @@ function umbDataFormatter() {
         },
 
         /** formats the display model used to display the data type to the model used to save the data type */
-        formatDataTypePostData: function(displayModel, preValues, action) {
+        formatDataTypePostData: function (displayModel, preValues, action) {
             var saveModel = {
                 parentId: displayModel.parentId,
                 id: displayModel.id,
@@ -651,14 +651,23 @@ function umbDataFormatter() {
             return saveModel;
         },
 
+        /** formats the display model used to display the user to the model used to save the user */
+        formatUserPostData: function (displayModel, preValues, action) {
+
+            //create the save model from the display model
+            var saveModel = _.pick(displayModel, 'id', 'parentId', 'name', 'username', 'culture', 'email', 'startContentIds', 'startMediaIds', 'userGroups');
+            
+            return saveModel;
+        },
+
         /** formats the display model used to display the member to the model used to save the member */
-        formatMemberPostData: function(displayModel, action) {
+        formatMemberPostData: function (displayModel, action) {
             //this is basically the same as for media but we need to explicitly add the username,email, password to the save model
 
             var saveModel = this.formatMediaPostData(displayModel, action);
 
             saveModel.key = displayModel.key;
-            
+
             var genericTab = _.find(displayModel.tabs, function (item) {
                 return item.id === 0;
             });
@@ -679,7 +688,7 @@ function umbDataFormatter() {
             saveModel.email = propEmail.value;
             saveModel.username = propLogin.value;
             saveModel.password = propPass.value;
-            
+
             var selectedGroups = [];
             for (var n in propGroups.value) {
                 if (propGroups.value[n] === true) {
@@ -687,12 +696,12 @@ function umbDataFormatter() {
                 }
             }
             saveModel.memberGroups = selectedGroups;
-            
+
             //turn the dictionary into an array of pairs
             var memberProviderPropAliases = _.pairs(displayModel.fieldConfig);
             _.each(displayModel.tabs, function (tab) {
                 _.each(tab.properties, function (prop) {
-                    var foundAlias = _.find(memberProviderPropAliases, function(item) {
+                    var foundAlias = _.find(memberProviderPropAliases, function (item) {
                         return prop.alias === item[1];
                     });
                     if (foundAlias) {
@@ -709,7 +718,7 @@ function umbDataFormatter() {
                                 saveModel.comments = prop.value;
                                 break;
                         }
-                    }                
+                    }
                 });
             });
 
@@ -719,7 +728,7 @@ function umbDataFormatter() {
         },
 
         /** formats the display model used to display the media to the model used to save the media */
-        formatMediaPostData: function(displayModel, action) {
+        formatMediaPostData: function (displayModel, action) {
             //NOTE: the display model inherits from the save model so we can in theory just post up the display model but 
             // we don't want to post all of the data as it is unecessary.
             var saveModel = {
@@ -744,7 +753,7 @@ function umbDataFormatter() {
                             value: prop.value
                         });
                     }
-                    
+
                 });
             });
 
@@ -760,8 +769,8 @@ function umbDataFormatter() {
             var genericTab = _.find(displayModel.tabs, function (item) {
                 return item.id === 0;
             });
-            
-            var propExpireDate = _.find(genericTab.properties, function(item) {
+
+            var propExpireDate = _.find(genericTab.properties, function (item) {
                 return item.alias === "_umb_expiredate";
             });
             var propReleaseDate = _.find(genericTab.properties, function (item) {

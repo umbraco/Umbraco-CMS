@@ -80,6 +80,13 @@ namespace Umbraco.Core.Models.Rdbms
         [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime UpdateDate { get; set; }
 
+        /// <summary>
+        /// Will hold the media file system relative path of the users custom avatar if they uploaded one
+        /// </summary>
+        [Column("avatar")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public string Avatar { get; set; }
+
         [ResultColumn]
         public List<UserGroupDto> UserGroupDtos { get; set; }
 
