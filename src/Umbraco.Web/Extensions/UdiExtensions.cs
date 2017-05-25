@@ -39,27 +39,5 @@ namespace Umbraco.Web.Extensions
 
             return null;
         }
-
-        /// <summary>
-        /// An extension method to easily acquire the integer Id for a given udi
-        /// </summary>
-        /// <param name="udi"></param>
-        /// <returns>An <see cref="int"/> identifier if the item is found, -1 otherwise</returns>
-        public static int ToIntId(this Udi udi)
-        {
-            Udi identifier;
-            if (Udi.TryParse(udi.ToString(), out identifier) == false)
-                return -1;
-
-            var guidUdi = GuidUdi.Parse(udi.ToString());
-            var umbracoType = Constants.UdiEntityType.ToUmbracoObjectType(identifier.EntityType);
-
-            var entityService = ApplicationContext.Current.Services.EntityService;
-            var entity = entityService.GetByKey(guidUdi.Guid, umbracoType);
-            if (entity == null)
-                return -1;
-
-            return entity.Id;
-        }
     }
 }
