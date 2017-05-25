@@ -36,7 +36,7 @@ namespace Umbraco.Web.Extensions
                         return umbracoHelper.TypedMember(memberAttempt.Result);
                     break;
             }
-            
+
             return null;
         }
     }

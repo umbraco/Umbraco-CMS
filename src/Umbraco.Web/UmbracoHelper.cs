@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
-using System.Web.Routing;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Web
@@ -38,6 +37,7 @@ namespace Umbraco.Web
         private MembershipHelper _membershipHelper;
         private TagQuery _tag;
         private IDataTypeService _dataTypeService;
+        private IEntityService _entityService;
         private UrlProvider _urlProvider;
         private ICultureDictionary _cultureDictionary;
 
@@ -111,6 +111,14 @@ namespace Umbraco.Web
         public IDataTypeService DataTypeService
         {
             get { return _dataTypeService ?? (_dataTypeService = UmbracoContext.Application.Services.DataTypeService); }
+        }
+
+        /// <summary>
+        /// Lazy instantiates the IEntityService
+        /// </summary>
+        private IEntityService EntityService
+        {
+            get { return _entityService ?? (_entityService = UmbracoContext.Application.Services.EntityService); }
         }
 
         /// <summary>
@@ -1489,5 +1497,10 @@ namespace Umbraco.Web
             return surfaceRouteParams.EncryptWithMachineKey();
         }
 
+        public int GetIdForUdi(Udi udi)
+        {
+            var udiToIdAttempt = EntityService.GetIdForUdi(udi);
+            return udiToIdAttempt.Success ? udiToIdAttempt.Result : -1;
+        }
 	}
 }
