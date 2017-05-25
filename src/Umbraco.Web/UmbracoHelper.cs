@@ -116,7 +116,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Lazy instantiates the IEntityService
         /// </summary>
-        public IEntityService EntityService
+        private IEntityService EntityService
         {
             get { return _entityService ?? (_entityService = UmbracoContext.Application.Services.EntityService); }
         }
