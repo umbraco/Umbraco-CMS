@@ -648,10 +648,7 @@ namespace umbraco.BusinessLogic
         public void ClearGroups()
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-            foreach (var group in UserEntity.Groups.ToArray())
-            {
-                UserEntity.RemoveGroup(group);
-            }
+            UserEntity.ClearGroups();
         }
 
         /// <summary>

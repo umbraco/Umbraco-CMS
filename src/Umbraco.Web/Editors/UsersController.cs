@@ -12,6 +12,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -40,7 +41,17 @@ namespace Umbraco.Web.Editors
             : base(umbracoContext)
         {
         }
-        
+
+        public IHttpActionResult SetAvatar(int id)
+        {
+            return Ok();
+        }
+
+        public IHttpActionResult ClearAvatar(int id)
+        {
+            return Ok();
+        }
+
         /// <summary>
         /// Gets a user by Id
         /// </summary>
@@ -61,8 +72,8 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         public IEnumerable<UserGroupDisplay> GetUserGroups()
-        {            
-            return Mapper.Map< IEnumerable<IUserGroup>, IEnumerable<UserGroupDisplay>>(Services.UserService.GetAllUserGroups());
+        {
+            return Mapper.Map<IEnumerable<IUserGroup>, IEnumerable<UserGroupDisplay>>(Services.UserService.GetAllUserGroups());
         }
 
         /// <summary>
@@ -111,7 +122,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
-            
+
             var existing = Services.UserService.GetByEmail(userSave.Email);
             if (existing != null)
             {
@@ -177,7 +188,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
-            
+
             var intId = userSave.Id.TryConvertTo<int>();
             if (intId.Success == false)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -189,28 +200,32 @@ namespace Umbraco.Web.Editors
             var hasErrors = false;
 
             var existing = Services.UserService.GetByEmail(userSave.Email);
-            if (existing != null && existing.Id != (int)userSave.Id)
+            if (existing != null && existing.Id != userSave.Id)
             {
                 ModelState.AddModelError("Email", "A user with the email already exists");
                 hasErrors = true;
             }
             existing = Services.UserService.GetByUsername(userSave.Name);
-            if (existing != null && existing.Id != (int)userSave.Id)
+            if (existing != null && existing.Id != userSave.Id)
             {
                 ModelState.AddModelError("Email", "A user with the email already exists");
                 hasErrors = true;
-            }
+            }            
 
             if (hasErrors)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
 
             //TODO: More validation, password changing logic, persisting
 
-            var user = Mapper.Map<IUser>(userSave);
+            //merge the save data onto the user
+            var user = Mapper.Map(userSave, found);
 
             Services.UserService.Save(user);
 
-            return Mapper.Map<UserDisplay>(user);
+            var display = Mapper.Map<UserDisplay>(user);
+
+            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserSaved"));
+            return display;
         }
 
         /// <summary>
@@ -222,7 +237,7 @@ namespace Umbraco.Web.Editors
             var users = Services.UserService.GetUsersById(userIds).ToArray();
             foreach (var u in users)
             {
-                u.IsApproved = false;                
+                u.IsApproved = false;
             }
             Services.UserService.Save(users);
 
@@ -238,7 +253,7 @@ namespace Umbraco.Web.Editors
             var users = Services.UserService.GetUsersById(userIds).ToArray();
             foreach (var u in users)
             {
-                u.IsApproved = true;                                
+                u.IsApproved = true;
             }
             Services.UserService.Save(users);
 

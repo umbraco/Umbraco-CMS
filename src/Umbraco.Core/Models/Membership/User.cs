@@ -78,6 +78,7 @@ namespace Umbraco.Core.Models.Membership
             if (userGroups == null) throw new ArgumentNullException("userGroups");
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
+            if (string.IsNullOrWhiteSpace(rawPasswordValue)) throw new ArgumentException("Value cannot be null or whitespace.", "rawPasswordValue");
 
             Id = id;
             _name = name;
@@ -342,6 +343,15 @@ namespace Umbraco.Core.Models.Membership
                 _userGroups.Remove(group);
                 OnPropertyChanged(Ps.Value.UserGroupsSelector);
             }
+        }
+
+        public void ClearGroups()
+        {
+            if (_userGroups.Count > 0)
+            {
+                _userGroups.Clear();
+                OnPropertyChanged(Ps.Value.UserGroupsSelector);
+            }        
         }
 
         public void AddGroup(string group)

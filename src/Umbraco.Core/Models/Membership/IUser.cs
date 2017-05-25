@@ -23,7 +23,7 @@ namespace Umbraco.Core.Models.Membership
         IEnumerable<string> Groups { get; }        
 
         void RemoveGroup(string group);
-
+        void ClearGroups();
         void AddGroup(string group);
         
         IEnumerable<string> AllowedSections { get; }

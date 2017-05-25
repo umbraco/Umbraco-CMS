@@ -17,7 +17,15 @@ namespace Umbraco.Web.Models.ContentEditing
     {
         //TODO: There will be more information to save along with the structure for changing passwords
 
-        [DataMember(Name = "locale", IsRequired = true)]
+        [DataMember(Name = "id", IsRequired = true)]
+        [Required]
+        public new int Id { get; set; }
+
+        [DataMember(Name = "username", IsRequired = true)]
+        [Required]
+        public string Username { get; set; }
+
+        [DataMember(Name = "culture", IsRequired = true)]
         [Required]
         public string Culture { get; set; }
 

@@ -16,6 +16,34 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
+            //Used for merging existing UserSave to an existing IUser instance - this will not create an IUser instance!
+            config.CreateMap<UserSave, IUser>()
+                .ForMember(user => user.Language, expression => expression.MapFrom(save => save.Culture))                
+                .ForMember(user => user.SessionTimeout, expression => expression.Ignore())
+                .ForMember(user => user.SecurityStamp, expression => expression.Ignore())
+                .ForMember(user => user.ProviderUserKey, expression => expression.Ignore())
+                .ForMember(user => user.RawPasswordValue, expression => expression.Ignore())
+                .ForMember(user => user.PasswordQuestion, expression => expression.Ignore())
+                .ForMember(user => user.RawPasswordAnswerValue, expression => expression.Ignore())
+                .ForMember(user => user.Comments, expression => expression.Ignore())
+                .ForMember(user => user.IsApproved, expression => expression.Ignore())
+                .ForMember(user => user.IsLockedOut, expression => expression.Ignore())
+                .ForMember(user => user.LastLoginDate, expression => expression.Ignore())
+                .ForMember(user => user.LastPasswordChangeDate, expression => expression.Ignore())
+                .ForMember(user => user.LastLockoutDate, expression => expression.Ignore())
+                .ForMember(user => user.FailedPasswordAttempts, expression => expression.Ignore())
+                .ForMember(user => user.DeletedDate, expression => expression.Ignore())
+                .ForMember(user => user.CreateDate, expression => expression.Ignore())
+                .ForMember(user => user.UpdateDate, expression => expression.Ignore())
+                .AfterMap((save, user) =>
+                {
+                    user.ClearGroups();
+                    foreach (var group in save.UserGroups)
+                    {
+                        user.AddGroup(group);
+                    }
+                });
+
             config.CreateMap<UserInvite, IUser>()
                 .ConstructUsing(invite => new User(invite.Name, invite.Email, invite.Email, Guid.NewGuid().ToString("N")))
                 .ForMember(user => user.Id, expression => expression.Ignore())
@@ -57,7 +85,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Path, opt => opt.MapFrom(user => "-1," + user.Id))
                 .ForMember(detail => detail.AdditionalData, opt => opt.Ignore());
 
-            config.CreateMap<IUser, UserDisplay>()                
+            config.CreateMap<IUser, UserDisplay>()
+                .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(detail => detail.UserGroups, opt => opt.MapFrom(user => user.Groups))
                 .ForMember(detail => detail.StartContentIds, opt => opt.MapFrom(user => user.StartContentIds))
                 .ForMember(detail => detail.StartMediaIds, opt => opt.MapFrom(user => user.StartMediaIds))

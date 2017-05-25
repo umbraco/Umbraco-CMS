@@ -19,6 +19,9 @@ namespace Umbraco.Web.Models.ContentEditing
             Notifications = new List<Notification>();
         }
 
+        [DataMember(Name = "username")]
+        public string Username { get; set; }
+
         /// <summary>
         /// The MD5 lowercase hash of the email which can be used by gravatar
         /// </summary>
