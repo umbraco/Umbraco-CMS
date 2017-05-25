@@ -11,6 +11,17 @@
 
     function usersResource($http, umbRequestHelper, $q, umbDataFormatter) {
 
+        function clearAvatar(userId) {
+           
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "userApiBaseUrl",
+                        "PostClearAvatar",
+                        { id: userId })),
+                'Failed to clear the user avatar ' + userId);
+        }
+
         function disableUsers(userIds) {
             if (!userIds) {
                 throw "userIds not specified";
@@ -188,7 +199,8 @@
             createUser: createUser,
             saveUser: saveUser,
             getUserGroup: getUserGroup,
-            getUserGroups: getUserGroups
+            getUserGroups: getUserGroups,
+            clearAvatar: clearAvatar
         };
 
         return resource;

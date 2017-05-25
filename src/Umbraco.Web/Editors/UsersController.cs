@@ -24,6 +24,8 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
+
+
     [PluginController("UmbracoApi")]
     [UmbracoApplicationAuthorize(Constants.Applications.Users)]
     public class UsersController : UmbracoAuthorizedJsonController
@@ -45,8 +47,21 @@ namespace Umbraco.Web.Editors
         {
         }
 
+        /// <summary>
+        /// Returns a list of the sizes of gravatar urls for the user or null if the gravatar server cannot be reached
+        /// </summary>
+        /// <returns></returns>
+        public string[] GetCurrentUserAvatarUrls()
+        {
+            var urls = UmbracoContext.Security.CurrentUser.GetCurrentUserAvatarUrls(Services.UserService, ApplicationContext.ApplicationCache.StaticCache);
+            if (urls == null)
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Could not access Gravatar endpoint"));
+
+            return urls;
+        }
+
         [FileUploadCleanupFilter(false)]
-        public async Task<HttpResponseMessage> SetAvatar(int id)
+        public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
             if (Request.Content.IsMimeMultipartContent() == false)
             {
@@ -65,14 +80,8 @@ namespace Umbraco.Web.Editors
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
-
-            //get the string json from the request
-            var userId = result.FormData["userId"];
-            int intUserId;
-            if (int.TryParse(userId, out intUserId) == false)
-                return Request.CreateValidationErrorResponse("The request was not formatted correctly, the userId is not an integer");
-
-            var user = Services.UserService.GetUserById(intUserId);
+           
+            var user = Services.UserService.GetUserById(id);
             if (user == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
@@ -89,12 +98,8 @@ namespace Umbraco.Web.Editors
 
             if (UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Contains(ext) == false)
             {
-                if (user.Avatar.IsNullOrWhiteSpace())
-                {
-                    //we'll need to generate a new path!
-                    //make it a hash of known data, we don't want this path to be guessable
-                    user.Avatar =  "UserAvatars/" + (user.Id + user.CreateDate.ToString("yyyyMMdd")).ToSHA1() + ext;
-                }
+                //generate a path of known data, we don't want this path to be guessable
+                user.Avatar = "UserAvatars/" + (user.Id + safeFileName).ToSHA1() + "." + ext;
 
                 using (var fs = System.IO.File.OpenRead(file.LocalFileName))
                 {
@@ -110,14 +115,14 @@ namespace Umbraco.Web.Editors
                 });
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, tempFiles);
+            return Request.CreateResponse(HttpStatusCode.OK, user.GetCurrentUserAvatarUrls(Services.UserService, ApplicationContext.ApplicationCache.StaticCache));
         }
 
-        public IHttpActionResult ClearAvatar(int id)
+        public HttpResponseMessage PostClearAvatar(int id)
         {
             var found = Services.UserService.GetUserById(id);
             if (found == null)
-                return NotFound();
+                return Request.CreateResponse(HttpStatusCode.NotFound);
 
             var filePath = found.Avatar;
 
@@ -128,7 +133,7 @@ namespace Umbraco.Web.Editors
             if (FileSystemProviderManager.Current.MediaFileSystem.FileExists(filePath))
                 FileSystemProviderManager.Current.MediaFileSystem.DeleteFile(filePath);
 
-            return Ok();
+            return Request.CreateResponse(HttpStatusCode.OK, found.GetCurrentUserAvatarUrls(Services.UserService, ApplicationContext.ApplicationCache.StaticCache));
         }
 
         /// <summary>

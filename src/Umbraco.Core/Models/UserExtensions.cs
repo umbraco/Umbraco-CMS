@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Net;
+using Umbraco.Core.Cache;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
@@ -8,6 +11,69 @@ namespace Umbraco.Core.Models
 {
     public static class UserExtensions
     {
+        /// <summary>
+        /// Tries to lookup the user's gravatar to see if the endpoint can be reached, if so it returns the valid URL
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="userService"></param>
+        /// <param name="staticCache"></param>
+        /// <returns>
+        /// A list of 5 different sized avatar URLs
+        /// </returns>
+        internal static string[] GetCurrentUserAvatarUrls(this IUser user, IUserService userService, ICacheProvider staticCache)
+        {
+            if (user.Avatar.IsNullOrWhiteSpace())
+            {
+                var gravatarHash = user.Email.ToMd5();
+                var gravatarUrl = "https://www.gravatar.com/avatar/" + gravatarHash;
+
+                //try gravatar
+                var gravatarAccess = staticCache.GetCacheItem<bool>("UserAvatar" + user.Id, () =>
+                {
+                    // Test if we can reach this URL, will fail when there's network or firewall errors
+                    var request = (HttpWebRequest)WebRequest.Create(gravatarUrl);
+                    // Require response within 10 seconds
+                    request.Timeout = 10000;
+                    try
+                    {
+                        using ((HttpWebResponse)request.GetResponse()) { }
+                    }
+                    catch (Exception)
+                    {
+                        // There was an HTTP or other error, return an null instead
+                        return false;
+                    }
+                    return true;
+                });
+
+                if (gravatarAccess)
+                {
+                    return new[]
+                    {
+                        gravatarUrl  + "?s=30&d=mm",
+                        gravatarUrl  + "?s=60&d=mm",
+                        gravatarUrl  + "?s=90&d=mm",
+                        gravatarUrl  + "?s=150&d=mm",
+                        gravatarUrl  + "?s=300&d=mm"
+                    };
+                }
+
+                return null;
+            }
+
+            //use the custom avatar
+            var avatarUrl = FileSystemProviderManager.Current.MediaFileSystem.GetUrl(user.Avatar);
+            return new[]
+            {
+                avatarUrl  + "?width=30&height=30&mode=crop",
+                avatarUrl  + "?width=60&height=60&mode=crop",
+                avatarUrl  + "?width=90&height=90&mode=crop",
+                avatarUrl  + "?width=150&height=150&mode=crop",
+                avatarUrl  + "?width=300&height=300&mode=crop"
+            };
+
+        }
+
         /// <summary>
         /// Returns the culture info associated with this user, based on the language they're assigned to in the back office
         /// </summary>

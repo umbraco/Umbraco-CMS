@@ -96,7 +96,7 @@
                         }
 
                     } else if (evt.Message) {
-                        file.serverErrorMessage = evt.Message;
+                        vm.zipFile.serverErrorMessage = evt.Message;
                     }
                 }
             });

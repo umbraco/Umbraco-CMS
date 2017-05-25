@@ -6,6 +6,7 @@ using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
@@ -88,6 +89,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.AdditionalData, opt => opt.Ignore());
 
             config.CreateMap<IUser, UserDisplay>()
+                .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(applicationContext.Services.UserService, applicationContext.ApplicationCache.RuntimeCache)))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(detail => detail.UserGroups, opt => opt.MapFrom(user => user.Groups))
                 .ForMember(detail => detail.StartContentIds, opt => opt.MapFrom(user => user.StartContentIds))
@@ -110,11 +112,10 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Trashed, opt => opt.Ignore())                
                 .ForMember(detail => detail.Alias, opt => opt.Ignore())                
                 .ForMember(detail => detail.Trashed, opt => opt.Ignore())
-                //TODO: Enable this when we can!
-                .ForMember(detail => detail.CustomAvatar, opt => opt.Ignore())
                 .ForMember(detail => detail.AdditionalData, opt => opt.Ignore());
 
             config.CreateMap<IUser, UserDetail>()
+                .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(applicationContext.Services.UserService, applicationContext.ApplicationCache.RuntimeCache)))
                 .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))
                 .ForMember(detail => detail.StartContentIds, opt => opt.MapFrom(user => user.StartContentIds))
                 .ForMember(detail => detail.StartMediaIds, opt => opt.MapFrom(user => user.StartMediaIds))

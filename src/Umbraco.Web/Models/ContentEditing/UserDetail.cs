@@ -37,6 +37,12 @@ namespace Umbraco.Web.Models.ContentEditing
         public int[] StartMediaIds { get; set; }
 
         /// <summary>
+        /// Returns a list of different size avatars
+        /// </summary>
+        [DataMember(Name = "avatars")]
+        public string[] Avatars { get; set; }
+
+        /// <summary>
         /// A list of sections the user is allowed to view.
         /// </summary>
         [DataMember(Name = "allowedSections")]

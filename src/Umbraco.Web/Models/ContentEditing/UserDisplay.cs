@@ -31,8 +31,11 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "lastLoginDate")]
         public DateTime LastLoginDate { get; set; }
 
-        [DataMember(Name = "customAvatar")]
-        public string CustomAvatar { get; set; }
+        /// <summary>
+        /// Returns a list of different size avatars
+        /// </summary>
+        [DataMember(Name = "avatars")]
+        public string[] Avatars { get; set; }
 
         [DataMember(Name = "userState")]
         public UserState UserState { get; set; }

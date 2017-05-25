@@ -300,11 +300,7 @@ namespace Umbraco.Web.Editors
                             {
                                 "logApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<LogController>(
                                     controller => controller.GetEntityLog(0))
-                            },
-                            {
-                                "gravatarApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<GravatarController>(
-                                    controller => controller.GetCurrentUserGravatarUrl())
-                            },
+                            },                           
                             {
                                 "memberApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberController>(
                                     controller => controller.GetByKey(Guid.Empty))
