@@ -59,7 +59,7 @@ namespace Umbraco.Tests
             Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/path%20to/this%20is%20a%20test.xyz", udi3.ToString());
         }
 
-        [Test]
+        [Test, Ignore]
         public void StringEncodingTest2()
         {
             // reserved = : / ? # [ ] @ ! $ & ' ( ) * + , ; =
