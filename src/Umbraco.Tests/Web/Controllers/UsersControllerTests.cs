@@ -1,23 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using System.Linq;
-using System.Net;
+﻿using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Web.Configuration;
-using System.Web.Http;
-using System.Web.Http.SelfHost;
-using AutoMapper;
-using Examine.Providers;
-using Microsoft.Owin.Testing;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -26,10 +12,8 @@ using Umbraco.Tests.TestHelpers.ControllerTesting;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
-using Umbraco.Web.WebApi;
 
-namespace Umbraco.Tests.Controllers
+namespace Umbraco.Tests.Web.Controllers
 {
     [DatabaseTestBehavior(DatabaseBehavior.NoDatabasePerFixture)]
     [TestFixture]

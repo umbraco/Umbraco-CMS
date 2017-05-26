@@ -29,8 +29,8 @@ namespace Umbraco.Tests.Security
                 //This is the id that 'identity' uses to check for the username
                 new Claim(ClaimTypes.Name, "testing", ClaimValueTypes.String, TestIssuer, TestIssuer), 
                 new Claim(ClaimTypes.GivenName, "hello world", ClaimValueTypes.String, TestIssuer, TestIssuer), 
-                new Claim(Constants.Security.StartContentNodeIdClaimType, "-1", ClaimValueTypes.Integer32, TestIssuer, TestIssuer),
-                new Claim(Constants.Security.StartMediaNodeIdClaimType, "5543", ClaimValueTypes.Integer32, TestIssuer, TestIssuer),
+                new Claim(Constants.Security.StartContentNodeIdClaimType, "[-1]", ClaimValueTypes.Integer32, TestIssuer, TestIssuer),
+                new Claim(Constants.Security.StartMediaNodeIdClaimType, "[5543]", ClaimValueTypes.Integer32, TestIssuer, TestIssuer),
                 new Claim(Constants.Security.AllowedApplicationsClaimType, "content", ClaimValueTypes.String, TestIssuer, TestIssuer),
                 new Claim(Constants.Security.AllowedApplicationsClaimType, "media", ClaimValueTypes.String, TestIssuer, TestIssuer),
                 new Claim(ClaimTypes.Locality, "en-us", ClaimValueTypes.String, TestIssuer, TestIssuer),
@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Security
             Assert.AreEqual(sessionId, backofficeIdentity.SessionId);
             Assert.AreEqual("testing", backofficeIdentity.Username);
             Assert.AreEqual("hello world", backofficeIdentity.RealName);
-            Assert.AreEqual(0, backofficeIdentity.StartContentNodes.Length);
+            Assert.AreEqual(1, backofficeIdentity.StartContentNodes.Length);
             Assert.IsTrue(backofficeIdentity.StartMediaNodes.UnsortedSequenceEqual(new []{ 5543 }));
             Assert.IsTrue(new[] {"content", "media"}.SequenceEqual(backofficeIdentity.AllowedApplications));
             Assert.AreEqual("en-us", backofficeIdentity.Culture);

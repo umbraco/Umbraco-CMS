@@ -40,9 +40,10 @@ namespace Umbraco.Web.Models.Mapping
                 .AfterMap((save, user) =>
                 {
                     user.ClearGroups();
-                    foreach (var group in save.UserGroups)
+                    var foundGroups = applicationContext.Services.UserService.GetUserGroupsByAlias(save.UserGroups.ToArray());
+                    foreach (var group in foundGroups)
                     {
-                        user.AddGroup(group);
+                        user.AddGroup(group.ToReadOnlyGroup());
                     }
                 });
 
@@ -72,10 +73,12 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(user => user.UpdateDate, expression => expression.Ignore())
                 .AfterMap((invite, user) =>
                 {
-                    foreach (var group in invite.UserGroups)
+                    user.ClearGroups();
+                    var foundGroups = applicationContext.Services.UserService.GetUserGroupsByAlias(invite.UserGroups.ToArray());
+                    foreach (var group in foundGroups)
                     {
-                        user.AddGroup(group);
-                    } 
+                        user.AddGroup(group.ToReadOnlyGroup());
+                    }
                 });
 
             config.CreateMap<IUserGroup, UserGroupDisplay>()
@@ -123,18 +126,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     detail => detail.EmailHash,
                     opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().ToMd5()))
-                .ForMember(detail => detail.SecondsUntilTimeout, opt => opt.Ignore());
-
-            config.CreateMap<BackOfficeIdentityUser, UserDetail>()
-                .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => user.Id))
-                .ForMember(detail => detail.StartContentIds, opt => opt.MapFrom(user => user.StartContentIds))
-                .ForMember(detail => detail.StartMediaIds, opt => opt.MapFrom(user => user.StartMediaIds))
-                .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.Culture))
-                .ForMember(detail => detail.AllowedSections, opt => opt.MapFrom(user => user.AllowedSections))
-                .ForMember(
-                    detail => detail.EmailHash,
-                    opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().ToMd5()))
-                .ForMember(detail => detail.SecondsUntilTimeout, opt => opt.Ignore());
+                .ForMember(detail => detail.SecondsUntilTimeout, opt => opt.Ignore());            
 
             config.CreateMap<IProfile, UserBasic>()
                   .ForMember(detail => detail.UserId, opt => opt.MapFrom(profile => GetIntId(profile.Id)));

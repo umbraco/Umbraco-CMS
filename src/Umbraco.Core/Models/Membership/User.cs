@@ -23,7 +23,7 @@ namespace Umbraco.Core.Models.Membership
         public User()
         {
             SessionTimeout = 60;
-            _userGroups = new List<string>();
+            _userGroups = new HashSet<IReadOnlyUserGroup>();
             _language = GlobalSettings.DefaultUILanguage;
             _isApproved = true;
             _isLockedOut = false;
@@ -31,7 +31,6 @@ namespace Umbraco.Core.Models.Membership
             _startMediaIds = new int[] { };
             //cannot be null
             _rawPasswordValue = "";
-            _allowedSections = new List<string>();
         }
 
         /// <summary>
@@ -53,8 +52,7 @@ namespace Umbraco.Core.Models.Membership
             _email = email;
             _username = username;
             _rawPasswordValue = rawPasswordValue;
-            _allowedSections = new List<string>();
-            _userGroups = new List<string>();
+            _userGroups = new HashSet<IReadOnlyUserGroup>();
             _isApproved = true;
             _isLockedOut = false;
             _startContentIds = new int[] { };
@@ -69,26 +67,22 @@ namespace Umbraco.Core.Models.Membership
         /// <param name="email"></param>
         /// <param name="username"></param>
         /// <param name="rawPasswordValue"></param>
-        /// <param name="allowedSections"></param>
         /// <param name="userGroups"></param>
-        public User(int id, string name, string email, string username, string rawPasswordValue, IEnumerable<string> allowedSections, IEnumerable<string> userGroups)
+        public User(int id, string name, string email, string username, string rawPasswordValue, IEnumerable<IReadOnlyUserGroup> userGroups)
             : this()
         {
             //we allow whitespace for this value so just check null
             if (rawPasswordValue == null) throw new ArgumentNullException("rawPasswordValue");
-            if (allowedSections == null) throw new ArgumentNullException("allowedSections");
             if (userGroups == null) throw new ArgumentNullException("userGroups");
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
-            
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");            
 
             Id = id;
             _name = name;
             _email = email;
             _username = username;
             _rawPasswordValue = rawPasswordValue;
-            _allowedSections = allowedSections;
-            _userGroups = new List<string>(userGroups);
+            _userGroups = new HashSet<IReadOnlyUserGroup>(userGroups);
             _isApproved = true;
             _isLockedOut = false;
             _startContentIds = new int[] { };
@@ -107,7 +101,7 @@ namespace Umbraco.Core.Models.Membership
         private string _email;
         private string _rawPasswordValue;
         private IEnumerable<string> _allowedSections;
-        private List<string> _userGroups;
+        private HashSet<IReadOnlyUserGroup> _userGroups;
         private bool _isApproved;
         private bool _isLockedOut;
         private string _language;
@@ -142,7 +136,7 @@ namespace Umbraco.Core.Models.Membership
 
             public readonly PropertyInfo DefaultToLiveEditingSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.DefaultToLiveEditing);
 
-            public readonly PropertyInfo UserGroupsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<string>>(x => x.Groups);
+            public readonly PropertyInfo UserGroupsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<IReadOnlyUserGroup>>(x => x.Groups);
 
             //Custom comparer for enumerable
             public readonly DelegateEqualityComparer<IEnumerable<int>> IntegerEnumerableComparer =
@@ -258,7 +252,7 @@ namespace Umbraco.Core.Models.Membership
 
         public IEnumerable<string> AllowedSections
         {
-            get { return _allowedSections; }
+            get { return _allowedSections ?? (_allowedSections = new List<string>(_userGroups.SelectMany(x => x.AllowedSections).Distinct())); }
         }
 
         public IProfile ProfileData
@@ -339,20 +333,25 @@ namespace Umbraco.Core.Models.Membership
         }
 
         /// <summary>
-        /// Gets or sets the groups that user is part of
+        /// Gets the groups that user is part of
         /// </summary>
         [DataMember]
-        public IEnumerable<string> Groups
+        public IEnumerable<IReadOnlyUserGroup> Groups
         {
             get { return _userGroups; }
         }
         
         public void RemoveGroup(string group)
         {
-            if (_userGroups.Contains(group))
+            foreach (var userGroup in _userGroups.ToArray())
             {
-                _userGroups.Remove(group);
-                OnPropertyChanged(Ps.Value.UserGroupsSelector);
+                if (userGroup.Alias == group)
+                {
+                    _userGroups.Remove(userGroup);
+                    //reset this flag so it's rebuilt with the assigned groups
+                    _allowedSections = null;
+                    OnPropertyChanged(Ps.Value.UserGroupsSelector);
+                }
             }
         }
 
@@ -361,17 +360,20 @@ namespace Umbraco.Core.Models.Membership
             if (_userGroups.Count > 0)
             {
                 _userGroups.Clear();
+                //reset this flag so it's rebuilt with the assigned groups
+                _allowedSections = null;
                 OnPropertyChanged(Ps.Value.UserGroupsSelector);
             }        
         }
 
-        public void AddGroup(string group)
+        public void AddGroup(IReadOnlyUserGroup group)
         {
-            if (_userGroups.Contains(group) == false)
+            if (_userGroups.Add(group))
             {
-                _userGroups.Add(group);
+                //reset this flag so it's rebuilt with the assigned groups
+                _allowedSections = null;
                 OnPropertyChanged(Ps.Value.UserGroupsSelector);
-            }
+            }            
         }
         
         #endregion
@@ -385,8 +387,8 @@ namespace Umbraco.Core.Models.Membership
             //turn off change tracking
             clone.DisableChangeTracking();
             //need to create new collections otherwise they'll get copied by ref
-            clone._userGroups = new List<string>(_userGroups);
-            clone._allowedSections = new List<string>(_allowedSections);
+            clone._userGroups = new HashSet<IReadOnlyUserGroup>(_userGroups);
+            clone._allowedSections = _allowedSections != null ? new List<string>(_allowedSections) : null;
             //re-create the event handler
             //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);

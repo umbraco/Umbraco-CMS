@@ -343,6 +343,9 @@
     <Compile Include="HashCodeHelper.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
+    <Compile Include="Models\Membership\IReadOnlyUserGroup.cs" />
+    <Compile Include="Models\Membership\ReadOnlyUserGroup.cs" />
+    <Compile Include="Models\Membership\UserGroupExtensions.cs" />
     <Compile Include="Models\Membership\UserProfile.cs" />
     <Compile Include="Models\Membership\UserState.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeConverter.cs" />

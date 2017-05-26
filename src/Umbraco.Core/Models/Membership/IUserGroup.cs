@@ -5,6 +5,8 @@ namespace Umbraco.Core.Models.Membership
 {
     public interface IUserGroup : IAggregateRoot
     {
+        string Alias { get; set; }
+
         int StartContentId { get; set; }
         int StartMediaId { get; set; }
 
@@ -12,12 +14,7 @@ namespace Umbraco.Core.Models.Membership
         /// The icon
         /// </summary>
         string Icon { get; set; }
-
-        /// <summary>
-        /// The alias
-        /// </summary>
-        string Alias { get; set; }
-
+        
         /// <summary>
         /// The name
         /// </summary>

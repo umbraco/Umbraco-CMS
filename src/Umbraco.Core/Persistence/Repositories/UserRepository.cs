@@ -221,7 +221,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //lookup all assigned
                 var assigned = entity.Groups == null || entity.Groups.Any() == false
                     ? new List<UserGroupDto>()
-                    : Database.Fetch<UserGroupDto>("SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)", new { aliases = entity.Groups });
+                    : Database.Fetch<UserGroupDto>("SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)", new { aliases = entity.Groups.Select(x => x.Alias) });
                 
                 foreach (var groupDto in assigned)
                 {
@@ -318,7 +318,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //lookup all assigned
                 var assigned = entity.Groups == null || entity.Groups.Any() == false
                     ? new List<UserGroupDto>()
-                    : Database.Fetch<UserGroupDto>("SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)", new { aliases = entity.Groups });
+                    : Database.Fetch<UserGroupDto>("SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)", new { aliases = entity.Groups.Select(x => x.Alias) });
 
                 //first delete all 
                 //TODO: We could do this a nicer way instead of "Nuke and Pave"

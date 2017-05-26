@@ -7,7 +7,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
 
-namespace Umbraco.Tests.Web.Controllers.WebApiEditors
+namespace Umbraco.Tests.Web.Controllers
 {
     [TestFixture]
     public class MediaControllerUnitTests

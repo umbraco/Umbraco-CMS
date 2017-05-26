@@ -825,7 +825,7 @@ namespace Umbraco.Core.Services
             foreach (var group in user.Groups)
             {
                 //TODO: This may perform horribly :/ 
-                foreach (var permission in GetPermissions(group, false, nodeIds))
+                foreach (var permission in GetPermissions(group.Alias, false, nodeIds))
                 {
                     AddOrAmendPermissionList(result, permission);
                 }
@@ -922,7 +922,7 @@ namespace Umbraco.Core.Services
         /// <returns>String indicating permissions for provided user and path</returns>
         public string GetPermissionsForPath(IUser user, string path)
         {   
-            var assignedPermissions = GetPermissionsForGroupsAndPath(user.Groups, path);
+            var assignedPermissions = GetPermissionsForGroupsAndPath(user.Groups.Select(x => x.Alias), path);
             return GetAggregatePermissions(assignedPermissions);
         }
 

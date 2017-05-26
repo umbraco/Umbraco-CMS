@@ -408,7 +408,7 @@ namespace Umbraco.Core.Security
 
             if (foundUser != null && foundGroup != null)
             {
-                foundUser.AddGroup(foundGroup.Alias);
+                foundUser.AddGroup(foundGroup.ToReadOnlyGroup());
             }
 
             return Task.FromResult(0);
@@ -688,22 +688,21 @@ namespace Umbraco.Core.Security
                 anythingChanged = true;
                 user.SecurityStamp = identityUser.SecurityStamp;
             }
-            
-            if (user.Groups.ContainsAll(identityUser.Groups) == false
-                || identityUser.Groups.ContainsAll(user.Groups) == false)
+
+            var userGroups = user.Groups.Select(x => x.Alias).ToArray();
+            if (userGroups.ContainsAll(identityUser.Groups) == false
+                || identityUser.Groups.ContainsAll(userGroups) == false)
             {
                 anythingChanged = true;
-                
+
                 //clear out the current groups (need to ToArray since we are modifying the iterator)
-                foreach (var group in user.Groups.ToArray())
-                {
-                    user.RemoveGroup(group);
-                }
+                user.ClearGroups();
+                
                 //get all of the ones found by alias and add them
                 var foundGroups = _userService.GetUserGroupsByAlias(identityUser.Groups);
                 foreach (var group in foundGroups)
                 {
-                    user.AddGroup(group.Alias);
+                    user.AddGroup(group.ToReadOnlyGroup());
                 }
             }
 

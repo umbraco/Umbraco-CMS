@@ -190,7 +190,7 @@
     <Compile Include="TestHelpers\ControllerTesting\TestRunner.cs" />
     <Compile Include="TestHelpers\ControllerTesting\TestStartup.cs" />
     <Compile Include="TestHelpers\ControllerTesting\TraceExceptionLogger.cs" />
-    <Compile Include="Controllers\UsersControllerTests.cs" />
+    <Compile Include="Web\Controllers\UsersControllerTests.cs" />
     <Compile Include="Dependencies\NuGet.cs" />
     <Compile Include="CallContextTests.cs" />
     <Compile Include="Issues\U9560.cs" />
@@ -368,9 +368,9 @@
     <Compile Include="Configurations\UmbracoSettings\ViewstateMoverModuleElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementTests.cs" />
-    <Compile Include="Web\Controllers\WebApiEditors\ContentControllerUnitTests.cs" />
-    <Compile Include="Web\Controllers\WebApiEditors\FilterAllowedOutgoingContentAttributeTests.cs" />
-    <Compile Include="Web\Controllers\WebApiEditors\MediaControllerUnitTests.cs" />
+    <Compile Include="Web\Controllers\ContentControllerUnitTests.cs" />
+    <Compile Include="Web\Controllers\FilterAllowedOutgoingContentAttributeTests.cs" />
+    <Compile Include="Web\Controllers\MediaControllerUnitTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
     <Compile Include="DynamicsAndReflection\QueryableExtensionTests.cs" />
     <Compile Include="DynamicsAndReflection\ExtensionMethodFinderTests.cs" />

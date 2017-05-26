@@ -337,7 +337,7 @@ namespace Umbraco.Tests.Services
             var users = MockedUser.CreateMulipleUsers(10).ToArray();
             for (var i = 0; i < 10;)
             {
-                users[i].AddGroup(userGroup.Alias);
+                users[i].AddGroup(userGroup.ToReadOnlyGroup());
                 i = i + 2;
             }
             ServiceContext.UserService.Save(users);
@@ -360,7 +360,7 @@ namespace Umbraco.Tests.Services
             var users = MockedUser.CreateMulipleUsers(10).ToArray();
             for (var i = 0; i < 10;)
             {
-                users[i].AddGroup(userGroup.Alias);
+                users[i].AddGroup(userGroup.ToReadOnlyGroup());
                 i = i + 2;
             }
             for (var i = 0; i < 10;)
@@ -697,7 +697,7 @@ namespace Umbraco.Tests.Services
             userGroup = CreateTestUserGroup();
 
             var user = ServiceContext.UserService.CreateUserWithIdentity("test1", "test1@test.com");
-            user.AddGroup(userGroup.Alias);
+            user.AddGroup(userGroup.ToReadOnlyGroup());
             ServiceContext.UserService.Save(user);
             return user;
         }

@@ -12,20 +12,8 @@ namespace Umbraco.Core.Persistence.Factories
         public static IUser BuildEntity(UserDto dto)
         {
             var guidId = dto.Id.ToGuid();
-
-            var groupAliases = new HashSet<string>();
-            var allowedSections = new HashSet<string>();
-            var userGroups = dto.UserGroupDtos;
-            foreach (var userGroup in userGroups)
-            {
-                groupAliases.Add(userGroup.Alias);
-                foreach (var section in userGroup.UserGroup2AppDtos)
-                {
-                    allowedSections.Add(section.AppAlias);
-                }
-            }
-
-            var user = new User(dto.Id, dto.UserName, dto.Email, dto.Login,dto.Password, allowedSections, groupAliases);
+            
+            var user = new User(dto.Id, dto.UserName, dto.Email, dto.Login,dto.Password, dto.UserGroupDtos.Select(x => x.ToReadOnlyGroup()).ToArray());
 
             try
             {

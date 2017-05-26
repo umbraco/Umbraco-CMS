@@ -20,11 +20,11 @@ namespace Umbraco.Core.Models.Membership
         /// <summary>
         /// Gets the groups that user is part of
         /// </summary>
-        IEnumerable<string> Groups { get; }        
+        IEnumerable<IReadOnlyUserGroup> Groups { get; }        
 
         void RemoveGroup(string group);
         void ClearGroups();
-        void AddGroup(string group);
+        void AddGroup(IReadOnlyUserGroup group);
         
         IEnumerable<string> AllowedSections { get; }
 

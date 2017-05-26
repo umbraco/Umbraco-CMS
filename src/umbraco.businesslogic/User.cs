@@ -657,7 +657,9 @@ namespace umbraco.BusinessLogic
         public void AddGroup(string groupAlias)
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-            UserEntity.AddGroup(groupAlias);
+            var group = ApplicationContext.Current.Services.UserService.GetUserGroupByAlias(groupAlias);
+            if (group != null)
+                UserEntity.AddGroup(group.ToReadOnlyGroup());
         }
 
         /// <summary>
@@ -667,7 +669,7 @@ namespace umbraco.BusinessLogic
         public string[] GetGroups()
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-            return UserEntity.Groups.ToArray();
+            return UserEntity.Groups.Select(x => x.Alias).ToArray();
         }
 
 

@@ -11,7 +11,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi.Filters;
 
-namespace Umbraco.Tests.Web.Controllers.WebApiEditors
+namespace Umbraco.Tests.Web.Controllers
 {
     [TestFixture]
     public class FilterAllowedOutgoingContentAttributeTests

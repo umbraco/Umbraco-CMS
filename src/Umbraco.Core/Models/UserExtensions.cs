@@ -125,12 +125,16 @@ namespace Umbraco.Core.Models
             var formattedPath = "," + path + ",";
             var formattedRecycleBinId = "," + recycleBinId.ToInvariantString() + ",";
 
-            //only users with root access have access to the recycle bin
+            //check for root path access
+            //TODO: This logic may change
+            if (startNodeIds.Length == 0 || startNodeIds.Contains(Constants.System.Root))
+                return true;
+
+            //only users with root access have access to the recycle bin so if the above check didn't pass than access is denied
             if (formattedPath.Contains(formattedRecycleBinId))
             {
-                var hasAccess = startNodeIds.Length == 0 || startNodeIds.Contains(Constants.System.Root);
-                return hasAccess;
-            }
+                return false;
+            }            
 
             //check for normal paths
             foreach (var startNodeId in startNodeIds)
@@ -168,7 +172,7 @@ namespace Umbraco.Core.Models
         public static bool IsAdmin(this IUser user)
         {
             if (user == null) throw new ArgumentNullException("user");
-            return user.Groups != null && user.Groups.Any(x => x == Constants.Security.AdminGroupAlias);
+            return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.AdminGroupAlias);
         }
     }
 }

@@ -2,6 +2,8 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
@@ -26,6 +28,29 @@ namespace Umbraco.Tests.Persistence.Repositories
         public override void TearDown()
         {
             base.TearDown();
+        }
+
+        private MediaRepository CreateMediaRepository(IScopeUnitOfWork unitOfWork, out IMediaTypeRepository mediaTypeRepository)
+        {
+            mediaTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper, Mock.Of<ILogger>(), SqlSyntax);
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Mock.Of<ILogger>(), SqlSyntax);
+            var repository = new MediaRepository(unitOfWork, CacheHelper, Mock.Of<ILogger>(), SqlSyntax, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>());
+            return repository;
+        }
+
+        private ContentRepository CreateContentRepository(IScopeUnitOfWork unitOfWork, out IContentTypeRepository contentTypeRepository)
+        {
+            ITemplateRepository tr;
+            return CreateContentRepository(unitOfWork, out contentTypeRepository, out tr);
+        }
+
+        private ContentRepository CreateContentRepository(IScopeUnitOfWork unitOfWork, out IContentTypeRepository contentTypeRepository, out ITemplateRepository templateRepository)
+        {
+            templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, SqlSyntax);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, templateRepository);
+            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            return repository;
         }
 
         private UserRepository CreateRepository(IScopeUnitOfWork unitOfWork)
@@ -75,7 +100,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {                
                 IUser user = MockedUser.CreateUser();
-                user.AddGroup(group.Alias);
+                user.AddGroup(group.ToReadOnlyGroup());
 
                 // Act
                 repository.AddOrUpdate(user);
@@ -86,7 +111,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(user.HasIdentity, Is.True);
                 Assert.AreEqual(1, user.Groups.Count());
-                Assert.AreEqual(group.Alias, user.Groups.ElementAt(0));
+                Assert.AreEqual(group.Alias, user.Groups.ElementAt(0).Alias);
             }
         }
 
@@ -137,30 +162,49 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Update_On_UserRepository()
         {
+            var ct = MockedContentTypes.CreateBasicContentType("test");
+            var content = MockedContent.CreateBasicContent(ct);
+            var mt = MockedContentTypes.CreateSimpleMediaType("testmedia", "TestMedia");
+            var media = MockedMedia.CreateSimpleMedia(mt, "asdf", -1);
+
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            IContentTypeRepository contentTypeRepo;
+            IMediaTypeRepository mediaTypeRepo;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepo))
+            using (var mediaRepository = CreateMediaRepository(unitOfWork, out mediaTypeRepo))
+            using (contentTypeRepo)
+            using(mediaTypeRepo)
+            using (var userRepository = CreateRepository(unitOfWork))
             using (var userGroupRepository = CreateUserGroupRepository(unitOfWork))
             {
-                var user = CreateAndCommitUserWithGroup(repository, userGroupRepository, unitOfWork);
+                contentTypeRepo.AddOrUpdate(ct);
+                mediaTypeRepo.AddOrUpdate(mt);
+                unitOfWork.Commit();
+
+                contentRepository.AddOrUpdate(content);
+                mediaRepository.AddOrUpdate(media);
+                unitOfWork.Commit();
+
+                var user = CreateAndCommitUserWithGroup(userRepository, userGroupRepository, unitOfWork);
 
                 // Act
-                var resolved = (User)repository.Get((int)user.Id);
+                var resolved = (User)userRepository.Get((int)user.Id);
 
                 resolved.Name = "New Name";
                 resolved.Language = "fr";
                 resolved.IsApproved = false;
                 resolved.RawPasswordValue = "new";
                 resolved.IsLockedOut = true;
-                resolved.StartContentIds = new []{ 10 };
-                resolved.StartMediaIds = new []{ 11 };
+                resolved.StartContentIds = new[] { content.Id };
+                resolved.StartMediaIds = new[] { media.Id };
                 resolved.Email = "new@new.com";
                 resolved.Username = "newName";
 
-                repository.AddOrUpdate(resolved);
+                userRepository.AddOrUpdate(resolved);
                 unitOfWork.Commit();
-                var updatedItem = (User)repository.Get((int)user.Id);
+                var updatedItem = (User)userRepository.Get((int)user.Id);
 
                 // Assert
                 Assert.That(updatedItem.Id, Is.EqualTo(resolved.Id));
