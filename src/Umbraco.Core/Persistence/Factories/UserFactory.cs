@@ -13,15 +13,16 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var guidId = dto.Id.ToGuid();
             
-            var user = new User(dto.Id, dto.UserName, dto.Email, dto.Login,dto.Password, dto.UserGroupDtos.Select(x => x.ToReadOnlyGroup()).ToArray());
+            var user = new User(dto.Id, dto.UserName, dto.Email, dto.Login,dto.Password, 
+                dto.UserGroupDtos.Select(x => x.ToReadOnlyGroup()).ToArray(),
+                dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Content).Select(x => x.StartNode).ToArray(),
+                dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Media).Select(x => x.StartNode).ToArray());
 
             try
             {
                 user.DisableChangeTracking();
                 
                 user.Key = guidId;
-                user.StartContentIds = dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Content).Select(x => x.StartNode).ToArray();
-                user.StartMediaIds = dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int) UserStartNodeDto.StartNodeTypeValue.Media).Select(x => x.StartNode).ToArray();
                 user.IsLockedOut = dto.NoConsole;
                 user.IsApproved = dto.Disabled == false;
                 user.Language = dto.UserLanguage;

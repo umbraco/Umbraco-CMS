@@ -68,12 +68,16 @@ namespace Umbraco.Core.Models.Membership
         /// <param name="username"></param>
         /// <param name="rawPasswordValue"></param>
         /// <param name="userGroups"></param>
-        public User(int id, string name, string email, string username, string rawPasswordValue, IEnumerable<IReadOnlyUserGroup> userGroups)
+        /// <param name="startContentIds"></param>
+        /// <param name="startMediaIds"></param>
+        public User(int id, string name, string email, string username, string rawPasswordValue, IEnumerable<IReadOnlyUserGroup> userGroups, int[] startContentIds, int[] startMediaIds)
             : this()
         {
             //we allow whitespace for this value so just check null
             if (rawPasswordValue == null) throw new ArgumentNullException("rawPasswordValue");
             if (userGroups == null) throw new ArgumentNullException("userGroups");
+            if (startContentIds == null) throw new ArgumentNullException("startContentIds");
+            if (startMediaIds == null) throw new ArgumentNullException("startMediaIds");
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");            
 
@@ -85,8 +89,8 @@ namespace Umbraco.Core.Models.Membership
             _userGroups = new HashSet<IReadOnlyUserGroup>(userGroups);
             _isApproved = true;
             _isLockedOut = false;
-            _startContentIds = new int[] { };
-            _startMediaIds = new int[] { };
+            _startContentIds = startContentIds;
+            _startMediaIds = startMediaIds;
         }
 
         private string _name;

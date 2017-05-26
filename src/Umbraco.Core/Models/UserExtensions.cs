@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -11,6 +12,24 @@ namespace Umbraco.Core.Models
 {
     public static class UserExtensions
     {
+        /// <summary>
+        /// Returns all of the user's assigned start node ids based on ids assigned directly to the IUser object and it's groups
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<int> GetCombinedStartContentIds(this IUser user)
+        {
+            return user.StartContentIds.Concat(user.Groups.Select(x => x.StartContentId)).Distinct();
+        }
+
+        /// <summary>
+        /// Returns all of the user's assigned start node ids based on ids assigned directly to the IUser object and it's groups
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<int> GetCombinedMediaContentIds(this IUser user)
+        {
+            return user.StartMediaIds.Concat(user.Groups.Select(x => x.StartMediaId)).Distinct();
+        }
+
         /// <summary>
         /// Tries to lookup the user's gravatar to see if the endpoint can be reached, if so it returns the valid URL
         /// </summary>
@@ -115,7 +134,7 @@ namespace Umbraco.Core.Models
         {
             if (user == null) throw new ArgumentNullException("user");
             if (content == null) throw new ArgumentNullException("content");
-            return HasPathAccess(content.Path, user.StartContentIds, Constants.System.RecycleBinContent);
+            return HasPathAccess(content.Path, user.GetCombinedStartContentIds().ToArray(), Constants.System.RecycleBinContent);
         }
 
         internal static bool HasPathAccess(string path, int[] startNodeIds, int recycleBinId)
@@ -159,7 +178,7 @@ namespace Umbraco.Core.Models
         {
             if (user == null) throw new ArgumentNullException("user");
             if (media == null) throw new ArgumentNullException("media");
-            return HasPathAccess(media.Path, user.StartMediaIds, Constants.System.RecycleBinMedia);
+            return HasPathAccess(media.Path, user.GetCombinedMediaContentIds().ToArray(), Constants.System.RecycleBinMedia);
         }
         
         /// <summary>
