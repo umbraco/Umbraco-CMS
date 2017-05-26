@@ -285,8 +285,8 @@
 
         function formatDates(users) {
             angular.forEach(users, function(user){
-                if(user.lastLogin) {
-                    user.formattedLastLogin = moment(user.lastLogin).format("MMMM Do YYYY, HH:mm");
+                if (user.lastLoginDate) {
+                    user.formattedLastLogin = moment(user.lastLoginDate).format("MMMM Do YYYY, HH:mm");
                 }
             });
         }

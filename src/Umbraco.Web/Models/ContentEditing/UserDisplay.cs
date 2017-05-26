@@ -29,7 +29,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public string EmailHash { get; set; }
 
         [DataMember(Name = "lastLoginDate")]
-        public DateTime LastLoginDate { get; set; }
+        public DateTime? LastLoginDate { get; set; }
 
         /// <summary>
         /// Returns a list of different size avatars

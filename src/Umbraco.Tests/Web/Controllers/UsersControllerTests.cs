@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using Moq;
@@ -36,7 +37,11 @@ namespace Umbraco.Tests.Web.Controllers
                         u.Id = 1234;
                     });
                 userServiceMock.Setup(service => service.GetAllUserGroups(It.IsAny<int[]>()))
-                    .Returns(Enumerable.Empty<IUserGroup>);
+                    .Returns(new[] { Mock.Of<IUserGroup>(group => group.Id == 123 && group.Alias == "writers" && group.Name == "Writers") });
+                userServiceMock.Setup(service => service.GetUserGroupsByAlias(It.IsAny<string[]>()))
+                    .Returns(new[] { Mock.Of<IUserGroup>(group => group.Id == 123 && group.Alias == "writers" && group.Name == "Writers") });
+                userServiceMock.Setup(service => service.GetUserById(It.IsAny<int>()))
+                    .Returns(new User(1234,  "Test", "asdf@asdf.com", "test", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]));
 
                 //we need to manually apply automapper mappings with the mocked applicationcontext
                 InitializeMappers(helper.UmbracoContext.Application);
@@ -44,30 +49,32 @@ namespace Umbraco.Tests.Web.Controllers
                 return new UsersController(helper.UmbracoContext);
             });
 
-            var invite = new UserInvite
+            var userSave = new UserSave
             {
                 Id = -1,
                 Email = "test@test.com",
-                Message = "Hello test!",
+                Username = "test@test.com",
+                Culture = "en",
                 Name = "Test",
                 UserGroups = new[] { "writers" }
             };
             var response = await runner.Execute("Users", "PostSaveUser", HttpMethod.Post,
-                new ObjectContent<UserInvite>(invite, new JsonMediaTypeFormatter()));
+                new ObjectContent<UserSave>(userSave, new JsonMediaTypeFormatter()));
 
             var obj = JsonConvert.DeserializeObject<UserDisplay>(response.Item2);
 
-            Assert.AreEqual(invite.Name, obj.Name);
+            Assert.AreEqual(userSave.Name, obj.Name);
             Assert.AreEqual(1234, obj.Id);
-            Assert.AreEqual(invite.Email, obj.Email);
-            foreach (var group in invite.UserGroups)
+            Assert.AreEqual(userSave.Email, obj.Email);
+            foreach (var group in userSave.UserGroups)
             {
                 Assert.IsTrue(obj.UserGroups.Contains(group));
             }
         }
 
-        [Test]
-        public async void Invite_User()
+        [TestCase("PostInviteUser")]
+        [TestCase("PostCreateUser")]
+        public async void Invite_And_Create(string action)
         {
             var runner = new TestRunner((message, helper) =>
             {
@@ -82,7 +89,9 @@ namespace Umbraco.Tests.Web.Controllers
                         u.Id = 1234;
                     });
                 userServiceMock.Setup(service => service.GetAllUserGroups(It.IsAny<int[]>()))
-                    .Returns(Enumerable.Empty<IUserGroup>);
+                    .Returns(new[] { Mock.Of<IUserGroup>(group => group.Id == 123 && group.Alias == "writers" && group.Name == "Writers") });
+                userServiceMock.Setup(service => service.GetUserGroupsByAlias(It.IsAny<string[]>()))
+                    .Returns(new[]{Mock.Of<IUserGroup>(group => group.Id == 123 && group.Alias == "writers" && group.Name == "Writers")});
 
                 //we need to manually apply automapper mappings with the mocked applicationcontext
                 InitializeMappers(helper.UmbracoContext.Application);
@@ -98,7 +107,7 @@ namespace Umbraco.Tests.Web.Controllers
                 Name = "Test",
                 UserGroups = new[] {"writers"}
             };
-            var response = await runner.Execute("Users", "PostInviteUser", HttpMethod.Post,
+            var response = await runner.Execute("Users", action, HttpMethod.Post,
                 new ObjectContent<UserInvite>(invite, new JsonMediaTypeFormatter()));
 
             var obj = JsonConvert.DeserializeObject<UserDisplay>(response.Item2);

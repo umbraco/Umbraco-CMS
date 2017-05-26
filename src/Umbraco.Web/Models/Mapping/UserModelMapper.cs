@@ -94,6 +94,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IUser, UserDisplay>()
                 .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(applicationContext.Services.UserService, applicationContext.ApplicationCache.RuntimeCache)))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
+                .ForMember(detail => detail.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?)user.LastLoginDate))
                 .ForMember(detail => detail.UserGroups, opt => opt.MapFrom(user => user.Groups.Select(x => x.Alias).ToArray()))
                 .ForMember(detail => detail.StartContentIds, opt => opt.MapFrom(user => user.StartContentIds))
                 .ForMember(detail => detail.StartMediaIds, opt => opt.MapFrom(user => user.StartMediaIds))
