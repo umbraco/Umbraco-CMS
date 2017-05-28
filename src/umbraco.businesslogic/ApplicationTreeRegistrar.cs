@@ -24,8 +24,8 @@ namespace umbraco.BusinessLogic
 
         	var items = types
         		.Select(x =>
-        		        new Tuple<Type, TreeAttribute>(x, x.GetCustomAttributes<TreeAttribute>(false).Single()))
-        		.Where(x => ApplicationTree.getByAlias(x.Item2.Alias) == null);
+        		        new Tuple<Type, TreeAttribute>(x, x.GetCustomAttributes<TreeAttribute>(false).SingleOrDefault()))
+        		.Where(x => x.Item2 != null && ApplicationTree.getByAlias(x.Item2.Alias) == null);
 
             var allAliases = ApplicationTree.getAll().Select(x => x.Alias).Concat(items.Select(x => x.Item2.Alias));
             var inString = "'" + string.Join("','", allAliases) + "'";
