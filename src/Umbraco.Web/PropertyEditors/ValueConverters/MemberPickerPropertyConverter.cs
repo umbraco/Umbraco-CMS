@@ -17,12 +17,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
+            if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MemberPicker2Alias))
+                return true;
+
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters == false)
             {
-                return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.MemberPickerAlias)
-                    || propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.MemberPicker2Alias);
+                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MemberPickerAlias);
             }
-            return false;
+            return false;            
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
