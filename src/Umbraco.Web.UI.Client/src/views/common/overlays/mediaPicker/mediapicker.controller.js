@@ -139,8 +139,16 @@ angular.module("umbraco")
                 } else {
                     eventsService.emit("dialogs.mediaPicker.select", image);
                     if ($scope.showDetails) {
+
                         $scope.target = image;
-                        $scope.target.url = mediaHelper.resolveFile(image);
+
+                        // handle both entity and full media object
+                        if(image.image) {
+                            $scope.target.url = image.image;
+                        } else {
+                            $scope.target.url = mediaHelper.resolveFile(image);
+                        }
+
                         $scope.openDetailsDialog();
                     } else {
                         selectImage(image);
