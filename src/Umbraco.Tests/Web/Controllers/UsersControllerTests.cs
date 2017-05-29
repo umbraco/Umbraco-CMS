@@ -2,17 +2,21 @@
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
+using Microsoft.AspNet.Identity;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Security;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.ControllerTesting;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
+using IUser = Umbraco.Core.Models.Membership.IUser;
 
 namespace Umbraco.Tests.Web.Controllers
 {
@@ -41,7 +45,7 @@ namespace Umbraco.Tests.Web.Controllers
                 userServiceMock.Setup(service => service.GetUserGroupsByAlias(It.IsAny<string[]>()))
                     .Returns(new[] { Mock.Of<IUserGroup>(group => group.Id == 123 && group.Alias == "writers" && group.Name == "Writers") });
                 userServiceMock.Setup(service => service.GetUserById(It.IsAny<int>()))
-                    .Returns(new User(1234,  "Test", "asdf@asdf.com", "test", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]));
+                    .Returns(new User(1234, "Test", "asdf@asdf.com", "test", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]));
 
                 //we need to manually apply automapper mappings with the mocked applicationcontext
                 InitializeMappers(helper.UmbracoContext.Application);
@@ -91,12 +95,18 @@ namespace Umbraco.Tests.Web.Controllers
                 userServiceMock.Setup(service => service.GetAllUserGroups(It.IsAny<int[]>()))
                     .Returns(new[] { Mock.Of<IUserGroup>(group => group.Id == 123 && group.Alias == "writers" && group.Name == "Writers") });
                 userServiceMock.Setup(service => service.GetUserGroupsByAlias(It.IsAny<string[]>()))
-                    .Returns(new[]{Mock.Of<IUserGroup>(group => group.Id == 123 && group.Alias == "writers" && group.Name == "Writers")});
+                    .Returns(new[] { Mock.Of<IUserGroup>(group => group.Id == 123 && group.Alias == "writers" && group.Name == "Writers") });
 
                 //we need to manually apply automapper mappings with the mocked applicationcontext
                 InitializeMappers(helper.UmbracoContext.Application);
 
-                return new UsersController(helper.UmbracoContext);
+                var emailService = new Mock<IIdentityMessageService>();
+                emailService.Setup(service => service.SendAsync(It.IsAny<IdentityMessage>())).Returns(System.Threading.Tasks.Task.FromResult(0));
+                var backofficeUserMgr = new BackOfficeUserManager(Mock.Of<IUserStore<BackOfficeIdentityUser, int>>())
+                {
+                    EmailService = emailService.Object
+                };
+                return new UsersController(helper.UmbracoContext, helper, backofficeUserMgr);
             });
 
             var invite = new UserInvite
@@ -105,7 +115,7 @@ namespace Umbraco.Tests.Web.Controllers
                 Email = "test@test.com",
                 Message = "Hello test!",
                 Name = "Test",
-                UserGroups = new[] {"writers"}
+                UserGroups = new[] { "writers" }
             };
             var response = await runner.Execute("Users", action, HttpMethod.Post,
                 new ObjectContent<UserInvite>(invite, new JsonMediaTypeFormatter()));

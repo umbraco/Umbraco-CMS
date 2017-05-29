@@ -24,6 +24,8 @@ namespace Umbraco.Web.WebApi
     [UmbracoWebApiRequireHttps]
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
     {
+        
+
         protected UmbracoAuthorizedApiController()
         {
         }
@@ -34,6 +36,11 @@ namespace Umbraco.Web.WebApi
 
         protected UmbracoAuthorizedApiController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper) : base(umbracoContext, umbracoHelper)
         {
+        }
+
+        protected UmbracoAuthorizedApiController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper, BackOfficeUserManager<BackOfficeIdentityUser> backOfficeUserManager) : base(umbracoContext, umbracoHelper)
+        {
+            _userManager = backOfficeUserManager;
         }
 
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;

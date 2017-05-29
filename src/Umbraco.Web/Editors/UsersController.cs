@@ -51,7 +51,10 @@ namespace Umbraco.Web.Editors
         {
         }
 
-        
+        public UsersController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper, BackOfficeUserManager<BackOfficeIdentityUser> backOfficeUserManager) : base(umbracoContext, umbracoHelper, backOfficeUserManager)
+        {
+        }
+
 
         /// <summary>
         /// Returns a list of the sizes of gravatar urls for the user or null if the gravatar server cannot be reached
@@ -263,21 +266,13 @@ namespace Umbraco.Web.Editors
             var link = string.Format("{0}#/login/false?invite={1}", 
                 ApplicationContext.UmbracoApplicationUrl,
                 user.SecurityStamp.ToUrlBase64());
-
-            try
+            
+            await UserManager.EmailService.SendAsync(new IdentityMessage
             {
-                await UserManager.EmailService.SendAsync(new IdentityMessage
-                {
-                    Body = string.Format("You have been invited to the Umbraco Back Office!\n\n{0}\n\nClick this link to accept the invite\n\n{1}", userSave.Message, link),
-                    Destination = userSave.Email,
-                    Subject = "You have been invited to the Umbraco Back Office!"
-                });
-            }
-            catch (Exception ex)
-            {
-                throw new HttpResponseException(
-                    Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex));
-            }
+                Body = string.Format("You have been invited to the Umbraco Back Office!\n\n{0}\n\nClick this link to accept the invite\n\n{1}", userSave.Message, link),
+                Destination = userSave.Email,
+                Subject = "You have been invited to the Umbraco Back Office!"
+            });
 
             //Email was successful, so save the user now
 
