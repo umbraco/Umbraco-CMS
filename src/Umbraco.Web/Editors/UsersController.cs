@@ -268,7 +268,7 @@ namespace Umbraco.Web.Editors
             {
                 await UserManager.EmailService.SendAsync(new IdentityMessage
                 {
-                    Body = string.Format("You have been invited to the Umbraco Back Office!\n\nClick this link to accept the invite\n\n{0}", link),
+                    Body = string.Format("You have been invited to the Umbraco Back Office!\n\n{0}\n\nClick this link to accept the invite\n\n{1}", userSave.Message, link),
                     Destination = userSave.Email,
                     Subject = "You have been invited to the Umbraco Back Office!"
                 });
