@@ -41,23 +41,22 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (source == null)
                 return null;
 
-            if (UmbracoContext.Current != null)
+            if (UmbracoContext.Current == null) return source;
+
+            var umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
+            IPublishedContent member;
+            if (source is int)
+            {                    
+                member = umbracoHelper.TypedMember((int)source);
+                if (member != null)
+                    return member;
+            }
+            else
             {
-                IPublishedContent member;
-                if (source is int)
-                {
-                    var membershipHelper = new MembershipHelper(UmbracoContext.Current);
-                    member = membershipHelper.GetById((int)source);
-                    if (member != null)
-                        return member;
-                }
-                else
-                {
-                    var sourceUdi = source as Udi;
-                    member = sourceUdi.ToPublishedContent();
-                    if (member != null)
-                        return member;
-                }
+                var sourceUdi = source as Udi;
+                member = umbracoHelper.TypedMember(sourceUdi);
+                if (member != null)
+                    return member;
             }
 
             return source;

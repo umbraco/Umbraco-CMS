@@ -42,37 +42,38 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 try
                 {
                     var obj = JsonConvert.DeserializeObject<JArray>(sourceString);
+                    
                     //update the internal links if we have a context
-                    if (UmbracoContext.Current != null)
+                    if (UmbracoContext.Current == null) return obj;
+
+                    var helper = new UmbracoHelper(UmbracoContext.Current);
+                    foreach (var a in obj)
                     {
-                        var helper = new UmbracoHelper(UmbracoContext.Current);
-                        foreach (var a in obj)
+                        var type = a.Value<string>("type");
+                        if (type.IsNullOrWhiteSpace() == false)
                         {
-                            var type = a.Value<string>("type");
-                            if (type.IsNullOrWhiteSpace() == false)
+                            if (type == "internal")
                             {
-                                if (type == "internal")
+                                switch (propertyType.PropertyEditorAlias)
                                 {
-                                    switch (propertyType.PropertyEditorAlias)
-                                    {
-                                        case Constants.PropertyEditors.RelatedLinksAlias:
-                                            var intLinkId = a.Value<int>("link");
-                                            var intLink = helper.NiceUrl(intLinkId);
-                                            a["link"] = intLink;
-                                            break;
-                                        case Constants.PropertyEditors.RelatedLinks2Alias:
-                                            var strLinkId = a.Value<string>("link");
-                                            var udiAttempt = strLinkId.TryConvertTo<Udi>();
-                                            if (udiAttempt)
-                                            {
-                                                var content = udiAttempt.Result.ToPublishedContent();
-                                                a["link"] = helper.NiceUrl(content.Id);
-                                            }
-                                            break;
-                                    }                                    
-                                }
+                                    case Constants.PropertyEditors.RelatedLinksAlias:
+                                        var intLinkId = a.Value<int>("link");
+                                        var intLink = helper.NiceUrl(intLinkId);
+                                        a["link"] = intLink;
+                                        break;
+                                    case Constants.PropertyEditors.RelatedLinks2Alias:
+                                        var strLinkId = a.Value<string>("link");
+                                        var udiAttempt = strLinkId.TryConvertTo<Udi>();
+                                        if (udiAttempt)
+                                        {
+                                            var content = helper.TypedContent(udiAttempt.Result);
+                                            if (content == null) break;
+                                            a["link"] = helper.NiceUrl(content.Id);
+                                        }
+                                        break;
+                                }                                    
                             }
-                        }    
+                        }
                     }
                     return obj;
                 }
