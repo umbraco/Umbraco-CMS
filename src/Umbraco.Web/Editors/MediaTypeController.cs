@@ -29,7 +29,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
     [EnableOverrideAuthorization]
-    [MediaTypeControllerControllerConfigurationAttribute]
+    [MediaTypeControllerControllerConfiguration]
     public class MediaTypeController : ContentTypeControllerBase
     {
         /// <summary>

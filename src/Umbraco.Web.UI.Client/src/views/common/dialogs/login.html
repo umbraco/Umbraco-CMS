@@ -8,10 +8,10 @@
             <img ng-src="assets/img/application/logo.png" ng-srcset="assets/img/application/logo@2x.png 2x, assets/img/application/logo@3x.png 3x">
         </div>
 
-        <div ng-show="isInvite" class="umb-login-container">
+        <div ng-show="invitedUser != null" class="umb-login-container">
 
             <div class="form" ng-if="inviteSetPassword">
-                <h1 style="margin-bottom: 10px; text-align: left;">Hi, User</h1>
+                <h1 style="margin-bottom: 10px; text-align: left;">Hi, {{invitedUser.name}}</h1>
                 <p style="line-height: 1.6; margin-bottom: 25px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
 
                 <div class="control-group" ng-class="{error: setPasswordForm.password.$invalid}">
@@ -62,7 +62,7 @@
 
         </div>
 
-        <div ng-show="!isInvite" class="umb-login-container">
+        <div ng-show="invitedUser == null" class="umb-login-container">
 
             <div class="form">
                 <h1>{{greeting}}</h1>

@@ -50,7 +50,28 @@ namespace Umbraco.Web.Editors
             get { return _signInManager ?? (_signInManager = TryGetOwinContext().Result.GetBackOfficeSignInManager()); }
         }
 
-        
+        /// <summary>
+        /// Checks if a valid token is specified for an invited user and if so returns the user object
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        [ValidateAngularAntiForgeryToken]
+        public UserDisplay PostVerifyInvite([FromUri]string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            var decoded = token.FromUrlBase64();
+            if (decoded.IsNullOrWhiteSpace())
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            var user = Services.UserService.ValidateInviteToken(decoded);
+            if (user == null)
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            return Mapper.Map<UserDisplay>(user);
+        }
+
         [WebApi.UmbracoAuthorize]
         [ValidateAngularAntiForgeryToken]
         public async Task<HttpResponseMessage> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)

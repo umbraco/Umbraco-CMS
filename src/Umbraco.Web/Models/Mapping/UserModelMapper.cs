@@ -51,6 +51,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ConstructUsing(invite => new User(invite.Name, invite.Email, invite.Email, Guid.NewGuid().ToString("N")))
                 //generate a token for the invite
                 .ForMember(user => user.SecurityStamp, expression => expression.MapFrom(x => (DateTime.Now + x.Email).ToSHA1()))
+                //all invited users will not be approved, completing the invite will approve the user
+                .ForMember(user => user.IsApproved, expression => expression.UseValue(false))
                 .ForMember(user => user.Id, expression => expression.Ignore())
                 .ForMember(user => user.Avatar, expression => expression.Ignore())
                 .ForMember(user => user.SessionTimeout, expression => expression.Ignore())

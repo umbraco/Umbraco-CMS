@@ -43,6 +43,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<User, UserDto>(src => src.LastLockoutDate, dto => dto.LastLockoutDate);
             CacheMap<User, UserDto>(src => src.LastLoginDate, dto => dto.LastLoginDate);
             CacheMap<User, UserDto>(src => src.LastPasswordChangeDate, dto => dto.LastPasswordChangeDate);
+            CacheMap<User, UserDto>(src => src.SecurityStamp, dto => dto.SecurityStampToken);
         }
 
         #endregion

@@ -14,7 +14,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
     return {
 
         get2FAProviders: function () {
-            
+
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
@@ -69,7 +69,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
          *
          */
         performLogin: function (username, password) {
-            
+
             if (!username || !password) {
                 return angularHelper.rejectedPromise({
                     errorMsg: 'Username or password cannot be empty'
@@ -81,10 +81,28 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                     umbRequestHelper.getApiUrl(
                         "authenticationApiBaseUrl",
                         "PostLogin"), {
-                            username: username,
-                            password: password
-                        }),
+                        username: username,
+                        password: password
+                    }),
                 'Login failed for user ' + username);
+        },
+
+        verifyInvite: function (token) {
+
+            if (!token) {
+                return angularHelper.rejectedPromise({
+                    errorMsg: 'Token cannot be empty'
+                });
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "authenticationApiBaseUrl",
+                        "PostVerifyInvite", {
+                        token: token
+                      })),
+                'Failed to verify token ' + token);
         },
 
         /**
@@ -114,7 +132,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                     errorMsg: 'Email address cannot be empty'
                 });
             }
-            
+
             //TODO: This validation shouldn't really be done here, the validation on the login dialog
             // is pretty hacky which is why this is here, ideally validation on the login dialog would
             // be done properly.
@@ -130,11 +148,11 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                     umbRequestHelper.getApiUrl(
                         "authenticationApiBaseUrl",
                         "PostRequestPasswordReset"), {
-                            email: email
-                        }),
+                        email: email
+                    }),
                 'Request password reset failed for email ' + email);
         },
-        
+
         /**
          * @ngdoc method
          * @name umbraco.resources.authResource#performValidatePasswordResetCode
@@ -173,11 +191,11 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "authenticationApiBaseUrl",
-                        "PostValidatePasswordResetCode"), 
-                        {
-                            userId: userId,
-                            resetCode: resetCode
-                        }),
+                        "PostValidatePasswordResetCode"),
+                    {
+                        userId: userId,
+                        resetCode: resetCode
+                    }),
                 'Password reset code validation failed for userId ' + userId + ', code' + resetCode);
         },
 
@@ -234,11 +252,11 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                     umbRequestHelper.getApiUrl(
                         "authenticationApiBaseUrl",
                         "PostSetPassword"),
-                        {
-                            userId: userId,
-                            password: password,
-                            resetCode: resetCode
-                        }),
+                    {
+                        userId: userId,
+                        password: password,
+                        resetCode: resetCode
+                    }),
                 'Password reset code validation failed for userId ' + userId);
         },
 
@@ -254,9 +272,9 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                     umbRequestHelper.getApiUrl(
                         "authenticationApiBaseUrl",
                         "PostUnLinkLogin"), {
-                            loginProvider: loginProvider,
-                            providerKey: providerKey
-                        }),
+                        loginProvider: loginProvider,
+                        providerKey: providerKey
+                    }),
                 'Unlinking login provider failed');
         },
 
@@ -278,14 +296,14 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
          * @returns {Promise} resourcePromise object
          *
          */
-        performLogout: function() {
+        performLogout: function () {
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "authenticationApiBaseUrl",
                         "PostLogout")));
         },
-        
+
         /**
          * @ngdoc method
          * @name umbraco.resources.authResource#getCurrentUser
@@ -305,13 +323,13 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
          *
          */
         getCurrentUser: function () {
-            
+
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "authenticationApiBaseUrl",
                         "GetCurrentUser")),
-                'Server call failed for getting current user'); 
+                'Server call failed for getting current user');
         },
 
         getCurrentUserLinkedLogins: function () {
@@ -323,7 +341,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                         "GetCurrentUserLinkedLogins")),
                 'Server call failed for getting current users linked logins');
         },
-        
+
         /**
          * @ngdoc method
          * @name umbraco.resources.authResource#isAuthenticated
@@ -357,7 +375,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                         }
                         return data;
                     },
-                    error: function (data, status, headers, config) {                     
+                    error: function (data, status, headers, config) {
                         return {
                             errorMsg: 'Server call failed for checking authentication',
                             data: data,

@@ -1,23 +1,29 @@
 ﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController",
     function ($scope, $cookies, $location, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, dialogService) {
 
-        $scope.isInvite = false;
+        $scope.invitedUser = null;
 
         function init() {
             // Check if it is a new user
             if ($location.search().invite) {
-                $scope.isInvite = true;
-                $scope.inviteSetPassword = true;
+                var token = $location.search().invite;
+                authResource.verifyInvite(token).then(function (data) {
+                    $scope.invitedUser = data;
+                    $scope.inviteSetPassword = true;
+                }, function () {
+                    //it failed so we should remove the search
+                    $location.search('invite', null);
+                });
             }
         }
 
-        $scope.inviteSavePassword = function() {
+        $scope.inviteSavePassword = function () {
             $scope.inviteSetPassword = false;
             $scope.inviteSetAvatar = true;
         };
 
-        var setFieldFocus = function(form, field) {
-            $timeout(function() {
+        var setFieldFocus = function (form, field) {
+            $timeout(function () {
                 $("form[name='" + form + "'] input[name='" + field + "']").focus();
             });
         }
@@ -112,7 +118,7 @@
         }
 
         $scope.loginSubmit = function (login, password) {
-            
+
             //if the login and password are not empty we need to automatically 
             // validate them - this is because if there are validation errors on the server
             // then the user has to change both username & password to resubmit which isn't ideal,
@@ -127,24 +133,24 @@
             }
 
             userService.authenticate(login, password)
-                .then(function(data) {
-                        $scope.submit(true);
-                    },
-                    function(reason) {
+                .then(function (data) {
+                    $scope.submit(true);
+                },
+                function (reason) {
 
-                        //is Two Factor required?
-                        if (reason.status === 402) {
-                            $scope.errorMsg = "Additional authentication required";
-                            show2FALoginDialog(reason.data.twoFactorView, $scope.submit);
-                        }
-                        else {
-                            $scope.errorMsg = reason.errorMsg;
+                    //is Two Factor required?
+                    if (reason.status === 402) {
+                        $scope.errorMsg = "Additional authentication required";
+                        show2FALoginDialog(reason.data.twoFactorView, $scope.submit);
+                    }
+                    else {
+                        $scope.errorMsg = reason.errorMsg;
 
-                            //set the form inputs to invalid
-                            $scope.loginForm.username.$setValidity("auth", false);
-                            $scope.loginForm.password.$setValidity("auth", false);
-                        }
-                    });
+                        //set the form inputs to invalid
+                        $scope.loginForm.username.$setValidity("auth", false);
+                        $scope.loginForm.password.$setValidity("auth", false);
+                    }
+                });
 
             //setup a watch for both of the model values changing, if they change
             // while the form is invalid, then revalidate them so that the form can 
@@ -166,7 +172,7 @@
             if (email && email.length > 0) {
                 $scope.requestPasswordResetForm.email.$setValidity('auth', true);
             }
-            
+
             $scope.showEmailResetConfirmation = false;
 
             if ($scope.requestPasswordResetForm.$invalid) {
