@@ -678,7 +678,7 @@ namespace Umbraco.Core.Security
                 anythingChanged = true;
                 user.StartMediaIds = identityUser.StartMediaIds;
             }
-            if (user.StartContentIds.UnsortedSequenceEqual(identityUser.StartContentIds))
+            if (user.StartContentIds.UnsortedSequenceEqual(identityUser.StartContentIds) == false)
             {
                 anythingChanged = true;
                 user.StartContentIds = identityUser.StartContentIds;
@@ -690,6 +690,7 @@ namespace Umbraco.Core.Security
             }
 
             var userGroups = user.Groups.Select(x => x.Alias).ToArray();
+
             if (userGroups.ContainsAll(identityUser.Groups) == false
                 || identityUser.Groups.ContainsAll(userGroups) == false)
             {

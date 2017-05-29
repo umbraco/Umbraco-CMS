@@ -24,7 +24,7 @@ namespace Umbraco.Core.Models.Identity
                 .ForMember(user => user.StartMediaIds, expression => expression.MapFrom(user => user.StartMediaIds))
                 .ForMember(user => user.StartContentIds, expression => expression.MapFrom(user => user.StartContentIds))
                 .ForMember(user => user.AccessFailedCount, expression => expression.MapFrom(user => user.FailedPasswordAttempts))
-                .ForMember(user => user.Groups, expression => expression.MapFrom(user => user.Groups.ToArray()))
+                .ForMember(user => user.Groups, expression => expression.MapFrom(user => user.Groups.Select(x => x.Alias).ToArray()))
                 .ForMember(user => user.AllowedSections, expression => expression.MapFrom(user => user.AllowedSections.ToArray()));
 
             config.CreateMap<BackOfficeIdentityUser, UserData>()

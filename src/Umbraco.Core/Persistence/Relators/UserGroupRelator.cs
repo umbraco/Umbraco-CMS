@@ -35,7 +35,7 @@ namespace Umbraco.Core.Persistence.Relators
             // Setup the new current user
             _currentUser = user;
             _currentUser.UserGroupDtos = new List<UserGroupDto>();
-            _currentUser.UserStartNodeDtos = new List<UserStartNodeDto>();
+            _currentUser.UserStartNodeDtos = new HashSet<UserStartNodeDto>();
 
             AddOrUpdateGroup(group, section);
             AddOrUpdateStartNode(startNode);
@@ -50,16 +50,8 @@ namespace Umbraco.Core.Persistence.Relators
             if (startNode == null || startNode.Id == default(int))
                 return;
 
-            //check if this is a new start node
-            var latestStartNode = _currentUser.UserStartNodeDtos.Count > 0
-                ? _currentUser.UserStartNodeDtos[_currentUser.UserStartNodeDtos.Count - 1]
-                : null;
-
-            if (latestStartNode == null || latestStartNode.Id != startNode.Id)
-            {
-                //add the current (new) start node
-                _currentUser.UserStartNodeDtos.Add(startNode);
-            }            
+            //add the current (new) start node - this is a hashset so it will only allow unique rows so no need to check for existence
+            _currentUser.UserStartNodeDtos.Add(startNode);            
         }
 
         private void AddOrUpdateGroup(UserGroupDto group, UserGroup2AppDto section)
