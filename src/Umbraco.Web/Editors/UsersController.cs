@@ -259,16 +259,29 @@ namespace Umbraco.Web.Editors
             }
 
             var user = Mapper.Map<IUser>(userSave);
+            
+            var link = string.Format("{0}#/login/false?invite={1}", 
+                ApplicationContext.UmbracoApplicationUrl,
+                user.SecurityStamp.ToUrlBase64());
+
+            try
+            {
+                await UserManager.EmailService.SendAsync(new IdentityMessage
+                {
+                    Body = string.Format("You have been invited to the Umbraco Back Office!\n\nClick this link to accept the invite\n\n{0}", link),
+                    Destination = userSave.Email,
+                    Subject = "You have been invited to the Umbraco Back Office!"
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new HttpResponseException(
+                    Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex));
+            }
+
+            //Email was successful, so save the user now
 
             Services.UserService.Save(user);
-
-            //TODO: Send an email!
-            await UserManager.EmailService.SendAsync(new IdentityMessage
-            {
-                Body = "You have been invited to the Umbraco Back Office!",
-                Destination = userSave.,
-                Subject = "You have been invited to the Umbraco Back Office!"
-            });
 
             return Mapper.Map<UserDisplay>(user);
         }

@@ -6,7 +6,7 @@ namespace Umbraco.Core.Security
 {
     public class EmailService : IIdentityMessageService
     {
-        public async Task SendAsync(IdentityMessage message)
+        public Task SendAsync(IdentityMessage message)
         {
             using (var client = new SmtpClient())
             using (var mailMessage = new MailMessage())
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Security
                 mailMessage.IsBodyHtml = message.Body.IsNullOrWhiteSpace() == false 
                     && message.Body.Contains("<") && message.Body.Contains("</");
 
-                await client.SendMailAsync(mailMessage);
+                return client.SendMailAsync(mailMessage);
             }
         }
     }

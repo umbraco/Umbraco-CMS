@@ -12,7 +12,7 @@
     function usersResource($http, umbRequestHelper, $q, umbDataFormatter) {
 
         function clearAvatar(userId) {
-           
+
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
@@ -127,6 +127,23 @@
                 "Failed to save user");
         }
 
+        function inviteUser(user) {
+            if (!user) {
+                throw "user not specified";
+            }
+
+          //need to convert the user data into the correctly formatted save data - it is *not* the same and we don't want to over-post
+          var formattedSaveData = umbDataFormatter.formatUserPostData(user);
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "userApiBaseUrl",
+                        "PostInviteUser"),
+                  formattedSaveData),
+                "Failed to invite user");
+        }
+
         function saveUser(user) {
             if (!user) {
                 throw "user not specified";
@@ -197,6 +214,7 @@
             getPagedResults: getPagedResults,
             getUser: getUser,
             createUser: createUser,
+            inviteUser: inviteUser,
             saveUser: saveUser,
             getUserGroup: getUserGroup,
             getUserGroups: getUserGroups,

@@ -655,8 +655,21 @@ function umbDataFormatter() {
         formatUserPostData: function (displayModel, preValues, action) {
 
             //create the save model from the display model
-            var saveModel = _.pick(displayModel, 'id', 'parentId', 'name', 'username', 'culture', 'email', 'startContentIds', 'startMediaIds', 'userGroups');
-            
+            var saveModel = _.pick(displayModel, 'id', 'parentId', 'name', 'username', 'culture', 'email', 'startContentIds', 'startMediaIds', 'userGroups', 'message');
+
+            //make sure the userGroups are just a string array
+            var currGroups = saveModel.userGroups;
+            var formattedGroups = [];
+            for (var i = 0; i < currGroups.length; i++) {
+              if (!angular.isString(currGroups[i])) {
+                formattedGroups.push(currGroups[i].alias);
+              }
+              else {
+                formattedGroups.push(currGroups[i]);
+              }
+            }
+            saveModel.userGroups = formattedGroups;
+
             return saveModel;
         },
 

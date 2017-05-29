@@ -14,11 +14,11 @@
         vm.usersOptions = {};
         vm.newUser.userGroups = [];
         vm.usersViewState = 'overview';
-        
+
         vm.allowDisableUser = true;
         vm.allowEnableUser = true;
         vm.allowSetUserGroup = true;
-        
+
         vm.layouts = [
             {
                 "icon": "icon-thumbnails-small",
@@ -40,12 +40,12 @@
 
         //don't set this if no email is configured
         if (Umbraco.Sys.ServerVariables.umbracoSettings.emailServerConfigured) {
-          vm.defaultButton = {
-            labelKey: "users_inviteUser",
-            handler: function () {
-              vm.setUsersViewState('inviteUser');
-            }
-          };  
+            vm.defaultButton = {
+                labelKey: "users_inviteUser",
+                handler: function () {
+                    vm.setUsersViewState('inviteUser');
+                }
+            };
         }
 
         vm.subButtons = [
@@ -71,6 +71,7 @@
         vm.searchUsers = searchUsers;
         vm.setOrderByFilter = setOrderByFilter;
         vm.createUser = createUser;
+        vm.inviteUser = inviteUser;
 
         function init() {
 
@@ -103,7 +104,7 @@
 
         function selectLayout(selectedLayout) {
 
-            angular.forEach(vm.layouts, function(layout){
+            angular.forEach(vm.layouts, function (layout) {
                 layout.active = false;
             });
 
@@ -112,7 +113,7 @@
         }
 
         function selectUser(user, selection) {
-            if(user.selected) {
+            if (user.selected) {
                 var index = selection.indexOf(user.id);
                 selection.splice(index, 1);
                 user.selected = false;
@@ -126,7 +127,7 @@
         }
 
         function clearSelection() {
-            angular.forEach(vm.users, function(user){
+            angular.forEach(vm.users, function (user) {
                 user.selected = false;
             });
             vm.selection = [];
@@ -147,17 +148,17 @@
                 selection: vm.newUser.userGroups,
                 closeButtonLabel: "Cancel",
                 show: true,
-                submit: function(model) {
+                submit: function (model) {
                     // apply changes
-                    if(model.selection) {
+                    if (model.selection) {
                         vm.newUser.userGroups = model.selection;
                     }
                     vm.userGroupPicker.show = false;
                     vm.userGroupPicker = null;
                 },
-                close: function(oldModel) {
+                close: function (oldModel) {
                     // rollback on close
-                    if(oldModel.selection) {
+                    if (oldModel.selection) {
                         vm.newUser.userGroups = oldModel.selection;
                     }
                     vm.userGroupPicker.show = false;
@@ -171,16 +172,16 @@
         }
 
         function selectAll() {
-            if(areAllSelected()) {
+            if (areAllSelected()) {
                 vm.selection = [];
-                angular.forEach(vm.users, function(user){
+                angular.forEach(vm.users, function (user) {
                     user.selected = false;
                 });
             } else {
                 // clear selection so we don't add the same user twice
                 vm.selection = [];
                 // select all users
-                angular.forEach(vm.users, function(user){
+                angular.forEach(vm.users, function (user) {
                     user.selected = true;
                     vm.selection.push(user.id);
                 });
@@ -188,7 +189,7 @@
         }
 
         function areAllSelected() {
-            if(vm.selection.length === vm.users.length) {
+            if (vm.selection.length === vm.users.length) {
                 return true;
             }
         }
@@ -223,7 +224,35 @@
                 // when server side validation fails - as opposed to content where we are capable of saving the content
                 // item if server side validation fails
                 redirectOnFailure: false,
-                rebindCallback: function (orignal, saved) {}
+                rebindCallback: function (orignal, saved) { }
+            }).then(function (saved) {
+
+                vm.page.createButtonState = "success";
+
+            }, function (err) {
+
+                vm.page.createButtonState = "error";
+
+            });
+
+        }
+
+        function inviteUser() {
+
+            vm.newUser.id = -1;
+            vm.newUser.parentId = -1;
+            vm.page.createButtonState = "busy";
+
+            contentEditingHelper.contentEditorPerformSave({
+                statusMessage: localizeSaving,
+                saveMethod: usersResource.inviteUser,
+                scope: $scope,
+                content: vm.newUser,
+                // We do not redirect on failure for users - this is because it is not possible to actually save a user
+                // when server side validation fails - as opposed to content where we are capable of saving the content
+                // item if server side validation fails
+                redirectOnFailure: false,
+                rebindCallback: function (orignal, saved) { }
             }).then(function (saved) {
 
                 vm.page.createButtonState = "success";
@@ -243,7 +272,7 @@
 
             // Get users
             usersResource.getPagedResults(vm.usersOptions).then(function (users) {
-                
+
                 vm.users = users.items;
 
                 vm.usersOptions.pageNumber = users.pageNumber;
@@ -261,20 +290,20 @@
 
         function getUserStates(users) {
             var userStates = [];
-            
-            angular.forEach(users, function(user) {
 
-                var newUserState = {"name": user.state, "count": 1};
+            angular.forEach(users, function (user) {
+
+                var newUserState = { "name": user.state, "count": 1 };
                 var userStateExists = false;
 
-                angular.forEach(userStates, function(userState){
-                    if(newUserState.name === userState.name) {
+                angular.forEach(userStates, function (userState) {
+                    if (newUserState.name === userState.name) {
                         userState.count = userState.count + 1;
                         userStateExists = true;
                     }
                 });
 
-                if(userStateExists === false) {
+                if (userStateExists === false) {
                     userStates.push(newUserState);
                 }
 
@@ -284,7 +313,7 @@
         }
 
         function formatDates(users) {
-            angular.forEach(users, function(user){
+            angular.forEach(users, function (user) {
                 if (user.lastLoginDate) {
                     user.formattedLastLogin = moment(user.lastLoginDate).format("MMMM Do YYYY, HH:mm");
                 }
@@ -298,21 +327,21 @@
             vm.allowEnableUser = true;
             vm.allowSetUserGroup = true;
 
-            angular.forEach(users, function(user){
+            angular.forEach(users, function (user) {
 
-                if(!user.selected) {
+                if (!user.selected) {
                     return;
                 }
 
-                if(user.state === "disabled") {
+                if (user.state === "disabled") {
                     vm.allowDisableUser = false;
-                } 
-                
-                if(user.state === "active") {
+                }
+
+                if (user.state === "active") {
                     vm.allowEnableUser = false;
                 }
 
-                if(user.state === "pending") {
+                if (user.state === "pending") {
                     vm.allowEnableUser = false;
                 }
 
