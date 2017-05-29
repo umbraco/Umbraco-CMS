@@ -5,6 +5,8 @@ using Umbraco.Core.Configuration;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.WebApi
 {
@@ -32,6 +34,12 @@ namespace Umbraco.Web.WebApi
 
         protected UmbracoAuthorizedApiController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper) : base(umbracoContext, umbracoHelper)
         {
+        }
+
+        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
+        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
+        {
+            get { return _userManager ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager()); }
         }
 
         private bool _userisValidated = false;

@@ -9,18 +9,22 @@ using System.Web;
 using System.Web.Http;
 using AutoMapper;
 using ClientDependency.Core;
+using Microsoft.AspNet.Identity;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
+using IUser = Umbraco.Core.Models.Membership.IUser;
 
 namespace Umbraco.Web.Editors
 {
@@ -46,6 +50,8 @@ namespace Umbraco.Web.Editors
             : base(umbracoContext)
         {
         }
+
+        
 
         /// <summary>
         /// Returns a list of the sizes of gravatar urls for the user or null if the gravatar server cannot be reached
@@ -229,7 +235,7 @@ namespace Umbraco.Web.Editors
         /// <remarks>
         /// This will email the user an invite and generate a token that will be validated in the email
         /// </remarks>
-        public UserDisplay PostInviteUser(UserInvite userSave)
+        public async Task<UserDisplay> PostInviteUser(UserInvite userSave)
         {
             if (userSave == null) throw new ArgumentNullException("userSave");
 
@@ -255,6 +261,14 @@ namespace Umbraco.Web.Editors
             var user = Mapper.Map<IUser>(userSave);
 
             Services.UserService.Save(user);
+
+            //TODO: Send an email!
+            await UserManager.EmailService.SendAsync(new IdentityMessage
+            {
+                Body = "You have been invited to the Umbraco Back Office!",
+                Destination = userSave.,
+                Subject = "You have been invited to the Umbraco Back Office!"
+            });
 
             return Mapper.Map<UserDisplay>(user);
         }

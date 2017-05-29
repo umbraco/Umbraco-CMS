@@ -49,13 +49,14 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<UserInvite, IUser>()
                 .ConstructUsing(invite => new User(invite.Name, invite.Email, invite.Email, Guid.NewGuid().ToString("N")))
+                //generate a token for the invite
+                .ForMember(user => user.SecurityStamp, expression => expression.MapFrom(x => (DateTime.Now + x.Email).ToSHA1()))
                 .ForMember(user => user.Id, expression => expression.Ignore())
                 .ForMember(user => user.Avatar, expression => expression.Ignore())
                 .ForMember(user => user.SessionTimeout, expression => expression.Ignore())
                 .ForMember(user => user.StartContentIds, expression => expression.Ignore())
                 .ForMember(user => user.StartMediaIds, expression => expression.Ignore())
-                .ForMember(user => user.Language, expression => expression.Ignore())
-                .ForMember(user => user.SecurityStamp, expression => expression.Ignore())
+                .ForMember(user => user.Language, expression => expression.Ignore())                
                 .ForMember(user => user.ProviderUserKey, expression => expression.Ignore())
                 .ForMember(user => user.Username, expression => expression.Ignore())
                 .ForMember(user => user.RawPasswordValue, expression => expression.Ignore())
