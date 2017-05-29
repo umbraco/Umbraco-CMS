@@ -18,6 +18,8 @@ using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -25,8 +27,8 @@ namespace Umbraco.Web.Trees
     //We will not allow the tree to render unless the user has access to any of the sections that the tree gets rendered
     // this is not ideal but until we change permissions to be tree based (not section) there's not much else we can do here.
     [UmbracoApplicationAuthorize(
-        Constants.Applications.Content, 
-        Constants.Applications.Media, 
+        Constants.Applications.Content,
+        Constants.Applications.Media,
         Constants.Applications.Users,
         Constants.Applications.Settings,
         Constants.Applications.Developer,
@@ -35,12 +37,15 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Content, Constants.Trees.Content)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
-    public class ContentTreeController : ContentTreeControllerBase
+    [SearchableTree("searchResultFormatter", "configureContentResult")]
+    public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
     {
-       
+    
+        private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
+
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
-            var node = base.CreateRootNode(queryStrings); 
+            var node = base.CreateRootNode(queryStrings);
             //if the user's start node is not default, then ensure the root doesn't have a menu
             if (Security.CurrentUser.StartContentId != Constants.System.Root)
             {
@@ -64,7 +69,7 @@ namespace Umbraco.Web.Trees
         {
             get { return Security.CurrentUser.StartContentId; }
         }
-        
+
         /// <summary>
         /// Creates a tree node for a content item based on an UmbracoEntity
         /// </summary>
@@ -74,7 +79,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected override TreeNode GetSingleTreeNode(IUmbracoEntity e, string parentId, FormDataCollection queryStrings)
         {
-            var entity = (UmbracoEntity) e;
+            var entity = (UmbracoEntity)e;
 
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(e);
             if (CanUserAccessNode(e, allowedUserOptions))
@@ -87,7 +92,7 @@ namespace Umbraco.Web.Trees
                     entity,
                     Constants.ObjectTypes.DocumentGuid,
                     parentId,
-                    queryStrings,                    
+                    queryStrings,
                     entity.HasChildren && (isContainer == false));
 
                 node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
@@ -97,7 +102,7 @@ namespace Umbraco.Web.Trees
                     node.AdditionalData.Add("isContainer", true);
                     node.SetContainerStyle();
                 }
-                    
+
 
                 if (entity.IsPublished == false)
                     node.SetNotPublishedStyle();
@@ -150,7 +155,7 @@ namespace Umbraco.Web.Trees
                 // add default actions for *all* users
                 menu.Items.Add<ActionRePublish>(ui.Text("actions", ActionRePublish.Instance.Alias)).ConvertLegacyMenuItem(null, "content", "content");
                 menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
-                
+
                 return menu;
             }
 
@@ -169,11 +174,11 @@ namespace Umbraco.Web.Trees
 
             var nodeMenu = GetAllNodeMenuItems(item);
             var allowedMenuItems = GetAllowedUserMenuItemsForNode(item);
-                
+
             FilterUserAllowedMenuItems(nodeMenu, allowedMenuItems);
 
             //if the media item is in the recycle bin, don't have a default menu, just show the regular menu
-            if (item.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
+            if (item.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
                 nodeMenu.DefaultMenuAlias = null;
                 nodeMenu.Items.Insert(2, new MenuItem(ActionRestore.Instance, ui.Text("actions", ActionRestore.Instance.Alias)));
@@ -181,9 +186,9 @@ namespace Umbraco.Web.Trees
             else
             {
                 //set the default to create
-                nodeMenu.DefaultMenuAlias = ActionNew.Instance.Alias;    
+                nodeMenu.DefaultMenuAlias = ActionNew.Instance.Alias;
             }
-            
+
 
             return nodeMenu;
         }
@@ -225,7 +230,7 @@ namespace Umbraco.Web.Trees
             var menu = new MenuItemCollection();
             menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
             menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
-            
+
             //need to ensure some of these are converted to the legacy system - until we upgrade them all to be angularized.
             menu.Items.Add<ActionMove>(ui.Text("actions", ActionMove.Instance.Alias), true);
             menu.Items.Add<ActionCopy>(ui.Text("actions", ActionCopy.Instance.Alias));
@@ -240,7 +245,7 @@ namespace Umbraco.Web.Trees
             menu.Items.Add<ActionAssignDomain>(ui.Text("actions", ActionAssignDomain.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
             menu.Items.Add<ActionRights>(ui.Text("actions", ActionRights.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
             menu.Items.Add<ActionProtect>(ui.Text("actions", ActionProtect.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
-            
+
             menu.Items.Add<ActionNotify>(ui.Text("actions", ActionNotify.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
             menu.Items.Add<ActionSendToTranslate>(ui.Text("actions", ActionSendToTranslate.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
 
@@ -249,5 +254,9 @@ namespace Umbraco.Web.Trees
             return menu;
         }
 
+        public IEnumerable<SearchResultItem> Search(string query, int pageSize, int pageIndex, out int totalFound, string searchFrom = null)
+        {
+            return _treeSearcher.ExamineSearch(Umbraco, query, UmbracoEntityTypes.Document, pageSize, pageIndex, out totalFound, searchFrom);
+        }
     }
 }

@@ -51,6 +51,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Profiling;
+using Umbraco.Web.Search;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 
@@ -373,6 +374,8 @@ namespace Umbraco.Web
         protected override void InitializeResolvers()
         {
             base.InitializeResolvers();
+
+            SearchableTreeResolver.Current = new SearchableTreeResolver(ServiceProvider, LoggerResolver.Current.Logger, ApplicationContext.Services.ApplicationTreeService, () => PluginManager.ResolveSearchableTrees());
 
             XsltExtensionsResolver.Current = new XsltExtensionsResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.ResolveXsltExtensions());
 

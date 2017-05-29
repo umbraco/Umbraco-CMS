@@ -89,8 +89,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
-            config.CreateMap<SearchResult, EntityBasic>()
+            config.CreateMap<SearchResult, SearchResultItem>()
                 //default to document icon
+                  .ForMember(x => x.Score, expression => expression.MapFrom(result => result.Score))
                   .ForMember(x => x.Udi, expression => expression.Ignore())
                   .ForMember(x => x.Icon, expression => expression.Ignore())
                   .ForMember(x => x.Id, expression => expression.MapFrom(result => result.Id))
@@ -156,11 +157,11 @@ namespace Umbraco.Web.Models.Mapping
                           }
                       });
 
-            config.CreateMap<ISearchResults, IEnumerable<EntityBasic>>()
-                  .ConvertUsing(results => results.Select(Mapper.Map<EntityBasic>).ToList());
+            config.CreateMap<ISearchResults, IEnumerable<SearchResultItem>>()
+                  .ConvertUsing(results => results.Select(Mapper.Map<SearchResultItem>).ToList());
 
-            config.CreateMap<IEnumerable<SearchResult>, IEnumerable<EntityBasic>>()
-                  .ConvertUsing(results => results.Select(Mapper.Map<EntityBasic>).ToList());
+            config.CreateMap<IEnumerable<SearchResult>, IEnumerable<SearchResultItem>>()
+                  .ConvertUsing(results => results.Select(Mapper.Map<SearchResultItem>).ToList());
         }
     }
 }
