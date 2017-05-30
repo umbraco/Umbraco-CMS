@@ -22,15 +22,16 @@ namespace Umbraco.Core.Scoping
     internal class ScopeProvider : IScopeProviderInternal
     {
         private readonly ILogger _logger;
-        private readonly Lazy<FileSystems> _fileSystems;
+        private readonly FileSystems _fileSystems;
 
-        // fixme - circular dependency on file systems, refactor!
-
-        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, Lazy<FileSystems> fileSystems, ILogger logger)
+        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, ILogger logger)
         {
             DatabaseFactory = databaseFactory;
             _fileSystems = fileSystems;
             _logger = logger;
+
+            // take control of the FileSystems
+            _fileSystems.IsScoped = () => AmbientScope != null && AmbientScope.ScopedFileSystems;
         }
 
         static ScopeProvider()
@@ -332,7 +333,7 @@ namespace Umbraco.Core.Scoping
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null)
         {
-            return new Scope(this, _logger, _fileSystems.Value, true, null, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems);
+            return new Scope(this, _logger, _fileSystems, true, null, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems);
         }
 
         /// <inheritdoc />
@@ -390,7 +391,7 @@ namespace Umbraco.Core.Scoping
             {
                 var ambientContext = AmbientContext;
                 var newContext = ambientContext == null ? new ScopeContext() : null;
-                var scope = new Scope(this, _logger, _fileSystems.Value, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext);
+                var scope = new Scope(this, _logger, _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext);
                 // assign only if scope creation did not throw!
                 SetAmbient(scope, newContext ?? ambientContext);
                 return scope;
@@ -399,7 +400,7 @@ namespace Umbraco.Core.Scoping
             var ambientScope = ambient as Scope;
             if (ambientScope == null) throw new Exception("Ambient scope is not a Scope instance.");  // fixme - why? how?
 
-            var nested = new Scope(this, _logger, _fileSystems.Value, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext);
+            var nested = new Scope(this, _logger, _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext);
             SetAmbient(nested, AmbientContext);
             return nested;
         }

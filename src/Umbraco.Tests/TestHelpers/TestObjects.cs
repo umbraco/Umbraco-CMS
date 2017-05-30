@@ -227,10 +227,9 @@ namespace Umbraco.Tests.TestHelpers
                 var mappers = Current.Container.GetInstance<IMapperCollection>();
                 databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, mappers);
             }
-            // fixme - how elegant ;(
-            FileSystems fileSystems = null;
-            var scopeProvider = new ScopeProvider(databaseFactory, new Lazy<FileSystems>(() => fileSystems), logger);
-            fileSystems = new FileSystems(scopeProvider, logger);
+
+            var fileSystems = new FileSystems(logger);
+            var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger);
             return scopeProvider;
         }
 
@@ -246,10 +245,8 @@ namespace Umbraco.Tests.TestHelpers
             }
             if (scopeProvider == null)
             {
-                // fixme - how elegant ;(
-                FileSystems fileSystems = null;
-                scopeProvider = new ScopeProvider(databaseFactory, new Lazy<FileSystems>(() => fileSystems), logger);
-                fileSystems = new FileSystems((IScopeProviderInternal) scopeProvider, logger);
+                var fileSystems = new FileSystems(logger);
+                scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger);
             }
             repositoryFactory = repositoryFactory  ??  new RepositoryFactory(Mock.Of<IServiceContainer>());
             IDatabaseContext databaseContext = databaseFactory;

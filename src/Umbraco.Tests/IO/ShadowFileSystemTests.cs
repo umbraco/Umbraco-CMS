@@ -384,10 +384,9 @@ namespace Umbraco.Tests.IO
             Directory.CreateDirectory(appdata);
 
             var scopedFileSystems = false;
-            var scopeProvider = MockScopeProvider(() => scopedFileSystems);
 
             var fs = new PhysicalFileSystem(path, "ignore");
-            var sw = new ShadowWrapper(fs, "shadow", scopeProvider);
+            var sw = new ShadowWrapper(fs, "shadow", () => scopedFileSystems);
             var swa = new[] { sw };
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -467,10 +466,9 @@ namespace Umbraco.Tests.IO
             Directory.CreateDirectory(path);
 
             var scopedFileSystems = false;
-            var scopeProvider = MockScopeProvider(() => scopedFileSystems);
 
             var fs = new PhysicalFileSystem(path, "ignore");
-            var sw = new ShadowWrapper(fs, "shadow", scopeProvider);
+            var sw = new ShadowWrapper(fs, "shadow", () => scopedFileSystems);
             var swa = new[] { sw };
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -518,10 +516,9 @@ namespace Umbraco.Tests.IO
             Directory.CreateDirectory(path);
 
             var scopedFileSystems = false;
-            var scopeProvider = MockScopeProvider(() => scopedFileSystems);
 
             var fs = new PhysicalFileSystem(path, "ignore");
-            var sw = new ShadowWrapper(fs, "shadow", scopeProvider);
+            var sw = new ShadowWrapper(fs, "shadow", () => scopedFileSystems);
             var swa = new[] { sw };
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))

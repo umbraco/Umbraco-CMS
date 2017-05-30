@@ -13,7 +13,6 @@ namespace Umbraco.Core.IO
 {
     public class FileSystems
     {
-        private readonly IScopeProviderInternal _scopeProvider;
         private readonly FileSystemProvidersSection _config;
         private readonly ConcurrentSet<ShadowWrapper> _wrappers = new ConcurrentSet<ShadowWrapper>();
         private readonly ILogger _logger;
@@ -32,20 +31,11 @@ namespace Umbraco.Core.IO
 
         #region Constructor
 
-        // fixme - circular dependency on scope provider
-        // managed via lazy-injecting FileSystems into ScopeProvider for now,
-        // but we must refactor this somehow!
-
         // DI wants a public ctor
         // but IScopeProviderInternal is not public
-        public FileSystems(/*IScopeProviderInternal scopeProvider,*/ ILogger logger)
-            : this(Composing.Current.ScopeProvider as IScopeProviderInternal, logger)
-        { }
-
-        internal FileSystems(IScopeProviderInternal scopeProvider, ILogger logger)
+        public FileSystems(ILogger logger)
         {
             _config = (FileSystemProvidersSection)ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
-            _scopeProvider = scopeProvider;
             _logger = logger;
             CreateWellKnownFileSystems();
         }
@@ -58,6 +48,8 @@ namespace Umbraco.Core.IO
             _filesystems.Clear();
             CreateWellKnownFileSystems();
         }
+
+        internal Func<bool> IsScoped { get; set; }
 
         #endregion
 
@@ -82,13 +74,13 @@ namespace Umbraco.Core.IO
             var masterPagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
 
-            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", _scopeProvider);
-            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", _scopeProvider);
-            _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", _scopeProvider);
-            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", _scopeProvider);
-            _xsltFileSystem = new ShadowWrapper(xsltFileSystem, "xslt", _scopeProvider);
-            _masterPagesFileSystem = new ShadowWrapper(masterPagesFileSystem, "masterpages", _scopeProvider);
-            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", _scopeProvider);
+            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", IsScoped);
+            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", IsScoped);
+            _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", IsScoped);
+            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", IsScoped);
+            _xsltFileSystem = new ShadowWrapper(xsltFileSystem, "xslt", IsScoped);
+            _masterPagesFileSystem = new ShadowWrapper(masterPagesFileSystem, "masterpages", IsScoped);
+            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", IsScoped);
 
             // filesystems obtained from GetFileSystemProvider are already wrapped and do not need to be wrapped again
             MediaFileSystem = GetFileSystemProvider<MediaFileSystem>();
@@ -223,7 +215,7 @@ namespace Umbraco.Core.IO
                 // so we are double-wrapping here
                 // could be optimized by having FileSystemWrapper inherit from ShadowWrapper, maybe
                 var innerFs = GetUnderlyingFileSystemNoCache(alias, fallback);
-                var shadowWrapper = new ShadowWrapper(innerFs, "typed/" + alias, _scopeProvider);
+                var shadowWrapper = new ShadowWrapper(innerFs, "typed/" + alias, IsScoped);
                 var fs = (IFileSystem) Activator.CreateInstance(typeof(TFileSystem), shadowWrapper);
                 _wrappers.Add(shadowWrapper); // keeping a reference to the wrapper
                 return fs;
