@@ -11,8 +11,10 @@ using Umbraco.Core.Models.EntityBase;
 using umbraco.cms.businesslogic.property;
 using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
+using umbraco.BusinessLogic;
 using umbraco.cms.helpers;
 using umbraco.cms.businesslogic.datatype.controls;
+using Umbraco.Core.Media;
 using File = System.IO.File;
 using Property = umbraco.cms.businesslogic.property.Property;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
@@ -55,7 +57,7 @@ namespace umbraco.cms.businesslogic
         public Content(int id) : base(id) { }
 
         protected Content(int id, bool noSetup) : base(id, noSetup) { }
-       
+
         protected Content(Guid id) : base(id) { }
 
         protected Content(Guid id, bool noSetup) : base(id, noSetup) { }
@@ -130,23 +132,27 @@ namespace umbraco.cms.businesslogic
         {
             get
             {
-                if (_contentType == null)
+                using (var sqlHelper = Application.SqlHelper)
                 {
-                    object o = SqlHelper.ExecuteScalar<object>(
-                        "Select ContentType from cmsContent where nodeId=@nodeid",
-                            SqlHelper.CreateParameter("@nodeid", this.Id));
-                    if (o == null)
-                        return null;
-                    int contentTypeId;
-                    if (int.TryParse(o.ToString(), out contentTypeId) == false)
-                        return null;
-                    try
+                    if (_contentType == null)
                     {
-                        _contentType = new ContentType(contentTypeId);
-                    }
-                    catch
-                    {
-                        return null;
+                        object o = sqlHelper.ExecuteScalar<object>(
+                            "Select ContentType from cmsContent where nodeId=@nodeid",
+                            sqlHelper.CreateParameter("@nodeid", this.Id));
+                        if (o == null)
+                            return null;
+                        int contentTypeId;
+                        if (int.TryParse(o.ToString(), out contentTypeId) == false)
+                            return null;
+
+                        try
+                        {
+                            _contentType = new ContentType(contentTypeId);
+                        }
+                        catch (Exception e)
+                        {
+                            return null;
+                        }
                     }
                 }
                 return _contentType;
@@ -196,27 +202,34 @@ namespace umbraco.cms.businesslogic
                     if (this is media.Media)
                     {
                         // get the xml fragment from cmsXmlContent
-                        string xmlFragment = SqlHelper.ExecuteScalar<string>(@"SELECT [xml] FROM cmsContentXml WHERE nodeId = " + this.Id);
-                        if (!string.IsNullOrWhiteSpace(xmlFragment))
+                        using (var sqlHelper = Application.SqlHelper)
                         {
-                            XmlDocument xmlDocument = new XmlDocument();
-                            xmlDocument.LoadXml(xmlFragment);                            
+                            string xmlFragment = sqlHelper.ExecuteScalar<string>(@"SELECT [xml] FROM cmsContentXml WHERE nodeId = " + this.Id);
+                            if (!string.IsNullOrWhiteSpace(xmlFragment))
+                            {
+                                XmlDocument xmlDocument = new XmlDocument();
+                                xmlDocument.LoadXml(xmlFragment);
 
-                            _versionDateInitialized = DateTime.TryParse(xmlDocument.SelectSingleNode("//*[1]").Attributes["updateDate"].Value, out _versionDate);
+                                _versionDateInitialized = DateTime.TryParse(xmlDocument.SelectSingleNode("//*[1]").Attributes["updateDate"].Value, out _versionDate);
+                            }
                         }
                     }
 
                     if (!_versionDateInitialized)
                     {
-                        object o = SqlHelper.ExecuteScalar<object>(
-                            "select VersionDate from cmsContentVersion where versionId = '" + this.Version.ToString() + "'");
-                        if (o == null)
+
+                        using (var sqlHelper = Application.SqlHelper)
                         {
-                            _versionDate = DateTime.Now;
-                        }
-                        else
-                        {
-                            _versionDateInitialized = DateTime.TryParse(o.ToString(), out _versionDate);
+                            object o = sqlHelper.ExecuteScalar<object>(
+                                "select VersionDate from cmsContentVersion where versionId = '" + this.Version.ToString() + "'");
+                            if (o == null)
+                            {
+                                _versionDate = DateTime.Now;
+                            }
+                            else
+                            {
+                                _versionDateInitialized = DateTime.TryParse(o.ToString(), out _versionDate);
+                            }
                         }
                     }
                 }
@@ -266,7 +279,8 @@ namespace umbraco.cms.businesslogic
                     string sql = "Select versionId from cmsContentVersion where contentID = " + this.Id +
                                  " order by id desc ";
 
-                    using (IRecordsReader dr = SqlHelper.ExecuteReader(sql))
+                    using (var sqlHelper = Application.SqlHelper)
+                    using (IRecordsReader dr = sqlHelper.ExecuteReader(sql))
                     {
                         if (!dr.Read())
                             _version = Guid.Empty;
@@ -287,7 +301,7 @@ namespace umbraco.cms.businesslogic
         /// Used to persist object changes to the database. This ensures that the properties are re-loaded from the database.
         /// </summary>
         public override void Save()
-        {            
+        {
             base.Save();
 
             ClearLoadedProperties();
@@ -326,7 +340,7 @@ namespace umbraco.cms.businesslogic
         public virtual Property addProperty(PropertyType pt, Guid versionId)
         {
             ClearLoadedProperties();
-            
+
             return property.Property.MakeNew(pt, this, versionId);
 
         }
@@ -346,13 +360,15 @@ namespace umbraco.cms.businesslogic
                 // after the empty catch we'll generate the xml which is why we don't do anything in the catch part
                 try
                 {
-                    XmlReader xr = SqlHelper.ExecuteXmlReader("select xml from cmsContentXml where nodeID = " + this.Id.ToString());
-                    if (xr.MoveToContent() != System.Xml.XmlNodeType.None)
+                    using (var sqlHelper = Application.SqlHelper)
+                    using (var xr = sqlHelper.ExecuteXmlReader("select xml from cmsContentXml where nodeID = " + this.Id.ToString()))
                     {
-                        xmlDoc.Load(xr);
-                        _xml = xmlDoc.FirstChild;
+                        if (xr.MoveToContent() != System.Xml.XmlNodeType.None)
+                        {
+                            xmlDoc.Load(xr);
+                            _xml = xmlDoc.FirstChild;
+                        }
                     }
-                    xr.Close();
                 }
                 catch
                 {
@@ -395,7 +411,8 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         public virtual void XmlRemoveFromDB()
         {
-            SqlHelper.ExecuteNonQuery("delete from cmsContentXml where nodeId = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("delete from cmsContentXml where nodeId = @nodeId", sqlHelper.CreateParameter("@nodeId", this.Id));
         }
 
         /// <summary>
@@ -458,16 +475,20 @@ namespace umbraco.cms.businesslogic
             this.deleteAllProperties();
 
             // Remove all content preview xml
-            SqlHelper.ExecuteNonQuery("delete from cmsPreviewXml where nodeId = " + Id);
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("delete from cmsPreviewXml where nodeId = " + Id);
 
             // Delete version history
-            SqlHelper.ExecuteNonQuery("Delete from cmsContentVersion where ContentId = " + this.Id);
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("Delete from cmsContentVersion where ContentId = " + this.Id);
 
             // Delete xml
-            SqlHelper.ExecuteNonQuery("delete from cmsContentXml where nodeID = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("delete from cmsContentXml where nodeID = @nodeId", sqlHelper.CreateParameter("@nodeId", this.Id));
 
             // Delete Contentspecific data ()
-            SqlHelper.ExecuteNonQuery("Delete from cmsContent where NodeId = " + this.Id);
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("Delete from cmsContent where NodeId = " + this.Id);
 
             // Delete Nodeinformation!!
             base.delete();
@@ -486,7 +507,7 @@ namespace umbraco.cms.businesslogic
         {
             //we know that there is one ctor arg and it is a GUID since we are only calling the base
             // ctor with this overload for one purpose.
-            var version = (Guid) ctorArgs[0];
+            var version = (Guid)ctorArgs[0];
             _version = version;
 
             base.PreSetupNode(ctorArgs);
@@ -518,20 +539,21 @@ namespace umbraco.cms.businesslogic
         /// <param name="ct"></param>
         protected virtual void CreateContent(ContentType ct)
         {
-            SqlHelper.ExecuteNonQuery("insert into cmsContent (nodeId,ContentType) values (" + this.Id + "," + ct.Id + ")");
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("insert into cmsContent (nodeId,ContentType) values (" + this.Id + "," + ct.Id + ")");
             createNewVersion(DateTime.Now);
         }
-        
+
         /// <summary>
         /// Method for creating a new version of the data associated to the Content. 
         /// </summary>
         /// <returns>The new version Id</returns>
-		protected Guid createNewVersion(DateTime versionDate = default(DateTime))
+        protected Guid createNewVersion(DateTime versionDate = default(DateTime))
         {
-			if (versionDate == default (DateTime))
-			{
-				versionDate = DateTime.Now;
-			}
+            if (versionDate == default(DateTime))
+            {
+                versionDate = DateTime.Now;
+            }
 
             ClearLoadedProperties();
 
@@ -539,8 +561,9 @@ namespace umbraco.cms.businesslogic
             bool tempHasVersion = hasVersion();
 
             // we need to ensure that a version in the db exist before we add related data
-            SqlHelper.ExecuteNonQuery("Insert into cmsContentVersion (ContentId,versionId,versionDate) values (" + this.Id + ",'" + newVersion + "', @updateDate)",
-                SqlHelper.CreateParameter("@updateDate", versionDate));
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("Insert into cmsContentVersion (ContentId,versionId,versionDate) values (" + this.Id + ",'" + newVersion + "', @updateDate)",
+                sqlHelper.CreateParameter("@updateDate", versionDate));
 
             List<PropertyType> pts = ContentType.PropertyTypes;
             foreach (propertytype.PropertyType pt in pts)
@@ -577,16 +600,20 @@ namespace umbraco.cms.businesslogic
         protected virtual void SaveXmlDocument(XmlNode node)
         {
             // Method is synchronized so exists remains consistent (avoiding race condition)
-            bool exists = SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @nodeId",
-                                           SqlHelper.CreateParameter("@nodeId", Id)) > 0;
-            string query;
-            if (exists)
-                query = "UPDATE cmsContentXml SET xml = @xml WHERE nodeId = @nodeId";
-            else
-                query = "INSERT INTO cmsContentXml(nodeId, xml) VALUES (@nodeId, @xml)";
-            SqlHelper.ExecuteNonQuery(query,
-                                      SqlHelper.CreateParameter("@nodeId", Id),
-                                      SqlHelper.CreateParameter("@xml", node.OuterXml));
+            using (var sqlHelper = Application.SqlHelper)
+            {
+                bool exists = sqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @nodeId",
+                                           sqlHelper.CreateParameter("@nodeId", Id)) > 0;
+                string query;
+                if (exists)
+                    query = "UPDATE cmsContentXml SET xml = @xml WHERE nodeId = @nodeId";
+                else
+                    query = "INSERT INTO cmsContentXml(nodeId, xml) VALUES (@nodeId, @xml)";
+            
+                sqlHelper.ExecuteNonQuery(query,
+                                      sqlHelper.CreateParameter("@nodeId", Id),
+                                      sqlHelper.CreateParameter("@xml", node.OuterXml));
+            }
         }
 
         /// <summary>
@@ -599,9 +626,9 @@ namespace umbraco.cms.businesslogic
 
             var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
             var uploadField = DataTypesResolver.Current.GetById(new Guid(Constants.PropertyEditors.UploadField));
-             
+
             foreach (Property p in GenericProperties)
-            {               
+            {
                 var isUploadField = false;
                 try
                 {
@@ -692,8 +719,9 @@ namespace umbraco.cms.businesslogic
 
             string sql = @"select id, propertyTypeId from cmsPropertyData where versionId=@versionId";
 
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(sql,
-                SqlHelper.CreateParameter("@versionId", Version)))
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader dr = sqlHelper.ExecuteReader(sql,
+                sqlHelper.CreateParameter("@versionId", Version)))
             {
                 while (dr.Read())
                 {
@@ -736,13 +764,16 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         protected void deleteAllProperties()
         {
-            SqlHelper.ExecuteNonQuery("Delete from cmsPropertyData where contentNodeId = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("Delete from cmsPropertyData where contentNodeId = @nodeId", sqlHelper.CreateParameter("@nodeId", this.Id));
         }
 
         private XmlNode importXml()
         {
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(SqlHelper.ExecuteXmlReader("select xml from cmsContentXml where nodeID = " + this.Id.ToString()));
+            using (var sqlHelper = Application.SqlHelper)
+            using (var doc = sqlHelper.ExecuteXmlReader("select xml from cmsContentXml where nodeID = " + this.Id.ToString()))
+                xmlDoc.Load(doc);
 
             return xmlDoc.FirstChild;
         }
@@ -753,8 +784,11 @@ namespace umbraco.cms.businesslogic
         /// <returns>Returns true if the Content has a version</returns>
         private bool hasVersion()
         {
-            int versionCount = SqlHelper.ExecuteScalar<int>("select Count(Id) as tmp from cmsContentVersion where contentId = " + this.Id.ToString());
-            return (versionCount > 0);
+            using (var sqlHelper = Application.SqlHelper)
+            {
+                int versionCount = sqlHelper.ExecuteScalar<int>("select Count(Id) as tmp from cmsContentVersion where contentId = " + this.Id.ToString());
+                return (versionCount > 0);
+            }
         }
 
         #endregion
@@ -774,7 +808,6 @@ namespace umbraco.cms.businesslogic
         {
             SavePreviewXml(generateXmlWithoutSaving(xd), Version);
         }
-
         #endregion
     }
 }

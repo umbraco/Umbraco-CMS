@@ -87,7 +87,7 @@
     <key alias="selectCurrentFolder">Välj aktuell mapp</key>
     <key alias="showPage">Förhandsgranska</key>
     <key alias="showPageDisabled">Förhandsgranskning är avstängt på grund av att det inte finns någon mall tilldelad</key>
-    <key alias="somethingElse">Ångra</key>
+    <key alias="somethingElse">Annat</key>
     <key alias="styleChoose">Välj stil</key>
     <key alias="styleShow">Visa stil</key>
     <key alias="tableInsert">Infoga tabell</key>
@@ -171,6 +171,7 @@
     <key alias="noDocumentTypes"><![CDATA[Det finns inga giltiga dokumenttyper tillgängliga. Du måste aktivera dessa under sektionen inställningar och under <strong>"dokumenttyper"</strong>.]]></key>
     <key alias="noMediaTypes"><![CDATA[Det finns inga giltiga mediatyper tillgängliga. Du måste aktivera dessa under sektionen inställningar och under <strong>"mediatyper"</strong>.]]></key>
     <key alias="updateData">Välj typ och rubrik</key>
+    <key alias="documentTypeWithoutTemplate">Dokumenttyp utan sidmall</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Surfa på din webbplats</key>
@@ -593,11 +594,12 @@
     <key alias="search">Skriv för att söka...</key>
     <key alias="username">Fyll i ditt lösenord</key>
     <key alias="enterTags">Skriv för att lägga till taggar (och tryck enter efter varje tagg)...</key>
+    <key alias="usernamehint">Ditt användarnamn är vanligtvis din e-postadress</key>
   </area>
   <area alias="publicAccess">
     <key alias="paAdvanced">Rollbaserat lösenordsskydd</key>
     <key alias="paAdvancedHelp"><![CDATA[Välj detta alternativ om du vill skydda sidan med hjälp av rollbaserat lösenordsskydd.<br /> Då används Umbracos medlemsgrupper.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Du måste skapa en medlemsgrupp innan du kan använda <br />rollbaserat lösenordsskydd.]]></key>
+    <key alias="paAdvancedNoGroups">Du måste skapa en medlemsgrupp innan du kan använda rollbaserat lösenordsskydd.</key>
     <key alias="paErrorPage">Sida med felmeddelande</key>
     <key alias="paErrorPageHelp">Används när en användare är inloggad, men saknar rättigheter att se sidan</key>
     <key alias="paHowWould">Välj hur du vill lösenordsskydda sidan</key>

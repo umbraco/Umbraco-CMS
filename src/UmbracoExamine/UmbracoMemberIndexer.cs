@@ -9,6 +9,8 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
 using UmbracoExamine.Config;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using Examine;
 using System.IO;
 using UmbracoExamine.DataServices;
@@ -24,6 +26,7 @@ namespace UmbracoExamine
     {
 
         private readonly IMemberService _memberService;
+        private readonly IMemberTypeService _memberTypeService;
         private readonly IDataTypeService _dataTypeService;
 
         /// <summary>
@@ -33,6 +36,7 @@ namespace UmbracoExamine
         {
             _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
             _memberService = ApplicationContext.Current.Services.MemberService;
+            _memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
         }
 
         /// <summary>
@@ -48,6 +52,7 @@ namespace UmbracoExamine
         {
             _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
             _memberService = ApplicationContext.Current.Services.MemberService;
+            _memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
         }
 
         /// <summary>
@@ -60,6 +65,8 @@ namespace UmbracoExamine
         /// <param name="memberService"></param>
         /// <param name="analyzer"></param>
         /// <param name="async"></param>
+        [Obsolete("Use the ctor specifying all dependencies instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public UmbracoMemberIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService,
               IDataTypeService dataTypeService,
               IMemberService memberService,
@@ -68,9 +75,31 @@ namespace UmbracoExamine
         {
             _dataTypeService = dataTypeService;
             _memberService = memberService;
+            _memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
         }
 
-
+        /// <summary>
+        /// Constructor to allow for creating an indexer at runtime
+        /// </summary>
+        /// <param name="indexerData"></param>
+        /// <param name="indexPath"></param>
+        /// <param name="dataService"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="memberService"></param>
+        /// <param name="memberTypeService"></param>
+        /// <param name="analyzer"></param>
+        /// <param name="async"></param>
+        public UmbracoMemberIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService,
+              IDataTypeService dataTypeService,
+              IMemberService memberService,
+              IMemberTypeService memberTypeService,
+              Analyzer analyzer, bool async)
+            : base(indexerData, indexPath, dataService, analyzer, async)
+        {
+            _dataTypeService = dataTypeService;
+            _memberService = memberService;
+            _memberTypeService = memberTypeService;
+        }
 
         /// <summary>
         /// Ensures that the'_searchEmail' is added to the user fields so that it is indexed - without having to modify the config
@@ -88,8 +117,9 @@ namespace UmbracoExamine
                 if (indexerData.UserFields.Any(x => x.Name == "_searchEmail") == false)
                 {
                     var field = new IndexField { Name = "_searchEmail" };
-                    var policy = IndexFieldPolicies.FirstOrDefault(x => x.Name == "_searchEmail");
-                    if (policy != null)
+
+                    StaticField policy;
+                    if (IndexFieldPolicies.TryGetValue("_searchEmail", out policy))
                     {
                         field.Type = policy.Type;
                         field.EnableSorting = policy.EnableSorting;
@@ -129,40 +159,69 @@ namespace UmbracoExamine
             if (SupportedTypes.Contains(type) == false)
                 return;
 
-            const int pageSize = 1000;
-            var pageIndex = 0;
+            DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - Start data queries - {0}", type));
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
 
-            IMember[] members;
-
-            if (IndexerData.IncludeNodeTypes.Any())
+            try
             {
-                //if there are specific node types then just index those
-                foreach (var nodeType in IndexerData.IncludeNodeTypes)
+                if (DisableXmlDocumentLookup == false)
                 {
-                    do
+                    ReindexWithXmlEntries(type, -1,
+                        () => _memberTypeService.GetAll().ToArray(),
+                        (path, pIndex, pSize) =>
+                        {
+                            long totalContent;
+                            var result = _memberService.GetPagedXmlEntries(pIndex, pSize, out totalContent).ToArray();
+                            var more = result.Length == pSize;
+                            return Tuple.Create(result, more);
+                        },
+                        i => _memberService.GetById(i));
+                }
+                else
+                {
+                    const int pageSize = 1000;
+                    var pageIndex = 0;
+
+                    IMember[] members;
+
+                    if (IndexerData.IncludeNodeTypes.Any())
                     {
-                        long total;
-                        members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, true, null, nodeType).ToArray();
+                        //if there are specific node types then just index those
+                        foreach (var nodeType in IndexerData.IncludeNodeTypes)
+                        {
+                            do
+                            {
+                                long total;
+                                members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, true, null, nodeType).ToArray();
 
-                        AddNodesToIndex(GetSerializedMembers(members), type);
+                                AddNodesToIndex(GetSerializedMembers(members), type);
 
-                        pageIndex++;
-                    } while (members.Length == pageSize);
+                                pageIndex++;
+                            } while (members.Length == pageSize);
+                        }
+                    }
+                    else
+                    {
+                        //no node types specified, do all members
+                        do
+                        {
+                            int total;
+                            members = _memberService.GetAll(pageIndex, pageSize, out total).ToArray();
+
+                            AddNodesToIndex(GetSerializedMembers(members), type);
+
+                            pageIndex++;
+                        } while (members.Length == pageSize);
+                    }
                 }
             }
-            else
+            finally
             {
-                //no node types specified, do all members
-                do
-                {
-                    int total;
-                    members = _memberService.GetAll(pageIndex, pageSize, out total).ToArray();
-
-                    AddNodesToIndex(GetSerializedMembers(members), type);
-
-                    pageIndex++;
-                } while (members.Length == pageSize);
+                stopwatch.Stop();
             }
+
+            DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - End data queries - {0}, took {1}ms", type, stopwatch.ElapsedMilliseconds));
         }
 
         private IEnumerable<XElement> GetSerializedMembers(IEnumerable<IMember> members)
@@ -174,19 +233,8 @@ namespace UmbracoExamine
         protected override XDocument GetXDocument(string xPath, string type)
         {
             throw new NotSupportedException();
-        }
-
-        protected override Dictionary<string, string> GetSpecialFieldsToIndex(Dictionary<string, string> allValuesForIndexing)
-        {
-            var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
-
-            //adds the special path property to the index
-            fields.Add("__key", allValuesForIndexing["__key"]);
-
-            return fields;
-
-        }
-
+        }       
+        
         /// <summary>
         /// Add the special __key and _searchEmail fields
         /// </summary>
@@ -197,8 +245,8 @@ namespace UmbracoExamine
 
             if (e.Node.Attribute("key") != null)
             {
-                if (e.Fields.ContainsKey("__key") == false)
-                    e.Fields.Add("__key", e.Node.Attribute("key").Value);
+                if (e.Fields.ContainsKey(NodeKeyFieldName) == false)
+                    e.Fields.Add(NodeKeyFieldName, e.Node.Attribute("key").Value);
             }
 
             if (e.Node.Attribute("email") != null)

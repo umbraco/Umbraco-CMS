@@ -275,19 +275,12 @@
     <key alias="thumbnailimageclickfororiginal">クリックすると画像がフルサイズで表示されます</key>
     <key alias="treepicker">項目の選択</key>
     <key alias="viewCacheItem">キャッシュされている項目の表示</key>
-	<key alias="createFolder">フォルダーの作成...</key>
-
+    <key alias="createFolder">フォルダーの作成...</key>
     <key alias="relateToOriginalLabel">オリジナルに関連付ける</key>
     <key alias="theFriendliestCommunity">フレンドリーなコミュニティ</key>
-
     <key alias="linkToPage">ページへリンク</key>
-
     <key alias="openInNewWindow">リンク ドキュメントを新しいウィンドウまたはタブで開く</key>
-    <key alias="openInFullBody">リンク ドキュメントをウィンドウ全文表示で開く</key>
-    <key alias="openInParentFrame">親フレームでリンク ドキュメントを開く</key>
-
     <key alias="linkToMedia">メディアへリンク</key>
-
     <key alias="selectMedia">メディアの選択</key>
     <key alias="selectIcon">アイコンの選択</key>
     <key alias="selectItem">アイテムの選択</key>
@@ -296,19 +289,14 @@
     <key alias="selectContent">コンテンツの選択</key>
     <key alias="selectMember">メンバーの選択</key>
     <key alias="selectMemberGroup">メンバー グループの選択</key>
-
     <key alias="noMacroParams">このマクロのパラメーターはありません</key>
-
     <key alias="externalLoginProviders">外部ログイン プロバイダー</key>
     <key alias="exceptionDetail">例外の詳細</key>
     <key alias="stacktrace">スタックトレース</key>
     <key alias="innerException">Inner Exception</key>
-
     <key alias="linkYour">次をリンク:</key>
     <key alias="unLinkYour">次をリンク解除:</key>
-
     <key alias="account">アカウント</key>
-
     <key alias="selectEditor">エディターの選択</key>
   </area>
   <area alias="dictionaryItem">

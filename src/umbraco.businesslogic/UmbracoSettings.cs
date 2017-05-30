@@ -273,6 +273,14 @@ namespace umbraco
         }
 
         /// <summary>
+        /// File types that will be allowed to be uploaded via the content/media upload control
+        /// </summary>
+        public static IEnumerable<string> AllowedUploadFiles
+        {
+            get { return UmbracoConfig.For.UmbracoSettings().Content.AllowedUploadFiles; }
+        }
+
+        /// <summary>
         /// Gets the allowed image file types.
         /// </summary>
         /// <value>The allowed image file types.</value>

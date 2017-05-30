@@ -21,25 +21,16 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class MemberTypeRepository : ContentTypeBaseRepository<IMemberType>, IMemberTypeRepository
     {
-
-        public MemberTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public MemberTypeRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
         }
 
-        private FullDataSetRepositoryCachePolicyFactory<IMemberType, int> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<IMemberType, int> CachePolicyFactory
+        protected override IRepositoryCachePolicy<IMemberType, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IMemberType, int>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(),
-                    //allow this cache to expire
-                    expires: true));
-            }
+            return new FullDataSetRepositoryCachePolicy<IMemberType, int>(runtimeCache, GetEntityId, /*expires:*/ true);
         }
-        
+
         protected override IMemberType PerformGet(int id)
         {
             //use the underlying GetAll which will force cache all content types
@@ -55,7 +46,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 var statement = string.Join(" OR ", ids.Select(x => string.Format("umbracoNode.id='{0}'", x)));
                 sql.Where(statement);
             }
-            sql.OrderByDescending<NodeDto>(x => x.NodeId, SqlSyntax);
+
+            //must be sorted this way for the relator to work
+            sql.OrderBy<MemberTypeReadOnlyDto>(x => x.UniqueId, SqlSyntax);
 
             var dtos =
                 Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
@@ -71,7 +64,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var subquery = translator.Translate();
             var sql = GetBaseQuery(false)
                 .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
-                .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
+                //must be sorted this way for the relator to work
+                .OrderBy<MemberTypeReadOnlyDto>(x => x.UniqueId, SqlSyntax);
 
             var dtos =
                 Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
@@ -300,13 +294,19 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="dtos"></param>
         /// <returns></returns>
-        private static IEnumerable<IMemberType> BuildFromDtos(List<MemberTypeReadOnlyDto> dtos)
+        private IEnumerable<IMemberType> BuildFromDtos(List<MemberTypeReadOnlyDto> dtos)
         {
             if (dtos == null || dtos.Any() == false)
                 return Enumerable.Empty<IMemberType>();
 
             var factory = new MemberTypeReadOnlyFactory();
-            return dtos.Select(factory.BuildEntity);
+            return dtos.Select(x =>
+            {
+                bool needsSaving;
+                var memberType = factory.BuildEntity(x, out needsSaving);
+                if (needsSaving) PersistUpdatedItem(memberType);
+                return memberType;
+            }).ToList();
         }
 
         /// <summary>

@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Web;
 using Microsoft.Owin;
-using Microsoft.Owin.Extensions;
-using Microsoft.Owin.Logging;
 using Owin;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
 using Umbraco.Web;
 using Umbraco.Web.Security.Identity;
@@ -42,11 +38,11 @@ namespace Umbraco.Web
         {
             app.SetUmbracoLoggerFactory();
 
-            //Configure the Identity user manager for use with Umbraco Back office 
+            //Configure the Identity user manager for use with Umbraco Back office
             // (EXPERT: an overload accepts a custom BackOfficeUserStore implementation)
             app.ConfigureUserManagerForUmbracoBackOffice(
                 ApplicationContext,
-                Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());
+                Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());            
         }
 
         /// <summary>
@@ -61,6 +57,7 @@ namespace Umbraco.Web
                 .UseUmbracoBackOfficeCookieAuthentication(ApplicationContext, PipelineStage.Authenticate)
                 .UseUmbracoBackOfficeExternalCookieAuthentication(ApplicationContext, PipelineStage.Authenticate)
                 .UseUmbracoPreviewAuthentication(ApplicationContext, PipelineStage.Authorize)
+                .UseSignalR()
                 .FinalizeMiddlewareConfiguration();
         }
 

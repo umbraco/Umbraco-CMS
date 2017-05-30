@@ -44,7 +44,7 @@
 
 				<div class="col">
 					<h2>Be a part of the community</h2>
-					<p>The Umbraco community is the best of its kind, be sure to visit, and if you have any questions, we’re sure that you can get your answers from the community.</p>
+					<p>The Umbraco community is the best of its kind, be sure to visit, and if you have any questions, we're sure that you can get your answers from the community.</p>
 					
 					<a href="http://our.umbraco.org?ref=ourFromInstaller" target="_blank">our.Umbraco &rarr;</a>
 				</div>

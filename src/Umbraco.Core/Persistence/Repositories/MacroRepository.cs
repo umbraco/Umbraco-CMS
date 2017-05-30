@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class MacroRepository : PetaPocoRepositoryBase<int, IMacro>, IMacroRepository
     {
 
-        public MacroRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public MacroRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
         }
@@ -26,6 +26,19 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
+            return GetBySql(sql);
+        }
+
+        public IMacro Get(Guid id)
+        {
+            var sql = GetBaseQuery().Where("uniqueId=@Id", new { Id = id });
+            return GetBySql(sql);
+        }
+
+        private IMacro GetBySql(Sql sql)
+        {
+            //must be sorted this way for the relator to work
+            sql.OrderBy<MacroDto>(x => x.Id, SqlSyntax);
 
             var macroDto = Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql).FirstOrDefault();
             if (macroDto == null)
@@ -41,26 +54,29 @@ namespace Umbraco.Core.Persistence.Repositories
             return entity;
         }
 
+        public IEnumerable<IMacro> GetAll(params Guid[] ids)
+        {
+            return ids.Length > 0 ? ids.Select(Get) : GetAllNoIds();
+        }
+
+        public bool Exists(Guid id)
+        {
+            return Get(id) != null;
+        }
+
         protected override IEnumerable<IMacro> PerformGetAll(params int[] ids)
         {
-            if (ids.Any())
-            {
-                return PerformGetAllOnIds(ids);
-            }
+            return ids.Length > 0 ? ids.Select(Get) : GetAllNoIds();
+        }
 
-            var sql = GetBaseQuery(false);
+        private IEnumerable<IMacro> GetAllNoIds()
+        {
+            var sql = GetBaseQuery(false)
+                //must be sorted this way for the relator to work
+                .OrderBy<MacroDto>(x => x.Id, SqlSyntax);
 
             return ConvertFromDtos(Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql))
                 .ToArray();// we don't want to re-iterate again!
-        }
-
-        private IEnumerable<IMacro> PerformGetAllOnIds(params int[] ids)
-        {
-            if (ids.Any() == false) yield break;
-            foreach (var id in ids)
-            {
-                yield return Get(id);
-            }
         }
 
         private IEnumerable<IMacro> ConvertFromDtos(IEnumerable<MacroDto> dtos)
@@ -81,6 +97,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IMacro>(sqlClause, query);
             var sql = translator.Translate();
+
+            //must be sorted this way for the relator to work
+            sql.OrderBy<MacroDto>(x => x.Id, SqlSyntax);
 
             var dtos = Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql);
 
@@ -104,13 +123,13 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        private static Sql GetBaseQuery()
+        private Sql GetBaseQuery()
         {
             var sql = new Sql();
             sql.Select("*")
-               .From<MacroDto>()
-               .LeftJoin<MacroPropertyDto>()
-               .On<MacroDto, MacroPropertyDto>(left => left.Id, right => right.Macro);
+                .From<MacroDto>()
+                .LeftJoin<MacroPropertyDto>()
+                .On<MacroDto, MacroPropertyDto>(left => left.Id, right => right.Macro);
             return sql;
         }
 
@@ -124,7 +143,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var list = new List<string>
                 {
                     "DELETE FROM cmsMacroProperty WHERE macro = @Id",
-                    "DELETE FROM cmsMacro WHERE id = @Id"                           
+                    "DELETE FROM cmsMacro WHERE id = @Id"
                 };
             return list;
         }
@@ -146,7 +165,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             foreach (var propDto in dto.MacroPropertyDtos)
             {
-                //need to set the id explicitly here
+                // need to set the id explicitly here
                 propDto.Macro = id;
                 var propId = Convert.ToInt32(Database.Insert(propDto));
                 entity.Properties[propDto.Alias].Id = propId;
@@ -165,71 +184,60 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Update(dto);
 
             //update the properties if they've changed
-            var macro = (Macro)entity;
+            var macro = (Macro) entity;
             if (macro.IsPropertyDirty("Properties") || macro.Properties.Any(x => x.IsDirty()))
             {
-                //now we need to delete any props that have been removed
-                foreach (var propAlias in macro.RemovedProperties)
-                {
-                    //delete the property
-                    Database.Delete<MacroPropertyDto>("WHERE macro=@macroId AND macroPropertyAlias=@propAlias",
-                        new { macroId = macro.Id, propAlias = propAlias });
-                }
+                var ids = dto.MacroPropertyDtos.Where(x => x.Id > 0).Select(x => x.Id).ToArray();
+                if (ids.Length > 0)
+                    Database.Delete<MacroPropertyDto>("WHERE macro=@macro AND id NOT IN (@ids)", new { macro = dto.Id, ids });
+                else
+                    Database.Delete<MacroPropertyDto>("WHERE macro=@macro", new { macro = dto.Id });
 
-                //for any that exist on the object, we need to determine if we need to update or insert
+                // detect new aliases, replace with temp aliases
+                // this ensures that we don't have collisions, ever
+                var aliases = new Dictionary<string, string>();
                 foreach (var propDto in dto.MacroPropertyDtos)
                 {
-                    if (macro.AddedProperties.Contains(propDto.Alias))
+                    var prop = macro.Properties.FirstOrDefault(x => x.Id == propDto.Id);
+                    if (prop == null) throw new Exception("oops: property.");
+                    if (propDto.Id == 0 || prop.IsPropertyDirty("Alias"))
                     {
-                        //we need to insert since this was added  and re-assign the new id
-                        var propId = Convert.ToInt32(Database.Insert(propDto));
-                        macro.Properties[propDto.Alias].Id = propId;
+                        var tempAlias = Guid.NewGuid().ToString("N").Substring(0, 8);
+                        aliases[tempAlias] = propDto.Alias;
+                        propDto.Alias = tempAlias;
+                    }
+                }
+
+                // insert or update existing properties, with temp aliases
+                foreach (var propDto in dto.MacroPropertyDtos)
+                {
+                    if (propDto.Id == 0)
+                    {
+                        // insert
+                        propDto.Id = Convert.ToInt32(Database.Insert(propDto));
+                        macro.Properties[aliases[propDto.Alias]].Id = propDto.Id;
                     }
                     else
                     {
-                        //This will only work if the Alias hasn't been changed
-                        if (macro.Properties.ContainsKey(propDto.Alias))
-                        {
-                            //only update if it's dirty
-                            if (macro.Properties[propDto.Alias].IsDirty())
-                            {
-                                Database.Update(propDto);
-                            }
-                        }
-                        else
-                        {
-                            var property = macro.Properties.FirstOrDefault(x => x.Id == propDto.Id);
-                            if (property != null && property.IsDirty())
-                            {
-                                Database.Update(propDto);
-                            }
-                        }
+                        // update
+                        var property = macro.Properties.FirstOrDefault(x => x.Id == propDto.Id);
+                        if (property == null) throw new Exception("oops: property.");
+                        if (property.IsDirty())
+                            Database.Update(propDto);
                     }
                 }
 
-                
+                // replace the temp aliases with the real ones
+                foreach (var propDto in dto.MacroPropertyDtos)
+                {
+                    if (aliases.ContainsKey(propDto.Alias) == false) continue;
+
+                    propDto.Alias = aliases[propDto.Alias];
+                    Database.Update(propDto);
+                }
             }
 
             entity.ResetDirtyProperties();
         }
-
-        //public IEnumerable<IMacro> GetAll(params string[] aliases)
-        //{
-        //    if (aliases.Any())
-        //    {
-        //        var q = new Query<IMacro>();
-        //        foreach (var alias in aliases)
-        //        {
-        //            q.Where(macro => macro.Alias == alias);
-        //        }
-
-        //        var wheres = string.Join(" OR ", q.WhereClauses());
-        //    }
-        //    else
-        //    {
-        //        return GetAll(new int[] {});
-        //    }
-            
-        //}
     }
 }

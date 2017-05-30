@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -17,9 +15,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -34,26 +30,19 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ViewHelper _viewHelper;
         private readonly MasterPageHelper _masterPageHelper;
 
-        internal TemplateRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig)
+        internal TemplateRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig)
             : base(work, cache, logger, sqlSyntax)
         {
             _masterpagesFileSystem = masterpageFileSystem;
             _viewsFileSystem = viewFileSystem;
             _templateConfig = templateConfig;
             _viewHelper = new ViewHelper(_viewsFileSystem);
-            _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);            
+            _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
         }
 
-
-        private FullDataSetRepositoryCachePolicyFactory<ITemplate, int> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<ITemplate, int> CachePolicyFactory
+        protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<ITemplate, int>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(), false));
-            }
+            return new FullDataSetRepositoryCachePolicy<ITemplate, int>(runtimeCache, GetEntityId, /*expires:*/ false);
         }
 
         #region Overrides of RepositoryBase<int,ITemplate>
@@ -81,7 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (dtos.Count == 0) return Enumerable.Empty<ITemplate>();
 
-            //look up the simple template definitions that have a master template assigned, this is used 
+            //look up the simple template definitions that have a master template assigned, this is used
             // later to populate the template item's properties
             var childIds = (ids.Any()
                 ? GetAxisDefinitions(dtos.ToArray())
@@ -91,7 +80,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     ParentId = x.NodeDto.ParentId,
                     Name = x.Alias
                 })).ToArray();
-            
+
             return dtos.Select(d => MapFromDto(d, childIds));
         }
 
@@ -105,7 +94,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (dtos.Count == 0) return Enumerable.Empty<ITemplate>();
 
-            //look up the simple template definitions that have a master template assigned, this is used 
+            //look up the simple template definitions that have a master template assigned, this is used
             // later to populate the template item's properties
             var childIds = GetAxisDefinitions(dtos.ToArray()).ToArray();
 
@@ -188,29 +177,7 @@ namespace Umbraco.Core.Persistence.Repositories
             template.Path = nodeDto.Path;
 
             //now do the file work
-
-            if (DetermineTemplateRenderingEngine(entity) == RenderingEngine.Mvc)
-            {
-                var result = _viewHelper.CreateView(template, true);
-                if (result != entity.Content)
-                {
-                    entity.Content = result;
-                    //re-persist it... though we don't really care about the templates in the db do we??!!
-                    dto.Design = result;
-                    Database.Update(dto);
-                }
-            }
-            else
-            {
-                var result = _masterPageHelper.CreateMasterPage(template, this, true);
-                if (result != entity.Content)
-                {
-                    entity.Content = result;
-                    //re-persist it... though we don't really care about the templates in the db do we??!!
-                    dto.Design = result;
-                    Database.Update(dto);
-                }
-            }
+            SaveFile(template, dto);
 
             template.ResetDirtyProperties();
 
@@ -241,7 +208,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     entity.Path = string.Concat(parent.Path, ",", entity.Id);
                 }
-
+                else
+                {
+                    //this means that the master template has been removed, so we need to reset the template's
+                    //path to be at the root
+                    entity.Path = string.Concat("-1,", entity.Id);
+                }
             }
 
             //Get TemplateDto from db to get the Primary key of the entity
@@ -260,35 +232,49 @@ namespace Umbraco.Core.Persistence.Repositories
             template.IsMasterTemplate = axisDefs.Any(x => x.ParentId == dto.NodeId);
 
             //now do the file work
-
-            if (DetermineTemplateRenderingEngine(entity) == RenderingEngine.Mvc)
-            {
-                var result = _viewHelper.UpdateViewFile(entity, originalAlias);
-                if (result != entity.Content)
-                {
-                    entity.Content = result;
-                    //re-persist it... though we don't really care about the templates in the db do we??!!
-                    dto.Design = result;
-                    Database.Update(dto);
-                }
-            }
-            else
-            {
-                var result = _masterPageHelper.UpdateMasterPageFile(entity, originalAlias, this);
-                if (result != entity.Content)
-                {
-                    entity.Content = result;
-                    //re-persist it... though we don't really care about the templates in the db do we??!!
-                    dto.Design = result;
-                    Database.Update(dto);
-                }
-            }
+            SaveFile((Template) entity, dto, originalAlias);
 
             entity.ResetDirtyProperties();
 
             // ensure that from now on, content is lazy-loaded
             if (template.GetFileContent == null)
                 template.GetFileContent = file => GetFileContent((Template) file, false);
+        }
+
+        private void SaveFile(Template template, TemplateDto dto, string originalAlias = null)
+        {
+            string content;
+
+            var templateOnDisk = template as TemplateOnDisk;
+            if (templateOnDisk != null && templateOnDisk.IsOnDisk)
+            {
+                // if "template on disk" load content from disk
+                content = _viewHelper.GetFileContents(template);
+            }
+            else
+            {
+                // else, create or write template.Content to disk
+                if (DetermineTemplateRenderingEngine(template) == RenderingEngine.Mvc)
+                {
+                    content = originalAlias == null
+                        ? _viewHelper.CreateView(template, true)
+                        : _viewHelper.UpdateViewFile(template, originalAlias);
+                }
+                else
+                {
+                    content = originalAlias == null
+                        ? _masterPageHelper.CreateMasterPage(template, this, true)
+                        : _masterPageHelper.UpdateMasterPageFile(template, originalAlias, this);
+                }
+            }
+
+            // once content has been set, "template on disk" are not "on disk" anymore
+            template.Content = content;
+            SetVirtualPath(template);
+
+            if (dto.Design == content) return;
+            dto.Design = content;
+            Database.Update(dto); // though... we don't care about the db value really??!!
         }
 
         protected override void PersistDeletedItem(ITemplate entity)
@@ -324,14 +310,16 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var masterpageName = string.Concat(entity.Alias, ".master");
                 _masterpagesFileSystem.DeleteFile(masterpageName);
-            }         
+            }
+
+            entity.DeletedDate = DateTime.Now;
         }
 
         #endregion
 
         private IEnumerable<IUmbracoEntity> GetAxisDefinitions(params TemplateDto[] templates)
         {
-            //look up the simple template definitions that have a master template assigned, this is used 
+            //look up the simple template definitions that have a master template assigned, this is used
             // later to populate the template item's properties
             var childIdsSql = new Sql()
                 .Select("nodeId,alias,parentID")
@@ -340,7 +328,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<TemplateDto, NodeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId)
                 //lookup axis's
                 .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("id") + " IN (@parentIds) OR umbracoNode.parentID IN (@childIds)",
-                    new {parentIds = templates.Select(x => x.NodeDto.ParentId), childIds = templates.Select(x => x.NodeId)});            
+                    new {parentIds = templates.Select(x => x.NodeDto.ParentId), childIds = templates.Select(x => x.NodeId)});
 
             var childIds = Database.Fetch<dynamic>(childIdsSql)
                 .Select(x => new UmbracoEntity
@@ -386,6 +374,50 @@ namespace Umbraco.Core.Persistence.Repositories
             return template;
         }
 
+        private void SetVirtualPath(ITemplate template)
+        {
+            var path = template.OriginalPath;
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                // we need to discover the path
+                path = string.Concat(template.Alias, ".cshtml");
+                if (_viewsFileSystem.FileExists(path))
+                {
+                    template.VirtualPath = _viewsFileSystem.GetUrl(path);
+                    return;
+                }
+                path = string.Concat(template.Alias, ".vbhtml");
+                if (_viewsFileSystem.FileExists(path))
+                {
+                    template.VirtualPath = _viewsFileSystem.GetUrl(path);
+                    return;
+                }
+                path = string.Concat(template.Alias, ".master");
+                if (_masterpagesFileSystem.FileExists(path))
+                {
+                    template.VirtualPath = _masterpagesFileSystem.GetUrl(path);
+                    return;
+                }
+            }
+            else
+            {
+                // we know the path already
+                var ext = Path.GetExtension(path);
+                switch (ext)
+                {
+                    case ".cshtml":
+                    case ".vbhtml":
+                        template.VirtualPath = _viewsFileSystem.GetUrl(path);
+                        return;
+                    case ".master":
+                        template.VirtualPath = _masterpagesFileSystem.GetUrl(path);
+                        return;
+                }
+            }
+
+            template.VirtualPath = string.Empty; // file not found...
+        }
+
         private string GetFileContent(ITemplate template, bool init)
         {
             var path = template.OriginalPath;
@@ -413,20 +445,10 @@ namespace Umbraco.Core.Persistence.Repositories
                         return GetFileContent(template, _viewsFileSystem, path, init);
                     case ".master":
                         return GetFileContent(template, _masterpagesFileSystem, path, init);
-                    default:
-                        return string.Empty;
                 }
             }
 
-            var fsname = string.Concat(template.Alias, ".cshtml");
-            if (_viewsFileSystem.FileExists(fsname))
-                return GetFileContent(template, _viewsFileSystem, fsname, init);
-            fsname = string.Concat(template.Alias, ".vbhtml");
-            if (_viewsFileSystem.FileExists(fsname))
-                return GetFileContent(template, _viewsFileSystem, fsname, init);
-            fsname = string.Concat(template.Alias, ".master");
-            if (_masterpagesFileSystem.FileExists(fsname))
-                return GetFileContent(template, _masterpagesFileSystem, fsname, init);
+            template.VirtualPath = string.Empty; // file not found...
             return string.Empty;
         }
 
@@ -459,6 +481,50 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 return reader.ReadToEnd();
             }
+        }
+
+        public Stream GetFileContentStream(string filepath)
+        {
+            var fs = GetFileSystem(filepath);
+            if (fs.FileExists(filepath) == false) return null;
+
+            try
+            {
+                return GetFileSystem(filepath).OpenFile(filepath);
+            }
+            catch
+            {
+                return null; // deal with race conds
+            }
+        }
+
+        public void SetFileContent(string filepath, Stream content)
+        {
+            GetFileSystem(filepath).AddFile(filepath, content, true);
+        }
+
+        public long GetFileSize(string filepath)
+        {
+            return GetFileSystem(filepath).GetSize(filepath);
+        }
+
+        private IFileSystem GetFileSystem(string filepath)
+        {
+            var ext = Path.GetExtension(filepath);
+            IFileSystem fs;
+            switch (ext)
+            {
+                case ".cshtml":
+                case ".vbhtml":
+                    fs = _viewsFileSystem;
+                    break;
+                case ".master":
+                    fs = _masterpagesFileSystem;
+                    break;
+                default:
+                    throw new Exception("Unsupported extension " + ext + ".");
+            }
+            return fs;
         }
 
         #region Implementation of ITemplateRepository
@@ -526,7 +592,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //return the list - it will be naturally ordered by level
             return descendants;
         }
-        
+
         public IEnumerable<ITemplate> GetDescendants(string alias)
         {
             var all = base.GetAll().ToArray();
@@ -570,7 +636,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         [Obsolete("Use GetDescendants instead")]
         public TemplateNode GetTemplateNode(string alias)
-        {            
+        {
             //first get all template objects
             var allTemplates = base.GetAll().ToArray();
 
@@ -579,7 +645,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 return null;
             }
-            
+
             var top = selfTemplate;
             while (top.MasterTemplateAlias.IsNullOrWhiteSpace() == false)
             {
@@ -630,16 +696,16 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// This checks what the default rendering engine is set in config but then also ensures that there isn't already 
-        /// a template that exists in the opposite rendering engine's template folder, then returns the appropriate 
+        /// This checks what the default rendering engine is set in config but then also ensures that there isn't already
+        /// a template that exists in the opposite rendering engine's template folder, then returns the appropriate
         /// rendering engine to use.
-        /// </summary> 
+        /// </summary>
         /// <returns></returns>
         /// <remarks>
         /// The reason this is required is because for example, if you have a master page file already existing under ~/masterpages/Blah.aspx
-        /// and then you go to create a template in the tree called Blah and the default rendering engine is MVC, it will create a Blah.cshtml 
-        /// empty template in ~/Views. This means every page that is using Blah will go to MVC and render an empty page. 
-        /// This is mostly related to installing packages since packages install file templates to the file system and then create the 
+        /// and then you go to create a template in the tree called Blah and the default rendering engine is MVC, it will create a Blah.cshtml
+        /// empty template in ~/Views. This means every page that is using Blah will go to MVC and render an empty page.
+        /// This is mostly related to installing packages since packages install file templates to the file system and then create the
         /// templates in business logic. Without this, it could cause the wrong rendering engine to be used for a package.
         /// </remarks>
         public RenderingEngine DetermineTemplateRenderingEngine(ITemplate template)
@@ -747,7 +813,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="template"></param>
         private void EnsureValidAlias(ITemplate template)
         {
-            //ensure unique alias 
+            //ensure unique alias
             template.Alias = template.Alias.ToCleanString(CleanStringType.UnderscoreAlias);
 
             if (template.Alias.Length > 100)

@@ -39,7 +39,8 @@
    on-drag-enter="vm.dragEnter()">
 
       <umb-file-dropzone
-         ng-if="!vm.isRecycleBin"
+         ng-if="!vm.isRecycleBin && vm.acceptedMediatypes.length > 0"
+         accepted-mediatypes="vm.acceptedMediatypes"
          parent-id="{{vm.nodeId}}"
          files-uploaded="vm.onUploadComplete"
          accept="{{vm.acceptedFileTypes}}"
@@ -50,7 +51,7 @@
       </umb-file-dropzone>
 
       <umb-folder-grid
-         ng-if="folders.length > 0 && !vm.isRecycleBin"
+         ng-if="folders.length > 0"
          folders="folders"
          on-click="vm.selectFolder"
          on-click-name="vm.goToItem">
@@ -75,7 +76,7 @@
       </umb-tooltip>
 
       <umb-empty-state
-          ng-if="vm.itemsWithoutFolders.length === 0 && options.filter.length == 0 && vm.isRecycleBin"
+          ng-if="vm.itemsWithoutFolders.length === 0 && folders.length === 0 && options.filter.length == 0 && vm.isRecycleBin"
           position="center">
           <localize key="general_recycleBinEmpty"></localize>
       </umb-empty-state>

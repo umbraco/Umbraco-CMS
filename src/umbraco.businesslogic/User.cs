@@ -29,13 +29,7 @@ namespace umbraco.BusinessLogic
         
         private readonly Hashtable _notifications = new Hashtable();
         private bool _notificationsInitialized = false;
-
-        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
-        private static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
+        
         internal User(IUser user)
         {
             UserEntity = user;
@@ -304,19 +298,22 @@ namespace umbraco.BusinessLogic
             if (checkForUmbracoConsoleAccess)
                 consoleCheckSql = "and userNoConsole = 0 ";
 
-            object tmp = SqlHelper.ExecuteScalar<object>(
-                "select id from umbracoUser where userDisabled = 0 " + consoleCheckSql + " and userLogin = @login and userPassword = @pw", 
-                SqlHelper.CreateParameter("@login", lname), 
-                SqlHelper.CreateParameter("@pw", passw)
+            using (var sqlHelper = Application.SqlHelper)
+            {
+                object tmp = sqlHelper.ExecuteScalar<object>(
+                    "select id from umbracoUser where userDisabled = 0 " + consoleCheckSql + " and userLogin = @login and userPassword = @pw",
+                    sqlHelper.CreateParameter("@login", lname),
+                    sqlHelper.CreateParameter("@pw", passw)
                 );
 
-            // Logging
-            if (tmp == null)
-            {
-				LogHelper.Info<User>("Login: '" + lname + "' failed, from IP: " + System.Web.HttpContext.Current.Request.UserHostAddress);
+                // Logging
+                if (tmp == null)
+                {
+                    LogHelper.Info<User>("Login: '" + lname + "' failed, from IP: " + System.Web.HttpContext.Current.Request.UserHostAddress);
+                }
+
+                return (tmp != null);
             }
-                
-            return (tmp != null);
         }
 
         /// <summary>

@@ -326,7 +326,7 @@ namespace Umbraco.Core.Models
             }
         }
 
-            /// <summary>
+        /// <summary>
         /// A boolean flag indicating if a property type has been removed from this instance.
         /// </summary>
         /// <remarks>

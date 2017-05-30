@@ -1,8 +1,10 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Xml;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using Newtonsoft.Json;
 using Umbraco.Core.Media;
 
@@ -27,10 +29,13 @@ namespace Umbraco.Web.Media.EmbedProviders
 
         public virtual string BuildFullUrl(string url, int maxWidth, int maxHeight)
         {
+            if (Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute) == false)
+                throw new ArgumentException("Not a valid Url");
+
             var fullUrl = new StringBuilder();
 
             fullUrl.Append(APIEndpoint);
-            fullUrl.Append("?url=" + url);
+            fullUrl.Append("?url=" + HttpUtility.UrlEncode(url));
 
             foreach (var p in RequestParams)
                 fullUrl.Append(string.Format("&{0}={1}", p.Key, p.Value));

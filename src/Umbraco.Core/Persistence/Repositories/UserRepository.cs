@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IUserTypeRepository _userTypeRepository;
         private readonly CacheHelper _cacheHelper;
 
-        public UserRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax, IUserTypeRepository userTypeRepository)
+        public UserRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax, IUserTypeRepository userTypeRepository)
             : base(work, cacheHelper, logger, sqlSyntax)
         {
             _userTypeRepository = userTypeRepository;
@@ -39,6 +39,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
+            //must be sorted this way for the relator to work
+            sql.OrderBy<UserDto>(x => x.Id, SqlSyntax);
 
             var dto = Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql).FirstOrDefault();
             
@@ -60,7 +62,10 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 sql.Where("umbracoUser.id in (@ids)", new {ids = ids});
             }
-            
+
+            //must be sorted this way for the relator to work
+            sql.OrderBy<UserDto>(x => x.Id, SqlSyntax);
+
             return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql))
                     .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
         }
@@ -70,6 +75,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IUser>(sqlClause, query);
             var sql = translator.Translate();
+
+            //must be sorted this way for the relator to work
+            sql.OrderBy<UserDto>(x => x.Id, SqlSyntax);
 
             var dtos = Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql)
                 .DistinctBy(x => x.Id);
@@ -96,13 +104,13 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        private static Sql GetBaseQuery(string columns)
+        private Sql GetBaseQuery(string columns)
         {
             var sql = new Sql();
             sql.Select(columns)
-                      .From<UserDto>()
-                      .LeftJoin<User2AppDto>()
-                      .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId);
+                .From<UserDto>()
+                .LeftJoin<User2AppDto>()
+                .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId);
             return sql;
         }
 
@@ -300,6 +308,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var innerSql = GetBaseQuery("umbracoUser.id");
             innerSql.Where("umbracoUser2app.app = " + SqlSyntax.GetQuotedValue(sectionAlias));
             sql.Where(string.Format("umbracoUser.id IN ({0})", innerSql.SQL));
+            //must be sorted this way for the relator to work
+            sql.OrderBy<UserDto>(x => x.Id, SqlSyntax);
 
             return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql));
         }

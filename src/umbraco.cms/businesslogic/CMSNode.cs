@@ -107,7 +107,8 @@ namespace umbraco.cms.businesslogic
         /// </returns>
         public static int CountByObjectType(Guid objectType)
         {
-            return SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) from umbracoNode WHERE nodeObjectType = @type", SqlHelper.CreateParameter("@type", objectType));
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteScalar<int>("SELECT COUNT(*) from umbracoNode WHERE nodeObjectType = @type", sqlHelper.CreateParameter("@type", objectType));
         }
 
         /// <summary>
@@ -119,7 +120,9 @@ namespace umbraco.cms.businesslogic
         /// </returns>
         public static int CountSubs(int Id)
         {
-            return SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE ','+path+',' LIKE '%," + Id.ToString() + ",%'");
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE ','+path+',' LIKE '%,@nodeId,%'", 
+                    sqlHelper.CreateParameter("nodeId", Id));
         }
 
         /// <summary>
@@ -130,9 +133,10 @@ namespace umbraco.cms.businesslogic
         /// <returns></returns>
         public static int CountLeafNodes(int parentId, Guid objectType)
         {
-            return SqlHelper.ExecuteScalar<int>("Select count(uniqueID) from umbracoNode where nodeObjectType = @type And parentId = @parentId",
-                SqlHelper.CreateParameter("@type", objectType),
-                SqlHelper.CreateParameter("@parentId", parentId));
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteScalar<int>("Select count(uniqueID) from umbracoNode where nodeObjectType = @type And parentId = @parentId",
+	                sqlHelper.CreateParameter("@type", objectType),
+	                sqlHelper.CreateParameter("@parentId", parentId));
         }
 
         /// <summary>
@@ -163,7 +167,8 @@ namespace umbraco.cms.businesslogic
         /// <returns>True if there is a CMSNode with the given Guid</returns>
         public static bool IsNode(Guid uniqueID)
         {
-            return (SqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where uniqueID = @uniqueID", SqlHelper.CreateParameter("@uniqueId", uniqueID)) > 0);
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where uniqueID = @uniqueID", sqlHelper.CreateParameter("@uniqueId", uniqueID)) > 0;
         }
 
         /// <summary>
@@ -173,7 +178,8 @@ namespace umbraco.cms.businesslogic
         /// <returns>True if there is a CMSNode with the given id</returns>
         public static bool IsNode(int Id)
         {
-            return (SqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where id = @id", SqlHelper.CreateParameter("@id", Id)) > 0);
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where id = @id", sqlHelper.CreateParameter("@id", Id)) > 0;
         }
 
         /// <summary>
@@ -185,16 +191,19 @@ namespace umbraco.cms.businesslogic
         /// </returns>
         public static Guid[] getAllUniquesFromObjectType(Guid objectType)
         {
-            IRecordsReader dr = SqlHelper.ExecuteReader("Select uniqueID from umbracoNode where nodeObjectType = @type",
-                SqlHelper.CreateParameter("@type", objectType));
-            System.Collections.ArrayList tmp = new System.Collections.ArrayList();
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader dr = sqlHelper.ExecuteReader("Select uniqueID from umbracoNode where nodeObjectType = @type",
+                sqlHelper.CreateParameter("@type", objectType)))
+            {
+                System.Collections.ArrayList tmp = new System.Collections.ArrayList();
 
-            while (dr.Read()) tmp.Add(dr.GetGuid("uniqueID"));
-            dr.Close();
+                while (dr.Read()) tmp.Add(dr.GetGuid("uniqueID"));
+                dr.Close();
 
-            Guid[] retval = new Guid[tmp.Count];
-            for (int i = 0; i < tmp.Count; i++) retval[i] = (Guid)tmp[i];
-            return retval;
+                Guid[] retval = new Guid[tmp.Count];
+                for (int i = 0; i < tmp.Count; i++) retval[i] = (Guid)tmp[i];
+                return retval;
+            }
         }
 
         /// <summary>
@@ -206,14 +215,17 @@ namespace umbraco.cms.businesslogic
         /// </returns>
         public static int[] getAllUniqueNodeIdsFromObjectType(Guid objectType)
         {
-            IRecordsReader dr = SqlHelper.ExecuteReader("Select id from umbracoNode where nodeObjectType = @type",
-                SqlHelper.CreateParameter("@type", objectType));
-            System.Collections.ArrayList tmp = new System.Collections.ArrayList();
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader dr = sqlHelper.ExecuteReader("Select id from umbracoNode where nodeObjectType = @type",
+                sqlHelper.CreateParameter("@type", objectType)))
+            {
+                System.Collections.ArrayList tmp = new System.Collections.ArrayList();
 
-            while (dr.Read()) tmp.Add(dr.GetInt("id"));
-            dr.Close();
+                while (dr.Read()) tmp.Add(dr.GetInt("id"));
+                dr.Close();
 
-            return (int[])tmp.ToArray(typeof(int));
+                return (int[])tmp.ToArray(typeof(int));
+            }
         }
 
 
@@ -226,16 +238,19 @@ namespace umbraco.cms.businesslogic
         /// </returns>
         public static Guid[] TopMostNodeIds(Guid ObjectType)
         {
-            IRecordsReader dr = SqlHelper.ExecuteReader("Select uniqueID from umbracoNode where nodeObjectType = @type And parentId = -1 order by sortOrder",
-                SqlHelper.CreateParameter("@type", ObjectType));
-            System.Collections.ArrayList tmp = new System.Collections.ArrayList();
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader dr = sqlHelper.ExecuteReader("Select uniqueID from umbracoNode where nodeObjectType = @type And parentId = -1 order by sortOrder", 
+                sqlHelper.CreateParameter("@type", ObjectType)))
+            {
+                System.Collections.ArrayList tmp = new System.Collections.ArrayList();
 
-            while (dr.Read()) tmp.Add(dr.GetGuid("uniqueID"));
-            dr.Close();
+                while (dr.Read()) tmp.Add(dr.GetGuid("uniqueID"));
+                dr.Close();
 
-            Guid[] retval = new Guid[tmp.Count];
-            for (int i = 0; i < tmp.Count; i++) retval[i] = (Guid)tmp[i];
-            return retval;
+                Guid[] retval = new Guid[tmp.Count];
+                for (int i = 0; i < tmp.Count; i++) retval[i] = (Guid)tmp[i];
+                return retval;
+            }
         }
 
         #endregion
@@ -272,18 +287,18 @@ namespace umbraco.cms.businesslogic
             // Ruben 8/1/2007: I replace this with a parameterized version.
             // But does anyone know what the 'level++' is supposed to be doing there?
             // Nothing obviously, since it's a postfix.
-
-            SqlHelper.ExecuteNonQuery("INSERT INTO umbracoNode(trashed, parentID, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text, createDate) VALUES(@trashed, @parentID, @nodeObjectType, @nodeUser, @level, @path, @sortOrder, @uniqueID, @text, @createDate)",
-                                      SqlHelper.CreateParameter("@trashed", 0),
-                                      SqlHelper.CreateParameter("@parentID", parentId),
-                                      SqlHelper.CreateParameter("@nodeObjectType", objectType),
-                                      SqlHelper.CreateParameter("@nodeUser", userId),
-                                      SqlHelper.CreateParameter("@level", level++),
-                                      SqlHelper.CreateParameter("@path", path),
-                                      SqlHelper.CreateParameter("@sortOrder", sortOrder),
-                                      SqlHelper.CreateParameter("@uniqueID", uniqueID),
-                                      SqlHelper.CreateParameter("@text", text),
-                                      SqlHelper.CreateParameter("@createDate", DateTime.Now));
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("INSERT INTO umbracoNode(trashed, parentID, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text, createDate) VALUES(@trashed, @parentID, @nodeObjectType, @nodeUser, @level, @path, @sortOrder, @uniqueID, @text, @createDate)",
+                                        sqlHelper.CreateParameter("@trashed", 0),
+                                        sqlHelper.CreateParameter("@parentID", parentId),
+                                        sqlHelper.CreateParameter("@nodeObjectType", objectType),
+                                        sqlHelper.CreateParameter("@nodeUser", userId),
+                                        sqlHelper.CreateParameter("@level", level++),
+                                        sqlHelper.CreateParameter("@path", path),
+                                        sqlHelper.CreateParameter("@sortOrder", sortOrder),
+                                        sqlHelper.CreateParameter("@uniqueID", uniqueID),
+                                        sqlHelper.CreateParameter("@text", text),
+                                        sqlHelper.CreateParameter("@createDate", DateTime.Now));
 
             CMSNode retVal = new CMSNode(uniqueID);
             retVal.Path = path + "," + retVal.Id.ToString();
@@ -309,11 +324,12 @@ namespace umbraco.cms.businesslogic
         private static int GetNewDocumentSortOrder(int parentId)
         {
             var sortOrder = 0;
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                        "SELECT MAX(sortOrder) AS sortOrder FROM umbracoNode WHERE parentID = @parentID AND nodeObjectType = @GuidForNodesOfTypeDocument",
-                        SqlHelper.CreateParameter("@parentID", parentId),
-                        SqlHelper.CreateParameter("@GuidForNodesOfTypeDocument", Document._objectType)
-                  ))
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader dr = sqlHelper.ExecuteReader(
+                    "SELECT MAX(sortOrder) AS sortOrder FROM umbracoNode WHERE parentID = @parentID AND nodeObjectType = @GuidForNodesOfTypeDocument",
+                    sqlHelper.CreateParameter("@parentID", parentId),
+                    sqlHelper.CreateParameter("@GuidForNodesOfTypeDocument", Document._objectType)
+                ))
             {
                 while (dr.Read())
                     sortOrder = dr.GetInt("sortOrder") + 1;
@@ -332,19 +348,18 @@ namespace umbraco.cms.businesslogic
         /// </returns>
         protected static int[] getUniquesFromObjectTypeAndFirstLetter(Guid objectType, char letter)
         {
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("Select id from umbracoNode where nodeObjectType = @objectType AND text like @letter", SqlHelper.CreateParameter("@objectType", objectType), SqlHelper.CreateParameter("@letter", letter.ToString() + "%")))
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader dr = sqlHelper.ExecuteReader("Select id from umbracoNode where nodeObjectType = @objectType AND text like @letter", sqlHelper.CreateParameter("@objectType", objectType), sqlHelper.CreateParameter("@letter", letter.ToString() + "%")))
             {
                 List<int> tmp = new List<int>();
                 while (dr.Read()) tmp.Add(dr.GetInt("id"));
                 return tmp.ToArray();
             }
         }
-
-
+        
         /// <summary>
-        /// Gets the SQL helper.
+        /// Unused, please do not use
         /// </summary>
-        /// <value>The SQL helper.</value>
         [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
@@ -410,13 +425,15 @@ namespace umbraco.cms.businesslogic
         /// <param name="uniqueID">The unique ID.</param>
         public CMSNode(Guid uniqueID)
         {
-            _id = SqlHelper.ExecuteScalar<int>("SELECT id FROM umbracoNode WHERE uniqueID = @uniqueId", SqlHelper.CreateParameter("@uniqueId", uniqueID));
+            using (var sqlHelper = Application.SqlHelper)
+                _id = sqlHelper.ExecuteScalar<int>("SELECT id FROM umbracoNode WHERE uniqueID = @uniqueId", sqlHelper.CreateParameter("@uniqueId", uniqueID));
             setupNode();
         }
 
         public CMSNode(Guid uniqueID, bool noSetup)
         {
-            _id = SqlHelper.ExecuteScalar<int>("SELECT id FROM umbracoNode WHERE uniqueID = @uniqueId", SqlHelper.CreateParameter("@uniqueId", uniqueID));
+            using (var sqlHelper = Application.SqlHelper)
+                _id = sqlHelper.ExecuteScalar<int>("SELECT id FROM umbracoNode WHERE uniqueID = @uniqueId", sqlHelper.CreateParameter("@uniqueId", uniqueID));
 
             if (!noSetup)
                 setupNode();
@@ -500,14 +517,17 @@ inner join cmsPreviewXml on cmsPreviewXml.nodeId = umbracoNode.id
 where trashed = 0 and path like '{0}' 
 order by level,sortOrder";
 
-            string pathExp = childrenOnly ? Path + ",%" : Path;
+            var pathExp = childrenOnly ? Path + ",%" : Path;
 
-            IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(sql, pathExp));
-            while (dr.Read())
-                nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("uniqueID"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml"), false));
-            dr.Close();
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader dr = sqlHelper.ExecuteReader(string.Format(sql, pathExp)))
+            {
+                while (dr.Read())
+                    nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("uniqueID"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml"), false));
+                dr.Close();
 
-            return nodes;
+                return nodes;
+            }
         }
 
         /// <summary>
@@ -552,11 +572,13 @@ order by level,sortOrder";
                 //level and path might change even if it's the same newParent because the newParent could be moving somewhere.
                 if (ParentId != newParent.Id)
                 {
-                    int maxSortOrder = SqlHelper.ExecuteScalar<int>("select coalesce(max(sortOrder),0) from umbracoNode where parentid = @parentId",
-                        SqlHelper.CreateParameter("@parentId", newParent.Id));
-
-                    this.Parent = newParent;
-                    this.sortOrder = maxSortOrder + 1;
+                    using (var sqlHelper = Application.SqlHelper)
+                    {
+                        int maxSortOrder = sqlHelper.ExecuteScalar<int>("select coalesce(max(sortOrder),0) from umbracoNode where parentid = @parentId",
+                                sqlHelper.CreateParameter("@parentId", newParent.Id));
+                        this.Parent = newParent;
+                        this.sortOrder = maxSortOrder + 1;
+                    }
                 }
 
                 //detect if we have moved, then update the level and path
@@ -654,8 +676,8 @@ order by level,sortOrder";
 
                 //removes tag associations (i know the key is set to cascade but do it anyways)
                 Tag.RemoveTagsFromNode(this.Id);
-
-                SqlHelper.ExecuteNonQuery("DELETE FROM umbracoNode WHERE uniqueID= @uniqueId", SqlHelper.CreateParameter("@uniqueId", _uniqueID));
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("DELETE FROM umbracoNode WHERE uniqueID= @uniqueId", sqlHelper.CreateParameter("@uniqueId", _uniqueID));
                 FireAfterDelete(e);
             }
         }
@@ -672,9 +694,12 @@ order by level,sortOrder";
             {
                 if (!_hasChildrenInitialized)
                 {
-                    int tmpChildrenCount = SqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where ParentId = @id",
-                        SqlHelper.CreateParameter("@id", Id));
-                    HasChildren = (tmpChildrenCount > 0);
+                    using (var sqlHelper = Application.SqlHelper)
+                    {
+                        int tmpChildrenCount = sqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where ParentId = @id",
+                                sqlHelper.CreateParameter("@id", Id));
+                        HasChildren = (tmpChildrenCount > 0);
+                    }
                 }
                 return _hasChildren;
             }
@@ -696,7 +721,8 @@ order by level,sortOrder";
         public virtual IEnumerable GetDescendants()
         {
             var descendants = new List<CMSNode>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(SqlDescendants, Id)))
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader dr = sqlHelper.ExecuteReader(string.Format(SqlDescendants, Id)))
             {
                 while (dr.Read())
                 {
@@ -722,17 +748,21 @@ order by level,sortOrder";
             {
                 if (!_isTrashed.HasValue)
                 {
-                    _isTrashed = Convert.ToBoolean(SqlHelper.ExecuteScalar<object>("SELECT trashed FROM umbracoNode where id=@id",
-                        SqlHelper.CreateParameter("@id", this.Id)));
+                    using (var sqlHelper = Application.SqlHelper)
+                    {
+                        const string query = "SELECT trashed FROM umbracoNode where id=@id";
+                        _isTrashed = Convert.ToBoolean(sqlHelper.ExecuteScalar<object>(query, sqlHelper.CreateParameter("@id", this.Id)));
+                    }
                 }
                 return _isTrashed.Value;
             }
             set
             {
                 _isTrashed = value;
-                SqlHelper.ExecuteNonQuery("update umbracoNode set trashed = @trashed where id = @id",
-                    SqlHelper.CreateParameter("@trashed", value),
-                    SqlHelper.CreateParameter("@id", this.Id));
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("update umbracoNode set trashed = @trashed where id = @id",
+                    sqlHelper.CreateParameter("@trashed", value),
+                    sqlHelper.CreateParameter("@id", this.Id));
             }
         }
 
@@ -746,7 +776,8 @@ order by level,sortOrder";
             set
             {
                 _sortOrder = value;
-                SqlHelper.ExecuteNonQuery("update umbracoNode set sortOrder = '" + value + "' where id = " + this.Id.ToString());
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("update umbracoNode set sortOrder = '" + value + "' where id = " + this.Id);
 
                 if (Entity != null)
                     Entity.SortOrder = value;
@@ -763,7 +794,8 @@ order by level,sortOrder";
             set
             {
                 _createDate = value;
-                SqlHelper.ExecuteNonQuery("update umbracoNode set createDate = @createDate where id = " + this.Id.ToString(), SqlHelper.CreateParameter("@createDate", _createDate));
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("update umbracoNode set createDate = @createDate where id = " + this.Id, sqlHelper.CreateParameter("@createDate", _createDate));
             }
         }
 
@@ -816,7 +848,8 @@ order by level,sortOrder";
             set
             {
                 _parentid = value.Id;
-                SqlHelper.ExecuteNonQuery("update umbracoNode set parentId = " + value.Id + " where id = " + this.Id.ToString());
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("update umbracoNode set parentId = " + value.Id + " where id = " + this.Id.ToString());
 
                 if (Entity != null)
                     Entity.ParentId = value.Id;
@@ -836,7 +869,8 @@ order by level,sortOrder";
             set
             {
                 _path = value;
-                SqlHelper.ExecuteNonQuery("update umbracoNode set path = '" + _path + "' where id = " + this.Id.ToString());
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("update umbracoNode set path = '" + _path + "' where id = " + this.Id.ToString());
 
                 if (Entity != null)
                     Entity.Path = value;
@@ -854,7 +888,8 @@ order by level,sortOrder";
             set
             {
                 _level = value;
-                SqlHelper.ExecuteNonQuery("update umbracoNode set level = " + _level.ToString() + " where id = " + this.Id.ToString());
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("update umbracoNode set level = " + _level.ToString() + " where id = " + this.Id.ToString());
 
                 if (Entity != null)
                     Entity.Level = value;
@@ -893,8 +928,9 @@ order by level,sortOrder";
         {
             get
             {
-                return SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode where ParentID = @parentId",
-                                                    SqlHelper.CreateParameter("@parentId", this.Id));
+                using (var sqlHelper = Application.SqlHelper)
+                    return sqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode where ParentID = @parentId",
+                                                    sqlHelper.CreateParameter("@parentId", this.Id));
             }
         }
 
@@ -907,9 +943,10 @@ order by level,sortOrder";
             get
             {
                 System.Collections.ArrayList tmp = new System.Collections.ArrayList();
-                using (IRecordsReader dr = SqlHelper.ExecuteReader("SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE ParentID = @ParentID AND nodeObjectType = @type order by sortOrder",
-                    SqlHelper.CreateParameter("@type", this.nodeObjectType),
-                    SqlHelper.CreateParameter("ParentID", this.Id)))
+                using (var sqlHelper = Application.SqlHelper)
+                using (IRecordsReader dr = sqlHelper.ExecuteReader("SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE ParentID = @ParentID AND nodeObjectType = @type order by sortOrder",
+                    sqlHelper.CreateParameter("@type", this.nodeObjectType),
+                    sqlHelper.CreateParameter("ParentID", this.Id)))
                 {
                     while (dr.Read())
                     {
@@ -937,12 +974,12 @@ order by level,sortOrder";
             get
             {
                 System.Collections.ArrayList tmp = new System.Collections.ArrayList();
-                IRecordsReader dr = SqlHelper.ExecuteReader("select id from umbracoNode where ParentID = " + this.Id + " order by sortOrder");
-
-                while (dr.Read())
-                    tmp.Add(dr.GetInt("Id"));
-
-                dr.Close();
+                using (var sqlHelper = Application.SqlHelper)
+                using (IRecordsReader dr = sqlHelper.ExecuteReader("select id from umbracoNode where ParentID = " + this.Id + " order by sortOrder"))
+                {
+                    while (dr.Read())
+                        tmp.Add(dr.GetInt("Id"));
+                }
 
                 CMSNode[] retval = new CMSNode[tmp.Count];
 
@@ -952,7 +989,7 @@ order by level,sortOrder";
                 return retval;
             }
         }
-
+        
         #region IconI members
 
         // Unique identifier of the given node
@@ -973,9 +1010,10 @@ order by level,sortOrder";
             set
             {
                 _text = value;
-                SqlHelper.ExecuteNonQuery("UPDATE umbracoNode SET text = @text WHERE id = @id",
-                                          SqlHelper.CreateParameter("@text", value.Trim()),
-                                          SqlHelper.CreateParameter("@id", this.Id));
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("UPDATE umbracoNode SET text = @text WHERE id = @id",
+                                          sqlHelper.CreateParameter("@text", value.Trim()),
+                                          sqlHelper.CreateParameter("@id", this.Id));
 
                 if (Entity != null)
                     Entity.Name = value;
@@ -1052,8 +1090,9 @@ order by level,sortOrder";
         /// </summary>
         protected virtual void setupNode()
         {
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(SqlSingle,
-                    SqlHelper.CreateParameter("@id", this.Id)))
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader dr = sqlHelper.ExecuteReader(SqlSingle, 
+                sqlHelper.CreateParameter("@id", this.Id)))
             {
                 if (dr.Read())
                 {
@@ -1103,23 +1142,24 @@ order by level,sortOrder";
 
         protected virtual XmlNode GetPreviewXml(XmlDocument xd, Guid version)
         {
+            var xmlDoc = new XmlDocument();
 
-            XmlDocument xmlDoc = new XmlDocument();
-            using (XmlReader xmlRdr = SqlHelper.ExecuteXmlReader(
-                                                       "select xml from cmsPreviewXml where nodeID = @nodeId and versionId = @versionId",
-                                      SqlHelper.CreateParameter("@nodeId", Id),
-                                      SqlHelper.CreateParameter("@versionId", version)))
-            {
-                xmlDoc.Load(xmlRdr);
-            }
+            var xmlStr = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
+                "select xml from cmsPreviewXml where nodeID = @nodeId and versionId = @versionId",
+                new { nodeId = Id, versionId = version });
 
+            if (xmlStr.IsNullOrWhiteSpace()) return null;
+
+            xmlDoc.LoadXml(xmlStr);
+            
             return xd.ImportNode(xmlDoc.FirstChild, true);
         }
 
         protected internal virtual bool PreviewExists(Guid versionId)
         {
-            return (SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId=@nodeId and versionId = @versionId",
-                        SqlHelper.CreateParameter("@nodeId", Id), SqlHelper.CreateParameter("@versionId", versionId)) != 0);
+            return ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
+                        "SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId=@nodeId and versionId = @versionId",
+                        new {nodeId = Id, versionId = versionId}) != 0;
 
         }
 
@@ -1133,11 +1173,10 @@ order by level,sortOrder";
         {
             string sql = PreviewExists(versionId) ? "UPDATE cmsPreviewXml SET xml = @xml, timestamp = @timestamp WHERE nodeId=@nodeId AND versionId = @versionId"
                                 : "INSERT INTO cmsPreviewXml(nodeId, versionId, timestamp, xml) VALUES (@nodeId, @versionId, @timestamp, @xml)";
-            SqlHelper.ExecuteNonQuery(sql,
-                                      SqlHelper.CreateParameter("@nodeId", Id),
-                                      SqlHelper.CreateParameter("@versionId", versionId),
-                                      SqlHelper.CreateParameter("@timestamp", DateTime.Now),
-                                      SqlHelper.CreateParameter("@xml", x.OuterXml));
+
+            ApplicationContext.Current.DatabaseContext.Database.Execute(
+                sql, new {nodeId = Id, versionId = versionId, timestamp = DateTime.Now, xml = x.OuterXml});
+            
         }
 
         protected void PopulateCMSNodeFromReader(IRecordsReader dr)

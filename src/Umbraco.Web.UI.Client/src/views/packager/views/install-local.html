@@ -139,7 +139,7 @@
                                 <button type="button"
                                         ng-class="{'-inactive' : localPackageForm.$invalid}"
                                         ng-disabled="localPackageForm.$invalid"
-                                        class="umb-era-button -blue flex-inline mt3"
+                                        class="umb-era-button -green flex-inline mt3"
                                         ng-click="vm.installPackage()">
                                         Install package
                                 </button>
@@ -157,6 +157,19 @@
                             </div>
                             <div class="umb-info-local-item text-info">
                                 <p>{{vm.installState.status}}</p>
+                            </div>
+
+
+
+                            <div class="umb-info-local-item text-info"
+                                 ng-show="vm.installCompleted">
+                              
+                                <button type="button"
+                                       
+                                        class="btn btn-success flex-inline mt3"
+                                        ng-click="vm.reloadPage()">
+                                    Finish
+                                </button>
                             </div>
 
                         </div>

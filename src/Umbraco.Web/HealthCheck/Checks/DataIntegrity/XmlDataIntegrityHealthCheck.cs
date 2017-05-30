@@ -103,7 +103,7 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
         /// </remarks>
         private HealthCheckStatus CheckMedia()
         {
-            var total = _services.MediaService.Count();
+            var total = _services.MediaService.CountNotTrashed();
             var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
 
             //count entries

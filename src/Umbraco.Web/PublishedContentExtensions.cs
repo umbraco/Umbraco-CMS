@@ -567,7 +567,7 @@ namespace Umbraco.Web
             var filtered = dynamicDocumentList.Where<DynamicPublishedContent>(predicate);
             return filtered.Count() == 1;
         }
-        
+
         #endregion
 
         #region AsDynamic
@@ -833,7 +833,7 @@ namespace Umbraco.Web
         public static HtmlString IsOdd(this IPublishedContent content, string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(content.IsOdd() ? valueIfTrue : valueIfFalse);
-        } 
+        }
 
         #endregion
 
@@ -863,7 +863,7 @@ namespace Umbraco.Web
         {
             return content.IsNotEqual(other, valueIfTrue, string.Empty);
         }
-        
+
         public static HtmlString IsNotEqual(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
 		{
 			return new HtmlString(content.IsNotEqual(other) ? valueIfTrue : valueIfFalse);
@@ -1152,7 +1152,7 @@ namespace Umbraco.Web
         {
             return content.Ancestors<T>(maxLevel).FirstOrDefault();
         }
-        
+
         /// <summary>
         /// Gets the content or its nearest ancestor.
         /// </summary>
@@ -1213,7 +1213,7 @@ namespace Umbraco.Web
         {
             return content.AncestorsOrSelf<T>(maxLevel).FirstOrDefault();
         }
-        
+
         internal static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool> func)
         {
             var ancestorsOrSelf = content.EnumerateAncestors(orSelf);
@@ -1264,7 +1264,7 @@ namespace Umbraco.Web
             where T : class, IPublishedContent
         {
             return parentNodes.SelectMany(x => x.DescendantsOrSelf<T>());
-        } 
+        }
 
 
         // as per XPath 1.0 specs §2.2,
@@ -1312,7 +1312,7 @@ namespace Umbraco.Web
         {
             return content.Descendants(level).OfType<T>();
         }
-        
+
         public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content)
         {
             return content.DescendantsOrSelf(true, null);
@@ -1393,7 +1393,7 @@ namespace Umbraco.Web
         {
             return content.DescendantOrSelf(level) as T;
         }
-        
+
         internal static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool> func)
         {
             return content.EnumerateDescendants(orSelf).Where(x => func == null || func(x));
@@ -1417,7 +1417,7 @@ namespace Umbraco.Web
                 foreach (var child2 in child.EnumerateDescendants())
                     yield return child2;
         }
-        
+
         #endregion
 
 		#region Axes: following-sibling, preceding-sibling, following, preceding + pseudo-axes up, down, next, previous
@@ -1440,8 +1440,8 @@ namespace Umbraco.Web
 
 		public static IPublishedContent Up(this IPublishedContent content, string contentTypeAlias)
 		{
-		    return string.IsNullOrEmpty(contentTypeAlias) 
-                ? content.Parent 
+		    return string.IsNullOrEmpty(contentTypeAlias)
+                ? content.Parent
                 : content.Ancestor(contentTypeAlias);
 		}
 
@@ -1804,6 +1804,17 @@ namespace Umbraco.Web
             return content.Children().FirstOrDefault();
         }
 
+        /// <summary>
+        /// Gets the first child of the content, of a given content type.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="alias">The content type alias.</param>
+        /// <returns>The first child of content, of the given content type.</returns>
+        public static IPublishedContent FirstChild(this IPublishedContent content, string alias)
+        {
+            return content.Children( alias ).FirstOrDefault();
+        }
+
         public static IPublishedContent FirstChild(this IPublishedContent content, Func<IPublishedContent, bool> predicate)
         {
             return content.Children(predicate).FirstOrDefault();
@@ -1815,13 +1826,19 @@ namespace Umbraco.Web
             return content.Children<T>().FirstOrDefault();
         }
 
-		/// <summary>
-		/// Gets the children of the content in a DataTable.
-		/// </summary>
+        public static IPublishedContent FirstChild<T>(this IPublishedContent content, Func<IPublishedContent, bool> predicate)
+            where T : class, IPublishedContent
+        {
+            return content.Children<T>().FirstOrDefault(predicate);
+        }
+
+        /// <summary>
+        /// Gets the children of the content in a DataTable.
+        /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="contentTypeAliasFilter">An optional content type alias.</param>
         /// <returns>The children of the content.</returns>
-		public static DataTable ChildrenAsTable(this IPublishedContent content, string contentTypeAliasFilter = "")
+        public static DataTable ChildrenAsTable(this IPublishedContent content, string contentTypeAliasFilter = "")
 		{
             return GenerateDataTable(content, contentTypeAliasFilter);
 		}
@@ -1840,7 +1857,7 @@ namespace Umbraco.Web
 									: null
 								: content.Children.FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAliasFilter);
 			if (firstNode == null)
-				return new DataTable(); //no children found 
+				return new DataTable(); //no children found
 
 			//use new utility class to create table so that we don't have to maintain code in many places, just one
 			var dt = Core.DataTableExtensions.GenerateDataTable(
@@ -1980,7 +1997,7 @@ namespace Umbraco.Web
         public static CultureInfo GetCulture(this IPublishedContent content, Uri current = null)
         {
             return Models.ContentExtensions.GetCulture(UmbracoContext.Current,
-                ApplicationContext.Current.Services.DomainService, 
+                ApplicationContext.Current.Services.DomainService,
                 ApplicationContext.Current.Services.LocalizationService,
                 ApplicationContext.Current.Services.ContentService,
                 content.Id, content.Path,

@@ -35,40 +35,10 @@ namespace umbraco.BusinessLogic.Actions
     public class Action
     {
         private static readonly Dictionary<string, string> ActionJs = new Dictionary<string, string>();
-
-        private static readonly object Lock = new object();
-
-        static Action()
-        {
-            ReRegisterActionsAndHandlers();
-        }
-
-        /// <summary>
-        /// This is used when an IAction or IActionHandler is installed into the system
-        /// and needs to be loaded into memory.
-        /// </summary>
-        /// <remarks>
-        /// TODO: this shouldn't be needed... we should restart the app pool when a package is installed!
-        /// </remarks>
+        
+        [Obsolete("This no longer performs any action there is never a reason to rescan because the app domain will be restarted if new IActions are added because they are included in assemblies")]
         public static void ReRegisterActionsAndHandlers()
-        {
-            lock (Lock)
-            {
-                // NOTE use the DirtyBackdoor to change the resolution configuration EXCLUSIVELY
-                // ie do NOT do ANYTHING else while holding the backdoor, because while it is open
-                // the whole resolution system is locked => nothing can work properly => deadlocks
-
-                var newResolver = new ActionsResolver(
-                    new ActivatorServiceProvider(), LoggerResolver.Current.Logger,
-                        () => TypeFinder.FindClassesOfType<IAction>(PluginManager.Current.AssembliesToScan));
-
-                using (Umbraco.Core.ObjectResolution.Resolution.DirtyBackdoorToConfiguration)
-                {
-                    ActionsResolver.Reset(false); // and do NOT reset the whole resolution!
-                    ActionsResolver.Current = newResolver;
-                }
-
-            }
+        {            
         }
 
         /// <summary>

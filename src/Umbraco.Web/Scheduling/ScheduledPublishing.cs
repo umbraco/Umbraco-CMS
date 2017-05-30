@@ -23,13 +23,8 @@ namespace Umbraco.Web.Scheduling
             _settings = settings;
         }
 
-        public override bool PerformRun()
-        {
-            throw new NotImplementedException();
-        }
-
         public override async Task<bool> PerformRunAsync(CancellationToken token)
-        {            
+        {
             if (_appContext == null) return true; // repeat...
 
             switch (_appContext.GetCurrentServerRole())
@@ -70,21 +65,45 @@ namespace Umbraco.Web.Scheduling
             var url = umbracoAppUrl + "/RestServices/ScheduledPublish/Index";
 
             using (DisposableTimer.DebugDuration<ScheduledPublishing>(
-                () => string.Format("Scheduled publishing executing @ {0}", url), 
+                () => string.Format("Scheduled publishing executing @ {0}", url),
                 () => "Scheduled publishing complete"))
-            {                
+            {
                 try
-                {   
+                {
                     using (var wc = new HttpClient())
                     {
                         var request = new HttpRequestMessage(HttpMethod.Post, url)
                         {
                             Content = new StringContent(string.Empty)
                         };
-                        //pass custom the authorization header
-                        request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);
+
+                        // running on a background task, requires its own (safe) scope
+                        // (GetAuthenticationHeaderValue uses UserService to load the current user, hence requires a database)
+                        // (might not need a scope but we don't know really)
+                        using (var scope = ApplicationContext.Current.ScopeProvider.CreateScope())
+                        {
+                            //pass custom the authorization header
+                            request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);
+                            scope.Complete();
+                        }
 
                         var result = await wc.SendAsync(request, token);
+                        var content = await result.Content.ReadAsStringAsync();
+
+                        if (result.IsSuccessStatusCode)
+                        {
+                            LogHelper.Debug<ScheduledPublishing>(
+                                () => string.Format(
+                                    "Request successfully sent to url = \"{0}\". ", url));
+                        }
+                        else
+                        {
+                            var msg = string.Format(
+                                    "Request failed with status code \"{0}\". Request content = \"{1}\".",
+                                    result.StatusCode, content);
+                            var ex = new HttpRequestException(msg);
+                            LogHelper.Error<ScheduledPublishing>(msg, ex);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -99,11 +118,6 @@ namespace Umbraco.Web.Scheduling
         public override bool IsAsync
         {
             get { return true; }
-        }
-    
-        public override bool RunsOnShutdown
-        {
-            get { return false; }
         }
     }
 }

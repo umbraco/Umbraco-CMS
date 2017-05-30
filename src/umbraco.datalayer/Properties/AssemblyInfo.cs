@@ -25,3 +25,5 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("6210756f-436d-4536-bad3-d7b000e1694f")]
+
+[assembly: InternalsVisibleTo("SqlCE4Umbraco")]

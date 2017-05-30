@@ -625,6 +625,12 @@ namespace Umbraco.Core.Security
             var anythingChanged = false;
             //don't assign anything if nothing has changed as this will trigger
             //the track changes of the model
+            if ((user.LastLoginDate != default(DateTime) && identityUser.LastLoginDateUtc.HasValue == false)
+                || identityUser.LastLoginDateUtc.HasValue && user.LastLoginDate.ToUniversalTime() != identityUser.LastLoginDateUtc.Value)
+            {
+                anythingChanged = true;
+                user.LastLoginDate = identityUser.LastLoginDateUtc.Value.ToLocalTime();
+            }
             if (user.Name != identityUser.Name && identityUser.Name.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
@@ -644,6 +650,13 @@ namespace Umbraco.Core.Security
             {
                 anythingChanged = true;
                 user.IsLockedOut = identityUser.IsLockedOut;
+
+                if (user.IsLockedOut)
+                {
+                    //need to set the last lockout date
+                    user.LastLockoutDate = DateTime.Now;
+                }
+
             }
             if (user.Username != identityUser.UserName && identityUser.UserName.IsNullOrWhiteSpace() == false)
             {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 
 namespace umbraco
@@ -15,7 +16,8 @@ namespace umbraco
 			if (propertyId > 0)
 			{
 				var sql = "SELECT contentNodeId FROM cmsPropertyData WHERE id = @propertyId";
-				return uQuery.SqlHelper.ExecuteScalar<int>(sql, uQuery.SqlHelper.CreateParameter("@propertyId", propertyId));
+                using (var sqlHelper = Application.SqlHelper)
+                    return sqlHelper.ExecuteScalar<int>(sql, sqlHelper.CreateParameter("@propertyId", propertyId));
 			}
 
 			return uQuery.RootNodeId;

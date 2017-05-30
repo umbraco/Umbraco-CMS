@@ -8,8 +8,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
 {
     
     //see: http://issues.umbraco.org/issue/U4-4430
-    [Migration("7.1.0", 0, GlobalSettings.UmbracoMigrationName)]
-    [Migration("6.2.0", 0, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.1.0", 0, Constants.System.UmbracoMigrationName)]
+    [Migration("6.2.0", 0, Constants.System.UmbracoMigrationName)]
     public class AssignMissingPrimaryForMySqlKeys : MigrationBase
     {
         public AssignMissingPrimaryForMySqlKeys(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)

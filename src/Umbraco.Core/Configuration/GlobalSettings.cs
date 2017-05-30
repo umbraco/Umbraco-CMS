@@ -212,7 +212,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                var settings = ConfigurationManager.ConnectionStrings[UmbracoConnectionName];
+                var settings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
                 var connectionString = string.Empty;
 
                 if (settings != null)
@@ -241,10 +241,7 @@ namespace Umbraco.Core.Configuration
                 }
             }
         }
-
-        //TODO: Move these to constants!
-        public const string UmbracoConnectionName = "umbracoDbDSN";
-        public const string UmbracoMigrationName = "Umbraco";
+        
 
         /// <summary>
         /// Gets or sets the configuration status. This will return the version number of the currently installed umbraco instance.
@@ -521,11 +518,24 @@ namespace Umbraco.Core.Configuration
 
         internal static bool ContentCacheXmlStoredInCodeGen
         {
+            get { return ContentCacheXmlStorageLocation == ContentXmlStorage.AspNetTemp; }
+        }
+
+        internal static ContentXmlStorage ContentCacheXmlStorageLocation
+        {
             get
             {
-                //defaults to false
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoContentXMLUseLocalTemp") 
-                    && bool.Parse(ConfigurationManager.AppSettings["umbracoContentXMLUseLocalTemp"]); //default to false
+                if (ConfigurationManager.AppSettings.ContainsKey("umbracoContentXMLStorage"))
+                {
+                    return Enum<ContentXmlStorage>.Parse(ConfigurationManager.AppSettings["umbracoContentXMLStorage"]);
+                }
+                if (ConfigurationManager.AppSettings.ContainsKey("umbracoContentXMLUseLocalTemp"))
+                {
+                    return bool.Parse(ConfigurationManager.AppSettings["umbracoContentXMLUseLocalTemp"]) 
+                        ? ContentXmlStorage.AspNetTemp 
+                        : ContentXmlStorage.Default;
+                }
+                return ContentXmlStorage.Default;
             }
         }
 

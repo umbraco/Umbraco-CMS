@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             }
 
             //Get the connectionstring settings from config
-            var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            var settings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
 
             Resolution.Freeze();
 
