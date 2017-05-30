@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace Umbraco.Core
 {
@@ -55,14 +52,14 @@ namespace Umbraco.Core
 			AddCaseInsensitiveString(f.FullName);
 			AddDateTime(f.CreationTimeUtc);
 			AddDateTime(f.LastWriteTimeUtc);
-			
-			//check if it is a file or folder 
+
+			//check if it is a file or folder
 			var fileInfo = f as FileInfo;
 			if (fileInfo != null)
 			{
 				AddInt(fileInfo.Length.GetHashCode());
 			}
-			
+
 			var dirInfo = f as DirectoryInfo;
 			if (dirInfo != null)
 			{
@@ -79,12 +76,12 @@ namespace Umbraco.Core
 
 		internal void AddFile(FileInfo f)
 		{
-			AddFileSystemItem(f);			
+			AddFileSystemItem(f);
 		}
 
 		internal void AddFolder(DirectoryInfo d)
 		{
-			AddFileSystemItem(d);			
+			AddFileSystemItem(d);
 		}
 
 		/// <summary>

@@ -1,4 +1,5 @@
-﻿using NPoco;
+﻿using System;
+using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations.Syntax.Alter;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create;
@@ -27,8 +28,15 @@ namespace Umbraco.Core.Persistence.Migrations
             Context = context;
         }
 
-        public abstract void Up();
-        public abstract void Down();        
+        public virtual void Up()
+        {
+            throw new NotSupportedException("This migration does not implement the \"up\" operation.");
+        }
+
+        public virtual void Down()
+        {
+            throw new NotSupportedException("This migration does not implement the \"down\" operation.");
+        }
 
         public IAlterSyntaxBuilder Alter => new AlterSyntaxBuilder(Context);
 

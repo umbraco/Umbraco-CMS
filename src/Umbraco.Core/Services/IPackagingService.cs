@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
 
@@ -186,5 +187,14 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the IMacro object</returns>
         XElement Export(IMacro macro, bool raiseEvents = true);
+
+        /// <summary>
+        /// This will fetch an Umbraco package file from the package repository and return the relative file path to the downloaded package file
+        /// </summary>
+        /// <param name="packageId"></param>
+        /// <param name="umbracoVersion"></param>
+        /// <param name="userId">The current user id performing the operation</param>
+        /// <returns></returns>
+        string FetchPackageFile(Guid packageId, Version umbracoVersion, int userId);
     }
 }

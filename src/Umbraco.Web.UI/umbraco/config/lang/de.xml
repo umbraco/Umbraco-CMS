@@ -278,6 +278,7 @@
     <key alias="search">Durchsuchen ...</key>
     <key alias="filter">Filtern ...</key>
     <key alias="enterTags">Tippen, um Tags hinzuzufügen (nach jedem Tag die Eingabetaste drücken) ...</key>
+    <key alias="usernameHint">Der Benutzername ist normalerweise Ihre E-Mail-Adresse</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Auf oberster Ebene erlauben</key>

@@ -4,11 +4,9 @@ using Umbraco.Core.IO;
 namespace Umbraco.Core.Events
 {
     /// <summary>
-    /// This event manager is created for each scope and is aware of if it is nested in an outer scope
+    /// An IEventDispatcher that queues events, and raise them when the scope
+    /// exits and has been completed.
     /// </summary>
-    /// <remarks>
-    /// The outer scope is the only scope that can raise events, the inner scope's will defer to the outer scope
-    /// </remarks>
     internal class QueuingEventDispatcher : QueuingEventDispatcherBase
     {
         public QueuingEventDispatcher()

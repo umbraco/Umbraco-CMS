@@ -593,6 +593,7 @@
     <key alias="search">Skriv för att söka...</key>
     <key alias="username">Fyll i ditt lösenord</key>
     <key alias="enterTags">Skriv för att lägga till taggar (och tryck enter efter varje tagg)...</key>
+    <key alias="usernamehint">Ditt användarnamn är vanligtvis din e-postadress</key>
   </area>
   <area alias="publicAccess">
     <key alias="paAdvanced">Rollbaserat lösenordsskydd</key>

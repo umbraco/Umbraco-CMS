@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Misc
 
         private void Initialize(IUmbracoSettingsSection settings)
         {
-            _registrar = new ConfigServerRegistrar(settings.DistributedCall);
+            _registrar = new ConfigServerRegistrar(settings.DistributedCall, Mock.Of<ILogger>());
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
             container.Register(_ => _registrar);

@@ -238,11 +238,11 @@ namespace Umbraco.Web.PropertyEditors
                         .GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId).FirstOrDefault();
                     var crops = string.IsNullOrWhiteSpace(config) ? "[]" : config;
                     src = svalue;
-                    property.Value = "{src: '" + svalue + "', crops: " + crops + "}";
+                    property.Value = "{\"src\": \"" + svalue + "\", \"crops\": " + crops + "}";
                 }
                 else
                 {
-                    src = jo["src"] == null ? null : jo["src"].Value<string>();
+                    src = jo["src"]?.Value<string>();
                 }
 
                 if (src == null)

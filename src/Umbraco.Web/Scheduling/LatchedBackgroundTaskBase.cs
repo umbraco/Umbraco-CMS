@@ -5,7 +5,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.Scheduling
 {
-    internal abstract class LatchedBackgroundTaskBase : DisposableObject, ILatchedBackgroundTask
+    public abstract class LatchedBackgroundTaskBase : DisposableObject, ILatchedBackgroundTask
     {
         private TaskCompletionSource<bool> _latch;
 
@@ -17,27 +17,27 @@ namespace Umbraco.Web.Scheduling
         /// <summary>
         /// Implements IBackgroundTask.Run().
         /// </summary>
-        public abstract void Run();
+        public virtual void Run()
+        {
+            throw new NotSupportedException("This task cannot run synchronously.");
+        }
 
         /// <summary>
         /// Implements IBackgroundTask.RunAsync().
         /// </summary>
-        public abstract Task RunAsync(CancellationToken token);
+        public virtual Task RunAsync(CancellationToken token)
+        {
+            throw new NotSupportedException("This task cannot run asynchronously.");
+        }
 
         /// <summary>
         /// Indicates whether the background task can run asynchronously.
         /// </summary>
         public abstract bool IsAsync { get; }
 
-        public Task Latch
-        {
-            get { return _latch.Task; }
-        }
+        public Task Latch => _latch.Task;
 
-        public bool IsLatched
-        {
-            get { return _latch.Task.IsCompleted == false; }
-        }
+        public bool IsLatched => _latch.Task.IsCompleted == false;
 
         protected void Release()
         {
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Scheduling
             _latch = new TaskCompletionSource<bool>();
         }
 
-        public abstract bool RunsOnShutdown { get; }
+        public virtual bool RunsOnShutdown => false;
 
         // the task is going to be disposed after execution,
         // unless it is latched again, thus indicating it wants to

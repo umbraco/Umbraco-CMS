@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models
     /// Used in content/media/member repositories in order to add this type of entity to the persisted collection to be saved
     /// in a single transaction during saving an entity
     /// </summary>
-    internal class ContentXmlEntity<TContent> : IAggregateRoot
+    internal class ContentXmlEntity<TContent> : IAggregateRoot // fixme kill?
         where TContent : IContentBase
     {
         private readonly Func<TContent, XElement> _xml;
@@ -42,6 +42,7 @@ namespace Umbraco.Core.Models
         public Guid Key { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
+        public DateTime? DeletedDate { get; set; }
 
         /// <summary>
         /// Special case, always return false, this will cause the repositories managing 

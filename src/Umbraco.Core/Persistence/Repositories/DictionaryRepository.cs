@@ -195,6 +195,8 @@ namespace Umbraco.Core.Persistence.Repositories
             //Clear the cache entries that exist by uniqueid/item key
             IsolatedCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.ItemKey));
             IsolatedCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.Key));
+
+            entity.DeletedDate = DateTime.Now;
         }
 
         private void RecursiveDelete(Guid parentId)

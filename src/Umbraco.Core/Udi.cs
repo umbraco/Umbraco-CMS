@@ -103,7 +103,8 @@ namespace Umbraco.Core
         public override string ToString()
         {
             // UriValue is created in the ctor and is never null
-            return UriValue.ToString();
+            // use AbsoluteUri here and not ToString else it's not encoded!
+            return UriValue.AbsoluteUri;
         }
 
         /// <summary>
@@ -161,7 +162,7 @@ namespace Umbraco.Core
             }
             if (udiType == UdiType.StringUdi)
             {
-                udi = path == string.Empty ? GetRootUdi(uri.Host) : new StringUdi(uri.Host, path);
+                udi = path == string.Empty ? GetRootUdi(uri.Host) : new StringUdi(uri.Host, Uri.UnescapeDataString(path));
                 return true;
             }
             if (tryParse) return false;

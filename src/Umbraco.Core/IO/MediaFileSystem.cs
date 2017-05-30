@@ -177,7 +177,7 @@ namespace Umbraco.Core.IO
             }
 
             var filepath = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
-                ? Path.Combine(folder, filename)
+                ? Path.Combine(folder, filename).Replace('\\', '/')
                 : folder + "-" + filename;
 
             return filepath;

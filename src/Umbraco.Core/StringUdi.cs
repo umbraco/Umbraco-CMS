@@ -20,7 +20,7 @@ namespace Umbraco.Core
         /// <param name="entityType">The entity type part of the udi.</param>
         /// <param name="id">The string id part of the udi.</param>
         public StringUdi(string entityType, string id)
-            : base(entityType, "umb://" + entityType + "/" + id)
+            : base(entityType, "umb://" + entityType + "/" + Uri.EscapeUriString(id))
         {
             Id = id;
         }
@@ -32,7 +32,7 @@ namespace Umbraco.Core
         public StringUdi(Uri uriValue)
             : base(uriValue)
         {
-            Id = uriValue.AbsolutePath.TrimStart('/');
+            Id = Uri.UnescapeDataString(uriValue.AbsolutePath.TrimStart('/'));
         }
 
         /// <summary>

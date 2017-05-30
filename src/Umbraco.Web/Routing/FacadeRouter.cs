@@ -11,6 +11,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 using RenderingEngine = Umbraco.Core.RenderingEngine;
@@ -94,7 +95,7 @@ namespace Umbraco.Web.Routing
 
 	        return request.HasPublishedContent;
 	    }
-		
+
         /// <summary>
         /// Prepares the request.
         /// </summary>
@@ -534,44 +535,52 @@ namespace Umbraco.Web.Routing
 			if (request.PublishedContent == null)
 				throw new InvalidOperationException("There is no PublishedContent.");
 
-			var redirect = false;
-			var internalRedirect = request.PublishedContent.Value<string>(Constants.Conventions.Content.InternalRedirectId);
+		    // don't try to find a redirect if the property doesn't exist
+		    if (request.PublishedContent.HasProperty(Constants.Conventions.Content.InternalRedirectId) == false)
+		        return false;
 
-		    if (string.IsNullOrWhiteSpace(internalRedirect))
-                return false;
+            var redirect = false;
+		    var valid = false;
+		    IPublishedContent internalRedirectNode = null;
+            var internalRedirectId = request.PublishedContent.Value(Constants.Conventions.Content.InternalRedirectId, -1);
 
-		    _logger.Debug<FacadeRouter>("{0}Found umbracoInternalRedirectId={1}", () => tracePrefix, () => internalRedirect);
+		    if (internalRedirectId > 0)
+		    {
+		        // try and get the redirect node from a legacy integer ID
+		        valid = true;
+		        internalRedirectNode = request.UmbracoContext.ContentCache.GetById(internalRedirectId);
+            }
+		    else
+		    {
+		        var udiInternalRedirectId = request.PublishedContent.Value<GuidUdi>(Constants.Conventions.Content.InternalRedirectId);
+		        if (udiInternalRedirectId != null)
+		        {
+		            // try and get the redirect node from a UDI Guid
+		            valid = true;
+		            internalRedirectNode = request.UmbracoContext.ContentCache.GetById(udiInternalRedirectId.Guid);
+		        }
+		    }
 
-		    int internalRedirectId;
-		    if (int.TryParse(internalRedirect, out internalRedirectId) == false)
-		        internalRedirectId = -1;
-
-		    if (internalRedirectId <= 0)
+		    if (valid == false)
 		    {
 		        // bad redirect - log and display the current page (legacy behavior)
-		        //_pcr.Document = null; // no! that would be to force a 404
-		        _logger.Debug<FacadeRouter>("{0}Failed to redirect to id={1}: invalid value", () => tracePrefix, () => internalRedirect);
+		        _logger.Debug<FacadeRouter>($"{tracePrefix}Failed to redirect to id={request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).SourceValue}: value is not an int nor a GuidUdi.");
 		    }
+
+            if (internalRedirectNode == null)
+            {
+                _logger.Debug<FacadeRouter>($"{tracePrefix}Failed to redirect to id={request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).SourceValue}: no such published document.");
+            }
 		    else if (internalRedirectId == request.PublishedContent.Id)
 		    {
 		        // redirect to self
-		        _logger.Debug<FacadeRouter>("{0}Redirecting to self, ignore", () => tracePrefix);
+		        _logger.Debug<FacadeRouter>($"{tracePrefix}Redirecting to self, ignore");
 		    }
 		    else
 		    {
-		        // redirect to another page
-		        var node = request.UmbracoContext.Facade.ContentCache.GetById(internalRedirectId);
-
-		        if (node != null)
-		        {
-                    request.SetInternalRedirectPublishedContent(node); // don't use .PublishedContent here
-		            redirect = true;
-		            _logger.Debug<FacadeRouter>("{0}Redirecting to id={1}", () => tracePrefix, () => internalRedirectId);
-		        }
-		        else
-		        {
-		            _logger.Debug<FacadeRouter>("{0}Failed to redirect to id={1}: no such published document", () => tracePrefix, () => internalRedirectId);
-		        }
+                request.SetInternalRedirectPublishedContent(internalRedirectNode); // don't use .PublishedContent here
+		        redirect = true;
+		        _logger.Debug<FacadeRouter>($"{tracePrefix}Redirecting to id={internalRedirectId}");
 		    }
 
 		    return redirect;
@@ -735,11 +744,24 @@ namespace Umbraco.Web.Routing
 		{
 		    if (request.HasPublishedContent == false) return;
 
-		    var redirectId = request.PublishedContent.Value(Constants.Conventions.Content.Redirect, -1);
+		    // don't try to find a redirect if the property doesn't exist
+		    if (request.PublishedContent.HasProperty(Constants.Conventions.Content.Redirect) == false)
+		        return;
+
+            var redirectId = request.PublishedContent.Value(Constants.Conventions.Content.Redirect, -1);
 		    var redirectUrl = "#";
 		    if (redirectId > 0)
-				redirectUrl = request.UmbracoContext.UrlProvider.GetUrl(redirectId);
-		    if (redirectUrl != "#")
+		    {
+		        redirectUrl = request.UmbracoContext.UrlProvider.GetUrl(redirectId);
+		    }
+		    else
+		    {
+		        // might be a UDI instead of an int Id
+		        var redirectUdi = request.PublishedContent.Value<GuidUdi>(Constants.Conventions.Content.Redirect);
+		        if (redirectUdi != null)
+		            redirectUrl = request.UmbracoContext.UrlProvider.GetUrl(redirectUdi.Guid);
+		    }
+            if (redirectUrl != "#")
                 request.SetRedirect(redirectUrl);
 		}
 

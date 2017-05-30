@@ -42,13 +42,13 @@ namespace Umbraco.Web.Editors
             switch (type)
             {
                 case Core.Constants.Trees.PartialViews:
-                    var view = new PartialView(display.VirtualPath);
+                    var view = new PartialView(PartialViewType.PartialView, display.VirtualPath);
                     view.Content = display.Content;
                     var result = Services.FileService.CreatePartialView(view, display.Snippet, Security.CurrentUser.Id);
                     return result.Success == true ? Request.CreateResponse(HttpStatusCode.OK) : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
 
                 case Core.Constants.Trees.PartialViewMacros:
-                    var viewMacro = new PartialView(display.VirtualPath);
+                    var viewMacro = new PartialView(PartialViewType.PartialViewMacro, display.VirtualPath);
                     viewMacro.Content = display.Content;
                     var resultMacro = Services.FileService.CreatePartialViewMacro(viewMacro, display.Snippet, Security.CurrentUser.Id);
                     return resultMacro.Success == true ? Request.CreateResponse(HttpStatusCode.OK) : Request.CreateNotificationValidationErrorResponse(resultMacro.Exception.Message);
@@ -219,13 +219,13 @@ namespace Umbraco.Web.Editors
             switch (type)
             {
                 case Core.Constants.Trees.PartialViews:
-                    codeFileDisplay = Mapper.Map<IPartialView, CodeFileDisplay>(new PartialView(string.Empty));
+                    codeFileDisplay = Mapper.Map<IPartialView, CodeFileDisplay>(new PartialView(PartialViewType.PartialView, string.Empty));
                     codeFileDisplay.VirtualPath = SystemDirectories.PartialViews;
                     if (snippetName.IsNullOrWhiteSpace() == false)
                         codeFileDisplay.Content = Services.FileService.GetPartialViewSnippetContent(snippetName);
                     break;
                 case Core.Constants.Trees.PartialViewMacros:
-                    codeFileDisplay = Mapper.Map<IPartialView, CodeFileDisplay>(new PartialView(string.Empty));
+                    codeFileDisplay = Mapper.Map<IPartialView, CodeFileDisplay>(new PartialView(PartialViewType.PartialViewMacro, string.Empty));
                     codeFileDisplay.VirtualPath = SystemDirectories.MacroPartials;
                     if (snippetName.IsNullOrWhiteSpace() == false)
                         codeFileDisplay.Content = Services.FileService.GetPartialViewMacroSnippetContent(snippetName);
@@ -475,7 +475,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                view = new PartialView(virtualPath + display.Name);
+                view = new PartialView(PartialViewType.PartialView, virtualPath + display.Name);
                 view.Content = display.Content;
                 partialViewResult = createView(view, display.Snippet, Security.CurrentUser.Id);
             }

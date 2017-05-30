@@ -11,7 +11,7 @@ namespace Umbraco.Core
     {
         private readonly bool _keepOldest;
 
-        public OrderedHashSet(bool keepOldest = true)
+        public OrderedHashSet(bool keepOldest = true) 
         {
             _keepOldest = keepOldest;
         }

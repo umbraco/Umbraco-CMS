@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
@@ -29,11 +28,6 @@ namespace Umbraco.Web.Scheduling
             _scopeProvider = scopeProvider;
             _logger = logger;
             _proflog = proflog;
-        }
-
-        public override bool PerformRun()
-        {
-            throw new NotImplementedException();
         }
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)
@@ -95,6 +89,18 @@ namespace Umbraco.Web.Scheduling
                         }
 
                         var result = await wc.SendAsync(request, token);
+                        var content = await result.Content.ReadAsStringAsync();
+
+                        if (result.IsSuccessStatusCode)
+                        {
+                            _logger.Debug<ScheduledPublishing>($"Request successfully sent to url = \"{url}\".");
+                        }
+                        else
+                        {
+                            var msg = $"Request failed with status code \"{result.StatusCode}\". Request content = \"{content}\".";
+                            var ex = new HttpRequestException(msg);
+                            _logger.Error<ScheduledPublishing>(msg, ex);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -107,7 +113,5 @@ namespace Umbraco.Web.Scheduling
         }
 
         public override bool IsAsync => true;
-
-        public override bool RunsOnShutdown => false;
     }
 }

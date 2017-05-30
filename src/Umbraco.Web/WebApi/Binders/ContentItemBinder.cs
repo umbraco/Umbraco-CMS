@@ -19,7 +19,7 @@ namespace Umbraco.Web.WebApi.Binders
             var contentType = Services.ContentTypeService.Get(model.ContentTypeAlias);
             if (contentType == null)
             {
-                throw new InvalidOperationException("No content type found wth alias " + model.ContentTypeAlias);
+                throw new InvalidOperationException("No content type found with alias " + model.ContentTypeAlias);
             }
             return new Content(model.Name, model.ParentId, contentType);
         }

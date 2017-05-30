@@ -285,6 +285,8 @@ AND umbracoNode.id <> @id",
 
             //Delete (base) node data
             Database.Delete<NodeDto>("WHERE uniqueID = @Id", new { Id = entity.Key });
+
+            entity.DeletedDate = DateTime.Now;
         }
 
         #endregion
@@ -551,6 +553,8 @@ AND umbracoNode.id <> @id",
             protected override void PersistDeletedItem(PreValueEntity entity)
             {
                 Database.Execute("DELETE FROM cmsDataTypePreValues WHERE id=@Id", new { Id = entity.Id });
+
+                entity.DeletedDate = DateTime.Now;
             }
 
             protected override void PersistNewItem(PreValueEntity entity)

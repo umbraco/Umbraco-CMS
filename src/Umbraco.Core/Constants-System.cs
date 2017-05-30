@@ -24,7 +24,6 @@
 
             public const string UmbracoConnectionName = "umbracoDbDSN";
             public const string UmbracoMigrationName = "Umbraco";
-	    }
-        
+	    }        
     }
 }

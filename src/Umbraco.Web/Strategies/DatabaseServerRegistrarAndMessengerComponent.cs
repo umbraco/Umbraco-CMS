@@ -17,6 +17,7 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Scheduling;
 using LightInject;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Web.Strategies
 {
@@ -200,8 +201,6 @@ namespace Umbraco.Web.Strategies
 
             public override bool IsAsync => false;
 
-            public override bool RunsOnShutdown => false;
-
             /// <summary>
             /// Runs the background task.
             /// </summary>
@@ -220,11 +219,6 @@ namespace Umbraco.Web.Strategies
                     _logger.Error<DatabaseServerRegistrarAndMessengerComponent>("Failed to update server record in database.", ex);
                     return false; // probably stop if we have an error
                 }
-            }
-
-            public override Task<bool> PerformRunAsync(CancellationToken token)
-            {
-                throw new NotImplementedException();
             }
         }
     }

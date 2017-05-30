@@ -16,12 +16,12 @@ namespace Umbraco.Web.WebApi.Binders
 
         protected override IMedia CreateNew(MediaItemSave model)
         {
-            var contentType = Services.MediaTypeService.Get(model.ContentTypeAlias);
-            if (contentType == null)
+            var mediaType = Services.MediaTypeService.Get(model.ContentTypeAlias);
+            if (mediaType == null)
             {
-                throw new InvalidOperationException("No content type found wth alias " + model.ContentTypeAlias);
+                throw new InvalidOperationException("No media type found with alias " + model.ContentTypeAlias);
             }
-            return new Core.Models.Media(model.Name, model.ParentId, contentType);
+            return new Core.Models.Media(model.Name, model.ParentId, mediaType);
         }
 
         protected override ContentItemDto<IMedia> MapFromPersisted(MediaItemSave model)

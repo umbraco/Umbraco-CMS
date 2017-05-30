@@ -339,6 +339,7 @@
     <key alias="filter">Type to filter...</key>
     <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
     <key alias="email">Enter your email</key>
+    <key alias="usernameHint">Your username is usually your email</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Allow at root</key>
@@ -1257,6 +1258,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="userPermissions">User Permissions</key>
     <key alias="userTypes">User Types</key>
     <key alias="users">Users</key>
+    <key alias="partialViews">Partial Views</key>
+    <key alias="partialViewMacros">Partial View Macro Files</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">New update ready</key>

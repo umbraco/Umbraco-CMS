@@ -4,7 +4,7 @@ using System.Xml.Linq;
 
 namespace Umbraco.Core.Events
 {
-    public class ImportEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>, IEquatable<ImportEventArgs<TEntity>>
+    public class ImportEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>, IEquatable<ImportEventArgs<TEntity>>
     {
         /// <summary>
         /// Constructor accepting an XElement with the xml being imported

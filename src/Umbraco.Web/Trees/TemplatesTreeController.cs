@@ -14,7 +14,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Templates)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Templates, "Templates", sortOrder:1)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Templates, null, sortOrder:1)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class TemplatesTreeController : TreeController

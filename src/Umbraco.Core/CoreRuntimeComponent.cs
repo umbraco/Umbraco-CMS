@@ -81,7 +81,7 @@ namespace Umbraco.Core
             composition.Container.RegisterSingleton<IServerRegistrar>(f =>
             {
                 if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled)
-                    return new ConfigServerRegistrar(UmbracoConfig.For.UmbracoSettings());
+                    return new ConfigServerRegistrar(UmbracoConfig.For.UmbracoSettings(), f.GetInstance<ILogger>());
                 if ("true".InvariantEquals(ConfigurationManager.AppSettings["umbracoDisableElectionForSingleServer"]))
                     return new SingleServerRegistrar(f.GetInstance<IRuntimeState>());
                 return new DatabaseServerRegistrar(

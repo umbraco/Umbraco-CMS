@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Sync
 {
@@ -17,12 +17,12 @@ namespace Umbraco.Core.Sync
         private readonly ServerRole _serverRole;
         private readonly string _umbracoApplicationUrl;
 
-        public ConfigServerRegistrar(IUmbracoSettingsSection settings)
-            : this(settings.DistributedCall)
+        public ConfigServerRegistrar(IUmbracoSettingsSection settings, ILogger logger)
+            : this(settings.DistributedCall, logger)
         { }
 
         // for tests
-        internal ConfigServerRegistrar(IDistributedCallSection settings)
+        internal ConfigServerRegistrar(IDistributedCallSection settings, ILogger logger)
         {
             if (settings.Enabled == false)
             {
@@ -42,6 +42,7 @@ namespace Umbraco.Core.Sync
             if (serversA.Length == 0)
             {
                 _serverRole = ServerRole.Unknown; // config error, actually
+                logger.Debug<ConfigServerRegistrar>("Server Role Unknown: DistributedCalls are enabled but no servers are listed.");
             }
             else
             {
@@ -50,17 +51,23 @@ namespace Umbraco.Core.Sync
                 var serverName = master.ServerName;
 
                 if (appId.IsNullOrWhiteSpace() && serverName.IsNullOrWhiteSpace())
+                {
                     _serverRole = ServerRole.Unknown; // config error, actually
+                    logger.Debug<ConfigServerRegistrar>("Server Role Unknown: Server Name or AppId missing from Server configuration in DistributedCalls settings.");
+                }
                 else
+                {
                     _serverRole = IsCurrentServer(appId, serverName)
                         ? ServerRole.Master
                         : ServerRole.Slave;
+                }
             }
 
             var currentServer = serversA.FirstOrDefault(x => IsCurrentServer(x.AppId, x.ServerName));
             if (currentServer != null)
             {
                 // match, use the configured url
+                // ReSharper disable once UseStringInterpolation
                 _umbracoApplicationUrl = string.Format("{0}://{1}:{2}/{3}",
                     currentServer.ForceProtocol.IsNullOrWhiteSpace() ? "http" : currentServer.ForceProtocol,
                     currentServer.ServerAddress,
@@ -76,19 +83,10 @@ namespace Umbraco.Core.Sync
                 || (serverName.IsNullOrWhiteSpace() == false && serverName.Trim().InvariantEquals(NetworkHelper.MachineName));
         }
 
-        public IEnumerable<IServerAddress> Registrations
-        {
-            get { return _addresses; }
-        }
+        public IEnumerable<IServerAddress> Registrations => _addresses;
 
-        public ServerRole GetCurrentServerRole()
-        {
-            return _serverRole;
-        }
+        public ServerRole GetCurrentServerRole() => _serverRole;
 
-        public string GetCurrentServerUmbracoApplicationUrl()
-        {
-            return _umbracoApplicationUrl;
-        }
+        public string GetCurrentServerUmbracoApplicationUrl() => _umbracoApplicationUrl;
     }
 }

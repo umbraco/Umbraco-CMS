@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 
@@ -18,6 +20,47 @@ namespace Umbraco.Core.Plugins
             = new ConcurrentDictionary<Type, FieldInfo[]>();
 
         private static readonly Assembly[] EmptyAssemblies  = new Assembly[0];
+
+	    /// <summary>
+	    /// Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also deal with array types and return List{T} for those too.
+	    /// If it cannot be done, null is returned.
+	    /// </summary>
+	    /// <param name="obj"></param>
+	    /// <returns></returns>
+	    // fixme wtf is this and do we need it in v8?
+	    internal static IList CreateGenericEnumerableFromObject(object obj)
+	    {
+	        var type = obj.GetType();
+
+	        if (type.IsGenericType)
+	        {
+	            var genericTypeDef = type.GetGenericTypeDefinition();
+
+	            if (genericTypeDef == typeof(IEnumerable<>)
+	                || genericTypeDef == typeof(ICollection<>)
+	                || genericTypeDef == typeof(Collection<>)
+	                || genericTypeDef == typeof(IList<>)
+	                || genericTypeDef == typeof(List<>)
+	                //this will occur when Linq is used and we get the odd WhereIterator or DistinctIterators since those are special iterator types
+	                || obj is IEnumerable)
+	            {
+	                //if it is a IEnumerable<>, IList<T> or ICollection<> we'll use a List<>
+	                var genericType = typeof(List<>).MakeGenericType(type.GetGenericArguments());
+	                //pass in obj to fill the list
+	                return (IList)Activator.CreateInstance(genericType, obj);
+	            }
+	        }
+
+	        if (type.IsArray)
+	        {
+	            //if its an array, we'll use a List<>
+	            var genericType = typeof(List<>).MakeGenericType(type.GetElementType());
+	            //pass in obj to fill the list
+	            return (IList)Activator.CreateInstance(genericType, obj);
+	        }
+
+	        return null;
+	    }
 
         /// <summary>
         /// Checks if the method is actually overriding a base method

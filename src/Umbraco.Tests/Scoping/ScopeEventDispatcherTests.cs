@@ -4,15 +4,18 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Events;
+using Umbraco.Core.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
+using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Scoping
 {
     [TestFixture]
-    public class ScopeEventDispatcherTests
+    public class ScopeEventDispatcherTests //: BaseUmbracoConfigurationTest
     {
         [SetUp]
         public void Setup()
@@ -81,13 +84,173 @@ namespace Umbraco.Tests.Scoping
                 var events = scope.Events.GetEvents(EventDefinitionFilter.All).ToArray();
 
                 var knownNames = new[] { "DoThing1", "DoThing2", "DoThing3" };
-                var knownArgTypes = new[] { typeof (SaveEventArgs<string>), typeof (SaveEventArgs<int>), typeof (SaveEventArgs<decimal>) };
+                var knownArgTypes = new[] { typeof(SaveEventArgs<string>), typeof(SaveEventArgs<int>), typeof(SaveEventArgs<decimal>) };
 
                 for (var i = 0; i < events.Length; i++)
                 {
                     Assert.AreEqual(knownNames[i], events[i].EventName);
                     Assert.AreEqual(knownArgTypes[i], events[i].Args.GetType());
                 }
+            }
+        }
+
+        [Test]
+        public void SupersededEvents()
+        {
+            DoSaveForContent += OnDoThingFail;
+            DoDeleteForContent += OnDoThingFail;
+            DoForTestArgs += OnDoThingFail;
+            DoForTestArgs2 += OnDoThingFail;
+            
+            var contentType = MockedContentTypes.CreateBasicContentType();
+
+            var content1 = MockedContent.CreateBasicContent(contentType);
+            content1.Id = 123;
+
+            var content2 = MockedContent.CreateBasicContent(contentType);
+            content2.Id = 456;
+
+            var content3 = MockedContent.CreateBasicContent(contentType);
+            content3.Id = 789;
+
+            var scopeProvider = new ScopeProvider(Mock.Of<IUmbracoDatabaseFactory>(), new Lazy<FileSystems>(() => Mock.Of<FileSystems>()), Mock.Of<ILogger>());
+            using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
+            {
+                
+                //content1 will be filtered from the args
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(new[]{ content1 , content3}));
+                scope.Events.Dispatch(DoDeleteForContent, this, new DeleteEventArgs<IContent>(content1));
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content2));
+                //this entire event will be filtered
+                scope.Events.Dispatch(DoForTestArgs, this, new TestEventArgs(content1));
+                scope.Events.Dispatch(DoForTestArgs2, this, new TestEventArgs2(content1));
+
+                // events have been queued
+                var events = scope.Events.GetEvents(EventDefinitionFilter.All).ToArray();
+                Assert.AreEqual(4, events.Length);
+
+                Assert.AreEqual(typeof(SaveEventArgs<IContent>), events[0].Args.GetType());
+                Assert.AreEqual(1, ((SaveEventArgs<IContent>)events[0].Args).SavedEntities.Count());
+                Assert.AreEqual(content3.Id, ((SaveEventArgs<IContent>)events[0].Args).SavedEntities.First().Id);
+
+                Assert.AreEqual(typeof(DeleteEventArgs<IContent>), events[1].Args.GetType());
+                Assert.AreEqual(content1.Id, ((DeleteEventArgs<IContent>) events[1].Args).DeletedEntities.First().Id);
+
+                Assert.AreEqual(typeof(SaveEventArgs<IContent>), events[2].Args.GetType());
+                Assert.AreEqual(content2.Id, ((SaveEventArgs<IContent>)events[2].Args).SavedEntities.First().Id);
+
+                Assert.AreEqual(typeof(TestEventArgs2), events[3].Args.GetType());
+            }
+        }
+
+        /// <summary>
+        /// This will test that when we track events that before we Get the events we normalize all of the
+        /// event entities to be the latest one (most current) found amongst the event so that there is 
+        /// no 'stale' entities in any of the args
+        /// </summary>
+        [Test]
+        public void LatestEntities()
+        {
+            DoSaveForContent += OnDoThingFail;            
+
+            var now = DateTime.Now;
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            var content1 = MockedContent.CreateBasicContent(contentType);
+            content1.Id = 123;
+            content1.UpdateDate = now.AddMinutes(1);
+            var content2 = MockedContent.CreateBasicContent(contentType);
+            content2.Id = 123;
+            content2.UpdateDate = now.AddMinutes(2);
+            var content3 = MockedContent.CreateBasicContent(contentType);
+            content3.Id = 123;
+            content3.UpdateDate = now.AddMinutes(3);
+
+            var scopeProvider = new ScopeProvider(Mock.Of<IUmbracoDatabaseFactory>(), new Lazy<FileSystems>(() => Mock.Of<FileSystems>()), Mock.Of<ILogger>());
+            using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
+            {                                
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content1));
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content2));
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content3));
+
+                // events have been queued
+                var events = scope.Events.GetEvents(EventDefinitionFilter.All).ToArray();
+                Assert.AreEqual(3, events.Length);
+                
+                foreach (var t in events)
+                {
+                    var args = (SaveEventArgs<IContent>)t.Args;
+                    foreach (var entity in args.SavedEntities)
+                    {
+                        Assert.AreEqual(content3, entity);
+                        Assert.IsTrue(object.ReferenceEquals(content3, entity));
+                    }
+                }
+            }
+        }
+
+        [Test]
+        public void FirstIn()
+        {
+            DoSaveForContent += OnDoThingFail;
+
+            var now = DateTime.Now;
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            var content1 = MockedContent.CreateBasicContent(contentType);
+            content1.Id = 123;
+            content1.UpdateDate = now.AddMinutes(1);
+            var content2 = MockedContent.CreateBasicContent(contentType);
+            content2.Id = 123;
+            content1.UpdateDate = now.AddMinutes(2);
+            var content3 = MockedContent.CreateBasicContent(contentType);
+            content3.Id = 123;
+            content1.UpdateDate = now.AddMinutes(3);
+
+            var scopeProvider = new ScopeProvider(Mock.Of<IUmbracoDatabaseFactory>(), new Lazy<FileSystems>(() => Mock.Of<FileSystems>()), Mock.Of<ILogger>());
+            using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
+            {
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content1));
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content2));
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content3));
+
+                // events have been queued
+                var events = scope.Events.GetEvents(EventDefinitionFilter.FirstIn).ToArray();
+                Assert.AreEqual(1, events.Length);                
+                Assert.AreEqual(content1, ((SaveEventArgs<IContent>) events[0].Args).SavedEntities.First());
+                Assert.IsTrue(object.ReferenceEquals(content1, ((SaveEventArgs<IContent>)events[0].Args).SavedEntities.First()));
+                Assert.AreEqual(content1.UpdateDate, ((SaveEventArgs<IContent>) events[0].Args).SavedEntities.First().UpdateDate);
+            }
+        }
+
+        [Test]
+        public void LastIn()
+        {
+            DoSaveForContent += OnDoThingFail;
+
+            var now = DateTime.Now;
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            var content1 = MockedContent.CreateBasicContent(contentType);
+            content1.Id = 123;
+            content1.UpdateDate = now.AddMinutes(1);
+            var content2 = MockedContent.CreateBasicContent(contentType);
+            content2.Id = 123;
+            content2.UpdateDate = now.AddMinutes(2);
+            var content3 = MockedContent.CreateBasicContent(contentType);
+            content3.Id = 123;
+            content3.UpdateDate = now.AddMinutes(3);
+
+            var scopeProvider = new ScopeProvider(Mock.Of<IUmbracoDatabaseFactory>(), new Lazy<FileSystems>(() => Mock.Of<FileSystems>()), Mock.Of<ILogger>());
+            using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
+            {
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content1));
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content2));
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content3));
+
+                // events have been queued
+                var events = scope.Events.GetEvents(EventDefinitionFilter.LastIn).ToArray();
+                Assert.AreEqual(1, events.Length);
+                Assert.AreEqual(content3, ((SaveEventArgs<IContent>)events[0].Args).SavedEntities.First());
+                Assert.IsTrue(object.ReferenceEquals(content3, ((SaveEventArgs<IContent>)events[0].Args).SavedEntities.First()));
+                Assert.AreEqual(content3.UpdateDate, ((SaveEventArgs<IContent>)events[0].Args).SavedEntities.First().UpdateDate);
             }
         }
 
@@ -179,11 +342,39 @@ namespace Umbraco.Tests.Scoping
             Assert.Fail();
         }
 
+        public static event EventHandler<SaveEventArgs<IContent>> DoSaveForContent;
+        public static event EventHandler<DeleteEventArgs<IContent>> DoDeleteForContent;
+        public static event EventHandler<TestEventArgs> DoForTestArgs;
+        public static event EventHandler<TestEventArgs2> DoForTestArgs2;
         public static event EventHandler<SaveEventArgs<string>> DoThing1;
-
         public static event EventHandler<SaveEventArgs<int>> DoThing2;
 
         public static event TypedEventHandler<ScopeEventDispatcherTests, SaveEventArgs<decimal>> DoThing3;
+
+        public class TestEventArgs : CancellableObjectEventArgs
+        {
+            public TestEventArgs(object eventObject) : base(eventObject)
+            {
+            }
+
+            public object MyEventObject
+            {
+                get { return EventObject; }
+            }
+        }
+
+        [SupersedeEvent(typeof(TestEventArgs))]
+        public class TestEventArgs2 : CancellableObjectEventArgs
+        {
+            public TestEventArgs2(object eventObject) : base(eventObject)
+            {
+            }
+
+            public object MyEventObject
+            {
+                get { return EventObject; }
+            }
+        }
 
         public class PassiveEventDispatcher : QueuingEventDispatcherBase
         {

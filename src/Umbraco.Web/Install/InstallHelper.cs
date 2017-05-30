@@ -50,7 +50,7 @@ namespace Umbraco.Web.Install
                 new DatabaseConfigureStep(_databaseBuilder),
                 new DatabaseInstallStep(_databaseBuilder, Current.RuntimeState, Current.Logger),
                 new DatabaseUpgradeStep(_databaseBuilder, Current.Services.MigrationEntryService, Current.RuntimeState, Current.MigrationCollectionBuilder, Current.Logger),
-                new StarterKitDownloadStep(Current.Services.ContentService, this),
+                new StarterKitDownloadStep(Current.Services.ContentService, this, Current.UmbracoContext.Security),
                 new StarterKitInstallStep(_httpContext),
                 new StarterKitCleanupStep(),
                 new SetUmbracoVersionStep(_httpContext, _logger, this)

@@ -15,7 +15,7 @@
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44319</IISExpressSSLPort>
+    <IISExpressSSLPort></IISExpressSSLPort>
     <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
     <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
     <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
@@ -482,13 +482,6 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Umbraco\Install\Legacy\LoadStarterKits.ascx.cs">
-      <DependentUpon>loadStarterKits.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Install\Legacy\LoadStarterKits.ascx.designer.cs">
-      <DependentUpon>loadStarterKits.ascx</DependentUpon>
-    </Compile>
     <Compile Include="Config\splashes\NoNodes.aspx.cs">
       <DependentUpon>noNodes.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -565,13 +558,6 @@
     </Compile>
     <Compile Include="Umbraco\Developer\Packages\DirectoryBrowser.aspx.designer.cs">
       <DependentUpon>directoryBrowser.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Developer\Packages\StarterKits.aspx.cs">
-      <DependentUpon>StarterKits.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Developer\Packages\StarterKits.aspx.designer.cs">
-      <DependentUpon>StarterKits.aspx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.cs">
       <DependentUpon>ChangeDocType.aspx</DependentUpon>
@@ -668,7 +654,6 @@
     <Content Include="Scripts\jquery-1.6.4.js" />
     <Content Include="Scripts\jquery-1.6.4.min.js" />
     <Content Include="Umbraco\Config\Lang\cs.xml" />
-    <Content Include="Umbraco\Install\Legacy\loadStarterKits.ascx" />
     <Content Include="Umbraco\ClientRedirect.aspx" />
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
@@ -816,7 +801,6 @@
     <Content Include="Umbraco_Client\Modal\jquery.simplemodal.1.4.1.custom.js" />
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
-    <Content Include="Umbraco\Developer\Packages\StarterKits.aspx" />
     <Content Include="Umbraco_Client\Ui\base2.js" />
     <Content Include="Umbraco_Client\Ui\json2.js" />
     <Content Include="Umbraco_Client\Ui\knockout.js" />
@@ -859,7 +843,6 @@
     <Content Include="Umbraco\Dialogs\mediaPicker.aspx" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.cookie.js" />
     <Content Include="Umbraco_Client\Tablesorting\Img\bg.gif" />
-    <Content Include="Umbraco\Developer\Packages\proxy.htm" />
     <Content Include="Umbraco\Developer\Xslt\xsltVisualize.aspx" />
     <Content Include="Umbraco\Dialogs\empty.htm" />
     <Content Include="Umbraco\Dialogs\insertMasterpageContent.aspx" />
@@ -878,12 +861,8 @@
     <Content Include="Umbraco\Translation\details.aspx" />
     <Content Include="Umbraco_Client\Modal\modalBackground.gif" />
     <Content Include="Umbraco_Client\Modal\modalGradiant.gif" />
-    <Content Include="Umbraco\Developer\Packages\BrowseRepository.aspx" />
     <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
-    <Content Include="Umbraco\Developer\Packages\installedPackage.aspx" />
-    <Content Include="Umbraco\Developer\Packages\LoadNitros.ascx" />
-    <Content Include="Umbraco\Developer\Packages\SubmitPackage.aspx" />
     <Content Include="Umbraco\Dialogs\about.aspx" />
     <Content Include="Umbraco\Dialogs\create.aspx" />
     <Content Include="Umbraco\Dialogs\cruds.aspx" />
@@ -1131,7 +1110,26 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
   </ProjectExtensions>
   <Import Project="$(MSBuildProjectDirectory)\..\umbraco.presentation.targets" Condition="$(BuildingInsideVisualStudio) != true" />
   <Import Project="$(SolutionDir)umbraco.presentation.targets" Condition="$(BuildingInsideVisualStudio) == true" />
+  <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  </PropertyGroup>
+  <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  </PropertyGroup>
+  <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  </PropertyGroup>
+  <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  </PropertyGroup>
+  <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  </PropertyGroup>
+  <UsingTask TaskName="TransformXml" AssemblyFile="$(WebPublishingTasks)" Condition="'$(WebPublishingTasks)' != ''" />
+  <UsingTask TaskName="TransformXml" AssemblyFile="$(VSWherePath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll" Condition="'$(VSWherePath)' != ''" />
   <Target Name="BeforeBuild">
+    <Message Text="WebPublishingTasks: $(WebPublishingTasks)" Importance="high" />
+    <Message Text="VSWherePath: $(VSWherePath)" Importance="high" />
     <!-- Create web.config file from Template if it doesn't exist -->
     <Copy SourceFiles="$(ProjectDir)web.Template.config" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Web.config')" />
     <!-- Transform the local Web.config file in Visual Studio -->

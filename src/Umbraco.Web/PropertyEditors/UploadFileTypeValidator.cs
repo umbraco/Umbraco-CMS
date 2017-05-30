@@ -10,6 +10,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using umbraco;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -43,7 +44,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             if (fileName.IndexOf('.') <= 0) return false;
             var extension = Path.GetExtension(fileName).TrimStart(".");
-            return UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Any(x => StringExtensions.InvariantEquals(x, extension)) == false;
+            return UmbracoConfig.For.UmbracoSettings().Content.IsFileAllowedForUpload(extension);
         }
 
     }

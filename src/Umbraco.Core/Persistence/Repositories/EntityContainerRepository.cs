@@ -157,6 +157,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // delete
             Database.Delete(nodeDto);
+
+            entity.DeletedDate = DateTime.Now;
         }
 
         protected override void PersistNewItem(EntityContainer entity)

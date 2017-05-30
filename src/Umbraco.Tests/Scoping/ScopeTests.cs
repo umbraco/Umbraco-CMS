@@ -533,6 +533,44 @@ namespace Umbraco.Tests.Scoping
             Assert.IsNotNull(ambientContext); // the context is still there
         }
 
+        [TestCase(true)]
+        [TestCase(false)]
+        public void ScopeContextEnlistAgain(bool complete)
+        {
+            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+
+            bool? completed = null;
+            Exception exception = null;
+
+            Assert.IsNull(scopeProvider.AmbientScope);
+            using (var scope = scopeProvider.CreateScope())
+            {
+                scopeProvider.Context.Enlist("name", c =>
+                {
+                    completed = c;
+
+                    // at that point the scope is gone, but the context is still there
+                    var ambientContext = scopeProvider.AmbientContext;
+
+                    try
+                    {
+                        ambientContext.Enlist("another", c2 => { });
+                    }
+                    catch (Exception e)
+                    {
+                        exception = e;
+                    }
+                });
+                if (complete)
+                    scope.Complete();
+            }
+            Assert.IsNull(scopeProvider.AmbientScope);
+            Assert.IsNull(scopeProvider.AmbientContext);
+            Assert.IsNotNull(completed);
+            Assert.IsNotNull(exception);
+            Assert.IsInstanceOf<InvalidOperationException>(exception);
+        }
+
         [Test]
         public void ScopeContextException()
         {

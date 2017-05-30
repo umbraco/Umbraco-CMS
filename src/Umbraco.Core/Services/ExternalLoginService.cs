@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
@@ -24,7 +25,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repo = uow.CreateRepository<IExternalLoginRepository>();
-                return repo.GetByQuery(repo.QueryT.Where(x => x.UserId == userId));
+                return repo
+                    .GetByQuery(repo.QueryT.Where(x => x.UserId == userId))
+                    .ToList(); // ToList is important here, must evaluate within uow!
             }
         }
 
@@ -39,8 +42,9 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repo = uow.CreateRepository<IExternalLoginRepository>();
-                return repo.GetByQuery(repo.QueryT
-                    .Where(x => x.ProviderKey == login.ProviderKey && x.LoginProvider == login.LoginProvider));
+                return repo
+                    .GetByQuery(repo.QueryT.Where(x => x.ProviderKey == login.ProviderKey && x.LoginProvider == login.LoginProvider))
+                    .ToList(); // ToList is important here, must evaluate within uow!
             }
         }
 

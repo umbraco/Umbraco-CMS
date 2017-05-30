@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -9,9 +10,13 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services;
 using System.Linq;
 using System.Reflection;
+using System.Web;
+using System.Web.Hosting;
 using Umbraco.Core.Components;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services.Changes;
+using Umbraco.Web.Security;
 using Umbraco.Web.Services;
 using Content = Umbraco.Core.Models.Content;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
@@ -209,12 +214,36 @@ namespace Umbraco.Web.Cache
 
         internal static void HandleEvents(IEnumerable<IEventDefinition> events)
         {
-            foreach (var e in events)
+            // fixme remove this in v8, this is a backwards compat hack and is needed because when we are using Deploy, the events will be raised on a background
+            //thread which means that cache refreshers will also execute on a background thread and in many cases developers may be using UmbracoContext.Current in their
+            //cache refresher handlers, so before we execute all of the events, we'll ensure a context
+            UmbracoContext tempContext = null;
+            if (UmbracoContext.Current == null)
             {
-                var handler = FindHandler(e);
-                if (handler == null) continue;
+                var httpContext = new HttpContextWrapper(HttpContext.Current ?? new HttpContext(new SimpleWorkerRequest("temp.aspx", "", new StringWriter())));
+                tempContext = UmbracoContext.EnsureContext(
+                    Current.UmbracoContextAccessor,
+                    httpContext,
+                    null,
+                    new WebSecurity(httpContext, Current.Services.UserService),
+                    UmbracoConfig.For.UmbracoSettings(),
+                    Current.UrlProviders,
+                    true);
+            }
 
-                handler.Invoke(null, new[] { e.Sender, e.Args });
+            try
+            {
+                foreach (var e in events)
+                {
+                    var handler = FindHandler(e);
+                    if (handler == null) continue;
+
+                    handler.Invoke(null, new[] { e.Sender, e.Args });
+                }
+            }
+            finally
+            {
+                tempContext?.Dispose();
             }
         }
 

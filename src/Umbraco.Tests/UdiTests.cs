@@ -32,6 +32,34 @@ namespace Umbraco.Tests
         }
 
         [Test]
+        public void StringEncodingTest()
+        {
+            // absolute path is unescaped
+            var uri = new Uri("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test");
+            Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/this is a test", uri.ToString());
+            Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test", uri.AbsoluteUri);
+            Assert.AreEqual("/this%20is%20a%20test", uri.AbsolutePath);
+
+            Assert.AreEqual("/this is a test", Uri.UnescapeDataString(uri.AbsolutePath));
+            Assert.AreEqual("%2Fthis%20is%20a%20test", Uri.EscapeDataString("/this is a test"));
+            Assert.AreEqual("/this%20is%20a%20test", Uri.EscapeUriString("/this is a test"));
+
+            var udi = Udi.Parse("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test");
+            Assert.AreEqual(Constants.UdiEntityType.AnyString, udi.EntityType);
+            Assert.IsInstanceOf<StringUdi>(udi);
+            var stringEntityId = udi as StringUdi;
+            Assert.IsNotNull(stringEntityId);
+            Assert.AreEqual("this is a test", stringEntityId.Id);
+            Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test", udi.ToString());
+
+            var udi2 = new StringUdi(Constants.UdiEntityType.AnyString, "this is a test");
+            Assert.AreEqual(udi, udi2);
+
+            var udi3 = new StringUdi(Constants.UdiEntityType.AnyString, "path to/this is a test.xyz");
+            Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/path%20to/this%20is%20a%20test.xyz", udi3.ToString());
+        }
+
+        [Test]
         public void GuidEntityCtorTest()
         {
             var guid = Guid.NewGuid();

@@ -5,8 +5,10 @@ using System.Linq;
 namespace Umbraco.Core.Events
 {
     /// <summary>
-    /// This event manager supports event cancellation and will raise the events as soon as they are tracked, it does not store tracked events
+    /// An IEventDispatcher that immediately raise all events.
     /// </summary>
+    /// <remarks>This means that events will be raised during the scope transaction,
+    /// whatever happens, and the transaction could roll back in the end.</remarks>
     internal class PassThroughEventDispatcher : IEventDispatcher
     {
         public bool DispatchCancelable(EventHandler eventHandler, object sender, CancellableEventArgs args, string eventName = null)

@@ -4,7 +4,9 @@ using System.Linq;
 using System.Web;
 using umbraco.cms.businesslogic.packager;
 using Umbraco.Core.Services;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Install.Models;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -14,11 +16,13 @@ namespace Umbraco.Web.Install.InstallSteps
     {
         private readonly InstallHelper _installHelper;
         private readonly IContentService _contentService;
+        private readonly WebSecurity _security;
 
-        public StarterKitDownloadStep(IContentService contentService, InstallHelper installHelper)
+        public StarterKitDownloadStep(IContentService contentService, InstallHelper installHelper, WebSecurity security)
         {
             _installHelper = installHelper;
             _contentService = contentService;
+            _security = security;
         }
 
         private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
@@ -51,19 +55,13 @@ namespace Umbraco.Web.Install.InstallSteps
         }
 
         private Tuple<string, int> DownloadPackageFiles(Guid kitGuid)
-        {
-            var repo = global::umbraco.cms.businesslogic.packager.repositories.Repository.getByGuid(RepoGuid);
-            if (repo == null)
-            {
-                throw new InstallException("No repository found with id " + RepoGuid);
-            }
-            if (repo.HasConnection() == false)
-            {
-                throw new InstallException("Cannot connect to repository");
-            }
+        {          
             var installer = new Installer();
 
-            var tempFile = installer.Import(repo.fetch(kitGuid.ToString()));
+            //Go get the package file from the package repo
+            var packageFile = Current.Services.PackagingService.FetchPackageFile(kitGuid, UmbracoVersion.Current, _security.GetUserId());
+
+            var tempFile = installer.Import(packageFile);
             installer.LoadConfig(tempFile);
             var pId = installer.CreateManifest(tempFile, kitGuid.ToString(), RepoGuid);
 

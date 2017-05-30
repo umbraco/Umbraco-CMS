@@ -57,6 +57,20 @@ $IndexPath = "../src/umbraco.web.ui.client/docs/api/index.html"
 
 # Build the solution in debug mode
 $SolutionPath = Join-Path -Path $SolutionRoot -ChildPath "umbraco.sln"
+
+# Go get nuget.exe if we don't hae it
+$NuGet = "$ToolsRoot\nuget.exe"
+$FileExists = Test-Path $NuGet
+If ($FileExists -eq $False) {
+	Write-Host "Retrieving nuget.exe..."
+	$SourceNugetExe = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
+	Invoke-WebRequest $SourceNugetExe -OutFile $NuGet
+}
+
+#restore nuget packages
+Write-Host "Restoring nuget packages..."
+& $NuGet restore $SolutionPath
+
 & $MSBuild "$SolutionPath" /p:Configuration=Debug /maxcpucount /t:Clean
 if (-not $?)
 {

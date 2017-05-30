@@ -67,8 +67,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(member => member.SortOrder, expression => expression.Ignore())
                 .ForMember(member => member.AdditionalData, expression => expression.Ignore())
                 .ForMember(member => member.FailedPasswordAttempts, expression => expression.Ignore())
+                .ForMember(member => member.DeletedDate, expression => expression.Ignore())
                 //TODO: Support these eventually
-                .ForMember(member => member.PasswordQuestion, expression => expression.Ignore())
+                .ForMember(member => member.PasswordQuestion, expression => expression.Ignore())                
                 .ForMember(member => member.RawPasswordAnswerValue, expression => expression.Ignore());
 
             //FROM IMember TO MediaItemDisplay

@@ -89,6 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 Database.Execute(delete, new { Id = GetEntityId(entity) });
             }
+            entity.DeletedDate = DateTime.Now;
         }
     }
 }

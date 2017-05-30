@@ -118,6 +118,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return GetOptionalDelimitedElement("disallowedUploadFiles", new[] {"ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd"}); }
         }
 
+        [ConfigurationProperty("allowedUploadFiles")]
+        internal CommaDelimitedConfigurationElement AllowedUploadFiles
+        {
+            get { return GetOptionalDelimitedElement("allowedUploadFiles", new string[0]); }
+        }
+
         [ConfigurationProperty("cloneXmlContent")]
         internal InnerTextConfigurationElement<bool> CloneXmlContent
         {
@@ -263,6 +269,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IEnumerable<string> IContentSection.DisallowedUploadFiles
         {
             get { return DisallowedUploadFiles; }
+        }
+
+        IEnumerable<string> IContentSection.AllowedUploadFiles
+        {
+            get { return AllowedUploadFiles; }
         }
 
         bool IContentSection.CloneXmlContent

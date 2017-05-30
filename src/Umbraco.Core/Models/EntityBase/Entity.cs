@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 
 namespace Umbraco.Core.Models.EntityBase
 {
@@ -13,8 +10,8 @@ namespace Umbraco.Core.Models.EntityBase
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [DebuggerDisplay("Id: {Id}")]
-    public abstract class Entity : TracksChangesEntityBase, IEntity, IRememberBeingDirty, ICanBeDirty
+    [DebuggerDisplay("Id: {" + nameof(Id) + "}")]
+    public abstract class Entity : TracksChangesEntityBase, IEntity //, IRememberBeingDirty, ICanBeDirty
     {
         private bool _hasIdentity;
         private int _id;
@@ -25,6 +22,7 @@ namespace Umbraco.Core.Models.EntityBase
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
             public readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<Entity, int>(x => x.Id);
@@ -41,7 +39,7 @@ namespace Umbraco.Core.Models.EntityBase
         [DataMember]
         public int Id
         {
-            get { return _id; }
+            get => _id;
             set
             {
                 SetPropertyValueAndDetectChanges(value, ref _id, Ps.Value.IdSelector);
@@ -64,7 +62,7 @@ namespace Umbraco.Core.Models.EntityBase
                     _key = Guid.NewGuid();
                 return _key;
             }
-            set { SetPropertyValueAndDetectChanges(value, ref _key, Ps.Value.KeySelector); }
+            set => SetPropertyValueAndDetectChanges(value, ref _key, Ps.Value.KeySelector);
         }
 
         /// <summary>
@@ -73,8 +71,8 @@ namespace Umbraco.Core.Models.EntityBase
         [DataMember]
         public DateTime CreateDate
         {
-            get { return _createDate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _createDate, Ps.Value.CreateDateSelector); }            
+            get => _createDate;
+            set => SetPropertyValueAndDetectChanges(value, ref _createDate, Ps.Value.CreateDateSelector);
         }
 
         /// <summary>
@@ -87,8 +85,8 @@ namespace Umbraco.Core.Models.EntityBase
         [Obsolete("Anytime there's a cancellable method it needs to return an Attempt so we know the outcome instead of this hack, not all services have been updated to use this though yet.")]
         internal bool WasCancelled
         {
-            get { return _wasCancelled; }
-            set { SetPropertyValueAndDetectChanges(value, ref _wasCancelled, Ps.Value.WasCancelledSelector); }            
+            get => _wasCancelled;
+            set => SetPropertyValueAndDetectChanges(value, ref _wasCancelled, Ps.Value.WasCancelledSelector);
         }
 
         /// <summary>
@@ -97,9 +95,12 @@ namespace Umbraco.Core.Models.EntityBase
         [DataMember]
         public DateTime UpdateDate
         {
-            get { return _updateDate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _updateDate, Ps.Value.UpdateDateSelector); }           
+            get => _updateDate;
+            set => SetPropertyValueAndDetectChanges(value, ref _updateDate, Ps.Value.UpdateDateSelector);
         }
+
+        [IgnoreDataMember]
+        public DateTime? DeletedDate { get; set; }
 
         internal virtual void ResetIdentity()
         {
@@ -134,32 +135,19 @@ namespace Umbraco.Core.Models.EntityBase
         [DataMember]
         public virtual bool HasIdentity
         {
-            get
-            {
-                return _hasIdentity;
-            }
-            protected set { SetPropertyValueAndDetectChanges(value, ref _hasIdentity, Ps.Value.HasIdentitySelector); }
+            get => _hasIdentity;
+            protected set => SetPropertyValueAndDetectChanges(value, ref _hasIdentity, Ps.Value.HasIdentitySelector);
         }
 
         //TODO: Make this NOT virtual or even exist really!
         public virtual bool SameIdentityAs(IEntity other)
         {
-            if (ReferenceEquals(null, other))
-                return false;
-            if (ReferenceEquals(this, other))
-                return true;
-
-            return SameIdentityAs(other as Entity);
+            return other != null && (ReferenceEquals(this, other) || SameIdentityAs(other as Entity));
         }
 
         public virtual bool Equals(Entity other)
         {
-            if (ReferenceEquals(null, other))
-                return false;
-            if (ReferenceEquals(this, other))
-                return true;
-
-            return SameIdentityAs(other);
+            return other != null && (ReferenceEquals(this, other) || SameIdentityAs(other));
         }
 
         //TODO: Make this NOT virtual or even exist really!
@@ -185,12 +173,7 @@ namespace Umbraco.Core.Models.EntityBase
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-
-            return SameIdentityAs(obj as IEntity);
+            return obj != null && (ReferenceEquals(this, obj) || SameIdentityAs(obj as IEntity));
         }
 
         public override int GetHashCode()
@@ -208,7 +191,7 @@ namespace Umbraco.Core.Models.EntityBase
         {
             //Memberwise clone on Entity will work since it doesn't have any deep elements
             // for any sub class this will work for standard properties as well that aren't complex object's themselves.
-            var ignored = this.Key; // ensure that 'this' has a key, before cloning
+            var unused = Key; // ensure that 'this' has a key, before cloning
             var clone = (Entity)MemberwiseClone();
             //ensure the clone has it's own dictionaries
             clone.ResetChangeTrackingCollections();

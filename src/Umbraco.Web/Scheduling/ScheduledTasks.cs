@@ -85,11 +85,6 @@ namespace Umbraco.Web.Scheduling
             }
         }
 
-        public override bool PerformRun()
-        {
-            throw new NotImplementedException();
-        }
-
         public override async Task<bool> PerformRunAsync(CancellationToken token)
         {
             switch (_runtime.ServerRole)
@@ -124,14 +119,6 @@ namespace Umbraco.Web.Scheduling
             return true; // repeat
         }
 
-        public override bool IsAsync
-        {
-            get { return true; }
-        }
-
-        public override bool RunsOnShutdown
-        {
-            get { return false; }
-        }
+        public override bool IsAsync => true;
     }
 }
