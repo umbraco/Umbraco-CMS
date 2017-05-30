@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 
-namespace Umbraco.Core.Plugins
+namespace Umbraco.Core.Composing
 {
     /// <summary>
 	/// A utility class for type checking, this provides internal caching so that calls to these methods will be faster

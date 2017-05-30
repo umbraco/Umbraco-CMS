@@ -10,7 +10,7 @@ using System.Web.Compilation;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
-namespace Umbraco.Core.Plugins
+namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// A utility class to find all classes of a certain type by reflection in the current bin folder

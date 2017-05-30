@@ -4,7 +4,6 @@ using System.Xml;
 using LightInject;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Plugins;
 using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Tests.DI

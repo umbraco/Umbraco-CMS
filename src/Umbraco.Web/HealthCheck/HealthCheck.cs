@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Umbraco.Core;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.HealthCheck
 {

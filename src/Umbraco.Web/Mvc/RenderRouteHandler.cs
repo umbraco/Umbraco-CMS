@@ -10,7 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using System.Collections.Generic;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 using LightInject;
 
 namespace Umbraco.Web.Mvc

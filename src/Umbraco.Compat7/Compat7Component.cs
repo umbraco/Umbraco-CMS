@@ -5,7 +5,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Compat7
 {

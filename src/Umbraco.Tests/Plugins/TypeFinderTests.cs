@@ -20,7 +20,7 @@ using Umbraco.Core.IO;
 using umbraco.DataLayer;
 using umbraco.uicontrols;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;

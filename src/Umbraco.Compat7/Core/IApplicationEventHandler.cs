@@ -1,6 +1,6 @@
 ﻿// ReSharper disable once CheckNamespace
 
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core
 {

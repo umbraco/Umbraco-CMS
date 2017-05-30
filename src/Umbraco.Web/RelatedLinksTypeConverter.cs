@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web

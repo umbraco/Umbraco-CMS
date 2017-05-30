@@ -13,7 +13,6 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Plugins;
 using Umbraco.Tests.Testing;
 using Current = Umbraco.Web.Current;
 

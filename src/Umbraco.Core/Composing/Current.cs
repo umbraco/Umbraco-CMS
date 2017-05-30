@@ -7,7 +7,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Plugins;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -97,7 +96,7 @@ namespace Umbraco.Core.Composing
         public static IRuntimeState RuntimeState
             => Container.GetInstance<IRuntimeState>();
 
-        public static TypeLoader TypeLoader 
+        public static TypeLoader TypeLoader
             => Container.GetInstance<TypeLoader>();
 
         public static FileSystems FileSystems

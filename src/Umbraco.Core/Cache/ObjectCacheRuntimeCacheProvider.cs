@@ -5,7 +5,7 @@ using System.Runtime.Caching;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web.Caching;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 using CacheItemPriority = System.Web.Caching.CacheItemPriority;
 
 namespace Umbraco.Core.Cache

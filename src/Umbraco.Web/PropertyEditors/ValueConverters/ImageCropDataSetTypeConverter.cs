@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters

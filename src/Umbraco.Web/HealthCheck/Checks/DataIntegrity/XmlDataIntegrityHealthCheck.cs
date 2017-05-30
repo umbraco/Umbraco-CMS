@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 

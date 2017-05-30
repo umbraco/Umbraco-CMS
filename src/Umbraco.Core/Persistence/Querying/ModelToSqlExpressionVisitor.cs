@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Persistence.Querying
 {

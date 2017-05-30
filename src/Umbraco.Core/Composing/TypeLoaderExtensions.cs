@@ -7,7 +7,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core._Legacy.PackageActions;
 
-namespace Umbraco.Core.Plugins
+namespace Umbraco.Core.Composing
 {
     internal static class TypeLoaderExtensions
     {

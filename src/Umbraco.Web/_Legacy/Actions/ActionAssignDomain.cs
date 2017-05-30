@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using LightInject;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Plugins;
 using Umbraco.Web.UI.Pages;
 
 namespace Umbraco.Web._Legacy.Actions

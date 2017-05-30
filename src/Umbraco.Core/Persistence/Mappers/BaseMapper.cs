@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using NPoco;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Persistence.Mappers
 {

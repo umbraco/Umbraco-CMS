@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.Plugins
 {

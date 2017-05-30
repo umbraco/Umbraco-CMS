@@ -11,7 +11,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using File = System.IO.File;
 
-namespace Umbraco.Core.Plugins
+namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// Provides methods to find and instanciate types.

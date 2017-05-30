@@ -1,6 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.PropertyEditors
 {

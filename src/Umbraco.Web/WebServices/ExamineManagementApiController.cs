@@ -12,7 +12,7 @@ using Lucene.Net.Search;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Search;
 using Umbraco.Web.WebApi;

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Plugins
+﻿namespace Umbraco.Core.Composing
 {
     public interface IDiscoverable
     { }

@@ -1,6 +1,6 @@
 using System;
 
-namespace Umbraco.Core.Plugins
+namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// Notifies the TypeFinder that it should ignore the class marked with this attribute.

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.IO

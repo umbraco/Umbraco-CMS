@@ -1,7 +1,7 @@
 ﻿using System;
 using Umbraco.Core;
 using umbraco.cms.presentation.Trees;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Trees
 {

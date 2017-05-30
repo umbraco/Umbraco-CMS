@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Plugins;
+﻿using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Models.Trees
 {

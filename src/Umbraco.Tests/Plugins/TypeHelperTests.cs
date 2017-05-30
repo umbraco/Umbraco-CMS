@@ -8,7 +8,7 @@ using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Scheduling;
 

@@ -10,7 +10,6 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Plugins;
 
 namespace Umbraco.Tests.TestHelpers
 {

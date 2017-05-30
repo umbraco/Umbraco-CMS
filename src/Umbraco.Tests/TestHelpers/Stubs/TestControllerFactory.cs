@@ -7,7 +7,7 @@ using System.Web.Routing;
 using System.Web.SessionState;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Plugins;
+using Umbraco.Core.Composing;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.TestHelpers.Stubs

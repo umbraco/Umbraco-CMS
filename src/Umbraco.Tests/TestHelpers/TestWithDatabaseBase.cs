@@ -22,7 +22,6 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Security;
-using Umbraco.Core.Plugins;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
 using Umbraco.Core.Composing;

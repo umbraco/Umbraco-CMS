@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using Umbraco.Core.Deploy;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Plugins;
 
 namespace Umbraco.Core
 {

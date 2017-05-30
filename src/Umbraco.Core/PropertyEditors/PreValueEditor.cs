@@ -7,7 +7,6 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Plugins;
 
 namespace Umbraco.Core.PropertyEditors
 {
