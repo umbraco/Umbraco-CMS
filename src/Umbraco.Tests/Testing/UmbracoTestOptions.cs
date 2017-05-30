@@ -23,5 +23,15 @@
             // new database file with schema per test
             NewSchemaPerTest
         }
+
+        public enum PluginManager
+        {
+            // the default, global plugin manager for tests
+            Default,
+            // create one plugin manager for the feature
+            PerFixture,
+            // create one plugin manager for each test
+            PerTest
+        }
     }
 }

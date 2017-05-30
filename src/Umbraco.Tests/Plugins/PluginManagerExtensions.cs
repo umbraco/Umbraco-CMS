@@ -10,9 +10,9 @@ namespace Umbraco.Tests.Plugins
 	/// </summary>
 	internal static class PluginManagerExtensions
 	{
-		public static IEnumerable<Type> ResolveFindMeTypes(this PluginManager resolver)
+		public static IEnumerable<Type> ResolveFindMeTypes(this TypeLoader resolver)
 		{
-			return resolver.ResolveTypes<PluginManagerTests.IFindMe>();
+			return resolver.GetTypes<PluginManagerTests.IFindMe>();
 		}
 	}
 }

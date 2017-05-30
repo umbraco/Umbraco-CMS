@@ -11,7 +11,7 @@ namespace Umbraco.Web.Strategies.Migrations
         public override void Compose(Composition composition)
         {
             composition.Container.RegisterCollectionBuilder<PostMigrationCollectionBuilder>()
-                .Add(factory => factory.GetInstance<PluginManager>().ResolveTypes<IPostMigration>());
+                .Add(factory => factory.GetInstance<TypeLoader>().GetTypes<IPostMigration>());
         }
 
         public void Initialize(PostMigrationCollection posts)

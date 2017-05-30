@@ -5,6 +5,7 @@ using LightInject;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.DI;
+using Umbraco.Core.DI.CompositionRoots;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;

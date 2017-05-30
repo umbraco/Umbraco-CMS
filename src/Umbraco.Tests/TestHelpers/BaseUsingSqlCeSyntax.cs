@@ -40,13 +40,13 @@ namespace Umbraco.Tests.TestHelpers
             container.RegisterSingleton<IProfiler>(factory => Mock.Of<IProfiler>());
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
-            var pluginManager = new PluginManager(new NullCacheProvider(),
+            var pluginManager = new TypeLoader(new NullCacheProvider(),
                 logger,
                 false);
             container.RegisterInstance(pluginManager);
 
             container.RegisterCollectionBuilder<MapperCollectionBuilder>()
-                .Add(() => Current.PluginManager.ResolveAssignedMapperTypes());
+                .Add(() => Current.TypeLoader.GetAssignedMapperTypes());
             Mappers = container.GetInstance<IMapperCollection>();
 
             var mappers = new NPoco.MapperCollection { new PocoMapper() };

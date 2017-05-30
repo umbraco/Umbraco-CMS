@@ -9,6 +9,7 @@ using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.DI;
+using Umbraco.Core.DI.CompositionRoots;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
@@ -62,10 +63,10 @@ namespace Umbraco.Core
             composition.Container.RegisterSingleton<ManifestBuilder>();
 
             composition.Container.RegisterCollectionBuilder<PropertyEditorCollectionBuilder>()
-                .Add(factory => factory.GetInstance<PluginManager>().ResolvePropertyEditors());
+                .Add(factory => factory.GetInstance<TypeLoader>().GetPropertyEditors());
 
             composition.Container.RegisterCollectionBuilder<ParameterEditorCollectionBuilder>()
-                .Add(factory => factory.GetInstance<PluginManager>().ResolveParameterEditors());
+                .Add(factory => factory.GetInstance<TypeLoader>().GetParameterEditors());
 
             // register our predefined validators
             composition.Container.RegisterCollectionBuilder<ValidatorCollectionBuilder>()
@@ -102,17 +103,17 @@ namespace Umbraco.Core
                     true, new DatabaseServerMessengerOptions()));
 
             composition.Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
-                .Add(factory => factory.GetInstance<PluginManager>().ResolveCacheRefreshers());
+                .Add(factory => factory.GetInstance<TypeLoader>().GetCacheRefreshers());
 
             composition.Container.RegisterCollectionBuilder<PackageActionCollectionBuilder>()
-                .Add(f => f.GetInstance<PluginManager>().ResolvePackageActions());
+                .Add(f => f.GetInstance<TypeLoader>().GetPackageActions());
 
             composition.Container.RegisterCollectionBuilder<MigrationCollectionBuilder>()
-                .Add(factory => factory.GetInstance<PluginManager>().ResolveTypes<IMigration>());
+                .Add(factory => factory.GetInstance<TypeLoader>().GetTypes<IMigration>());
 
             // need to filter out the ones we dont want!! fixme - what does that mean?
             composition.Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>()
-                .Append(factory => factory.GetInstance<PluginManager>().ResolveTypes<IPropertyValueConverter>());
+                .Append(factory => factory.GetInstance<TypeLoader>().GetTypes<IPropertyValueConverter>());
 
             composition.Container.RegisterSingleton<IShortStringHelper>(factory
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IUmbracoSettingsSection>())));

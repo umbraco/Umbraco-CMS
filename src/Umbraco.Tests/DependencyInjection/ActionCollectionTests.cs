@@ -18,7 +18,7 @@ namespace Umbraco.Tests.DI
 		public void FindAllActions()
         {
             var collectionBuilder = new ActionCollectionBuilder();
-            collectionBuilder.SetProducer(() => PluginManager.ResolveActions());
+            collectionBuilder.SetProducer(() => TypeLoader.ResolveActions());
 
             var actions = collectionBuilder.CreateCollection();
 			Assert.AreEqual(2, actions.Count());

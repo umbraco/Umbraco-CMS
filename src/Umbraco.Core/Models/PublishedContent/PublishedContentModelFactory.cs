@@ -23,7 +23,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// accepts one IPublishedContent as a parameter.</para>
         /// <para>To activate,</para>
         /// <code>
-        /// var types = PluginManager.Current.ResolveTypes{PublishedContentModel}();
+        /// var types = TypeLoader.Current.GetTypes{PublishedContentModel}();
         /// var factory = new PublishedContentModelFactoryImpl(types);
         /// PublishedContentModelFactoryResolver.Current.SetFactory(factory);
         /// </code>

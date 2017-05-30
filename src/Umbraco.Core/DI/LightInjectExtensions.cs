@@ -186,7 +186,7 @@ namespace Umbraco.Core.DI
                 UpdateRegistration(registration, null, factory);
         }
 
-        // fixme - what's below ALSO applies to non-singleton ie transient services
+        // note - what's below ALSO applies to non-singleton ie transient services
         //
         // see https://github.com/seesharper/LightInject/issues/133
         //
@@ -201,6 +201,9 @@ namespace Umbraco.Core.DI
         // all in all, not sure we want to let ppl have direct access to the container
         // we might instead want to expose some methods in UmbracoComponentBase or whatever?
 
+        /// <summary>
+        /// Updates a registration.
+        /// </summary>
         private static void UpdateRegistration(Registration registration, Type implementingType, Delegate factoryExpression)
         {
             // if the container has compiled already then the registrations have been captured,
@@ -313,56 +316,6 @@ namespace Umbraco.Core.DI
                 LightInjectException.TryThrow(e, implementingType);
                 throw;
             }
-        }
-
-        // FIXME or just use names?!
-        // this is what RegisterMany does => kill RegisterCollection!
-
-        /// <summary>
-        /// In order for LightInject to deal with enumerables of the same type, each one needs to be registered as their explicit types
-        /// </summary>
-        /// <typeparam name="TLifetime"></typeparam>
-        /// <param name="container"></param>
-        /// <param name="implementationTypes"></param>
-        /// <remarks>
-        /// This works as of 3.0.2.2: https://github.com/seesharper/LightInject/issues/68#issuecomment-70611055
-        /// but means that the explicit type is registered, not the implementing type
-        /// </remarks>
-        public static void RegisterCollection<TLifetime>(this IServiceContainer container, IEnumerable<Type> implementationTypes)
-            where TLifetime : ILifetime, new()
-        {
-            foreach (var type in implementationTypes)
-                container.Register(type, new TLifetime());
-        }
-
-        public static void RegisterCollection<TLifetime>(this IServiceContainer container, Func<IServiceFactory, IEnumerable<Type>> implementationTypes)
-            where TLifetime : ILifetime, new()
-        {
-            foreach (var type in implementationTypes(container))
-                container.Register(type, new TLifetime());
-        }
-
-        /// <summary>
-        /// In order for LightInject to deal with enumerables of the same type, each one needs to be registered as their explicit types
-        /// </summary>
-        /// <param name="container"></param>
-        /// <param name="implementationTypes"></param>
-        /// <remarks>
-        /// This works as of 3.0.2.2: https://github.com/seesharper/LightInject/issues/68#issuecomment-70611055
-        /// but means that the explicit type is registered, not the implementing type
-        /// </remarks>
-        public static void RegisterCollection(this IServiceContainer container, IEnumerable<Type> implementationTypes)
-        {
-            foreach (var type in implementationTypes)
-            {
-                container.Register(type);
-            }
-        }
-
-        public static void RegisterCollection(this IServiceContainer container, Func<IServiceFactory, IEnumerable<Type>> implementationTypes)
-        {
-            foreach (var type in implementationTypes(container))
-                container.Register(type);
         }
 
         /// <summary>

@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
-namespace Umbraco.Core.DI
+namespace Umbraco.Core.DI.CompositionRoots
 {
     /// <summary>
     /// Sets the IoC container for the umbraco data layer/repositories/sql/database/etc...

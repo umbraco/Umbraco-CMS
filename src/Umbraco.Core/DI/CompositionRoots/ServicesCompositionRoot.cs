@@ -8,7 +8,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.DI
+namespace Umbraco.Core.DI.CompositionRoots
 {
     public sealed class ServicesCompositionRoot : ICompositionRoot
     {

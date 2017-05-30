@@ -17,15 +17,27 @@ using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Core.DI
 {
-    // this class is here to support the transition from singletons and resolvers to injection,
-    // by providing a static access to singleton services - it is initialized once with a service
-    // container, in CoreBootManager.
-    // obviously, this is some sort of service locator anti-pattern. ideally, it should not exist.
-    // practically... time will tell.
+    /// <summary>
+    /// Provides a static service locator for most singletons.
+    /// </summary>
+    /// <remarks>
+    /// <para>This class is initialized with the container via LightInjectExtensions.ConfigureUmbracoCore,
+    /// right after the container is created in UmbracoApplicationBase.HandleApplicationStart.</para>
+    /// <para>Obviously, this is a service locator, which some may consider an anti-pattern. And yet,
+    /// practically, it works.</para>
+    /// </remarks>
     public static class Current
     {
         private static ServiceContainer _container;
 
+        private static IShortStringHelper _shortStringHelper;
+        private static ILogger _logger;
+        private static IProfiler _profiler;
+        private static ProfilingLogger _profilingLogger;
+
+        /// <summary>
+        /// Gets or sets the DI container.
+        /// </summary>
         internal static ServiceContainer Container
         {
             get
@@ -52,7 +64,6 @@ namespace Umbraco.Core.DI
             _logger = null;
             _profiler = null;
             _profilingLogger = null;
-            _pluginManager = null; // fixme - some of our tests don't reset it?
 
             Resetted?.Invoke(null, EventArgs.Empty);
         }
@@ -61,22 +72,33 @@ namespace Umbraco.Core.DI
 
         #region Getters
 
+        // fixme - refactor
+        // we don't want Umbraco to die because the container has not been properly initialized,
+        // for some too-important things such as IShortStringHelper or loggers, so if it's not
+        // registered we setup a default one. We should really refactor our tests so that it does
+        // not happen. Will do when we get rid of IShortStringHelper.
+
+        public static IShortStringHelper ShortStringHelper
+            => _shortStringHelper ?? (_shortStringHelper = _container?.TryGetInstance<IShortStringHelper>()
+                ?? new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(UmbracoConfig.For.UmbracoSettings())));
+
+        public static ILogger Logger
+            => _logger ?? (_logger = _container?.TryGetInstance<ILogger>()
+                ?? new DebugDiagnosticsLogger());
+
+        public static IProfiler Profiler
+            => _profiler ?? (_profiler = _container?.TryGetInstance<IProfiler>()
+                ?? new LogProfiler(Logger));
+
+        public static ProfilingLogger ProfilingLogger
+            => _profilingLogger ?? (_profilingLogger = _container?.TryGetInstance<ProfilingLogger>())
+               ?? new ProfilingLogger(Logger, Profiler);
+
         public static IRuntimeState RuntimeState
             => Container.GetInstance<IRuntimeState>();
 
-        // fixme - refactor
-        // some of our tests did mess with the current plugin manager
-        // so for the time being we support it, however we should fix our tests
-
-        private static PluginManager _pluginManager;
-
-        public static PluginManager PluginManager
-        {
-            get { return _pluginManager
-                    ?? (_pluginManager = Container.TryGetInstance<PluginManager>()
-                        ?? new PluginManager(ApplicationCache.RuntimeCache, ProfilingLogger)); }
-            set { _pluginManager = value; }
-        }
+        public static TypeLoader TypeLoader 
+            => Container.GetInstance<TypeLoader>();
 
         public static FileSystems FileSystems
             => Container.GetInstance<FileSystems>();
@@ -113,34 +135,6 @@ namespace Umbraco.Core.DI
 
         public static ICultureDictionaryFactory CultureDictionaryFactory
             => Container.GetInstance<ICultureDictionaryFactory>();
-
-        // fixme - refactor
-        // we don't want Umbraco to die because the container has not been properly initialized,
-        // for some too-important things such as IShortStringHelper or loggers, so if it's not
-        // registered we setup a default one. We should really refactor our tests so that it does
-        // not happen, but hey...
-
-        private static IShortStringHelper _shortStringHelper;
-
-        public static IShortStringHelper ShortStringHelper
-            => _shortStringHelper ?? (_shortStringHelper = _container?.TryGetInstance<IShortStringHelper>()
-                ?? new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(UmbracoConfig.For.UmbracoSettings())));
-
-        private static ILogger _logger;
-        private static IProfiler _profiler;
-        private static ProfilingLogger _profilingLogger;
-
-        public static ILogger Logger
-            => _logger ?? (_logger = _container?.TryGetInstance<ILogger>()
-                ?? new DebugDiagnosticsLogger());
-
-        public static IProfiler Profiler
-            => _profiler ?? (_profiler = _container?.TryGetInstance<IProfiler>()
-                ?? new LogProfiler(Logger));
-
-        public static ProfilingLogger ProfilingLogger
-            => _profilingLogger ?? (_profilingLogger = _container?.TryGetInstance<ProfilingLogger>())
-               ?? new ProfilingLogger(Logger, Profiler);
 
         public static CacheHelper ApplicationCache
             => Container.GetInstance<CacheHelper>();

@@ -40,8 +40,7 @@ namespace Umbraco.Core
         /// <param name="umbracoApplication">The Umbraco HttpApplication.</param>
         public CoreRuntime(UmbracoApplicationBase umbracoApplication)
         {
-            if (umbracoApplication == null) throw new ArgumentNullException(nameof(umbracoApplication));
-            _app = umbracoApplication;
+            _app = umbracoApplication ?? throw new ArgumentNullException(nameof(umbracoApplication));
         }
 
         /// <inheritdoc/>
@@ -209,7 +208,7 @@ namespace Umbraco.Core
             container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
 
             // register the plugin manager
-            container.RegisterSingleton(f => new PluginManager(f.GetInstance<IRuntimeCacheProvider>(), f.GetInstance<ProfilingLogger>()));
+            container.RegisterSingleton(f => new TypeLoader(f.GetInstance<IRuntimeCacheProvider>(), f.GetInstance<ProfilingLogger>()));
 
             // register syntax providers - required by database factory
             container.Register<ISqlSyntaxProvider, MySqlSyntaxProvider>("MySqlSyntaxProvider");
@@ -378,7 +377,8 @@ namespace Umbraco.Core
 
         // getters can be implemented by runtimes inheriting from CoreRuntime
 
-        protected virtual IEnumerable<Type> GetComponentTypes() => Current.PluginManager.ResolveTypes<IUmbracoComponent>();
+        // fixme - inject! no Current!
+        protected virtual IEnumerable<Type> GetComponentTypes() => Current.TypeLoader.GetTypes<IUmbracoComponent>();
 
         // by default, returns null, meaning that Umbraco should auto-detect the application root path.
         // override and return the absolute path to the Umbraco site/solution, if needed

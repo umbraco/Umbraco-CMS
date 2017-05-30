@@ -28,12 +28,12 @@ namespace Umbraco.Tests.Plugins
     [TestFixture]
     public class PluginManagerTests
     {
-        private PluginManager _manager;
+        private TypeLoader _manager;
         [SetUp]
         public void Initialize()
         {
             //this ensures its reset
-            _manager = new PluginManager(new NullCacheProvider(),
+            _manager = new TypeLoader(new NullCacheProvider(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Plugins
         private DirectoryInfo PrepareFolder()
         {
             var assDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
-            var dir = Directory.CreateDirectory(Path.Combine(assDir.FullName, "PluginManager", Guid.NewGuid().ToString("N")));
+            var dir = Directory.CreateDirectory(Path.Combine(assDir.FullName, "TypeLoader", Guid.NewGuid().ToString("N")));
             foreach (var f in dir.GetFiles())
             {
                 f.Delete();
@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Plugins
         //[Test]
         //public void Scan_Vs_Load_Benchmark()
         //{
-        //	var pluginManager = new PluginManager(false);
+        //	var typeLoader = new TypeLoader(false);
         //	var watch = new Stopwatch();
         //	watch.Start();
         //	for (var i = 0; i < 1000; i++)
@@ -103,7 +103,7 @@ namespace Umbraco.Tests.Plugins
         //	watch.Start();
         //	for (var i = 0; i < 1000; i++)
         //	{
-        //		var refreshers = pluginManager.ResolveTypes<ICacheRefresher>(false);
+        //		var refreshers = typeLoader.GetTypes<ICacheRefresher>(false);
         //	}
         //	watch.Stop();
         //	Debug.WriteLine("TOTAL TIME (2nd round): " + watch.ElapsedMilliseconds);
@@ -194,9 +194,9 @@ AnotherContentFinder
         [Test]
         public void Create_Cached_Plugin_File()
         {
-            var types = new[] { typeof (PluginManager), typeof (PluginManagerTests), typeof (UmbracoContext) };
+            var types = new[] { typeof (TypeLoader), typeof (PluginManagerTests), typeof (UmbracoContext) };
 
-            var typeList1 = new PluginManager.TypeList(typeof (object), null);
+            var typeList1 = new TypeLoader.TypeList(typeof (object), null);
             foreach (var type in types) typeList1.Add(type);
             _manager.AddTypeList(typeList1);
             _manager.WriteCache();
@@ -218,7 +218,7 @@ AnotherContentFinder
         public void PluginHash_From_String()
         {
             var s = "hello my name is someone".GetHashCode().ToString("x", CultureInfo.InvariantCulture);
-            var output = PluginManager.ConvertHashToInt64(s);
+            var output = TypeLoader.ConvertHashToInt64(s);
             Assert.AreNotEqual(0, output);
         }
 
@@ -250,16 +250,16 @@ AnotherContentFinder
             var list3 = new[] { f1, f3, f5, f7 };
 
             //Act
-            var hash1 = PluginManager.GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            var hash2 = PluginManager.GetFileHash(list2, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            var hash3 = PluginManager.GetFileHash(list3, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            var hash1 = TypeLoader.GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            var hash2 = TypeLoader.GetFileHash(list2, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            var hash3 = TypeLoader.GetFileHash(list3, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             //Assert
             Assert.AreNotEqual(hash1, hash2);
             Assert.AreNotEqual(hash1, hash3);
             Assert.AreNotEqual(hash2, hash3);
 
-            Assert.AreEqual(hash1, PluginManager.GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
+            Assert.AreEqual(hash1, TypeLoader.GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
         }
 
         [Test]
@@ -273,7 +273,7 @@ AnotherContentFinder
         [Test]
         public void Resolves_Assigned_Mappers()
         {
-            var foundTypes1 = _manager.ResolveAssignedMapperTypes();
+            var foundTypes1 = _manager.GetAssignedMapperTypes();
             Assert.AreEqual(29, foundTypes1.Count()); // 29 classes in the solution implement BaseMapper
         }
 
@@ -312,9 +312,9 @@ AnotherContentFinder
         [Test]
         public void TypeList_Resolves_Explicit_Types()
         {
-            var types = new HashSet<PluginManager.TypeList>();
+            var types = new HashSet<TypeLoader.TypeList>();
 
-            var propEditors = new PluginManager.TypeList(typeof (PropertyEditor), null);
+            var propEditors = new TypeLoader.TypeList(typeof (PropertyEditor), null);
             propEditors.Add(typeof(LabelPropertyEditor));
             types.Add(propEditors);
 

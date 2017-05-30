@@ -23,7 +23,7 @@ namespace Umbraco.Tests.DI
             container.ConfigureUmbracoCore();
 
             container.RegisterCollectionBuilder<PackageActionCollectionBuilder>()
-                .Add(() => PluginManager.ResolvePackageActions());
+                .Add(() => TypeLoader.GetPackageActions());
 
 			var actions = Current.PackageActions;
 			Assert.AreEqual(2, actions.Count());

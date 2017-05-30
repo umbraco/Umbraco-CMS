@@ -10,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.DI;
+using Umbraco.Core.DI.CompositionRoots;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -78,7 +79,9 @@ namespace Umbraco.Tests.Testing
 
         internal TestObjects TestObjects { get; private set; }
 
-        private static PluginManager _pluginManager;
+        private static TypeLoader _commonTypeLoader;
+
+        private TypeLoader _featureTypeLoader;
 
         #region Accessors
 
@@ -125,7 +128,7 @@ namespace Umbraco.Tests.Testing
             ComposeLogging(Options.Logger);
             ComposeCacheHelper();
             ComposeAutoMapper(Options.AutoMapper);
-            ComposePluginManager(Options.ResetPluginManager);
+            ComposePluginManager(Options.PluginManager);
             ComposeDatabase(Options.Database);
             ComposeApplication(Options.WithApplication);
             // etc
@@ -186,24 +189,42 @@ namespace Umbraco.Tests.Testing
             Container.RegisterFrom<WebModelMappersCompositionRoot>();
         }
 
-        protected virtual void ComposePluginManager(bool reset)
+        protected virtual void ComposePluginManager(UmbracoTestOptions.PluginManager pluginManager)
         {
             Container.RegisterSingleton(f =>
             {
-                if (_pluginManager != null && reset == false) return _pluginManager;
-
-                return _pluginManager = new PluginManager(f.GetInstance<CacheHelper>().RuntimeCache, f.GetInstance<ProfilingLogger>(), false)
+                switch (pluginManager)
                 {
-                    AssembliesToScan = new[]
-                    {
-                        Assembly.Load("Umbraco.Core"),
-                        Assembly.Load("umbraco"),
-                        Assembly.Load("Umbraco.Tests"),
-                        Assembly.Load("cms"),
-                        Assembly.Load("controls"),
-                    }
-                };
+                    case UmbracoTestOptions.PluginManager.Default:
+                        return _commonTypeLoader ?? (_commonTypeLoader = CreateCommonPluginManager(f));
+                    case UmbracoTestOptions.PluginManager.PerFixture:
+                        return _featureTypeLoader ?? (_featureTypeLoader = CreatePluginManager(f));
+                    case UmbracoTestOptions.PluginManager.PerTest:
+                        return CreatePluginManager(f);
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(pluginManager));
+                }
             });
+        }
+
+        protected virtual TypeLoader CreatePluginManager(IServiceFactory f)
+        {
+            return CreateCommonPluginManager(f);
+        }
+
+        private static TypeLoader CreateCommonPluginManager(IServiceFactory f)
+        {
+            return new TypeLoader(f.GetInstance<CacheHelper>().RuntimeCache, f.GetInstance<ProfilingLogger>(), false)
+            {
+                AssembliesToScan = new[]
+                {
+                    Assembly.Load("Umbraco.Core"),
+                    Assembly.Load("umbraco"),
+                    Assembly.Load("Umbraco.Tests"),
+                    Assembly.Load("cms"),
+                    Assembly.Load("controls"),
+                }
+            };
         }
 
         protected virtual void ComposeDatabase(UmbracoTestOptions.Database option)

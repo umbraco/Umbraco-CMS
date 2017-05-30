@@ -12,6 +12,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Core.DI;
 using Current = Umbraco.Core.DI.Current;
 using LightInject;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -19,9 +20,10 @@ namespace Umbraco.Tests.PublishedContent
 	/// Tests the methods on IPublishedContent using the DefaultPublishedContentStore
 	/// </summary>
 	[TestFixture]
+    [UmbracoTest(PluginManager = UmbracoTestOptions.PluginManager.PerFixture)]
     public class PublishedContentTests : PublishedContentTestBase
 	{
-        private PluginManager _pluginManager;
+        private TypeLoader _typeLoader;
 
         public override void SetUp()
         {
@@ -29,14 +31,6 @@ namespace Umbraco.Tests.PublishedContent
             //PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver();
 
             base.SetUp();
-
-            // this is so the model factory looks into the test assembly
-            _pluginManager = Current.PluginManager;
-            Core.DI.Current.PluginManager = new PluginManager(CacheHelper.RuntimeCache, ProfilingLogger, false)
-            {
-                AssembliesToScan = _pluginManager.AssembliesToScan
-                    .Union(new[] { typeof(PublishedContentTests).Assembly })
-            };
 
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
@@ -57,19 +51,23 @@ namespace Umbraco.Tests.PublishedContent
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
         }
 
-        public override void TearDown()
-        {
-            base.TearDown();
-            // fixme - wtf, restoring? keeping it accross tests for perfs I guess?
-            //PluginManager.Current = _pluginManager;
-            Core.DI.Current.Reset();
-        }
-
 	    protected override void Compose()
 	    {
 	        base.Compose();
 
-            Container.RegisterSingleton<IPublishedContentModelFactory>(f => new PublishedContentModelFactory(f.GetInstance<PluginManager>().ResolveTypes<PublishedContentModel>()));
+            Container.RegisterSingleton<IPublishedContentModelFactory>(f => new PublishedContentModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
+	    }
+
+	    protected override TypeLoader CreatePluginManager(IServiceFactory f)
+	    {
+	        var pluginManager = base.CreatePluginManager(f);
+
+	        // this is so the model factory looks into the test assembly
+	        pluginManager.AssembliesToScan = pluginManager.AssembliesToScan
+	            .Union(new[] { typeof(PublishedContentTests).Assembly })
+	            .ToList();
+
+	        return pluginManager;
 	    }
 
         private readonly Guid _node1173Guid = Guid.NewGuid();

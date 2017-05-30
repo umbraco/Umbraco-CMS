@@ -73,7 +73,8 @@ namespace Umbraco.Core
                 // just pick every service connectors - just making sure that not two of them
                 // would register the same entity type, with different udi types (would not make
                 // much sense anyways).
-                var connectors = Current.PluginManager.ResolveTypes<IServiceConnector>();
+                // fixme - current! replace static ctor w/ component?
+                var connectors = Current.TypeLoader.GetTypes<IServiceConnector>();
                 foreach (var connector in connectors)
                 {
                     var attrs = connector.GetCustomAttributes<UdiDefinitionAttribute>(false);

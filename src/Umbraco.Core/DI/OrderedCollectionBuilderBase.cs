@@ -14,6 +14,10 @@ namespace Umbraco.Core.DI
         where TBuilder : OrderedCollectionBuilderBase<TBuilder, TCollection, TItem>
         where TCollection : IBuilderCollection<TItem>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OrderedCollectionBuilderBase{TBuilder,TCollection,TItem}"/> class.
+        /// </summary>
+        /// <param name="container"></param>
         protected OrderedCollectionBuilderBase(IServiceContainer container)
             : base (container)
         { }

@@ -26,8 +26,8 @@ namespace Umbraco.Compat7
             _app = container.GetInstance<UmbracoApplicationBase>();
             var logger = container.GetInstance<ILogger>();
 
-            var pluginManager = container.GetInstance<PluginManager>();
-            var handlerTypes = pluginManager.ResolveTypes<IApplicationEventHandler>();
+            var pluginManager = container.GetInstance<TypeLoader>();
+            var handlerTypes = pluginManager.GetTypes<IApplicationEventHandler>();
 
             _handlers = handlerTypes.Select(Activator.CreateInstance).Cast<IApplicationEventHandler>().ToList();
 

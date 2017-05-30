@@ -31,12 +31,6 @@ namespace Umbraco.Tests.Testing
         /// <summary>
         /// Gets or sets a value indicating ... FIXME to be completed
         /// </summary>
-        public bool ResetPluginManager { get => _resetPluginManager.ValueOrDefault(false); set => _resetPluginManager.Set(value); }
-        private readonly Settable<bool> _resetPluginManager = new Settable<bool>();
-
-        /// <summary>
-        /// Gets or sets a value indicating ... FIXME to be completed
-        /// </summary>
         public bool FacadeServiceRepositoryEvents { get => _facadeServiceRepositoryEvents.ValueOrDefault(false); set => _facadeServiceRepositoryEvents.Set(value); }
         private readonly Settable<bool> _facadeServiceRepositoryEvents = new Settable<bool>();
 
@@ -53,6 +47,13 @@ namespace Umbraco.Tests.Testing
         /// <remarks>Default is no database support.</remarks>
         public UmbracoTestOptions.Database Database { get => _database.ValueOrDefault(UmbracoTestOptions.Database.None); set => _database.Set(value); }
         private readonly Settable<UmbracoTestOptions.Database> _database = new Settable<UmbracoTestOptions.Database>();
+
+        /// <summary>
+        /// Gets or sets a value indicating the required plugin manager support.
+        /// </summary>
+        /// <remarks>Default is to use the global tests plugin manager.</remarks>
+        public UmbracoTestOptions.PluginManager PluginManager { get => _pluginManager.ValueOrDefault(UmbracoTestOptions.PluginManager.Default); set => _pluginManager.Set(value); }
+        private readonly Settable<UmbracoTestOptions.PluginManager> _pluginManager = new Settable<UmbracoTestOptions.PluginManager>();
 
         #endregion
 
@@ -85,10 +86,10 @@ namespace Umbraco.Tests.Testing
         private UmbracoTestAttribute Merge(UmbracoTestAttribute other)
         {
             _autoMapper.Set(other._autoMapper);
-            _resetPluginManager.Set(other._resetPluginManager);
             _facadeServiceRepositoryEvents.Set(other._facadeServiceRepositoryEvents);
             _logger.Set(other._logger);
             _database.Set(other._database);
+            _pluginManager.Set(other._pluginManager);
             return this;
         }
 

@@ -24,28 +24,28 @@ namespace Umbraco.Web
         /// Returns all available IAction in application
         /// </summary>
         /// <returns></returns>
-        internal static IEnumerable<Type> ResolveActions(this PluginManager resolver)
+        internal static IEnumerable<Type> ResolveActions(this TypeLoader resolver)
         {
-            return resolver.ResolveTypes<IAction>();
+            return resolver.GetTypes<IAction>();
         }
         /// <summary>
         /// Returns all available TreeApiController's in application that are attribute with TreeAttribute
         /// </summary>
         /// <param name="resolver"></param>
         /// <returns></returns>
-        internal static IEnumerable<Type> ResolveAttributedTreeControllers(this PluginManager resolver)
+        internal static IEnumerable<Type> ResolveAttributedTreeControllers(this TypeLoader resolver)
         {
-            return resolver.ResolveTypesWithAttribute<TreeController, TreeAttribute>();
+            return resolver.GetTypesWithAttribute<TreeController, TreeAttribute>();
         }
 
-        internal static IEnumerable<Type> ResolveSurfaceControllers(this PluginManager resolver)
+        internal static IEnumerable<Type> ResolveSurfaceControllers(this TypeLoader resolver)
 		{
-			return resolver.ResolveTypes<SurfaceController>();
+			return resolver.GetTypes<SurfaceController>();
 		}
 
-        internal static IEnumerable<Type> ResolveUmbracoApiControllers(this PluginManager resolver)
+        internal static IEnumerable<Type> ResolveUmbracoApiControllers(this TypeLoader resolver)
         {
-            return resolver.ResolveTypes<UmbracoApiController>();
+            return resolver.GetTypes<UmbracoApiController>();
         }
 
 		/// <summary>
@@ -53,9 +53,9 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveTrees(this PluginManager resolver)
+		internal static IEnumerable<Type> ResolveTrees(this TypeLoader resolver)
 		{
-			return resolver.ResolveTypes<BaseTree>();
+			return resolver.GetTypes<BaseTree>();
 		}
 
 
@@ -64,9 +64,9 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveXsltExtensions(this PluginManager resolver)
+		internal static IEnumerable<Type> ResolveXsltExtensions(this TypeLoader resolver)
 		{
-			return resolver.ResolveAttributedTypes<Umbraco.Core.Macros.XsltExtensionAttribute>();
+			return resolver.GetAttributedTypes<Umbraco.Core.Macros.XsltExtensionAttribute>();
 		}
 
 		/// <summary>
@@ -74,9 +74,9 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveThumbnailProviders(this PluginManager resolver)
+		internal static IEnumerable<Type> ResolveThumbnailProviders(this TypeLoader resolver)
 		{
-			return resolver.ResolveTypes<IThumbnailProvider>();
+			return resolver.GetTypes<IThumbnailProvider>();
 		}
 
         /// <summary>
@@ -84,9 +84,9 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="resolver"></param>
         /// <returns></returns>
-        internal static IEnumerable<Type> ResolveImageUrlProviders(this PluginManager resolver)
+        internal static IEnumerable<Type> ResolveImageUrlProviders(this TypeLoader resolver)
         {
-            return resolver.ResolveTypes<IImageUrlProvider>();
+            return resolver.GetTypes<IImageUrlProvider>();
         }
 
     }

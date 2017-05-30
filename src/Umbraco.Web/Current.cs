@@ -196,7 +196,7 @@ namespace Umbraco.Web
 
         public static IRuntimeState RuntimeState => CoreCurrent.RuntimeState;
 
-        public static PluginManager PluginManager => CoreCurrent.PluginManager;
+        public static TypeLoader TypeLoader => CoreCurrent.TypeLoader;
 
         public static UrlSegmentProviderCollection UrlSegmentProviders => CoreCurrent.UrlSegmentProviders;
 

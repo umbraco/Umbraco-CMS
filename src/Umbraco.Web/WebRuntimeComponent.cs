@@ -54,7 +54,7 @@ namespace Umbraco.Web
 
             composition.Container.RegisterFrom<WebModelMappersCompositionRoot>();
 
-            var pluginManager = composition.Container.GetInstance<PluginManager>();
+            var pluginManager = composition.Container.GetInstance<TypeLoader>();
             var logger = composition.Container.GetInstance<ILogger>();
             var proflog = composition.Container.GetInstance<ProfilingLogger>();
 
@@ -105,7 +105,7 @@ namespace Umbraco.Web
                 .AddExtensionObjectProducer(() => pluginManager.ResolveXsltExtensions());
 
             composition.Container.RegisterCollectionBuilder<EditorValidatorCollectionBuilder>()
-                .Add(() => pluginManager.ResolveTypes<IEditorValidator>());
+                .Add(() => pluginManager.GetTypes<IEditorValidator>());
 
             // set the default RenderMvcController
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
@@ -165,7 +165,7 @@ namespace Umbraco.Web
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             composition.Container.RegisterCollectionBuilder<HealthCheckCollectionBuilder>()
-                .Add(() => pluginManager.ResolveTypes<HealthCheck.HealthCheck>());
+                .Add(() => pluginManager.GetTypes<HealthCheck.HealthCheck>());
 
             // auto-register views
             composition.Container.RegisterAuto(typeof(UmbracoViewPage<>));

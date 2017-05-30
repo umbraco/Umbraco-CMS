@@ -15,6 +15,10 @@ namespace Umbraco.Core.DI
         where TBuilder : WeightedCollectionBuilderBase<TBuilder, TCollection, TItem>
         where TCollection : IBuilderCollection<TItem>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WeightedCollectionBuilderBase{TBuilder,TCollection,TItem}"/> class.
+        /// </summary>
+        /// <param name="container"></param>
         protected WeightedCollectionBuilderBase(IServiceContainer container)
             : base(container)
         { }

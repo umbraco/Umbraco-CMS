@@ -19,6 +19,9 @@ namespace Umbraco.Core.DI
         private readonly List<Func<IServiceFactory, IEnumerable<Type>>> _producers2 = new List<Func<IServiceFactory, IEnumerable<Type>>>();
         private readonly List<Type> _excluded = new List<Type>();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LazyCollectionBuilderBase{TBuilder,TCollection,TItem}"/> class.
+        /// </summary>
         protected LazyCollectionBuilderBase(IServiceContainer container)
             : base(container)
         { }

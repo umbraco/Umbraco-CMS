@@ -408,7 +408,7 @@ namespace Umbraco.Web.Services
                     var added = new List<string>();
 
                     // Load all Controller Trees by attribute
-                    var types = Current.PluginManager.ResolveTypesWithAttribute<TreeController, TreeAttribute>(); // fixme inject
+                    var types = Current.TypeLoader.GetTypesWithAttribute<TreeController, TreeAttribute>(); // fixme inject
                     //convert them to ApplicationTree instances
                     var items = types
                         .Select(x =>

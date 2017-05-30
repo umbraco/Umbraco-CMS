@@ -140,7 +140,7 @@ namespace umbraco.cms.presentation.Trees
                     if (_ensureTrees == false)
                     {
 
-                        var foundITrees = Current.PluginManager.ResolveTrees();
+                        var foundITrees = Current.TypeLoader.ResolveTrees();
 
                         var appTrees = Current.Services.ApplicationTreeService.GetAll().ToList();
                         var apps = Current.Services.SectionService.GetSections().ToList();

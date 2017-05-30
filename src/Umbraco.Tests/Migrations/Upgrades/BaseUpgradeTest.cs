@@ -94,8 +94,6 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [TearDown]
         public virtual void TearDown()
         {
-            Current.PluginManager = null;
-			
             TestHelper.CleanContentDirectories();
 
             Path = TestHelper.CurrentAssemblyDirectory;

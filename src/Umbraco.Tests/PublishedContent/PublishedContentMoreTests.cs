@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Web.Routing;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
 using Umbraco.Core.Plugins;
@@ -13,38 +12,35 @@ using Umbraco.Web.Security;
 using Umbraco.Core.DI;
 using Current = Umbraco.Core.DI.Current;
 using LightInject;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.PublishedContent
 {
     [TestFixture]
+    [UmbracoTest(PluginManager = UmbracoTestOptions.PluginManager.PerFixture)]
     public class PublishedContentMoreTests : PublishedContentTestBase
     {
-
         // read http://stackoverflow.com/questions/7713326/extension-method-that-works-on-ienumerablet-and-iqueryablet
         // and http://msmvps.com/blogs/jon_skeet/archive/2010/10/28/overloading-and-generic-constraints.aspx
         // and http://blogs.msdn.com/b/ericlippert/archive/2009/12/10/constraints-are-not-part-of-the-signature.aspx
 
-        private PluginManager _pluginManager;
-
-        public override void SetUp()
-        {
-            base.SetUp();
-
-            // this is so the model factory looks into the test assembly
-            _pluginManager = Current.PluginManager;
-            Current.PluginManager = new PluginManager(new NullCacheProvider(), ProfilingLogger, false)
-                {
-                    AssembliesToScan = _pluginManager.AssembliesToScan
-                        .Union(new[] { typeof (PublishedContentMoreTests).Assembly})
-                };
-
-            InitializeUmbracoContext();
-        }
-
         protected override void Compose()
         {
             base.Compose();
-            Container.RegisterSingleton<IPublishedContentModelFactory>(f => new PublishedContentModelFactory(f.GetInstance<PluginManager>().ResolveTypes<PublishedContentModel>()));
+
+            Container.RegisterSingleton<IPublishedContentModelFactory>(f => new PublishedContentModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
+        }
+
+        protected override TypeLoader CreatePluginManager(IServiceFactory f)
+        {
+            var pluginManager = base.CreatePluginManager(f);
+
+            // this is so the model factory looks into the test assembly
+            pluginManager.AssembliesToScan = pluginManager.AssembliesToScan
+                .Union(new[] { typeof (PublishedContentMoreTests).Assembly })
+                .ToList();
+
+            return pluginManager;
         }
 
         private void InitializeUmbracoContext()
@@ -71,7 +67,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.TearDown();
 
-            Core.DI.Current.Reset();
+            Current.Reset();
         }
 
         [Test]
@@ -184,19 +180,19 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(2, result[1].Id);
         }
 
-        static SolidFacade CreateFacade()
+        private static SolidFacade CreateFacade()
         {
             var caches = new SolidFacade();
             var cache = caches.InnerContentCache;
 
             var props = new[]
-                    {
-                        new PublishedPropertyType("prop1", 1, "?"),
-                    };
+            {
+                new PublishedPropertyType("prop1", 1, "?"),
+            };
 
             var contentType1 = new PublishedContentType(1, "ContentType1", Enumerable.Empty<string>(), props);
             var contentType2 = new PublishedContentType(2, "ContentType2", Enumerable.Empty<string>(), props);
-            var contentType2s = new PublishedContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), props);
+            var contentType2Sub = new PublishedContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), props);
 
             cache.Add(new SolidPublishedContent(contentType1)
                 {
@@ -210,15 +206,15 @@ namespace Umbraco.Tests.PublishedContent
                     ParentId = -1,
                     ChildIds = new int[] {},
                     Properties = new Collection<IPublishedProperty>
+                    {
+                        new SolidPublishedProperty
                         {
-                            new SolidPublishedProperty
-                                {
-                                    PropertyTypeAlias = "prop1",
-                                    HasValue = true,
-                                    Value = 1234,
-                                    SourceValue = "1234"
-                                }
+                            PropertyTypeAlias = "prop1",
+                            HasValue = true,
+                            Value = 1234,
+                            SourceValue = "1234"
                         }
+                    }
                 });
 
             cache.Add(new SolidPublishedContent(contentType2)
@@ -233,18 +229,18 @@ namespace Umbraco.Tests.PublishedContent
                     ParentId = -1,
                     ChildIds = new int[] { },
                     Properties = new Collection<IPublishedProperty>
-                            {
-                                new SolidPublishedProperty
-                                    {
-                                        PropertyTypeAlias = "prop1",
-                                        HasValue = true,
-                                        Value = 1234,
-                                        SourceValue = "1234"
-                                    }
-                            }
+                    {
+                        new SolidPublishedProperty
+                        {
+                            PropertyTypeAlias = "prop1",
+                            HasValue = true,
+                            Value = 1234,
+                            SourceValue = "1234"
+                        }
+                    }
                 });
 
-            cache.Add(new SolidPublishedContent(contentType2s)
+            cache.Add(new SolidPublishedContent(contentType2Sub)
             {
                 Id = 3,
                 SortOrder = 2,
@@ -256,15 +252,15 @@ namespace Umbraco.Tests.PublishedContent
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
-                            {
-                                new SolidPublishedProperty
-                                    {
-                                        PropertyTypeAlias = "prop1",
-                                        HasValue = true,
-                                        Value = 1234,
-                                        SourceValue = "1234"
-                                    }
-                            }
+                {
+                    new SolidPublishedProperty
+                    {
+                        PropertyTypeAlias = "prop1",
+                        HasValue = true,
+                        Value = 1234,
+                        SourceValue = "1234"
+                    }
+                }
             });
 
             return caches;

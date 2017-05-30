@@ -11,7 +11,7 @@ namespace Umbraco.Tests.DI
 {
     public abstract class ResolverBaseTest // fixme rename, do something!
     {
-        protected PluginManager PluginManager { get; private set; }
+        protected TypeLoader TypeLoader { get; private set; }
         protected ProfilingLogger ProfilingLogger { get; private set; }
 
         [SetUp]
@@ -19,7 +19,7 @@ namespace Umbraco.Tests.DI
         {
             ProfilingLogger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
 
-            PluginManager = new PluginManager(new NullCacheProvider(),
+            TypeLoader = new TypeLoader(new NullCacheProvider(),
                 ProfilingLogger,
                 false)
             {

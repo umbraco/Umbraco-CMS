@@ -667,7 +667,7 @@ namespace Umbraco.Web.Macros
                 }
 
             // get types marked with XsltExtension attribute
-            var foundExtensions = PluginManager.Current.ResolveXsltExtensions();
+            var foundExtensions = TypeLoader.Current.ResolveXsltExtensions();
             foreach (var xsltType in foundExtensions)
             {
                 var attributes = xsltType.GetCustomAttributes<XsltExtensionAttribute>(true);

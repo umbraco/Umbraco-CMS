@@ -82,7 +82,7 @@ namespace Umbraco.Tests.TestHelpers
 
             Container.GetInstance<PropertyEditorCollectionBuilder>()
                 .Clear()
-                .Add(f => f.GetInstance<PluginManager>().ResolvePropertyEditors());
+                .Add(f => f.GetInstance<TypeLoader>().GetPropertyEditors());
 
             Container.RegisterSingleton(f =>
             {
