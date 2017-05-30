@@ -244,11 +244,12 @@
             </div>
 
             <!-- Pagination -->
-            <div class="flex justify-center">
+            <div ng-if="!vm.loading" class="flex justify-center">
                 <umb-pagination
                     ng-if="vm.usersOptions.totalPages"
                     page-number="vm.usersOptions.pageNumber"
-                    total-pages="vm.usersOptions.totalPages">
+                    total-pages="vm.usersOptions.totalPages"
+                    on-change="vm.changePageNumber(pageNumber)">
                 </umb-pagination>
             </div>
 

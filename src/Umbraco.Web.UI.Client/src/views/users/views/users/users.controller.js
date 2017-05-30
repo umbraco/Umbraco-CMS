@@ -70,6 +70,7 @@
         vm.areAllSelected = areAllSelected;
         vm.searchUsers = searchUsers;
         vm.setOrderByFilter = setOrderByFilter;
+        vm.changePageNumber = changePageNumber;
         vm.createUser = createUser;
         vm.inviteUser = inviteUser;
 
@@ -206,6 +207,11 @@
 
         function setOrderByFilter(value) {
             vm.usersOptions.orderBy = value;
+            getUsers();
+        }
+
+        function changePageNumber(pageNumber) {
+            vm.usersOptions.pageNumber = pageNumber;
             getUsers();
         }
 
