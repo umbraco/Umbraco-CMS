@@ -115,7 +115,7 @@ namespace Umbraco.Web
 			return template == null ? string.Empty : template.Alias;
 		}
 
-        public static bool IsTemplateAllowed(this IPublishedContent content, int templateId)
+        public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
         {
             if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == true)
                 return content.TemplateId == templateId;
@@ -131,26 +131,14 @@ namespace Umbraco.Web
 
             return true;
         }
-        public static bool IsTemplateAllowed(this IPublishedContent content, string templateAlias)
+        public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
         {
-            var contentTemplateAlias = content.GetTemplateAlias();
-            //I assume it is enough to compare aliases, as you can not have different templates with the same alias
-            var matchingAlias = contentTemplateAlias.Equals(templateAlias, StringComparison.InvariantCultureIgnoreCase);
+            var template = ApplicationContext.Current.Services.FileService.GetTemplate(templateAlias);
+            var isAllowedTemplate = (template != null) ?
+                    content.IsAllowedTemplate(template.Id) :
+                    false;
 
-            if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == true)
-                return matchingAlias;
-
-            if (matchingAlias == false && UmbracoConfig.For.UmbracoSettings().WebRouting.ValidateAlternativeTemplates == true)
-            {
-                var publishedContentContentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(content.ContentType.Id);
-                if (publishedContentContentType == null)
-                    throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
-
-                //This doesn't appear to be working because new templates aren't in AllowedTemplates
-                return publishedContentContentType.IsAllowedTemplate(templateAlias);
-            }
-
-            return true;
+            return isAllowedTemplate;
         }
 
         #endregion

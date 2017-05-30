@@ -647,7 +647,7 @@ namespace Umbraco.Web.Routing
 					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Has a template already, but also an alternate template.", () => tracePrefix);
 				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Look for alternate template alias=\"{1}\"", () => tracePrefix, () => altTemplate);
 
-                if (_pcr.PublishedContent.IsTemplateAllowed(altTemplate))
+                if (_pcr.PublishedContent.IsAllowedTemplate(altTemplate))
                 {
                     var template = ApplicationContext.Current.Services.FileService.GetTemplate(altTemplate);
                     if (template != null)

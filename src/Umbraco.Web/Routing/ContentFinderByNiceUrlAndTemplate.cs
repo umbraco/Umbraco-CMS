@@ -44,7 +44,7 @@ namespace Umbraco.Web.Routing
                     var route = docRequest.HasDomain ? (docRequest.Domain.RootNodeId.ToString() + path) : path;
                     node = FindContent(docRequest, route);
 
-                    if (node.IsTemplateAllowed(template.Id))
+                    if (node.IsAllowedTemplate(template.Id))
                     {
                         docRequest.TemplateModel = template;
                     }
