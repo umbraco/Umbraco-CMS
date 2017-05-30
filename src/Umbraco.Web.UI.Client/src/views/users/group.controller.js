@@ -13,6 +13,7 @@
         vm.openSectionPicker = openSectionPicker;
         vm.openContentPicker = openContentPicker;
         vm.openMediaPicker = openMediaPicker;
+        vm.openUserPicker = openUserPicker;
         vm.removeSelectedItem = removeSelectedItem;
         vm.getUserStateType = getUserStateType;
 
@@ -80,6 +81,28 @@
                 close: function(oldModel) {
                     vm.contentPicker.show = false;
                     vm.contentPicker = null;
+                }
+            };
+        }
+
+        function openUserPicker() {
+            vm.userPicker = {
+                title: "Select users",
+                view: "userpicker",
+                selection: vm.userGroup.users,
+                show: true,
+                submit: function(model) {
+                    /*
+                    if(model.selection) {
+                        vm.userGroup.startNodesMedia = model.selection;
+                    }
+                    */
+                    vm.userPicker.show = false;
+                    vm.userPicker = null;
+                },
+                close: function(oldModel) {
+                    vm.userPicker.show = false;
+                    vm.userPicker = null;
                 }
             };
         }

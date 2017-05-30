@@ -114,7 +114,7 @@
                                 <a href=""
                                     style="max-width: 100%;"
                                     class="umb-node-preview-add"
-                                    ng-click="vm.openMediaPicker()"
+                                    ng-click="vm.openUserPicker()"
                                     prevent-default>
                                     <localize key="general_add">Add</localize>
                                 </a>
@@ -187,6 +187,13 @@
         ng-if="vm.mediaPicker.show"
         model="vm.mediaPicker"
         view="vm.mediaPicker.view"
+        position="right">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.userPicker.show"
+        model="vm.userPicker"
+        view="vm.userPicker.view"
         position="right">
     </umb-overlay>
 

@@ -170,25 +170,25 @@
                 "icon": "icon-medal",
                 "users": [
                     {
-                        "id": "1",
+                        "id": 1,
                         "name": "Angela Stone",
                         "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/jina/128.jpg",
                         "state": "active"
                     },
                     {
-                        "id": "1",
+                        "id": 2,
                         "name": "Beverly Silva",
                         "avatar": "",
                         "state": "disabled"
                     },
                     {
-                        "id": "1",
+                        "id": 3,
                         "name": "Ruth Turner",
                         "avatar": "",
                         "state": "pending"
                     },
                     {
-                        "id": "1",
+                        "id": 4,
                         "name": "Arthur Welch",
                         "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/ashleyford/128.jpg",
                         "state": "active"
