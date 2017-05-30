@@ -6,6 +6,7 @@ using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Profiling;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {

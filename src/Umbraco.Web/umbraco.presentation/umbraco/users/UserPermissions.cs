@@ -5,6 +5,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.cms.presentation.user

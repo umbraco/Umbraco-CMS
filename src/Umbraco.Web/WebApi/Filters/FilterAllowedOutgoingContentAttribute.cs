@@ -7,6 +7,7 @@ using System.Reflection;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Core;
+using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.WebApi.Filters

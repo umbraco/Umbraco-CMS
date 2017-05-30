@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 

@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Templates

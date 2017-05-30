@@ -16,6 +16,7 @@ using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using System.Net.Http;
 using System.Text;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Editors
 {

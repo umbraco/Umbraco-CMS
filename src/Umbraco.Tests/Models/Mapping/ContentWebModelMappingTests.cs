@@ -14,7 +14,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Composing;
 using Umbraco.Tests.Testing;
-using Current = Umbraco.Web.Current;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Models.Mapping
 {

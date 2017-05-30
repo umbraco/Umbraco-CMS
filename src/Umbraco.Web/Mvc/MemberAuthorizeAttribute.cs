@@ -8,6 +8,7 @@ using Umbraco.Web.Security;
 using umbraco.cms.businesslogic.member;
 using AuthorizeAttribute = System.Web.Mvc.AuthorizeAttribute;
 using Umbraco.Core;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {

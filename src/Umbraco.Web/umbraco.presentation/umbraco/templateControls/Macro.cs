@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
 
 namespace umbraco.presentation.templateControls

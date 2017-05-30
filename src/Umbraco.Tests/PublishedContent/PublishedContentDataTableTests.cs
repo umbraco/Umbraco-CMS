@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.TestHelpers;
@@ -59,7 +60,7 @@ namespace Umbraco.Tests.PublishedContent
 			var umbracoContext = GetUmbracoContext("/test");
 
             //set the UmbracoContext.Current since the extension methods rely on it
-            Umbraco.Web.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
+            Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
         }
 
 		public override void TearDown()

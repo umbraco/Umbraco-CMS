@@ -11,6 +11,7 @@ using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.template;
 using umbraco.uicontrols;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
 
 namespace umbraco.cms.presentation.settings

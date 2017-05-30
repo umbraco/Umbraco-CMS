@@ -3,6 +3,7 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Install
 {

@@ -12,6 +12,7 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.cms.presentation.Trees

@@ -10,6 +10,7 @@ using umbraco;
 using Umbraco.Core;
 using Umbraco.Web.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web.WebApi;
 

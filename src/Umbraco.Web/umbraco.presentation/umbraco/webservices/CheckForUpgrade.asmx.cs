@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Web.WebServices;
 using Umbraco.Core.Configuration;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Install;
 
 

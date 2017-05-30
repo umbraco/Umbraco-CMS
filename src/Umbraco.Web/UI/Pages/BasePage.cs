@@ -9,6 +9,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 using System.Web.UI;
 using Umbraco.Core.Persistence;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.UI.Pages
 {

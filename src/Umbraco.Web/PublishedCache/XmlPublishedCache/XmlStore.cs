@@ -23,6 +23,7 @@ using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Scheduling;
 using Content = umbraco.cms.businesslogic.Content;
 using File = System.IO.File;

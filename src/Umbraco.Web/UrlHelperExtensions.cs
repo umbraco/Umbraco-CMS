@@ -8,6 +8,7 @@ using System.Web.Routing;
 using ClientDependency.Core.Config;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebServices;

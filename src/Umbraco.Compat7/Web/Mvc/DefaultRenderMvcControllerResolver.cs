@@ -1,5 +1,5 @@
 ﻿using System;
-using WebCurrent = Umbraco.Web.Current;
+using WebCurrent = Umbraco.Web.Composing.Current;
 
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Web.Mvc

@@ -76,7 +76,14 @@
     <PackageReference Include="SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="**\*.cs" Exclude="obj\**\*.cs;Constants-*.cs;Persistence\FaultHandling\RetryDbConnection.cs;Sync\ServerSyncWebServiceClient.cs" />
+    <!--
+    this does not fully work - breaks intellisense
+    Exclude="Constants-*.cs"
+    <Compile Include="Constants-*.cs">
+      <DependentUpon>Constants.cs</DependentUpon>
+    </Compile>
+    -->
+    <Compile Include="**\*.cs" Exclude="obj\**\*.cs;Persistence\FaultHandling\RetryDbConnection.cs;Sync\ServerSyncWebServiceClient.cs" />
     <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -85,9 +92,6 @@
     </Compile>
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
-    </Compile>
-    <Compile Include="Constants-*.cs">
-      <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

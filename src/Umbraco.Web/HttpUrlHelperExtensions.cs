@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Web.Http.Routing;
 using Umbraco.Core;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 

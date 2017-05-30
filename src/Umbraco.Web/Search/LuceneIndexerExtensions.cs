@@ -7,6 +7,7 @@ using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Umbraco.Core.Logging;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Search
 {

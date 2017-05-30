@@ -1,5 +1,6 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Trees
 {

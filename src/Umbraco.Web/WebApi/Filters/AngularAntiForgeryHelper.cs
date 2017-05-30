@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Web.Helpers;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.WebApi.Filters
 {

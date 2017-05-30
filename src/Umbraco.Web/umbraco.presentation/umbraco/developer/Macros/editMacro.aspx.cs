@@ -17,6 +17,7 @@ using Umbraco.Web.UI;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Core.Services;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace umbraco.cms.presentation.developer
 {

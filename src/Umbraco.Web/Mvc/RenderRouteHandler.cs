@@ -7,10 +7,11 @@ using System.Web.Routing;
 using System.Web.SessionState;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using System.Collections.Generic;
-using Umbraco.Core.Composing;
+using Current = Umbraco.Web.Composing.Current;
 using LightInject;
 
 namespace Umbraco.Web.Mvc

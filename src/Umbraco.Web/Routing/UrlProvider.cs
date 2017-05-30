@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Routing
 {

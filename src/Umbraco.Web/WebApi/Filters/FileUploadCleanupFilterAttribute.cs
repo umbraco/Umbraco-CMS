@@ -7,6 +7,7 @@ using System.Web.Http.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using File = System.IO.File;
 

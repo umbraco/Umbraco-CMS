@@ -5,6 +5,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using LightInject;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Routing
 {

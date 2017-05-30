@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Authentication;
 using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Web.Composing;
 using Umbraco.Web.UI;
 
 namespace Umbraco.Web._Legacy.UI

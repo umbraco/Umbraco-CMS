@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using System.Web.Http.Filters;
 using Umbraco.Core.Events;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.UI;
 

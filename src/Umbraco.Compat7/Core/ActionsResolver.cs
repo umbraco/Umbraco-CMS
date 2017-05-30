@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Web._Legacy.Actions;
-using WebCurrent = Umbraco.Web.Current;
+using WebCurrent = Umbraco.Web.Composing.Current;
 
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Core

@@ -21,6 +21,7 @@ using UmbracoExamine;
 using umbraco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
@@ -258,7 +259,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             catch (AlreadyClosedException)
             {
                 //If the app domain is shutting down and the site is under heavy load the index reader will be closed and it really cannot
-                //be re-opened since the app domain is shutting down. In this case we have no option but to try to load the data from the db.                    
+                //be re-opened since the app domain is shutting down. In this case we have no option but to try to load the data from the db.
             }
             return null;
         }

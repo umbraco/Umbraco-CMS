@@ -10,6 +10,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Composing;
 
 namespace umbraco
 {

@@ -11,6 +11,7 @@ using Umbraco.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.UI;
 
 namespace umbraco.cms.presentation.user

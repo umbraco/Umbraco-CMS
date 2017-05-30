@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Mvc

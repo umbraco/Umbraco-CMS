@@ -16,6 +16,7 @@ using System;
 using System.ComponentModel;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Editors
 {

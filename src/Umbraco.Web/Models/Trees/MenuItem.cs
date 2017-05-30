@@ -5,6 +5,7 @@ using Umbraco.Web.Trees;
 using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Models.Trees

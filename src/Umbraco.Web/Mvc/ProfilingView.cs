@@ -2,6 +2,7 @@ using System.IO;
 using System.Web.Mvc;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Core.Profiling
 {

@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 using Umbraco.Core;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web._Legacy.Actions;
 

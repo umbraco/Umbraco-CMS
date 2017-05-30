@@ -15,7 +15,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
-using Current = Umbraco.Web.Current;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Services
 {

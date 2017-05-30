@@ -5,6 +5,7 @@ using System.Web;
 using umbraco.cms.businesslogic.packager;
 using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web.Security;
 

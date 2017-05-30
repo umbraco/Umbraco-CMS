@@ -14,6 +14,7 @@ using umbraco.cms.businesslogic.language;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Services;
 using LightInject;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Templates
 {

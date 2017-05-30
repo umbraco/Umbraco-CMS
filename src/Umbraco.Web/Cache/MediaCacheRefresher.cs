@@ -7,6 +7,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Cache

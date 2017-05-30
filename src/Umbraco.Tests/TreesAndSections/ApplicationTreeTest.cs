@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Services;
-using Current = Umbraco.Web.Current;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.TreesAndSections
 {

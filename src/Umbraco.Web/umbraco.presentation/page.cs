@@ -16,6 +16,7 @@ using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace umbraco
 {

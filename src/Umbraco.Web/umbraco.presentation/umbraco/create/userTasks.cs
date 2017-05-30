@@ -5,6 +5,7 @@ using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.UI;
 using MembershipProviderExtensions = Umbraco.Core.Security.MembershipProviderExtensions;
 

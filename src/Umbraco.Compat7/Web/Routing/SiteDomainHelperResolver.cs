@@ -1,6 +1,6 @@
 ﻿using Umbraco.Core.Composing;
 using CoreCurrent = Umbraco.Core.Composing.Current;
-using WebCurrent = Umbraco.Web.Current;
+using WebCurrent = Umbraco.Web.Composing.Current;
 
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Web.Routing

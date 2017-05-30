@@ -3,6 +3,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Routing
 {

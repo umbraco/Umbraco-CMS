@@ -18,6 +18,7 @@ using Umbraco.Core.IO;
 using Umbraco.Web.Templates;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic;
+using Umbraco.Web.Composing;
 
 namespace umbraco
 {

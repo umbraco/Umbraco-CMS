@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.Actions;
 using Action = Umbraco.Web._Legacy.Actions.Action;
 

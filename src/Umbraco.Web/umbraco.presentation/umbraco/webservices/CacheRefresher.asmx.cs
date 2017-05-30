@@ -15,6 +15,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Security;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace umbraco.presentation.webservices
 {

@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache

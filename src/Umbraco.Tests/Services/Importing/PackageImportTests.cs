@@ -8,7 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using Current = Umbraco.Web.Current;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Services.Importing
 {

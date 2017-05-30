@@ -12,6 +12,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
 using Language = umbraco.cms.businesslogic.language.Language;
 

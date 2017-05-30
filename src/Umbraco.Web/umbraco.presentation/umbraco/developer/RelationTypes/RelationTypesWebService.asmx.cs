@@ -1,6 +1,7 @@
 ﻿using System.Web.Services;
 using Umbraco.Core;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace umbraco.cms.presentation.developer.RelationTypes
 {

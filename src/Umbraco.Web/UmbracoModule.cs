@@ -15,6 +15,7 @@ using Umbraco.Core.Collections;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 

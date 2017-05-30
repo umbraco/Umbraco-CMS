@@ -352,7 +352,7 @@ namespace Umbraco.Tests.TestHelpers
                 urlProviders ?? Enumerable.Empty<IUrlProvider>());
 
             if (setSingleton)
-                Umbraco.Web.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
+                Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
 
             return umbracoContext;
         }

@@ -12,7 +12,7 @@ using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using Current = Umbraco.Web.Current;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Testing.TestingTests
 {

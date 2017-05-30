@@ -59,7 +59,7 @@ namespace Umbraco.Tests.PublishedContent
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>());
 
-            Umbraco.Web.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
+            Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
         }
 
         public override void TearDown()

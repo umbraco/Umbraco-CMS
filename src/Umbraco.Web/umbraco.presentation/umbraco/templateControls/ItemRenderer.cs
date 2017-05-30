@@ -16,6 +16,7 @@ using Umbraco.Web.Templates;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace umbraco.presentation.templateControls
 {

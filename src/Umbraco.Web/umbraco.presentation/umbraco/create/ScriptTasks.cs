@@ -2,6 +2,7 @@ using Umbraco.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.UI;
 
 namespace umbraco

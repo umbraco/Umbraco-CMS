@@ -18,6 +18,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Scheduling;
 using LightInject;
 using Umbraco.Core.Exceptions;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Strategies
 {

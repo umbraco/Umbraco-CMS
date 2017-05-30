@@ -11,7 +11,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Tests.Testing;
-using Current = Umbraco.Web.Current;
+using Current = Umbraco.Web.Composing.Current;
 using LightInject;
 
 namespace Umbraco.Tests.Cache.PublishedCache

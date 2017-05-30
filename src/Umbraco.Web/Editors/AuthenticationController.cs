@@ -25,6 +25,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Web.Composing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 
 namespace Umbraco.Web.Editors

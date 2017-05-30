@@ -3,6 +3,7 @@ using umbraco.uicontrols.TreePicker;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace umbraco.controls
 {

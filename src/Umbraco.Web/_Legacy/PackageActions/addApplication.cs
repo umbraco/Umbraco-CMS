@@ -2,6 +2,7 @@ using System;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core._Legacy.PackageActions;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web._Legacy.PackageActions
 {

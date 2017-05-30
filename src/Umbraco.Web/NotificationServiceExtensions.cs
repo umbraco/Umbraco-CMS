@@ -9,6 +9,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Web._Legacy.Actions;
 using System.Collections.Generic;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web
 {

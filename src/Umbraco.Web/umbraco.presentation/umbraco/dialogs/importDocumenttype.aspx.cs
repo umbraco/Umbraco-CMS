@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace umbraco.presentation.umbraco.dialogs
 {

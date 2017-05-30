@@ -2,8 +2,7 @@
 using Umbraco.Core.Media;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Web.Media.ThumbnailProviders;
-using CoreCurrent = Umbraco.Core.Composing.Current;
-using WebCurrent = Umbraco.Web.Current;
+using WebCurrent = Umbraco.Web.Composing.Current;
 using LightInject;
 
 // ReSharper disable once CheckNamespace
@@ -16,7 +15,7 @@ namespace Umbraco.Web.Media
         { }
 
         public static ThumbnailProvidersResolver Current { get; }
-            = new ThumbnailProvidersResolver(CoreCurrent.Container.GetInstance<ThumbnailProviderCollectionBuilder>());
+            = new ThumbnailProvidersResolver(WebCurrent.Container.GetInstance<ThumbnailProviderCollectionBuilder>());
 
         public IEnumerable<IThumbnailProvider> Providers => WebCurrent.ThumbnailProviders;
 

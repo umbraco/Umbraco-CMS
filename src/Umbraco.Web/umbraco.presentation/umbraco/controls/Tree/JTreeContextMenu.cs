@@ -4,6 +4,7 @@ using System.Web.Script.Serialization;
 using Umbraco.Core.Logging;
 using Umbraco.Core;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.Actions;
 using Action = Umbraco.Web._Legacy.Actions.Action;
 

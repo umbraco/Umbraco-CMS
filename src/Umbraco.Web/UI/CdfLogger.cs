@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Logging;
+using Umbraco.Web.Composing;
 using ICdfLogger = ClientDependency.Core.Logging.ILogger;
 using ICoreLogger = Umbraco.Core.Logging.ILogger;
 

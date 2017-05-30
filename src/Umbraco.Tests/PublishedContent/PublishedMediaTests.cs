@@ -17,7 +17,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using UmbracoExamine;
-using Current = Umbraco.Web.Current;
+using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Tests.Testing;
 using LightInject;
 

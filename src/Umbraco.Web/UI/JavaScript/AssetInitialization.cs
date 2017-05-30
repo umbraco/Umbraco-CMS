@@ -8,6 +8,7 @@ using ClientDependency.Core;
 using ClientDependency.Core.Config;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Web.UI.JavaScript

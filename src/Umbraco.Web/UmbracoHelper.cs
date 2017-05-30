@@ -17,6 +17,7 @@ using System.Web.Mvc;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web
 {

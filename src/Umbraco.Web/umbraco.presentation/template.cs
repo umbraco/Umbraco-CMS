@@ -19,6 +19,7 @@ using umbraco.BusinessLogic;
 using Umbraco.Core.IO;
 using System.Web;
 using Umbraco.Core.Xml;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
 
 namespace umbraco

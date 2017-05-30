@@ -171,7 +171,7 @@ namespace Umbraco.Tests.Testing
         {
             // imported from TestWithSettingsBase
             // which was inherited by TestWithApplicationBase so pretty much used everywhere
-            Umbraco.Web.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
+            Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
         }
 
         protected virtual void ComposeCacheHelper()

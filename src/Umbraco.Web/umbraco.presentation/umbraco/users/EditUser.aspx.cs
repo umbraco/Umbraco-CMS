@@ -25,6 +25,7 @@ using Umbraco.Web.UI.Pages;
 using System.Text.RegularExpressions;
 using System.Text;
 using Umbraco.Core.Security;
+using Umbraco.Web.Composing;
 
 namespace umbraco.cms.presentation.user
 {

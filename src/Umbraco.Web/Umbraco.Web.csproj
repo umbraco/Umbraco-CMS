@@ -60,7 +60,8 @@
   </ItemGroup>
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
-    <PackageReference Include="AutoMapper" Version="4.2.1" /> <!-- do not update -->
+    <PackageReference Include="AutoMapper" Version="4.2.1" />
+    <!-- do not update -->
     <PackageReference Include="ClientDependency" Version="1.9.2" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="dotless" Version="1.5.2" />
@@ -129,7 +130,7 @@
     <Compile Include="AspNetHttpContextAccessor.cs" />
     <Compile Include="Cache\ContentCacheRefresher.cs" />
     <Compile Include="CompositionExtensions.cs" />
-    <Compile Include="Current.cs" />
+    <Compile Include="Composing\Current.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\EditorValidatorCollection.cs" />
     <Compile Include="Editors\EditorValidatorCollectionBuilder.cs" />

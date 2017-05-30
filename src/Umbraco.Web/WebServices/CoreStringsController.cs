@@ -1,6 +1,7 @@
 ﻿using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.WebServices

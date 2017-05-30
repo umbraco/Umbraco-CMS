@@ -5,6 +5,7 @@ using Microsoft.Owin.Security.Cookies;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Security.Identity
 {

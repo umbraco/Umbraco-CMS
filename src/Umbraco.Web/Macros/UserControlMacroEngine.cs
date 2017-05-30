@@ -6,6 +6,7 @@ using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Macros
 {

@@ -4,6 +4,7 @@ using Moq;
 using NUnit.Framework;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;

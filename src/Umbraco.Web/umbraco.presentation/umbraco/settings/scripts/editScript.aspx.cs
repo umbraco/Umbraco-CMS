@@ -8,6 +8,7 @@ using Umbraco.Core.IO;
 using umbraco.cms.presentation.Trees;
 using umbraco.uicontrols;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace umbraco.cms.presentation.settings.scripts
 {

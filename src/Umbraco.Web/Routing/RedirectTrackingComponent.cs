@@ -8,6 +8,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Redirects
 {

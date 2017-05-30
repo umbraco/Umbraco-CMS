@@ -19,15 +19,14 @@ using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core.Composing;
+using Current = Umbraco.Web.Composing.Current;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
-using IAuthorizationFilter = System.Web.Http.Filters.IAuthorizationFilter;
 using UrlHelper = System.Web.Http.Routing.UrlHelper;
 
 namespace Umbraco.Web.Trees
 {
     internal static class ApplicationTreeExtensions
     {
-
         internal static Attempt<Type> TryGetControllerTree(this ApplicationTree appTree)
         {
             //get reference to all TreeApiControllers

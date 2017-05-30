@@ -10,6 +10,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
 using Umbraco.Web._Legacy.Actions;
 

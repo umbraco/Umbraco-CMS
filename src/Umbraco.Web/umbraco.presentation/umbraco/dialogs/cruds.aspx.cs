@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Web;
 using umbraco.cms.businesslogic;
+using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web._Legacy.Actions;
 

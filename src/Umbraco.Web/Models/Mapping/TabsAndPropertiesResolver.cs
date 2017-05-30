@@ -8,6 +8,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Models.Mapping
 {

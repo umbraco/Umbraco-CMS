@@ -18,6 +18,7 @@ using Umbraco.Web;
 using Umbraco.Core.PropertyEditors;
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
+using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
 using MacroProperty = umbraco.cms.businesslogic.macro.MacroProperty;
 

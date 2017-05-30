@@ -3,6 +3,7 @@ using System.IO;
 using System.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
 {

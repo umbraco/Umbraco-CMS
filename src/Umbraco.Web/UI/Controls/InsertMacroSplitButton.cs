@@ -11,6 +11,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using umbraco.DataLayer;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.UI.Controls
 {

@@ -6,6 +6,7 @@ using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
 using Umbraco.Core.Security;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.UI.Pages
 {

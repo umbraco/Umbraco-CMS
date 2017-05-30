@@ -23,6 +23,7 @@ using Umbraco.Web.Templates;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.IO;
 using Umbraco.Core.Xml;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Language = umbraco.cms.businesslogic.language.Language;

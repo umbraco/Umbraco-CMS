@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Web;
 using umbraco.cms.businesslogic.packager;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps

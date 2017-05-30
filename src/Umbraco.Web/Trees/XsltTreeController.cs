@@ -2,6 +2,7 @@
 using System.IO;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Trees

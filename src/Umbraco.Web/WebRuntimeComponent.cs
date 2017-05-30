@@ -41,6 +41,7 @@ using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using Umbraco.Web._Legacy.Actions;
 using UmbracoExamine;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web
 {

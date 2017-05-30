@@ -11,6 +11,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Install.InstallSteps;
 using Umbraco.Web.Install.Models;
 

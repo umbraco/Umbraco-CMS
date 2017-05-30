@@ -5,6 +5,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web;
 using System.Web.UI;
 using System.Collections.Generic;
+using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
 
 namespace umbraco.cms.presentation

@@ -3,6 +3,7 @@ using System.Web.UI.WebControls;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using umbraco.presentation.create;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.UI.Umbraco.Create
 {

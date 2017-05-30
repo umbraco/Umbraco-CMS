@@ -134,7 +134,7 @@ namespace Umbraco.Web
         /// Gets the current Umbraco Context.
         /// </summary>
         // note: obsolete, use Current.UmbracoContext... then obsolete Current too, and inject!
-        public static UmbracoContext Current => Web.Current.UmbracoContext;
+        public static UmbracoContext Current => Composing.Current.UmbracoContext;
 
         /// <summary>
 		/// This is used internally for performance calculations, the ObjectCreated DateTime is set as soon as this
@@ -308,7 +308,7 @@ namespace Umbraco.Web
 
             // reset - important when running outside of http context
             // also takes care of the accessor
-            Web.Current.ClearUmbracoContext();
+            Composing.Current.ClearUmbracoContext();
 
             // help caches release resources
             // (but don't create caches just to dispose them)

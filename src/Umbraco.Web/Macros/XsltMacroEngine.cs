@@ -18,6 +18,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Xml.XPath;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.Macros

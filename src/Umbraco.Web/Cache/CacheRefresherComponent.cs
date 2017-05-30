@@ -16,6 +16,7 @@ using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services.Changes;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 using Umbraco.Web.Services;
 using Content = Umbraco.Core.Models.Content;

@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Serialization;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {

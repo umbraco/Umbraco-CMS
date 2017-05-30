@@ -10,6 +10,7 @@ using System.IO;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
 
 namespace umbraco.presentation.umbraco.developer.Xslt

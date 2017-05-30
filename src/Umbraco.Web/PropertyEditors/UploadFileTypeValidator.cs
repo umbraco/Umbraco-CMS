@@ -11,6 +11,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using umbraco;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.PropertyEditors
 {

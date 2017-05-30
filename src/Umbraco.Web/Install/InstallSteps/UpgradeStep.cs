@@ -2,6 +2,7 @@ using System;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps

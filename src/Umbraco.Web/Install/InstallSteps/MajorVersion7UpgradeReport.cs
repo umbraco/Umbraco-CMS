@@ -9,6 +9,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Install.Models;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Install.InstallSteps
 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.Http;
 using Umbraco.Core;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.WebApi
 {

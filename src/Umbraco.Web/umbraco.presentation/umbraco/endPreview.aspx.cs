@@ -3,6 +3,7 @@ using System.Web;
 using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 
 namespace umbraco.presentation

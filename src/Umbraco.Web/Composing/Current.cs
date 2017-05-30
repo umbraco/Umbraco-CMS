@@ -30,9 +30,9 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web._Legacy.Actions;
 using CoreCurrent = Umbraco.Core.Composing.Current;
 
-namespace Umbraco.Web
+namespace Umbraco.Web.Composing
 {
-    // see notes in Umbraco.Core.DependencyInjection.Current.
+    // see notes in Umbraco.Core.Composing.Current.
     public static class Current
     {
         private static readonly object Locker = new object();
@@ -55,7 +55,10 @@ namespace Umbraco.Web
             CoreCurrent.Reset();
         }
 
-        private static ServiceContainer Container
+        /// <summary>
+        /// Gets the DI container.
+        /// </summary>
+        internal static IServiceContainer Container
             => CoreCurrent.Container;
 
         #region Temp & Special
@@ -69,7 +72,7 @@ namespace Umbraco.Web
                 if (_umbracoContextAccessor != null) return _umbracoContextAccessor;
                 return _umbracoContextAccessor = Container.GetInstance<IUmbracoContextAccessor>();
             }
-            set { _umbracoContextAccessor = value; } // for tests
+            set => _umbracoContextAccessor = value; // for tests
         }
 
         // clears the "current" umbraco context
@@ -158,7 +161,7 @@ namespace Umbraco.Web
         // internal - can only be accessed through Composition at compose time
         internal static Type DefaultRenderMvcControllerType
         {
-            get { return _defaultRenderMvcControllerType; }
+            get => _defaultRenderMvcControllerType;
             set
             {
                 if (value.Implements<IRenderController>() == false)

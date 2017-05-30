@@ -1,12 +1,8 @@
 ﻿using System;
 using LightInject;
-using Umbraco.Core.Dictionary;
 using Umbraco.Core.Composing;
+using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Core.Macros;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Migrations;
-using Umbraco.Core.Sync;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Media;
@@ -14,7 +10,6 @@ using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Strategies.Migrations;
 using Umbraco.Web._Legacy.Actions;
 
 // the namespace here is intentional -  although defined in Umbraco.Web assembly,
@@ -141,7 +136,7 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         public static void SetDefaultRenderMvcControllerType<T>(this Composition composition)
         {
-            Web.Current.DefaultRenderMvcControllerType = typeof(T);
+            Current.DefaultRenderMvcControllerType = typeof(T);
         }
 
         /// <summary>
