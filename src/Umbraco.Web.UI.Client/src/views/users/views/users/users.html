@@ -163,9 +163,9 @@
                         <umb-badge
                             class="umb-user__badge"
                             size="xs"
-                            ng-if="user.state !== 'active'"
-                            color="{{vm.getUserStateType(user.state)}}">
-                            {{ user.state }}
+                            ng-if="user.userDisplayState.alias !== 'active'"
+                            color="{{user.userDisplayState.color}}">
+                            {{ user.userDisplayState.name }}
                         </umb-badge>
                         <div class="umb-user__avatar">
                             <umb-avatar
@@ -232,9 +232,9 @@
                             <td style="text-transform: capitalize;">
                                 <umb-badge
                                     size="xs"
-                                    ng-if="user.state !== 'active'"
-                                    color="{{vm.getUserStateType(user.state)}}">
-                                    {{ user.state }}
+                                    ng-if="user.userDisplayState.alias !== 'active'"
+                                    color="{{user.userDisplayState.color}}">
+                                    {{ user.userDisplayState.name }}
                                 </umb-badge>
                             </td>
                         </tr>
@@ -259,7 +259,7 @@
 
             <umb-editor-sub-header>
                 <umb-editor-sub-header-content-left>
-                    <a class="umb-package-details__back-link" href="" ng-click="vm.setUsersViewState('overview');">&larr; Take me back</a>
+                    <a class="umb-package-details__back-link" href="" ng-click="vm.setUsersViewState('overview');">&larr; Back to users</a>
                 </umb-editor-sub-header-content-left>
             </umb-editor-sub-header>
 
@@ -317,11 +317,14 @@
                     </umb-control-group>
 
                     <umb-control-group label="Message">
-                        <textarea type="text"
+                        <textarea 
+                            type="text"
                             class="input-block-level"
                             localize="placeholder" 
                             placeholder="@placeholders_entername" 
-                            ng-model="vm.newUser.message"></textarea>
+                            ng-model="vm.newUser.message"
+                            rows="4">
+                        </textarea>
                     </umb-control-group>
 
                     <umb-button
@@ -330,7 +333,8 @@
                         state="vm.page.createButtonState"
                         type="button"
                         action="vm.inviteUser()"
-                        label="Send invite">
+                        label="Send invite"
+                        size="m">
                     </umb-button>
 
                     <umb-button
@@ -339,12 +343,51 @@
                         state="vm.page.createButtonState"
                         type="button"
                         action="vm.createUser()"
-                        label="Create user">
+                        label="Create user"
+                        size="m">
                     </umb-button>
 
                 </ng-form>
-            </div>
 
+            </div>
+        </div>
+
+        <!-- Create user success -->
+        <div ng-if="vm.usersViewState === 'createUserSuccess'">
+            <umb-editor-sub-header>
+                <umb-editor-sub-header-content-left>
+                    <a class="umb-package-details__back-link" href="" ng-click="vm.setUsersViewState('overview');">&larr; Back to users</a>
+                </umb-editor-sub-header-content-left>
+            </umb-editor-sub-header>
+
+            <div class="flex justify-center">
+                <div style="max-width: 500px;" class="tc">
+                    <div class="flex justify-center" style="margin-bottom: 15px;">
+                        <umb-checkmark
+                            checked="vm.usersViewState === 'createUserSuccess'"
+                            size="xl">
+                        </umb-checkmark>
+                    </div>
+                    <h3 class="bold" style="margin-bottom: 0;">{{vm.newUser.name | umbWordLimit:1}} has been created</h3>
+                    <p style="line-height: 1.6em; margin-bottom: 30px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
+                    <div>
+                        <umb-button
+                            type="button"
+                            button-style="success"
+                            label="Set permissions for {{ vm.newUser.name | umbWordLimit:1 }}"
+                            action="vm.goToUser(vm.newUser);"
+                            size="m">
+                        </umb-button>
+                        <umb-button
+                            type="button"
+                            button-style="info"
+                            label="Create another user"
+                            action="vm.setUsersViewState('createUser');"
+                            size="m">
+                        </umb-button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <umb-overlay

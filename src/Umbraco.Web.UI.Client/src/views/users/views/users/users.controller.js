@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, usersResource, localizationService, contentEditingHelper) {
+    function UsersController($scope, $timeout, $location, usersResource, localizationService, contentEditingHelper, usersHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -133,7 +133,7 @@
             vm.selection = [];
         }
 
-        function goToUser(user, event) {
+        function goToUser(user) {
             $location.path('users/users/user/' + user.id);
         }
 
@@ -228,6 +228,9 @@
             }).then(function (saved) {
 
                 vm.page.createButtonState = "success";
+                vm.newUser = saved;
+                setUsersViewState('createUserSuccess');
+                clearAddUserForm();
 
             }, function (err) {
 
@@ -282,6 +285,7 @@
 
                 vm.userStates = getUserStates(vm.users);
                 formatDates(vm.users);
+                setUserDisplayState(vm.users);
 
                 vm.loading = false;
 
@@ -312,6 +316,12 @@
             return userStates;
         }
 
+        function setUserDisplayState(users) {
+            angular.forEach(users, function(user){
+                user.userDisplayState = usersHelper.getUserStateFromValue(user.userState);
+            });
+        }
+
         function formatDates(users) {
             angular.forEach(users, function (user) {
                 if (user.lastLoginDate) {
@@ -333,19 +343,29 @@
                     return;
                 }
 
-                if (user.state === "disabled") {
+                if(user.userDisplayState.alias === "disabled") {
                     vm.allowDisableUser = false;
                 }
 
-                if (user.state === "active") {
+                if(user.userDisplayState.alias === "active") {
                     vm.allowEnableUser = false;
                 }
 
-                if (user.state === "pending") {
+                if(user.userDisplayState.alias === "invited") {
                     vm.allowEnableUser = false;
                 }
 
             });
+        }
+
+        function clearAddUserForm() {
+            // clear form data
+            vm.newUser.name = "";
+            vm.newUser.email = "";
+            vm.newUser.userGroups = [];
+            vm.newUser.message = "";
+            // clear button state
+            vm.page.createButtonState = "init";
         }
 
 
