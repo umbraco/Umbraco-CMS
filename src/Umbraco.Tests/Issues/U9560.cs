@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Issues
             contentType.Name = "test";
             var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext, "prop") { Name = "Prop", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 };
             contentType.PropertyTypeCollection.Add(propertyType);
-            Core.DI.Current.Services.ContentTypeService.Save(contentType);
+            Core.Composing.Current.Services.ContentTypeService.Save(contentType);
 
             var aliasName = string.Empty;
 

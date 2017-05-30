@@ -1,4 +1,4 @@
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Events

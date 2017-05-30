@@ -12,7 +12,7 @@ using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using System.Diagnostics;
 using Umbraco.Core.Models;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Services;

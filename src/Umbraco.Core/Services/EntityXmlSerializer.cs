@@ -6,7 +6,7 @@ using System.Web;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;

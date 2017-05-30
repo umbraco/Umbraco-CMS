@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.ObjectResolution;
-using CoreCurrent = Umbraco.Core.DI.Current;
+using CoreCurrent = Umbraco.Core.Composing.Current;
 using WebCurrent = Umbraco.Web.Current;
 using LightInject;
 

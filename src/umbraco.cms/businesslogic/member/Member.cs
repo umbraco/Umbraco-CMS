@@ -16,7 +16,7 @@ using System.Web.Security;
 using System.Text;
 using System.Security.Cryptography;
 using System.Linq;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Xml;

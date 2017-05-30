@@ -6,7 +6,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 
 namespace umbraco.uicontrols.TreePicker

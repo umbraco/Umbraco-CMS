@@ -41,7 +41,7 @@ namespace Umbraco.Web.Templates
 		}
 
         // todo - inject!
-        private FacadeRouter FacadeRouter => Core.DI.Current.Container.GetInstance<FacadeRouter>();
+        private FacadeRouter FacadeRouter => Core.Composing.Current.Container.GetInstance<FacadeRouter>();
 
 
         /// <summary>

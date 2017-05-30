@@ -6,7 +6,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Services;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.Routing
 {

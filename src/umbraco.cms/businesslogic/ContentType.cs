@@ -12,7 +12,7 @@ using Umbraco.Core.Models.Rdbms;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Language = umbraco.cms.businesslogic.language.Language;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 

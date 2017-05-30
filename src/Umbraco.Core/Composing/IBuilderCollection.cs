@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Umbraco.Core.DI
+namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// Represents a builder collection, ie an immutable enumeration of items.

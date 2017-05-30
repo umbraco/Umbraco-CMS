@@ -25,7 +25,7 @@ using Umbraco.Web.Security;
 using Umbraco.Core.Plugins;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -55,15 +55,15 @@ namespace Umbraco.Tests.TestHelpers
 
         protected CacheHelper DisabledCache => _disabledCacheHelper ?? (_disabledCacheHelper = CacheHelper.CreateDisabledCacheHelper());
 
-        protected IScopeUnitOfWorkProvider UowProvider => Core.DI.Current.Container.GetInstance<IScopeUnitOfWorkProvider>();
+        protected IScopeUnitOfWorkProvider UowProvider => Core.Composing.Current.Container.GetInstance<IScopeUnitOfWorkProvider>();
 
         protected PublishedContentTypeCache ContentTypesCache { get; private set; }
 
         protected override ISqlSyntaxProvider SqlSyntax => GetSyntaxProvider();
 
-        protected ServiceContext ServiceContext => Core.DI.Current.Services;
+        protected ServiceContext ServiceContext => Core.Composing.Current.Services;
 
-        protected IScopeProvider ScopeProvider => Core.DI.Current.ScopeProvider;
+        protected IScopeProvider ScopeProvider => Core.Composing.Current.ScopeProvider;
 
         public override void SetUp()
         {
@@ -240,18 +240,18 @@ namespace Umbraco.Tests.TestHelpers
                 var cache = new NullCacheProvider();
 
                 ContentTypesCache = new PublishedContentTypeCache(
-                        Core.DI.Current.Services.ContentTypeService,
-                        Core.DI.Current.Services.MediaTypeService,
-                        Core.DI.Current.Services.MemberTypeService,
-                        Core.DI.Current.Logger);
+                        Core.Composing.Current.Services.ContentTypeService,
+                        Core.Composing.Current.Services.MediaTypeService,
+                        Core.Composing.Current.Services.MemberTypeService,
+                        Core.Composing.Current.Logger);
 
                 // testing=true so XmlStore will not use the file nor the database
                 var facadeAccessor = new TestFacadeAccessor();
                 var service = new FacadeService(
-                    Core.DI.Current.Services,
-                    (IScopeProviderInternal) Core.DI.Current.ScopeProvider,
+                    Core.Composing.Current.Services,
+                    (IScopeProviderInternal) Core.Composing.Current.ScopeProvider,
                     UowProvider,
-                    cache, facadeAccessor, Core.DI.Current.Logger, ContentTypesCache, null, true, Options.FacadeServiceRepositoryEvents);
+                    cache, facadeAccessor, Core.Composing.Current.Logger, ContentTypesCache, null, true, Options.FacadeServiceRepositoryEvents);
 
                 // initialize PublishedCacheService content with an Xml source
                 service.XmlStore.GetXmlDocument = () =>
@@ -321,7 +321,7 @@ namespace Umbraco.Tests.TestHelpers
             }
             catch (Exception ex)
             {
-                Core.DI.Current.Logger.Error<TestWithDatabaseBase>("Could not remove the old database file", ex);
+                Core.Composing.Current.Logger.Error<TestWithDatabaseBase>("Could not remove the old database file", ex);
 
                 // swallow this exception - that's because a sub class might require further teardown logic
                 onFail?.Invoke(ex);
@@ -348,7 +348,7 @@ namespace Umbraco.Tests.TestHelpers
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 service,
-                new WebSecurity(httpContext, Core.DI.Current.Services.UserService),
+                new WebSecurity(httpContext, Core.Composing.Current.Services.UserService),
                 umbracoSettings ?? SettingsForTests.GetDefault(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>());
 

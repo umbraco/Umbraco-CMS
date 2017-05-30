@@ -5,7 +5,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Dashboard;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Configuration

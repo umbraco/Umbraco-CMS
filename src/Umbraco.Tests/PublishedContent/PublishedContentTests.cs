@@ -9,8 +9,8 @@ using Umbraco.Core.Plugins;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Core.DI;
-using Current = Umbraco.Core.DI.Current;
+using Umbraco.Core.Composing;
+using Current = Umbraco.Core.Composing.Current;
 using LightInject;
 using Umbraco.Tests.Testing;
 

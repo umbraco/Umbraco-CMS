@@ -9,8 +9,8 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
-using Umbraco.Core.DI;
-using Umbraco.Core.DI.CompositionRoots;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Composing.CompositionRoots;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -31,7 +31,7 @@ using Umbraco.Web;
 using Umbraco.Web.DI;
 using Umbraco.Web.Services;
 using UmbracoExamine;
-using Current = Umbraco.Core.DI.Current;
+using Current = Umbraco.Core.Composing.Current;
 
 namespace Umbraco.Tests.Testing
 {

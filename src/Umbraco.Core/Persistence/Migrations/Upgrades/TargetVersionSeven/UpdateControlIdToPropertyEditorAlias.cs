@@ -1,6 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 

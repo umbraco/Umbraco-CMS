@@ -10,7 +10,7 @@ using Lucene.Net.Analysis;
 using Lucene.Net.Index;
 using Lucene.Net.Store;
 using Umbraco.Core;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Directory = System.IO.Directory;

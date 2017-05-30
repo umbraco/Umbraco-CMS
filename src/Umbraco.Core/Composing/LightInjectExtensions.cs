@@ -5,7 +5,7 @@ using System.Reflection;
 using LightInject;
 using Umbraco.Core.Exceptions;
 
-namespace Umbraco.Core.DI
+namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// Provides extensions to LightInject.

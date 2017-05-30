@@ -15,7 +15,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Core._Legacy.PackageActions;
 
-namespace Umbraco.Core.DI
+namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// Provides a static service locator for most singletons.

@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Persistence.Mappers
 {

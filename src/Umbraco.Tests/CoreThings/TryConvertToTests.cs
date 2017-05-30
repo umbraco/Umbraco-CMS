@@ -3,7 +3,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.CoreThings

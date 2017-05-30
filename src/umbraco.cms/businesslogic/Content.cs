@@ -10,7 +10,7 @@ using Umbraco.Core.Models.EntityBase;
 using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
 using umbraco.BusinessLogic;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Media;

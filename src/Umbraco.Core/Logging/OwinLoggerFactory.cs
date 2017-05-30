@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Owin.Logging;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Logging
 {

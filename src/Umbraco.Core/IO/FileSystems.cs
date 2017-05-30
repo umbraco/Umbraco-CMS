@@ -39,7 +39,7 @@ namespace Umbraco.Core.IO
         // DI wants a public ctor
         // but IScopeProviderInternal is not public
         public FileSystems(/*IScopeProviderInternal scopeProvider,*/ ILogger logger)
-            : this(DI.Current.ScopeProvider as IScopeProviderInternal, logger)
+            : this(Composing.Current.ScopeProvider as IScopeProviderInternal, logger)
         { }
 
         internal FileSystems(IScopeProviderInternal scopeProvider, ILogger logger)

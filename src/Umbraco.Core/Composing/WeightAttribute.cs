@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.DI
+namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// Specifies the weight of pretty much anything.

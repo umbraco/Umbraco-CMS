@@ -396,7 +396,7 @@ namespace Umbraco.Web.Mvc
             if (request.HasTemplate == false && routeDef.HasHijackedRoute == false)
             {
                 // fixme - better find a way to inject that engine? or at least Current.Engine of some sort!
-                var engine = Core.DI.Current.Container.GetInstance<FacadeRouter>();
+                var engine = Core.Composing.Current.Container.GetInstance<FacadeRouter>();
                 request.UpdateOnMissingTemplate(); // request will go 404
 
                 // HandleHttpResponseStatus returns a value indicating that the request should

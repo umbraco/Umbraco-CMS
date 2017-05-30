@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
 using umbraco.DataLayer;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 
 
 namespace umbraco.cms.businesslogic.task

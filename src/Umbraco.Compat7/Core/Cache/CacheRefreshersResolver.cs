@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.ObjectResolution;
-using CoreCurrent = Umbraco.Core.DI.Current;
+using CoreCurrent = Umbraco.Core.Composing.Current;
 using LightInject;
 
 // ReSharper disable once CheckNamespace

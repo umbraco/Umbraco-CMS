@@ -28,7 +28,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using Umbraco.Web._Legacy.Actions;
-using CoreCurrent = Umbraco.Core.DI.Current;
+using CoreCurrent = Umbraco.Core.Composing.Current;
 
 namespace Umbraco.Web
 {

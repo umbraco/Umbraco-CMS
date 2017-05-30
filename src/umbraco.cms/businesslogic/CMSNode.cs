@@ -16,7 +16,7 @@ using System.ComponentModel;
 using Umbraco.Core.IO;
 using System.Collections;
 using umbraco.cms.businesslogic.task;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 using File = System.IO.File;
 

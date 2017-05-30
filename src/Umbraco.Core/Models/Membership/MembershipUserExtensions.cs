@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Web.Security;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 

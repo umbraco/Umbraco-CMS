@@ -1,6 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Components;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 

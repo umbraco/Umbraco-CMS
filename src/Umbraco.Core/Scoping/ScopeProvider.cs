@@ -5,7 +5,7 @@ using System.Data;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Web;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;

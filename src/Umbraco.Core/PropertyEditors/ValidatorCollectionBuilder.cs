@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LightInject;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.PropertyEditors
 {

@@ -3,7 +3,7 @@ using System.Collections;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;

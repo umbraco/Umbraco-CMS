@@ -18,7 +18,7 @@ using Examine.LuceneEngine.Faceting;
 using Examine.LuceneEngine.Indexing;
 using Lucene.Net.Documents;
 using Lucene.Net.Store;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Xml;
 using UmbracoExamine.LocalStorage;

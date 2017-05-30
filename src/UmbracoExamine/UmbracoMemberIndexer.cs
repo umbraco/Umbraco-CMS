@@ -13,7 +13,7 @@ using Examine;
 using System.IO;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;

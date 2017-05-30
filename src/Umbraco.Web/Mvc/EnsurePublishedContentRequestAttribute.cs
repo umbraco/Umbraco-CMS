@@ -73,7 +73,7 @@ namespace Umbraco.Web.Mvc
         protected UmbracoContext UmbracoContext => _umbracoContext ?? (_umbracoContext = UmbracoContext.Current);
 
         // todo - try lazy property injection?
-        private FacadeRouter FacadeRouter => Core.DI.Current.Container.GetInstance<FacadeRouter>();
+        private FacadeRouter FacadeRouter => Core.Composing.Current.Container.GetInstance<FacadeRouter>();
 
         /// <summary>
         /// Exposes an UmbracoHelper

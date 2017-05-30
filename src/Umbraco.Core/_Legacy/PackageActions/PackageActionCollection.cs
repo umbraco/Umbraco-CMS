@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core._Legacy.PackageActions
 {

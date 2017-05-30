@@ -16,7 +16,7 @@ using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
 using Examine.LuceneEngine.SearchCriteria;
 using Lucene.Net.Analysis;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using UmbracoExamine.LocalStorage;
 using Directory = Lucene.Net.Store.Directory;

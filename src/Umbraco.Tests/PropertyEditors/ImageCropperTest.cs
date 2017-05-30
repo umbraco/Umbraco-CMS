@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -84,7 +84,7 @@ namespace Umbraco.Tests.PropertyEditors
             }
             finally
             {
-                Core.DI.Current.Reset();
+                Core.Composing.Current.Reset();
             }
         }
 

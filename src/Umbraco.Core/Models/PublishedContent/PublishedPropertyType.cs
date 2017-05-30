@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models.PublishedContent

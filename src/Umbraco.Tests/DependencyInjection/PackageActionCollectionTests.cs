@@ -3,7 +3,7 @@ using System.Linq;
 using System.Xml;
 using LightInject;
 using NUnit.Framework;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Plugins;
 using Umbraco.Core._Legacy.PackageActions;
 

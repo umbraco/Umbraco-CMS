@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
 
 namespace Umbraco.Core.Services

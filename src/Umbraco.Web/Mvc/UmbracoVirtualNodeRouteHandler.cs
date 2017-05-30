@@ -11,7 +11,7 @@ namespace Umbraco.Web.Mvc
     public abstract class UmbracoVirtualNodeRouteHandler : IRouteHandler
     {
         // todo - try lazy property injection?
-        private FacadeRouter FacadeRouter => Core.DI.Current.Container.GetInstance<FacadeRouter>();
+        private FacadeRouter FacadeRouter => Core.Composing.Current.Container.GetInstance<FacadeRouter>();
 
         /// <summary>
         /// Returns the UmbracoContext for this route handler

@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.IO;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Xml;

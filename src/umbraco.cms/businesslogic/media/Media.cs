@@ -9,7 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 using System.Linq;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 
 namespace umbraco.cms.businesslogic.media

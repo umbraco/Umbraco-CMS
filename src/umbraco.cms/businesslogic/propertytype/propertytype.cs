@@ -10,7 +10,7 @@ using Umbraco.Core.Models;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Language = umbraco.cms.businesslogic.language.Language;
 
 namespace umbraco.cms.businesslogic.propertytype

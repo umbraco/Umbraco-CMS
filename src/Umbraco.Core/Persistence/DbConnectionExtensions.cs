@@ -5,7 +5,7 @@ using System.Data.SqlClient;
 using System.Data.SqlServerCe;
 using System.Linq;
 using MySql.Data.MySqlClient;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
 

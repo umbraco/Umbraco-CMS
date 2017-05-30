@@ -2,7 +2,7 @@
 using Umbraco.Core.Media;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Web.Media.ThumbnailProviders;
-using CoreCurrent = Umbraco.Core.DI.Current;
+using CoreCurrent = Umbraco.Core.Composing.Current;
 using WebCurrent = Umbraco.Web.Current;
 using LightInject;
 

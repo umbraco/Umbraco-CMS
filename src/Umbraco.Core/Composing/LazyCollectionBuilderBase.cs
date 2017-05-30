@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LightInject;
 
-namespace Umbraco.Core.DI
+namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// Implements a lazy collection builder.

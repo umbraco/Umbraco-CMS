@@ -1,7 +1,7 @@
 ﻿using System;
 using LightInject;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Mappers;

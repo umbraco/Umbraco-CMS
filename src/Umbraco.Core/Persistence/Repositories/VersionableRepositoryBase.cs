@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;

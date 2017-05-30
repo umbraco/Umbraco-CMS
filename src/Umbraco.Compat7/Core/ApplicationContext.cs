@@ -12,24 +12,24 @@ namespace Umbraco.Core
     {
         private ApplicationContext()
         {
-            DatabaseContext = new DatabaseContext(DI.Current.Container.GetInstance<IUmbracoDatabaseFactory>());
+            DatabaseContext = new DatabaseContext(Composing.Current.Container.GetInstance<IUmbracoDatabaseFactory>());
         }
 
         public static ApplicationContext Current { get; } = new ApplicationContext();
 
-        public CacheHelper ApplicationCache => DI.Current.ApplicationCache;
+        public CacheHelper ApplicationCache => Composing.Current.ApplicationCache;
 
-        public ProfilingLogger ProfilingLogger => DI.Current.ProfilingLogger;
+        public ProfilingLogger ProfilingLogger => Composing.Current.ProfilingLogger;
 
         public bool IsReady { get; } = true; // because... not accessible before we are ready
 
-        public bool IsConfigured => DI.Current.RuntimeState.Level == RuntimeLevel.Run;
+        public bool IsConfigured => Composing.Current.RuntimeState.Level == RuntimeLevel.Run;
 
-	    public bool IsUpgrading => DI.Current.RuntimeState.Level == RuntimeLevel.Upgrade;
+	    public bool IsUpgrading => Composing.Current.RuntimeState.Level == RuntimeLevel.Upgrade;
 
         public DatabaseContext DatabaseContext { get; }
 
-        public ServiceContext Services => DI.Current.Services;
+        public ServiceContext Services => Composing.Current.Services;
 
         public void Dispose()
         { }

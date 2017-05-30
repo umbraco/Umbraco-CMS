@@ -1,5 +1,5 @@
-﻿using Umbraco.Core.DI;
-using CoreCurrent = Umbraco.Core.DI.Current;
+﻿using Umbraco.Core.Composing;
+using CoreCurrent = Umbraco.Core.Composing.Current;
 using WebCurrent = Umbraco.Web.Current;
 
 // ReSharper disable once CheckNamespace

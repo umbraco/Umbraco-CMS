@@ -4,7 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using System.Linq;
 using System.Threading;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 

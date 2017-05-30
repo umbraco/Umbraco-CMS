@@ -1,5 +1,5 @@
 ﻿using Umbraco.Core.Components;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Plugins;
 using LightInject;

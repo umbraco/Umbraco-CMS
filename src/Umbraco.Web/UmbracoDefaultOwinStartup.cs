@@ -28,7 +28,7 @@ namespace Umbraco.Web
             app.SanitizeThreadCulture();
 
             // there's nothing we can do really
-            if (Core.DI.Current.RuntimeState.Level == RuntimeLevel.BootFailed)
+            if (Core.Composing.Current.RuntimeState.Level == RuntimeLevel.BootFailed)
                 return;
 
             ConfigureServices(app, Current.Services);

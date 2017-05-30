@@ -8,7 +8,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Tests.Testing;
 using LightInject;
 

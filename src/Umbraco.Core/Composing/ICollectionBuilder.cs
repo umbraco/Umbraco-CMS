@@ -1,4 +1,4 @@
-namespace Umbraco.Core.DI
+namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// Represents a collection builder.

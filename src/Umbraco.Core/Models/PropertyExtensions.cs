@@ -2,7 +2,7 @@
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.DI;
+using Umbraco.Core.Composing;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 

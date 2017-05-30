@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using LightInject;
 
-namespace Umbraco.Core.DI
+namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// Provides a base class for collection builders.

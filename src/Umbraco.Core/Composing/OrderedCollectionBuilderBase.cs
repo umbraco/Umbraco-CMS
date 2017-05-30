@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using LightInject;
 
-namespace Umbraco.Core.DI
+namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// Implements an ordered collection builder.

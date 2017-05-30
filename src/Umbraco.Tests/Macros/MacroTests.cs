@@ -17,7 +17,7 @@ using Umbraco.Web;
 using Umbraco.Web.Macros;
 using File = System.IO.File;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
-using Current = Umbraco.Core.DI.Current;
+using Current = Umbraco.Core.Composing.Current;
 
 namespace Umbraco.Tests.Macros
 {

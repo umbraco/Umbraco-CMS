@@ -1,5 +1,5 @@
 ﻿using System;
-using CoreCurrent = Umbraco.Core.DI.Current;
+using CoreCurrent = Umbraco.Core.Composing.Current;
 
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Core.Logging
