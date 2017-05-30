@@ -19,7 +19,7 @@ namespace Umbraco.Core.Scoping
     /// <summary>
     /// Implements <see cref="IScopeProvider"/>.
     /// </summary>
-    internal class ScopeProvider : IScopeProviderInternal
+    internal class ScopeProvider : IScopeProvider
     {
         private readonly ILogger _logger;
         private readonly FileSystems _fileSystems;

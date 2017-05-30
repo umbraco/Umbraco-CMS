@@ -21,13 +21,13 @@ namespace Umbraco.Tests.Scoping
         {
             base.SetUp();
 
-            Assert.IsNull((ScopeProvider as IScopeProviderInternal).AmbientScope); // gone
+            Assert.IsNull(ScopeProvider.AmbientScope); // gone
         }
 
         [Test]
         public void SimpleCreateScope()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope())
@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void SimpleCreateScopeContext()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope())
@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void SimpleCreateScopeDatabase()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
 
             IUmbracoDatabase database;
 
@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void NestedCreateScope()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope())
@@ -152,7 +152,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void NestedCreateScopeContext()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope())
@@ -185,7 +185,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void NestedCreateScopeInnerException()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
             bool? scopeCompleted = null;
 
             Assert.IsNull(scopeProvider.AmbientScope);
@@ -224,7 +224,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void NestedCreateScopeDatabase()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
 
             IUmbracoDatabase database;
 
@@ -254,7 +254,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void Transaction()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
 
             using (var scope = scopeProvider.CreateScope())
             {
@@ -291,7 +291,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void NestedTransactionInnerFail()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
 
             using (var scope = scopeProvider.CreateScope())
             {
@@ -330,7 +330,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void NestedTransactionOuterFail()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
 
             using (var scope = scopeProvider.CreateScope())
             {
@@ -368,7 +368,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void NestedTransactionComplete()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
 
             using (var scope = scopeProvider.CreateScope())
             {
@@ -407,7 +407,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void CallContextScope1()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
             using (var scope = scopeProvider.CreateScope())
             {
                 Assert.IsNotNull(scopeProvider.AmbientScope);
@@ -438,7 +438,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void CallContextScope2()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
             Assert.IsNull(scopeProvider.AmbientScope);
 
             var httpContextItems = new Hashtable();
@@ -486,7 +486,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void ScopeReference()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
             var scope = scopeProvider.CreateScope();
             var nested = scopeProvider.CreateScope();
             Assert.IsNotNull(scopeProvider.AmbientScope);
@@ -507,7 +507,7 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void ScopeContextEnlist(bool complete)
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
 
             bool? completed = null;
             IScope ambientScope = null;
@@ -537,7 +537,7 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void ScopeContextEnlistAgain(bool complete)
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
 
             bool? completed = null;
             Exception exception = null;
@@ -574,7 +574,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void ScopeContextException()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
 
             bool? completed = null;
 
@@ -615,7 +615,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void DetachableScope()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope())

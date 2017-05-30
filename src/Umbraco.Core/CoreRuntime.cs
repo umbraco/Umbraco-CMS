@@ -228,8 +228,7 @@ namespace Umbraco.Core
             container.RegisterSingleton<IDatabaseContext>(f => f.GetInstance<IUmbracoDatabaseFactory>());
 
             // register the scope provider
-            container.RegisterSingleton<IScopeProviderInternal, ScopeProvider>();
-            container.RegisterSingleton<IScopeProvider>(f => f.GetInstance<IScopeProviderInternal>());
+            container.RegisterSingleton<IScopeProvider, ScopeProvider>();
 
             // register MainDom
             container.RegisterSingleton<MainDom>();

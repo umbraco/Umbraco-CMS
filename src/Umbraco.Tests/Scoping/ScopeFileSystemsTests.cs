@@ -127,7 +127,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void SingleShadowEvenDetached()
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
             using (var scope = scopeProvider.CreateScope(scopeFileSystems: true))
             {
                 using (new SafeCallContext()) // not nesting!

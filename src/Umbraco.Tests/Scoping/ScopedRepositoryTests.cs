@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void DefaultRepositoryCachePolicy(bool complete)
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
             var service = Current.Services.UserService;
             var globalCache = Current.ApplicationCache.IsolatedRuntimeCache.GetOrCreateCache(typeof(IUser));
 
@@ -103,7 +103,7 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void FullDataSetRepositoryCachePolicy(bool complete)
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
             var service = Current.Services.LocalizationService;
             var globalCache = Current.ApplicationCache.IsolatedRuntimeCache.GetOrCreateCache(typeof (ILanguage));
 
@@ -195,7 +195,7 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void SingleItemsOnlyRepositoryCachePolicy(bool complete)
         {
-            var scopeProvider = ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
             var service = Current.Services.LocalizationService;
             var globalCache = Current.ApplicationCache.IsolatedRuntimeCache.GetOrCreateCache(typeof (IDictionaryItem));
 

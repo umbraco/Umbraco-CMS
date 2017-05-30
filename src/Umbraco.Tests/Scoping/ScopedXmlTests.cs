@@ -238,7 +238,7 @@ namespace Umbraco.Tests.Scoping
         //        Assert.AreEqual(beforeOuterXml, xml.OuterXml);
         //    }
 
-        //    var scopeProvider = ScopeProvider as IScopeProviderInternal;
+        //    var scopeProvider = ScopeProvider;
         //    Assert.IsNotNull(scopeProvider);
         //    // ambient scope may be null, or maybe not, depending on whether the code that
         //    // was called did proper scoped work, or some direct (NoScope) use of the database

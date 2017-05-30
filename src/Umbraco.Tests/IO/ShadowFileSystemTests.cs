@@ -611,26 +611,6 @@ namespace Umbraco.Tests.IO
             TestHelper.TryAssert(() => Assert.IsFalse(File.Exists(path + "/test/inner/f3.txt")));
         }
 
-        [Test]
-        public void MockTest()
-        {
-            var scoped = false;
-            var provider = MockScopeProvider(() => scoped);
-
-            Assert.IsFalse(provider.AmbientScope.ScopedFileSystems);
-            scoped = true;
-            Assert.IsTrue(provider.AmbientScope.ScopedFileSystems);
-        }
-
-        private static IScopeProviderInternal MockScopeProvider(Func<bool> f)
-        {
-            var scopeMock = new Mock<IScopeInternal>();
-            scopeMock.Setup(x => x.ScopedFileSystems).Returns(f);
-            var providerMock = new Mock<IScopeProviderInternal>();
-            providerMock.Setup(x => x.AmbientScope).Returns(scopeMock.Object);
-            return providerMock.Object;
-        }
-
         /// <summary>
         /// Check that GetFiles will return all files on the shadow, while returning
         /// just one on each of the filesystems used by the shadow.

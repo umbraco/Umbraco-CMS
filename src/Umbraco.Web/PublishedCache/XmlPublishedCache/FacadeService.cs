@@ -35,7 +35,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         // used in WebBootManager + tests
         public FacadeService(ServiceContext serviceContext,
-            IScopeProviderInternal scopeProvider,
+            IScopeProvider scopeProvider,
             IScopeUnitOfWorkProvider uowProvider, 
             ICacheProvider requestCache, 
             IEnumerable<IUrlSegmentProvider> segmentProviders,
@@ -48,7 +48,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         // used in some tests
         internal FacadeService(ServiceContext serviceContext,
-            IScopeProviderInternal scopeProvider,
+            IScopeProvider scopeProvider,
             IScopeUnitOfWorkProvider uowProvider, 
             ICacheProvider requestCache,
             IFacadeAccessor facadeAccessor,
@@ -59,8 +59,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             : this(serviceContext, scopeProvider, uowProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(), facadeAccessor, logger, contentTypeCache, mainDom, testing, enableRepositoryEvents)
         { }
 
-        private FacadeService(ServiceContext serviceContext, 
-            IScopeProviderInternal scopeProvider,
+        private FacadeService(ServiceContext serviceContext,
+            IScopeProvider scopeProvider,
             IScopeUnitOfWorkProvider uowProvider, 
             ICacheProvider requestCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders,

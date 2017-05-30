@@ -28,7 +28,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _xml = IsWriter ? Clone(xml) : xml;
         }
 
-        public static SafeXmlReaderWriter Get(IScopeProviderInternal scopeProvider, AsyncLock xmlLock, XmlDocument xml, Action<XmlDocument> refresh, Action<XmlDocument, bool> apply, bool writer)
+        public static SafeXmlReaderWriter Get(IScopeProvider scopeProvider, AsyncLock xmlLock, XmlDocument xml, Action<XmlDocument> refresh, Action<XmlDocument, bool> apply, bool writer)
         {
             var scopeContext = scopeProvider.Context;
 

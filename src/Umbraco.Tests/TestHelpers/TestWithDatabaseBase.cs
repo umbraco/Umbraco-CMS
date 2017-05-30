@@ -54,15 +54,15 @@ namespace Umbraco.Tests.TestHelpers
 
         protected CacheHelper DisabledCache => _disabledCacheHelper ?? (_disabledCacheHelper = CacheHelper.CreateDisabledCacheHelper());
 
-        protected IScopeUnitOfWorkProvider UowProvider => Core.Composing.Current.Container.GetInstance<IScopeUnitOfWorkProvider>();
+        protected IScopeUnitOfWorkProvider UowProvider => Current.Container.GetInstance<IScopeUnitOfWorkProvider>();
 
         protected PublishedContentTypeCache ContentTypesCache { get; private set; }
 
         protected override ISqlSyntaxProvider SqlSyntax => GetSyntaxProvider();
 
-        protected ServiceContext ServiceContext => Core.Composing.Current.Services;
+        protected ServiceContext ServiceContext => Current.Services;
 
-        protected IScopeProvider ScopeProvider => Core.Composing.Current.ScopeProvider;
+        internal ScopeProvider ScopeProvider => Current.ScopeProvider as ScopeProvider;
 
         public override void SetUp()
         {
@@ -239,18 +239,18 @@ namespace Umbraco.Tests.TestHelpers
                 var cache = new NullCacheProvider();
 
                 ContentTypesCache = new PublishedContentTypeCache(
-                        Core.Composing.Current.Services.ContentTypeService,
-                        Core.Composing.Current.Services.MediaTypeService,
-                        Core.Composing.Current.Services.MemberTypeService,
-                        Core.Composing.Current.Logger);
+                    Current.Services.ContentTypeService,
+                    Current.Services.MediaTypeService,
+                    Current.Services.MemberTypeService,
+                    Current.Logger);
 
                 // testing=true so XmlStore will not use the file nor the database
                 var facadeAccessor = new TestFacadeAccessor();
                 var service = new FacadeService(
-                    Core.Composing.Current.Services,
-                    (IScopeProviderInternal) Core.Composing.Current.ScopeProvider,
+                    Current.Services,
+                    (ScopeProvider) Current.ScopeProvider,
                     UowProvider,
-                    cache, facadeAccessor, Core.Composing.Current.Logger, ContentTypesCache, null, true, Options.FacadeServiceRepositoryEvents);
+                    cache, facadeAccessor, Current.Logger, ContentTypesCache, null, true, Options.FacadeServiceRepositoryEvents);
 
                 // initialize PublishedCacheService content with an Xml source
                 service.XmlStore.GetXmlDocument = () =>

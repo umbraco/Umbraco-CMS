@@ -421,7 +421,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             var cache = new NullCacheProvider();
             //var provider = new ScopeUnitOfWorkProvider(databaseFactory, new RepositoryFactory(Mock.Of<IServiceContainer>()));
-            var scopeProvider = TestObjects.GetScopeProvider(Mock.Of<ILogger>()) as IScopeProviderInternal;
+            var scopeProvider = TestObjects.GetScopeProvider(Mock.Of<ILogger>());
             var uowProvider = TestObjects.GetScopeUnitOfWorkProvider(Mock.Of<ILogger>(), scopeProvider: scopeProvider);
             _service = new FacadeService(svcCtx, scopeProvider, uowProvider, cache, Enumerable.Empty<IUrlSegmentProvider>(), null, Current.Logger, null, true, false); // no events
 

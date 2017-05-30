@@ -54,7 +54,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private readonly RoutesCache _routesCache;
         private readonly ServiceContext _serviceContext; // fixme WHY
         private readonly IScopeUnitOfWorkProvider _uowProvider;
-        private readonly IScopeProviderInternal _scopeProvider;
+        private readonly IScopeProvider _scopeProvider;
 
         #region Constructors
 
@@ -62,7 +62,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// Initializes a new instance of the <see cref="XmlStore"/> class.
         /// </summary>
         /// <remarks>The default constructor will boot the cache, load data from file or database, /// wire events in order to manage changes, etc.</remarks>
-        public XmlStore(ServiceContext serviceContext, IScopeProviderInternal scopeProvider, IScopeUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
+        public XmlStore(ServiceContext serviceContext, IScopeProvider scopeProvider, IScopeUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders, IFacadeAccessor facadeAccessor, MainDom mainDom)
             : this(serviceContext, scopeProvider, uowProvider, routesCache, contentTypeCache, segmentProviders, facadeAccessor, mainDom, false, false)
         { }
@@ -70,7 +70,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // internal for unit tests
         // no file nor db, no config check
         // fixme - er, we DO have a DB?
-        internal XmlStore(ServiceContext serviceContext, IScopeProviderInternal scopeProvider, IScopeUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
+        internal XmlStore(ServiceContext serviceContext, IScopeProvider scopeProvider, IScopeUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders, IFacadeAccessor facadeAccessor, MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
         {

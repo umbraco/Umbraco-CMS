@@ -8,9 +8,9 @@
     /// chain).</remarks>
     internal class ScopeReference : IDisposeOnRequestEnd // implies IDisposable
     {
-        private readonly IScopeProviderInternal _scopeProvider;
+        private readonly ScopeProvider _scopeProvider;
 
-        public ScopeReference(IScopeProviderInternal scopeProvider)
+        public ScopeReference(ScopeProvider scopeProvider)
         {
             _scopeProvider = scopeProvider;
         }

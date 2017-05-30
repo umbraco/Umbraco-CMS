@@ -19,7 +19,7 @@ namespace Umbraco.Core.Scoping
         /// <param name="repositoryCacheMode">The repositories cache mode.</param>
         /// <param name="eventDispatcher">An optional events dispatcher.</param>
         /// <param name="scopeFileSystems">A value indicating whether to scope the filesystems.</param>
-        /// <param name="callContext">fixme what is this</param>
+        /// <param name="callContext">A value indicating whether this scope should always be registered in the call context.</param>
         /// <returns>The created ambient scope.</returns>
         /// <remarks>
         /// <para>The created scope becomes the ambient scope.</para>
@@ -38,7 +38,10 @@ namespace Umbraco.Core.Scoping
         /// Creates a detached scope.
         /// </summary>
         /// <returns>A detached scope.</returns>
-        /// fixme - params!
+        /// <param name="isolationLevel">The transaction isolation level.</param>
+        /// <param name="repositoryCacheMode">The repositories cache mode.</param>
+        /// <param name="eventDispatcher">An optional events dispatcher.</param>
+        /// <param name="scopeFileSystems">A value indicating whether to scope the filesystems.</param>
         /// <remarks>
         /// <para>A detached scope is not ambient and has no parent.</para>
         /// <para>It is meant to be attached by <see cref="AttachScope"/>.</para>

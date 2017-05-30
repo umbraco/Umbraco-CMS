@@ -21,7 +21,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // register the XML facade service
             composition.SetFacadeService(factory => new FacadeService(
                 factory.GetInstance<ServiceContext>(),
-                factory.GetInstance<IScopeProviderInternal>(),
+                (ScopeProvider) factory.GetInstance<IScopeProvider>(),
                 factory.GetInstance<IScopeUnitOfWorkProvider>(),
                 factory.GetInstance<CacheHelper>().RequestCache,
                 factory.GetInstance<UrlSegmentProviderCollection>(),
