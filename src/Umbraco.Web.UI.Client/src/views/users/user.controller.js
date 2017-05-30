@@ -183,15 +183,22 @@
 
         function upload(file) {
 
+            vm.avatarFile.uploadProgress = 0;
+
             Upload.upload({
                 url: umbRequestHelper.getApiUrl("userApiBaseUrl", "PostSetAvatar", { id: vm.user.id }),
                 fields: {},
                 file: file
             }).progress(function (evt) {
 
-                //TODO: Do progress, etc...
                 // set uploading status on file
                 vm.avatarFile.uploadStatus = "uploading";
+
+                // calculate progress in percentage
+                var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
+
+                // set percentage property on file
+                vm.avatarFile.uploadProgress = progressPercentage;
 
             }).success(function (data, status, headers, config) {
 
