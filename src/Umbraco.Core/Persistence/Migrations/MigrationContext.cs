@@ -12,12 +12,9 @@ namespace Umbraco.Core.Persistence.Migrations
     {
         public MigrationContext(IUmbracoDatabase database, ILogger logger)
         {
-            if (database == null) throw new ArgumentNullException(nameof(database));
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
-
             Expressions = new Collection<IMigrationExpression>();
-            Database = database;
-            Logger = logger;
+            Database = database ?? throw new ArgumentNullException(nameof(database));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public ICollection<IMigrationExpression> Expressions { get; set; }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
@@ -29,6 +30,13 @@ namespace Umbraco.Core.IO
         private ShadowWrapper _masterPagesFileSystem;
         private ShadowWrapper _mvcViewsFileSystem;
 
+        // well-known file systems lazy initialization
+        private object _wkfsLock = new object();
+        private bool _wkfsInitialized;
+        private object _wkfsObject;
+
+        private MediaFileSystem _mediaFileSystem;
+
         #region Constructor
 
         // DI wants a public ctor
@@ -37,7 +45,6 @@ namespace Umbraco.Core.IO
         {
             _config = (FileSystemProvidersSection)ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
             _logger = logger;
-            CreateWellKnownFileSystems();
         }
 
         // for tests only, totally unsafe
@@ -46,25 +53,95 @@ namespace Umbraco.Core.IO
             _wrappers.Clear();
             _providerLookup.Clear();
             _filesystems.Clear();
-            CreateWellKnownFileSystems();
+            Volatile.Write(ref _wkfsInitialized, false);
         }
 
-        internal Func<bool> IsScoped { get; set; }
+        internal Func<bool> IsScoped { get; set; } = () => false;
 
         #endregion
 
         #region Well-Known FileSystems
 
-        public IFileSystem MacroPartialsFileSystem => _macroPartialFileSystem;
-        public IFileSystem PartialViewsFileSystem => _partialViewsFileSystem;
-        public IFileSystem StylesheetsFileSystem => _stylesheetsFileSystem;
-        public IFileSystem ScriptsFileSystem => _scriptsFileSystem;
-        public IFileSystem XsltFileSystem => _xsltFileSystem;
-        public IFileSystem MasterPagesFileSystem => _masterPagesFileSystem; // fixme - see 7.6?!
-        public IFileSystem MvcViewsFileSystem => _mvcViewsFileSystem;
-        public MediaFileSystem MediaFileSystem { get; private set; }
+        public IFileSystem MacroPartialsFileSystem
+        {
+            get
+            {
+                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
+                return _macroPartialFileSystem;
+            }
+        }
 
-        private void CreateWellKnownFileSystems()
+        public IFileSystem PartialViewsFileSystem
+        {
+            get
+            {
+                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
+                return _partialViewsFileSystem;
+            }
+        }
+
+        public IFileSystem StylesheetsFileSystem
+        {
+            get
+            {
+                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
+                return _stylesheetsFileSystem;
+            }
+        }
+
+        public IFileSystem ScriptsFileSystem
+        {
+            get
+            {
+                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
+                return _scriptsFileSystem;
+            }
+        }
+
+        public IFileSystem XsltFileSystem
+        {
+            get
+            {
+                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
+                return _xsltFileSystem;
+            }
+        }
+
+        public IFileSystem MasterPagesFileSystem
+        {
+            get
+            {
+                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
+                return _masterPagesFileSystem;// fixme - see 7.6?!
+            }
+        } 
+
+        public IFileSystem MvcViewsFileSystem
+        {
+            get
+            {
+                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
+                return _mvcViewsFileSystem;
+            }
+        }
+
+        public MediaFileSystem MediaFileSystem
+        {
+            get
+            {
+                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
+                return _mediaFileSystem;
+            }
+        }
+
+        private void EnsureWellKnownFileSystems()
+        {
+            LazyInitializer.EnsureInitialized(ref _wkfsObject, ref _wkfsInitialized, ref _wkfsLock, CreateWellKnownFileSystems);
+        }
+
+        // need to return something to LazyInitializer.EnsureInitialized
+        // but it does not really matter what we return - here, null
+        private object CreateWellKnownFileSystems()
         {
             var macroPartialFileSystem = new PhysicalFileSystem(SystemDirectories.MacroPartials);
             var partialViewsFileSystem = new PhysicalFileSystem(SystemDirectories.PartialViews);
@@ -74,16 +151,18 @@ namespace Umbraco.Core.IO
             var masterPagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
 
-            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", IsScoped);
-            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", IsScoped);
-            _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", IsScoped);
-            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", IsScoped);
-            _xsltFileSystem = new ShadowWrapper(xsltFileSystem, "xslt", IsScoped);
-            _masterPagesFileSystem = new ShadowWrapper(masterPagesFileSystem, "masterpages", IsScoped);
-            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", IsScoped);
+            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", () => IsScoped());
+            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", () => IsScoped());
+            _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", () => IsScoped());
+            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", () => IsScoped());
+            _xsltFileSystem = new ShadowWrapper(xsltFileSystem, "xslt", () => IsScoped());
+            _masterPagesFileSystem = new ShadowWrapper(masterPagesFileSystem, "masterpages", () => IsScoped());
+            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", () => IsScoped());
 
             // filesystems obtained from GetFileSystemProvider are already wrapped and do not need to be wrapped again
-            MediaFileSystem = GetFileSystemProvider<MediaFileSystem>();
+            _mediaFileSystem = GetFileSystemProvider<MediaFileSystem>();
+
+            return null;
         }
 
         #endregion
@@ -215,7 +294,7 @@ namespace Umbraco.Core.IO
                 // so we are double-wrapping here
                 // could be optimized by having FileSystemWrapper inherit from ShadowWrapper, maybe
                 var innerFs = GetUnderlyingFileSystemNoCache(alias, fallback);
-                var shadowWrapper = new ShadowWrapper(innerFs, "typed/" + alias, IsScoped);
+                var shadowWrapper = new ShadowWrapper(innerFs, "typed/" + alias, () => IsScoped());
                 var fs = (IFileSystem) Activator.CreateInstance(typeof(TFileSystem), shadowWrapper);
                 _wrappers.Add(shadowWrapper); // keeping a reference to the wrapper
                 return fs;

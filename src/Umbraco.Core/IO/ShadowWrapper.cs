@@ -19,7 +19,7 @@ namespace Umbraco.Core.IO
         {
             _innerFileSystem = innerFileSystem;
             _shadowPath = shadowPath;
-            _isScoped = isScoped ?? (() => false);
+            _isScoped = isScoped;
         }
 
         internal void Shadow(Guid id)

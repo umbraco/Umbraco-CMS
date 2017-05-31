@@ -31,6 +31,8 @@ namespace Umbraco.Core.Scoping
 
             // take control of the FileSystems
             _fileSystems.IsScoped = () => AmbientScope != null && AmbientScope.ScopedFileSystems;
+
+            _scopeReference = new ScopeReference(this);
         }
 
         static ScopeProvider()
@@ -230,7 +232,7 @@ namespace Umbraco.Core.Scoping
 
         internal const string ContextItemKey = "Umbraco.Core.Scoping.ScopeContext";
 
-        internal static ScopeContext AmbientContextStatic
+        public ScopeContext AmbientContext
         {
             get
             {
@@ -251,9 +253,6 @@ namespace Umbraco.Core.Scoping
             }
         }
 
-        /// <inheritdoc />
-        public ScopeContext AmbientContext => AmbientContextStatic;
-
         #endregion
 
         #region Ambient Scope
@@ -262,10 +261,9 @@ namespace Umbraco.Core.Scoping
         internal const string ScopeRefItemKey = "Umbraco.Core.Scoping.ScopeReference";
 
         // only 1 instance which can be disposed and disposed again
-        // fixme - more weird static - we should try to get rid of all static & use an accessor
-        private static readonly ScopeReference StaticScopeReference = new ScopeReference(new ScopeProvider(null, null, null));
+        private readonly ScopeReference _scopeReference;
 
-        private static Scope AmbientScopeStatic
+        public Scope AmbientScope
         {
             get
             {
@@ -283,17 +281,10 @@ namespace Umbraco.Core.Scoping
 
                 // set http/call context
                 if (value.CallContext == false && SetHttpContextObject(ScopeItemKey, value, false))
-                    SetHttpContextObject(ScopeRefItemKey, StaticScopeReference);
+                    SetHttpContextObject(ScopeRefItemKey, _scopeReference);
                 else
                     SetCallContextObject(ScopeItemKey, value);
             }
-        }
-
-        /// <inheritdoc />
-        public Scope AmbientScope
-        {
-            get => AmbientScopeStatic;
-            set => AmbientScopeStatic = value;
         }
 
         #endregion
@@ -315,7 +306,7 @@ namespace Umbraco.Core.Scoping
 
             if (scope.CallContext == false && SetHttpContextObject(ScopeItemKey, scope, false))
             {
-                SetHttpContextObject(ScopeRefItemKey, StaticScopeReference);
+                SetHttpContextObject(ScopeRefItemKey, _scopeReference);
                 SetHttpContextObject(ContextItemKey, context);
             }
             else
@@ -410,7 +401,7 @@ namespace Umbraco.Core.Scoping
             var scope = AmbientScope as Scope;
             scope?.Reset();
 
-            StaticScopeReference.Dispose();
+            _scopeReference.Dispose();
         }
 
         /// <inheritdoc />
