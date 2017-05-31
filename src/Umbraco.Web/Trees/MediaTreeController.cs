@@ -171,7 +171,7 @@ namespace Umbraco.Web.Trees
             return Security.CurrentUser.HasPathAccess(media);
         }
 
-        public IEnumerable<SearchResultItem> Search(string query, int pageSize, int pageIndex, out int totalFound, string searchFrom = null)
+        public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
             return _treeSearcher.ExamineSearch(Umbraco, query, UmbracoEntityTypes.Media, pageSize, pageIndex, out totalFound, searchFrom);
         }

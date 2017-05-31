@@ -10,6 +10,12 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "score")]
         public float Score { get; set; }
-        
+
+        //TODO: Enable this!
+        ///// <summary>
+        ///// A caption for the search result
+        ///// </summary>
+        //[DataMember(Name = "caption")]
+        //public string Caption { get; set; }
     }
 }

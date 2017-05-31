@@ -21,6 +21,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Search;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Editors
 {
@@ -105,51 +106,40 @@ namespace Umbraco.Web.Editors
         /// 
         /// The reason a user is allowed to search individual entity types that they are not allowed to edit is because those search
         /// methods might be used in things like pickers in the content editor.
-        /// </remarks>
+        /// </remarks>        
         [HttpGet]
-        public IEnumerable<TreeSearchResult> SearchAll(string query)
+        public IDictionary<string, TreeSearchResult> SearchAll(string query)
         {
-            if (string.IsNullOrEmpty(query))
-                return Enumerable.Empty<TreeSearchResult>();
+            var result = new Dictionary<string, TreeSearchResult>();
 
-            var result = new List<TreeSearchResult>();
+            if (string.IsNullOrEmpty(query))
+                return result;
+            
             var allowedSections = Security.CurrentUser.AllowedSections.ToArray();
             var searchableTrees = SearchableTreeResolver.Current.SearchableTrees;
+            
             foreach (var searchableTree in searchableTrees)
             {
                 if (allowedSections.Contains(searchableTree.AppAlias))
                 {
-                    var attribute = searchableTree.SearchableTree.GetType().GetCustomAttribute<SearchableTreeAttribute>(false);
+                    var tree = Services.ApplicationTreeService.GetByAlias(searchableTree.TreeAlias);
+                    if (tree == null) continue; //shouldn't occur
+                    
+                    var searchableTreeAttribute = searchableTree.SearchableTree.GetType().GetCustomAttribute<SearchableTreeAttribute>(false);
+                    var treeAttribute = tree.GetTreeAttribute();
 
-                    int total;
-                    result.Add(new TreeSearchResult
-                    {                        
+                    long total;
+
+                    result[treeAttribute.GetRootNodeDisplayName(Services.TextService)] = new TreeSearchResult
+                    {
                         Results = searchableTree.SearchableTree.Search(query, 200, 0, out total),
                         TreeAlias = searchableTree.TreeAlias,
                         AppAlias = searchableTree.AppAlias,
-                        JsFormatterService = attribute == null ? "" : attribute.ServiceName,
-                        JsFormatterMethod = attribute == null ? "" : attribute.MethodName
-                    });
+                        JsFormatterService = searchableTreeAttribute == null ? "" : searchableTreeAttribute.ServiceName,
+                        JsFormatterMethod = searchableTreeAttribute == null ? "" : searchableTreeAttribute.MethodName
+                    };
                 }
-            }
-
-            //if (allowedSections.InvariantContains(Constants.Applications.Media))
-            //{
-            //    result.Add(new TreeSearchResult
-            //    {
-            //        Results = ExamineSearch(query, UmbracoEntityTypes.Media),
-            //        TreeTypeAlias = UmbracoEntityTypes.Media.ToString()
-            //    });
-            //}
-            //if (allowedSections.InvariantContains(Constants.Applications.Members))
-            //{
-            //    result.Add(new TreeSearchResult
-            //    {
-            //        Results = ExamineSearch(query, UmbracoEntityTypes.Member),
-            //        TreeTypeAlias = UmbracoEntityTypes.Member.ToString()
-            //    });
-
-            //}
+            }            
             return result;
         }
 
@@ -469,7 +459,7 @@ namespace Umbraco.Web.Editors
             //the EntityService cannot search members of a certain type, this is currently not supported and would require 
             //quite a bit of plumbing to do in the Services/Repository, we'll revert to a paged search
 
-            int total;
+            long total;
             var searchResult = _treeSearcher.ExamineSearch(Umbraco, filter ?? "", type, pageSize, pageNumber - 1, out total, id);
 
             return new PagedResult<EntityBasic>(total, pageNumber, pageSize)
@@ -605,7 +595,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private IEnumerable<SearchResultItem> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
         {
-            int total;
+            long total;
             return _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, searchFrom);
         }
         

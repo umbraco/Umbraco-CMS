@@ -121,7 +121,11 @@ angular.module('umbraco.services')
 
                     _.each(data, function (resultByType) {
 
+                        //we need to format the search result data to include things like the subtitle, urls, etc...
+                        // this is done with registered angular services as part of the SearchableTreeAttribute, if that 
+                        // is not found, than we format with the default formatter
                         var formatterMethod = searchResultFormatter.configureDefaultResult;
+                        //check if a custom formatter is specified...
                         if (resultByType.jsSvc) {
                             var searchFormatterService = $injector.get(resultByType.jsSvc);
                             if (searchFormatterService) {
@@ -135,10 +139,11 @@ angular.module('umbraco.services')
                                 }
                             }
                         }
-
+                        //now apply the formatter for each result
                         _.each(resultByType.results, function (item) {
                             formatterMethod.apply(this, [item, resultByType.treeAlias, resultByType.appAlias]);
                         });
+                        
                     });
 
                     return data;
