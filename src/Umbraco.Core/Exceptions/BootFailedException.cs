@@ -8,6 +8,11 @@ namespace Umbraco.Core.Exceptions
     public class BootFailedException : Exception
     {
         /// <summary>
+        /// Defines the default boot failed exception message.
+        /// </summary>
+        public const string DefaultMessage = "Boot failed: Umbraco cannot run. Sad. See Umbraco's log file for more details.";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Exception"/> class with a specified error message.
         /// </summary>
         /// <param name="message">The message that describes the error. </param>

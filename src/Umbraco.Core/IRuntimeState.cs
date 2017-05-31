@@ -1,5 +1,6 @@
 using System;
 using Semver;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core
@@ -55,5 +56,10 @@ namespace Umbraco.Core
         /// Gets the runtime level of execution.
         /// </summary>
         RuntimeLevel Level { get; }
+
+        /// <summary>
+        /// Gets the exception that caused the boot to fail.
+        /// </summary>
+        BootFailedException BootFailedException { get; }
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using LightInject;
 
 namespace Umbraco.Core

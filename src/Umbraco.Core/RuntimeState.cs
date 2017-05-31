@@ -4,6 +4,7 @@ using System.Web;
 using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 
@@ -87,7 +88,7 @@ namespace Umbraco.Core
         /// </summary>
         public RuntimeLevel Level
         {
-            get { return _level; }
+            get => _level;
             internal set { _level = value; if (value == RuntimeLevel.Run) _runLevel.Set(); }
         }
 
@@ -113,5 +114,10 @@ namespace Umbraco.Core
         {
             return _runLevel.WaitHandle.WaitOne(timeout);
         }
+
+        /// <summary>
+        /// Gets the exception that caused the boot to fail.
+        /// </summary>
+        public BootFailedException BootFailedException { get; internal set; }
     }
 }

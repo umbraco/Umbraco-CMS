@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Web;
 using System.Web.Routing;
 using LightInject;
@@ -504,7 +505,31 @@ namespace Umbraco.Web
             if (Core.Composing.Current.RuntimeState.Level == RuntimeLevel.BootFailed)
             {
                 // there's nothing we can do really
-                app.BeginRequest += (sender, args) => throw new BootFailedException("Boot failed. Umbraco cannot run. Umbraco's log file contains details about what caused the boot to fail.");
+                app.BeginRequest += (sender, args) =>
+                {
+                    // would love to avoid throwing, and instead display a customized Umbraco 500
+                    // page - however if we don't throw here, something else might go wrong, and
+                    // it's this later exception that would be reported. could not figure out how
+                    // to prevent it, either with httpContext.Response.End() or .ApplicationInstance
+                    // .CompleteRequest()
+
+                    // also, if something goes wrong with our DI setup, the logging subsystem may
+                    // not even kick in, so here we try to give as much detail as possible
+
+                    Exception e = Core.Composing.Current.RuntimeState.BootFailedException;
+                    if (e == null)
+                        throw new BootFailedException(BootFailedException.DefaultMessage);
+                    var m = new StringBuilder();
+                    m.Append(BootFailedException.DefaultMessage);
+                    while (e != null)
+                    {
+                        m.Append($"\n\n-> {e.GetType().FullName}: {e.Message}");
+                        if (string.IsNullOrWhiteSpace(e.StackTrace) == false)
+                            m.Append($"\n{e.StackTrace}");
+                        e = e.InnerException;
+                    }
+                    throw new BootFailedException(m.ToString());
+                };
                 return;
             }
 
@@ -548,14 +573,15 @@ namespace Umbraco.Web
 		    app.EndRequest += (sender, args) =>
 		    {
 		        var httpContext = ((HttpApplication) sender).Context;
+
 		        if (UmbracoContext.Current != null && UmbracoContext.Current.IsFrontEndUmbracoRequest)
 		        {
 		            Logger.Debug<UmbracoModule>($"End Request. ({DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds}ms)");
 		        }
 
-                    OnEndRequest(new UmbracoRequestEventArgs(UmbracoContext.Current, new HttpContextWrapper(httpContext)));
+                OnEndRequest(new UmbracoRequestEventArgs(UmbracoContext.Current, new HttpContextWrapper(httpContext)));
 
-                    DisposeHttpContextItems(httpContext);
+                DisposeHttpContextItems(httpContext);
 		    };
 		}
 

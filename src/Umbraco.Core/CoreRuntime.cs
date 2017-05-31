@@ -105,6 +105,7 @@ namespace Umbraco.Core
                 {
                     _state.Level = RuntimeLevel.BootFailed;
                     var bfe = e as BootFailedException ?? new BootFailedException("Boot failed.", e);
+                    _state.BootFailedException = bfe;
                     bootTimer.Fail(exception: bfe); // be sure to log the exception - even if we repeat ourselves
 
                     // throwing here can cause w3wp to hard-crash and we want to avoid it.
