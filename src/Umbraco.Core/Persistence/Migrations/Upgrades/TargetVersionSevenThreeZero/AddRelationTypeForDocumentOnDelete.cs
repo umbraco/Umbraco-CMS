@@ -17,7 +17,6 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
 
         public override void Up()
         {
-            ((UmbracoDatabase) Context.Database).EnableSqlTrace = true;
             var exists = Context.Database.FirstOrDefault<RelationTypeDtoCapture>("WHERE alias=@alias", new {alias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias});
             if (exists == null)
             {
