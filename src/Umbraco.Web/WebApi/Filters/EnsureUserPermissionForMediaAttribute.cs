@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
 
@@ -40,21 +38,18 @@ namespace Umbraco.Web.WebApi.Filters
 
         public EnsureUserPermissionForMediaAttribute(string paramName)
         {
-            Mandate.ParameterNotNullOrEmpty(paramName, "paramName");
+            if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullOrEmptyException(nameof(paramName));
             _paramName = paramName;
         }
 
         // fixme v8 guess this is not used anymore, source is ignored?!
         public EnsureUserPermissionForMediaAttribute(string paramName, DictionarySource source)
         {
-            Mandate.ParameterNotNullOrEmpty(paramName, "paramName");
+            if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullOrEmptyException(nameof(paramName));
             _paramName = paramName;
         }
 
-        public override bool AllowMultiple
-        {
-            get { return true; }
-        }
+        public override bool AllowMultiple => true;
 
         private int GetNodeIdFromParameter(object parameterValue)
         {

@@ -50,16 +50,14 @@ namespace Umbraco.Core.Services
         /// <param name="source"></param>
         /// <param name="logger"></param>
         public LocalizedTextService(IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> source, ILogger logger)
-        {            
-            if (source == null) throw new ArgumentNullException("source");
-            if (logger == null) throw new ArgumentNullException("logger");
-            _dictionarySource = source;
-            _logger = logger;
+        {
+            _dictionarySource = source ?? throw new ArgumentNullException(nameof(source));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public string Localize(string key, CultureInfo culture, IDictionary<string, string> tokens = null)
         {
-            Mandate.ParameterNotNull(culture, "culture");
+            if (culture == null) throw new ArgumentNullException(nameof(culture));
 
             //TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
             culture = ConvertToSupportedCultureWithRegionCode(culture);

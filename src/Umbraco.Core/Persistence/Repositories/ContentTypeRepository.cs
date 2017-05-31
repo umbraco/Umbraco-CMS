@@ -214,18 +214,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(IContentType entity)
         {
-            Mandate.That<Exception>(string.IsNullOrEmpty(entity.Alias) == false,
-                                    () =>
-                                    {
-                                        var message =
-                                            string.Format(
-                                                "ContentType '{0}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
-                                                entity.Name);
-                                        var exception = new Exception(message);
-
-                                        Logger.Error<ContentTypeRepository>(message, exception);
-                                        throw exception;
-                                    });
+            if (string.IsNullOrWhiteSpace(entity.Alias))
+            {
+                var m = $"ContentType '{entity.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.";
+                var e = new Exception(m);
+                Logger.Error<ContentTypeRepository>(m, e);
+                throw e;
+            }
 
             ((ContentType)entity).AddingEntity();
 

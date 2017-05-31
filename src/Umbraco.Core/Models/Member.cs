@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Models
@@ -29,10 +30,8 @@ namespace Umbraco.Core.Models
         public Member(IMemberType contentType)
             : base("", -1, contentType, new PropertyCollection())
         {
-            Mandate.ParameterNotNull(contentType, "contentType");
-
+            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             _contentTypeAlias = contentType.Alias;
-            _contentType = contentType;
             IsApproved = true;
 
             //this cannot be null but can be empty
@@ -47,13 +46,12 @@ namespace Umbraco.Core.Models
         /// <param name="name">Name of the content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         public Member(string name, IMemberType contentType)
-            : this(contentType)
+            : base(name, -1, contentType, new PropertyCollection())
         {
-            Mandate.ParameterNotNull(contentType, "contentType");
-            Mandate.ParameterNotNullOrEmpty(name, "name");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
 
+            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             _contentTypeAlias = contentType.Alias;
-            _contentType = contentType;
             IsApproved = true;
 
             //this cannot be null but can be empty
@@ -72,13 +70,12 @@ namespace Umbraco.Core.Models
         public Member(string name, string email, string username, IMemberType contentType)
             : base(name, -1, contentType, new PropertyCollection())
         {
-            Mandate.ParameterNotNull(contentType, "contentType");
-            Mandate.ParameterNotNullOrEmpty(name, "name");
-            Mandate.ParameterNotNullOrEmpty(email, "email");
-            Mandate.ParameterNotNullOrEmpty(username, "username");
+            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentNullOrEmptyException(nameof(email));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullOrEmptyException(nameof(username));
 
+            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             _contentTypeAlias = contentType.Alias;
-            _contentType = contentType;
             _email = email;
             _username = username;
             IsApproved = true;
@@ -100,10 +97,9 @@ namespace Umbraco.Core.Models
         public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType)
             : base(name, -1, contentType, new PropertyCollection())
         {
-            Mandate.ParameterNotNull(contentType, "contentType");
-
+            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             _contentTypeAlias = contentType.Alias;
-            _contentType = contentType;
+
             _email = email;
             _username = username;
             _rawPasswordValue = rawPasswordValue;
@@ -195,7 +191,7 @@ namespace Umbraco.Core.Models
         /// <remarks>
         /// For security reasons this value should be encrypted, the encryption process is handled by the memberhip provider
         /// Alias: umbracoMemberPasswordRetrievalAnswer
-        /// 
+        ///
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -261,7 +257,7 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.IsApproved, "IsApproved", 
+                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.IsApproved, "IsApproved",
                     //This is the default value if the prop is not found
                     true);
                 if (a.Success == false) return a.Result;
@@ -463,7 +459,7 @@ namespace Umbraco.Core.Models
         /// User key from the Provider.
         /// </summary>
         /// <remarks>
-        /// When using standard umbraco provider this key will 
+        /// When using standard umbraco provider this key will
         /// correspond to the guid UniqueId/Key.
         /// Otherwise it will the one available from the asp.net
         /// membership provider.
@@ -478,7 +474,7 @@ namespace Umbraco.Core.Models
             set { SetPropertyValueAndDetectChanges(value, ref _providerUserKey, Ps.Value.ProviderUserKeySelector); }
         }
 
-      
+
         /// <summary>
         /// Method to call when Entity is being saved
         /// </summary>
@@ -500,7 +496,7 @@ namespace Umbraco.Core.Models
             get { return _contentType; }
         }
 
-        /* Internal experiment - only used for mapping queries. 
+        /* Internal experiment - only used for mapping queries.
          * Adding these to have first level properties instead of the Properties collection.
          */
         [IgnoreDataMember]
@@ -529,7 +525,7 @@ namespace Umbraco.Core.Models
                         + propertyAlias
                         + " configured on your member type in order to use the '"
                         + propertyName
-                        + "' property on the model correctly.");     
+                        + "' property on the model correctly.");
 
             //if the property doesn't exist, then do the logging and return a failure
             if (Properties.Contains(propertyAlias) == false)

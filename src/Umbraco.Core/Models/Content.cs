@@ -43,9 +43,7 @@ namespace Umbraco.Core.Models
 		public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties)
 			: base(name, parent, contentType, properties)
 		{
-			Mandate.ParameterNotNull(contentType, "contentType");
-
-			_contentType = contentType;
+		    _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             PublishedState = PublishedState.Unpublished;
 		}
 
@@ -69,9 +67,7 @@ namespace Umbraco.Core.Models
         public Content(string name, int parentId, IContentType contentType, PropertyCollection properties) 
 			: base(name, parentId, contentType, properties)
         {
-            Mandate.ParameterNotNull(contentType, "contentType");
-
-            _contentType = contentType;
+            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             PublishedState = PublishedState.Unpublished;
         }
 

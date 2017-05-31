@@ -6,6 +6,7 @@ using System.Web.Routing;
 using System.Web.SessionState;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Mvc
@@ -44,12 +45,12 @@ namespace Umbraco.Web.Mvc
                                                     bool isMvc = true,
                                                     string areaPathPrefix = "")
         {
-            Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
-            Mandate.ParameterNotNull(controllerSuffixName, "controllerSuffixName");
-            
-            Mandate.ParameterNotNull(controllerType, "controllerType");
-            Mandate.ParameterNotNull(routes, "routes");
-            Mandate.ParameterNotNull(defaultId, "defaultId");
+            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (controllerSuffixName == null) throw new ArgumentNullException(nameof(controllerSuffixName));
+
+            if (controllerType == null) throw new ArgumentNullException(nameof(controllerType));
+            if (routes == null) throw new ArgumentNullException(nameof(routes));
+            if (defaultId == null) throw new ArgumentNullException(nameof(defaultId));
 
             var umbracoArea = GlobalSettings.UmbracoMvcArea;
 

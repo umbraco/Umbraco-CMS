@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
@@ -75,7 +76,7 @@ namespace Umbraco.Core.Models
 
         internal static bool HasPathAccess(string path, int startNodeId, int recycleBinId)
         {
-            Mandate.ParameterNotNullOrEmpty(path, "path");
+            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
 
             var formattedPath = "," + path + ",";
             var formattedStartNodeId = "," + startNodeId.ToInvariantString() + ",";

@@ -438,7 +438,6 @@
     <Compile Include="Macros\XsltExtensionCollection.cs" />
     <Compile Include="Macros\XsltExtensionCollectionBuilder.cs" />
     <Compile Include="MainDom.cs" />
-    <Compile Include="Mandate.cs" />
     <Compile Include="Manifest\GridEditorConverter.cs" />
     <Compile Include="Manifest\ManifestBuilder.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />

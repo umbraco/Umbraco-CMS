@@ -4,6 +4,7 @@ using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Web.Security.Identity
 {
@@ -75,7 +76,7 @@ namespace Umbraco.Web.Security.Identity
         /// </param>
         public static void ForUmbracoBackOffice(this AuthenticationOptions options, string style, string icon, string callbackPath = null)
         {
-            Mandate.ParameterNotNullOrEmpty(options.AuthenticationType, "options.AuthenticationType");
+            if (string.IsNullOrEmpty(options.AuthenticationType)) throw new ArgumentNullOrEmptyException("options.AuthenticationType");
 
             //Ensure the prefix is set
             if (options.AuthenticationType.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix) == false)

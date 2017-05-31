@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -10,9 +11,9 @@ namespace Umbraco.Core.PropertyEditors
     {
         public PropertyEditorAttribute(string alias, string name, string editorView)
         {
-            Mandate.ParameterNotNullOrEmpty(alias, "alias");
-            Mandate.ParameterNotNullOrEmpty(name, "name");
-            Mandate.ParameterNotNullOrEmpty(editorView, "editorView");
+            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentNullOrEmptyException(nameof(alias));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
+            if (string.IsNullOrWhiteSpace(editorView)) throw new ArgumentNullOrEmptyException(nameof(editorView));
 
             Alias = alias;
             Name = name;
@@ -26,8 +27,8 @@ namespace Umbraco.Core.PropertyEditors
 
         public PropertyEditorAttribute(string alias, string name)
         {
-            Mandate.ParameterNotNullOrEmpty(alias, "id");
-            Mandate.ParameterNotNullOrEmpty(name, "name");
+            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentNullOrEmptyException(nameof(alias));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
 
             Alias = alias;
             Name = name;
@@ -40,10 +41,10 @@ namespace Umbraco.Core.PropertyEditors
 
         public PropertyEditorAttribute(string alias, string name, string valueType, string editorView)
         {
-            Mandate.ParameterNotNullOrEmpty(alias, "alias");
-            Mandate.ParameterNotNullOrEmpty(name, "name");
-            Mandate.ParameterNotNullOrEmpty(valueType, "valueType");
-            Mandate.ParameterNotNullOrEmpty(editorView, "editorView");
+            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentNullOrEmptyException(nameof(alias));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
+            if (string.IsNullOrWhiteSpace(valueType)) throw new ArgumentNullOrEmptyException(nameof(valueType));
+            if (string.IsNullOrWhiteSpace(editorView)) throw new ArgumentNullOrEmptyException(nameof(editorView));
 
             Alias = alias;
             Name = name;

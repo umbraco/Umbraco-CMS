@@ -9,6 +9,7 @@ using NPoco;
 using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations.Syntax.IfDatabase;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -32,18 +33,13 @@ namespace Umbraco.Core.Persistence.Migrations
 
         public MigrationRunner(IMigrationCollectionBuilder builder, IMigrationEntryService migrationEntryService, ILogger logger, SemVersion currentVersion, SemVersion targetVersion, string productName, params IMigration[] migrations)
         {
-            if (builder == null) throw new ArgumentNullException("builder");
-            if (migrationEntryService == null) throw new ArgumentNullException("migrationEntryService");
-            if (logger == null) throw new ArgumentNullException("logger");
-            if (currentVersion == null) throw new ArgumentNullException("currentVersion");
-            if (targetVersion == null) throw new ArgumentNullException("targetVersion");
-            Mandate.ParameterNotNullOrEmpty(productName, "productName");
+            if (string.IsNullOrWhiteSpace(productName)) throw new ArgumentNullOrEmptyException(nameof(productName));
 
-            _builder = builder;
-            _migrationEntryService = migrationEntryService;
-            _logger = logger;
-            _currentVersion = currentVersion;
-            _targetVersion = targetVersion;
+            _builder = builder ?? throw new ArgumentNullException(nameof(builder));
+            _migrationEntryService = migrationEntryService ?? throw new ArgumentNullException(nameof(migrationEntryService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _currentVersion = currentVersion ?? throw new ArgumentNullException(nameof(currentVersion));
+            _targetVersion = targetVersion ?? throw new ArgumentNullException(nameof(targetVersion));
             _productName = productName;
             //ensure this is null if there aren't any
             _migrations = migrations == null || migrations.Length == 0 ? null : migrations;

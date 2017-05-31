@@ -43,17 +43,15 @@ namespace Umbraco.Core.Models
         /// <param name="properties"></param>
         protected ContentBase(string name, int parentId, IContentTypeComposition contentType, PropertyCollection properties)
         {
-            Mandate.ParameterCondition(parentId != 0, "parentId");
-            Mandate.ParameterNotNull(contentType, "contentType");
-            Mandate.ParameterNotNull(properties, "properties");
+            if (parentId == 0) throw new ArgumentOutOfRangeException(nameof(parentId));
 
-            ContentTypeBase = contentType;
+            ContentTypeBase = contentType ?? throw new ArgumentNullException(nameof(contentType));
             Version = Guid.NewGuid();
 
             _parentId = new Lazy<int>(() => parentId);
             _name = name;
             _contentTypeId = contentType.Id;
-            _properties = properties;
+            _properties = properties ?? throw new ArgumentNullException(nameof(properties));
             _properties.EnsurePropertyTypes(PropertyTypes);
             _additionalData = new Dictionary<string, object>();
         }
@@ -67,17 +65,15 @@ namespace Umbraco.Core.Models
         /// <param name="properties"></param>
         protected ContentBase(string name, IContentBase parent, IContentTypeComposition contentType, PropertyCollection properties)
 		{
-			Mandate.ParameterNotNull(parent, "parent");
-			Mandate.ParameterNotNull(contentType, "contentType");
-			Mandate.ParameterNotNull(properties, "properties");
+		    if (parent == null) throw new ArgumentNullException(nameof(parent));
 
-            ContentTypeBase = contentType;
+		    ContentTypeBase = contentType ?? throw new ArgumentNullException(nameof(contentType));
             Version = Guid.NewGuid();
 
 			_parentId = new Lazy<int>(() => parent.Id);
             _name = name;
 			_contentTypeId = contentType.Id;
-			_properties = properties;
+		    _properties = properties ?? throw new ArgumentNullException(nameof(properties));
 			_properties.EnsurePropertyTypes(PropertyTypes);
             _additionalData = new Dictionary<string, object>();
 		}

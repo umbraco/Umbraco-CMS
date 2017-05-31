@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Exceptions;
 using Umbraco.Web;
 
 // ReSharper disable once CheckNamespace
@@ -38,8 +39,8 @@ namespace Umbraco.Core.Logging
         [Obsolete("Warnings with http trace should not be used. This method will be removed in future versions")]
         public static void Warn(Type callingType, string message, bool showHttpTrace, params Func<object>[] formatItems)
         {
-            Mandate.ParameterNotNull(callingType, "callingType");
-            Mandate.ParameterNotNullOrEmpty(message, "message");
+            if (callingType == null) throw new ArgumentNullException(nameof(callingType));
+            if (string.IsNullOrEmpty(message)) throw new ArgumentNullOrEmptyException(nameof(message));
 
             if (showHttpTrace && HttpContext.Current != null)
             {
@@ -59,9 +60,9 @@ namespace Umbraco.Core.Logging
         [Obsolete("Warnings with http trace should not be used. This method will be removed in future versions")]
         public static void WarnWithException(Type callingType, string message, bool showHttpTrace, Exception e, params Func<object>[] formatItems)
         {
-            Mandate.ParameterNotNull(e, "e");
-            Mandate.ParameterNotNull(callingType, "callingType");
-            Mandate.ParameterNotNullOrEmpty(message, "message");
+            if (e == null) throw new ArgumentNullException(nameof(e));
+            if (callingType == null) throw new ArgumentNullException(nameof(callingType));
+            if (string.IsNullOrEmpty(message)) throw new ArgumentNullOrEmptyException(nameof(message));
 
             if (showHttpTrace && HttpContext.Current != null)
             {

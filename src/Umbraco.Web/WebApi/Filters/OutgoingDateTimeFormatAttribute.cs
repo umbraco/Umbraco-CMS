@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -19,7 +20,7 @@ namespace Umbraco.Web.WebApi.Filters
         /// <param name="format"></param>
         public OutgoingDateTimeFormatAttribute(string format)
         {
-            Mandate.ParameterNotNullOrEmpty(format, "format");
+            if (string.IsNullOrEmpty(format)) throw new ArgumentNullOrEmptyException(nameof(format));
             _format = format;
         }
 

@@ -520,36 +520,24 @@ AND umbracoNode.id <> @id",
 
         protected void ValidateAlias(PropertyType pt)
         {
-            Mandate.That<InvalidOperationException>(string.IsNullOrEmpty(pt.Alias) == false,
-                                    () =>
-                                    {
-                                        var message =
-                                            string.Format(
-                                                "{0} '{1}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
-                                                "Property Type",
-                                                pt.Name);
-                                        var exception = new InvalidOperationException(message);
-
-                                        Logger.Error<ContentTypeRepositoryBase<TEntity>>(message, exception);
-                                        throw exception;
-                                    });
+            if (string.IsNullOrWhiteSpace(pt.Alias))
+            {
+                var m = $"Property Type '{pt.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.";
+                var e = new InvalidOperationException(m);
+                Logger.Error<ContentTypeRepositoryBase<TEntity>>(m, e);
+                throw e;
+            }
         }
 
         protected void ValidateAlias(TEntity entity)
         {
-            Mandate.That<InvalidOperationException>(string.IsNullOrEmpty(entity.Alias) == false,
-                                    () =>
-                                    {
-                                        var message =
-                                            string.Format(
-                                                "{0} '{1}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
-                                                typeof(TEntity).Name,
-                                                entity.Name);
-                                        var exception = new InvalidOperationException(message);
-
-                                        Logger.Error<ContentTypeRepositoryBase<TEntity>>(message, exception);
-                                        throw exception;
-                                    });
+            if (string.IsNullOrWhiteSpace(entity.Alias))
+            {
+                var m = $"{typeof(TEntity).Name} '{entity.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.";
+                var e = new InvalidOperationException(m);
+                Logger.Error<ContentTypeRepositoryBase<TEntity>>(m, e);
+                throw e;
+            }
         }
 
         /// <summary>
@@ -759,7 +747,7 @@ AND umbracoNode.id <> @id",
             internal static IEnumerable<IMediaType> MapMediaTypes(IDatabase db, ISqlSyntaxProvider sqlSyntax,
                 out IDictionary<int, List<int>> parentMediaTypeIds)
             {
-                Mandate.ParameterNotNull(db, "db");
+                if (db == null) throw new ArgumentNullException(nameof(db));
 
                 var sql = @"SELECT cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc,
                                 cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
@@ -898,7 +886,7 @@ AND umbracoNode.id <> @id",
                 out IDictionary<int, List<AssociatedTemplate>> associatedTemplates,
                 out IDictionary<int, List<int>> parentContentTypeIds)
             {
-                Mandate.ParameterNotNull(db, "db");
+                if (db == null) throw new ArgumentNullException(nameof(db));
 
                 var sql = @"SELECT cmsDocumentType.IsDefault as dtIsDefault, cmsDocumentType.templateNodeId as dtTemplateId,
                                 cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc,

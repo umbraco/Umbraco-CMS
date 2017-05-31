@@ -3,6 +3,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
@@ -266,8 +267,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string SurfaceAction(this UrlHelper url, string action, string controllerName, string area, object additionalRouteVals)
         {
-            Mandate.ParameterNotNullOrEmpty(action, "action");
-            Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
+            if (string.IsNullOrEmpty(action)) throw new ArgumentNullOrEmptyException(nameof(action));
+            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
 
             var encryptedRoute = UmbracoHelper.CreateEncryptedRouteString(controllerName, action, area, additionalRouteVals);
 
@@ -297,8 +298,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string SurfaceAction(this UrlHelper url, string action, Type surfaceType, object additionalRouteVals)
         {
-            Mandate.ParameterNotNullOrEmpty(action, "action");
-            Mandate.ParameterNotNull(surfaceType, "surfaceType");
+            if (string.IsNullOrEmpty(action)) throw new ArgumentNullOrEmptyException(nameof(action));
+            if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
 
             var area = "";
 

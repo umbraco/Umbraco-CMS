@@ -10,6 +10,7 @@ using System.Web.Mvc;
 using Umbraco.Web.Templates;
 using System.IO;
 using System.Web.Routing;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 
@@ -34,14 +35,14 @@ namespace Umbraco.Web
 
         public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedContent contentItem, string propertyAlias)
         {
-            Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
+            if (string.IsNullOrWhiteSpace(propertyAlias)) throw new ArgumentNullOrEmptyException(nameof(propertyAlias));
 
             return html.GetGridHtml(contentItem, propertyAlias, "bootstrap3");
         }
 
         public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedContent contentItem, string propertyAlias, string framework)
         {
-            Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
+            if (string.IsNullOrWhiteSpace(propertyAlias)) throw new ArgumentNullOrEmptyException(nameof(propertyAlias));
 
             var view = "Grid/" + framework;
             var prop = contentItem.GetProperty(propertyAlias);
@@ -68,13 +69,13 @@ namespace Umbraco.Web
         }
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, HtmlHelper html, string propertyAlias)
         {
-            Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
+            if (string.IsNullOrWhiteSpace(propertyAlias)) throw new ArgumentNullOrEmptyException(nameof(propertyAlias));
 
             return GetGridHtml(contentItem, html, propertyAlias, "bootstrap3");
         }
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, HtmlHelper html, string propertyAlias, string framework)
         {
-            Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
+            if (string.IsNullOrWhiteSpace(propertyAlias)) throw new ArgumentNullOrEmptyException(nameof(propertyAlias));
 
             var view = "Grid/" + framework;
             var prop = contentItem.GetProperty(propertyAlias);
@@ -107,7 +108,7 @@ namespace Umbraco.Web
         [Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, string propertyAlias)
         {
-            Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
+            if (string.IsNullOrWhiteSpace(propertyAlias)) throw new ArgumentNullOrEmptyException(nameof(propertyAlias));
 
             return GetGridHtml(contentItem, propertyAlias, "bootstrap3");    
         }
@@ -115,7 +116,7 @@ namespace Umbraco.Web
         [Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, string propertyAlias, string framework)
         {
-            Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
+            if (string.IsNullOrWhiteSpace(propertyAlias)) throw new ArgumentNullOrEmptyException(nameof(propertyAlias));
 
             var prop = contentItem.GetProperty(propertyAlias);
             if (prop == null) throw new NullReferenceException("No property type found with alias " + propertyAlias);

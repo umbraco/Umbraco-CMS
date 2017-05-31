@@ -34,8 +34,7 @@ namespace Umbraco.Core.Models
         public Media(string name, IMedia parent, IMediaType contentType, PropertyCollection properties)
 			: base(name, parent, contentType, properties)
 		{
-			Mandate.ParameterNotNull(contentType, "contentType");
-			_contentType = contentType;
+			_contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
 		}
 
         /// <summary>
@@ -59,18 +58,14 @@ namespace Umbraco.Core.Models
         public Media(string name, int parentId, IMediaType contentType, PropertyCollection properties) 
             : base(name, parentId, contentType, properties)
         {
-			Mandate.ParameterNotNull(contentType, "contentType");
-            _contentType = contentType;
+            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
         }
 
         /// <summary>
         /// Gets the ContentType used by this Media object
         /// </summary>
         [IgnoreDataMember]
-        public IMediaType ContentType
-        {
-            get { return _contentType; }
-        }
+        public IMediaType ContentType => _contentType;
 
         /// <summary>
         /// Changes the <see cref="IMediaType"/> for the current Media object

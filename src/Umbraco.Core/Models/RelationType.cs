@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
 
@@ -19,19 +20,19 @@ namespace Umbraco.Core.Models
         private Guid _parentObjectType;
         private Guid _childObjectType;
 
-        public RelationType(Guid childObjectType, Guid parentObjectType, string @alias)
+        public RelationType(Guid childObjectType, Guid parentObjectType, string alias)
         {
-            Mandate.ParameterNotNullOrEmpty(@alias, "alias");
+            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentNullOrEmptyException(nameof(alias));
             _childObjectType = childObjectType;
             _parentObjectType = parentObjectType;
             _alias = alias;
             Name = _alias;
         }
 
-        public RelationType(Guid childObjectType, Guid parentObjectType, string @alias, string name)
-            :this(childObjectType, parentObjectType, @alias)
+        public RelationType(Guid childObjectType, Guid parentObjectType, string alias, string name)
+            : this(childObjectType, parentObjectType, alias)
         {
-            Mandate.ParameterNotNullOrEmpty(name, "name");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
             Name = name;
         }
 

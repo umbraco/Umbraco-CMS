@@ -3,6 +3,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Web.Security.Identity
@@ -18,7 +19,7 @@ namespace Umbraco.Web.Security.Identity
             string[] defaultAllowedSections = null, 
             string defaultCulture = null)
         {
-            Mandate.ParameterNotNullOrEmpty(defaultUserType, "defaultUserType");
+            if (string.IsNullOrEmpty(defaultUserType)) throw new ArgumentNullOrEmptyException(nameof(defaultUserType));
 
             _defaultUserType = defaultUserType;
             _defaultAllowedSections = defaultAllowedSections ?? new[] { "content", "media" };

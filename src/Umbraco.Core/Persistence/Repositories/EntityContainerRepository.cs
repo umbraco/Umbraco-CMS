@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -165,8 +166,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             EnsureContainerType(entity);
 
+            if (string.IsNullOrWhiteSpace(entity.Name)) throw new ArgumentNullOrEmptyException("entity.Name");
             entity.Name = entity.Name.Trim();
-            Mandate.ParameterNotNullOrEmpty(entity.Name, "entity.Name");
 
             // guard against duplicates
             var nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
@@ -227,7 +228,7 @@ namespace Umbraco.Core.Persistence.Repositories
             EnsureContainerType(entity);
 
             entity.Name = entity.Name.Trim();
-            Mandate.ParameterNotNullOrEmpty(entity.Name, "entity.Name");
+            if (string.IsNullOrWhiteSpace(entity.Name)) throw new ArgumentNullOrEmptyException("entity.Name");
 
             // find container to update
             var nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()

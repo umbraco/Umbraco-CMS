@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Web.Models.Trees
 {
@@ -16,8 +16,8 @@ namespace Umbraco.Web.Models.Trees
         /// <param name="methodName"></param>
         public ActionMenuItemAttribute(string serviceName, string methodName)
         {
-            Mandate.ParameterNotNullOrEmpty(serviceName, "serviceName");
-            Mandate.ParameterNotNullOrEmpty(methodName, "methodName");
+            if (string.IsNullOrWhiteSpace(serviceName)) throw new ArgumentNullOrEmptyException(nameof(serviceName));
+            if (string.IsNullOrWhiteSpace(methodName)) throw new ArgumentNullOrEmptyException(nameof(methodName));
             MethodName = methodName;
             ServiceName = serviceName;
         }
@@ -28,12 +28,12 @@ namespace Umbraco.Web.Models.Trees
         /// <param name="serviceName"></param>
         public ActionMenuItemAttribute(string serviceName)
         {
-            Mandate.ParameterNotNullOrEmpty(serviceName, "serviceName");
+            if (string.IsNullOrWhiteSpace(serviceName)) throw new ArgumentNullOrEmptyException(nameof(serviceName));
             MethodName = "";
             ServiceName = serviceName;
         }
 
-        public string MethodName { get; private set; }
-        public string ServiceName { get; private set; }
+        public string MethodName { get; }
+        public string ServiceName { get; }
     }
 }

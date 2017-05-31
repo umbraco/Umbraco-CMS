@@ -10,6 +10,7 @@ using Umbraco.Web.Templates;
 using umbraco;
 using System.Collections.Generic;
 using umbraco.presentation.templateControls;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
@@ -217,8 +218,8 @@ namespace Umbraco.Web
             //TODO: commented out until as it is not implemented by umbraco:item yet
         //,string formatString = "")
         {
-            Mandate.ParameterNotNull(currentPage, "currentPage");
-            Mandate.ParameterNotNullOrEmpty(fieldAlias, "fieldAlias");
+            if (currentPage == null) throw new ArgumentNullException(nameof(currentPage));
+            if (string.IsNullOrEmpty(fieldAlias)) throw new ArgumentNullOrEmptyException(nameof(fieldAlias));
 
             //TODO: This is real nasty and we should re-write the 'item' and 'ItemRenderer' class but si fine for now
 

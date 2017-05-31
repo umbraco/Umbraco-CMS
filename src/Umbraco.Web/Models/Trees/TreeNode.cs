@@ -3,6 +3,7 @@ using Umbraco.Core.IO;
 using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Trees
@@ -25,8 +26,8 @@ namespace Umbraco.Web.Models.Trees
         /// <param name="menuUrl"></param>
         internal TreeNode(string nodeId, string parentId, string getChildNodesUrl, string menuUrl)
         {
-            Mandate.ParameterNotNullOrEmpty(nodeId, "nodeId");            
-
+            if (string.IsNullOrWhiteSpace(nodeId)) throw new ArgumentNullOrEmptyException(nameof(nodeId));
+            
             Id = nodeId;
             ParentId = parentId;
             ChildNodesUrl = getChildNodesUrl;

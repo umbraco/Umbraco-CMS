@@ -9,6 +9,7 @@ using System.Web.Mvc.Html;
 using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -172,8 +173,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static IHtmlString Action(this HtmlHelper htmlHelper, string actionName, Type surfaceType)
         {
-            Mandate.ParameterNotNull(surfaceType, "surfaceType");
-            Mandate.ParameterNotNullOrEmpty(actionName, "actionName");
+            if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
+            if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentNullOrEmptyException(nameof(actionName));
 
             var routeVals = new RouteValueDictionary(new {area = ""});
 
@@ -412,8 +413,8 @@ namespace Umbraco.Web
                                                IDictionary<string, object> htmlAttributes,
                                                FormMethod method)
         {
-            Mandate.ParameterNotNullOrEmpty(action, "action");
-            Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
+            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentNullOrEmptyException(nameof(action));
+            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
 
             return html.BeginUmbracoForm(action, controllerName, "", additionalRouteVals, htmlAttributes, method);
         }
@@ -431,10 +432,10 @@ namespace Umbraco.Web
 											   object additionalRouteVals,
 											   IDictionary<string, object> htmlAttributes)
 		{
-			Mandate.ParameterNotNullOrEmpty(action, "action");
-			Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
+		    if (string.IsNullOrWhiteSpace(action)) throw new ArgumentNullOrEmptyException(nameof(action));
+		    if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
 
-			return html.BeginUmbracoForm(action, controllerName, "", additionalRouteVals, htmlAttributes);
+            return html.BeginUmbracoForm(action, controllerName, "", additionalRouteVals, htmlAttributes);
 		}
 
         /// <summary>
@@ -632,8 +633,8 @@ namespace Umbraco.Web
                                                IDictionary<string, object> htmlAttributes,
                                                FormMethod method)
         {
-            Mandate.ParameterNotNullOrEmpty(action, "action");
-            Mandate.ParameterNotNull(surfaceType, "surfaceType");
+            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentNullOrEmptyException(nameof(action));
+            if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
 
             var area = "";
 
@@ -744,8 +745,8 @@ namespace Umbraco.Web
                                                IDictionary<string, object> htmlAttributes,
                                                FormMethod method)
         {
-            Mandate.ParameterNotNullOrEmpty(action, "action");
-            Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
+            if (string.IsNullOrEmpty(action)) throw new ArgumentNullOrEmptyException(nameof(action));
+            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
 
             var formAction = UmbracoContext.Current.OriginalRequestUrl.PathAndQuery;
             return html.RenderForm(formAction, method, htmlAttributes, controllerName, action, area, additionalRouteVals);

@@ -8,6 +8,7 @@ using System.Web.Routing;
 using ClientDependency.Core.Config;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -92,8 +93,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetUmbracoApiService(this UrlHelper url, string actionName, Type apiControllerType, RouteValueDictionary routeVals = null)
         {
-            Mandate.ParameterNotNullOrEmpty(actionName, "actionName");
-            Mandate.ParameterNotNull(apiControllerType, "apiControllerType");
+            if (string.IsNullOrEmpty(actionName)) throw new ArgumentNullOrEmptyException(nameof(actionName));
+            if (apiControllerType == null) throw new ArgumentNullException(nameof(apiControllerType));
 
             var area = "";
 
@@ -134,8 +135,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetUmbracoApiService(this UrlHelper url, string actionName, string controllerName, string area, RouteValueDictionary routeVals = null)
         {
-            Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
-            Mandate.ParameterNotNullOrEmpty(actionName, "actionName");
+            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (string.IsNullOrEmpty(actionName)) throw new ArgumentNullOrEmptyException(nameof(actionName));
 
             if (routeVals == null)
             {

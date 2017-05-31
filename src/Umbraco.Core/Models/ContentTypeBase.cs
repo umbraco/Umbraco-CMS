@@ -40,7 +40,7 @@ namespace Umbraco.Core.Models
 
         protected ContentTypeBase(int parentId)
         {
-			Mandate.ParameterCondition(parentId != 0, "parentId");
+            if (parentId == 0) throw new ArgumentOutOfRangeException(nameof(parentId));
 
             _parentId = new Lazy<int>(() => parentId);
             _allowedContentTypes = new List<ContentTypeSort>();
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Models
 
         protected ContentTypeBase(IContentTypeBase parent, string alias)
         {
-            Mandate.ParameterNotNull(parent, "parent");
+            if (parent == null) throw new ArgumentNullException(nameof(parent));
 
             _alias = alias;
             _parentId = new Lazy<int>(() => parent.Id);

@@ -17,6 +17,7 @@ using System.Text;
 using System.Security.Cryptography;
 using System.Linq;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Xml;
@@ -255,7 +256,7 @@ namespace umbraco.cms.businesslogic.member
         /// <returns>The member with the specified loginname - null if no Member with the login exists</returns>
         public static Member GetMemberFromLoginName(string loginName)
         {
-            Mandate.ParameterNotNullOrEmpty(loginName, "loginName");
+            if (string.IsNullOrEmpty(loginName)) throw new ArgumentNullOrEmptyException(nameof(loginName));
 
             var found = Current.Services.MemberService.GetByUsername(loginName);
             if (found == null) return null;
@@ -374,7 +375,7 @@ namespace umbraco.cms.businesslogic.member
         /// <returns>True if the member exists</returns>
         public static bool IsMember(string loginName)
         {
-            Mandate.ParameterNotNullOrEmpty(loginName, "loginName");
+            if (string.IsNullOrWhiteSpace(loginName)) throw new ArgumentNullOrEmptyException(nameof(loginName));
             return Current.Services.MemberService.Exists(loginName);
         }
 

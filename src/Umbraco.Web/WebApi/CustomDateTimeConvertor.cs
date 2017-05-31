@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Umbraco.Core;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Web.WebApi
 {
@@ -14,7 +15,7 @@ namespace Umbraco.Web.WebApi
         
         public CustomDateTimeConvertor(string dateTimeFormat)
         {
-            Mandate.ParameterNotNullOrEmpty(dateTimeFormat, "dateTimeFormat");
+            if (string.IsNullOrEmpty(dateTimeFormat)) throw new ArgumentNullOrEmptyException(nameof(dateTimeFormat));
             _dateTimeFormat = dateTimeFormat;
         }
 

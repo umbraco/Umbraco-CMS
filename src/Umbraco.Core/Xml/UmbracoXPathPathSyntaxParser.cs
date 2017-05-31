@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Xml
 {
@@ -36,9 +37,9 @@ namespace Umbraco.Core.Xml
             // allowed 'inline', not just at the beginning... whether or not we want to support that is up 
             // for discussion.
 
-            Mandate.ParameterNotNullOrEmpty(xpathExpression, "xpathExpression");
-            Mandate.ParameterNotNull(getPath, "getPath");
-            Mandate.ParameterNotNull(publishedContentExists, "publishedContentExists");
+            if (string.IsNullOrWhiteSpace(xpathExpression)) throw new ArgumentNullOrEmptyException(nameof(xpathExpression));
+            if (getPath == null) throw new ArgumentNullException(nameof(getPath));
+            if (publishedContentExists == null) throw new ArgumentNullException(nameof(publishedContentExists));
 
             //no need to parse it
             if (xpathExpression.StartsWith("$") == false)

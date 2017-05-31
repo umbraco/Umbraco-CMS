@@ -1,18 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
+using Umbraco.Core.Exceptions;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -43,7 +35,7 @@ namespace Umbraco.Web.WebApi.Filters
 
         public EnsureUserPermissionForContentAttribute(string paramName)
         {
-            Mandate.ParameterNotNullOrEmpty(paramName, "paramName");
+            if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullOrEmptyException(nameof(paramName));
             _paramName = paramName;
             _permissionToCheck = ActionBrowse.Instance.Letter;
         }
@@ -53,10 +45,7 @@ namespace Umbraco.Web.WebApi.Filters
             _permissionToCheck = permissionToCheck;
         }
 
-        public override bool AllowMultiple
-        {
-            get { return true; }
-        }
+        public override bool AllowMultiple => true;
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
@@ -69,7 +58,7 @@ namespace Umbraco.Web.WebApi.Filters
             int nodeId;
             if (_nodeId.HasValue == false)
             {
-                var parts = _paramName.Split(new char[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
+                var parts = _paramName.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
 
                 if (actionContext.ActionArguments[parts[0]] == null)
                 {

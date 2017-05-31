@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
@@ -1030,9 +1031,9 @@ namespace Umbraco.Web
         /// <returns></returns>
         internal static string CreateEncryptedRouteString(string controllerName, string controllerAction, string area, object additionalRouteVals = null)
         {
-            Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
-            Mandate.ParameterNotNullOrEmpty(controllerAction, "controllerAction");
-            Mandate.ParameterNotNull(area, "area");
+            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (string.IsNullOrEmpty(controllerAction)) throw new ArgumentNullOrEmptyException(nameof(controllerAction));
+            if (area == null) throw new ArgumentNullException(nameof(area));
 
             //need to create a params string as Base64 to put into our hidden field to use during the routes
             var surfaceRouteParams = $"c={HttpUtility.UrlEncode(controllerName)}&a={HttpUtility.UrlEncode(controllerAction)}&ar={area}";
