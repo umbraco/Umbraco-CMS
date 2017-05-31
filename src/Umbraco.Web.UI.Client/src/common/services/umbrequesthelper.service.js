@@ -47,17 +47,15 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 return _.map(queryStrings, function (item) {
                     var key = null;
                     var val = null;
-                    var encodedQueryStrings = [];
-                    // can be multiple parameters passed via array
                     for (var k in item) {
                         key = k;
                         val = item[k];
-                        encodedQueryStrings.push(encodeURIComponent(key) + "=" + encodeURIComponent(val));
-                     }
+                        break;
+                    }
                     if (key === null || val === null) {
                         throw "The object in the array was not formatted as a key/value pair";
-                    }                  
-                    return encodedQueryStrings.join("&");
+                    }
+                    return encodeURIComponent(key) + "=" + encodeURIComponent(val);
                 }).join("&");
             }
             else if (angular.isObject(queryStrings)) {
@@ -105,15 +103,15 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
          * @description
          * This returns a promise with an underlying http call, it is a helper method to reduce
          *  the amount of duplicate code needed to query http resources and automatically handle any 
-         *  500 Http server errors. 
+         *  Http errors. See /docs/source/using-promises-resources.md
          *
-         * @param {object} opts A mixed object which can either be a `string` representing the error message to be
-         *   returned OR an `object` containing either:
+         * @param {object} opts A mixed object which can either be a string representing the error message to be
+         *   returned OR an object containing either:
          *     { success: successCallback, errorMsg: errorMessage }
          *          OR
          *     { success: successCallback, error: errorCallback }
-         *   In both of the above, the successCallback must accept these parameters: `data`, `status`, `headers`, `config`
-         *   If using the errorCallback it must accept these parameters: `data`, `status`, `headers`, `config`
+         *   In both of the above, the successCallback must accept these parameters: data, status, headers, config
+         *   If using the errorCallback it must accept these parameters: data, status, headers, config
          *   The success callback must return the data which will be resolved by the deferred object.
          *   The error callback must return an object containing: {errorMsg: errorMessage, data: originalData, status: status }
          */
