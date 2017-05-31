@@ -592,7 +592,8 @@
     <key alias="nameentity">Namnge %0%...</key>
     <key alias="password">Fyll i ditt lösenord</key>
     <key alias="search">Skriv för att söka...</key>
-    <key alias="username">Fyll i ditt lösenord</key>
+    <key alias="username">Fyll i ditt användarnamn</key>
+    <key alias="usernameHint">Ditt användarnamn är vanligen din epostadress</key>
     <key alias="enterTags">Skriv för att lägga till taggar (och tryck enter efter varje tagg)...</key>
     <key alias="usernamehint">Ditt användarnamn är vanligtvis din e-postadress</key>
   </area>
