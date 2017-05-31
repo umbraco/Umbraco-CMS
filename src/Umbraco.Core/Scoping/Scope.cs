@@ -14,7 +14,7 @@ namespace Umbraco.Core.Scoping
     /// Implements <see cref="IScope"/>.
     /// </summary>
     /// <remarks>Not thread-safe obviously.</remarks>
-    internal class Scope : IScopeInternal
+    internal class Scope : IScope
     {
         // fixme
         // considering that a great amount of things here are only useful for the top-level
@@ -182,12 +182,12 @@ namespace Umbraco.Core.Scoping
         public bool Detachable { get; }
 
         // the parent scope (in a nested scopes chain)
-        public IScopeInternal ParentScope { get; set; }
+        public Scope ParentScope { get; set; }
 
         public bool Attached { get; set; }
 
         // the original scope (when attaching a detachable scope)
-        public IScopeInternal OrigScope { get; set; }
+        public Scope OrigScope { get; set; }
 
         // the original context (when attaching a detachable scope)
         public ScopeContext OrigContext { get; set; }

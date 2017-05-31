@@ -1253,7 +1253,7 @@
     <Compile Include="SafeCallContext.cs" />
     <Compile Include="Scoping\IInstanceIdentifiable.cs" />
     <Compile Include="Scoping\IScope.cs" />
-    <Compile Include="Scoping\IScopeInternal.cs" />
+    <Compile Include="Scoping\IScopeContext.cs" />
     <Compile Include="Scoping\IScopeProvider.cs" />
     <Compile Include="Scoping\RepositoryCacheMode.cs" />
     <Compile Include="Scoping\Scope.cs" />

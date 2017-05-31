@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void NestedMigrateScope()
         {
-            var scopeProvider = ScopeProvider as ScopeProvider;
+            var scopeProvider = ScopeProvider;
             Assert.IsNull(scopeProvider.AmbientScope);
 
             var httpContextItems = new Hashtable();
@@ -162,7 +162,7 @@ namespace Umbraco.Tests.Scoping
                 Assert.AreSame(scope, scopeProvider.AmbientScope);
                 Assert.IsNotNull(scopeProvider.AmbientContext);
 
-                ScopeContext context;
+                IScopeContext context;
                 using (var nested = scopeProvider.CreateScope())
                 {
                     Assert.IsInstanceOf<Scope>(nested);

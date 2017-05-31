@@ -74,7 +74,7 @@ namespace Umbraco.Core.Scoping
         /// <summary>
         /// Gets the scope context.
         /// </summary>
-        ScopeContext Context { get; }
+        IScopeContext Context { get; }
 
 #if DEBUG_SCOPES
         Dictionary<Guid, object> CallContextObjects { get; }

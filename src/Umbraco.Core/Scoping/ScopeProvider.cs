@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Runtime.Remoting.Messaging;
-using System.Text;
 using System.Web;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
@@ -39,7 +38,7 @@ namespace Umbraco.Core.Scoping
             SafeCallContext.Register(
                 () =>
                 {
-                    var scope = GetCallContextObject<IScopeInternal>(ScopeItemKey);
+                    var scope = GetCallContextObject<Scope>(ScopeItemKey);
                     var context = GetCallContextObject<ScopeContext>(ContextItemKey);
                     SetCallContextObject(ScopeItemKey, null);
                     SetCallContextObject(ContextItemKey, null);
@@ -48,12 +47,12 @@ namespace Umbraco.Core.Scoping
                 o =>
                 {
                     // cannot re-attached over leaked scope/context
-                    if (GetCallContextObject<IScope>(ScopeItemKey) != null)
+                    if (GetCallContextObject<Scope>(ScopeItemKey) != null)
                             throw new Exception("Found leaked scope when restoring call context.");
                     if (GetCallContextObject<ScopeContext>(ContextItemKey) != null)
                         throw new Exception("Found leaked context when restoring call context.");
 
-                    var t = (Tuple<IScopeInternal, ScopeContext>) o;
+                    var t = (Tuple<Scope, ScopeContext>) o;
                     SetCallContextObject(ScopeItemKey, t.Item1);
                     SetCallContextObject(ContextItemKey, t.Item2);
                 });
@@ -231,7 +230,7 @@ namespace Umbraco.Core.Scoping
 
         internal const string ContextItemKey = "Umbraco.Core.Scoping.ScopeContext";
 
-        internal static ScopeContext AmbientContextInternal
+        internal static ScopeContext AmbientContextStatic
         {
             get
             {
@@ -253,7 +252,7 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public ScopeContext AmbientContext => AmbientContextInternal;
+        public ScopeContext AmbientContext => AmbientContextStatic;
 
         #endregion
 
@@ -266,13 +265,13 @@ namespace Umbraco.Core.Scoping
         // fixme - more weird static - we should try to get rid of all static & use an accessor
         private static readonly ScopeReference StaticScopeReference = new ScopeReference(new ScopeProvider(null, null, null));
 
-        internal static IScopeInternal AmbientScopeInternal
+        private static Scope AmbientScopeStatic
         {
             get
             {
                 // try http context, fallback onto call context
-                var value = GetHttpContextObject<IScopeInternal>(ScopeItemKey, false);
-                return value ?? GetCallContextObject<IScopeInternal>(ScopeItemKey);
+                var value = GetHttpContextObject<Scope>(ScopeItemKey, false);
+                return value ?? GetCallContextObject<Scope>(ScopeItemKey);
             }
             set
             {
@@ -291,15 +290,15 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public IScopeInternal AmbientScope
+        public Scope AmbientScope
         {
-            get => AmbientScopeInternal;
-            internal set => AmbientScopeInternal = value;
+            get => AmbientScopeStatic;
+            set => AmbientScopeStatic = value;
         }
 
         #endregion
 
-        public void SetAmbient(IScopeInternal scope, ScopeContext context = null)
+        public void SetAmbient(Scope scope, ScopeContext context = null)
         {
             // clear all
             SetHttpContextObject(ScopeItemKey, null, false);
@@ -415,7 +414,7 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public ScopeContext Context => AmbientContext;
+        public IScopeContext Context => AmbientContext;
 
 #if DEBUG_SCOPES
         // this code needs TLC

@@ -4,10 +4,7 @@ using System.Linq;
 
 namespace Umbraco.Core.Scoping
 {
-    // fixme should we have an IScopeContext?
-    // fixme document all this properly!
-
-    public class ScopeContext : IInstanceIdentifiable
+    internal class ScopeContext : IScopeContext, IInstanceIdentifiable
     {
         private Dictionary<string, IEnlistedObject> _enlisted;
         private bool _exiting;
@@ -62,7 +59,7 @@ namespace Umbraco.Core.Scoping
 
             public T Item { get; }
 
-            public int Priority { get; private set; }
+            public int Priority { get; }
 
             public void Execute(bool completed)
             {
@@ -70,38 +67,19 @@ namespace Umbraco.Core.Scoping
             }
         }
 
-        // todo: replace with optional parameters when we can break things
-        public T Enlist<T>(string key, Func<T> creator)
-        {
-            return Enlist(key, creator, null, 100);
-        }
-
-        // todo: replace with optional parameters when we can break things
-        public T Enlist<T>(string key, Func<T> creator, Action<bool, T> action)
-        {
-            return Enlist(key, creator, action, 100);
-        }
-
-        // todo: replace with optional parameters when we can break things
-        public void Enlist(string key, Action<bool> action)
-        {
-            Enlist<object>(key, null, (completed, item) => action(completed), 100);
-        }
-
-        public void Enlist(string key, Action<bool> action, int priority)
+        public void Enlist(string key, Action<bool> action, int priority = 100)
         {
             Enlist<object>(key, null, (completed, item) => action(completed), priority);
         }
 
-        public T Enlist<T>(string key, Func<T> creator, Action<bool, T> action, int priority)
+        public T Enlist<T>(string key, Func<T> creator, Action<bool, T> action = null, int priority = 100)
         {
             if (_exiting)
                 throw new InvalidOperationException("Cannot enlist now, context is exiting.");
 
             var enlistedObjects = _enlisted ?? (_enlisted = new Dictionary<string, IEnlistedObject>());
 
-            IEnlistedObject enlisted;
-            if (enlistedObjects.TryGetValue(key, out enlisted))
+            if (enlistedObjects.TryGetValue(key, out IEnlistedObject enlisted))
             {
                 var enlistedAs = enlisted as EnlistedObject<T>;
                 if (enlistedAs == null) throw new InvalidOperationException("An item with the key already exists, but with a different type.");
