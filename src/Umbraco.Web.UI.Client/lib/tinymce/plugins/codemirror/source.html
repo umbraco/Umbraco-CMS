@@ -138,7 +138,8 @@ function start()
 	head.appendChild(div);
 	
 	// Set CodeMirror cursor to same position as cursor was in TinyMCE:
-	var html = editor.getContent({source_view: true});
+	var html = editor.getContent({ source_view: true });
+	html = html.replace(/(<p>\s*)<span\s+class="CmCaReT"([^>]*)>([^<]*)<\/span>(\s*<\/p>\n)/gm, String.fromCharCode(chr));
 	html = html.replace(/<span\s+class="CmCaReT"([^>]*)>([^<]*)<\/span>/gm, String.fromCharCode(chr));
 	editor.dom.remove(editor.dom.select('.CmCaReT'));
 	html = html.replace(/(<div class=".*?umb-macro-holder.*?mceNonEditable.*?"><!-- <\?UMBRACO_MACRO macroAlias="(.*?)".*?\/> --> *<ins>)[\s\S]*?(<\/ins> *<\/div>)/ig, "$1Macro alias: <strong>$2</strong>$3");
@@ -206,15 +207,15 @@ function submit()
 
 	var pos = codemirror.getCursor(),
 		curLineHTML = doc.getLine(pos.line);
-
-	if (findDepth(curLineHTML, cc) !== 0) {
+	
+	if (findDepth(curLineHTML, cc) !== 0 || curLineHTML.indexOf("UMBRACO_MACRO")) {
 		// Cursor is inside a <tag>, don't set cursor:
 		curLineHTML = curLineHTML.replace(cc, '');
 		doc.getLineHandle(pos.line).text = curLineHTML;
 	}
 
 	// Submit HTML to TinyMCE:
-	editor.setContent(codemirror.getValue().replace(cc, '<span class="CmCaReT">&nbsp;</span>'));
+	editor.setContent(codemirror.getValue().replace(cc, '<span class="CmCaReT" style="display:none">&#0;</span>'));
 	editor.isNotDirty = !isDirty;
 	if (isDirty) {
 		editor.nodeChanged();
