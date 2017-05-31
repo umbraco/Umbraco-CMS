@@ -47,15 +47,17 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 return _.map(queryStrings, function (item) {
                     var key = null;
                     var val = null;
+                    var encodedQueryStrings = [];
+                    // can be multiple parameters passed via array
                     for (var k in item) {
                         key = k;
                         val = item[k];
-                        break;
-                    }
+                        encodedQueryStrings.push(encodeURIComponent(key) + "=" + encodeURIComponent(val));
+                     }
                     if (key === null || val === null) {
                         throw "The object in the array was not formatted as a key/value pair";
-                    }
-                    return encodeURIComponent(key) + "=" + encodeURIComponent(val);
+                    }                  
+                    return encodedQueryStrings.join("&");
                 }).join("&");
             }
             else if (angular.isObject(queryStrings)) {
