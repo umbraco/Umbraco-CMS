@@ -17,5 +17,6 @@ namespace Umbraco.Web.Models.ContentEditing
         ///// </summary>
         //[DataMember(Name = "caption")]
         //public string Caption { get; set; }
+        
     }
 }

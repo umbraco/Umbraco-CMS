@@ -94,6 +94,8 @@ namespace Umbraco.Web.Models.Mapping
                             basic.Icon = "icon-item-arrangement";
                         else if (entity.NodeObjectTypeId == Constants.ObjectTypes.MediaTypeGuid)
                             basic.Icon = "icon-thumbnails";
+                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.TemplateTypeGuid)
+                            basic.Icon = "icon-newspaper-alt";
                     }
                 });
 
