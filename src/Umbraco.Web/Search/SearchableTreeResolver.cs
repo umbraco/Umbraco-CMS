@@ -40,21 +40,19 @@ namespace Umbraco.Web.Search
                     var appTrees = _treeService.GetAll().ToArray();
                     _resolved = new SearchableTreeCollection();
                     var searchableTrees = Values.ToArray();
-                    foreach (var instanceType in InstanceTypes)
+                    foreach (var searchableTree in searchableTrees)
                     {
-                        if (TypeHelper.IsTypeAssignableFrom<ISearchableTree>(instanceType))
+                        var found = appTrees.FirstOrDefault(x => x.Alias == searchableTree.TreeAlias);
+                        if (found != null)
                         {
-                            var found = appTrees.FirstOrDefault(x => x.GetRuntimeType() == instanceType);
-                            if (found != null)
-                            {
-                                _resolved.Add(new SearchableApplicationTree(found.ApplicationAlias, found.Alias, searchableTrees.First(x => x.GetType() == instanceType)));
-                            }
+                            _resolved.Add(new SearchableApplicationTree(found.ApplicationAlias, found.Alias, searchableTree));
                         }
                     }
                     return _resolved;
                 }
             }
         }
+        
 
     }
 }

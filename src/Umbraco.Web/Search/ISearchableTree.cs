@@ -1,10 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Search
 {
     public interface ISearchableTree
     {
+        /// <summary>
+        /// The alias of the tree that the <see cref="ISearchableTree"/> belongs to
+        /// </summary>
+        string TreeAlias { get; }
+
         /// <summary>
         /// Searches for results based on the entity type
         /// </summary>
