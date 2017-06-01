@@ -56,11 +56,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinks2Alias))
                 return true;
 
-            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters == false)
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
             {
                 return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinksAlias);
             }
-            return false;            
+            return false;
         }
 
         /// <summary>
