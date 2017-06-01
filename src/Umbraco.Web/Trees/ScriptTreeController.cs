@@ -5,7 +5,7 @@ using Umbraco.Web.Models.Trees;
 namespace Umbraco.Web.Trees
 {
     [Tree(Constants.Applications.Settings, "scripts", "Scripts", sortOrder: 4)]
-    public class ScriptTreeController : FileSystemTreeController
+    public class ScriptTreeController : FileSystemTreeController2
     {
         protected override IFileSystem2 FileSystem
         {

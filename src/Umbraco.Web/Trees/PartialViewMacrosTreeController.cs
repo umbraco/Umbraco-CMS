@@ -8,7 +8,7 @@ namespace Umbraco.Web.Trees
     /// Tree for displaying partial view macros in the developer app
     /// </summary>
     [Tree(Constants.Applications.Developer, "partialViewMacros", "Partial View Macro Files", sortOrder: 6)]
-	public class PartialViewMacrosTreeController : FileSystemTreeController
+	public class PartialViewMacrosTreeController : FileSystemTreeController2
     {
         protected override IFileSystem2 FileSystem
         {
