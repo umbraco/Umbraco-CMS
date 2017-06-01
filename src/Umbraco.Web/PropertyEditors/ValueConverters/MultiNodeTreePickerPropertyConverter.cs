@@ -55,11 +55,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePicker2Alias))
                 return true;
 
-            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters == false)
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
             {
                 return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePickerAlias);
             }
-            return false;            
+            return false;
         }
 
         /// <summary>
