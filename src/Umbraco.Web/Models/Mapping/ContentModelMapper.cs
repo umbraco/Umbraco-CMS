@@ -28,6 +28,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemDisplay
             config.CreateMap<IContent, ContentItemDisplay>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Document, content.Key)))
                 .ForMember(display => display.Owner, expression => expression.ResolveUsing(new OwnerResolver<IContent>()))
                 .ForMember(display => display.Updater, expression => expression.ResolveUsing(new CreatorResolver()))
                 .ForMember(display => display.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -58,6 +59,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Document, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IContent>()))
                 .ForMember(dto => dto.Updater, expression => expression.ResolveUsing(new CreatorResolver()))
                 .ForMember(dto => dto.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -68,6 +70,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemDto<IContent>
             config.CreateMap<IContent, ContentItemDto<IContent>>()
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Document, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IContent>()))
                 .ForMember(dto => dto.HasPublishedVersion, expression => expression.MapFrom(content => content.HasPublishedVersion))
                 .ForMember(dto => dto.Updater, expression => expression.Ignore())
@@ -99,7 +102,7 @@ namespace Umbraco.Web.Models.Mapping
             //map the tree node url
             if (HttpContext.Current != null)
             {
-                var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
+                var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
                 var url = urlHelper.GetUmbracoApiService<ContentTreeController>(controller => controller.GetTreeNode(display.Id.ToString(), null));
                 display.TreeNodeUrl = url;
             }
@@ -162,15 +165,9 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         {"items", templateItemConfig}
                     }
-                },
-                new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("content/urls"),
-                    Value = string.Join(",", display.Urls),
-                    View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                 }
             };
+
 
             TabsAndPropertiesResolver.MapGenericProperties(content, display, localizedText, properties.ToArray(),
                 genericProperties =>
@@ -203,6 +200,15 @@ namespace Umbraco.Web.Models.Mapping
                         //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                         docTypeProperty.View = "urllist";
                     }
+
+                    // inject 'Link to document' as the first generic property
+                    genericProperties.Insert(0, new ContentPropertyDisplay
+                    {
+                        Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = localizedText.Localize("content/urls"),
+                        Value = string.Join(",", display.Urls),
+                        View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                    });
                 });
         }
 

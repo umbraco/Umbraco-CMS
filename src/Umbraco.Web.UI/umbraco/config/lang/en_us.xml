@@ -199,6 +199,13 @@
     <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
     <key alias="newFolder">New folder</key>
     <key alias="newDataType">New data type</key>
+    <key alias="newJavascriptFile">New javascript file</key>
+    <key alias="newEmptyPartialView">New empty partial view</key>
+    <key alias="newPartialViewMacro">New partial view macro</key>
+    <key alias="newPartialViewFromSnippet">New partial view from snippet</key>
+    <key alias="newEmptyPartialViewMacro">New empty partial view macro</key>
+    <key alias="newPartialViewMacroFromSnippet">New partial view macro from snippet</key>
+    <key alias="newPartialViewMacroNoMacro">New partial view macro (without macro)</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Browse your website</key>
@@ -553,6 +560,16 @@
 
     <key alias="toggleListView">Toggle list view</key>
     <key alias="toggleAllowAsRoot">Toggle allow as root</key>
+
+    <key alias="commentLine">Comment/Uncomment lines</key>
+    <key alias="removeLine">Remove line</key>
+    <key alias="copyLineUp">Copy Lines Up</key>
+    <key alias="copyLineDown">Copy Lines Down</key>
+    <key alias="moveLineUp">Move Lines Up</key>
+    <key alias="moveLineDown">Move Lines Down</key>
+
+    <key alias="generalHeader">General</key>
+    <key alias="editorHeader">Editor</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background color</key>
@@ -828,7 +845,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="publicAccess">
     <key alias="paAdvanced">Role based protection</key>
     <key alias="paAdvancedHelp"><![CDATA[If you wish to control access to the page using role-based authentication,<br /> using Umbraco's member groups.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[You need to create a membergroup before you can use <br />role-based authentication.]]></key>
+    <key alias="paAdvancedNoGroups">You need to create a membergroup before you can use role-based authentication</key>
     <key alias="paErrorPage">Error Page</key>
     <key alias="paErrorPageHelp">Used when people are logged on, but do not have access</key>
     <key alias="paHowWould">Choose how to restrict access to this page</key>
@@ -1027,13 +1044,105 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="template">
     <key alias="edittemplate">Edit template</key>
+
+    <key alias="insertSections">Sections</key>
     <key alias="insertContentArea">Insert content area</key>
     <key alias="insertContentAreaPlaceHolder">Insert content area placeholder</key>
-    <key alias="insertDictionaryItem">Insert dictionary item</key>
-    <key alias="insertMacro">Insert Macro</key>
-    <key alias="insertPageField">Insert Umbraco page field</key>
+
+    <key alias="insert">Insert</key>
+    <key alias="insertDesc">Choose what to insert into your template</key>
+
+    <key alias="insertDictionaryItem">Dictionary item</key>
+    <key alias="insertDictionaryItemDesc">A dictionary item is a placeholder for a translatable piece of text, which makes it easy to create designs for multilingual websites.</key>
+
+    <key alias="insertMacro">Macro</key>
+    <key alias="insertMacroDesc">
+      A Macro is a configurable component which is great for
+      reusable parts of your design, where you need the option to provide parameters,
+      such as galleries, forms and lists.
+    </key>
+
+    <key alias="insertPageField">Value</key>
+    <key alias="insertPageFieldDesc">Displays the value of a named field from the current page, with options to modify the value or fallback to alternative values.</key>
+
+    <key alias="insertPartialView">Partial view</key>
+    <key alias="insertPartialViewDesc">
+      A partial view is a separate template file which can be rendered inside another
+      template, it's great for reusing markup or for separating complex templates into separate files.
+    </key>
+
     <key alias="mastertemplate">Master template</key>
-    <key alias="quickGuide">Quick Guide to Umbraco template tags</key>
+    <key alias="noMastertemplate">No master template</key>
+    <key alias="noMaster">No master</key>
+
+    <key alias="renderBody">Render child template</key>
+    <key alias="renderBodyDesc">
+      <![CDATA[
+     Renders the contents of a child template, by inserting a
+     <code>@RenderBody()</code> placeholder.
+      ]]>
+    </key>
+
+
+    <key alias="defineSection">Define a named section</key>
+    <key alias="defineSectionDesc">
+      <![CDATA[
+         Defines a part of your template as a named section by wrapping it in
+          <code>@section { ... }</code>. This can be rendered in a
+          specific area of the parent of this template, by using <code>@RenderSection</code>.
+      ]]>
+    </key>
+
+    <key alias="renderSection">Render a named section</key>
+    <key alias="renderSectionDesc">
+      <![CDATA[
+      Renders a named area of a child template, by inserting a <code>@RenderSection(name)</code> placeholder.
+      This renders an area of a child template which is wrapped in a corresponding <code>@section [name]{ ... }</code> definition.
+      ]]>
+    </key>
+
+    <key alias="sectionName">Section Name</key>
+    <key alias="sectionMandatory">Section is mandatory</key>
+    <key alias="sectionMandatoryDesc">
+      If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is shown.
+    </key>
+
+
+    <key alias="queryBuilder">Query builder</key>
+    <key alias="itemsReturned">items returned, in</key>
+
+    <key alias="iWant">I want</key>
+    <key alias="allContent">all content</key>
+    <key alias="contentOfType">content of type &quot;%0%&quot;</key>
+    <key alias="from">from</key>
+    <key alias="websiteRoot">my website</key>
+    <key alias="where">where</key>
+    <key alias="and">and</key>
+
+    <key alias="is">is</key>
+    <key alias="isNot">is not</key>
+    <key alias="before">before</key>
+    <key alias="beforeIncDate">before (including selected date)</key>
+    <key alias="after">after</key>
+    <key alias="afterIncDate">after (including selected date)</key>
+    <key alias="equals">equals</key>
+    <key alias="doesNotEqual">does not equal</key>
+    <key alias="contains">contains</key>
+    <key alias="doesNotContain">does not contain</key>
+    <key alias="greaterThan">greater than</key>
+    <key alias="greaterThanEqual">greater than or equal to</key>
+    <key alias="lessThan">less than</key>
+    <key alias="lessThanEqual">less than or equal to</key>
+
+    <key alias="id">Id</key>
+    <key alias="name">Name</key>
+    <key alias="createdDate">Created Date</key>
+    <key alias="lastUpdatedDate">Last Updated Date</key>
+
+    <key alias="orderBy">order by</key>
+    <key alias="ascending">ascending</key>
+    <key alias="descending">descending</key>
+
     <key alias="template">Template</key>
   </area>
   <area alias="grid">
@@ -1437,5 +1546,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="disableError">Error disabling the URL tracker, more information can be found in your log file.</key>
     <key alias="enabledConfirm">URL tracker has now been enabled.</key>
     <key alias="enableError">Error enabling the URL tracker, more information can be found in your log file.</key>
+  </area>
+  <area alias="emptyStates">
+    <key alias="emptyDictionaryTree">No Dictionary items to choose from</key>
   </area>
 </language>

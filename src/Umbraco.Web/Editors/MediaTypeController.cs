@@ -40,7 +40,7 @@ namespace Umbraco.Web.Editors
             public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetAllowedChildren", "contentId", typeof(int), typeof(Guid), typeof(string))));
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetAllowedChildren", "contentId", typeof(int), typeof(Guid), typeof(Udi), typeof(string))));
             }
         }
 
@@ -187,6 +187,7 @@ namespace Umbraco.Web.Editors
         }
 
 
+        #region GetAllowedChildren
         /// <summary>
         /// Returns the allowed child content type objects for the content item id passed in - based on an INT id
         /// </summary>
@@ -247,10 +248,30 @@ namespace Umbraco.Web.Editors
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
         }
-        
-        [Obsolete("Do not use this method, use either the overload with INT or GUID instead, this will be removed in future versions")]
+
+        /// <summary>
+        /// Returns the allowed child content type objects for the content item id passed in - based on a UDI id
+        /// </summary>
+        /// <param name="contentId"></param>
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        public IEnumerable<ContentTypeBasic> GetAllowedChildren(Udi contentId)
+        {
+            var guidUdi = contentId as GuidUdi;
+            if (guidUdi != null)
+            {
+                var entity = ApplicationContext.Services.EntityService.GetByKey(guidUdi.Guid);
+                if (entity != null)
+                {
+                    return GetAllowedChildren(entity.Id);
+                }
+            }
+
+            throw new HttpResponseException(HttpStatusCode.NotFound);
+        }
+
+        [Obsolete("Do not use this method, use either the overload with INT, GUID or UDI instead, this will be removed in future versions")]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]        
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(string contentId)
         {
             foreach (var type in new[] { typeof(int), typeof(Guid) })
@@ -260,11 +281,12 @@ namespace Umbraco.Web.Editors
                 {
                     //oooh magic! will auto select the right overload
                     return GetAllowedChildren((dynamic)parsed.Result);
-                }                    
+                }
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
-        }
+        } 
+        #endregion
 
         /// <summary>
         /// Move the media type

@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Models
 {
-    internal enum PartialViewType : byte
+    public enum PartialViewType : byte
     {
         Unknown = 0, // default
         PartialView = 1,

@@ -167,7 +167,7 @@ namespace Umbraco.Core
 			}
 			return false;
 		}
-
+        
 		/// <summary>
 		/// Determines whether [is of generic type] [the specified type].
 		/// </summary>
@@ -425,7 +425,28 @@ namespace Umbraco.Core
                 assemblyName.FullName.StartsWith("App_Code.") ? "App_Code" : assemblyName.Name);
 		}
 
+        /// <summary>
+        /// If the given <paramref name="type"/> is an array or some other collection
+        /// comprised of 0 or more instances of a "subtype", get that type
+        /// </summary>
+        /// <param name="type">the source type</param>
+        /// <returns></returns>
+        internal static Type GetEnumeratedType(this Type type)
+        {
+            if (typeof(IEnumerable).IsAssignableFrom(type) == false)
+                return null;
 
+            // provided by Array
+            var elType = type.GetElementType();
+            if (null != elType) return elType;
+
+            // otherwise provided by collection
+            var elTypes = type.GetGenericArguments();
+            if (elTypes.Length > 0) return elTypes[0];
+
+            // otherwise is not an 'enumerated' type
+            return null;
+        }
 
     }
 }

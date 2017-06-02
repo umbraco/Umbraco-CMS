@@ -54,8 +54,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    $scope.actionInProgress = false;
    $scope.selection = [];
    $scope.folders = [];   
-   //tracks if we've already loaded the folders for the current node
-   var foldersLoaded = false;
    $scope.listViewResultSet = {
       totalPages: 0,
       items: []
@@ -217,7 +215,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             500);
 
         if (reload === true) {
-            $scope.reloadView($scope.contentId);
+            $scope.reloadView($scope.contentId, true);
         }
 
         if (err.data && angular.isArray(err.data.notifications)) {
@@ -252,7 +250,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    /*Pagination is done by an array of objects, due angularJS's funky way of monitoring state
    with simple values */
 
-   $scope.reloadView = function (id) {
+   $scope.getContent = function() {
+       $scope.reloadView($scope.contentId, true);
+   }
+
+   $scope.reloadView = function (id, reloadFolders) {
 
       $scope.viewLoaded = false;
 
@@ -270,13 +272,12 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             });
          }
 
-         if (!foldersLoaded && $scope.entityType === 'media') {
+         if (reloadFolders && $scope.entityType === 'media') {
             //The folders aren't loaded - we only need to do this once since we're never changing node ids
             mediaResource.getChildFolders($scope.contentId)
                     .then(function (folders) {
                        $scope.folders = folders;
                        $scope.viewLoaded = true;
-                       foldersLoaded = true;
                     });
 
          } else {
@@ -319,7 +320,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    function makeSearch() {
       if ($scope.options.filter !== null && $scope.options.filter !== undefined) {
          $scope.options.pageNumber = 1;
-         //$scope.actionInProgress = true;
          $scope.reloadView($scope.contentId);
       }
    }
@@ -486,7 +486,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                    //we need to do a double sync here: first refresh the node where the content was moved,
                    // then refresh the node where the content was moved from
                    navigationService.syncTree({
-                           tree: target.nodeType,
+                           tree: target.nodeType ? target.nodeType : (target.metaData.treeAlias),
                            path: newPath,
                            forceReload: true,
                            activate: false
@@ -621,7 +621,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
              $scope.options.allowBulkMove ||
              $scope.options.allowBulkDelete;
 
-      $scope.reloadView($scope.contentId);
+      $scope.reloadView($scope.contentId, true);
    }
 
    function getLocalizedKey(alias) {

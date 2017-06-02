@@ -112,9 +112,15 @@
 
             public const string Languages = "languages";
 
+            public const string PartialViews = "partialViews";
+
+            public const string PartialViewMacros = "partialViewMacros";
+
+            public const string Scripts = "scripts";
+
             //TODO: Fill in the rest!
         }
-	}
+    }
 
    
 }

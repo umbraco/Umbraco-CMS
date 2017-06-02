@@ -1,35 +1,30 @@
-﻿using Umbraco.Core;
+﻿using System;
+using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MultipleMediaPickerAlias, "Media Picker", "mediapicker", Group = "media", Icon = "icon-pictures-alt-2")]
-    public class MultipleMediaPickerPropertyEditor : MediaPickerPropertyEditor
+    [Obsolete("This editor is obsolete, use MultipleMediaPickerPropertyEditor2 instead which stores UDI")]
+    [PropertyEditor(Constants.PropertyEditors.MultipleMediaPickerAlias, "(Obsolete) Media Picker", "mediapicker", Group = "media", Icon = "icon-pictures-alt-2", IsDeprecated = true)]
+    public class MultipleMediaPickerPropertyEditor : MediaPicker2PropertyEditor
     {
         public MultipleMediaPickerPropertyEditor()
         {
-            //clear the pre-values so it defaults to a multiple picker.
-            InternalPreValues.Clear();
+            //default it to multi picker
+            InternalPreValues["multiPicker"] = "1";
+            InternalPreValues["idType"] = "int";
         }
 
+        /// <summary>
+        /// overridden to change the pre-value picker to use INT ids
+        /// </summary>
+        /// <returns></returns>
         protected override PreValueEditor CreatePreValueEditor()
         {
-            return new MediaPickerPreValueEditor();
+            var preValEditor = base.CreatePreValueEditor();
+            preValEditor.Fields.Single(x => x.Key == "startNodeId").Config["idType"] = "int";
+            return preValEditor;
         }
-
-        internal class MediaPickerPreValueEditor : PreValueEditor
-        {
-            [PreValueField("multiPicker", "Pick multiple items", "boolean")]
-            public bool MultiPicker { get; set; }
-
-            [PreValueField("onlyImages", "Pick only images", "boolean", Description = "Only let the editor choose images from media.")]
-            public bool OnlyImages { get; set; }
-
-            [PreValueField("disableFolderSelect", "Disable folder select", "boolean", Description = "Do not allow folders to be picked.")]
-            public bool DisableFolderSelect { get; set; }
-
-            [PreValueField("startNodeId", "Start node", "mediapicker")]
- 			public int StartNodeId { get; set; }
-        }
-    }
+    }    
 }

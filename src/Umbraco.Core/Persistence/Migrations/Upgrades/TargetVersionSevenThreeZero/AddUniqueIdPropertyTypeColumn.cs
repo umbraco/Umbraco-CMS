@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
 {    
-    [Migration("7.3.0", 13, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.3.0", 13, Constants.System.UmbracoMigrationName)]
     public class AddUniqueIdPropertyTypeColumn : MigrationBase
     {
         public AddUniqueIdPropertyTypeColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)

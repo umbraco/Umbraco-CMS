@@ -8,6 +8,7 @@ using System.Web.Http;
 using Newtonsoft.Json.Linq;
 using umbraco;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web.WebApi;
 
@@ -57,23 +58,15 @@ namespace Umbraco.Web.Install.Controllers
         /// <returns></returns>
         [HttpPost]
         public HttpResponseMessage DownloadPackageFiles(InstallPackageModel model)
-		{
-			var repo = global::umbraco.cms.businesslogic.packager.repositories.Repository.getByGuid(RepoGuid);
-            if (repo == null)
-            {
-                return Json(
-                    new {success = false, error = "No repository found with id " + RepoGuid},
-                    HttpStatusCode.OK);
-            }
-			if (repo.HasConnection() == false)
-			{
-                return Json(
-                    new { success = false, error = "cannot_connect" },
-                    HttpStatusCode.OK);
-			}
-			var installer = new global::umbraco.cms.businesslogic.packager.Installer(UmbracoContext.Current.Security.CurrentUser.Id);
+        {
+            var packageFile = _applicationContext.Services.PackagingService.FetchPackageFile(
+                model.KitGuid,
+                UmbracoVersion.Current,
+                UmbracoContext.Current.Security.CurrentUser.Id);
 
-            var tempFile = installer.Import(repo.fetch(model.KitGuid.ToString(), UmbracoContext.Current.Security.CurrentUser.Id));
+            var installer = new global::umbraco.cms.businesslogic.packager.Installer(UmbracoContext.Current.Security.CurrentUser.Id);
+
+            var tempFile = installer.Import(packageFile);
 			installer.LoadConfig(tempFile);
             var pId = installer.CreateManifest(tempFile, model.KitGuid.ToString(), RepoGuid);
 			return Json(new

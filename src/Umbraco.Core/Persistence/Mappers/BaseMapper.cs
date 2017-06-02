@@ -2,11 +2,12 @@
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
+using umbraco.interfaces;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
-    public abstract class BaseMapper
+    public abstract class BaseMapper : IDiscoverable
     {
         private readonly ISqlSyntaxProvider _sqlSyntax;
 

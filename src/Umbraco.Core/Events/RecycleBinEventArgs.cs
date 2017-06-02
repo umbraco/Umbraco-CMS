@@ -5,7 +5,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Events
 {
-    public class RecycleBinEventArgs : CancellableEventArgs
+    public class RecycleBinEventArgs : CancellableEventArgs, IEquatable<RecycleBinEventArgs>, IDeletingMediaFilesEventArgs
     {
         public RecycleBinEventArgs(Guid nodeObjectType, Dictionary<int, IEnumerable<Property>> allPropertyData, bool emptiedSuccessfully)
             : base(false)
@@ -97,6 +97,8 @@ namespace Umbraco.Core.Events
         /// </remarks>
         public List<string> Files { get; private set; }
 
+        public List<string> MediaFilesToDelete { get { return Files; } }
+
         /// <summary>
         /// Gets the list of all property data associated with a content id
         /// </summary>
@@ -121,6 +123,45 @@ namespace Umbraco.Core.Events
         public bool IsMediaRecycleBin
         {
             get { return NodeObjectType == new Guid(Constants.ObjectTypes.Media); }
+        }
+
+        public bool Equals(RecycleBinEventArgs other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return base.Equals(other) && AllPropertyData.Equals(other.AllPropertyData) && Files.Equals(other.Files) && Ids.Equals(other.Ids) && NodeObjectType.Equals(other.NodeObjectType) && RecycleBinEmptiedSuccessfully == other.RecycleBinEmptiedSuccessfully;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((RecycleBinEventArgs) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = base.GetHashCode();
+                hashCode = (hashCode * 397) ^ AllPropertyData.GetHashCode();
+                hashCode = (hashCode * 397) ^ Files.GetHashCode();
+                hashCode = (hashCode * 397) ^ Ids.GetHashCode();
+                hashCode = (hashCode * 397) ^ NodeObjectType.GetHashCode();
+                hashCode = (hashCode * 397) ^ RecycleBinEmptiedSuccessfully.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(RecycleBinEventArgs left, RecycleBinEventArgs right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(RecycleBinEventArgs left, RecycleBinEventArgs right)
+        {
+            return !Equals(left, right);
         }
     }
 }

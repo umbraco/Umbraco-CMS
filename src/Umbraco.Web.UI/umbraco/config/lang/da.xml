@@ -150,7 +150,7 @@
     <key alias="releaseDate">Udgivelsesdato</key>
     <key alias="unpublishDate">Dato for Fortryd udgivelse</key>
     <key alias="removeDate">Fjern dato</key>
-    <key alias="sortDone">Sorteringrækkefølgen er opdateret</key>
+    <key alias="sortDone">Sorteringsrækkefølgen er opdateret</key>
     <key alias="sortHelp">For at sortere, træk siderne eller klik på en af kolonnehovederne. Du kan vælge flere sider ved at holde "shift" eller "control" nede mens du vælger.</key>
     <key alias="statistics">Statistik</key>
     <key alias="titleOptional">Titel (valgfri)</key>
@@ -184,7 +184,7 @@
     <key alias="updateData">Vælg en type og skriv en titel</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokument typer. Du skal tillade disse i indstillinger under <strong>"dokument typer"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.]]></key>
-    <key alias="documentTypeWithoutTemplate">Dokument type uden skabelon</key>
+    <key alias="documentTypeWithoutTemplate">Dokumenttype uden skabelon</key>
     <key alias="newFolder">Ny mappe</key>
     <key alias="newDataType">Ny datatype</key>
   </area>
@@ -291,6 +291,7 @@
     <key alias="selectMember">Vælg medlem</key>
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>
     <key alias="noMacroParams">Der er ingen parametre for denne makro</key>
+    <key alias="noMacros">Der er ikke tilføjet nogen makroer</key>
     <key alias="linkYour">Link dit</key>
     <key alias="unLinkYour">Fjern link fra dit</key>
     <key alias="account">konto</key>
@@ -320,6 +321,7 @@
     <key alias="search">Søg...</key>
     <key alias="filter">Filtrer...</key>
     <key alias="enterTags">Indtast nøgleord (tryk på Enter efter hvert nøgleord)...</key>
+    <key alias="usernameHint">Dit brugernavn er typisk din e-mail adresse</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Tillad på rodniveau</key>
@@ -525,6 +527,16 @@
 
     <key alias="toggleListView">Brug listevisning</key>
     <key alias="toggleAllowAsRoot">Tillad på rodniveau</key>
+
+    <key alias="commentLine">Comment/Uncomment lines</key>
+    <key alias="removeLine">Remove line</key>
+    <key alias="copyLineUp">Copy Lines Up</key>
+    <key alias="copyLineDown">Copy Lines Down</key>
+    <key alias="moveLineUp">Move Lines Up</key>
+    <key alias="moveLineDown">Move Lines Down</key>
+
+    <key alias="generalHeader">General</key>
+    <key alias="editorHeader">Editor</key>
   </area>
 
   <area alias="graphicheadline">
@@ -568,13 +580,13 @@
     <key alias="permissionsAffectedFolders">Berørte filer og foldere</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Flere informationer om at opsætte rettigheder for Umbraco her</key>
     <key alias="permissionsAffectedFoldersText">Du er nødt til at give ASP.NET 'modify' rettigheder på følgende filer/foldere</key>
-    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Dine rettighedsinstillinger er næsten perfekte!</strong><br/><br/>Du kan køre Umbraco uden problemer, men du vil ikke være i stand til at installere pakker, som er anbefalet for at få fuldt udbytte af Umbraco.]]></key>
+    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Dine rettighedsindstillinger er næsten perfekte!</strong><br/><br/>Du kan køre Umbraco uden problemer, men du vil ikke være i stand til at installere pakker, som er anbefalet for at få fuldt udbytte af Umbraco.]]></key>
     <key alias="permissionsHowtoResolve">Hvorledes besluttes</key>
     <key alias="permissionsHowtoResolveLink">Klik her for at læse tekstversionen</key>
     <key alias="permissionsHowtoResolveText"><![CDATA[Se vores <strong>video tutorials</strong> om at opsætte folderrettigheder for Umbraco eller læs tekstversionen.]]></key>
-    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Dine rettighedsinstillinger kan være et problem!</strong><br/><br/>Du kan afvikle Umbraco uden problemer, men du vil ikke være i stand til at oprette foldere eller installere pakker, hvilket er anbefalet for at få fuldt udbytte af Umbraco.]]></key>
-    <key alias="permissionsNotReady"><![CDATA[<strong>Dine rettighedsinstillinger er ikke klar til Umbraco!</strong><br/><br/>For at afvikle Umbraco er du nødt til at opdatere dine rettighedsinstillinger.]]></key>
-    <key alias="permissionsPerfect"><![CDATA[<strong>Dine rettighedsinstillinger er perfekte!</strong><br/><br/>Du er nu parat til at afvikle Umbraco og installere pakker!]]></key>
+    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Dine rettighedsindstillinger kan være et problem!</strong><br/><br/>Du kan afvikle Umbraco uden problemer, men du vil ikke være i stand til at oprette foldere eller installere pakker, hvilket er anbefalet for at få fuldt udbytte af Umbraco.]]></key>
+    <key alias="permissionsNotReady"><![CDATA[<strong>Dine rettighedsindstillinger er ikke klar til Umbraco!</strong><br/><br/>For at afvikle Umbraco er du nødt til at opdatere dine rettighedsindstillinger.]]></key>
+    <key alias="permissionsPerfect"><![CDATA[<strong>Dine rettighedsindstillinger er perfekte!</strong><br/><br/>Du er nu parat til at afvikle Umbraco og installere pakker!]]></key>
     <key alias="permissionsResolveFolderIssues">Løser folder problem</key>
     <key alias="permissionsResolveFolderIssuesLink">Følg dette link for mere information om udfordringer med ASP.NET og oprettelse af foldere</key>
     <key alias="permissionsSettingUpPermissions">Sætter folderrettigheder op</key>
@@ -586,7 +598,7 @@
     <key alias="runwayInstalledText"><![CDATA[Du har fundamentet på plads. Vælg hvilke moduler du ønsker at installere ovenpå det.<br/>Dette er vores liste over anbefalede moduler. Kryds dem af du ønsker at installere eller se den <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">fulde liste af moduler</a>  ]]></key>
     <key alias="runwayOnlyProUsers">Kun anbefalet for erfarne brugere</key>
     <key alias="runwaySimpleSite">Jeg ønsker at begynder med et simpelt website</key>
-    <key alias="runwaySimpleSiteText"><![CDATA[<p>"Runway" er et simpelt website som stiller nogle basale dokumenttyper og skabeloner til rådighed. Instaleringsprogrammet kan automatisk opsætte Runway for dig, men du kan nemt redigere, udvide eller fjerne det. Det er ikke nødvendigt og du kan sagtens bruge Umbraco uden. Men Runway tilbyder et fundament, som er baseret på 'Best Practices', som får dig igang hurtigere end nogensinde før. Hvis du vælger at installere Runway, kan du efter eget valg vælge de grundlæggende byggesten kaldet 'Runway Modules' til at forbedre dine Runway-sider.</p><p><small><em>Inkluderet med Runway:</em>Home Page, Getting Started page, Installing Modules page.<br /> <em>Valgfri Moduler:</em> Top Navigation, Sitemap, Contact, Gallery. </small></p>]]></key>
+    <key alias="runwaySimpleSiteText"><![CDATA[<p>"Runway" er et simpelt website som stiller nogle basale dokumenttyper og skabeloner til rådighed. Installeringsprogrammet kan automatisk opsætte Runway for dig, men du kan nemt redigere, udvide eller fjerne det. Det er ikke nødvendigt og du kan sagtens bruge Umbraco uden. Men Runway tilbyder et fundament, som er baseret på 'Best Practices', som får dig igang hurtigere end nogensinde før. Hvis du vælger at installere Runway, kan du efter eget valg vælge de grundlæggende byggesten kaldet 'Runway Modules' til at forbedre dine Runway-sider.</p><p><small><em>Inkluderet med Runway:</em>Home Page, Getting Started page, Installing Modules page.<br /> <em>Valgfri Moduler:</em> Top Navigation, Sitemap, Contact, Gallery. </small></p>]]></key>
     <key alias="runwayWhatIsRunway">Hvad er Runway</key>
     <key alias="step1">Skridt 1/5: Acceptér licens</key>
     <key alias="step2">Skridt 2/5: Database-konfiguration</key>
@@ -703,7 +715,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="packageRepository">Pakke opbevaringsbase</key>
     <key alias="packageUninstallConfirm">Bekræft af-installering</key>
     <key alias="packageUninstalledHeader">Pakken blev fjernet</key>
-    <key alias="packageUninstalledText">Pakken er på succefuld vis blevet fjernet</key>
+    <key alias="packageUninstalledText">Pakken er på succesfuld vis blevet fjernet</key>
     <key alias="packageUninstallHeader">Afinstallér pakke</key>
     <key alias="packageUninstallText">
       <![CDATA[Du kan fjerne markeringen på elementer du ikke ønsker at fjerne, på dette tidspunkt, nedenfor. Når du klikker 'bekræft' vil alle afkrydsede elemenet blive fjernet <br/>
@@ -725,7 +737,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="publicAccess">
     <key alias="paAdvanced">Rollebaseret beskyttelse</key>
     <key alias="paAdvancedHelp">Hvis du ønsker at kontrollere adgang til siden ved hjælp af rollebaseret godkendelse via Umbracos medlemsgrupper.</key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Du skal oprette en medlemsgruppe før du kan bruge <br />rollebaseret godkendelse]]></key>
+    <key alias="paAdvancedNoGroups">Du skal oprette en medlemsgruppe før du kan bruge rollebaseret godkendelse</key>
     <key alias="paErrorPage">Fejlside</key>
     <key alias="paErrorPageHelp">Brugt når folk er logget ind, men ingen adgang</key>
     <key alias="paHowWould">Vælg hvordan siden skal beskyttes</key>
@@ -784,7 +796,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="addRows">Tilføj række</key>
     <key alias="addElement">Tilføj indhold</key>
     <key alias="dropElement">Slip indhold</key>
-    <key alias="settingsApplied">Instillinger tilføjet</key>
+    <key alias="settingsApplied">Indstillinger tilføjet</key>
 
     <key alias="contentNotAllowed">Indholdet er ikke tilladt her</key>
     <key alias="contentAllowed">Indholdet er tilladt her</key>
@@ -929,7 +941,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="tab">Faneblad</key>
     <key alias="tabname">Titel på faneblad</key>
     <key alias="tabs">Faneblade</key>
-    <key alias="masterDocumentType">Master Dokument Type</key>
+    <key alias="masterDocumentType">Master Dokumenttype</key>
     <key alias="createMatchingTemplate">Opret matchende skabelon</key>
   </area>
   <area alias="sort">
@@ -1004,17 +1016,117 @@ Mange hilsner fra Umbraco robotten
     <key alias="preview">Vis prøve</key>
     <key alias="styles">Styles</key>
   </area>
+
   <area alias="template">
     <key alias="edittemplate">Rediger skabelon</key>
+
+    <key alias="insertSections">Sektioner</key>
     <key alias="insertContentArea">Indsæt indholdsområde</key>
-    <key alias="insertContentAreaPlaceHolder">Indsæt indholdsområdemarkering</key>
-    <key alias="insertDictionaryItem">Indsæt ordbogselement</key>
-    <key alias="insertMacro">Indsæt makro</key>
-    <key alias="insertPageField">Indsæt Umbraco sidefelt</key>
+    <key alias="insertContentAreaPlaceHolder">Indsæt pladsholder for indholdsområde</key>
+
+    <key alias="insert">Indsæt</key>
+    <key alias="insertDesc">Hvad vil du indsætte?</key>
+
+    <key alias="insertDictionaryItem">Oversættelse</key>
+    <key alias="insertDictionaryItemDesc">Indsætter en oversætbar tekst, som skifter efter det sprog, som websitet vises i.</key>
+
+    <key alias="insertMacro">Makro</key>
+    <key alias="insertMacroDesc">
+      En makro er et element, som kan have forskellige indstillinger, når det indsættes. 
+      Brug det som en genbrugelig del af dit design såsom gallerier, formularer og lister.
+    </key>
+
+    <key alias="insertPageField">Sideværdi</key>
+    <key alias="insertPageFieldDesc">
+      Viser værdien af et felt fra den nuværende side. Kan indstilles til at bruge rekursive værdier eller 
+      vise en standardværdi i tilfælde af, at feltet er tomt.
+    </key>
+
+    <key alias="insertPartialView">Partial view</key>
+    <key alias="insertPartialViewDesc">
+      Et Partial View er et skabelonelement, som kan indsættes i andre skabeloner og derved 
+      genbruges og deles på tværs af sideskabelonerne.
+    </key>
+
     <key alias="mastertemplate">Master skabelon</key>
-    <key alias="quickGuide">Lynguide til Umbracos skabelontags</key>
+    <key alias="noMastertemplate">Ingen masterskabelon</key>
+    <key alias="noMaster">Ingen master</key>
+
+    <key alias="renderBody">Indsæt en underliggende skabelon</key>
+    <key alias="renderBodyDesc">
+      <![CDATA[
+      Henter indholdet af en underliggende skabelon ind, ved at 
+      indsætte et <code>@RenderBody()</code> element.
+      ]]>
+    </key>
+
+
+    <key alias="defineSection">Definer en sektion</key>
+    <key alias="defineSectionDesc">
+      <![CDATA[
+         Definerer en del af din skabelon som en navngivet sektion, ved at 
+         omkranse den i <code>@section { ... }</code>. Herefter kan denne sektion flettes ind i 
+         overliggende skabelon ved at indsætte et <code>@RenderSection</code> element.
+      ]]>
+    </key>
+
+    <key alias="renderSection">Indsæt en sektion</key>
+    <key alias="renderSectionDesc">
+      <![CDATA[
+      Henter indholdet af en sektion fra den underliggende skabelon ind, ved at indsætte et 
+      <code>@RenderSection(name)</code> element. Den underliggende skabelon skal have 
+      defineret en sektion via et <code>@section [name]{ ... }</code> element.
+      ]]>
+    </key>
+
+    <key alias="sectionName">Sektionsnavn</key>
+    <key alias="sectionMandatory">Sektionen er obligatorisk</key>
+    
+    <key alias="sectionMandatoryDesc">
+      Hvis obligatorisk, skal underskabelonen indeholde en <code>@section</code> -definition.
+    </key>
+
+
+    <key alias="queryBuilder">Query builder</key>
+    <key alias="itemsReturned">sider returneret, på</key>
+
+    <key alias="iWant">Returner</key>
+    <key alias="allContent">alt indhold</key>
+    <key alias="contentOfType">indhold af typen &quot;%0%&quot;</key>
+    
+    <key alias="from">fra</key>
+    <key alias="websiteRoot">mit website</key>
+    <key alias="where">hvor</key>
+    <key alias="and">og</key>
+
+    <key alias="is">er</key>
+    <key alias="isNot">ikke er</key>
+    <key alias="before">er før</key>
+    <key alias="beforeIncDate">er før (inkl. valgte dato)</key>
+    <key alias="after">er efter</key>
+    <key alias="afterIncDate">er efter (inkl. valgte dato)</key>
+    <key alias="equals">er</key>
+    <key alias="doesNotEqual">ikke er</key>
+    <key alias="contains">indeholder</key>
+    <key alias="doesNotContain">ikke indeholder</key>
+    <key alias="greaterThan">er større end</key>
+    <key alias="greaterThanEqual">er større end eller det samme som</key>
+    <key alias="lessThan">er mindre end</key>
+    <key alias="lessThanEqual">er mindre end eller det samme som</key>
+
+    <key alias="id">Id</key>
+    <key alias="name">Navn</key>
+    <key alias="createdDate">Oprettelsesdato</key>
+    <key alias="lastUpdatedDate">Sidste opdatering</key>
+
+    <key alias="orderBy">Sortér efter</key>
+    <key alias="ascending">stigende rækkefølge</key>
+    <key alias="descending">faldende rækkefølge</key>
+
     <key alias="template">Skabelon</key>
   </area>
+  
+ 
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativt felt</key>
     <key alias="alternativeText">Alternativ tekst</key>

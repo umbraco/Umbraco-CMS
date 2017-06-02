@@ -11,8 +11,20 @@ namespace Umbraco.Web
     /// </summary>
     public interface ITypedPublishedContentQuery
     {
+        /// <summary>
+        /// Gets a content item from the cache
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         IPublishedContent TypedContent(int id);
+
+        /// <summary>
+        /// Gets a content item from the cache
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         IPublishedContent TypedContent(Guid id);
+
         IPublishedContent TypedContentSingleAtXPath(string xpath, params XPathVariable[] vars);
         IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids);
         IEnumerable<IPublishedContent> TypedContent(IEnumerable<Guid> ids);
@@ -20,8 +32,8 @@ namespace Umbraco.Web
         IEnumerable<IPublishedContent> TypedContentAtXPath(XPathExpression xpath, params XPathVariable[] vars);
         IEnumerable<IPublishedContent> TypedContentAtRoot();
 
-        // note: we CANNOT implement TypedMedia by Guid in v7 without break-changing IPublishedCache,
-        // since we don't support XPath navigation of the media tree.
+        // TODO: we CANNOT implement TypedMedia by Guid in v7 without break-changing IPublishedCache, since we don't support XPath navigation of the media tree.
+        // surely there is a way we can support this without XPath, it's needed so we can query properly by UDI
 
         IPublishedContent TypedMedia(int id);
         //IPublishedContent TypedMedia(Guid id);

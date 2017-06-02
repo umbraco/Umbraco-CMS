@@ -22,7 +22,6 @@ namespace Umbraco.Web.WebApi.Filters
     {
         private readonly int? _nodeId;
         private readonly string _paramName;
-        private DictionarySource _source;
 
         public enum DictionarySource
         {
@@ -43,19 +42,44 @@ namespace Umbraco.Web.WebApi.Filters
         {
             Mandate.ParameterNotNullOrEmpty(paramName, "paramName");
             _paramName = paramName;
-            _source = DictionarySource.ActionArguments;            
         }
 
         public EnsureUserPermissionForMediaAttribute(string paramName, DictionarySource source)
         {
             Mandate.ParameterNotNullOrEmpty(paramName, "paramName");
             _paramName = paramName;
-            _source = source;  
         }
        
         public override bool AllowMultiple
         {
             get { return true; }
+        }
+
+        private int GetNodeIdFromParameter(object parameterValue)
+        {
+            if (parameterValue is int)
+            {
+                return (int) parameterValue;
+            }
+
+            var guidId = Guid.Empty;
+            if (parameterValue is Guid)
+            {
+                guidId = (Guid)parameterValue;
+            }
+            else if (parameterValue is GuidUdi)
+            {
+                guidId = ((GuidUdi) parameterValue).Guid;
+            }
+
+            if (guidId != Guid.Empty)
+            {
+                var found =  ApplicationContext.Current.Services.EntityService.GetIdForKey(guidId, UmbracoObjectTypes.Media);
+                if (found)
+                    return found.Result;
+            }
+
+            throw new InvalidOperationException("The id type: " + parameterValue.GetType() + " is not a supported id");
         }
 
         public override void OnActionExecuting(HttpActionContext actionContext)
@@ -68,7 +92,7 @@ namespace Umbraco.Web.WebApi.Filters
             int nodeId;
             if (_nodeId.HasValue == false)
             {
-                var parts = _paramName.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                var parts = _paramName.Split(new [] { '.' }, StringSplitOptions.RemoveEmptyEntries);
 
                 if (actionContext.ActionArguments[parts[0]] == null)
                 {
@@ -77,7 +101,7 @@ namespace Umbraco.Web.WebApi.Filters
 
                 if (parts.Length == 1)
                 {
-                    nodeId = (int)actionContext.ActionArguments[parts[0]];
+                    nodeId = GetNodeIdFromParameter(actionContext.ActionArguments[parts[0]]);
                 }
                 else
                 {
@@ -88,7 +112,7 @@ namespace Umbraco.Web.WebApi.Filters
                     {
                         throw new InvalidOperationException("No argument found for the current action with the name: " + _paramName);
                     }
-                    nodeId = (int)prop.GetValue(actionContext.ActionArguments[parts[0]]);
+                    nodeId = GetNodeIdFromParameter(prop.GetValue(actionContext.ActionArguments[parts[0]]));
                 }
             }
             else
@@ -109,22 +133,7 @@ namespace Umbraco.Web.WebApi.Filters
             }
             
         }
-
-        //private object GetValueFromSource(HttpActionContext actionContext, string key)
-        //{
-        //    switch (_source)
-        //    {
-        //        case DictionarySource.ActionArguments:
-        //            return actionContext.ActionArguments[key];
-        //        case DictionarySource.RequestForm:
-        //            return actionContext.Request.Properties
-        //        case DictionarySource.RequestQueryString:
-        //            break;
-        //        default:
-        //            throw new ArgumentOutOfRangeException();
-        //    }
-        //}
-
+        
         
 
     }

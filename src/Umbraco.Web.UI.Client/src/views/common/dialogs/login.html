@@ -1,133 +1,146 @@
 ﻿<div ng-controller="Umbraco.Dialogs.LoginController">
+    
     <div id="login" class="umb-modalcolumn umb-dialog" ng-class="{'show-validation': loginForm.$invalid}" ng-cloak konami-code="activateKonamiMode()">
-        <div class="form">
-            <h1>{{greeting}}</h1>
+        
+        <div class="login-overlay__background-image" ng-if="backgroundImage" ng-style="{'background-image':'url(' + backgroundImage + ')'}"></div>
 
-            <div ng-show="view == 'login'">
+        <div class="login-overlay__logo">
+            <img ng-src="assets/img/application/logo.png" ng-srcset="assets/img/application/logo@2x.png 2x, assets/img/application/logo@3x.png 3x">
+        </div>
 
-                <p>
-                    <span ng-show="dialogData.isTimedOut"><localize key="login_timeout">Log in below</localize>.</span>
-                    <localize key="login_instruction">Log in below</localize>
-                </p>
+        <div class="umb-login-container">
 
-                <div class="external-logins" ng-if="externalLoginProviders.length > 0">
+            <div class="form">
+                <h1>{{greeting}}</h1>
 
-                    <div class="text-error" ng-repeat="error in externalLoginInfo.errors">
+                <div ng-show="view == 'login'">
+                    
+                    <p>
+                        <span ng-show="dialogData.isTimedOut"><localize key="login_timeout">Log in below</localize>.</span>
+                    </p>
+
+                    <div class="external-logins" ng-if="externalLoginProviders.length > 0">
+
+                        <div class="text-error" ng-repeat="error in externalLoginInfo.errors">
+                            <span>{{error}}</span>
+                        </div>
+
+                        <form method="POST" name="externalLoginForm" action="{{externalLoginFormAction}}">
+
+                            <div ng-repeat="login in externalLoginProviders">
+
+                                <button type="submit" class="btn btn-block btn-social"
+                                        ng-class="login.properties.SocialStyle"
+                                        id="{{login.authType}}" name="provider" value="{{login.authType}}"
+                                        title="Log in using your {{login.caption}} account">
+                                    <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                                    <localize key="login_signInWith">Sign in with</localize> {{login.caption}}
+                                </button>
+
+                            </div>
+                        </form>
+
+                    </div>
+
+                    <form method="POST" name="loginForm" ng-submit="loginSubmit(login, password)">
+
+                        <div class="control-group" ng-show="loginForm.$invalid">
+                            <div class="text-error">{{errorMsg}}</div>
+                        </div>
+
+                        <div class="control-group" ng-class="{error: loginForm.username.$invalid}">
+                            <label><localize key="general_username">Username</localize></label>
+                            <input type="text" ng-model="login" name="username" class="-full-width-input" localize="placeholder" placeholder="@placeholders_usernameHint" />
+                        </div>
+
+                        <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
+                            <label><localize key="general_password">Password</localize></label>
+                            <input type="password" ng-model="password" name="password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" autocomplete="off" />
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <button type="submit" class="btn btn-success" val-trigger-change="#login .form input"><localize key="general_login">Login</localize></button>
+                            <div ng-show="allowPasswordReset">
+                                <a class="muted" style="text-decoration: underline;" href="#" prevent-default ng-click="showRequestPasswordReset()"><localize key="login_forgottenPassword">Forgotten password?</localize></a>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div ng-show="view == 'request-password-reset'">
+                    <p>
+                        <localize key="login_forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</localize>
+                    </p>
+
+                    <form method="POST" name="requestPasswordResetForm" ng-submit="requestPasswordResetSubmit(email)">
+                        <div class="control-group" ng-class="{error: requestPasswordResetForm.email.$invalid}">
+                            <label><localize key="general_email">Email</localize></label>
+                            <input type="email" ng-model="email" name="email" class="-full-width-input" localize="placeholder" placeholder="@placeholders_email" />
+                        </div>
+                        
+                        <div class="control-group" ng-show="requestPasswordResetForm.$invalid">
+                            <div class="text-error">{{errorMsg}}</div>
+                        </div>
+                        
+                        <div class="control-group" ng-show="showEmailResetConfirmation">
+                            <div class="text-info">
+                                <localize key="login_requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</localize>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <button type="submit" class="btn btn-success" val-trigger-change="#login .form input"><localize key="general_submit">Submit</localize></button>
+                            <a class="muted" href="#" prevent-default ng-click="showLogin()" style="text-decoration: underline;"><localize key="login_returnToLogin">Return to login form</localize></a>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div ng-show="view == 'set-password'">
+                    
+                    <p ng-hide="resetComplete">
+                        <localize key="login_setPasswordInstruction">Please provide a new password.</localize>
+                    </p>
+
+                    <form method="POST" name="setPasswordForm" ng-submit="setPasswordSubmit(password, confirmPassword)">
+
+                        <div ng-hide="resetComplete" class="control-group" ng-class="{error: setPasswordForm.password.$invalid}">
+                            <label><localize key="user_newPassword">New password</localize></label>
+                            <input type="password" ng-model="password" name="password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" />
+                        </div>
+
+                        <div ng-hide="resetComplete" class="control-group" ng-class="{error: setPasswordForm.confirmPassword.$invalid}">
+                            <label><localize key="user_confirmNewPassword">Confirm new password</localize></label>
+                            <input type="password" ng-model="confirmPassword" name="confirmPassword" class="-full-width-input" localize="placeholder" placeholder="@placeholders_confirmPassword" />
+                        </div>
+                        
+                        <div ng-hide="resetComplete" class="control-group" ng-show="setPasswordForm.$invalid">
+                            <div class="text-error">{{errorMsg}}</div>
+                        </div>
+
+                        <div class="control-group" ng-show="showSetPasswordConfirmation">
+                            <div class="text-info">
+                                <localize key="login_setPasswordConfirmation">Your new password has been set and you may now use it to log in.</localize>
+                            </div>                        
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <button ng-hide="resetComplete" type="submit" class="btn btn-success" val-trigger-change="#login .form input"><localize key="general_submit">Submit</localize></button>
+                            <a class="muted" href="#" prevent-default ng-click="showLogin()"><localize key="login_returnToLogin">Return to login form</localize></a>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div ng-show="view == 'password-reset-code-expired'">
+                    <div class="text-error" ng-repeat="error in resetPasswordCodeInfo.errors">
                         <span>{{error}}</span>
                     </div>
-
-                    <form method="POST" name="externalLoginForm" action="{{externalLoginFormAction}}">
-
-                        <div ng-repeat="login in externalLoginProviders">
-
-                            <button type="submit" class="btn btn-block btn-social"
-                                    ng-class="login.properties.SocialStyle"
-                                    id="{{login.authType}}" name="provider" value="{{login.authType}}"
-                                    title="Log in using your {{login.caption}} account">
-                                <i class="fa" ng-class="login.properties.SocialIcon"></i>
-                                <localize key="login_signInWith">Sign in with</localize> {{login.caption}}
-                            </button>
-
-                        </div>
-                    </form>
-
-                    <div id="hrOr">
-                        <hr />
-                        <div><localize key="general_or">or</localize></div>
-                    </div>
-
-                </div>
-
-                <form method="POST" name="loginForm" ng-submit="loginSubmit(login, password)">
-                    <div class="control-group" ng-class="{error: loginForm.username.$invalid}">
-                        <input type="text" ng-model="login" name="username" class="input-xlarge" localize="placeholder" placeholder="@placeholders_username" />
-                    </div>
-
-                    <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
-                        <input type="password" ng-model="password" name="password" class="input-xlarge" localize="placeholder" placeholder="@placeholders_password" autocomplete="off" />
-                    </div>
                     
-                    <div class="control-group" ng-show="loginForm.$invalid">
-                        <div class="text-error">{{errorMsg}}</div>
-                    </div>
-
-                    <button type="submit" class="btn" val-trigger-change="#login .form input"><localize key="general_login">Login</localize></button>
-
-                    <div class="switch-view" ng-show="allowPasswordReset">
-                        <a class="muted" href="#" prevent-default ng-click="showRequestPasswordReset()"><localize key="login_forgottenPassword">Forgotten password?</localize></a>
-                    </div>
-                </form>
-            </div>
-
-            <div ng-show="view == 'request-password-reset'">
-                <p>
-                    <localize key="login_forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</localize>
-                </p>
-
-                <form method="POST" name="requestPasswordResetForm" ng-submit="requestPasswordResetSubmit(email)">
-                    <div class="control-group" ng-class="{error: requestPasswordResetForm.email.$invalid}">
-                        <input type="text" ng-model="email" name="email" class="input-xlarge" localize="placeholder" placeholder="@placeholders_email" />
-                    </div>
-                    
-                    <div class="control-group" ng-show="requestPasswordResetForm.$invalid">
-                        <div class="text-error">{{errorMsg}}</div>
-                    </div>
-                    
-                    <div class="control-group" ng-show="showEmailResetConfirmation">
-                        <div class="text-info">
-                            <localize key="login_requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</localize>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn" val-trigger-change="#login .form input"><localize key="general_submit">Submit</localize></button>
-
                     <div class="switch-view">
                         <a class="muted" href="#" prevent-default ng-click="showLogin()"><localize key="login_returnToLogin">Return to login form</localize></a>
                     </div>
-                </form>
-            </div>
-
-            <div ng-show="view == 'set-password'">
-                
-                <p ng-hide="resetComplete">
-                    <localize key="login_setPasswordInstruction">Please provide a new password.</localize>
-                </p>
-
-                <form method="POST" name="setPasswordForm" ng-submit="setPasswordSubmit(password, confirmPassword)">
-
-                    <div ng-hide="resetComplete" class="control-group" ng-class="{error: setPasswordForm.password.$invalid}">
-                        <input type="password" ng-model="password" name="password" class="input-xlarge" localize="placeholder" placeholder="@placeholders_password" />
-                    </div>
-
-                    <div ng-hide="resetComplete" class="control-group" ng-class="{error: setPasswordForm.confirmPassword.$invalid}">
-                        <input type="password" ng-model="confirmPassword" name="confirmPassword" class="input-xlarge" localize="placeholder" placeholder="@placeholders_confirmPassword" />
-                    </div>
-                    
-                    <div ng-hide="resetComplete" class="control-group" ng-show="setPasswordForm.$invalid">
-                        <div class="text-error">{{errorMsg}}</div>
-                    </div>
-
-                    <div class="control-group" ng-show="showSetPasswordConfirmation">
-                        <div class="text-info">
-                            <localize key="login_setPasswordConfirmation">Your new password has been set and you may now use it to log in.</localize>
-                        </div>                        
-                    </div>
-
-                    <button ng-hide="resetComplete" type="submit" class="btn" val-trigger-change="#login .form input"><localize key="general_submit">Submit</localize></button>
-
-                    <div class="switch-view">
-                        <a class="muted" href="#" prevent-default ng-click="showLogin()"><localize key="login_returnToLogin">Return to login form</localize></a>
-                    </div>
-                </form>
-            </div>
-
-            <div ng-show="view == 'password-reset-code-expired'">
-                <div class="text-error" ng-repeat="error in resetPasswordCodeInfo.errors">
-                    <span>{{error}}</span>
-                </div>
-                
-                <div class="switch-view">
-                    <a class="muted" href="#" prevent-default ng-click="showLogin()"><localize key="login_returnToLogin">Return to login form</localize></a>
                 </div>
             </div>
         </div>

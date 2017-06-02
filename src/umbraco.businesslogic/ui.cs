@@ -56,8 +56,8 @@ namespace umbraco
         
         private static string GetLanguage()
         {
-            var user = UmbracoEnsuredPage.CurrentUser;
-            return GetLanguage(user);
+            //Return the current user's language which is based on the current thread culture
+            return GetLanguage("");
         }
 
         private static string GetLanguage(User u)
@@ -84,7 +84,7 @@ namespace umbraco
             {
                 return userLanguage;
             }
-            var language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+            var language = Thread.CurrentThread.CurrentCulture.Name;
             if (string.IsNullOrEmpty(language))
                 language = UmbracoDefaultUiLanguage;
             return language;

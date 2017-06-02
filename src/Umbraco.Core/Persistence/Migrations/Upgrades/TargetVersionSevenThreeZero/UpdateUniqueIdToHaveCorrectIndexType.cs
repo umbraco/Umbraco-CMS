@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
 {
-    [Migration("7.3.0", 5, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.3.0", 5, Constants.System.UmbracoMigrationName)]
     public class UpdateUniqueIdToHaveCorrectIndexType : MigrationBase
     {
         public UpdateUniqueIdToHaveCorrectIndexType(ISqlSyntaxProvider sqlSyntax, ILogger logger)
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 }).ToArray();
 
             //must be non-nullable
-            Alter.Column("uniqueID").OnTable("umbracoNode").AsGuid().NotNullable();
+            Alter.Table("umbracoNode").AlterColumn("uniqueID").AsGuid().NotNullable();
 
             //make sure it already exists
             if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoNodeUniqueID")))

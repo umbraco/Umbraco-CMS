@@ -5,7 +5,25 @@ namespace Umbraco.Tests.TestHelpers.Entities
 {
     public static class MockedMedia
     {
-        public static IMedia CreateMediaImage(IMediaType mediaType, int parentId)
+        public static Media CreateSimpleMedia(IMediaType contentType, string name, int parentId)
+        {
+            var content = new Media(name, parentId, contentType) { CreatorId = 0 };
+            object obj =
+                new
+                {
+                    title = name + " Subpage",
+                    bodyText = "This is a subpage",
+                    author = "John Doe"
+                };
+
+            content.PropertyValues(obj);
+
+            content.ResetDirtyProperties(false);
+
+            return content;
+        }
+
+        public static Media CreateMediaImage(IMediaType mediaType, int parentId)
         {
             var media = new Media("Test Image", parentId, mediaType)
             {
@@ -21,7 +39,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return media;
         }
 
-        public static IMedia CreateMediaFile(IMediaType mediaType, int parentId)
+        public static Media CreateMediaFile(IMediaType mediaType, int parentId)
         {
             var media = new Media("Test File", parentId, mediaType)
             {
@@ -35,7 +53,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return media;
         }
 
-        public static IMedia CreateMediaImageWithCrop(IMediaType mediaType, int parentId)
+        public static Media CreateMediaImageWithCrop(IMediaType mediaType, int parentId)
         {
             var media = new Media("Test Image", parentId, mediaType)
             {
@@ -51,7 +69,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return media;
         }
 
-        public static IMedia CreateMediaFolder(IMediaType mediaType, int parentId)
+        public static Media CreateMediaFolder(IMediaType mediaType, int parentId)
          {
              var media = new Media("Test Folder", parentId, mediaType)
                              {

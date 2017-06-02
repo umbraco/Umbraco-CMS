@@ -9,7 +9,7 @@ function valServerField(serverValidationManager) {
     return {
         require: 'ngModel',
         restrict: "A",
-        link: function (scope, element, attr, ctrl) {
+        link: function (scope, element, attr, ngModel) {
             
             var fieldName = null;
             var eventBindings = [];
@@ -23,23 +23,25 @@ function valServerField(serverValidationManager) {
                     // resubmitted. So once a field is changed that has a server error assigned to it
                     // we need to re-validate it for the server side validator so the user can resubmit
                     // the form. Of course normal client-side validators will continue to execute.
-                    eventBindings.push(scope.$watch('ngModel', function(newValue){
-                        if (ctrl.$invalid) {
-                            ctrl.$setValidity('valServerField', true);
+                    eventBindings.push(scope.$watch(function() {
+                        return ngModel.$modelValue;
+                    }, function(newValue){
+                        if (ngModel.$invalid) {
+                            ngModel.$setValidity('valServerField', true);
                         }
                     }));
 
                     //subscribe to the server validation changes
                     serverValidationManager.subscribe(null, fieldName, function (isValid, fieldErrors, allErrors) {
                         if (!isValid) {
-                            ctrl.$setValidity('valServerField', false);
+                            ngModel.$setValidity('valServerField', false);
                             //assign an error msg property to the current validator
-                            ctrl.errorMsg = fieldErrors[0].errorMsg;
+                            ngModel.errorMsg = fieldErrors[0].errorMsg;
                         }
                         else {
-                            ctrl.$setValidity('valServerField', true);
+                            ngModel.$setValidity('valServerField', true);
                             //reset the error message
-                            ctrl.errorMsg = "";
+                            ngModel.errorMsg = "";
                         }
                     });
 

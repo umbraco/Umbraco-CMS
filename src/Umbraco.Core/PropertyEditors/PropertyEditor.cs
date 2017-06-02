@@ -38,6 +38,7 @@ namespace Umbraco.Core.PropertyEditors
                 IsParameterEditor = _attribute.IsParameterEditor;
                 Icon = _attribute.Icon;
                 Group = _attribute.Group;
+                IsDeprecated = _attribute.IsDeprecated;
             }
         }
 
@@ -89,6 +90,9 @@ namespace Umbraco.Core.PropertyEditors
         {
             get { return CreateValueEditor(); }
         }
+
+        [JsonIgnore]
+        public bool IsDeprecated { get; internal set; }
 
         [JsonIgnore]
         IValueEditor IParameterEditor.ValueEditor
