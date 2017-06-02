@@ -1,14 +1,13 @@
-(function () {
+(function() {
     "use strict";
 
     function QueryBuilderOverlayController($scope, templateQueryResource, localizationService) {
 
-        var everything = localizationService.localize("template_allContent");
-        var myWebsite = localizationService.localize("template_websiteRoot");
+        var everything = "";
+        var myWebsite = "";
+        var ascendingTranslation = "";
+        var descendingTranslation = "";
 
-        var ascendingTranslation = localizationService.localize("template_ascending");
-        var descendingTranslation = localizationService.localize("template_descending");
-    
         var vm = this;
 
         vm.properties = [];
@@ -19,34 +18,6 @@
             pickDate: true,
             pickTime: false,
             format: "YYYY-MM-DD"
-        };
-
-        vm.query = {
-            contentType: {
-                name: everything
-            },
-            source: {
-                name: myWebsite
-            },
-            filters: [
-                {
-                    property: undefined,
-                    operator: undefined
-                }
-            ],
-            sort: {
-                property: {
-                    alias: "",
-                    name: "",
-                },
-                direction: "ascending", //This is the value for sorting sent to server
-                translation: {
-                    currentLabel: ascendingTranslation, //This is the localized UI value in the the dialog
-                    ascending: ascendingTranslation,
-                    descending: descendingTranslation
-                }
-
-            }
         };
 
         vm.chooseSource = chooseSource;
@@ -63,21 +34,48 @@
 
         function onInit() {
 
+            vm.query = {
+                contentType: {
+                    name: everything
+                },
+                source: {
+                    name: myWebsite
+                },
+                filters: [
+                    {
+                        property: undefined,
+                        operator: undefined
+                    }
+                ],
+                sort: {
+                    property: {
+                        alias: "",
+                        name: "",
+                    },
+                    direction: "ascending", //This is the value for sorting sent to server
+                    translation: {
+                        currentLabel: ascendingTranslation, //This is the localized UI value in the the dialog
+                        ascending: ascendingTranslation,
+                        descending: descendingTranslation
+                    }
+                }
+            };
+
             templateQueryResource.getAllowedProperties()
-                .then(function (properties) {
+                .then(function(properties) {
                     vm.properties = properties;
                 });
 
             templateQueryResource.getContentTypes()
-                .then(function (contentTypes) {
+                .then(function(contentTypes) {
                     vm.contentTypes = contentTypes;
                 });
 
             templateQueryResource.getFilterConditions()
-                .then(function (conditions) {
+                .then(function(conditions) {
                     vm.conditions = conditions;
                 });
-                
+
             throttledFunc();
 
         }
@@ -111,10 +109,11 @@
         }
 
         function getPropertyOperators(property) {
-            var conditions = _.filter(vm.conditions, function (condition) {
-                var index = condition.appliesTo.indexOf(property.type);
-                return index >= 0;
-            });
+            var conditions = _.filter(vm.conditions,
+                function(condition) {
+                    var index = condition.appliesTo.indexOf(property.type);
+                    return index >= 0;
+                });
             return conditions;
         }
 
@@ -123,10 +122,8 @@
         }
 
         function trashFilter(query, filter) {
-            for (var i = 0; i < query.filters.length; i++)
-            {
-                if (query.filters[i] == filter)
-                {
+            for (var i = 0; i < query.filters.length; i++) {
+                if (query.filters[i] == filter) {
                     query.filters.splice(i, 1);
                 }
             }
@@ -173,7 +170,7 @@
 
         function setFilterTerm(filter, term) {
             filter.term = term;
-            if(filter.constraintValue) {
+            if (filter.constraintValue) {
                 throttledFunc();
             }
         }
@@ -183,22 +180,32 @@
         }
 
         function datePickerChange(event, filter) {
-            if(event.date && event.date.isValid()) {
+            if (event.date && event.date.isValid()) {
                 filter.constraintValue = event.date.format(vm.datePickerConfig.format);
                 throttledFunc();
             }
         }
 
-        var throttledFunc = _.throttle(function () {
-            
-            templateQueryResource.postTemplateQuery(vm.query)
-                .then(function (response) {
-                    $scope.model.result = response;
-                });
+        var throttledFunc = _.throttle(function() {
 
-        }, 200);
+                templateQueryResource.postTemplateQuery(vm.query)
+                    .then(function(response) {
+                        $scope.model.result = response;
+                    });
 
-        onInit();
+            },
+            200);
+
+        localizationService.localizeMany([
+                "template_allContent", "template_websiteRoot", "template_ascending", "template_descending"
+            ])
+            .then(function(res) {
+                everything = res[0];
+                myWebsite = res[1];
+                ascendingTranslation = res[2];
+                descendingTranslation = res[3];
+                onInit();
+            });
     }
 
     angular.module("umbraco").controller("Umbraco.Overlays.QueryBuilderController", QueryBuilderOverlayController);

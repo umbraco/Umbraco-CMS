@@ -22,6 +22,7 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
@@ -225,6 +226,9 @@ namespace Umbraco.Web.Editors
                             {"serverVarsJs", Url.Action("Application", "BackOffice")},
                             //API URLs
                             {
+                                "packagesRestApiBaseUrl", UmbracoConfig.For.UmbracoSettings().PackageRepositories.GetDefault().RestApiUrl
+                            },
+                            {
                                 "redirectUrlManagementApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RedirectUrlManagementController>(
                                     controller => controller.GetEnableState())
                             },
@@ -387,6 +391,10 @@ namespace Umbraco.Web.Editors
                             {
                                 "disallowedUploadFiles",
                                 string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles)
+                            },
+                            {
+                                "allowedUploadFiles",
+                                string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.AllowedUploadFiles)
                             },
                             {
                                 "maxFileSize",

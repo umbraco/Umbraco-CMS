@@ -95,6 +95,16 @@ namespace Umbraco.Core.Services
             return result.HasValue ? Attempt.Succeed(result.Value) : Attempt<int>.Fail();
         }
 
+        public Attempt<int> GetIdForUdi(Udi udi)
+        {
+            var guidUdi = udi as GuidUdi;
+            if (guidUdi == null)
+                return Attempt<int>.Fail();
+
+            var umbracoType = Constants.UdiEntityType.ToUmbracoObjectType(guidUdi.EntityType);
+            return GetIdForKey(guidUdi.Guid, umbracoType);
+        }
+
         /// <summary>
         /// Returns the GUID for a given integer id
         /// </summary>
@@ -124,35 +134,11 @@ namespace Umbraco.Core.Services
 
         private static Guid GetNodeObjectTypeGuid(UmbracoObjectTypes umbracoObjectType)
         {
-            switch (umbracoObjectType)
-            {
-                case UmbracoObjectTypes.Document:
-                    return Constants.ObjectTypes.DocumentGuid;
-                case UmbracoObjectTypes.MemberType:
-                    return Constants.ObjectTypes.MemberTypeGuid;
-                case UmbracoObjectTypes.Media:
-                    return Constants.ObjectTypes.MediaGuid;
-                case UmbracoObjectTypes.Template:
-                    return Constants.ObjectTypes.TemplateTypeGuid;
-                case UmbracoObjectTypes.MediaType:
-                    return Constants.ObjectTypes.MediaTypeGuid;
-                case UmbracoObjectTypes.DocumentType:
-                    return Constants.ObjectTypes.DocumentTypeGuid;
-                case UmbracoObjectTypes.Member:
-                    return Constants.ObjectTypes.MemberGuid;
-                case UmbracoObjectTypes.DataType:
-                    return Constants.ObjectTypes.DataTypeGuid;
-                case UmbracoObjectTypes.MemberGroup:
-                    return Constants.ObjectTypes.MemberGroupGuid;
-                case UmbracoObjectTypes.RecycleBin:
-                case UmbracoObjectTypes.Stylesheet:
-                case UmbracoObjectTypes.ContentItem:
-                case UmbracoObjectTypes.ContentItemType:
-                case UmbracoObjectTypes.ROOT:
-                case UmbracoObjectTypes.Unknown:
-                default:
-                    throw new NotSupportedException("Unsupported object type (" + umbracoObjectType + ").");
-            }
+            var guid = umbracoObjectType.GetGuid();
+            if (guid == Guid.Empty)
+                throw new NotSupportedException("Unsupported object type (" + umbracoObjectType + ").");
+
+            return guid;            
         }
 
         public IUmbracoEntity GetByKey(Guid key, bool loadBaseType = true)

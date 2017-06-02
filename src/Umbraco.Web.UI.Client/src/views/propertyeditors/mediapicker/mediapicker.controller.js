@@ -112,10 +112,9 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                // content picker. THen we don't have to worry about setting ids, render models, models, we just set one and let the
                // watch do all the rest.
                 $timeout(function(){
-                    angular.forEach($scope.images, function(value, key){
-                        r.push(value.id);
+                    angular.forEach($scope.images, function(value, key) {
+                        r.push($scope.model.config.idType === "udi" ? value.udi : value.id);
                     });
-
                     $scope.ids = r;
                     $scope.sync();
                 }, 500, false);

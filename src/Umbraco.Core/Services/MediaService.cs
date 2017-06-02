@@ -692,11 +692,11 @@ namespace Umbraco.Core.Services
             }
 
             Func<string, Sql> createSql = url => new Sql().Select("*")
-                                                  .From<PropertyDataDto>()
-                                                  .InnerJoin<PropertyTypeDto>()
-                                                  .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                                                  .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
-                                                  .Where<PropertyDataDto>(x => x.VarChar == url);
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>()
+                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
+                .Where<PropertyDataDto>(x => x.VarChar == url);
 
             var sql = createSql(umbracoFileValue);
 
@@ -900,7 +900,13 @@ namespace Umbraco.Core.Services
                 }
 
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
-                media.CreatorId = userId;
+
+                //set the creator id if it's new
+                if (media.HasIdentity == false)
+                {
+                    media.CreatorId = userId;
+                }
+
                 repository.AddOrUpdate(media);
                 repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, m));
                 // generate preview for blame history?
@@ -1048,7 +1054,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user deleting the media</param>
         public void DeleteMediaOfType(int mediaTypeId, int userId = 0)
         {
-            DeleteMediaOfTypes(new[] {mediaTypeId}, userId);
+            DeleteMediaOfTypes(new[] { mediaTypeId }, userId);
         }
 
         /// <summary>

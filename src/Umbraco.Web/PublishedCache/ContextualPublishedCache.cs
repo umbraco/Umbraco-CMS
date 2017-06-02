@@ -13,6 +13,10 @@ namespace Umbraco.Web.PublishedCache
     /// </summary>
     public abstract class ContextualPublishedCache
     {
+        //TODO: We need to add:
+        //* GetById(Guid contentId)
+        //* GetById(UDI contentId)
+
         protected readonly UmbracoContext UmbracoContext;
 
         /// <summary>
@@ -33,6 +37,18 @@ namespace Umbraco.Web.PublishedCache
         public IPublishedContent GetById(int contentId)
         {
             return GetById(UmbracoContext.InPreviewMode, contentId);
+        }
+
+        /// <summary>
+        /// Gets a content identified by its unique identifier.
+        /// </summary>
+        /// <param name="contentId">The content unique identifier.</param>
+        /// <returns>The content, or null.</returns>
+        /// <remarks>Considers published or unpublished content depending on context.</remarks>
+        public IPublishedContent GetById(Guid contentId)
+        {
+            var intId = UmbracoContext.Application.Services.EntityService.GetIdForKey(contentId, UmbracoObjectTypes.Document);
+            return GetById(intId.Success ? intId.Result : -1);
         }
 
         /// <summary>

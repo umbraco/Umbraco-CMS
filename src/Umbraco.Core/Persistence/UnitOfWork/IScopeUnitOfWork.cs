@@ -8,5 +8,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         IScope Scope { get; }
         EventMessages Messages { get; }
         IEventDispatcher Events { get; }
+        void Flush();
     }
 }

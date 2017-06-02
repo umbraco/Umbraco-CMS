@@ -416,6 +416,9 @@
     <key alias="rteShowLabel">Показать метку</key>
     <key alias="rteWidthAndHeight">Ширина и высота</key>
   </area>
+  <area alias="emptyStates">
+    <key alias="emptyDictionaryTree">Нет доступных элементов словаря</key>
+  </area>
   <area alias="errorHandling">
     <key alias="errorButDataWasSaved">Ваши данные сохранены, но для того, чтобы опубликовать этот документ, Вы должны сначала исправить следующие ошибки:</key>
     <key alias="errorChangingProviderPassword">Текущий провайдер ролей пользователей не поддерживает изменение пароля (необходимо свойству EnablePasswordRetrieval в файле web.config присвоить значение true)</key>
@@ -1019,6 +1022,7 @@
     <key alias="password">Укажите пароль</key>
     <key alias="search">Что искать...</key>
     <key alias="username">Укажите имя пользователя</key>
+    <key alias="usernameHint">Имя пользователя (часто это Ваш email-адрес)</key>
   </area>
   <area alias="prompt">
     <key alias="stay">Остаться</key>

@@ -15,7 +15,7 @@ namespace Umbraco.Web.Cache
     /// <remarks>
     /// If Load balancing is enabled (by default disabled, is set in umbracoSettings.config) PageCacheRefresher will be called
     /// everytime content is added/updated/removed to ensure that the content cache is identical on all load balanced servers
-    /// </remarks>    
+    /// </remarks>
     public class PageCacheRefresher : TypedCacheRefresherBase<PageCacheRefresher, IContent>
     {
 
@@ -51,6 +51,7 @@ namespace Umbraco.Web.Cache
         public override void RefreshAll()
         {
             content.Instance.RefreshContentFromDatabase();
+            XmlPublishedContent.ClearRequest();
             base.RefreshAll();
         }
 
@@ -62,6 +63,7 @@ namespace Umbraco.Web.Cache
         {
             ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
             content.Instance.UpdateDocumentCache(id);
+            XmlPublishedContent.ClearRequest();
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
             base.Refresh(id);
@@ -75,6 +77,7 @@ namespace Umbraco.Web.Cache
         {
             ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
             content.Instance.ClearDocumentCache(id, false);
+            XmlPublishedContent.ClearRequest();
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
