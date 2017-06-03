@@ -285,7 +285,7 @@ namespace Umbraco.Core.Services
             var nodeName = element.Attribute("nodeName").Value;
             var path = element.Attribute("path").Value;
             var template = element.Attribute("template").Value;
-            var key = element.Attribute("key") != null ? Guid.Parse(element.Attribute("key").Value) : Guid.Empty;
+            var key = Guid.Empty;
 
             var properties = from property in element.Elements()
                              where property.Attribute("isDoc") == null
@@ -303,8 +303,8 @@ namespace Umbraco.Core.Services
                                        SortOrder = int.Parse(sortOrder)
                                    };
 
+            if (Guid.TryParse(element.Attribute("key").Value, out key))  { 
             // update the Guid (for UDI support)
-            if (key != Guid.Empty) { 
                 content.Key = key;
             }
 
