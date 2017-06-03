@@ -303,8 +303,9 @@ namespace Umbraco.Core.Services
                                        SortOrder = int.Parse(sortOrder)
                                    };
 
-            if (Guid.TryParse(element.Attribute("key").Value, out key))  { 
-            // update the Guid (for UDI support)
+            if (Guid.TryParse(element.Attribute("key").Value, out key))  
+            { 
+                // update the Guid (for UDI support)
                 content.Key = key;
             }
 
