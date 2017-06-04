@@ -319,6 +319,14 @@ namespace Umbraco.Core.Security
             return await Task.FromResult(IdentityResult.Success);
         }
 
+        internal void RaiseAccountUpdatedEvent(int userId)
+        {
+            OnAccountUpdated(new IdentityAuditEventArgs(AuditEvent.AccountUpdated)
+            {
+                AffectedUser = userId
+            });
+        }
+
         internal void RaisePasswordChangedEvent(int userId)
         {
             OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged)
@@ -338,6 +346,14 @@ namespace Umbraco.Core.Security
         internal void RaiseAccountLockedEvent(int userId)
         {
             OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaiseAccountUnlockedEvent(int userId)
+        {
+            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked)
             {
                 AffectedUser = userId
             });
