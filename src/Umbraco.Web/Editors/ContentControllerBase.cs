@@ -57,7 +57,7 @@ namespace Umbraco.Web.Editors
             where TPersisted : IContentBase
         {
             //Don't update the name if it is empty
-            if (!contentItem.Name.IsNullOrWhiteSpace())
+            if (contentItem.Name.IsNullOrWhiteSpace() == false)
             {
                 contentItem.PersistedContent.Name = contentItem.Name;
             }

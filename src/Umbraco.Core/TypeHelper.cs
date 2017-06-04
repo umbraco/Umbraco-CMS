@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 
@@ -15,11 +16,51 @@ namespace Umbraco.Core
 	{
 	    private static readonly ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]> GetPropertiesCache
             = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
-		private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache 
+		private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache
             = new ConcurrentDictionary<Type, FieldInfo[]>();
 
         private static readonly Assembly[] EmptyAssemblies  = new Assembly[0];
-        
+
+        /// <summary>
+        /// Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also deal with array types and return List{T} for those too.
+        /// If it cannot be done, null is returned.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+	    internal static IList CreateGenericEnumerableFromObject(object obj)
+        {
+            var type = obj.GetType();
+
+            if (type.IsGenericType)
+            {
+                var genericTypeDef = type.GetGenericTypeDefinition();
+
+                if (genericTypeDef == typeof(IEnumerable<>)
+                    || genericTypeDef == typeof(ICollection<>)
+                    || genericTypeDef == typeof(Collection<>)
+                    || genericTypeDef == typeof(IList<>)
+                    || genericTypeDef == typeof(List<>)
+                    //this will occur when Linq is used and we get the odd WhereIterator or DistinctIterators since those are special iterator types
+                    || obj is IEnumerable)
+                {
+                    //if it is a IEnumerable<>, IList<T> or ICollection<> we'll use a List<>
+                    var genericType = typeof(List<>).MakeGenericType(type.GetGenericArguments());
+                    //pass in obj to fill the list
+                    return (IList)Activator.CreateInstance(genericType, obj);
+                }
+	        }
+
+	        if (type.IsArray)
+	        {
+                //if its an array, we'll use a List<>
+	            var genericType = typeof(List<>).MakeGenericType(type.GetElementType());
+                //pass in obj to fill the list
+	            return (IList)Activator.CreateInstance(genericType, obj);
+            }
+
+            return null;
+	    }
+
         /// <summary>
         /// Checks if the method is actually overriding a base method
         /// </summary>
@@ -45,8 +86,8 @@ namespace Umbraco.Core
             if (assembly.IsAppCodeAssembly() || assembly.IsGlobalAsaxAssembly())
                 return EmptyAssemblies;
 
-            
-            // find all assembly references that are referencing the current type's assembly since we 
+
+            // find all assembly references that are referencing the current type's assembly since we
             // should only be scanning those assemblies because any other assembly will definitely not
             // contain sub type's of the one we're currently looking for
             var name = assembly.GetName().Name;

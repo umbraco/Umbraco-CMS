@@ -46,7 +46,7 @@ namespace umbraco
                 fileName += ".cshtml";
             }
 
-            var model = new PartialView(fileName);
+            var model = new PartialView(IsPartialViewMacro ? PartialViewType.PartialViewMacro : PartialViewType.PartialView, fileName);
             var fileService = (FileService)ApplicationContext.Current.Services.FileService;
             var macroService = ApplicationContext.Current.Services.MacroService;
 

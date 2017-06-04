@@ -184,9 +184,8 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Semver, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Semver.2.0.4\lib\netstandard1.1\Semver.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Semver, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\semver.1.1.2\lib\net45\Semver.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -413,6 +412,7 @@
     <Compile Include="PropertyEditors\ValueConverters\MemberPickerPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultipleMediaPickerPropertyConverter.cs" />
+    <Compile Include="PublishedContentQueryExtensions.cs" />
     <Compile Include="Routing\RedirectTrackingEventHandler.cs" />
     <Compile Include="Editors\RedirectUrlManagementController.cs" />
     <Compile Include="Models\ContentEditing\RedirectUrlSearchResults.cs" />
@@ -442,7 +442,9 @@
     <Compile Include="Security\WebAuthExtensions.cs" />
     <Compile Include="umbraco.presentation\SafeXmlReaderWriter.cs" />
     <Compile Include="Trees\ScriptTreeController.cs" />
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="Models\ContentEditing\Relation.cs" />

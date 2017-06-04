@@ -101,6 +101,9 @@ namespace Umbraco.Core.Models.EntityBase
             set { SetPropertyValueAndDetectChanges(value, ref _updateDate, Ps.Value.UpdateDateSelector); }           
         }
 
+        [IgnoreDataMember]
+        public DateTime? DeletedDate { get; set; }
+
         internal virtual void ResetIdentity()
         {
             _hasIdentity = false;

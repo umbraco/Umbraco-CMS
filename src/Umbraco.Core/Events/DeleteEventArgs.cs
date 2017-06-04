@@ -1,9 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Umbraco.Core.Events
 {
-    public class DeleteEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>, IEquatable<DeleteEventArgs<TEntity>>, IDeletingMediaFilesEventArgs
+    [SupersedeEvent(typeof(SaveEventArgs<>))]
+    [SupersedeEvent(typeof(PublishEventArgs<>))]
+    [SupersedeEvent(typeof(MoveEventArgs<>))]
+    [SupersedeEvent(typeof(CopyEventArgs<>))]
+    public class DeleteEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>, IEquatable<DeleteEventArgs<TEntity>>, IDeletingMediaFilesEventArgs
 	{
 	    /// <summary>
 	    /// Constructor accepting multiple entities that are used in the delete operation
@@ -106,7 +111,7 @@ namespace Umbraco.Core.Events
 	    {
 	        if (ReferenceEquals(null, other)) return false;
 	        if (ReferenceEquals(this, other)) return true;
-	        return base.Equals(other) && MediaFilesToDelete.Equals(other.MediaFilesToDelete);
+	        return base.Equals(other) && MediaFilesToDelete.SequenceEqual(other.MediaFilesToDelete);
 	    }
 
 	    public override bool Equals(object obj)

@@ -89,7 +89,7 @@ namespace umbraco
 		/// <param name="rootNode">the 'Relation Types' root node</param>
 		protected override void CreateRootNode(ref XmlTreeNode rootNode)
 		{
-			rootNode.Text = "Relation Types";
+			//rootNode.Text = "Relation Types";
 			rootNode.Icon = BaseTree.FolderIcon;
 			rootNode.OpenIcon = BaseTree.FolderIconOpen;
 			rootNode.NodeType = this.TreeAlias; // (Was prefixed with init)

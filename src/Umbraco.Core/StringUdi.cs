@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Linq;
 
 namespace Umbraco.Core
 {
@@ -20,7 +21,7 @@ namespace Umbraco.Core
         /// <param name="entityType">The entity type part of the udi.</param>
         /// <param name="id">The string id part of the udi.</param>
         public StringUdi(string entityType, string id)
-            : base(entityType, "umb://" + entityType + "/" + id)
+            : base(entityType, "umb://" + entityType + "/" + EscapeUriString(id))
         {
             Id = id;
         }
@@ -32,7 +33,20 @@ namespace Umbraco.Core
         public StringUdi(Uri uriValue)
             : base(uriValue)
         {
-            Id = uriValue.AbsolutePath.TrimStart('/');
+            Id = Uri.UnescapeDataString(uriValue.AbsolutePath.TrimStart('/'));
+        }
+
+        private static string EscapeUriString(string s)
+        {
+            // Uri.EscapeUriString preserves / but also [ and ] which is bad
+            // Uri.EscapeDataString does not preserve / which is bad
+
+            // reserved = : / ? # [ ] @ ! $ & ' ( ) * + , ; =
+            // unreserved = alpha digit - . _ ~
+
+            // we want to preserve the / and the unreserved
+            // so...
+            return string.Join("/", s.Split('/').Select(Uri.EscapeDataString));
         }
 
         /// <summary>

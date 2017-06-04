@@ -32,6 +32,57 @@ namespace Umbraco.Tests
         }
 
         [Test]
+        public void StringEncodingTest()
+        {
+            // absolute path is unescaped
+            var uri = new Uri("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test");
+            Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/this is a test", uri.ToString());
+            Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test", uri.AbsoluteUri);
+            Assert.AreEqual("/this%20is%20a%20test", uri.AbsolutePath);
+
+            Assert.AreEqual("/this is a test", Uri.UnescapeDataString(uri.AbsolutePath));
+            Assert.AreEqual("%2Fthis%20is%20a%20test", Uri.EscapeDataString("/this is a test"));
+            Assert.AreEqual("/this%20is%20a%20test", Uri.EscapeUriString("/this is a test"));
+
+            var udi = Udi.Parse("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test");
+            Assert.AreEqual(Constants.UdiEntityType.AnyString, udi.EntityType);
+            Assert.IsInstanceOf<StringUdi>(udi);
+            var stringEntityId = udi as StringUdi;
+            Assert.IsNotNull(stringEntityId);
+            Assert.AreEqual("this is a test", stringEntityId.Id);
+            Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test", udi.ToString());
+
+            var udi2 = new StringUdi(Constants.UdiEntityType.AnyString, "this is a test");
+            Assert.AreEqual(udi, udi2);
+
+            var udi3 = new StringUdi(Constants.UdiEntityType.AnyString, "path to/this is a test.xyz");
+            Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/path%20to/this%20is%20a%20test.xyz", udi3.ToString());
+        }
+
+        [Test, Ignore]
+        public void StringEncodingTest2()
+        {
+            // reserved = : / ? # [ ] @ ! $ & ' ( ) * + , ; =
+            // unreserved = alpha digit - . _ ~
+
+            Assert.AreEqual("%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2B%2C%3B%3D.-_~%25", Uri.EscapeDataString(":/?#[]@!$&'()+,;=.-_~%"));
+            Assert.AreEqual(":/?#[]@!$&'()+,;=.-_~%25", Uri.EscapeUriString(":/?#[]@!$&'()+,;=.-_~%"));
+
+            // we cannot have reserved chars at random places
+            // we want to keep the / in string udis
+
+            var r = string.Join("/", "path/to/View[1].cshtml".Split('/').Select(Uri.EscapeDataString));
+            Assert.AreEqual("path/to/View%5B1%5D.cshtml", r);
+            Assert.IsTrue(Uri.IsWellFormedUriString("umb://partial-view-macro/" + r, UriKind.Absolute));
+
+            // with the proper fix in StringUdi this should work:
+            var udi1 = new StringUdi("partial-view-macro", "path/to/View[1].cshtml");
+            Assert.AreEqual("umb://partial-view-macro/path/to/View%5B1%5D.cshtml", udi1.ToString());
+            var udi2 = Udi.Parse("umb://partial-view-macro/path/to/View%5B1%5D.cshtml");
+            Assert.AreEqual("path/to/View[1].cshtml", ((StringUdi) udi2).Id);
+        }
+
+        [Test]
         public void GuidEntityCtorTest()
         {
             var guid = Guid.NewGuid();

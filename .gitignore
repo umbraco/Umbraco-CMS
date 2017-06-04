@@ -143,3 +143,5 @@ build/csharp-docs.zip
 build/msbuild.log
 .vs/
 src/packages/
+build/tools/
+src/PrecompiledWeb/*

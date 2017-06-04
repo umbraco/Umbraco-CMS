@@ -70,6 +70,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //Remove 'published' xml from the cmsContentXml table for the unpublished content
             Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new { Id = entity.Id });
+
+            entity.DeletedDate = DateTime.Now;
         }
 
         protected override void PersistNewItem(ContentXmlEntity<TContent> entity)
