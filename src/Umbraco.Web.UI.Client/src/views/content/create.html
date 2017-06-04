@@ -1,32 +1,52 @@
 <div class="umb-dialog-body with-footer" ng-controller="Umbraco.Editors.Content.CreateController" ng-cloak>
-	
-	<div class="umb-pane">
-	<h5><localize key="create_createUnder">Create a page under</localize> {{currentNode.name}}</h5>
 
-	<p class="abstract" ng-if="allowedTypes && allowedTypes.length === 0">
-		<localize key="create_noDocumentTypes" />
-	</p>
+  <div class="umb-pane">
+    <h5><localize key="create_createUnder">Create a page under</localize> {{currentNode.name}}</h5>
 
-	<ul class="umb-actions umb-actions-child">
+    <p class="abstract" ng-if="allowedTypes && allowedTypes.length === 0">
+      <localize key="create_noDocumentTypes" />
+    </p>
 
-	  <li ng-repeat="docType in allowedTypes | orderBy:'name':false">
-	    <a ng-click="goToAction(docType)">
-	      <i class="large {{docType.icon}}"></i>
-	      <span class="menu-label">
-	        {{docType.name}}
-	        <small>
-	          {{docType.description}}
-	        </small>
-	      </span>
-	    </a>
-	  </li>
+    <ul class="umb-actions umb-actions-child" ng-show="selectContentType">
 
-	</ul>
-	</div>		
+      <li ng-repeat="docType in allowedTypes | orderBy:'name':false">
+        <a ng-click="createOrSelectBlueprintIfAny(docType)">
+          <i class="large {{docType.icon}}"></i>
+          <span class="menu-label">
+            {{docType.name}}
+            <small>
+              {{docType.description}}
+            </small>
+          </span>
+        </a>
+      </li>
+
+    </ul>
+    <ul class="umb-actions umb-actions-child" ng-show="selectBlueprint">
+
+      <li ng-repeat="(key, value) in docType.blueprints | orderBy:'name':false">
+        <a ng-click="createFromBlueprint(key)">
+          <i class="large {{docType.icon}}"></i>
+          <span class="menu-label">
+            {{value}}
+          </span>
+        </a>
+      </li>
+      <li>
+        <a ng-click="createBlank(docType)">
+          <i class="large {{docType.icon}}"></i>
+          <span class="menu-label">
+            <localize key="create_blank">Blank</localize>
+          </span>
+        </a>
+      </li>
+    </ul>
+
+  </div>
 </div>
-	
+
 <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-	<button class="btn btn-info" ng-click="nav.hideDialog(true)">
-		<localize key="buttons_somethingElse">Do something else</localize>
-	</button>
+  <button class="btn btn-info" ng-click="nav.hideDialog(true)">
+    <localize key="buttons_somethingElse">Do something else</localize>
+  </button>
 </div>

@@ -3,7 +3,8 @@
     function CreateBlueprintController(
       $scope,
       contentResource,
-      notificationService
+      notificationsService,
+      navigationService
     ) {
 
     $scope.name = $scope.currentNode.name;
@@ -11,22 +12,17 @@
     $scope.create = function() {
       contentResource.createBlueprintFromContent($scope.currentNode.id, $scope.name)
         .then(function() {
-          notificationService.showNotification({
+          notificationsService.showNotification({
             type: 3,
             header: "Created blueprint",
-            message: "Blueprint was created based on " + $scope.name
+            message: "Blueprint was created based on " + $scope.currentNode.name
           });
-          $scope.closeDialogs();
+          navigationService.hideMenu();
         });
     };
   }
 
-  angular.module("umbraco").controller("Umbraco.Editors.Content.CreateBlueprintController",
-    [
-      "$scope",
-      "contentResource",
-      "notificationsService",
-      CreateBlueprintController
-    ]);
+
+  angular.module("umbraco").controller("Umbraco.Editors.Content.CreateBlueprintController", CreateBlueprintController);
 
 }());
