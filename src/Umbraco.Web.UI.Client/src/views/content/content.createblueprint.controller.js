@@ -1,15 +1,19 @@
 ﻿(function() {
 
-    function CreateBlueprintController(
-      $scope,
-      contentResource,
-      notificationsService,
-      navigationService
-    ) {
+  function CreateBlueprintController(
+    $scope,
+    contentResource,
+    notificationsService,
+    navigationService
+  ) {
 
     $scope.name = $scope.currentNode.name;
 
-    $scope.create = function() {
+    $scope.cancel = function() {
+      navigationService.hideMenu();
+    };
+
+    $scope.create = function () {
       contentResource.createBlueprintFromContent($scope.currentNode.id, $scope.name)
         .then(function() {
           notificationsService.showNotification({
