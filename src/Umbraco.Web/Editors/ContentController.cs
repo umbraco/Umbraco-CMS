@@ -339,8 +339,9 @@ namespace Umbraco.Web.Editors
                 //not allowed
                 var notificationModel = new SimpleNotificationModel();
                 notificationModel.AddSuccessNotification(
-                    "Error",
-                    "Another Blueprint with the same name already exists");
+                    Services.TextService.Localize("content_failedBlueprintHeading"),
+                    Services.TextService.Localize("content_duplicateBlueprintMessage")
+                );
                 return Request.CreateValidationErrorResponse(notificationModel);
             }
 
