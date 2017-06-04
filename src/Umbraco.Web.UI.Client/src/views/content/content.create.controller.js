@@ -7,32 +7,41 @@
  * The controller for the content creation dialog
  */
 function contentCreateController($scope, $routeParams, contentTypeResource, iconHelper, $location) {
-
     contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
         $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
     });
 
-    $scope.goToAction = function (docType) {
-        docType.blueprints = [
-          {id:1, name:"A blue print"},
-          {id:2, name:"A red print"}
-      ];
+    $scope.selectContentType = true;
+    $scope.selectBlueprint = false;
 
-        if (docType.blueprints && docType.blueprints.length) {
-          // Show dialog
+    $scope.createOrSelectBlueprintIfAny = function (docType) {
+        docType.blueprints =
+            {
+                "1": "A blue print",
+                "2": "A red print"
+            };
+
+        if (docType.blueprints && _.keys(docType.blueprints).length) {
+            $scope.docType = docType;
+            $scope.selectContentType = false;
+            $scope.selectBlueprint = true;
         } else {
-          $location.path( "/content/edit/" +
-            $scope.currentNode.id +
-            "?doctype=" +
-            docType.alias +
-            "&create=true"
-          );
+            $location
+                .path("/content/content/edit/" + $scope.currentNode.id)
+                .search("doctype=" + docType.alias + "&create=true");
+            $scope.close();
         }
-        navigationService.hideNavigation();
     }
 
-    $scope.createLinkAttributes = function(docType) {
-      return linkAttributes;
+    $scope.createFromBlueprint = function (blueprintId) {
+        $location
+            .path("/content/content/edit/" + $scope.currentNode.id)
+            .search(
+            "doctype=" + $scope.docType.alias +
+            "&create=true" +
+            "&blueprintId=" + blueprintId
+            );
+        $scope.close();
     }
 }
 

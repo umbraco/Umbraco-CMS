@@ -674,7 +674,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         contentId: contentId, name: name
                     })
                 ),
-                "Failed to create blueprint from content with id " + id
+                "Failed to create blueprint from content with id " + contentId
             );
         }
 

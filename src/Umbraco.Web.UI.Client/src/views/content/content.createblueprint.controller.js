@@ -16,7 +16,7 @@
             header: "Created blueprint",
             message: "Blueprint was created based on " + $scope.name
           });
-          $scope.closeDialogs();
+          $scope.close();
         });
     };
   }
