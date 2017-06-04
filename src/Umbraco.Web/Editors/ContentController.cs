@@ -281,7 +281,8 @@ namespace Umbraco.Web.Editors
         /// <param name="contentId">The content id to copy</param>
         /// <param name="name">The name of the blueprint</param>
         /// <returns></returns>
-        public IHttpActionResult CreateBlueprintFromContent(int contentId, string name)
+        [HttpPost]
+        public IHttpActionResult CreateBlueprintFromContent([FromUri]int contentId, [FromUri]string name)
         {
             var content = Services.ContentService.GetById(contentId);
             if (content == null) return NotFound();

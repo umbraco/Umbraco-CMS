@@ -667,11 +667,11 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         },
 
-        createBlueprintFromContent: function(id, name) {
+        createBlueprintFromContent: function (contentId, name) {
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl("contentApiBaseUrl", "CreateBlueprintFromContent", {
-                        id: id, name: name
+                        contentId: contentId, name: name
                     })
                 ),
                 "Failed to create blueprint from content with id " + id
