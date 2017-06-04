@@ -289,7 +289,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //now delete the items that shouldn't be there
             var sqlAllIds = translate(0, GetBaseQuery(BaseQueryType.Ids));
             var allContentIds = Database.Fetch<int>(sqlAllIds);
-            var docObjectType = Guid.Parse(Constants.ObjectTypes.Document);
+            var docObjectType = NodeObjectTypeId;
             var xmlIdsQuery = new Sql()
                 .Select("DISTINCT cmsContentXml.nodeId")
                 .From<ContentXmlDto>(SqlSyntax)
@@ -820,7 +820,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             XmlElement last = null;
 
             //NOTE: Query creates a reader - does not load all into memory
-            foreach (var row in Database.Query<dynamic>(sql, new { type = new Guid(Constants.ObjectTypes.Document) }))
+            foreach (var row in Database.Query<dynamic>(sql, new { type = NodeObjectTypeId }))
             {
                 string parentId = ((int)row.parentID).ToInvariantString();
                 string xml = row.xml;

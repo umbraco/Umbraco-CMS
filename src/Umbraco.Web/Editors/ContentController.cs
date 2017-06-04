@@ -115,6 +115,11 @@ namespace Umbraco.Web.Editors
 
             var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
 
+            content.AllowPreview = false;
+
+            //set a custom path since the tree that renders this has the content type id as the parent
+            content.Path = string.Format("-1,{0},{1}", foundContent.ContentTypeId, content.Id);
+
             content.AllowedActions = new[] {'A'};
 
             var excludeProps = new[] {"_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template"};
@@ -177,6 +182,26 @@ namespace Umbraco.Web.Editors
 
             var emptyContent = Services.ContentService.CreateContent("", parentId, contentType.Alias, UmbracoUser.Id);
             var mapped = Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
+
+            //remove this tab if it exists: umbContainerView
+            var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
+            mapped.Tabs = mapped.Tabs.Except(new[] { containerTab });
+            return mapped;
+        }
+
+        [OutgoingEditorModelEvent]
+        public ContentItemDisplay GetEmpty(int blueprintId)
+        {
+            var blueprint = Services.ContentService.GetBlueprintById(blueprintId);
+            if (blueprint == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            blueprint.Id = 0;
+            blueprint.Name = string.Empty;
+
+            var mapped = Mapper.Map<ContentItemDisplay>(blueprint);
 
             //remove this tab if it exists: umbContainerView
             var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);

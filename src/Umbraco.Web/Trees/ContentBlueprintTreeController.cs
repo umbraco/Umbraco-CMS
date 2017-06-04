@@ -35,27 +35,47 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            //check if we're rendering the root
+            //get all blueprints
+            var entities = Services.EntityService.GetChildren(Constants.System.Root, UmbracoObjectTypes.DocumentBlueprint).ToArray();
+
+            //check if we're rendering the root in which case we'll render the content types that have blueprints
             if (id == Constants.System.Root.ToInvariantString())
             {
-                var altStartId = string.Empty;
+                //get all blueprint content types
+                var contentTypeAliases = entities.Select(x => ((UmbracoEntity) x).ContentTypeAlias).Distinct();
+                //get the ids
+                var contentTypeIds = Services.ContentTypeService.GetAllContentTypeIds(contentTypeAliases.ToArray());
+                //now get the entities ... it's a bit round about but still smaller queries than getting all document types
+                var docTypeEntities = Services.EntityService.GetAll(UmbracoObjectTypes.DocumentType, contentTypeIds.ToArray()).ToArray();
 
-                if (queryStrings.HasKey(TreeQueryStringParameters.StartNodeId))
-                    altStartId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
-
-                //check if a request has been made to render from a specific start node
-                if (string.IsNullOrEmpty(altStartId) == false && altStartId != "undefined" && altStartId != Constants.System.Root.ToString(CultureInfo.InvariantCulture))
-                {
-                    id = altStartId;
-                }
-
-                var entities = Services.EntityService.GetChildren(Constants.System.Root, UmbracoObjectTypes.DocumentBlueprint).ToArray();
-
-                nodes.AddRange(entities
-                    .Select(entity => CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprintGuid, id, queryStrings, "icon-blueprint", false))
-                    .Where(node => node != null));
+                nodes.AddRange(docTypeEntities
+                    .Select(entity =>
+                    {
+                        var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprintGuid, id, queryStrings, "icon-item-arrangement", true);
+                        treeNode.Path = string.Format("-1,{0}", entity.Id);
+                        treeNode.NodeType = "contentType";
+                        //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
+                        treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
+                        return treeNode;
+                    }));
 
                 return nodes;
+            }
+            else
+            {
+                var intId = id.TryConvertTo<int>();
+                //Get the content type
+                var ct = Services.ContentTypeService.GetContentType(intId.Result);
+                if (ct == null) return nodes;
+
+                var blueprintsForDocType = entities.Where(x => ct.Alias == ((UmbracoEntity) x).ContentTypeAlias);
+                nodes.AddRange(blueprintsForDocType
+                    .Select(entity =>
+                    {
+                        var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprintGuid, id, queryStrings, "icon-blueprint", false);
+                        treeNode.Path = string.Format("-1,{0},{1}", ct.Id, entity.Id);
+                        return treeNode;
+                    }));
             }
 
             return nodes;
@@ -71,8 +91,12 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
                 return menu;
             }
+            var ct = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.DocumentType);
+            //no menu if it's a content type
+            if (ct != null) return null;
 
             menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
+
 
             return menu;
         }

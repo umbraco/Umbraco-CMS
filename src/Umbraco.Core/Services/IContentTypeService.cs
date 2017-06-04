@@ -63,6 +63,13 @@ namespace Umbraco.Core.Services
         IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes);
 
         /// <summary>
+        /// Returns all content type Ids for the aliases given
+        /// </summary>
+        /// <param name="aliases"></param>
+        /// <returns></returns>        
+        IEnumerable<int> GetAllContentTypeIds(string[] aliases);
+
+        /// <summary>
         /// Copies a content type as a child under the specified parent if specified (otherwise to the root)
         /// </summary>
         /// <param name="original">

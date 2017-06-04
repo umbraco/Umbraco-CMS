@@ -14,7 +14,7 @@
       scope.page.menu.currentNode = null;
       scope.page.menu.currentSection = appState.getSectionState("currentSection");
       scope.page.listViewPath = null;
-      scope.page.isNew = scope.createOptions ? true : false;
+      scope.page.isNew = scope.isNew ? true : false;
       scope.page.buttonGroupState = "init";
 
       function init(content) {
@@ -116,7 +116,7 @@
         scope.page.loading = true;
 
         //we are creating so get an empty content item
-        contentResource.getScaffold(scope.contentId, scope.createOptions.docType)
+        scope.getScaffoldMethod()()
           .then(function (data) {
 
             scope.content = data;
@@ -230,11 +230,12 @@
       templateUrl: 'views/components/content/edit.html',
       scope: {
         contentId: "=",
+        isNew: "=?",
         treeAlias: "@",
-        createOptions: "=?",
         page: "=?",
         saveMethod: "&",
-        getMethod: "&"
+        getMethod: "&",
+        getScaffoldMethod: "&?"
       },
       link: link
     };

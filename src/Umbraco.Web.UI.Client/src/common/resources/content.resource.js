@@ -399,6 +399,17 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                   'Failed to retrieve data for empty content item type ' + alias);
         },
 
+        getBlueprintScaffold: function (blueprintId) {
+
+          return umbRequestHelper.resourcePromise(
+            $http.get(
+              umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "GetEmpty",
+                [{ blueprintId: blueprintId }])),
+            'Failed to retrieve blueprint for id ' + blueprintId);
+        },
+
         /**
           * @ngdoc method
           * @name umbraco.resources.contentResource#getNiceUrl
