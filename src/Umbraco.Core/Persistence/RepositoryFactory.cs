@@ -157,7 +157,8 @@ namespace Umbraco.Core.Persistence
                 CreateTagRepository(uow),
                 _settings.Content)
             {
-                EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming
+                //duplicates are allowed
+                EnsureUniqueNaming = false
             };
         }
 

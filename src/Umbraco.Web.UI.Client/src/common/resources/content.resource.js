@@ -269,6 +269,16 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                    'Failed to delete item ' + id);
         },
 
+        deleteBlueprint: function (id) {
+          return umbRequestHelper.resourcePromise(
+            $http.post(
+              umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "DeleteBlueprint",
+                [{ id: id }])),
+            'Failed to delete blueprint ' + id);
+        },
+
         /**
           * @ngdoc method
           * @name umbraco.resources.contentResource#getById

@@ -1153,6 +1153,15 @@ namespace Umbraco.Core.Services
             return ((IContentServiceOperations)this).SaveAndPublish(content, userId, raiseEvents);
         }
 
+        public IContent GetBlueprintById(int id)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
+                return repository.Get(id);
+            }
+        }
+
         public void SaveBlueprint(IContent content, int userId = 0)
         {
             //always ensure the blueprint is at the root

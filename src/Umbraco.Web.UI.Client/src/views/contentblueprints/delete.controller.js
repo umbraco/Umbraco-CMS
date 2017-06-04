@@ -6,14 +6,14 @@
  * @description
  * The controller for deleting content blueprints
  */
-function ContentBlueprintDeleteController($scope, codefileResource, treeService, navigationService) {
+function ContentBlueprintDeleteController($scope, contentResource, treeService, navigationService) {
 
     $scope.performDelete = function() {
 
         //mark it for deletion (used in the UI)
         $scope.currentNode.loading = true;
         
-        codefileResource.deleteByPath('partialViews', $scope.currentNode.id)
+        contentResource.deleteBlueprint($scope.currentNode.id)
             .then(function() {
                 $scope.currentNode.loading = false;
                 //get the root node before we remove it
