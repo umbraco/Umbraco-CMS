@@ -5,21 +5,22 @@
 var ncNodeNameCache = {
     id: "",
     keys: {}
-}
+};
 
 angular.module("umbraco.filters").filter("ncNodeName", function (editorState, entityResource) {
 
     return function (input) {
 
         // Check we have a value at all
-        if (input == "" || input.toString() == "0")
+        if (input === "" || input.toString() === "0") {
             return "";
+        }
 
         var currentNode = editorState.getCurrent();
 
         // Ensure a unique cache per editor instance
         var key = "ncNodeName_" + currentNode.key;
-        if (ncNodeNameCache.id != key) {
+        if (ncNodeNameCache.id !== key) {
             ncNodeNameCache.id = key;
             ncNodeNameCache.keys = {};
         }
@@ -41,6 +42,6 @@ angular.module("umbraco.filters").filter("ncNodeName", function (editorState, en
 
         // Return the current value for now
         return ncNodeNameCache.keys[input];
-    }
+    };
 
 });
