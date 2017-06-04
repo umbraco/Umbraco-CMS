@@ -24,6 +24,7 @@ using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.preview;
+using Umbraco.Core.Events;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -102,6 +103,21 @@ namespace Umbraco.Web.Editors
             TabsAndPropertiesResolver.AddListView(display, "content", Services.DataTypeService, Services.TextService);
 
             return display;
+        }
+
+        public ContentItemDisplay GetBlueprintById(int id)
+        {
+            var foundContent = Services.ContentService.GetBlueprintById(id);
+            if (foundContent == null)
+            {
+                HandleContentNotFound(id);
+            }
+
+            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+
+            content.AllowedActions = new[] {'A'};
+
+            return content;
         }
 
         /// <summary>
@@ -311,9 +327,33 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [FileUploadCleanupFilter]
         [ContentPostValidate]
+        public ContentItemDisplay PostSaveBlueprint(
+            [ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
+        {
+            return PostSaveInternal(contentItem,
+                content =>
+                {
+                    Services.ContentService.SaveBlueprint(contentItem.PersistedContent, Security.CurrentUser.Id);
+                    //we need to reuse the underlying logic so return the result that it wants
+                    return Attempt<OperationStatus>.Succeed(new OperationStatus(OperationStatusType.Success, new EventMessages()));
+                });
+        }
+
+        /// <summary>
+        /// Saves content
+        /// </summary>
+        /// <returns></returns>
+        [FileUploadCleanupFilter]
+        [ContentPostValidate]
         public ContentItemDisplay PostSave(
                 [ModelBinder(typeof(ContentItemBinder))]
                                 ContentItemSave contentItem)
+        {
+            return PostSaveInternal(contentItem, 
+                content => Services.ContentService.WithResult().Save(contentItem.PersistedContent, Security.CurrentUser.Id));
+        }
+
+        private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, Attempt<OperationStatus>> saveMethod)
         {
             //If we've reached here it means:
             // * Our model has been bound
@@ -361,7 +401,7 @@ namespace Umbraco.Web.Editors
             if (contentItem.Action == ContentSaveAction.Save || contentItem.Action == ContentSaveAction.SaveNew)
             {
                 //save the item
-                var saveResult = Services.ContentService.WithResult().Save(contentItem.PersistedContent, Security.CurrentUser.Id);
+                var saveResult = saveMethod(contentItem.PersistedContent);
 
                 wasCancelled = saveResult.Success == false && saveResult.Result.StatusType == OperationStatusType.FailedCancelledByEvent;
             }
@@ -391,8 +431,8 @@ namespace Umbraco.Web.Editors
                     if (wasCancelled == false)
                     {
                         display.AddSuccessNotification(
-                                Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
-                                Services.TextService.Localize("speechBubbles/editContentSavedText"));
+                            Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
+                            Services.TextService.Localize("speechBubbles/editContentSavedText"));
                     }
                     else
                     {
@@ -404,8 +444,8 @@ namespace Umbraco.Web.Editors
                     if (wasCancelled == false)
                     {
                         display.AddSuccessNotification(
-                                Services.TextService.Localize("speechBubbles/editContentSendToPublish"),
-                                Services.TextService.Localize("speechBubbles/editContentSendToPublishText"));
+                            Services.TextService.Localize("speechBubbles/editContentSendToPublish"),
+                            Services.TextService.Localize("speechBubbles/editContentSendToPublishText"));
                     }
                     else
                     {

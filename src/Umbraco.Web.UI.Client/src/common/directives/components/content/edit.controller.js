@@ -49,14 +49,14 @@
       function syncTreeNode(content, path, initialLoad) {
 
         if (!scope.content.isChildOfListView) {
-          navigationService.syncTree({ tree: "content", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
+          navigationService.syncTree({ tree: scope.treeAlias, path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
             scope.page.menu.currentNode = syncArgs.node;
           });
         }
         else if (initialLoad === true) {
 
           //it's a child item, just sync the ui node to the parent
-          navigationService.syncTree({ tree: "content", path: path.substring(0, path.lastIndexOf(",")).split(","), forceReload: initialLoad !== true });
+          navigationService.syncTree({ tree: scope.treeAlias, path: path.substring(0, path.lastIndexOf(",")).split(","), forceReload: initialLoad !== true });
 
           //if this is a child of a list view and it's the initial load of the editor, we need to get the tree node 
           // from the server so that we can load in the actions menu.
@@ -134,7 +134,7 @@
         scope.page.loading = true;
 
         //we are editing so get the content item from the server
-        contentResource.getById(scope.contentId)
+        scope.getMethod()(scope.contentId)
           .then(function (data) {
 
             scope.content = data;
@@ -200,7 +200,7 @@
       };
 
       scope.save = function () {
-        return performSave({ saveMethod: contentResource.save, statusMessage: "Saving...", action: "save" });
+        return performSave({ saveMethod: scope.saveMethod(), statusMessage: "Saving...", action: "save" });
       };
 
       scope.preview = function (content) {
@@ -230,8 +230,11 @@
       templateUrl: 'views/components/content/edit.html',
       scope: {
         contentId: "=",
+        treeAlias: "@",
         createOptions: "=?",
-        page: "=?"
+        page: "=?",
+        saveMethod: "&",
+        getMethod: "&"
       },
       link: link
     };

@@ -26,11 +26,9 @@
 function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     /** internal method process the saving of data and post processing the result */
-    function saveContentItem(content, action, files) {
+  function saveContentItem(content, action, files, restApiUrl) {
         return umbRequestHelper.postSaveContent({
-            restApiUrl: umbRequestHelper.getApiUrl(
-                   "contentApiBaseUrl",
-                   "PostSave"),
+          restApiUrl: restApiUrl,
             content: content,
             action: action,
             files: files,
@@ -310,6 +308,16 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                   'Failed to retrieve data for content id ' + id);
         },
 
+        getBlueprintById: function (id) {
+          return umbRequestHelper.resourcePromise(
+            $http.get(
+              umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "GetBlueprintById",
+                [{ id: id }])),
+            'Failed to retrieve data for content id ' + id);
+        },
+
         /**
           * @ngdoc method
           * @name umbraco.resources.contentResource#getByIds
@@ -574,9 +582,18 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           */
         save: function (content, isNew, files) {
-            return saveContentItem(content, "save" + (isNew ? "New" : ""), files);
+          var endpoint = umbRequestHelper.getApiUrl(
+            "contentApiBaseUrl",
+            "PostSave");
+          return saveContentItem(content, "save" + (isNew ? "New" : ""), files, endpoint);
         },
 
+        saveBlueprint: function (content, isNew, files) {
+          var endpoint = umbRequestHelper.getApiUrl(
+            "contentApiBaseUrl",
+            "PostSaveBlueprint");
+          return saveContentItem(content, "save" + (isNew ? "New" : ""), files, endpoint);
+        },
 
         /**
           * @ngdoc method
@@ -607,7 +624,10 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           */
         publish: function (content, isNew, files) {
-            return saveContentItem(content, "publish" + (isNew ? "New" : ""), files);
+          var endpoint = umbRequestHelper.getApiUrl(
+            "contentApiBaseUrl",
+            "PostSave");
+          return saveContentItem(content, "publish" + (isNew ? "New" : ""), files, endpoint);
         },
 
 
@@ -638,7 +658,10 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           */
         sendToPublish: function (content, isNew, files) {
-            return saveContentItem(content, "sendPublish" + (isNew ? "New" : ""), files);
+          var endpoint = umbRequestHelper.getApiUrl(
+            "contentApiBaseUrl",
+            "PostSave");
+          return saveContentItem(content, "sendPublish" + (isNew ? "New" : ""), files, endpoint);
         },
 
         /**
