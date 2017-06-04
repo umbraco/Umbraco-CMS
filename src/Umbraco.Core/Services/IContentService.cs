@@ -96,7 +96,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentService : IContentServiceBase
     {
-        IEnumerable<IContent> GetDocumentBlueprints(params int[] documentTypeIds);
+        IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] documentTypeIds);
         void SaveBlueprint(IContent content, int userId = 0);
         void DeleteBlueprint(IContent content, int userId = 0);
         IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = 0);

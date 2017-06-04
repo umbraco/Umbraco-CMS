@@ -1852,7 +1852,7 @@ namespace Umbraco.Core.Services
             return true;
         }
 
-        public IEnumerable<IContent> GetDocumentBlueprints(params int[] documentTypeIds)
+        public IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] documentTypeIds)
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
