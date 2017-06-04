@@ -16,17 +16,6 @@
             );
         }
 
-        $scope.selectedDocTypeTabs = function (cfg) {
-            var dt = _.find($scope.model.docTypes, function (itm) {
-                return itm.alias.toLowerCase() == cfg.ncAlias.toLowerCase();
-            });
-            var tabs = dt ? dt.tabs : [];
-            if (!_.contains(tabs, cfg.ncTabAlias)) {
-                cfg.ncTabAlias = tabs[0];
-            }
-            return tabs;
-        }
-
         $scope.remove = function (index) {
             $scope.model.value.splice(index, 1);
         }
@@ -37,8 +26,15 @@
             handle: ".icon-navigation"
         };
 
+        $scope.selectedDocTypeTabs = {};
+
         ncResources.getContentTypes().then(function (docTypes) {
             $scope.model.docTypes = docTypes;
+
+            // Populate document type tab dictionary
+            docTypes.forEach(function (value) {
+                $scope.selectedDocTypeTabs[value.alias] = value.tabs;
+            });
         });
 
         if (!$scope.model.value) {
@@ -376,7 +372,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 var newValues = [];
                 for (var i = 0; i < $scope.nodes.length; i++) {
                     var node = $scope.nodes[i];
-                  var newValue = {
+                    var newValue = {
                         key: node.key,
                         name: node.name,
                         ncContentTypeAlias: node.ncContentTypeAlias
