@@ -74,11 +74,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 {
                     message = exception.Status == WebExceptionStatus.TrustFailure
                         ? _textService.Localize("healthcheck/httpsCheckInvalidCertificate", new [] { exception.Message })
-                        : _textService.Localize("healthcheck/httpsCheckInvalidUrl", new [] { address, exception.Message });
+                        : _textService.Localize("healthcheck/healthCheckInvalidUrl", new [] { address, exception.Message });
                 }
                 else
                 {
-                    message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, ex.Message });
+                    message = _textService.Localize("healthcheck/healthCheckInvalidUrl", new[] { address, ex.Message });
                 }
             }
 
