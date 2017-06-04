@@ -16,7 +16,7 @@
 
             if ($scope.tabAlias) {
                 angular.forEach($scope.model.tabs, function (tab) {
-                    if (tab.alias.toLowerCase() == $scope.tabAlias.toLowerCase()) {
+                    if (tab.alias.toLowerCase() === $scope.tabAlias.toLowerCase()) {
                         selectedTab = tab;
                         return;
                     }
@@ -34,7 +34,7 @@
 
                     // Sync the values back
                     angular.forEach($scope.ngModel.tabs, function (tab) {
-                        if (tab.alias.toLowerCase() == selectedTab.alias.toLowerCase()) {
+                        if (tab.alias.toLowerCase() === selectedTab.alias.toLowerCase()) {
 
                             var localPropsMap = selectedTab.properties.reduce(function (map, obj) {
                                 map[obj.alias] = obj;
@@ -55,7 +55,7 @@
             $scope.$on('$destroy', function () {
                 unsubscribe();
             });
-        }
+        };
 
         return {
             restrict: "E",
