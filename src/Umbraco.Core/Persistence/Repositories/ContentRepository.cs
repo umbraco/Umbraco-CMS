@@ -39,6 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { return Constants.ObjectTypes.DocumentBlueprintGuid; }
         }
+        
     }
 
     /// <summary>

@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Services
 
             contentService.SaveBlueprint(blueprint);
 
-            var found = contentService.GetDocumentBlueprints().ToArray();
+            var found = contentService.GetBlueprintsForContentTypes().ToArray();
             Assert.AreEqual(1, found.Length);
             
             //ensures it's not found by normal content
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Services
 
             contentService.DeleteBlueprint(blueprint);
 
-            var found = contentService.GetDocumentBlueprints().ToArray();
+            var found = contentService.GetBlueprintsForContentTypes().ToArray();
             Assert.AreEqual(0, found.Length);
         }
 
@@ -143,13 +143,13 @@ namespace Umbraco.Tests.Services
                 contentService.SaveBlueprint(blueprint);
             }            
 
-            var found = contentService.GetDocumentBlueprints().ToArray();
+            var found = contentService.GetBlueprintsForContentTypes().ToArray();
             Assert.AreEqual(10, found.Length);
 
-            found = contentService.GetDocumentBlueprints(ct1.Id).ToArray();
+            found = contentService.GetBlueprintsForContentTypes(ct1.Id).ToArray();
             Assert.AreEqual(5, found.Length);
 
-            found = contentService.GetDocumentBlueprints(ct2.Id).ToArray();
+            found = contentService.GetBlueprintsForContentTypes(ct2.Id).ToArray();
             Assert.AreEqual(5, found.Length);
         }
 

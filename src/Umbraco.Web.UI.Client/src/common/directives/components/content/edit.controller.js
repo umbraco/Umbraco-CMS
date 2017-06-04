@@ -230,7 +230,8 @@
       templateUrl: 'views/components/content/edit.html',
       scope: {
         contentId: "=",
-        createOptions: "="
+        createOptions: "=?",
+        page: "=?"
       },
       link: link
     };

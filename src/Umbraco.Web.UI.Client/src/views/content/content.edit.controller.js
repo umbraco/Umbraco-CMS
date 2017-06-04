@@ -9,6 +9,7 @@
 function ContentEditController($scope, $routeParams) {
 
   $scope.contentId = $routeParams.id;
+  $scope.page = $routeParams.page;
   $scope.createOptions = null;
   if ($routeParams.create && $routeParams.doctype) {
     $scope.createOptions = {

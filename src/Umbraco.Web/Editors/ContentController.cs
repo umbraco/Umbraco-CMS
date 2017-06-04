@@ -282,16 +282,27 @@ namespace Umbraco.Web.Editors
         /// <param name="name">The name of the blueprint</param>
         /// <returns></returns>
         [HttpPost]
-        public IHttpActionResult CreateBlueprintFromContent([FromUri]int contentId, [FromUri]string name)
+        public HttpResponseMessage CreateBlueprintFromContent([FromUri]int contentId, [FromUri]string name)
         {
             var content = Services.ContentService.GetById(contentId);
-            if (content == null) return NotFound();
+            if (content == null) return Request.CreateResponse(HttpStatusCode.NotFound);
+
+            var existing = Services.ContentService.GetBlueprintsForContentTypes(content.ContentTypeId);
+            if (existing.Any(x => x.Name == name))
+            {
+                //not allowed
+                var notificationModel = new SimpleNotificationModel();
+                notificationModel.AddSuccessNotification(
+                    "Error",
+                    "Another Blueprint with the same name already exists");
+                return Request.CreateValidationErrorResponse(notificationModel);
+            }
 
             var blueprint = Services.ContentService.CreateContentFromBlueprint(content, name, Security.GetUserId());
 
             Services.ContentService.SaveBlueprint(blueprint, Security.GetUserId());
 
-            return Ok();
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         /// <summary>
@@ -451,6 +462,22 @@ namespace Umbraco.Web.Editors
             //return ok
             return Request.CreateResponse(HttpStatusCode.OK);
 
+        }
+
+        [HttpDelete]
+        [HttpPost]
+        public HttpResponseMessage DeleteBlueprint(int id)
+        {
+            var found = Services.ContentService.GetBlueprintById(id);
+
+            if (found == null)
+            {
+                return HandleContentNotFound(id, false);
+            }
+
+            Services.ContentService.DeleteBlueprint(found);
+
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         /// <summary>
