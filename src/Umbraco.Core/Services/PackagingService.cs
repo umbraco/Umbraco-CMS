@@ -303,8 +303,9 @@ namespace Umbraco.Core.Services
                                        SortOrder = int.Parse(sortOrder)
                                    };
 
-            if (element.Attribute("key") != null && Guid.TryParse(element.Attribute("key").Value, out key))  { 
-            // update the Guid (for UDI support)
+            if (element.Attribute("key") != null && Guid.TryParse(element.Attribute("key").Value, out key))
+            {
+                // update the Guid (for UDI support)
                 content.Key = key;
             }
 
@@ -526,7 +527,7 @@ namespace Umbraco.Core.Services
             {
                 var foldersAttribute = documentType.Attribute("Folders");
                 var infoElement = documentType.Element("Info");
-                if (foldersAttribute != null && infoElement != null 
+                if (foldersAttribute != null && infoElement != null
                     //don't import any folder if this is a child doc type - the parent doc type will need to
                     //exist which contains it's folders
                     && ((string)infoElement.Element("Master")).IsNullOrWhiteSpace())
@@ -1047,7 +1048,7 @@ namespace Umbraco.Core.Services
                         {
                             _logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
                             throw tryCreateFolder.Exception;
-                        }                        
+                        }
                         current = _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
                     }
 
@@ -1097,14 +1098,14 @@ namespace Umbraco.Core.Services
                 if (dataTypeDefinition != null)
                 {
                     var valuesWithoutKeys = prevaluesElement.Elements("PreValue")
-                        .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace())
+                        .Where(x => ((string)x.Attribute("Alias")).IsNullOrWhiteSpace())
                         .Select(x => x.Attribute("Value").Value);
 
                     var valuesWithKeys = prevaluesElement.Elements("PreValue")
-                        .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace() == false)
+                        .Where(x => ((string)x.Attribute("Alias")).IsNullOrWhiteSpace() == false)
                         .ToDictionary(
-                            key => (string) key.Attribute("Alias"),
-                            val => new PreValue((string) val.Attribute("Value")));
+                            key => (string)key.Attribute("Alias"),
+                            val => new PreValue((string)val.Attribute("Value")));
 
                     //save the values with keys
                     _dataTypeService.SavePreValues(dataTypeDefinition, valuesWithKeys);
