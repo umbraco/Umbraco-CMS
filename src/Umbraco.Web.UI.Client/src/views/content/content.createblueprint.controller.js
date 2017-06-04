@@ -1,16 +1,15 @@
 ﻿(function() {
 
-  function CreateBlueprintController($scope,
-    contentResource,
-    appState,
-    navigationService,
-    editorState,
-    notificationService) {
+    function CreateBlueprintController(
+      $scope,
+      contentResource,
+      notificationService
+    ) {
 
-    $scope.name = editorState.current.name;
+    $scope.name = $scope.currentNode.name;
 
     $scope.create = function() {
-      contentResource.createBlueprintFromContent(editorState.current.id, $scope.name)
+      contentResource.createBlueprintFromContent($scope.currentNode.id, $scope.name)
         .then(function() {
           notificationService.showNotification({
             type: 3,
@@ -26,8 +25,6 @@
     [
       "$scope",
       "contentResource",
-      "navigationService",
-      "editorState",
       "notificationsService",
       CreateBlueprintController
     ]);
