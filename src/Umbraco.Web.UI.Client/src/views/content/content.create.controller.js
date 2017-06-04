@@ -14,18 +14,20 @@ function contentCreateController($scope, $routeParams, contentTypeResource, icon
     $scope.selectContentType = true;
     $scope.selectBlueprint = false;
 
-    $scope.createOrSelectBlueprintIfAny = function (docType) {
-        // TODO: The none one
+    $scope.createBlank = function (docType) {
+        $location
+            .path("/content/content/edit/" + $scope.currentNode.id)
+            .search("doctype=" + docType.alias + "&create=true");
+        navigationService.hideMenu();
+    }
 
+    $scope.createOrSelectBlueprintIfAny = function (docType) {
         if (docType.blueprints && _.keys(docType.blueprints).length) {
             $scope.docType = docType;
             $scope.selectContentType = false;
             $scope.selectBlueprint = true;
         } else {
-            $location
-                .path("/content/content/edit/" + $scope.currentNode.id)
-                .search("doctype=" + docType.alias + "&create=true");
-          navigationService.hideMenu();
+            $scope.createBlank(docType);
         }
     }
 
@@ -37,7 +39,7 @@ function contentCreateController($scope, $routeParams, contentTypeResource, icon
             "&create=true" +
             "&blueprintId=" + blueprintId
             );
-      navigationService.hideMenu();
+        navigationService.hideMenu();
     }
 }
 
