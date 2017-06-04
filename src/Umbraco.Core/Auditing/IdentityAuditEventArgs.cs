@@ -54,10 +54,8 @@ namespace Umbraco.Core.Auditing
 
     public enum AuditEvent
     {
-        AccountCreated,
         AccountLocked,
         AccountUnlocked,
-        AccountUpdated,
         LoginFailed,
         LoginRequiresVerification,
         LoginSucces,

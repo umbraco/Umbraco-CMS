@@ -567,8 +567,6 @@ namespace umbraco.cms.presentation.user
                     }
 
                     u.Save();
-                    if(backofficeUserManager != null)
-                        backofficeUserManager.RaiseAccountUpdatedEvent(u.Id);
 
                     // save data
                     if (cName.Text != "")

@@ -283,19 +283,6 @@ namespace Umbraco.Core.Security
             return result;
         }
 
-        public override Task<IdentityResult> CreateAsync(T user)
-        {
-            var result = base.CreateAsync(user);
-
-            if (result.Result.Succeeded)
-                OnAccountCreated(new IdentityAuditEventArgs(AuditEvent.AccountCreated)
-                {
-                    AffectedUser = user.Id
-                });
-
-            return result;
-        }
-
         public override async Task<IdentityResult> ResetAccessFailedCountAsync(int userId)
         {
             var user = ApplicationContext.Current.Services.UserService.GetUserById(userId);
@@ -317,14 +304,6 @@ namespace Umbraco.Core.Security
             }
 
             return await Task.FromResult(IdentityResult.Success);
-        }
-
-        internal void RaiseAccountUpdatedEvent(int userId)
-        {
-            OnAccountUpdated(new IdentityAuditEventArgs(AuditEvent.AccountUpdated)
-            {
-                AffectedUser = userId
-            });
         }
 
         internal void RaisePasswordChangedEvent(int userId)
@@ -391,27 +370,6 @@ namespace Umbraco.Core.Security
             });
         }
 
-        internal void RaiseCreateUserEvent(int userId)
-        {
-            OnAccountCreated(new IdentityAuditEventArgs(AuditEvent.AccountCreated)
-            {
-                AffectedUser = userId
-            });
-        }
-
-        public override Task<IdentityResult> UpdateAsync(T user)
-        {
-            var result = base.UpdateAsync(user);
-
-            if (result.Result.Succeeded)
-                OnAccountUpdated(new IdentityAuditEventArgs(AuditEvent.AccountUpdated)
-                {
-                    AffectedUser = user.Id
-                });
-
-            return result;
-        }
-
         /// <summary>
         /// Clears a lock so that the membership user can be validated.
         /// </summary>
@@ -444,10 +402,8 @@ namespace Umbraco.Core.Security
             return true;
         }
 
-        public static event EventHandler AccountCreated;
         public static event EventHandler AccountLocked;
         public static event EventHandler AccountUnlocked;
-        public static event EventHandler AccountUpdated;
         public static event EventHandler LoginFailed;
         public static event EventHandler LoginRequiresVerification;
         public static event EventHandler LoginSuccess;
@@ -455,11 +411,6 @@ namespace Umbraco.Core.Security
         public static event EventHandler PasswordChanged;
         public static event EventHandler PasswordReset;
         public static event EventHandler ResetAccessFailedCount;
-
-        protected virtual void OnAccountCreated(IdentityAuditEventArgs e)
-        {
-            if (AccountCreated != null) AccountCreated(this, e);
-        }
 
         protected virtual void OnAccountLocked(IdentityAuditEventArgs e)
         {
@@ -469,11 +420,6 @@ namespace Umbraco.Core.Security
         protected virtual void OnAccountUnlocked(IdentityAuditEventArgs e)
         {
             if (AccountUnlocked != null) AccountUnlocked(this, e);
-        }
-
-        protected virtual void OnAccountUpdated(IdentityAuditEventArgs e)
-        {
-            if (AccountUpdated != null) AccountUpdated(this, e);
         }
 
         protected virtual void OnLoginFailed(IdentityAuditEventArgs e)
