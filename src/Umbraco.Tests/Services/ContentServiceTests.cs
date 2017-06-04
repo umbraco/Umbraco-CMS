@@ -51,6 +51,107 @@ namespace Umbraco.Tests.Services
         //TODO Add test to verify there is only ONE newest document/content in cmsDocument table after updating.
         //TODO Add test to delete specific version (with and without deleting prior versions) and versions by date.
 
+        [Test]
+        public void Create_Blueprint()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            contentTypeService.Save(contentType);
+
+            var blueprint = MockedContent.CreateTextpageContent(contentType, "hello", -1);
+            blueprint.SetValue("title", "blueprint 1");
+            blueprint.SetValue("bodyText", "blueprint 2");
+            blueprint.SetValue("keywords", "blueprint 3");
+            blueprint.SetValue("description", "blueprint 4");
+
+            contentService.SaveBlueprint(blueprint);
+
+            var found = contentService.GetDocumentBlueprints().ToArray();
+            Assert.AreEqual(1, found.Length);
+            
+            //ensures it's not found by normal content
+            var contentFound = contentService.GetById(found[0].Id);
+            Assert.IsNull(contentFound);
+        }
+
+        [Test]
+        public void Delete_Blueprint()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            contentTypeService.Save(contentType);
+
+            var blueprint = MockedContent.CreateTextpageContent(contentType, "hello", -1);
+            blueprint.SetValue("title", "blueprint 1");
+            blueprint.SetValue("bodyText", "blueprint 2");
+            blueprint.SetValue("keywords", "blueprint 3");
+            blueprint.SetValue("description", "blueprint 4");
+
+            contentService.SaveBlueprint(blueprint);
+
+            contentService.DeleteBlueprint(blueprint);
+
+            var found = contentService.GetDocumentBlueprints().ToArray();
+            Assert.AreEqual(0, found.Length);
+        }
+
+        [Test]
+        public void Create_Content_From_Blueprint()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            contentTypeService.Save(contentType);
+
+            var blueprint = MockedContent.CreateTextpageContent(contentType, "hello", -1);
+            blueprint.SetValue("title", "blueprint 1");
+            blueprint.SetValue("bodyText", "blueprint 2");
+            blueprint.SetValue("keywords", "blueprint 3");
+            blueprint.SetValue("description", "blueprint 4");
+
+            contentService.SaveBlueprint(blueprint);
+
+            var fromBlueprint = contentService.CreateContentFromBlueprint(blueprint, "hello world");
+            contentService.Save(fromBlueprint);
+
+            Assert.IsTrue(fromBlueprint.HasIdentity);
+            Assert.AreEqual("blueprint 1", fromBlueprint.Properties["title"].Value);
+            Assert.AreEqual("blueprint 2", fromBlueprint.Properties["bodyText"].Value);
+            Assert.AreEqual("blueprint 3", fromBlueprint.Properties["keywords"].Value);
+            Assert.AreEqual("blueprint 4", fromBlueprint.Properties["description"].Value);
+        }
+
+        [Test]
+        public void Get_All_Blueprints()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var ct1 = MockedContentTypes.CreateTextpageContentType("ct1");
+            contentTypeService.Save(ct1);
+            var ct2 = MockedContentTypes.CreateTextpageContentType("ct2");
+            contentTypeService.Save(ct2);
+
+            for (int i = 0; i < 10; i++)
+            {
+                var blueprint = MockedContent.CreateTextpageContent(i % 2 == 0 ? ct1 : ct2, "hello" + i, -1);
+                contentService.SaveBlueprint(blueprint);
+            }            
+
+            var found = contentService.GetDocumentBlueprints().ToArray();
+            Assert.AreEqual(10, found.Length);
+
+            found = contentService.GetDocumentBlueprints(ct1.Id).ToArray();
+            Assert.AreEqual(5, found.Length);
+
+            found = contentService.GetDocumentBlueprints(ct2.Id).ToArray();
+            Assert.AreEqual(5, found.Length);
+        }
 
         /// <summary>
         /// Ensures that we don't unpublish all nodes when a node is deleted that has an invalid path of -1

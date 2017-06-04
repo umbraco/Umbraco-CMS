@@ -39,6 +39,14 @@ namespace Umbraco.Core.Models
         Document,
 
         /// <summary>
+        /// Document
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.DocumentBlueprint, typeof(IContent))]
+        [FriendlyName("DocumentBlueprint")]
+        [UmbracoUdiType(Constants.UdiEntityType.Document)]
+        DocumentBlueprint,
+
+        /// <summary>
         /// Media
         /// </summary>
         [UmbracoObjectType(Constants.ObjectTypes.Media, typeof(IMedia))]
