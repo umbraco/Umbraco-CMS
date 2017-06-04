@@ -185,7 +185,6 @@
     <key alias="createdBlueprintHeading">Blueprint created</key>
     <key alias="createdBlueprintMessage">Blueprint was created under %0%</key>
     <key alias="failedBlueprintHeading">Failure</key>
-    <key alias="failedBlueprintMessage">Failed to create blueprint. Check the logs for more information.</key>
     <key alias="duplicateBlueprintMessage">Another Blueprint with the same name already exists.</key>
   </area>
   <area alias="media">
