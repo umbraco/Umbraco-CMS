@@ -117,6 +117,11 @@ namespace Umbraco.Web.Editors
 
             content.AllowedActions = new[] {'A'};
 
+            var excludeProps = new[] {"_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template"};
+            var propsTab = content.Tabs.Last();
+            propsTab.Properties = propsTab.Properties
+                .Where(p => excludeProps.Contains(p.Alias) == false);
+
             return content;
         }
 
