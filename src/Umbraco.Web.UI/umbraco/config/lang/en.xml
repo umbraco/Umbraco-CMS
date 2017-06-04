@@ -1340,6 +1340,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="uploadTranslationXml">Upload translation XML</key>
   </area>
   <area alias="treeHeaders">
+    <key alias="contentBlueprints">Content Blueprints</key>
     <key alias="cacheBrowser">Cache Browser</key>
     <key alias="contentRecycleBin">Recycle Bin</key>
     <key alias="createdPackages">Created packages</key>
