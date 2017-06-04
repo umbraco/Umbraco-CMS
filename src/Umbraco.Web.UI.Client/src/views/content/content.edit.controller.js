@@ -6,9 +6,11 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams) {
+function ContentEditController($scope, $routeParams, contentResource) {
 
   $scope.contentId = $routeParams.id;
+  $scope.saveMethod = contentResource.save;
+  $scope.getMethod = contentResource.getById;
   $scope.page = $routeParams.page;
   $scope.createOptions = null;
   if ($routeParams.create && $routeParams.doctype) {
