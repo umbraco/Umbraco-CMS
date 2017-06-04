@@ -14,13 +14,13 @@
       scope.page.menu.currentNode = null;
       scope.page.menu.currentSection = appState.getSectionState("currentSection");
       scope.page.listViewPath = null;
-      scope.page.isNew = $routeParams.create;
+      scope.page.isNew = scope.createOptions ? true : false;
       scope.page.buttonGroupState = "init";
 
       function init(content) {
 
         var buttons = contentEditingHelper.configureContentEditorButtons({
-          create: $routeParams.create,
+          create: scope.page.isNew,
           content: content,
           methods: {
             saveAndPublish: scope.saveAndPublish,
@@ -35,7 +35,7 @@
         editorState.set(scope.content);
 
         //We fetch all ancestors of the node to generate the footer breadcrumb navigation
-        if (!$routeParams.create) {
+        if (!scope.page.isNew) {
           if (content.parentId && content.parentId !== -1) {
             entityResource.getAncestors(content.id, "document")
               .then(function (anc) {
@@ -111,12 +111,12 @@
         }
       }
 
-      if ($routeParams.create) {
+      if (scope.page.isNew) {
 
         scope.page.loading = true;
 
         //we are creating so get an empty content item
-        contentResource.getScaffold($routeParams.id, $routeParams.doctype)
+        contentResource.getScaffold(scope.contentId, scope.createOptions.docType)
           .then(function (data) {
 
             scope.content = data;
@@ -134,7 +134,7 @@
         scope.page.loading = true;
 
         //we are editing so get the content item from the server
-        contentResource.getById($routeParams.id)
+        contentResource.getById(scope.contentId)
           .then(function (data) {
 
             scope.content = data;
@@ -229,7 +229,8 @@
       replace: true,
       templateUrl: 'views/components/content/edit.html',
       scope: {
-
+        contentId: "=",
+        createOptions: "="
       },
       link: link
     };
