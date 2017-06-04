@@ -10,6 +10,9 @@
 
     $scope.name = $scope.currentNode.name;
 
+    $scope.cancel = function() {
+      navigationService.hideMenu();
+    };
     localizationService.localize("content_createBlueprintFrom").then(function (value) {
       $scope.label = value + " " + $scope.name;
     });

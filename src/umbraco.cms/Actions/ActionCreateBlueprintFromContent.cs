@@ -28,7 +28,7 @@ namespace umbraco.businesslogic.Actions
         {
             Letter = 'ï';
             CanBePermissionAssigned = true;
-            Icon = "code";
+            Icon = "blueprint";
             Alias = "createblueprint";
         }
     }
