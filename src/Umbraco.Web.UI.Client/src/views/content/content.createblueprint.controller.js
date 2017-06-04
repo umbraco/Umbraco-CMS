@@ -1,24 +1,36 @@
-﻿(function() {
+﻿(function () {
 
-    function CreateBlueprintController(
-      $scope,
-      contentResource,
-      notificationsService,
-      navigationService
-    ) {
+  function CreateBlueprintController(
+    $scope,
+    contentResource,
+    notificationsService,
+    navigationService,
+    localizationService,
+    formHelper) {
 
     $scope.name = $scope.currentNode.name;
 
-    $scope.create = function() {
-      contentResource.createBlueprintFromContent($scope.currentNode.id, $scope.name)
-        .then(function() {
-          notificationsService.showNotification({
-            type: 3,
-            header: "Created blueprint",
-            message: "Blueprint was created based on " + $scope.currentNode.name
+    localizationService.localize("content_createBlueprintFrom").then(function (value) {
+      $scope.label = value + " " + $scope.name;
+    });
+
+
+    $scope.create = function () {
+
+      if (formHelper.submitForm({ scope: $scope, formCtrl: this.blueprintForm, statusMessage: "Creating blueprint..."})) {
+
+        contentResource.createBlueprintFromContent($scope.currentNode.id, $scope.name)
+          .then(function () {
+            notificationsService.showNotification({
+              type: 3,
+              header: "Created blueprint",
+              message: "Blueprint was created based on " + $scope.currentNode.name
+            });
+            navigationService.hideMenu();
           });
-          navigationService.hideMenu();
-        });
+
+      }
+
     };
   }
 
