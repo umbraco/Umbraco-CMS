@@ -276,6 +276,24 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Creates a blueprint from a content item 
+        /// </summary>
+        /// <param name="contentId">The content id to copy</param>
+        /// <param name="name">The name of the blueprint</param>
+        /// <returns></returns>
+        public IHttpActionResult CreateBlueprintFromContent(int contentId, string name)
+        {
+            var content = Services.ContentService.GetById(contentId);
+            if (content == null) return NotFound();
+
+            var blueprint = Services.ContentService.CreateContentFromBlueprint(content, name, Security.GetUserId());
+
+            Services.ContentService.SaveBlueprint(blueprint, Security.GetUserId());
+
+            return Ok();
+        }
+
+        /// <summary>
         /// Saves content
         /// </summary>
         /// <returns></returns>
