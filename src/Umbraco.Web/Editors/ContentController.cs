@@ -179,6 +179,26 @@ namespace Umbraco.Web.Editors
             return mapped;
         }
 
+        [OutgoingEditorModelEvent]
+        public ContentItemDisplay GetEmpty(int blueprintId)
+        {
+            var blueprint = Services.ContentService.GetBlueprintById(blueprintId);
+            if (blueprint == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            blueprint.Id = 0;
+            blueprint.Name = string.Empty;
+
+            var mapped = Mapper.Map<ContentItemDisplay>(blueprint);
+
+            //remove this tab if it exists: umbContainerView
+            var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
+            mapped.Tabs = mapped.Tabs.Except(new[] { containerTab });
+            return mapped;
+        }
+
         /// <summary>
         /// Gets the Url for a given node ID
         /// </summary>
