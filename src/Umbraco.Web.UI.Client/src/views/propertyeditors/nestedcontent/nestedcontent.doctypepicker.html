@@ -27,7 +27,7 @@
                     </td>
                     <td>
                         <select id="{{model.alias}}_tab_select"
-                            ng-options="t for t in selectedDocTypeTabs(config)"
+                            ng-options="t for t in selectedDocTypeTabs[config.ncAlias]"
                             ng-model="config.ncTabAlias" required></select>
                     </td>
                     <td>
