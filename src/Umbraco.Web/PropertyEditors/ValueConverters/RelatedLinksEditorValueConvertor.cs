@@ -53,10 +53,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
+            if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinks2Alias))
+                return true;
+
             if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
             {
-                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinksAlias)
-                    || propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinks2Alias);
+                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinksAlias);
             }
             return false;
         }

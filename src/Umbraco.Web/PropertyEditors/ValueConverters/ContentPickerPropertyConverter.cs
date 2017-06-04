@@ -50,10 +50,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
+            if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.ContentPicker2Alias))
+                return true;
+
             if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
             {
-                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.ContentPickerAlias)
-                    || propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.ContentPicker2Alias);
+                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.ContentPickerAlias);
             }
             return false;
         }

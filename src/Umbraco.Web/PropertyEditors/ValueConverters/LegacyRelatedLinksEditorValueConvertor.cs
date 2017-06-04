@@ -18,16 +18,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]    
     public class LegacyRelatedLinksEditorValueConvertor : PropertyValueConverterBase
     {
-        private static readonly string[] MatchingEditors = {
-            Constants.PropertyEditors.RelatedLinksAlias,
-            Constants.PropertyEditors.RelatedLinks2Alias
-        };
 
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters == false)
             {
-                return MatchingEditors.Contains(propertyType.PropertyEditorAlias);
+                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinksAlias);
             }
             return false;
         }
