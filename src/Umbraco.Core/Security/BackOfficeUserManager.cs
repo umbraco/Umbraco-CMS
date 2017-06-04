@@ -238,12 +238,18 @@ namespace Umbraco.Core.Security
         /// </summary>
         public IBackOfficeUserPasswordChecker BackOfficeUserPasswordChecker { get; set; }
 
-        public override Task<IdentityResult> SetLockoutEnabledAsync(int userId, bool enabled)
+        public override Task<IdentityResult> SetLockoutEndDateAsync(int userId, DateTimeOffset lockoutEnd)
         {
-            var result = base.SetLockoutEnabledAsync(userId, enabled);
+            var result = base.SetLockoutEndDateAsync(userId, lockoutEnd);
 
-            if (result.Result.Succeeded)
+            // The way we unlock is by setting the lockoutEnd date to the current datetime
+            if (result.Result.Succeeded && lockoutEnd >= DateTimeOffset.UtcNow)
                 OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked)
+                {
+                    AffectedUser = userId
+                });
+            else
+                OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked)
                 {
                     AffectedUser = userId
                 });
@@ -414,7 +420,7 @@ namespace Umbraco.Core.Security
 
             ApplicationContext.Current.Services.UserService.Save(user);
 
-            OnAccounthUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked)
+            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked)
             {
                 AffectedUser = user.Id
             });
@@ -444,7 +450,7 @@ namespace Umbraco.Core.Security
             if (AccountLocked != null) AccountLocked(this, e);
         }
 
-        protected virtual void OnAccounthUnlocked(IdentityAuditEventArgs e)
+        protected virtual void OnAccountUnlocked(IdentityAuditEventArgs e)
         {
             if (AccountUnlocked != null) AccountUnlocked(this, e);
         }

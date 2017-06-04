@@ -49,7 +49,7 @@ namespace Umbraco.Core.Security
         public override async Task<SignInStatus> PasswordSignInAsync(string userName, string password, bool isPersistent, bool shouldLockout)
         {
             var result = await PasswordSignInAsyncImpl(userName, password, isPersistent, shouldLockout);
-            
+
             switch (result)
             {
                 case SignInStatus.Success:
@@ -121,6 +121,11 @@ namespace Umbraco.Core.Security
                 await UserManager.AccessFailedAsync(user.Id);
                 if (await UserManager.IsLockedOutAsync(user.Id))
                 {
+                    //at this point we've just locked the user out after too many failed login attempts
+                    var backofficeUserManager = _request.Context.GetBackOfficeUserManager();
+                    if(backofficeUserManager != null)
+                        backofficeUserManager.RaiseAccountLockedEvent(user.Id);
+
                     return SignInStatus.LockedOut;
                 }
             }
@@ -176,7 +181,7 @@ namespace Umbraco.Core.Security
                     AllowRefresh = true,
                     IssuedUtc = nowUtc,
                     ExpiresUtc = nowUtc.AddMinutes(GlobalSettings.TimeOutInMinutes)
-                }, userIdentity, rememberBrowserIdentity);                
+                }, userIdentity, rememberBrowserIdentity);
             }
             else
             {
