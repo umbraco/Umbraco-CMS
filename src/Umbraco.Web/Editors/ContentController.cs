@@ -115,6 +115,11 @@ namespace Umbraco.Web.Editors
 
             var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
 
+            content.AllowPreview = false;
+
+            //set a custom path since the tree that renders this has the content type id as the parent
+            content.Path = string.Format("-1,{0},{1}", foundContent.ContentTypeId, content.Id);
+
             content.AllowedActions = new[] {'A'};
 
             var excludeProps = new[] {"_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template"};
