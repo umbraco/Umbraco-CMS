@@ -19,6 +19,7 @@ function contentCreateController($scope,
 
   $scope.selectContentType = true;
   $scope.selectBlueprint = false;
+  $scope.allowBlank = blueprintConfig.allowBlank;
 
   $scope.createBlank = function(docType) {
     $location
@@ -59,5 +60,6 @@ function contentCreateController($scope,
 angular.module("umbraco").controller("Umbraco.Editors.Content.CreateController", contentCreateController);
 
 angular.module("umbraco").value("blueprintConfig", {
-  skipSelect: false
+    skipSelect: false,
+    allowBlank: true
 });
