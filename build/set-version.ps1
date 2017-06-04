@@ -27,6 +27,7 @@ param (
 
 # import build module
 import-module ".\build-module.psm1"
+loadSemVer
 
 # validate params and get version string
 $release = $release.Trim()
@@ -46,7 +47,6 @@ write "Text version: $version"
 
 # semver-parse the version string
 # just to ensure that it can be parsed
-loadSemVer
 $semver = [SemVer.SemVersion]::Parse($version)
 write "Sem version:  $semver"
 
@@ -77,7 +77,7 @@ fileReplace "..\src\SolutionInfo.cs" `
   "AssemblyCopyright\(`"Copyright © Umbraco (\d{4})`"\)" `
   "AssemblyCopyright(`"Copyright © Umbraco $year`")"
  
-# edit csproj and set IIS Expres port number
+# edit csproj and set IIS Express port number
 # this is a raw copy of ReplaceIISExpressPortNumber.exe
 # it probably can be achieved in a much nicer way - l8tr
 $source = @"

@@ -4,22 +4,27 @@
 #  and populates UMBRACO_... environment vars
 #
 
-# import build module
+param (
+  [string]
+  $vso
+)
+
+# import build module, load what we need
 import-module ".\build-module.psm1"
+loadSemVer
 
 # parse SolutionInfo and retrieve the version string
 $filepath = $(fullPath "..\src\SolutionInfo.cs")
 $text = [System.IO.File]::ReadAllText($filepath)
 $match = [System.Text.RegularExpressions.Regex]::Matches($text, "AssemblyInformationalVersion\(`"(.+)?`"\)")
 $version = $match.Groups[1]
-Write-Host "Text version: $version"
+write "Text version: $version"
 
 # semver-parse the version string
-loadSemVer
 $semver = [SemVer.SemVersion]::Parse($version)
 write "Sem version:  $semver"
 
-# extract release, comment and build back from semver
+# extract release, comment and build from semver
 # rebuild a clean version string
 $release = "" + $semver.Major + "." + $semver.Minor + "." + $semver.Patch
 $comment = $semver.PreRelease
@@ -51,9 +56,12 @@ $env:UMBRACO_BUILD=$build
 # set environment variable for VSO
 # https://github.com/Microsoft/vsts-tasks/issues/375
 # https://github.com/Microsoft/vsts-tasks/blob/master/docs/authoring/commands.md
-Write-Host ("##vso[task.setvariable variable=UMBRACO_VERSION;]$version")
-Write-Host ("##vso[task.setvariable variable=UMBRACO_RELEASE;]$release")
-Write-Host ("##vso[task.setvariable variable=UMBRACO_COMMENT;]$comment")
-Write-Host ("##vso[task.setvariable variable=UMBRACO_BUILD;]$build")
+if ($vso)
+{
+  Write-Host ("##vso[task.setvariable variable=UMBRACO_VERSION;]$version")
+  Write-Host ("##vso[task.setvariable variable=UMBRACO_RELEASE;]$release")
+  Write-Host ("##vso[task.setvariable variable=UMBRACO_COMMENT;]$comment")
+  Write-Host ("##vso[task.setvariable variable=UMBRACO_BUILD;]$build")
+}
 
 # eof
