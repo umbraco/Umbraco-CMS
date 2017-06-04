@@ -339,8 +339,8 @@ namespace Umbraco.Web.Editors
                 //not allowed
                 var notificationModel = new SimpleNotificationModel();
                 notificationModel.AddSuccessNotification(
-                    Services.TextService.Localize("content_failedBlueprintHeading"),
-                    Services.TextService.Localize("content_duplicateBlueprintMessage")
+                    Services.TextService.Localize("content/failedBlueprintHeading"),
+                    Services.TextService.Localize("content/duplicateBlueprintMessage")
                 );
                 return Request.CreateValidationErrorResponse(notificationModel);
             }

@@ -5,20 +5,18 @@
     contentResource,
     notificationsService,
     navigationService,
-    localizationService
-  ) {
+    localizationService,
+    formHelper) {
 
-    var successText = {}, errorText = {};
+    var successText = {};
     localizationService.localizeMany([
+      "content_createBlueprintFrom",
       "content_createdBlueprintHeading",
-      "content_createdBlueprintMessage",
-      "content_failedBlueprintMessage",
-      "content_failedBlueprintMessage"
+      "content_createdBlueprintMessage"
     ]).then(function(localizedValues) {
-      successText.heading = localizedValues[0];
-      successText.message = localizedValues[1].replace("%0%", $scope.name);
-      errorText.heading = localizedValues[2];
-      errorText.message = localizedValues[3];
+      $scope.label = localizedValues[0] + " " + $scope.name;
+      successText.heading = localizedValues[1];
+      successText.message = localizedValues[2].replace("%0%", $scope.name);
     });
 
     $scope.name = $scope.currentNode.name;
@@ -27,16 +25,35 @@
       navigationService.hideMenu();
     };
 
-    $scope.create = function () {
-      contentResource.createBlueprintFromContent($scope.currentNode.id, $scope.name)
-      .then(
-        function () { notificationsService.showNotification({ type: 3, header: successText.heading, message: successText.message }) },
-        function () { notificationsService.showNotification({ type: 2, header: errorText.heading, message: errorText.message }) }
-      );
-      navigationService.hideMenu();
-    }
-  }
+    $scope.create = function() {
+      if (formHelper.submitForm({
+        scope: $scope,
+        formCtrl: this.blueprintForm,
+        statusMessage: "Creating blueprint..."
+      })) {
 
+        contentResource.createBlueprintFromContent($scope.currentNode.id, $scope.name)
+          .then(function() {
+              notificationsService.showNotification({
+                type: 3,
+                header: successText.heading,
+                message: successText.message
+              });
+              navigationService.hideMenu();
+            },
+            function(response) {
+              for (var n = 0; n < response.data.notifications.length; n++) {
+                notificationsService.showNotification({
+                  type: 2,
+                  header: response.data.notifications[n].header,
+                  message: response.data.notifications[n].message
+                });
+              }
+            }
+          );
+      }
+    };
+  }
 
   angular.module("umbraco").controller("Umbraco.Editors.Content.CreateBlueprintController", CreateBlueprintController);
 

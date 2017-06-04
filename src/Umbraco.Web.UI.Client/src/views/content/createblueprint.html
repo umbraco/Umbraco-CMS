@@ -1,20 +1,28 @@
 ﻿<div ng-controller="Umbraco.Editors.Content.CreateBlueprintController">
-  <div class="umb-dialog-body with-footer" ng-cloak>
 
-    <div class="umb-pane">
-      <h5><localize key="content_createBlueprintFrom">Create a blueprint from</localize> {{currentNode.name}}</h5>
+  <form name="blueprintForm"
+        novalidate
+        ng-submit="create()"
+        val-form-manager>
 
-      <label for="name"><localize key="content_blueprintName">Name</localize></label>
-      <input type="text" name="name" id="name" ng-model="name" />
+    <div class="umbracoDialog umb-dialog-body with-footer"
+         ng-cloak>
+      <div class="umb-pane">
+        <umb-control-group label="{{label}}" hide-label="false">
+          <input type="text" name="name" ng-model="name" class="umb-textstring textstring input-block-level" required />
+        </umb-control-group>
+
+      </div>
+
     </div>
-  </div>
-
-  <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
     <button class="btn umb-button btn-info" ng-click="cancel()">
       <localize key="general_cancel">Cancel</localize>
     </button>
-    <button class="btn umb-button btn-success" ng-click="create()">
-      <localize key="general_create">Create blueprint</localize>
-    </button>
-  </div>
+    <button class="btn umb-button btn-success">
+        <localize key="general_create">Create blueprint</localize>
+      </button>
+    </div>
+
+  </form>
 </div>

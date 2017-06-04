@@ -92,8 +92,12 @@ namespace Umbraco.Web.Trees
                 return menu;
             }
             var ct = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.DocumentType);
-            //no menu if it's a content type
-            if (ct != null) return null;
+            //only refresh if it's a content type
+            if (ct != null)
+            {
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+                return menu;
+            }
 
             menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
 
