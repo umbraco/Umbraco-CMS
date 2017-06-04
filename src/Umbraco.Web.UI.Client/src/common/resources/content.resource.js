@@ -665,6 +665,17 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                                                 [{ id: id }])),
                                     'Failed to publish content with id ' + id);
 
+        },
+
+        createBlueprintFromContent: function(id, name) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "CreateBlueprintFromContent", {
+                        id: id, name: name
+                    })
+                ),
+                "Failed to create blueprint from content with id " + id
+            );
         }
 
 
