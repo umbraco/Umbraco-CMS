@@ -6,7 +6,7 @@
  * @description
  * The controller for the content creation dialog
  */
-function contentCreateController($scope, $routeParams, contentTypeResource, iconHelper, $location) {
+function contentCreateController($scope, $routeParams, contentTypeResource, iconHelper, $location, navigationService) {
     contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
         $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
     });
@@ -15,11 +15,7 @@ function contentCreateController($scope, $routeParams, contentTypeResource, icon
     $scope.selectBlueprint = false;
 
     $scope.createOrSelectBlueprintIfAny = function (docType) {
-        docType.blueprints =
-            {
-                "1": "A blue print",
-                "2": "A red print"
-            };
+        // TODO: The none one
 
         if (docType.blueprints && _.keys(docType.blueprints).length) {
             $scope.docType = docType;
@@ -29,7 +25,7 @@ function contentCreateController($scope, $routeParams, contentTypeResource, icon
             $location
                 .path("/content/content/edit/" + $scope.currentNode.id)
                 .search("doctype=" + docType.alias + "&create=true");
-            $scope.close();
+          navigationService.hideMenu();
         }
     }
 
@@ -41,7 +37,7 @@ function contentCreateController($scope, $routeParams, contentTypeResource, icon
             "&create=true" +
             "&blueprintId=" + blueprintId
             );
-        $scope.close();
+      navigationService.hideMenu();
     }
 }
 
