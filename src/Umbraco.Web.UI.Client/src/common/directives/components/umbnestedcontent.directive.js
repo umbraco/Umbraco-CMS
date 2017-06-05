@@ -1,4 +1,4 @@
-﻿angular.module("umbraco.directives").directive('nestedContentEditor', [
+﻿angular.module("umbraco.directives").directive('umbNestedContentEditor', [
 
     function () {
 
