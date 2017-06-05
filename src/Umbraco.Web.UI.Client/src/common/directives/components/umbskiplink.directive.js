@@ -19,7 +19,8 @@
             transclude: true,
             templateUrl: 'views/components/umb-skip-link.html',
             scope: {
-                element: "@"
+                element: "@",
+                label: "@"
             },
             link: link
         };

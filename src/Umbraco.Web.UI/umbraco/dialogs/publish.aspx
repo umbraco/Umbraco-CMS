@@ -42,7 +42,7 @@
             </p>
 
             <div>
-                <input type="checkbox" id="publishAllCheckBox" data-bind="checked: publishAll" />
+                <input type="checkbox" id="publishAllCheckBox" data-bind="checked: publishAll" autofocus="autofocus" />
                 <label for="publishAllCheckBox">
                     <%=umbraco.ui.Text("publish", "publishAll", PageName, UmbracoUser) %>
                 </label>

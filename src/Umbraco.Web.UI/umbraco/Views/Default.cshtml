@@ -53,24 +53,11 @@
 
 </head>
 <noscript><h5><strong>&nbsp; JavaScript is disabled. Please enable to continue!</strong></h5></noscript>
-<body ng-class="{touch:touchDevice,emptySection:emptySection}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
-    <style>
-        a.btn-info:focus{
-            outline: none;
-            border: 2px solid #00BEC1 !important;
-        }
-        .sections li.help a:focus,
-        .sections li a:focus {
-            outline: none;
-            border-bottom-color: #00BEC1 !important;
-            border-bottom-style: solid !important;
-        }
-    </style>
-    
+<body ng-class="{touch:touchDevice,emptySection:emptySection}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">   
     <div ng-hide="!authenticated" ng-cloak id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
-        <umb-skip-link element="#search-field">Go to search</umb-skip-link>
-        <umb-skip-link element="#tree">Go to content tree</umb-skip-link>
-        <umb-skip-link element="#umb-editor-header-name">Go to content</umb-skip-link>
+        <umb-skip-link element="#search-field" label="Go to search"></umb-skip-link>
+        <umb-skip-link element="#tree" label="Go to content tree"></umb-skip-link>
+        <umb-skip-link element="#umb-editor-header-name" label="Go to content"></umb-skip-link>
 
         <umb-navigation></umb-navigation>
 

@@ -13,7 +13,7 @@
 
 <cc1:Pane ID="pane_form" runat="server">
   <cc1:PropertyPanel ID="pp_translator" runat="server">
-    <asp:DropDownList ID="translator" runat="server"></asp:DropDownList>
+    <asp:DropDownList ID="translator" runat="server" autofocus="autofocus"></asp:DropDownList>
   </cc1:PropertyPanel>
   <cc1:PropertyPanel ID="pp_language" runat="server">
     <asp:DropDownList ID="language" runat="server"></asp:DropDownList>

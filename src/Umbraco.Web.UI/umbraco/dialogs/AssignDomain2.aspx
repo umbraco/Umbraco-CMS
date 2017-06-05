@@ -33,7 +33,7 @@
     
          <cc1:Pane runat="server" ID="pane_language">
             <cc1:PropertyPanel runat="server" ID="prop_language">
-                <select class="umb-editor umb-dropdown" name="language" data-bind="options: languages, optionsText: 'Code', optionsValue: 'Id', value: language, optionsCaption: '<%=umbraco.ui.Text("assignDomain", "inherit") %>    '"></select>
+                <select class="umb-editor umb-dropdown" name="language" autofocus="autofocus" data-bind="options: languages, optionsText: 'Code', optionsValue: 'Id', value: language, optionsCaption: '<%=umbraco.ui.Text("assignDomain", "inherit") %>'"></select>
              <!--   <small class="help-inline"><%=umbraco.ui.Text("assignDomain", "setLanguageHelp") %></small>-->
             </cc1:PropertyPanel>
         </cc1:Pane>
