@@ -1,4 +1,4 @@
-﻿(function() {
+﻿(function () {
 
   function CreateBlueprintController(
     $scope,
@@ -6,49 +6,45 @@
     notificationsService,
     navigationService,
     localizationService,
-    formHelper) {
+    formHelper,
+    contentEditingHelper) {
 
     var successText = {};
     localizationService.localizeMany([
-      "content_createBlueprintFrom",
-      "content_createdBlueprintHeading",
-      "content_createdBlueprintMessage"
-    ]).then(function(localizedValues) {
-      $scope.label = localizedValues[0] + " " + $scope.name;
-      successText.heading = localizedValues[1];
-      successText.message = localizedValues[2].replace("%0%", $scope.name);
+      "content_createBlueprintFrom"
+    ]).then(function (localizedValues) {
+      $scope.label = localizedValues[0] + " " + $scope.message.name;
     });
 
-    $scope.name = $scope.currentNode.name;
+    $scope.message = {
+      name : $scope.currentNode.name
+    };
 
-    $scope.cancel = function() {
+    $scope.cancel = function () {
       navigationService.hideMenu();
     };
 
-    $scope.create = function() {
+    $scope.create = function () {
       if (formHelper.submitForm({
         scope: $scope,
         formCtrl: this.blueprintForm,
         statusMessage: "Creating blueprint..."
       })) {
 
-        contentResource.createBlueprintFromContent($scope.currentNode.id, $scope.name)
-          .then(function() {
-              notificationsService.showNotification({
-                type: 3,
-                header: successText.heading,
-                message: successText.message
-              });
+        contentResource.createBlueprintFromContent($scope.currentNode.id, $scope.message.name)
+          .then(function(data) {
+
+              formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+
               navigationService.hideMenu();
             },
-            function(response) {
-              for (var n = 0; n < response.data.notifications.length; n++) {
-                notificationsService.showNotification({
-                  type: 2,
-                  header: response.data.notifications[n].header,
-                  message: response.data.notifications[n].message
-                });
-              }
+            function(err) {
+
+              contentEditingHelper.handleSaveError({
+                redirectOnFailure: false,
+                err: err
+              });
+
             }
           );
       }
