@@ -104,7 +104,10 @@ namespace Umbraco.Web.Models.Mapping
 
                     //applicationContext.Services.EntityService.Get<IContent>(x.StartContentId, false))
                     //applicationContext.Services.EntityService.Get<IMedia>(x.StartMediaId, false))
-
+                    if (display.Icon.IsNullOrWhiteSpace())
+                    {
+                        display.Icon = "icon-users";
+                    }
                 });
 
             config.CreateMap<IUserGroup, UserGroupDisplay>()
