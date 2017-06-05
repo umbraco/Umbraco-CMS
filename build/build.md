@@ -1,6 +1,46 @@
 Umbraco Core Build
 --
 
+
+# Environment
+
+## Bootstrap
+
+From within the solution directory,
+
+    $env:PSModulePath = "$pwd\build\Modules\;$env:PSModulePath"
+    Import-Module Umbraco.Build -Verbose -Force
+
+## Get-UmbracoBuildEnv
+
+Gets the Umbraco build environment ie NuGet, Semver, Visual Studio, etc. Can download things that can be downloaded such as NuGet. Examples:
+
+    $uenv = Get-UmbracoBuildEnv
+    write-host $uenv.SolutionRoot
+    &$uenv.NuGet help
+
+# Versions
+
+## Get-UmbracoVersion
+
+Gets an object representing the current Umbraco version. Example:
+
+    $v = Get-UmbracoVersion
+    write $v.Semver
+
+## Set-UmbracoVersion
+
+Modifies Umbraco files with the new version. Must be a valid semver version. Can have a *pre release* part (eg `alpha02`) and/or a *build number* (eg `1234`). Examples:
+
+    Set-UmbracoVersion 7.6.33
+    Set-UmbracoVersion 7.6.33-alpha02
+    Set-UmbracoVersion 7.6.33+1234
+    Set-UmbracoVersion 7.6.33-beta05+5678
+
+>It is considered best to add trailing zeroes to pre releases, else NuGet gets the order of versions wrong. So if you plan to have more than 10, but no more that 100 alpha versions, number the versions `alpha00`, `alpha01`, etc. 
+
+**[EVERYTHING BELOW IS OBSOLETE]**
+
 Core can be entirely built, including running the grunt/gulp UI build and creating the NuGet packages, from the `build.bat` script.
 
 ## Script Usage 

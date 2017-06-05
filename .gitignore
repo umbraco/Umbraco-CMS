@@ -147,8 +147,6 @@ build/tools/
 src/PrecompiledWeb/*
 
 
-tools/nuget.exe
-tools/vswhere.exe
-tools/7za.exe
 build.out/
 build.temp/
+build/Modules/*/temp/
