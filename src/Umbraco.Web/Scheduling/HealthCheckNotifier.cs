@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Slack.Webhooks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
@@ -68,7 +69,15 @@ namespace Umbraco.Web.Scheduling
                 // TODO: get web hook and post
                 if (!string.IsNullOrEmpty(healthCheckConfig.NotificationSettings.WebhookUrl))
                 {
-
+                    var slackClient = new SlackClient(healthCheckConfig.NotificationSettings.WebhookUrl);
+                    var slackMessage = new SlackMessage
+                    {
+                        Channel = "#test",
+                        Text = sb.ToString(),
+                        IconEmoji = Emoji.Ghost,
+                        Username = "Umbraco Health Check Notifier"
+                    };
+                    slackClient.Post(slackMessage);
                 }
 
                 LogHelper.Info<HealthCheckNotifier>("Health check results:");
