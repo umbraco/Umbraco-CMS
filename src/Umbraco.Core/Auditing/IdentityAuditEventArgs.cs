@@ -5,13 +5,39 @@ using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Auditing
 {
+    /// <summary>
+    /// This class is used by events raised from hthe BackofficeUserManager
+    /// </summary>
     public class IdentityAuditEventArgs : EventArgs
     {
+        /// <summary>
+        /// The action that got triggered from the audit event
+        /// </summary>
         public AuditEvent Action { get; set; }
+
+        /// <summary>
+        /// Current data/time in UTC format
+        /// </summary>
         public DateTime DateTimeUtc { get; private set; }
+
+        /// <summary>
+        /// The source IP address of the user performing the action
+        /// </summary>
         public string IpAddress { get; set; }
+
+        /// <summary>
+        /// The user affected by the event raised
+        /// </summary>
         public int AffectedUser { get; set; }
+
+        /// <summary>
+        /// If a user is perfoming an action on a different user then this will be set, otherwise it will be -1
+        /// </summary>
         public int PerformingUser { get; set; }
+
+        /// <summary>
+        /// An optional comment about the action being logged
+        /// </summary>
         public string Comment { get; set; }
 
         /// <summary>
@@ -19,6 +45,12 @@ namespace Umbraco.Core.Auditing
         /// </summary>
         public string Username { get; set; }
 
+        /// <summary>
+        /// Sets the properties on the event being raised, all parameters are optional except for the action being performed
+        /// </summary>
+        /// <param name="action">An action based on the AuditEvent enum</param>
+        /// <param name="ipAddress">The client's IP address. This is usually automatically set but could be overridden is necessary</param>
+        /// <param name="performingUser">The Id of the user performing the action (if different from the user affected by the action)</param>
         public IdentityAuditEventArgs(AuditEvent action, string ipAddress = "", int performingUser = -1)
         {
             DateTimeUtc = DateTime.UtcNow;

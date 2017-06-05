@@ -244,15 +244,9 @@ namespace Umbraco.Core.Security
 
             // The way we unlock is by setting the lockoutEnd date to the current datetime
             if (result.Result.Succeeded && lockoutEnd >= DateTimeOffset.UtcNow)
-                OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked)
-                {
-                    AffectedUser = userId
-                });
+                RaiseAccountLockedEvent(userId);
             else
-                OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked)
-                {
-                    AffectedUser = userId
-                });
+                RaiseAccountUnlockedEvent(userId);
 
             return result;
         }
@@ -262,10 +256,9 @@ namespace Umbraco.Core.Security
             var result = base.AccessFailedAsync(userId);
 
             if (result.Result.Succeeded)
-                OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed)
-                {
-                    AffectedUser = userId
-                });
+                RaiseLoginSuccessEvent(userId);
+            else
+                RaiseLoginFailedEvent(userId);
 
             return result;
         }
@@ -275,10 +268,7 @@ namespace Umbraco.Core.Security
             var result = base.ChangePasswordAsync(userId, currentPassword, newPassword);
 
             if (result.Result.Succeeded)
-                OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged)
-                {
-                    AffectedUser = userId
-                });
+                RaisePasswordChangedEvent(userId);
 
             return result;
         }
@@ -296,103 +286,10 @@ namespace Umbraco.Core.Security
             {
                 user.FailedPasswordAttempts = 0;
                 ApplicationContext.Current.Services.UserService.Save(user);
-
-                OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount)
-                {
-                    AffectedUser = userId
-                });
+                RaiseResetAccessFailedCountEvent(userId);
             }
 
             return await Task.FromResult(IdentityResult.Success);
-        }
-
-        internal void RaisePasswordChangedEvent(int userId)
-        {
-            OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged)
-            {
-                AffectedUser = userId
-            });
-        }
-
-        internal void RaisePasswordResetEvent(int userId)
-        {
-            OnPasswordReset(new IdentityAuditEventArgs(AuditEvent.PasswordReset)
-            {
-                AffectedUser = userId
-            });
-        }
-
-        internal void RaiseAccountLockedEvent(int userId)
-        {
-            OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked)
-            {
-                AffectedUser = userId
-            });
-        }
-
-        internal void RaiseAccountUnlockedEvent(int userId)
-        {
-            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked)
-            {
-                AffectedUser = userId
-            });
-        }
-
-        internal void RaiseResetAccessFailedCountEvent(int userId)
-        {
-            OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount)
-            {
-                AffectedUser = userId
-            });
-        }
-
-        internal void RaiseLoginSuccessEvent(int userId)
-        {
-            OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces)
-            {
-                AffectedUser = userId
-            });
-        }
-
-        internal void RaiseLogoutSuccessEvent(int userId)
-        {
-            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess)
-            {
-                AffectedUser = userId
-            });
-        }
-
-        internal void RaiseLoginRequiresVerificationEvent(int userId)
-        {
-            OnLoginRequiresVerification(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification)
-            {
-                AffectedUser = userId
-            });
-        }
-
-        internal void RaiseForgotPasswordRequestedEvent(int userId)
-        {
-            OnForgotPasswordRequested(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordRequested)
-            {
-                AffectedUser = userId
-            });
-        }
-
-        internal void RaiseForgotPasswordChangedSuccessEvent(int userId)
-        {
-            OnForgotPasswordChangedSuccess(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordChangedSuccess)
-            {
-                AffectedUser = userId
-            });
-        }
-
-        public void RaiseInvalidLoginAttemptEvent(string username)
-        {
-            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed)
-            {
-                Username = username,
-                Comment = string.Format("Attempted login for username '{0}' failed", username)
-            });
         }
 
         /// <summary>
@@ -419,14 +316,106 @@ namespace Umbraco.Core.Security
 
             ApplicationContext.Current.Services.UserService.Save(user);
 
-            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked)
-            {
-                AffectedUser = user.Id
-            });
+            RaiseAccountUnlockedEvent(user.Id);
 
             return true;
         }
 
+        internal void RaiseAccountLockedEvent(int userId)
+        {
+            OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaiseAccountUnlockedEvent(int userId)
+        {
+            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaiseForgotPasswordRequestedEvent(int userId)
+        {
+            OnForgotPasswordRequested(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordRequested)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaiseForgotPasswordChangedSuccessEvent(int userId)
+        {
+            OnForgotPasswordChangedSuccess(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordChangedSuccess)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        public void RaiseLoginFailedEvent(int userId)
+        {
+            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        public void RaiseInvalidLoginAttemptEvent(string username)
+        {
+            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed)
+            {
+                Username = username,
+                Comment = string.Format("Attempted login for username '{0}' failed", username)
+            });
+        }
+
+        internal void RaiseLoginRequiresVerificationEvent(int userId)
+        {
+            OnLoginRequiresVerification(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaiseLoginSuccessEvent(int userId)
+        {
+            OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaiseLogoutSuccessEvent(int userId)
+        {
+            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaisePasswordChangedEvent(int userId)
+        {
+            OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaisePasswordResetEvent(int userId)
+        {
+            OnPasswordReset(new IdentityAuditEventArgs(AuditEvent.PasswordReset)
+            {
+                AffectedUser = userId
+            });
+        }
+        internal void RaiseResetAccessFailedCountEvent(int userId)
+        {
+            OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount)
+            {
+                AffectedUser = userId
+            });
+        }
         public static event EventHandler AccountLocked;
         public static event EventHandler AccountUnlocked;
         public static event EventHandler ForgotPasswordRequested;
