@@ -6,7 +6,9 @@
     <div class='umb-modalcolumn-body'>
         <ul class="umb-actions">
             <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in menuActions">
-                <a href="" prevent-default focus-when="{{action.hasFocus}}"
+                <a prevent-default
+                    href=""
+                    focus-when="{{action.hasFocus}}"
                     ng-click="executeMenuItem(action)">
                     <i class="icon icon-{{action.cssclass}}"></i>
                     <span class="menu-label">{{action.name}}</span>

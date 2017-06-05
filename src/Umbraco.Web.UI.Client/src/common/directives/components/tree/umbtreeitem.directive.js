@@ -43,7 +43,7 @@ angular.module("umbraco.directives")
             '<i class="icon umb-tree-icon sprTree" ng-click="select(node, $event)"></i>' +
             '<a class="umb-tree-item-name" href="#/{{node.routePath}}" ng-click="select(node, $event)"></a>' +
             //NOTE: These are the 'option' elipses
-            '<a href="" class="umb-options" ng-click="options(node, $event)" hotkey="ctrl+." hotkey-when=""><i></i><i></i><i></i></a>' +
+            '<a href="" class="umb-options" ng-click="options(node, $event)" hotkey="ctrl+." hotkey-when="{{node.hasFocus}}"><i></i><i></i><i></i></a>' +
             '<div ng-show="node.loading" class="l"><div></div></div>' +
             '</div>' +
             '</li>', 
@@ -270,6 +270,13 @@ angular.module("umbraco.directives")
                         var prevListItemLeftArrow = element.prev('li');
                         prevListItemLeftArrow = element.parent().parent();
                         prevListItemLeftArrow.find('a.umb-tree-item-name:first').focus();
+                    }
+                }
+
+                var treeItemName = element.find(".umb-tree-item-name").first();
+                if (treeItemName.is(":focus")) {
+                    if (node.menuUrl) {
+                        node.hasFocus = true;
                     }
                 }
             };

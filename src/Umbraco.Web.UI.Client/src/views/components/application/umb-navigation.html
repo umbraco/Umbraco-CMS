@@ -1,5 +1,5 @@
 <div id="leftcolumn" ng-controller="Umbraco.NavigationController"
-    ng-mouseleave="leaveTree($event)" ng-mouseenter="enterTree($event)">
+     ng-mouseleave="leaveTree($event)" ng-mouseenter="enterTree($event)">
 
     <umb-sections sections="sections" ng-if="authenticated">
     </umb-sections>
@@ -19,13 +19,14 @@
                         <form class="form-search" novalidate>
                             <i class="icon-search"></i>
                             <input type="text"
-                                hotkey="ctrl+space"
-                                id="search-field"
-                                ng-model="searchTerm"
-                                class="umb-search-field search-query search-input"
-                                localize="placeholder"
-                                placeholder="@placeholders_search"
-                                ng-keydown="navigateResults($event)"/>
+                                   hotkey="ctrl+space"
+                                   umb-auto-focus
+                                   id="search-field"
+                                   ng-model="searchTerm"
+                                   class="umb-search-field search-query search-input"
+                                   localize="placeholder"
+                                   placeholder="@placeholders_search"
+                                   ng-keydown="navigateResults($event)" />
                         </form>
                     </div>
                 </div>
@@ -67,10 +68,9 @@
 
             <!-- the tree -->
             <div id="tree" tabindex="0" class="umb-modalcolumn-body" ng-if="authenticated">
-                <umb-tree
-                    cachekey="_"
-                    eventhandler="treeEventHandler"
-                    section="{{currentSection}}" >
+                <umb-tree cachekey="_"
+                          eventhandler="treeEventHandler"
+                          section="{{currentSection}}">
                 </umb-tree>
             </div>
         </div>
@@ -79,21 +79,20 @@
 
             <!-- The context menu -->
             <div id="contextMenu" class="umb-modalcolumn fill shadow"
-                 ng-swipe-left="nav.hideMenu()" 
+                 ng-swipe-left="nav.hideMenu()"
                  ng-show="showContextMenu" ng-animate="'slide'">
-                <umb-context-menu
-                    menu-dialog-title="{{menuDialogTitle}}"
-                    current-section="{{currentSection}}"
-                    current-node="menuNode"
-                    menu-actions="menuActions">
+                <umb-context-menu menu-dialog-title="{{menuDialogTitle}}"
+                                  current-section="{{currentSection}}"
+                                  current-node="menuNode"
+                                  menu-actions="menuActions">
                 </umb-context-menu>
             </div>
 
 
             <!-- Tree dialogs -->
             <div id="dialog" class='umb-modalcolumn fill shadow'
-                ng-swipe-left="nav.hideDialog()"
-                ng-show="showContextMenuDialog" ng-animate="'slide'">
+                 ng-swipe-left="nav.hideDialog()"
+                 ng-show="showContextMenuDialog" ng-animate="'slide'">
                 <div class='umb-modalcolumn-header'>
                     <h1>{{menuDialogTitle}}</h1>
                 </div>
