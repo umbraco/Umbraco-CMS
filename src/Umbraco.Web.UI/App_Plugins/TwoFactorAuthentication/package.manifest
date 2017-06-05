@@ -1,0 +1,8 @@
+﻿{
+  //array of files we want to inject into the application on app_start
+  "javascript": [
+    "~/App_Plugins/TwoFactorAuthentication/2fa-login.js",
+    "~/App_Plugins/TwoFactorAuthentication/managementdashboard.controller.js",
+    "~/App_Plugins/TwoFactorAuthentication/managementdashboard.service.js"
+  ]
+}
