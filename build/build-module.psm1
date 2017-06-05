@@ -102,7 +102,7 @@ function fileReplace($filename, $source, $replacement) {
 }
 
 # finds msbuild
-function findVisualStudio($vswhere) {
+function Get-VisualStudio($vswhere) {
   $vsPath = ""
   $vsVer = ""
   &$vswhere | foreach {
@@ -133,7 +133,7 @@ function findVisualStudio($vswhere) {
 
 # ensure we have tools
 # cache for some time
-function ensureTools($path)
+function Get-Tools($path)
 {
   $cache = 2 # days
   Write "Tools: $path"
@@ -164,6 +164,7 @@ function ensureTools($path)
     &$nuget install 7-Zip.CommandLine -OutputDirectory $path -Verbosity quiet
     $dir = ls $path\7-Zip.CommandLine.* | sort -property Name -descending | select -first 1
     $file = ls -path $dir -name 7za.exe -recurse
+    write "MOVE $dir\$file to $sevenZip"
     mv "$dir\$file" $sevenZip
     rmrf $dir
   }
@@ -183,4 +184,6 @@ function ensureTools($path)
     mv "$dir\$file" $vswhere
     rmrf $dir
   }
+  
+  # fixme - not exporting nor returning anything?!
 }
