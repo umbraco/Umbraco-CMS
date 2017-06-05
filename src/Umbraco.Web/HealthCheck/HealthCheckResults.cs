@@ -10,10 +10,23 @@ namespace Umbraco.Web.HealthCheck
     internal class HealthCheckResults
     {
         private readonly Dictionary<string, IEnumerable<HealthCheckStatus>> _results;
+        internal readonly bool AllChecksSuccessful;
 
         internal HealthCheckResults(IEnumerable<HealthCheck> checks)
         {
             _results = checks.ToDictionary(t => t.Name, t => t.GetStatus());
+
+            // find out if all checks pass or not
+            AllChecksSuccessful = true;
+            foreach (var result in _results)
+            {
+                var checkIsSuccess = result.Value.All(x => x.ResultType == StatusResultType.Success);
+                if (checkIsSuccess == false)
+                {
+                    AllChecksSuccessful = false;
+                    break;
+                }
+            }
         }
 
         internal void LogResults()

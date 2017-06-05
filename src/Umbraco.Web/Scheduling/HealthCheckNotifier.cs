@@ -88,11 +88,18 @@ namespace Umbraco.Web.Scheduling
                 if (healthCheckConfig.NotificationSettings.SlackSettings != null && string.IsNullOrEmpty(healthCheckConfig.NotificationSettings.SlackSettings.WebHookUrl) == false)
                 {
                     var slackClient = new SlackClient(healthCheckConfig.NotificationSettings.SlackSettings.WebHookUrl);
+
+                    var icon = Emoji.MinusOne;
+                    if (results.AllChecksSuccessful)
+                    {
+                        icon = Emoji.PlusOne;
+                    }
+
                     var slackMessage = new SlackMessage
                     {
                         Channel = healthCheckConfig.NotificationSettings.SlackSettings.Channel,
                         Text = results.ResultsAsMarkDown(true),
-                        IconEmoji = Emoji.Ghost,
+                        IconEmoji = icon,
                         Username = healthCheckConfig.NotificationSettings.SlackSettings.UserName
                     };
                     slackClient.Post(slackMessage);
