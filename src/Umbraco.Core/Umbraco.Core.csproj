@@ -218,8 +218,12 @@
     <Compile Include="Configuration\Dashboard\SectionElement.cs" />
     <Compile Include="Configuration\Dashboard\TabCollection.cs" />
     <Compile Include="Configuration\Dashboard\TabElement.cs" />
+    <Compile Include="Configuration\HealthChecks\HealthCheckNotificationSettingsElement.cs" />
+    <Compile Include="Configuration\HealthChecks\DisabledHealthCheckElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElement.cs" />
+    <Compile Include="Configuration\HealthChecks\DisabledHealthChecksElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
+    <Compile Include="Configuration\HealthChecks\HealthChecksSection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
     <Compile Include="Configuration\Grid\GridConfig.cs" />
     <Compile Include="Configuration\Grid\GridEditorsConfig.cs" />
