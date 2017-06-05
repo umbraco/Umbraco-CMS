@@ -68,13 +68,20 @@ namespace Umbraco.Web.HealthCheck
                 var checkName = result.Key;
                 var checkResults = result.Value;
                 var checkIsSuccess = result.Value.All(x => x.ResultType == StatusResultType.Success);
+
+                // add a new line if not the first check
+                if (result.Equals(_results.First()) == false)
+                {
+                    sb.Append(Environment.NewLine);
+                }
+
                 if (checkIsSuccess)
                 {
-                    sb.AppendFormat("{0}Checks for'{1}' all completed succesfully.{2}", newItem, checkName, Environment.NewLine);
+                    sb.AppendFormat("{0}Checks for '{1}' all completed succesfully.{2}", newItem, checkName, Environment.NewLine);
                 }
                 else
                 {
-                    sb.AppendFormat("{0}Checks for'{1}' completed with errors.{2}", newItem, checkName, Environment.NewLine);
+                    sb.AppendFormat("{0}Checks for '{1}' completed with errors.{2}", newItem, checkName, Environment.NewLine);
                 }
 
                 foreach (var checkResult in checkResults)

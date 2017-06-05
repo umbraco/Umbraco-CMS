@@ -89,10 +89,10 @@ namespace Umbraco.Web.Scheduling
                 {
                     var slackClient = new SlackClient(healthCheckConfig.NotificationSettings.SlackSettings.WebHookUrl);
 
-                    var icon = Emoji.MinusOne;
+                    var icon = Emoji.Warning;
                     if (results.AllChecksSuccessful)
                     {
-                        icon = Emoji.PlusOne;
+                        icon = Emoji.WhiteCheckMark;
                     }
 
                     var slackMessage = new SlackMessage
