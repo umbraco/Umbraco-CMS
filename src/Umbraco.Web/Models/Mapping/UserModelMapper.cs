@@ -132,8 +132,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(detail => detail.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?) user.LastLoginDate))
                 .ForMember(detail => detail.UserGroups, opt => opt.Ignore())
-                .ForMember(detail => detail.StartContentIds, opt => Enumerable.Empty<EntityBasic>())
-                .ForMember(detail => detail.StartMediaIds, opt => Enumerable.Empty<EntityBasic>())
+                .ForMember(detail => detail.StartContentIds, opt => opt.UseValue(Enumerable.Empty<EntityBasic>()))
+                .ForMember(detail => detail.StartMediaIds, opt => opt.UseValue(Enumerable.Empty<EntityBasic>()))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))                
                 .ForMember(
                     detail => detail.AvailableCultures,
