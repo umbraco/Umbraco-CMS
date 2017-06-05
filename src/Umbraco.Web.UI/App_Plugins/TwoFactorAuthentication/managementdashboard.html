@@ -1,0 +1,20 @@
+﻿<div ng-controller="TwoFactorAuthentication.DashboardController">
+    <h2>Two step verification</h2>
+    <span>You have two step verification <strong>{{enabledText}}</strong>.</span>
+    <form method="POST" name="twoFactorCodeForm" ng-submit="disable()" ng-if="enabled === true">
+        <button type="submit">Disable two step verification</button>
+    </form>
+
+    <div ng-if="googleAuthEnabled === false">
+        <form method="POST" name="twoFactorCodeFormGoogleAuth" ng-submit="validateAndSaveGoogleAuth(code)">
+            <h3>Setup Google Authenticator</h3>
+            <img src="https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=otpauth://totp/{{email}}?secret={{secret}}&issuer={{applicationName}}" />
+            <input type="text" name="code" ng-model="code" ui-keypress="{13:'validateAndSaveGoogleAuth(code)'}" />
+            <br />
+            <div ng-if="error2FA !== ''">
+                {{error2FA}}<br />
+            </div>
+            <button type="submit">Validate & save</button>
+        </form>
+    </div>
+</div>
