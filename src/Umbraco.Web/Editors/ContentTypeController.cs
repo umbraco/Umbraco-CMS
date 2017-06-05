@@ -304,6 +304,17 @@ namespace Umbraco.Web.Editors
                 basic.Description = localizedTextService.UmbracoDictionaryTranslate(basic.Description);
             }
 
+            //map the blueprints
+            var blueprints = Services.ContentService.GetBlueprintsForContentTypes(types.Select(x => x.Id).ToArray()).ToArray();
+            foreach (var basic in basics)
+            {
+                var docTypeBluePrints = blueprints.Where(x => x.ContentTypeId == (int) basic.Id).ToArray();
+                foreach (var blueprint in docTypeBluePrints)
+                {
+                    basic.Blueprints[blueprint.Id] = blueprint.Name;
+                }
+            }
+
             return basics;
         }
 

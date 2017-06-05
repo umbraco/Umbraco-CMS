@@ -40,6 +40,7 @@
     <key alias="translate">Translate</key>
     <key alias="update">Update</key>
     <key alias="defaultValue">Default value</key>
+    <key alias="createblueprint">Create blueprint</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permission denied.</key>
@@ -177,6 +178,12 @@
     <key alias="target" version="7.0">Target</key>
     <key alias="scheduledPublishServerTime">This translates to the following time on the server:</key>
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">What does this mean?</a>]]></key>
+    <key alias="createBlueprintFrom">Create a blueprint from %0%</key>
+    <key alias="blankBlueprint">Blank</key>
+    <key alias="selectBlueprint">Select a blueprint</key>
+    <key alias="createdBlueprintHeading">Blueprint created</key>
+    <key alias="createdBlueprintMessage">Blueprint was created from %0%</key>
+    <key alias="duplicateBlueprintMessage">Another Blueprint with the same name already exists.</key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
@@ -1340,6 +1347,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="uploadTranslationXml">Upload translation XML</key>
   </area>
   <area alias="treeHeaders">
+    <key alias="contentBlueprints">Content Blueprints</key>
     <key alias="cacheBrowser">Cache Browser</key>
     <key alias="contentRecycleBin">Recycle Bin</key>
     <key alias="createdPackages">Created packages</key>
