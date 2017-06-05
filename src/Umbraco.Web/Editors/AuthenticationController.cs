@@ -226,6 +226,8 @@ namespace Umbraco.Web.Editors
                             //Ensure the culture of the found user is used for the email!
                             UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService)),
                         message);
+
+                    _userManager.RaiseForgotPasswordRequestedEvent(user.Id);
                 }
             }
 
@@ -333,6 +335,7 @@ namespace Umbraco.Web.Editors
                     }
                 }
 
+                _userManager.RaiseForgotPasswordChangedSuccessEvent(model.UserId);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             return Request.CreateValidationErrorResponse(

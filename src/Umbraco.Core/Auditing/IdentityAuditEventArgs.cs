@@ -56,6 +56,8 @@ namespace Umbraco.Core.Auditing
     {
         AccountLocked,
         AccountUnlocked,
+        ForgotPasswordRequested,
+        ForgotPasswordChangedSuccess,
         LoginFailed,
         LoginRequiresVerification,
         LoginSucces,

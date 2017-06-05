@@ -370,6 +370,22 @@ namespace Umbraco.Core.Security
             });
         }
 
+        internal void RaiseForgotPasswordRequestedEvent(int userId)
+        {
+            OnForgotPasswordRequested(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordRequested)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaiseForgotPasswordChangedSuccessEvent(int userId)
+        {
+            OnForgotPasswordChangedSuccess(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordChangedSuccess)
+            {
+                AffectedUser = userId
+            });
+        }
+
         /// <summary>
         /// Clears a lock so that the membership user can be validated.
         /// </summary>
@@ -404,6 +420,8 @@ namespace Umbraco.Core.Security
 
         public static event EventHandler AccountLocked;
         public static event EventHandler AccountUnlocked;
+        public static event EventHandler ForgotPasswordRequested;
+        public static event EventHandler ForgotPasswordChangedSuccess;
         public static event EventHandler LoginFailed;
         public static event EventHandler LoginRequiresVerification;
         public static event EventHandler LoginSuccess;
@@ -420,6 +438,16 @@ namespace Umbraco.Core.Security
         protected virtual void OnAccountUnlocked(IdentityAuditEventArgs e)
         {
             if (AccountUnlocked != null) AccountUnlocked(this, e);
+        }
+
+        protected virtual void OnForgotPasswordRequested(IdentityAuditEventArgs e)
+        {
+            if (ForgotPasswordRequested != null) ForgotPasswordRequested(this, e);
+        }
+
+        protected virtual void OnForgotPasswordChangedSuccess(IdentityAuditEventArgs e)
+        {
+            if (ForgotPasswordChangedSuccess != null) ForgotPasswordChangedSuccess(this, e);
         }
 
         protected virtual void OnLoginFailed(IdentityAuditEventArgs e)
