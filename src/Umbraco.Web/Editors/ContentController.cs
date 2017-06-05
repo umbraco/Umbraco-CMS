@@ -333,28 +333,32 @@ namespace Umbraco.Web.Editors
         /// <param name="name">The name of the blueprint</param>
         /// <returns></returns>
         [HttpPost]
-        public HttpResponseMessage CreateBlueprintFromContent([FromUri]int contentId, [FromUri]string name)
+        public SimpleNotificationModel CreateBlueprintFromContent([FromUri]int contentId, [FromUri]string name)
         {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+
             var content = Services.ContentService.GetById(contentId);
-            if (content == null) return Request.CreateResponse(HttpStatusCode.NotFound);
+            if (content == null)
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
             var existing = Services.ContentService.GetBlueprintsForContentTypes(content.ContentTypeId);
             if (existing.Any(x => x.Name == name))
             {
-                //not allowed
-                var notificationModel = new SimpleNotificationModel();
-                notificationModel.AddSuccessNotification(
-                    Services.TextService.Localize("content/failedBlueprintHeading"),
-                    Services.TextService.Localize("content/duplicateBlueprintMessage")
-                );
-                return Request.CreateValidationErrorResponse(notificationModel);
+                ModelState.AddModelError("value", Services.TextService.Localize("content/duplicateBlueprintMessage"));
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
 
             var blueprint = Services.ContentService.CreateContentFromBlueprint(content, name, Security.GetUserId());
 
             Services.ContentService.SaveBlueprint(blueprint, Security.GetUserId());
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            var notificationModel = new SimpleNotificationModel();
+            notificationModel.AddSuccessNotification(
+                Services.TextService.Localize("content/createdBlueprintHeading"),
+                Services.TextService.Localize("content/createdBlueprintMessage")
+            );
+
+            return notificationModel;
         }
 
         /// <summary>

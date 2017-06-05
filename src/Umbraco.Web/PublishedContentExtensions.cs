@@ -24,6 +24,12 @@ namespace Umbraco.Web
 
         public static Guid GetKey(this IPublishedContent content)
         {
+            var wrapped = content as PublishedContentWrapped;
+            while (wrapped != null)
+            {
+                content = wrapped.Unwrap();
+                wrapped = content as PublishedContentWrapped;
+            }
             var contentWithKey = content as IPublishedContentWithKey;
             return contentWithKey == null ? Guid.Empty : contentWithKey.Key;
         }
