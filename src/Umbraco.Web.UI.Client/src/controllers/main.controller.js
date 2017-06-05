@@ -134,18 +134,10 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
 
 
     // manage the help dialog by subscribing to the showHelp appState
-    $scope.helpDialogModel ={
-            show: appState.getGlobalState("showHelp"),
-            view: "help",
-            hideHeader: true,
-            close: function (oldModel) {
-                oldModel.show = false;
-            }
-        };
-
+    $scope.showhelpDrawer = false;
     evts.push(eventsService.on("appState.globalState.changed", function (e, args) {
         if (args.key === "showHelp") {
-            $scope.helpDialogModel.show = args.value;
+            $scope.showhelpDrawer = args.value;
         }
     }));
 
