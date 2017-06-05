@@ -78,10 +78,20 @@ namespace Umbraco.Web.Scheduling
 
                 if (healthCheckConfig.NotificationSettings.Enabled)
                 {
-                    var delayInMilliseconds = DateTime.Now.PeriodicMinutesFrom(healthCheckConfig.NotificationSettings.FirstRunTime) * 60 * 1000;
-                    if (delayInMilliseconds < DelayMilliseconds)
+                    // If first run time not set, start with just small delay after application start
+                    int delayInMilliseconds;
+                    if (string.IsNullOrEmpty(healthCheckConfig.NotificationSettings.FirstRunTime))
                     {
                         delayInMilliseconds = DelayMilliseconds;
+                    }
+                    else
+                    {
+                        // Otherwise start at scheduled time
+                        delayInMilliseconds = DateTime.Now.PeriodicMinutesFrom(healthCheckConfig.NotificationSettings.FirstRunTime) * 60 * 1000;
+                        if (delayInMilliseconds < DelayMilliseconds)
+                        {
+                            delayInMilliseconds = DelayMilliseconds;
+                        }
                     }
 
                     var periodInMilliseconds = healthCheckConfig.NotificationSettings.PeriodInHours * 60 * 60 * 1000;

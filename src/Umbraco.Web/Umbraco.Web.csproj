@@ -345,6 +345,7 @@
     <Compile Include="HealthCheck\HealthCheckGroup.cs" />
     <Compile Include="HealthCheck\HealthCheckResolver.cs" />
     <Compile Include="HealthCheck\HealthCheck.cs" />
+    <Compile Include="HealthCheck\HealthCheckResults.cs" />
     <Compile Include="HealthCheck\HealthCheckStatus.cs" />
     <Compile Include="HealthCheck\Checks\Security\HttpsCheck.cs" />
     <Compile Include="HealthCheck\IHealthCheckResolver.cs" />
