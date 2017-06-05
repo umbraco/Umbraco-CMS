@@ -59,6 +59,29 @@ namespace Umbraco.Tests
             Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/path%20to/this%20is%20a%20test.xyz", udi3.ToString());
         }
 
+        [Test, Ignore]
+        public void StringEncodingTest2()
+        {
+            // reserved = : / ? # [ ] @ ! $ & ' ( ) * + , ; =
+            // unreserved = alpha digit - . _ ~
+
+            Assert.AreEqual("%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2B%2C%3B%3D.-_~%25", Uri.EscapeDataString(":/?#[]@!$&'()+,;=.-_~%"));
+            Assert.AreEqual(":/?#[]@!$&'()+,;=.-_~%25", Uri.EscapeUriString(":/?#[]@!$&'()+,;=.-_~%"));
+
+            // we cannot have reserved chars at random places
+            // we want to keep the / in string udis
+
+            var r = string.Join("/", "path/to/View[1].cshtml".Split('/').Select(Uri.EscapeDataString));
+            Assert.AreEqual("path/to/View%5B1%5D.cshtml", r);
+            Assert.IsTrue(Uri.IsWellFormedUriString("umb://partial-view-macro/" + r, UriKind.Absolute));
+
+            // with the proper fix in StringUdi this should work:
+            var udi1 = new StringUdi("partial-view-macro", "path/to/View[1].cshtml");
+            Assert.AreEqual("umb://partial-view-macro/path/to/View%5B1%5D.cshtml", udi1.ToString());
+            var udi2 = Udi.Parse("umb://partial-view-macro/path/to/View%5B1%5D.cshtml");
+            Assert.AreEqual("path/to/View[1].cshtml", ((StringUdi) udi2).Id);
+        }
+
         [Test]
         public void GuidEntityCtorTest()
         {

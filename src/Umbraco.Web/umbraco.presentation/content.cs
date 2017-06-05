@@ -511,7 +511,7 @@ namespace umbraco
         private void ClearContextCache()
         {
             var items = HttpContextItems;
-            if (items == null || items.Contains(XmlContextContentItemKey)) return;
+            if (items == null || items.Contains(XmlContextContentItemKey) == false) return;
             items.Remove(XmlContextContentItemKey);
         }
 

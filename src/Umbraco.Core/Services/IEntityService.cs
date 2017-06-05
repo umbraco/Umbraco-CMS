@@ -31,6 +31,13 @@ namespace Umbraco.Core.Services
         Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType);
 
         /// <summary>
+        /// Returns the integer id for a given Udi
+        /// </summary>
+        /// <param name="udi"></param>
+        /// <returns></returns>
+        Attempt<int> GetIdForUdi(Udi udi);
+
+        /// <summary>
         /// Returns the GUID for a given integer id
         /// </summary>
         /// <param name="id"></param>

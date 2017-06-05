@@ -12,6 +12,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -122,7 +123,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPicker2Alias);
+            if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPicker2Alias))
+                return true;
+
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
+            {
+                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPickerAlias);
+            }
+            return false;
         }
 
         /// <summary>
@@ -173,11 +181,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var udis = (Udi[])source;
             var mediaItems = new List<IPublishedContent>();
+            if (UmbracoContext.Current == null) return source;
+            var helper = new UmbracoHelper(UmbracoContext.Current);
             if (udis.Any())
             {
                 foreach (var udi in udis)
                 {
-                    var item = udi.ToPublishedContent();
+                    var item = helper.TypedMedia(udi);
                     if (item != null)
                         mediaItems.Add(item);
                 }
