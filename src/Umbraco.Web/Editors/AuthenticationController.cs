@@ -229,7 +229,8 @@ namespace Umbraco.Web.Editors
                             UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService)),
                         message);
 
-                    _userManager.RaiseForgotPasswordRequestedEvent(user.Id);
+                    if(UserManager != null)
+                        UserManager.RaiseForgotPasswordRequestedEvent(user.Id);
                 }
             }
 
@@ -337,7 +338,8 @@ namespace Umbraco.Web.Editors
                     }
                 }
 
-                _userManager.RaiseForgotPasswordChangedSuccessEvent(model.UserId);
+                if(UserManager != null)
+                    UserManager.RaiseForgotPasswordChangedSuccessEvent(model.UserId);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             return Request.CreateValidationErrorResponse(

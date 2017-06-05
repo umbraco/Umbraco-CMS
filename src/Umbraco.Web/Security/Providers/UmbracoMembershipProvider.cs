@@ -584,6 +584,7 @@ namespace Umbraco.Web.Security.Providers
             {
                 if (member.FailedPasswordAttempts > 0)
                 {
+                    //we have successfully logged in, reset the AccessFailedCount
                     member.FailedPasswordAttempts = 0;
                     if (backofficeUserManager != null)
                         backofficeUserManager.RaiseResetAccessFailedCountEvent(member.Id);

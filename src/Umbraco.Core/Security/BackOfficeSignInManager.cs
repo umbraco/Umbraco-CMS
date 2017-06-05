@@ -122,9 +122,13 @@ namespace Umbraco.Core.Security
                 if (await UserManager.IsLockedOutAsync(user.Id))
                 {
                     //at this point we've just locked the user out after too many failed login attempts
-                    var backofficeUserManager = _request.Context.GetBackOfficeUserManager();
-                    if(backofficeUserManager != null)
-                        backofficeUserManager.RaiseAccountLockedEvent(user.Id);
+                    var requestContext = _request.Context;
+                    if (requestContext != null)
+                    {
+                        var backofficeUserManager = requestContext.GetBackOfficeUserManager();
+                        if (backofficeUserManager != null)
+                            backofficeUserManager.RaiseAccountLockedEvent(user.Id);
+                    }
 
                     return SignInStatus.LockedOut;
                 }
@@ -197,6 +201,7 @@ namespace Umbraco.Core.Security
             //track the last login date
             user.LastLoginDateUtc = DateTime.UtcNow;
             if (user.AccessFailedCount > 0)
+                //we have successfully logged in, reset the AccessFailedCount
                 user.AccessFailedCount = 0;
             await UserManager.UpdateAsync(user);
 

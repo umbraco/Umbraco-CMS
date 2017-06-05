@@ -255,9 +255,8 @@ namespace Umbraco.Core.Security
         {
             var result = base.AccessFailedAsync(userId);
 
+            //Slightly confusing: this will return a Success if we successfully update the AccessFailed count
             if (result.Result.Succeeded)
-                RaiseLoginSuccessEvent(userId);
-            else
                 RaiseLoginFailedEvent(userId);
 
             return result;
@@ -266,10 +265,8 @@ namespace Umbraco.Core.Security
         public override Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
         {
             var result = base.ChangePasswordAsync(userId, currentPassword, newPassword);
-
             if (result.Result.Succeeded)
                 RaisePasswordChangedEvent(userId);
-
             return result;
         }
 
@@ -302,11 +299,8 @@ namespace Umbraco.Core.Security
         public bool UnlockUser(string username)
         {
             var user = ApplicationContext.Current.Services.UserService.GetByUsername(username);
-
             if (user == null)
-            {
                 throw new ProviderException(string.Format("No user with the username '{0}' found", username));
-            }
 
             // Non need to update
             if (user.IsLockedOut == false) return true;
