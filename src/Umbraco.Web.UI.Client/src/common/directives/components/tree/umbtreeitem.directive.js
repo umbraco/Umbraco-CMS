@@ -43,7 +43,7 @@ angular.module("umbraco.directives")
             '<i class="icon umb-tree-icon sprTree" ng-click="select(node, $event)"></i>' +
             '<a class="umb-tree-item-name" href="#/{{node.routePath}}" ng-click="select(node, $event)"></a>' +
             //NOTE: These are the 'option' elipses
-            '<a href="" class="umb-options" ng-click="options(node, $event)" hotkey="ctrl+." hotkey-when="{{node.hasFocus}}"><i></i><i></i><i></i></a>' +
+            '<a href="" class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></a>' +
             '<div ng-show="node.loading" class="l"><div></div></div>' +
             '</div>' +
             '</li>', 

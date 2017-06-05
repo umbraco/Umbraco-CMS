@@ -7,7 +7,7 @@
     </a>
 
     <!-- actions -->
-    <ul class="dropdown-menu umb-actions" ng-if="isOpen" role="menu" aria-labelledby="dLabel" on-outside-click="closeDropdown()">
+    <ul class="dropdown-menu umb-actions" ng-if="isOpen" role="menu" style="display:block;" aria-labelledby="dLabel" on-outside-click="closeDropdown()">
         <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in actions">
 
             <!-- How does this reference executeMenuItem() i really don't think that this is very clear -->
