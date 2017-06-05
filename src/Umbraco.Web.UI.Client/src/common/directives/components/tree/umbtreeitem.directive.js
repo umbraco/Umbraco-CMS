@@ -36,14 +36,14 @@ angular.module("umbraco.directives")
         // this will greatly improve performance since there's potentially a lot of nodes being rendered = a LOT of watches!
 
         template: '<li ng-class="{\'current\': (node == currentNode), \'has-children\': node.hasChildren}" on-right-click="altSelect(node, $event)">' +
-            '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" >' +
+            '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" ng-keyup="test(node, $event)" >' +
             //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
             //'<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' + 
             '<ins ng-class="{\'icon-navigation-right\': !node.expanded || node.metaData.isContainer, \'icon-navigation-down\': node.expanded && !node.metaData.isContainer}" ng-click="load(node)">&nbsp;</ins>' +
             '<i class="icon umb-tree-icon sprTree" ng-click="select(node, $event)"></i>' +
-            '<a href="#/{{node.routePath}}" ng-click="select(node, $event)"></a>' +
+            '<a class="umb-tree-item-name" href="#/{{node.routePath}}" ng-click="select(node, $event)"></a>' +
             //NOTE: These are the 'option' elipses
-            '<a class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></a>' +
+            '<a href="" class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></a>' +
             '<div ng-show="node.loading" class="l"><div></div></div>' +
             '</div>' +
             '</li>',
@@ -223,7 +223,58 @@ angular.module("umbraco.directives")
                     node.expanded = true;
                     enableDeleteAnimations();
                 }
-            };            
+            };
+
+            scope.test = function(node, event) {
+
+                // arrow down
+                if (event.keyCode === 40) {
+
+                    var childList = element.find('ul');
+
+                    if (childList.children().length > 0 && childList.is(':visible')) {
+
+                        var test = element.find('li:first').find('a:first');
+                        test.focus();
+
+                    } else {
+
+                        var nextListItem = element;
+                        while (nextListItem.next('li').length === 0 && !nextListItem.hasClass('root')) {
+                            nextListItem = nextListItem.parent();
+                        }
+
+                        nextListItem.next('li').find('a:first').focus();
+                    }
+
+                    // arrow up
+                } else if (event.keyCode === 38) {
+
+                    var prevListItem = element.prev('li');
+
+                    if (prevListItem.length === 0) {
+                        prevListItem = element.parent().parent();
+                        prevListItem.find('a.umb-tree-item-name:first').focus();
+                    }
+                    else
+                    {
+
+                        prevListItem.find('a.umb-tree-item-name:visible').last().focus();
+                    }
+                    
+
+                // arrow right
+                } else if (event.keyCode === 39) {
+                    scope.loadChildren(node);
+
+                    // arrow left
+                } else if (event.keyCode === 37) {
+                    scope.load(node);
+                }
+
+                console.log(event);
+
+            };           
 
             //if the current path contains the node id, we will auto-expand the tree item children
 
