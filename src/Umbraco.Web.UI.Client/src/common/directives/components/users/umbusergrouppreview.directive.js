@@ -16,8 +16,8 @@
                 name: "=",
                 description: "=?",
                 sections: "=?",
-                contentStartNodes: "=?",
-                mediaStartNodes: "=?",
+                contentStartNode: "=?",
+                mediaStartNode: "=?",
                 allowRemove: "=?",
                 onRemove: "&?"
             },
