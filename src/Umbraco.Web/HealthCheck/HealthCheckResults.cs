@@ -27,8 +27,6 @@ namespace Umbraco.Web.HealthCheck
                         var message = string.Format("Health check failed with exception: {0}. See logs for details.", ex.Message);
                         return new List<HealthCheckStatus>
                         {
-
-
                             new HealthCheckStatus(message)
                             {
                                 ResultType = StatusResultType.Error
@@ -37,18 +35,17 @@ namespace Umbraco.Web.HealthCheck
                     }                    
                 });
                 
-               // find out if all checks pass or not
-                AllChecksSuccessful = true;
-                foreach (var result in _results)
+            // find out if all checks pass or not
+            AllChecksSuccessful = true;
+            foreach (var result in _results)
+            {
+                var checkIsSuccess = result.Value.All(x => x.ResultType == StatusResultType.Success);
+                if (checkIsSuccess == false)
                 {
-                    var checkIsSuccess = result.Value.All(x => x.ResultType == StatusResultType.Success);
-                    if (checkIsSuccess == false)
-                    {
-                        AllChecksSuccessful = false;
-                        break;
-                    }
+                    AllChecksSuccessful = false;
+                    break;
                 }
-
+            }
         }
 
         internal void LogResults()
