@@ -104,6 +104,14 @@ namespace Umbraco.Core.Security
             var user = await UserManager.FindByNameAsync(userName);
             if (user == null)
             {
+                var requestContext = _request.Context;
+                if (requestContext != null)
+                {
+                    var backofficeUserManager = requestContext.GetBackOfficeUserManager();
+                    if (backofficeUserManager != null)
+                        backofficeUserManager.RaiseInvalidLoginAttemptEvent(userName);
+                }
+
                 return SignInStatus.Failure;
             }
             if (await UserManager.IsLockedOutAsync(user.Id))

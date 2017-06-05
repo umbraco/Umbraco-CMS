@@ -189,8 +189,6 @@ namespace Umbraco.Web.Editors
                     // by our angular helper because it thinks that we need to re-perform the request once we are
                     // authorized and we don't want to return a 403 because angular will show a warning msg indicating
                     // that the user doesn't have access to perform this function, we just want to return a normal invalid msg.
-                    if (UserManager != null)
-                        UserManager.RaiseInvalidLoginAttemptEvent(loginModel.Username);
                     throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
         }
