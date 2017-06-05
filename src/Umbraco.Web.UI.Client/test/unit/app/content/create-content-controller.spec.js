@@ -4,51 +4,121 @@
     function() {
 
       var scope,
-        allowedTypes = [{ id: 1, alias: "x" }, { id: 2, alias: "y" }],
-        location;
+        allowedTypes = [
+          { id: 1, alias: "x" },
+          { id: 2, alias: "y", blueprints: { "1": "a", "2": "b" } }
+        ],
+        location,
+        searcher,
+        controller,
+        rootScope,
+        contentTypeResource;
 
       beforeEach(module("umbraco"));
 
-      beforeEach(inject(function ($controller, $rootScope, $q, $location) {
-        var contentTypeResource = {
+      function initialize(blueprintConfig) {
+        scope = rootScope.$new();
+        scope.currentNode = { id: 1234 };
+        var dependencies = {
+          $scope: scope,
+          contentTypeResource: contentTypeResource
+        };
+        if (blueprintConfig) {
+          dependencies.blueprintConfig = blueprintConfig;
+        }
+        controller("Umbraco.Editors.Content.CreateController",
+          dependencies);
+
+        scope.$digest();
+
+      }
+
+      beforeEach(inject(function($controller, $rootScope, $q, $location) {
+        contentTypeResource = {
           getAllowedTypes: function() {
             var def = $q.defer();
             def.resolve(allowedTypes);
             return def.promise;
           }
-        }
-
+        };
         location = $location;
+        controller = $controller;
+        rootScope = $rootScope;
 
-        scope = $rootScope.$new();
-        scope.currentNode = { id: 1234 };
+        searcher = { search: function() {} };
+        spyOn(location, "path").andReturn(searcher);
+        spyOn(searcher, "search");
 
-        $controller("Umbraco.Editors.Content.CreateController", {
-          $scope: scope,
-          contentTypeResource: contentTypeResource
-        });
-
-        scope.$digest();
-
+        initialize();
       }));
 
-    it("shows available child document types for the given node", function() {
-      expect(scope.allowedTypes).toBe(allowedTypes);
-    });
+      it("shows available child document types for the given node",
+        function() {
+          expect(scope.selectContentType).toBe(true);
+          expect(scope.allowedTypes).toBe(allowedTypes);
+        });
 
       it("creates content directly when there are no blueprints",
         function() {
-          var searcher = {search:function(){}};
-          spyOn(location, "path").andReturn(searcher);
-          spyOn(searcher, "search");
-
           scope.createOrSelectBlueprintIfAny(allowedTypes[0]);
 
           expect(location.path).toHaveBeenCalledWith("/content/content/edit/1234");
           expect(searcher.search).toHaveBeenCalledWith("doctype=x&create=true");
         });
 
+      it("shows list of blueprints when there are some",
+        function() {
+          scope.createOrSelectBlueprintIfAny(allowedTypes[1]);
+          expect(scope.selectContentType).toBe(false);
+          expect(scope.selectBlueprint).toBe(true);
+          expect(scope.docType).toBe(allowedTypes[1]);
+        });
+
+      it("creates blueprint when selected",
+        function() {
+          scope.createOrSelectBlueprintIfAny(allowedTypes[1]);
+          scope.createFromBlueprint("1");
+
+          expect(location.path).toHaveBeenCalledWith("/content/content/edit/1234");
+          expect(searcher.search).toHaveBeenCalledWith("doctype=y&create=true&blueprintId=1");
+        });
+
+      it("skips selection and creates first blueprint when configured to",
+        function() {
+          initialize({
+            allowBlank: true,
+            skipSelect: true
+          });
+
+          scope.createOrSelectBlueprintIfAny(allowedTypes[1]);
+
+          expect(location.path).toHaveBeenCalledWith("/content/content/edit/1234");
+          expect(searcher.search).toHaveBeenCalledWith("doctype=y&create=true&blueprintId=1");
+        });
+
+      it("allows blank to be selected",
+        function() {
+          expect(scope.allowBlank).toBe(true);
+        });
+
+      it("creates blank when selected",
+        function() {
+          scope.createBlank(allowedTypes[1]);
+
+          expect(location.path).toHaveBeenCalledWith("/content/content/edit/1234");
+          expect(searcher.search).toHaveBeenCalledWith("doctype=y&create=true");
+        });
+
+      it("hides blank when configured to",
+        function() {
+          initialize({
+            allowBlank: false,
+            skipSelect: false
+          });
+
+          expect(scope.allowBlank).toBe(false);
+        });
+
     });
 
 }());
-
