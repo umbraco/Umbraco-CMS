@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http.Formatting;
 using System.Web.Http;
 using umbraco;
+using umbraco.businesslogic.Actions;
 using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Services;
@@ -91,16 +92,20 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
                 return menu;
             }
-            var ct = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.DocumentType);
-            //only refresh if it's a content type
-            if (ct != null)
+            var cte = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.DocumentType);
+            //only refresh & create if it's a content type
+            if (cte != null)
             {
+                var ct = Services.ContentTypeService.GetContentType(cte.Id);
+                var createItem = menu.Items.Add<ActionCreateBlueprintFromContent>(Services.TextService.Localize(string.Format("actions/{0}", ActionCreateBlueprintFromContent.Instance.Alias)));
+                createItem.NavigateToRoute("/settings/contentBlueprints/edit/-1?create=true&doctype=" + ct.Alias);
+
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+
                 return menu;
             }
 
             menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
-
 
             return menu;
         }
