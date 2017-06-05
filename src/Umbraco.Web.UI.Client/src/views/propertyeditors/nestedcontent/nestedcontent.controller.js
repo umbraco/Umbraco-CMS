@@ -171,11 +171,13 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.deleteNode = function (idx) {
             if ($scope.nodes.length > $scope.model.config.minItems) {
                 if ($scope.model.config.confirmDeletes && $scope.model.config.confirmDeletes == 1) {
-                    if (confirm("Are you sure you want to delete this item?")) {
-                        $scope.nodes.splice(idx, 1);
-                        $scope.setDirty();
-                        updateModel();
-                    }
+                    localizationService.localize('content_nestedContentDeleteItem').then(function (value) {
+                        if (confirm(value)) {
+                            $scope.nodes.splice(idx, 1);
+                            $scope.setDirty();
+                            updateModel();
+                        }
+                    });
                 } else {
                     $scope.nodes.splice(idx, 1);
                     $scope.setDirty();
@@ -287,15 +289,16 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 });
                 scaffold.tabs = [];
                 if (tab) {
-                  scaffold.tabs.push(tab);
+                    scaffold.tabs.push(tab);
 
-                  angular.forEach(tab.properties,
-                    function(property) {
-                      if (_.find(notSupported, function (x) { return x === property.editor; })) {
-                        property.notSupported = true;
-                        property.notSupportedMessage = "Property " + property.label + " uses editor " + property.editor + " which is not supported by NestedContent.";
-                      }
-                    });
+                    angular.forEach(tab.properties,
+                      function (property) {
+                          if (_.find(notSupported, function (x) { return x === property.editor; })) {
+                              property.notSupported = true;
+                              //TODO: Not supported message to be replaced with 'content_nestedContentEditorNotSupported' dictionary key. Currently not possible due to async/timing quirk.
+                              property.notSupportedMessage = "Property " + property.label + " uses editor " + property.editor + " which is not supported by Nested Content.";
+                          }
+                      });
                 }
 
                 // Store the scaffold object
