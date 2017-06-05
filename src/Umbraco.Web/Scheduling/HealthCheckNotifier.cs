@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
+using Umbraco.Core.Sync;
 using Umbraco.Web.HealthCheck;
 
 namespace Umbraco.Web.Scheduling
@@ -31,6 +32,16 @@ namespace Umbraco.Web.Scheduling
         public override async Task<bool> PerformRunAsync(CancellationToken token)
         {
             if (_appContext == null) return true; // repeat...
+
+            switch (_appContext.GetCurrentServerRole())
+            {
+                case ServerRole.Slave:
+                    LogHelper.Debug<ScheduledPublishing>("Does not run on slave servers.");
+                    return true; // DO repeat, server role can change
+                case ServerRole.Unknown:
+                    LogHelper.Debug<ScheduledPublishing>("Does not run on servers with unknown role.");
+                    return true; // DO repeat, server role can change
+            }
 
             // ensure we do not run if not main domain, but do NOT lock it
             if (_appContext.MainDom.IsMainDom == false)
