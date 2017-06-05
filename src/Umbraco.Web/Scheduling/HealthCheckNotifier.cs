@@ -69,7 +69,7 @@ namespace Umbraco.Web.Scheduling
                     var slackMessage = new SlackMessage
                     {
                         Channel = "#test",
-                        Text = sb.ToString(),
+                        Text = results.ResultsAsMarkDown(),
                         IconEmoji = Emoji.Ghost,
                         Username = "Umbraco Health Check Notifier"
                     };

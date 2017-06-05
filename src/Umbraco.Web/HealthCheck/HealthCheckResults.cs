@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.HealthCheck
@@ -35,6 +36,33 @@ namespace Umbraco.Web.HealthCheck
                     LogHelper.Info<HealthCheckResults>(string.Format("        Result: {0}, Message: '{1}'", checkResult.ResultType, checkResult.Message));
                 }
             }
+        }
+
+        public string ResultsAsMarkDown()
+        {
+            var newItem = "- ";
+            var sb = new StringBuilder();
+
+            foreach (var result in _results)
+            {
+                var checkName = result.Key;
+                var checkResults = result.Value;
+                var checkIsSuccess = result.Value.All(x => x.ResultType == StatusResultType.Success);
+                if (checkIsSuccess)
+                {
+                    sb.AppendFormat("{0}Checks for'{1}' all completed succesfully.", newItem, checkName);
+                }
+                else
+                {
+                    sb.AppendFormat("{0}Checks for'{1}' completed with errors.", newItem, checkName);
+                }
+
+                foreach (var checkResult in checkResults)
+                {
+                    sb.AppendFormat("{0}{1}Result:'{2}' , Message: '{3}'", newItem, newItem, checkResult.ResultType, checkResult.Message);
+                }
+            }
+            return sb.ToString();
         }
     }
 }
