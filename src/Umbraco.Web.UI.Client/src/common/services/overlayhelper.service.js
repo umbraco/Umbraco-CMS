@@ -4,14 +4,25 @@
    function overlayHelper() {
 
       var numberOfOverlays = 0;
+      var numberOfOverLaysWithBackdrop = 0;
 
-      function registerOverlay() {
-         numberOfOverlays++;
+      function registerOverlay(hideBackdrop) {
+          numberOfOverlays++;
+
+          if (hideBackdrop !== true) {
+              numberOfOverLaysWithBackdrop++;
+          }
+
          return numberOfOverlays;
       }
 
-      function unregisterOverlay() {
-         numberOfOverlays--;
+      function unregisterOverlay(hideBackdrop) {
+          numberOfOverlays--;
+
+          if (hideBackdrop !== true) {
+              numberOfOverLaysWithBackdrop--;
+          }
+          
          return numberOfOverlays;
       }
 
@@ -19,11 +30,16 @@
          return numberOfOverlays;
       }
 
+      function showBackdrop() {
+          return numberOfOverLaysWithBackdrop > 0;
+      }
+
       var service = {
          numberOfOverlays: numberOfOverlays,
          registerOverlay: registerOverlay,
          unregisterOverlay: unregisterOverlay,
-         getNumberOfOverlays: getNumberOfOverlays
+         getNumberOfOverlays: getNumberOfOverlays,
+         showBackdrop: showBackdrop
       };
 
       return service;

@@ -440,7 +440,10 @@ Opens an overlay to show a custom YSOD. </br>
                // event on other overlays is run before registering a new one
                registerOverlay();
 
-               setOverlayIndent();
+               //only need to adjust the indent when we have right-positioned overlay
+               if (scope.position === "right") {
+                   setOverlayIndent();
+               }
 
             });
 
@@ -470,11 +473,11 @@ Opens an overlay to show a custom YSOD. </br>
 
          function registerOverlay() {
 
-            overlayNumber = overlayHelper.registerOverlay();
+            overlayNumber = overlayHelper.registerOverlay(scope.hideBackdrop);
 
             $(document).bind("keydown.overlay-" + overlayNumber, function(event) {
 
-               if (event.which === 27) {
+                if (event.which === 27 && !scope.sticky) {
 
                   numberOfOverlays = overlayHelper.getNumberOfOverlays();
 
@@ -485,7 +488,8 @@ Opens an overlay to show a custom YSOD. </br>
                   }
 
                   event.preventDefault();
-               }
+                }
+
 
                if (event.which === 13) {
 
@@ -524,7 +528,7 @@ Opens an overlay to show a custom YSOD. </br>
 
             if(isRegistered) {
 
-               overlayHelper.unregisterOverlay();
+                overlayHelper.unregisterOverlay(scope.hideBackdrop);
 
                $(document).unbind("keydown.overlay-" + overlayNumber);
 
@@ -648,17 +652,20 @@ Opens an overlay to show a custom YSOD. </br>
              scope.model.confirmSubmit.show = false;
          };
 
-         scope.closeOverLay = function() {
+         
+         scope.closeOverLay = function(force) {
 
-            unregisterOverlay();
+             if (!scope.sticky || force) {
+                 unregisterOverlay();
 
-            if (scope.model.close) {
-               scope.model = modelCopy;
-               scope.model.close(scope.model);
-            } else {
-                scope.model.show = false;
-               scope.model = null;
-            }
+                 if (scope.model.close) {
+                     scope.model = modelCopy;
+                     scope.model.close(scope.model);
+                 } else {
+                     scope.model.show = false;
+                     scope.model = null;
+                 }
+             }
 
          };
 
@@ -693,6 +700,9 @@ Opens an overlay to show a custom YSOD. </br>
             ngShow: "=",
             model: "=",
             view: "=",
+            sticky: "=",
+            hideHeader: "=",
+            hideBackdrop: "=",
             position: "@"
          },
          link: link

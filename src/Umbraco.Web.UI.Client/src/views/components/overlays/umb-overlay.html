@@ -1,10 +1,11 @@
 <div class="umb-overlay umb-overlay-{{position}}" on-outside-click="closeOverLay()">
     <ng-form class="umb-overlay__form" name="overlayForm" novalidate val-form-manager>
 
-        <div class="umb-overlay-header">
+        <div class="umb-overlay-header" ng-if="model.hideHeader !== true">
             <h4 class="umb-overlay__title">{{model.title}}</h4>
             <p class="umb-overlay__subtitle">{{model.subtitle}}</p>
         </div>
+
 
         <div class="umb-overlay-container form-horizontal" ng-transclude>
             <div ng-if="view" ng-include="view"></div>
@@ -53,7 +54,7 @@
 
             <div class="umb-overlay-drawer__align-right" ng-if="!model.confirmSubmit.show">
                 <umb-button
-                    action="closeOverLay()"
+                    action="closeOverLay(true)"
                     button-style="link"
                     label-key="{{model.closeButtonLabelKey}}"
                     label="{{model.closeButtonLabel}}"

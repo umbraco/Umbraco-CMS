@@ -40,9 +40,13 @@ body {
 }
 
 #mainwrapper {
-  height: 100%;
-  width: 100%;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
   margin: 0;
+}
+
+body.helpenabled #mainwrapper{
+    left: 400px;
 }
 
 #contentwrapper, #contentcolumn {
