@@ -16,21 +16,14 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "notifications")]
         public List<Notification> Notifications { get; private set; }
-
+        
         [DataMember(Name = "sections")]
-        public IEnumerable<string> Sections { get; set; }
+        public IEnumerable<Section> Sections { get; set; }
+        
+        [DataMember(Name = "startContentId")]
+        public EntityBasic StartContentId { get; set; }
 
-        /// <summary>
-        /// Gets the available sections (i.e. to populate a drop down)
-        /// The key is the Alias the value is the Name - the Alias is what is used in the AllowedSections property and for persistence
-        /// </summary>
-        [DataMember(Name = "availableSections")]
-        public IEnumerable<Section> AvailableSections { get; set; }
-
-        [DataMember(Name = "startNodeContent")]
-        public int StartContentId { get; set; }
-
-        [DataMember(Name = "startNodeMedia")]
-        public int StartMediaId { get; set; }
+        [DataMember(Name = "startMediaId")]
+        public EntityBasic StartMediaId { get; set; }
     }
 }

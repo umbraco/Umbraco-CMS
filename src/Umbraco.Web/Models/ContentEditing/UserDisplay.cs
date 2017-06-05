@@ -50,13 +50,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// The list of group aliases assigned to the user
         /// </summary>
         [DataMember(Name = "userGroups")]
-        public IEnumerable<string> UserGroups { get; set; }
-
-        /// <summary>
-        /// Gets the available user groups (i.e. to populate a drop down)
-        /// </summary>
-        [DataMember(Name = "availableUserGroups")]
-        public IEnumerable<UserGroupDisplay> AvailableUserGroups { get; set; }
+        public IEnumerable<UserGroupDisplay> UserGroups { get; set; }        
 
         /// <summary>
         /// Gets the available cultures (i.e. to populate a drop down)
@@ -64,12 +58,12 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "availableCultures")]
         public IDictionary<string, string> AvailableCultures { get; set; }
-
+        
         [DataMember(Name = "startContentIds")]
-        public int[] StartContentIds { get; set; }
+        public IEnumerable<EntityBasic> StartContentIds { get; set; }
 
         [DataMember(Name = "startMediaIds")]
-        public int[] StartMediaIds { get; set; }
+        public IEnumerable<EntityBasic> StartMediaIds { get; set; }
 
         ///// <summary>
         ///// A list of sections the user is allowed to view based on their current groups assigned

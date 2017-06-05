@@ -70,9 +70,10 @@ namespace Umbraco.Tests.Web.Controllers
             Assert.AreEqual(userSave.Name, obj.Name);
             Assert.AreEqual(1234, obj.Id);
             Assert.AreEqual(userSave.Email, obj.Email);
+            var userGroupAliases = obj.UserGroups.Select(x => x.Alias).ToArray();
             foreach (var group in userSave.UserGroups)
             {
-                Assert.IsTrue(obj.UserGroups.Contains(group));
+                Assert.IsTrue(userGroupAliases.Contains(group));
             }
         }
 
@@ -125,9 +126,10 @@ namespace Umbraco.Tests.Web.Controllers
             Assert.AreEqual(invite.Name, obj.Name);
             Assert.AreEqual(1234, obj.Id);
             Assert.AreEqual(invite.Email, obj.Email);
+            var userGroupAliases = obj.UserGroups.Select(x => x.Alias).ToArray();
             foreach (var group in invite.UserGroups)
             {
-                Assert.IsTrue(obj.UserGroups.Contains(group));
+                Assert.IsTrue(userGroupAliases.Contains(group));
             }
         }
 

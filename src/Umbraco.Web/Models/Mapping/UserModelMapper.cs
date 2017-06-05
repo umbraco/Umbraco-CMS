@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
@@ -8,6 +9,7 @@ using Umbraco.Web.Models.ContentEditing;
 using umbraco;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 
@@ -85,8 +87,9 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             config.CreateMap<IUserGroup, UserGroupDisplay>()
-                .ForMember(detail => detail.AvailableSections, opt => opt.MapFrom(x => applicationContext.Services.SectionService.GetSections()))
                 .ForMember(detail => detail.Sections, opt => opt.MapFrom(x => x.AllowedSections))
+                .ForMember(detail => detail.StartContentId, opt => opt.MapFrom(x => applicationContext.Services.EntityService.Get<IContent>(x.StartContentId, false)))
+                .ForMember(detail => detail.StartMediaId, opt => opt.MapFrom(x => applicationContext.Services.EntityService.Get<IMedia>(x.StartMediaId, false)))
                 .ForMember(detail => detail.Notifications, opt => opt.Ignore())                
                 .ForMember(detail => detail.Udi, opt => opt.Ignore())
                 .ForMember(detail => detail.Trashed, opt => opt.Ignore())
@@ -97,14 +100,11 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IUser, UserDisplay>()
                 .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(applicationContext.Services.UserService, applicationContext.ApplicationCache.RuntimeCache)))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
-                .ForMember(detail => detail.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?)user.LastLoginDate))
+                .ForMember(detail => detail.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?) user.LastLoginDate))
                 .ForMember(detail => detail.UserGroups, opt => opt.MapFrom(user => user.Groups.Select(x => x.Alias).ToArray()))
-                .ForMember(detail => detail.StartContentIds, opt => opt.MapFrom(user => user.StartContentIds))
-                .ForMember(detail => detail.StartMediaIds, opt => opt.MapFrom(user => user.StartMediaIds))
-                .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
-                .ForMember(
-                    detail => detail.AvailableUserGroups,
-                    opt => opt.MapFrom(user => applicationContext.Services.UserService.GetAllUserGroups()))               
+                .ForMember(detail => detail.StartContentIds, opt => opt.Ignore())
+                .ForMember(detail => detail.StartMediaIds, opt => opt.Ignore())
+                .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))                
                 .ForMember(
                     detail => detail.AvailableCultures,
                     opt => opt.MapFrom(user => applicationContext.Services.TextService.GetSupportedCultures().ToDictionary(x => x.Name, x => x.DisplayName)))
@@ -116,10 +116,17 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Notifications, opt => opt.Ignore())
                 .ForMember(detail => detail.Udi, opt => opt.Ignore())
                 .ForMember(detail => detail.Icon, opt => opt.Ignore())
-                .ForMember(detail => detail.Trashed, opt => opt.Ignore())                
-                .ForMember(detail => detail.Alias, opt => opt.Ignore())                
                 .ForMember(detail => detail.Trashed, opt => opt.Ignore())
-                .ForMember(detail => detail.AdditionalData, opt => opt.Ignore());
+                .ForMember(detail => detail.Alias, opt => opt.Ignore())
+                .ForMember(detail => detail.Trashed, opt => opt.Ignore())
+                .ForMember(detail => detail.AdditionalData, opt => opt.Ignore())
+                .AfterMap((user, display) =>
+                {
+                    var contentItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, user.StartContentIds.ToArray());
+                    var mediaItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, user.StartContentIds.ToArray());
+                    display.StartContentIds = Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(contentItems);
+                    display.StartMediaIds = Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(mediaItems);
+                });
 
             config.CreateMap<IUser, UserDetail>()
                 .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(applicationContext.Services.UserService, applicationContext.ApplicationCache.RuntimeCache)))

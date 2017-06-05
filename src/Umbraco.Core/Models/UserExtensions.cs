@@ -44,7 +44,7 @@ namespace Umbraco.Core.Models
             if (user.Avatar.IsNullOrWhiteSpace())
             {
                 var gravatarHash = user.Email.ToMd5();
-                var gravatarUrl = "https://www.gravatar.com/avatar/" + gravatarHash;
+                var gravatarUrl = "https://www.gravatar.com/avatar/" + gravatarHash + "?d=404";
 
                 //try gravatar
                 var gravatarAccess = staticCache.GetCacheItem<bool>("UserAvatar" + user.Id, () =>
@@ -69,11 +69,11 @@ namespace Umbraco.Core.Models
                 {
                     return new[]
                     {
-                        gravatarUrl  + "?s=30&d=mm",
-                        gravatarUrl  + "?s=60&d=mm",
-                        gravatarUrl  + "?s=90&d=mm",
-                        gravatarUrl  + "?s=150&d=mm",
-                        gravatarUrl  + "?s=300&d=mm"
+                        gravatarUrl  + "?s=30",
+                        gravatarUrl  + "?s=60",
+                        gravatarUrl  + "?s=90",
+                        gravatarUrl  + "?s=150",
+                        gravatarUrl  + "?s=300"
                     };
                 }
 
