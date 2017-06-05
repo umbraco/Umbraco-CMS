@@ -5,8 +5,10 @@ namespace Umbraco.Core.Models.Membership
 {
     public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGroup>
     {
-        public ReadOnlyUserGroup(int id, int startContentId, int startMediaId, string @alias, IEnumerable<string> allowedSections)
+        public ReadOnlyUserGroup(int id, string name, string icon, int startContentId, int startMediaId, string @alias, IEnumerable<string> allowedSections)
         {
+            Name = name;
+            Icon = icon;
             Id = id;
             StartContentId = startContentId;
             StartMediaId = startMediaId;
@@ -15,6 +17,8 @@ namespace Umbraco.Core.Models.Membership
         }
 
         public int Id { get; private set; }
+        public string Name { get; private set; }
+        public string Icon { get; private set; }
         public int StartContentId { get; private set; }
         public int StartMediaId { get; private set; }
         public string Alias { get; private set; }

@@ -7,12 +7,12 @@ namespace Umbraco.Core.Models.Membership
     {
         public static IReadOnlyUserGroup ToReadOnlyGroup(this IUserGroup group)
         {
-            return new ReadOnlyUserGroup(group.Id, group.StartContentId, group.StartMediaId, group.Alias, group.AllowedSections);
+            return new ReadOnlyUserGroup(group.Id, group.Name, group.Icon, group.StartContentId, group.StartMediaId, group.Alias, group.AllowedSections);
         }
 
         public static IReadOnlyUserGroup ToReadOnlyGroup(this UserGroupDto group)
         {
-            return new ReadOnlyUserGroup(group.Id, group.StartContentId, group.StartMediaId, group.Alias, group.UserGroup2AppDtos.Select(x => x.AppAlias).ToArray());
+            return new ReadOnlyUserGroup(group.Id, group.Name, group.Icon, group.StartContentId, group.StartMediaId, group.Alias, group.UserGroup2AppDtos.Select(x => x.AppAlias).ToArray());
         }
     }
 }
