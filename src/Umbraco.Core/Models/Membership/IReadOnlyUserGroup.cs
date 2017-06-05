@@ -7,6 +7,7 @@ namespace Umbraco.Core.Models.Membership
     /// </summary>
     public interface IReadOnlyUserGroup
     {
+        int Id { get; }
         int StartContentId { get; }
         int StartMediaId { get; }
 
