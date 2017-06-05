@@ -72,11 +72,11 @@
                                         
                                         <umb-node-preview
                                             style="max-width: 100%;"
-                                            ng-repeat="node in vm.user.startNodesContent"
+                                            ng-repeat="node in vm.user.startContentIds"
                                             icon="node.icon"
                                             name="node.name"
                                             allow-remove="true"
-                                            on-remove="vm.removeSelectedItem($index, vm.user.startNodesContent)">
+                                            on-remove="vm.removeSelectedItem($index, vm.user.startContentIds)">
                                         </umb-node-preview>
 
                                         <a href=""
@@ -93,11 +93,11 @@
 
                                         <umb-node-preview
                                             style="max-width: 100%;"
-                                            ng-repeat="node in vm.user.startNodesMedia"
+                                            ng-repeat="node in vm.user.startMediaIds"
                                             icon="node.icon"
                                             name="node.name"
                                             allow-remove="true"
-                                            on-remove="vm.removeSelectedItem($index, vm.user.startNodesMedia)">
+                                            on-remove="vm.removeSelectedItem($index, vm.user.startMediaIds)">
                                         </umb-node-preview>
 
                                         <a href=""
