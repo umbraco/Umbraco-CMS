@@ -503,9 +503,7 @@ namespace Umbraco.Core.Services
                 if (found.Length == 0) return null;
 
                 var user = found[0];
-
-                //they must not be approved for an invite to work
-                if (user.IsApproved) return null;
+                
                 //they should have never logged in for an invite to work
                 if (user.LastLoginDate != default(DateTime)) return null;
 
