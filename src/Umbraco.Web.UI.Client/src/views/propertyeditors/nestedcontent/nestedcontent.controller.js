@@ -53,9 +53,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
     "contentResource",
     "localizationService",
     "iconHelper",
-    "Umbraco.PropertyEditors.NestedContent.Resources",
 
-    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, ncResources) {
+    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper) {
 
         //$scope.model.config.contentTypes;
         //$scope.model.config.minItems;
