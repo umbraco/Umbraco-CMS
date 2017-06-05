@@ -333,6 +333,7 @@
     <Compile Include="Editors\EditorValidator.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
     <Compile Include="Editors\GravatarController.cs" />
+    <Compile Include="Editors\HelpController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\CodeFileController.cs" />

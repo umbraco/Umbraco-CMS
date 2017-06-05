@@ -375,6 +375,10 @@ namespace Umbraco.Web.Editors
                             {
                                 "codeFileApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<CodeFileController>(
                                     controller => controller.GetByPath("", ""))
+                            },
+                            {
+                                "helpApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<HelpController>(
+                                    controller => controller.GetLessons("", ""))
                             }
                         }
                     },
