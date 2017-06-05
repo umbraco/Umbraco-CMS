@@ -132,8 +132,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(detail => detail.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?) user.LastLoginDate))
                 .ForMember(detail => detail.UserGroups, opt => opt.Ignore())
-                .ForMember(detail => detail.StartContentIds, opt => opt.Ignore())
-                .ForMember(detail => detail.StartMediaIds, opt => opt.Ignore())
+                .ForMember(detail => detail.StartContentIds, opt => Enumerable.Empty<EntityBasic>())
+                .ForMember(detail => detail.StartMediaIds, opt => Enumerable.Empty<EntityBasic>())
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))                
                 .ForMember(
                     detail => detail.AvailableCultures,
@@ -152,11 +152,18 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.AdditionalData, opt => opt.Ignore())
                 .AfterMap((user, display) =>
                 {
-                    var contentItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, user.StartContentIds.ToArray());
-                    var mediaItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, user.StartContentIds.ToArray());
-                    display.StartContentIds = Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(contentItems);
-                    display.StartMediaIds = Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(mediaItems);
-
+                    var startContentIds = user.StartContentIds.ToArray();
+                    if (startContentIds.Length > 0)
+                    {
+                        var contentItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, startContentIds);
+                        display.StartContentIds = Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(contentItems);
+                    }
+                    var startMediaIds = user.StartContentIds.ToArray();
+                    if (startMediaIds.Length > 0)
+                    {
+                        var mediaItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, startMediaIds);
+                        display.StartMediaIds = Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(mediaItems);
+                    }
                     display.UserGroups = Mapper.Map<IEnumerable<IReadOnlyUserGroup>, IEnumerable<UserGroupDisplay>>(user.Groups);
                     
                 });
