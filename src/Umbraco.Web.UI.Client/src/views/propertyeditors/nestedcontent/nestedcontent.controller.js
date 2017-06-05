@@ -265,6 +265,17 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             });
         }
 
+        var notSupported = [
+          "Umbraco.CheckBoxList",
+          "Umbraco.DropDownMultiple",
+          "Umbraco.MacroContainer",
+          "Umbraco.RadioButtonList",
+          "Umbraco.MultipleTextstring",
+          "Umbraco.Tags",
+          "Umbraco.UploadField",
+          "Umbraco.ImageCropper"
+        ];
+
         // Initialize
         var scaffoldsLoaded = 0;
         $scope.scaffolds = [];
@@ -276,7 +287,15 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 });
                 scaffold.tabs = [];
                 if (tab) {
-                    scaffold.tabs.push(tab);
+                  scaffold.tabs.push(tab);
+
+                  angular.forEach(tab.properties,
+                    function(property) {
+                      if (_.find(notSupported, function (x) { return x === property.editor; })) {
+                        property.notSupported = true;
+                        property.notSupportedMessage = "Property " + property.label + " uses editor " + property.editor + " which is not supported by NestedContent.";
+                      }
+                    });
                 }
 
                 // Store the scaffold object
