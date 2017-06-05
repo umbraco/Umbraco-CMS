@@ -33,21 +33,21 @@ angular.module("umbraco.directives")
         },
 
         //TODO: Remove more of the binding from this template and move the DOM manipulation to be manually done in the link function,
-        // this will greatly improve performance since there's potentially a lot of nodes being rendered = a LOT of watches!
+        // this will greatly improve performance since there's potentially a lot of nodes being rendered = a LOT of watches! 
 
         template: '<li ng-class="{\'current\': (node == currentNode), \'has-children\': node.hasChildren}" on-right-click="altSelect(node, $event)">' +
-            '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" ng-keyup="test(node, $event)" >' +
+            '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" ng-keyup="keyboardNavigation(node, $event)" >' +
             //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
             //'<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' + 
             '<ins ng-class="{\'icon-navigation-right\': !node.expanded || node.metaData.isContainer, \'icon-navigation-down\': node.expanded && !node.metaData.isContainer}" ng-click="load(node)">&nbsp;</ins>' +
             '<i class="icon umb-tree-icon sprTree" ng-click="select(node, $event)"></i>' +
             '<a class="umb-tree-item-name" href="#/{{node.routePath}}" ng-click="select(node, $event)"></a>' +
             //NOTE: These are the 'option' elipses
-            '<a href="" class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></a>' +
+            '<a href="" class="umb-options" ng-click="options(node, $event)" hotkey="ctrl+." hotkey-when=""><i></i><i></i><i></i></a>' +
             '<div ng-show="node.loading" class="l"><div></div></div>' +
             '</div>' +
-            '</li>',
-        
+            '</li>', 
+
         link: function (scope, element, attrs) {
 
             localizationService.localize("general_search").then(function (value) {
@@ -67,7 +67,7 @@ angular.module("umbraco.directives")
 
             // updates the node's DOM/styles
             function setupNodeDom(node, tree) {
-                
+
                 //get the first div element
                 element.children(":first")
                     //set the padding
@@ -75,7 +75,7 @@ angular.module("umbraco.directives")
 
                 //toggle visibility of last 'ins' depending on children
                 //visibility still ensure the space is "reserved", so both nodes with and without children are aligned.
-                
+
                 if (node.hasChildren || node.metaData.isContainer && scope.enablelistviewexpand === "true") {
                     element.find("ins").last().css("visibility", "visible");
                 }
@@ -112,9 +112,9 @@ angular.module("umbraco.directives")
                 if (!node) {
                     return '';
                 }
-                var css = [];                
+                var css = [];
                 if (node.cssClasses) {
-                    _.each(node.cssClasses, function(c) {
+                    _.each(node.cssClasses, function (c) {
                         css.push(c);
                     });
                 }
@@ -225,59 +225,56 @@ angular.module("umbraco.directives")
                 }
             };
 
-            scope.test = function(node, event) {
-
-                // arrow down
+            scope.keyboardNavigation = function (node, event) {
                 if (event.keyCode === 40) {
-
+                    // If arrow down is pressed
                     var childList = element.find('ul');
-
                     if (childList.children().length > 0 && childList.is(':visible')) {
-
-                        var test = element.find('li:first').find('a:first');
-                        test.focus();
-
+                        var firstElement = element.find('li:first').find('a:first');
+                        firstElement.focus();
                     } else {
-
                         var nextListItem = element;
                         while (nextListItem.next('li').length === 0 && !nextListItem.hasClass('root')) {
                             nextListItem = nextListItem.parent();
                         }
-
                         nextListItem.next('li').find('a:first').focus();
                     }
-
-                    // arrow up
                 } else if (event.keyCode === 38) {
-
+                    // If arrow up is pressed
                     var prevListItem = element.prev('li');
-
                     if (prevListItem.length === 0) {
                         prevListItem = element.parent().parent();
                         prevListItem.find('a.umb-tree-item-name:first').focus();
                     }
-                    else
-                    {
-
+                    else {
                         prevListItem.find('a.umb-tree-item-name:visible').last().focus();
                     }
-                    
-
-                // arrow right
                 } else if (event.keyCode === 39) {
-                    scope.loadChildren(node);
-
-                    // arrow left
+                    // If arrow right is pressed
+                    if (!node.expanded) {
+                        // Not expanded => Load children of this node
+                        scope.loadChildren(node);
+                    }
+                    else {
+                        // Expandend => So click the three dots (open up options menu)
+                        scope.options(node);
+                    }
                 } else if (event.keyCode === 37) {
-                    scope.load(node);
+                    // If arrow left is pressed
+                    if (node.expanded) {
+                        // Close the node
+                        scope.load(node);
+                    }
+                    else {
+                        // Go to top node (Just like in the file explorer of Windows)
+                        var prevListItemLeftArrow = element.prev('li');
+                        prevListItemLeftArrow = element.parent().parent();
+                        prevListItemLeftArrow.find('a.umb-tree-item-name:first').focus();
+                    }
                 }
-
-                console.log(event);
-
-            };           
+            };
 
             //if the current path contains the node id, we will auto-expand the tree item children
-
             setupNodeDom(scope.node, scope.tree);
 
             var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" enablelistviewexpand="{{enablelistviewexpand}}" eventhandler="eventhandler" tree="tree" current-node="currentNode" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';

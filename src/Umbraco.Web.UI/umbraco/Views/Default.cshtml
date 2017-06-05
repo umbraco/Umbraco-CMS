@@ -55,12 +55,15 @@
 <noscript><h5><strong>&nbsp; JavaScript is disabled. Please enable to continue!</strong></h5></noscript>
 <body ng-class="{touch:touchDevice,emptySection:emptySection}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
     <style>
-        #search-field:focus, a.umb-search-group-item-link:focus, .umb-panel-header-name-input:focus, .sections a:focus, ul.umb-tree li.root a:focus, .nav-tabs a:focus {
+        a.btn-info:focus{
             outline: none;
             border: 2px solid #00BEC1 !important;
         }
-        .dropdown-menu a:focus {
-            border: 2px solid #00BEC1;
+        .sections li.help a:focus,
+        .sections li a:focus {
+            outline: none;
+            border-bottom-color: #00BEC1 !important;
+            border-bottom-style: solid !important;
         }
     </style>
     

@@ -17,6 +17,11 @@ angular.module("umbraco.directives")
             scope.executeMenuItem = function (action) {
                 navigationService.executeMenuAction(action, scope.currentNode, scope.currentSection);
             };
+
+            if(scope.menuActions && scope.menuActions.length > 0)
+            {
+                scope.menuActions[0].hasFocus = true;
+            }
         }
     };
 });

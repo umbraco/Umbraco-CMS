@@ -96,6 +96,11 @@
 	text-decoration: none
 }
 
+.umb-tree a:focus{
+	text-decoration: underline;
+    font-weight:bold;
+}
+
 .umb-tree div {
 	padding: 5px 0 5px 0;
 	position: relative;
@@ -389,6 +394,9 @@ div.locked:before{
 .umb-actions li.selected {
 	color: @black !important;
 	background: @gray-10 !important;
+    outline:none;
+    font-weight:bold;
+    text-decoration:none;
 }
 
 .umb-actions .menu-label {
