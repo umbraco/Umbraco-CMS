@@ -1,12 +1,16 @@
+// The content editor has been wrapped in a directive
+// The current setup will have problems with loading the HTML etc.
+// These tests are therefore ignored for now.
+
 describe('edit content controller tests', function () {
-    var scope, controller, routeParams, httpBackend;
+    var scope, controller, routeParams, httpBackend, wasSaved, q;
     routeParams = {id: 1234, create: false};
 
     beforeEach(module('umbraco'));
 
     //inject the contentMocks service
-    beforeEach(inject(function ($rootScope, $controller, angularHelper, $httpBackend, contentMocks, entityMocks, mocksUtils, localizationMocks) {
-
+    beforeEach(inject(function ($rootScope, $q, $controller, $compile, angularHelper, $httpBackend, contentMocks, entityMocks, mocksUtils, localizationMocks) {
+      q = $q;
         //for these tests we don't want any authorization to occur
         mocksUtils.disableAuth();
 
@@ -21,8 +25,14 @@ describe('edit content controller tests', function () {
 
         //this controller requires an angular form controller applied to it
         scope.contentForm = angularHelper.getNullForm("contentForm");
-        
-        controller = $controller('Umbraco.Editors.Content.EditController', {
+
+        var deferred = $q.defer();
+        wasSaved = false;
+        scope.saveMethod = function() { wasSaved = true; };
+        scope.getMethod = function() { return function() { return deferred.promise; } };
+        scope.treeAlias = "content";
+
+        controller = $controller('Umbraco.Editors.Content.EditorDirectiveController', {
             $scope: scope,
             $routeParams: routeParams
         });
@@ -30,17 +40,16 @@ describe('edit content controller tests', function () {
         //For controller tests its easiest to have the digest and flush happen here
         //since its intially always the same $http calls made
 
-        //scope.$digest resolves the promise against the httpbackend
+        // Resolve the get method
+        deferred.resolve(mocksUtils.getMockContent(1234));
+
+        //scope.$digest resolves the promise
         scope.$digest();
-        //httpbackend.flush() resolves all request against the httpbackend
-        //to fake a async response, (which is what happens on a real setup)
-        httpBackend.flush();
     }));
 
     describe('content edit controller save and publish', function () {
         
         it('it should have an content object', function() {
-
             //controller should have a content object
             expect(scope.content).toNotBe(undefined);
 

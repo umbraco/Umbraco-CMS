@@ -129,6 +129,7 @@ namespace Umbraco.Web.Models.Mapping
             return mapping
                 .ForMember(x => x.Udi, expression => expression.ResolveUsing(new ContentTypeUdiResolver()))
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
+                .ForMember(display => display.Blueprints, expression => expression.Ignore())
                 .ForMember(display => display.Errors, expression => expression.Ignore())
                 .ForMember(display => display.AllowAsRoot, expression => expression.MapFrom(type => type.AllowedAsRoot))
                 .ForMember(display => display.ListViewEditorName, expression => expression.Ignore())
