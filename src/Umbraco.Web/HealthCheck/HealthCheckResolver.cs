@@ -20,7 +20,7 @@ namespace Umbraco.Web.HealthCheck
     internal class HealthCheckResolver : LazyManyObjectsResolverBase<HealthCheckResolver, HealthCheck>, IHealthCheckResolver
     {
         public HealthCheckResolver(ILogger logger, Func<IEnumerable<Type>> lazyTypeList)
-            : base(new HealthCheckServiceProvider(), logger, lazyTypeList, ObjectLifetimeScope.HttpRequest)
+            : base(new HealthCheckServiceProvider(), logger, lazyTypeList, ObjectLifetimeScope.Transient)
         {
         }
 
@@ -46,9 +46,13 @@ namespace Umbraco.Web.HealthCheck
                 var found = serviceType.GetConstructor(normalArgs);
                 if (found != null)
                 {
+                    var gotUmbracoContext = UmbracoContext.Current != null;
+                    var healthCheckContext = gotUmbracoContext
+                        ? new HealthCheckContext(new HttpContextWrapper(HttpContext.Current), UmbracoContext.Current)
+                        : new HealthCheckContext(ApplicationContext.Current);
                     return found.Invoke(new object[]
                     {
-                        new HealthCheckContext(new HttpContextWrapper(HttpContext.Current), UmbracoContext.Current)
+                        healthCheckContext
                     });
                 }
 

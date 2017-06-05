@@ -161,6 +161,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DateTimeExtensionsTests.cs" />
     <Compile Include="Cache\CacheRefresherEventHandlerTests.cs" />
     <Compile Include="Dependencies\NuGet.cs" />
     <Compile Include="CallContextTests.cs" />

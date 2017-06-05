@@ -40,8 +40,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>
-    </IISExpressSSLPort>
+    <IISExpressSSLPort>44319</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
     <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
     <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
@@ -633,6 +632,13 @@
     <None Include="Config\EmbeddedMedia.Release.config">
       <DependentUpon>EmbeddedMedia.config</DependentUpon>
     </None>
+    <Content Include="Config\HealthChecks.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Config\HealthChecks.Release.config">
+      <DependentUpon>HealthChecks.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Config\umbracoSettings.Release.config">
       <DependentUpon>umbracoSettings.config</DependentUpon>
       <SubType>Designer</SubType>

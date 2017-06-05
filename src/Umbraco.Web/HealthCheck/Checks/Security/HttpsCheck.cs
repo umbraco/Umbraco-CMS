@@ -54,12 +54,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         {
             var message = string.Empty;
             var success = false;
-            var url = HealthCheckContext.HttpContext.Request.Url;
 
             // Attempt to access the site over HTTPS to see if it HTTPS is supported 
             // and a valid certificate has been configured
-            var address = string.Format("https://{0}:{1}", url.Host.ToLower(), url.Port);
-            var request = (HttpWebRequest)WebRequest.Create(address);
+            var url = HealthCheckContext.SiteUrl.Replace("http:", "https:");
+            var request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = "HEAD";
 
             try
@@ -74,11 +73,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 {
                     message = exception.Status == WebExceptionStatus.TrustFailure
                         ? _textService.Localize("healthcheck/httpsCheckInvalidCertificate", new [] { exception.Message })
-                        : _textService.Localize("healthcheck/httpsCheckInvalidUrl", new [] { address, exception.Message });
+                        : _textService.Localize("healthcheck/httpsCheckInvalidUrl", new [] { url, exception.Message });
                 }
                 else
                 {
-                    message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, ex.Message });
+                    message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { url, ex.Message });
                 }
             }
 
@@ -149,7 +148,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         {
             var configFile = IOHelper.MapPath("~/Web.config");
             const string xPath = "/configuration/appSettings/add[@key='umbracoUseSSL']/@value";
-            var configurationService = new ConfigurationService(configFile, xPath);
+            var configurationService = new ConfigurationService(configFile, xPath, _textService);
             var updateConfigFile = configurationService.UpdateConfigFile("true");
 
             if (updateConfigFile.Success)
