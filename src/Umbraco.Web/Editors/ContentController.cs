@@ -115,10 +115,17 @@ namespace Umbraco.Web.Editors
 
             var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
 
+            SetupBlueprint(content, foundContent);
+
+            return content;
+        }
+
+        private static void SetupBlueprint(ContentItemDisplay content, IContent persistedContent)
+        {
             content.AllowPreview = false;
 
             //set a custom path since the tree that renders this has the content type id as the parent
-            content.Path = string.Format("-1,{0},{1}", foundContent.ContentTypeId, content.Id);
+            content.Path = string.Format("-1,{0},{1}", persistedContent.ContentTypeId, content.Id);
 
             content.AllowedActions = new[] {'A'};
 
@@ -126,8 +133,6 @@ namespace Umbraco.Web.Editors
             var propsTab = content.Tabs.Last();
             propsTab.Properties = propsTab.Properties
                 .Where(p => excludeProps.Contains(p.Alias) == false);
-
-            return content;
         }
 
         /// <summary>
@@ -361,13 +366,16 @@ namespace Umbraco.Web.Editors
         public ContentItemDisplay PostSaveBlueprint(
             [ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
-            return PostSaveInternal(contentItem,
+            var contentItemDisplay = PostSaveInternal(contentItem,
                 content =>
                 {
                     Services.ContentService.SaveBlueprint(contentItem.PersistedContent, Security.CurrentUser.Id);
                     //we need to reuse the underlying logic so return the result that it wants
                     return Attempt<OperationStatus>.Succeed(new OperationStatus(OperationStatusType.Success, new EventMessages()));
                 });
+            SetupBlueprint(contentItemDisplay, contentItemDisplay.PersistedContent);
+
+            return contentItemDisplay;
         }
 
         /// <summary>
@@ -392,7 +400,6 @@ namespace Umbraco.Web.Editors
             // * any file attachments have been saved to their temporary location for us to use
             // * we have a reference to the DTO object and the persisted object
             // * Permissions are valid
-
             MapPropertyValues(contentItem);
 
             //We need to manually check the validation results here because:
@@ -498,6 +505,8 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
             }
+
+            display.PersistedContent = contentItem.PersistedContent;
 
             return display;
         }
