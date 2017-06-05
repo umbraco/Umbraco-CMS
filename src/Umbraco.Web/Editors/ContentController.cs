@@ -341,12 +341,7 @@ namespace Umbraco.Web.Editors
             if (content == null)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
-            var existing = Services.ContentService.GetBlueprintsForContentTypes(content.ContentTypeId);
-            if (existing.Any(x => x.Name == name))
-            {
-                ModelState.AddModelError("name", Services.TextService.Localize("content/duplicateBlueprintMessage"));
-                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
-            }
+            EnsureUniqueName(name, content, "name");
 
             var blueprint = Services.ContentService.CreateContentFromBlueprint(content, name, Security.GetUserId());
 
@@ -361,6 +356,16 @@ namespace Umbraco.Web.Editors
             return notificationModel;
         }
 
+        private void EnsureUniqueName(string name, IContent content, string modelName)
+        {
+            var existing = Services.ContentService.GetBlueprintsForContentTypes(content.ContentTypeId);
+            if (existing.Any(x => x.Name == name && x.Id != content.Id))
+            {
+                ModelState.AddModelError(modelName, Services.TextService.Localize("content/duplicateBlueprintMessage"));
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+            }
+        }
+
         /// <summary>
         /// Saves content
         /// </summary>
@@ -373,6 +378,8 @@ namespace Umbraco.Web.Editors
             var contentItemDisplay = PostSaveInternal(contentItem,
                 content =>
                 {
+                    EnsureUniqueName(content.Name, content, "Name");
+
                     Services.ContentService.SaveBlueprint(contentItem.PersistedContent, Security.CurrentUser.Id);
                     //we need to reuse the underlying logic so return the result that it wants
                     return Attempt<OperationStatus>.Succeed(new OperationStatus(OperationStatusType.Success, new EventMessages()));
