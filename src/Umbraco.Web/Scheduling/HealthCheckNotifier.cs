@@ -75,8 +75,8 @@ namespace Umbraco.Web.Scheduling
                     using (var client = new SmtpClient())
                     using (var mailMessage = new MailMessage())
                     {
-                        mailMessage.Body = "Results"; // TODO - get from results
-                        mailMessage.To.Add(healthCheckConfig.NotificationSettings.EmailSettings.RecipientEmail);
+                        mailMessage.Body = string.Format("<html><body><p>Results of the scheduled Umbraco Health Checks run on {0} at {1} are as follows:</p>{2}</body></html>",
+                            DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(), results.ResultsAsHtml());
                         mailMessage.Subject = "Umbraco Scheduled HeathChecks Results";
                         mailMessage.IsBodyHtml = true;
 

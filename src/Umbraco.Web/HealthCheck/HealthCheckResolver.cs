@@ -20,7 +20,7 @@ namespace Umbraco.Web.HealthCheck
     internal class HealthCheckResolver : LazyManyObjectsResolverBase<HealthCheckResolver, HealthCheck>, IHealthCheckResolver
     {
         public HealthCheckResolver(ILogger logger, Func<IEnumerable<Type>> lazyTypeList)
-            : base(new HealthCheckServiceProvider(), logger, lazyTypeList, ObjectLifetimeScope.Transient)
+            : base(new HealthCheckServiceProvider(), logger, lazyTypeList, ObjectLifetimeScope.Application)
         {
         }
 

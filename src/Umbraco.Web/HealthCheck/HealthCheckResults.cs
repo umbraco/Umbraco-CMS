@@ -14,19 +14,41 @@ namespace Umbraco.Web.HealthCheck
 
         internal HealthCheckResults(IEnumerable<HealthCheck> checks)
         {
-            _results = checks.ToDictionary(t => t.Name, t => t.GetStatus());
+            _results = checks.ToDictionary(
+                t => t.Name, 
+                t => {
+                    try
+                    {
+                        return t.GetStatus();
+                    }
+                    catch (Exception ex)
+                    {
+                        LogHelper.Error<HealthCheckResults>(string.Format("Error running scheduled health check: {0}", t.Name), ex);
+                        var message = string.Format("Health check failed with exception: {0}. See logs for details.", ex.Message);
+                        return new List<HealthCheckStatus>
+                        {
 
-            // find out if all checks pass or not
-            AllChecksSuccessful = true;
-            foreach (var result in _results)
-            {
-                var checkIsSuccess = result.Value.All(x => x.ResultType == StatusResultType.Success);
-                if (checkIsSuccess == false)
+
+                            new HealthCheckStatus(message)
+                            {
+                                ResultType = StatusResultType.Error
+                            }
+                        };
+                    }                    
+                });
+                
+               // find out if all checks pass or not
+                AllChecksSuccessful = true;
+                foreach (var result in _results)
                 {
-                    AllChecksSuccessful = false;
-                    break;
+                    var checkIsSuccess = result.Value.All(x => x.ResultType == StatusResultType.Success);
+                    if (checkIsSuccess == false)
+                    {
+                        AllChecksSuccessful = false;
+                        break;
+                    }
                 }
-            }
+
         }
 
         internal void LogResults()
@@ -86,17 +108,34 @@ namespace Umbraco.Web.HealthCheck
 
                 foreach (var checkResult in checkResults)
                 {
-                    sb.AppendFormat("\t{0}Result:'{1}' , Message: '{2}'{3}", newItem, checkResult.ResultType, SimpleHtmlToMarkDown(checkResult.Message, slackMarkDown), Environment.NewLine);
+                    sb.AppendFormat("\t{0}Result: '{1}', Message: '{2}'{3}", newItem, checkResult.ResultType, SimpleHtmlToMarkDown(checkResult.Message, slackMarkDown), Environment.NewLine);
                 }
             }
+
             return sb.ToString();
         }
 
         internal string ResultsAsHtml()
         {
-            Markdown mark = new Markdown();
-            return mark.Transform(ResultsAsMarkDown());
+            var mark = new Markdown();
+            var html = mark.Transform(ResultsAsMarkDown());
+            html = ApplyHtmlHighlighting(html);
+            return html;
         }
+
+        private string ApplyHtmlHighlighting(string html)
+        {
+            html = ApplyHtmlHighlightingForStatus(html, StatusResultType.Success, "5cb85c");
+            html = ApplyHtmlHighlightingForStatus(html, StatusResultType.Warning, "f0ad4e");
+            return ApplyHtmlHighlightingForStatus(html, StatusResultType.Error, "d9534f");
+        }
+
+        private string ApplyHtmlHighlightingForStatus(string html, StatusResultType status, string color)
+        {
+            return html
+                .Replace("Result: '" + status + "'", "Result <span style=\"color: #" + color + "\">" + status + "</span>");
+        }
+
         private string SimpleHtmlToMarkDown(string html, bool slackMarkDown = false)
         {
             if (slackMarkDown)
