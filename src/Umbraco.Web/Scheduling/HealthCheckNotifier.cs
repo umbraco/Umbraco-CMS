@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Slack.Webhooks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 using Umbraco.Web.HealthCheck;
 
 namespace Umbraco.Web.Scheduling
@@ -56,10 +58,19 @@ namespace Umbraco.Web.Scheduling
                 var results = new HealthCheckResults(checks);
                 results.LogResults();
 
-                // TODO: get email address and send
+                // Send to email address if configured
                 if (!string.IsNullOrEmpty(healthCheckConfig.NotificationSettings.RecipientEmail))
                 {
+                    using (var client = new SmtpClient())
+                    using (var mailMessage = new MailMessage())
+                    {
+                        mailMessage.Body = "Results"; // TODO - get from results
+                        mailMessage.To.Add(healthCheckConfig.NotificationSettings.RecipientEmail);
+                        mailMessage.Subject = "Umbraco Scheduled HeathChecks Results";
+                        mailMessage.IsBodyHtml = true;
 
+                        await client.SendMailAsync(mailMessage);
+                    }
                 }
 
                 // TODO: get web hook and post
