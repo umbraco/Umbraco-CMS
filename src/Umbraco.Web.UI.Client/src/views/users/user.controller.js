@@ -116,7 +116,7 @@
         }
 
         function openMediaPicker() {
-            vm.contentPicker = {
+            vm.mediaPicker = {
                 title: "Select media start node",
                 view: "treepicker",
                 section: "media",
@@ -128,12 +128,12 @@
                     if (model.selection) {
                         vm.user.startNodesMedia = model.selection;
                     }
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                    vm.mediaPicker.show = false;
+                    vm.mediaPicker = null;
                 },
                 close: function (oldModel) {
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                    vm.mediaPicker.show = false;
+                    vm.mediaPicker = null;
                 }
             };
         }
