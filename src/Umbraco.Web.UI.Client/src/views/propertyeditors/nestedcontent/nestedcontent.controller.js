@@ -26,14 +26,14 @@
             handle: ".icon-navigation"
         };
 
-        $scope.selectedDocTypeTabs = {};
+        $scope.docTypeTabs = {};
 
         ncResources.getContentTypes().then(function (docTypes) {
             $scope.model.docTypes = docTypes;
 
             // Populate document type tab dictionary
             docTypes.forEach(function (value) {
-                $scope.selectedDocTypeTabs[value.alias] = value.tabs;
+                $scope.docTypeTabs[value.alias] = value.tabs;
             });
         });
 
