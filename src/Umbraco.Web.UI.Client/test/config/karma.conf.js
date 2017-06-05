@@ -32,7 +32,7 @@ module.exports = function(karma) {
          'test/config/app.unit.js',
          'src/common/mocks/umbraco.servervariables.js',
 
-         'src/common/directives/*.js',
+         'src/common/directives/**/*.js',
          'src/common/filters/*.js',
          'src/common/services/*.js',
          'src/common/security/*.js',

@@ -13,6 +13,7 @@ function contentCreateController($scope,
   $location,
   navigationService,
   blueprintConfig) {
+
   contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function(data) {
     $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
   });
