@@ -14,6 +14,11 @@ namespace Umbraco.Core.Auditing
         public int PerformingUser { get; set; }
         public string Comment { get; set; }
 
+        /// <summary>
+        /// This property is always empty except in the LoginFailed event for an unknown user trying to login
+        /// </summary>
+        public string Username { get; set; }
+
         public IdentityAuditEventArgs(AuditEvent action, string ipAddress = "", int performingUser = -1)
         {
             DateTimeUtc = DateTime.UtcNow;

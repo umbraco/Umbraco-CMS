@@ -386,6 +386,15 @@ namespace Umbraco.Core.Security
             });
         }
 
+        public void RaiseInvalidLoginAttemptEvent(string username)
+        {
+            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed)
+            {
+                Username = username,
+                Comment = string.Format("Attempted login for username '{0}' failed", username)
+            });
+        }
+
         /// <summary>
         /// Clears a lock so that the membership user can be validated.
         /// </summary>
