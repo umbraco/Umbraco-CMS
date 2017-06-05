@@ -178,13 +178,11 @@
     <key alias="target" version="7.0">Target</key>
     <key alias="scheduledPublishServerTime">This translates to the following time on the server:</key>
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">What does this mean?</a>]]></key>
-    <key alias="createBlueprintFrom">Create a blueprint from</key>
-    <key alias="blueprintName">Name</key>
+    <key alias="createBlueprintFrom">Create a blueprint from %0%</key>
     <key alias="blankBlueprint">Blank</key>
     <key alias="selectBlueprint">Select a blueprint</key>
     <key alias="createdBlueprintHeading">Blueprint created</key>
-    <key alias="createdBlueprintMessage">Blueprint was created under %0%</key>
-    <key alias="failedBlueprintHeading">Failure</key>
+    <key alias="createdBlueprintMessage">Blueprint was created from %0%</key>
     <key alias="duplicateBlueprintMessage">Another Blueprint with the same name already exists.</key>
   </area>
   <area alias="media">

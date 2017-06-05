@@ -344,7 +344,7 @@ namespace Umbraco.Web.Editors
             var existing = Services.ContentService.GetBlueprintsForContentTypes(content.ContentTypeId);
             if (existing.Any(x => x.Name == name))
             {
-                ModelState.AddModelError("value", Services.TextService.Localize("content/duplicateBlueprintMessage"));
+                ModelState.AddModelError("name", Services.TextService.Localize("content/duplicateBlueprintMessage"));
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
 
@@ -355,7 +355,7 @@ namespace Umbraco.Web.Editors
             var notificationModel = new SimpleNotificationModel();
             notificationModel.AddSuccessNotification(
                 Services.TextService.Localize("content/createdBlueprintHeading"),
-                Services.TextService.Localize("content/createdBlueprintMessage")
+                Services.TextService.Localize("content/createdBlueprintMessage", new[]{ content.Name})
             );
 
             return notificationModel;
