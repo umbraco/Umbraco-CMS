@@ -4,25 +4,16 @@
    function overlayHelper() {
 
       var numberOfOverlays = 0;
-      var numberOfOverLaysWithBackdrop = 0;
 
-      function registerOverlay(hideBackdrop) {
+      function registerOverlay() {
           numberOfOverlays++;
-
-          if (hideBackdrop !== true) {
-              numberOfOverLaysWithBackdrop++;
-          }
 
          return numberOfOverlays;
       }
 
-      function unregisterOverlay(hideBackdrop) {
+      function unregisterOverlay() {
           numberOfOverlays--;
 
-          if (hideBackdrop !== true) {
-              numberOfOverLaysWithBackdrop--;
-          }
-          
          return numberOfOverlays;
       }
 
@@ -31,7 +22,7 @@
       }
 
       function showBackdrop() {
-          return numberOfOverLaysWithBackdrop > 0;
+          return numberOfOverlays > 0;
       }
 
       var service = {

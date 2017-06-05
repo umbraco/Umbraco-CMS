@@ -1,14 +1,14 @@
 <div class="umb-overlay umb-overlay-{{position}}" on-outside-click="closeOverLay()">
     <ng-form class="umb-overlay__form" name="overlayForm" novalidate val-form-manager>
 
-        <div class="umb-overlay-header" ng-if="model.hideHeader !== true">
+        <div class="umb-overlay-header">
             <h4 class="umb-overlay__title">{{model.title}}</h4>
             <p class="umb-overlay__subtitle">{{model.subtitle}}</p>
         </div>
 
 
         <div class="umb-overlay-container form-horizontal" ng-transclude>
-            <div ng-if="view" ng-include="view"></div>
+            <div ng-if="configuredView" ng-include="configuredView"></div>
         </div>
 
         <div class="umb-overlay__item-details" ng-if="model.itemDetails">

@@ -452,12 +452,18 @@ Opens an overlay to show a custom YSOD. </br>
          function setView() {
 
             if (scope.view) {
-
+                
+               //we do this to avoid a hidden dialog to start loading unconfigured views before the first activation
+               var configuredView = scope.view;
                if (scope.view.indexOf(".html") === -1) {
                   var viewAlias = scope.view.toLowerCase();
-                  scope.view = "views/common/overlays/" + viewAlias + "/" + viewAlias + ".html";
+                  configuredView = "views/common/overlays/" + viewAlias + "/" + viewAlias + ".html";
                }
 
+               if (configuredView !== scope.configuredView) {
+                   scope.configuredView = configuredView;
+               }
+               
             }
 
          }
@@ -473,11 +479,11 @@ Opens an overlay to show a custom YSOD. </br>
 
          function registerOverlay() {
 
-            overlayNumber = overlayHelper.registerOverlay(scope.hideBackdrop);
+            overlayNumber = overlayHelper.registerOverlay();
 
             $(document).bind("keydown.overlay-" + overlayNumber, function(event) {
 
-                if (event.which === 27 && !scope.sticky) {
+                if (event.which === 27) {
 
                   numberOfOverlays = overlayHelper.getNumberOfOverlays();
 
@@ -528,7 +534,7 @@ Opens an overlay to show a custom YSOD. </br>
 
             if(isRegistered) {
 
-                overlayHelper.unregisterOverlay(scope.hideBackdrop);
+                overlayHelper.unregisterOverlay();
 
                $(document).unbind("keydown.overlay-" + overlayNumber);
 
@@ -700,9 +706,6 @@ Opens an overlay to show a custom YSOD. </br>
             ngShow: "=",
             model: "=",
             view: "=",
-            sticky: "=",
-            hideHeader: "=",
-            hideBackdrop: "=",
             position: "@"
          },
          link: link
