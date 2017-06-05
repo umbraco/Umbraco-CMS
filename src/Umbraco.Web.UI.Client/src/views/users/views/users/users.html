@@ -178,7 +178,7 @@
                         <div class="umb-user__checkmark" ng-if="user.selected"><umb-checkmark checked="user.selected" size="s"></umb-checkmark></div>
                         <a class="umb-user__name" href="" ng-click="vm.goToUser(user)">{{user.name}}</a>
                         <div class="umb-user__group">
-                            <span ng-repeat="(key,value) in user.userGroups">{{ value }}<span ng-if="!$last">, </span></span>
+                            <span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span>
                         </div>
                         <div class="umb-user__last-login">
                             <div ng-if="user.formattedLastLogin">
