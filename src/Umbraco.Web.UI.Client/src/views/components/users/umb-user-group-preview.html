@@ -16,16 +16,16 @@
         <div class="umb-user-group-preview__permission">
             <span>
                 <span class="bold">Content start node:</span>
-                <span ng-repeat="startNode in contentStartNodes">{{ startNode.name }}<span ng-if="!$last">, </span></span>
-                <span ng-if="contentStartNodes.length === 0">Content root</span>
+                <span ng-if="startContentId">{{ startNode.name }}</span>
+                <span ng-if="!startContentId">Content root</span>
             </span>
         </div>
         
         <div class="umb-user-group-preview__permission">
             <span>
                 <span class="bold">Media start node:</span>
-                <span ng-repeat="startNode in mediaStartNodes">{{ startNode.name }}<span ng-if="!$last">, </span></span>
-                <span ng-if="mediaStartNodes.length === 0">Media root</span>
+                <span ng-if="startMediaId">{{ startNode.name }}</span>
+                <span ng-if="!startMediaId">Media root</span>
             </span>
         </div>
 
