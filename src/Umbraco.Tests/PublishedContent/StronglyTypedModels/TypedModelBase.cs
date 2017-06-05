@@ -48,7 +48,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
         protected T Resolve<T>(string propertyTypeAlias)
         {
-            return Content.GetPropertyValue<T>(propertyTypeAlias);
+            return WrappedContentInternal.GetPropertyValue<T>(propertyTypeAlias);
         }
 
         protected T Resolve<T>(MethodBase methodBase, T ifCannotConvert)
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
         protected T Resolve<T>(string propertyTypeAlias, T ifCannotConvert)
         {
-            return Content.GetPropertyValue<T>(propertyTypeAlias, false, ifCannotConvert);
+            return WrappedContentInternal.GetPropertyValue<T>(propertyTypeAlias, false, ifCannotConvert);
         }
 
         protected T Resolve<T>(MethodBase methodBase, bool recursive, T ifCannotConvert)
@@ -70,7 +70,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
         protected T Resolve<T>(string propertyTypeAlias, bool recursive, T ifCannotConvert)
         {
-            return Content.GetPropertyValue<T>(propertyTypeAlias, recursive, ifCannotConvert);
+            return WrappedContentInternal.GetPropertyValue<T>(propertyTypeAlias, recursive, ifCannotConvert);
         }
         #endregion
 
@@ -81,7 +81,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
             if (constructorInfo == null)
                 throw new Exception("No valid constructor found");
 
-            return (T) constructorInfo.Invoke(new object[] {Content.Parent});
+            return (T) constructorInfo.Invoke(new object[] {WrappedContentInternal.Parent});
         }
 
         protected IEnumerable<T> Children<T>(MethodBase methodBase) where T : TypedModelBase
@@ -98,7 +98,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
             string singularizedDocTypeAlias = docTypeAlias.ToSingular();
 
-            return Content.Children.Where(x => x.DocumentTypeAlias == singularizedDocTypeAlias)
+            return WrappedContentInternal.Children.Where(x => x.DocumentTypeAlias == singularizedDocTypeAlias)
                 .Select(x => (T)constructorInfo.Invoke(new object[] { x }));
         }
 
@@ -116,7 +116,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
             string singularizedDocTypeAlias = docTypeAlias.ToSingular();
 
-            return Content.Ancestors().Where(x => x.DocumentTypeAlias == singularizedDocTypeAlias)
+            return WrappedContentInternal.Ancestors().Where(x => x.DocumentTypeAlias == singularizedDocTypeAlias)
                 .Select(x => (T)constructorInfo.Invoke(new object[] { x }));
         }
 
@@ -134,7 +134,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
             string singularizedDocTypeAlias = docTypeAlias.ToSingular();
 
-            return Content.Descendants().Where(x => x.DocumentTypeAlias == singularizedDocTypeAlias)
+            return WrappedContentInternal.Descendants().Where(x => x.DocumentTypeAlias == singularizedDocTypeAlias)
                 .Select(x => (T)constructorInfo.Invoke(new object[] { x }));
         }
         #endregion
