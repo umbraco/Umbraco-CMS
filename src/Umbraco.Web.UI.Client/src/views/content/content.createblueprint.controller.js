@@ -9,16 +9,16 @@
     formHelper,
     contentEditingHelper) {
 
+    $scope.message = {
+      name: $scope.currentNode.name
+    };
+
     var successText = {};
-    localizationService.localizeMany([
-      "content_createBlueprintFrom"
-    ]).then(function (localizedValues) {
-      $scope.label = localizedValues[0] + " " + $scope.message.name;
+    localizationService.localize("content_createBlueprintFrom", [$scope.message.name]).then(function (localizedVal) {
+      $scope.label = localizedVal;
     });
 
-    $scope.message = {
-      name : $scope.currentNode.name
-    };
+   
 
     $scope.cancel = function () {
       navigationService.hideMenu();
