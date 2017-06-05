@@ -33,7 +33,7 @@
 
     var findHelp = function (section, tree, usertype, lang) {
 
-        helpService.getContextHelpForPage(section, tree, "http://localhost:24292").then(function (topics) {
+        helpService.getContextHelpForPage(section, tree).then(function (topics) {
             $scope.topics = topics;
         });
 
