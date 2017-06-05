@@ -24,7 +24,7 @@ namespace Umbraco.Core.Configuration.HealthChecks
             }
         }
 
-        [ConfigurationProperty(FIRST_RUN_TIME_KEY, IsRequired = true)]
+        [ConfigurationProperty(FIRST_RUN_TIME_KEY, IsRequired = false)]
         public string FirstRunTime
         {
             get
