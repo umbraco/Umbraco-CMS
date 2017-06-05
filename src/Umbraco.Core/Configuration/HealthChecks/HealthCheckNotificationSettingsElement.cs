@@ -11,9 +11,9 @@ namespace Umbraco.Core.Configuration.HealthChecks
         private const string ENABLED_KEY = "enabled";
         private const string FIRST_RUN_TIME_KEY = "firstRunTime";
         private const string PERIOD_KEY = "periodInHours";
-        private const string RECIPIENT_EMAIL_KEY = "recipientEmail";
-        private const string WEBHOOK_URL_KEY = "webHookUrl";
         private const string DISABLED_CHECKS_KEY = "disabledChecks";
+        private const string EMAIL_SETTINGS_KEY = "emailSettings";
+        private const string SLACK_SETTINGS_KEY = "slackSettings";
 
         [ConfigurationProperty(ENABLED_KEY, IsRequired = true)]
         public bool Enabled
@@ -42,30 +42,30 @@ namespace Umbraco.Core.Configuration.HealthChecks
             }
         }
 
-        [ConfigurationProperty(RECIPIENT_EMAIL_KEY, IsRequired = true)]
-        public string RecipientEmail
-        {
-            get
-            {
-                return ((string)(base[RECIPIENT_EMAIL_KEY]));
-            }
-        }
-
-        [ConfigurationProperty(WEBHOOK_URL_KEY, IsRequired = true)]
-        public string WebhookUrl
-        {
-            get
-            {
-                return ((string)(base[WEBHOOK_URL_KEY]));
-            }
-        }
-
         [ConfigurationProperty(DISABLED_CHECKS_KEY, IsDefaultCollection = true, IsRequired = false)]
         public DisabledHealthChecksElementCollection DisabledChecks
         {
             get
             {
                 return ((DisabledHealthChecksElementCollection)(base[DISABLED_CHECKS_KEY]));
+            }
+        }
+
+        [ConfigurationProperty(EMAIL_SETTINGS_KEY, IsDefaultCollection = true, IsRequired = false)]
+        public EmailSettingsElement EmailSettings
+        {
+            get
+            {
+                return ((EmailSettingsElement)(base[EMAIL_SETTINGS_KEY]));
+            }
+        }
+
+        [ConfigurationProperty(SLACK_SETTINGS_KEY, IsDefaultCollection = true, IsRequired = false)]
+        public SlackSettingsElement SlackSettings
+        {
+            get
+            {
+                return ((SlackSettingsElement)(base[SLACK_SETTINGS_KEY]));
             }
         }
     }

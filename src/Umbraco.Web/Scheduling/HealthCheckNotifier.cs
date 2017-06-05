@@ -70,13 +70,13 @@ namespace Umbraco.Web.Scheduling
                 results.LogResults();
 
                 // Send to email address if configured
-                if (!string.IsNullOrEmpty(healthCheckConfig.NotificationSettings.RecipientEmail))
+                if (healthCheckConfig.NotificationSettings.EmailSettings != null && string.IsNullOrEmpty(healthCheckConfig.NotificationSettings.EmailSettings.RecipientEmail) == false)
                 {
                     using (var client = new SmtpClient())
                     using (var mailMessage = new MailMessage())
                     {
                         mailMessage.Body = "Results"; // TODO - get from results
-                        mailMessage.To.Add(healthCheckConfig.NotificationSettings.RecipientEmail);
+                        mailMessage.To.Add(healthCheckConfig.NotificationSettings.EmailSettings.RecipientEmail);
                         mailMessage.Subject = "Umbraco Scheduled HeathChecks Results";
                         mailMessage.IsBodyHtml = true;
 
@@ -84,16 +84,16 @@ namespace Umbraco.Web.Scheduling
                     }
                 }
 
-                // TODO: get web hook and post
-                if (!string.IsNullOrEmpty(healthCheckConfig.NotificationSettings.WebhookUrl))
+                // send Slack Incoming Webhook if configured
+                if (healthCheckConfig.NotificationSettings.SlackSettings != null && string.IsNullOrEmpty(healthCheckConfig.NotificationSettings.SlackSettings.WebHookUrl) == false)
                 {
-                    var slackClient = new SlackClient(healthCheckConfig.NotificationSettings.WebhookUrl);
+                    var slackClient = new SlackClient(healthCheckConfig.NotificationSettings.SlackSettings.WebHookUrl);
                     var slackMessage = new SlackMessage
                     {
-                        Channel = "#test",
+                        Channel = healthCheckConfig.NotificationSettings.SlackSettings.Channel,
                         Text = results.ResultsAsMarkDown(true),
                         IconEmoji = Emoji.Ghost,
-                        Username = "Umbraco Health Check Notifier"
+                        Username = healthCheckConfig.NotificationSettings.SlackSettings.UserName
                     };
                     slackClient.Post(slackMessage);
                 }
