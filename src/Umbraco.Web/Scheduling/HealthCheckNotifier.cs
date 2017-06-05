@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Text;
@@ -50,14 +52,8 @@ namespace Umbraco.Web.Scheduling
                 var checks = _healthCheckResolver.HealthChecks
                     .Where(x => disabledCheckIds.Contains(x.Id) == false);
 
-                var sb = new StringBuilder();
-                foreach (var check in checks)
-                {
-                    // TODO: get all sub-checks, not just first
-                    var status = check.GetStatus().First();
-                    sb.AppendFormat(" - Check {0} returned {1} with message {2}.", check.Name, status.ResultType, status.Message);
-                    sb.AppendLine();
-                }
+                var results = new HealthCheckResults(checks);
+                results.LogResults();
 
                 // TODO: get email address and send
                 if (!string.IsNullOrEmpty(healthCheckConfig.NotificationSettings.RecipientEmail))
@@ -70,9 +66,6 @@ namespace Umbraco.Web.Scheduling
                 {
 
                 }
-
-                LogHelper.Info<HealthCheckNotifier>("Health check results:");
-                LogHelper.Info<HealthCheckNotifier>(sb.ToString());
             }
 
             return true; // repeat
