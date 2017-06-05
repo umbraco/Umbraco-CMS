@@ -57,16 +57,16 @@ namespace Umbraco.Web.HealthCheck
                 var checkIsSuccess = result.Value.All(x => x.ResultType == StatusResultType.Success);
                 if (checkIsSuccess)
                 {
-                    sb.AppendFormat("{0}Checks for'{1}' all completed succesfully.{2}", newItem, checkName, Environment.NewLine);
+                    sb.AppendFormat("{0}Checks for '{1}' all completed succesfully.{2}", newItem, checkName, Environment.NewLine);
                 }
                 else
                 {
-                    sb.AppendFormat("{0}Checks for'{1}' completed with errors.{2}", newItem, checkName, Environment.NewLine);
+                    sb.AppendFormat("{0}Checks for '{1}' completed with errors.{2}", newItem, checkName, Environment.NewLine);
                 }
 
                 foreach (var checkResult in checkResults)
                 {
-                    sb.AppendFormat("\t{0}Result:'{1}' , Message: '{2}'{3}", newItem, checkResult.ResultType, SimpleHtmlToMarkDown(checkResult.Message, slackMarkDown), Environment.NewLine);
+                    sb.AppendFormat("\t{0}Result: '{1}' , Message: '{2}'{3}", newItem, checkResult.ResultType, SimpleHtmlToMarkDown(checkResult.Message, slackMarkDown), Environment.NewLine);
                 }
             }
             return sb.ToString();
