@@ -8,7 +8,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// Represents information for the current user
     /// </summary>
     [DataContract(Name = "user", Namespace = "")]
-    public class UserDetail : UserBasic
+    public class UserDetail : UserProfile
     {
         [DataMember(Name = "email", IsRequired = true)]
         [Required]

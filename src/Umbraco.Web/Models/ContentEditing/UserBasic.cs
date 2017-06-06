@@ -1,28 +1,51 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-    /// <summary>
-    /// A bare minimum structure that represents a user, usually attached to other objects
-    /// </summary>
     [DataContract(Name = "user", Namespace = "")]
-    public class UserBasic : IComparable
+    [ReadOnly(true)]
+    public class UserBasic : EntityBasic, INotificationModel
     {
-        [DataMember(Name = "id", IsRequired = true)]
-        [Required]
-        public int UserId { get; set; }
-        
-        [DataMember(Name = "name", IsRequired = true)]
-        [Required]
-        public string Name { get; set; }
-
-
-        int IComparable.CompareTo(object obj)
+        public UserBasic()
         {
-            return String.Compare(Name, ((UserBasic)obj).Name, StringComparison.Ordinal);
-       }
+            Notifications = new List<Notification>();
+        }
+
+        [DataMember(Name = "username")]
+        public string Username { get; set; }
+
+        /// <summary>
+        /// The MD5 lowercase hash of the email which can be used by gravatar
+        /// </summary>
+        [DataMember(Name = "emailHash")]
+        public string EmailHash { get; set; }
+
+        [DataMember(Name = "lastLoginDate")]
+        public DateTime? LastLoginDate { get; set; }
+
+        /// <summary>
+        /// Returns a list of different size avatars
+        /// </summary>
+        [DataMember(Name = "avatars")]
+        public string[] Avatars { get; set; }
+
+        [DataMember(Name = "userState")]
+        public UserState UserState { get; set; }
+
+        [DataMember(Name = "culture", IsRequired = true)]
+        public string Culture { get; set; }
+
+        [DataMember(Name = "email", IsRequired = true)]
+        public string Email { get; set; }
+
+        /// <summary>
+        /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
+        /// </summary>
+        [DataMember(Name = "notifications")]
+        public List<Notification> Notifications { get; private set; }
     }
 }

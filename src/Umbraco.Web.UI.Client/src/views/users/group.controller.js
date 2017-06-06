@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserGroupEditController($scope, $timeout, $location, usersResource) {
+    function UserGroupEditController($scope, $timeout, $location, usersResource, $routeParams) {
 
         var vm = this;
 
@@ -22,7 +22,7 @@
             vm.loading = true;
 
             // get user
-            usersResource.getUserGroup().then(function (userGroup) {
+            usersResource.getUserGroup($routeParams.id).then(function (userGroup) {
                 vm.userGroup = userGroup;
                 makeBreadcrumbs();
             });

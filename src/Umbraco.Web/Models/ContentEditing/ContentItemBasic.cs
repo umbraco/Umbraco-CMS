@@ -29,10 +29,10 @@ namespace Umbraco.Web.Models.ContentEditing
         public bool HasPublishedVersion { get; set; }
 
         [DataMember(Name = "owner")]
-        public UserBasic Owner { get; set; }
+        public UserProfile Owner { get; set; }
 
         [DataMember(Name = "updater")]
-        public UserBasic Updater { get; set; }
+        public UserProfile Updater { get; set; }
 
         [DataMember(Name = "contentTypeAlias", IsRequired = true)]
         [Required(AllowEmptyStrings = false)]

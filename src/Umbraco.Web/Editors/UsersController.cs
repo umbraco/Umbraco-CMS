@@ -164,9 +164,22 @@ namespace Umbraco.Web.Editors
         /// Returns all user groups
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<UserGroupDisplay> GetUserGroups()
+        public IEnumerable<UserGroupBasic> GetUserGroups()
         {
-            return Mapper.Map<IEnumerable<IUserGroup>, IEnumerable<UserGroupDisplay>>(Services.UserService.GetAllUserGroups());
+            return Mapper.Map<IEnumerable<IUserGroup>, IEnumerable<UserGroupBasic>>(Services.UserService.GetAllUserGroups());
+        }
+
+        /// <summary>
+        /// Returns all user groups
+        /// </summary>
+        /// <returns></returns>
+        public UserGroupDisplay GetUserGroup(int id)
+        {
+            var found = Services.UserService.GetUserGroupById(id);
+            if (found == null)
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            return Mapper.Map<UserGroupDisplay>(found);
         }
 
         /// <summary>

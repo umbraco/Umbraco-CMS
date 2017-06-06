@@ -164,42 +164,16 @@
         "Failed to save user");
     }
 
-    function getUserGroup() {
-      var deferred = $q.defer();
-      var user = {
-        "name": "Admin",
-        "alias": "admin",
-        "id": 1,
-        "icon": "icon-medal",
-        "users": [
-          {
-            "id": 1,
-            "name": "Angela Stone",
-            "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/jina/128.jpg",
-            "state": "active"
-          },
-          {
-            "id": 2,
-            "name": "Beverly Silva",
-            "avatar": "",
-            "state": "disabled"
-          },
-          {
-            "id": 3,
-            "name": "Ruth Turner",
-            "avatar": "",
-            "state": "pending"
-          },
-          {
-            "id": 4,
-            "name": "Arthur Welch",
-            "avatar": "https://s3.amazonaws.com/uifaces/faces/twitter/ashleyford/128.jpg",
-            "state": "active"
-          }
-        ]
-      };
-      deferred.resolve(user);
-      return deferred.promise;
+    function getUserGroup(id) {
+
+      return umbRequestHelper.resourcePromise(
+        $http.get(
+          umbRequestHelper.getApiUrl(
+            "userApiBaseUrl",
+            "GetUserGroup",
+            { id: id })),
+        "Failed to retrieve data for user group " + id);
+      
     }
 
     function getUserGroups() {

@@ -12,6 +12,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
+using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -86,7 +88,7 @@ namespace Umbraco.Web.Models.Mapping
                     }
                 });
 
-            config.CreateMap<IReadOnlyUserGroup, UserGroupDisplay>()
+            config.CreateMap<IReadOnlyUserGroup, UserGroupBasic>()
                 .ForMember(detail => detail.StartContentId, opt => opt.Ignore())
                 .ForMember(detail => detail.StartMediaId, opt => opt.Ignore())
                 .ForMember(detail => detail.Key, opt => opt.Ignore())
@@ -99,15 +101,22 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.AdditionalData, opt => opt.Ignore())
                 .AfterMap((group, display) =>
                 {
-                    var allSections = applicationContext.Services.SectionService.GetSections();
-                    display.Sections = allSections.Where(x => group.Alias == x.Alias).Select(Mapper.Map<ContentEditing.Section>);
+                    MapUserGroupBasic(applicationContext.Services, group, display);
+                });
 
-                    //applicationContext.Services.EntityService.Get<IContent>(x.StartContentId, false))
-                    //applicationContext.Services.EntityService.Get<IMedia>(x.StartMediaId, false))
-                    if (display.Icon.IsNullOrWhiteSpace())
-                    {
-                        display.Icon = "icon-users";
-                    }
+            config.CreateMap<IUserGroup, UserGroupBasic>()
+                .ForMember(detail => detail.StartContentId, opt => opt.Ignore())
+                .ForMember(detail => detail.StartMediaId, opt => opt.Ignore())
+                .ForMember(detail => detail.Sections, opt => opt.Ignore())
+                .ForMember(detail => detail.Notifications, opt => opt.Ignore())
+                .ForMember(detail => detail.Udi, opt => opt.Ignore())
+                .ForMember(detail => detail.Trashed, opt => opt.Ignore())
+                .ForMember(detail => detail.ParentId, opt => opt.UseValue(-1))
+                .ForMember(detail => detail.Path, opt => opt.MapFrom(userGroup => "-1," + userGroup.Id))
+                .ForMember(detail => detail.AdditionalData, opt => opt.Ignore())
+                .AfterMap((group, display) =>
+                {
+                    MapUserGroupBasic(applicationContext.Services, group, display);
                 });
 
             config.CreateMap<IUserGroup, UserGroupDisplay>()
@@ -120,14 +129,12 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.ParentId, opt => opt.UseValue(-1))
                 .ForMember(detail => detail.Path, opt => opt.MapFrom(userGroup => "-1," + userGroup.Id))
                 .ForMember(detail => detail.AdditionalData, opt => opt.Ignore())
+                .ForMember(detail => detail.Users, opt => opt.Ignore())
                 .AfterMap((group, display) =>
                 {
-                    var allSections = applicationContext.Services.SectionService.GetSections();
-                    display.Sections = allSections.Where(x => group.Alias == x.Alias).Select(Mapper.Map<ContentEditing.Section>);
-
-                    //applicationContext.Services.EntityService.Get<IContent>(x.StartContentId, false))
-                    //applicationContext.Services.EntityService.Get<IMedia>(x.StartMediaId, false))
-
+                    MapUserGroupBasic(applicationContext.Services, group, display);
+                    var users = applicationContext.Services.UserService.GetAllInGroup(group.Id);
+                    display.Users = Mapper.Map<IEnumerable<UserBasic>>(users);
                 });
 
             config.CreateMap<IUser, UserDisplay>()
@@ -167,9 +174,27 @@ namespace Umbraco.Web.Models.Mapping
                         var mediaItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, startMediaIds);
                         display.StartMediaIds = Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(mediaItems);
                     }
-                    display.UserGroups = Mapper.Map<IEnumerable<IReadOnlyUserGroup>, IEnumerable<UserGroupDisplay>>(user.Groups);
+                    display.UserGroups = Mapper.Map<IEnumerable<IReadOnlyUserGroup>, IEnumerable<UserGroupBasic>>(user.Groups);
                     
                 });
+
+            config.CreateMap<IUser, UserBasic>()
+                .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(applicationContext.Services.UserService, applicationContext.ApplicationCache.RuntimeCache)))
+                .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
+                .ForMember(detail => detail.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?) user.LastLoginDate))
+                .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
+                .ForMember(
+                    detail => detail.EmailHash,
+                    opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().ToMd5()))
+                .ForMember(detail => detail.ParentId, opt => opt.UseValue(-1))
+                .ForMember(detail => detail.Path, opt => opt.MapFrom(user => "-1," + user.Id))
+                .ForMember(detail => detail.Notifications, opt => opt.Ignore())
+                .ForMember(detail => detail.Udi, opt => opt.Ignore())
+                .ForMember(detail => detail.Icon, opt => opt.Ignore())
+                .ForMember(detail => detail.Trashed, opt => opt.Ignore())
+                .ForMember(detail => detail.Alias, opt => opt.Ignore())
+                .ForMember(detail => detail.Trashed, opt => opt.Ignore())
+                .ForMember(detail => detail.AdditionalData, opt => opt.Ignore());
 
             config.CreateMap<IUser, UserDetail>()
                 .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(applicationContext.Services.UserService, applicationContext.ApplicationCache.RuntimeCache)))
@@ -182,7 +207,7 @@ namespace Umbraco.Web.Models.Mapping
                     opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().ToMd5()))
                 .ForMember(detail => detail.SecondsUntilTimeout, opt => opt.Ignore());            
 
-            config.CreateMap<IProfile, UserBasic>()
+            config.CreateMap<IProfile, UserProfile>()
                   .ForMember(detail => detail.UserId, opt => opt.MapFrom(profile => GetIntId(profile.Id)));
 
             config.CreateMap<IUser, UserData>()
@@ -197,8 +222,28 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
                 .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));
             
-        } 
-     
+        }
+
+        private void MapUserGroupBasic(ServiceContext services, dynamic group, UserGroupBasic display)
+        {
+            var allSections = services.SectionService.GetSections();
+            display.Sections = allSections.Where(x => group.Alias == x.Alias).Select(Mapper.Map<ContentEditing.Section>);
+            if (group.StartMediaId > 0)
+            {
+                display.StartMediaId = Mapper.Map<EntityBasic>(
+                    services.EntityService.Get<IMedia>(group.StartMediaId, false));
+            }
+            if (group.StartContentId > 0)
+            {
+                display.StartContentId = Mapper.Map<EntityBasic>(
+                    services.EntityService.Get<IContent>(group.StartContentId, false));
+            }
+            if (display.Icon.IsNullOrWhiteSpace())
+            {
+                display.Icon = "icon-users";
+            }
+        }
+
         private static int GetIntId(object id)
         {
             var result = id.TryConvertTo<int>();

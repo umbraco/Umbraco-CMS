@@ -388,6 +388,8 @@
     <Compile Include="Models\ContentEditing\SnippetDisplay.cs" />
     <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
     <Compile Include="Models\ContentEditing\UserDisplay.cs" />
+    <Compile Include="Models\ContentEditing\UserBasic.cs" />
+    <Compile Include="Models\ContentEditing\UserGroupBasic.cs" />
     <Compile Include="Models\ContentEditing\UserGroupDisplay.cs" />
     <Compile Include="Models\DetachedPublishedContent.cs" />
     <Compile Include="Models\DetachedPublishedProperty.cs" />
@@ -836,7 +838,7 @@
     <Compile Include="Models\ContentEditing\Section.cs" />
     <Compile Include="Models\ContentEditing\Tab.cs" />
     <Compile Include="Models\ContentEditing\TabbedContentItem.cs" />
-    <Compile Include="Models\ContentEditing\UserBasic.cs" />
+    <Compile Include="Models\ContentEditing\UserProfile.cs" />
     <Compile Include="Models\ContentEditing\UserDetail.cs" />
     <Compile Include="FormDataCollectionExtensions.cs" />
     <Compile Include="Models\Mapping\ContentPropertyBasicConverter.cs" />
