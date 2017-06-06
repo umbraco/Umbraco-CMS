@@ -227,7 +227,7 @@
                                 </umb-avatar>
                             </td>
                             <td class="bold"><a href="" ng-click="vm.goToUser(user)">{{user.name}}</a></td>
-                            <td><span ng-repeat="(key,value) in user.userGroups">{{ value }}<span ng-if="!$last">, </span></span></td>
+                            <td><span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span></td>
                             <td>{{ user.formattedLastLogin }}</td>
                             <td style="text-transform: capitalize;">
                                 <umb-badge
