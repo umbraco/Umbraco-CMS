@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.HealthChecks
 {
-    public class SlackSettingsElement : ConfigurationElement
+    public class SlackSettingsElement : BaseNotificationMethodElement
     {
         private const string WEBHOOKURL_KEY = "webHookUrl";
         private const string CHANNEL_KEY = "channel";

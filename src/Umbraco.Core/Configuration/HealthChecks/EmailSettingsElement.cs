@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.HealthChecks
 {
-    public class EmailSettingsElement : ConfigurationElement
+    public class EmailSettingsElement : BaseNotificationMethodElement
     {
         private const string RECIPIENT_EMAIL_KEY = "recipientEmail";
         private const string SUBJECT_KEY = "subject";

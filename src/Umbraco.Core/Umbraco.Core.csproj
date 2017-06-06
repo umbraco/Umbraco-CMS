@@ -218,6 +218,8 @@
     <Compile Include="Configuration\Dashboard\SectionElement.cs" />
     <Compile Include="Configuration\Dashboard\TabCollection.cs" />
     <Compile Include="Configuration\Dashboard\TabElement.cs" />
+    <Compile Include="Configuration\HealthChecks\BaseNotificationMethodElement.cs" />
+    <Compile Include="Configuration\HealthChecks\HealthCheckNotificationVerbosity.cs" />
     <Compile Include="Configuration\HealthChecks\SlackSettingsElement.cs" />
     <Compile Include="Configuration\HealthChecks\HealthCheckNotificationSettingsElement.cs" />
     <Compile Include="Configuration\HealthChecks\EmailSettingsElement.cs" />

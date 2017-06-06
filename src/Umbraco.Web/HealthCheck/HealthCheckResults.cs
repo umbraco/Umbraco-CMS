@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MarkdownSharp;
+using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.HealthCheck
@@ -72,7 +73,7 @@ namespace Umbraco.Web.HealthCheck
             }
         }
 
-        internal string ResultsAsMarkDown(bool slackMarkDown = false)
+        internal string ResultsAsMarkDown(HealthCheckNotificationVerbosity verbosity, bool slackMarkDown = false)
         {
             var newItem = "- ";
             if (slackMarkDown)
@@ -105,17 +106,25 @@ namespace Umbraco.Web.HealthCheck
 
                 foreach (var checkResult in checkResults)
                 {
-                    sb.AppendFormat("\t{0}Result: '{1}', Message: '{2}'{3}", newItem, checkResult.ResultType, SimpleHtmlToMarkDown(checkResult.Message, slackMarkDown), Environment.NewLine);
+                    sb.AppendFormat("\t{0}Result: '{1}'", newItem, checkResult.ResultType);
+
+                    // With summary logging, only record details of warnings or errors
+                    if (checkResult.ResultType != StatusResultType.Success || verbosity == HealthCheckNotificationVerbosity.Detailed)
+                    {
+                        sb.AppendFormat(", Message: '{0}'", SimpleHtmlToMarkDown(checkResult.Message, slackMarkDown));
+                    }
+
+                    sb.AppendLine(Environment.NewLine);
                 }
             }
 
             return sb.ToString();
         }
 
-        internal string ResultsAsHtml()
+        internal string ResultsAsHtml(HealthCheckNotificationVerbosity verbosity)
         {
             var mark = new Markdown();
-            var html = mark.Transform(ResultsAsMarkDown());
+            var html = mark.Transform(ResultsAsMarkDown(verbosity));
             html = ApplyHtmlHighlighting(html);
             return html;
         }
@@ -130,7 +139,7 @@ namespace Umbraco.Web.HealthCheck
         private string ApplyHtmlHighlightingForStatus(string html, StatusResultType status, string color)
         {
             return html
-                .Replace("Result: '" + status + "'", "Result <span style=\"color: #" + color + "\">" + status + "</span>");
+                .Replace("Result: '" + status + "'", "Result: <span style=\"color: #" + color + "\">" + status + "</span>");
         }
 
         private string SimpleHtmlToMarkDown(string html, bool slackMarkDown = false)

@@ -70,25 +70,27 @@ namespace Umbraco.Web.Scheduling
                 results.LogResults();
 
                 // Send to email address if configured
-                if (healthCheckConfig.NotificationSettings.EmailSettings != null && string.IsNullOrEmpty(healthCheckConfig.NotificationSettings.EmailSettings.RecipientEmail) == false)
+                var emailNotificationSettings = healthCheckConfig.NotificationSettings.EmailSettings;
+                if (emailNotificationSettings != null && string.IsNullOrEmpty(emailNotificationSettings.RecipientEmail) == false)
                 {
                     using (var client = new SmtpClient())
                     using (var mailMessage = new MailMessage())
                     {
-                        mailMessage.To.Add(healthCheckConfig.NotificationSettings.EmailSettings.RecipientEmail);
+                        mailMessage.To.Add(emailNotificationSettings.RecipientEmail);
                         mailMessage.Body = string.Format("<html><body><p>Results of the scheduled Umbraco Health Checks run on {0} at {1} are as follows:</p>{2}</body></html>",
-                            DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(), results.ResultsAsHtml());
-                        mailMessage.Subject = healthCheckConfig.NotificationSettings.EmailSettings.Subject;
+                            DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(), results.ResultsAsHtml(emailNotificationSettings.Verbosity));
+                        mailMessage.Subject = emailNotificationSettings.Subject;
                         mailMessage.IsBodyHtml = true;
 
                         await client.SendMailAsync(mailMessage);
                     }
                 }
 
-                // send Slack Incoming Webhook if configured
-                if (healthCheckConfig.NotificationSettings.SlackSettings != null && string.IsNullOrEmpty(healthCheckConfig.NotificationSettings.SlackSettings.WebHookUrl) == false)
+                // Send Slack incoming webhook if configured
+                var slackNotificationSettings = healthCheckConfig.NotificationSettings.SlackSettings;
+                if (slackNotificationSettings != null && string.IsNullOrEmpty(slackNotificationSettings.WebHookUrl) == false)
                 {
-                    var slackClient = new SlackClient(healthCheckConfig.NotificationSettings.SlackSettings.WebHookUrl);
+                    var slackClient = new SlackClient(slackNotificationSettings.WebHookUrl);
 
                     var icon = Emoji.Warning;
                     if (results.AllChecksSuccessful)
@@ -98,10 +100,10 @@ namespace Umbraco.Web.Scheduling
 
                     var slackMessage = new SlackMessage
                     {
-                        Channel = healthCheckConfig.NotificationSettings.SlackSettings.Channel,
-                        Text = results.ResultsAsMarkDown(true),
+                        Channel = slackNotificationSettings.Channel,
+                        Text = results.ResultsAsMarkDown(slackNotificationSettings.Verbosity, true),
                         IconEmoji = icon,
-                        Username = healthCheckConfig.NotificationSettings.SlackSettings.UserName
+                        Username = slackNotificationSettings.UserName
                     };
                     slackClient.Post(slackMessage);
                 }

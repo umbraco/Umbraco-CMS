@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Web.HealthCheck;
 
 namespace Umbraco.Tests.Web.HealthChecks
@@ -10,6 +11,8 @@ namespace Umbraco.Tests.Web.HealthChecks
     [TestFixture]
     public class HealthCheckResultsTests
     {
+        #region Stub checks
+
         [HealthCheck("CFD6FC34-59C9-4402-B55F-C8BC96B628A1", "Stub check")]
         public abstract class StubHealthCheck : HealthCheck
         {
@@ -68,6 +71,8 @@ namespace Umbraco.Tests.Web.HealthChecks
             }
         }
 
+        #endregion
+
         [Test]
         public void HealthCheckResults_WithSuccessfulChecks_ReturnsCorrectResultDescription()
         {
@@ -77,9 +82,10 @@ namespace Umbraco.Tests.Web.HealthChecks
                 new StubHealthCheck2(StatusResultType.Success, "Second check was successful"),
             };
             var results = new HealthCheckResults(checks);
+
             Assert.IsTrue(results.AllChecksSuccessful);
 
-            var resultAsMarkdown = results.ResultsAsMarkDown();
+            var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Summary);
             Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 1' all completed succesfully.") > -1);
             Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 2' all completed succesfully.") > -1);
         }
@@ -93,9 +99,10 @@ namespace Umbraco.Tests.Web.HealthChecks
                 new StubHealthCheck2(StatusResultType.Error, "Second check was not successful"),
             };
             var results = new HealthCheckResults(checks);
+
             Assert.IsFalse(results.AllChecksSuccessful);
 
-            var resultAsMarkdown = results.ResultsAsMarkDown();
+            var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Summary);
             Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 1' all completed succesfully.") > -1);
             Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 2' completed with errors.") > -1);
         }
@@ -110,12 +117,42 @@ namespace Umbraco.Tests.Web.HealthChecks
                 new StubHealthCheck2(StatusResultType.Error, "Second check was not successful"),
             };
             var results = new HealthCheckResults(checks);
+
             Assert.IsFalse(results.AllChecksSuccessful);
 
-            var resultAsMarkdown = results.ResultsAsMarkDown();
+            var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Summary);
             Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 1' all completed succesfully.") > -1);
             Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 2' completed with errors.") > -1);
             Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 3' completed with errors.") > -1);
+        }
+
+        [Test]
+        public void HealthCheckResults_WithSummaryVerbosity_ReturnsCorrectResultDescription()
+        {
+            var checks = new List<HealthCheck>
+            {
+                new StubHealthCheck1(StatusResultType.Success, "First check was successful"),
+                new StubHealthCheck2(StatusResultType.Success, "Second check was successful"),
+            };
+            var results = new HealthCheckResults(checks);
+
+            var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Summary);
+            Assert.IsTrue(resultAsMarkdown.IndexOf("Result: 'Success'\r\n") > -1);
+        }
+
+        [Test]
+        public void HealthCheckResults_WithDetailedVerbosity_ReturnsCorrectResultDescription()
+        {
+            var checks = new List<HealthCheck>
+            {
+                new StubHealthCheck1(StatusResultType.Success, "First check was successful"),
+                new StubHealthCheck2(StatusResultType.Success, "Second check was successful"),
+            };
+            var results = new HealthCheckResults(checks);
+
+            var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Detailed);
+            Assert.IsFalse(resultAsMarkdown.IndexOf("Result: 'Success'\r\n") > -1);
+            Assert.IsTrue(resultAsMarkdown.IndexOf("Result: 'Success', Message: 'First check was successful'\r\n") > -1);
         }
     }
 }
