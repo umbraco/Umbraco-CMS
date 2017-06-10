@@ -69,26 +69,30 @@ namespace Umbraco.Web.Scheduling
                 var results = new HealthCheckResults(checks);
                 results.LogResults();
 
-                // Send to email address if configured
+                // Send to email address if configured observing if the configuration is set to only notify if there are any failures
                 var emailNotificationSettings = healthCheckConfig.NotificationSettings.EmailSettings;
-                if (emailNotificationSettings != null && string.IsNullOrEmpty(emailNotificationSettings.RecipientEmail) == false)
+                if (emailNotificationSettings != null && string.IsNullOrEmpty(emailNotificationSettings.RecipientEmail) == false 
+                    && (emailNotificationSettings.FailureOnly == false || emailNotificationSettings.FailureOnly && results.AllChecksSuccessful == false))
                 {
-                    using (var client = new SmtpClient())
-                    using (var mailMessage = new MailMessage())
-                    {
-                        mailMessage.To.Add(emailNotificationSettings.RecipientEmail);
-                        mailMessage.Body = string.Format("<html><body><p>Results of the scheduled Umbraco Health Checks run on {0} at {1} are as follows:</p>{2}</body></html>",
-                            DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(), results.ResultsAsHtml(emailNotificationSettings.Verbosity));
-                        mailMessage.Subject = emailNotificationSettings.Subject;
-                        mailMessage.IsBodyHtml = true;
+                        using (var client = new SmtpClient())
+                        using (var mailMessage = new MailMessage())
+                        {
+                            mailMessage.To.Add(emailNotificationSettings.RecipientEmail);
+                            mailMessage.Body =
+                                string.Format(
+                                    "<html><body><p>Results of the scheduled Umbraco Health Checks run on {0} at {1} are as follows:</p>{2}</body></html>",
+                                    DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(),
+                                    results.ResultsAsHtml(emailNotificationSettings.Verbosity));
+                            mailMessage.Subject = emailNotificationSettings.Subject;
+                            mailMessage.IsBodyHtml = true;
 
-                        await client.SendMailAsync(mailMessage);
-                    }
+                            await client.SendMailAsync(mailMessage);
+                        }
                 }
 
-                // Send Slack incoming webhook if configured
+                // Send Slack incoming webhook if configured observing if the configuration is set to only notify if there are any failures
                 var slackNotificationSettings = healthCheckConfig.NotificationSettings.SlackSettings;
-                if (slackNotificationSettings != null && string.IsNullOrEmpty(slackNotificationSettings.WebHookUrl) == false)
+                if (slackNotificationSettings != null && string.IsNullOrEmpty(slackNotificationSettings.WebHookUrl) == false && (slackNotificationSettings.FailureOnly == false || slackNotificationSettings.FailureOnly && results.AllChecksSuccessful == false))
                 {
                     var slackClient = new SlackClient(slackNotificationSettings.WebHookUrl);
 
