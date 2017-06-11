@@ -7,7 +7,6 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
 {
-
     public abstract class AbstractConfigCheck : HealthCheck
     {
         private readonly ConfigurationService _configurationService;
@@ -42,6 +41,22 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         /// Gets the comparison type for checking the value.
         /// </summary>
         public abstract ValueComparisonType ValueComparisonType { get; }
+
+        /// <summary>
+        /// Indicates validation method for provided value
+        /// </summary>
+        public virtual ProvidedValueValidation ProvidedValueValidation
+        {
+            get { return ProvidedValueValidation.None; }
+        }
+
+        /// <summary>
+        /// If provided value validation requires a regex, it's provided here
+        /// </summary>
+        public virtual string ProvidedValueValidationRegex
+        {
+            get { return string.Empty; }
+        }
 
         protected AbstractConfigCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
@@ -154,6 +169,12 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                 Name = _textService.Localize("healthcheck/rectifyButton"),
                 ValueRequired = CanRectifyWithValue,
             };
+
+            if (rectifyAction.ValueRequired)
+            {
+                rectifyAction.ProvidedValueValidation = ProvidedValueValidation.ToString().ToLower();
+                rectifyAction.ProvidedValueValidationRegex = ProvidedValueValidationRegex;
+            }
 
             var resultMessage = string.Format(CheckErrorMessage, FileName, XPath, Values, CurrentValue);
             return new[]

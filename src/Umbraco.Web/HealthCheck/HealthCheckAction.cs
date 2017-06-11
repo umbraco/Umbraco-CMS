@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Umbraco.Core.Services;
+using Umbraco.Web.HealthCheck.Checks.Config;
 
 namespace Umbraco.Web.HealthCheck
 {
@@ -69,6 +70,18 @@ namespace Umbraco.Web.HealthCheck
         /// </summary>
         [DataMember(Name = "valueRequired")]
         public bool ValueRequired { get; set; }
+
+        /// <summary>
+        /// Indicates if a value required, how it is validated
+        /// </summary>
+        [DataMember(Name = "providedValueValidation")]
+        public string ProvidedValueValidation { get; set; }
+
+        /// <summary>
+        /// Indicates if a value required, and is validated by a regex, what the regex to use is
+        /// </summary>
+        [DataMember(Name = "providedValueValidationRegex")]
+        public string ProvidedValueValidationRegex { get; set; }
 
         /// <summary>
         /// Provides a value to rectify the issue

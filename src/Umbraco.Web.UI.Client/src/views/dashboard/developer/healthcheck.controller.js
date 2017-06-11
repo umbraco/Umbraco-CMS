@@ -130,6 +130,10 @@
                 }
             }
         }
+
+        $scope.parseRegex = function (regexAsString) {
+            return new RegExp(regexAsString);
+        }
     }
 
     angular.module("umbraco").controller("Umbraco.Dashboard.HealthCheckController", HealthCheckController);

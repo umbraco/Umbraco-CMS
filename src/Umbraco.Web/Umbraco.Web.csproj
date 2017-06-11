@@ -323,6 +323,7 @@
     <Compile Include="HealthCheck\Checks\Config\TrySkipIisCustomErrorsCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\CustomErrorsCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\TraceCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Config\ProvidedValueValidation.cs" />
     <Compile Include="HealthCheck\Checks\Config\ValueComparisonType.cs" />
     <Compile Include="HealthCheck\Checks\Config\CompilationDebugCheck.cs" />
     <Compile Include="HealthCheck\Checks\Services\SmtpCheck.cs" />

@@ -31,6 +31,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             get { return ValueComparisonType.ShouldNotEqual; }
         }
 
+        public override ProvidedValueValidation ProvidedValueValidation
+        {
+            get { return ProvidedValueValidation.Email; }
+        }
+
         public override IEnumerable<AcceptableConfiguration> Values
         {
             get
