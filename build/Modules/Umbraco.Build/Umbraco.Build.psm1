@@ -247,28 +247,31 @@ function Get-UmbracoBuildEnv
   }
   
   # find visual studio
+  # will not work on VSO but VSO does not need it
   $vsPath = ""
   $vsVer = ""
+  $msBuild = $null
   &$vswhere | foreach {
     if ($_.StartsWith("installationPath:")) { $vsPath = $_.SubString("installationPath:".Length).Trim() }
     if ($_.StartsWith("installationVersion:")) { $vsVer = $_.SubString("installationVersion:".Length).Trim() }
   }
-  if ($vsPath -eq "") { return $null }
-  
-  $vsVerParts = $vsVer.Split('.')
-  $vsMajor = [int]::Parse($vsVerParts[0])
-  $vsMinor = [int]::Parse($vsVerParts[1])
-  if ($vsMajor -eq 15) {
-    $msBuild = "$vsPath\MSBuild\$vsMajor.$vsMinor\Bin"
-  }
-  elseif ($vsMajor -eq 14) {
-    $msBuild = "c:\Program Files (x86)\MSBuild\$vsMajor\Bin"
-  }
-  else 
+  if ($vsPath -ne "")
   {
-    $msBuild = $null
+    $vsVerParts = $vsVer.Split('.')
+    $vsMajor = [int]::Parse($vsVerParts[0])
+    $vsMinor = [int]::Parse($vsVerParts[1])
+    if ($vsMajor -eq 15) {
+      $msBuild = "$vsPath\MSBuild\$vsMajor.$vsMinor\Bin"
+    }
+    elseif ($vsMajor -eq 14) {
+      $msBuild = "c:\Program Files (x86)\MSBuild\$vsMajor\Bin"
+    }
+    else 
+    {
+      $msBuild = $null
+    }
   }
-  
+ 
   $vs = $null
   if ($msBuild)
   {
@@ -540,6 +543,12 @@ function Build-Compile
   $out = "$($uenv.SolutionRoot)\build.out"
 
   $buildConfiguration = "Release"
+  
+  if ($uenv.VisualStudio -eq $null)
+  {
+    Write-Error "Build environment does not provide VisualStudio."
+    break
+  }
   
   $toolsVersion = "4.0"
   if ($uenv.VisualStudio.Major -eq 15)
