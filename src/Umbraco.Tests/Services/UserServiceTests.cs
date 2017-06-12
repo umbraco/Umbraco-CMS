@@ -56,9 +56,9 @@ namespace Umbraco.Tests.Services
 
             //assert
             Assert.AreEqual(3, permissions.Count());
-            Assert.AreEqual(17, permissions.ElementAt(0).AssignedPermissions.Count());
-            Assert.AreEqual(17, permissions.ElementAt(1).AssignedPermissions.Count());
-            Assert.AreEqual(17, permissions.ElementAt(2).AssignedPermissions.Count());
+            Assert.AreEqual(18, permissions.ElementAt(0).AssignedPermissions.Count());
+            Assert.AreEqual(18, permissions.ElementAt(1).AssignedPermissions.Count());
+            Assert.AreEqual(18, permissions.ElementAt(2).AssignedPermissions.Count());
         }
 
         [Test]

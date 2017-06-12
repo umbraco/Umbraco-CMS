@@ -21,6 +21,28 @@ using Umbraco.Core.Persistence.UnitOfWork;
 namespace Umbraco.Core.Persistence.Repositories
 {
     /// <summary>
+    /// Override the base content repository so we can change the node object type
+    /// </summary>
+    /// <remarks>
+    /// It would be nicer if we could separate most of this down into a smaller version of the ContentRepository class, however to do that 
+    /// requires quite a lot of work since we'd need to re-organize the interhitance quite a lot or create a helper class to perform a lot of the underlying logic.
+    /// 
+    /// TODO: Create a helper method to conain most of the underlying logic for the ContentRepository
+    /// </remarks>
+    internal class ContentBlueprintRepository : ContentRepository
+    {
+        public ContentBlueprintRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider syntaxProvider, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection contentSection) : base(work, cacheHelper, logger, syntaxProvider, contentTypeRepository, templateRepository, tagRepository, contentSection)
+        {
+        }
+
+        protected override Guid NodeObjectTypeId
+        {
+            get { return Constants.ObjectTypes.DocumentBlueprintGuid; }
+        }
+        
+    }
+
+    /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IContent"/>
     /// </summary>
     internal class ContentRepository : RecycleBinRepository<int, IContent>, IContentRepository
@@ -201,7 +223,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Guid NodeObjectTypeId
         {
-            get { return new Guid(Constants.ObjectTypes.Document); }
+            get { return Constants.ObjectTypes.DocumentGuid; }
         }
 
         #endregion
@@ -267,7 +289,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //now delete the items that shouldn't be there
             var sqlAllIds = translate(0, GetBaseQuery(BaseQueryType.Ids));
             var allContentIds = Database.Fetch<int>(sqlAllIds);
-            var docObjectType = Guid.Parse(Constants.ObjectTypes.Document);
+            var docObjectType = NodeObjectTypeId;
             var xmlIdsQuery = new Sql()
                 .Select("DISTINCT cmsContentXml.nodeId")
                 .From<ContentXmlDto>(SqlSyntax)
@@ -742,7 +764,19 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return ProcessQuery(translate(translatorFull), new PagingSqlQuery(translate(translatorIds)), true);
         }
-        
+
+        public IEnumerable<IContent> GetBlueprints(IQuery<IContent> query)
+        {
+            Func<SqlTranslator<IContent>, Sql> translate = t => t.Translate();
+            
+            var sqlFull = GetBaseQuery(BaseQueryType.FullMultiple);
+            var translatorFull = new SqlTranslator<IContent>(sqlFull, query);
+            var sqlIds = GetBaseQuery(BaseQueryType.Ids);
+            var translatorIds = new SqlTranslator<IContent>(sqlIds, query);
+
+            return ProcessQuery(translate(translatorFull), new PagingSqlQuery(translate(translatorIds)), true);
+        }
+
         /// <summary>
         /// This builds the Xml document used for the XML cache
         /// </summary>
@@ -786,7 +820,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             XmlElement last = null;
 
             //NOTE: Query creates a reader - does not load all into memory
-            foreach (var row in Database.Query<dynamic>(sql, new { type = new Guid(Constants.ObjectTypes.Document) }))
+            foreach (var row in Database.Query<dynamic>(sql, new { type = NodeObjectTypeId }))
             {
                 string parentId = ((int)row.parentID).ToInvariantString();
                 string xml = row.xml;

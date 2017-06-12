@@ -24,6 +24,10 @@ namespace Umbraco.Core
 
             [UdiType(UdiType.GuidUdi)]
             public const string Document = "document";
+
+            [UdiType(UdiType.GuidUdi)]
+            public const string DocumentBluePrint = "document-blueprint";
+
             [UdiType(UdiType.GuidUdi)]
             public const string Media = "media";
             [UdiType(UdiType.GuidUdi)]
