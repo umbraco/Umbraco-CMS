@@ -610,13 +610,14 @@ namespace UmbracoExamine
 
                 //if specific types are declared we need to post filter them
                 //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
+                var filteredElements = xElements;
                 if (IndexerData.IncludeNodeTypes.Any())
                 {
                     var includeNodeTypeIds = contentTypes.Where(x => IndexerData.IncludeNodeTypes.Contains(x.Alias)).Select(x => x.Id);
-                    xElements = xElements.Where(elm => includeNodeTypeIds.Contains(elm.AttributeValue<int>("nodeType"))).ToArray();
+                    filteredElements = xElements.Where(elm => includeNodeTypeIds.Contains(elm.AttributeValue<int>("nodeType"))).ToArray();
                 }
 
-                foreach (var element in xElements)
+                foreach (var element in filteredElements)
                 {
                     if (element.Attribute("icon") == null)
                     {
@@ -624,7 +625,7 @@ namespace UmbracoExamine
                     }
                 }
 
-                AddNodesToIndex(xElements, type);
+                AddNodesToIndex(filteredElements, type);
                 pageIndex++;
             } while (xElements.Length == pageSize);
         }
