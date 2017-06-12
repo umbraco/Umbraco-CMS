@@ -240,6 +240,7 @@ function Get-UmbracoBuildEnv
     write-host "Download Npm..."
     &$nuget install npm -OutputDirectory $path -Verbosity quiet
     $npm = ls "$path\npm.*" | sort -property Name -descending | select -first 1
+    $npm.CreationTime = [DateTime]::Now
     $npm = $npm.ToString()
   }
   
@@ -448,13 +449,17 @@ function Build-Pre($uenv)
   mkdir "$out" > $null
 
   # prepare
-  write-host "Making sure we have a web.config"
+  # fixme - if we have a completely weird local one, it will
+  # use it? this is bad, should always use the proper one!
+  write-host "Making sure we have a clean web.config"
 
   $webUi = "$src\Umbraco.Web.UI"
-  if (-not (test-path "$webUi\web.config"))
+  if (test-path "$webUi\web.config")
   {
-    cpf "$webUi\web.Template.config" "$webUi\web.config"
+    write-host "Saving existing web.config to web.config.temp-build"
+    mv "$webUi\web.config" "$webUi\web.config.temp-build"
   }
+  cpf "$webUi\web.Template.config" "$webUi\web.config"
 }
 
 function Build-Belle($uenv, $version)
@@ -474,11 +479,18 @@ function Build-Belle($uenv, $version)
   &npm install -g bower --quiet >> $tmp\belle.log 2>&1
   &grunt build --buildversion=$version.Release >> $tmp\belle.log 2>&1
   
-  # need to filter the log?
+  # fixme - should we filter the log to find errors?
   #get-content .\build.tmp\belle.log | %{ if ($_ -match "build") { write $_}}
   
   pop-location
   $env:path = $p
+}
+
+function Build-UmbracoBelle()
+{
+  $uenv = Get-UmbracoBuildEnv
+  $version = Get-UmbracoVersion
+  Build-Belle $uenv $version
 }
 
 function Build-Compile($uenv)
@@ -525,9 +537,14 @@ function Build-Post($uenv)
 
   $buildConfiguration = "Release"
 
-  # fixme
-  #  at that point build.bat triggers build.proj
-  #  vso should build and run tests
+  # restore web.config
+  $webUi = "$src\Umbraco.Web.UI"
+  if (test-path "$webUi\web.config.temp-build")
+  {
+    write-host "Restoring existing web.config"
+    rmf "$webUi\web.config"
+    mv "$webUi\web.config.temp-build" "$webUi\web.config"
+  }
 
   # cleanup build
   write "Clean build"
@@ -637,7 +654,8 @@ function Build-Post($uenv)
   write "Add web.config transforms to NuGet package"
 
   mv "$tmp\WebApp\Views\Web.config" "$tmp\WebApp\Views\Web.config.transform"
-  # that one does not exist in .bat build either?
+  
+  # fixme - that one does not exist in .bat build either?
   #mv "$tmp\WebApp\Xslt\Web.config" "$tmp\WebApp\Xslt\Web.config.transform"
 }
 
@@ -652,13 +670,16 @@ function Build-NuGet($uenv)
 
   write-host "Create NuGet packages"
 
-  # fixme - ugly references to ..\_BuildOutput in there?!!?
-  #-Properties tmp="$tmp" AND THEN use $tmp in nuspecs?
   # see https://docs.microsoft.com/en-us/nuget/schema/nuspec
+  # note - warnings about SqlCE native libs being outside of 'lib' folder,
+  # nothing much we can do about it as it's intentional yet there does not
+  # seem to be a way to disable the warning
+  
   &$uenv.NuGet Pack "$nuspecs\UmbracoCms.Core.nuspec" `
     -Properties BuildTmp="$tmp" `
     -Version $version.Semver.ToString() `
     -Symbols -Verbosity quiet -outputDirectory $out
+
   &$uenv.NuGet Pack "$nuspecs\UmbracoCms.nuspec" `
     -Properties BuildTmp="$tmp" `
     -Version $version.Semver.ToString() `
@@ -698,6 +719,7 @@ Export-ModuleMember -function Get-UmbracoBuildEnv
 Export-ModuleMember -function Set-UmbracoVersion
 Export-ModuleMember -function Get-UmbracoVersion
 Export-ModuleMember -function Build-Umbraco
+Export-ModuleMember -function Build-UmbracoBelle
 
 # fixme
 # stop using relative paths, need $uenv.SolutionRoot
