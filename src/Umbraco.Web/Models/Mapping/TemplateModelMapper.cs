@@ -15,7 +15,6 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<TemplateDisplay, Template>()
                 .ForMember(x => x.DeletedDate, exp => exp.Ignore())
-                .ForMember(x => x.Key, exp => exp.Ignore())
                 .ForMember(x => x.Path, exp => exp.Ignore())
                 .ForMember(x => x.CreateDate, exp => exp.Ignore())
                 .ForMember(x => x.UpdateDate, exp => exp.Ignore())
