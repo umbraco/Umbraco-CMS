@@ -151,7 +151,7 @@ function Get-UmbracoBuildEnv
   }
   if (-not (test-path $nuget))
   {
-    write-host "Download NuGet..."
+    Write-Host "Download NuGet..."
     $client = new-object Net.WebClient
     $client.DownloadFile($source, $nuget)
   }
@@ -164,7 +164,7 @@ function Get-UmbracoBuildEnv
   }
   if (-not (test-path $sevenZip))
   {
-    write-host "Download 7-Zip..."
+    Write-Host "Download 7-Zip..."
     &$nuget install 7-Zip.CommandLine -OutputDirectory $path -Verbosity quiet
     $dir = ls "$path\7-Zip.CommandLine.*" | sort -property Name -descending | select -first 1
     $file = ls -path "$dir" -name 7za.exe -recurse
@@ -180,7 +180,7 @@ function Get-UmbracoBuildEnv
   }
   if (-not (test-path $vswhere))
   {
-    write-host "Download VsWhere..."
+    Write-Host "Download VsWhere..."
     &$nuget install vswhere -OutputDirectory $path -Verbosity quiet
     $dir = ls "$path\vswhere.*" | sort -property Name -descending | select -first 1
     $file = ls -path "$dir" -name vswhere.exe -recurse
@@ -196,13 +196,13 @@ function Get-UmbracoBuildEnv
   }
   if (-not (test-path $semver))
   {
-    write-host "Download Semver..."
+    Write-Host "Download Semver..."
     &$nuget install semver -OutputDirectory $path -Verbosity quiet
     $dir = ls "$path\semver.*" | sort -property Name -descending | select -first 1
     $file = "$dir\lib\net452\Semver.dll"
     if (-not (test-path $file))
     {
-      write-error "Failed to file $file"
+      Write-Error "Failed to file $file"
       return
     }
     mv "$file" $semver
@@ -214,8 +214,7 @@ function Get-UmbracoBuildEnv
   $source = "http://nodejs.org/dist/v6.9.1/node-v6.9.1-win-x86.7z"
   if (-not (test-path $node))
   {
-  write-host $node
-    write-host "Download Node..."
+    Write-Host "Download Node..."
     $client = new-object Net.WebClient
     $client.DownloadFile($source, "$path\node-v6.9.1-win-x86.7z")
     &$sevenZip x "$path\node-v6.9.1-win-x86.7z" -o"$path" -aos > $nul
@@ -240,7 +239,7 @@ function Get-UmbracoBuildEnv
   }
   if ($getNpm)
   {
-    write-host "Download Npm..."
+    Write-Host "Download Npm..."
     &$nuget install npm -OutputDirectory $path -Verbosity quiet
     $npm = ls "$path\npm.*" | sort -property Name -descending | select -first 1
     $npm.CreationTime = [DateTime]::Now
@@ -312,13 +311,14 @@ function Set-UmbracoVersion
   )
   
   $uenv = Get-UmbracoBuildEnv
+  
   try
   {
     [Reflection.Assembly]::LoadFile($uenv.Semver) > $null
   }
   catch
   {
-    write-error "Failed to load $uenv.Semver"
+    Write-Error "Failed to load $uenv.Semver"
     break
   }
   
@@ -326,7 +326,7 @@ function Set-UmbracoVersion
   $ok = [Regex]::Match($version, "^[0-9]+\.[0-9]+\.[0-9]+(\-[a-z0-9]+)?(\+[0-9]+)?$")
   if (-not $ok.Success)
   {
-    write-error "Invalid version $version"
+    Write-Error "Invalid version $version"
     break
   }
 
@@ -337,7 +337,7 @@ function Set-UmbracoVersion
   }
   catch
   {
-    write-error "Invalid version $version"
+    Write-Error "Invalid version $version"
     break
   }
   
@@ -345,14 +345,14 @@ function Set-UmbracoVersion
   $release = "" + $semver.Major + "." + $semver.Minor + "." + $semver.Patch
   
   # edit files and set the proper versions and dates
-  write-host "Update UmbracoVersion.cs"
+  Write-Host "Update UmbracoVersion.cs"
   fileReplace "$($uenv.SolutionRoot)\src\Umbraco.Core\Configuration\UmbracoVersion.cs" `
     "(\d+)\.(\d+)\.(\d+)(.(\d+))?" `
     "$release" 
   fileReplace "$($uenv.SolutionRoot)\src\Umbraco.Core\Configuration\UmbracoVersion.cs" `
     "CurrentComment { get { return `"(.+)`"" `
     "CurrentComment { get { return `"$semver.PreRelease`""
-  write-host "Update SolutionInfo.cs"
+  Write-Host "Update SolutionInfo.cs"
   fileReplace "$($uenv.SolutionRoot)\src\SolutionInfo.cs" `
     "AssemblyFileVersion\(`"(.+)?`"\)" `
     "AssemblyFileVersion(`"$release`")"
@@ -404,7 +404,7 @@ function Set-UmbracoVersion
     "System.Globalization"
   )
 
-  write-host "Update Umbraco.Web.UI.csproj"
+  Write-Host "Update Umbraco.Web.UI.csproj"
   add-type -referencedAssemblies $assem -typeDefinition $source -language CSharp
   $csproj = "$($uenv.SolutionRoot)\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj"
   [Umbraco.PortUpdater]::Update($csproj, $release)
@@ -419,13 +419,14 @@ function Set-UmbracoVersion
 function Get-UmbracoVersion
 {  
   $uenv = Get-UmbracoBuildEnv
+  
   try
   {
     [Reflection.Assembly]::LoadFile($uenv.Semver) > $null
   }
   catch
   {
-    write-error "Failed to load $uenv.Semver"
+    Write-Error -Exception $_.Exception -Message "Failed to load $uenv.Semver"
     break
   }
   
@@ -434,7 +435,7 @@ function Get-UmbracoVersion
   $text = [System.IO.File]::ReadAllText($filepath)
   $match = [System.Text.RegularExpressions.Regex]::Matches($text, "AssemblyInformationalVersion\(`"(.+)?`"\)")
   $version = $match.Groups[1]
-  write-host "AssemblyInformationalVersion: $version"
+  Write-Host "AssemblyInformationalVersion: $version"
 
   # semver-parse the version string
   $semver = [SemVer.SemVersion]::Parse($version)
@@ -459,14 +460,14 @@ function Build-Pre
     $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
   )
 
-  write-host "Pre-Compile"
+  Write-Host "Pre-Compile"
   
   $src = "$($uenv.SolutionRoot)\src"
   $tmp = "$($uenv.SolutionRoot)\build.tmp"
   $out = "$($uenv.SolutionRoot)\build.out"
 
   # clear
-  write-host "Clear folders and files"
+  Write-Host "Clear folders and files"
 
   rmrf "$src\Umbraco.Web.UI.Client\build"
   rmrf "$src\Umbraco.Web.UI.Client\bower_components"
@@ -480,12 +481,12 @@ function Build-Pre
   # prepare
   # fixme - if we have a completely weird local one, it will
   # use it? this is bad, should always use the proper one!
-  write-host "Making sure we have a clean web.config"
+  Write-Host "Making sure we have a clean web.config"
 
   $webUi = "$src\Umbraco.Web.UI"
   if (test-path "$webUi\web.config")
   {
-    write-host "Saving existing web.config to web.config.temp-build"
+    Write-Host "Saving existing web.config to web.config.temp-build"
     mv "$webUi\web.config" "$webUi\web.config.temp-build"
   }
   cpf "$webUi\web.Template.config" "$webUi\web.config"
@@ -504,7 +505,7 @@ function Build-Belle
 
   $tmp = "$($uenv.SolutionRoot)\build.tmp"
 
-  write-host "Build Belle (logging to $tmp\belle.log)"
+  Write-Host "Build Belle (logging to $tmp\belle.log)"
 
   push-location "$($uenv.SolutionRoot)\src\Umbraco.Web.UI.Client"
   $p = $env:path
@@ -546,7 +547,7 @@ function Build-Compile
     $toolsVersion = "15.0"
   }
     
-  write-host "Compile (logging to $tmp\msbuild.log)"
+  Write-Host "Compile (logging to $tmp\msbuild.log)"
 
   # beware of the weird double \\ at the end of paths
   # see http://edgylogic.com/blog/powershell-and-external-commands-done-right/
@@ -576,7 +577,7 @@ function Build-Post
     $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
   )
 
-  write-host "Post-Compile" 
+  Write-Host "Post-Compile" 
   
   $src = "$($uenv.SolutionRoot)\src"
   $tmp = "$($uenv.SolutionRoot)\build.tmp"
@@ -588,7 +589,7 @@ function Build-Post
   $webUi = "$src\Umbraco.Web.UI"
   if (test-path "$webUi\web.config.temp-build")
   {
-    write-host "Restoring existing web.config"
+    Write-Host "Restoring existing web.config"
     rmf "$webUi\web.config"
     mv "$webUi\web.config.temp-build" "$webUi\web.config"
   }
@@ -722,7 +723,7 @@ function Build-NuGet
   $out = "$($uenv.SolutionRoot)\build.out"
   $nuspecs = "$($uenv.SolutionRoot)\build\NuSpecs"
   
-  write-host "Create NuGet packages"
+  Write-Host "Create NuGet packages"
 
   # see https://docs.microsoft.com/en-us/nuget/schema/nuspec
   # note - warnings about SqlCE native libs being outside of 'lib' folder,
@@ -760,7 +761,6 @@ function Build-Umbraco
   $target = $target.ToLowerInvariant()
 
   Write-Host "Build-Umbraco " + $version.Semver
-  Write-Verbose "Build-Umbraco " + $version.Semver
 
   if ($target -eq "pre")
   {
