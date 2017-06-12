@@ -486,13 +486,6 @@ function Build-Belle($uenv, $version)
   $env:path = $p
 }
 
-function Build-UmbracoBelle()
-{
-  $uenv = Get-UmbracoBuildEnv
-  $version = Get-UmbracoVersion
-  Build-Belle $uenv $version
-}
-
 function Build-Compile($uenv)
 {
   $src = "$($uenv.SolutionRoot)\src"
@@ -691,41 +684,46 @@ function Build-Umbraco($target)
   $uenv = Get-UmbracoBuildEnv
   $version = Get-UmbracoVersion
   
-  # set environment variables
-  #$env:UMBRACO_VERSION=$version.Semver.ToString()
-  #$env:UMBRACO_RELEASE=$version.Release
-  #$env:UMBRACO_COMMENT=$version.Comment
-  #$env:UMBRACO_BUILD=$version.Build
-
-  # set environment variable for VSO
-  # https://github.com/Microsoft/vsts-tasks/issues/375
-  # https://github.com/Microsoft/vsts-tasks/blob/master/docs/authoring/commands.md
-  if ($vso)
+  if ($target == $null) $target = "all"
+  $target = $target.ToLowerInvariant()
+  if ($target == "pre")
   {
+    Build-Pre $uenv
+    Build-Belle $uenv $version
+
+    # set environment variables
+    $env:UMBRACO_VERSION=$version.Semver.ToString()
+    $env:UMBRACO_RELEASE=$version.Release
+    $env:UMBRACO_COMMENT=$version.Comment
+    $env:UMBRACO_BUILD=$version.Build
+
+    # set environment variable for VSO
+    # https://github.com/Microsoft/vsts-tasks/issues/375
+    # https://github.com/Microsoft/vsts-tasks/blob/master/docs/authoring/commands.md
     write-host ("##vso[task.setvariable variable=UMBRACO_VERSION;]$($version.Semver.ToString())")
     write-host ("##vso[task.setvariable variable=UMBRACO_RELEASE;]$($version.Release)")
     write-host ("##vso[task.setvariable variable=UMBRACO_COMMENT;]$($version.Comment)")
     write-host ("##vso[task.setvariable variable=UMBRACO_BUILD;]$($version.Build)")
   }
-  
-  Build-Pre $uenv
-  Build-Belle $uenv $version
-  Build-Compile $uenv
-  Build-Post $uenv
-  Build-NuGet $uenv
+  else if ($target == "post")
+  {
+    Build-Post $uenv
+  }
+  else if ($target == "belle")
+  {
+    Build-Belle $uenv $version
+  }
+  else if ($target == "all")
+  {
+    Build-Pre $uenv
+    Build-Belle $uenv $version
+    Build-Compile $uenv
+    Build-Post $uenv
+    Build-NuGet $uenv
+  }
 }
 
 Export-ModuleMember -function Get-UmbracoBuildEnv
 Export-ModuleMember -function Set-UmbracoVersion
 Export-ModuleMember -function Get-UmbracoVersion
 Export-ModuleMember -function Build-Umbraco
-Export-ModuleMember -function Build-UmbracoBelle
-
-# fixme
-# stop using relative paths, need $uenv.SolutionRoot
-# build-pre ok (test?)
-# build-belle ok (needs better error detection?)
-# build-compile
-#  imports .nuget targets wtf <<<<<<<<<<<<<<<
-# build-post ?
-# build-nuget ?
