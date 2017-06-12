@@ -125,8 +125,11 @@ function findVisualStudio($vswhere) {
   return $vs
 }
 
-# initialize environment
-# download if needed
+#
+# Get-UmbracoBuildEnv
+# Gets the Umbraco build environment
+# Downloads tools if necessary
+#
 function Get-UmbracoBuildEnv
 {
   # store tools in the module's directory
@@ -292,8 +295,22 @@ function Get-UmbracoBuildEnv
   return $uenv
 }
 
-function Set-UmbracoVersion($version)
+#
+# Set-UmbracoVersion
+# Sets the Umbraco version
+#
+#   -Version <version>
+#   where <version> is a Semver valid version
+#   eg 1.2.3, 1.2.3-alpha, 1.2.3-alpha+456
+#
+function Set-UmbracoVersion
 {
+  param (
+    [Parameter(Mandatory=$true)]
+    [string]
+    $version
+  )
+  
   $uenv = Get-UmbracoBuildEnv
   try
   {
@@ -395,7 +412,11 @@ function Set-UmbracoVersion($version)
   return $semver
 }
 
-function Get-UmbracoVersion()
+#
+# Get-UmbracoVersion
+# Gets the Umbraco version
+#
+function Get-UmbracoVersion
 {  
   $uenv = Get-UmbracoBuildEnv
   try
@@ -428,8 +449,16 @@ function Get-UmbracoVersion()
   return $versions
 }
 
-function Build-Pre($uenv)
+#
+# Build-Pre
+# Prepares the build
+#
+function Build-Pre
 {
+  param (
+    $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
+  )
+
   write-host "Pre-Compile"
   
   $src = "$($uenv.SolutionRoot)\src"
@@ -462,8 +491,17 @@ function Build-Pre($uenv)
   cpf "$webUi\web.Template.config" "$webUi\web.config"
 }
 
-function Build-Belle($uenv, $version)
+#
+# Build-Belle
+# Builds the Belle UI project
+#
+function Build-Belle
 {
+  param (
+    $uenv, # an Umbraco build environment (see Get-UmbracoBuildEnv)
+    $version # an Umbraco version object (see Get-UmbracoVersion)
+  )
+
   $tmp = "$($uenv.SolutionRoot)\build.tmp"
 
   write-host "Build Belle (logging to $tmp\belle.log)"
@@ -486,8 +524,16 @@ function Build-Belle($uenv, $version)
   $env:path = $p
 }
 
-function Build-Compile($uenv)
+#
+# Build-Compile
+# Compiles Umbraco
+#
+function Build-Compile
 {
+  param (
+    $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
+  )
+
   $src = "$($uenv.SolutionRoot)\src"
   $tmp = "$($uenv.SolutionRoot)\build.tmp"
   $out = "$($uenv.SolutionRoot)\build.out"
@@ -520,8 +566,16 @@ function Build-Compile($uenv)
   # /p:UmbracoBuild tells the csproj that we are building from PS
 }
 
-function Build-Post($uenv)
+#
+# Build-Post
+# Cleans things up and prepare files after compilation
+#
+function Build-Post
 {
+  param (
+    $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
+  )
+
   write-host "Post-Compile" 
   
   $src = "$($uenv.SolutionRoot)\src"
@@ -652,15 +706,22 @@ function Build-Post($uenv)
   #mv "$tmp\WebApp\Xslt\Web.config" "$tmp\WebApp\Xslt\Web.config.transform"
 }
 
-function Build-NuGet($uenv)
+#
+# Build-NuGet
+# Creates the NuGet packages
+#
+function Build-NuGet
 {
+  param (
+    $uenv, # an Umbraco build environment (see Get-UmbracoBuildEnv)
+    $version # an Umbraco version object (see Get-UmbracoVersion)
+  )
+  
   $src = "$($uenv.SolutionRoot)\src"
   $tmp = "$($uenv.SolutionRoot)\build.tmp"
   $out = "$($uenv.SolutionRoot)\build.out"
   $nuspecs = "$($uenv.SolutionRoot)\build\NuSpecs"
   
-  $version = Get-UmbracoVersion
-
   write-host "Create NuGet packages"
 
   # see https://docs.microsoft.com/en-us/nuget/schema/nuspec
@@ -679,14 +740,29 @@ function Build-NuGet($uenv)
     -Verbosity quiet -outputDirectory $out
 }
 
-function Build-Umbraco($target)
+#
+# Build-Umbraco
+# Builds Umbraco
+#
+#   -Target all|pre|post|belle
+#   (default: all)
+#
+function Build-Umbraco
 {
+  [CmdletBinding()]
+  param (
+    [string]
+    $target = "all"
+  )
+  
   $uenv = Get-UmbracoBuildEnv
   $version = Get-UmbracoVersion
-  
-  if ($target == $null) $target = "all"
   $target = $target.ToLowerInvariant()
-  if ($target == "pre")
+
+  Write-Host "Build-Umbraco " + $version.Semver
+  Write-Verbose "Build-Umbraco " + $version.Semver
+
+  if ($target -eq "pre")
   {
     Build-Pre $uenv
     Build-Belle $uenv $version
@@ -700,30 +776,39 @@ function Build-Umbraco($target)
     # set environment variable for VSO
     # https://github.com/Microsoft/vsts-tasks/issues/375
     # https://github.com/Microsoft/vsts-tasks/blob/master/docs/authoring/commands.md
-    write-host ("##vso[task.setvariable variable=UMBRACO_VERSION;]$($version.Semver.ToString())")
-    write-host ("##vso[task.setvariable variable=UMBRACO_RELEASE;]$($version.Release)")
-    write-host ("##vso[task.setvariable variable=UMBRACO_COMMENT;]$($version.Comment)")
-    write-host ("##vso[task.setvariable variable=UMBRACO_BUILD;]$($version.Build)")
+    Write-Host ("##vso[task.setvariable variable=UMBRACO_VERSION;]$($version.Semver.ToString())")
+    Write-Host ("##vso[task.setvariable variable=UMBRACO_RELEASE;]$($version.Release)")
+    Write-Host ("##vso[task.setvariable variable=UMBRACO_COMMENT;]$($version.Comment)")
+    Write-Host ("##vso[task.setvariable variable=UMBRACO_BUILD;]$($version.Build)")
   }
-  else if ($target == "post")
+  elseif ($target -eq "post")
   {
     Build-Post $uenv
   }
-  else if ($target == "belle")
+  elseif ($target -eq "belle")
   {
     Build-Belle $uenv $version
   }
-  else if ($target == "all")
+  elseif ($target -eq "all")
   {
     Build-Pre $uenv
     Build-Belle $uenv $version
     Build-Compile $uenv
     Build-Post $uenv
-    Build-NuGet $uenv
+    Build-NuGet $uenv $version
+  }
+  else
+  {
+    Write-Error "Unsupported target `"$target`"."
   }
 }
 
+#
+# export functions
+#
 Export-ModuleMember -function Get-UmbracoBuildEnv
 Export-ModuleMember -function Set-UmbracoVersion
 Export-ModuleMember -function Get-UmbracoVersion
 Export-ModuleMember -function Build-Umbraco
+
+#eof
