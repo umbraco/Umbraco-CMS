@@ -494,15 +494,6 @@ function Build-Pre
     mv "$webUi\web.config" "$webUi\web.config.temp-build"
   }
   cpf "$webUi\web.Template.config" "$webUi\web.config"
-
-  # setting node_modules folder to hidden
-  # used to prevent VS13 from crashing on it while loading the websites project
-  # also makes sure aspnet compiler does not try to handle rogue files and chokes
-  # in VSO with Microsoft.VisualC.CppCodeProvider -related errors
-  # use get-item -force 'cos it might be hidden already
-  write "Set hidden attribute on node_modules"
-  $dir = get-item -force "$src\Umbraco.Web.UI.Client\node_modules"
-  $dir.Attributes = $dir.Attributes -bor ([System.IO.FileAttributes]::Hidden)
 }
 
 #
@@ -517,7 +508,8 @@ function Build-Belle
   )
 
   $tmp = "$($uenv.SolutionRoot)\build.tmp"
-
+  $src = "$($uenv.SolutionRoot)\src"
+  
   Write-Host "Build Belle (logging to $tmp\belle.log)"
 
   push-location "$($uenv.SolutionRoot)\src\Umbraco.Web.UI.Client"
@@ -536,6 +528,16 @@ function Build-Belle
   
   pop-location
   $env:path = $p
+
+  
+  # setting node_modules folder to hidden
+  # used to prevent VS13 from crashing on it while loading the websites project
+  # also makes sure aspnet compiler does not try to handle rogue files and chokes
+  # in VSO with Microsoft.VisualC.CppCodeProvider -related errors
+  # use get-item -force 'cos it might be hidden already
+  write "Set hidden attribute on node_modules"
+  $dir = get-item -force "$src\Umbraco.Web.UI.Client\node_modules"
+  $dir.Attributes = $dir.Attributes -bor ([System.IO.FileAttributes]::Hidden)
 }
 
 #
