@@ -10,6 +10,8 @@
 # PowerShell Module Manifest:
 # https://msdn.microsoft.com/en-us/library/dd878337%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
 #
+# See also
+# http://www.powershellmagazine.com/2014/08/15/pstip-taking-control-of-verbose-and-debug-output-part-5/
 
 
 # returns a string containing the hash of $file
@@ -438,7 +440,6 @@ function Get-UmbracoVersion
   $text = [System.IO.File]::ReadAllText($filepath)
   $match = [System.Text.RegularExpressions.Regex]::Matches($text, "AssemblyInformationalVersion\(`"(.+)?`"\)")
   $version = $match.Groups[1]
-  Write-Host "AssemblyInformationalVersion: $version"
 
   # semver-parse the version string
   $semver = [SemVer.SemVersion]::Parse($version)
@@ -690,7 +691,8 @@ function Build-Post
     > $null
     
   # clear
-  write "Delete build folder"
+  # fixme - NuGet needs $tmp ?!
+  #write "Delete build folder"
   #rmrf "$tmp"
 
   # hash the webpi file
@@ -769,7 +771,7 @@ function Build-Umbraco
   $version = Get-UmbracoVersion
   $target = $target.ToLowerInvariant()
 
-  Write-Host "Build-Umbraco " + $version.Semver
+  Write-Host "Build-Umbraco $($version.Semver) $target"
 
   if ($target -eq "pre")
   {
@@ -789,6 +791,8 @@ function Build-Umbraco
     Write-Host ("##vso[task.setvariable variable=UMBRACO_RELEASE;]$($version.Release)")
     Write-Host ("##vso[task.setvariable variable=UMBRACO_COMMENT;]$($version.Comment)")
     Write-Host ("##vso[task.setvariable variable=UMBRACO_BUILD;]$($version.Build)")
+    
+    Write-Host ("##vso[task.setvariable variable=UMBRACO_TMP;]$($uenv.SolutionRoot)\build.tmp")
   }
   elseif ($target -eq "post")
   {
