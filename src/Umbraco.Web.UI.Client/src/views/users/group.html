@@ -1,10 +1,10 @@
 <div ng-controller="Umbraco.Editors.Users.GroupController as vm" class="clearfix">
 
-    <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
     <form name="editUserForm" novalidate val-form-manager>
 
-        <umb-editor-view>
+        <umb-editor-view ng-if="!vm.loading">
 
             <umb-editor-header
                 name="vm.userGroup.name"

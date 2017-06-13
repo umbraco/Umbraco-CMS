@@ -5,7 +5,6 @@
 
         var vm = this;
 
-        vm.loading = false;
         vm.page = {};
         vm.userGroup = {};
         vm.labels = {};
@@ -31,12 +30,8 @@
                 vm.userGroup = userGroup;
                 setSectionIcon(vm.userGroup.sections);
                 makeBreadcrumbs();
-            });
-
-            // fake loading
-            $timeout(function () {
                 vm.loading = false;
-            }, 500);
+            });
             
         }
 
