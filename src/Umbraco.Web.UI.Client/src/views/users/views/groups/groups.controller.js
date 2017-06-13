@@ -7,19 +7,10 @@
 
         vm.userGroups = [];
         vm.selection = [];
-        vm.viewState = 'overview';
-        
-        vm.pagination = {
-            "pageNumber": 1,
-            "totalPages": 5
-        };
 
-        vm.setViewState = setViewState;
         vm.goToUserGroup = goToUserGroup;
         vm.clearSelection = clearSelection;
         vm.selectUserGroup = selectUserGroup;
-        vm.selectAll = selectAll;
-        vm.areAllSelected = areAllSelected;
 
         function init() {
 
@@ -35,10 +26,6 @@
                 vm.loading = false;
             }, 500);
 
-        }
-
-        function setViewState(state) {
-            vm.viewState = state;
         }
 
         function selectUserGroup(userGroup, selection) {
@@ -61,28 +48,6 @@
 
         function goToUserGroup(userGroup) {
             $location.path('users/users/group/' + userGroup.id);
-        }
-        function selectAll() {
-            if(areAllSelected()) {
-                vm.selection = [];
-                angular.forEach(vm.userGroups, function(userGroup){
-                    userGroup.selected = false;
-                });
-            } else {
-                // clear selection so we don't add the same user twice
-                vm.selection = [];
-                // select all users
-                angular.forEach(vm.userGroups, function(userGroup){
-                    userGroup.selected = true;
-                    vm.selection.push(userGroup.id);
-                });
-            }
-        }
-
-        function areAllSelected() {
-            if(vm.selection.length === vm.userGroups.length) {
-                return true;
-            }
         }
 
         init();
