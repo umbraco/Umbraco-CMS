@@ -22,7 +22,7 @@
             }
 
             // get sections
-            sectionResource.getSections().then(function(sections){
+            sectionResource.getAllSections().then(function(sections){
                 vm.sections = sections;
 
                 setSectionIcon(vm.sections);
