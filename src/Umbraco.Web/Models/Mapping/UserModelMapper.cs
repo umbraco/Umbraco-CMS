@@ -227,7 +227,7 @@ namespace Umbraco.Web.Models.Mapping
         private void MapUserGroupBasic(ServiceContext services, dynamic group, UserGroupBasic display)
         {
             var allSections = services.SectionService.GetSections();
-            display.Sections = allSections.Where(x => group.AllowedSections.Contains(x.Alias)).Select(Mapper.Map<ContentEditing.Section>);
+            display.Sections = allSections.Where(x => Enumerable.Contains(group.AllowedSections, x.Alias)).Select(Mapper.Map<ContentEditing.Section>);
             if (group.StartMediaId > 0)
             {
                 display.StartMediaId = Mapper.Map<EntityBasic>(
