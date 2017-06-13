@@ -69,8 +69,8 @@ namespace Umbraco.Web.Editors
             if (decoded.IsNullOrWhiteSpace())
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
-            var user = await UserManager.FindByIdAsync(id);
-            if (user == null)
+            var identityUser = await UserManager.FindByIdAsync(id);
+            if (identityUser == null)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
             var result = await UserManager.ConfirmEmailAsync(id, decoded);
@@ -79,8 +79,14 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(string.Join(", ", result.Errors)));
             }
-            
-            await SignInManager.SignInAsync(user, false, false);
+
+            Request.TryGetOwinContext().Result.Authentication.SignOut(
+                Core.Constants.Security.BackOfficeAuthenticationType,
+                Core.Constants.Security.BackOfficeExternalAuthenticationType);
+
+            await SignInManager.SignInAsync(identityUser, false, false);
+
+            var user = ApplicationContext.Services.UserService.GetUserById(id);
 
             return Mapper.Map<UserDisplay>(user);
         }
