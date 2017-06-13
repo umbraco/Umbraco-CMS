@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -660,10 +661,23 @@ namespace umbraco
         /// Returns an MD5 hash of the string specified
         /// </summary>
         /// <param name="text">The text to create a hash from</param>
-        /// <returns>Md5 has of the string</returns>
+        /// <returns>Md5 hash of the string</returns>
+        [Obsolete("Please use the CreateHash method instead. This may be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static string md5(string text)
         {
-			return text.ToMd5();
+            return text.ToMd5();
+        }
+
+        /// <summary>
+        /// Generates a hash based on the text string passed in.  This method will detect the 
+        /// security requirements (is FIPS enabled) and return an appropriate hash.
+        /// </summary>
+        /// <param name="text">The text to create a hash from</param>
+        /// <returns>hash of the string</returns>
+        public static string CreateHash(string text)
+        {
+            return text.GenerateHash();
         }
 
         /// <summary>
