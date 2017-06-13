@@ -1,11 +1,16 @@
 .umb-button-group__toggle {
-   padding-left: 8px;
-   padding-right: 8px;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .umb-button-group__sub-buttons.-align-right {
-   right: 0;
-   left: auto;
+    right: 0;
+    left: auto;
+}
+
+.umb-button-group__sub-buttons a:focus {
+    outline: none;
+    text-decoration: underline !important;
 }
 
 .umb-button-group {
@@ -17,12 +22,10 @@
     .umb-button-group__toggle {
         border-radius: 0px 3px 3px 0;
     }
-
 }
 
 // hack for umb-era-button
 .umb-era-button-group {
-
     display: flex;
 
     .umb-era-button:first-child {
@@ -42,5 +45,4 @@
     .umb-era-button.umb-button-group__toggle .caret {
         margin: 0;
     }
-
 }

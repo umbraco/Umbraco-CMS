@@ -1,14 +1,16 @@
 (function() {
    'use strict';
 
-   function EditorMenuDirective($injector, treeService, navigationService, umbModelMapper, appState) {
+   function EditorMenuDirective($injector, $timeout, treeService, navigationService, umbModelMapper, appState) {
 
       function link(scope, el, attr, ctrl) {
+          scope.isOpen = false;
 
          //adds a handler to the context menu item click, we need to handle this differently
          //depending on what the menu item is supposed to do.
          scope.executeMenuItem = function (action) {
              navigationService.executeMenuAction(action, scope.currentNode, scope.currentSection);
+             scope.closeDropdown();
          };
 
          //callback method to go and get the options async
@@ -25,9 +27,31 @@
                  treeService.getMenu({ treeNode: scope.currentNode })
                      .then(function (data) {
                          scope.actions = data.menuItems;
+                         scope.actions[0].hasFocus = true;
                      });
+             } else {
+                scope.actions[0].hasFocus = true;
              }
          };
+
+         scope.toggleDropdown = function () {
+             var visibleDropdown = el.find(".dropdown-menu:visible");
+             if (visibleDropdown.length === 0)
+             {
+                 scope.isOpen = true;
+                 scope.getOptions();
+             }
+             else
+             {
+                 scope.isOpen = false;
+             }
+         };
+
+         scope.closeDropdown = function() {
+            scope.isOpen = false;
+         };
+
+         
 
       }
 

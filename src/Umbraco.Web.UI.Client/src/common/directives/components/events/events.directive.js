@@ -152,7 +152,7 @@ angular.module('umbraco.directives')
                 var el = event.target.nodeName;
 
                 //ignore link and button clicks
-                var els = ["INPUT","A","BUTTON"];
+                var els = ["INPUT[type='button']","INPUT[type='submit']","A","BUTTON"];
                 if(els.indexOf(el) >= 0){return;}
 
                 // ignore children of links and buttons

@@ -63,7 +63,7 @@
                 <asp:Literal ID="currentVersionTitle" runat="server" />
                 <small>(<asp:Literal ID="currentVersionMeta" runat="server" />)</small></cc1:PropertyPanel>
             <cc1:PropertyPanel ID="pp_rollBackTo" Text="Rollback to" runat="server">
-                <asp:DropDownList OnSelectedIndexChanged="version_load" ID="allVersions" runat="server" Width="400px" AutoPostBack="True" CssClass="guiInputTextTiny" />
+                <asp:DropDownList OnSelectedIndexChanged="version_load" ID="allVersions" runat="server" Width="400px" AutoPostBack="True" CssClass="guiInputTextTiny" autofocus="autofocus" />
             </cc1:PropertyPanel>
 
             <cc1:PropertyPanel id="pp_view" Text="View" runat="server">

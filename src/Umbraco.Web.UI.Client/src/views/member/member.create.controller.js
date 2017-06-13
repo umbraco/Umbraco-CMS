@@ -10,6 +10,11 @@ function memberCreateController($scope, $routeParams, memberTypeResource, iconHe
     
     memberTypeResource.getTypes($scope.currentNode.id).then(function (data) {
         $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
+
+        // add focus to the first item
+        if ($scope.allowedTypes.length > 0) {
+            $scope.allowedTypes[0].hasFocus = true;
+        }
     });
     
 }

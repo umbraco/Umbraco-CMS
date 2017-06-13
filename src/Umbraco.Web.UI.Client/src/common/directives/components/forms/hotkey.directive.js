@@ -19,7 +19,6 @@ angular.module("umbraco.directives")
             function activate() {
 
                 if (keyCombo) {
-
                     // disable shortcuts in input fields if keycombo is 1 character
                     if (keyCombo.length === 1) {
                         options = {
