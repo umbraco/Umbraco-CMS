@@ -1,13 +1,14 @@
 (function () {
     "use strict";
 
-    function UserGroupEditController($scope, $timeout, $location, usersResource, $routeParams) {
+    function UserGroupEditController($scope, $timeout, $location, $routeParams, usersResource, localizationService) {
 
         var vm = this;
 
         vm.loading = false;
         vm.page = {};
         vm.userGroup = {};
+        vm.labels = {};
 
         vm.goToPage = goToPage;
         vm.openSectionPicker = openSectionPicker;
@@ -21,9 +22,14 @@
 
             vm.loading = true;
 
+            localizationService.localize("general_cancel").then(function(name){
+    	        vm.labels.cancel = name;
+            });
+
             // get user
             usersResource.getUserGroup($routeParams.id).then(function (userGroup) {
                 vm.userGroup = userGroup;
+                setSectionIcon(vm.userGroup.sections);
                 makeBreadcrumbs();
             });
 
@@ -39,7 +45,24 @@
         }
 
         function openSectionPicker() {
-            alert("open section picker");
+            vm.sectionPicker = {
+                title: "Select sections",
+                view: "sectionpicker",
+                selection: vm.userGroup.sections,
+                closeButtonLabel: vm.labels.cancel,
+                show: true,
+                submit: function(model) {
+                    vm.sectionPicker.show = false;
+                    vm.sectionPicker = null;
+                },
+                close: function(oldModel) {
+                    if(oldModel.selection) {
+                        vm.userGroup.sections = oldModel.selection;
+                    }
+                    vm.sectionPicker.show = false;
+                    vm.sectionPicker = null;
+                }
+            };
         }
 
         function openContentPicker() {
@@ -133,6 +156,12 @@
                     "name": vm.userGroup.name
                 }
             ];
+        }
+
+        function setSectionIcon(sections) {
+            angular.forEach(sections, function(section) {
+                section.icon = "icon-section " + section.cssclass;
+            });
         }
  
         init();
