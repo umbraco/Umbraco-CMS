@@ -66,7 +66,7 @@
                         <umb-button
                             ng-if="vm.allowSetUserGroup"
                             type="button"
-                        button-style="link"
+                            button-style="link"
                             label="Set group"
                             icon="icon-users"
                             action="vm.setUserGroup()">
@@ -76,7 +76,7 @@
                         <umb-button
                             ng-if="vm.allowEnableUser"
                             type="button"
-                        button-style="link"
+                            button-style="link"
                             label="Enable"
                             icon="icon-check"
                             action="vm.enableUser()">
@@ -86,7 +86,7 @@
                         <umb-button
                             ng-if="vm.allowDisableUser"
                             type="button"
-                        button-style="link"
+                            button-style="link"
                             label="Disable"
                             icon="icon-block"
                             action="vm.disableUser()">
@@ -104,44 +104,53 @@
 
                 <div class="flex" style="margin-left: auto;">
 
-                    <div class="dropdown pull-right">
-                        <a style="text-decoration: none;" class="btn btn-link dropdown-toggle" href="" ng-click="vm.showFilter = !vm.showFilter">
-                            Show:
-                            <span class="bold" style="margin-left: 2px;">All</span>
+                    <!-- Status filter -->
+                    <div class="dropdown pull-right" ng-if="vm.userStates.length > 0">
+                        <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.showStatusFilter = !vm.showStatusFilter">
+                            <span>Status:</span>
+                            <span class="bold" style="margin-left: 5px; margin-right: 3px;">All</span>
                             <span class="caret"></span>
                         </a>
-                        <ul ng-if="vm.showFilter" on-outside-click="vm.showFilter = false;" style="display: block;" class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                            <li style="padding: 5px 10px;">
-                                <div class="flex items-center">
-                                    <input style="margin-right: 7px; margin-top: 2px;" type="checkbox" />All
-                                </div>
-                            </li>
-                            <li class="divider"></li>
-                            <li ng-repeat="userGroup in vm.userGroups" style="padding: 5px 10px;">
-                                <div class="flex items-center">
-                                    <input style="margin-right: 7px; margin-top: 2px;" type="checkbox" />
-                                    {{ userGroup.name }}
-                                </div>
-                            </li>
-                            <li class="divider"></li>
+                        <ul ng-if="vm.showStatusFilter" on-outside-click="vm.showStatusFilter = false;" class="dropdown-menu db" role="menu" aria-labelledby="dropdownMenu">
                             <li ng-repeat="userState in vm.userStates" style="padding: 5px 10px;">
                                 <div class="flex items-center">
-                                    <input style="margin-right: 7px; margin-top: 2px;" type="checkbox" />
+                                    <input style="margin-right: 7px; margin-top: 2px;" type="checkbox" /> 
                                     {{ userState.name }} ({{userState.count}})
                                 </div>
                             </li>
                         </ul>
                     </div>
 
+                    <!-- Groups filter -->
                     <div class="dropdown pull-right">
-                        <a style="text-decoration: none;" class="btn btn-link dropdown-toggle" href="" data-toggle="dropdown">
-                            Order by:
+                        <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.showGroupFilter = !vm.showGroupFilter">
+                            <span>Groups:</span>
+                            <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getGroupFilterName() }}</span>
+                            <span class="caret"></span>
+                        </a>
+                        <ul ng-if="vm.showGroupFilter" on-outside-click="vm.showGroupFilter = false;" class="dropdown-menu db" role="menu" aria-labelledby="dropdownMenu">
+                            <li ng-repeat="userGroup in vm.userGroups" style="padding: 5px 10px;">
+                                <div class="flex items-center">
+                                    <input checklist-model="vm.usersOptions.filter" checklist-value="userGroup.alias" style="margin-right: 7px; margin-top: 2px;" type="checkbox" />
+                                    {{ userGroup.name }}
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Order By -->
+                    <div class="dropdown pull-right">
+                        <a class="btn btn-link dropdown-toggle flex" href="" data-toggle="dropdown">
+                            <span>Order by:</span>
                             <span class="bold" style="margin-left: 2px;">{{ vm.usersOptions.orderBy }} </span>
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                            <li><a tabindex="-1" href="#" ng-click="vm.setOrderByFilter('NameAsc')" prevent-default>Name (A-Z)</a></li>
+                            <li><a tabindex="-1" href="#" ng-click="vm.setOrderByFilter('NameDesc')" prevent-default>Name (Z-A)</a></li>
+                            <li><a tabindex="-1" href="#" ng-click="vm.setOrderByFilter('Newest')" prevent-default>Newest</a></li>
+                            <li><a tabindex="-1" href="#" ng-click="vm.setOrderByFilter('Oldest')" prevent-default>Oldest</a></li>
                             <li><a tabindex="-1" href="#" ng-click="vm.setOrderByFilter('lastLoginDate')" prevent-default>Last login</a></li>
-                            <li><a tabindex="-1" href="#" ng-click="vm.setOrderByFilter('Name')" prevent-default>Name</a></li>
                         </ul>
                     </div>
 

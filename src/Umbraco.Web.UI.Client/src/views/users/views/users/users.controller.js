@@ -69,6 +69,7 @@
         vm.selectAll = selectAll;
         vm.areAllSelected = areAllSelected;
         vm.searchUsers = searchUsers;
+        vm.getGroupFilterName = getGroupFilterName;
         vm.setOrderByFilter = setOrderByFilter;
         vm.changePageNumber = changePageNumber;
         vm.createUser = createUser;
@@ -205,6 +206,31 @@
             search();
         }
 
+        function getGroupFilterName() {
+
+            var name = "";
+            var found = false;
+
+            angular.forEach(vm.usersOptions.filter, function(value, index){
+                angular.forEach(vm.userGroups, function(userGroup){
+                    if(value === userGroup.alias) {
+                        if(index === 0) {
+                            name = userGroup.name;
+                        } else {
+                            name = name + ", " + userGroup.name;
+                        }
+                        found = true;
+                    }
+                });
+            });
+
+            if(!found) {
+                name = "All";
+            }
+
+            return name;
+        }
+
         function setOrderByFilter(value) {
             vm.usersOptions.orderBy = value;
             getUsers();
@@ -292,6 +318,10 @@
                 vm.userStates = getUserStates(vm.users);
                 formatDates(vm.users);
                 setUserDisplayState(vm.users);
+
+                vm.loading = false;
+
+            }, function(error){
 
                 vm.loading = false;
 
