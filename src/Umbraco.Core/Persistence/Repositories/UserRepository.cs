@@ -270,7 +270,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 {"failedLoginAttempts", "FailedPasswordAttempts"},
                 {"createDate", "CreateDate"},
                 {"updateDate", "UpdateDate"},
-                {"avatar", "Avatar"}
+                {"avatar", "Avatar"},
+                {"emailConfirmedDate", "EmailConfirmedDate"}
             };
 
             //create list of properties that have changed

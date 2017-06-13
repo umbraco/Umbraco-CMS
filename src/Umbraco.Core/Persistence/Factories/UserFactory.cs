@@ -65,7 +65,8 @@ namespace Umbraco.Core.Persistence.Factories
                 LastPasswordChangeDate = entity.LastPasswordChangeDate == DateTime.MinValue ? (DateTime?)null : entity.LastPasswordChangeDate,
                 CreateDate = entity.CreateDate,
                 UpdateDate = entity.UpdateDate,
-                Avatar = entity.Avatar
+                Avatar = entity.Avatar,
+                EmailConfirmedDate = entity.EmailConfirmedDate
             };
 
             foreach (var startNodeId in entity.StartContentIds)

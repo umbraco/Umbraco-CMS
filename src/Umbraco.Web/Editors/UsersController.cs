@@ -253,6 +253,8 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         public async Task<UserDisplay> PostInviteUser(UserInvite userSave)
         {
+            //TODO: Allow re-inviting the user!
+
             if (userSave == null) throw new ArgumentNullException("userSave");
 
             if (ModelState.IsValid == false)
@@ -267,19 +269,57 @@ namespace Umbraco.Web.Editors
                     Request.CreateNotificationValidationErrorResponse("No Email server is configured"));
             }
 
-            var existing = Services.UserService.GetByEmail(userSave.Email);
-            if (existing != null)
+            var identityUser = await UserManager.FindByEmailAsync(userSave.Email);
+            if (identityUser != null && identityUser.LastLoginDateUtc.HasValue && identityUser.LastLoginDateUtc.Value == default(DateTime))
             {
                 ModelState.AddModelError("Email", "A user with the email already exists");
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
-            var user = Mapper.Map<IUser>(userSave);
+            if (identityUser == null)
+            {
+                identityUser = new BackOfficeIdentityUser
+                {
+                    Email = userSave.Email,
+                    Name = userSave.Name,
+                    UserName = userSave.Email
+                };
+
+                //Save the user first
+                var result = await UserManager.CreateAsync(identityUser);
+                if (result.Succeeded == false)
+                {
+                    throw new HttpResponseException(
+                        Request.CreateNotificationValidationErrorResponse(string.Join(", ", result.Errors)));
+                }
+            }
+            else
+            {
+                identityUser.Name = userSave.Name;
+                var result = await UserManager.UpdateAsync(identityUser);
+                if (result.Succeeded == false)
+                {
+                    throw new HttpResponseException(
+                        Request.CreateNotificationValidationErrorResponse(string.Join(", ", result.Errors)));
+                }
+            }
+
+            //Add/Update to roles
+            var roleResult = await UserManager.AddToRolesAsync(identityUser.Id, userSave.UserGroups.ToArray());
+            if (roleResult.Succeeded == false)
+            {
+                throw new HttpResponseException(
+                    Request.CreateNotificationValidationErrorResponse(string.Join(", ", roleResult.Errors)));
+            }
             
-            var link = string.Format("{0}#/login/false?invite={1}", 
+            //now send the email
+            var token = await UserManager.GenerateEmailConfirmationTokenAsync(identityUser.Id);
+            var link = string.Format("{0}#/login/false?invite={1}{2}{3}",
                 ApplicationContext.UmbracoApplicationUrl,
-                user.SecurityStamp.ToUrlBase64());
-            
+                identityUser.Id,
+                WebUtility.UrlEncode("|"),
+                token.ToUrlBase64());
+
             await UserManager.EmailService.SendAsync(new IdentityMessage
             {
                 Body = string.Format("You have been invited to the Umbraco Back Office!\n\n{0}\n\nClick this link to accept the invite\n\n{1}", userSave.Message, link),
@@ -287,11 +327,7 @@ namespace Umbraco.Web.Editors
                 Subject = "You have been invited to the Umbraco Back Office!"
             });
 
-            //Email was successful, so save the user now
-
-            Services.UserService.Save(user);
-
-            return Mapper.Map<UserDisplay>(user);
+            return Mapper.Map<UserDisplay>(identityUser);
         }
 
         /// <summary>

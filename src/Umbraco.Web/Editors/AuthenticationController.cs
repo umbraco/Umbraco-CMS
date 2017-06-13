@@ -51,12 +51,16 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Checks if a valid token is specified for an invited user and if so returns the user object
+        /// Checks if a valid token is specified for an invited user and if so logs the user in and returns the user object
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="token"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// This will also update the security stamp for the user so it can only be used once
+        /// </remarks>
         [ValidateAngularAntiForgeryToken]
-        public UserDisplay PostVerifyInvite([FromUri]string token)
+        public async Task<UserDisplay> PostVerifyInvite([FromUri]int id, [FromUri]string token)
         {
             if (string.IsNullOrWhiteSpace(token))
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
@@ -65,9 +69,18 @@ namespace Umbraco.Web.Editors
             if (decoded.IsNullOrWhiteSpace())
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
-            var user = Services.UserService.ValidateInviteToken(decoded);
+            var user = await UserManager.FindByIdAsync(id);
             if (user == null)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            var result = await UserManager.ConfirmEmailAsync(id, decoded);
+
+            if (result.Succeeded == false)
+            {
+                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(string.Join(", ", result.Errors)));
+            }
+            
+            await SignInManager.SignInAsync(user, false, false);
 
             return Mapper.Map<UserDisplay>(user);
         }

@@ -10,13 +10,6 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IUserService : IMembershipUserService
     {
-        /// <summary>
-        /// Checks if a valid token is specified for an invited user and if so returns the user object
-        /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        IUser ValidateInviteToken(string token);
-
         IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, 
             UserState? userState = null, string[] userGroups = null, string filter = "");

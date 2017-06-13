@@ -16,6 +16,8 @@ namespace Umbraco.Core.Models.Identity
         {
             StartMediaIds = new int[] { };
             StartContentIds = new int[] { };
+            Groups = new string[] { };
+            AllowedSections = new string[] { };
             Culture = Configuration.GlobalSettings.DefaultUILanguage;
         }
 

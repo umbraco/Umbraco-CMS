@@ -487,29 +487,7 @@ namespace Umbraco.Core.Services
 
                 return ret;
             }
-        }
-
-        public IUser ValidateInviteToken(string token)
-        {
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
-            {
-                var repository = RepositoryFactory.CreateUserRepository(uow);
-                var query = new Query<IUser>();
-
-                query.Where(member => member.SecurityStamp == token);
-
-                var found = repository.GetByQuery(query).ToArray();
-
-                if (found.Length == 0) return null;
-
-                var user = found[0];
-                
-                //they should have never logged in for an invite to work
-                if (user.LastLoginDate != default(DateTime)) return null;
-
-                return user;
-            }
-        }
+        }        
 
         public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState? userState = null, string[] userGroups = null, string filter = "")
         {

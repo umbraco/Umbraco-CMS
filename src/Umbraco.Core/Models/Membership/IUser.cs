@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models.Membership
@@ -16,6 +17,8 @@ namespace Umbraco.Core.Models.Membership
         int[] StartContentIds { get; set; }
         int[] StartMediaIds { get; set; }
         string Language { get; set; }
+
+        DateTime? EmailConfirmedDate { get; set; }
 
         /// <summary>
         /// Gets the groups that user is part of

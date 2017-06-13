@@ -276,7 +276,9 @@ namespace Umbraco.Core.Security
         public Task<bool> GetEmailConfirmedAsync(BackOfficeIdentityUser user)
         {
             ThrowIfDisposed();
-            throw new NotImplementedException();
+            if (user == null) throw new ArgumentNullException("user");
+
+            return Task.FromResult(user.EmailConfirmed);
         }
 
         /// <summary>
@@ -287,7 +289,8 @@ namespace Umbraco.Core.Security
         public Task SetEmailConfirmedAsync(BackOfficeIdentityUser user, bool confirmed)
         {
             ThrowIfDisposed();
-            throw new NotImplementedException();
+            user.EmailConfirmed = confirmed;
+            return Task.FromResult(0);
         }
 
         /// <summary>
@@ -629,6 +632,12 @@ namespace Umbraco.Core.Security
             {
                 anythingChanged = true;
                 user.LastLoginDate = identityUser.LastLoginDateUtc.Value.ToLocalTime();
+            }
+            if ((user.EmailConfirmedDate.HasValue && user.EmailConfirmedDate.Value != default(DateTime) && identityUser.EmailConfirmed == false)
+                || ((user.EmailConfirmedDate.HasValue == false || user.EmailConfirmedDate.Value == default(DateTime)) && identityUser.EmailConfirmed))                
+            {
+                anythingChanged = true;
+                user.EmailConfirmedDate = identityUser.EmailConfirmed ? (DateTime?)DateTime.Now : null;
             }
             if (user.Name != identityUser.Name && identityUser.Name.IsNullOrWhiteSpace() == false)
             {
