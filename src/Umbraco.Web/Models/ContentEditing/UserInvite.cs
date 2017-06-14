@@ -22,5 +22,6 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "message", IsRequired = true)]
         [Required]
         public string Message { get; set; }
+        
     }
 }

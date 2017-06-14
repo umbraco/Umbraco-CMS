@@ -7,6 +7,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using System.Web.Mvc;
+using System.Web.Routing;
+using System.Web.WebPages;
 using AutoMapper;
 using ClientDependency.Core;
 using Microsoft.AspNet.Identity;
@@ -25,6 +28,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using IUser = Umbraco.Core.Models.Membership.IUser;
+using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Web.Editors
 {
@@ -281,22 +285,61 @@ namespace Umbraco.Web.Editors
 
             Services.UserService.Save(user);
             
+            var display = Mapper.Map<UserDisplay>(user);
+
+            await SendEmailAsync(display, Security.CurrentUser.Name, userSave.Message);
+
+            return display;
+        }
+
+        private async Task SendEmailAsync(UserDisplay userDisplay, string from, string message)
+        {
             //now send the email
-            var token = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+            var token = await UserManager.GenerateEmailConfirmationTokenAsync((int)userDisplay.Id);
             var link = string.Format("{0}#/login/false?invite={1}{2}{3}",
                 ApplicationContext.UmbracoApplicationUrl,
-                user.Id,
+                (int)userDisplay.Id,
                 WebUtility.UrlEncode("|"),
                 token.ToUrlBase64());
 
-            await UserManager.EmailService.SendAsync(new IdentityMessage
-            {
-                Body = string.Format("You have been invited to the Umbraco Back Office!\n\n{0}\n\nClick this link to accept the invite\n\n{1}", userSave.Message, link),
-                Destination = userSave.Email,
-                Subject = "You have been invited to the Umbraco Back Office!"
-            });
+            var virtualPath = SystemDirectories.Umbraco.EnsureEndsWith("/") + "Views/UserInvite.cshtml";
+            var view = IOHelper.MapPath(virtualPath);
 
-            return Mapper.Map<UserDisplay>(user);
+            //This should always exist but just in case, we'll check
+            if (System.IO.File.Exists(view) == false)
+            {
+                await UserManager.EmailService.SendAsync(new IdentityMessage
+                {
+                    Body = string.Format("<html><body>You have been invited to the Umbraco Back Office!<br/><br/>{0}\n\nClick this link to accept the invite\n\n{1}", message, link),
+                    Destination = userDisplay.Email,
+                    Subject = "You have been invited to the Umbraco Back Office"
+                });
+            }
+            else
+            {
+                //TODO: Inject IControllerFactory in v8                
+                var httpContext = TryGetHttpContext().Result;
+                var requestContext = new RequestContext(httpContext, new RouteData());                
+                var userInviteEmail = new UserInviteEmail
+                {
+                    StartContentIds = userDisplay.StartContentIds,
+                    StartMediaIds = userDisplay.StartMediaIds,
+                    Email = userDisplay.Email,
+                    Name = userDisplay.Name,
+                    UserGroups = userDisplay.UserGroups,
+                    Message = message,
+                    InviteUrl = link,
+                    FromName = from
+                };
+                var viewResult = requestContext.RenderViewToString(new ViewDataDictionary(), new TempDataDictionary(), virtualPath, userInviteEmail, false);
+                await UserManager.EmailService.SendAsync(new IdentityMessage
+                {
+                    Body = viewResult,
+                    Destination = userDisplay.Email,
+                    Subject = "You have been invited to the Umbraco Back Office"
+                });
+            }
+            
         }
 
         /// <summary>
