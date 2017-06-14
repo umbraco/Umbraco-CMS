@@ -174,21 +174,26 @@ function Compile-Umbraco
 # Prepare-Tests
 # Prepare Tests
 #
-# fixme - idea is to avoid rebuilding everything for tests
-# but because of our weird assembly versioning (with .* stuff)
-# everything gets rebuilt all the time...
-#
 function Prepare-Tests
 {
   param (
     $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
   )
   
+  $src = "$($uenv.SolutionRoot)\src"
   $tmp = "$($uenv.SolutionRoot)\build.tmp"
   
   Write-Host ">> Prepare-Tests"
 
-  Copy-Files "$tmp\bin" "." "$tmp\tests"
+  # fixme - idea is to avoid rebuilding everything for tests
+  # but because of our weird assembly versioning (with .* stuff)
+  # everything gets rebuilt all the time...
+  #Copy-Files "$tmp\bin" "." "$tmp\tests"
+  
+  # data
+  Write-Host "Copy data files"
+  mkdir "$tmp\tests\Packaging" > $null
+  Copy-Files "$src\Umbraco.Tests\Packaging\Packages" "*" "$tmp\tests\Packaging\Packages"
 }
 
 #
@@ -420,11 +425,15 @@ function Build-Umbraco
     $target = "all"
   )
   
-  $uenv = Get-UmbracoBuildEnv
-  $version = Get-UmbracoVersion
   $target = $target.ToLowerInvariant()
+  Write-Host ">> Build-Umbraco <$target>"
 
-  Write-Host "Build-Umbraco $($version.Semver) <$target>"
+  Write-Host "Get Build Environment"
+  $uenv = Get-UmbracoBuildEnv
+  
+  Write-Host "Get Version"
+  $version = Get-UmbracoVersion
+  Write-Host "Version $($version.Semver)"
 
   if ($target -eq "pre-build")
   {
