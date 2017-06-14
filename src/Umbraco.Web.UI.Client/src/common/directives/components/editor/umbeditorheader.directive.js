@@ -255,7 +255,8 @@ Use this directive to construct a header inside the main editor window.
                 description: "=",
                 hideDescription: "@",
                 descriptionLocked: "@",
-                navigation: "="
+                navigation: "=",
+                key: "="
             },
             link: link
         };
