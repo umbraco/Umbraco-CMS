@@ -14,10 +14,10 @@
 # http://www.powershellmagazine.com/2014/08/15/pstip-taking-control-of-verbose-and-debug-output-part-5/
 
 
-". $PSScriptRoot\Utilities.ps1"
-". $PSScriptRoot\Get-VisualStudio.ps1"
+. "$PSScriptRoot\Utilities.ps1"
+. "$PSScriptRoot\Get-VisualStudio.ps1"
 
-". $PSScriptRoot\Get-UmbracoBuildEnv.ps1"
+. "$PSScriptRoot\Get-UmbracoBuildEnv.ps1"
 . "$PSScriptRoot\Set-UmbracoVersion.ps1"
 . "$PSScriptRoot\Get-UmbracoVersion.ps1"
 
