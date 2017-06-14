@@ -194,6 +194,10 @@ function Prepare-Tests
   Write-Host "Copy data files"
   mkdir "$tmp\tests\Packaging" > $null
   Copy-Files "$src\Umbraco.Tests\Packaging\Packages" "*" "$tmp\tests\Packaging\Packages"
+  
+  # required for package install tests  
+  Write-Host "Create bin directory"
+  mkdir "$tmp\tests\bin" > $null
 }
 
 #
