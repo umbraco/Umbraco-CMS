@@ -7,7 +7,7 @@ namespace Umbraco.Core.Packaging.Models
 {
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class UninstallationSummary
+    public class UninstallationSummary
     {
         public MetaData MetaData { get; set; }
         public IEnumerable<IDataTypeDefinition> DataTypesUninstalled { get; set; }
