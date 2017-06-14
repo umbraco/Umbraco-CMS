@@ -36,11 +36,8 @@ namespace Umbraco.Web.Models.Mapping
                     }
                 });
 
-            config.CreateMap<UserInvite, IUser>()
-                .ConstructUsing(invite => new User(invite.Name, invite.Email, invite.Email, Guid.NewGuid().ToString("N")))
-                .IgnoreAllUnmapped()
-                //generate a new token
-                .ForMember(user => user.SecurityStamp, expression => expression.MapFrom(x => (DateTime.Now + x.Email).ToSHA1()))
+            config.CreateMap<UserInvite, IUser>()                
+                .IgnoreAllUnmapped()                
                 //all invited users will not be approved, completing the invite will approve the user
                 .ForMember(user => user.IsApproved, expression => expression.UseValue(false))                
                 .AfterMap((invite, user) =>

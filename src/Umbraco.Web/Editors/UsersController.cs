@@ -270,7 +270,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(
                     Request.CreateNotificationValidationErrorResponse("No Email server is configured"));
             }
-
+            
             var user = Services.UserService.GetByEmail(userSave.Email);
             if (user != null && (user.LastLoginDate != default(DateTime) || user.EmailConfirmedDate.HasValue))
             {
@@ -278,13 +278,29 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
-            //map to new user or map to existing user (if they've already been invited but didn't accept it)
-            user = user == null ? Mapper.Map<IUser>(userSave) : Mapper.Map(userSave, user);
+            if (user == null)
+            {
+                //we want to create the user with the UserManager, this ensures the 'empty' (special) password
+                //format is applied without us having to duplicate that logic
+                var created = await UserManager.CreateAsync(new BackOfficeIdentityUser
+                {
+                    Email = userSave.Email,
+                    Name = userSave.Name,
+                    UserName = userSave.Email
+                });
+                if (created.Succeeded == false)
+                {
+                    throw new HttpResponseException(
+                        Request.CreateNotificationValidationErrorResponse(string.Join(", ", created.Errors)));
+                }
 
-            //This is the default but just ensure it's true, until they click on the invite and set their password they will not be approved
-            //and therefore not authenticated to the back office
-            user.IsApproved = false;
+                //now re-look the user back up
+                user = Services.UserService.GetByEmail(userSave.Email);
+            }
 
+            //map the save info over onto the user
+            user = Mapper.Map(userSave, user);
+            
             //Save the user first
             Services.UserService.Save(user);            
             var display = Mapper.Map<UserDisplay>(user);

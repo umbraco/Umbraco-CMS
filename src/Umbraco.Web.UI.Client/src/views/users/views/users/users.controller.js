@@ -280,9 +280,7 @@
 
             contentEditingHelper.contentEditorPerformSave({
                 statusMessage: localizeSaving,
-                saveMethod: function(obj, isCreate, files) {
-                  usersResource.inviteUser(a, b, c);
-                },
+                saveMethod: usersResource.inviteUser,
                 scope: $scope,
                 content: vm.newUser,
                 // We do not redirect on failure for users - this is because it is not possible to actually save a user

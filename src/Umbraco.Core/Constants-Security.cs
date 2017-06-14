@@ -16,6 +16,8 @@ namespace Umbraco.Core
             public const string BackOfficeTokenAuthenticationType = "UmbracoBackOfficeToken";
             public const string BackOfficeTwoFactorAuthenticationType = "UmbracoTwoFactorCookie";
 
+            internal const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
+
             /// <summary>
             /// The prefix used for external identity providers for their authentication type
             /// </summary>

@@ -42,7 +42,7 @@ namespace Umbraco.Core.Models.Identity
 
         private string GetPasswordHash(string storedPass)
         {
-            return storedPass.StartsWith("___UIDEMPTYPWORD__") ? null : storedPass;
+            return storedPass.StartsWith(Constants.Security.EmptyPasswordPrefix) ? null : storedPass;
         }
     }
 }

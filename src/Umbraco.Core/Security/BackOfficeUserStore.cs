@@ -68,32 +68,25 @@ namespace Umbraco.Core.Security
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
-            var member = new User
-            {
-                DefaultToLiveEditing = false,
-                Email = user.Email,
-                Language = user.Culture ?? Configuration.GlobalSettings.DefaultUILanguage,
-                Name = user.Name,
-                Username = user.UserName,
-                StartContentIds = user.StartContentIds ?? new int[] { },
-                StartMediaIds = user.StartMediaIds ?? new int[] { },
-                IsLockedOut = user.IsLockedOut,
-                IsApproved = true
-            };
-
-            UpdateMemberProperties(member, user);
-
             //the password must be 'something' it could be empty if authenticating
             // with an external provider so we'll just generate one and prefix it, the 
             // prefix will help us determine if the password hasn't actually been specified yet.
-            if (member.RawPasswordValue.IsNullOrWhiteSpace())
-            {
-                //this will hash the guid with a salt so should be nicely random
-                var aspHasher = new PasswordHasher();
-                member.RawPasswordValue = "___UIDEMPTYPWORD__" +
-                    aspHasher.HashPassword(Guid.NewGuid().ToString("N"));
+            //this will hash the guid with a salt so should be nicely random
+            var aspHasher = new PasswordHasher();
+            var emptyPasswordValue = Constants.Security.EmptyPasswordPrefix +
+                                      aspHasher.HashPassword(Guid.NewGuid().ToString("N"));
 
-            }
+            var member = new User(user.Name, user.Email, user.UserName, emptyPasswordValue)
+            {
+                DefaultToLiveEditing = false,
+                Language = user.Culture ?? Configuration.GlobalSettings.DefaultUILanguage,
+                StartContentIds = user.StartContentIds ?? new int[] { },
+                StartMediaIds = user.StartMediaIds ?? new int[] { },
+                IsLockedOut = user.IsLockedOut,
+            };
+
+            UpdateMemberProperties(member, user);
+            
             _userService.Save(member);
 
             if (member.Id == 0) throw new DataException("Could not create the user, check logs for details");
@@ -206,7 +199,7 @@ namespace Umbraco.Core.Security
         {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
-            if (passwordHash.IsNullOrWhiteSpace()) throw new ArgumentNullException("passwordHash");
+            if (string.IsNullOrEmpty(passwordHash)) throw new ArgumentException("Value cannot be null or empty.", "passwordHash");
 
             user.PasswordHash = passwordHash;
 
@@ -222,7 +215,7 @@ namespace Umbraco.Core.Security
         {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
-
+            
             return Task.FromResult(user.PasswordHash);
         }
 
@@ -236,7 +229,7 @@ namespace Umbraco.Core.Security
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
-            return Task.FromResult(user.PasswordHash.IsNullOrWhiteSpace() == false);
+            return Task.FromResult(string.IsNullOrEmpty(user.PasswordHash) == false);
         }
 
         /// <summary>

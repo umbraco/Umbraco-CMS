@@ -46,7 +46,7 @@ namespace Umbraco.Core.Models.Membership
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
             if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Value cannot be null or whitespace.", "email");
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
-            if (string.IsNullOrWhiteSpace(rawPasswordValue)) throw new ArgumentException("Value cannot be null or whitespace.", "rawPasswordValue");
+            if (string.IsNullOrEmpty(rawPasswordValue)) throw new ArgumentException("Value cannot be null or empty.", "rawPasswordValue");
 
             _name = name;
             _email = email;
@@ -57,6 +57,7 @@ namespace Umbraco.Core.Models.Membership
             _isLockedOut = false;
             _startContentIds = new int[] { };
             _startMediaIds = new int[] { };
+            
         }
 
         /// <summary>
