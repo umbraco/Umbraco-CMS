@@ -44,17 +44,18 @@
                                         </a>
                                     </umb-control-group>
 
-                                    <umb-control-group label="Content start nodes" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
+                                    <umb-control-group label="Content start node" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
                                         <umb-node-preview
+                                            ng-if="vm.userGroup.startContentId.id"
                                             style="max-width: 100%;"
-                                            ng-repeat="node in vm.userGroup.startNodesContent"
-                                            icon="node.icon"
-                                            name="node.name"
+                                            icon="vm.userGroup.startContentId.icon"
+                                            name="vm.userGroup.startContentId.name"
                                             allow-remove="true"
-                                            on-remove="vm.removeSelectedItem($index, vm.userGroup.startNodesContent)">
+                                            on-remove="vm.clearStartNode('content')">
                                         </umb-node-preview>
 
                                         <a href=""
+                                            ng-if="!vm.userGroup.startContentId.id"
                                             style="max-width: 100%;"
                                             class="umb-node-preview-add"
                                             ng-click="vm.openContentPicker()"
@@ -63,17 +64,18 @@
                                         </a>
                                     </umb-control-group>
 
-                                    <umb-control-group label="Media start nodes" description="Donec quis lacinia ligula. Suspendisse ultrices risus ante">
+                                    <umb-control-group label="Media start node" description="Donec quis lacinia ligula. Suspendisse ultrices risus ante">
                                         <umb-node-preview
+                                            ng-if="vm.userGroup.startMediaId.id"
                                             style="max-width: 100%;"
-                                            ng-repeat="node in vm.userGroup.startNodesMedia"
-                                            icon="node.icon"
-                                            name="node.name"
+                                            icon="vm.userGroup.startMediaId.icon"
+                                            name="vm.userGroup.startMediaId.name"
                                             allow-remove="true"
-                                            on-remove="vm.removeSelectedItem($index, vm.userGroup.startNodesMedia)">
+                                            on-remove="vm.clearStartNode('media')">
                                         </umb-node-preview>
 
                                         <a href=""
+                                            ng-if="!vm.userGroup.startMediaId.id"
                                             style="max-width: 100%;"
                                             class="umb-node-preview-add"
                                             ng-click="vm.openMediaPicker()"
@@ -106,7 +108,7 @@
                                 <umb-user-preview
                                     ng-repeat="user in vm.userGroup.users"
                                     name="user.name"
-                                    avatar="user.avatar"
+                                    avatars="user.avatars"
                                     allow-remove="true"
                                     on-remove="vm.removeSelectedUser($index, vm.userGroup.users)">
                                 </umb-user-preview>

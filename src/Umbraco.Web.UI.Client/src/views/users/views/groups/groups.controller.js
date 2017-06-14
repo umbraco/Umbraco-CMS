@@ -12,19 +12,15 @@
         vm.clearSelection = clearSelection;
         vm.selectUserGroup = selectUserGroup;
 
-        function init() {
+        function onInit() {
 
             vm.loading = true;
 
             // Get users
             usersResource.getUserGroups().then(function (userGroups) {
                 vm.userGroups = userGroups;
-            });
-
-            // fake loading
-            $timeout(function () {
                 vm.loading = false;
-            }, 500);
+            });
 
         }
 
@@ -50,7 +46,7 @@
             $location.path('users/users/group/' + userGroup.id);
         }
 
-        init();
+        onInit();
 
     }
 

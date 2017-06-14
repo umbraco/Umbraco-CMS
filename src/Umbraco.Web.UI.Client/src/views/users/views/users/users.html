@@ -181,7 +181,8 @@
                                 size="l"
                                 color="secondary"
                                 name="{{user.name}}"
-                                img-src="{{user.avatars[2]}}">
+                                img-src="{{user.avatars[2]}}"
+                                img-srcset="{{user.avatars[3]}} 2x, {{user.avatars[4]}} 3x">
                             </umb-avatar>
                         </div>
                         <div class="umb-user__checkmark" ng-if="user.selected"><umb-checkmark checked="user.selected" size="s"></umb-checkmark></div>
@@ -232,7 +233,8 @@
                                     size="xs"
                                     color="secondary"
                                     name="{{user.name}}"
-                                    img-src="{{user.avatars[0]}}">
+                                    img-src="{{user.avatars[0]}}"
+                                    img-srcset="{{user.avatars[1]}} 2x, {{user.avatars[2]}} 3x">
                                 </umb-avatar>
                             </td>
                             <td class="bold"><a href="" ng-click="vm.goToUser(user)">{{user.name}}</a></td>

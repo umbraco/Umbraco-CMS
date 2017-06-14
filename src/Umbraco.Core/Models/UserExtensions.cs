@@ -69,11 +69,11 @@ namespace Umbraco.Core.Models
                 {
                     return new[]
                     {
-                        gravatarUrl  + "?s=30",
-                        gravatarUrl  + "?s=60",
-                        gravatarUrl  + "?s=90",
-                        gravatarUrl  + "?s=150",
-                        gravatarUrl  + "?s=300"
+                        gravatarUrl  + "&s=30",
+                        gravatarUrl  + "&s=60",
+                        gravatarUrl  + "&s=90",
+                        gravatarUrl  + "&s=150",
+                        gravatarUrl  + "&s=300"
                     };
                 }
 
