@@ -22,7 +22,6 @@
 . "$PSScriptRoot\Get-UmbracoVersion.ps1"
 
 #
-# Prepare-Build
 # Prepares the build
 #
 function Prepare-Build
@@ -31,7 +30,7 @@ function Prepare-Build
     $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
   )
 
-  Write-Host ">> Prepare-Build"
+  Write-Host ">> Prepare Build"
   
   $src = "$($uenv.SolutionRoot)\src"
   $tmp = "$($uenv.SolutionRoot)\build.tmp"
@@ -77,7 +76,6 @@ function Prepare-Build
 }
 
 #
-# Compile-Belle
 # Builds the Belle UI project
 #
 function Compile-Belle
@@ -90,7 +88,7 @@ function Compile-Belle
   $tmp = "$($uenv.SolutionRoot)\build.tmp"
   $src = "$($uenv.SolutionRoot)\src"
   
-  Write-Host ">> Build Belle"
+  Write-Host ">> Compile Belle"
   Write-Host "Logging to $tmp\belle.log"
 
   push-location "$($uenv.SolutionRoot)\src\Umbraco.Web.UI.Client"
@@ -122,7 +120,6 @@ function Compile-Belle
 }
 
 #
-# Compile-Umbraco
 # Compiles Umbraco
 #
 function Compile-Umbraco
@@ -171,7 +168,6 @@ function Compile-Umbraco
 }
 
 #
-# Prepare-Tests
 # Prepare Tests
 #
 function Prepare-Tests
@@ -183,7 +179,7 @@ function Prepare-Tests
   $src = "$($uenv.SolutionRoot)\src"
   $tmp = "$($uenv.SolutionRoot)\build.tmp"
   
-  Write-Host ">> Prepare-Tests"
+  Write-Host ">> Prepare Tests"
 
   # fixme - idea is to avoid rebuilding everything for tests
   # but because of our weird assembly versioning (with .* stuff)
@@ -201,7 +197,6 @@ function Prepare-Tests
 }
 
 #
-# Compile-Tests
 # Compiles Tests
 #
 function Compile-Tests
@@ -248,16 +243,15 @@ function Compile-Tests
 }
 
 #
-# Build-Post
 # Cleans things up and prepare files after compilation
 #
-function Build-Post
+function Prepare-Packages
 {
   param (
     $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
   )
 
-  Write-Host "Post-Compile" 
+  Write-Host ">> Prepare Packages" 
   
   $src = "$($uenv.SolutionRoot)\src"
   $tmp = "$($uenv.SolutionRoot)\build.tmp"
@@ -332,21 +326,8 @@ function Build-Post
   Copy-Files "$src\Umbraco.Web.UI.Client\build\belle" "*" "$tmp\WebApp\umbraco" `
     { -not ($_.RelativeName -eq "index.html") }
 
-  # zip webapp
-  write "Zip WebApp"
-
-  &$uenv.Zip a -r "$out\UmbracoCms.AllBinaries.$($version.Semver).zip" `
-    "$tmp\bin\*" `
-    -x!dotless.Core.dll `
-    > $null
-    
-  &$uenv.Zip a -r "$out\UmbracoCms.$($version.Semver).zip" `
-    "$tmp\WebApp\*" `
-    -x!dotless.Core.dll -x!Content_Types.xml `
-    > $null
-
-  # prepare and zip WebPI
-  write "Zip WebPI"
+  # prepare WebPI
+  write "Prepare WebPI"
 
   Remove-Directory "$tmp\WebPi"
   mkdir "$tmp\WebPi" > $null
@@ -355,22 +336,6 @@ function Build-Post
   Copy-Files "$tmp\WebApp" "*" "$tmp\WebPi\umbraco"
   Copy-Files "$src\WebPi" "*" "$tmp\WebPi"
       
-  &$uenv.Zip a -r "$out\UmbracoCms.WebPI.$($version.Semver).zip" `
-    "$tmp\WebPi\*" `
-    -x!dotless.Core.dll `
-    > $null
-    
-  # clear
-  # fixme - NuGet needs $tmp ?!
-  #write "Delete build folder"
-  #Remove-Directory "$tmp"
-
-  # hash the webpi file
-  write "Hash the WebPI file"
-
-  $hash = Get-FileHash "$out\UmbracoCms.WebPI.$($version.Semver).zip"
-  write $hash | out-file "$out\webpihash.txt" -encoding ascii
-
   # add Web.config transform files to the NuGet package
   write "Add web.config transforms to NuGet package"
 
@@ -381,7 +346,45 @@ function Build-Post
 }
 
 #
-# Package-NuGet
+# Creates the Zip packages
+#
+function Package-Zip
+{
+  param (
+    $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
+  )
+
+  Write-Host ">> Create Zip packages" 
+  
+  $src = "$($uenv.SolutionRoot)\src"
+  $tmp = "$($uenv.SolutionRoot)\build.tmp"
+  $out = "$($uenv.SolutionRoot)\build.out"
+
+  Write-Host "Zip all binaries"  
+  &$uenv.Zip a -r "$out\UmbracoCms.AllBinaries.$($version.Semver).zip" `
+    "$tmp\bin\*" `
+    -x!dotless.Core.dll `
+    > $null
+   
+  Write-Host "Zip cms"  
+  &$uenv.Zip a -r "$out\UmbracoCms.$($version.Semver).zip" `
+    "$tmp\WebApp\*" `
+    -x!dotless.Core.dll -x!Content_Types.xml `
+    > $null
+
+  Write-Host "Zip WebPI"  
+  &$uenv.Zip a -r "$out\UmbracoCms.WebPI.$($version.Semver).zip" `
+    "$tmp\WebPi\*" `
+    -x!dotless.Core.dll `
+    > $null
+  
+    # hash the webpi file
+  Write-Host "Hash WebPI"
+  $hash = Get-FileHash "$out\UmbracoCms.WebPI.$($version.Semver).zip"
+  Write $hash | out-file "$out\webpihash.txt" -encoding ascii
+}
+
+#
 # Creates the NuGet packages
 #
 function Package-NuGet
@@ -396,7 +399,7 @@ function Package-NuGet
   $out = "$($uenv.SolutionRoot)\build.out"
   $nuspecs = "$($uenv.SolutionRoot)\build\NuSpecs"
   
-  Write-Host "Create NuGet packages"
+  Write-Host ">> Create NuGet packages"
 
   # see https://docs.microsoft.com/en-us/nuget/schema/nuspec
   # note - warnings about SqlCE native libs being outside of 'lib' folder,
@@ -415,11 +418,7 @@ function Package-NuGet
 }
 
 #
-# Build-Umbraco
 # Builds Umbraco
-#
-#   -Target all|pre|post|belle
-#   (default: all)
 #
 function Build-Umbraco
 {
@@ -472,9 +471,13 @@ function Build-Umbraco
   {
     Compile-Umbraco $uenv
   }
-  elseif ($target -eq "post")
+  elseif ($target -eq "pre-packages")
   {
-    Build-Post $uenv
+    Prepare-Packages $uenv
+  }
+  elseif ($target -eq "pkg-zip")
+  {
+    Package-Zip $uenv
   }
   elseif ($target -eq "compile-belle")
   {
@@ -488,7 +491,8 @@ function Build-Umbraco
     Prepare-Tests $uenv
     Compile-Tests $uenv
     # not running tests...
-    Build-Post $uenv
+    Prepare-Packages $uenv
+    Package-Zip $uenv
     Package-NuGet $uenv $version
   }
   else
