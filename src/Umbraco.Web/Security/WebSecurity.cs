@@ -337,16 +337,16 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public virtual bool ValidateCurrentUser()
         {
-            var result = ValidateCurrentUser(false);
-            return result == ValidateRequestAttempt.Success; 
-        }
+            return ValidateCurrentUser(false, true) == ValidateRequestAttempt.Success;
+        }        
 
         /// <summary>
         /// Validates the current user assigned to the request and ensures the stored user data is valid
         /// </summary>
         /// <param name="throwExceptions">set to true if you want exceptions to be thrown if failed</param>
+        /// <param name="requiresApproval">If true requires that the user is approved to be validated</param>
         /// <returns></returns>
-        internal ValidateRequestAttempt ValidateCurrentUser(bool throwExceptions)
+        public virtual ValidateRequestAttempt ValidateCurrentUser(bool throwExceptions, bool requiresApproval = true)
         {
             //This will first check if the current user is already authenticated - which should be the case in nearly all circumstances
             // since the authentication happens in the Module, that authentication also checks the ticket expiry. We don't 
@@ -362,7 +362,7 @@ namespace Umbraco.Web.Security
             var user = CurrentUser;
 
             // Check for console access
-            if (user == null || user.IsApproved == false || (user.IsLockedOut && GlobalSettings.RequestIsInUmbracoApplication(_httpContext)))
+            if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && GlobalSettings.RequestIsInUmbracoApplication(_httpContext)))
             {
                 if (throwExceptions) throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
                 return ValidateRequestAttempt.FailedNoPrivileges;

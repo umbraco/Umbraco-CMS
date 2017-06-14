@@ -86,6 +86,66 @@ namespace Umbraco.Web.Editors
                 () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml"));
         }
 
+        [HttpGet]
+        public async Task<ActionResult> VerifyInvite(string invite)
+        {
+            if (invite == null)
+            {
+                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: NULL");
+                return RedirectToAction("Default");
+            }
+
+            var parts = Server.UrlDecode(invite).Split('|');
+
+            if (parts.Length != 2)
+            {
+                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: " + invite);
+                return RedirectToAction("Default");
+            }
+
+            var token = parts[1];
+
+            var decoded = token.FromUrlBase64();
+            if (decoded.IsNullOrWhiteSpace())
+            {
+                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: " + invite);
+                return RedirectToAction("Default");
+            }
+
+            var id = parts[0];
+            int intId;
+            if (int.TryParse(id, out intId) == false)
+            {
+                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: " + invite);
+                return RedirectToAction("Default");
+            }
+
+            var identityUser = await UserManager.FindByIdAsync(intId);
+            if (identityUser == null)
+            {
+                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with non existing user: " + id);
+                return RedirectToAction("Default");
+            }
+
+            var result = await UserManager.ConfirmEmailAsync(intId, decoded);
+
+            if (result.Succeeded == false)
+            {
+                Logger.Warn<BackOfficeController>("Could not verify email, Error: " + string.Join(",", result.Errors) + ", Token: " + invite);
+                return RedirectToAction("Default");
+            }
+
+            //sign the user in
+
+            AuthenticationManager.SignOut(
+                Core.Constants.Security.BackOfficeAuthenticationType,
+                Core.Constants.Security.BackOfficeExternalAuthenticationType);
+
+            await SignInManager.SignInAsync(identityUser, false, false);
+
+            return new RedirectResult(Url.Action("Default") + "#/login/false?invite=true");
+        }
+
         /// <summary>
         /// This Action is used by the installer when an upgrade is detected but the admin user is not logged in. We need to 
         /// ensure the user is authenticated before the install takes place so we redirect here to show the standard login screen.

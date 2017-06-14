@@ -6,10 +6,8 @@
     function init() {
       // Check if it is a new user
       if ($location.search().invite) {
-        var token = decodeURIComponent($location.search().invite);
-        //it's split by pipe so split it
-        var parts = token.split("|");
-        authResource.verifyInvite(parts[0], parts[1]).then(function (data) {
+        
+        authResource.getCurrentInvitedUser().then(function (data) {
           $scope.invitedUser = data;
           $scope.inviteSetPassword = true;
         }, function () {

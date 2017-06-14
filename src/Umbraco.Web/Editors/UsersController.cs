@@ -281,26 +281,51 @@ namespace Umbraco.Web.Editors
             //map to new user or map to existing user (if they've already been invited but didn't accept it)
             user = user == null ? Mapper.Map<IUser>(userSave) : Mapper.Map(userSave, user);
 
-            //Save the user first
+            //This is the default but just ensure it's true, until they click on the invite and set their password they will not be approved
+            //and therefore not authenticated to the back office
+            user.IsApproved = false;
 
-            Services.UserService.Save(user);
-            
+            //Save the user first
+            Services.UserService.Save(user);            
             var display = Mapper.Map<UserDisplay>(user);
+
+            //send the email
 
             await SendEmailAsync(display, Security.CurrentUser.Name, userSave.Message);
 
             return display;
         }
 
+        private HttpContextBase EnsureHttpContext()
+        {
+            var attempt = this.TryGetHttpContext();
+            if (attempt.Success == false)
+                throw new InvalidOperationException("This method requires that an HttpContext be active");
+            return attempt.Result;
+        }
+
         private async Task SendEmailAsync(UserDisplay userDisplay, string from, string message)
         {
-            //now send the email
-            var token = await UserManager.GenerateEmailConfirmationTokenAsync((int)userDisplay.Id);
-            var link = string.Format("{0}#/login/false?invite={1}{2}{3}",
-                ApplicationContext.UmbracoApplicationUrl,
+            var token = await UserManager.GenerateEmailConfirmationTokenAsync((int)userDisplay.Id);           
+
+            var inviteToken = string.Format("{0}{1}{2}",
                 (int)userDisplay.Id,
                 WebUtility.UrlEncode("|"),
                 token.ToUrlBase64());
+
+            // Get an mvc helper to get the url
+            var http = EnsureHttpContext();
+            var urlHelper = new UrlHelper(http.Request.RequestContext);
+            var action = urlHelper.Action("VerifyInvite", "BackOffice",
+                new
+                {
+                    area = GlobalSettings.UmbracoMvcArea,
+                    invite = inviteToken
+                });
+
+            // Construct full URL using configured application URL (which will fall back to request)
+            var applicationUri = new Uri(ApplicationContext.UmbracoApplicationUrl);
+            var inviteUri = new Uri(applicationUri, action);
 
             var virtualPath = SystemDirectories.Umbraco.EnsureEndsWith("/") + "Views/UserInvite.cshtml";
             var view = IOHelper.MapPath(virtualPath);
@@ -310,16 +335,15 @@ namespace Umbraco.Web.Editors
             {
                 await UserManager.EmailService.SendAsync(new IdentityMessage
                 {
-                    Body = string.Format("<html><body>You have been invited to the Umbraco Back Office!<br/><br/>{0}\n\nClick this link to accept the invite\n\n{1}", message, link),
+                    Body = string.Format("<html><body>You have been invited to the Umbraco Back Office!<br/><br/>{0}\n\nClick this link to accept the invite\n\n{1}", message, inviteUri.ToString()),
                     Destination = userDisplay.Email,
                     Subject = "You have been invited to the Umbraco Back Office"
                 });
             }
             else
-            {
-                //TODO: Inject IControllerFactory in v8                
-                var httpContext = TryGetHttpContext().Result;
-                var requestContext = new RequestContext(httpContext, new RouteData());                
+            {     
+                //Send an email based on a razor view template
+                var requestContext = new RequestContext(http, new RouteData());                
                 var userInviteEmail = new UserInviteEmail
                 {
                     StartContentIds = userDisplay.StartContentIds,
@@ -328,7 +352,7 @@ namespace Umbraco.Web.Editors
                     Name = userDisplay.Name,
                     UserGroups = userDisplay.UserGroups,
                     Message = message,
-                    InviteUrl = link,
+                    InviteUrl = inviteUri.ToString(),
                     FromName = from
                 };
                 var viewResult = requestContext.RenderViewToString(new ViewDataDictionary(), new TempDataDictionary(), virtualPath, userInviteEmail, false);

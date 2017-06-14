@@ -87,29 +87,19 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
         'Login failed for user ' + username);
     },
 
-    verifyInvite: function (userId, token) {
-
-      if (!token) {
-        return angularHelper.rejectedPromise({
-          errorMsg: 'token cannot be empty'
-        });
-      }
-
-      if (!userId) {
-        return angularHelper.rejectedPromise({
-          errorMsg: 'userId cannot be empty'
-        });
-      }
-
+    /**
+     * There are not parameters for this since when the user has clicked on their invite email they will be partially
+     * logged in (but they will not be approved) so we need to use this method to verify the non approved logged in user's details.
+     * Using the getCurrentUser will not work since that only works for approved users
+     * @returns {} 
+     */
+    getCurrentInvitedUser: function () {      
       return umbRequestHelper.resourcePromise(
-        $http.post(
+        $http.get(
           umbRequestHelper.getApiUrl(
             "authenticationApiBaseUrl",
-            "PostVerifyInvite", {
-              id: userId,
-              token: token
-            })),
-        'Failed to verify token ' + token);
+            "GetCurrentInvitedUser")),
+        'Failed to verify invite');
     },
 
     /**

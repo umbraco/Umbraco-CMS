@@ -153,6 +153,30 @@ namespace Umbraco.Web.Editors
             return result;
         }
 
+        /// <summary>
+        /// When a user is invited they are not approved but we need to resolve the partially logged on (non approved) 
+        /// user. 
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// We cannot user GetCurrentUser since that requires they are approved, this is the same as GetCurrentUser but doesn't require them to be approved
+        /// </remarks>
+        [WebApi.UmbracoAuthorize(requireApproval:false)]
+        [SetAngularAntiForgeryTokens]
+        public UserDetail GetCurrentInvitedUser()
+        {
+            var user = Services.UserService.GetUserById(UmbracoContext.Security.GetUserId());
+            var result = Mapper.Map<UserDetail>(user);
+            var httpContextAttempt = TryGetHttpContext();
+            if (httpContextAttempt.Success)
+            {
+                //set their remaining seconds
+                result.SecondsUntilTimeout = httpContextAttempt.Result.GetRemainingAuthSeconds();
+            }
+
+            return result;
+        }
+
         [WebApi.UmbracoAuthorize]
         [ValidateAngularAntiForgeryToken]
         public async Task<Dictionary<string, string>>  GetCurrentUserLinkedLogins()
