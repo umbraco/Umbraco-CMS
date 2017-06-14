@@ -52,8 +52,7 @@ namespace Umbraco.Web
                     },
                     ""application"": {
                         ""applicationPath"": """ + html.ViewContext.HttpContext.Request.ApplicationPath + @""",
-                        ""version"": """ + version + @""",
-                        ""cdf"": """ + ClientDependencySettings.Instance.Version + @"""
+                        ""versionHash"": """ + string.Format("{0}.{1}", version, ClientDependencySettings.Instance.Version).GenerateHash() + @"""
                     },
                     ""isDebuggingEnabled"" : " + html.ViewContext.HttpContext.IsDebuggingEnabled.ToString().ToLowerInvariant() + @"
                 };       
