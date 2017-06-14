@@ -15,6 +15,7 @@
         vm.openMediaPicker = openMediaPicker;
         vm.openUserPicker = openUserPicker;
         vm.removeSelectedItem = removeSelectedItem;
+        vm.clearStartNode = clearStartNode;
         vm.getUserStateType = getUserStateType;
 
         function init() {
@@ -64,11 +65,11 @@
             vm.contentPicker = {
                 title: "Select content start node",
                 view: "contentpicker",
-                multiPicker: true,
+                hideSubmitButton: true,
                 show: true,
                 submit: function(model) {
                     if(model.selection) {
-                        vm.userGroup.startNodesContent = model.selection;
+                        vm.userGroup.startContentId = model.selection[0];
                     }
                     vm.contentPicker.show = false;
                     vm.contentPicker = null;
@@ -87,11 +88,11 @@
                 section: "media",
                 treeAlias: "media",
                 entityType: "media",
-                multiPicker: true,
+                hideSubmitButton: true,
                 show: true,
                 submit: function(model) {
                     if(model.selection) {
-                        vm.userGroup.startNodesMedia = model.selection;
+                        vm.userGroup.startMediaId = model.selection[0];
                     }
                     vm.contentPicker.show = false;
                     vm.contentPicker = null;
@@ -126,7 +127,17 @@
         }
 
         function removeSelectedItem(index, selection) {
-            selection.splice(index, 1);
+            if(selection && selection.length > 0) {
+                selection.splice(index, 1);
+            }
+        }
+
+        function clearStartNode(type) {
+            if (type === "content") {
+                vm.userGroup.startContentId = null;
+            } else if (type === "media") {
+                vm.userGroup.startMediaId = null;
+            }
         }
 
         function getUserStateType(state) {

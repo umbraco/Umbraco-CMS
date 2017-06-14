@@ -100,15 +100,21 @@
                 title: "Select content start node",
                 view: "contentpicker",
                 multiPicker: true,
+                selection: vm.user.startContentIds,
                 show: true,
                 submit: function (model) {
+                    // select items
                     if (model.selection) {
-                        vm.user.startNodesContent = model.selection;
+                        angular.forEach(model.selection, function(item){
+                            multiSelectItem(item, vm.user.startContentIds);
+                        });
                     }
+                    // close overlay
                     vm.contentPicker.show = false;
                     vm.contentPicker = null;
                 },
                 close: function (oldModel) {
+                    // close overlay
                     vm.contentPicker.show = false;
                     vm.contentPicker = null;
                 }
@@ -125,17 +131,38 @@
                 multiPicker: true,
                 show: true,
                 submit: function (model) {
+                    // select items
                     if (model.selection) {
-                        vm.user.startNodesMedia = model.selection;
+                        angular.forEach(model.selection, function(item){
+                            multiSelectItem(item, vm.user.startMediaIds);
+                        });
                     }
+                    // close overlay
                     vm.mediaPicker.show = false;
                     vm.mediaPicker = null;
                 },
                 close: function (oldModel) {
+                    // close overlay
                     vm.mediaPicker.show = false;
                     vm.mediaPicker = null;
                 }
             };
+        }
+
+        function multiSelectItem(item, selection) {
+            var found = false;
+            // check if item is already in the selected list
+            if (selection.length > 0) {
+                angular.forEach(selection, function (selectedItem) {
+                    if (selectedItem.udi === item.udi) {
+                        found = true;
+                    }
+                });
+            }
+            // only add the selected item if it is not already selected
+            if (!found) {
+                selection.push(item);
+            }
         }
 
         function removeSelectedItem(index, selection) {
