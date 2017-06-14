@@ -12,7 +12,7 @@
             replace: true,
             templateUrl: 'views/components/users/umb-user-preview.html',
             scope: {
-                avatar: "=?",
+                avatars: "=?",
                 name: "=",
                 allowRemove: "=?",
                 onRemove: "&?"
