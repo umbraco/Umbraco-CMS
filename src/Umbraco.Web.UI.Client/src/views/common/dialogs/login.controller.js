@@ -1,7 +1,11 @@
 ﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController",
-  function ($scope, $cookies, $location, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, dialogService) {
+  function ($scope, $cookies, $location, currentUserResource, formHelper, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, dialogService) {
 
     $scope.invitedUser = null;
+    $scope.invitedUserPasswordModel = {
+      password: "",
+      confirmPassword: ""
+    }
 
     function init() {
       // Check if it is a new user
@@ -19,9 +23,29 @@
 
     $scope.inviteSavePassword = function () {
 
+      if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
 
-      $scope.inviteSetPassword = false;
-      $scope.inviteSetAvatar = true;
+        $scope.inviteChangePasswordButtonState = "busy";
+
+        authResource.performSetInvitedUserPassword($scope.invitedUserPasswordModel.password)
+          .then(function (data) {
+
+            //success
+            formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+            $scope.inviteChangePasswordButtonState = "success";
+
+            $scope.inviteSetPassword = false;
+            $scope.inviteSetAvatar = true;
+
+          }, function(err) {
+
+            //error
+            formHelper.handleError(err);
+            
+            $scope.inviteChangePasswordButtonState = "error";
+
+          });
+      }      
     };
 
     var setFieldFocus = function (form, field) {
@@ -213,6 +237,7 @@
         return;
       }
 
+      //TODO: All of this logic can/should be shared! We should do validation the nice way instead of all of this manual stuff, see: inviteSavePassword
       authResource.performSetPassword($scope.resetPasswordCodeInfo.resetCodeModel.userId, password, confirmPassword, $scope.resetPasswordCodeInfo.resetCodeModel.resetCode)
         .then(function () {
           $scope.showSetPasswordConfirmation = true;

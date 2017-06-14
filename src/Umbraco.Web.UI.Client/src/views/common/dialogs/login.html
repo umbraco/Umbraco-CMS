@@ -10,7 +10,7 @@
 
     <div ng-show="invitedUser != null" class="umb-login-container">
 
-      <form novalidate="" ng-submit="inviteSavePassword()">
+      <form name="inviteUserPasswordForm" novalidate="" ng-submit="inviteSavePassword()" val-form-manager>
         <div class="form" ng-if="inviteSetPassword">
           <h1 style="margin-bottom: 10px; text-align: left;">Hi, {{invitedUser.name}}</h1>
           <p style="line-height: 1.6; margin-bottom: 25px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
@@ -18,20 +18,23 @@
           <div class="control-group" ng-class="{error: setPasswordForm.password.$invalid}">
             <label>
               <localize key="user_newPassword">New password</localize>
-              <small style="font-size: 13px;">Some hint here about the new password</small>
+              <small style="font-size: 13px;">Lorem ipsum dolor sit amet (Some hint here about the new password)</small>
             </label>
-            <input type="password" ng-model="password" name="password" class="-full-width-input" umb-auto-focus required />
+            <input type="password" ng-model="invitedUserPasswordModel.password" name="password" class="-full-width-input" umb-auto-focus required val-server-field="value" autocomplete="off" />
+            <span class="help-inline" val-msg-for="password" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
+            <span class="help-inline" val-msg-for="password" val-toggle-msg="valServerField"></span>     
           </div>
 
           <div class="control-group" ng-class="{error: setPasswordForm.confirmPassword.$invalid}">
             <label><localize key="user_confirmNewPassword">Confirm new password</localize></label>
-            <input type="password" ng-model="confirmPassword" name="confirmPassword" class="-full-width-input" required />
+            <input type="password" ng-model="invitedUserPasswordModel.confirmPassword" name="confirmPassword" class="-full-width-input" required val-compare="password" autocomplete="off"/>
+            <span class="help-inline" val-msg-for="confirmPassword" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
           </div>
 
           <div class="flex justify-between items-center">
-            <umb-button type="button"
+            <umb-button type="submit"
                         button-style="success"
-                        action=""
+                        state="inviteChangePasswordButtonState"
                         label="Save password">
             </umb-button>
           </div>

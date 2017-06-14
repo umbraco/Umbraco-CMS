@@ -196,6 +196,21 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
         'Password reset code validation failed for userId ' + userId + ', code' + resetCode);
     },
 
+    performSetInvitedUserPassword: function (newPassword) {
+
+      if (!newPassword) {
+        return angularHelper.rejectedPromise({ errorMsg: 'newPassword cannot be empty' });
+      }
+
+      return umbRequestHelper.resourcePromise(
+        $http.post(
+          umbRequestHelper.getApiUrl(
+            "authenticationApiBaseUrl",
+            "PostSetInvitedUserPassword"),
+          angular.toJson(newPassword)),
+        'Failed to change password');
+    },
+
     /**
      * @ngdoc method
      * @name umbraco.resources.authResource#performSetPassword
