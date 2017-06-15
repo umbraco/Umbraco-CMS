@@ -707,7 +707,7 @@ namespace Umbraco.Web.Editors
 
             var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
 
-            app.Add("versionHash", string.Format("{0}.{1}", version, ClientDependencySettings.Instance.Version).GenerateHash());
+            app.Add("cacheBuster", string.Format("{0}.{1}", version, ClientDependencySettings.Instance.Version).GenerateHash());
             app.Add("version", version);
             
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
