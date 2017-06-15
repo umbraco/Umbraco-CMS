@@ -436,7 +436,13 @@ namespace Umbraco.Core
             /// Alias for the email address property editor
             /// </summary>
             public const string EmailAddressAlias = "Umbraco.EmailAddress";
-
+            
+	    /// <summary>
+            /// Guid for the XPath Digibiz Advanced Media Picker datatype.
+            /// </summary>
+            [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
+            public const string DigibizAdvancedMediaPicker = "EF94C406-9E83-4058-A780-0375624BA7CA"; 
+		
             public static class PreValueKeys
             {
                 /// <summary>
