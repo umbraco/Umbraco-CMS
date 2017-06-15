@@ -44,22 +44,22 @@ namespace Umbraco.Tests.Services
 		}
 
         // not sure this is doing anything really
-        //protected override string GetDbConnectionString()
-        //{
-        //    // need a longer timeout for tests?
-        //    return base.GetDbConnectionString() + "default lock timeout=10000;";
-        //}
+        protected override string GetDbConnectionString()
+        {
+            // need a longer timeout for tests?
+            return base.GetDbConnectionString() + "default lock timeout=60000;";
+        }
 
-	    /// <summary>
-		/// Used to track exceptions during multi-threaded tests, volatile so that it is not locked in CPU registers.
-		/// </summary>
-		private volatile Exception _error;
+        /// <summary>
+        /// Used to track exceptions during multi-threaded tests, volatile so that it is not locked in CPU registers.
+        /// </summary>
+        private volatile Exception _error;
 
 		private const int MaxThreadCount = 20;
 
         private IScopeProvider ScopeProvider { get { return ApplicationContext.Current.ScopeProvider; } }
 
-	    private void Save(ContentService service, IContent content)
+        private void Save(ContentService service, IContent content)
 	    {
 	        using (var scope = ScopeProvider.CreateScope())
 	        {
@@ -79,9 +79,36 @@ namespace Umbraco.Tests.Services
 	        }
 	    }
 
+	    private ManualResetEventSlim TraceLocks()
+	    {
+	        var done = new ManualResetEventSlim(false);
+
+            // comment out to trace locks
+	        return done;
+
+	        new Thread(() =>
+	        {
+	            while (done.IsSet == false)
+	            {
+	                var db = ApplicationContext.Current.DatabaseContext.Database;
+	                var info = db.Query<dynamic>("SELECT * FROM sys.lock_information;");
+	                Console.WriteLine("LOCKS:");
+	                foreach (var row in info)
+	                {
+	                    Console.WriteLine("> " + row.request_spid + " " + row.resource_type + " " + row.resource_description + " " + row.request_mode + " " + row.resource_table + " " + row.resource_table_id + " " + row.request_status);
+	                }
+	                Thread.Sleep(50);
+	            }
+	        }).Start();
+	        return done;
+	    }
+
         [Test]
 		public void Ensure_All_Threads_Execute_Successfully_Content_Service()
 		{
+            if (Environment.GetEnvironmentVariable("UMBRACO_TMP") != null)
+                Assert.Ignore("Do not run on VSTS.");
+
 			// the ServiceContext in that each repository in a service (i.e. ContentService) is a singleton
 			var contentService = (ContentService)ServiceContext.ContentService;
 
@@ -89,6 +116,9 @@ namespace Umbraco.Tests.Services
 
 			Debug.WriteLine("Starting...");
 
+		    var done = TraceLocks();
+
+		    _error = null;
 			for (var i = 0; i < MaxThreadCount; i++)
 			{
 				var t = new Thread(() =>
@@ -123,6 +153,8 @@ namespace Umbraco.Tests.Services
 			// wait for all to complete
 			threads.ForEach(x => x.Join());
 
+		    done.Set();
+
 			if (_error == null)
 			{
 				// now look up all items, there should be 40!
@@ -138,14 +170,20 @@ namespace Umbraco.Tests.Services
 		[Test]
 		public void Ensure_All_Threads_Execute_Successfully_Media_Service()
 		{
-			// mimick the ServiceContext in that each repository in a service (i.e. ContentService) is a singleton
-			var mediaService = (MediaService) ServiceContext.MediaService;
+		    if (Environment.GetEnvironmentVariable("UMBRACO_TMP") != null)
+		        Assert.Ignore("Do not run on VSTS.");
+
+            // mimick the ServiceContext in that each repository in a service (i.e. ContentService) is a singleton
+            var mediaService = (MediaService) ServiceContext.MediaService;
 
 			var threads = new List<Thread>();
 
 			Debug.WriteLine("Starting...");
 
-			for (var i = 0; i < MaxThreadCount; i++)
+		    var done = TraceLocks();
+
+            _error = null;
+            for (var i = 0; i < MaxThreadCount; i++)
 			{
 				var t = new Thread(() =>
 				{
@@ -155,14 +193,14 @@ namespace Umbraco.Tests.Services
 
                         var name1 = "test-" + Guid.NewGuid();
 					    var media1 = mediaService.CreateMedia(name1, -1, Constants.Conventions.MediaTypes.Folder);
-                        Debug.WriteLine("[{0}] Saving content #1.", Thread.CurrentThread.ManagedThreadId);
+                        Debug.WriteLine("[{0}] Saving media #1.", Thread.CurrentThread.ManagedThreadId);
 					    Save(mediaService, media1);
 
 						Thread.Sleep(100); // quick pause for maximum overlap
 
                         var name2 = "test-" + Guid.NewGuid();
                         var media2 = mediaService.CreateMedia(name2, -1, Constants.Conventions.MediaTypes.Folder);
-                        Debug.WriteLine("[{0}] Saving content #2.", Thread.CurrentThread.ManagedThreadId);
+                        Debug.WriteLine("[{0}] Saving media #2.", Thread.CurrentThread.ManagedThreadId);
                         Save(mediaService, media2);
 					}
 					catch (Exception e)
@@ -178,6 +216,8 @@ namespace Umbraco.Tests.Services
 
 			// wait for all to complete
 			threads.ForEach(x => x.Join());
+
+		    done.Set();
 
 			if (_error == null)
 			{
