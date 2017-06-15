@@ -5,9 +5,10 @@
     /// </summary>
     public enum UserState
     {
-        Active = 0,
-        Disabled = 1,
-        LockedOut = 2,
-        Invited = 3
+        All = 0,
+        Active = 1,
+        Disabled = 2,
+        LockedOut = 3,
+        Invited = 4
     }
 }

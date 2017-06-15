@@ -10,6 +10,23 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IUserService : IMembershipUserService
     {
+        /// <summary>
+        /// This is basically facets of UserStates key = state, value = count
+        /// </summary>
+        IDictionary<UserState, int> GetUserStates();
+
+        /// <summary>
+        /// Get paged users
+        /// </summary>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="userState"></param>
+        /// <param name="userGroups"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, 
             UserState? userState = null, string[] userGroups = null, string filter = "");

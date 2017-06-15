@@ -104,6 +104,7 @@ namespace Umbraco.Core.Models.Membership
 
         private string _username;
         private DateTime? _emailConfirmedDate;
+        private DateTime? _invitedDate;
         private string _email;
         private string _rawPasswordValue;
         private IEnumerable<string> _allowedSections;
@@ -140,6 +141,7 @@ namespace Umbraco.Core.Models.Membership
             public readonly PropertyInfo IsApprovedSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.IsApproved);
             public readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Language);
             public readonly PropertyInfo EmailConfirmedDateSelector = ExpressionHelper.GetPropertyInfo<User, DateTime?>(x => x.EmailConfirmedDate);
+            public readonly PropertyInfo InvitedDateSelector = ExpressionHelper.GetPropertyInfo<User, DateTime?>(x => x.InvitedDate);
 
             public readonly PropertyInfo DefaultToLiveEditingSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.DefaultToLiveEditing);
 
@@ -166,6 +168,12 @@ namespace Umbraco.Core.Models.Membership
         {
             get { return _emailConfirmedDate; }
             set { SetPropertyValueAndDetectChanges(value, ref _emailConfirmedDate, Ps.Value.EmailConfirmedDateSelector); }
+        }
+        [DataMember]
+        public DateTime? InvitedDate
+        {
+            get { return _invitedDate; }
+            set { SetPropertyValueAndDetectChanges(value, ref _invitedDate, Ps.Value.InvitedDateSelector); }
         }
         [DataMember]
         public string Username

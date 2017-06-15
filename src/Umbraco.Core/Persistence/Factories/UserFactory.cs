@@ -34,6 +34,8 @@ namespace Umbraco.Core.Persistence.Factories
                 user.CreateDate = dto.CreateDate;
                 user.UpdateDate = dto.UpdateDate;
                 user.Avatar = dto.Avatar;
+                user.EmailConfirmedDate = dto.EmailConfirmedDate;
+                user.InvitedDate = dto.InvitedDate;
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
@@ -66,7 +68,8 @@ namespace Umbraco.Core.Persistence.Factories
                 CreateDate = entity.CreateDate,
                 UpdateDate = entity.UpdateDate,
                 Avatar = entity.Avatar,
-                EmailConfirmedDate = entity.EmailConfirmedDate
+                EmailConfirmedDate = entity.EmailConfirmedDate,
+                InvitedDate = entity.InvitedDate
             };
 
             foreach (var startNodeId in entity.StartContentIds)

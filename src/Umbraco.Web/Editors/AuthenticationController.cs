@@ -393,6 +393,10 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
 
+            //They've successfully set their password, we can now update their user account to be approved
+            Security.CurrentUser.IsApproved = true;
+            Services.UserService.Save(Security.CurrentUser);
+
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -196,7 +197,7 @@ namespace Umbraco.Web.Editors
         /// <param name="userGroups"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public PagedResult<UserDisplay> GetPagedUsers(
+        public PagedUserResult GetPagedUsers(
             int pageNumber = 1,
             int pageSize = 10,
             string orderBy = "username",
@@ -210,13 +211,16 @@ namespace Umbraco.Web.Editors
 
             if (total == 0)
             {
-                return new PagedResult<UserDisplay>(0, 0, 0);
+                return new PagedUserResult(0, 0, 0);
             }
 
-            return new PagedResult<UserDisplay>(total, pageNumber, pageSize)
+            var paged = new PagedUserResult(total, pageNumber, pageSize)
             {
-                Items = Mapper.Map<IEnumerable<UserDisplay>>(result)
+                Items = Mapper.Map<IEnumerable<UserDisplay>>(result),
+                UserStates = Services.UserService.GetUserStates()
             };
+
+            return paged;
         }
 
         /// <summary>
@@ -325,7 +329,10 @@ namespace Umbraco.Web.Editors
             //map the save info over onto the user
             user = Mapper.Map(userSave, user);
             
-            //Save the user first
+            //ensure the invited date is set
+            user.InvitedDate = DateTime.Now;
+
+            //Save the updated user
             Services.UserService.Save(user);            
             var display = Mapper.Map<UserDisplay>(user);
 
@@ -489,6 +496,20 @@ namespace Umbraco.Web.Editors
             Services.UserService.Save(users);
 
             return true;
+        }
+
+        public class PagedUserResult : PagedResult<UserDisplay>
+        {
+            public PagedUserResult(long totalItems, long pageNumber, long pageSize) : base(totalItems, pageNumber, pageSize)
+            {
+                UserStates = new Dictionary<UserState, int>();
+            }
+
+            /// <summary>
+            /// This is basically facets of UserStates key = state, value = count
+            /// </summary>
+            [DataMember(Name = "userStates")]
+            public IDictionary<UserState, int> UserStates { get; set; }
         }
     }
 }

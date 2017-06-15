@@ -74,6 +74,10 @@ namespace Umbraco.Core.Models.Rdbms
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? EmailConfirmedDate { get; set; }
 
+        [Column("invitedDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public DateTime? InvitedDate { get; set; }
+
         [Column("createDate")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Constraint(Default = SystemMethods.CurrentDateTime)]

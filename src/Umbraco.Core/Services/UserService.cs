@@ -487,7 +487,16 @@ namespace Umbraco.Core.Services
 
                 return ret;
             }
-        }        
+        }
+
+        public IDictionary<UserState, int> GetUserStates()
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateUserRepository(uow);
+                return repository.GetUserStates();
+            }
+        }
 
         public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState? userState = null, string[] userGroups = null, string filter = "")
         {
