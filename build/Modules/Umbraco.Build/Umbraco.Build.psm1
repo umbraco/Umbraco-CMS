@@ -269,19 +269,16 @@ function Prepare-Packages
   }
 
   # cleanup build
-  write "Clean build"
-
+  Write-Host "Clean build"
   Remove-File "$tmp\bin\*.dll.config"
   Remove-File "$tmp\WebApp\bin\*.dll.config"
 
   # cleanup presentation
-  write "Cleanup presentation"
-
+  Write-Host "Cleanup presentation"
   Remove-Directory "$tmp\WebApp\umbraco.presentation"
 
   # create directories
-  write "Create directories"
-
+  Write-Host "Create directories"
   mkdir "$tmp\Configs" > $null
   mkdir "$tmp\Configs\Lang" > $null
   mkdir "$tmp\WebApp\App_Data" > $null
@@ -289,60 +286,45 @@ function Prepare-Packages
   #mkdir "$tmp\WebApp\Views" > $null
 
   # copy various files
-  write "Copy xml documentation"
-
+  Write-Host "Copy xml documentation"
   cp -force "$tmp\bin\*.xml" "$tmp\WebApp\bin"
 
-  write "Copy transformed configs and langs"
-
+  Write-Host "Copy transformed configs and langs"
   Copy-Files "$tmp\WebApp\config" "*.config" "$tmp\Configs"
   Copy-Files "$tmp\WebApp\config" "*.js" "$tmp\Configs"
   Copy-Files "$tmp\WebApp\config\lang" "*.xml" "$tmp\Configs\Lang"
   Copy-File "$tmp\WebApp\web.config" "$tmp\Configs\web.config.transform"
 
-  write "Copy transformed web.config"
-
+  Write-Host "Copy transformed web.config"
   Copy-File "$src\Umbraco.Web.UI\web.$buildConfiguration.Config.transformed" "$tmp\WebApp\web.config"
 
   # offset the modified timestamps on all umbraco dlls, as WebResources
   # break if date is in the future, which, due to timezone offsets can happen.
-  write "Offset dlls timestamps"
+  Write-Host "Offset dlls timestamps"
   ls -r "$tmp\*.dll" | foreach {
     $_.CreationTime = $_.CreationTime.AddHours(-11)
     $_.LastWriteTime = $_.LastWriteTime.AddHours(-11)
   }
 
   # copy libs
-  write "Copy SqlCE libraries"
-
+  Write-Host "Copy SqlCE libraries"
   Copy-Files "$src\packages\SqlServerCE.4.0.0.1" "*.*" "$tmp\bin" `
     { -not $_.Extension.StartsWith(".nu") -and -not $_.RelativeName.StartsWith("lib\") }
   Copy-Files "$src\packages\SqlServerCE.4.0.0.1" "*.*" "$tmp\WebApp\bin" `
     { -not $_.Extension.StartsWith(".nu") -and -not $_.RelativeName.StartsWith("lib\") }
           
   # copy Belle
-  write "Copy Belle"
-
+  Write-Host "Copy Belle"
   Copy-Files "$src\Umbraco.Web.UI.Client\build\belle" "*" "$tmp\WebApp\umbraco" `
     { -not ($_.RelativeName -eq "index.html") }
 
   # prepare WebPI
-  write "Prepare WebPI"
-
+  Write-Host "Prepare WebPI"
   Remove-Directory "$tmp\WebPi"
   mkdir "$tmp\WebPi" > $null
   mkdir "$tmp\WebPi\umbraco" > $null
-
   Copy-Files "$tmp\WebApp" "*" "$tmp\WebPi\umbraco"
-  Copy-Files "$src\WebPi" "*" "$tmp\WebPi"
-      
-  # add Web.config transform files to the NuGet package
-  write "Add web.config transforms to NuGet package"
-
-  mv "$tmp\WebApp\Views\Web.config" "$tmp\WebApp\Views\Web.config.transform"
-  
-  # fixme - that one does not exist in .bat build either?
-  #mv "$tmp\WebApp\Xslt\Web.config" "$tmp\WebApp\Xslt\Web.config.transform"
+  Copy-Files "$src\WebPi" "*" "$tmp\WebPi"     
 }
 
 #
@@ -363,25 +345,48 @@ function Package-Zip
   Write-Host "Zip all binaries"  
   &$uenv.Zip a -r "$out\UmbracoCms.AllBinaries.$($version.Semver).zip" `
     "$tmp\bin\*" `
-    -x!dotless.Core.dll `
+    "-x!dotless.Core.*" `
     > $null
    
   Write-Host "Zip cms"  
   &$uenv.Zip a -r "$out\UmbracoCms.$($version.Semver).zip" `
     "$tmp\WebApp\*" `
-    -x!dotless.Core.dll -x!Content_Types.xml `
+    "-x!dotless.Core.*" "-x!Content_Types.xml" `
     > $null
 
   Write-Host "Zip WebPI"  
   &$uenv.Zip a -r "$out\UmbracoCms.WebPI.$($version.Semver).zip" `
     "$tmp\WebPi\*" `
-    -x!dotless.Core.dll `
+    "-x!dotless.Core.*" `
     > $null
   
     # hash the webpi file
   Write-Host "Hash WebPI"
   $hash = Get-FileHash "$out\UmbracoCms.WebPI.$($version.Semver).zip"
   Write $hash | out-file "$out\webpihash.txt" -encoding ascii
+}
+
+#
+# Prepares NuGet
+#
+function Prepare-NuGet
+{
+  param (
+    $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
+  )
+
+  Write-Host ">> Prepare NuGet" 
+  
+  $src = "$($uenv.SolutionRoot)\src"
+  $tmp = "$($uenv.SolutionRoot)\build.tmp"
+  $out = "$($uenv.SolutionRoot)\build.out"
+
+  # add Web.config transform files to the NuGet package
+  Write-Host "Add web.config transforms to NuGet package"
+  mv "$tmp\WebApp\Views\Web.config" "$tmp\WebApp\Views\Web.config.transform"
+  
+  # fixme - that one does not exist in .bat build either?
+  #mv "$tmp\WebApp\Xslt\Web.config" "$tmp\WebApp\Xslt\Web.config.transform"
 }
 
 #
@@ -475,6 +480,10 @@ function Build-Umbraco
   {
     Prepare-Packages $uenv
   }
+  elseif ($target -eq "pre-nuget")
+  {
+    Prepare-NuGet $uenv
+  }
   elseif ($target -eq "pkg-zip")
   {
     Package-Zip $uenv
@@ -493,6 +502,7 @@ function Build-Umbraco
     # not running tests...
     Prepare-Packages $uenv
     Package-Zip $uenv
+    Prepare-NuGet $uenv
     Package-NuGet $uenv $version
   }
   else
