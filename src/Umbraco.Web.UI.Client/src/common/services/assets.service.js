@@ -50,7 +50,7 @@ angular.module('umbraco.services')
             return url;
         }
 
-        var rnd = Umbraco.Sys.ServerVariables.application.versionHash;
+        var rnd = Umbraco.Sys.ServerVariables.application.cacheBuster;
         var _op = (url.indexOf("?") > 0) ? "&" : "?";
         url = url + _op + "umb__rnd=" + rnd;
         return url;
