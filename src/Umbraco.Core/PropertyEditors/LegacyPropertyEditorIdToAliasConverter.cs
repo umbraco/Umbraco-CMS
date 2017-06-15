@@ -145,7 +145,8 @@ namespace Umbraco.Core.PropertyEditors
             //Not being converted - convert to label
             CreateMap(Guid.Parse(Constants.PropertyEditors.DictionaryPicker), Constants.PropertyEditors.NoEditAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.UmbracoUserControlWrapper), Constants.PropertyEditors.NoEditAlias);
-            
+            //Old Digibiz Advanced Media Picker
+            CreateMap(Guid.Parse(Constants.PropertyEditors.DigibizAdvancedMediaPicker), Constants.PropertyEditors.NoEditAlias);            
             
         }
 
