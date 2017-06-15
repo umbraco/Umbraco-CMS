@@ -26,13 +26,18 @@
     	        vm.labels.cancel = name;
             });
 
-            // get user
-            usersResource.getUserGroup($routeParams.id).then(function (userGroup) {
-                vm.userGroup = userGroup;
-                setSectionIcon(vm.userGroup.sections);
+            if ($routeParams.create) {
                 makeBreadcrumbs();
                 vm.loading = false;
-            });
+            } else {
+                // get user group
+                usersResource.getUserGroup($routeParams.id).then(function (userGroup) {
+                    vm.userGroup = userGroup;
+                    setSectionIcon(vm.userGroup.sections);
+                    makeBreadcrumbs();
+                    vm.loading = false;
+                });
+            }
             
         }
 

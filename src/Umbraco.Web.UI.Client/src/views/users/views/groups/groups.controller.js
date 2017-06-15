@@ -8,6 +8,7 @@
         vm.userGroups = [];
         vm.selection = [];
 
+        vm.createUserGroup = createUserGroup;
         vm.goToUserGroup = goToUserGroup;
         vm.clearSelection = clearSelection;
         vm.selectUserGroup = selectUserGroup;
@@ -22,6 +23,13 @@
                 vm.loading = false;
             });
 
+        }
+
+        function createUserGroup() {
+            // clear all query params
+            $location.search({});
+            // go to create user group
+            $location.path('users/users/group/-1').search("create", "true");;
         }
 
         function selectUserGroup(userGroup, selection) {
