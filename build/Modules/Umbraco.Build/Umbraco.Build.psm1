@@ -290,7 +290,9 @@ function Prepare-Packages
   cp -force "$tmp\bin\*.xml" "$tmp\WebApp\bin"
 
   Write-Host "Copy transformed configs and langs"
-  Copy-Files "$tmp\WebApp\config" "*.config" "$tmp\Configs"
+  # note: exclude imageprocessor/*.config as imageprocessor pkg installs them
+  Copy-Files "$tmp\WebApp\config" "*.config" "$tmp\Configs" `
+    { -not $_.RelativeName.StartsWith("imageprocessor") }
   Copy-Files "$tmp\WebApp\config" "*.js" "$tmp\Configs"
   Copy-Files "$tmp\WebApp\config\lang" "*.xml" "$tmp\Configs\Lang"
   Copy-File "$tmp\WebApp\web.config" "$tmp\Configs\web.config.transform"

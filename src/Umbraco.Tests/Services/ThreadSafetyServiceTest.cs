@@ -5,15 +5,26 @@ using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
+    // these tests tend to fail from time to time esp. on VSTS
+    //
+    // read
+    // Lock Time-out: https://technet.microsoft.com/en-us/library/ms172402.aspx?f=255&MSPPError=-2147217396
+    //    http://support.x-tensive.com/question/5242/strange-locking-exceptions-with-sqlserverce
+    //    http://debuggingblog.com/wp/2009/05/07/high-cpu-usage-and-windows-forms-application-hang-with-sqlce-database-and-the-sqlcelocktimeoutexception/
+    //
+    // tried to increase it via connection string but does not seem to work
+    // now trying to do it via SET LOCK_TIMEOUT...
+
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
 	[TestFixture, RequiresSTA]
-    [Ignore("Temp. disabled, issues on VSTS?")]
 	public class ThreadSafetyServiceTest : BaseDatabaseFactoryTest
 	{
 		[SetUp]
@@ -32,11 +43,12 @@ namespace Umbraco.Tests.Services
 			base.TearDown();
 		}
 
-	    protected override string GetDbConnectionString()
-	    {
-            // need a longer timeout for tests?
-	        return base.GetDbConnectionString() + "default lock timeout=10000;";
-	    }
+        // not sure this is doing anything really
+        //protected override string GetDbConnectionString()
+        //{
+        //    // need a longer timeout for tests?
+        //    return base.GetDbConnectionString() + "default lock timeout=10000;";
+        //}
 
 	    /// <summary>
 		/// Used to track exceptions during multi-threaded tests, volatile so that it is not locked in CPU registers.
@@ -45,7 +57,29 @@ namespace Umbraco.Tests.Services
 
 		private const int MaxThreadCount = 20;
 
-		[Test]
+        private IScopeProvider ScopeProvider { get { return ApplicationContext.Current.ScopeProvider; } }
+
+	    private void Save(ContentService service, IContent content)
+	    {
+	        using (var scope = ScopeProvider.CreateScope())
+	        {
+	            scope.Database.Execute("SET LOCK_TIMEOUT 60000");
+	            service.Save(content);
+	            scope.Complete();
+	        }
+        }
+
+	    private void Save(MediaService service, IMedia media)
+	    {
+	        using (var scope = ScopeProvider.CreateScope())
+	        {
+	            scope.Database.Execute("SET LOCK_TIMEOUT 60000");
+	            service.Save(media);
+	            scope.Complete();
+	        }
+	    }
+
+        [Test]
 		public void Ensure_All_Threads_Execute_Successfully_Content_Service()
 		{
 			// the ServiceContext in that each repository in a service (i.e. ContentService) is a singleton
@@ -66,14 +100,14 @@ namespace Umbraco.Tests.Services
                             var name1 = "test-" + Guid.NewGuid();
 							var content1 = contentService.CreateContent(name1, -1, "umbTextpage");
 						    Debug.WriteLine("[{0}] Saving content #1.", Thread.CurrentThread.ManagedThreadId);
-							contentService.Save(content1);
+						    Save(contentService, content1);
 
-							Thread.Sleep(100); // quick pause for maximum overlap
+                            Thread.Sleep(100); // quick pause for maximum overlap
 
                             var name2 = "test-" + Guid.NewGuid();
 							var content2 = contentService.CreateContent(name2, -1, "umbTextpage");
                             Debug.WriteLine("[{0}] Saving content #2.", Thread.CurrentThread.ManagedThreadId);
-                            contentService.Save(content2);
+                            Save(contentService, content2);
 						}
 						catch(Exception e)
 						{
@@ -122,14 +156,14 @@ namespace Umbraco.Tests.Services
                         var name1 = "test-" + Guid.NewGuid();
 					    var media1 = mediaService.CreateMedia(name1, -1, Constants.Conventions.MediaTypes.Folder);
                         Debug.WriteLine("[{0}] Saving content #1.", Thread.CurrentThread.ManagedThreadId);
-                        mediaService.Save(media1);
+					    Save(mediaService, media1);
 
 						Thread.Sleep(100); // quick pause for maximum overlap
 
                         var name2 = "test-" + Guid.NewGuid();
                         var media2 = mediaService.CreateMedia(name2, -1, Constants.Conventions.MediaTypes.Folder);
                         Debug.WriteLine("[{0}] Saving content #2.", Thread.CurrentThread.ManagedThreadId);
-                        mediaService.Save(media2);
+                        Save(mediaService, media2);
 					}
 					catch (Exception e)
 					{
