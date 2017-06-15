@@ -25,6 +25,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
 
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("emailConfirmedDate")) == false)
                 Create.Column("emailConfirmedDate").OnTable("umbracoUser").AsDateTime().Nullable();
+
+            if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("invitedDate")) == false)
+                Create.Column("invitedDate").OnTable("umbracoUser").AsDateTime().Nullable();
         }
 
         public override void Down()

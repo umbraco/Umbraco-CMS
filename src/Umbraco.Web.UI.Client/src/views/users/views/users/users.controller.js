@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, usersResource, localizationService, contentEditingHelper, usersHelper) {
+    function UsersController($scope, $timeout, $location, usersResource, localizationService, contentEditingHelper, usersHelper, formHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -241,62 +241,53 @@
             getUsers();
         }
 
-        function createUser() {
+        function createUser(addUserForm) {
+
+          if (formHelper.submitForm({ formCtrl: addUserForm,scope: $scope, statusMessage: "Saving..." })) {
 
             vm.newUser.id = -1;
             vm.newUser.parentId = -1;
             vm.page.createButtonState = "busy";
 
-            contentEditingHelper.contentEditorPerformSave({
-                statusMessage: localizeSaving,
-                saveMethod: usersResource.createUser,
-                scope: $scope,
-                content: vm.newUser,
-                // We do not redirect on failure for users - this is because it is not possible to actually save a user
-                // when server side validation fails - as opposed to content where we are capable of saving the content
-                // item if server side validation fails
-                redirectOnFailure: false,
-                rebindCallback: function (orignal, saved) { }
-            }).then(function (saved) {
+            usersResource.createUser(vm.newUser)
+              .then(function (saved) {
 
+                //success
                 vm.page.createButtonState = "success";
                 vm.newUser = saved;
                 setUsersViewState('createUserSuccess');
                 clearAddUserForm();
 
-            }, function (err) {
+              }, function (err) {
 
+                //error
+                formHelper.handleError(err);
                 vm.page.createButtonState = "error";
-
-            });
+              });            
+          }
 
         }
 
-        function inviteUser() {
+        function inviteUser(addUserForm) {
 
+          if (formHelper.submitForm({ formCtrl: addUserForm, scope: $scope, statusMessage: "Saving..." })) {
             vm.newUser.id = -1;
             vm.newUser.parentId = -1;
             vm.page.createButtonState = "busy";
 
-            contentEditingHelper.contentEditorPerformSave({
-                statusMessage: localizeSaving,
-                saveMethod: usersResource.inviteUser,
-                scope: $scope,
-                content: vm.newUser,
-                // We do not redirect on failure for users - this is because it is not possible to actually save a user
-                // when server side validation fails - as opposed to content where we are capable of saving the content
-                // item if server side validation fails
-                redirectOnFailure: false,
-                rebindCallback: function (orignal, saved) { }
-            }).then(function (saved) {
+            usersResource.inviteUser(vm.newUser)
+              .then(function (saved) {
 
+                //success
                 vm.page.createButtonState = "success";
 
-            }, function (err) {
+              }, function (err) {
 
+                //error
+                formHelper.handleError(err);
                 vm.page.createButtonState = "error";
-
-            });
+              });                    
+          }
 
         }
 

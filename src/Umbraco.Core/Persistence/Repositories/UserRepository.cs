@@ -77,6 +77,27 @@ namespace Umbraco.Core.Persistence.Repositories
             return new UserProfile(dto.Id, dto.UserName);
         }
 
+        public IDictionary<UserState, int> GetUserStates()
+        {
+            var sql = @"SELECT 
+(SELECT COUNT(id) FROM umbracoUser) AS CountOfAll,
+(SELECT COUNT(id) FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL) AS CountOfActive,
+(SELECT COUNT(id) FROM umbracoUser WHERE userDisabled = 1) AS CountOfDisabled,
+(SELECT COUNT(id) FROM umbracoUser WHERE userNoConsole = 1) AS CountOfLockedOut,
+(SELECT COUNT(id) FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL) AS CountOfInvited";
+
+            var result = Database.First<dynamic>(sql);
+            
+            return new Dictionary<UserState, int>
+            {
+                {UserState.All, result.CountOfAll},
+                {UserState.Active, result.CountOfActive},
+                {UserState.Disabled, result.CountOfDisabled},
+                {UserState.Invited, result.CountOfInvited},
+                {UserState.LockedOut, result.CountOfLockedOut}
+            };
+        }
+
         protected override IEnumerable<IUser> PerformGetAll(params int[] ids)
         {
             var sql = GetQueryWithGroups();
@@ -271,7 +292,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 {"createDate", "CreateDate"},
                 {"updateDate", "UpdateDate"},
                 {"avatar", "Avatar"},
-                {"emailConfirmedDate", "EmailConfirmedDate"}
+                {"emailConfirmedDate", "EmailConfirmedDate"},
+                {"invitedDate", "InvitedDate"}
             };
 
             //create list of properties that have changed

@@ -19,6 +19,7 @@ namespace Umbraco.Core.Models.Membership
         string Language { get; set; }
 
         DateTime? EmailConfirmedDate { get; set; }
+        DateTime? InvitedDate { get; set; }
 
         /// <summary>
         /// Gets the groups that user is part of
