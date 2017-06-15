@@ -339,7 +339,7 @@ namespace Umbraco.Web.Editors
                             },
                             {
                                 "currentUserApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
-                                    controller => controller.GetMembershipProviderConfig())
+                                    controller => controller.PostChangePassword(null))
                             },
                             {
                                 "legacyApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<LegacyController>(

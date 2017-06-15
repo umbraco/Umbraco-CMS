@@ -213,6 +213,23 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
 
     /**
      * @ngdoc method
+     * @name umbraco.resources.currentUserResource#getMembershipProviderConfig
+     * @methodOf umbraco.resources.currentUserResource
+     *
+     * @description
+     * Gets the configuration of the user membership provider which is used to configure the change password form         
+     */
+    getMembershipProviderConfig: function () {
+      return umbRequestHelper.resourcePromise(
+        $http.get(
+          umbRequestHelper.getApiUrl(
+            "authenticationApiBaseUrl",
+            "GetMembershipProviderConfig")),
+        'Failed to retrieve membership provider config');
+    },
+
+    /**
+     * @ngdoc method
      * @name umbraco.resources.authResource#performSetPassword
      * @methodOf umbraco.resources.authResource
      *

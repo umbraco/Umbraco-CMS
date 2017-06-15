@@ -51,6 +51,17 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Returns the configuration for the backoffice user membership provider - used to configure the change password dialog
+        /// </summary>
+        /// <returns></returns>
+        [WebApi.UmbracoAuthorize(requireApproval: false)]
+        public IDictionary<string, object> GetMembershipProviderConfig()
+        {
+            var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
+            return provider.GetConfiguration(Services.UserService);
+        }
+
+        /// <summary>
         /// Checks if a valid token is specified for an invited user and if so logs the user in and returns the user object
         /// </summary>
         /// <param name="id"></param>

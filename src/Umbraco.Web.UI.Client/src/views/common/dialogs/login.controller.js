@@ -1,22 +1,43 @@
 ﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController",
-  function ($scope, $cookies, $location, currentUserResource, formHelper, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, dialogService) {
+  function ($scope, $cookies, $location, currentUserResource, formHelper, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, dialogService, $q) {
 
     $scope.invitedUser = null;
     $scope.invitedUserPasswordModel = {
       password: "",
-      confirmPassword: ""
+      confirmPassword: "",
+      buttonState: "",
+      passwordPolicies: null,
+      passwordPolicyText: ""
     }
 
     function init() {
       // Check if it is a new user
       if ($location.search().invite) {
-        
-        authResource.getCurrentInvitedUser().then(function (data) {
-          $scope.invitedUser = data;
+
+        $q.all([
+          //get the current invite user
+          authResource.getCurrentInvitedUser().then(function (data) {
+              $scope.invitedUser = data;
+            },
+            function() {
+              //it failed so we should remove the search
+              $location.search('invite', null);
+            }),
+          //get the membership provider config for password policies
+          authResource.getMembershipProviderConfig().then(function (data) {
+            $scope.invitedUserPasswordModel.passwordPolicies = data;
+
+            //localize the text
+            localizationService.localize("errorHandling_errorInPasswordFormat",
+              [
+                $scope.invitedUserPasswordModel.passwordPolicies.minPasswordLength,
+                $scope.invitedUserPasswordModel.passwordPolicies.minNonAlphaNumericChars
+              ]).then(function(data) {
+                $scope.invitedUserPasswordModel.passwordPolicyText = data;
+            });
+          })
+        ]).then(function() {
           $scope.inviteSetPassword = true;
-        }, function () {
-          //it failed so we should remove the search
-          $location.search('invite', null);
         });
       }
     }
@@ -25,14 +46,14 @@
 
       if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
 
-        $scope.inviteChangePasswordButtonState = "busy";
+        $scope.invitedUserPasswordModel.buttonState = "busy";
 
         authResource.performSetInvitedUserPassword($scope.invitedUserPasswordModel.password)
           .then(function (data) {
 
             //success
             formHelper.resetForm({ scope: $scope, notifications: data.notifications });
-            $scope.inviteChangePasswordButtonState = "success";
+            $scope.invitedUserPasswordModel.buttonState = "success";
 
             $scope.inviteSetPassword = false;
             $scope.inviteSetAvatar = true;
@@ -42,7 +63,7 @@
             //error
             formHelper.handleError(err);
             
-            $scope.inviteChangePasswordButtonState = "error";
+            $scope.invitedUserPasswordModel.buttonState = "error";
 
           });
       }      
@@ -145,6 +166,8 @@
 
     $scope.loginSubmit = function (login, password) {
 
+      //TODO: Do validation properly like in the invite password update
+
       //if the login and password are not empty we need to automatically 
       // validate them - this is because if there are validation errors on the server
       // then the user has to change both username & password to resubmit which isn't ideal,
@@ -194,6 +217,8 @@
     };
 
     $scope.requestPasswordResetSubmit = function (email) {
+
+      //TODO: Do validation properly like in the invite password update
 
       if (email && email.length > 0) {
         $scope.requestPasswordResetForm.email.$setValidity('auth', true);
