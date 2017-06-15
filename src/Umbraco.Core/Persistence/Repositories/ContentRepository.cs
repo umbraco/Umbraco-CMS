@@ -50,33 +50,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public bool EnsureUniqueNaming { get; set; }
 
-        public IContent Get(Guid id)
-        {
-            // cannot use cache policy because, <int, IContent>, so what?
-
-            var sql = GetBaseQuery(BaseQueryType.FullSingle)
-                .Where("umbracoNode.uniqueId = @id", new { id })
-                .Where<DocumentDto>(x => x.Newest, SqlSyntax)
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
-
-            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
-
-            if (dto == null)
-                return null;
-
-            var content = CreateContentFromDto(dto, sql);
-
-            return content;
-        }
-
-        public IContent Get2(Guid id)
-        {
-            // cannot use cache policy because, <int, IContent>, so what?
-
-            var a = ApplicationContext.Current.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
-            return a.Success ? Get(a.Result) : null;
-        }
-
         #region Overrides of RepositoryBase<IContent>
 
         protected override IContent PerformGet(int id)
