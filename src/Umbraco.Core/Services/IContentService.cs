@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services
     {
         //TODO: Remove this class in v8
 
-        //TODO: There's probably more that needs to be added like the EmptyRecycleBin, etc...
+        //TODO: There's probably more that needs to be added like the EmptyRecycleBin, etc...        
 
         /// <summary>
         /// Saves a single <see cref="IContent"/> object
@@ -96,6 +96,12 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentService : IContentServiceBase
     {
+        IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] documentTypeIds);
+        IContent GetBlueprintById(int id);
+        void SaveBlueprint(IContent content, int userId = 0);
+        void DeleteBlueprint(IContent content, int userId = 0);
+        IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = 0);
+
         /// <summary>
         /// Gets all XML entries found in the cmsContentXml table based on the given path
         /// </summary>

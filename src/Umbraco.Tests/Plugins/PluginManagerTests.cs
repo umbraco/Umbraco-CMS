@@ -301,7 +301,7 @@ AnotherContentFinder
         public void Resolves_Actions()
         {
             var actions = _manager.ResolveActions();
-            Assert.AreEqual(37, actions.Count());
+            Assert.AreEqual(38, actions.Count());
         }
 
         [Test]
