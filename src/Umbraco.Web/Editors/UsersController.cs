@@ -224,7 +224,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="userSave"></param>
         /// <returns></returns>
-        public UserDisplay PostCreateUser(UserInvite userSave)
+        public async Task<UserDisplay> PostCreateUser(UserInvite userSave)
         {
             if (userSave == null) throw new ArgumentNullException("userSave");
 
@@ -236,11 +236,32 @@ namespace Umbraco.Web.Editors
             var existing = Services.UserService.GetByEmail(userSave.Email);
             if (existing != null)
             {
-                ModelState.AddModelError("Email", "A user with the email already exists");
+                ModelState.AddModelError("email", "A user with the email already exists");
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
-            var user = Mapper.Map<IUser>(userSave);
+            //we want to create the user with the UserManager, this ensures the 'empty' (special) password
+            //format is applied without us having to duplicate that logic
+            var created = await UserManager.CreateAsync(new BackOfficeIdentityUser
+            {
+                Email = userSave.Email,
+                Name = userSave.Name,
+                UserName = userSave.Email
+            });
+            if (created.Succeeded == false)
+            {
+                throw new HttpResponseException(
+                    Request.CreateNotificationValidationErrorResponse(string.Join(", ", created.Errors)));
+            }
+
+            //now re-look the user back up which will now exist
+            var user = Services.UserService.GetByEmail(userSave.Email);
+
+            //map the save info over onto the user
+            user = Mapper.Map(userSave, user);
+
+            //since the back office user is creating this user, they will be set to approved
+            user.IsApproved = true;
 
             Services.UserService.Save(user);
 
@@ -258,6 +279,9 @@ namespace Umbraco.Web.Editors
         public async Task<UserDisplay> PostInviteUser(UserInvite userSave)
         {
             if (userSave == null) throw new ArgumentNullException("userSave");
+
+            if (userSave.Message.IsNullOrWhiteSpace())
+                ModelState.AddModelError("message", "Message cannot be empty");
 
             if (ModelState.IsValid == false)
             {

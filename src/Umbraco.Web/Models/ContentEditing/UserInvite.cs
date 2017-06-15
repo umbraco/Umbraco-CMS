@@ -19,8 +19,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [EmailAddress]
         public string Email { get; set; }        
 
-        [DataMember(Name = "message", IsRequired = true)]
-        [Required]
+        [DataMember(Name = "message")]
         public string Message { get; set; }
         
     }
