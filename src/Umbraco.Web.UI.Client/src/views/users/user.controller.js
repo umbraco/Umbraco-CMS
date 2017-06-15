@@ -55,6 +55,7 @@
             }).then(function (saved) {
 
                 vm.user = saved;
+                setUserDisplayState();
                 vm.page.saveButtonState = "success";
 
             }, function (err) {
