@@ -1,27 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence;
-
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using umbraco.editorControls.tinyMCE3;
-using umbraco.interfaces;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Tests.Persistence.Repositories
@@ -69,6 +64,83 @@ namespace Umbraco.Tests.Persistence.Repositories
             contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, templateRepository);
             var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
+        }
+
+        protected override CacheHelper CreateCacheHelper()
+        {
+            return new CacheHelper(
+                new ObjectCacheRuntimeCacheProvider(),
+                new StaticCacheProvider(),
+                new NullCacheProvider(),
+                new IsolatedRuntimeCache(type => new ObjectCacheRuntimeCacheProvider()));
+        }
+
+        [Test]
+        public void Bench()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            IContent content1;
+
+            var versions = new List<Guid>();
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                var hasPropertiesContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
+                content1 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
+
+                //save version
+                contentTypeRepository.AddOrUpdate(hasPropertiesContentType);
+                repository.AddOrUpdate(content1);
+                unitOfWork.Commit();
+                versions.Add(content1.Version);
+
+                //publish version
+                content1.ChangePublishedState(PublishedState.Published);
+                repository.AddOrUpdate(content1);
+                unitOfWork.Commit();
+                versions.Add(content1.Version);
+
+                //change something and make a pending version
+                content1.Name = "new name";
+                content1.ChangePublishedState(PublishedState.Saved);
+                repository.AddOrUpdate(content1);
+                unitOfWork.Commit();
+                versions.Add(content1.Version);
+
+
+                var unused1 = repository.Get(content1.Id);
+
+                var sw = Stopwatch.StartNew();
+                for (var i = 0; i < 1000; i++)
+                {
+                    var unused = repository.Get(content1.Id);
+                }
+                sw.Stop();
+                Console.WriteLine(sw.Elapsed);
+                sw.Restart();
+                for (var i = 0; i < 1000; i++)
+                {
+                    var unused = repository.Get(content1.Key);
+                }
+                sw.Stop();
+                Console.WriteLine(sw.Elapsed);
+                sw.Restart();
+                for (var i = 0; i < 1000; i++)
+                {
+                    var unused = repository.Get2(content1.Key);
+                }
+                sw.Stop();
+                Console.WriteLine(sw.Elapsed);
+                sw.Restart();
+                for (var i = 0; i < 1000; i++)
+                {
+                    var query = Query<IContent>.Builder.Where(x => x.Key == content1.Key);
+                    var unused = repository.GetByQuery(query).SingleOrDefault();
+                }
+                sw.Stop();
+                Console.WriteLine(sw.Elapsed);
+            }
         }
 
         [Test]
@@ -138,10 +210,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var hasPropertiesContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 content1 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
-                
+
                 contentTypeRepository.AddOrUpdate(hasPropertiesContentType);
-                repository.AddOrUpdate(content1);                
-                unitOfWork.Commit();                
+                repository.AddOrUpdate(content1);
+                unitOfWork.Commit();
             }
 
             var versionDtos = new List<ContentVersionDto>();
@@ -237,7 +309,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Assert
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
-                //this will cause the GetPropertyCollection to execute and we need to ensure that 
+                //this will cause the GetPropertyCollection to execute and we need to ensure that
                 // all of the properties and property types are all correct
                 var result = repository.GetAll(allContent.Select(x => x.Id).ToArray()).ToArray();
 
@@ -246,7 +318,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     foreach (var contentProperty in content.Properties)
                     {
                         //prior to the fix, the 2nd document iteration in the GetPropertyCollection would have caused
-                        //the enumerator to move forward past the first property of the 3rd document which would have 
+                        //the enumerator to move forward past the first property of the 3rd document which would have
                         //ended up not assiging a property to the 3rd document. This would have ended up with the 3rd
                         //document still having 3 properties but the last one would not have been assigned an identity
                         //because the property data would not have been assigned.
