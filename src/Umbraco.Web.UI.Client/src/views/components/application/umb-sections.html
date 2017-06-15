@@ -5,6 +5,8 @@
                 <a href="#" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}" prevent-default>
                     <umb-avatar
                         size="xs"
+                        color="secondary"
+                        name="{{user.name}}"
                         img-src="{{avatar[0].value}}"
                         img-srcset="{{avatar[1].value}} 2x, {{avatar[2].value}} 3x">
                     </umb-avatar>
