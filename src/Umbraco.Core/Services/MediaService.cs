@@ -327,12 +327,15 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia GetById(Guid key)
         {
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
-            {
-                var repository = RepositoryFactory.CreateMediaRepository(uow);
-                var query = Query<IMedia>.Builder.Where(x => x.Key == key);
-                return repository.GetByQuery(query).SingleOrDefault();
-            }
+            // the repository implements a cache policy on int identifiers, not guids,
+            // and we are not changing it now, but we still would like to rely on caching
+            // instead of running a full query against the database, so relying on the
+            // id-key map, which is fast.
+            //
+            // we should inject the id-key map but ... breaking changes ... yada
+
+            var a = ApplicationContext.Current.IdkMap.GetIdForKey(key, UmbracoObjectTypes.Media);
+            return a.Success ? GetById(a.Result) : null;
         }
 
         /// <summary>
