@@ -78,6 +78,8 @@ Use this directive to render an umbraco button. The directive can be used to gen
 
          function activate() {
 
+             scope.blockElement = false;
+
             if (!scope.state) {
                scope.state = "init";
             }
@@ -95,10 +97,16 @@ Use this directive to render an umbraco button. The directive can be used to gen
                     
                     angular.forEach(array, function(item){
                         scope.style = scope.style + " " + "btn-" + item;
+                        if(item === "block") {
+                            scope.blockElement = true;
+                        }
                     });
 
                 } else {
                     scope.style = "btn-" + scope.buttonStyle;
+                    if(scope.buttonStyle === "block") {
+                        scope.blockElement = true;
+                    }
                 }
 
             }
