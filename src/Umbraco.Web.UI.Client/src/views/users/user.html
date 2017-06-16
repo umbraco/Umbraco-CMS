@@ -154,7 +154,6 @@
                                     
                                 </div>
 
-                                <!--
                                 <div class="umb-package-details__information-item">
                                     <div class="umb-package-details__information-item-label">Status</div>
                                     <div class="umb-package-details__information-item-content">
@@ -166,7 +165,6 @@
                                         </umb-badge>
                                     </div>
                                 </div>
-                                -->
 
                                 <div class="umb-package-details__information-item">
                                     <div class="umb-package-details__information-item-label">Last login:</div>
@@ -201,7 +199,7 @@
 
                                     <div style="margin-bottom: 10px;">
                                         <umb-button
-                                            ng-if="vm.user.userDisplayState.alias === 'disabled'"
+                                            ng-if="vm.user.userDisplayState.alias === 'disabled' || vm.user.userDisplayState.alias === 'lockedOut'"
                                             type="button"
                                             button-style="[success,block]"
                                             state="vm.enableUserButtonState"

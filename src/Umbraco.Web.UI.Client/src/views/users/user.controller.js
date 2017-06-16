@@ -174,10 +174,23 @@
             vm.disableUserButtonState = "busy";
             usersResource.disableUsers([vm.user.id]).then(function (data) {
                 if (data === "true") {
+                    vm.user.userState = 1;
+                    setUserDisplayState();
                     vm.disableUserButtonState = "success";
+                    localizationService.localize("speechBubbles_disableUserSuccess", [vm.user.name]).then(function (value) {
+                        notificationsService.success(value);
+                    });
                 } else {
                     vm.disableUserButtonState = "error";
+                    localizationService.localize("speechBubbles_disableUserError").then(function (value) {
+                        notificationsService.error(value);
+                    });
                 }
+            }, function(error){
+                vm.disableUserButtonState = "error";
+                localizationService.localize("speechBubbles_disableUserError").then(function (value) {
+                    notificationsService.error(value);
+                });
             });
         }
 
@@ -185,10 +198,23 @@
             vm.enableUserButtonState = "busy";
             usersResource.enableUsers([vm.user.id]).then(function (data) {
                 if (data === "true") {
+                    vm.user.userState = 0;
+                    setUserDisplayState();
                     vm.enableUserButtonState = "success";
+                    localizationService.localize("speechBubbles_enableUserSuccess", [vm.user.name]).then(function (value) {
+                        notificationsService.success(value);
+                    });
                 } else {
                     vm.enableUserButtonState = "error";
+                    localizationService.localize("speechBubbles_enableUserError").then(function (value) {
+                        notificationsService.error(value);
+                    });
                 }
+            }, function(error){
+                vm.disableUserButtonState = "error";
+                localizationService.localize("speechBubbles_enableUserError").then(function (value) {
+                    notificationsService.error(value);
+                });
             });
         }
 
