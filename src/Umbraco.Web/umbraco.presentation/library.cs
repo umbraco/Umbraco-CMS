@@ -992,7 +992,7 @@ namespace umbraco
         /// <returns>The text with text line breaks replaced with html linebreaks (<br/>)</returns>
         public static string ReplaceLineBreaks(string text)
         {
-        	return GetUmbracoHelper().ReplaceLineBreaksForHtml(text);
+        	return GetUmbracoHelper().ReplaceLineBreaksForHtml(text).ToString();
         }
 
         /// <summary>
