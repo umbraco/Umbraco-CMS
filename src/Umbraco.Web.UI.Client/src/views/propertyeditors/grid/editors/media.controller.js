@@ -1,10 +1,17 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.MediaController",
-    function ($scope, $rootScope, $timeout) {
+    function ($scope, $rootScope, $timeout, userService) {
+
+        if (!$scope.model.config.startNodeId) {
+            userService.getCurrentUser().then(function (userData) {
+                $scope.model.config.startNodeId = userData.startMediaId;
+            });
+        }
 
         $scope.setImage = function(){
             $scope.mediaPickerOverlay = {};
             $scope.mediaPickerOverlay.view = "mediapicker";
+            $scope.mediaPickerOverlay.startNodeId = $scope.model.config && $scope.model.config.startNodeId ? $scope.model.config.startNodeId : undefined;
             $scope.mediaPickerOverlay.cropSize = $scope.control.editor.config && $scope.control.editor.config.size ? $scope.control.editor.config.size : undefined;
             $scope.mediaPickerOverlay.showDetails = true;
             $scope.mediaPickerOverlay.disableFolderSelect = true;

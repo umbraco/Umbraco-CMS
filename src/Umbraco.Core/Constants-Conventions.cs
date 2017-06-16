@@ -4,7 +4,8 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core
 {
-	public static partial class Constants
+   
+    public static partial class Constants
 	{
 		/// <summary>
 		/// Defines the identifiers for property-type alias conventions that are used within the Umbraco core.
@@ -122,6 +123,11 @@ namespace Umbraco.Core
 				/// MediaType alias for an image.
 				/// </summary>
 				public const string Image = "Image";
+
+                /// <summary>
+                /// MediaType alias indicating allowing auto-selection.
+                /// </summary>
+			    public const string AutoSelect = "umbracoAutoSelect";
 			}
             
 		    /// <summary>

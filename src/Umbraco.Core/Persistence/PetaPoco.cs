@@ -1,10 +1,10 @@
 ﻿/* PetaPoco v4.0.3 - A Tiny ORMish thing for your POCO's.
  * Copyright © 2011 Topten Software.  All Rights Reserved.
- * 
+ *
  * Apache License 2.0 - http://www.toptensoftware.com/petapoco/license
- * 
- * Special thanks to Rob Conery (@robconery) for original inspiration (ie:Massive) and for 
- * use of Subsonic's T4 templates, Rob Sullivan (@DataChomp) for hard core DBA advice 
+ *
+ * Special thanks to Rob Conery (@robconery) for original inspiration (ie:Massive) and for
+ * use of Subsonic's T4 templates, Rob Sullivan (@DataChomp) for hard core DBA advice
  * and Adam Schroder (@schotime) for lots of suggestions, improvements and Oracle support
  */
 
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Persistence
 	}
 
 	// Results from paged request
-	public class Page<T> 
+	public class Page<T>
 	{
 		public long CurrentPage { get; set; }
 		public long TotalPages { get; set; }
@@ -164,15 +164,15 @@ namespace Umbraco.Core.Persistence
 				connectionStringName = ConfigurationManager.ConnectionStrings[0].Name;
 
 			// Work out connection string and provider name
-			var providerName = "System.Data.SqlClient";
+			var providerName = Constants.DatabaseProviders.SqlServer;
 			if (ConfigurationManager.ConnectionStrings[connectionStringName] != null)
 			{
-				if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName))
+				if (string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName) == false)
 					providerName = ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName;
 			}
 			else
 			{
-				throw new InvalidOperationException("Can't find a connection string with the name '" + connectionStringName + "'");
+				throw new NullReferenceException("Can't find a connection string with the name '" + connectionStringName + "'");
 			}
 
 			// Store factory and connection string
@@ -181,7 +181,7 @@ namespace Umbraco.Core.Persistence
 			CommonConstruct();
 		}
 
-		enum DBType
+		public enum DBType
 		{
 			SqlServer,
 			SqlServerCE,
@@ -190,7 +190,9 @@ namespace Umbraco.Core.Persistence
 			Oracle,
             SQLite
 		}
-		DBType _dbType = DBType.SqlServer;
+		private DBType _dbType = DBType.SqlServer;
+
+        public DBType DatabaseType { get { return _dbType; } }
 
 		// Common initialization
 		private void CommonConstruct()
@@ -202,7 +204,7 @@ namespace Umbraco.Core.Persistence
 
             if (_providerName != null)
 				_factory = DbProviderFactories.GetFactory(_providerName);
-			
+
             string dbtype = (_factory == null ? _sharedConnection.GetType() : _factory.GetType()).Name;
 
 			if (dbtype.StartsWith("MySql")) _dbType = DBType.MySql;
@@ -224,13 +226,18 @@ namespace Umbraco.Core.Persistence
 		// Automatically close one open shared connection
 		public void Dispose()
 		{
-			// Automatically close one open connection reference
-			//  (Works with KeepConnectionAlive and manually opening a shared connection)
-			CloseSharedConnection();
+		    Dispose(true);
 		}
 
-		// Set to true to keep the first opened connection alive until this object is disposed
-		public bool KeepConnectionAlive { get; set; }
+	    protected virtual void Dispose(bool disposing)
+	    {
+            // Automatically close one open connection reference
+            //  (Works with KeepConnectionAlive and manually opening a shared connection)
+            CloseSharedConnection();
+        }
+
+        // Set to true to keep the first opened connection alive until this object is disposed
+        public bool KeepConnectionAlive { get; set; }
 
 		// Open a connection (can be nested)
 		public void OpenSharedConnection()
@@ -325,8 +332,16 @@ namespace Umbraco.Core.Persistence
 			if (_transactionDepth == 1)
 			{
 				OpenSharedConnection();
-				_transaction = _sharedConnection.BeginTransaction(isolationLevel);
-				_transactionCancelled = false;
+			    try
+			    {
+			        _transaction = _sharedConnection.BeginTransaction(isolationLevel);
+			    }
+
+			    catch (Exception e)
+			    {
+			        throw;
+			    }
+                _transactionCancelled = false;
 				OnBeginTransaction();
 			}
             else if (isolationLevel > _transaction.IsolationLevel)
@@ -385,7 +400,7 @@ namespace Umbraco.Core.Persistence
                     return "SET TRANSACTION ISOLATION LEVEL READ COMMITTED";
             }
         }
-        
+
         // Helper to handle named parameters from object properties
 		static Regex rxParams = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
 		public static string ProcessParams(string _sql, object[] args_src, List<object> args_dest)
@@ -425,8 +440,8 @@ namespace Umbraco.Core.Persistence
 				}
 
 				// Expand collections to parameter lists
-				if ((arg_val as System.Collections.IEnumerable) != null && 
-					(arg_val as string) == null && 
+				if ((arg_val as System.Collections.IEnumerable) != null &&
+					(arg_val as string) == null &&
 					(arg_val as byte[]) == null)
 				{
 					var sb = new StringBuilder();
@@ -487,10 +502,10 @@ namespace Umbraco.Core.Persistence
 				}
 				else if (t == typeof(string))
 				{
-                    // out of memory exception occurs if trying to save more than 4000 characters to SQL Server CE NText column. 
+                    // out of memory exception occurs if trying to save more than 4000 characters to SQL Server CE NText column.
                     //Set before attempting to set Size, or Size will always max out at 4000
                     if ((item as string).Length + 1 > 4000 && p.GetType().Name == "SqlCeParameter")
-                        p.GetType().GetProperty("SqlDbType").SetValue(p, SqlDbType.NText, null); 
+                        p.GetType().GetProperty("SqlDbType").SetValue(p, SqlDbType.NText, null);
 
                     p.Size = (item as string).Length + 1;
                     if(p.Size < 4000)
@@ -676,19 +691,19 @@ namespace Umbraco.Core.Persistence
 		public bool ForceDateTimesToUtc { get; set; }
 
 		// Return a typed list of pocos
-		public List<T> Fetch<T>(string sql, params object[] args) 
+		public List<T> Fetch<T>(string sql, params object[] args)
 		{
 			return Query<T>(sql, args).ToList();
 		}
 
-		public List<T> Fetch<T>(Sql sql) 
+		public List<T> Fetch<T>(Sql sql)
 		{
 			return Fetch<T>(sql.SQL, sql.Arguments);
 		}
 
 		static Regex rxColumns = new Regex(@"\A\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 		static Regex rxOrderBy = new Regex(@"\bORDER\s+BY\s+(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-		static Regex rxDistinct = new Regex(@"\ADISTINCT\s", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+        static Regex rxDistinct = new Regex(@"\ADISTINCT\s", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 		public static bool SplitSqlForPaging(string sql, out string sqlCount, out string sqlSelectRemoved, out string sqlOrderBy)
 		{
 			sqlSelectRemoved = null;
@@ -708,10 +723,9 @@ namespace Umbraco.Core.Persistence
 				sqlCount = sql.Substring(0, g.Index) + "COUNT(" + m.Groups[1].ToString().Trim() + ") " + sql.Substring(g.Index + g.Length);
 			else
 				sqlCount = sql.Substring(0, g.Index) + "COUNT(*) " + sql.Substring(g.Index + g.Length);
-
-
-			// Look for an "ORDER BY <whatever>" clause
-			m = rxOrderBy.Match(sqlCount);
+            
+		    // Look for an "ORDER BY <whatever>" clause
+            m = rxOrderBy.Match(sqlCount);
 			if (!m.Success)
 			{
 				sqlOrderBy = null;
@@ -722,11 +736,59 @@ namespace Umbraco.Core.Persistence
 				sqlOrderBy = g.ToString();
 				sqlCount = sqlCount.Substring(0, g.Index) + sqlCount.Substring(g.Index + g.Length);
 			}
-
-			return true;
+            return true;
 		}
 
-		public void BuildPageQueries<T>(long skip, long take, string sql, ref object[] args, out string sqlCount, out string sqlPage) 
+	    /// <summary>
+	    /// NOTE: This is a custom mod of PetaPoco!! This builds the paging sql for different db providers
+	    /// </summary>
+	    /// <param name="sql"></param>
+	    /// <param name="sqlSelectRemoved"></param>
+	    /// <param name="sqlOrderBy"></param>
+	    /// <param name="args"></param>
+	    /// <param name="sqlPage"></param>
+	    /// <param name="databaseType"></param>
+	    /// <param name="skip"></param>
+	    /// <param name="take"></param>
+	    internal virtual void BuildSqlDbSpecificPagingQuery(DBType databaseType, long skip, long take, string sql, string sqlSelectRemoved, string sqlOrderBy, ref object[] args, out string sqlPage)
+	    {
+            // this is overriden in UmbracoDatabase, and if running SqlServer >=2012, the database type
+            // is switched from SqlServer to SqlServerCE in order to use the better paging syntax that
+            // SqlCE supports, and SqlServer >=2012 too.
+            // so the first case is actually for SqlServer <2012, and second case is CE *and* SqlServer >=2012
+
+            if (databaseType == DBType.SqlServer || databaseType == DBType.Oracle)
+            {
+                sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
+                if (rxDistinct.IsMatch(sqlSelectRemoved))
+                {
+                    sqlSelectRemoved = "peta_inner.* FROM (SELECT " + sqlSelectRemoved + ") peta_inner";
+                }
+
+                // split to ensure that peta_rn is the last field to be selected, else Page<int> would fail
+                // the resulting sql is not perfect, NPoco has a much nicer way to do it, but it would require
+                // importing large parts of NPoco
+                var pos = sqlSelectRemoved.IndexOf("FROM");
+                var sqlColumns = sqlSelectRemoved.Substring(0, pos);
+                var sqlFrom = sqlSelectRemoved.Substring(pos);
+
+                sqlPage = string.Format("SELECT * FROM (SELECT {0}, ROW_NUMBER() OVER ({1}) peta_rn {2}) peta_paged WHERE peta_rn>@{3} AND peta_rn<=@{4}",
+                                        sqlColumns, sqlOrderBy ?? "ORDER BY (SELECT NULL)", sqlFrom, args.Length, args.Length + 1);
+                args = args.Concat(new object[] { skip, skip + take }).ToArray();
+            }
+            else if (databaseType == DBType.SqlServerCE)
+            {
+                sqlPage = string.Format("{0}\nOFFSET @{1} ROWS FETCH NEXT @{2} ROWS ONLY", sql, args.Length, args.Length + 1);
+                args = args.Concat(new object[] { skip, take }).ToArray();
+            }
+            else
+            {
+                sqlPage = string.Format("{0}\nLIMIT @{1} OFFSET @{2}", sql, args.Length, args.Length + 1);
+                args = args.Concat(new object[] { take, skip }).ToArray();
+            }
+        }
+
+		public void BuildPageQueries<T>(long skip, long take, string sql, ref object[] args, out string sqlCount, out string sqlPage)
 		{
 			// Add auto select clause
 			if (EnableAutoSelect)
@@ -734,38 +796,16 @@ namespace Umbraco.Core.Persistence
 
 			// Split the SQL into the bits we need
 			string sqlSelectRemoved, sqlOrderBy;
-			if (!SplitSqlForPaging(sql, out sqlCount, out sqlSelectRemoved, out sqlOrderBy))
+			if (SplitSqlForPaging(sql, out sqlCount, out sqlSelectRemoved, out sqlOrderBy) == false)
 				throw new Exception("Unable to parse SQL statement for paged query");
 			if (_dbType == DBType.Oracle && sqlSelectRemoved.StartsWith("*"))
                 throw new Exception("Query must alias '*' when performing a paged query.\neg. select t.* from table t order by t.id");
 
-			// Build the SQL for the actual final result
-			if (_dbType == DBType.SqlServer || _dbType == DBType.Oracle)
-			{
-				sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
-				if (rxDistinct.IsMatch(sqlSelectRemoved))
-				{
-					sqlSelectRemoved = "peta_inner.* FROM (SELECT " + sqlSelectRemoved + ") peta_inner";
-				}
-				sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) peta_rn, {1}) peta_paged WHERE peta_rn>@{2} AND peta_rn<=@{3}",
-										sqlOrderBy==null ? "ORDER BY (SELECT NULL)" : sqlOrderBy, sqlSelectRemoved, args.Length, args.Length + 1);
-				args = args.Concat(new object[] { skip, skip+take }).ToArray();
-			}
-			else if (_dbType == DBType.SqlServerCE)
-			{
-				sqlPage = string.Format("{0}\nOFFSET @{1} ROWS FETCH NEXT @{2} ROWS ONLY", sql, args.Length, args.Length + 1);
-				args = args.Concat(new object[] { skip, take }).ToArray();
-			}
-			else
-			{
-				sqlPage = string.Format("{0}\nLIMIT @{1} OFFSET @{2}", sql, args.Length, args.Length + 1);
-				args = args.Concat(new object[] { take, skip }).ToArray();
-			}
-
+		    BuildSqlDbSpecificPagingQuery(_dbType, skip, take, sql, sqlSelectRemoved, sqlOrderBy, ref args, out sqlPage);
 		}
 
-		// Fetch a page	
-		public Page<T> Page<T>(long page, long itemsPerPage, string sql, params object[] args) 
+		// Fetch a page
+		public Page<T> Page<T>(long page, long itemsPerPage, string sql, params object[] args)
 		{
 			string sqlCount, sqlPage;
 			BuildPageQueries<T>((page-1)*itemsPerPage, itemsPerPage, sql, ref args, out sqlCount, out sqlPage);
@@ -778,7 +818,7 @@ namespace Umbraco.Core.Persistence
 			result.CurrentPage = page;
 			result.ItemsPerPage = itemsPerPage;
 			result.TotalItems = ExecuteScalar<long>(sqlCount, args);
-			result.TotalPages = result.TotalItems / itemsPerPage;
+		    result.TotalPages = result.TotalItems / itemsPerPage;
 			if ((result.TotalItems % itemsPerPage) != 0)
 				result.TotalPages++;
 
@@ -791,7 +831,7 @@ namespace Umbraco.Core.Persistence
 			return result;
 		}
 
-		public Page<T> Page<T>(long page, long itemsPerPage, Sql sql) 
+		public Page<T> Page<T>(long page, long itemsPerPage, Sql sql)
 		{
 			return Page<T>(page, itemsPerPage, sql.SQL, sql.Arguments);
 		}
@@ -820,7 +860,7 @@ namespace Umbraco.Core.Persistence
 		}
 
 		// Return an enumerable collection of pocos
-		public IEnumerable<T> Query<T>(string sql, params object[] args) 
+		public IEnumerable<T> Query<T>(string sql, params object[] args)
 		{
 			if (EnableAutoSelect)
 				sql = AddSelectClause<T>(sql);
@@ -1033,7 +1073,7 @@ namespace Umbraco.Core.Persistence
 			}
 			private List<Delegate> Delegates { get; set; }
 			private Delegate GetItem(int index) { return Delegates[index]; }
-			
+
 			/// <summary>
 			/// Calls the delegate at the specified index and returns its values
 			/// </summary>
@@ -1068,7 +1108,7 @@ namespace Umbraco.Core.Persistence
 
 		// Create a multi-poco factory
 		Func<IDataReader, Delegate, TRet> CreateMultiPocoFactory<TRet>(Type[] types, string sql, IDataReader r)
-		{			
+		{
 			// Call each delegate
 			var dels = new List<Delegate>();
 			int pos = 0;
@@ -1088,7 +1128,7 @@ namespace Umbraco.Core.Persistence
 		static Dictionary<string, Delegate> AutoMappers = new Dictionary<string, Delegate>();
 		static System.Threading.ReaderWriterLockSlim RWLock = new System.Threading.ReaderWriterLockSlim();
 
-		// Get (or create) the multi-poco factory for a query	
+		// Get (or create) the multi-poco factory for a query
 		Func<IDataReader, Delegate, TRet> GetMultiPocoFactory<TRet>(Type[] types, string sql, IDataReader r)
 		{
 			// Build a key string  (this is crap, should address this at some point)
@@ -1113,8 +1153,8 @@ namespace Umbraco.Core.Persistence
 				if (MultiPocoFactories.TryGetValue(key, out oFactory))
 				{
 					//mpFactory = oFactory;
-					return (Func<IDataReader, Delegate, TRet>)oFactory;	
-				}					
+					return (Func<IDataReader, Delegate, TRet>)oFactory;
+				}
 			}
 			finally
 			{
@@ -1130,9 +1170,9 @@ namespace Umbraco.Core.Persistence
 				if (MultiPocoFactories.TryGetValue(key, out oFactory))
 				{
 					return (Func<IDataReader, Delegate, TRet>)oFactory;
-				}	
-				
-				// Create the factory				
+				}
+
+				// Create the factory
 				var factory = CreateMultiPocoFactory<TRet>(types, sql, r);
 
 				MultiPocoFactories.Add(key, factory);
@@ -1207,54 +1247,54 @@ namespace Umbraco.Core.Persistence
 			}
 		}
 
-			
-		public IEnumerable<T> Query<T>(Sql sql) 
+
+		public IEnumerable<T> Query<T>(Sql sql)
 		{
 			return Query<T>(sql.SQL, sql.Arguments);
 		}
 
-		public bool Exists<T>(object primaryKey) 
+		public bool Exists<T>(object primaryKey)
 		{
 			return FirstOrDefault<T>(string.Format("WHERE {0}=@0", EscapeSqlIdentifier(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey) != null;
 		}
-		public T Single<T>(object primaryKey) 
+		public T Single<T>(object primaryKey)
 		{
 			return Single<T>(string.Format("WHERE {0}=@0", EscapeSqlIdentifier(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey);
 		}
-		public T SingleOrDefault<T>(object primaryKey) 
+		public T SingleOrDefault<T>(object primaryKey)
 		{
 			return SingleOrDefault<T>(string.Format("WHERE {0}=@0", EscapeSqlIdentifier(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey);
 		}
-		public T Single<T>(string sql, params object[] args) 
+		public T Single<T>(string sql, params object[] args)
 		{
 			return Query<T>(sql, args).Single();
 		}
-		public T SingleOrDefault<T>(string sql, params object[] args) 
+		public T SingleOrDefault<T>(string sql, params object[] args)
 		{
 			return Query<T>(sql, args).SingleOrDefault();
 		}
-		public T First<T>(string sql, params object[] args) 
+		public T First<T>(string sql, params object[] args)
 		{
 			return Query<T>(sql, args).First();
 		}
-		public T FirstOrDefault<T>(string sql, params object[] args) 
+		public T FirstOrDefault<T>(string sql, params object[] args)
 		{
 			return Query<T>(sql, args).FirstOrDefault();
 		}
 
-		public T Single<T>(Sql sql) 
+		public T Single<T>(Sql sql)
 		{
 			return Query<T>(sql).Single();
 		}
-		public T SingleOrDefault<T>(Sql sql) 
+		public T SingleOrDefault<T>(Sql sql)
 		{
 			return Query<T>(sql).SingleOrDefault();
 		}
-		public T First<T>(Sql sql) 
+		public T First<T>(Sql sql)
 		{
 			return Query<T>(sql).First();
 		}
-		public T FirstOrDefault<T>(Sql sql) 
+		public T FirstOrDefault<T>(Sql sql)
 		{
 			return Query<T>(sql).FirstOrDefault();
 		}
@@ -1285,7 +1325,7 @@ namespace Umbraco.Core.Persistence
 			return Insert(tableName, primaryKeyName, true, poco);
 		}
 
-		// Insert a poco into a table.  If the poco has a property with the same name 
+		// Insert a poco into a table.  If the poco has a property with the same name
 		// as the primary key the id of the new record is assigned to it.  Either way,
 		// the new id is returned.
 		public object Insert(string tableName, string primaryKeyName, bool autoIncrement, object poco)
@@ -1721,7 +1761,7 @@ namespace Umbraco.Core.Persistence
 			{
 				cmd.CommandTimeout = CommandTimeout;
 			}
-			
+
 			// Call hook
 			OnExecutingCommand(cmd);
 
@@ -1779,8 +1819,8 @@ namespace Umbraco.Core.Persistence
 		public class ExpandoColumn : PocoColumn
 		{
 			public override void SetValue(object target, object val) { (target as IDictionary<string, object>)[ColumnName]=val; }
-			public override object GetValue(object target) 
-			{ 
+			public override object GetValue(object target)
+			{
 				object val=null;
 				(target as IDictionary<string, object>).TryGetValue(ColumnName, out val);
 				return val;
@@ -1803,7 +1843,7 @@ namespace Umbraco.Core.Persistence
             }
 
             static readonly ObjectCache ObjectCache = new MemoryCache("NPoco");
-            
+
         }
 
         public class PocoData
@@ -1812,7 +1852,7 @@ namespace Umbraco.Core.Persistence
             internal static bool UseLongKeys = false;
             //USE ONLY FOR TESTING - default is one hr
             internal static int SlidingExpirationSeconds = 3600;
-            
+
 			public static PocoData ForObject(object o, string primaryKeyName)
 			{
 				var t = o.GetType();
@@ -1836,7 +1876,7 @@ namespace Umbraco.Core.Persistence
 #endif
 					return ForType(t);
 			}
-            
+
 			public static PocoData ForType(Type t)
 			{
 #if !PETAPOCO_NO_DYNAMIC
@@ -1856,7 +1896,7 @@ namespace Umbraco.Core.Persistence
 					InnerLock.ExitReadLock();
 				}
 
-				
+
 				// Cache it
 				InnerLock.EnterWriteLock();
 				try
@@ -1959,7 +1999,7 @@ namespace Umbraco.Core.Persistence
 			public Delegate GetFactory(string sql, string connString, bool ForceDateTimesToUtc, int firstColumn, int countColumns, IDataReader r)
 			{
 
-                //TODO: It would be nice to remove the irrelevant SQL parts - for a mapping operation anything after the SELECT clause isn't required. 
+                //TODO: It would be nice to remove the irrelevant SQL parts - for a mapping operation anything after the SELECT clause isn't required.
                 // This would ensure less duplicate entries that get cached, currently both of these queries would be cached even though they are
                 // returning the same structured data:
                 // SELECT * FROM MyTable ORDER BY MyColumn
@@ -1981,7 +2021,7 @@ namespace Umbraco.Core.Persistence
                     combiner.AddInt(countColumns);
                     key = combiner.GetCombinedHashCode();
 			    }
-                
+
 
 			    var objectCache = _managedCache.GetCache();
 
@@ -2029,7 +2069,7 @@ namespace Umbraco.Core.Persistence
                             il.Emit(OpCodes.Brfalse_S, lblNotNull);		// obj, obj, fieldname, converter?,  value
                             il.Emit(OpCodes.Pop);						// obj, obj, fieldname, converter?
                             if (converter != null)
-                                il.Emit(OpCodes.Pop);					// obj, obj, fieldname, 
+                                il.Emit(OpCodes.Pop);					// obj, obj, fieldname,
                             il.Emit(OpCodes.Ldnull);					// obj, obj, fieldname, null
                             if (converter != null)
                             {
@@ -2169,7 +2209,7 @@ namespace Umbraco.Core.Persistence
 
                     // return it
                     var del = m.CreateDelegate(Expression.GetFuncType(typeof(IDataReader), type));
-                    
+
                     return del;
 			    };
 
@@ -2178,7 +2218,7 @@ namespace Umbraco.Core.Persistence
                 // the line belows returns existing item or adds the new value if it doesn't exist
                 var value = (Lazy<Delegate>)objectCache.AddOrGetExisting(key, newValue, new CacheItemPolicy
                 {
-                    //sliding expiration of 1 hr, if the same key isn't used in this 
+                    //sliding expiration of 1 hr, if the same key isn't used in this
                     // timeframe it will be removed from the cache
                     SlidingExpiration = new TimeSpan(0, 0, SlidingExpirationSeconds)
                 });
@@ -2272,7 +2312,7 @@ namespace Umbraco.Core.Persistence
 			public TableInfo TableInfo { get; private set; }
 			public Dictionary<string, PocoColumn> Columns { get; private set; }
             static System.Threading.ReaderWriterLockSlim InnerLock = new System.Threading.ReaderWriterLockSlim();
-            
+
             /// <summary>
             /// Returns a report of the current cache being utilized by PetaPoco
             /// </summary>
@@ -2286,7 +2326,7 @@ namespace Umbraco.Core.Persistence
                 foreach (var pocoData in m_PocoDatas)
                 {
                     sb.AppendFormat("\t{0}\n", pocoData.Key);
-                    sb.AppendFormat("\t\tTable:{0} - Col count:{1}\n", pocoData.Value.TableInfo.TableName, pocoData.Value.QueryColumns.Length);              
+                    sb.AppendFormat("\t\tTable:{0} - Col count:{1}\n", pocoData.Value.TableInfo.TableName, pocoData.Value.QueryColumns.Length);
                 }
 
                 var cache = managedCache.GetCache();
@@ -2299,7 +2339,7 @@ namespace Umbraco.Core.Persistence
                 totalBytes = Encoding.Unicode.GetByteCount(keys);
 
                 sb.AppendFormat("\tTotal byte for keys:{0}\n", totalBytes);
-                
+
                 sb.AppendLine("\tAll Poco cache items:");
 
                 foreach (var item in cache)
@@ -2315,8 +2355,8 @@ namespace Umbraco.Core.Persistence
 
 
 		// Member variables
-		string _connectionString;
-		string _providerName;
+	    readonly string _connectionString;
+	    readonly string _providerName;
 		DbProviderFactory _factory;
 		IDbConnection _sharedConnection;
 		IDbTransaction _transaction;
@@ -2417,6 +2457,7 @@ namespace Umbraco.Core.Persistence
 			else
 				_rhs = sql;
 
+			_sqlFinal = null;
 			return this;
 		}
 

@@ -8,6 +8,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
+    [DefaultPropertyValueConverter]
     [PropertyValueType(typeof(IEnumerable<string>))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class MultipleTextStringValueConverter : PropertyValueConverterBase
@@ -28,7 +29,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             //    </values>
             // </keyFeatureList>
 
-            var sourceString = source.ToString();
+            var sourceString = source != null ? source.ToString() : null;
             if (string.IsNullOrWhiteSpace(sourceString)) return Enumerable.Empty<string>();
 
             //SD: I have no idea why this logic is here, I'm pretty sure we've never saved the multiple txt string

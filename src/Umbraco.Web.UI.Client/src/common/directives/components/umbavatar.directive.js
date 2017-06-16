@@ -13,8 +13,8 @@ Use this directive to render an avatar.
 
         <umb-avatar
             size="xs"
-            src="{{vm.avatar[0].value}}"
-            srcset="{{vm.avatar[1].value}} 2x, {{vm.avatar[2].value}} 3x">
+            img-src="{{vm.avatar[0].value}}"
+            img-srcset="{{vm.avatar[1].value}} 2x, {{vm.avatar[2].value}} 3x">
         </umb-avatar>
 
 	</div>
@@ -43,8 +43,8 @@ Use this directive to render an avatar.
 </pre>
 
 @param {string} size (<code>attribute</code>): The size of the avatar (xs, s, m, l, xl).
-@param {string} src (<code>attribute</code>): The image source to the avatar.
-@param {string} srcset (<code>atribute</code>): Reponsive support for the image source.
+@param {string} img-src (<code>attribute</code>): The image source to the avatar.
+@param {string} img-srcset (<code>atribute</code>): Reponsive support for the image source.
 **/
 
 (function() {
@@ -58,8 +58,8 @@ Use this directive to render an avatar.
             templateUrl: 'views/components/umb-avatar.html',
             scope: {
                 size: "@",
-                src: "@",
-                srcset: "@"
+                imgSrc: "@",
+                imgSrcset: "@"
             }
         };
 

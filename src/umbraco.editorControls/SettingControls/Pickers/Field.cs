@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic.datatype;
 
@@ -40,11 +41,16 @@ namespace umbraco.editorControls.SettingControls.Pickers
 
             string fieldSql = "select distinct alias from cmsPropertyType order by alias";
 
-            IRecordsReader dataTypes = umbraco.BusinessLogic.Application.SqlHelper.ExecuteReader(fieldSql);
-            ddl.DataTextField = "alias";
-            ddl.DataValueField = "alias";
-            ddl.DataSource = dataTypes;
-            ddl.DataBind();
+            using (var sqlHelper = Application.SqlHelper)
+            {
+                using (IRecordsReader dataTypes = sqlHelper.ExecuteReader(fieldSql))
+                {
+                    ddl.DataTextField = "alias";
+                    ddl.DataValueField = "alias";
+                    ddl.DataSource = dataTypes;
+                    ddl.DataBind();
+                }
+            }
 
             foreach (string s in preValuesSource)
             {

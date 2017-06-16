@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -10,6 +11,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Migrations.Stubs;
 
@@ -38,7 +40,7 @@ namespace Umbraco.Tests.Migrations
             //This is needed because the Migration resolver is creating migration instances with their full ctors
             ApplicationContext.EnsureContext(
                 new ApplicationContext(
-                    new DatabaseContext(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), sqlSyntax, "test"),
+                    new DatabaseContext(Mock.Of<IScopeProviderInternal>(), Mock.Of<ILogger>(), sqlSyntax, "test"),
                     new ServiceContext(), 
                     CacheHelper.CreateDisabledCacheHelper(),
                     new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())),  
@@ -87,7 +89,7 @@ namespace Umbraco.Tests.Migrations
             //Console output
             foreach (var expression in context.Expressions)
             {
-                Console.WriteLine(expression.ToString());
+                Debug.Print(expression.ToString());
             }
         }
 

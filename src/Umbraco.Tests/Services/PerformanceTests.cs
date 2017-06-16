@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Services
 
         protected override string GetDbProviderName()
         {
-            return "System.Data.SqlClient";
+            return Constants.DatabaseProviders.SqlServer;
         }
 
 

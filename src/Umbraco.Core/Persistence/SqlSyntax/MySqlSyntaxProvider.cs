@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// <summary>
     /// Represents an SqlSyntaxProvider for MySql
     /// </summary>
-    [SqlSyntaxProviderAttribute("MySql.Data.MySqlClient")]
+    [SqlSyntaxProvider(Constants.DatabaseProviders.MySql)]
     public class MySqlSyntaxProvider : SqlSyntaxProviderBase<MySqlSyntaxProvider>
     {
         private readonly ILogger _logger;
@@ -176,6 +176,11 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             }
 
             return result > 0;
+        }
+
+        public override Sql SelectTop(Sql sql, int top)
+        {
+            return new Sql(string.Concat(sql.SQL, " LIMIT ", top), sql.Arguments);
         }
 
         public override bool SupportsClustered()

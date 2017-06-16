@@ -63,7 +63,7 @@ namespace Umbraco.Core.Persistence.Migrations
             _targetVersion = targetVersion;
             _productName = productName;
             //ensure this is null if there aren't any
-            _migrations = migrations.Length == 0 ? null : migrations;
+            _migrations = migrations == null || migrations.Length == 0 ? null : migrations;
         }
 
         /// <summary>

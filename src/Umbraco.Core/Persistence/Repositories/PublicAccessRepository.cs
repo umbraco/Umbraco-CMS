@@ -15,20 +15,13 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class PublicAccessRepository : PetaPocoRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
     {
-        public PublicAccessRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public PublicAccessRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
-        {            
-        }
+        { }
 
-        private FullDataSetRepositoryCachePolicyFactory<PublicAccessEntry, Guid> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<PublicAccessEntry, Guid> CachePolicyFactory
+        protected override IRepositoryCachePolicy<PublicAccessEntry, Guid> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<PublicAccessEntry, Guid>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(), false));
-            }
+            return new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(runtimeCache, GetEntityId, /*expires:*/ false);
         }
 
         protected override PublicAccessEntry PerformGet(Guid id)
@@ -45,8 +38,12 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 sql.Where("umbracoAccess.id IN (@ids)", new { ids = ids });
             }
-
+            
             var factory = new PublicAccessEntryFactory();
+
+            //MUST be ordered by this GUID ID for the AccessRulesRelator to work
+            sql.OrderBy<AccessDto>(dto => dto.Id, SqlSyntax);
+
             var dtos = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql);
             return dtos.Select(factory.BuildEntity);
         }
@@ -58,6 +55,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate();
 
             var factory = new PublicAccessEntryFactory();
+            
+            //MUST be ordered by this GUID ID for the AccessRulesRelator to work
+            sql.OrderBy<AccessDto>(dto => dto.Id, SqlSyntax);
+
             var dtos = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql);
             return dtos.Select(factory.BuildEntity);
         }
@@ -70,6 +71,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .LeftJoin<AccessRuleDto>(SqlSyntax)
                 .On<AccessDto, AccessRuleDto>(SqlSyntax, left => left.Id, right => right.AccessId);
                 
+
             return sql;
         }
 
@@ -109,6 +111,11 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 rule.AccessId = entity.Key;
                 Database.Insert(rule);
+                //update the id so HasEntity is correct
+                var entityRule = entity.Rules.First(x => x.Key == rule.Id);
+                entityRule.Id = entityRule.Key.GetHashCode();
+                //double make sure that this is set since it is possible to add rules via ctor without AddRule
+                entityRule.AccessEntryId = entity.Key;
             }
 
             entity.ResetDirtyProperties();
@@ -125,11 +132,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Database.Update(dto);
 
+            foreach (var removedRule in entity.RemovedRules)
+            {
+                Database.Delete<AccessRuleDto>("WHERE id=@Id", new { Id = removedRule });
+            }
+
             foreach (var rule in entity.Rules)
             {
                 if (rule.HasIdentity)
                 {
-                    var count = Database.Update(dto.Rules.Single(x => x.Id == rule.Key));
+                    var count = Database.Update(dto.Rules.First(x => x.Id == rule.Key));
                     if (count == 0)
                     {
                         throw new InvalidOperationException("No rows were updated for the access rule");
@@ -150,10 +162,8 @@ namespace Umbraco.Core.Persistence.Repositories
                     rule.Id = rule.Key.GetHashCode();
                 }
             }
-            foreach (var removedRule in entity.RemovedRules)
-            {
-                Database.Delete<AccessRuleDto>("WHERE id=@Id", new {Id = removedRule});
-            }
+
+            entity.ClearRemovedRules();
 
             entity.ResetDirtyProperties();
         }
@@ -162,7 +172,5 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             return entity.Key;
         }
-
-    
     }
 }

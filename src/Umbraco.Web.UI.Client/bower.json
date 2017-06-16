@@ -20,13 +20,15 @@
     "underscore": "~1.7.0",
     "rgrove-lazyload": "*",
     "bootstrap-social": "~4.8.0",
-    "jquery": "2.0.3",
+    "jquery": "2.2.4",
     "jquery-ui": "1.11.4",
+    "jquery-migrate": "1.4.0",
     "angular-dynamic-locale": "0.1.28",
     "ng-file-upload": "~7.3.8",
-    "tinymce": "~4.1.10",
+    "tinymce": "~4.5.3",
     "codemirror": "~5.3.0",
     "angular-local-storage": "~0.2.3",
-    "moment": "~2.10.3"
+    "moment": "~2.10.3",
+    "ace-builds": "^1.2.3"
   }
 }

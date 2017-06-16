@@ -93,14 +93,24 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            // Root actions              
-            menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)))
-                .ConvertLegacyMenuItem(null, Constants.Trees.Packages, queryStrings.GetValue<string>("application"));
-
-            if (id == "created")
+            // Root actions
+            if (id == "-1")
             {
+                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)))
+                    .ConvertLegacyMenuItem(null, Constants.Trees.Packages, queryStrings.GetValue<string>("application"));
+            }
+            else if (id == "created")
+            {
+                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)))
+                    .ConvertLegacyMenuItem(null, Constants.Trees.Packages, queryStrings.GetValue<string>("application"));
+
                 menu.Items.Add<RefreshNode, ActionRefresh>(
                     Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+            }
+            else
+            {
+                //it's a package node
+                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
             }
 
             return menu;

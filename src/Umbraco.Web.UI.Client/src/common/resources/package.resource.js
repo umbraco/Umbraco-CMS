@@ -24,6 +24,24 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
                'Failed to get installed packages');
         },
 
+        validateInstalled: function (name, version) {
+            return umbRequestHelper.resourcePromise(
+               $http.post(
+                   umbRequestHelper.getApiUrl(
+                       "packageInstallApiBaseUrl",
+                       "ValidateInstalled", { name: name, version: version })),
+               'Failed to validate package ' + name);
+        },
+
+        deleteCreatedPackage: function (packageId) {
+            return umbRequestHelper.resourcePromise(
+               $http.post(
+                   umbRequestHelper.getApiUrl(
+                       "packageInstallApiBaseUrl",
+                       "DeleteCreatedPackage", { packageId: packageId })),
+               'Failed to delete package ' + packageId);
+        },
+
         uninstall: function(packageId) {
             return umbRequestHelper.resourcePromise(
                 $http.post(
@@ -93,7 +111,7 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
                   umbRequestHelper.getApiUrl(
                       "packageInstallApiBaseUrl",
                       "Import"), package),
-              'Failed to create package manifest for zip file ');
+              'Failed to install package. Error during the step "Import" ');
         }, 
 
         installFiles: function (package) {
@@ -102,7 +120,7 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
                   umbRequestHelper.getApiUrl(
                       "packageInstallApiBaseUrl",
                       "InstallFiles"), package),
-              'Failed to create package manifest for zip file ');
+              'Failed to install package. Error during the step "InstallFiles" ');
         }, 
 
         installData: function (package) {
@@ -112,7 +130,7 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
                   umbRequestHelper.getApiUrl(
                       "packageInstallApiBaseUrl",
                       "InstallData"), package),
-              'Failed to create package manifest for zip file ');
+              'Failed to install package. Error during the step "InstallData" ');
         }, 
 
         cleanUp: function (package) {
@@ -122,7 +140,7 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
                   umbRequestHelper.getApiUrl(
                       "packageInstallApiBaseUrl",
                       "CleanUp"), package),
-              'Failed to create package manifest for zip file ');
+              'Failed to install package. Error during the step "CleanUp" ');
         }
     };
 }

@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Caching;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web.Caching;
-using Umbraco.Core.Logging;
 using CacheItemPriority = System.Web.Caching.CacheItemPriority;
 
 namespace Umbraco.Core.Cache
 {
     /// <summary>
+    /// Represents a cache provider that caches item in a <see cref="MemoryCache"/>.
     /// A cache provider that wraps the logic of a System.Runtime.Caching.ObjectCache
     /// </summary>
-    internal class ObjectCacheRuntimeCacheProvider : IRuntimeCacheProvider
+    /// <remarks>The <see cref="MemoryCache"/> is created with name "in-memory". That name is
+    /// used to retrieve configuration options. It does not identify the memory cache, i.e.
+    /// each instance of this class has its own, independent, memory cache.</remarks>
+    public class ObjectCacheRuntimeCacheProvider : IRuntimeCacheProvider
     {
-
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         internal ObjectCache MemoryCache;
 

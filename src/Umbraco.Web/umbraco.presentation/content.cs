@@ -1,15 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Web;
 using System.Xml;
-using System.Xml.Linq;
-using System.Xml.XPath;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
@@ -22,12 +19,12 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.Scoping;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Scheduling;
 using File = System.IO.File;
 using Node = umbraco.NodeFactory.Node;
-using Task = System.Threading.Tasks.Task;
 
 namespace umbraco
 {
@@ -36,6 +33,7 @@ namespace umbraco
     /// </summary>
     public class content
     {
+        private readonly IScopeProviderInternal _scopeProvider = (IScopeProviderInternal) ApplicationContext.Current.ScopeProvider;
         private XmlCacheFilePersister _persisterTask;
 
         private volatile bool _released;
@@ -50,7 +48,7 @@ namespace umbraco
                 var profingLogger = new ProfilingLogger(
                     logger,
                     ProfilerResolver.HasCurrent ? ProfilerResolver.Current.Profiler : new LogProfiler(logger));
- 
+
                 // prepare the persister task
                 // there's always be one task keeping a ref to the runner
                 // so it's safe to just create it as a local var here
@@ -71,7 +69,7 @@ namespace umbraco
                         // once released, the cache still works but does not write to file anymore,
                         // which is OK with database server messenger but will cause data loss with
                         // another messenger...
-                        
+
                         runner.Shutdown(false, true); // wait until flushed
                         _released = true;
                     });
@@ -84,7 +82,7 @@ namespace umbraco
             }
 
             // initialize content - populate the cache
-            using (var safeXml = GetSafeXmlWriter(false))
+            using (var safeXml = GetSafeXmlWriter())
             {
                 bool registerXmlChange;
 
@@ -93,7 +91,7 @@ namespace umbraco
                 LoadXmlLocked(safeXml, out registerXmlChange);
                 // if we use the file and registerXmlChange is true this will
                 // write to file, else it will not
-                safeXml.Commit(registerXmlChange);
+                safeXml.AcceptChanges(registerXmlChange);
             }
         }
 
@@ -119,10 +117,10 @@ namespace umbraco
         // (not refactoring that part at the moment)
         private static readonly object DbReadSyncLock = new object();
 
-        private const string XmlContextContentItemKey = "UmbracoXmlContextContent";
-        private const string XmlContextClonedContentItemKey = "UmbracoXmlContextContent.cloned";
+        internal const string XmlContextContentItemKey = "UmbracoXmlContextContent";
         private static string _umbracoXmlDiskCacheFileName = string.Empty;
-        private volatile XmlDocument _xmlContent;
+        // internal for SafeXmlReaderWriter
+        internal volatile XmlDocument _xmlContent;
 
         /// <summary>
         /// Gets the path of the umbraco XML disk cache file.
@@ -145,13 +143,21 @@ namespace umbraco
         }
 
         //NOTE: We CANNOT use this for a double check lock because it is a property, not a field and to do double
-        // check locking in c# you MUST have a volatile field. Even thoug this wraps a volatile field it will still 
+        // check locking in c# you MUST have a volatile field. Even thoug this wraps a volatile field it will still
         // not work as expected for a double check lock because properties are treated differently in the clr.
         public virtual bool isInitializing
         {
-            get { return _xmlContent == null; }
+            get
+            {
+                // ok to access _xmlContent here
+                return _xmlContent == null;
+            }
         }
 
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -175,14 +181,16 @@ namespace umbraco
             var e = new RefreshContentEventArgs();
             FireBeforeRefreshContent(e);
 
-            if (!e.Cancel)
+            if (e.Cancel) return;
+
+            using (var safeXml = GetSafeXmlWriter())
             {
-                using (var safeXml = GetSafeXmlWriter())
-                {
-                    safeXml.Xml = LoadContentFromDatabase();
-                }
+                safeXml.Xml = LoadContentFromDatabase();
+                safeXml.AcceptChanges();
             }
         }
+
+        internal static bool TestingUpdateSitemapProvider = true;
 
         /// <summary>
         /// Used by all overloaded publish methods to do the actual "noderepresentation to xml"
@@ -192,6 +200,8 @@ namespace umbraco
         /// <param name="updateSitemapProvider"></param>
         public static XmlDocument PublishNodeDo(Document d, XmlDocument xmlContentCopy, bool updateSitemapProvider)
         {
+            updateSitemapProvider &= TestingUpdateSitemapProvider;
+
             // check if document *is* published, it could be unpublished by an event
             if (d.Published)
             {
@@ -247,7 +257,7 @@ namespace umbraco
         /// <param name="parentId">The parent node identifier.</param>
         public void SortNodes(int parentId)
         {
-            using (var safeXml = GetSafeXmlWriter(false))
+            using (var safeXml = GetSafeXmlWriter())
             {
                 var parentNode = parentId == -1
                     ? safeXml.Xml.DocumentElement
@@ -262,7 +272,7 @@ namespace umbraco
 
                 if (sorted == false) return;
 
-                safeXml.Commit();
+                safeXml.AcceptChanges();
             }
         }
 
@@ -285,22 +295,20 @@ namespace umbraco
             var e = new DocumentCacheEventArgs();
             FireBeforeUpdateDocumentCache(d, e);
 
-            if (!e.Cancel)
+            if (e.Cancel) return;
+
+            // lock the xml cache so no other thread can write to it at the same time
+            // note that some threads could read from it while we hold the lock, though
+            using (var safeXml = GetSafeXmlWriter())
             {
-                // lock the xml cache so no other thread can write to it at the same time
-                // note that some threads could read from it while we hold the lock, though
-                using (var safeXml = GetSafeXmlWriter())
-                {
-                    safeXml.Xml = PublishNodeDo(d, safeXml.Xml, true);
-                }
-
-                ClearContextCache();
-
-                var cachedFieldKeyStart = string.Format("{0}{1}_", CacheKeys.ContentItemCacheKey, d.Id);
-                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(cachedFieldKeyStart);
-
-                FireAfterUpdateDocumentCache(d, e);
+                safeXml.Xml = PublishNodeDo(d, safeXml.Xml, true);
+                safeXml.AcceptChanges();
             }
+
+            var cachedFieldKeyStart = string.Format("{0}{1}_", CacheKeys.ContentItemCacheKey, d.Id);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(cachedFieldKeyStart);
+
+            FireAfterUpdateDocumentCache(d, e);
         }
 
         internal virtual void UpdateSortOrder(int contentId)
@@ -323,13 +331,19 @@ namespace umbraco
             // this updates the published cache to take care of the situation
             // without ContentService having to ... what exactly?
 
-            // no need to do it if the content is published without unpublished changes,
-            // though, because in that case the XML will get re-generated with the
-            // correct sort order.
-            if (c.Published)
-                return;
+            // no need to do it if
+            // - the content is published without unpublished changes (XML will be re-gen anyways)
+            // - the content has no published version (not in XML)
+            // - the sort order has not changed
+            // note that
+            // - if it is a new entity is has not published version
+            // - if Published is dirty and false it's getting unpublished and has no published version
+            //
+            if (c.Published) return;
+            if (c.HasPublishedVersion == false) return;
+            if (c.WasPropertyDirty("SortOrder") == false) return;
 
-            using (var safeXml = GetSafeXmlWriter(false))
+            using (var safeXml = GetSafeXmlWriter())
             {
                 //TODO: This can be null: safeXml.Xml!!!!
 
@@ -344,7 +358,7 @@ namespace umbraco
                 // only if node was actually modified
                 attr.Value = sortOrder;
 
-                safeXml.Commit();
+                safeXml.AcceptChanges();
             }
         }
 
@@ -355,20 +369,14 @@ namespace umbraco
         [Obsolete("This is not used and will be removed from the codebase in future versions")]
         public virtual void UpdateDocumentCache(List<Document> Documents)
         {
-            // We need to lock content cache here, because we cannot allow other threads
-            // making changes at the same time, they need to be queued
-            int parentid = Documents[0].Id;
-
-
             using (var safeXml = GetSafeXmlWriter())
             {
-                foreach (Document d in Documents)
+                foreach (var d in Documents)
                 {
                     safeXml.Xml = PublishNodeDo(d, safeXml.Xml, true);
                 }
+                safeXml.AcceptChanges();
             }
-
-            ClearContextCache();
         }
 
         [Obsolete("Method obsolete in version 4.1 and later, please use UpdateDocumentCache", true)]
@@ -385,6 +393,11 @@ namespace umbraco
 
         public virtual void ClearDocumentCache(int documentId)
         {
+            ClearDocumentCache(documentId, true);
+        }
+
+        internal virtual void ClearDocumentCache(int documentId, bool removeDbXmlEntry)
+        {
             // Get the document
             Document d;
             try
@@ -398,7 +411,7 @@ namespace umbraco
                 ClearDocumentXmlCache(documentId);
                 return;
             }
-            ClearDocumentCache(d);
+            ClearDocumentCache(d, removeDbXmlEntry);
         }
 
         /// <summary>
@@ -406,7 +419,8 @@ namespace umbraco
         /// This means the node gets unpublished from the website.
         /// </summary>
         /// <param name="doc">The document</param>
-        internal void ClearDocumentCache(Document doc)
+        /// <param name="removeDbXmlEntry"></param>
+        internal void ClearDocumentCache(Document doc, bool removeDbXmlEntry)
         {
             var e = new DocumentCacheEventArgs();
             FireBeforeClearDocumentCache(doc, e);
@@ -415,13 +429,16 @@ namespace umbraco
             {
                 XmlNode x;
 
-                // remove from xml db cache 
-                doc.XmlRemoveFromDB();
+                //Hack: this is here purely for backwards compat if someone for some reason is using the
+                // ClearDocumentCache(int documentId) method and expecting it to remove the xml
+                if (removeDbXmlEntry)
+                {
+                    // remove from xml db cache
+                    doc.XmlRemoveFromDB();
+                }
 
                 // clear xml cache
                 ClearDocumentXmlCache(doc.Id);
-
-                ClearContextCache();
 
                 //SD: changed to fire event BEFORE running the sitemap!! argh.
                 FireAfterClearDocumentCache(doc, e);
@@ -431,7 +448,7 @@ namespace umbraco
                 {
                     var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
                     prov.RemoveNode(doc.Id);
-                }                
+                }
             }
         }
 
@@ -446,7 +463,8 @@ namespace umbraco
                 if (x == null)
                     return;
 
-                safeXml.UpgradeToWriter(false);
+                if (safeXml.IsWriter == false)
+                    safeXml.UpgradeToWriter();
 
                 // Find the document in the xml cache
                 x = safeXml.Xml.GetElementById(id.ToString());
@@ -454,7 +472,7 @@ namespace umbraco
                 {
                     // The document already exists in cache, so repopulate it
                     x.ParentNode.RemoveChild(x);
-                    safeXml.Commit();
+                    safeXml.AcceptChanges();
                 }
             }
         }
@@ -473,14 +491,38 @@ namespace umbraco
 
         #region Protected & Private methods
 
-        /// <summary>
-        /// Clear HTTPContext cache if any
-        /// </summary>
+        // this is for tests exclusively until we have a proper accessor in v8
+        internal static Func<IDictionary> HttpContextItemsGetter { get; set; }
+
+        private static IDictionary HttpContextItems
+        {
+            get
+            {
+                return HttpContextItemsGetter == null
+                    ? (HttpContext.Current == null ? null : HttpContext.Current.Items)
+                    : HttpContextItemsGetter();
+            }
+        }
+
+        // clear the current xml capture in http context
+        // used when applying changes from SafeXmlReaderWriter,
+        // to force a new capture - so that changes become
+        // visible for the current request
         private void ClearContextCache()
         {
-            // If running in a context very important to reset context cache orelse new nodes are missing
-            if (UmbracoContext.Current != null && UmbracoContext.Current.HttpContext != null && UmbracoContext.Current.HttpContext.Items.Contains(XmlContextContentItemKey))
-                UmbracoContext.Current.HttpContext.Items.Remove(XmlContextContentItemKey);
+            var items = HttpContextItems;
+            if (items == null || items.Contains(XmlContextContentItemKey) == false) return;
+            items.Remove(XmlContextContentItemKey);
+        }
+
+        // replaces the current xml capture in http context
+        // used for temp changes from SafeXmlReaderWriter
+        // so the current request immediately sees changes
+        private void SetContextCache(XmlDocument xml)
+        {
+            var items = HttpContextItems;
+            if (items == null) return;
+            items[XmlContextContentItemKey] = xml;
         }
 
         /// <summary>
@@ -490,81 +532,13 @@ namespace umbraco
         {
             try
             {
-                // Try to log to the DB
                 LogHelper.Info<content>("Loading content from database...");
-                
-                try
+
+                lock (DbReadSyncLock)
                 {
-                    LogHelper.Debug<content>("Republishing starting");
-
-                    lock (DbReadSyncLock)
-                    {
-                        //TODO: This is what we should do , but converting to use XDocument would be breaking unless we convert
-                        // to XmlDocument at the end of this, but again, this would be bad for memory... though still not nearly as
-                        // bad as what is happening before!
-                        // We'll keep using XmlDocument for now though, but XDocument xml generation is much faster:
-                        // https://blogs.msdn.microsoft.com/codejunkie/2008/10/08/xmldocument-vs-xelement-performance/
-                        // I think we already have code in here to convert XDocument to XmlDocument but in case we don't here
-                        // it is: https://blogs.msdn.microsoft.com/marcelolr/2009/03/13/fast-way-to-convert-xmldocument-into-xdocument/
-
-                        //// Prepare an XmlDocument with an appropriate inline DTD to match
-                        //// the expected content
-                        //var parent = new XElement("root", new XAttribute("id", "-1"));
-                        //var xmlDoc = new XDocument(
-                        //    new XDocumentType("root", null, null, DocumentType.GenerateDtd()),
-                        //    parent);
-
-                        var xmlDoc = new XmlDocument();
-                        var doctype = xmlDoc.CreateDocumentType("root", null, null, 
-                            ApplicationContext.Current.Services.ContentTypeService.GetContentTypesDtd());
-                        xmlDoc.AppendChild(doctype);
-                        var parent = xmlDoc.CreateElement("root");
-                        var pIdAtt = xmlDoc.CreateAttribute("id");
-                        pIdAtt.Value = "-1";
-                        parent.Attributes.Append(pIdAtt);
-                        xmlDoc.AppendChild(parent);
-
-                        // Esben Carlsen: At some point we really need to put all data access into to a tier of its own.
-                        // CLN - added checks that document xml is for a document that is actually published.
-                        const string sql = @"select umbracoNode.id, umbracoNode.parentID, umbracoNode.sortOrder, cmsContentXml.xml, umbracoNode.level from umbracoNode
-inner join cmsContentXml on cmsContentXml.nodeId = umbracoNode.id and umbracoNode.nodeObjectType = @type
-where umbracoNode.id in (select cmsDocument.nodeId from cmsDocument where cmsDocument.published = 1)
-order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
-
-                        XmlElement last = null;
-
-                        var db = ApplicationContext.Current.DatabaseContext.Database;
-                        //NOTE: Query creates a reader - does not load all into memory
-                        foreach (var row in db.Query<dynamic>(sql, new { type  = new Guid(Constants.ObjectTypes.Document)}))
-                        {
-                            string parentId = ((int)row.parentID).ToInvariantString();
-                            string xml = row.xml;
-                            int sortOrder = row.sortOrder;
-
-                            //if the parentid is changing
-                            if (last != null && last.GetAttribute("parentID") != parentId)
-                            {
-                                parent = xmlDoc.GetElementById(parentId);
-                                if (parent == null) throw new InvalidOperationException("No parent node found in xml doc with id " + parentId);
-                            }
-
-                            var xmlDocFragment = xmlDoc.CreateDocumentFragment();
-                            xmlDocFragment.InnerXml = xml;
-                            
-                            last = (XmlElement)parent.AppendChild(xmlDocFragment);
-
-                            // fix sortOrder - see notes in UpdateSortOrder
-                            last.Attributes["sortOrder"].Value = sortOrder.ToInvariantString();
-                        }
-
-                        LogHelper.Debug<content>("Done republishing Xml Index");
-
-                        return xmlDoc;
-                    }
-                }                
-                catch (Exception ee)
-                {
-                    LogHelper.Error<content>("Error Republishing", ee);
+                    var xmlDoc = ApplicationContext.Current.Services.ContentService.BuildXmlCache();
+                    LogHelper.Debug<content>("Done republishing Xml Index");
+                    return xmlDoc;
                 }
             }
             catch (Exception ee)
@@ -581,7 +555,7 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
         public void PersistXmlToFile()
         {
         }
-        
+
         internal DateTime GetCacheFileUpdateTime()
         {
             //TODO: Should there be a try/catch here in case the file is being written to while this is trying to be executed?
@@ -620,23 +594,18 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
             get { return XmlFileEnabled && UmbracoConfig.For.UmbracoSettings().Content.XmlContentCheckForDiskChanges; }
         }
 
-        // whether _xml is immutable or not (achieved by cloning before changing anything)
-        private static bool XmlIsImmutable
-        {
-            get { return UmbracoConfig.For.UmbracoSettings().Content.CloneXmlContent; }
-        }
-
         // whether to use the legacy schema
         private static bool UseLegacySchema
         {
             get { return UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema; }
-        }        
+        }
 
         #endregion
 
         #region Xml
 
-        private readonly AsyncLock _xmlLock = new AsyncLock(); // protects _xml
+        // internal for SafeXmlReaderWriter
+        internal readonly AsyncLock _xmlLock = new AsyncLock(); // protects _xml
 
         /// <remarks>
         /// Get content. First call to this property will initialize xmldoc
@@ -648,13 +617,17 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
         {
             get
             {
-                if (UmbracoContext.Current == null || UmbracoContext.Current.HttpContext == null)
+                var items = HttpContextItems;
+                if (items == null)
                     return XmlContentInternal;
-                var content = UmbracoContext.Current.HttpContext.Items[XmlContextContentItemKey] as XmlDocument;
+
+                // capture or return the current xml in http context
+                // so that it remains stable over the entire request
+                var content = (XmlDocument) items[XmlContextContentItemKey];
                 if (content == null)
                 {
                     content = XmlContentInternal;
-                    UmbracoContext.Current.HttpContext.Items[XmlContextContentItemKey] = content;
+                    items[XmlContextContentItemKey] = content;
                 }
                 return content;
             }
@@ -667,6 +640,7 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
         }
 
         // to be used by content.Instance
+        // ok to access _xmlContent here - just capturing
         protected internal virtual XmlDocument XmlContentInternal
         {
             get
@@ -677,7 +651,9 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
         }
 
         // assumes xml lock
-        private void SetXmlLocked(XmlDocument xml, bool registerXmlChange)
+        // ok to access _xmlContent here since this is called from the safe reader/writer
+        // internal for SafeXmlReaderWriter
+        internal void SetXmlLocked(XmlDocument xml, bool registerXmlChange)
         {
             // this is the ONLY place where we write to _xmlContent
             _xmlContent = xml;
@@ -687,11 +663,6 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
 
             //_lastXmlChange = DateTime.UtcNow;
             _persisterTask = _persisterTask.Touch(); // _persisterTask != null because SyncToXmlFile == true
-        }
-
-        private static XmlDocument Clone(XmlDocument xmlDoc)
-        {
-            return xmlDoc == null ? null : (XmlDocument)xmlDoc.CloneNode(true);
         }
 
         private static XmlDocument EnsureSchema(string contentTypeAlias, XmlDocument xml)
@@ -750,93 +721,27 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
         // gets a locked safe read access to the main xml
         private SafeXmlReaderWriter GetSafeXmlReader()
         {
-            var releaser = _xmlLock.Lock();
-            return SafeXmlReaderWriter.GetReader(this, releaser);
+            return SafeXmlReaderWriter.Get(_scopeProvider, _xmlLock, _xmlContent,
+                SetContextCache,
+                (xml, registerXmlChange) =>
+                {
+                    SetXmlLocked(xml, registerXmlChange);
+                    ClearContextCache();
+                }, false);
         }
 
         // gets a locked safe write access to the main xml (cloned)
-        private SafeXmlReaderWriter GetSafeXmlWriter(bool auto = true)
+        private SafeXmlReaderWriter GetSafeXmlWriter()
         {
-            var releaser = _xmlLock.Lock();
-            return SafeXmlReaderWriter.GetWriter(this, releaser, auto);
+            return SafeXmlReaderWriter.Get(_scopeProvider, _xmlLock, _xmlContent,
+                SetContextCache,
+                (xml, registerXmlChange) =>
+                {
+                    SetXmlLocked(xml, registerXmlChange);
+                    ClearContextCache();
+                }, true);
         }
 
-        private class SafeXmlReaderWriter : IDisposable
-        {
-            private readonly content _instance;
-            private IDisposable _releaser;
-            private bool _isWriter;
-            private bool _auto;
-            private bool _committed;
-            private XmlDocument _xml;
-
-            private SafeXmlReaderWriter(content instance, IDisposable releaser, bool isWriter, bool auto)
-            {
-                _instance = instance;
-                _releaser = releaser;
-                _isWriter = isWriter;
-                _auto = auto;
-
-                // cloning for writer is not an option anymore (see XmlIsImmutable)
-                _xml = _isWriter ? Clone(instance._xmlContent) : instance._xmlContent;
-            }
-
-            public static SafeXmlReaderWriter GetReader(content instance, IDisposable releaser)
-            {
-                return new SafeXmlReaderWriter(instance, releaser, false, false);
-            }
-
-            public static SafeXmlReaderWriter GetWriter(content instance, IDisposable releaser, bool auto)
-            {
-                return new SafeXmlReaderWriter(instance, releaser, true, auto);
-            }
-
-            public void UpgradeToWriter(bool auto)
-            {
-                if (_isWriter)
-                    throw new InvalidOperationException("Already writing.");
-                _isWriter = true;
-                _auto = auto;
-                _xml = Clone(_xml); // cloning for writer is not an option anymore (see XmlIsImmutable)
-            }
-
-            public XmlDocument Xml
-            {
-                get
-                {
-                    return _xml;
-                }
-                set
-                {
-                    if (_isWriter == false)
-                        throw new InvalidOperationException("Not writing.");
-                    _xml = value;
-                }
-            }
-
-            // registerXmlChange indicates whether to do what should be done when Xml changes,
-            // that is, to request that the file be written to disk - something we don't want
-            // to do if we're committing Xml precisely after we've read from disk!
-            public void Commit(bool registerXmlChange = true)
-            {
-                if (_isWriter == false)
-                    throw new InvalidOperationException("Not writing.");
-                _instance.SetXmlLocked(Xml, registerXmlChange);
-                _committed = true;
-            }
-
-            public void Dispose()
-            {
-                if (_releaser == null)
-                    return;
-                if (_isWriter && _auto && _committed == false)
-                    Commit();
-                _releaser.Dispose();
-                _releaser = null;
-            }
-            
-        }
-                
         private static string ChildNodesXPath
         {
             get
@@ -891,10 +796,10 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
         internal void SaveXmlToFile()
         {
             LogHelper.Info<content>("Save Xml to file...");
-
             try
             {
-                var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
+                // ok to access _xmlContent here - capture (atomic + volatile), immutable anyway
+                var xml = _xmlContent;
                 if (xml == null) return;
 
                 // delete existing file, if any
@@ -908,7 +813,7 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
                     Directory.CreateDirectory(directoryName);
 
                 // save
-                using (var fs = new FileStream(_xmlFileName, FileMode.Create, FileAccess.Write, FileShare.Read, bufferSize: 4096, useAsync: true))
+                using (var fs = new FileStream(_xmlFileName, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {
                     SaveXmlToStream(xml, fs);
                 }
@@ -918,8 +823,15 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
             catch (Exception e)
             {
                 // if something goes wrong remove the file
-                DeleteXmlFile();
-
+                try
+                {
+                    DeleteXmlFile();
+                }
+                catch
+                {
+                    // don't make it worse: could be that we failed to write because we cannot
+                    // access the file, in which case we won't be able to delete it either
+                }
                 LogHelper.Error<content>("Failed to save Xml to file.", e);
             }
         }
@@ -930,9 +842,9 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
             // and in addition, writing async is never fully async because
             // althouth the writer is async, xml.WriteTo() will not async
 
-            // that one almost works but... "The elements are indented as long as the element 
+            // that one almost works but... "The elements are indented as long as the element
             // does not contain mixed content. Once the WriteString or WriteWhitespace method
-            // is called to write out a mixed element content, the XmlWriter stops indenting. 
+            // is called to write out a mixed element content, the XmlWriter stops indenting.
             // The indenting resumes once the mixed content element is closed." - says MSDN
             // about XmlWriterSettings.Indent
 
@@ -981,7 +893,15 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
             catch (Exception e)
             {
                 LogHelper.Error<content>("Failed to load Xml from file.", e);
-                DeleteXmlFile();
+                try
+                {
+                    DeleteXmlFile();
+                }
+                catch
+                {
+                    // don't make it worse: could be that we failed to read because we cannot
+                    // access the file, in which case we won't be able to delete it either
+                }
                 return null;
             }
         }
@@ -1008,11 +928,11 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
 
             // time to read
 
-            using (var safeXml = GetSafeXmlWriter(false))
+            using (var safeXml = GetSafeXmlWriter())
             {
                 bool registerXmlChange;
                 LoadXmlLocked(safeXml, out registerXmlChange); // updates _lastFileRead
-                safeXml.Commit(registerXmlChange);
+                safeXml.AcceptChanges(registerXmlChange);
             }
         }
 
@@ -1137,7 +1057,7 @@ order by umbracoNode.level, umbracoNode.parentID, umbracoNode.sortOrder";
             //TODO: This could be faster, might as well just iterate all children and filter
             // instead of selecting matching children (i.e. iterating all) and then iterating the
             // filtered items to remove, this also allocates more memory to store the list of children.
-            // Below we also then do another filtering of child nodes, if we just iterate all children we 
+            // Below we also then do another filtering of child nodes, if we just iterate all children we
             // can perform both functions more efficiently
             var dataNodes = publishedNode.SelectNodes(DataNodesXPath);
             if (dataNodes == null) throw new Exception("oops");

@@ -135,7 +135,7 @@ namespace Umbraco.Core.Models
 
         private static void ThrowTypeException(object value, Type expected, string alias)
         {
-            throw new Exception(string.Format("Value \"{0}\" of type \"{1}\" could not be converted"
+            throw new InvalidOperationException(string.Format("Value \"{0}\" of type \"{1}\" could not be converted"
                 + " to type \"{2}\" which is expected by property type \"{3}\".",
                 value, value.GetType(), expected, alias));
         }
@@ -160,28 +160,42 @@ namespace Umbraco.Core.Models
                     // "garbage-in", accept what we can & convert
                     // throw only if conversion is not possible
 
+                    var s = value.ToString();
+
                     switch (_propertyType.DataTypeDatabaseType)
                     {
                         case DataTypeDatabaseType.Nvarchar:
                         case DataTypeDatabaseType.Ntext:
-                            value = value.ToString();
+                            value = s;
                             break;
                         case DataTypeDatabaseType.Integer:
-                            var convInt = value.TryConvertTo<int>();
-                            if (convInt == false) ThrowTypeException(value, typeof(int), _propertyType.Alias);
-                            value = convInt.Result;
+                            if (s.IsNullOrWhiteSpace()) value = null; // assume empty means null
+                            else
+                            {
+                                var convInt = value.TryConvertTo<int>();
+                                if (convInt == false) ThrowTypeException(value, typeof(int), _propertyType.Alias);
+                                value = convInt.Result;
+                            }
                             break;
                         case DataTypeDatabaseType.Decimal:
-                            var convDecimal = value.TryConvertTo<decimal>();
-                            if (convDecimal == false) ThrowTypeException(value, typeof(decimal), _propertyType.Alias);
-                            // need to normalize the value (change the scaling factor and remove trailing zeroes)
-                            // because the underlying database is going to mess with the scaling factor anyways.
-                            value = convDecimal.Result.Normalize();
+                            if (s.IsNullOrWhiteSpace()) value = null; // assume empty means null
+                            else
+                            {
+                                var convDecimal = value.TryConvertTo<decimal>();
+                                if (convDecimal == false) ThrowTypeException(value, typeof (decimal), _propertyType.Alias);
+                                // need to normalize the value (change the scaling factor and remove trailing zeroes)
+                                // because the underlying database is going to mess with the scaling factor anyways.
+                                value = convDecimal.Result.Normalize();
+                            }
                             break;
                         case DataTypeDatabaseType.Date:
-                            var convDateTime = value.TryConvertTo<DateTime>();
-                            if (convDateTime == false) ThrowTypeException(value, typeof(DateTime), _propertyType.Alias);
-                            value = convDateTime.Result;
+                            if (s.IsNullOrWhiteSpace()) value = null; // assume empty means null
+                            else
+                            {
+                                var convDateTime = value.TryConvertTo<DateTime>();
+                                if (convDateTime == false) ThrowTypeException(value, typeof (DateTime), _propertyType.Alias);
+                                value = convDateTime.Result;
+                            }
                             break;
                     }
                 }

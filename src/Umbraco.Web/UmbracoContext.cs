@@ -10,6 +10,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
 using umbraco.presentation.preview;
+using Umbraco.Core.CodeAnnotations;
 using GlobalSettings = umbraco.GlobalSettings;
 using IOHelper = Umbraco.Core.IO.IOHelper;
 using SystemDirectories = Umbraco.Core.IO.SystemDirectories;
@@ -324,6 +325,8 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the current ApplicationContext
         /// </summary>
+        [UmbracoWillObsolete("Do not access the ApplicationContext via the UmbracoContext, either inject the ApplicationContext into the services you need or access it via it's own Singleton accessor ApplicationContext.Current")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public ApplicationContext Application { get; private set; }
 
         /// <summary>

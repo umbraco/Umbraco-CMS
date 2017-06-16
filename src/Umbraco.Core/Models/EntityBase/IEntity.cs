@@ -20,7 +20,7 @@ namespace Umbraco.Core.Models.EntityBase
         /// <summary>
         /// Guid based Id
         /// </summary>
-        /// <remarks>The key is currectly used to store the Unique Id from the 
+        /// <remarks>The key is currectly used to store the Unique Id from the
         /// umbracoNode table, which many of the entities are based on.</remarks>
         [DataMember]
         Guid Key { get; set; }

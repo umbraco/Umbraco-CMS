@@ -354,7 +354,7 @@ angular.module('umbraco.services')
          * @description
          * Opens a content picker tree in a modal, the callback returns an array of selected documents
          * @param {Object} options content picker dialog options object
-         * @param {Boolean} options.multipicker should the picker return one or multiple items
+         * @param {Boolean} options.multiPicker should the picker return one or multiple items
          * @param {Function} options.callback callback function
          * @returns {Object} modal object
          */

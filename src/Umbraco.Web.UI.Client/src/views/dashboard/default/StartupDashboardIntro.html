@@ -1,44 +1,71 @@
+<div class="umb-dashboard-grid" ng-controller="Umbraco.Dashboard.StartUpDynamicContentController as vm">
 
-<div style="max-width: 1200px">
-<h3><strong>Welcome to The Friendly CMS</strong></h3>
-<p style="font-size: 16px; line-height: 1.5; margin-bottom: 30px; max-width: 760px;">Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible:</p>
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-<div class="row">
-    <div class="span4">
-        <a href="http://umbraco.tv/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=tv" target="_blank" class="nounderline">
-            <img src="views/dashboard/default/umbracotv.png" alt="Umbraco.TV - Hours of Umbraco Video Tutorials" style="margin: 10px 0 10px 0"/>
-        </a>
+    <div class="row clearfix" ng-if="vm.dashboard">
+        <!-- Sections -->
+        <div class="grid-section" ng-repeat="section in vm.dashboard.sections">
+            <div class="{{'span' + section.grid + ' column dash-section'}}">
 
+                <!-- rows -->
+                <div class="row clearfix dash-row" ng-repeat="row in section.rows">
+                    <div class="dash-inner-row">
 
-         <a href="http://umbraco.tv/?utm_source=core&utm_medium=dashboard&utm_content=header&utm_campaign=tv" target="_blank" class="btn-link -underline">
-             <h4> <strong>Umbraco.TV - Learn from the source!</strong> </h4>
-        </a>
+                        <!-- areas -->
+                        <div ng-repeat="area in row.areas"
+                             class="{{'span' + area.grid + ' column dash-area'}}">
+                            <div class="dash-inner-area">
 
-        <p style="line-height: 1.5;">
-            Umbraco.TV will help you go from zero to Umbraco
-            hero at a pace that suits you. Our easy to follow
-            online training videos will give you the fundamental
-            knowledge to start building awesome Umbraco websites.
-        </p>
+                                <!-- Controls -->
+                                <div ng-repeat="control in area.controls" class="dash-control dash-control-{{control.alias}}">
+                                    <div class="dash-inner-control">
+                                        <div ng-bind-html-unsafe="control.html"></div>
+                                    </div>
+                                </div>
+                                <!-- Controls end -->
+                            </div>
+                        </div>
+                        <!-- Area end -->
+                    </div>
+                </div>
+            </div>
+            <!-- Section end -->
+
+        </div>
     </div>
+    <!-- grid container end -->
 
-    <div class="span4 offset1">
 
-        <a href="http://our.umbraco.org/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=our" target="_blank" class="nounderline">
-            <img src="views/dashboard/default/ourumbraco.png" alt="Our Umbraco" style="margin: 10px 0 10px 0"/>
-        </a>
+    <!-- Default content in case we cannot fetch content from the outside -->
+    <div style="max-width: 1200px" ng-if="vm.showDefault">
 
-        <a href="http://our.umbraco.org/?utm_source=core&utm_medium=dashboard&utm_content=header&utm_campaign=our" target="_blank" class="btn-link -underline">
-            <h4><strong>Our Umbraco - The Friendliest Community</strong></h4>
-        </a>
+        <div class="welcome-dashboard__intro">
+            <h1 class="welcome-dashboard__title">Welcome to The Friendly CMS</h1>
+            <p class="welcome-dashboard__intro-text">Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</p>
+        </div>
 
-        <p style="line-height: 1.5;">
-            Our Umbraco - the official community site is your one
-            stop for everything Umbraco. Whether you need a
-            question answered or looking for cool plugins, the
-            worlds best community is just a click away.
-        </p>
+        <div class="welcome-dashboard__info-box-boxes">
+            <a ng-href="{{infoBox.url}}" target="_blank" class="welcome-dashboard__info-box" ng-repeat="infoBox in vm.defaultDashboard.infoBoxes">
+                <div class="welcome-dashboard__info-box-title">{{ infoBox.title }}</div>
+                <div class="welcome-dashboard__info-box-description">{{ infoBox.description }}</div>
+            </a>
+        </div>
+
+        <div class="welcome-dashboard__cards">
+            <div class="welcome-dashboard__card" ng-repeat="article in vm.defaultDashboard.articles">
+                <div class="welcome-dashboard__card-image-wrapper">
+                    <a ng-href="{{article.url}}" target="_blank">
+                        <img class="welcome-dashboard__card-image" ng-src="{{article.img}}" alt="{{ article.altText }}" />
+                    </a>
+                </div>
+                <div class="welcome-dashboard__card-content">
+                    <h2 class="welcome-dashboard__card-title">{{ article.title }}</h2>
+                    <div class="welcome-dashboard__card-teaser">{{ article.description }}</div>
+                    <a class="btn btn-success" ng-href="{{article.url}}" target="_blank">{{article.buttonText}}</a>
+                </div>
+            </div>
+        </div>
+        
     </div>
-</div>
 
 </div>

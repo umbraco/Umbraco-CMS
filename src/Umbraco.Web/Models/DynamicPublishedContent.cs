@@ -1101,11 +1101,9 @@ namespace Umbraco.Web.Models
         }
 
         /// <summary>
-        /// A shortcut method for AncestorOrSelf(1)
+        /// Gets the 'site' content for this content.
         /// </summary>
-        /// <returns>
-        /// The site homepage
-        /// </returns>
+        /// <returns>The 'site' content ie AncestorOrSelf(1).</returns>
 	    public DynamicPublishedContent Site()
 	    {
             return AncestorOrSelf(1);

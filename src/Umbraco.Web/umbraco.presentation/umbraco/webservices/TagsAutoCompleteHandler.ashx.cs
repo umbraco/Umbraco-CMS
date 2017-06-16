@@ -37,8 +37,7 @@ namespace umbraco.presentation.umbraco.webservices
             string id = context.Request.QueryString["id"];
            
             string sql;
-
-            IRecordsReader rr;
+            IRecordsReader reader = null;
 
             try
             {
@@ -47,49 +46,66 @@ namespace umbraco.presentation.umbraco.webservices
                 {
                     sql = @"SELECT TOP (20) tag FROM cmsTags WHERE tag LIKE @prefix AND cmsTags.id not in 
                         (SELECT tagID FROM cmsTagRelationShip WHERE NodeId = @nodeId) AND cmstags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + " = @group;";
-
-                    rr = SqlHelper.ExecuteReader(sql,
-                        SqlHelper.CreateParameter("@count", count),
-                        SqlHelper.CreateParameter("@prefix", prefixText + "%"),
-                        SqlHelper.CreateParameter("@nodeId", id),
-                        SqlHelper.CreateParameter("@group", group)
-                        );
-
-
-
+                    using (var sqlHelper = Application.SqlHelper)
+                    using (var rr = sqlHelper.ExecuteReader(sql,
+                        sqlHelper.CreateParameter("@count", count),
+                        sqlHelper.CreateParameter("@prefix", prefixText + "%"),
+                        sqlHelper.CreateParameter("@nodeId", id),
+                        sqlHelper.CreateParameter("@group", group)
+                    ))
+                    {
+                        reader = rr;
+                    }
                 }
                 else
                 {
                     //fallback...
                     sql = "SELECT TOP (20) tag FROM cmsTags WHERE tag LIKE @prefix";
 
-                    rr = SqlHelper.ExecuteReader(sql,
-                       SqlHelper.CreateParameter("@count", count),
-                       SqlHelper.CreateParameter("@prefix", prefixText + "%")
-                       );
+                    using (var sqlHelper = Application.SqlHelper)
+                    using (var rr = sqlHelper.ExecuteReader(sql,
+                        sqlHelper.CreateParameter("@count", count),
+                        sqlHelper.CreateParameter("@prefix", prefixText + "%")
+                    ))
+                    {
+                        reader = rr;
+                    }
                 }
 
                 var tagList = new List<string>();
-                while (rr.Read())
+                while (reader.Read())
                 {
-                    tagList.Add(rr.GetString("tag"));
+                    tagList.Add(reader.GetString("tag"));
                 }
 
                 context.Response.Write(returnJson
-                                           ? new JavaScriptSerializer().Serialize(tagList)
-                                           : string.Join(Environment.NewLine, tagList));
+                    ? new JavaScriptSerializer().Serialize(tagList)
+                    : string.Join(Environment.NewLine, tagList));
             }
             catch (Exception ex)
             {
-				LogHelper.Error<TagsAutoCompleteHandler>("An error occurred", ex);
+                LogHelper.Error<TagsAutoCompleteHandler>("An error occurred", ex);
+            }
+            finally
+            {
+                if (reader != null)
+                {
+                    reader.Close();
+                    reader.Dispose();
+                }
             }
 
         }
-
+        
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         public static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
         }
+
 
         public bool IsReusable
         {

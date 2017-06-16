@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 using Moq;
@@ -34,7 +35,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
-        private MemberRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MemberTypeRepository memberTypeRepository, out MemberGroupRepository memberGroupRepository)
+        private MemberRepository CreateRepository(IScopeUnitOfWork unitOfWork, out MemberTypeRepository memberTypeRepository, out MemberGroupRepository memberGroupRepository)
         {
             memberTypeRepository = new MemberTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
             memberGroupRepository = new MemberGroupRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
@@ -53,7 +54,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
             {
                 var memberType1 = CreateTestMemberType();
-                
+
                 for (var i = 0; i < 100; i++)
                 {
                     var member = MockedMember.CreateSimpleMember(memberType1, "blah" + i, "blah" + i + "@example.com", "blah", "blah" + i);
@@ -102,7 +103,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
                 unitOfWork.Commit();
 
-                //delete all xml                 
+                //delete all xml
                 unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
                 Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
 
@@ -215,7 +216,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var sut = repository.Get(member.Id);
 
                 Assert.That(sut, Is.Not.Null);
-                Assert.That(sut.HasIdentity, Is.True);      
+                Assert.That(sut.HasIdentity, Is.True);
                 Assert.That(sut.Properties.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
                 Assert.That(sut.Name, Is.EqualTo("Johnny Hefty"));
                 Assert.That(sut.Email, Is.EqualTo("johnny@example.com"));
@@ -333,7 +334,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
                 .OrderBy<NodeDto>(x => x.SortOrder);
 
-            Console.WriteLine(sql.SQL);
+            Debug.Print(sql.SQL);
             Assert.That(sql.SQL, Is.Not.Empty);
         }
 
@@ -349,7 +350,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     memberType = MockedContentTypes.CreateSimpleMemberType();
                     memberTypeRepository.AddOrUpdate(memberType);
-                    unitOfWork.Commit();    
+                    unitOfWork.Commit();
                 }
 
                 var member = MockedMember.CreateSimpleMember(memberType, name ?? "Johnny Hefty", email ?? "johnny@example.com", password ?? "123", username ?? "hefty", key);

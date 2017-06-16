@@ -12,6 +12,7 @@ using Umbraco.Core.Security;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using umbraco.businesslogic.Exceptions;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Web.Models.ContentEditing;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using User = umbraco.BusinessLogic.User;
@@ -98,23 +99,11 @@ namespace Umbraco.Web.Security
             }
         }
 
-        private BackOfficeUserManager _userManager;
-        protected BackOfficeUserManager UserManager
+        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
+        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
         {
-            get
-            {
-                if (_userManager == null)
-                {
-                    var mgr = _httpContext.GetOwinContext().GetUserManager<BackOfficeUserManager>();
-                    if (mgr == null)
-                    {
-                        throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeUserManager) + " from the " + typeof(IOwinContext) + " GetUserManager method");
-                    }
-                    _userManager = mgr;
-                }
-                return _userManager;
-            }
-        }
+            get { return _userManager ?? (_userManager = _httpContext.GetOwinContext().GetBackOfficeUserManager()); }
+        }        
 
         /// <summary>
         /// Logs a user in.
@@ -200,13 +189,13 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// Returns the back office IUser instance for the username specified
+        /// Gets (and creates if not found) the back office <see cref="IUser"/> instance for the username specified
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
         /// <remarks>
-        /// This will return an Iuser instance no matter what membership provider is installed for the back office, it will automatically
-        /// create any missing Iuser accounts if one is not found and a custom membership provider is being used. 
+        /// This will return an <see cref="IUser"/> instance no matter what membership provider is installed for the back office, it will automatically
+        /// create any missing <see cref="IUser"/> accounts if one is not found and a custom membership provider or <see cref="IBackOfficeUserPasswordChecker"/> is being used. 
         /// </remarks>
         internal IUser GetBackOfficeUser(string username)
         {

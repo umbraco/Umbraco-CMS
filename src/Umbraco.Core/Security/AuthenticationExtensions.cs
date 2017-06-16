@@ -81,6 +81,40 @@ namespace Umbraco.Core.Security
             return false;
         }
 
+        /// <summary>
+        /// This will return the current back office identity if the IPrincipal is the correct type
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        internal static UmbracoBackOfficeIdentity GetUmbracoIdentity(this IPrincipal user)
+        {
+            //If it's already a UmbracoBackOfficeIdentity
+            var backOfficeIdentity = user.Identity as UmbracoBackOfficeIdentity;
+            if (backOfficeIdentity != null) return backOfficeIdentity;
+
+            //Check if there's more than one identity assigned and see if it's a UmbracoBackOfficeIdentity and use that
+            var claimsPrincipal = user as ClaimsPrincipal;
+            if (claimsPrincipal != null)
+            {
+                backOfficeIdentity = claimsPrincipal.Identities.OfType<UmbracoBackOfficeIdentity>().FirstOrDefault();
+                if (backOfficeIdentity != null) return backOfficeIdentity;
+            }
+
+            //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session            
+            var claimsIdentity = user.Identity as ClaimsIdentity;
+            if (claimsIdentity != null && claimsIdentity.IsAuthenticated && claimsIdentity.HasClaim(x => x.Type == Constants.Security.SessionIdClaimType))
+            {
+                try
+                {
+                    return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
+                }
+                catch (InvalidOperationException)
+                {                    
+                }
+            }
+
+            return null;
+        }
 
         /// <summary>
         /// This will return the current back office identity. 
@@ -100,31 +134,8 @@ namespace Umbraco.Core.Security
             if (http.User == null) return null; //there's no user at all so no identity
 
             //If it's already a UmbracoBackOfficeIdentity
-            var backOfficeIdentity = http.User.Identity as UmbracoBackOfficeIdentity;
-            if (backOfficeIdentity != null) return backOfficeIdentity;
-
-            //Check if there's more than one identity assigned and see if it's a UmbracoBackOfficeIdentity and use that
-            var claimsPrincipal = http.User as ClaimsPrincipal;
-            if (claimsPrincipal != null)
-            {
-                backOfficeIdentity = claimsPrincipal.Identities.OfType<UmbracoBackOfficeIdentity>().FirstOrDefault();
-                if (backOfficeIdentity != null) return backOfficeIdentity;
-            }
-
-            //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session            
-            var claimsIdentity = http.User.Identity as ClaimsIdentity;
-            if (claimsIdentity != null && claimsIdentity.IsAuthenticated)
-            {                
-                try
-                {
-                    return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
-                }
-                catch (InvalidOperationException ex)
-                {
-                    //This will occur if the required claim types are missing which would mean something strange is going on
-                    LogHelper.Error(typeof(AuthenticationExtensions), "The current identity cannot be converted to " + typeof(UmbracoBackOfficeIdentity), ex);
-                }
-            }
+            var backOfficeIdentity = GetUmbracoIdentity(http.User);
+            if (backOfficeIdentity != null) return backOfficeIdentity;            
 
             if (authenticateRequestIfNotFound == false) return null;
 
@@ -307,11 +318,9 @@ namespace Umbraco.Core.Security
             }
             catch (Exception)
             {
-                //TODO: Do we need to do more here?? need to make sure that the forms cookie is gone, but is that
-                // taken care of in our custom middleware somehow?
                 ctx.Authentication.SignOut(
-                    Core.Constants.Security.BackOfficeAuthenticationType,
-                    Core.Constants.Security.BackOfficeExternalAuthenticationType);
+                    Constants.Security.BackOfficeAuthenticationType,
+                    Constants.Security.BackOfficeExternalAuthenticationType);
                 return null;
             }
         }

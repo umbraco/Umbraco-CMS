@@ -5,6 +5,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Routing
 {
@@ -24,6 +25,7 @@ namespace Umbraco.Web.Routing
         public UrlProvider(UmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders)
         {
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (routingSettings == null) throw new ArgumentNullException("routingSettings");
 
             _umbracoContext = umbracoContext;
             _urlProviders = urlProviders;
@@ -64,6 +66,72 @@ namespace Umbraco.Web.Routing
         #endregion
 
         #region GetUrl
+
+        /// <summary>
+        /// Gets the url of a published content.
+        /// </summary>
+        /// <param name="id">The published content identifier.</param>
+        /// <returns>The url for the published content.</returns>
+        /// <remarks>
+        /// <para>The url is absolute or relative depending on <c>Mode</c> and on the current url.</para>
+        /// <para>If the provider is unable to provide a url, it returns "#".</para>
+        /// </remarks>
+        public string GetUrl(Guid id)
+        {
+            var intId = _umbracoContext.Application.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
+            return GetUrl(intId.Success ? intId.Result : -1);
+        }
+
+        /// <summary>
+        /// Gets the nice url of a published content.
+        /// </summary>
+        /// <param name="id">The published content identifier.</param>
+        /// <param name="absolute">A value indicating whether the url should be absolute in any case.</param>
+        /// <returns>The url for the published content.</returns>
+        /// <remarks>
+        /// <para>The url is absolute or relative depending on <c>Mode</c> and on <c>current</c>, unless
+        /// <c>absolute</c> is true, in which case the url is always absolute.</para>
+        /// <para>If the provider is unable to provide a url, it returns "#".</para>
+        /// </remarks>
+        public string GetUrl(Guid id, bool absolute)
+        {
+            var intId = _umbracoContext.Application.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
+            return GetUrl(intId.Success ? intId.Result : -1, absolute);
+        }
+
+        /// <summary>
+        /// Gets the nice url of a published content.
+        /// </summary>
+        /// <param name="id">The published content id.</param>
+        /// <param name="current">The current absolute url.</param>
+        /// <param name="absolute">A value indicating whether the url should be absolute in any case.</param>
+        /// <returns>The url for the published content.</returns>
+        /// <remarks>
+        /// <para>The url is absolute or relative depending on <c>Mode</c> and on <c>current</c>, unless
+        /// <c>absolute</c> is true, in which case the url is always absolute.</para>
+        /// <para>If the provider is unable to provide a url, it returns "#".</para>
+        /// </remarks>
+        public string GetUrl(Guid id, Uri current, bool absolute)
+        {
+            var intId = _umbracoContext.Application.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
+            return GetUrl(intId.Success ? intId.Result : -1, current, absolute);
+        }
+
+        /// <summary>
+        /// Gets the nice url of a published content.
+        /// </summary>
+        /// <param name="id">The published content identifier.</param>
+        /// <param name="mode">The url mode.</param>
+        /// <returns>The url for the published content.</returns>
+        /// <remarks>
+        /// <para>The url is absolute or relative depending on <c>mode</c> and on the current url.</para>
+        /// <para>If the provider is unable to provide a url, it returns "#".</para>
+        /// </remarks>
+        public string GetUrl(Guid id, UrlProviderMode mode)
+        {
+            var intId = _umbracoContext.Application.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
+            return GetUrl(intId.Success ? intId.Result : -1, mode);
+        }
 
         /// <summary>
         /// Gets the url of a published content.
@@ -145,6 +213,15 @@ namespace Umbraco.Web.Routing
             var url = _urlProviders.Select(provider => provider.GetUrl(_umbracoContext, id, current, mode))
                 .FirstOrDefault(u => u != null);
             return url ?? "#"; // legacy wants this
+        }
+
+        internal string GetUrlFromRoute(int id, string route)
+        {
+            var provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
+            var url = provider == null 
+                ? route // what else?
+                : provider.GetUrlFromRoute(route, UmbracoContext.Current, id, _umbracoContext.CleanedUmbracoUrl, Mode);
+            return url ?? "#";
         }
 
         #endregion

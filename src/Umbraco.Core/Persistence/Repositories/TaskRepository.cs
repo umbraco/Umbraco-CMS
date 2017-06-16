@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class TaskRepository : PetaPocoRepositoryBase<int, Task>, ITaskRepository
     {
-        public TaskRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public TaskRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
         }
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var taskDto = Database.Fetch<TaskDto, TaskTypeDto>(sql).FirstOrDefault();
+            var taskDto = Database.Fetch<TaskDto, TaskTypeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             if (taskDto == null)
                 return null;
 

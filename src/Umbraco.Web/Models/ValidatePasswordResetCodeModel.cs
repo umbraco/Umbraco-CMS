@@ -1,8 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models
 {
+    [Serializable]
     [DataContract(Name = "validatePasswordReset", Namespace = "")]
     public class ValidatePasswordResetCodeModel
     {

@@ -54,12 +54,26 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         
         IEnumerable<string> DisallowedUploadFiles { get; }
 
+        IEnumerable<string> AllowedUploadFiles { get; }
+
         bool CloneXmlContent { get; }
 
         bool GlobalPreviewStorageEnabled { get; }
 
         string DefaultDocumentTypeProperty { get; }
 
+        /// <summary>
+        /// The default for this is false but if you would like deprecated property editors displayed 
+        /// in the data type editor you can enable this
+        /// </summary>
+        bool ShowDeprecatedPropertyEditors { get; }
+
         bool EnableInheritedDocumentTypes { get; }
+
+        bool EnableInheritedMediaTypes { get; }
+
+        bool EnablePropertyValueConverters { get; }
+
+        string LoginBackgroundImage { get; }
     }
 }

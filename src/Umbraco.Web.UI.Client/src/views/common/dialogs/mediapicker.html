@@ -116,8 +116,10 @@
   
 
         <div class="umb-panel-body with-footer">
-            
+                       
             <umb-file-dropzone 
+                ng-if="acceptedMediatypes.length > 0"
+                accepted-mediatypes="acceptedMediatypes"
                 hide-dropzone="{{!activeDrag && images.length > 0}}" 
                 parent-id="{{currentFolder.id}}"
                 files-uploaded="onUploadComplete"
@@ -156,4 +158,4 @@
 
     </div>
 
-</div>
+</form>

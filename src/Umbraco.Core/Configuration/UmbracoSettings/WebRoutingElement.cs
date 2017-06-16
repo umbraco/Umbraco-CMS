@@ -27,6 +27,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (bool) base["disableFindContentByIdPath"]; }
         }
 
+        [ConfigurationProperty("disableRedirectUrlTracking", DefaultValue = "false")]
+        public bool DisableRedirectUrlTracking
+        {
+            get { return (bool) base["disableRedirectUrlTracking"]; }
+        }
+
         [ConfigurationProperty("urlProviderMode", DefaultValue = "AutoLegacy")]
         public string UrlProviderMode
         {

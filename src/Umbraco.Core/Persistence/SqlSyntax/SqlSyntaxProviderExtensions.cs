@@ -1,7 +1,23 @@
-﻿namespace Umbraco.Core.Persistence.SqlSyntax
+﻿using System.Collections.Generic;
+using System.Linq;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+
+namespace Umbraco.Core.Persistence.SqlSyntax
 {
     internal static class SqlSyntaxProviderExtensions
     {
+        public static IEnumerable<DbIndexDefinition> GetDefinedIndexesDefinitions(this ISqlSyntaxProvider sql, Database db)
+        {
+            return sql.GetDefinedIndexes(db)
+                .Select(x => new DbIndexDefinition()
+                {
+                    TableName = x.Item1,
+                    IndexName = x.Item2,
+                    ColumnName = x.Item3,
+                    IsUnique = x.Item4
+                }).ToArray();
+        }
+
         /// <summary>
         /// Returns the quotes tableName.columnName combo
         /// </summary>
@@ -22,12 +38,23 @@
         /// <remarks>
         /// See: http://issues.umbraco.org/issue/U4-3876
         /// </remarks>
-        public static Sql GetDeleteSubquery(this ISqlSyntaxProvider sqlProvider, string tableName, string columnName, Sql subQuery)
+        public static Sql GetDeleteSubquery(this ISqlSyntaxProvider sqlProvider, string tableName, string columnName, Sql subQuery, WhereInType whereInType = WhereInType.In)
         {
-            return new Sql(string.Format(@"DELETE FROM {0} WHERE {1} IN (SELECT {1} FROM ({2}) x)",
+
+            return 
+                new Sql(string.Format(
+                    whereInType == WhereInType.In
+                        ? @"DELETE FROM {0} WHERE {1} IN (SELECT {1} FROM ({2}) x)"
+                        : @"DELETE FROM {0} WHERE {1} NOT IN (SELECT {1} FROM ({2}) x)",
                 sqlProvider.GetQuotedTableName(tableName),
                 sqlProvider.GetQuotedColumnName(columnName),
                 subQuery.SQL), subQuery.Arguments);
         }
+    }
+
+    internal enum WhereInType
+    {
+        In,
+        NotIn
     }
 }

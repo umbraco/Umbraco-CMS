@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -31,8 +32,8 @@ namespace Umbraco.Tests.Strings
         [TestCase("hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello", "hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello", true)]
         public void String_To_Guid(string first, string second, bool result)
         {
-            Console.WriteLine("First: " + first.ToGuid());
-            Console.WriteLine("Second: " + second.ToGuid());
+            Debug.Print("First: " + first.ToGuid());
+            Debug.Print("Second: " + second.ToGuid());
             Assert.AreEqual(result, first.ToGuid() == second.ToGuid());
         }
 

@@ -38,6 +38,7 @@ namespace Umbraco.Web.Cache
         public const string ContentTypeCacheRefresherId = "6902E22C-9C10-483C-91F3-66B7CAE9E2F5";
         public const string LanguageCacheRefresherId = "3E0F95D8-0BE5-44B8-8394-2B8750B62654";
         public const string DomainCacheRefresherId = "11290A79-4B57-4C99-AD72-7748A3CF38AF";
+        public const string RelationTypeCacheRefresherId = "D8375ABA-4FB3-4F86-B505-92FBA1B6F7C9";
 
         [Obsolete("This is no longer used and will be removed in future versions")]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -67,6 +68,7 @@ namespace Umbraco.Web.Cache
         public static readonly Guid DataTypeCacheRefresherGuid = new Guid(DataTypeCacheRefresherId);
         public static readonly Guid DictionaryCacheRefresherGuid = new Guid(DictionaryCacheRefresherId);
         public static readonly Guid PublicAccessCacheRefresherGuid = new Guid(PublicAccessCacheRefresherId);
+        public static readonly Guid RelationTypeCacheRefresherGuid = new Guid(RelationTypeCacheRefresherId);
 
         #endregion
 

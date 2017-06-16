@@ -14,30 +14,112 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
         });
     };
 }
+
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
 
 
-function FormsController($scope, $route, $cookieStore, packageResource) {
+function startUpDynamicContentController(dashboardResource, assetsService) {
+    var vm = this;
+    vm.loading = true;
+    vm.showDefault = false;
+
+    // default dashboard content
+    vm.defaultDashboard = {
+        infoBoxes: [
+            {
+                title: "Documentation",
+                description: "Find the answers to your Umbraco questions",
+                url: "https://our.umbraco.org/documentation/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=documentation/"
+            },
+            {
+                title: "Community",
+                description: "Find the answers or ask your Umbraco questions",
+                url: "https://our.umbraco.org/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=our_forum"
+            },
+            {
+                title: "Umbraco.tv",
+                description: "Tutorial videos (some are free, some are on subscription)",
+                url: "https://umbraco.tv/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=tutorial_videos"
+            },
+            {
+                title: "Training",
+                description: "Real-life training and official Umbraco certifications",
+                url: "https://umbraco.com/training/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=training"
+            }
+        ],
+        articles: [
+            {
+                title: "Umbraco.TV - Learn from the source!",
+                description: "Umbraco.TV will help you go from zero to Umbraco hero at a pace that suits you. Our easy to follow online training videos will give you the fundamental knowledge to start building awesome Umbraco websites.",
+                img: "views/dashboard/default/umbracotv.jpg",
+                url: "https://umbraco.tv/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=tv",
+                altText: "Umbraco.TV - Hours of Umbraco Video Tutorials",
+                buttonText: "Visit Umbraco.TV"
+            },
+            {
+                title: "Our Umbraco - The Friendliest Community",
+                description: "Our Umbraco - the official community site is your one stop for everything Umbraco. Whether you need a question answered or looking for cool plugins, the world's best and friendliest community is just a click away.",
+                img: "views/dashboard/default/ourumbraco.jpg",
+                url: "https://our.umbraco.org/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=our",
+                altText: "Our Umbraco",
+                buttonText: "Visit Our Umbraco"
+            }
+        ]
+    };
+
+    
+    //proxy remote css through the local server
+    assetsService.loadCss( dashboardResource.getRemoteDashboardCssUrl("content") );
+    dashboardResource.getRemoteDashboardContent("content").then(
+        function (data) {
+
+            vm.loading = false;
+
+            //test if we have received valid data
+            //we capture it like this, so we avoid UI errors - which automatically triggers ui based on http response code
+            if (data && data.sections) {
+                vm.dashboard = data;
+            } else{
+                vm.showDefault = true;
+            }
+
+        },
+
+        function (exception) {
+            console.error(exception);
+            vm.loading = false;
+            vm.showDefault = true;
+        });
+}
+
+angular.module("umbraco").controller("Umbraco.Dashboard.StartUpDynamicContentController", startUpDynamicContentController);
+
+
+function FormsController($scope, $route, $cookieStore, packageResource, localizationService) {
     $scope.installForms = function(){
-        $scope.state = "Installng package";
+        $scope.state = localizationService.localize("packager_installStateDownloading");
         packageResource
             .fetch("CD44CF39-3D71-4C19-B6EE-948E1FAF0525")
-            .then(function(pack){
-              $scope.state = "importing";
-              return packageResource.import(pack);
-            }, $scope.error)
-            .then(function(pack){
-              $scope.state = "Installing";
-              return packageResource.installFiles(pack);
-            }, $scope.error)
-            .then(function(pack){
-              $scope.state = "Restarting, please wait...";
-              return packageResource.installData(pack);
-            }, $scope.error)
-            .then(function(pack){
-              $scope.state = "All done, your browser will now refresh";
-              return packageResource.cleanUp(pack);
-            }, $scope.error)
+            .then(function(pack) {
+                $scope.state = localizationService.localize("packager_installStateImporting");
+                    return packageResource.import(pack);
+                },
+                $scope.error)
+            .then(function(pack) {
+                $scope.state = localizationService.localize("packager_installStateInstalling");
+                    return packageResource.installFiles(pack);
+                },
+                $scope.error)
+            .then(function(pack) {
+                $scope.state = localizationService.localize("packager_installStateRestarting");
+                    return packageResource.installData(pack);
+                },
+                $scope.error)
+            .then(function(pack) {
+                $scope.state = localizationService.localize("packager_installStateComplete");
+                    return packageResource.cleanUp(pack);
+                },
+                $scope.error)
             .then($scope.complete, $scope.error);
     };
 
@@ -50,6 +132,8 @@ function FormsController($scope, $route, $cookieStore, packageResource) {
     $scope.error = function(err){
         $scope.state = undefined;
         $scope.error = err;
+        //This will return a rejection meaning that the promise change above will stop
+        return $q.reject();
     };
 
 
@@ -186,27 +270,43 @@ function startupLatestEditsController($scope) {
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupLatestEditsController", startupLatestEditsController);
 
-function MediaFolderBrowserDashboardController($rootScope, $scope, contentTypeResource) {
+function MediaFolderBrowserDashboardController($rootScope, $scope, $location, contentTypeResource, userService) {
 
-    //get the system media listview
-    contentTypeResource.getPropertyTypeScaffold(-96)
-        .then(function(dt) {
+    var currentUser = {};
 
-            $scope.fakeProperty = {
-                alias: "contents",
-                config: dt.config,
-                description: "",
-                editor: dt.editor,
-                hideLabel: true,
-                id: 1,
-                label: "Contents:",
-                validation: {
-                    mandatory: false,
-                    pattern: null
-                },
-                value: "",
-                view: dt.view
-            };
+    userService.getCurrentUser().then(function (user) {
+
+        currentUser = user;
+
+        // check if the user start node is the dashboard
+        if(currentUser.startMediaId === -1) {
+
+            //get the system media listview
+            contentTypeResource.getPropertyTypeScaffold(-96)
+                .then(function(dt) {
+
+                    $scope.fakeProperty = {
+                        alias: "contents",
+                        config: dt.config,
+                        description: "",
+                        editor: dt.editor,
+                        hideLabel: true,
+                        id: 1,
+                        label: "Contents:",
+                        validation: {
+                            mandatory: false,
+                            pattern: null
+                        },
+                        value: "",
+                        view: dt.view
+                    };
+
+            });
+
+        } else {
+            // redirect to start node
+            $location.path("/media/media/edit/" + currentUser.startMediaId);
+        }
 
     });
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,7 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class DefaultShortStringHelperTests 
+    public class DefaultShortStringHelperTests
     {
         private DefaultShortStringHelper _helper;
 
@@ -142,6 +143,33 @@ namespace Umbraco.Tests.Strings
                 });
             output = helper.CleanStringForUrlSegment(input);
             Assert.AreEqual("aeoa-and-aeoa-and-and-and-grosser-bbddzhzh-page", output);
+        }
+
+        [Test]
+        public void U4_4056_TryAscii()
+        {
+            var settings = SettingsForTests.GenerateMockSettings();
+            var contentMock = Mock.Get(settings.RequestHandler);
+            contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
+            contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
+            SettingsForTests.ConfigureSettings(settings);
+
+            const string input1 = "ÆØÅ and æøå and 中文测试 and  אודות האתר and größer БбДдЖж page";
+            const string input2 = "ÆØÅ and æøå and größer БбДдЖж page";
+
+            var helper = new DefaultShortStringHelper(settings).WithDefaultConfig(); // unicode
+            Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input1));
+            Assert.AreEqual("æøå-and-æøå-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input2));
+
+            helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
+                .WithConfig(CleanStringType.UrlSegment, new DefaultShortStringHelper.Config
+                {
+                    IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
+                    StringType = CleanStringType.LowerCase | CleanStringType.TryAscii, // try ascii
+                    Separator = '-'
+                });
+            Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input1));
+            Assert.AreEqual("aeoa-and-aeoa-and-grosser-bbddzhzh-page", helper.CleanStringForUrlSegment(input2));
         }
 
         [Test]
@@ -338,7 +366,7 @@ namespace Umbraco.Tests.Strings
                     Separator = '*'
                 });
             Assert.AreEqual("house*2", helper.CleanString("house (2)", CleanStringType.Alias));
-            
+
             // FIXME but for a filename we want to keep them!
             // FIXME and what about a url?
         }
@@ -369,9 +397,9 @@ namespace Umbraco.Tests.Strings
             // then next string element is one char and 3 bytes, 16 bits of code point
             Assert.AreEqual('t', bytes[9]);
             //foreach (var b in bytes)
-            //    Console.WriteLine("{0:X}", b);
+            //    Debug.Print("{0:X}", b);
 
-            Console.WriteLine("\U00010B70");
+            Debug.Print("\U00010B70");
         }
 
         [Test]
@@ -573,7 +601,7 @@ namespace Umbraco.Tests.Strings
         {
             var output = _helper.SplitPascalCasing(input, ' ');
             Assert.AreEqual(expected, output);
-			
+
             output = _helper.SplitPascalCasing(input, '*');
             expected = expected.Replace(' ', '*');
             Assert.AreEqual(expected, output);

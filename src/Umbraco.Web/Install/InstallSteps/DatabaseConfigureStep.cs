@@ -61,8 +61,8 @@ namespace Umbraco.Web.Install.InstallSteps
             }
             else
             {
-                var password = string.Format("'{0}'", database.Password);
-                password = password.Replace("&", "&amp;").Replace(">", "&gt;").Replace("<", "&lt;").Replace("\"", "&quot;").Replace("'", "''");
+                var password = database.Password.Replace("&", "&amp;").Replace(">", "&gt;").Replace("<", "&lt;").Replace("\"", "&quot;").Replace("'", "''");
+                password = string.Format("'{0}'", password);
 
                 dbContext.ConfigureDatabaseConnection(
                     database.Server, database.DatabaseName, database.Login, password,
@@ -83,7 +83,7 @@ namespace Umbraco.Web.Install.InstallSteps
         private bool ShouldDisplayView()
         {
             //If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
-            var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
 
             if (_applicationContext.DatabaseContext.IsConnectionStringConfigured(databaseSettings))
             {

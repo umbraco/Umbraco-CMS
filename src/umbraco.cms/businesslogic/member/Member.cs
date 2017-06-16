@@ -130,14 +130,16 @@ namespace umbraco.cms.businesslogic.member
             // changing how the members are shown and not having to worry about letters.
 
             var ids = new List<int>();
-            using (var dr = SqlHelper.ExecuteReader(
+
+            using (var sqlHelper = Application.SqlHelper)
+            using (var dr = sqlHelper.ExecuteReader(
                                         string.Format(_sQLOptimizedMany.Trim(), "LOWER(SUBSTRING(text, 1, 1)) NOT IN ('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z')", "umbracoNode.text"),
-                                            SqlHelper.CreateParameter("@nodeObjectType", Member._objectType)))
+                                            sqlHelper.CreateParameter("@nodeObjectType", Member._objectType)))
             {
-                
+
                 while (dr.Read())
                 {
-                    ids.Add(dr.GetInt("id"));                    
+                    ids.Add(dr.GetInt("id"));
                 }
             }
 
@@ -219,7 +221,7 @@ namespace umbraco.cms.businesslogic.member
         /// <returns>The new member</returns>
         public static Member MakeNew(string Name, string LoginName, string Email, MemberType mbt, User u)
         {
-            if (mbt == null) throw new ArgumentNullException("mbt");            
+            if (mbt == null) throw new ArgumentNullException("mbt");
             var loginName = (string.IsNullOrEmpty(LoginName) == false) ? LoginName : Name;
 
             var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
@@ -243,7 +245,7 @@ namespace umbraco.cms.businesslogic.member
             var e = new NewEventArgs();
 
             legacy.OnNew(e);
-            
+
             legacy.Save();
 
             return legacy;
@@ -339,19 +341,22 @@ namespace umbraco.cms.businesslogic.member
         [Obsolete("This method will not work if the password format is encrypted since the encryption that is performed is not static and a new value will be created each time the same string is encrypted")]
         public static Member GetMemberFromLoginAndEncodedPassword(string loginName, string password)
         {
-            var o = SqlHelper.ExecuteScalar<object>(
-                "select nodeID from cmsMember where LoginName = @loginName and Password = @password",
-                SqlHelper.CreateParameter("loginName", loginName),
-                SqlHelper.CreateParameter("password", password));
+            using (var sqlHelper = Application.SqlHelper)
+            {
+                var o = sqlHelper.ExecuteScalar<object>(
+                    "select nodeID from cmsMember where LoginName = @loginName and Password = @password",
+                    sqlHelper.CreateParameter("loginName", loginName),
+                    sqlHelper.CreateParameter("password", password));
 
-            if (o == null)
-                return null;
+                if (o == null)
+                    return null;
 
-            int tmpId;
-            if (!int.TryParse(o.ToString(), out tmpId))
-                return null;
+                int tmpId;
+                if (!int.TryParse(o.ToString(), out tmpId))
+                    return null;
 
-            return new Member(tmpId);
+                return new Member(tmpId);
+            }
         }
 
         [Obsolete("Use MembershipProviderExtensions.IsUmbracoMembershipProvider instead")]
@@ -596,7 +601,7 @@ namespace umbraco.cms.businesslogic.member
             var e = new SaveEventArgs();
             if (raiseEvents)
             {
-                FireBeforeSave(e);    
+                FireBeforeSave(e);
             }
 
             foreach (var property in GenericProperties)
@@ -614,7 +619,7 @@ namespace umbraco.cms.businesslogic.member
 
                 if (raiseEvents)
                 {
-                    FireAfterSave(e);    
+                    FireAfterSave(e);
                 }
             }
         }
@@ -638,16 +643,16 @@ namespace umbraco.cms.businesslogic.member
             var x = base.ToXml(xd, Deep);
             if (x.Attributes != null && x.Attributes["loginName"] == null)
             {
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "loginName", LoginName));                
+                x.Attributes.Append(XmlHelper.AddAttribute(xd, "loginName", LoginName));
             }
             if (x.Attributes != null && x.Attributes["email"] == null)
             {
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "email", Email));    
+                x.Attributes.Append(XmlHelper.AddAttribute(xd, "email", Email));
             }
             if (x.Attributes != null && x.Attributes["key"] == null)
             {
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "key", UniqueId.ToString()));   
-            }                       
+                x.Attributes.Append(XmlHelper.AddAttribute(xd, "key", UniqueId.ToString()));
+            }
             return x;
         }
 
@@ -686,7 +691,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="newPassword"></param>
         public void ChangePassword(string newPassword)
         {
-            MemberItem.RawPasswordValue = newPassword;            
+            MemberItem.RawPasswordValue = newPassword;
         }
 
         /// <summary>
@@ -711,13 +716,17 @@ namespace umbraco.cms.businesslogic.member
 
             if (!e.Cancel)
             {
-                var parameters = new IParameter[] { SqlHelper.CreateParameter("@id", Id),
-                                                         SqlHelper.CreateParameter("@groupId", GroupId) };
-                bool exists = SqlHelper.ExecuteScalar<int>("SELECT COUNT(member) FROM cmsMember2MemberGroup WHERE member = @id AND memberGroup = @groupId",
-                                                           parameters) > 0;
-                if (!exists)
-                    SqlHelper.ExecuteNonQuery("INSERT INTO cmsMember2MemberGroup (member, memberGroup) values (@id, @groupId)",
-                                              parameters);
+                using (var sqlHelper = Application.SqlHelper)
+                {
+                    var parameters = new IParameter[] { sqlHelper.CreateParameter("@id", Id),
+                                                             sqlHelper.CreateParameter("@groupId", GroupId) };
+                    bool exists = sqlHelper.ExecuteScalar<int>("SELECT COUNT(member) FROM cmsMember2MemberGroup WHERE member = @id AND memberGroup = @groupId",
+                                                               parameters) > 0;
+                    if (!exists)
+                        sqlHelper.ExecuteNonQuery("INSERT INTO cmsMember2MemberGroup (member, memberGroup) values (@id, @groupId)",
+                                                  parameters);
+                }
+
                 PopulateGroups();
 
                 FireAfterAddGroup(e);
@@ -736,9 +745,10 @@ namespace umbraco.cms.businesslogic.member
 
             if (!e.Cancel)
             {
-                SqlHelper.ExecuteNonQuery(
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery(
                     "delete from cmsMember2MemberGroup where member = @id and Membergroup = @groupId",
-                    SqlHelper.CreateParameter("@id", Id), SqlHelper.CreateParameter("@groupId", GroupId));
+                    sqlHelper.CreateParameter("@id", Id), sqlHelper.CreateParameter("@groupId", GroupId));
                 PopulateGroups();
                 FireAfterRemoveGroup(e);
             }
@@ -762,9 +772,11 @@ namespace umbraco.cms.businesslogic.member
         private void PopulateGroups()
         {
             var temp = new Hashtable();
-            using (var dr = SqlHelper.ExecuteReader(
+
+            using (var sqlHelper = Application.SqlHelper)
+            using (var dr = sqlHelper.ExecuteReader(
                 "select memberGroup from cmsMember2MemberGroup where member = @id",
-                SqlHelper.CreateParameter("@id", Id)))
+                sqlHelper.CreateParameter("@id", Id)))
             {
                 while (dr.Read())
                     temp.Add(dr.GetInt("memberGroup"),
@@ -821,16 +833,16 @@ namespace umbraco.cms.businesslogic.member
                     //cache the member
                     var cachedMember = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<Member>(
                         GetCacheKey(m.Id),
-                        timeout:        TimeSpan.FromMinutes(30),
-                        getCacheItem:   () =>
-                        {
+                        timeout: TimeSpan.FromMinutes(30),
+                        getCacheItem: () =>
+                      {
                             // Debug information
                             HttpContext.Current.Trace.Write("member",
-                                                            string.Format("Member added to cache: {0}/{1} ({2})",
-                                                                          m.Text, m.LoginName, m.Id));
+                                                          string.Format("Member added to cache: {0}/{1} ({2})",
+                                                                        m.Text, m.LoginName, m.Id));
 
-                            return m;
-                        });
+                          return m;
+                      });
 
                     m.FireAfterAddToCache(e);
                 }
@@ -870,16 +882,16 @@ namespace umbraco.cms.businesslogic.member
                     //cache the member
                     var cachedMember = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<Member>(
                         GetCacheKey(m.Id),
-                        timeout:        TimeSpan.FromMinutes(30),
-                        getCacheItem:   () =>
-                        {
+                        timeout: TimeSpan.FromMinutes(30),
+                        getCacheItem: () =>
+                      {
                             // Debug information
                             HttpContext.Current.Trace.Write("member",
-                                                            string.Format("Member added to cache: {0}/{1} ({2})",
-                                                                          m.Text, m.LoginName, m.Id));
+                                                          string.Format("Member added to cache: {0}/{1} ({2})",
+                                                                        m.Text, m.LoginName, m.Id));
 
-                            return m;
-                        });
+                          return m;
+                      });
 
                     m.FireAfterAddToCache(e);
                 }

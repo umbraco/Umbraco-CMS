@@ -30,11 +30,11 @@ namespace umbraco.MacroEngines
             {
                 //first check in Examine as this is WAY faster
                 var criteria = ExamineManager.Instance
-                    .SearchProviderCollection["InternalSearcher"]
+                    .SearchProviderCollection[Constants.Examine.InternalSearcher]
                     .CreateSearchCriteria("media");
                 var filter = criteria.Id(id);
                 var results = ExamineManager
-                    .Instance.SearchProviderCollection["InternalSearcher"]
+                    .Instance.SearchProviderCollection[Constants.Examine.InternalSearcher]
                     .Search(filter.Compile());
                 if (results.Any())
                 {
@@ -299,12 +299,12 @@ namespace umbraco.MacroEngines
 
         private BaseIndexProvider GetIndexer()
         {
-            return _indexer ?? ExamineManager.Instance.IndexProviderCollection["InternalIndexer"];
+            return _indexer ?? ExamineManager.Instance.IndexProviderCollection[Constants.Examine.InternalIndexer];
         }
 
         private BaseSearchProvider GetSearcher()
         {
-            return _searcher ?? ExamineManager.Instance.SearchProviderCollection["InternalSearcher"];
+            return _searcher ?? ExamineManager.Instance.SearchProviderCollection[Constants.Examine.InternalSearcher];
         }
 
         private DateTime GetvalueAsDateTime(string key)

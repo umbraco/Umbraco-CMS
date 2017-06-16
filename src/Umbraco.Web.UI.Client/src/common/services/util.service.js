@@ -71,7 +71,7 @@ function dateHelper() {
                 .minutes(Math.abs(serverOffsetMinutes))
                 .format('HH:mm');
 
-            var server = moment.utc(momentLocal).zone(formattedOffset);
+            var server = moment.utc(momentLocal).utcOffset(formattedOffset);
             return server.format(format ? format : "YYYY-MM-DD HH:mm:ss");
         },
 

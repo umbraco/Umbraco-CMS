@@ -46,16 +46,16 @@ namespace Umbraco.Web.WebServices
                 /*var result = ((ContentService) Services.ContentService)
                     .PublishWithChildrenInternal(content, UmbracoUser.Id, includeUnpublished)
                     .ToArray();*/
-                var result = doc.PublishWithSubs(UmbracoUser.Id, includeUnpublished);
+                var result = doc.PublishWithSubs(UmbracoUser.Id, includeUnpublished).ToArray();
                 return Json(new
                     {
                         success = result.All(x => x.Success),
-                        message = GetMessageForStatuses(result.Select(x => x.Result), content)
+                        message = GetMessageForStatuses(result.Select(x => x.Result).ToArray(), content)
                     });
             }
         }
 
-        private string GetMessageForStatuses(IEnumerable<PublishStatus> statuses, IContent doc)
+        private string GetMessageForStatuses(PublishStatus[] statuses, IContent doc)
         {
             //if all are successful then just say it was successful
             if (statuses.All(x => ((int) x.StatusType) < 10))
@@ -91,12 +91,12 @@ namespace Umbraco.Web.WebServices
                     return "Cannot publish document with a status of " + status.StatusType;
                 case PublishStatusType.FailedCancelledByEvent:
                     return ui.Text("publish", "contentPublishedFailedByEvent",
-                                   string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id), UmbracoUser);
+                                   string.Format("'{0}' ({1})", status.ContentItem.Name, status.ContentItem.Id), UmbracoUser);
                 case PublishStatusType.FailedContentInvalid:
                     return ui.Text("publish", "contentPublishedFailedInvalid",
                                    new []{
-                                       string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id), 
-                                       string.Join(",", status.InvalidProperties.Select(x => x.Alias))
+                                       string.Format("'{0}' ({1})", status.ContentItem.Name, status.ContentItem.Id), 
+                                       string.Format("'{0}'", string.Join(", ", status.InvalidProperties.Select(x => x.Alias)))
                                    }, 
                                    UmbracoUser);  
                 default:

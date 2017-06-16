@@ -5,7 +5,6 @@ using System.Linq;
 using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Publishing;
 using Umbraco.Core.Events;
 
 namespace Umbraco.Core.Services
@@ -14,7 +13,7 @@ namespace Umbraco.Core.Services
     /// These are used currently to return the temporary 'operation' interfaces for services
     /// which are used to return a status from operational methods so we can determine if things are
     /// cancelled, etc...
-    /// 
+    ///
     /// These will be obsoleted in v8 since all real services methods will be changed to have the correct result.
     /// </summary>
     public static class ServiceWithResultExtensions
@@ -36,11 +35,11 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ServiceContext
     {
-        private Lazy<IMigrationEntryService> _migrationEntryService; 
-        private Lazy<IPublicAccessService> _publicAccessService; 
-        private Lazy<ITaskService> _taskService; 
-        private Lazy<IDomainService> _domainService; 
-        private Lazy<IAuditService> _auditService; 
+        private Lazy<IMigrationEntryService> _migrationEntryService;
+        private Lazy<IPublicAccessService> _publicAccessService;
+        private Lazy<ITaskService> _taskService;
+        private Lazy<IDomainService> _domainService;
+        private Lazy<IAuditService> _auditService;
         private Lazy<ILocalizedTextService> _localizedTextService;
         private Lazy<ITagService> _tagService;
         private Lazy<IContentService> _contentService;
@@ -153,30 +152,26 @@ namespace Umbraco.Core.Services
         /// Creates a service context with a RepositoryFactory which is used to construct Services
         /// </summary>
         /// <param name="repositoryFactory"></param>
-        /// <param name="dbUnitOfWorkProvider"></param>
-        /// <param name="fileUnitOfWorkProvider"></param>
-        /// <param name="publishingStrategy"></param>
+        /// <param name="provider"></param>
         /// <param name="cache"></param>
         /// <param name="logger"></param>
         /// <param name="eventMessagesFactory"></param>
         public ServiceContext(
             RepositoryFactory repositoryFactory,
-            IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, 
-            IUnitOfWorkProvider fileUnitOfWorkProvider, 
-            BasePublishingStrategy publishingStrategy, 
-            CacheHelper cache, 
+            IScopeUnitOfWorkProvider provider,
+            CacheHelper cache,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory)
         {
             if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
-            if (dbUnitOfWorkProvider == null) throw new ArgumentNullException("dbUnitOfWorkProvider");
-            if (fileUnitOfWorkProvider == null) throw new ArgumentNullException("fileUnitOfWorkProvider");
-            if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
+            if (provider == null) throw new ArgumentNullException("provider");
             if (cache == null) throw new ArgumentNullException("cache");
             if (logger == null) throw new ArgumentNullException("logger");
             if (eventMessagesFactory == null) throw new ArgumentNullException("eventMessagesFactory");
 
-            BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy, cache,
+            EventMessagesFactory = eventMessagesFactory;
+
+            BuildServiceCache(provider, cache,
                               repositoryFactory,
                               logger, eventMessagesFactory);
         }
@@ -185,16 +180,13 @@ namespace Umbraco.Core.Services
         /// Builds the various services
         /// </summary>
         private void BuildServiceCache(
-            IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider,
-            IUnitOfWorkProvider fileUnitOfWorkProvider,
-            BasePublishingStrategy publishingStrategy,
+            IScopeUnitOfWorkProvider provider,
             CacheHelper cache,
             RepositoryFactory repositoryFactory,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory)
         {
-            var provider = dbUnitOfWorkProvider;
-            var fileProvider = fileUnitOfWorkProvider;
+            EventMessagesFactory = eventMessagesFactory;
 
             if (_migrationEntryService == null)
                 _migrationEntryService = new Lazy<IMigrationEntryService>(() => new MigrationEntryService(provider, repositoryFactory, logger, eventMessagesFactory));
@@ -216,7 +208,7 @@ namespace Umbraco.Core.Services
 
             if (_localizedTextService == null)
             {
-                
+
                 _localizedTextService = new Lazy<ILocalizedTextService>(() => new LocalizedTextService(
                     new Lazy<LocalizedTextServiceFileSources>(() =>
                     {
@@ -249,7 +241,7 @@ namespace Umbraco.Core.Services
                     }),
                     logger));
             }
-                
+
 
             if (_notificationService == null)
                 _notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, _userService.Value, _contentService.Value, logger));
@@ -264,7 +256,7 @@ namespace Umbraco.Core.Services
                 _memberService = new Lazy<IMemberService>(() => new MemberService(provider, repositoryFactory, logger, eventMessagesFactory, _memberGroupService.Value, _dataTypeService.Value));
 
             if (_contentService == null)
-                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory, logger, eventMessagesFactory, publishingStrategy, _dataTypeService.Value, _userService.Value));
+                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory, logger, eventMessagesFactory, _dataTypeService.Value, _userService.Value));
 
             if (_mediaService == null)
                 _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory, logger, eventMessagesFactory, _dataTypeService.Value, _userService.Value));
@@ -276,7 +268,7 @@ namespace Umbraco.Core.Services
                 _dataTypeService = new Lazy<IDataTypeService>(() => new DataTypeService(provider, repositoryFactory, logger, eventMessagesFactory));
 
             if (_fileService == null)
-                _fileService = new Lazy<IFileService>(() => new FileService(fileProvider, provider, repositoryFactory, logger, eventMessagesFactory));
+                _fileService = new Lazy<IFileService>(() => new FileService(provider, repositoryFactory, logger, eventMessagesFactory));
 
             if (_localizationService == null)
                 _localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, repositoryFactory, logger, eventMessagesFactory));
@@ -287,7 +279,7 @@ namespace Umbraco.Core.Services
                     _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value, _memberService.Value, _memberTypeService.Value,
                     //TODO: Consider making this an isolated cache instead of using the global one
                     cache.RuntimeCache));
-            
+
             if (_packagingService == null)
                 _packagingService = new Lazy<IPackagingService>(() => new PackagingService(logger, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _macroService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, _entityService.Value, _userService.Value, repositoryFactory, provider));
 
@@ -315,6 +307,8 @@ namespace Umbraco.Core.Services
             if (_redirectUrlService == null)
                 _redirectUrlService = new Lazy<IRedirectUrlService>(() => new RedirectUrlService(provider, repositoryFactory, logger, eventMessagesFactory));
         }
+
+        internal IEventMessagesFactory EventMessagesFactory { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="IMigrationEntryService"/>

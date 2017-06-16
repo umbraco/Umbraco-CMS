@@ -1,6 +1,6 @@
 /** Executed when the application starts, binds to events and set global state */
-app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache',
-    function (userService, $log, $rootScope, $location, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache) {
+app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService',
+    function (userService, $log, $rootScope, $location, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService) {
 
         //This sets the default jquery ajax headers to include our csrf token, we
         // need to user the beforeSend method because our token changes per user/login so
@@ -13,6 +13,7 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
 
         /** Listens for authentication and checks if our required assets are loaded, if/once they are we'll broadcast a ready event */
         eventsService.on("app.authenticated", function(evt, data) {
+            
             assetsService._loadInitAssets().then(function() {
                 appState.setGlobalState("isReady", true);
 
@@ -25,10 +26,35 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
         /** execute code on each successful route */
         $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
 
-            if(current.params.section){
-                $rootScope.locationTitle = current.params.section + " - " + $location.$$host;
+            var deployConfig = Umbraco.Sys.ServerVariables.deploy;
+            var deployEnv, deployEnvTitle;
+            if (deployConfig) {
+                deployEnv = Umbraco.Sys.ServerVariables.deploy.CurrentWorkspace;
+                deployEnvTitle = "(" + deployEnv + ") ";
+            }
+
+            if(current.params.section) {
+
+                //Uppercase the current section, content, media, settings, developer, forms
+                var currentSection = current.params.section.charAt(0).toUpperCase() + current.params.section.slice(1);
+
+                var baseTitle = currentSection + " - " + $location.$$host;
+
+                //Check deploy for Global Umbraco.Sys obj workspace
+                if(deployEnv){
+                    $rootScope.locationTitle = deployEnvTitle + baseTitle;
+                }
+                else {
+                    $rootScope.locationTitle = baseTitle;
+                }
+                
             }
             else {
+
+                if(deployEnv) {
+                     $rootScope.locationTitle = deployEnvTitle + "Umbraco - " + $location.$$host;
+                }
+
                 $rootScope.locationTitle = "Umbraco - " + $location.$$host;
             }
 

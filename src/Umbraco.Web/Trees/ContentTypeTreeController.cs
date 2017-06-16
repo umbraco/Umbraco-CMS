@@ -47,9 +47,9 @@ namespace Umbraco.Web.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-item-arrangement", 
-                            //NOTE: This is legacy now but we need to support upgrades. From 7.4+ we don't allow 'child' creations since
-                            // this is an organiational thing and we do that with folders now.
+                        var node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentTypeGuid, id, queryStrings, "icon-item-arrangement",
+                            //NOTE: Since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to. 
+                            //We need this check to keep supporting sites where childs have already been created.
                             dt.HasChildren());
 
                         node.Path = dt.Path;
@@ -101,8 +101,7 @@ namespace Umbraco.Web.Trees
             else
             {
                 var ct = Services.ContentTypeService.GetContentType(int.Parse(id));
-                IContentType parent = null;
-                parent = ct == null ? null : Services.ContentTypeService.GetContentType(ct.ParentId);
+                var parent = ct == null ? null : Services.ContentTypeService.GetContentType(ct.ParentId);
 
                 if (enableInheritedDocumentTypes)
                 {

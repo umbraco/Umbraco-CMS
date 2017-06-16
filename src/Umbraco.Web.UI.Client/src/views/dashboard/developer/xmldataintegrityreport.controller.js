@@ -1,4 +1,4 @@
-function xmlDataIntegrityReportController($scope, umbRequestHelper, $log, $http, $q, $timeout) {
+function XmlDataIntegrityReportController($scope, umbRequestHelper, $log, $http) {
 
     function check(item) {
         var action = item.check;
@@ -20,12 +20,12 @@ function xmlDataIntegrityReportController($scope, umbRequestHelper, $log, $http,
                 "or when editors are editing content.")) {
                 item.fixing = true;
                 umbRequestHelper.resourcePromise(
-                    $http.post(umbRequestHelper.getApiUrl("xmlDataIntegrityBaseUrl", action)),
-                    'Failed to retrieve data integrity status')
-                .then(function (result) {
-                    item.fixing = false;
-                    item.invalid = result === "false";
-                });
+                        $http.post(umbRequestHelper.getApiUrl("xmlDataIntegrityBaseUrl", action)),
+                        'Failed to retrieve data integrity status')
+                    .then(function(result) {
+                        item.fixing = false;
+                        item.invalid = result === "false";
+                    });
             }
         }
     }
@@ -57,6 +57,6 @@ function xmlDataIntegrityReportController($scope, umbRequestHelper, $log, $http,
     for (var i in $scope.items) {
         check($scope.items[i]);
     }
-
 }
-angular.module("umbraco").controller("Umbraco.Dashboard.XmlDataIntegrityReportController", xmlDataIntegrityReportController);
+
+angular.module("umbraco").controller("Umbraco.Dashboard.XmlDataIntegrityReportController", XmlDataIntegrityReportController);

@@ -35,16 +35,23 @@
       <div ng-if="currentSection" style="padding-bottom: 50px;">
 
           <umb-control-group label="@general_width">
-             <div  class="grid-size-scaler" >
+             <div class="grid-size-scaler">
                   <a href ng-click="scaleDown(currentSection)">
-                      <i class="icon icon-navigation-down"></i>
+                      <i class="icon icon-remove"></i>
                   </a>
                       {{currentSection.grid}}
                   <a href ng-click="scaleUp(currentSection, availableLayoutSpace)">
-                      <i class="icon icon-navigation-up"></i>
+                      <i class="icon icon-add"></i>
                   </a>
              </div>
           </umb-control-group>
+
+		  <umb-control-group hide-label="true">
+			<i class="icon-delete red"></i>
+	  		<a class="btn btn-small btn-link" href="" ng-click="deleteSection(currentSection, currentLayout)">
+			  <localize key="general_delete" class="ng-isolate-scope ng-scope">Delete</localize>
+			</a>
+	  	</umb-control-group>
 
 
           <umb-control-group hide-label="true">

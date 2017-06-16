@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Http.Filters;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 
@@ -20,7 +18,7 @@ namespace Umbraco.Web.Editors
         {
             var updChkCookie = Request.Headers.GetCookies("UMB_UPDCHK").FirstOrDefault();
             var updateCheckCookie = updChkCookie != null ? updChkCookie["UMB_UPDCHK"].Value : "";            
-            if (GlobalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && Security.CurrentUser.UserType.Alias == "admin")
+            if (GlobalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && Security.CurrentUser.IsAdmin())
             {
                 try
                 {

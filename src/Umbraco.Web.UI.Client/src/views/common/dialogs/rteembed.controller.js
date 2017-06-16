@@ -32,7 +32,7 @@
                             break;
                         case 1:
                             //error
-                            $scope.form.info = "Computer says no";
+                            $scope.form.info = "Could not embed media - please ensure the URL is valid";
                             break;
                         case 2:
                             $scope.form.preview = data.Markup;
@@ -44,7 +44,7 @@
                 .error(function () {
                     $scope.form.supportsDimensions = false;
                     $scope.form.preview = "";
-                    $scope.form.info = "Computer says no";
+                    $scope.form.info = "Could not embed media - please ensure the URL is valid";
                 });
         } else {
             $scope.form.supportsDimensions = false;

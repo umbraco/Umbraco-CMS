@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Xml;
@@ -53,12 +54,12 @@ namespace Umbraco.Web.Search
             CacheRefresherBase<MemberCacheRefresher>.CacheUpdated += MemberCacheRefresherCacheUpdated;
             CacheRefresherBase<ContentTypeCacheRefresher>.CacheUpdated += ContentTypeCacheRefresherCacheUpdated;
             
-			var contentIndexer = ExamineManager.Instance.IndexProviderCollection["InternalIndexer"] as UmbracoContentIndexer;
+			var contentIndexer = ExamineManager.Instance.IndexProviderCollection[Constants.Examine.InternalIndexer] as UmbracoContentIndexer;
 			if (contentIndexer != null)
 			{
 				contentIndexer.DocumentWriting += IndexerDocumentWriting;
 			}
-			var memberIndexer = ExamineManager.Instance.IndexProviderCollection["InternalMemberIndexer"] as UmbracoMemberIndexer;
+			var memberIndexer = ExamineManager.Instance.IndexProviderCollection[Constants.Examine.InternalMemberIndexer] as UmbracoMemberIndexer;
 			if (memberIndexer != null)
 			{
 				memberIndexer.DocumentWriting += IndexerDocumentWriting;
@@ -67,12 +68,12 @@ namespace Umbraco.Web.Search
 
         /// <summary>
         /// This is used to refresh content indexers IndexData based on the DataService whenever a content type is changed since
-        /// properties may have been added/removed
+        /// properties may have been added/removed, then we need to re-index any required data if aliases have been changed
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <remarks>
-        /// See: http://issues.umbraco.org/issue/U4-4798
+        /// See: http://issues.umbraco.org/issue/U4-4798, http://issues.umbraco.org/issue/U4-7833
         /// </remarks>
 	    static void ContentTypeCacheRefresherCacheUpdated(ContentTypeCacheRefresher sender, CacheRefresherEventArgs e)
         {
@@ -81,6 +82,88 @@ namespace Umbraco.Web.Search
             {
                 provider.RefreshIndexerDataFromDataService();
             }
+
+            if (e.MessageType == MessageType.RefreshByJson)
+            {
+                var contentTypesChanged = new HashSet<string>();
+                var mediaTypesChanged = new HashSet<string>();
+                var memberTypesChanged = new HashSet<string>();
+
+                var payloads = ContentTypeCacheRefresher.DeserializeFromJsonPayload(e.MessageObject.ToString());
+                foreach (var payload in payloads)
+                {
+                    if (payload.IsNew == false
+                        && (payload.WasDeleted || payload.AliasChanged || payload.PropertyRemoved || payload.PropertyTypeAliasChanged))
+                    {
+                        //if we get here it means that some aliases have changed and the indexes for those particular doc types will need to be updated
+                        if (payload.Type == typeof(IContentType).Name)
+                        {
+                            //if it is content
+                            contentTypesChanged.Add(payload.Alias);
+                        }
+                        else if (payload.Type == typeof(IMediaType).Name)
+                        {
+                            //if it is media
+                            mediaTypesChanged.Add(payload.Alias);
+                        }
+                        else if (payload.Type == typeof(IMemberType).Name)
+                        {
+                            //if it is members
+                            memberTypesChanged.Add(payload.Alias);
+                        }
+                    }
+                }
+
+                //TODO: We need to update Examine to support re-indexing multiple items at once instead of one by one which will speed up 
+                // the re-indexing process, we don't want to revert to rebuilding the whole thing!
+
+                if (contentTypesChanged.Count > 0)
+                {
+                    foreach (var alias in contentTypesChanged)
+                    {
+                        var ctType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(alias);
+                        if (ctType != null)
+                        {
+                            var contentItems = ApplicationContext.Current.Services.ContentService.GetContentOfContentType(ctType.Id);
+                            foreach (var contentItem in contentItems)
+                            {
+                                ReIndexForContent(contentItem, contentItem.HasPublishedVersion && contentItem.Trashed == false);
+                            }
+                        }                        
+                    }                    
+                }
+                if (mediaTypesChanged.Count > 0)
+                {
+                    foreach (var alias in mediaTypesChanged)
+                    {
+                        var ctType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(alias);
+                        if (ctType != null)
+                        {
+                            var mediaItems = ApplicationContext.Current.Services.MediaService.GetMediaOfMediaType(ctType.Id);
+                            foreach (var mediaItem in mediaItems)
+                            {
+                                ReIndexForMedia(mediaItem, mediaItem.Trashed == false);
+                            }
+                        }
+                    }
+                }
+                if (memberTypesChanged.Count > 0)
+                {
+                    foreach (var alias in memberTypesChanged)
+                    {
+                        var ctType = ApplicationContext.Current.Services.MemberTypeService.Get(alias);
+                        if (ctType != null)
+                        {
+                            var memberItems = ApplicationContext.Current.Services.MemberService.GetMembersByMemberType(ctType.Id);
+                            foreach (var memberItem in memberItems)
+                            {
+                                ReIndexForMember(memberItem);
+                            }
+                        }
+                    }
+                }
+            }
+            
         }
 
 	    static void MemberCacheRefresherCacheUpdated(MemberCacheRefresher sender, CacheRefresherEventArgs e)
@@ -432,7 +515,7 @@ namespace Umbraco.Web.Search
             //add an icon attribute to get indexed
             xml.Add(new XAttribute("icon", sender.ContentType.Icon));
 
-	        ExamineManager.Instance.ReIndexNode(
+            ExamineManager.Instance.ReIndexNode(
                 xml, IndexTypes.Content,
 	            ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
                     

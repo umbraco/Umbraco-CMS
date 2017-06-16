@@ -23,7 +23,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
                 .ForMember(
                     detail => detail.EmailHash,
-                    opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().ToMd5()))
+                    opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().GenerateHash()))
                 .ForMember(detail => detail.SecondsUntilTimeout, opt => opt.Ignore());
 
             config.CreateMap<BackOfficeIdentityUser, UserDetail>()
@@ -35,7 +35,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.AllowedSections, opt => opt.MapFrom(user => user.AllowedSections))
                 .ForMember(
                     detail => detail.EmailHash,
-                    opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().ToMd5()))
+                    opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().GenerateHash()))
                 .ForMember(detail => detail.SecondsUntilTimeout, opt => opt.Ignore());
 
             config.CreateMap<IProfile, UserBasic>()

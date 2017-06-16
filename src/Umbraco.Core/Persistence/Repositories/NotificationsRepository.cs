@@ -9,13 +9,34 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class NotificationsRepository
+    internal class NotificationsRepository : IDisposable
     {
         private readonly IDatabaseUnitOfWork _unitOfWork;
 
         public NotificationsRepository(IDatabaseUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
+        }
+
+        public IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string action, IEnumerable<int> nodeIds, Guid objectType)
+        {
+            var nodeIdsA = nodeIds.ToArray();
+            var syntax = ApplicationContext.Current.DatabaseContext.SqlSyntax; // bah
+            var sql = new Sql()
+                    .Select("DISTINCT umbracoNode.id nodeId, umbracoUser.id userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
+                    .From<User2NodeNotifyDto>(syntax)
+                    .InnerJoin<NodeDto>(syntax).On<User2NodeNotifyDto, NodeDto>(syntax, left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<UserDto>(syntax).On<User2NodeNotifyDto, UserDto>(syntax, left => left.UserId, right => right.Id)
+                    .Where<NodeDto>(x => x.NodeObjectType == objectType)
+                    .Where<UserDto>(x => x.Disabled == false) // only approved users
+                    .Where<User2NodeNotifyDto>(x => x.Action == action); // on the specified action
+            if (nodeIdsA.Length > 0)
+                sql
+                    .WhereIn<NodeDto>(x => x.NodeId, nodeIdsA); // for the specified nodes
+            sql
+                .OrderBy<UserDto>(x => x.Id, syntax)
+                .OrderBy<NodeDto>(dto => dto.NodeId, syntax);
+            return _unitOfWork.Database.Fetch<dynamic>(sql).Select(x => new Notification(x.nodeId, x.userId, x.action, objectType));
         }
 
         public IEnumerable<Notification> GetUserNotifications(IUser user)
@@ -80,6 +101,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 };
             _unitOfWork.Database.Insert(dto);
             return new Notification(dto.NodeId, dto.UserId, dto.Action, nodeType);
+        }
+
+        public void Dispose()
+        {
+            _unitOfWork.Dispose();
         }
     }
 }

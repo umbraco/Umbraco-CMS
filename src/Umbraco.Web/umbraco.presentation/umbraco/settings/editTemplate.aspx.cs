@@ -198,23 +198,24 @@ namespace umbraco.cms.presentation.settings
 
 		private void LoadMacros()
 		{
-			IRecordsReader macroRenderings =
-				SqlHelper.ExecuteReader("select id, macroAlias, macroName from cmsMacro order by macroName");
-
-			rpt_macros.DataSource = macroRenderings;
-			rpt_macros.DataBind();
-
-			macroRenderings.Close();
+		    using (var sqlHelper = BusinessLogic.Application.SqlHelper)
+            using (IRecordsReader macroRenderings = 
+                sqlHelper.ExecuteReader("select id, macroAlias, macroName from cmsMacro order by macroName"))
+		    {
+		        rpt_macros.DataSource = macroRenderings;
+		        rpt_macros.DataBind();
+		    }
 		}
 
 		public string DoesMacroHaveSettings(string macroId)
 		{
-			if (
-				SqlHelper.ExecuteScalar<int>(string.Format("select 1 from cmsMacroProperty where macro = {0}", macroId)) ==
-				1)
-				return "1";
-			else
-				return "0";
+            using (var sqlHelper = BusinessLogic.Application.SqlHelper)
+                if (
+				    sqlHelper.ExecuteScalar<int>(string.Format("select 1 from cmsMacroProperty where macro = {0}", macroId)) ==
+				    1)
+				    return "1";
+			    else
+				    return "0";
 		}
 
 		/// <summary>

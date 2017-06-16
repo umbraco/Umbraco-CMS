@@ -261,8 +261,17 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void GetCropUrl_SpecifiedCropModeTest()
         {
-            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson1, width: 300, height: 150, imageCropMode:ImageCropMode.Max);
-            Assert.AreEqual(mediaPath + "?mode=max&width=300&height=150", urlString);
+            var urlStringMin = mediaPath.GetCropUrl(imageCropperValue: cropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Min);
+            var urlStringBoxPad = mediaPath.GetCropUrl(imageCropperValue: cropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.BoxPad);
+            var urlStringPad = mediaPath.GetCropUrl(imageCropperValue: cropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Pad);
+            var urlStringMax = mediaPath.GetCropUrl(imageCropperValue: cropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Max);
+            var urlStringStretch = mediaPath.GetCropUrl(imageCropperValue: cropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Stretch);
+            
+            Assert.AreEqual(mediaPath + "?mode=min&width=300&height=150", urlStringMin);
+            Assert.AreEqual(mediaPath + "?mode=boxpad&width=300&height=150", urlStringBoxPad);
+            Assert.AreEqual(mediaPath + "?mode=pad&width=300&height=150", urlStringPad);
+            Assert.AreEqual(mediaPath + "?mode=max&width=300&height=150", urlStringMax);
+            Assert.AreEqual(mediaPath + "?mode=stretch&width=300&height=150", urlStringStretch);
         }
 
         /// <summary>
@@ -357,6 +366,18 @@ namespace Umbraco.Tests.PropertyEditors
 
             var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, height: 200);
             Assert.AreEqual(mediaPath + "?anchor=center&mode=crop&height=200", urlString);
+        }
+
+        /// <summary>
+        /// Test to check result when using a background color with padding
+        /// </summary>
+        [Test]
+        public void GetCropUrl_BackgroundColorParameter()
+        {
+            var cropperJson = "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"" + mediaPath + "\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
+
+            var urlString = mediaPath.GetCropUrl(400, 400, cropperJson, imageCropMode: ImageCropMode.Pad, furtherOptions: "&bgcolor=fff");
+            Assert.AreEqual(mediaPath + "?mode=pad&width=400&height=400&bgcolor=fff", urlString);
         }
     }
 }

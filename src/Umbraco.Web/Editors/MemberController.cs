@@ -76,7 +76,7 @@ namespace Umbraco.Web.Editors
         public PagedResult<MemberBasic> GetPagedResults(
             int pageNumber = 1,
             int pageSize = 100,
-            string orderBy = "Name",
+            string orderBy = "username",
             Direction orderDirection = Direction.Ascending,
             bool orderBySystemField = true,
             string filter = "",
@@ -92,8 +92,7 @@ namespace Umbraco.Web.Editors
             {
                 long totalRecords;
                 var members = Services.MemberService
-            .GetAll((pageNumber - 1), pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField
-            , memberTypeAlias, filter).ToArray();
+                    .GetAll((pageNumber - 1), pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, memberTypeAlias, filter).ToArray();
                 if (totalRecords == 0)
                 {
                     return new PagedResult<MemberBasic>(0, 0, 0);

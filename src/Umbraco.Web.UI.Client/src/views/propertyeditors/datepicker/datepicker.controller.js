@@ -99,7 +99,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     if (Umbraco.Sys.ServerVariables.application.serverTimeOffset !== undefined) {
         // Will return something like 120
         var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
-        
+
         // Will return something like -120
         var localOffset = new Date().getTimezoneOffset();
 
@@ -142,8 +142,8 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 			    if ($scope.hasDatetimePickerValue) {
 			        var dateVal;
 			        //check if we are supposed to offset the time
-			        if ($scope.model.value && $scope.model.config.offsetTime === "1" && Umbraco.Sys.ServerVariables.application.serverTimeOffset) {
-                        //get the local time offset from the server
+			        if ($scope.model.value && $scope.model.config.offsetTime === "1" && $scope.serverTimeNeedsOffsetting) {
+			            //get the local time offset from the server
 			            dateVal = dateHelper.convertToLocalMomentTime($scope.model.value, Umbraco.Sys.ServerVariables.application.serverTimeOffset);
 			            $scope.serverTime = dateHelper.convertToServerStringTime(dateVal, Umbraco.Sys.ServerVariables.application.serverTimeOffset, "YYYY-MM-DD HH:mm:ss Z");
 			        }

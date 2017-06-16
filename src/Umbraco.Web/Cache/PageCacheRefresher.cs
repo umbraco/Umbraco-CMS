@@ -5,6 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Sync;
 using umbraco;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Web.Cache
 {
@@ -14,7 +15,7 @@ namespace Umbraco.Web.Cache
     /// <remarks>
     /// If Load balancing is enabled (by default disabled, is set in umbracoSettings.config) PageCacheRefresher will be called
     /// everytime content is added/updated/removed to ensure that the content cache is identical on all load balanced servers
-    /// </remarks>    
+    /// </remarks>
     public class PageCacheRefresher : TypedCacheRefresherBase<PageCacheRefresher, IContent>
     {
 
@@ -49,7 +50,8 @@ namespace Umbraco.Web.Cache
         /// </summary>
         public override void RefreshAll()
         {
-            content.Instance.RefreshContentFromDatabaseAsync();
+            content.Instance.RefreshContentFromDatabase();
+            XmlPublishedContent.ClearRequest();
             base.RefreshAll();
         }
 
@@ -61,6 +63,7 @@ namespace Umbraco.Web.Cache
         {
             ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
             content.Instance.UpdateDocumentCache(id);
+            XmlPublishedContent.ClearRequest();
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
             base.Refresh(id);
@@ -73,7 +76,8 @@ namespace Umbraco.Web.Cache
         public override void Remove(int id)
         {
             ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
-            content.Instance.ClearDocumentCache(id);
+            content.Instance.ClearDocumentCache(id, false);
+            XmlPublishedContent.ClearRequest();
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
@@ -84,6 +88,7 @@ namespace Umbraco.Web.Cache
         {
             ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
             content.Instance.UpdateDocumentCache(new Document(instance));
+            XmlPublishedContent.ClearRequest();
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
@@ -93,7 +98,8 @@ namespace Umbraco.Web.Cache
         public override void Remove(IContent instance)
         {
             ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
-            content.Instance.ClearDocumentCache(new Document(instance));
+            content.Instance.ClearDocumentCache(new Document(instance), false);
+            XmlPublishedContent.ClearRequest();
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();

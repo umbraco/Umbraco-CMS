@@ -36,7 +36,7 @@
     </div>
 
     <!-- List of uploading/uploaded files  -->
-    <ul class="file-list" ng-show="done.length > 0 || queue.length > 0 || rejected.length > 0">
+    <ul class="file-list" ng-show="done.length > 0 || queue.length > 0 || rejected.length > 0 || filesHolder.length > 0">
 
         <!-- make list sort order the same as photo grid. The last uploaded photo in the top -->
         <li class="file" ng-repeat="file in done">
@@ -97,5 +97,12 @@
     </ul>
 
 </ng-form>
+
+<umb-overlay
+		ng-if="mediatypepickerOverlay.show"
+		model="mediatypepickerOverlay"
+        view="mediatypepickerOverlay.view"
+		position="right">        
+</umb-overlay>
 
 </div>

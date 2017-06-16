@@ -5,6 +5,8 @@ namespace Umbraco.Web.Models
         Crop,
         Max,
         Stretch,
-        Pad
+        Pad,
+        BoxPad,
+        Min
     }
 }

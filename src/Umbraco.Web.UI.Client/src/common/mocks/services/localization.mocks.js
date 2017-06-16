@@ -134,7 +134,7 @@ angular.module('umbraco.mocks').
                   "content_nodeName": "Page Title",
                   "content_otherElements": "Properties",
                   "content_parentNotPublished": "This document is published but is not visible because the parent '%0%' is unpublished",
-                  "content_parentNotPublishedAnomaly": "Oops: this document is published but is not in the cache (internal error)",
+                  "content_parentNotPublishedAnomaly": "This document is published but is not in the cache",
                   "content_publish": "Publish",
                   "content_publishStatus": "Publication Status",
                   "content_releaseDate": "Publish at",

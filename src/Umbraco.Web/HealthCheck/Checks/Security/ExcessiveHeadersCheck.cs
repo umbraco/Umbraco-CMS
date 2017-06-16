@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Security
@@ -10,7 +11,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     [HealthCheck(
         "92ABBAA2-0586-4089-8AE2-9A843439D577",
         "Excessive Headers",
-        Description = "Checks to see if your site is revealing information in it's headers that gives away unnecessary details about the technology used to build and host it.",
+        Description = "Checks to see if your site is revealing information in its headers that gives away unnecessary details about the technology used to build and host it.",
         Group = "Security")]
     public class ExcessiveHeadersCheck : HealthCheck
     {
@@ -48,7 +49,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var url = HealthCheckContext.HttpContext.Request.Url;
 
             // Access the site home page and check for the headers
-            var address = string.Format("http://{0}:{1}", url.Host.ToLower(), url.Port);
+            var serverVariables = HealthCheckContext.HttpContext.Request.ServerVariables;
+            var useSsl = GlobalSettings.UseSSL || serverVariables["SERVER_PORT"] == "443";
+            var address = string.Format("http{0}://{1}:{2}", useSsl ? "s" : "", url.Host.ToLower(), url.Port);
             var request = WebRequest.Create(address);
             request.Method = "HEAD";
             try

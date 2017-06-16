@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -9,8 +10,15 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
+
     public interface IContentRepository : IRepositoryVersionable<int, IContent>, IRecycleBinRepository<IContent>, IDeleteMediaFilesRepository
     {
+        /// <summary>
+        /// This builds the Xml document used for the XML cache
+        /// </summary>
+        /// <returns></returns>
+        XmlDocument BuildXmlCache();
+
         /// <summary>
         /// Get the count of published items
         /// </summary>
@@ -75,19 +83,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="xml"></param>
         void AddOrUpdatePreviewXml(IContent content, Func<IContent, XElement> xml);
 
-        /// <summary>
-        /// Gets paged content results
-        /// </summary>
-        /// <param name="query">Query to excute</param>
-        /// <param name="pageIndex">Page number</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="totalRecords">Total records query would return without paging</param>
-        /// <param name="orderBy">Field to order by</param>
-        /// <param name="orderDirection">Direction to order by</param>
-        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter"></param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter = null);
+        
+        
     }
 }

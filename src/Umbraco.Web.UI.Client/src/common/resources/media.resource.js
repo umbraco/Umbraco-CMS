@@ -427,7 +427,9 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * Retrieves all media children with types used as folders.
           * Uses the convention of looking for media items with mediaTypes ending in
           * *Folder so will match "Folder", "bannerFolder", "secureFolder" etc,
-          *
+          * 
+          * NOTE: This will return a max of 500 folders, if more is required it needs to be paged
+          * 
           * ##usage
           * <pre>
           * mediaResource.getChildFolders(1234)
@@ -445,14 +447,15 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 parentId = -1;
             }
 
+            //NOTE: This will return a max of 500 folders, if more is required it needs to be paged
             return umbRequestHelper.resourcePromise(
                   $http.get(
                         umbRequestHelper.getApiUrl(
                               "mediaApiBaseUrl",
                               "GetChildFolders",
-                              [
-                                    { id: parentId }
-                              ])),
+                            {
+                                id: parentId
+                            })),
                   'Failed to retrieve child folders for media item ' + parentId);
         },
 
@@ -482,7 +485,49 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                                "mediaApiBaseUrl",
                                "EmptyRecycleBin")),
                    'Failed to empty the recycle bin');
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.mediaResource#search
+          * @methodOf umbraco.resources.mediaResource
+          *
+          * @description
+          * Empties the media recycle bin
+          *
+          * ##usage
+          * <pre>
+          * mediaResource.search("my search", 1, 100, -1)
+          *    .then(function(searchResult) {
+          *        alert('it's here!');
+          *    });
+          * </pre> 
+          *           
+          * @param {string} query The search query
+          * @param {int} pageNumber The page number
+          * @param {int} pageSize The number of media items on a page
+          * @param {int} searchFrom Id to search from
+          * @returns {Promise} resourcePromise object.
+          *
+          */
+        search: function (query, pageNumber, pageSize, searchFrom) {
+
+            var args = [
+                { "query": query }, 
+                { "pageNumber": pageNumber },
+                { "pageSize": pageSize },
+                { "searchFrom": searchFrom }
+            ];
+
+            return umbRequestHelper.resourcePromise(
+                  $http.get(
+                        umbRequestHelper.getApiUrl(
+                              "mediaApiBaseUrl",
+                              "Search",
+                              args)),
+                  'Failed to retrieve media items for search: ' + query);
         }
+
     };
 }
 

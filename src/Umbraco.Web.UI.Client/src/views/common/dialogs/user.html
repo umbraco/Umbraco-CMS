@@ -46,18 +46,18 @@
 
                 <div ng-repeat="login in externalLoginProviders">
 
-                    <form ng-if="login.linkedProviderKey == undefined" method="POST" name="externalLoginForm"
-                          action="{{externalLinkLoginFormAction}}">
+					<form ng-if="login.linkedProviderKey == undefined" method="POST" name="externalLoginForm"
+						  action="{{externalLinkLoginFormAction}}" id="oauthloginform" name="oauthloginform">
+						<input type="hidden" name="provider" value="{{login.authType}}" />
+						<button class="btn btn-block btn-social"
+								ng-class="login.properties.SocialStyle"
+								id="{{login.authType}}"
+								onclick="document.forms.oauthloginform.submit();">
 
-                        <button class="btn btn-block btn-social"
-                                ng-class="login.properties.SocialStyle"
-                                id="{{login.authType}}"
-                                name="provider"
-                                value="{{login.authType}}">
-                            <i class="fa" ng-class="login.properties.SocialIcon"></i>
-                            Link your {{login.caption}} account
-                        </button>
-                    </form>
+							<i class="fa" ng-class="login.properties.SocialIcon"></i>
+							Link your {{login.caption}} account
+						</button>
+					</form>
 
                     <button ng-if="login.linkedProviderKey != undefined"
                             ng-click="unlink($event, login.authType, login.linkedProviderKey)"

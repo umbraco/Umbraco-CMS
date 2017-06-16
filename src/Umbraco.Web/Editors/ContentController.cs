@@ -4,11 +4,10 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Formatting;
 using System.Text;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
-using System.Web.Http.ModelBinding.Binders;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -17,24 +16,15 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
-using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
-using umbraco;
-using Umbraco.Core.Models;
-using Umbraco.Core.Dynamics;
-using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.preview;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.UI;
 using Constants = Umbraco.Core.Constants;
-using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 
 namespace Umbraco.Web.Editors
 {
@@ -46,7 +36,8 @@ namespace Umbraco.Web.Editors
     /// access to ALL of the methods on this controller will need access to the content application.
     /// </remarks>
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
+    [UmbracoApplicationAuthorize(Constants.Applications.Content)]
+    [ContentControllerConfiguration]
     public class ContentController : ContentControllerBase
     {
         /// <summary>
@@ -64,6 +55,18 @@ namespace Umbraco.Web.Editors
         public ContentController(UmbracoContext umbracoContext)
                 : base(umbracoContext)
         {
+        }
+
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class ContentControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetNiceUrl", "id", typeof(int), typeof(Guid), typeof(Udi))));
+            }
         }
 
         /// <summary>
@@ -171,6 +174,34 @@ namespace Umbraco.Web.Editors
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(url, Encoding.UTF8, "application/json");
             return response;
+        }
+
+        /// <summary>
+        /// Gets the Url for a given node ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public HttpResponseMessage GetNiceUrl(Guid id)
+        {
+            var url = Umbraco.UrlProvider.GetUrl(id);
+            var response = Request.CreateResponse(HttpStatusCode.OK);
+            response.Content = new StringContent(url, Encoding.UTF8, "application/json");
+            return response;
+        }
+
+        /// <summary>
+        /// Gets the Url for a given node ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public HttpResponseMessage GetNiceUrl(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi != null)
+            {
+                return GetNiceUrl(guidUdi.Guid);
+            }
+            throw new HttpResponseException(HttpStatusCode.NotFound);            
         }
 
         /// <summary>
@@ -467,7 +498,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Change the sort order for media
+        /// Change the sort order for content
         /// </summary>
         /// <param name="sorted"></param>
         /// <returns></returns>
@@ -485,23 +516,24 @@ namespace Umbraco.Web.Editors
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
 
-            var contentService = Services.ContentService;
-            var sortedContent = new List<IContent>();
             try
             {
-                sortedContent.AddRange(Services.ContentService.GetByIds(sorted.IdSortOrder));
+                var contentService = Services.ContentService;
+
+                // content service GetByIds does order the content items based on the order of Ids passed in
+                var content = contentService.GetByIds(sorted.IdSortOrder);
 
                 // Save content with new sort order and update content xml in db accordingly
-                if (contentService.Sort(sortedContent) == false)
+                if (contentService.Sort(content) == false)
                 {
-                    LogHelper.Warn<MediaController>("Content sorting failed, this was probably caused by an event being cancelled");
+                    LogHelper.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
                     return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
                 }
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
-                LogHelper.Error<MediaController>("Could not update content sort order", ex);
+                LogHelper.Error<ContentController>("Could not update content sort order", ex);
                 throw;
             }
         }

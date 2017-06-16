@@ -13,8 +13,8 @@ namespace umbraco.editorControls.tinymce
     [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class tinyMCEPreValueConfigurator : System.Web.UI.WebControls.PlaceHolder, interfaces.IDataPrevalue
     {
-		// UI controls
-		private CheckBoxList _editorButtons;
+        // UI controls
+        private CheckBoxList _editorButtons;
         private CheckBox _enableRightClick;
         private DropDownList _dropdownlist;
         private CheckBoxList _advancedUsersList;
@@ -27,27 +27,32 @@ namespace umbraco.editorControls.tinymce
         private RegularExpressionValidator _widthValidator = new RegularExpressionValidator();
         private RegularExpressionValidator _heightValidator = new RegularExpressionValidator();
         private RegularExpressionValidator _maxImageWidthValidator = new RegularExpressionValidator();
-				
-		// referenced datatype
-		private cms.businesslogic.datatype.BaseDataType _datatype;
+
+        // referenced datatype
+        private cms.businesslogic.datatype.BaseDataType _datatype;
         private string _selectedButtons = "";
         private string _advancedUsers = "";
         private string _stylesheets = "";
 
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         public static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
         }
 
-        public tinyMCEPreValueConfigurator(cms.businesslogic.datatype.BaseDataType DataType) 
-		{
-			// state it knows its datatypedefinitionid
-			_datatype = DataType;
-			setupChildControls();
-		}
-		
-		private void setupChildControls() 
-		{
+
+        public tinyMCEPreValueConfigurator(cms.businesslogic.datatype.BaseDataType DataType)
+        {
+            // state it knows its datatypedefinitionid
+            _datatype = DataType;
+            setupChildControls();
+        }
+
+        private void setupChildControls()
+        {
             _dropdownlist = new DropDownList();
             _dropdownlist.ID = "dbtype";
             _dropdownlist.Items.Add(DBTypes.Date.ToString());
@@ -61,7 +66,7 @@ namespace umbraco.editorControls.tinymce
             _editorButtons.CellPadding = 3;
 
             _enableRightClick = new CheckBox();
-		    _enableRightClick.ID = "enableRightClick";
+            _enableRightClick.ID = "enableRightClick";
 
             _advancedUsersList = new CheckBoxList();
             _advancedUsersList.ID = "advancedUsersList";
@@ -76,14 +81,14 @@ namespace umbraco.editorControls.tinymce
             _maxImageWidth.ID = "maxImageWidth";
 
             // put the childcontrols in context - ensuring that
-			// the viewstate is persisted etc.
+            // the viewstate is persisted etc.
             Controls.Add(_dropdownlist);
             Controls.Add(_enableRightClick);
             Controls.Add(_editorButtons);
             Controls.Add(_advancedUsersList);
             Controls.Add(_stylesheetList);
             Controls.Add(_width);
-		    Controls.Add(_widthValidator);
+            Controls.Add(_widthValidator);
             Controls.Add(_height);
             Controls.Add(_heightValidator);
             Controls.Add(_showLabel);
@@ -91,11 +96,11 @@ namespace umbraco.editorControls.tinymce
             Controls.Add(_maxImageWidthValidator);
             //            Controls.Add(_fullWidth);
 
-		}
-		
-		protected override void OnLoad(EventArgs e)
-		{
-			base.OnLoad (e);
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
             // add ids to controls
             _width.ID = "width";
             _height.ID = "height";
@@ -104,19 +109,19 @@ namespace umbraco.editorControls.tinymce
             // initialize validators
             _widthValidator.ValidationExpression = "0*[1-9][0-9]*";
             _widthValidator.ErrorMessage = ui.Text("errorHandling", "errorIntegerWithoutTab", ui.Text("width"), new BasePages.BasePage().getUser());
-		    _widthValidator.Display = ValidatorDisplay.Dynamic;
+            _widthValidator.Display = ValidatorDisplay.Dynamic;
             _widthValidator.ControlToValidate = _width.ID;
             _heightValidator.ValidationExpression = "0*[1-9][0-9]*";
             _heightValidator.ErrorMessage = ui.Text("errorHandling", "errorIntegerWithoutTab", ui.Text("height"), new BasePages.BasePage().getUser());
             _heightValidator.ControlToValidate = _height.ID;
             _heightValidator.Display = ValidatorDisplay.Dynamic;
             _maxImageWidthValidator.ValidationExpression = "0*[1-9][0-9]*";
-            _maxImageWidthValidator.ErrorMessage = ui.Text("errorHandling", "errorIntegerWithoutTab","'" +  ui.Text("rteMaximumDefaultImgSize") + "'", new BasePages.BasePage().getUser());
+            _maxImageWidthValidator.ErrorMessage = ui.Text("errorHandling", "errorIntegerWithoutTab", "'" + ui.Text("rteMaximumDefaultImgSize") + "'", new BasePages.BasePage().getUser());
             _maxImageWidthValidator.ControlToValidate = _maxImageWidth.ID;
             _maxImageWidthValidator.Display = ValidatorDisplay.Dynamic;
-            
+
             if (!Page.IsPostBack)
-			{
+            {
                 if (Configuration != null)
                 {
                     string[] config = Configuration.Split("|".ToCharArray());
@@ -133,13 +138,13 @@ namespace umbraco.editorControls.tinymce
 
                         if (config.Length > 4 && config[4].Split(',').Length > 1)
                         {
-//                        if (config[3] == "1")
-//                            _fullWidth.Checked = true;
-//                        else
-//                        {
+                            //                        if (config[3] == "1")
+                            //                            _fullWidth.Checked = true;
+                            //                        else
+                            //                        {
                             _width.Text = config[4].Split(',')[0];
                             _height.Text = config[4].Split(',')[1];
-//                        }
+                            //                        }
                         }
 
                         // if width and height are empty or lower than 0 then set default sizes:
@@ -166,7 +171,7 @@ namespace umbraco.editorControls.tinymce
                     IDictionaryEnumerator ide = tinyMCEConfiguration.SortedCommands.GetEnumerator();
                     while (ide.MoveNext())
                     {
-                        tinyMCECommand cmd = (tinyMCECommand) ide.Value;
+                        tinyMCECommand cmd = (tinyMCECommand)ide.Value;
                         ListItem li =
                             new ListItem(
                                 string.Format("<img src=\"{0}\" class=\"tinymceIcon\" alt=\"{1}\" />&nbsp;", cmd.Icon,
@@ -198,25 +203,25 @@ namespace umbraco.editorControls.tinymce
                     }
                 }
 
-			    // Mark the current db type
+                // Mark the current db type
                 _dropdownlist.SelectedValue = _datatype.DBType.ToString();
-                    
-            }
-		}
-		
-		public Control Editor 
-		{
-			get
-			{
-				return this;
-			}
-		}
 
-		public virtual void Save() 
-		{
+            }
+        }
+
+        public Control Editor
+        {
+            get
+            {
+                return this;
+            }
+        }
+
+        public virtual void Save()
+        {
             _datatype.DBType = (cms.businesslogic.datatype.DBTypes)Enum.Parse(typeof(cms.businesslogic.datatype.DBTypes), _dropdownlist.SelectedValue, true);
 
-			// Generate data-string
+            // Generate data-string
             string data = ",";
 
             foreach (ListItem li in _editorButtons.Items)
@@ -238,43 +243,39 @@ namespace umbraco.editorControls.tinymce
 
             data += "|";
 
-            
-		    data += "0|";
-            /*
-            if (_fullWidth.Checked)
-                data += "1|";
-            else
-                data += "0|";
-            */
+            data += "0|";
 
             data += _width.Text + "," + _height.Text + "|";
 
             foreach (ListItem li in _stylesheetList.Items)
                 if (li.Selected)
                     data += li.Value + ",";
-		    data += "|";
+
+            data += "|";
             data += _showLabel.Checked.ToString() + "|";
             data += _maxImageWidth.Text + "|";
 
-
-            // If the add new prevalue textbox is filled out - add the value to the collection.
-			IParameter[] SqlParams = new IParameter[] {
-										    SqlHelper.CreateParameter("@value",data),
-											SqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
-			SqlHelper.ExecuteNonQuery("delete from cmsDataTypePreValues where datatypenodeid = @dtdefid",SqlParams);
-            // we need to populate the parameters again due to an issue with SQL CE
-            SqlParams = new IParameter[] {
-										    SqlHelper.CreateParameter("@value",data),
-											SqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
-			SqlHelper.ExecuteNonQuery("insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')",SqlParams);
+            using (var sqlHelper = Application.SqlHelper)
+            {
+                // If the add new prevalue textbox is filled out - add the value to the collection.
+                IParameter[] SqlParams = new IParameter[] {
+                                                sqlHelper.CreateParameter("@value",data),
+                                                sqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
+                sqlHelper.ExecuteNonQuery("delete from cmsDataTypePreValues where datatypenodeid = @dtdefid", SqlParams);
+                // we need to populate the parameters again due to an issue with SQL CE
+                SqlParams = new IParameter[] {
+                                                sqlHelper.CreateParameter("@value",data),
+                                                sqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
+                sqlHelper.ExecuteNonQuery("insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')", SqlParams);
+            }
 		}
 
-		protected override void Render(HtmlTextWriter writer)
-		{
-			writer.WriteLine("<table>");
+        protected override void Render(HtmlTextWriter writer)
+        {
+            writer.WriteLine("<table>");
             writer.WriteLine("<tr><th>" + ui.Text("editdatatype", "dataBaseDatatype") + ":</th><td>");
-			_dropdownlist.RenderControl(writer);
-			writer.Write("</td></tr>");
+            _dropdownlist.RenderControl(writer);
+            writer.Write("</td></tr>");
             writer.Write("<tr><th>" + ui.Text("editdatatype", "rteButtons") + ":</th><td>");
             _editorButtons.RenderControl(writer);
             writer.Write("</td></tr>");
@@ -287,7 +288,7 @@ namespace umbraco.editorControls.tinymce
             writer.Write("<tr><th>" + ui.Text("editdatatype", "rteEnableAdvancedSettings") + ":</th><td>");
             _advancedUsersList.RenderControl(writer);
             writer.Write("</td></tr>");
-            writer.Write("<tr><th>"); 
+            writer.Write("<tr><th>");
             //"Size:</th><td>Maximum width and height: ");
             //            _fullWidth.RenderControl(writer);
 
@@ -309,20 +310,21 @@ namespace umbraco.editorControls.tinymce
             writer.Write("</table>");
         }
 
-		public string Configuration 
-		{
-			get 
-			{
+        public string Configuration
+        {
+            get
+            {
                 try
                 {
-                    return SqlHelper.ExecuteScalar<string>("select value from cmsDataTypePreValues where datatypenodeid = @datatypenodeid", SqlHelper.CreateParameter("@datatypenodeid", _datatype.DataTypeDefinitionId));
+                    using (var sqlHelper = Application.SqlHelper)
+                        return sqlHelper.ExecuteScalar<string>("select value from cmsDataTypePreValues where datatypenodeid = @datatypenodeid", sqlHelper.CreateParameter("@datatypenodeid", _datatype.DataTypeDefinitionId));
                 }
                 catch
                 {
                     return "";
                 }
-			}
-		}
+            }
+        }
 
-	}
+    }
 }

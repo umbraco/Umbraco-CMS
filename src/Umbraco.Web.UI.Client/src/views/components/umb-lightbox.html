@@ -1,6 +1,9 @@
 <div class="umb-lightbox">
 
     <div class="umb-lightbox__backdrop" ng-click="close()" hotkey="esc"></div>
+    <div class="umb-lightbox__close" title="Close" ng-click="close()">
+        <i class="icon-delete umb-lightbox__control"></i>
+    </div>
 
     <div class="umb-lightbox__images">
         <div class="umb-lightbox__image shadow-depth-2" ng-repeat="item in items" ng-show="$index === activeItemIndex">
@@ -8,11 +11,11 @@
         </div>
     </div>
 
-    <div class="umb-lightbox__control -prev" ng-if="activeItemIndex > 0" ng-click="prev()" hotkey="left">
+    <div class="umb-lightbox__control -prev" title="Previous" ng-if="activeItemIndex > 0" ng-click="prev()" hotkey="left">
         <i class="icon-previous umb-lightbox__control-icon"></i>
     </div>
 
-    <div class="umb-lightbox__control -next" ng-if="activeItemIndex + 1 < items.length" ng-click="next()" hotkey="right">
+    <div class="umb-lightbox__control -next" title="Next" ng-if="activeItemIndex + 1 < items.length" ng-click="next()" hotkey="right">
         <i class="icon-next umb-lightbox__control-icon"></i>
     </div>
 

@@ -19,7 +19,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(21, 21, 23, 0.7);
     width: 100%;
     height: 100%;
 }
@@ -27,7 +27,14 @@
 .umb-lightbox__close {
     position: absolute;
     top: 20px;
-    right: 20px;
+    right: 60px;
+}
+
+.umb-lightbox__close i {
+    font-size: 20px;
+    cursor: pointer;
+    height: 40px;
+    width: 40px;
 }
 
 .umb-lightbox__images {
@@ -40,13 +47,13 @@
     border-radius: 3px;
     padding: 10px;
     img {
-        max-width: 50vw;
-        max-height: 70vh;
+        max-width: 80vw;
+        max-height: 80vh;
     }
 }
 
 .umb-lightbox__control {
-    background-color: white;
+    background-color: @white;
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -70,6 +77,6 @@
 }
 
 .umb-lightbox__control-icon {
-    color: @blue;
+    color: @turquoise;
     font-size: 20px;
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -305,7 +306,7 @@ namespace Umbraco.Tests.DynamicsAndReflection
                 var parameterType = parameters[i].ParameterType;
                 var argumentType = arguments[i].GetType();
 
-                Console.WriteLine("{0} / {1}", parameterType, argumentType);
+                Debug.Print("{0} / {1}", parameterType, argumentType);
 
                 if (parameterType == argumentType) continue; // match
                 if (parameterType.IsGenericParameter) // eg T
@@ -334,7 +335,7 @@ namespace Umbraco.Tests.DynamicsAndReflection
 
                     // then what ?!
                     // should _variance_ be of some importance?
-                    Console.WriteLine("generic {0}", argumentType.IsGenericType);
+                    Debug.Print("generic {0}", argumentType.IsGenericType);
                 }
                 else
                 {

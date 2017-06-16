@@ -11,7 +11,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    public class PublicAccessService : RepositoryService, IPublicAccessService
+    public class PublicAccessService : ScopeRepositoryService, IPublicAccessService
     {
         public PublicAccessService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
@@ -24,8 +24,9 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<PublicAccessEntry> GetAll()
         {
-            using (var repo = RepositoryFactory.CreatePublicAccessRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
+                var repo = RepositoryFactory.CreatePublicAccessRepository(uow);
                 return repo.GetAll();
             }
         }
@@ -68,9 +69,11 @@ namespace Umbraco.Core.Services
             //start with the deepest id
             ids.Reverse();
 
-            using (var repo = RepositoryFactory.CreatePublicAccessRepository(UowProvider.GetUnitOfWork()))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 //This will retrieve from cache!                 
+                var repo = RepositoryFactory.CreatePublicAccessRepository(uow);
+
                 var entries = repo.GetAll().ToArray();
 
                 foreach (var id in ids)
@@ -122,12 +125,16 @@ namespace Umbraco.Core.Services
         public Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>> AddRule(IContent content, string ruleType, string ruleValue)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreatePublicAccessRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = RepositoryFactory.CreatePublicAccessRepository(uow);
                 var entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null)
+                {
+                    uow.Commit();
                     return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Fail();
+                }
+                    
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
                 if (existingRule == null)
@@ -136,15 +143,14 @@ namespace Umbraco.Core.Services
                 }
                 else
                 {
+                    uow.Commit();
                     //If they are both the same already then there's nothing to update, exit
-                    return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Succeed(
-                        new OperationStatus<PublicAccessEntry, OperationStatusType>(entry, OperationStatusType.Success, evtMsgs));
+                    return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Succeed(new OperationStatus<PublicAccessEntry, OperationStatusType>(entry, OperationStatusType.Success, evtMsgs));
                 }
 
-                if (Saving.IsRaisedEventCancelled(
-                    new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs),
-                    this))
+                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs)))
                 {
+                    uow.Commit();
                     return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Fail(
                         new OperationStatus<PublicAccessEntry, OperationStatusType>(entry, OperationStatusType.FailedCancelledByEvent, evtMsgs));
                 }
@@ -153,7 +159,7 @@ namespace Umbraco.Core.Services
 
                 uow.Commit();
 
-                Saved.RaiseEvent(new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
+                uow.Events.Dispatch(Saved, this, new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs));
                 return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Succeed(
                     new OperationStatus<PublicAccessEntry, OperationStatusType>(entry, OperationStatusType.Success, evtMsgs));
             }
@@ -168,21 +174,28 @@ namespace Umbraco.Core.Services
         public Attempt<OperationStatus> RemoveRule(IContent content, string ruleType, string ruleValue)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreatePublicAccessRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                var repo = RepositoryFactory.CreatePublicAccessRepository(uow);
                 var entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
-                if (entry == null) return Attempt<OperationStatus>.Fail();
+                if (entry == null)
+                {
+                    uow.Commit();
+                    return Attempt<OperationStatus>.Fail();
+                }
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
-                if (existingRule == null) return Attempt<OperationStatus>.Fail();
+                if (existingRule == null)
+                {
+                    uow.Commit();
+                    return Attempt<OperationStatus>.Fail();
+                }
 
                 entry.RemoveRule(existingRule);
 
-                if (Saving.IsRaisedEventCancelled(
-                    new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs),
-                    this))
+                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs)))
                 {
+                    uow.Commit();
                     return OperationStatus.Cancelled(evtMsgs);
                 }
 
@@ -190,7 +203,7 @@ namespace Umbraco.Core.Services
 
                 uow.Commit();
 
-                Saved.RaiseEvent(new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
+                uow.Events.Dispatch(Saved, this, new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs));
                 return OperationStatus.Success(evtMsgs);
             }
 
@@ -203,22 +216,23 @@ namespace Umbraco.Core.Services
         public Attempt<OperationStatus> Save(PublicAccessEntry entry)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            if (Saving.IsRaisedEventCancelled(
-                    new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs),
-                    this))
-            {
-                return OperationStatus.Cancelled(evtMsgs);
-            }
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreatePublicAccessRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs)))
+                {
+                    uow.Commit();
+                    return OperationStatus.Cancelled(evtMsgs);
+                }
+
+                var repo = RepositoryFactory.CreatePublicAccessRepository(uow);
                 repo.AddOrUpdate(entry);
                 uow.Commit();
+                uow.Events.Dispatch(Saved, this, new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs));
+                return OperationStatus.Success(evtMsgs);
             }
 
-            Saved.RaiseEvent(new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
-            return OperationStatus.Success(evtMsgs);
+           
         }
 
         /// <summary>
@@ -228,22 +242,23 @@ namespace Umbraco.Core.Services
         public Attempt<OperationStatus> Delete(PublicAccessEntry entry)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            if (Deleting.IsRaisedEventCancelled(
-                    new DeleteEventArgs<PublicAccessEntry>(entry, evtMsgs),
-                    this))
-            {
-                return OperationStatus.Cancelled(evtMsgs);
-            }
 
-            var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreatePublicAccessRepository(uow))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
+                if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<PublicAccessEntry>(entry, evtMsgs)))
+                {
+                    uow.Commit();
+                    return OperationStatus.Cancelled(evtMsgs);
+                }
+
+                var repo = RepositoryFactory.CreatePublicAccessRepository(uow);
                 repo.Delete(entry);
                 uow.Commit();
+                uow.Events.Dispatch(Deleted, this, new DeleteEventArgs<PublicAccessEntry>(entry, false, evtMsgs));
+                return OperationStatus.Success(evtMsgs);
             }
 
-            Deleted.RaiseEvent(new DeleteEventArgs<PublicAccessEntry>(entry, false, evtMsgs), this);
-            return OperationStatus.Success(evtMsgs);
+            
         }
 
         /// <summary>

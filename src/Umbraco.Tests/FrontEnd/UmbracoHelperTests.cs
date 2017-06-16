@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.FrontEnd
@@ -48,5 +45,38 @@ namespace Umbraco.Tests.FrontEnd
             Assert.AreEqual("Hello world, this is some text <a href='blah'>with&hellip;</a>", result);
         }
 
+        [Test]
+        public void Create_Encrypted_RouteString_From_Anonymous_Object()
+        {
+            var additionalRouteValues = new
+            {
+                key1 = "value1",
+                key2 = "value2",
+                Key3 = "Value3",
+                keY4 = "valuE4"
+        };
+            var encryptedRouteString = UmbracoHelper.CreateEncryptedRouteString("FormController", "FormAction", "", additionalRouteValues);
+            var result = encryptedRouteString.DecryptWithMachineKey();
+            var expectedResult = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
+
+            Assert.AreEqual(expectedResult, result);
+        }
+
+        [Test]
+        public void Create_Encrypted_RouteString_From_Dictionary()
+        {
+            var additionalRouteValues = new Dictionary<string, object>()
+            {
+                {"key1", "value1"},
+                {"key2", "value2"},
+                {"Key3", "Value3"},
+                {"keY4", "valuE4"}
+            };
+            var encryptedRouteString = UmbracoHelper.CreateEncryptedRouteString("FormController", "FormAction", "", additionalRouteValues);
+            var result = encryptedRouteString.DecryptWithMachineKey();
+            var expectedResult = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
+            
+            Assert.AreEqual(expectedResult, result);
+        }
     }
 }

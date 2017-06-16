@@ -14,6 +14,7 @@ body {
     overflow: hidden;
     height: 100%;
     width: 100%;
+    width: ~"(calc(~'100%' - ~'80px'))"; // 80px is the fixed left menu for toggling the different browser sizes
     position: absolute;
     padding: 0;
     margin: 0;
@@ -21,7 +22,6 @@ body {
     font-size: 14px;
     line-height: 20px;
     color: #343434;
-    background-color: #F5F5F5;
     -webkit-transition: all 0.2s ease-in-out;
     -moz-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out;
@@ -271,10 +271,10 @@ a, a:hover{
     height: 100%;
     padding: 0;
     margin-left: -80px;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: "Lato", Helvetica, Arial, sans-serif;
     font-size: 13px;
     line-height: 16px;
-    background: #1D1D1D;
+    background: #413659;
     -webkit-transition: all 0.2s ease-in-out;
     -moz-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out;
@@ -283,8 +283,8 @@ a, a:hover{
 
 .avatar {
     text-align:center;
-    padding: 25px 0 29px 0;
-    border-bottom: 1px solid #343434;
+    padding: 27px 0 29px 0;
+    border-bottom: 1px solid #2E2246;
 }
 
 .help {
@@ -296,7 +296,7 @@ a, a:hover{
     margin: 0;
     font-size: 30px;
     text-align: center;
-    color: #d9d9d9;
+    color: #D8D7D9;
     opacity: 0.4;
     -webkit-transition: all .3s linear;
     -moz-transition: all .3s linear;
@@ -305,7 +305,7 @@ a, a:hover{
 
 ul.sections {
     display: block;
-    background: #1d1d1d;
+    background: #413659;
     height: 100%;
     position:absolute;
     top: 90px;
@@ -321,7 +321,7 @@ ul.sections {
 
 ul.sections li {
     display: block;
-    border-left: 4px #1d1d1d solid;
+    border-left: 4px #413659 solid;
     -webkit-transition: all .3s linear;
     -moz-transition: all .3s linear;
     transition: all .3s linear;
@@ -329,7 +329,7 @@ ul.sections li {
 
 .fix-left-menu ul.sections li a span,
 .fix-left-menu ul.sections li a i {
-    color: #d9d9d9;
+    color: #8d869b;
     -webkit-transition: all .3s linear;
     -moz-transition: all .3s linear;
     transition: all .3s linear;
@@ -343,12 +343,11 @@ ul.sections li a {
     margin: 0 0 0 -4px;
     text-align: center;
     text-decoration: none;
-    border-bottom: 1px solid #343434;
+    border-bottom: 1px solid #2E2246;
 }
 
 ul.sections li a i {
     font-size: 30px;
-    opacity: 0.4;
 }
 
 ul.sections li a span {
@@ -358,8 +357,16 @@ ul.sections li a span {
     opacity: 0.4;
 }
 
+ul.sections li.current {
+    background-color: #2E2246;
+}
+
+ul.sections li.current a i {
+    color: #ffffff;
+}
+
 ul.sections li.current, ul.sections li:hover {
-    border-left: 4px #f57020 solid;
+    border-left: 4px #00AEA2 solid;
 }
 
 .fix-left-menu:hover ul.sections li a span,
@@ -534,7 +541,7 @@ h4.panel-title {
 .field-title {
     float: left;
     margin-right: 10px;
-    font-size: 11px;
+    font-size: 12px;
     color: #d9d9d9;
 }
 
@@ -652,7 +659,7 @@ h4.panel-title {
     padding: 0;
     margin-top: -9px;
     margin-right: 1px;
-    font-size: 11px;
+    font-size: 12px;
     color: #d9d9d9;
     text-align: right;
     background-color: transparent;
@@ -685,7 +692,7 @@ h4.panel-title {
 }
 
 .canvasdesigner select {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .canvasdesigner .sp-dd {
@@ -795,7 +802,7 @@ h4.panel-title {
     background-color: #ffffff;
     border-radius: 10px;
     opacity: 1.0;
-    box-shadow: 0 0 0 29px #ECECEC, 0 0 0 30px #C4C4C4;
+    box-shadow: 0 0 0 29px #E9E9EB, 0 0 0 30px #D8D7D9;
     transition: all 0.5s ease-in-out;
 }
 

@@ -26,7 +26,8 @@ namespace umbraco.presentation.developer.packages
     /// <summary>
     /// Summary description for packager.
     /// </summary>
-    public partial class Installer : UmbracoEnsuredPage
+    [Obsolete("This should not be used and will be removed in v8, this is kept here only for backwards compat reasons, this page should never be rendered/used")]
+    public class Installer : UmbracoEnsuredPage
     {
         public Installer()
         {
@@ -133,7 +134,7 @@ namespace umbraco.presentation.developer.packages
         protected void fetchProtectedPackage(object sender, EventArgs e)
         {
             //we auth against the webservice. This key will be used to fetch the protected package.
-            string memberGuid = _repo.Webservice.authenticate(tb_email.Text, library.md5(tb_password.Text));
+            string memberGuid = _repo.Webservice.authenticate(tb_email.Text, library.CreateHash(tb_password.Text));
 
             //if we auth correctly and get a valid key back, we will fetch the file from the repo webservice.
             if (string.IsNullOrEmpty(memberGuid) == false)

@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Web;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 
@@ -86,15 +80,15 @@ namespace Umbraco.Core.IO
         private void Initialize()
         {
             Filename = _fs.GetFileName(Path);
-            Extension = _fs.GetExtension(Path) != null
-                ? _fs.GetExtension(Path).Substring(1).ToLowerInvariant()
+            var ext = _fs.GetExtension(Path);
+            Extension = string.IsNullOrEmpty(ext) == false
+                ? ext.TrimStart('.').ToLowerInvariant()
                 : "";
             Url = _fs.GetUrl(Path);
+
             Exists = _fs.FileExists(Path);
             if (Exists == false)
-            {
                 LogHelper.Warn<UmbracoMediaFile>("The media file doesn't exist: " + Path);
-            }
         }
 
         public bool Exists { get; private set; }
@@ -117,27 +111,15 @@ namespace Umbraco.Core.IO
         {
             get
             {
-                if (_length == null)
-                {
-                    if (Exists)
-                    {
-                        _length = _fs.GetSize(Path);
-                    }
-                    else
-                    {
-                        _length = -1;
-                    }
-                }
+                if (_length.HasValue) return _length.Value;
+                _length = Exists ? _fs.GetSize(Path) : -1;
                 return _length.Value;
             }
         }
 
         public bool SupportsResizing
         {
-            get
-            {
-                return UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.InvariantContains(Extension);
-            }
+            get { return _fs.IsImageFile(Extension); }
         }
 
         public string GetFriendlyName()
@@ -147,67 +129,49 @@ namespace Umbraco.Core.IO
 
         public Size GetDimensions()
         {
-            if (_size == null)
-            {
-                if (_fs.FileExists(Path))
-                {
-                    EnsureFileSupportsResizing();
+            if (_size.HasValue) return _size.Value;
 
-                    using (var fs = _fs.OpenFile(Path))
-                    {
-                        _size = ImageHelper.GetDimensions(fs);
-                    }
-                }
-                else
+            if (_fs.FileExists(Path))
+            {
+                EnsureFileSupportsResizing();
+
+                using (var fs = _fs.OpenFile(Path))
                 {
-                    _size = new Size(-1, -1);
+                    _size = _fs.GetDimensions(fs);
                 }
             }
+            else
+            {
+                _size = new Size(-1, -1);
+            }
+
             return _size.Value;
         }
 
         public string Resize(int width, int height)
         {
-            if (Exists)
-            {
-                EnsureFileSupportsResizing();
+            if (Exists == false) return string.Empty;
 
-                var fileNameThumb = DoResize(width, height, -1, string.Empty);
-
-                return _fs.GetUrl(fileNameThumb);
-            }
-            return string.Empty;
+            EnsureFileSupportsResizing();
+            var filepath = Resize(width, height, -1, string.Empty);
+            return _fs.GetUrl(filepath);
         }
 
         public string Resize(int maxWidthHeight, string fileNameAddition)
         {
-            if (Exists)
-            {
-                EnsureFileSupportsResizing();
+            if (Exists == false) return string.Empty;
 
-                var fileNameThumb = DoResize(-1, -1, maxWidthHeight, fileNameAddition);
-
-                return _fs.GetUrl(fileNameThumb);
-            }
-            return string.Empty;
+            EnsureFileSupportsResizing();
+            var filepath = Resize(-1, -1, maxWidthHeight, fileNameAddition);
+            return _fs.GetUrl(filepath);
         }
 
-        private string DoResize(int width, int height, int maxWidthHeight, string fileNameAddition)
+        private string Resize(int width, int height, int maxWidthHeight, string sizeName)
         {
-            using (var fs = _fs.OpenFile(Path))
+            using (var filestream = _fs.OpenFile(Path))
+            using (var image = Image.FromStream(filestream))
             {
-                using (var image = Image.FromStream(fs))
-                {
-                    var fileNameThumb = string.IsNullOrWhiteSpace(fileNameAddition)
-                        ? string.Format("{0}_UMBRACOSYSTHUMBNAIL." + Extension, Path.Substring(0, Path.LastIndexOf(".", StringComparison.Ordinal)))
-                        : string.Format("{0}_{1}." + Extension, Path.Substring(0, Path.LastIndexOf(".", StringComparison.Ordinal)), fileNameAddition);
-
-                    var thumbnail = maxWidthHeight == -1
-                        ? ImageHelper.GenerateThumbnail(image, width, height, fileNameThumb, Extension, _fs)
-                        : ImageHelper.GenerateThumbnail(image, maxWidthHeight, fileNameThumb, Extension, _fs);
-
-                    return thumbnail.FileName;
-                }
+                return _fs.GenerateResized(image, Path, sizeName, maxWidthHeight, width, height).Filepath;
             }
         }
 
@@ -216,7 +180,5 @@ namespace Umbraco.Core.IO
             if (SupportsResizing == false)
                 throw new InvalidOperationException(string.Format("The file {0} is not an image, so can't get dimensions", Filename));
         }
-
-
     }
 }

@@ -19,7 +19,11 @@ namespace Umbraco.Web.WebServices
         public JsonResult Index()
         {
             if (_isPublishingRunning)
+            {
+                Logger.Debug<ScheduledPublishController>(() => "Scheduled publishing is currently executing this request will exit");
                 return null;
+            }
+                
             _isPublishingRunning = true;
 
             try
@@ -28,7 +32,8 @@ namespace Umbraco.Web.WebServices
                 if (content.Instance.isInitializing == false)
                 {
                     var publisher = new ScheduledPublisher(Services.ContentService);
-                    publisher.CheckPendingAndProcess();
+                    var count = publisher.CheckPendingAndProcess();
+                    Logger.Debug<ScheduledPublishController>(() => string.Format("The scheduler processed {0} items", count));
                 }
 
                 return Json(new
@@ -39,7 +44,17 @@ namespace Umbraco.Web.WebServices
             }
             catch (Exception ee)
             {
-                LogHelper.Error<ScheduledPublishController>("Error executing scheduled task", ee);
+                var errorMessage = "Error executing scheduled task";
+                if (HttpContext != null && HttpContext.Request != null)
+                {
+                    if (HttpContext.Request.Url != null)
+                        errorMessage = string.Format("{0} | Request to {1}", errorMessage, HttpContext.Request.Url);
+                    if (HttpContext.Request.UserHostAddress != null)
+                        errorMessage = string.Format("{0} | Coming from {1}", errorMessage, HttpContext.Request.UserHostAddress);
+                    if (HttpContext.Request.UrlReferrer != null)
+                        errorMessage = string.Format("{0} | Referrer {1}", errorMessage, HttpContext.Request.UrlReferrer);    
+                }
+                LogHelper.Error<ScheduledPublishController>(errorMessage, ee);
 
                 Response.StatusCode = 400; 
 

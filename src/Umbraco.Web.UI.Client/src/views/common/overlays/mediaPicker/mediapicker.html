@@ -10,13 +10,18 @@
 
       <div class="umb-control-group umb-mediapicker-upload">
 
+         <umb-load-indicator
+            ng-if="loading">
+         </umb-load-indicator>
+
          <div class="form-search">
             <i class="icon-search"></i>
             <input
-                class="umb-search-field search-query"
-                ng-model="searchTerm"
+                class="umb-search-field search-query -full-width-input"
+                ng-model="searchOptions.filter"
                 localize="placeholder"
-                placeholder="@placeholders_filter"
+                placeholder="@placeholders_search"
+                ng-change="changeSearch()"
                 type="text">
          </div>
 
@@ -32,7 +37,7 @@
 
       </div>
 
-      <div class="row umb-control-group">
+      <div class="row umb-control-group" ng-show="!searchOptions.filter">
          <ul class="umb-breadcrumbs">
             <li ng-hide="startNodeId != -1" class="umb-breadcrumbs__ancestor">
                <a href ng-click="gotoFolder()" prevent-default>Media</a>
@@ -59,22 +64,24 @@
                   focus-when="{{showFolderInput}}" />
                </li>
           </ul>
-
+          <div class="umb-loader" ng-if="creatingFolder"></div>
       </div>
 
       <umb-file-dropzone
+         ng-if="acceptedMediatypes.length > 0 && !loading"
+         accepted-mediatypes="acceptedMediatypes"
          parent-id="{{currentFolder.id}}"
          files-uploaded="onUploadComplete"
          files-queued="onFilesQueue"
          accept="{{acceptedFileTypes}}"
          max-file-size="{{maxFileSize}}"
-         hide-dropzone="{{!activeDrag && images.length > 0 }}"
+         hide-dropzone="{{!activeDrag && images.length > 0 || searchOptions.filter }}"
          compact="{{ images.length > 0 }}">
       </umb-file-dropzone>
 
       <umb-media-grid
+         ng-if="!loading"
          items="images"
-         filter-by="searchTerm"
          on-click="clickHandler"
          on-click-name="clickItemName"
          item-max-width="150"
@@ -83,6 +90,21 @@
          item-min-height="100"
          only-images={{onlyImages}}>
       </umb-media-grid>
+
+        <div class="flex justify-center">
+            <umb-pagination
+                ng-if="searchOptions.totalPages > 0 && !loading"
+                page-number="searchOptions.pageNumber"
+                total-pages="searchOptions.totalPages"
+                on-change="changePagination(pageNumber)">
+            </umb-pagination>
+        </div>
+
+        <umb-empty-state
+            ng-if="searchOptions.filter && images.length === 0 && !loading"
+            position="center">
+            <localize key="general_searchNoResult"></localize>
+        </umb-empty-state>
 
    </div>
 

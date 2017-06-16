@@ -29,9 +29,10 @@ using System.Security.Permissions;
 [assembly: InternalsVisibleTo("umbraco.webservices")]
 [assembly: InternalsVisibleTo("umbraco.datalayer")]
 [assembly: InternalsVisibleTo("umbraco.MacroEngines")]
-
+[assembly: InternalsVisibleTo("umbraco.providers")]
 [assembly: InternalsVisibleTo("umbraco.editorControls")]
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
+[assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]
 [assembly: InternalsVisibleTo("Umbraco.Core")]
 [assembly: InternalsVisibleTo("Umbraco.Web")]
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]
@@ -41,7 +42,14 @@ using System.Security.Permissions;
 [assembly: InternalsVisibleTo("Umbraco.VisualStudio")]
 [assembly: InternalsVisibleTo("Umbraco.Courier.Core")]
 [assembly: InternalsVisibleTo("Umbraco.Courier.Persistence")]
-[assembly: InternalsVisibleTo("umbraco.providers")]
+
+[assembly: InternalsVisibleTo("Umbraco.Deploy")]
+[assembly: InternalsVisibleTo("Umbraco.Deploy.UI")]
+[assembly: InternalsVisibleTo("Umbraco.Deploy.Cloud")]
+
+[assembly: InternalsVisibleTo("Umbraco.Forms.Core")]
+[assembly: InternalsVisibleTo("Umbraco.Forms.Core.Providers")]
+[assembly: InternalsVisibleTo("Umbraco.Forms.Web")]
 
 //allow this to be mocked in our unit tests
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

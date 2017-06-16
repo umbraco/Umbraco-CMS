@@ -9,9 +9,10 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal class MemberTypeReadOnlyFactory 
     {
-        public IMemberType BuildEntity(MemberTypeReadOnlyDto dto)
+        public IMemberType BuildEntity(MemberTypeReadOnlyDto dto, out bool needsSaving)
         {
             var standardPropertyTypes = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            needsSaving = false;
 
             var memberType = new MemberType(dto.ParentId);
 
@@ -47,6 +48,12 @@ namespace Umbraco.Core.Persistence.Factories
                 {
                     if (dto.PropertyTypes.Any(x => x.Alias.Equals(standardPropertyType.Key))) continue;
 
+                    // beware!
+                    // means that we can return a memberType "from database" that has some property types
+                    // that do *not* come from the database and therefore are incomplete eg have no key,
+                    // no id, no dataTypeDefinitionId - ouch! - better notify caller of the situation
+                    needsSaving = true;
+
                     //Add the standard PropertyType to the current list
                     propertyTypes.Add(standardPropertyType.Value);
 
@@ -79,7 +86,7 @@ namespace Umbraco.Core.Persistence.Factories
                 {
                     // note: no idea why Id is nullable here, but better check
                     if (groupDto.Id.HasValue == false)
-                        throw new Exception("oops: groupDto.Id has no value.");
+                        throw new Exception("GroupDto.Id has no value.");
                     group.Id = groupDto.Id.Value;
                 }
 

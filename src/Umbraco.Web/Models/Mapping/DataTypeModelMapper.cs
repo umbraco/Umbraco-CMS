@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AutoMapper;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.PropertyEditors;
@@ -34,6 +35,7 @@ namespace Umbraco.Web.Models.Mapping
             };
 
             config.CreateMap<PropertyEditor, DataTypeBasic>()
+                .ForMember(x => x.Udi, expression => expression.Ignore())
                 .ForMember(x => x.HasPrevalues, expression => expression.Ignore())
                 .ForMember(x => x.IsSystemDataType, expression => expression.Ignore())
                 .ForMember(x => x.Id, expression => expression.Ignore())
@@ -44,6 +46,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
             config.CreateMap<IDataTypeDefinition, DataTypeBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.DataType, content.Key)))
                 .ForMember(x => x.HasPrevalues, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
@@ -61,7 +64,8 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             config.CreateMap<IDataTypeDefinition, DataTypeDisplay>()
-                .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing<AvailablePropertyEditorsResolver>())
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.DataType, content.Key)))
+                .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing(new AvailablePropertyEditorsResolver(UmbracoConfig.For.UmbracoSettings().Content)))
                 .ForMember(display => display.PreValues, expression => expression.ResolveUsing(
                     new PreValueDisplayResolver(lazyDataTypeService)))
                 .ForMember(display => display.SelectedEditor, expression => expression.MapFrom(
@@ -98,12 +102,13 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(definition => definition.Key, expression => expression.Ignore())
                 .ForMember(definition => definition.Path, expression => expression.Ignore())
                 .ForMember(definition => definition.PropertyEditorAlias, expression => expression.MapFrom(save => save.SelectedEditor))
-                .ForMember(definition => definition.DatabaseType, expression => expression.ResolveUsing<DatabaseTypeResolver>())
+                .ForMember(definition => definition.DatabaseType, expression => expression.ResolveUsing(new DatabaseTypeResolver()))
                 .ForMember(x => x.ControlId, expression => expression.Ignore())
                 .ForMember(x => x.CreatorId, expression => expression.Ignore())
                 .ForMember(x => x.Level, expression => expression.Ignore())
                 .ForMember(x => x.SortOrder, expression => expression.Ignore())
                 .ForMember(x => x.CreateDate, expression => expression.Ignore())
+                .ForMember(x => x.DeletedDate, expression => expression.Ignore())
                 .ForMember(x => x.UpdateDate, expression => expression.Ignore());
 
             //Converts a property editor to a new list of pre-value fields - used when creating a new data type or changing a data type with new pre-vals

@@ -17,7 +17,7 @@
     </div>
   </div>
 
-  <div class="umb-keyboard-shortcuts-overview__overlay" ng-if="shortcutOverlay">
+  <div class="umb-keyboard-shortcuts-overview__overlay" ng-if="showOverlay">
 
     <a href="" class="umb-keyboard-shortcuts-overview__overlay-close" ng-click="toggleShortcutsOverlay()" data-hotkey="esc" hotkey-when-hidden="true">
       <i class="icon-delete"></i>
@@ -35,7 +35,7 @@
             <div class="umb-keyboard-shortcuts-overview__description">{{ keyboardShortcut.description }}</div>
             <div class="umb-keyboard-keys">
 
-              <div ng-repeat="key in keyboardShortcut.keys">
+              <div ng-repeat="key in keyboardShortcut.platformKeys">
 
                 <div class="umb-keyboard-key-wrapper">
                   <div class="umb-keyboard-key">{{ key.key }}</div>

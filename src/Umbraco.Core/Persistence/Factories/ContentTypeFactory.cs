@@ -122,7 +122,7 @@ namespace Umbraco.Core.Persistence.Factories
             else if (entity is IMemberType)
                 nodeObjectType = Constants.ObjectTypes.MemberTypeGuid;
             else
-                throw new Exception("oops: invalid entity.");
+                throw new Exception("Invalid entity.");
 
             var contentTypeDto = new ContentTypeDto
             {

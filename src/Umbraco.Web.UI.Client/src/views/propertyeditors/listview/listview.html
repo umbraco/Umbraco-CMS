@@ -17,7 +17,7 @@
                            <span class="caret"></span>
                        </a>
                        <ul class="dropdown-menu">
-                           <li ng-repeat="contentType in listViewAllowedTypes">
+                           <li ng-repeat="contentType in listViewAllowedTypes | orderBy:'name':false">
                                <a href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{contentType.alias}}&create=true">
                                    <i class="icon-{{contentType.cssClass}}"></i>
                                    {{contentType.name}}
@@ -136,7 +136,7 @@
                        ng-if="options.allowBulkDelete && (buttonPermissions == null || buttonPermissions.canDelete)"
                        type="button"
                        button-style="link"
-                       label="Delete"              
+                       label="Delete"
                        label-key="actions_delete"
                        icon="icon-trash"
                        action="delete()"
@@ -157,19 +157,21 @@
          selection="selection"
          options="options"
          entity-type="{{entityType}}"
-         on-get-content="reloadView">
+         on-get-content="getContent">
       </umb-list-view-layout>
 
       <umb-load-indicator ng-show="!viewLoaded"></umb-load-indicator>
 
-      <umb-pagination
-         ng-if="listViewResultSet.totalPages"
-         page-number="options.pageNumber"
-         total-pages="listViewResultSet.totalPages"
-         on-next="next"
-         on-prev="prev"
-         on-go-to-page="goToPage">
-      </umb-pagination>
+      <div class="flex justify-center">
+          <umb-pagination
+             ng-if="listViewResultSet.totalPages"
+             page-number="options.pageNumber"
+             total-pages="listViewResultSet.totalPages"
+             on-next="next"
+             on-prev="prev"
+             on-go-to-page="goToPage">
+          </umb-pagination>
+      </div>
 
     </div>
 

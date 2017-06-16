@@ -101,7 +101,12 @@ namespace Umbraco.Web
         /// Add a serialised date of the last edit of the item to ensure client cache refresh when updated
         /// </param>
         /// <param name="furtherOptions">
-        /// The further options.
+        /// These are any query string parameters (formatted as query strings) that ImageProcessor supports. For example:
+        /// <example>
+        /// <![CDATA[
+        /// furtherOptions: "&bgcolor=fff"
+        /// ]]>
+        /// </example>
         /// </param>
         /// <param name="ratioMode">
         /// Use a dimension as a ratio
@@ -113,7 +118,7 @@ namespace Umbraco.Web
         /// <param name="htmlEncode">
         /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be 
         /// set to false if using the result of this method for CSS.
-        /// </param>
+        /// </param>        
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -177,7 +182,12 @@ namespace Umbraco.Web
         /// Add a serialised date of the last edit of the item to ensure client cache refresh when updated
         /// </param>
         /// <param name="furtherOptions">
-        /// The further options.
+        /// These are any query string parameters (formatted as query strings) that ImageProcessor supports. For example:
+        /// <example>
+        /// <![CDATA[
+        /// furtherOptions: "&bgcolor=fff"
+        /// ]]>
+        /// </example>
         /// </param>
         /// <param name="ratioMode">
         /// Use a dimension as a ratio
@@ -189,7 +199,7 @@ namespace Umbraco.Web
         /// <param name="htmlEncode">
         /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be 
         /// set to false if using the result of this method for CSS.
-        /// </param>
+        /// </param>        
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -334,6 +344,23 @@ namespace Umbraco.Web
             return url.SurfaceAction(action, typeof (T), additionalRouteVals);
         }
 
+        /// <summary>
+        /// Generates a Absolute Media Item URL based on the current context
+        /// </summary>
+        /// <param name="urlHelper"></param>
+        /// <param name="mediaItem"></param>
+        /// <returns></returns>
+        public static string GetAbsoluteMediaUrl(this UrlHelper urlHelper, IPublishedContent mediaItem)
+        {
+            if (urlHelper == null) throw new ArgumentNullException("urlHelper");
+            if (mediaItem == null) throw new ArgumentNullException("mediaItem");
 
+            if (urlHelper.RequestContext.HttpContext.Request.Url != null)
+            {
+                var requestUrl = urlHelper.RequestContext.HttpContext.Request.Url.GetLeftPart(UriPartial.Authority);
+                return string.Format("{0}{1}", requestUrl, mediaItem.Url);
+            }
+            return null;
+        }
     }
 }

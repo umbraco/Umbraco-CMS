@@ -38,6 +38,15 @@ namespace umbraco.presentation.developer.packages {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::umbraco.uicontrols.PropertyPanel pp_name;
+
+        protected global::umbraco.uicontrols.PropertyPanel pp_icon;
+        protected global::umbraco.uicontrols.PropertyPanel pp_umbracoVersion;
+        protected global::System.Web.UI.WebControls.TextBox iconUrl;
+        protected global::System.Web.UI.WebControls.TextBox umbracoVersion;
+        protected global::umbraco.uicontrols.Pane Pane5;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator VersionValidator;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator7;
+
         
         /// <summary>
         /// packageName control.
@@ -119,15 +128,6 @@ namespace umbraco.presentation.developer.packages {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::umbraco.uicontrols.PropertyPanel pp_file;
-        
-        /// <summary>
-        /// bt_submitButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button bt_submitButton;
         
         /// <summary>
         /// packageUmbFile control.

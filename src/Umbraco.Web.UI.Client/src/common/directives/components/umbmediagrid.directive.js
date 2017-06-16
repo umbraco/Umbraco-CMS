@@ -134,10 +134,43 @@ Use this directive to generate a thumbnail grid of media items.
             }
 
             function setItemData(item) {
-                item.isFolder = !mediaHelper.hasFilePropertyType(item);
+
+                // check if item is a folder
+                if(item.image) {
+                    // if is has an image path, it is not a folder
+                    item.isFolder = false;
+                } else {
+                    item.isFolder = !mediaHelper.hasFilePropertyType(item);
+                }
+
                 if (!item.isFolder) {
-                    item.thumbnail = mediaHelper.resolveFile(item, true);
-                    item.image = mediaHelper.resolveFile(item, false);
+                    
+                    // handle entity
+                    if(item.image) {
+                        item.thumbnail = mediaHelper.resolveFileFromEntity(item, true);
+                        item.extension = mediaHelper.getFileExtension(item.image);
+                    // handle full media object
+                    } else {
+                        item.thumbnail = mediaHelper.resolveFile(item, true);
+                        item.image = mediaHelper.resolveFile(item, false);
+                        
+                        var fileProp = _.find(item.properties, function (v) {
+                            return (v.alias === "umbracoFile");
+                        });
+
+                        if (fileProp && fileProp.value) {
+                            item.file = fileProp.value;
+                        }
+
+                        var extensionProp = _.find(item.properties, function (v) {
+                            return (v.alias === "umbracoExtension");
+                        });
+
+                        if (extensionProp && extensionProp.value) {
+                            item.extension = extensionProp.value;
+                        }
+
+                    }
                 }
             }
 
@@ -231,6 +264,7 @@ Use this directive to generate a thumbnail grid of media items.
             scope.clickItem = function(item, $event, $index) {
                 if (scope.onClick) {
                     scope.onClick(item, $event, $index);
+                    $event.stopPropagation();
                 }
             };
 

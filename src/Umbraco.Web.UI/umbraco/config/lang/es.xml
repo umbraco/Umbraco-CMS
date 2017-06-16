@@ -191,6 +191,34 @@
     <key alias="unsavedChanges">You have unsaved changes</key>
     <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
   </area>
+  <area alias="bulk">
+    <key alias="done">Done</key>
+
+    <key alias="deletedItem">Deleted %0% item</key>
+    <key alias="deletedItems">Deleted %0% items</key>
+    <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
+    <key alias="deletedItemOfItems">Deleted %0% out of %1% items</key>
+
+    <key alias="publishedItem">Published %0% item</key>
+    <key alias="publishedItems">Published %0% items</key>
+    <key alias="publishedItemOfItem">Published %0% out of %1% item</key>
+    <key alias="publishedItemOfItems">Published %0% out of %1% items</key>
+
+    <key alias="unpublishedItem">Unpublished %0% item</key>
+    <key alias="unpublishedItems">Unpublished %0% items</key>
+    <key alias="unpublishedItemOfItem">Unpublished %0% out of %1% item</key>
+    <key alias="unpublishedItemOfItems">Unpublished %0% out of %1% items</key>
+
+    <key alias="movedItem">Moved %0% item</key>
+    <key alias="movedItems">Moved %0% items</key>
+    <key alias="movedItemOfItem">Moved %0% out of %1% item</key>
+    <key alias="movedItemOfItems">Moved %0% out of %1% items</key>
+
+    <key alias="copiedItem">Copied %0% item</key>
+    <key alias="copiedItems">Copied %0% items</key>
+    <key alias="copiedItemOfItem">Copied %0% out of %1% item</key>
+    <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
+  </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Nombre</key>
     <key alias="assignDomain">Administrar dominios</key>
@@ -249,6 +277,7 @@
     <key alias="entername">Escribe un nombre...</key>
     <key alias="search">Escribe tu búsqueda...</key>
     <key alias="filter">Escribe para filtrar resultados...</key>
+    <key alias="usernameHint">Tu nombre de usuario normalmente es tu e-mail</key>
   </area>
   <area alias="editcontenttype">
   <key alias="allowAtRoot" version="7.2">Permitir en nodo raíz</key>
@@ -568,7 +597,7 @@
   <area alias="publicAccess">
     <key alias="paAdvanced">Proteccion basada en roles</key>
     <key alias="paAdvancedHelp"><![CDATA[Si desea controlar el acceso a la página usando autenticación basada en roles,<br /> usando los grupos de miembros de Umbraco.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Necesita crear un grupo de miembros antes de poder usar <br /> autenticación basada en roles.]]></key>
+    <key alias="paAdvancedNoGroups">Necesita crear un grupo de miembros antes de poder usar autenticación basada en roles</key>
     <key alias="paErrorPage">Página de error</key>
     <key alias="paErrorPageHelp">Usada cuando alguien hace login, pero no tiene acceso</key>
     <key alias="paHowWould">Elija cómo restringir el acceso a esta página</key>

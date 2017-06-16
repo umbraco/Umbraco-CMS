@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Publishing;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
@@ -49,19 +50,20 @@ namespace Umbraco.Tests.Persistence
             //disable cache
             var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
-
+            var dbFactory = new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, _logger);
+            var scopeProvider = new ScopeProvider(dbFactory);
             var dbContext = new DatabaseContext(
-                new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, _logger),
-                _logger, SqlSyntaxProvider, "System.Data.SqlServerCe.4.0");
+                scopeProvider,
+                _logger, SqlSyntaxProvider, Constants.DatabaseProviders.SqlCe);
 
-            var repositoryFactory = new RepositoryFactory(cacheHelper, _logger, SqlSyntaxProvider, SettingsForTests.GenerateMockSettings());
+            var repositoryFactory = new RepositoryFactory(cacheHelper, _logger, SqlSyntaxProvider, SettingsForTests.GenerateMockSettings());            
 
             var evtMsgs = new TransientMessagesFactory();
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
                 dbContext,
                 //assign the service context
-                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(_logger), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, _logger), cacheHelper, _logger, evtMsgs),
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(scopeProvider), cacheHelper, _logger, evtMsgs),
                 cacheHelper,
                 new ProfilingLogger(_logger, Mock.Of<IProfiler>()))
                 {
@@ -575,31 +577,6 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 DatabaseSchemaHelper.CreateTable<TaskTypeDto>();
-
-                //transaction.Complete();
-            }
-        }
-
-        [Test]
-        public void Can_Create_umbracoDeployDependency_Table()
-        {
-
-            using (Transaction transaction = Database.GetTransaction())
-            {
-                DatabaseSchemaHelper.CreateTable<UmbracoDeployChecksumDto>();
-                DatabaseSchemaHelper.CreateTable<UmbracoDeployDependencyDto>();
-
-                //transaction.Complete();
-            }
-        }
-
-        [Test]
-        public void Can_Create_umbracoDeployChecksum_Table()
-        {
-
-            using (Transaction transaction = Database.GetTransaction())
-            {
-                DatabaseSchemaHelper.CreateTable<UmbracoDeployChecksumDto>();
 
                 //transaction.Complete();
             }

@@ -1,63 +1,31 @@
-//
-//     Install local package
-//
+/*
+
+    Install local package
+
+*/
 
 // Helpers
 .faded {
-    color: @grayMed;
-}
-
-.inline-flex {
-    display: inline-flex;
-}
-
-.mt-3 {
-    margin-top: 30px;
-}
-
-// Upload state
-
-.umb-upload-local,
-.umb-info-local {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-.umb-upload-local form,
-.umb-info-local-items {
-    display: flex;
-    flex-direction: column;
-
-    justify-content: center;
-    align-items: center;
-
-    margin: 0;
-
-    max-width: 640px;
+    color: @gray-5;
 }
 
 .umb-upload-local__dropzone {
     position: relative;
     width: 500px;
     height: 300px;
-    border: 2px dashed @grayLight;
+    border: 2px dashed @gray-8;
     border-radius: 3px;
-    background: @grayLighter;
-
+    background: @gray-10;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
     margin-bottom: 30px;
-
     transition: 100ms box-shadow ease, 100ms border ease;
 
     &:hover,
     &.drag-over {
-        border-color: @blue;
+        border-color: @turquoise;
         border-style: solid;
         box-shadow: 0 3px 8px rgba(0,0,0, .1);
         transition: 100ms box-shadow ease, 100ms border ease;
@@ -66,23 +34,25 @@
 
 .umb-upload-local__dropzone i {
     display: block;
-    color: @grayLight;
+    color: @gray-8;
     font-size: 110px;
     line-height: 1;
 }
 
 .umb-upload-local__select-file {
     font-weight: bold;
-    color: @blue;
+    color: @turquoise-d1;
     cursor: pointer;
-}
 
+    &:hover {
+        text-decoration: underline;
+    }
+}
 
 // Accept terms
 .umb-accept-terms {
     display: flex;
     align-items: center;
-
     font-size: 13px;
 }
 
@@ -98,24 +68,21 @@
 .umb-package-installer-label {
     display: inline-flex;
     align-items: center;
-
     font-size: 13px;
     user-select: none;
 }
 
-
 // Info state
 .umb-info-local-items {
-    border: 2px solid @grayLight;
+    border: 2px solid @gray-8;
     border-radius: 3px;
-    background: @grayLighter;
-
+    background: @gray-10;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
     margin: 0 20px;
+    width: 100%;
     max-width: 540px;
 }
 
@@ -127,9 +94,6 @@
     }
 }
 
-.umb-info-local-item {
-    margin-bottom: 20px;
-}
 
 .umb-info-local-items .umb-package-icon {
     width: 100%;
@@ -148,6 +112,10 @@
     padding: 20px 40px;
 }
 
-.umb-info-local-items .umb-package-installer-label {
-    margin-left: 10px;
+.umb-info-local-item {
+    margin-bottom: 20px;
+}
+
+.umb-upload-local__dropzone .umb-info-local-item {
+    margin:20px;
 }

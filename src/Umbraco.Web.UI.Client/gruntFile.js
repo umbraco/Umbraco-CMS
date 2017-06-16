@@ -11,17 +11,17 @@ module.exports = function (grunt) {
     //TODO: Too much watching, this brings windows to it's knees when in dev mode
     //run by the watch task
     grunt.registerTask('watch-js', ['jshint:dev', 'concat', 'copy:app', 'copy:mocks', 'copy:canvasdesigner', 'copy:vs', 'karma:unit']);
-    grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:canvasdesigner', 'postcss', 'copy:canvasdesigner', 'copy:assets', 'copy:vs']);
+    grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:nonodes', 'recess:canvasdesigner', 'postcss', 'copy:canvasdesigner', 'copy:assets', 'copy:vs']);
     grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
     grunt.registerTask('watch-installer', ['concat:install', 'concat:installJs', 'copy:installer', 'copy:vs']);
     grunt.registerTask('watch-canvasdesigner', ['copy:canvasdesigner', 'concat:canvasdesignerJs', 'copy:vs']);
     grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
     //triggered from grunt
-    grunt.registerTask('build', ['concat', 'recess:build', 'recess:installer', 'recess:canvasdesigner', 'postcss', 'bower-install-simple', 'bower', 'copy', 'clean:post']);
+    grunt.registerTask('build', ['concat', 'recess:build', 'recess:installer', 'recess:nonodes', 'recess:canvasdesigner', 'postcss', 'bower-install-simple', 'bower', 'copy', 'clean:post']);
 
     //triggered from grunt dev vs or grunt vs
-    grunt.registerTask('build-dev', ['clean:pre', 'concat', 'recess:build', 'recess:installer', 'postcss', 'bower-install-simple', 'bower', 'copy']);
+    grunt.registerTask('build-dev', ['clean:pre', 'concat', 'recess:build', 'recess:installer', 'recess:nonodes', 'postcss', 'bower-install-simple', 'bower', 'copy']);
 
     //utillity tasks
     grunt.registerTask('docs', ['ngdocs']);
@@ -293,6 +293,16 @@ module.exports = function (grunt) {
                     compress: true
                 }
             },
+            nonodes: {
+                files: {
+                    '<%= distdir %>/assets/css/nonodes.style.min.css':
+                    ['src/less/pages/nonodes.less']
+                },
+                options: {
+                    compile: true,
+                    compress: true
+                }
+            },
             installer: {
                 files: {
                     '<%= distdir %>/assets/css/installer.css':
@@ -394,7 +404,7 @@ module.exports = function (grunt) {
             tutorials: {
                 src: [],
                 title: ''
-            }            
+            }
         },
 
         eslint:{
@@ -484,11 +494,16 @@ module.exports = function (grunt) {
                             files: ['css/font-awesome.min.css', 'fonts/*']
                         },
                         "jquery": {
-                            files: ['jquery.min.js', 'jquery.min.map']
+                            keepExpandedHierarchy: false,
+                            files: ['dist/jquery.min.js', 'dist/jquery.min.map']
                         },
                         'jquery-ui': {
                             keepExpandedHierarchy: false,
                             files: ['jquery-ui.min.js']
+                        },
+                        'jquery-migrate': {
+                            keepExpandedHierarchy: false,
+                            files: ['jquery-migrate.min.js']
                         },
                         'tinymce': {
                             files: ['plugins/**', 'themes/**', 'tinymce.min.js']
@@ -519,7 +534,26 @@ module.exports = function (grunt) {
                                 'addon/selection/*',
                                 'addon/dialog/*'
                             ]
-                        }
+                        },
+                        'ace-builds': {
+                           files: [
+                                'src-min-noconflict/ace.js',
+                                
+                                'src-min-noconflict/ext-language_tools.js',
+                                'src-min-noconflict/ext-searchbox.js',
+                                'src-min-noconflict/ext-settings_menu.js',
+
+                                'src-min-noconflict/snippets/text.js',
+                                'src-min-noconflict/snippets/javascript.js',
+                                
+                                'src-min-noconflict/theme-chrome.js',
+                                
+                                'src-min-noconflict/mode-razor.js',
+                                'src-min-noconflict/mode-javascript.js',
+                                
+                                'src-min-noconflict/worker-javascript.js',
+                            ]
+                       }
                     }
                 }
             },

@@ -34,7 +34,7 @@ namespace umbraco.dialogs
         protected void Page_Load(object sender, EventArgs e)
         {
             Button1.Text = ui.Text("update");
-            pane_form.Text = "Set permissions for the page " + _node.Text;
+            pane_form.Text = ui.Text("actions", "SetPermissionsForThePage",_node.Text); 
         }
 
         override protected void OnInit(EventArgs e)

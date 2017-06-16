@@ -22,6 +22,7 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
@@ -39,6 +40,7 @@ using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.WebServices;
 using Umbraco.Core.Services;
+using Umbraco.Web.Security;
 using Action = umbraco.BusinessLogic.Actions.Action;
 using Constants = Umbraco.Core.Constants;
 
@@ -47,11 +49,11 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// A controller to render out the default back office view and JS results
     /// </summary>
-    [UmbracoUseHttps]
+    [UmbracoRequireHttps]
     [DisableClientCache]
     public class BackOfficeController : UmbracoController
     {
-        private BackOfficeUserManager _userManager;
+        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
 
         private const string TokenExternalSignInError = "ExternalSignInError";
@@ -60,12 +62,11 @@ namespace Umbraco.Web.Editors
 
         protected BackOfficeSignInManager SignInManager
         {
-            get { return _signInManager ?? (_signInManager = OwinContext.Get<BackOfficeSignInManager>()); }
+            get { return _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager()); }
         }
-
-        protected BackOfficeUserManager UserManager
+        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
         {
-            get { return _userManager ?? (_userManager = OwinContext.GetUserManager<BackOfficeUserManager>()); }
+            get { return _userManager ?? (_userManager = OwinContext.GetBackOfficeUserManager()); }
         }
 
         protected IAuthenticationManager AuthenticationManager
@@ -225,6 +226,13 @@ namespace Umbraco.Web.Editors
                             {"serverVarsJs", Url.Action("Application", "BackOffice")},
                             //API URLs
                             {
+                                "packagesRestApiBaseUrl", UmbracoConfig.For.UmbracoSettings().PackageRepositories.GetDefault().RestApiUrl
+                            },
+                            {
+                                "redirectUrlManagementApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RedirectUrlManagementController>(
+                                    controller => controller.GetEnableState())
+                            },
+                            {
                                 "embedApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
                                     controller => controller.GetEmbed("", 0, 0))
                             },
@@ -250,7 +258,7 @@ namespace Umbraco.Web.Editors
                             },
                             {
                                 "treeApplicationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
-                                    controller => controller.GetApplicationTrees(null, null, null))
+                                    controller => controller.GetApplicationTrees(null, null, null, true))
                             },
                             {
                                 "contentTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
@@ -329,6 +337,10 @@ namespace Umbraco.Web.Editors
                                     controller => controller.GetAllTags(null))
                             },
                             {
+                                "templateApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TemplateController>(
+                                    controller => controller.GetById(0))
+                            },
+                            {
                                 "memberTreeBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberTreeController>(
                                     controller => controller.GetNodes("-1", null))
                             },
@@ -355,6 +367,14 @@ namespace Umbraco.Web.Editors
                             {
                                 "healthCheckBaseUrl", Url.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
                                     controller => controller.GetAllHealthChecks())
+                            },
+                            {
+                                "templateQueryApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TemplateQueryController>(
+                                    controller => controller.PostTemplateQuery(null))
+                            },
+                            {
+                                "codeFileApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<CodeFileController>(
+                                    controller => controller.GetByPath("", ""))
                             }
                         }
                     },
@@ -373,12 +393,17 @@ namespace Umbraco.Web.Editors
                                 string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles)
                             },
                             {
+                                "allowedUploadFiles",
+                                string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.AllowedUploadFiles)
+                            },
+                            {
                                 "maxFileSize",
                                 GetMaxRequestLength()
                             },
                             {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
                             {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
                             {"allowPasswordReset", UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset},
+                            {"loginBackgroundImage",  UmbracoConfig.For.UmbracoSettings().Content.LoginBackgroundImage},
                         }
                     },
                     {
@@ -425,7 +450,7 @@ namespace Umbraco.Web.Editors
 
             return JavaScript(result);
         }
-        
+
         [HttpPost]
         public ActionResult ExternalLogin(string provider, string redirectUrl = null)
         {
@@ -458,7 +483,7 @@ namespace Umbraco.Web.Editors
                 if (result)
                 {
                     //Add a flag and redirect for it to be displayed
-                    TempData[TokenPasswordResetCode] = new ValidatePasswordResetCodeModel {UserId = userId, ResetCode = resetCode};
+                    TempData[TokenPasswordResetCode] = new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode };
                     return RedirectToLocal(Url.Action("Default", "BackOffice"));
                 }
             }
@@ -499,7 +524,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>       
         private async Task<ActionResult> RenderDefaultOrProcessExternalLoginAsync(
-            Func<ActionResult> defaultResponse, 
+            Func<ActionResult> defaultResponse,
             Func<ActionResult> externalSignInResponse)
         {
             if (defaultResponse == null) throw new ArgumentNullException("defaultResponse");
@@ -509,7 +534,7 @@ namespace Umbraco.Web.Editors
 
             //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
             foreach (var tempDataTokenName in TempDataTokenNames)
-            {                
+            {
                 if (TempData[tempDataTokenName] != null)
                 {
                     ViewData[tempDataTokenName] = TempData[tempDataTokenName];
@@ -692,7 +717,7 @@ namespace Umbraco.Web.Editors
 
             return app;
         }
-        
+
 
         private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()
         {

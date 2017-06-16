@@ -1,5 +1,5 @@
 <%@ Page Language="C#" AutoEventWireup="true" MasterPageFile="../masterpages/umbracoPage.Master" CodeBehind="PermissionEditor.aspx.cs" Inherits="umbraco.cms.presentation.user.PermissionEditor" %>
-
+<%@ Import Namespace="Umbraco.Web" %>
 <%@ Register Src="../controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
 <%@ Register Src="NodePermissions.ascx" TagName="NodePermissions" TagPrefix="user" %>
 <%@ Register TagPrefix="ui" Namespace="umbraco.uicontrols" Assembly="controls" %>
@@ -19,14 +19,15 @@
 				<umbraco:TreeControl runat="server" ID="JTree" App="content"
 				    Mode="Checkbox" CssClass="clearfix"></umbraco:TreeControl>				
 			</div>
-			<div id="permissionsPanel">
+
+			<div id="permissionsPanel" style="margin-top: -35px">
 				<user:NodePermissions ID="nodePermissions" runat="server" />
 			</div>			
 			
 			<script type="text/javascript" language="javascript">				
 				jQuery(document).ready(function() {
 					jQuery("#<%=JTree.ClientID%>").PermissionsEditor({
-						userId: <%=Request.QueryString["id"] %>,
+						userId: <%=Request.CleanForXss("id") %>,
 						pPanelSelector: "#permissionsPanel",
 						replacePChkBoxSelector: "#chkChildPermissions"});						
 				});

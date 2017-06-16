@@ -25,6 +25,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "published")]
         public bool Published { get; set; }
 
+        [DataMember(Name = "hasPublishedVersion")]
+        public bool HasPublishedVersion { get; set; }
+
         [DataMember(Name = "owner")]
         public UserBasic Owner { get; set; }
 
@@ -81,17 +84,21 @@ namespace Umbraco.Web.Models.ContentEditing
         }
 
         /// <summary>
-        /// The real persisted content object
+        /// The real persisted content object - used during inbound model binding
         /// </summary>
+        /// <remarks>
+        /// This is not used for outgoing model information.
+        /// </remarks>
         [JsonIgnore]
         internal TPersisted PersistedContent { get; set; }
 
         /// <summary>
-        /// The DTO object used to gather all required content data including data type information etc... for use with validation
+        /// The DTO object used to gather all required content data including data type information etc... for use with validation - used during inbound model binding
         /// </summary>
         /// <remarks>
         /// We basically use this object to hydrate all required data from the database into one object so we can validate everything we need
         /// instead of having to look up all the data individually.
+        /// This is not used for outgoing model information.
         /// </remarks>
         [JsonIgnore]
         internal ContentItemDto<TPersisted> ContentDto { get; set; }

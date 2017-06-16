@@ -5,6 +5,7 @@ using System.IO;
 using Moq;
 using NUnit.Framework;
 using SQLCE4Umbraco;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -41,9 +42,11 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
                 //Create the Sql CE database
                 //Get the connectionstring settings from config
-                var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
-                var engine = new SqlCeEngine(settings.ConnectionString);
-                engine.CreateDatabase();
+                var settings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
+                using (var engine = new SqlCeEngine(settings.ConnectionString))
+                {
+                    engine.CreateDatabase();
+                }
             }
             else
             {
@@ -67,7 +70,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public override UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
+            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", Constants.DatabaseProviders.SqlCe, Mock.Of<ILogger>());
         }
 
         public override DatabaseProviders GetDatabaseProvider()

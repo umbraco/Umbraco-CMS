@@ -1,10 +1,15 @@
 ﻿<div class="umb-editor umb-fileupload" ng-controller="Umbraco.PropertyEditors.FileUploadController">
-
+    
     <div ng-show="persistedFiles.length > 0">
         <ul class="thumbnails">
             <li class="span4 thumbnail" ng-repeat="file in persistedFiles">
-                <a href="{{file.file}}" target="_blank" ng-switch on="file.isImage" >
-                    <img ng-src="{{file.thumbnail}}" ng-switch-when="true" alt="{{file.file}}"/>
+                <a href="{{file.file}}" target="_blank" ng-switch on="file.isImage">
+                    <img ng-src="{{file.thumbnail}}" ng-switch-when="true" alt="{{file.file}}" />
+                    <img ng-src="{{file.file}}" ng-switch-when="false" ng-if="file.extension == 'svg'" alt="{{file.file}}" />
+                    <span class="file-icon" ng-if="!file.isImage && file.extension != 'svg'">
+                        <i class="icon icon-document"></i>
+                        <span>.{{file.extension}}</span>
+                    </span>
                     <span ng-switch-default>{{file.file}}</span>
                 </a>
             </li>

@@ -1,19 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Web;
-using System.Web.Services.Description;
-using System.Web.SessionState;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using umbraco.cms.businesslogic.web;
-using Umbraco.Core;
-using Umbraco.Web;
-using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 
 namespace umbraco.cms.presentation.settings.stylesheet
@@ -43,10 +31,11 @@ namespace umbraco.cms.presentation.settings.stylesheet
             _sheet = Services.FileService.GetStylesheetByName(Request.QueryString["id"]);
             if (_sheet == null) throw new InvalidOperationException("No stylesheet found with name: " + Request.QueryString["id"]);
 
-            var propName = IsPostBack ? OriginalName.Value : Request.QueryString["prop"];
+            var property = HttpUtility.UrlDecode(Request.QueryString["prop"]);
+            var propName = IsPostBack ? OriginalName.Value : property;
 
             _stylesheetproperty = _sheet.Properties.FirstOrDefault(x => x.Name.InvariantEquals(propName));
-            if (_stylesheetproperty == null) throw new InvalidOperationException("No stylesheet property found with name: " + Request.QueryString["prop"]);
+            if (_stylesheetproperty == null) throw new InvalidOperationException("No stylesheet property found with name: " + property);
 
             Panel1.Text = ui.Text("stylesheet", "editstylesheetproperty", UmbracoUser);
 
@@ -70,7 +59,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             var nodePath = string.Format("-1,init,{0},{0}_{1}", _sheet.Path
                         //needs a double escape to work with JS
-                        .Replace("\\", "\\\\").TrimEnd(".css"), _stylesheetproperty.Name);
+                        .Replace("\\", "\\\\").TrimEnd(".css"), HttpUtility.UrlEncode(_stylesheetproperty.Name));
 
             ClientTools
                     .SetActiveTreeType(Constants.Trees.Stylesheets)

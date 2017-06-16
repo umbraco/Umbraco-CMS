@@ -27,7 +27,7 @@
             //be the previous element with the class .sbMenu            
             var splitButtons = $('.sbPlaceHolder', container);
             splitButtons.each(function() {
-                var menu = $(this).prev(".sbMenu;");
+                var menu = $(this).prev(".sbMenu");
                 $(this).find("a.sbLink").splitbutton({ menu: menu });
             });
             

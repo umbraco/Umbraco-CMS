@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesRepoController($scope, $route, $location, $timeout, ourPackageRepositoryResource, $q, packageResource, $cookieStore) {
+    function PackagesRepoController($scope, $route, $location, $timeout, ourPackageRepositoryResource, $q, packageResource, localStorageService, localizationService) {
 
         var vm = this;
 
@@ -11,11 +11,13 @@
         vm.pagination = {
             pageNumber: 1,
             totalPages: 10,
-            pageSize: 8
+            pageSize: 24
         };
         vm.searchQuery = "";
         vm.installState = {
-            status: ""
+            status: "",
+            progress: 0,
+            type: "ok"
         };
         vm.selectCategory = selectCategory;
         vm.showPackageDetails = showPackageDetails;
@@ -27,10 +29,13 @@
         vm.downloadPackage = downloadPackage;
         vm.openLightbox = openLightbox;
         vm.closeLightbox = closeLightbox;
+        vm.search = search;
+        vm.installCompleted = false;
 
+        var currSort = "Latest";
         //used to cancel any request in progress if another one needs to take it's place
         var canceler = null;
-        
+
         function getActiveCategory() {
             if (vm.searchQuery !== "") {
                 return "";
@@ -38,7 +43,7 @@
             for (var i = 0; i < vm.categories.length; i++) {
                 if (vm.categories[i].active === true) {
                     return vm.categories[i].name;
-                }                
+                }
             }
             return "";
         }
@@ -56,7 +61,7 @@
                     .then(function(pack) {
                         vm.popular = pack.packages;
                     }),
-                    ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize)
+                    ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, currSort)
                     .then(function(pack) {
                         vm.packages = pack.packages;
                         vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
@@ -65,41 +70,6 @@
                 .then(function() {
                     vm.loading = false;
                 });
-
-            $scope.$watch(function() {
-                return vm.searchQuery;
-            }, _.debounce(function (newVal, oldVal) {
-                $scope.$apply(function () {
-                    if (vm.searchQuery) {
-                        if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
-                            vm.loading = true;
-                            
-                            //a canceler exists, so perform the cancelation operation and reset
-                            if (canceler) {
-                                canceler.resolve();
-                                canceler = $q.defer();
-                            }
-                            else {
-                                canceler = $q.defer();
-                            }
-
-                            ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1,
-                                    vm.pagination.pageSize,
-                                    "",
-                                    vm.searchQuery,
-                                    canceler)
-                                .then(function(pack) {
-                                    vm.packages = pack.packages;
-                                    vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
-                                    vm.pagination.pageNumber = 1;
-                                    vm.loading = false;
-                                    //set back to null so it can be re-created
-                                    canceler = null;
-                                });
-                        }
-                    }                    
-                });
-            }, 200));
 
         }
 
@@ -121,12 +91,14 @@
                 searchCategory = "";
             }
 
-            $q.all([                    
+            currSort = "Latest";
+
+            $q.all([
                     ourPackageRepositoryResource.getPopular(8, searchCategory)
                     .then(function(pack) {
                         vm.popular = pack.packages;
                     }),
-                    ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, searchCategory, vm.searchQuery)
+                    ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, currSort, searchCategory, vm.searchQuery)
                     .then(function(pack) {
                         vm.packages = pack.packages;
                         vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
@@ -141,11 +113,20 @@
 
         function showPackageDetails(selectedPackage) {
             ourPackageRepositoryResource.getDetails(selectedPackage.id)
-                .then(function(pack) {
-                    vm.package = pack;
-                    vm.packageViewState = "packageDetails";
+                .then(function (pack) {
+                    packageResource.validateInstalled(pack.name, pack.latestVersion)
+                        .then(function() {
+                            //ok, can install
+                            vm.package = pack;
+                            vm.package.isValid = true;
+                            vm.packageViewState = "packageDetails";
+                        }, function() {
+                            //nope, cannot install
+                            vm.package = pack;
+                            vm.package.isValid = false;
+                            vm.packageViewState = "packageDetails";
+                        })
                 });
-
         }
 
         function setPackageViewState(state) {
@@ -155,7 +136,7 @@
         }
 
         function nextPage(pageNumber) {
-            ourPackageRepositoryResource.search(pageNumber - 1, vm.pagination.pageSize, getActiveCategory(), vm.searchQuery)
+            ourPackageRepositoryResource.search(pageNumber - 1, vm.pagination.pageSize, currSort, getActiveCategory(), vm.searchQuery)
                 .then(function (pack) {
                     vm.packages = pack.packages;
                     vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
@@ -163,7 +144,7 @@
         }
 
         function prevPage(pageNumber) {
-            ourPackageRepositoryResource.search(pageNumber - 1, vm.pagination.pageSize, getActiveCategory(), vm.searchQuery)
+            ourPackageRepositoryResource.search(pageNumber - 1, vm.pagination.pageSize, currSort, getActiveCategory(), vm.searchQuery)
                 .then(function (pack) {
                     vm.packages = pack.packages;
                     vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
@@ -171,7 +152,7 @@
         }
 
         function goToPage(pageNumber) {
-            ourPackageRepositoryResource.search(pageNumber - 1, vm.pagination.pageSize, getActiveCategory(), vm.searchQuery)
+            ourPackageRepositoryResource.search(pageNumber - 1, vm.pagination.pageSize, currSort, getActiveCategory(), vm.searchQuery)
                 .then(function (pack) {
                     vm.packages = pack.packages;
                     vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
@@ -187,33 +168,44 @@
                         vm.packageViewState = "packageInstall";
                         vm.loading = false;
                         vm.localPackage = pack;
-                        vm.localPackage.allowed = true;                       
-                    },
-                    error);
+                        vm.localPackage.allowed = true;
+                }, function (evt, status, headers, config) {
+                    
+                    if (status == 400) {
+                        //it's a validation error
+                        vm.installState.type = "error";
+                        vm.zipFile.serverErrorMessage = evt.message;
+                    }
+                });
         }
 
         function error(e, args) {
-            
+            //This will return a rejection meaning that the promise change above will stop
+            return $q.reject();
         }
 
         function installPackage(selectedPackage) {
-            
-            vm.installState.status = "importing...";
+
+            vm.installState.status = localizationService.localize("packager_installStateImporting");
+            vm.installState.progress = "0";
 
             packageResource
-                .import(selectedPackage)                
+                .import(selectedPackage)
                 .then(function(pack) {
-                        vm.installState.status = "Installing...";
+                        vm.installState.status = localizationService.localize("packager_installStateInstalling");
+                        vm.installState.progress = "33";
                         return packageResource.installFiles(pack);
                     },
                     error)
                 .then(function(pack) {
-                        vm.installState.status = "Restarting, please wait...";
+                        vm.installState.status = localizationService.localize("packager_installStateRestarting");
+                        vm.installState.progress = "66";
                         return packageResource.installData(pack);
                     },
                     error)
                 .then(function(pack) {
-                        vm.installState.status = "All done, your browser will now refresh";
+                        vm.installState.status = localizationService.localize("packager_installStateComplete");
+                        vm.installState.progress = "100";
                         return packageResource.cleanUp(pack);
                     },
                     error)
@@ -221,13 +213,11 @@
 
                         if (result.postInstallationPath) {
                             //Put the redirect Uri in a cookie so we can use after reloading
-                            window.localStorage.setItem("packageInstallUri", result.postInstallationPath);
+                            localStorageService.set("packageInstallUri", result.postInstallationPath);
                         }
-                        
-                        //reload on next digest (after cookie)
-                        $timeout(function () {
-                            window.location.reload(true);
-                        });
+
+                        vm.installState.status = localizationService.localize("packager_installStateCompleted");
+                        vm.installCompleted = true;
 
                     },
                     error);
@@ -244,6 +234,53 @@
         function closeLightbox() {
             vm.lightbox.show = false;
             vm.lightbox = null;
+        }
+
+
+        var searchDebounced = _.debounce(function(e) {
+
+            $scope.$apply(function () {
+
+                //a canceler exists, so perform the cancelation operation and reset
+                if (canceler) {
+                    canceler.resolve();
+                    canceler = $q.defer();
+                }
+                else {
+                    canceler = $q.defer();
+                }
+
+                currSort = vm.searchQuery ? "Default" : "Latest";
+
+                ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1,
+                        vm.pagination.pageSize,
+                        currSort,
+                        "",
+                        vm.searchQuery,
+                        canceler)
+                    .then(function(pack) {
+                        vm.packages = pack.packages;
+                        vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
+                        vm.pagination.pageNumber = 1;
+                        vm.loading = false;
+                        //set back to null so it can be re-created
+                        canceler = null;
+                    });
+
+            });
+
+        }, 200);
+
+        function search(searchQuery) {
+            vm.loading = true;
+            searchDebounced();
+        }
+
+        vm.reloadPage = function () {
+            //reload on next digest (after cookie)
+            $timeout(function () {
+                window.location.reload(true);
+            });
         }
 
         init();

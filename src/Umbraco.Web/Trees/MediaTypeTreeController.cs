@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
-using System.Text;
-using System.Threading.Tasks;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
@@ -50,7 +47,11 @@ namespace Umbraco.Web.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-item-arrangement", false);
+                        var node = CreateTreeNode(dt, Constants.ObjectTypes.MediaTypeGuid, id, queryStrings, "icon-item-arrangement",
+                            //NOTE: Since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to. 
+                            //We need this check to keep supporting sites where childs have already been created.
+                            dt.HasChildren());
+
                         node.Path = dt.Path;
                         return node;
                     }));
@@ -61,6 +62,8 @@ namespace Umbraco.Web.Trees
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
+
+            var enableInheritedMediaTypes = UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedMediaTypes;
 
             if (id == Constants.System.Root.ToInvariantString())
             {
@@ -89,10 +92,34 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), hasSeparator: true);
             }
             else
-            {                
-                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
-                menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), hasSeparator: true);
+            {
+                var ct = Services.ContentTypeService.GetMediaType(int.Parse(id));
+                var parent = ct == null ? null : Services.ContentTypeService.GetMediaType(ct.ParentId);
+
+                if (enableInheritedMediaTypes)
+                {
+                    menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+
+                    //no move action if this is a child doc type
+                    if (parent == null)
+                    {
+                        menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), true);
+                    }
+                }
+                else
+                {
+                    menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)));
+                    //no move action if this is a child doc type
+                    if (parent == null)
+                    {
+                        menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), true);
+                    }
+                }
+
                 menu.Items.Add<ActionCopy>(Services.TextService.Localize(string.Format("actions/{0}", ActionCopy.Instance.Alias)));
+                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
+                if (enableInheritedMediaTypes)
+                    menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
             }
 
             return menu;

@@ -15,6 +15,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
@@ -38,41 +39,15 @@ namespace Umbraco.Web.Editors
     public class AuthenticationController : UmbracoApiController
     {
 
-        private BackOfficeUserManager _userManager;
+        private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
-
-        protected BackOfficeUserManager UserManager
+        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
         {
-            get
-            {
-                if (_userManager == null)
-                {
-                    var mgr = TryGetOwinContext().Result.GetUserManager<BackOfficeUserManager>();
-                    if (mgr == null)
-                    {
-                        throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeUserManager) + " from the " + typeof(IOwinContext) + " GetUserManager method");
-                    }
-                    _userManager = mgr;
-                }
-                return _userManager;
-            }
+            get { return _userManager ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager()); }
         }
-
         protected BackOfficeSignInManager SignInManager
         {
-            get
-            {
-                if (_signInManager == null)
-                {
-                    var mgr = TryGetOwinContext().Result.Get<BackOfficeSignInManager>();
-                    if (mgr == null)
-                    {
-                        throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeSignInManager) + " from the " + typeof(IOwinContext));
-                    }
-                    _signInManager = mgr;
-                }
-                return _signInManager;
-            }
+            get { return _signInManager ?? (_signInManager = TryGetOwinContext().Result.GetBackOfficeSignInManager()); }
         }
 
         
@@ -164,18 +139,7 @@ namespace Umbraco.Web.Editors
 
                     //get the user
                     var user = Security.GetBackOfficeUser(loginModel.Username);
-                    var userDetail = Mapper.Map<UserDetail>(user);
-                    //update the userDetail and set their remaining seconds
-                    userDetail.SecondsUntilTimeout = TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes).TotalSeconds;
-                    
-                    //create a response with the userDetail object
-                    var response = Request.CreateResponse(HttpStatusCode.OK, userDetail);
-
-                    //ensure the user is set for the current request
-                    Request.SetPrincipalForRequest(user);
-
-                    return response;
-
+                    return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.RequiresVerification:
 
                     var twofactorOptions = UserManager as IUmbracoBackOfficeTwoFactorOptions;
@@ -186,7 +150,7 @@ namespace Umbraco.Web.Editors
                                 HttpStatusCode.BadRequest, 
                                 "UserManager does not implement " + typeof(IUmbracoBackOfficeTwoFactorOptions)));
                     }
-
+                    
                     var twofactorView = twofactorOptions.GetTwoFactorView(
                         TryGetOwinContext().Result,
                         UmbracoContext,
@@ -200,10 +164,13 @@ namespace Umbraco.Web.Editors
                                 typeof(IUmbracoBackOfficeTwoFactorOptions) + ".GetTwoFactorView returned an empty string"));
                     }
 
+                    var attemptedUser = Security.GetBackOfficeUser(loginModel.Username);
+                    
                     //create a with information to display a custom two factor send code view
-                    var verifyResponse = Request.CreateResponse(HttpStatusCode.OK, new
+                    var verifyResponse = Request.CreateResponse(HttpStatusCode.PaymentRequired, new
                     {
-                        twoFactorView = twofactorView
+                        twoFactorView = twofactorView,
+                        userId = attemptedUser.Id
                     });
 
                     return verifyResponse;
@@ -237,10 +204,10 @@ namespace Umbraco.Web.Editors
             if (identityUser != null)
             {
                 var user = Services.UserService.GetByEmail(model.Email);
-                if (user != null && user.IsLockedOut == false)
+                if (user != null)
                 {
                     var code = await UserManager.GeneratePasswordResetTokenAsync(identityUser.Id);
-                    var callbackUrl = ConstuctCallbackUrl(identityUser.Id, code);
+                    var callbackUrl = ConstructCallbackUrl(identityUser.Id, code);
 
                     var message = Services.TextService.Localize("resetPasswordEmailCopyFormat",
                         //Ensure the culture of the found user is used for the email!
@@ -258,28 +225,74 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        private string ConstuctCallbackUrl(int userId, string code)
+        /// <summary>
+        /// Used to retrived the 2FA providers for code submission
+        /// </summary>
+        /// <returns></returns>
+        [SetAngularAntiForgeryTokens]
+        public async Task<IEnumerable<string>> Get2FAProviders()
         {
-            //get an mvc helper to get the url
-            var http = EnsureHttpContext();
-            var urlHelper = new UrlHelper(http.Request.RequestContext);
+            var userId = await SignInManager.GetVerifiedUserIdAsync();
+            if (userId < 0)
+            {
+                Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId);
+            return userFactors;
+        }
 
-            var action = urlHelper.Action("ValidatePasswordResetCode", "BackOffice", 
-                new
-                {
-                    area = GlobalSettings.UmbracoMvcArea,
-                    u = userId,
-                    r = code
-                });
+        [SetAngularAntiForgeryTokens]
+        public async Task<IHttpActionResult> PostSend2FACode([FromBody]string provider)
+        {
+            if (provider.IsNullOrWhiteSpace())
+                throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            //TODO: Virtual path?
+            var userId = await SignInManager.GetVerifiedUserIdAsync();
+            if (userId < 0)
+            {
+                Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
 
-            return string.Format("{0}://{1}{2}",
-                http.Request.Url.Scheme,
-                http.Request.Url.Host + (http.Request.Url.Port == 80 ? string.Empty : ":" + http.Request.Url.Port),
-                action);
-        }      
-     
+            // Generate the token and send it
+            if (await SignInManager.SendTwoFactorCodeAsync(provider) == false)
+            {
+                return BadRequest("Invalid code");
+            }
+            return Ok();
+        }
+
+        [SetAngularAntiForgeryTokens]
+        public async Task<HttpResponseMessage> PostVerify2FACode(Verify2FACodeModel model)
+        {
+            if (ModelState.IsValid == false)
+            {
+                return Request.CreateValidationErrorResponse(ModelState);
+            }
+
+            var userName = await SignInManager.GetVerifiedUserNameAsync();
+            if (userName == null)
+            {
+                Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: true, rememberBrowser: false);
+            switch (result)
+            {
+                case SignInStatus.Success:
+                    //get the user
+                    var user = Security.GetBackOfficeUser(userName);
+                    return SetPrincipalAndReturnUserDetail(user);
+                case SignInStatus.LockedOut:
+                    return Request.CreateValidationErrorResponse("User is locked out");                    
+                case SignInStatus.Failure:
+                default:
+                    return Request.CreateValidationErrorResponse("Invalid code");
+            }
+        }
+
         /// <summary>
         /// Processes a set password request.  Validates the request and sets a new password.
         /// </summary>
@@ -290,20 +303,35 @@ namespace Umbraco.Web.Editors
             var result = await UserManager.ResetPasswordAsync(model.UserId, model.ResetCode, model.Password);
             if (result.Succeeded)
             {
+                var lockedOut = await UserManager.IsLockedOutAsync(model.UserId);
+                if (lockedOut)
+                {
+                    Logger.Info<AuthenticationController>(
+                        "User {0} is currently locked out, unlocking and resetting AccessFailedCount",
+                        () => model.UserId);
+
+                    //var user = await UserManager.FindByIdAsync(model.UserId);
+                    var unlockResult = await UserManager.SetLockoutEndDateAsync(model.UserId, DateTimeOffset.Now);
+                    if(unlockResult.Succeeded == false)
+                    {
+                        Logger.Warn<AuthenticationController>("Could not unlock for user {0} - error {1}",
+                                        () => model.UserId, () => unlockResult.Errors.First());
+                    }
+
+                    var resetAccessFailedCountResult = await UserManager.ResetAccessFailedCountAsync(model.UserId);
+                    if (resetAccessFailedCountResult.Succeeded == false)
+                    {
+                        Logger.Warn<AuthenticationController>("Could not reset access failed count {0} - error {1}",
+                            () => model.UserId, () => unlockResult.Errors.First());
+                    }
+                }
+
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
-
             return Request.CreateValidationErrorResponse(
                 result.Errors.Any() ? result.Errors.First() : "Set password failed");
         }
 
-        private HttpContextBase EnsureHttpContext()
-        {
-            var attempt = this.TryGetHttpContext();
-            if (attempt.Success == false)
-                throw new InvalidOperationException("This method requires that an HttpContext be active");
-            return attempt.Result;
-        }
 
         /// <summary>
         /// Logs the current user out
@@ -323,6 +351,59 @@ namespace Umbraco.Web.Editors
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
+
+        /// <summary>
+        /// This is used when the user is auth'd successfully and we need to return an OK with user details along with setting the current Principal in the request
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        private HttpResponseMessage SetPrincipalAndReturnUserDetail(IUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+
+            var userDetail = Mapper.Map<UserDetail>(user);
+            //update the userDetail and set their remaining seconds
+            userDetail.SecondsUntilTimeout = TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes).TotalSeconds;
+
+            //create a response with the userDetail object
+            var response = Request.CreateResponse(HttpStatusCode.OK, userDetail);
+
+            //ensure the user is set for the current request
+            Request.SetPrincipalForRequest(user);
+
+            return response;
+        }
+
+        private string ConstructCallbackUrl(int userId, string code)
+        {
+            // Get an mvc helper to get the url
+            var http = EnsureHttpContext();
+            var urlHelper = new UrlHelper(http.Request.RequestContext);
+            var action = urlHelper.Action("ValidatePasswordResetCode", "BackOffice", 
+                new
+                {
+                    area = GlobalSettings.UmbracoMvcArea,
+                    u = userId,
+                    r = code
+                });
+
+            // Construct full URL using configured application URL (which will fall back to request)
+            var applicationUri = new Uri(ApplicationContext.UmbracoApplicationUrl);
+            var callbackUri = new Uri(applicationUri, action);
+            return callbackUri.ToString();
+        }      
+            
+
+        private HttpContextBase EnsureHttpContext()
+        {
+            var attempt = this.TryGetHttpContext();
+            if (attempt.Success == false)
+                throw new InvalidOperationException("This method requires that an HttpContext be active");
+            return attempt.Result;
+        }
+
+        
 
         private void AddModelErrors(IdentityResult result, string prefix = "")
         {
