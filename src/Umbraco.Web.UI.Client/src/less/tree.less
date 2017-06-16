@@ -31,12 +31,12 @@
 }
 .umb-tree li.current > div,
 .umb-tree div.selected {
-	background: @blue;
+	background: @turquoise-d1;
 }
 .umb-tree li.current > div a.umb-options i,
 .umb-tree div.selected i {
-	background: #fff;
-	border-color: @blue;
+	background: @white;
+	border-color: @turquoise-d1;
 	transition: opacity 120ms ease;
 }
 
@@ -48,9 +48,9 @@
 .umb-tree li.current > div a,
 .umb-tree li.current > div i.icon,
 .umb-tree li.current > div ins {
-	color: white !important;
-	background: @blue;
-	border-color: @blue;
+	color: @white !important;
+	background-color: @turquoise-d1;
+	border-color: @turquoise-d1;
 }
 
 .umb-tree li.root > div {
@@ -119,10 +119,9 @@
 
 .umb-tree li.root > div a,
 .umb-tree li.root h5, .umb-tree-header {
-	text-transform: uppercase;
-	color: #b3b3b3;
+	color: @gray-2;
 	font-weight: bold;
-	font-size: 13px;
+	font-size: 15px;
 }
 
 .umb-tree ins {
@@ -132,7 +131,6 @@
 	visibility: hidden;
 	text-decoration: none;
     font-size: 12px;
-
 	transition: opacity 120ms ease;
 }
 
@@ -163,7 +161,7 @@
 .umb-tree .icon {
 	vertical-align: middle;
 	margin: 0 13px 0 0;
-	color: #21201C;
+	color: @gray-1;
 	font-size: 20px;
 }
 
@@ -180,11 +178,11 @@
 }
 
 .umb-tree div:hover {
-	background: @grayLighter
+	background: @gray-10;
 }
 
 .umb-tree small.search-subtitle{
-	color: @grayLight;
+	color: @gray-7;
 	display: block;
 	padding-left: 35px;
 }
@@ -211,7 +209,7 @@
 .umb-tree .umb-tree-node-checked i[class^="icon-"],
 .umb-tree .umb-tree-node-checked i[class*=" icon-"] {
     font-family: 'icomoon' !important;
-    color:@blue !important;
+    color:@green !important;
 }
 .umb-tree .umb-tree-node-checked i:before {
 	/*check box*/
@@ -220,10 +218,8 @@
 
 a.umb-options {
 	visibility: hidden;
-
 	display: flex;
 	justify-content: flex-end;
-
     padding: 9px 5px;
     text-align: center;
     cursor: pointer;
@@ -250,7 +246,6 @@ a.umb-options:hover {
 
 li.root > div > a.umb-options {
     top: 18px;
-
 	display: flex;
     padding: 10px 5px;
 }
@@ -267,7 +262,7 @@ li.root > div > a.umb-options {
 }
 
 .umb-icon-item:hover {
-	background: #f8f8f8
+	background: @gray-10;
 }
 .umb-icon-item i.icon {
 	position: absolute;
@@ -279,14 +274,14 @@ li.root > div > a.umb-options {
 }
 
 .umb-icon-item a {
-	color: #525252;
+	color: @gray-3;
 	padding-top: 3px;
 	height: 15px;
 	font-size: 12px;
 	text-decoration: none;
 }
 .umb-icon-item small {
-	color: #999;
+	color: @gray-6;
 	font-size: 10px;
 	display: block
 }
@@ -332,7 +327,7 @@ div.not-allowed > i.icon,div.not-allowed > a{
 
 // override small icon color
 .umb-tree li.current > div:before {
-	color: @blueLight;
+	color: @turquoise-l2;
 }
 div.is-container:before{
 	content:"\e04e";
@@ -363,7 +358,6 @@ div.locked:before{
 	margin: 12px 0px 0px 0px;
 	padding: 0px;
 	list-style: none;
-
 	user-select: none;
 }
 
@@ -372,7 +366,7 @@ div.locked:before{
 
 .umb-actions li.sep {
 	display: block;
-	border-top: 1px solid #efefef;
+	border-top: 1px solid @gray-9;
 }
 
 .umb-actions li.sep:first-child {
@@ -382,30 +376,32 @@ div.locked:before{
 .umb-actions a {
 	white-space: nowrap;
 	display: block;
-	font-size: 14px;
+	font-size: 15px;
 	color: @black;
-	padding: 8px 25px 8px 20px;
+	padding: 9px 25px 9px 20px;
 	text-decoration: none;
 	cursor: pointer;
+	display: flex;
+    align-items: center;
 }
+
 .umb-actions a:hover, .umb-actions a:focus,
 .umb-actions li.selected {
 	color: @black !important;
-	background: @grayLighter !important;
+	background: @gray-10 !important;
 }
 
 .umb-actions .menu-label {
 	display: inline-block;
 	vertical-align: middle;
 	padding-left: 15px;
-	padding-top: 2px;
 }
+
 .umb-actions i {
-	color: #999;
-	margin-top: 2px;
+	color: @gray-6;
 	font-size: 18px;
 	vertical-align: middle;
-	color: #414141
+	color: @gray-3;
 }
 
 .umb-actions-child {
@@ -426,7 +422,7 @@ div.locked:before{
 }
 .umb-actions-child li .menu-label {
 	font-size: 14px;
-	color: #000;
+	color: @black;
 	margin-left: 10px;
 }
 
@@ -435,22 +431,23 @@ div.locked:before{
 	display: block;
 	clear: right;
 	line-height: 14px;
-	color: #ccc;
+	color: @gray-6;
 	white-space: normal;
+	margin-top: 2px;
 }
 .umb-actions-child li a:hover .menuLabel small {
 	text-decoration: none !important
 }
 .umb-actions-child i {
-	font-size: 32px;
-    min-width: 32px;
+	font-size: 30px;
+    min-width: 30px;
     text-align: center;
     line-height: 24px; /* set line-height to ensure all icons use same line-height */
 }
 
 .umb-actions-child li.add {
 	margin-top: 20px;
-	border-top: 1px solid #e9e9e9;
+	border-top: 1px solid @gray-8;
 	padding-top: 20px;
 }
 .umb-actions-child li.add i {
@@ -468,7 +465,7 @@ div.locked:before{
 	color: @green;
 }
 .umb-tree i.icon.purple {
-	color: @purple
+	color: @purple;
 }
 .umb-tree i.icon.orange {
 	color: @orange;

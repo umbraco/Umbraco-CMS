@@ -428,7 +428,8 @@ namespace Umbraco.Web.Security
             var viewProperties = new List<UmbracoProperty>();
 
             foreach (var prop in memberType.PropertyTypes
-                    .Where(x => builtIns.Contains(x.Alias) == false && memberType.MemberCanEditProperty(x.Alias)))
+                    .Where(x => builtIns.Contains(x.Alias) == false && memberType.MemberCanEditProperty(x.Alias))
+                    .OrderBy(p => p.SortOrder))
             {
                 var value = string.Empty;
                 if (member != null)
@@ -662,7 +663,8 @@ namespace Umbraco.Web.Security
             //Are we resetting the password??
             if (passwordModel.Reset.HasValue && passwordModel.Reset.Value)
             {
-                if (membershipProvider.EnablePasswordReset == false)
+                var canReset = membershipProvider.CanResetPassword(_applicationContext.Services.UserService);
+                if (canReset == false)
                 {
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password reset is not enabled", new[] { "resetPassword" }) });
                 }

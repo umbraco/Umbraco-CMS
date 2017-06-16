@@ -24,7 +24,7 @@
 		video {
 	        width: 100%;
 	        max-width: 640px;
-	        border: 1px solid #ededed;
+	        border: 1px solid @gray-9;
 	        border-left: none;
 	        border-bottom: none;
 	        box-sizing:border-box;
@@ -62,7 +62,7 @@
 		    width: 100%;
 		    height: 3px;
 		    margin-top: -13px;
-		    background-color: whitesmoke;
+		    background-color: @gray-10;
 		}
 
 		.progress-bar {
@@ -72,7 +72,7 @@
 		    max-width: 100%;
 		    width: 200px;
 		    height: 100%;
-		    background: #7c7e80;
+		    background: @gray-5;
 		}
 
 		.video-controls, .loader, .progress-bar {
@@ -95,7 +95,13 @@
 		}
 
 		.video_player video:hover + .video-controls .progress-bar, .video-controls:hover .progress-bar {
-			background: #2e99f4;
+			background: @turquoise-d1;
+		}
+	}
+
+	.forms-install-button {
+		.btn {
+			padding: 14px 40px;
 		}
 	}
 

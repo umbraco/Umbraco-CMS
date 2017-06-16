@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData();
         }
 
-        private DictionaryRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        private DictionaryRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
             var dictionaryRepository = new DictionaryRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider());
             return dictionaryRepository;

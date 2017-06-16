@@ -1,6 +1,6 @@
 angular.module("umbraco")
 .controller("Umbraco.PropertyEditors.TagsController",
-    function ($rootScope, $scope, $log, assetsService, umbRequestHelper, angularHelper, $timeout, $element, $sanitize) {
+    function ($rootScope, $scope, $log, assetsService, umbRequestHelper, angularHelper, $timeout, $element) {
 
         var $typeahead;
 
@@ -41,7 +41,6 @@ angular.module("umbraco")
 
             //Helper method to add a tag on enter or on typeahead select
             function addTag(tagToAdd) {
-                tagToAdd = String(tagToAdd).htmlEncode();
                 if (tagToAdd != null && tagToAdd.length > 0) {
                     if ($scope.model.value.indexOf(tagToAdd) < 0) {
                         $scope.model.value.push(tagToAdd);

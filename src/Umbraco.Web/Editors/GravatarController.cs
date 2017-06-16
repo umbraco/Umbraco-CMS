@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Security.Cryptography;
 using Umbraco.Core;
 using Umbraco.Web.Mvc;
 
@@ -13,6 +14,14 @@ namespace Umbraco.Web.Editors
     {
         public string GetCurrentUserGravatarUrl()
         {
+            // If FIPS is required, never check the Gravatar service as it only supports MD5 hashing.  
+            // Unfortunately, if the FIPS setting is enabled on Windows, using MD5 will throw an exception
+            // and the website will not run.
+            if (CryptoConfig.AllowOnlyFipsAlgorithms)
+            {
+                return null;
+            }
+
             var userService = Services.UserService;
             var user = userService.GetUserById(UmbracoContext.Security.CurrentUser.Id);
             var gravatarHash = user.Email.ToMd5();

@@ -27,15 +27,28 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region Implementation of IEntityFactory<IContent,DocumentDto>
 
-        public IContent BuildEntity(DocumentDto dto)
+        /// <summary>
+        /// Builds a IContent item from the dto(s) and content type
+        /// </summary>
+        /// <param name="dto">
+        /// This DTO can contain all of the information to build an IContent item, however in cases where multiple entities are being built,
+        /// a separate <see cref="DocumentPublishedReadOnlyDto"/> publishedDto entity will be supplied in place of the <see cref="DocumentDto"/>'s own 
+        /// ResultColumn DocumentPublishedReadOnlyDto
+        /// </param>
+        /// <param name="contentType"></param>
+        /// <param name="publishedDto">
+        /// When querying for multiple content items the main DTO will not contain the ResultColumn DocumentPublishedReadOnlyDto and a separate publishedDto instance will be supplied
+        /// </param>
+        /// <returns></returns>
+        public static IContent BuildEntity(DocumentDto dto, IContentType contentType, DocumentPublishedReadOnlyDto publishedDto = null)
         {
-            var content = new Content(dto.Text, dto.ContentVersionDto.ContentDto.NodeDto.ParentId, _contentType);
+            var content = new Content(dto.Text, dto.ContentVersionDto.ContentDto.NodeDto.ParentId, contentType);
 
             try
             {
                 content.DisableChangeTracking();
 
-                content.Id = _id;
+                content.Id = dto.NodeId;
                 content.Key = dto.ContentVersionDto.ContentDto.NodeDto.UniqueId;
                 content.Name = dto.Text;
                 content.NodeName = dto.ContentVersionDto.ContentDto.NodeDto.Text;
@@ -49,11 +62,19 @@ namespace Umbraco.Core.Persistence.Factories
                 content.Published = dto.Published;
                 content.CreateDate = dto.ContentVersionDto.ContentDto.NodeDto.CreateDate;
                 content.UpdateDate = dto.ContentVersionDto.VersionDate;
-                content.ExpireDate = dto.ExpiresDate.HasValue ? dto.ExpiresDate.Value : (DateTime?) null;
-                content.ReleaseDate = dto.ReleaseDate.HasValue ? dto.ReleaseDate.Value : (DateTime?) null;
+                content.ExpireDate = dto.ExpiresDate.HasValue ? dto.ExpiresDate.Value : (DateTime?)null;
+                content.ReleaseDate = dto.ReleaseDate.HasValue ? dto.ReleaseDate.Value : (DateTime?)null;
                 content.Version = dto.ContentVersionDto.VersionId;
+
                 content.PublishedState = dto.Published ? PublishedState.Published : PublishedState.Unpublished;
-                content.PublishedVersionGuid = dto.DocumentPublishedReadOnlyDto == null ? default(Guid) : dto.DocumentPublishedReadOnlyDto.VersionId;
+
+                //Check if the publishedDto has been supplied, if not the use the dto's own DocumentPublishedReadOnlyDto value
+                content.PublishedVersionGuid = publishedDto == null
+                    ? (dto.DocumentPublishedReadOnlyDto == null ? default(Guid) : dto.DocumentPublishedReadOnlyDto.VersionId)
+                    : publishedDto.VersionId;
+                content.PublishedDate = publishedDto == null
+                    ? (dto.DocumentPublishedReadOnlyDto == null ? default(DateTime) : dto.DocumentPublishedReadOnlyDto.VersionDate)
+                    : publishedDto.VersionDate;
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
@@ -64,6 +85,13 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 content.EnableChangeTracking();
             }
+
+        }
+
+        [Obsolete("Use the static BuildEntity instead so we don't have to allocate one of these objects everytime we want to map values")]
+        public IContent BuildEntity(DocumentDto dto)
+        {
+            return BuildEntity(dto, _contentType);
         }
 
         public DocumentDto BuildDto(IContent entity)

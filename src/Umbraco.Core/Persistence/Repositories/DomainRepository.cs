@@ -18,20 +18,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
     internal class DomainRepository : PetaPocoRepositoryBase<int, IDomain>, IDomainRepository
     {
-        public DomainRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public DomainRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {           
         }
 
-        private FullDataSetRepositoryCachePolicyFactory<IDomain, int> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<IDomain, int> CachePolicyFactory
+        protected override IRepositoryCachePolicy<IDomain, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IDomain, int>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(), false));
-            }
+            return new FullDataSetRepositoryCachePolicy<IDomain, int>(runtimeCache, GetEntityId, /*expires:*/ false);
         }
 
         protected override IDomain PerformGet(int id)

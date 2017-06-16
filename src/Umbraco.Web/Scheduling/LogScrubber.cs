@@ -16,7 +16,7 @@ namespace Umbraco.Web.Scheduling
         private readonly ApplicationContext _appContext;
         private readonly IUmbracoSettingsSection _settings;
 
-        public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds, 
+        public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
             ApplicationContext appContext, IUmbracoSettingsSection settings)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
@@ -77,25 +77,19 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
+            // running on a background task, and Log.CleanLogs uses the old SqlHelper,
+            // better wrap in a scope and ensure it's all cleaned up and nothing leaks
+            using (var scope = ApplicationContext.Current.ScopeProvider.CreateScope())
             using (DisposableTimer.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
                 Log.CleanLogs(GetLogScrubbingMaximumAge(_settings));
+                scope.Complete();
             }
 
             return true; // repeat
         }
 
-        public override Task<bool> PerformRunAsync(CancellationToken token)
-        {
-            throw new NotImplementedException();
-        }
-
         public override bool IsAsync
-        {
-            get { return false; }
-        }
-
-        public override bool RunsOnShutdown
         {
             get { return false; }
         }

@@ -119,7 +119,7 @@ namespace Umbraco.Web.UI.Controls
         /// </remarks>
         public UrlHelper Url
         {
-            get { return _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData()))); }
+            get { return _url ?? (_url = new UrlHelper(Context.Request.RequestContext)); }
         }
 
         /// <summary>

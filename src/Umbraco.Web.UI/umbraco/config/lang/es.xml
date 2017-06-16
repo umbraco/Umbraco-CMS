@@ -277,6 +277,7 @@
     <key alias="entername">Escribe un nombre...</key>
     <key alias="search">Escribe tu búsqueda...</key>
     <key alias="filter">Escribe para filtrar resultados...</key>
+    <key alias="usernameHint">Tu nombre de usuario normalmente es tu e-mail</key>
   </area>
   <area alias="editcontenttype">
   <key alias="allowAtRoot" version="7.2">Permitir en nodo raíz</key>
@@ -596,7 +597,7 @@
   <area alias="publicAccess">
     <key alias="paAdvanced">Proteccion basada en roles</key>
     <key alias="paAdvancedHelp"><![CDATA[Si desea controlar el acceso a la página usando autenticación basada en roles,<br /> usando los grupos de miembros de Umbraco.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Necesita crear un grupo de miembros antes de poder usar <br /> autenticación basada en roles.]]></key>
+    <key alias="paAdvancedNoGroups">Necesita crear un grupo de miembros antes de poder usar autenticación basada en roles</key>
     <key alias="paErrorPage">Página de error</key>
     <key alias="paErrorPageHelp">Usada cuando alguien hace login, pero no tiene acceso</key>
     <key alias="paHowWould">Elija cómo restringir el acceso a esta página</key>

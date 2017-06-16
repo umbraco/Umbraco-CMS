@@ -105,12 +105,14 @@ angular.module("umbraco.directives")
 					});
 
 					//// INIT /////
-					$image.load(function(){
-						$timeout(function(){
-							setDimensions();
-							scope.loaded = true;
-							scope.onImageLoaded();
-						});
+					$image.load(function() {
+					    $timeout(function() {
+					        setDimensions();
+					        scope.loaded = true;
+					        if (angular.isFunction(scope.onImageLoaded)) {
+					            scope.onImageLoaded();
+					        }
+					    });
 					});
 
 					$(window).on('resize.umbImageGravity', function(){

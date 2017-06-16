@@ -179,7 +179,7 @@ namespace Umbraco.Core.Models.PublishedContent
             }
 
             if (contentType == null)
-                throw new Exception(string.Format("ContentTypeService failed to find a {0} type with alias \"{1}\".",
+                throw new InvalidOperationException(string.Format("ContentTypeService failed to find a {0} type with alias \"{1}\".",
                     itemType.ToString().ToLower(), alias));
 
             return new PublishedContentType(contentType);

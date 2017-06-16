@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
 
@@ -10,6 +11,9 @@ namespace Umbraco.Core.Models
     {
         [DataMember]
         int Id { get; set; }
+
+        [DataMember]
+        Guid Key { get; set; }
 
         /// <summary>
         /// Gets or sets the Alias of the Property

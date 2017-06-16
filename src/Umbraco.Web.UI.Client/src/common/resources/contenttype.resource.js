@@ -92,6 +92,16 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                'Failed to retrieve property type aliases');
         },
 
+        getAllStandardFields: function () {
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentTypeApiBaseUrl",
+                       "GetAllStandardFields")),
+               'Failed to retrieve standard fields');
+        },
+
         getPropertyTypeScaffold : function (id) {
               return umbRequestHelper.resourcePromise(
                $http.get(

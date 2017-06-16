@@ -16,9 +16,8 @@ namespace umbraco.businesslogic
 		/// <param name="resolver"></param>
 		/// <returns></returns>
 		internal static IEnumerable<Type> ResolveApplications(this PluginManager resolver)
-		{
-			//don't cache the result of this because it is only used once during app startup, caching will just add a bit more mem overhead for no reason
-			return resolver.ResolveTypesWithAttribute<IApplication, ApplicationAttribute>(cacheResult:false);
+		{			
+			return resolver.ResolveTypesWithAttribute<IApplication, ApplicationAttribute>();
 		}
 
 		/// <summary>
@@ -28,8 +27,7 @@ namespace umbraco.businesslogic
 		/// <returns></returns>
 		internal static IEnumerable<Type> ResolveAttributedTrees(this PluginManager resolver)
 		{
-			//don't cache the result of this because it is only used once during app startup, caching will just add a bit more mem overhead for no reason
-			return resolver.ResolveTypesWithAttribute<ITree, TreeAttribute>(cacheResult:false);
+			return resolver.ResolveTypesWithAttribute<ITree, TreeAttribute>();
 		}
 		
 	}

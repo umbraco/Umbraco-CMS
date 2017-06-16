@@ -27,6 +27,10 @@
     <key alias="unpublish">Depubliceren</key>
     <key alias="refreshNode">Nodes opnieuw inladen</key>
     <key alias="republish">Herpubliceer de site</key>
+	<key alias="SetPermissionsForThePage">Stel rechten voor pagina %0% in</key>
+    <key alias="chooseWhereToMove">Waarheen verplaatsen/</key>
+    <key alias="toInTheTreeStructureBelow">Naar de onderstaande boomstructuur</key>
+	<key alias="restore" version="7.3.0">Herstellen</key>
     <key alias="rights">Rechten</key>
     <key alias="rollback">Vorige versies</key>
     <key alias="sendtopublish">Klaar voor publicatie</key>
@@ -64,10 +68,10 @@
     <key alias="atViewingFor">Tonen voor</key>
   </area>
   <area alias="buttons">
+	<key alias="clearSelection">Selectie ongedaan maken</key>
     <key alias="select">Selecteren</key>
     <key alias="selectCurrentFolder">Selecteer huidige map</key>
     <key alias="somethingElse">Doe iets anders</key>
-
     <key alias="bold">Vet</key>
     <key alias="deindent">Paragraaf uitspringen</key>
     <key alias="formFieldInsert">Voeg formulierveld in</key>
@@ -89,11 +93,14 @@
     <key alias="save">Opslaan</key>
     <key alias="saveAndPublish">Opslaan en publiceren</key>
     <key alias="saveToPublish">Opslaan en verzenden voor goedkeuring</key>
+	<key alias="saveListView">Sla list view op</key>
     <key alias="showPage">voorbeeld bekijken</key>
     <key alias="showPageDisabled">Voorbeeld bekijken is uitgeschakeld omdat er geen template is geselecteerd</key>
     <key alias="styleChoose">Stijl kiezen</key>
     <key alias="styleShow">Stijlen tonen</key>
     <key alias="tableInsert">Tabel invoegen</key>
+	<key alias="generateModels">Genereer models</key>
+    <key alias="saveAndGenerateModels">Opslaan en models genereren</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">Om het documenttype voor de geselecteerde inhoud te wijzigen, selecteert u eerst uit de lijst van geldige types voor deze locatie.</key>
@@ -133,7 +140,8 @@
     <key alias="itemChanged">Dit item is gewijzigd na publicatie</key>
     <key alias="itemNotPublished">Dit item is niet gepubliceerd</key>
     <key alias="lastPublished">Laatst gepubliceerd op</key>
-    <key alias="listViewNoItems" version="7.1.5">Nog geen items om weer te geven.</key>
+	<key alias="noItemsToShow">Er zijn geen items om weer te geven</key>
+    <key alias="listViewNoItems" version="7.1.5">Er zijn geen items om weer te geven.</key>
     <key alias="mediatype">Mediatype</key>
     <key alias="mediaLinks">Link naar media item(s)</key>
     <key alias="membergroup">Ledengroep</key>
@@ -143,7 +151,9 @@
     <key alias="nodeName">Pagina Titel</key>
     <key alias="otherElements">Eigenschappen</key>
     <key alias="parentNotPublished">Dit document is gepubliceerd maar niet zichtbaar omdat de bovenliggende node '%0%' niet gepubliceerd is</key>
-    <key alias="parentNotPublishedAnomaly">Oeps: dit document is gepubliceerd, maar het is niet in de cache (interne serverfout)</key>
+    <key alias="parentNotPublishedAnomaly">Dit document is gepubliceerd, maar het is niet in de cache (interne serverfout)</key>
+	<key alias="getUrlException">Kan de Url niet ophalen</key>
+    <key alias="routeError">Dit document is gepubliceerd, maar de Url conflicteert met %0%</key>
     <key alias="publish">Publiceren</key>
     <key alias="publishStatus">Publicatiestatus</key>
     <key alias="releaseDate">Publiceren op</key>
@@ -161,23 +171,34 @@
     <key alias="uploadClear">Bestand(en) verwijderen</key>
     <key alias="urls">Link naar het document</key>
     <key alias="memberof">Lid van groep(en)</key>
-    <key alias="notmemberof">Geen lid van groep(en)</key>
-    
+    <key alias="notmemberof">Geen lid van groep(en)</key>    
     <key alias="childItems" version="7.0">Kinderen</key>
     <key alias="target" version="7.0">Doel</key>
+	<key alias="scheduledPublishServerTime">Dit betekend de volgende tijd op de server:</key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Wat houd dit in?</a>]]></key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Klik om te uploaden</key>
     <key alias="dropFilesHere">Plaats je bestanden hier...</key>
+	<key alias="urls">Link naar media</key>
+    <key alias="orClickHereToUpload">Of klik hier om bestanden te kiezen</key>
+    <key alias="onlyAllowedFiles">De toegestane bestandtypen zijn</key>
+    <key alias="disallowedFileType">Dit bestand heeft niet het juiste file-type. Dit bestand kan niet geupload worden.</key>
+    <key alias="maxFileSize">Max file size is</key>
+  </area>
+  <area alias="member">
+    <key alias="createNewMember">Maak nieuwe member aan</key>
+    <key alias="allMembers">Alle Members</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Waar wil je de nieuwe %0% aanmaken?</key>
     <key alias="createUnder">Aanmaken onder</key>
     <key alias="updateData">Kies een type en een titel</key>
-
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Er zijn geen toegestane ​​documenttypes beschikbaar. Je moet deze inschakelen in de Instellingen sectie onder <strong>"Documenttypes"</ strong>.]]></key>
-
     <key alias="noMediaTypes" version="7.0"><![CDATA[Er zijn geen toegestande mediatypes beschikbaar. Je moet deze in schakelen in de Instellingen sectie onder <strong>"Mediatypes"</strong>.]]></key>
+	<key alias="documentTypeWithoutTemplate">Document Type zonder template</key>
+    <key alias="newFolder">Nieuwe folder</key>
+    <key alias="newDataType">Nieuw data type</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Open je website</key>
@@ -189,38 +210,38 @@
     <key alias="welcome">Welkom</key>
   </area>
   <area alias="prompt">
-    <key alias="stay">Stay</key>
-    <key alias="discardChanges">Discard changes</key>
-    <key alias="unsavedChanges">You have unsaved changes</key>
-    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+    <key alias="stay">Blijf op deze pagina</key>
+    <key alias="discardChanges">Negeer wijzigingen</key>
+    <key alias="unsavedChanges">Wijzigingen niet opgeslagen</key>
+    <key alias="unsavedChangesWarning">Weet je zeker dat deze pagina wilt verlaten? - er zijn onopgeslagen wijzigingen</key>
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
-
-    <key alias="deletedItem">Deleted %0% item</key>
-    <key alias="deletedItems">Deleted %0% items</key>
-    <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
-    <key alias="deletedItemOfItems">Deleted %0% out of %1% items</key>
-
-    <key alias="publishedItem">Published %0% item</key>
-    <key alias="publishedItems">Published %0% items</key>
-    <key alias="publishedItemOfItem">Published %0% out of %1% item</key>
-    <key alias="publishedItemOfItems">Published %0% out of %1% items</key>
-
-    <key alias="unpublishedItem">Unpublished %0% item</key>
-    <key alias="unpublishedItems">Unpublished %0% items</key>
-    <key alias="unpublishedItemOfItem">Unpublished %0% out of %1% item</key>
-    <key alias="unpublishedItemOfItems">Unpublished %0% out of %1% items</key>
-
-    <key alias="movedItem">Moved %0% item</key>
-    <key alias="movedItems">Moved %0% items</key>
-    <key alias="movedItemOfItem">Moved %0% out of %1% item</key>
-    <key alias="movedItemOfItems">Moved %0% out of %1% items</key>
-
-    <key alias="copiedItem">Copied %0% item</key>
-    <key alias="copiedItems">Copied %0% items</key>
-    <key alias="copiedItemOfItem">Copied %0% out of %1% item</key>
-    <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
+	
+    <key alias="deletedItem">%0% item verwijderd</key>
+    <key alias="deletedItems">%0% items verwijderd</key>
+    <key alias="deletedItemOfItem">Item %0% van de %1% verwijderd</key>
+    <key alias="deletedItemOfItems">Items %0% van de %1% verwijderd</key>
+	
+    <key alias="publishedItem">%0% item gepubliceerd</key>
+    <key alias="publishedItems">%0% items gepubliceerd</key>
+    <key alias="publishedItemOfItem">Item %0% van de %1% gepubliceerd</key>
+    <key alias="publishedItemOfItems">Items %0% van de %1% gepubliceerd</key>
+	
+    <key alias="unpublishedItem">%0% item gedepubliceerd</key>
+    <key alias="unpublishedItems">%0% items gedepubliceerd</key>
+    <key alias="unpublishedItemOfItem">Item %0% van de %1% gedepubliceerd</key>
+    <key alias="unpublishedItemOfItems">Items %0% van de %1% gedepubliceerd</key>
+	
+    <key alias="movedItem">%0% item verplaatst</key>
+    <key alias="movedItems">%0% items verplaatst</key>
+    <key alias="movedItemOfItem">item %0% van de %1% verplaatst</key>
+    <key alias="movedItemOfItems">items %0% van de %1% verplaatst</key>
+	
+    <key alias="copiedItem">%0% item gekopieerd</key>
+    <key alias="copiedItems">%0% items gekopieerd</key>
+    <key alias="copiedItemOfItem">item %0% van de %1% gekopieerd</key>
+    <key alias="copiedItemOfItems">item %0% van de %1% gekopieerd</key>
   </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Naam</key>
@@ -269,21 +290,56 @@
     <key alias="thumbnailimageclickfororiginal">Klik op de afbeelding voor volledige grootte</key>
     <key alias="treepicker">Kies een item</key>
     <key alias="viewCacheItem">Toon cache item</key>
+	<key alias="createFolder">Maak folder aan...</key>
+    <key alias="relateToOriginalLabel">Relateer aan origineel</key>
+    <key alias="includeDescendants">Descendants meenemen</key>
+    <key alias="theFriendliestCommunity">De vriendelijkste community</key>
+    <key alias="linkToPage">Link naar pagina</key>
+    <key alias="openInNewWindow">Opent het gelinkte document in een nieuw venster of tab</key>
+    <key alias="linkToMedia">Link naar media</key>
+    <key alias="selectMedia">Selecteer media</key>
+    <key alias="selectIcon">Selecteer icoon</key>
+    <key alias="selectItem">Selecteer item</key>
+    <key alias="selectLink">Selecteer link</key>
+    <key alias="selectMacro">Selecteer macro</key>
+    <key alias="selectContent">Selecteer content</key>
+    <key alias="selectMember">Selecteer member</key>
+    <key alias="selectMemberGroup">Selecteer member group</key>
+    <key alias="noMacroParams">Er zijn geen parameters voor deze macro</key>
+    <key alias="externalLoginProviders">Externe login providers</key>
+    <key alias="exceptionDetail">Error details</key>
+    <key alias="stacktrace">Stacktrace</key>
+    <key alias="innerException">Inner Exception</key>
+    <key alias="linkYour">Link je</key>
+    <key alias="unLinkYour">De-Link je</key>
+    <key alias="account">account</key>
+    <key alias="selectEditor">Selecteer editor</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
       Wijzig de verschillende taalversies voor het woordenboek item '%0%'. Je kunt extra talen toevoegen bij 'talen' in het menu links
    ]]></key>
     <key alias="displayName">Cultuurnaam</key>
+	 <key alias="changeKey">Verander de key van het dictionary item.</key>
+    <key alias="changeKeyError">
+      <![CDATA[
+      De key '%0%' bestaat al.
+   ]]>
+    </key>
   </area>
   <area alias="placeholders">
-    <key alias="username">Typ je gebruikersnaam</key>
-    <key alias="password">Typ je wachtwoord</key>
+    <key alias="username">Typ jouw gebruikersnaam</key>
+    <key alias="password">Typ jouw wachtwoord</key>
+	<key alias="confirmPassword">Bevestig jouw wachtwoord</key>
     <key alias="nameentity">Benoem de %0%...</key>
     <key alias="entername">Typ een naam...</key>
+	<key alias="label">Label...</key>
+	<key alias="enterDescription">Voer een omschrijving in...</key>
     <key alias="search">Typ om te zoeken...</key>
     <key alias="filter">Typ om te filteren...</key>
     <key alias="enterTags">Typ om tags toe te voegen (druk op enter na elke tag)...</key>
+	<key alias="email">Voer jouw email in</key>
+    <key alias="usernameHint">Jouw gebruikersnaam is meestal jouw email</key>
   </area>
 
   <area alias="editcontenttype">
@@ -331,10 +387,17 @@
     <key alias="errorRegExpWithoutTab">%0% is niet in het correcte formaat</key>
   </area>
   <area alias="errors">
+    <key alias="receivedErrorFromServer">Een error ontvangen van de server</key>
     <key alias="dissallowedMediaType">Het opgegeven bestandstype is niet toegestaan ​​door de beheerder</key>
     <key alias="codemirroriewarning">OPMERKING! Ondanks dat CodeMiror is ingeschakeld, is het uitgeschakeld in Internet Explorer omdat het niet stabiel genoeg is.</key>
     <key alias="contentTypeAliasAndNameNotNull">Zowel de alias als de naam van het nieuwe eigenschappen type moeten worden ingevuld!</key>
     <key alias="filePermissionsError">Er is een probleem met de lees/schrijf rechten op een bestand of map</key>
+	<key alias="macroErrorLoadingPartialView">Error bij het laden van Partial View script (file: %0%)</key>
+    <key alias="macroErrorLoadingUsercontrol">Error bij het laden van userControl '%0%'</key>
+    <key alias="macroErrorLoadingCustomControl">Error bij het laden van customControl (Assembly: %0%, Type: '%1%')</key>
+    <key alias="macroErrorLoadingMacroEngineScript">Error bij het laden van MacroEngine script (file: %0%)</key>
+    <key alias="macroErrorParsingXSLTFile">"Error bij het parsen van XSLT file: %0%</key>
+    <key alias="macroErrorReadingXSLTFile">"Error bij het laden van XSLT file: %0%</key>
     <key alias="missingTitle">Vul een titel in</key>
     <key alias="missingType">Selecteer een type</key>
     <key alias="pictureResizeBiggerThanOrg">U wilt een afbeelding groter maken dan de originele afmetingen. Weet je zeker dat je wilt doorgaan?</key>
@@ -355,102 +418,142 @@
     <key alias="actions">Acties</key>
     <key alias="add">Toevoegen</key>
     <key alias="alias">Alias</key>
+    <key alias="all">Alles</key>
     <key alias="areyousure">Weet je het zeker?</key>
-    <key alias="border">Rand</key>
-    <key alias="by">of</key>
-    <key alias="cancel">Annuleren</key>
+    <key alias="back">Terug</key>
+    <key alias="border">Border</key>
+    <key alias="by">bij</key>
+    <key alias="cancel">Cancel</key>
     <key alias="cellMargin">Cel marge</key>
-    <key alias="choose">Kiezen</key>
-    <key alias="close">Sluiten</key>
-    <key alias="closewindow">Venster sluiten</key>
-    <key alias="comment">Opmerking</key>
-    <key alias="confirm">Bevestigen</key>
-    <key alias="constrainProportions">Verhouding behouden</key>
-    <key alias="continue">Doorgaan</key>
-    <key alias="copy">Kopiëren</key>
+    <key alias="choose">Kies</key>
+    <key alias="close">Sluit</key>
+    <key alias="closewindow">Sluit venster</key>
+    <key alias="comment">Comment</key>
+    <key alias="confirm">Bevestig</key>
+    <key alias="constrainProportions">Verhoudingen behouden</key>
+    <key alias="continue">Ga verder</key>
+    <key alias="copy">Copy</key>
     <key alias="create">Aanmaken</key>
-    <key alias="database">Databank</key>
+    <key alias="database">Database</key>
     <key alias="date">Datum</key>
     <key alias="default">Standaard</key>
-    <key alias="delete">Verwijderen</key>
+    <key alias="delete">Verwijder</key>
     <key alias="deleted">Verwijderd</key>
-    <key alias="deleting">Verwijderen...</key>
+    <key alias="deleting">Aan het verwijderen...</key>
     <key alias="design">Ontwerp</key>
     <key alias="dimensions">Afmetingen</key>
-    <key alias="down">Beneden</key>
+    <key alias="down">Omlaag</key>
     <key alias="download">Download</key>
-    <key alias="edit">Aanpassen</key>
-    <key alias="edited">Aangepast</key>
+    <key alias="edit">Bewerk</key>
+    <key alias="edited">Bewerkt</key>
     <key alias="elements">Elementen</key>
-    <key alias="email">E-mail</key>
+    <key alias="email">Email</key>
     <key alias="error">Fout</key>
-    <key alias="findDocument">Zoeken</key>
-    <key alias="height">Hoogte</key>
+    <key alias="findDocument">Vind</key>
+    <key alias="height">Hogte</key>
     <key alias="help">Help</key>
     <key alias="icon">Icoon</key>
-    <key alias="import">Importeren</key>
-    <key alias="innerMargin">Binnenmarge</key>
+    <key alias="import">Import</key>
+    <key alias="innerMargin">Binnenste marge</key>
     <key alias="insert">Invoegen</key>
     <key alias="install">Installeren</key>
-    <key alias="justify">Uitvullen</key>
+    <key alias="invalid">Ongeldig</key>
+    <key alias="justify">Justify</key>
+    <key alias="label">Label</key>
     <key alias="language">Taal</key>
-    <key alias="layout">Lay-out</key>
-    <key alias="loading">Bezig met laden</key>
-    <key alias="locked">Geblokkeerd</key>
+    <key alias="layout">Layout</key>
+    <key alias="loading">Aan het laden</key>
+    <key alias="locked">Gesloten</key>
     <key alias="login">Inloggen</key>
-    <key alias="logoff">Afmelden</key>
-    <key alias="logout">Afmelden</key>
+    <key alias="logoff">Uitloggen</key>
+    <key alias="logout">Uitloggen</key>
     <key alias="macro">Macro</key>
-    <key alias="move">Verplaatsen</key>
-    <key alias="more">Meer</key>
+    <key alias="mandatory">Verplicht</key>
+    <key alias="move">Verplaats</key>
+    <key alias="more">meer</key>
     <key alias="name">Naam</key>
     <key alias="new">Nieuw</key>
     <key alias="next">Volgende</key>
     <key alias="no">Nee</key>
-    <key alias="of">van</key>
-    <key alias="ok">Ok</key>
-    <key alias="open">Openen</key>
+    <key alias="of">of</key>
+    <key alias="ok">OK</key>
+    <key alias="open">Open</key>
     <key alias="or">of</key>
     <key alias="password">Wachtwoord</key>
     <key alias="path">Pad</key>
     <key alias="placeHolderID">Placeholder ID</key>
-    <key alias="pleasewait">Een ogenblik geduld a.u.b.</key>
+    <key alias="pleasewait">Een ogenblik geduld aub...</key>
     <key alias="previous">Vorige</key>
     <key alias="properties">Eigenschappen</key>
-    <key alias="reciept">E-mail om formulier te ontvangen</key>
+    <key alias="reciept">Email om formulier resultaten te ontvangen</key>
     <key alias="recycleBin">Prullenbak</key>
-    <key alias="remaining">Overgebleven</key>
-    <key alias="rename">Hernoemen</key>
+    <key alias="recycleBinEmpty">De prullenbak is leeg</key>
+    <key alias="remaining">Overblijvend</key>
+    <key alias="rename">Hernoem</key>
     <key alias="renew">Vernieuw</key>
     <key alias="required" version="7.0">Verplicht</key>
     <key alias="retry">Opnieuw proberen</key>
     <key alias="rights">Rechten</key>
-    <key alias="search">Zoek</key>
+    <key alias="search">Zoeken</key>
+    <key alias="searchNoResult">We konden helaas niet vinden wat je zocht</key>
     <key alias="server">Server</key>
-    <key alias="show">Tonen</key>
-    <key alias="showPageOnSend">Toon pagina bij versturen</key>
-    <key alias="size">Formaat</key>
-    <key alias="sort">Sorteren</key>
-    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
-    <key alias="type">Type</key>
-    <key alias="typeToSearch">Type om te zoeken...</key>
+    <key alias="show">Toon</key>
+    <key alias="showPageOnSend">Toon pagina na verzenden</key>
+    <key alias="size">Grootte</key>
+    <key alias="sort">Sorteer</key>
+    <key alias="submit">Verstuur</key>
+    <key alias="type">Typen</key>
+    <key alias="typeToSearch">Typ om te zoeken...</key>
     <key alias="up">Omhoog</key>
-    <key alias="update">Bijwerken</key>
+    <key alias="update">Update</key>
     <key alias="upgrade">Upgrade</key>
     <key alias="upload">Upload</key>
     <key alias="url">Url</key>
     <key alias="user">Gebruiker</key>
     <key alias="username">Gebruikersnaam</key>
     <key alias="value">Waarde</key>
-    <key alias="view">Toon</key>
+    <key alias="view">Bekijk</key>
     <key alias="welcome">Welkom...</key>
     <key alias="width">Breedte</key>
     <key alias="yes">Ja</key>
     <key alias="folder">Map</key>
-    <key alias="reorder">Reorder</key>
-    <key alias="reorderDone">I am done reordering</key>
-
     <key alias="searchResults">Zoekresultaten</key>
+    <key alias="reorder">Herschik</key>
+    <key alias="reorderDone">Ik ben klaar met herschikken</key>
+    <key alias="preview">Voorvertoning</key>
+    <key alias="changePassword">Wachtwoord veranderen</key>
+    <key alias="to">naar</key>
+    <key alias="listView">Lijstweergave</key>
+    <key alias="saving">Aan het opslaan...</key>
+    <key alias="current">huidig</key>
+    <key alias="embed">Embed</key>
+    <key alias="selected">geselecteerd</key>
+  </area>
+  <area alias="colors">
+    <key alias="black">Zwart</key>
+    <key alias="green">Groen</key>
+    <key alias="yellow">Geel</key>
+    <key alias="orange">Oranje</key>
+    <key alias="blue">Blauw</key>
+    <key alias="red">Rood</key>
+  </area>
+    <area alias="shortcuts">
+    <key alias="addTab">Tab toevoegen</key>
+    <key alias="addProperty">Property toevoegen</key>
+    <key alias="addEditor">Editor toevoegen</key>
+    <key alias="addTemplate">Template toevoegen</key>
+    <key alias="addChildNode">Child node toevoegen</key>
+    <key alias="addChild">Child toevoegen</key>
+
+    <key alias="editDataType">Data type bewerken</key>
+
+    <key alias="navigateSections">Secties navigeren</key>
+
+    <key alias="shortcut">Shortcuts</key>
+    <key alias="showShortcuts">Toon shortcuts</key>
+
+    <key alias="toggleListView">Toggle lijstweergave</key>
+    <key alias="toggleAllowAsRoot">Toggle toestaan op root-niveau</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Achtergrondkleur</key>
@@ -528,6 +631,57 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="watch">Bekijken</key>
     <key alias="welcomeIntro"><![CDATA[Deze wizard helpt u met het configureren van <strong>Umbraco %0%</strong> voor een nieuwe installatie of een upgrade van versie 3.0. <br /><br /> Druk op <strong>"volgende"</strong> om de wizard te starten.]]></key>
   </area>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   <area alias="language">
     <key alias="cultureCode">Cultuurcode</key>
     <key alias="displayName">Cultuurnaam</key>
@@ -543,12 +697,22 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="greeting3">Fijne woensdag</key>
     <key alias="greeting4">Fijne donderdag</key>
     <key alias="greeting5">Fijne vrijdag</key>
-    <key alias="greeting6">Fijne zaterdag</key>
-    
+    <key alias="greeting6">Fijne zaterdag</key>    
     <key alias="instruction">log hieronder in</key>
+	<key alias="signInWith">Inloggen met</key>
     <key alias="timeout">Sessie is verlopen</key>
-
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p>]]></key>
+	<key alias="forgottenPassword">Wachtwoord vergeten?</key>
+    <key alias="forgottenPasswordInstruction">Er zal een email worden gestuurd naar het emailadres van jouw account. Hierin staat een link om je wachtwoord te resetten</key>
+    <key alias="requestPasswordResetConfirmation">Een email met daarin de wachtwoord reset uitleg zal worden gestuurd als het emailadres in onze database voorkomt.</key>
+    <key alias="returnToLogin">Terug naar loginformulier</key>
+    <key alias="setPasswordInstruction">Geeft alsjeblieft een nieuw wachtwoord op</key>
+    <key alias="setPasswordConfirmation">Je wachtwoord is aangepast</key>
+    <key alias="resetCodeExpired">De link die je hebt aangeklikt is niet (meer) geldig.</key>
+    <key alias="resetPasswordEmailCopySubject">Umbraco: Wachtwoord Reset</key>
+    <key alias="resetPasswordEmailCopyFormat">
+      <![CDATA[<p>De gebruikersnaam om in te loggen bij jouw Umbraco omgeving is: <strong>%0%</strong></p><p>Klik <a href="%1%"><strong>hier</strong></a> om je wachtwoord te resetten of knip/plak deze URL in je browser:</p><p><em>%1%</em></p>]]>
+    </key>
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
@@ -646,6 +810,15 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="packageVersion">Package versie</key>
     <key alias="packageVersionHistory">Package versiehistorie</key>
     <key alias="viewPackageWebsite">Bekijk de package website</key>
+	<key alias="packageAlreadyInstalled">Package reeds geinstalleerd</key>
+    <key alias="targetVersionMismatch">Deze package kan niet worden geinstalleerd omdat minimaal Umbraco versie %0% benodigd is.</key>
+    <key alias="installStateUninstalling">Aan het deinstalleren...</key>
+    <key alias="installStateDownloading">Aan het downloaden...</key>
+    <key alias="installStateImporting">Aan het importeren...</key>
+    <key alias="installStateInstalling">Aan het installeren...</key>
+    <key alias="installStateRestarting">Aan het herstarten, een ongenblik geduld aub...</key>
+    <key alias="installStateComplete">Geinstalleerd! Je browser zal nu automatisch ververst worden...</key>
+    <key alias="installStateCompleted">Kruk op "finish" om de installate te voltooien en de pagina te verversen.</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Plakken met alle opmaak (Niet aanbevolen)</key>
@@ -656,7 +829,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   <area alias="publicAccess">
     <key alias="paAdvanced">Geavanceerd: Beveilig door de Member Groups te seecteren die toegang hebben op de pagina</key>
     <key alias="paAdvancedHelp"><![CDATA[Als je toegang tot pagina's wilt regelen met behulp van role-based authenticatie,<br /> gebruik makend van Umbraco's member groups.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Je moet eerst een membergroup maken voordat je kunt werken met <br />role-based authentication.]]></key>
+    <key alias="paAdvancedNoGroups">Je moet eerst een membergroup maken voordat je kunt werken met role-based authentication.</key>
     <key alias="paErrorPage">Error Pagina</key>
     <key alias="paErrorPageHelp">Gebruikt om te tonen als een gebruiker is ingelogd, maar geen rechten heeft om de pagina te bekijken</key>
     <key alias="paHowWould">Hoe wil je de pagina beveiligen?</key>
@@ -677,13 +850,18 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       %0% kan niet worden gepubliceerd omdat het item is gepland voor release.
     ]]>
     </key>
+	<key alias="contentPublishedFailedExpired"><![CDATA[
+      %0% kon niet gepubliceerd worden omdat het item niet meer geldig is.
+    ]]></key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
       %0% kan niet worden gepubliceerd, omdat de eigenschappen:%1% de validatieregels niet hebben doorstaan.
     ]]></key>
     <key alias="contentPublishedFailedByEvent"><![CDATA[
-      %0% kon niet worden gepubliceerd doordat een 3rd party extensie het heeft geannuleerd.
-    
+      %0% kon niet worden gepubliceerd doordat een 3rd party extensie het heeft geannuleerd.    
         ]]></key>
+		<key alias="contentPublishedFailedByParent"><![CDATA[
+      %0% kon niet gepubliceerd worden, omdat de parent pagina niet gepubliceerd is.
+    ]]></key>
     <key alias="includeUnpublished">Inclusief ongepubliceerde kinderen</key>
     <key alias="inProgress">Publicatie in uitvoering - even geduld...</key>
     <key alias="inProgressCounter">%0% van %1% pagina’s zijn gepubliceerd...</key>
@@ -698,16 +876,13 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="noColors">Je hebt geen goedgekeurde kleuren geconfigureerd</key>
   </area>
   <area alias="relatedlinks">
-    <key alias="addExternal">Externe link toevoegen</key>
-    <key alias="addInternal">Interne link toevoegen</key>
-    <key alias="addlink">Toevoegen</key>
-    <key alias="caption">Bijschrift</key>
-    <key alias="internalPage">Interne pagina</key>
-    <key alias="linkurl">URL</key>
-    <key alias="modeDown">Verplaats omlaag</key>
-    <key alias="modeUp">Verplaats omhoog</key>
-    <key alias="newWindow">Open in nieuw venster</key>
-    <key alias="removeLink">Verwijder link</key>
+    <key alias="enterExternal">Externe link toevoegen</key>
+    <key alias="chooseInternal">Interne link toevoegen</key>    
+    <key alias="caption">Bijschrift</key> 
+	<key alias="link">Link</key>
+    <key alias="newWindow">In een nieuw venster openen</key>
+    <key alias="captionPlaceholder">Voer het bijschrijft in</key>
+    <key alias="externalLinkPlaceholder">Voer de link in</key>
   </area>
   <area alias="imagecropper">
     <key alias="reset">Reset</key>
@@ -736,12 +911,16 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="settings">Instellingen</key>
     <key alias="statistics">Statistieken</key>
     <key alias="translation">Vertaling</key>
-    <key alias="users">Gebruikers</key>
-    <key alias="contour" version="4.0">Umbraco Contour</key>
-
+    <key alias="users">Gebruikers</key>    
     <key alias="help" version="7.0">Help</key>
     <key alias="forms">Formulieren</key>
     <key alias="analytics">Analytics</key>
+  </area>
+  <area alias="help">
+    <key alias="goTo">ga naar</key>
+    <key alias="helpTopicsFor">Help onderwerpen voor</key>
+    <key alias="videoChaptersFor">Video's voor</key>
+    <key alias="theBestUmbracoVideoTutorials">De beste Umbraco video tutorials</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standaard template</key>
@@ -762,6 +941,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="noPropertiesDefinedOnTab">Geen eigenschappen gedefinieerd op dit tabblad. Klik op de link "voeg een nieuwe eigenschap" aan de bovenkant om een ​​nieuwe eigenschap te creëren.</key>
     <key alias="masterDocumentType">Master Document Type</key>
     <key alias="createMatchingTemplate">Maak een bijbehorend template</key>
+	<key alias="addIcon">Icon toevoegen</key>
   </area>
   <area alias="sort">
     <key alias="sortOrder">Sort order</key>
@@ -771,7 +951,13 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="sortPleaseWait"><![CDATA[Een ogenblik geduld. Paginas worden gesorteerd, dit kan even duren.<br/> <br/> Sluit dit venster niet tijdens het sorteren]]></key>
   </area>
   <area alias="speechBubbles">
-    <key alias="contentPublishedFailedByEvent">Publicatie werd geannuleerd door een 3rd party plug-in</key>
+	<key alias="validationFailedHeader">Validatie</key>
+	<key alias="validationFailedMessage">Validatiefouten moeten worden opgelost voor dit item kan worden opgeslagen</key>
+	<key alias="operationFailedHeader">Mislukt</key>
+	<key alias="invalidUserPermissionsText">Wegens onvoldoende rechten kon deze handeling kon niet worden uitegevoerd </key>
+	<key alias="operationCancelledHeader">Geannuleerd</key>
+	<key alias="operationCancelledText">Uitvoering is g eannuleerd door de plugin van een 3e partij</key>
+    <key alias="contentPublishedFailedByEvent">Publicatie werd geannuleerd doordeeen plugin van een 3e partij</key>
     <key alias="contentTypeDublicatePropertyType">Eigenschappen type bestaat al</key>
     <key alias="contentTypePropertyTypeCreated">Eigenschappen type aangemaakt</key>
     <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Naam: %0% <br /> Data type: %1%]]></key>
@@ -806,6 +992,8 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="fileSavedHeader">Bestand opgeslagen</key>
     <key alias="fileSavedText">Bestand opgeslagen zonder fouten</key>
     <key alias="languageSaved">Taal opgeslagen</key>
+	<key alias="mediaTypeSavedHeader">Media Type opgeslagen</key>
+    <key alias="memberTypeSavedHeader">Member Type opgeslagen</key>
     <key alias="pythonErrorHeader">Python script niet opgeslagen</key>
     <key alias="pythonErrorText">Python script kon niet worden opgeslagen door een fout</key>
     <key alias="pythonSavedHeader">Python script opeslagen!</key>
@@ -824,6 +1012,11 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="partialViewSavedText">Partial view opgeslagen zonder fouten!</key>
     <key alias="partialViewErrorHeader">Partial view niet opgeslagen</key>
     <key alias="partialViewErrorText">Er is een fout opgetreden bij het opslaan van het bestand.</key>
+	 <key alias="scriptSavedHeader">Script view opgeslagen</key>
+    <key alias="scriptSavedText">Script view opgeslagen zonder fouten!</key>
+    <key alias="scriptErrorHeader">Script view niet opgeslagen</key>
+    <key alias="scriptErrorText">Er is een fout opgetreden bij het opslaan van dit bestand.</key>
+    <key alias="cssErrorText">Er is een fout opgetreden bij het opslaan van dit bestand.</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Gebruik CSS syntax bijv: h1, .redHeader, .blueTex</key>
@@ -846,15 +1039,15 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   </area>
   <area alias="grid">
     <key alias="insertControl">Item toevoegen</key>
-    <key alias="chooseLayout">Choose a layout</key>
-    <key alias="addRows">Een rij aan de lay-out toevoegen</key>
-    <key alias="addElement"><![CDATA[Klik om te starten op het <i class="icon icon-add blue"></i> teken onderaan en voeg je eerste item toe]]></key>
+    <key alias="chooseLayout">Kies de indeling</key>
+    <key alias="addRows">Kies een indeling voor deze pagina om content toe te kunnen voegen</key>
+    <key alias="addElement"><![CDATA[<i class="icon icon-add blue"></i> Plaats een (extra) content blok]]></key>
     <key alias="dropElement">Drop content</key>
-    <key alias="settingsApplied">Settings applied</key>
+    <key alias="settingsApplied">Instellingen toegepast</key>
 
-    <key alias="contentNotAllowed">This content is not allowed here</key>
-    <key alias="contentAllowed">This content is allowed here</key>
-
+    <key alias="contentNotAllowed">Deze content is hier niet toegestaan</key>
+    <key alias="contentAllowed">Deze content is hier toegestaan</key>
+      
     <key alias="clickToEmbed">Klik om een item te embedden</key>
     <key alias="clickToInsertImage">Klik om een afbeelding in te voegen</key>
     <key alias="placeholderImageCaption">Afbeelding ondertitel...</key>
@@ -883,7 +1076,79 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
 
     <key alias="allowAllEditors">Alle editors toelaten</key>
     <key alias="allowAllRowConfigurations">Alle rijconfiguraties toelaten</key>
+	<key alias="setAsDefault">Instellen als standaard</key>
+    <key alias="chooseExtra">Kies extra</key>
+    <key alias="chooseDefault">Kies standaard</key>
+    <key alias="areAdded">zijn toegevoegd</key>
 </area>
+
+<area alias="contentTypeEditor">
+    <key alias="compositions">Composities</key>
+    <key alias="noTabs">Er zijn nog geen tabs toegevoegd</key>
+    <key alias="addNewTab">Voeg een nieuwe tab toe</key>
+    <key alias="addAnotherTab">Voeg nog een tab toe</key>
+    <key alias="inheritedFrom">Inherited van</key>
+    <key alias="addProperty">Voeg property toe</key>
+    <key alias="requiredLabel">Verplicht label</key>
+
+    <key alias="enableListViewHeading">Zet list view aan</key>
+    <key alias="enableListViewDescription">Laat de child nodes van het content item zien als een sorteer- en doorzoekbare lijstweergave zien. Deze child nodes worden dan niet in de boomstructuur getoond.</key>
+
+    <key alias="allowedTemplatesHeading">Toegestane Templates</key>
+    <key alias="allowedTemplatesDescription">Kies welke templates toegestaan zijn om door de editors op dit content-type gebruikt te worden</key>
+    <key alias="allowAsRootHeading">Sta toe op root-niveau</key>
+    <key alias="allowAsRootDescription">Sta editors toe om content van dit type aan te maken op root-niveau</key>
+    <key alias="allowAsRootCheckbox">Ja - sta content van dit type toe op root-niveau</key>
+
+    <key alias="childNodesHeading">Toegestane child node types</key>
+    <key alias="childNodesDescription">Sta contetn van een bepaalde type toe om onder dit type aangemaakt te kunnen worden</key>
+
+    <key alias="chooseChildNode">Kies child node</key>
+    <key alias="compositionsDescription">Overerfde tabs en properties van een bestaand document-type. Nieuwe tabs worden toegevoegd aan het huidige document-type of samengevoegd als een tab met de identieke naam al bestaat.</key>
+    <key alias="compositionInUse">Dit content-type wordt gebruikt in een compositie en kan daarom niet zelf een compositie worden.</key>
+    <key alias="noAvailableCompositions">Er zijn geen content-typen beschikbaar om als compositie te gebruiken.</key>
+
+    <key alias="availableEditors">Beschikbare editors</key>
+    <key alias="reuse">Herbruik</key>
+    <key alias="editorSettings">Editor instellingen</key>
+
+    <key alias="configuration">Configuratie</key>
+
+    <key alias="yesDelete">Ja, verwijder</key>
+
+    <key alias="movedUnderneath">is naar onder geplaatst</key>
+    <key alias="copiedUnderneath">is naar onder gecopierd</key>
+    <key alias="folderToMove">Selecteer de map om te verplaatsen</key>
+    <key alias="folderToCopy">Selecteer de map om te kopieren</key>
+    <key alias="structureBelow">naar de boomstructuur onder</key>
+
+    <key alias="allDocumentTypes">Alle Document types</key>
+    <key alias="allDocuments">Alle documenten</key>
+    <key alias="allMediaItems">Alle media items</key>
+
+    <key alias="usingThisDocument">die gebruik maken van dit document type zullen permanent verwijderd worden. Bevestig aub dat je deze ook wilt verwijderen.</key>
+    <key alias="usingThisMedia">die gebruik maken van dit media type zullen permanent verwijderd worden. Bevestig aub dat je deze ook wilt verwijderen.</key>
+    <key alias="usingThisMember">die gebruik maken van dit member type zullen permanent verwijderd worden. Bevestig aub dat je deze ook wilt verwijderen.</key>
+
+    <key alias="andAllDocuments">en alle documenten van dit type</key>
+    <key alias="andAllMediaItems">en alle media items van dit type</key>
+    <key alias="andAllMembers">en alle leden van dit type</key>
+
+    <key alias="thisEditorUpdateSettings">die gebruik maken van deze editor zullen geupdate worden met deze nieuwe instellingen</key>
+
+    <key alias="memberCanEdit">Lid kan bewerken</key>
+    <key alias="showOnMemberProfile">Toon in het profiel van leden</key>
+    <key alias="tabHasNoSortOrder">tab heeft geen sorteervolgorde</key>
+  </area>
+
+  <area alias="modelsBuilder">
+      <key alias="buildingModels">Models aan het gereneren</key>
+      <key alias="waitingMessage">dit kan enige tijd duren, geduld aub</key>
+      <key alias="modelsGenerated">Models gegenereerd</key>
+      <key alias="modelsGeneratedError">Models konden niet gegenereerd worden</key>
+      <key alias="modelsExceptionInUlog">Models generatie is mislukt, kijk in de Umbraco log voor details</key>
+  </area>
+  
   <area alias="templateEditor">
     <key alias="alternativeField">Alternatief veld</key>
     <key alias="alternativeText">Alternatieve tekst</key>
@@ -916,7 +1181,8 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   </area>
   <area alias="translation">
     <key alias="assignedTasks">Taken aan jou toegewezen</key>
-    <key alias="assignedTasksHelp"><![CDATA[Onderstaande lijst toont vertalingstaken aan jou toegewezen. Om een meer gedetailleerd overzicht te zien, met comments, klik op "Details" of de naam van de pagina. Je kan ook de pagina direct downloaden als XML door te klikken op "Download Xml".
+    <key alias="assignedTasksHelp"><![CDATA[Onderstaande lijst toont vertalingstaken aan jou toegewezen. Om een meer gedetailleerd overzicht te zien, met comments, klik op "Details" of de naam van de pagina. 
+	Je kan ook de pagina direct downloaden als XML door te klikken op "Download Xml".
 Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de "Sluit" knop.
     ]]></key>
     <key alias="closeTask">Sluit taak</key>
@@ -932,18 +1198,24 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
       Dit is een geautomatiseerde mail om u op de hoogte te brengen dat document '%1%'
       is aangevraagd voor vertaling naar '%5%' door %2%.
 
-      Ga naar http://%3%/Umbraco/translation/default.aspx?id=%4% om te bewerken.
+      Ga naar http://%3%/translation/details.aspx?id=%4% om te bewerken.
+	  Of log in bij Umbraco om een overzicht te krijgen van al jouw vertalingen.
 
-      Een prettige dag!
+	  
+      Met vriendelijke groet!
 
-      Dit is een bericht van uw Content Management Systeem.
-    
+	  
+      De Umbraco Robot    
         ]]></key>
     <key alias="mailSubject">[%0%] Vertaalopdracht voor %1%</key>
     <key alias="noTranslators">Geen vertaal-gebruikers gevonden. Maak eerst een vertaal-gebruiker aan voordat je pagina's voor vertaling verstuurd</key>
     <key alias="ownedTasks">Taken aangemaakt door jou</key>
-    <key alias="ownedTasksHelp"><![CDATA[De lijst hieronder toont pagina's <strong>die je aanmaakte</strong>. Om een detailweergave met opmerkingen te zien, klik op "Detail" of op de paginanaam. Je kan ook de pagina in XML-formaat downloaden door op de "Download XML"-link te klikken. Om een vertalingstaak te sluiten, klik je op de "Sluiten"-knop in detailweergave.]]></key>
+    <key alias="ownedTasksHelp"><![CDATA[De lijst hieronder toont pagina's <strong>die je aanmaakte</strong>. 
+	Om een detailweergave met opmerkingen te zien, klik op "Detail" of op de paginanaam. 
+	Je kan ook de pagina in XML-formaat downloaden door op de "Download XML"-link te klikken. 
+	Om een vertalingstaak te sluiten, klik je op de "Sluiten"-knop in detailweergave.]]></key>
     <key alias="pageHasBeenSendToTranslation">De pagina '%0%' is verstuurd voor vertaling</key>
+	<key alias="noLanguageSelected">Kies de taal waarin deze contetn vertaald moet worden</key>
     <key alias="sendToTranslate">Stuur voor vertaling</key>
     <key alias="taskAssignedBy">Toegewezen door</key>
     <key alias="taskOpened">Taak geopend</key>
@@ -973,7 +1245,8 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="memberGroups">Ledengroepen</key>
     <key alias="memberRoles">Rollen</key>
     <key alias="memberTypes">Ledentypes</key>
-    <key alias="documentTypes">Documenttypes</key>
+    <key alias="documentTypes">Documenttypen</key>
+	<key alias="relationTypes">RelatieTypen</key>
     <key alias="packager">Packages</key>
     <key alias="packages">Packages</key>
     <key alias="python">Python-bestanden</key>
@@ -985,6 +1258,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Sjablonen</key>
     <key alias="xslt">XSLT Bestanden</key>
+	<key alias="analytics">Analytics</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Nieuwe update beschikbaar</key>
@@ -1010,6 +1284,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="mediastartnode">Startnode in Mediabibliotheek</key>
     <key alias="modules">Secties</key>
     <key alias="noConsole">Blokkeer Umbraco toegang</key>
+	<key alias="oldPassword">Oude wachtwoord</key>
     <key alias="password">Wachtwoord</key>
     <key alias="resetPassword">Reset wachtwoord</key>
     <key alias="passwordChanged">Je wachtwoord is veranderd!</key>
@@ -1030,10 +1305,138 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="usertype">Gebruikerstype</key>
     <key alias="userTypes">Gebruikerstypes</key>
     <key alias="writer">Auteur</key>
+	<key alias="translator">Vertaler</key>
     <key alias="change">Wijzig</key>
-
     <key alias="yourProfile" version="7.0">Je profiel</key>
     <key alias="yourHistory" version="7.0">Je recente historie</key>
     <key alias="sessionExpires" version="7.0">Sessie verloopt over</key>
+  </area>
+	 <area alias="validation">
+    <key alias="validation">Validatie</key>
+    <key alias="validateAsEmail">Valideer als email</key>
+    <key alias="validateAsNumber">Valideer als nummer</key>
+    <key alias="validateAsUrl">Valideer als Url</key>
+    <key alias="enterCustomValidation">...of gebruik custom validatie</key>
+    <key alias="fieldIsMandatory">Veld is verplicht</key>
+  </area>
+  <area alias="healthcheck">
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: XPath
+		   3: Configuration file path
+	  -->
+    <key alias="checkSuccessMessage">Waarde is insteld naar the aanbevolen waarde: '%0%'.</key>
+    <key alias="rectifySuccessMessage">Waarde was '%1%' voor XPath '%2%' in configuratie bestand '%3%'.</key>
+    <key alias="checkErrorMessageDifferentExpectedValue">De verwachtte waarde voor '%2%' is '%1%' in configuratie bestand '%3%', maar is '%0%'.</key>
+    <key alias="checkErrorMessageUnexpectedValue">Onverwachte waarde '%0%' gevonden voor '%2%' in configuratie bestand '%3%'.</key>
+
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+	  -->
+    <key alias="customErrorsCheckSuccessMessage">Custom foutmeldingen zijn ingesteld op '%0%'.</key>
+    <key alias="customErrorsCheckErrorMessage">Custom foutmeldingen zijn momenteel '%0%'. Wij raden aan deze aan te passen naar '%1%' voor livegang.</key>
+    <key alias="customErrorsCheckRectifySuccessMessage">Custom foutmeldingen aangepast naar '%0%'.</key>
+
+    <key alias="macroErrorModeCheckSuccessMessage">Macro foutmeldingen zijn ingesteld op'%0%'.</key>
+    <key alias="macroErrorModeCheckErrorMessage">Macro foutmeldingen zijn ingesteld op '%0%'. Dit zal er voor zorgen dat bepaalde, of alle, pagina's van de website niet geladen kunnen worden als er errors in een Macro zitten. Corrigeren zal deze waarde aanpassen naar '%1%'.</key>
+    <key alias="macroErrorModeCheckRectifySuccessMessage">Macro foutmeldingen zijn aangepast naar '%0%'.</key>
+
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: Server version
+	  -->
+    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Try Skip IIS Custom foutmeldingen is ingesteld op '%0%'. IIS versie '%1%' wordt gebruikt.</key>
+    <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom foutmeldingen is ingesteld op '%0%'. Het wordt voor de gebruikte IIS versie (%2%) aangeraden deze in te stellen op '%1%'.</key>
+    <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom foutmeldingen ingesteld op '%0%'.</key>
+
+    <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
+    <key alias="configurationServiceFileNotFound">Het volgende bestand bestaat niet: '%0%'.</key>
+    <key alias="configurationServiceNodeNotFound"><![CDATA[<strong>'%0%'</strong> kon niet gevonden worden in configuratie bestand <strong>'%1%'</strong>.]]></key>
+    <key alias="configurationServiceError">Er is een fout opgetreden. Bekijk de log file voor de volledige fout: %0%.</key>
+
+    <key alias="xmlDataIntegrityCheckMembers">Members - Totaal XML: %0%, Totaal: %1%, Total incorrect: %2%</key>
+    <key alias="xmlDataIntegrityCheckMedia">Media - Totaal XML: %0%, Totaal: %1%, Total incorrect: %2%</key>
+    <key alias="xmlDataIntegrityCheckContent">Content - Totaal XML: %0%, Totaal gepubliceerd: %1%, Total incorrect: %2%</key>
+
+    <key alias="httpsCheckValidCertificate">Het cerficaat van de website is ongeldig.</key>
+    <key alias="httpsCheckInvalidCertificate">Cerficaat validatie foutmelding: '%0%'</key>
+    <key alias="httpsCheckInvalidUrl">Fout bij pingen van URL %0% - '%1%'</key>
+    <key alias="httpsCheckIsCurrentSchemeHttps">De site wordt momenteel %0% bekeken via HTTPS.</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">De appSetting 'umbracoUseSSL' in web.config staat op 'false'. Indien HTTPS gebruikt wordt moet deze op 'true' staan.</key>
+    <key alias="httpsCheckConfigurationCheckResult">De appSetting 'umbracoUseSSL' in web.config is ingesteld op '%0%'. Cookies zijn %1% ingesteld als secure.</key>
+    <key alias="httpsCheckEnableHttpsError">De 'umbracoUseSSL' waarde in web.config kon niet aangepast worden. Foutmelding: %0%</key>
+
+    <!-- The following keys don't get tokens passed in -->
+    <key alias="httpsCheckEnableHttpsButton">HTTPS inschakelen</key>
+    <key alias="httpsCheckEnableHttpsDescription">Zet in de appSettings van de web.config de umbracoSSL instelling op 'true'.</key>
+    <key alias="httpsCheckEnableHttpsSuccess">De appSetting 'umbracoUseSSL' is nu ingesteld op 'true', cookies zullen als 'secure' worden aangemerkt.</key>
+
+    <key alias="rectifyButton">Fix</key>
+    <key alias="cannotRectifyShouldNotEqual">Cannot fix a check with a value comparison type of 'ShouldNotEqual'.</key>
+    <key alias="cannotRectifyShouldEqualWithValue">Cannot fix a check with a value comparison type of 'ShouldEqual' with a provided value.</key>
+    <key alias="valueToRectifyNotProvided">Value to fix check not provided.</key>
+
+    <key alias="compilationDebugCheckSuccessMessage">Debug compiliate mode staat uit.</key>
+    <key alias="compilationDebugCheckErrorMessage">Debug compiliate mode staat momenteel aan. Wij raden aan deze instelling uit te zetten voor livegang.</key>
+    <key alias="compilationDebugCheckRectifySuccessMessage">Debug compiliate mode uitgezet.</key>
+
+    <key alias="traceModeCheckSuccessMessage">Trace mode staat uit.</key>
+    <key alias="traceModeCheckErrorMessage">Trace mode staat momenteel aan. Wij raden aan deze instelling uit te zetten voor livegang.</key>
+    <key alias="traceModeCheckRectifySuccessMessage">Trace mode uitgezet.</key>
+
+    <key alias="folderPermissionsCheckMessage">Alle mappen hebben de juiste permissie-instellingen!.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+    <key alias="requiredFolderPermissionFailed"><![CDATA[De volgende bestanden moeten wijzig-rechten krijgen om Umbraco goed te laten werken: <strong>%0%</strong>.]]></key>
+    <key alias="optionalFolderPermissionFailed"><![CDATA[Aangeraden wordt de volgende bestanden wijzig-rechten te geven om Umbraco goed te laten werken: <strong>%0%</strong>. Als deze niet in gebruik zijn voor deze omgeving hoeft er geen actie te worden ondernomen.]]></key>
+
+    <key alias="filePermissionsCheckMessage">All files have the correct permissions set.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+    <key alias="requiredFilePermissionFailed"><![CDATA[De volgende bestanden moeten schrijf-rechten krijgen om Umbraco goed te laten werken: <strong>%0%</strong>.]]></key>
+    <key alias="optionalFilePermissionFailed"><![CDATA[Aangeraden wordt de volgende bestanden schrijf-rechten te geven om Umbraco goed te laten werken: <strong>%0%</strong>. Als deze niet in gebruik zijn voor deze omgeving hoeft er geen actie te worden ondernomen.]]></key>
+
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[De <strong>X-Frame-Options</strong> header of meta-tag om IFRAMEing door andere websites te voorkomen is aanwezig!]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[De <strong>X-Frame-Options</strong> header of meta-tag om IFRAMEing door andere websites te voorkomen is NIET aanwezig.]]></key>
+    <key alias="clickJackingSetHeaderInConfig">Voorkom IFRAMEing via web.config</key>
+    <key alias="clickJackingSetHeaderInConfigDescription">Voegt de instelling toe aan de httpProtocol/customHeaders section in web.config om IFRAMEing door andere websites te voorkomen.</key>
+    <key alias="clickJackingSetHeaderInConfigSuccess">De instelling om IFRAMEing door andere websites te voorkomen is toegevoegd aan de web.config!</key>
+    <key alias="clickJackingSetHeaderInConfigError">Web.config kon niet aangepast worden door error: %0%</key>
+
+    <!-- The following key get these tokens passed in:
+	    0: Comma delimitted list of headers found
+  	-->
+    <key alias="excessiveHeadersFound"><![CDATA[De volgende header welke informatie tonen over de gebruikte website technologie zijn aangetroffen: <strong>%0%</strong>.]]></key>
+    <key alias="excessiveHeadersNotFound">Er zijn geen headeres gevonden welke informatie over de gebruikte website technologie prijsgeven!</key>
+
+    <key alias="smtpMailSettingsNotFound">In de Web.config werd system.net/mailsettings niet gevonden</key>
+    <key alias="smtpMailSettingsHostNotConfigured">In de Web.config sectie system.net/mailsettings is de host niet geconfigureerd.</key>
+    <key alias="smtpMailSettingsConnectionSuccess">SMTP instellingen zijn correct ingesteld en werken zoals verwacht.</key>
+    <key alias="smtpMailSettingsConnectionFail">De SMTP server geconfigureerd met host '%0%' en poort '%1%' kon niet gevonden worden. Controleer of de SMTP instellingen in Web.config file system.net/mailsettings correct zijn.</key>
+
+    <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notificatie email is verzonden naar <strong>%0%</strong>.]]></key>
+    <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notificatie email staat nog steeds op de default waarde van <strong>%0%</strong>.]]></key>
+  </area>
+	<area alias="redirectUrls">
+    <key alias="disableUrlTracker">URL tracker uitzetten</key>
+    <key alias="enableUrlTracker">URL tracker aanzetten</key>
+    <key alias="originalUrl">Originele URL</key>
+    <key alias="redirectedTo">Doorgestuurd naar</key>
+    <key alias="noRedirects">Er zijn geen redirects</key>
+    <key alias="noRedirectsDescription">Er wordt automatisch een redirect aangemaakt als een gepubliceerde pagina hernoemd of verplaatst wordt.</key>
+    <key alias="removeButton">Verwijder</key>
+    <key alias="confirmRemove">Weet je zeker dat je de redirect van '%0%' naar '%1%' wilt verwijderen?</key>
+    <key alias="redirectRemoved">Redirect URL verwijderd.</key>
+    <key alias="redirectRemoveError">Fout bij verwijderen redirect URL.</key>
+    <key alias="confirmDisable">Weet je zeker dat je de URL tracker wilt uitzetten?</key>
+    <key alias="disabledConfirm">URL tracker staat nu uit.</key>
+    <key alias="disableError">Fout bij het uitzetten van de URL Tracker. Meer informatie kan gevonden worden in de log file.</key>
+    <key alias="enabledConfirm">URL tracker staat nu aan.</key>
+    <key alias="enableError">Fout bij het aanzetten van de URL tracker. Meer informatie kan gevonden worden in de log file.</key>
   </area>
 </language>

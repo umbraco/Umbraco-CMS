@@ -9,6 +9,7 @@ using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Security;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Security
 {
@@ -76,7 +77,8 @@ namespace Umbraco.Core.Security
         private bool _requiresQuestionAndAnswer;
         private bool _requiresUniqueEmail;
         private string _customHashAlgorithmType ;
-        internal bool UseLegacyEncoding;
+
+        public bool UseLegacyEncoding { get; private set; }
 
         #region Properties
 
@@ -323,6 +325,14 @@ namespace Umbraco.Core.Security
                 throw new MembershipPasswordException("Change password canceled due to password validation failure.");
             }
 
+            //Special case to allow changing password without validating existing credentials
+            //This is used during installation only
+            if (AllowManuallyChangingPassword == false && ApplicationContext.Current != null
+                && ApplicationContext.Current.IsConfigured == false && oldPassword == "default")
+            {
+                return PerformChangePassword(username, oldPassword, newPassword);
+            }
+
             if (AllowManuallyChangingPassword == false)
             {
                 if (ValidateUser(username, oldPassword) == false) return false;
@@ -511,7 +521,11 @@ namespace Umbraco.Core.Security
 
         public override string ResetPassword(string username, string answer)
         {
-            if (EnablePasswordReset == false)
+            var userService = ApplicationContext.Current == null ? null : ApplicationContext.Current.Services.UserService;
+
+            var canReset = this.CanResetPassword(userService);                
+
+            if (canReset == false)
             {
                 throw new NotSupportedException("Password reset is not supported");
             }

@@ -14,16 +14,18 @@ using Umbraco.Core.Packaging;
 using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic;
 using System.Diagnostics;
-using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
 using umbraco.interfaces;
+using Umbraco.Core.Events;
+using Umbraco.Core.Packaging.Models;
+using Umbraco.Core.Services;
 
 namespace umbraco.cms.businesslogic.packager
 {
     /// <summary>
     /// The packager is a component which enables sharing of both data and functionality components between different umbraco installations.
     /// 
-    /// The output is a .umb (a zip compressed file) which contains the exported documents/medias/macroes/documenttypes (etc.)
+    /// The output is a .umb (a zip compressed file) which contains the exported documents/medias/macros/documenttypes (etc.)
     /// in a Xml document, along with the physical files used (images/usercontrols/xsl documents etc.)
     /// 
     /// Partly implemented, import of packages is done, the export is *under construction*.
@@ -507,6 +509,7 @@ namespace umbraco.cms.businesslogic.packager
                 }
 
                 OnPackageBusinessLogicInstalled(insPack);
+                OnPackageInstalled(insPack);
             }
         }
 
@@ -517,6 +520,7 @@ namespace umbraco.cms.businesslogic.packager
         /// <param name="tempDir"></param>
         public void InstallCleanUp(int packageId, string tempDir)
         {
+            
             if (Directory.Exists(tempDir))
             {
                 Directory.Delete(tempDir, true);
@@ -813,6 +817,22 @@ namespace umbraco.cms.businesslogic.packager
         {
             EventHandler<InstalledPackage> handler = PackageBusinessLogicInstalled;
             if (handler != null) handler(null, e);
+        }
+
+        private void OnPackageInstalled(InstalledPackage insPack)
+        {
+            // getting an InstallationSummary for sending to the PackagingService.ImportedPackage event
+            var fileService = ApplicationContext.Current.Services.FileService;
+            var macroService = ApplicationContext.Current.Services.MacroService;
+            var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
+            var dataTypeService = ApplicationContext.Current.Services.DataTypeService;
+            var localizationService = ApplicationContext.Current.Services.LocalizationService;
+
+            var installationSummary = insPack.GetInstallationSummary(contentTypeService, dataTypeService, fileService, localizationService, macroService);
+            installationSummary.PackageInstalled = true;
+
+            var args = new ImportPackageEventArgs<InstallationSummary>(installationSummary, false);
+            PackagingService.OnImportedPackage(args);
         }
     }
 }

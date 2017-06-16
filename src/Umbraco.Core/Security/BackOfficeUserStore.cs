@@ -494,7 +494,7 @@ namespace Umbraco.Core.Security
 
             //the stamp cannot be null, so if it is currently null then we'll just return a hash of the password
             return Task.FromResult(user.SecurityStamp.IsNullOrWhiteSpace() 
-                ? user.PasswordHash.ToMd5()
+                ? user.PasswordHash.GenerateHash()
                 : user.SecurityStamp);
         }
 
@@ -625,6 +625,12 @@ namespace Umbraco.Core.Security
             var anythingChanged = false;
             //don't assign anything if nothing has changed as this will trigger
             //the track changes of the model
+            if ((user.LastLoginDate != default(DateTime) && identityUser.LastLoginDateUtc.HasValue == false)
+                || identityUser.LastLoginDateUtc.HasValue && user.LastLoginDate.ToUniversalTime() != identityUser.LastLoginDateUtc.Value)
+            {
+                anythingChanged = true;
+                user.LastLoginDate = identityUser.LastLoginDateUtc.Value.ToLocalTime();
+            }
             if (user.Name != identityUser.Name && identityUser.Name.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;

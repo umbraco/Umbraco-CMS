@@ -27,7 +27,8 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                 description: preVals[i].description,
                 label: preVals[i].label,
                 view: preVals[i].view,
-                value: preVals[i].value
+                value: preVals[i].value,
+                config: preVals[i].config,
             });
         }
     }
@@ -178,8 +179,6 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
 
                     //share state
                     editorState.set($scope.content);
-
-                    dataTypeHelper.rebindChangedProperties($scope.content, data);
                 });
         }
 

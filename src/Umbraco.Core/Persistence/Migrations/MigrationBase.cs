@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Migrations
             Logger = logger;
         }
 
-        internal IMigrationContext Context;
+        public IMigrationContext Context;
 
         public abstract void Up();
         public abstract void Down();
