@@ -8,12 +8,12 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.HealthCheck
 {
-    internal class HealthCheckResults
+    public class HealthCheckResults
     {
         private readonly Dictionary<string, IEnumerable<HealthCheckStatus>> _results;
         internal readonly bool AllChecksSuccessful;
 
-        internal HealthCheckResults(IEnumerable<HealthCheck> checks)
+        public HealthCheckResults(IEnumerable<HealthCheck> checks)
         {
             _results = checks.ToDictionary(
                 t => t.Name, 
@@ -49,7 +49,7 @@ namespace Umbraco.Web.HealthCheck
             }
         }
 
-        internal void LogResults()
+        public void LogResults()
         {
             LogHelper.Info<HealthCheckResults>("Scheduled health check results:");
             foreach (var result in _results)
@@ -73,7 +73,7 @@ namespace Umbraco.Web.HealthCheck
             }
         }
 
-        internal string ResultsAsMarkDown(HealthCheckNotificationVerbosity verbosity, bool slackMarkDown = false)
+        public string ResultsAsMarkDown(HealthCheckNotificationVerbosity verbosity, bool slackMarkDown = false)
         {
             var newItem = "- ";
             if (slackMarkDown)
@@ -121,7 +121,7 @@ namespace Umbraco.Web.HealthCheck
             return sb.ToString();
         }
 
-        internal string ResultsAsHtml(HealthCheckNotificationVerbosity verbosity)
+        public string ResultsAsHtml(HealthCheckNotificationVerbosity verbosity)
         {
             var mark = new Markdown();
             var html = mark.Transform(ResultsAsMarkDown(verbosity));
@@ -151,6 +151,7 @@ namespace Umbraco.Web.HealthCheck
                     .Replace("<em>", "_")
                     .Replace("</em>", "_");
             }
+
             return html.Replace("<strong>", "**")
                 .Replace("</strong>", "**")
                 .Replace("<em>", "*")

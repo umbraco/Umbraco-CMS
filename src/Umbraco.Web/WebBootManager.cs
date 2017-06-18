@@ -544,6 +544,8 @@ namespace Umbraco.Web
 
             HealthCheckResolver.Current = new HealthCheckResolver(LoggerResolver.Current.Logger,
                 () => PluginManager.ResolveTypes<HealthCheck.HealthCheck>());
+            HealthCheckNotificationMethodResolver.Current = new HealthCheckNotificationMethodResolver(LoggerResolver.Current.Logger,
+                () => PluginManager.ResolveTypes<HealthCheck.NotificationMethods.IHealthCheckNotificatationMethod>());
         }
 
         /// <summary>
