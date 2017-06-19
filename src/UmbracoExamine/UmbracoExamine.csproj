@@ -53,14 +53,8 @@
     <PackageReference Include="NPoco" Version="3.5.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\umbraco.cms\umbraco.cms.csproj">
-      <Name>umbraco.cms</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Name>Umbraco.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">
-      <Name>umbraco.datalayer</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
