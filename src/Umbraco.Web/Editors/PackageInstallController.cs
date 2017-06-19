@@ -544,8 +544,10 @@ namespace Umbraco.Web.Editors
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallFiles(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
 
-            var restartMarker = RestartMarkerManager.CreateRestartMarker();
-            model.RestartId = restartMarker;
+            //set a restarting marker and reset the app pool
+            ApplicationContext.RestartApplicationPool(Request.TryGetHttpContext().Result);
+            
+            model.IsRestarting = true;
 
             return model;
         }
@@ -553,13 +555,13 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel CheckRestart(PackageInstallModel model)
         {
-            if (model.RestartId == null) return model;
+            if (model.IsRestarting == false) return model;
 
-            var exists = RestartMarkerManager.RestartMarkerExists();
-            if (exists == false)
+            //check for the key, if it's not there we're are restarted
+            if (Request.TryGetHttpContext().Result.Application.AllKeys.Contains("AppPoolRestarting") == false)
             {
                 //reset it
-                model.RestartId = null;
+                model.IsRestarting = false;
             }
             return model;
         }

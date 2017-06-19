@@ -227,9 +227,7 @@ namespace Umbraco.Web
 
             //Now ensure webapi is initialized after everything
             GlobalConfiguration.Configuration.EnsureInitialized();
-
-            RestartMarkerManager.ClearRestartMarkers();
-
+            
             return this;
         }
 

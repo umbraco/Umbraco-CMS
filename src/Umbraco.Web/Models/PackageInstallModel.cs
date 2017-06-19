@@ -27,7 +27,7 @@ namespace Umbraco.Web.Models
         /// <summary>
         /// During installation this can be used to track any pending appdomain restarts
         /// </summary>
-        [DataMember(Name = "restartId")]
-        public Guid? RestartId { get; set; }
+        [DataMember(Name = "isRestarting")]
+        public bool IsRestarting { get; set; }
     }
 }
