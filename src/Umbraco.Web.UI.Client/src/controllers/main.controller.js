@@ -18,8 +18,9 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         { value: "assets/img/application/logo@2x.png" },
         { value: "assets/img/application/logo@3x.png" }
     ];
-    $scope.touchDevice = appState.getGlobalState("touchDevice");
 
+    $scope.touchDevice = appState.getGlobalState("touchDevice");
+    
 
     $scope.removeNotification = function (index) {
         notificationsService.remove(index);
@@ -130,6 +131,16 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             show: true
         };
     }));
+
+
+    // manage the help dialog by subscribing to the showHelp appState
+    $scope.showhelpDrawer = false;
+    evts.push(eventsService.on("appState.globalState.changed", function (e, args) {
+        if (args.key === "showHelp") {
+            $scope.showhelpDrawer = args.value;
+        }
+    }));
+
 
     //ensure to unregister from all events!
     $scope.$on('$destroy', function () {

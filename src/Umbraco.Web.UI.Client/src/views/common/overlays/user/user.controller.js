@@ -1,5 +1,5 @@
 angular.module("umbraco")
-    .controller("Umbraco.Overlays.UserController", function ($scope, $location, $timeout, userService, historyService, eventsService, externalLoginInfo, authResource, currentUserResource, formHelper, localizationService) {
+    .controller("Umbraco.Overlays.UserController", function ($scope, $location, $timeout, dashboardResource, userService, historyService, eventsService, externalLoginInfo, authResource, currentUserResource, formHelper, localizationService) {
 
         $scope.history = historyService.getCurrent();
         $scope.version = Umbraco.Sys.ServerVariables.application.version + " assembly: " + Umbraco.Sys.ServerVariables.application.assemblyVersion;
@@ -173,4 +173,7 @@ angular.module("umbraco")
            $scope.changePasswordModel.confirm = "";
         }
 
+        dashboardResource.getDashboard("user-profile").then(function (dashboard) {
+            $scope.dashboard = dashboard;
+        });
     });

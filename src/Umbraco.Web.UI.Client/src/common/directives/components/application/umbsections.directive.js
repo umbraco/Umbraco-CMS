@@ -111,30 +111,11 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
                 scope.userDialog = null;
             }
 
-			scope.helpClick = function(){
-
-                if(scope.userDialog) {
-                    closeUserDialog();
-                }
-
-                if(!scope.helpDialog) {
-                    scope.helpDialog = {
-                        view: "help",
-                        show: true,
-                        close: function(oldModel) {
-                            closeHelpDialog();
-                        }
-                    };
-                } else {
-                    closeHelpDialog();
-                }
-
-			};
-
-            function closeHelpDialog() {
-                scope.helpDialog.show = false;
-                scope.helpDialog = null;
-            }
+            //toggle the help dialog by raising the global app state to toggle the help drawer
+            scope.helpClick = function () {
+                var currentHelpState = appState.getGlobalState("showHelp");
+                appState.setGlobalState("showHelp", !currentHelpState);
+            };
 
 			scope.sectionClick = function (event, section) {
 
@@ -149,9 +130,7 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
                 if (scope.userDialog) {
                     closeUserDialog();
 			    }
-			    if (scope.helpDialog) {
-                    closeHelpDialog();
-			    }
+			    
 
 			    navigationService.hideSearch();
 			    navigationService.showTree(section.alias);

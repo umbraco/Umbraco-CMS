@@ -547,6 +547,9 @@
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.htm" />
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.resource.js" />
+    <Content Include="App_Plugins\motivational\cat.html" />
+    <Content Include="App_Plugins\Starterkit\starterkithelp.controller.js" />
+    <Content Include="App_Plugins\Starterkit\starterkithelp.html" />
     <Content Include="Config\grid.editors.config.js" />
     <Content Include="Config\Lang\cs-CZ.user.xml" />
     <Content Include="Config\Lang\da-DK.user.xml" />
@@ -607,6 +610,7 @@
     </Content>
     <Content Include="Umbraco\Install\Views\Web.config" />
     <Content Include="App_Plugins\ModelsBuilder\package.manifest" />
+    <Content Include="App_Plugins\Starterkit\package.manifest" />
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>

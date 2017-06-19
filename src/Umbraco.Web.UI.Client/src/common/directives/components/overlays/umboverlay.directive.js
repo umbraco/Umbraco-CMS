@@ -440,7 +440,10 @@ Opens an overlay to show a custom YSOD. </br>
                // event on other overlays is run before registering a new one
                registerOverlay();
 
-               setOverlayIndent();
+               //only need to adjust the indent when we have right-positioned overlay
+               if (scope.position === "right") {
+                   setOverlayIndent();
+               }
 
             });
 
@@ -449,12 +452,18 @@ Opens an overlay to show a custom YSOD. </br>
          function setView() {
 
             if (scope.view) {
-
+                
+               //we do this to avoid a hidden dialog to start loading unconfigured views before the first activation
+               var configuredView = scope.view;
                if (scope.view.indexOf(".html") === -1) {
                   var viewAlias = scope.view.toLowerCase();
-                  scope.view = "views/common/overlays/" + viewAlias + "/" + viewAlias + ".html";
+                  configuredView = "views/common/overlays/" + viewAlias + "/" + viewAlias + ".html";
                }
 
+               if (configuredView !== scope.configuredView) {
+                   scope.configuredView = configuredView;
+               }
+               
             }
 
          }
@@ -474,7 +483,7 @@ Opens an overlay to show a custom YSOD. </br>
 
             $(document).bind("keydown.overlay-" + overlayNumber, function(event) {
 
-               if (event.which === 27) {
+                if (event.which === 27) {
 
                   numberOfOverlays = overlayHelper.getNumberOfOverlays();
 
@@ -485,7 +494,8 @@ Opens an overlay to show a custom YSOD. </br>
                   }
 
                   event.preventDefault();
-               }
+                }
+
 
                if (event.which === 13) {
 
@@ -524,7 +534,7 @@ Opens an overlay to show a custom YSOD. </br>
 
             if(isRegistered) {
 
-               overlayHelper.unregisterOverlay();
+                overlayHelper.unregisterOverlay();
 
                $(document).unbind("keydown.overlay-" + overlayNumber);
 
@@ -648,17 +658,20 @@ Opens an overlay to show a custom YSOD. </br>
              scope.model.confirmSubmit.show = false;
          };
 
-         scope.closeOverLay = function() {
+         
+         scope.closeOverLay = function(force) {
 
-            unregisterOverlay();
+             if (!scope.sticky || force) {
+                 unregisterOverlay();
 
-            if (scope.model.close) {
-               scope.model = modelCopy;
-               scope.model.close(scope.model);
-            } else {
-                scope.model.show = false;
-               scope.model = null;
-            }
+                 if (scope.model.close) {
+                     scope.model = modelCopy;
+                     scope.model.close(scope.model);
+                 } else {
+                     scope.model.show = false;
+                     scope.model = null;
+                 }
+             }
 
          };
 

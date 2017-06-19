@@ -6,12 +6,14 @@
       var numberOfOverlays = 0;
 
       function registerOverlay() {
-         numberOfOverlays++;
+          numberOfOverlays++;
+
          return numberOfOverlays;
       }
 
       function unregisterOverlay() {
-         numberOfOverlays--;
+          numberOfOverlays--;
+
          return numberOfOverlays;
       }
 
@@ -19,11 +21,16 @@
          return numberOfOverlays;
       }
 
+      function showBackdrop() {
+          return numberOfOverlays > 0;
+      }
+
       var service = {
          numberOfOverlays: numberOfOverlays,
          registerOverlay: registerOverlay,
          unregisterOverlay: unregisterOverlay,
-         getNumberOfOverlays: getNumberOfOverlays
+         getNumberOfOverlays: getNumberOfOverlays,
+         showBackdrop: showBackdrop
       };
 
       return service;

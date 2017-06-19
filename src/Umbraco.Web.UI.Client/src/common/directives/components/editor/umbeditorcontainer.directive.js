@@ -47,9 +47,9 @@ Use this directive to construct a main content area inside the main editor windo
          scope.numberOfOverlays = 0;
 
          scope.$watch(function(){
-            return overlayHelper.getNumberOfOverlays();
+            return overlayHelper.showBackdrop();
          }, function (newValue) {
-            scope.numberOfOverlays = newValue;
+             scope.showBackdrop = newValue;
          });
 
       }

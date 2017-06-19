@@ -44,7 +44,8 @@ function appState(eventsService) {
         stickyNavigation: null,
         navMode: null,
         isReady: null,
-        isTablet: null
+        isTablet: null,
+        showHelp: false
     };
     
     var sectionState = {
