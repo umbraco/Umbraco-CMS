@@ -158,29 +158,25 @@ namespace Umbraco.Web.HealthCheck
                 .Replace("</em>", "*");
         }
 
-        public Dictionary<string, IEnumerable<HealthCheckStatus>> Results(StatusResultType resultType)
+        public Dictionary<string, IEnumerable<HealthCheckStatus>> GetResultsForStatus(StatusResultType resultType)
         {
-            // a check is considered a success status if all checks are successful or info
-            var successResults = _results.Where(x => x.Value.Any(y => y.ResultType == StatusResultType.Success) && x.Value.All(y => y.ResultType == StatusResultType.Success || y.ResultType == StatusResultType.Info));
-
-            // a check is considered warn status if one check is warn and all others are success or info
-            var warnResults = _results.Where(x => x.Value.Any(y => y.ResultType == StatusResultType.Warning) && x.Value.All(y => y.ResultType == StatusResultType.Warning || y.ResultType == StatusResultType.Success || y.ResultType == StatusResultType.Info));
-
-            // a check is considered error status if any check is error
-            var errorResults = _results.Where(x => x.Value.Any(y => y.ResultType == StatusResultType.Error));
-
-            // a check is considered info status if all checks are info
-            var infoResults = _results.Where(x => x.Value.All(y => y.ResultType == StatusResultType.Info));
-
             switch (resultType)
             {
                 case StatusResultType.Success:
+                    // a check is considered a success status if all checks are successful or info
+                    var successResults = _results.Where(x => x.Value.Any(y => y.ResultType == StatusResultType.Success) && x.Value.All(y => y.ResultType == StatusResultType.Success || y.ResultType == StatusResultType.Info));
                     return successResults.ToDictionary(x => x.Key, x => x.Value);
                 case StatusResultType.Warning:
+                    // a check is considered warn status if one check is warn and all others are success or info
+                    var warnResults = _results.Where(x => x.Value.Any(y => y.ResultType == StatusResultType.Warning) && x.Value.All(y => y.ResultType == StatusResultType.Warning || y.ResultType == StatusResultType.Success || y.ResultType == StatusResultType.Info));
                     return warnResults.ToDictionary(x => x.Key, x => x.Value);
                 case StatusResultType.Error:
+                    // a check is considered error status if any check is error
+                    var errorResults = _results.Where(x => x.Value.Any(y => y.ResultType == StatusResultType.Error));
                     return errorResults.ToDictionary(x => x.Key, x => x.Value);
                 case StatusResultType.Info:
+                    // a check is considered info status if all checks are info
+                    var infoResults = _results.Where(x => x.Value.All(y => y.ResultType == StatusResultType.Info));
                     return infoResults.ToDictionary(x => x.Key, x => x.Value);
             }
 
