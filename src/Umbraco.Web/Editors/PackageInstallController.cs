@@ -543,6 +543,24 @@ namespace Umbraco.Web.Editors
             var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallFiles(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
+
+            var restartMarker = RestartMarkerManager.CreateRestartMarker();
+            model.RestartId = restartMarker;
+
+            return model;
+        }
+
+        [HttpPost]
+        public PackageInstallModel CheckRestart(PackageInstallModel model)
+        {
+            if (model.RestartId == null) return model;
+
+            var exists = RestartMarkerManager.RestartMarkerExists();
+            if (exists == false)
+            {
+                //reset it
+                model.RestartId = null;
+            }
             return model;
         }
 
