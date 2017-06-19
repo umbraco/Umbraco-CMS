@@ -1034,6 +1034,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="scriptErrorHeader">Script view not saved</key>
     <key alias="scriptErrorText">An error occurred saving the file.</key>
     <key alias="cssErrorText">An error occurred saving the file.</key>
+
+    <key alias="enableUsersSuccess">Enabled %0% users</key>
+    <key alias="enableUsersError">An error occurred while enabling the users</key>
+    <key alias="disableUsersSuccess">Disabled %0% users</key>
+    <key alias="disableUsersError">An error occurred while disabling the users</key>
+
     <key alias="enableUserSuccess">%0% is now enabled </key>
     <key alias="enableUserError">An error occurred while enabling the user</key>
     <key alias="disableUserSuccess">%0% is now disabled</key>

@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, usersResource, localizationService, contentEditingHelper, usersHelper, formHelper) {
+    function UsersController($scope, $timeout, $location, usersResource, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -58,12 +58,12 @@
         ];
 
         vm.setUsersViewState = setUsersViewState;
-        vm.getUserStateType = getUserStateType;
         vm.selectLayout = selectLayout;
         vm.selectUser = selectUser;
         vm.clearSelection = clearSelection;
         vm.goToUser = goToUser;
-        vm.disableUser = disableUser;
+        vm.disableUsers = disableUsers;
+        vm.enableUsers = enableUsers;
         vm.openUserGroupPicker = openUserGroupPicker;
         vm.removeSelectedUserGroup = removeSelectedUserGroup;
         vm.selectAll = selectAll;
@@ -93,23 +93,10 @@
             vm.usersViewState = state;
         }
 
-        function getUserStateType(state) {
-            switch (state) {
-                case "disabled" || "umbracoDisabled":
-                    return "danger";
-                case "pending":
-                    return "warning";
-                default:
-                    return "success";
-            }
-        }
-
         function selectLayout(selectedLayout) {
-
             angular.forEach(vm.layouts, function (layout) {
                 layout.active = false;
             });
-
             selectedLayout.active = true;
             vm.activeLayout = selectedLayout;
         }
@@ -123,9 +110,7 @@
                 user.selected = true;
                 vm.selection.push(user.id);
             }
-
             setBulkActions(vm.users);
-
         }
 
         function clearSelection() {
@@ -139,8 +124,80 @@
             $location.path('users/users/user/' + user.id);
         }
 
-        function disableUser() {
-            alert("disable users");
+        function disableUsers() {
+            vm.disableUserButtonState = "busy";
+            usersResource.disableUsers(vm.selection).then(function (data) {
+                if (data === "true") {
+                    // update userState
+                    angular.forEach(vm.selection, function(userId){
+                        var user = getUserFromArrayById(userId, vm.users);
+                        if(user) {
+                            user.userState = 1;
+                        }
+                    });
+                    // show the correct badges
+                    setUserDisplayState(vm.users);
+                    // show notification
+                    localizationService.localize("speechBubbles_disableUsersSuccess", [vm.selection.length]).then(function (value) {
+                        notificationsService.success(value);
+                    });
+                    vm.disableUserButtonState = "init";
+                    clearSelection();
+                } else {
+                    vm.disableUserButtonState = "error";
+                    localizationService.localize("speechBubbles_disableUsersError").then(function (value) {
+                        notificationsService.error(value);
+                    });
+                }
+            }, function(error){
+                vm.disableUserButtonState = "error";
+                localizationService.localize("speechBubbles_disableUsersError").then(function (value) {
+                    notificationsService.error(value);
+                });
+            });
+        }
+
+        function enableUsers() {
+            vm.enableUserButtonState = "busy";
+            usersResource.enableUsers(vm.selection).then(function (data) {
+                if (data === "true") {
+                    // update userState
+                    angular.forEach(vm.selection, function(userId){
+                        var user = getUserFromArrayById(userId, vm.users);
+                        if(user) {
+                            user.userState = 0;
+                        }
+                    });
+                    // show the correct badges
+                    setUserDisplayState(vm.users);
+                    // show notification
+                    localizationService.localize("speechBubbles_enableUsersSuccess", [vm.selection.length]).then(function (value) {
+                        notificationsService.success(value);
+                    });
+                    vm.enableUserButtonState = "init";
+                    clearSelection();
+                } else {
+                    vm.enableUserButtonState = "error";
+                    localizationService.localize("speechBubbles_enableUsersError").then(function (value) {
+                        notificationsService.error(value);
+                    });
+                }
+            }, function (error) {
+                vm.enableUserButtonState = "error";
+                localizationService.localize("speechBubbles_enableUsersError").then(function (value) {
+                    notificationsService.error(value);
+                });
+            });
+        }
+
+        function getUserFromArrayById(userId, users) {
+            var userFound;
+            angular.forEach(users, function(user){
+                if(userId === user.id) {
+                    userFound = user;
+                }
+            });
+            return userFound;
         }
 
         function openUserGroupPicker(event) {
@@ -306,7 +363,6 @@
                 vm.usersOptions.totalItems = users.totalItems;
                 vm.usersOptions.totalPages = users.totalPages;
 
-                vm.userStates = getUserStates(vm.users);
                 formatDates(vm.users);
                 setUserDisplayState(vm.users);
 
@@ -317,30 +373,6 @@
                 vm.loading = false;
 
             });
-        }
-
-        function getUserStates(users) {
-            var userStates = [];
-
-            angular.forEach(users, function (user) {
-
-                var newUserState = { "name": user.state, "count": 1 };
-                var userStateExists = false;
-
-                angular.forEach(userStates, function (userState) {
-                    if (newUserState.name === userState.name) {
-                        userState.count = userState.count + 1;
-                        userStateExists = true;
-                    }
-                });
-
-                if (userStateExists === false) {
-                    userStates.push(newUserState);
-                }
-
-            });
-
-            return userStates;
         }
 
         function setUserDisplayState(users) {

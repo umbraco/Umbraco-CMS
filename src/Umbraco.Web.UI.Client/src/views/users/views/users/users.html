@@ -47,6 +47,7 @@
         <umb-editor-sub-header-section>
           <umb-button type="button"
                       label="Clear selection"
+                            size="xs"
                       label-key="buttons_clearSelection"
                       action="vm.clearSelection()"
                       disabled="actionInProgress">
@@ -61,7 +62,7 @@
         <div style="margin-right: 5px;">
           <umb-button ng-if="vm.allowSetUserGroup"
                       type="button"
-                      button-style="link"
+                            size="xs"
                       label="Set group"
                       icon="icon-users"
                       action="vm.setUserGroup()">
@@ -70,19 +71,21 @@
         <div style="margin-right: 5px;">
           <umb-button ng-if="vm.allowEnableUser"
                       type="button"
-                      button-style="link"
+                            size="xs"
+                            state="vm.enableUserButtonState"
                       label="Enable"
                       icon="icon-check"
-                      action="vm.enableUser()">
+                            action="vm.enableUsers()">
           </umb-button>
         </div>
         <div>
           <umb-button ng-if="vm.allowDisableUser"
                       type="button"
-                      button-style="link"
+                            size="xs"
+                            state="vm.disableUserButtonState"
                       label="Disable"
                       icon="icon-block"
-                      action="vm.disableUser()">
+                            action="vm.disableUsers()">
           </umb-button>
         </div>
       </umb-editor-sub-header-content-right>
