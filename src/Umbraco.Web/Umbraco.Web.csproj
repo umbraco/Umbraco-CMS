@@ -999,6 +999,9 @@
     <Compile Include="Trees\PartialViewsTreeController.cs" />
     <Compile Include="UI\Controls\InsertMacroSplitButton.cs" />
     <Compile Include="UI\IAssignedApp.cs" />
+    <Compile Include="_Legacy\Controls\pane.cs" />
+    <Compile Include="_Legacy\Controls\ProgressBar.cs" />
+    <Compile Include="_Legacy\Controls\PropertyPanel.cs" />
     <Compile Include="_Legacy\PackageActions\addApplication.cs" />
     <Compile Include="_Legacy\PackageActions\addApplicationTree.cs" />
     <Compile Include="_Legacy\PackageActions\addDashboardSection.cs" />

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,7 +8,6 @@ using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web.UI.Pages;
-using umbraco.BusinessLogic;
 
 namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 {

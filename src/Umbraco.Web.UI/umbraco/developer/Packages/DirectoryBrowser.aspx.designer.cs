@@ -28,7 +28,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane;
         
         /// <summary>
         /// Output control.

@@ -173,11 +173,9 @@
     -->
   </ItemGroup>
   <ItemGroup>
-  
     <!--
         Which means we also have to have explicit references here ;(
     -->
-  
     <Reference Include="System.Security.Cryptography.Algorithms">
       <HintPath>..\packages\System.Security.Cryptography.Algorithms.4.2.0\lib\net461\System.Security.Cryptography.Algorithms.dll</HintPath>
       <Private>True</Private>
@@ -455,20 +453,8 @@
     <ProjectReference Include="..\UmbracoExamine\UmbracoExamine.csproj">
       <Name>UmbracoExamine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SQLCE4Umbraco\SqlCE4Umbraco.csproj">
-      <Name>SqlCE4Umbraco</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Name>Umbraco.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.controls\umbraco.controls.csproj">
-      <Name>umbraco.controls</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.cms\umbraco.cms.csproj">
-      <Name>umbraco.cms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">
-      <Name>umbraco.datalayer</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Name>Umbraco.Web</Name>
