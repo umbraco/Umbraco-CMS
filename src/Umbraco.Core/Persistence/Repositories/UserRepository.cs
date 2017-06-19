@@ -79,22 +79,25 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IDictionary<UserState, int> GetUserStates()
         {
-            var sql = @"SELECT 
-(SELECT COUNT(id) FROM umbracoUser) AS CountOfAll,
-(SELECT COUNT(id) FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL) AS CountOfActive,
-(SELECT COUNT(id) FROM umbracoUser WHERE userDisabled = 1) AS CountOfDisabled,
-(SELECT COUNT(id) FROM umbracoUser WHERE userNoConsole = 1) AS CountOfLockedOut,
-(SELECT COUNT(id) FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL) AS CountOfInvited";
+            var sql = @"SELECT 'CountOfAll' AS name, COUNT(id) AS num FROM umbracoUser 
+UNION
+SELECT 'CountOfActive' AS name, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL 
+UNION
+SELECT 'CountOfDisabled' AS name, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 1
+UNION
+SELECT 'CountOfLockedOut' AS name, COUNT(id) AS num FROM umbracoUser WHERE userNoConsole = 1
+UNION
+SELECT 'CountOfInvited' AS name, COUNT(id) AS num FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL";
 
-            var result = Database.First<dynamic>(sql);
+            var result = Database.Fetch<dynamic>(sql);
             
             return new Dictionary<UserState, int>
             {
-                {UserState.All, result.CountOfAll},
-                {UserState.Active, result.CountOfActive},
-                {UserState.Disabled, result.CountOfDisabled},
-                {UserState.Invited, result.CountOfInvited},
-                {UserState.LockedOut, result.CountOfLockedOut}
+                {UserState.All, result[0].num},
+                {UserState.Active, result[1].num},
+                {UserState.Disabled, result[2].num},
+                {UserState.LockedOut, result[3].num},
+                {UserState.Invited, result[4].num}
             };
         }
 
