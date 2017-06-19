@@ -42,6 +42,13 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
                 icon = Emoji.WhiteCheckMark;
             }
 
+            var successResults = results.Results(StatusResultType.Success);
+            var warnResults = results.Results(StatusResultType.Warning);
+            var errorResults = results.Results(StatusResultType.Error);
+            var infoResults = results.Results(StatusResultType.Info);
+
+            // todo construct Slack Message using Slack Attachments
+
             var slackMessage = new SlackMessage
             {
                 Channel = Channel,

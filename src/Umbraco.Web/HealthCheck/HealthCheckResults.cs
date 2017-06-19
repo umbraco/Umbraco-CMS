@@ -157,5 +157,34 @@ namespace Umbraco.Web.HealthCheck
                 .Replace("<em>", "*")
                 .Replace("</em>", "*");
         }
+
+        public Dictionary<string, IEnumerable<HealthCheckStatus>> Results(StatusResultType resultType)
+        {
+            // a check is considered a success status if all checks are successful or info
+            var successResults = _results.Where(x => x.Value.Any(y => y.ResultType == StatusResultType.Success) && x.Value.All(y => y.ResultType == StatusResultType.Success || y.ResultType == StatusResultType.Info));
+
+            // a check is considered warn status if one check is warn and all others are success or info
+            var warnResults = _results.Where(x => x.Value.Any(y => y.ResultType == StatusResultType.Warning) && x.Value.All(y => y.ResultType == StatusResultType.Warning || y.ResultType == StatusResultType.Success || y.ResultType == StatusResultType.Info));
+
+            // a check is considered error status if any check is error
+            var errorResults = _results.Where(x => x.Value.Any(y => y.ResultType == StatusResultType.Error));
+
+            // a check is considered info status if all checks are info
+            var infoResults = _results.Where(x => x.Value.All(y => y.ResultType == StatusResultType.Info));
+
+            switch (resultType)
+            {
+                case StatusResultType.Success:
+                    return successResults.ToDictionary(x => x.Key, x => x.Value);
+                case StatusResultType.Warning:
+                    return warnResults.ToDictionary(x => x.Key, x => x.Value);
+                case StatusResultType.Error:
+                    return errorResults.ToDictionary(x => x.Key, x => x.Value);
+                case StatusResultType.Info:
+                    return infoResults.ToDictionary(x => x.Key, x => x.Value);
+            }
+
+            return null;
+        }
     }
 }
