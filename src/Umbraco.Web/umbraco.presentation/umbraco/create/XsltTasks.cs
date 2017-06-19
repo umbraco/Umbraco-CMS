@@ -5,9 +5,11 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
 using Umbraco.Core.FileResources;
+using Umbraco.Core.Models;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.UI;
+using File = System.IO.File;
 
 namespace umbraco
 {
@@ -67,10 +69,16 @@ namespace umbraco
                         name = name.Substring(0, name.Length - 5);
 
 				    name = name.SplitPascalCasing().ToFirstUpperInvariant();
-					cms.businesslogic.macro.Macro m =
-						cms.businesslogic.macro.Macro.MakeNew(name);
-					m.Xslt = fileName;
-                    m.Save();
+					//cms.businesslogic.macro.Macro m =
+					//	cms.businesslogic.macro.Macro.MakeNew(name);
+                    var m = new Macro
+				    {
+				        Name = name,
+				        Alias = name.Replace(" ", String.Empty)
+				    };
+                    m.XsltPath = fileName;
+                    //m.Save();
+                    Current.Services.MacroService.Save(m);
 				}
 			}
 

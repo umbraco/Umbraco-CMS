@@ -107,15 +107,6 @@
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Name>Umbraco.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.controls\umbraco.controls.csproj">
-      <Name>umbraco.controls</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.cms\umbraco.cms.csproj">
-      <Name>umbraco.cms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">
-      <Name>umbraco.datalayer</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <!-- no globbing for now, painful -->
@@ -999,9 +990,26 @@
     <Compile Include="Trees\PartialViewsTreeController.cs" />
     <Compile Include="UI\Controls\InsertMacroSplitButton.cs" />
     <Compile Include="UI\IAssignedApp.cs" />
+    <Compile Include="_Legacy\BusinessLogic\Task.cs" />
+    <Compile Include="_Legacy\BusinessLogic\Tasks.cs" />
+    <Compile Include="_Legacy\BusinessLogic\TaskType.cs" />
+    <Compile Include="_Legacy\Controls\BaseTreePicker.cs" />
+    <Compile Include="_Legacy\Controls\CodeArea.cs" />
+    <Compile Include="_Legacy\Controls\DataAttributes.cs" />
+    <Compile Include="_Legacy\Controls\feedback.cs" />
+    <Compile Include="_Legacy\Controls\FieldDropDownList.cs" />
+    <Compile Include="_Legacy\Controls\MenuButton.cs" />
+    <Compile Include="_Legacy\Controls\MenuButtonI.cs" />
+    <Compile Include="_Legacy\Controls\MenuIcon.cs" />
+    <Compile Include="_Legacy\Controls\MenuIconI.cs" />
     <Compile Include="_Legacy\Controls\pane.cs" />
+    <Compile Include="_Legacy\Controls\Panel.cs" />
     <Compile Include="_Legacy\Controls\ProgressBar.cs" />
     <Compile Include="_Legacy\Controls\PropertyPanel.cs" />
+    <Compile Include="_Legacy\Controls\ScrollingMenu.cs" />
+    <Compile Include="_Legacy\Controls\Splitter.cs" />
+    <Compile Include="_Legacy\Controls\TabPage.cs" />
+    <Compile Include="_Legacy\Controls\TabView.cs" />
     <Compile Include="_Legacy\PackageActions\addApplication.cs" />
     <Compile Include="_Legacy\PackageActions\addApplicationTree.cs" />
     <Compile Include="_Legacy\PackageActions\addDashboardSection.cs" />
@@ -1012,6 +1020,20 @@
     <Compile Include="_Legacy\PackageActions\PackageHelper.cs" />
     <Compile Include="_Legacy\PackageActions\publishRootDocument.cs" />
     <Compile Include="_Legacy\PackageActions\removeStringFromTemplate.cs" />
+    <Compile Include="_Legacy\Packager\data.cs" />
+    <Compile Include="_Legacy\Packager\FileResources\PackageFiles.Designer.cs" />
+    <Compile Include="_Legacy\Packager\Installer.cs" />
+    <Compile Include="_Legacy\Packager\Package.cs" />
+    <Compile Include="_Legacy\Packager\PackageInstance\CreatedPackage.cs" />
+    <Compile Include="_Legacy\Packager\PackageInstance\InstalledPackage.cs" />
+    <Compile Include="_Legacy\Packager\PackageInstance\IPackageInstance.cs" />
+    <Compile Include="_Legacy\Packager\PackageInstance\PackageActions.cs" />
+    <Compile Include="_Legacy\Packager\PackageInstance\PackageInstance.cs" />
+    <Compile Include="_Legacy\Packager\PackageInstance\PackagerUtility.cs" />
+    <Compile Include="_Legacy\Packager\Repositories\Repository.cs" />
+    <Compile Include="_Legacy\Packager\Repositories\RepositoryWebservice.cs" />
+    <Compile Include="_Legacy\Packager\RequirementsType.cs" />
+    <Compile Include="_Legacy\Packager\Settings.cs" />
     <Compile Include="_Legacy\UI\ITask.cs" />
     <Compile Include="_Legacy\UI\ITaskReturnUrl.cs" />
     <Compile Include="_Legacy\UI\LegacyDialogHandler.cs" />
@@ -1680,6 +1702,7 @@
       <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
     </None>
     <None Include="umbraco.presentation\umbraco\templateControls\InlineXslt.xsltTemplate" />
+    <Content Include="_Legacy\Packager\FileResources\Packages.config" />
   </ItemGroup>
   <ItemGroup>
     <WebReferenceUrl Include="http://our.umbraco.org/umbraco/webservices/api/repository.asmx">

@@ -20,7 +20,7 @@ namespace umbraco.presentation.translation {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.UmbracoPanel Panel2;
+        protected global::Umbraco.Web._Legacy.Controls.UmbracoPanel Panel2;
         
         /// <summary>
         /// feedback control.
@@ -29,7 +29,7 @@ namespace umbraco.presentation.translation {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Feedback feedback;
+        protected global::Umbraco.Web._Legacy.Controls.Feedback feedback;
         
         /// <summary>
         /// pane_uploadFile control.
@@ -38,7 +38,7 @@ namespace umbraco.presentation.translation {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_uploadFile;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_uploadFile;
         
         /// <summary>
         /// translationFile control.
@@ -65,7 +65,7 @@ namespace umbraco.presentation.translation {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_tasks;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_tasks;
         
         /// <summary>
         /// lt_tasksHelp control.

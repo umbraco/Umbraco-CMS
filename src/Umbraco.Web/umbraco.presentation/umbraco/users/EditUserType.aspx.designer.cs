@@ -19,7 +19,7 @@ namespace umbraco.cms.presentation.user {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.UmbracoPanel pnlUmbraco;
+        protected global::Umbraco.Web._Legacy.Controls.UmbracoPanel pnlUmbraco;
         
         /// <summary>
         /// pnl1 control.
@@ -28,7 +28,7 @@ namespace umbraco.cms.presentation.user {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pnl1;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pnl1;
         
         /// <summary>
         /// hidUserTypeID control.
@@ -46,7 +46,7 @@ namespace umbraco.cms.presentation.user {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_name;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_name;
         
         /// <summary>
         /// txtUserTypeName control.
@@ -64,7 +64,7 @@ namespace umbraco.cms.presentation.user {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_alias;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_alias;
         
         /// <summary>
         /// lblUserTypeAlias control.
@@ -82,7 +82,7 @@ namespace umbraco.cms.presentation.user {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pnl2;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pnl2;
         
         /// <summary>
         /// pp_rights control.
@@ -91,7 +91,7 @@ namespace umbraco.cms.presentation.user {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_rights;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_rights;
         
         /// <summary>
         /// cbl_rights control.

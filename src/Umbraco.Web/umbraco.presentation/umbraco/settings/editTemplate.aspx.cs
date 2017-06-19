@@ -8,9 +8,8 @@ using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using umbraco.cms.businesslogic.template;
-using umbraco.uicontrols;
-using Umbraco.Web;
+using Umbraco.Core.Models;
+using Umbraco.Web._Legacy.Controls;
 using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
 
@@ -21,7 +20,7 @@ namespace umbraco.cms.presentation.settings
 	/// </summary>
 	public partial class editTemplate : UmbracoEnsuredPage
 	{
-		private Template _template;
+		private Umbraco.Core.Models.ITemplate _template;
         public MenuButton SaveButton;
 
 		public editTemplate()
@@ -49,28 +48,37 @@ namespace umbraco.cms.presentation.settings
 			if (!IsPostBack)
 			{
 				MasterTemplate.Items.Add(new ListItem(Services.TextService.Localize("none"), "0"));
-				foreach (Template t in Template.GetAllAsList())
-				{
-					if (t.Id != _template.Id)
-					{
-						var li = new ListItem(t.Text, t.Id.ToString());
-						li.Attributes.Add("id", t.Alias.Replace(" ", ""));
-						MasterTemplate.Items.Add(li);
-					}
-				}
+			    foreach (var t in Current.Services.FileService.GetTemplates())
+			    {
+			        if (t.Id != _template.Id)
+			        {
+			            var text = t.Name;
+			            if (text.StartsWith("#"))
+			            {
+			                var lang = Current.Services.LocalizationService.GetLanguageByIsoCode(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
+			                if (lang != null && Current.Services.LocalizationService.DictionaryItemExists(text.Substring(1)))
+			                {
+			                    var di = Current.Services.LocalizationService.GetDictionaryItemByKey(text.Substring(1));
+			                    text = di.GetTranslatedValue(lang.Id);
+			                }
+			                else
+			                {
+			                    text = "[" + text + "]";
+			                }
+                        }
+                        var li = new ListItem(text, t.Id.ToString());
+			            li.Attributes.Add("id", t.Alias.Replace(" ", ""));
+			            MasterTemplate.Items.Add(li);
+			        }
+			    }
 
-				NameTxt.Text = _template.GetRawText();
+				NameTxt.Text = _template.Name;
 				AliasTxt.Text = _template.Alias;
-				editorSource.Text = _template.Design;
+				editorSource.Text = _template.Content;
 
-				try
-				{
-					if (_template.MasterTemplate > 0)
-						MasterTemplate.SelectedValue = _template.MasterTemplate.ToString();
-				}
-				catch (Exception ex)
-				{
-				}
+				var master = Current.Services.FileService.GetTemplate(_template.MasterTemplateAlias);
+                if (master != null)
+                    MasterTemplate.SelectedValue = master.Id.ToString();
 
 				ClientTools
                     .SetActiveTreeType(Constants.Trees.Templates)
@@ -83,7 +91,7 @@ namespace umbraco.cms.presentation.settings
 
 		protected override void OnInit(EventArgs e)
 		{
-			_template = new Template(int.Parse(Request.QueryString["templateID"]));
+		    _template = Current.Services.FileService.GetTemplate(int.Parse(Request.QueryString["templateID"]));
 			//
 			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
 			//
@@ -262,7 +270,7 @@ namespace umbraco.cms.presentation.settings
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.TabView Panel1;
+		protected global::Umbraco.Web._Legacy.Controls.TabView Panel1;
 
 		/// <summary>
 		/// Pane7 control.
@@ -271,8 +279,8 @@ namespace umbraco.cms.presentation.settings
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.Pane Pane7;
-        protected global::umbraco.uicontrols.Pane Pane8;
+		protected global::Umbraco.Web._Legacy.Controls.Pane Pane7;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane8;
 
 		/// <summary>
 		/// pp_name control.
@@ -281,7 +289,7 @@ namespace umbraco.cms.presentation.settings
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_name;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_name;
 
 		/// <summary>
 		/// NameTxt control.
@@ -299,7 +307,7 @@ namespace umbraco.cms.presentation.settings
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_alias;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_alias;
 
 		/// <summary>
 		/// AliasTxt control.
@@ -317,7 +325,7 @@ namespace umbraco.cms.presentation.settings
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_masterTemplate;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_masterTemplate;
 
 		/// <summary>
 		/// MasterTemplate control.
@@ -335,7 +343,7 @@ namespace umbraco.cms.presentation.settings
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_source;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_source;
 
 		/// <summary>
 		/// editorSource control.
@@ -344,7 +352,7 @@ namespace umbraco.cms.presentation.settings
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.CodeArea editorSource;
+		protected global::Umbraco.Web._Legacy.Controls.CodeArea editorSource;
 
 		/// <summary>
 		/// rpt_codeTemplates control.

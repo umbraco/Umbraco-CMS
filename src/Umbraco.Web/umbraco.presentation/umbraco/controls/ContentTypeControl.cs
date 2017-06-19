@@ -16,7 +16,7 @@
 //    /// </summary>
 //	[Obsolete("No longer used, will be removed in v8")]
 //    [EditorBrowsable(EditorBrowsableState.Never)]
-//    public class ContentTypeControl : uicontrols.TabView
+//    public class ContentTypeControl : Umbraco.Web._Legacy.Controls.TabView
 //    {
 //        public event System.EventHandler OnSave;
 //        public event System.EventHandler OnPropertyTypeCreate;
@@ -26,22 +26,22 @@
 //        protected TextBox AliasTxt = new TextBox();
 //        protected DropDownList IconDDL = new DropDownList();
 //        protected TextBox TabTxt = new TextBox();
-//        protected uicontrols.Pane GenericPropertyTypes;
-//        private uicontrols.Pane TabsPane = new uicontrols.Pane();
+//        protected Umbraco.Web._Legacy.Controls.Pane GenericPropertyTypes;
+//        private Umbraco.Web._Legacy.Controls.Pane TabsPane = new Umbraco.Web._Legacy.Controls.Pane();
 //        private NodeTypeAddPropertyTypeControl AddPropertyTypeCtrl;
 //        private System.Collections.ArrayList tabDDLs = new ArrayList();
 //        private HtmlGenericControl br = new HtmlGenericControl();
 //        private NodeTypeEditorControl NodeTypeEditorCtrl;
-//        private uicontrols.Pane pp;
-//        private uicontrols.TabPage Panel1;
-//        private uicontrols.TabPage Panel2;
-//        private uicontrols.TabPage Panel3;
-//        private uicontrols.TabPage Panel4;
+//        private Umbraco.Web._Legacy.Controls.Pane pp;
+//        private Umbraco.Web._Legacy.Controls.TabPage Panel1;
+//        private Umbraco.Web._Legacy.Controls.TabPage Panel2;
+//        private Umbraco.Web._Legacy.Controls.TabPage Panel3;
+//        private Umbraco.Web._Legacy.Controls.TabPage Panel4;
 //        private BasePages.BasePage prnt;
 //        private ListBox AllowedContentTypes;
 //        private ArrayList extraPropertyPanes = new ArrayList();
 
-//        public void addPropertyPaneToGeneralTab(uicontrols.Pane pp) {
+//        public void addPropertyPaneToGeneralTab(Umbraco.Web._Legacy.Controls.Pane pp) {
 //            extraPropertyPanes.Add(pp);
 //        }
 //        public ContentTypeControl(cms.businesslogic.ContentType ct, string id) {
@@ -54,7 +54,7 @@
 //            this.Height = Unit.Pixel(600);
 //            string UmbracoPath = SystemDirectories.Umbraco;
 //            Panel1 = this.NewTabPage("Generelt");
-//            uicontrols.MenuImageButton Save = Panel1.Menu.NewImageButton();
+//            Umbraco.Web._Legacy.Controls.MenuImageButton Save = Panel1.Menu.NewImageButton();
 //            Save.Click += new System.Web.UI.ImageClickEventHandler(save_click);
 //            Save.ID = "Panel1Save";
 //            Save.ImageUrl = UmbracoPath + "/images/editor/save.gif";
@@ -136,7 +136,7 @@
 //                {foreach (int i in allowedIds) if (i == ct.Id) li.Selected= true;}
 //            }
 
-//            pp = new uicontrols.Pane();
+//            pp = new Umbraco.Web._Legacy.Controls.Pane();
 //            pp.addProperty("Tilladte indholdstyper",AllowedContentTypes);
 //            Panel3.Controls.Add(pp);
 //        }
@@ -183,7 +183,7 @@
 
 //        private void setupGeneralInfoTab() 
 //        {
-//            uicontrols.Pane pp = new uicontrols.Pane();
+//            Umbraco.Web._Legacy.Controls.Pane pp = new Umbraco.Web._Legacy.Controls.Pane();
 					
 //            DirectoryInfo dirInfo = new DirectoryInfo( IOHelper.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
 //            FileInfo[] fileInfo = dirInfo.GetFiles();
@@ -210,7 +210,7 @@
 //            br = new HtmlGenericControl();
 //            br.TagName = "p";
 //            Panel1.Controls.Add(br);
-//            foreach (uicontrols.Pane p in extraPropertyPanes) {
+//            foreach (Umbraco.Web._Legacy.Controls.Pane p in extraPropertyPanes) {
 //                Panel1.Controls.Add(p);
 //            }
 //        }
@@ -220,7 +220,7 @@
 //        private void setupGenericPropertyTypesTab() 
 //        {
 //            // Add new generic propertytype
-//            pp = new uicontrols.Pane();
+//            pp = new Umbraco.Web._Legacy.Controls.Pane();
 			
 //            AddPropertyTypeCtrl = new NodeTypeAddPropertyTypeControl(docType,this);
 //            pp.addProperty(AddPropertyTypeCtrl); 
@@ -237,7 +237,7 @@
 //        private void loadGenericPropertyTypesOnPane() 
 //        {
 //            // View/ Edit all propertytypes..
-//            GenericPropertyTypes = new uicontrols.Pane();
+//            GenericPropertyTypes = new Umbraco.Web._Legacy.Controls.Pane();
 
 //            NodeTypeEditorCtrl = new NodeTypeEditorControl(this);
 //            GenericPropertyTypes.addProperty(NodeTypeEditorCtrl);
@@ -250,7 +250,7 @@
 
 //        private void setupTabTab() 
 //        {
-//            pp = new uicontrols.Pane();
+//            pp = new Umbraco.Web._Legacy.Controls.Pane();
 //            pp.addProperty("Ny tab", TabTxt);
 //            Panel2.Controls.Add(pp);
 
@@ -267,7 +267,7 @@
 
 //        private void LoadExistingTabsOnTabsPane()  
 //        {
-//            uicontrols.Pane TabsPane = new uicontrols.Pane();
+//            Umbraco.Web._Legacy.Controls.Pane TabsPane = new Umbraco.Web._Legacy.Controls.Pane();
 //            foreach (cms.businesslogic.ContentType.TabI t in docType.getVirtualTabs.ToList())
 //            {
 //                Button tb = new Button();

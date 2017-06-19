@@ -58,7 +58,7 @@ namespace umbraco.dialogs
                     if (notifications.Any(x => x.Action == a.Letter.ToString()))
                         c.Checked = true;
 
-                    uicontrols.PropertyPanel pp = new umbraco.uicontrols.PropertyPanel();
+                    var pp = new Umbraco.Web._Legacy.Controls.PropertyPanel();
                     pp.CssClass = "inline";
                     pp.Text = Services.TextService.Localize("actions", a.Alias);
                     pp.Controls.Add(c);
@@ -96,9 +96,9 @@ namespace umbraco.dialogs
 
             Current.Services.NotificationService.SetNotifications(Security.CurrentUser, node, notifications.ToCharArray().Select(x => x.ToString()).ToArray());
 
-            var feedback = new umbraco.uicontrols.Feedback();
+            var feedback = new Umbraco.Web._Legacy.Controls.Feedback();
             feedback.Text = Services.TextService.Localize("notifications") + " " + Services.TextService.Localize("ok") + "</p><p><a href='#' class='btn btn-primary' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
-            feedback.type = umbraco.uicontrols.Feedback.feedbacktype.success;
+            feedback.type = Umbraco.Web._Legacy.Controls.Feedback.feedbacktype.success;
 
             pane_form.Controls.Clear();
             pane_form.Controls.Add(feedback);

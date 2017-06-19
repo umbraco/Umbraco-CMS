@@ -1,23 +1,13 @@
 using System;
-using System.Data;
-using System.Configuration;
 using System.Collections;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-
 using System.Xml;
-using System.Xml.Schema;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.task;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
+using Umbraco.Web.Composing;
+using Umbraco.Web._Legacy.BusinessLogic;
 
 namespace umbraco.presentation.translation
 {
@@ -47,7 +37,7 @@ namespace umbraco.presentation.translation
 
                     xmlContents.Text = root.OuterXml;
 
-                    Response.AddHeader("Content-Disposition", "attachment; filename=" + t.Node.Text.Replace(" ", "_") + ".xml");
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + t.TaskEntityEntity.Name.Replace(" ", "_") + ".xml");
                 }
             }
             else
@@ -57,11 +47,11 @@ namespace umbraco.presentation.translation
 
                 foreach (Task t in Task.GetTasks(Security.CurrentUser, false))
                 {
-                    if (!nodes.ContainsKey(t.Node.Path))
+                    if (!nodes.ContainsKey(t.TaskEntityEntity.Path))
                     {
                         var xTask = CreateTaskNode(t, _xd);
                         totalWords += int.Parse(xTask.Attributes.GetNamedItem("TotalWords").Value);
-                        nodes.Add(t.Node.Path, xTask);
+                        nodes.Add(t.TaskEntityEntity.Path, xTask);
                     }
                 }
 
@@ -90,20 +80,26 @@ namespace umbraco.presentation.translation
 
         private XmlElement CreateTaskNode(Task t, XmlDocument xd)
         {
-            var d = new Document(t.Node.Id);
-            var x = d.ToPreviewXml(xd);//  xd.CreateNode(XmlNodeType.Element, "node", "");
+            //var d = new Document(t.Node.Id);
+            //var x = d.ToPreviewXml(xd);//  xd.CreateNode(XmlNodeType.Element, "node", "");
+
+            var content = Current.Services.ContentService.GetById(t.TaskEntity.EntityId);
+
+            var exs = new EntityXmlSerializer();
+            var x = exs.Serialize(Current.Services.ContentService, Current.Services.DataTypeService, Current.Services.UserService, Current.UrlSegmentProviders, content);
+
 
             var xTask = xd.CreateElement("task");
             xTask.SetAttributeNode(XmlHelper.AddAttribute(xd, "Id", t.Id.ToString()));
             xTask.SetAttributeNode(XmlHelper.AddAttribute(xd, "Date", t.Date.ToString("s")));
-            xTask.SetAttributeNode(XmlHelper.AddAttribute(xd, "NodeId", t.Node.Id.ToString()));
+            xTask.SetAttributeNode(XmlHelper.AddAttribute(xd, "NodeId", t.TaskEntity.EntityId.ToString()));
             //TODO: Make this work again with correct APIs and angularized - so none of this code will exist anymore
             //xTask.SetAttributeNode(XmlHelper.AddAttribute(xd, "TotalWords", cms.businesslogic.translation.Translation.CountWords(d.Id).ToString()));
             xTask.AppendChild(XmlHelper.AddCDataNode(xd, "Comment", t.Comment));
             string protocol = GlobalSettings.UseSSL ? "https" : "http";
             xTask.AppendChild(XmlHelper.AddTextNode(xd, "PreviewUrl", protocol + "://" + Request.ServerVariables["SERVER_NAME"] + SystemDirectories.Umbraco + "/translation/preview.aspx?id=" + t.Id.ToString()));
             //            d.XmlPopulate(xd, ref x, false);
-            xTask.AppendChild(x);
+            xTask.AppendChild(x.ToXmlElement());
 
             return xTask;
         }

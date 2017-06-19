@@ -20,7 +20,7 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Feedback feedback1;
+        protected global::Umbraco.Web._Legacy.Controls.Feedback feedback1;
         
         /// <summary>
         /// pane_form control.
@@ -29,7 +29,7 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_form;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_form;
         
         /// <summary>
         /// PropertyPanel1 control.
@@ -38,7 +38,7 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel1;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel1;
         
         /// <summary>
         /// docLit control.
@@ -56,7 +56,7 @@ namespace umbraco.presentation.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel2;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel2;
         
         /// <summary>
         /// changeSetUrl control.

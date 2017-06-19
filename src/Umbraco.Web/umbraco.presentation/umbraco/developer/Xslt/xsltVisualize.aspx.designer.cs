@@ -20,7 +20,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane1;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane1;
         
         /// <summary>
         /// PropertyPanel1 control.
@@ -29,7 +29,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel1;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel1;
         
         /// <summary>
         /// xsltSelection control.
@@ -65,7 +65,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane visualizeContainer;
+        protected global::Umbraco.Web._Legacy.Controls.Pane visualizeContainer;
         
         /// <summary>
         /// visualizePanel control.
@@ -74,7 +74,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel visualizePanel;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel visualizePanel;
         
         /// <summary>
         /// visualizeArea control.

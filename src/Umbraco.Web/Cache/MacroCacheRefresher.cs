@@ -6,7 +6,6 @@ using umbraco;
 using Umbraco.Core.Persistence.Repositories;
 using System.Linq;
 using Newtonsoft.Json;
-using Macro = umbraco.cms.businesslogic.macro.Macro;
 
 namespace Umbraco.Web.Cache
 {

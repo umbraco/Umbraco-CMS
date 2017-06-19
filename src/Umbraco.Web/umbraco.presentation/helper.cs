@@ -1,18 +1,6 @@
 using System;
 using System.Collections;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Web;
-using Umbraco.Core;
-using Umbraco.Core.CodeAnnotations;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Profiling;
-using umbraco.BusinessLogic;
-using System.Xml;
-using umbraco.presentation;
-using Umbraco.Web;
 using Umbraco.Web.Macros;
-using Umbraco.Web.UI.Pages;
 
 namespace umbraco
 {
@@ -26,7 +14,7 @@ namespace umbraco
         {
             int result;
             return int.TryParse(number, out result);
-        }        
+        }
 
         public static string FindAttribute(IDictionary attributes, string key)
         {

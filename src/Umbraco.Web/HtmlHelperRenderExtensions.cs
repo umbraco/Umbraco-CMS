@@ -11,15 +11,12 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Profiling;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
-using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace Umbraco.Web
 {
@@ -101,7 +98,8 @@ namespace Umbraco.Web
 			}
 			if (cacheByMember)
 			{
-				var currentMember = Member.GetCurrentMember();
+                var helper = new MembershipHelper(Current.UmbracoContext);
+				var currentMember = helper.GetCurrentMember();
 				cacheKey.AppendFormat("m{0}-", currentMember == null ? 0 : currentMember.Id);
 			}
 			if (contextualKeyBuilder != null)

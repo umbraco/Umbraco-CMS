@@ -1,10 +1,6 @@
 using System;
 using System.Linq;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using umbraco;
-using umbraco.cms.businesslogic.web;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Web.Cache
@@ -254,18 +250,6 @@ namespace Umbraco.Web.Cache
             dc.RefreshByJson(MacroCacheRefresher.UniqueId, MacroCacheRefresher.Serialize(macro));
         }
 
-        public static void RefreshMacroCache(this DistributedCache dc, global::umbraco.cms.businesslogic.macro.Macro macro)
-        {
-            if (macro == null) return;
-            dc.RefreshByJson(MacroCacheRefresher.UniqueId, MacroCacheRefresher.Serialize(macro));
-        }
-
-        public static void RemoveMacroCache(this DistributedCache dc, global::umbraco.cms.businesslogic.macro.Macro macro)
-        {
-            if (macro == null) return;
-            dc.RefreshByJson(MacroCacheRefresher.UniqueId, MacroCacheRefresher.Serialize(macro));
-        }
-
         #endregion
 
         #region Content/Media/Member type cache
@@ -338,18 +322,6 @@ namespace Umbraco.Web.Cache
         {
             if (language == null) return;
             dc.Remove(LanguageCacheRefresher.UniqueId, language.Id);
-        }
-
-        public static void RefreshLanguageCache(this DistributedCache dc, global::umbraco.cms.businesslogic.language.Language language)
-        {
-            if (language == null) return;
-            dc.Refresh(LanguageCacheRefresher.UniqueId, language.id);
-        }
-
-        public static void RemoveLanguageCache(this DistributedCache dc, global::umbraco.cms.businesslogic.language.Language language)
-        {
-            if (language == null) return;
-            dc.Remove(LanguageCacheRefresher.UniqueId, language.id);
         }
 
         #endregion

@@ -2,7 +2,9 @@ using System;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
 using Umbraco.Core._Legacy.PackageActions;
 using Umbraco.Web.Composing;
@@ -38,10 +40,11 @@ namespace Umbraco.Web._Legacy.PackageActions
 			string htmlElementId = xmlData.Attributes["htmlElementId"].Value;
 			string position = xmlData.Attributes["position"].Value;
 			string value = XmlHelper.GetNodeValue(xmlData);
-			global::umbraco.cms.businesslogic.template.Template tmp = global::umbraco.cms.businesslogic.template.Template.GetByAlias(templateAlias);
+			var tmp = Current.Services.FileService.GetTemplate(templateAlias);
 
-            if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
-				value = tmp.EnsureMasterPageSyntax(value);
+		    if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
+		        //value = tmp.EnsureMasterPageSyntax(value);
+		        value = MasterPageHelper.EnsureMasterPageSyntax(templateAlias, value);
 
 			_addStringToHtmlElement(tmp, value, htmlElementId, position);
 
@@ -60,12 +63,13 @@ namespace Umbraco.Web._Legacy.PackageActions
 			string templateAlias = xmlData.Attributes["templateAlias"].Value;
 			string htmlElementId = xmlData.Attributes["htmlElementId"].Value;
 			string value = XmlHelper.GetNodeValue(xmlData);
-			global::umbraco.cms.businesslogic.template.Template tmp = global::umbraco.cms.businesslogic.template.Template.GetByAlias(templateAlias);
+		    var tmp = Current.Services.FileService.GetTemplate(templateAlias);
 
-			if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
-				value = tmp.EnsureMasterPageSyntax(value);
+            if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
+                //value = tmp.EnsureMasterPageSyntax(value);
+                value = MasterPageHelper.EnsureMasterPageSyntax(templateAlias, value);
 
-			_removeStringFromHtmlElement(tmp, value, htmlElementId);
+            _removeStringFromHtmlElement(tmp, value, htmlElementId);
 			return true;
 		}
 
@@ -78,7 +82,7 @@ namespace Umbraco.Web._Legacy.PackageActions
 			return "addStringToHtmlElement";
 		}
 
-		private void _addStringToHtmlElement(global::umbraco.cms.businesslogic.template.Template tmp, string value, string htmlElementId, string position)
+		private void _addStringToHtmlElement(ITemplate tmp, string value, string htmlElementId, string position)
 		{
 			bool hasAspNetContentBeginning = false;
 			string design = "";
@@ -92,14 +96,14 @@ namespace Umbraco.Web._Legacy.PackageActions
 					templateXml.PreserveWhitespace = true;
 
 					//Make sure that directive is remove before hacked non html4 compatiple replacement action... 
-					design = tmp.Design;
+					design = tmp.Content;
 
 
 					splitDesignAndDirective(ref design, ref directive);
 
-					//making sure that the template xml has a root node...
-					if (tmp.MasterTemplate > 0)
-						templateXml.LoadXml(PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, "<root>" + design + "</root>", true));
+                    //making sure that the template xml has a root node...
+				    if (string.IsNullOrWhiteSpace(tmp.MasterTemplateAlias) == false)
+                        templateXml.LoadXml(PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, "<root>" + design + "</root>", true));
 					else
 						templateXml.LoadXml(PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, design, true));
 
@@ -118,8 +122,8 @@ namespace Umbraco.Web._Legacy.PackageActions
 						}
 					}
 
-					tmp.Design = directive + "\n" + PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, templateXml.OuterXml, false);
-					tmp.Save();
+					tmp.Content = directive + "\n" + PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, templateXml.OuterXml, false);
+                    Current.Services.FileService.SaveTemplate(tmp);
 				}
 				catch (Exception ex)
 				{
@@ -132,7 +136,7 @@ namespace Umbraco.Web._Legacy.PackageActions
 			}
 		}
 
-		private void _removeStringFromHtmlElement(global::umbraco.cms.businesslogic.template.Template tmp, string value, string htmlElementId)
+		private void _removeStringFromHtmlElement(ITemplate tmp, string value, string htmlElementId)
 		{
 			bool hasAspNetContentBeginning = false;
 			string design = "";
@@ -147,11 +151,11 @@ namespace Umbraco.Web._Legacy.PackageActions
 					templateXml.PreserveWhitespace = true;
 
 					//Make sure that directive is remove before hacked non html4 compatiple replacement action... 
-					design = tmp.Design;
+					design = tmp.Content;
 					splitDesignAndDirective(ref design, ref directive);
 
 					//making sure that the template xml has a root node...
-					if (tmp.MasterTemplate > 0)
+                    if (string.IsNullOrWhiteSpace(tmp.MasterTemplateAlias) == false)
 						templateXml.LoadXml(PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, "<root>" + design + "</root>", true));
 					else
 						templateXml.LoadXml(PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, design, true));
@@ -166,8 +170,8 @@ namespace Umbraco.Web._Legacy.PackageActions
 						xmlElement.InnerXml = xmlElement.InnerXml.Replace(repValue, "");
 					}
 
-					tmp.Design = directive + "\n" + PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, templateXml.OuterXml, false);
-					tmp.Save();
+					tmp.Content = directive + "\n" + PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, templateXml.OuterXml, false);
+					Current.Services.FileService.SaveTemplate(tmp);
 				}
 				catch (Exception ex)
 				{

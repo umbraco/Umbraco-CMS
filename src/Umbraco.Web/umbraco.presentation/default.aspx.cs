@@ -1,23 +1,16 @@
 ﻿using System;
-using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.UI;
 using System.IO;
-using System.Xml;
-using System.Text.RegularExpressions;
-using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Profiling;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Web.Templates;
-using umbraco.cms.businesslogic.web;
-using umbraco.cms.businesslogic;
 using Umbraco.Web.Composing;
 
 namespace umbraco

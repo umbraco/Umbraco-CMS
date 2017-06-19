@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Web.Mvc;
 using System.Web.UI;
-using System.Web.UI.HtmlControls;
 using ClientDependency.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
-using umbraco.DataLayer;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.UI.Controls

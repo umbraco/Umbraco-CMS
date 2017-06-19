@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Linq;
 using System.Xml;
+using Umbraco.Core.Models;
 using Umbraco.Core._Legacy.PackageActions;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web._Legacy.PackageActions
 {
@@ -29,15 +31,17 @@ namespace Umbraco.Web._Legacy.PackageActions
 			string doctypeName = xmlData.Attributes["documentTypeAlias"].Value;
 			string parentDoctypeName = xmlData.Attributes["parentDocumentTypeAlias"].Value;
 
-			global::umbraco.cms.businesslogic.ContentType ct = global::umbraco.cms.businesslogic.ContentType.GetByAlias(doctypeName);
-			global::umbraco.cms.businesslogic.ContentType parentct = global::umbraco.cms.businesslogic.ContentType.GetByAlias(parentDoctypeName);
+			//global::umbraco.cms.businesslogic.ContentType ct = global::umbraco.cms.businesslogic.ContentType.GetByAlias(doctypeName);
+			//global::umbraco.cms.businesslogic.ContentType parentct = global::umbraco.cms.businesslogic.ContentType.GetByAlias(parentDoctypeName);
+		    var ct = Current.Services.ContentTypeService.Get(doctypeName);
+            var parentct = Current.Services.ContentTypeService.Get(parentDoctypeName);
 
-			if (ct != null && parentct != null)
+            if (ct != null && parentct != null)
 			{
 				bool containsId = false;
 				ArrayList tmp = new ArrayList();
 
-				foreach (int i in parentct.AllowedChildContentTypeIDs.ToList())
+				foreach (int i in parentct.AllowedContentTypes.Select(x => x.Id.Value).ToList())
 				{
 					tmp.Add(i);
 					if (i == ct.Id)
@@ -51,8 +55,11 @@ namespace Umbraco.Web._Legacy.PackageActions
 					for (int i = 0; i < tmp.Count; i++) ids[i] = (int)tmp[i];
 					ids[ids.Length - 1] = ct.Id;
 
-					parentct.AllowedChildContentTypeIDs = ids;
-					parentct.Save();
+					//parentct.AllowedChildContentTypeIDs = ids;
+				    var so = 0;
+				    parentct.AllowedContentTypes = ids.Select(x => new ContentTypeSort(x, so++));
+					//parentct.Save();
+                    Current.Services.ContentTypeService.Save(parentct);
 					return true;
 				}
 			}

@@ -1,16 +1,7 @@
 using System;
 using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using Umbraco.Core.Configuration;
-using umbraco.cms.businesslogic.propertytype;
 using Umbraco.Core;
 using Umbraco.Web.UI.Pages;
 
@@ -34,14 +25,17 @@ namespace umbraco.developer
             // generic properties
             string existingGenProps = ",";
 		    var exclude = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
-            foreach (PropertyType pt in PropertyType.GetAll().Where(x => exclude.Contains(x.Alias) == false))
+
+		    var propertyTypes = Services.ContentTypeService.GetAllPropertyTypeAliases();
+
+            foreach (var ptAlias in propertyTypes.Where(x => exclude.Contains(x) == false))
 		    {
-                if (!existingGenProps.Contains("," + pt.Alias + ","))
+                if (!existingGenProps.Contains("," + ptAlias + ","))
                 {
-                    preValuesSource.Add(pt.Alias);
+                    preValuesSource.Add(ptAlias);
                         
 
-                    existingGenProps += pt.Alias + ",";
+                    existingGenProps += ptAlias + ",";
                 }
 		    }
                 

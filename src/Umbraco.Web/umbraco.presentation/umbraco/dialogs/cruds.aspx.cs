@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Web;
 using umbraco.cms.businesslogic;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web._Legacy.Actions;
@@ -26,19 +27,19 @@ namespace umbraco.dialogs
         }
 
         private readonly Dictionary<string, HtmlTableRow> _permissions = new Dictionary<string, HtmlTableRow>();
-        private CMSNode _node;
+        private IUmbracoEntity _node;
         
         protected void Page_Load(object sender, EventArgs e)
         {
             Button1.Text = Services.TextService.Localize("update");
-            pane_form.Text = Services.TextService.Localize("actions/SetPermissionsForThePage",_node.Text); 
+            pane_form.Text = Services.TextService.Localize("actions/SetPermissionsForThePage",_node.Name); 
         }
 
         override protected void OnInit(EventArgs e)
         {
             base.OnInit(e);
 
-            _node = new CMSNode(Request.GetItemAs<int>("id"));
+            _node = Services.EntityService.Get(Request.GetItemAs<int>("id"));
 
             var ht = new HtmlTable();
             ht.Attributes.Add("class", "table");
@@ -157,12 +158,16 @@ namespace umbraco.dialogs
                 {
                     cruds = user.Value;
                 }
-                BusinessLogic.Permission.UpdateCruds(user.Key, _node, cruds);       
+                //BusinessLogic.Permission.UpdateCruds(user.Key, _node, cruds);
+                Current.Services.UserService.ReplaceUserPermissions(
+                    user.Key.Id,
+                    cruds.ToCharArray(),
+                    _node.Id);
             }
 
             // Update feedback message
             //FeedBackMessage.Text = "<div class=\"feedbackCreate\">" + Services.TextService.Localize("rights") + " " + Services.TextService.Localize("ok") + "</div>";
-            feedback1.type = uicontrols.Feedback.feedbacktype.success;
+            feedback1.type = Umbraco.Web._Legacy.Controls.Feedback.feedbacktype.success;
             feedback1.Text = Services.TextService.Localize("rights") + " " + Services.TextService.Localize("ok");
             PlaceHolder1.Visible = false;
             panel_buttons.Visible = false;
@@ -177,7 +182,7 @@ namespace umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_form;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_form;
 
         /// <summary>
         /// feedback1 control.
@@ -186,7 +191,7 @@ namespace umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Feedback feedback1;
+        protected global::Umbraco.Web._Legacy.Controls.Feedback feedback1;
 
         /// <summary>
         /// PlaceHolder1 control.

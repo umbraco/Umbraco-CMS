@@ -1,21 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
-using System.Web.Caching;
 using System.Web.UI;
 using System.Xml;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Macros;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Templates;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.web;
-using Umbraco.Web;
 using Umbraco.Web.Composing;
 
 namespace umbraco.presentation.templateControls

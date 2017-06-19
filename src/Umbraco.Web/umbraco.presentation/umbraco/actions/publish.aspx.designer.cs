@@ -20,7 +20,7 @@ namespace umbraco.presentation.actions {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.UmbracoPanel Panel2;
+        protected global::Umbraco.Web._Legacy.Controls.UmbracoPanel Panel2;
         
         /// <summary>
         /// confirm control.
@@ -38,7 +38,7 @@ namespace umbraco.presentation.actions {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_publish;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_publish;
         
         /// <summary>
         /// warning control.
@@ -65,7 +65,7 @@ namespace umbraco.presentation.actions {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane deleteMessage;
+        protected global::Umbraco.Web._Legacy.Controls.Pane deleteMessage;
         
         /// <summary>
         /// deleted control.

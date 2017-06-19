@@ -58,7 +58,7 @@ namespace umbraco.cms.presentation.create.controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp1;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp1;
 
         /// <summary>
         /// Cultures control.

@@ -30,16 +30,14 @@ namespace Umbraco.Web._Legacy.PackageActions
 
 			int parentDocid = 0;
 
-			global::umbraco.cms.businesslogic.web.Document[] rootDocs = global::umbraco.cms.businesslogic.web.Document.GetRootDocuments();
+			//global::umbraco.cms.businesslogic.web.Document[] rootDocs = global::umbraco.cms.businesslogic.web.Document.GetRootDocuments();
+		    var rootDocs = Current.Services.ContentService.GetRootContent();
 
-			foreach (global::umbraco.cms.businesslogic.web.Document rootDoc in rootDocs)
+			foreach (var rootDoc in rootDocs)
 			{
-				if (rootDoc.Text.Trim() == documentName.Trim() && rootDoc != null && rootDoc.ContentType != null)
+				if (rootDoc.Name.Trim() == documentName.Trim() && rootDoc != null && rootDoc.ContentType != null)
 				{
-
-					rootDoc.PublishWithChildrenWithResult(Current.Services.UserService.GetUserById(0));
-
-
+				    Current.Services.ContentService.PublishWithChildrenWithStatus(rootDoc, 0, true);
 					break;
 				}
 			}

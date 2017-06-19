@@ -1,16 +1,9 @@
 using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
+using System.Collections.Generic;
 using System.Linq;
-using umbraco.BusinessLogic;
+using System.Text;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Web.UI.Pages;
 
 namespace umbraco.developer
@@ -27,33 +20,40 @@ namespace umbraco.developer
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			// Put user code to initialize the page here
-			foreach(var dt in cms.businesslogic.web.DocumentType.GetAllAsList()) 
-			{
-				LabelDoc.Text +=
-					"<div class=\"propertyType\"><p class=\"documentType\">" + dt.Text + "</p><p class=\"type\">Id: " + dt.Id.ToString() + ", Alias: " + dt.Alias + ")</p>";
-				if (dt.PropertyTypes.Count > 0)
-					LabelDoc.Text += "<p class=\"docHeader\">Property Types:</p>";
-				foreach (var pt in dt.PropertyTypes)
-					LabelDoc.Text +=
-						"<p class=\"type\">" + pt.Id.ToString() + ", " + pt.Alias + ", " + pt.Name + "</p>";
-				if (dt.getVirtualTabs.Length > 0)
-					LabelDoc.Text += "<p class=\"docHeader\">Tabs:</p>";
-                foreach (var t in dt.getVirtualTabs.ToList())
-					LabelDoc.Text +=
-						"<p class=\"type\">" + t.Id.ToString() + ", " + t.Caption + "</p>";
-				if (dt.AllowedChildContentTypeIDs.Length > 0)
-					LabelDoc.Text += "<p class=\"docHeader\">Allowed children:</p>";
-				foreach (var child in dt.AllowedChildContentTypeIDs.ToList()) 
-				{
-					var contentType = new cms.businesslogic.ContentType(child);
-					LabelDoc.Text +=
-						"<p class=\"type\">" + contentType.Id.ToString() + ", " + contentType.Text + "</p>";
-				}
-
-				LabelDoc.Text += "</div>";
-			}
+            var sb = new StringBuilder();
+            AppendTypes(sb, Services.ContentTypeService.GetAll());
+		    AppendTypes(sb, Services.MediaTypeService.GetAll());
+		    AppendTypes(sb, Services.MemberTypeService.GetAll());
+		    LabelDoc.Text = sb.ToString();
 		}
 
-	}
+        private void AppendTypes(StringBuilder text, IEnumerable<IContentTypeBase> types)
+	    {
+	        foreach (var type in types)
+	        {
+	            text.Append(
+	                "<div class=\"propertyType\"><p class=\"documentType\">" + type.Name + "</p><p class=\"type\">Id: " + type.Id + ", Alias: " + type.Alias + ")</p>");
+	            if (type.PropertyTypes.Any())
+	                text.Append("<p class=\"docHeader\">Property Types:</p>");
+	            foreach (var pt in type.PropertyTypes)
+	                text.Append(
+                        "<p class=\"type\">" + pt.Id + ", " + pt.Alias + ", " + pt.Name + "</p>");
+	            if (type.PropertyGroups.Count > 0)
+	                text.Append("<p class=\"docHeader\">Tabs:</p>");
+	            foreach (var t in type.PropertyGroups)
+	                text.Append(
+                        "<p class=\"type\">" + t.Id + ", " + t.Name + "</p>");
+	            if (type.AllowedContentTypes.Any())
+	                text.Append("<p class=\"docHeader\">Allowed children:</p>");
+	            foreach (var child in type.AllowedContentTypes)
+	            {
+	                var contentType = types.First(x => x.Id == child.Id.Value);
+	                text.Append(
+                        "<p class=\"type\">" + child.Id + ", " + contentType.Name + "</p>");
+	            }
+
+	            text.Append("</div>");
+	        }
+        }
+    }
 }

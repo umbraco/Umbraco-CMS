@@ -21,6 +21,6 @@ namespace umbraco.presentation.umbraco.dialogs {
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox tb_alias;
 
-        protected global::umbraco.uicontrols.PropertyPanel pp_placeholder;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_placeholder;
     }
 }

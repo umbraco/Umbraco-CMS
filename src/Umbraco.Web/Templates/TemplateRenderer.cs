@@ -10,7 +10,6 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using umbraco;
-using umbraco.cms.businesslogic.language;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Services;
 using LightInject;
@@ -78,10 +77,10 @@ namespace Umbraco.Web.Templates
             //set the culture to the same as is currently rendering
             if (_umbracoContext.PublishedContentRequest == null)
             {
-                var defaultLanguage = Language.GetAllAsList().FirstOrDefault();
+                var defaultLanguage = Current.Services.LocalizationService.GetAllLanguages().FirstOrDefault();
                 contentRequest.Culture = defaultLanguage == null 
                     ? CultureInfo.CurrentUICulture 
-                    : new CultureInfo(defaultLanguage.CultureAlias);
+                    : defaultLanguage.CultureInfo;
             }
             else
             {

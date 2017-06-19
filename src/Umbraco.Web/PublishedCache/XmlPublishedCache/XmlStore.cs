@@ -25,7 +25,6 @@ using Umbraco.Core.Xml;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Scheduling;
-using Content = umbraco.cms.businesslogic.Content;
 using File = System.IO.File;
 using Task = System.Threading.Tasks.Task;
 
@@ -47,7 +46,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private XmlStoreFilePersister _persisterTask;
         private volatile bool _released;
         private bool _withRepositoryEvents;
-        private bool _withOtherEvents;
 
         private readonly IFacadeAccessor _facadeAccessor;
         private readonly PublishedContentTypeCache _contentTypeCache;
@@ -172,7 +170,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 InitializeRepositoryEvents();
             if (testing)
                 return;
-            InitializeOtherEvents();
 
             // not so soon! if eg installing we may not be able to load content yet
             // so replace this by LazyInitializeContent() called in Xml ppty getter
@@ -202,14 +199,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _withRepositoryEvents = true;
         }
 
-        private void InitializeOtherEvents()
-        {
-            // temp - until we get rid of Content
-            Content.DeletedContent += OnDeletedContent;
-
-            _withOtherEvents = true;
-        }
-
         private void ClearEvents()
         {
             ContentRepository.UowRemovingEntity -= OnContentRemovingEntity;
@@ -226,10 +215,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             MediaTypeService.UowRefreshedEntity -= OnMediaTypeRefreshedEntity;
             MemberTypeService.UowRefreshedEntity -= OnMemberTypeRefreshedEntity;
 
-            Content.DeletedContent -= OnDeletedContent;
-
             _withRepositoryEvents = false;
-            _withOtherEvents = false;
         }
 
         private void LazyInitializeContent()
@@ -1032,9 +1018,6 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             draftChanged = true; // by default - we don't track drafts
             publishedChanged = false;
 
-            if (_withOtherEvents == false)
-                return;
-
             // process all changes on one xml clone
             using (var safeXml = GetSafeXmlWriter())
             {
@@ -1645,14 +1628,6 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                     xml = dto.Xml,
                     id = dto.NodeId,
                 });
-        }
-
-        private static void OnDeletedContent(object sender, Content.ContentDeleteEventArgs args)
-        {
-            var db = args.Database;
-            var parms = new { @nodeId = args.Id };
-            db.Execute("DELETE FROM cmsPreviewXml WHERE nodeId=@nodeId", parms);
-            db.Execute("DELETE FROM cmsContentXml WHERE nodeId=@nodeId", parms);
         }
 
         private void OnContentTypeRefreshedEntity(IContentTypeService sender, ContentTypeChange<IContentType>.EventArgs args)

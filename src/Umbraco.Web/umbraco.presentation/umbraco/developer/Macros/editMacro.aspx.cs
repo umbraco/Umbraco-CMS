@@ -9,8 +9,6 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using umbraco.uicontrols;
-using umbraco.DataLayer;
 using umbraco.cms.presentation.Trees;
 using System.Linq;
 using Umbraco.Web.UI;
@@ -18,6 +16,7 @@ using Umbraco.Web.UI.Pages;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
+using Umbraco.Web._Legacy.Controls;
 
 namespace umbraco.cms.presentation.developer
 {
@@ -176,12 +175,6 @@ namespace umbraco.cms.presentation.developer
 		{
 		    return Convert.IsDBNull(test) ? 0 : test;
 		}
-
-	    [Obsolete("No longer used and will be removed in the future.")]
-		public IRecordsReader GetMacroPropertyTypes()
-        {
-            return null;
-        }
 
         protected IEnumerable<IParameterEditor> GetMacroParameterEditors()
         {
@@ -371,7 +364,7 @@ namespace umbraco.cms.presentation.developer
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.TabView TabView1;
+		protected global::Umbraco.Web._Legacy.Controls.TabView TabView1;
 
 		/// <summary>
 		/// Pane1 control.
@@ -380,7 +373,7 @@ namespace umbraco.cms.presentation.developer
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.Pane Pane1;
+		protected global::Umbraco.Web._Legacy.Controls.Pane Pane1;
 
 		/// <summary>
 		/// macroPane control.
@@ -416,7 +409,7 @@ namespace umbraco.cms.presentation.developer
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.Pane Pane1_2;
+		protected global::Umbraco.Web._Legacy.Controls.Pane Pane1_2;
 
 		/// <summary>
 		/// macroXslt control.
@@ -497,7 +490,7 @@ namespace umbraco.cms.presentation.developer
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.Pane Pane1_3;
+		protected global::Umbraco.Web._Legacy.Controls.Pane Pane1_3;
 
 		/// <summary>
 		/// Table1 control.
@@ -533,7 +526,7 @@ namespace umbraco.cms.presentation.developer
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.Pane Pane1_4;
+		protected global::Umbraco.Web._Legacy.Controls.Pane Pane1_4;
 
 		/// <summary>
 		/// Table3 control.
@@ -578,7 +571,7 @@ namespace umbraco.cms.presentation.developer
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.Pane Panel2;
+		protected global::Umbraco.Web._Legacy.Controls.Pane Panel2;
 
 		/// <summary>
 		/// macroProperties control.

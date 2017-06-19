@@ -179,7 +179,7 @@ namespace umbraco.cms.presentation
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.ProgressBar prog1;
+        protected global::Umbraco.Web._Legacy.Controls.ProgressBar prog1;
 
         /// <summary>
         /// sortDone control.
@@ -197,7 +197,7 @@ namespace umbraco.cms.presentation
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane sortPane;
+        protected global::Umbraco.Web._Legacy.Controls.Pane sortPane;
 
         /// <summary>
         /// lt_nodes control.

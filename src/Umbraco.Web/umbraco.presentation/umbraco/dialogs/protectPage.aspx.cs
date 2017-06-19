@@ -4,21 +4,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Web.Security;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Windows.Forms.VisualStyles;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using umbraco.cms.businesslogic.web;
 using umbraco.controls;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
 using MembershipProviderExtensions = Umbraco.Core.Security.MembershipProviderExtensions;
-using MemberType = umbraco.cms.businesslogic.member.MemberType;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
@@ -127,13 +122,13 @@ namespace umbraco.presentation.umbraco.dialogs
 
         private void ProtectPage(bool Simple, int DocumentId, int LoginDocumentId, int ErrorDocumentId)
         {
-            var doc = new Document(DocumentId);
+            var content = Current.Services.ContentService.GetById(DocumentId);
             var loginContent = Services.ContentService.GetById(LoginDocumentId);
             if (loginContent == null) throw new NullReferenceException("No content item found with id " + LoginDocumentId);
             var noAccessContent = Services.ContentService.GetById(ErrorDocumentId);
             if (noAccessContent == null) throw new NullReferenceException("No content item found with id " + ErrorDocumentId);
 
-            var entry = Services.PublicAccessService.GetEntryForContent(doc.ContentEntity.Id.ToString());
+            var entry = Services.PublicAccessService.GetEntryForContent(content.Id.ToString());
             if (entry != null)
             {
                 if (Simple)
@@ -148,7 +143,7 @@ namespace umbraco.presentation.umbraco.dialogs
             }
             else
             {
-                entry = new PublicAccessEntry(doc.ContentEntity,
+                entry = new PublicAccessEntry(content,
                     Services.ContentService.GetById(LoginDocumentId),
                     Services.ContentService.GetById(ErrorDocumentId),
                     new List<PublicAccessRule>());
@@ -159,10 +154,10 @@ namespace umbraco.presentation.umbraco.dialogs
         private void AddMembershipRoleToDocument(int documentId, string role)
         {
             //event
-            var doc = new Document(documentId);
+            var content = Current.Services.ContentService.GetById(documentId);
 
             var entry = Services.PublicAccessService.AddRule(
-                doc.ContentEntity,
+                content,
                 Constants.Conventions.PublicAccess.MemberRoleRuleType,
                 role);
 
@@ -175,9 +170,9 @@ namespace umbraco.presentation.umbraco.dialogs
         private void AddMembershipUserToDocument(int documentId, string membershipUserName)
         {
             //event
-            var doc = new Document(documentId);
+            var content = Current.Services.ContentService.GetById(documentId);
             var entry = Services.PublicAccessService.AddRule(
-                doc.ContentEntity,
+                content,
                 Constants.Conventions.PublicAccess.MemberUsernameRuleType,
                 membershipUserName);
 
@@ -189,17 +184,17 @@ namespace umbraco.presentation.umbraco.dialogs
 
         private void RemoveMembershipRoleFromDocument(int documentId, string role)
         {
-            var doc = new Document(documentId);
+            var content = Current.Services.ContentService.GetById(documentId);
             Services.PublicAccessService.RemoveRule(
-                doc.ContentEntity,
+                content,
                 Constants.Conventions.PublicAccess.MemberRoleRuleType,
                 role);
         }
 
         private void RemoveProtection(int documentId)
         {
-            var doc = new Document(documentId);
-            var entry = Services.PublicAccessService.GetEntryForContent(doc.ContentEntity);
+            var content = Current.Services.ContentService.GetById(documentId);
+            var entry = Services.PublicAccessService.GetEntryForContent(content);
             if (entry != null)
             {
                 Services.PublicAccessService.Delete(entry);
@@ -210,7 +205,7 @@ namespace umbraco.presentation.umbraco.dialogs
         {
             // Check for editing
             int documentId = int.Parse(Request.GetItemAsString("nodeId"));
-            var documentObject = new Document(documentId);
+            var content = Current.Services.ContentService.GetById(documentId);
             jsShowWindow.Text = "";
 
             ph_errorpage.Controls.Add(errorPagePicker);
@@ -235,16 +230,16 @@ namespace umbraco.presentation.umbraco.dialogs
                     bt_buttonRemoveProtection.Attributes.Add("onClick", "return confirm('" + Services.TextService.Localize("areyousure") + "')");
 
                     // Get login and error pages
-                    int errorPage = GetErrorPage(documentObject.Path);
-                    int loginPage = GetLoginPage(documentObject.Path);
+                    int errorPage = GetErrorPage(content.Path);
+                    int loginPage = GetLoginPage(content.Path);
                     try
                     {
-                        var loginPageObj = new Document(loginPage);
-                        if (loginPageObj != null)
+                        var loginPageContent = Current.Services.ContentService.GetById(loginPage);
+                        if (loginPageContent != null)
                         {
                             loginPagePicker.Value = loginPage.ToString(CultureInfo.InvariantCulture);
                         }
-                        var errorPageObj = new Document(errorPage);
+                        var errorPageContent = Current.Services.ContentService.GetById(errorPage);
                         errorPagePicker.Value = errorPage.ToString(CultureInfo.InvariantCulture);
                     }
                     catch (Exception ex)
@@ -355,9 +350,11 @@ namespace umbraco.presentation.umbraco.dialogs
                     else
                     {
                         //if it's the umbraco membership provider, then we need to tell it what member type to create it with
-                        if (MemberType.GetByAlias(Constants.Conventions.MemberTypes.SystemDefaultProtectType) == null)
+                        if (Current.Services.MemberTypeService.Get(Constants.Conventions.MemberTypes.SystemDefaultProtectType) == null)
+                        //if (MemberType.GetByAlias(Constants.Conventions.MemberTypes.SystemDefaultProtectType) == null)
                         {
-                            MemberType.MakeNew(Services.UserService.GetUserById(0), Constants.Conventions.MemberTypes.SystemDefaultProtectType);
+                            var defm = new MemberType(null, Constants.Conventions.MemberTypes.SystemDefaultProtectType);
+                            Current.Services.MemberTypeService.Save(defm);
                         }
                         var castedProvider = provider.AsUmbracoMembershipProvider();
                         MembershipCreateStatus status;
@@ -415,17 +412,19 @@ namespace umbraco.presentation.umbraco.dialogs
                 }
             }
 
-            feedback.Text = Services.TextService.Localize("publicAccess/paIsProtected", new[] { new cms.businesslogic.CMSNode(pageId).Text}) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
+            var content = Services.ContentService.GetById(pageId);
+            var text = content == null ? "" : content.Name;
+            feedback.Text = Services.TextService.Localize("publicAccess/paIsProtected", new[] { text }) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
 
             p_buttons.Visible = false;
             pane_advanced.Visible = false;
             pane_simple.Visible = false;
-                var content = Services.ContentService.GetById(pageId);
+
             //reloads the current node in the tree
             ClientTools.SyncTree(content.Path, true);
             //reloads the current node's children in the tree
             ClientTools.ReloadActionNode(false, true);
-            feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
+            feedback.type = global::Umbraco.Web._Legacy.Controls.Feedback.feedbacktype.success;
         }
 
 
@@ -438,14 +437,15 @@ namespace umbraco.presentation.umbraco.dialogs
 
             RemoveProtection(pageId);
 
-            feedback.Text = Services.TextService.Localize("publicAccess/paIsRemoved", new[] { new cms.businesslogic.CMSNode(pageId).Text}) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
-
             var content = Services.ContentService.GetById(pageId);
+            var text = content == null ? "" : content.Name;
+            feedback.Text = Services.TextService.Localize("publicAccess/paIsRemoved", new[] { text }) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
+
             //reloads the current node in the tree
             ClientTools.SyncTree(content.Path, true);
             //reloads the current node's children in the tree
             ClientTools.ReloadActionNode(false, true);
-            feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
+            feedback.type = global::Umbraco.Web._Legacy.Controls.Feedback.feedbacktype.success;
         }
 
         protected CustomValidator SimpleLoginNameValidator;
@@ -467,7 +467,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Feedback feedback;
+        protected global::Umbraco.Web._Legacy.Controls.Feedback feedback;
 
         /// <summary>
         /// p_mode control.
@@ -485,7 +485,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_chooseMode;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_chooseMode;
 
         /// <summary>
         /// rb_simple control.
@@ -530,7 +530,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_simple;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_simple;
 
         /// <summary>
         /// PropertyPanel1 control.
@@ -539,7 +539,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel1;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel1;
 
         /// <summary>
         /// pp_login control.
@@ -548,7 +548,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_login;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_login;
 
         /// <summary>
         /// simpleLogin control.
@@ -566,7 +566,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_pass;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_pass;
 
         /// <summary>
         /// simplePassword control.
@@ -584,7 +584,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_advanced;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_advanced;
 
         /// <summary>
         /// PropertyPanel3 control.
@@ -593,7 +593,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel3;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel3;
 
         /// <summary>
         /// PropertyPanel2 control.
@@ -602,7 +602,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel2;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel2;
 
         /// <summary>
         /// groupsSelector control.
@@ -629,7 +629,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_pages;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_pages;
 
         /// <summary>
         /// pp_loginPage control.
@@ -638,7 +638,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_loginPage;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_loginPage;
 
         /// <summary>
         /// ph_loginpage control.
@@ -665,7 +665,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_errorPage;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_errorPage;
 
         /// <summary>
         /// ph_errorpage control.

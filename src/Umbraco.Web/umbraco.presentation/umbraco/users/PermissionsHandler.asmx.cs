@@ -27,7 +27,7 @@ namespace umbraco.cms.presentation.user
         /// <param name="userID"></param>
         /// <param name="nodeID"></param>
         /// <returns></returns>
-        [WebMethod]        
+        [WebMethod]
         public string GetNodePermissions(int userID, string nodes)
         {
             AuthorizeRequest(true);
@@ -40,7 +40,7 @@ namespace umbraco.cms.presentation.user
             nodePermissions.UserID = userID;
             nodePermissions.NodeID = toIntArray(nodes);
             nodePermissions.ID = "nodePermissions";
-            
+
             page.Controls.Add(nodePermissions);
             StringWriter sw = new StringWriter();
             HttpContext.Current.Server.Execute(page, sw, false);
@@ -48,7 +48,7 @@ namespace umbraco.cms.presentation.user
         }
 
 
-        
+
 
         [WebMethod]
         public string SaveNodePermissions(int userID, string nodes, string permissions, bool replaceChild)
@@ -61,7 +61,7 @@ namespace umbraco.cms.presentation.user
 
             return GetNodePermissions(userID, nodes);
         }
-        
+
 
         private int[] toIntArray(string nodeIds) {
 

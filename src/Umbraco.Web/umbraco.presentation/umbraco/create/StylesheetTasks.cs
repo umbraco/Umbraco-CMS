@@ -28,8 +28,11 @@ namespace umbraco
 
         public override bool PerformDelete()
         {
-            var s = cms.businesslogic.web.StyleSheet.GetByName(Alias);
-            s.delete();
+            //var s = cms.businesslogic.web.StyleSheet.GetByName(Alias);
+            var s = Current.Services.FileService.GetStylesheetByName(Alias);
+            //s.delete();
+            if (s!=null)
+                Current.Services.FileService.DeleteStylesheet(s.Path);
             return true;
         }
 

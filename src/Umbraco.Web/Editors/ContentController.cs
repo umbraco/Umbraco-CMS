@@ -21,7 +21,6 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Web.PublishedCache;
 using Constants = Umbraco.Core.Constants;

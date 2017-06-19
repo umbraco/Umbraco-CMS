@@ -6,7 +6,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using umbraco.uicontrols;
+using Umbraco.Web._Legacy.Controls;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Web.UI.Pages;
 
@@ -142,7 +142,7 @@ namespace umbraco.cms.presentation.developer
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.TabView UmbracoPanel1;
+		protected global::Umbraco.Web._Legacy.Controls.TabView UmbracoPanel1;
 
 		/// <summary>
 		/// Pane1 control.
@@ -151,8 +151,8 @@ namespace umbraco.cms.presentation.developer
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.Pane pane1;
-        protected global::umbraco.uicontrols.Pane pane2;
+		protected global::Umbraco.Web._Legacy.Controls.Pane pane1;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane2;
 
 		/// <summary>
 		/// pp_filename control.
@@ -161,7 +161,7 @@ namespace umbraco.cms.presentation.developer
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_filename;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_filename;
 
 		/// <summary>
 		/// xsltFileName control.
@@ -179,7 +179,7 @@ namespace umbraco.cms.presentation.developer
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_errorMsg;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_errorMsg;
 
 		/// <summary>
 		/// editorSource control.
@@ -188,7 +188,7 @@ namespace umbraco.cms.presentation.developer
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.CodeArea editorSource;
+		protected global::Umbraco.Web._Legacy.Controls.CodeArea editorSource;
 
 		/// <summary>
 		/// editorJs control.

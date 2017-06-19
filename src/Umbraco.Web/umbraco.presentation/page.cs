@@ -12,7 +12,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
@@ -49,47 +48,6 @@ namespace umbraco
 		#endregion
 
 		#region Constructors
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="page"/> class for a yet unpublished document, identified by its <c>id</c> and <c>version</c>.
-		/// </summary>
-		/// <param name="id">The identifier of the document.</param>
-		/// <param name="version">The version to be displayed.</param>
-		public page(int id, Guid version)
-			: this(new Document(id, version))
-		{ }
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="page"/> class for a yet unpublished document.
-		/// </summary>
-		/// <param name="document">The document.</param>
-		public page(Document document)
-		{
-			var docParentId = -1;
-			try
-			{
-				docParentId = document.ParentId;
-			}
-			catch (ArgumentException)
-			{
-				//ignore if no parent
-			}
-
-			populatePageData(document.Id,
-				document.Text, document.ContentType.Id, document.ContentType.Alias,
-				document.User.Name, document.Creator.Name, document.CreateDateTime, document.UpdateDate,
-				document.Path, document.Version, docParentId);
-
-            //TODO: Get this working again - Actually get rid of the 'page' class all together
-
-            //foreach (Property prop in document.GenericProperties)
-            //{
-            //    string value = prop.Value != null ? prop.Value.ToString() : String.Empty;
-            //    _elements.Add(prop.PropertyType.Alias, value);
-            //}
-
-			_template = document.Template;
-		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="page"/> class for a published document request.
@@ -143,51 +101,6 @@ namespace umbraco
 			}			
 			
 			PopulateElementData(doc);
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="page"/> class for a published document.
-		/// </summary>
-		/// <param name="node">The <c>XmlNode</c> representing the document.</param>
-		public page(XmlNode node)
-		{			
-			populatePageData(node);
-
-		    if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == false)
-		    {
-                // Check for alternative template
-		        if (HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate] != null &&
-		            HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate].ToString() != String.Empty)
-		        {
-		            _template =
-		                umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(
-		                    HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate].ToString());
-		            _elements.Add("template", _template.ToString());
-		        }
-		        else if (HttpContext.Current.Request.GetItemAsString(Constants.Conventions.Url.AltTemplate) != String.Empty)
-		        {
-		            _template =
-		                umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(
-		                    HttpContext.Current.Request.GetItemAsString(Constants.Conventions.Url.AltTemplate).ToLower());
-		            _elements.Add("template", _template.ToString());
-		        }
-		    }
-
-		    if (_template == 0)
-			{
-				try
-				{
-					_template = Convert.ToInt32(node.Attributes.GetNamedItem("template").Value);
-					_elements.Add("template", node.Attributes.GetNamedItem("template").Value);
-				}
-				catch
-				{
-					HttpContext.Current.Trace.Warn("umbracoPage", "No template defined");
-				}
-			}
-
-			populateElementData(node);
-
 		}
 
         /// <summary>

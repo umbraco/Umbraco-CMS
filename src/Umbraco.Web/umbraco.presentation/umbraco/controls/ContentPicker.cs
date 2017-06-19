@@ -1,5 +1,5 @@
 using System;
-using umbraco.uicontrols.TreePicker;
+using Umbraco.Web._Legacy.Controls;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web;
@@ -56,7 +56,8 @@ namespace umbraco.controls
             {
                 if (Value != "" && Value != "-1")
                 {
-                    tempTitle = new cms.businesslogic.CMSNode(int.Parse(Value)).Text;
+                    //tempTitle = new cms.businesslogic.CMSNode(int.Parse(Value)).Text;
+                    tempTitle = Current.Services.EntityService.Get(int.Parse(Value)).Name;
                 }
                 else
                 {

@@ -29,9 +29,6 @@ using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using Database = Umbraco.Web.PublishedCache.NuCache.DataSource.Database;
-#pragma warning disable 618
-using Content = umbraco.cms.businesslogic.Content;
-#pragma warning restore 618
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -197,11 +194,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ContentTypeService.UowRefreshedEntity += OnContentTypeRefreshedEntity;
             MediaTypeService.UowRefreshedEntity+= OnMediaTypeRefreshedEntity;
             MemberTypeService.UowRefreshedEntity += OnMemberTypeRefreshedEntity;
-
-            // temp - until we get rid of Content
-#pragma warning disable 618
-            Content.DeletedContent += OnDeletedContent;
-#pragma warning restore 618
         }
 
         public class Options
@@ -1094,15 +1086,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     id = dto.NodeId,
                     published = dto.Published
                 });
-        }
-
-#pragma warning disable 618
-        private static void OnDeletedContent(object sender, Content.ContentDeleteEventArgs args)
-#pragma warning restore 618
-        {
-            var db = args.Database;
-            var parms = new { @nodeId = args.Id };
-            db.Execute("DELETE FROM cmsContentNu WHERE nodeId=@nodeId", parms);
         }
 
         private void OnContentTypeRefreshedEntity(IContentTypeService sender, ContentTypeChange<IContentType>.EventArgs args)

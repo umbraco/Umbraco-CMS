@@ -20,7 +20,7 @@ namespace umbraco.presentation.umbraco.translation {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.UmbracoPanel panel1;
+        protected global::Umbraco.Web._Legacy.Controls.UmbracoPanel panel1;
         
         /// <summary>
         /// pane_details control.
@@ -29,7 +29,7 @@ namespace umbraco.presentation.umbraco.translation {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_details;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_details;
         
         /// <summary>
         /// pp_date control.
@@ -38,7 +38,7 @@ namespace umbraco.presentation.umbraco.translation {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_date;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_date;
         
         /// <summary>
         /// pp_owner control.
@@ -47,7 +47,7 @@ namespace umbraco.presentation.umbraco.translation {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_owner;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_owner;
         
         /// <summary>
         /// pp_totalWords control.
@@ -56,7 +56,7 @@ namespace umbraco.presentation.umbraco.translation {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_totalWords;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_totalWords;
         
         /// <summary>
         /// pp_comment control.
@@ -65,7 +65,7 @@ namespace umbraco.presentation.umbraco.translation {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_comment;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_comment;
         
         /// <summary>
         /// pane_tasks control.
@@ -74,7 +74,7 @@ namespace umbraco.presentation.umbraco.translation {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_tasks;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_tasks;
         
         /// <summary>
         /// pp_xml control.
@@ -83,7 +83,7 @@ namespace umbraco.presentation.umbraco.translation {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_xml;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_xml;
         
         /// <summary>
         /// pp_upload control.
@@ -92,7 +92,7 @@ namespace umbraco.presentation.umbraco.translation {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_upload;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_upload;
         
         /// <summary>
         /// pp_closeTask control.
@@ -101,7 +101,7 @@ namespace umbraco.presentation.umbraco.translation {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_closeTask;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_closeTask;
         
         /// <summary>
         /// bt_close control.
@@ -119,7 +119,7 @@ namespace umbraco.presentation.umbraco.translation {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_fields;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_fields;
         
         /// <summary>
         /// dg_fields control.

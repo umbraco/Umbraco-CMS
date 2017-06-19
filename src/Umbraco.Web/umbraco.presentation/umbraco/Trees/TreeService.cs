@@ -1,5 +1,5 @@
 using System.Text;
-using umbraco.uicontrols;
+using Umbraco.Web._Legacy.Controls;
 
 namespace umbraco.cms.presentation.Trees
 {

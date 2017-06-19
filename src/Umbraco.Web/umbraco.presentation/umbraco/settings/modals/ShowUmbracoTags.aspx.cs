@@ -1,14 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using umbraco.BusinessLogic;
 using Umbraco.Core;
 
 namespace umbraco.cms.presentation.settings.modal
@@ -38,6 +28,6 @@ namespace umbraco.cms.presentation.settings.modal
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected uicontrols.Pane Pane7;
+        protected Umbraco.Web._Legacy.Controls.Pane Pane7;
     }
 }

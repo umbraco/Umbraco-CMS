@@ -19,7 +19,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.TabView tabControl;
+		protected global::Umbraco.Web._Legacy.Controls.TabView tabControl;
 
 		/// <summary>
 		/// idPane control.
@@ -28,7 +28,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.Pane idPane;
+		protected global::Umbraco.Web._Legacy.Controls.Pane idPane;
 
 		/// <summary>
 		/// idPropertyPanel control.
@@ -37,7 +37,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel idPropertyPanel;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel idPropertyPanel;
 
 		/// <summary>
 		/// idLiteral control.
@@ -55,7 +55,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.Pane nameAliasPane;
+		protected global::Umbraco.Web._Legacy.Controls.Pane nameAliasPane;
 
 		/// <summary>
 		/// nameProperyPanel control.
@@ -64,7 +64,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel nameProperyPanel;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel nameProperyPanel;
 
 		/// <summary>
 		/// nameTextBox control.
@@ -91,7 +91,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel aliasPropertyPanel;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel aliasPropertyPanel;
 
 		/// <summary>
 		/// aliasTextBox control.
@@ -127,7 +127,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.Pane directionPane;
+		protected global::Umbraco.Web._Legacy.Controls.Pane directionPane;
 
 		/// <summary>
 		/// dualPropertyPanel control.
@@ -136,7 +136,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel dualPropertyPanel;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel dualPropertyPanel;
 
 		/// <summary>
 		/// dualRadioButtonList control.
@@ -154,7 +154,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.Pane objectTypePane;
+		protected global::Umbraco.Web._Legacy.Controls.Pane objectTypePane;
 
 		/// <summary>
 		/// parentPropertyPanel control.
@@ -163,7 +163,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel parentPropertyPanel;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel parentPropertyPanel;
 
 		/// <summary>
 		/// parentLiteral control.
@@ -181,7 +181,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel childPropertyPanel;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel childPropertyPanel;
 
 		/// <summary>
 		/// childLiteral control.
@@ -199,7 +199,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.Pane relationsCountPane;
+		protected global::Umbraco.Web._Legacy.Controls.Pane relationsCountPane;
 
 		/// <summary>
 		/// relationsCountPropertyPanel control.
@@ -208,7 +208,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel relationsCountPropertyPanel;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel relationsCountPropertyPanel;
 
 		/// <summary>
 		/// relationsCountLiteral control.
@@ -226,7 +226,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.Pane relationsPane;
+		protected global::Umbraco.Web._Legacy.Controls.Pane relationsPane;
 
 		/// <summary>
 		/// relationsPropertyPanel control.
@@ -235,7 +235,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel relationsPropertyPanel;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel relationsPropertyPanel;
 
 		/// <summary>
 		/// relationsRepeater control.

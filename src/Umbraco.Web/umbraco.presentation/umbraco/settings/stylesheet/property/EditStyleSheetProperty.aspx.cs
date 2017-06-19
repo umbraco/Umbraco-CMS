@@ -46,7 +46,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
             bt.Click += SaveClick;
             bt.Text = Services.TextService.Localize("save");
             bt.ToolTip = Services.TextService.Localize("save");
-            bt.ButtonType = uicontrols.MenuButtonType.Primary;
+            bt.ButtonType = Umbraco.Web._Legacy.Controls.MenuButtonType.Primary;
             bt.ID = "save";
         }
 
@@ -109,7 +109,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.UmbracoPanel Panel1;
+        protected global::Umbraco.Web._Legacy.Controls.UmbracoPanel Panel1;
 
         /// <summary>
         /// Pane7 control.
@@ -118,7 +118,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane7;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane7;
 
         protected global::System.Web.UI.WebControls.HiddenField OriginalName;
 

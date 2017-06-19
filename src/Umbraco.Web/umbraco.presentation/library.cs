@@ -20,15 +20,10 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.Templates;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Core.IO;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Composing;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
-using Language = umbraco.cms.businesslogic.language.Language;
-using Member = umbraco.cms.businesslogic.member.Member;
-using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
 namespace umbraco
 {
@@ -39,6 +34,7 @@ namespace umbraco
     /// Especially usefull in XSLT where any of these methods can be accesed using the umbraco.library name-space. Example:
     /// &lt;xsl:value-of select="umbraco.library:NiceUrl(@id)"/&gt;
     /// </summary>
+    [Obsolete("v8.kill.kill")]
     public class library
     {
 		/// <summary>
@@ -222,25 +218,6 @@ namespace umbraco
         }
 
         /// <summary>
-        /// Checks with the Assigned domains settings and retuns an array the the Domains matching the node
-        /// </summary>
-        /// <param name="nodeId">Identifier for the node that should be returned</param>
-        /// <returns>A Domain array with all the Domains that matches the nodeId</returns>
-        public static Domain[] GetCurrentDomains(int nodeId)
-        {
-            string[] pathIds = GetItem(nodeId, "path").Split(',');
-            for (int i = pathIds.Length - 1; i > 0; i--)
-            {
-                Domain[] retVal = Domain.GetDomainsById(int.Parse(pathIds[i]));
-                if (retVal.Length > 0)
-                {
-                    return retVal;
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
         /// Returns a string with the data from the given element of the current node. Both elements (data-fields)
         /// and properties can be used - ie:
         /// getItem(nodeName) will return a string with the name of the current node/page even though
@@ -260,49 +237,6 @@ namespace umbraco
                 HttpContext.Current.Trace.Warn("library.GetItem", "Error reading '" + alias + "'", ItemException);
                 return string.Empty;
             }
-        }
-
-        /// <summary>
-        /// Returns that name of a generic property
-        /// </summary>
-        /// <param name="contentTypeAlias">The Alias of the content type (ie. Document Type, Member Type or Media Type)</param>
-        /// <param name="propertyTypeAlias">The Alias of the Generic property (ie. bodyText or umbracoNaviHide)</param>
-        /// <returns>A string with the name. If nothing matches the alias, an empty string is returned</returns>
-        public static string GetPropertyTypeName(string contentTypeAlias, string propertyTypeAlias)
-        {
-            try
-            {
-                umbraco.cms.businesslogic.ContentType ct = umbraco.cms.businesslogic.ContentType.GetByAlias(contentTypeAlias);
-                PropertyType pt = ct.getPropertyType(propertyTypeAlias);
-                return pt.Name;
-            }
-            catch
-            {
-                return string.Empty;
-            }
-        }
-
-        /// <summary>
-        /// Returns the Member Name from an umbraco member object
-        /// </summary>
-        /// <param name="memberId">The identifier of the Member</param>
-        /// <returns>The Member name matching the MemberId, an empty string is member isn't found</returns>
-        public static string GetMemberName(int memberId)
-        {
-            if (memberId != 0)
-            {
-                try
-                {
-                    Member m = new Member(memberId);
-                    return m.Text;
-                }
-                catch
-                {
-                    return string.Empty;
-                }
-            }
-            else
-                return string.Empty;
         }
 
         /// <summary>
@@ -412,26 +346,6 @@ namespace umbraco
             var serialized = serializer.Serialize(
                 Current.Services.DataTypeService, member);
             return serialized;
-        }
-
-        /// <summary>
-        /// Get the current member as an xml node
-        /// </summary>
-        /// <returns>Look in documentation for umbraco.library.GetMember(MemberId) for more information</returns>
-        public static XPathNodeIterator GetCurrentMember()
-        {
-            Member m = Member.GetCurrentMember();
-            if (m != null)
-            {
-                var n = global::Umbraco.Web.UmbracoContext.Current.Facade.MemberCache.CreateNodeNavigator(m.Id, false);
-                if (n != null)
-                    return n.Select("."); // vs "/node" vs "/node()" ?
-            }
-
-            XmlDocument xd = new XmlDocument();
-            xd.LoadXml(
-                "<error>No current member exists (best practice is to validate with 'isloggedon()' prior to this call)</error>");
-            return xd.CreateNavigator().Select("/");
         }
 
         /// <summary>
@@ -1145,61 +1059,6 @@ namespace umbraco
                 scope.Complete();
                 return ret;
             }
-        }
-
-        /// <summary>
-        /// Gets the dictionary item with the specified key and it's child dictionary items.
-        /// The language version is based on the culture of the current Url.
-        /// </summary>
-        /// <param name="Key">The key.</param>
-        /// <returns>A XpathNodeIterator in the format:
-        /// <DictionaryItems>
-        ///     <DictionaryItem key="[dictionaryItemKey]">[dictionaryItemValue]</DictionaryItem>
-        /// </DictionaryItems>
-        /// </returns>
-        public static XPathNodeIterator GetDictionaryItems(string Key)
-        {
-            XmlDocument xd = new XmlDocument();
-            xd.LoadXml("<DictionaryItems/>");
-
-            try
-            {
-                //int languageId = GetCurrentLanguageId();
-                int languageId = Language.GetByCultureCode(System.Threading.Thread.CurrentThread.CurrentUICulture.Name).id;
-
-                var di = Current.Services.LocalizationService.GetDictionaryItemByKey(Key);
-                if (di == null)
-                {
-                    return xd.CreateNavigator().Select("/");
-                }
-
-                var children = Current.Services.LocalizationService.GetDictionaryItemChildren(di.Key);
-                foreach (var item in children)
-                {
-                    XmlNode xe;
-                    try
-                    {
-                        if (languageId != 0)
-                            xe = XmlHelper.AddTextNode(xd, "DictionaryItem", item.GetTranslatedValue(languageId));
-                        else
-                            xe = XmlHelper.AddTextNode(xd, "DictionaryItem", item.GetDefaultValue());
-                    }
-                    catch
-                    {
-                        xe = XmlHelper.AddTextNode(xd, "DictionaryItem", string.Empty);
-                    }
-                    xe.Attributes.Append(XmlHelper.AddAttribute(xd, "key", item.ItemKey));
-                    xd.DocumentElement.AppendChild(xe);
-                }
-            }
-            catch (Exception ee)
-            {
-                xd.DocumentElement.AppendChild(
-                    XmlHelper.AddTextNode(xd, "Error", ee.ToString()));
-            }
-
-            XPathNavigator xp = xd.CreateNavigator();
-            return xp.Select("/");
         }
 
         /// <summary>

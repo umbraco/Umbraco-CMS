@@ -8,7 +8,6 @@ using Umbraco.Web.Mvc;
 using System.Collections.Generic;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
-using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace Umbraco.Web.WebServices
 {
@@ -127,71 +126,72 @@ namespace Umbraco.Web.WebServices
             return Success(Services.TextService.Localize("speechBubbles/partialViewSavedText"), Services.TextService.Localize("speechBubbles/partialViewSavedHeader"), new { name = currentView.Name, path = currentView.Path });
         }
 
-        /// <summary>
-        /// Saves a template
-        /// </summary>
-        /// <param name="templateName"></param>
-        /// <param name="templateAlias"></param>
-        /// <param name="templateContents"></param>
-        /// <param name="templateId"></param>
-        /// <param name="masterTemplateId"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public JsonResult SaveTemplate(string templateName, string templateAlias, string templateContents, int templateId, int masterTemplateId)
-        {
-            //TODO: Change this over to use the new API - Also this will be migrated to a TemplateEditor or ViewEditor when it's all moved to angular
+        // fixme - remove code
+        ///// <summary>
+        ///// Saves a template
+        ///// </summary>
+        ///// <param name="templateName"></param>
+        ///// <param name="templateAlias"></param>
+        ///// <param name="templateContents"></param>
+        ///// <param name="templateId"></param>
+        ///// <param name="masterTemplateId"></param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //public JsonResult SaveTemplate(string templateName, string templateAlias, string templateContents, int templateId, int masterTemplateId)
+        //{
+        //    //TODO: Change this over to use the new API - Also this will be migrated to a TemplateEditor or ViewEditor when it's all moved to angular
 
-            Template t;
-            bool pathChanged = false;
-            try
-            {
-                t = new Template(templateId)
-                {
-                    Text = templateName.CleanForXss('[', ']', '(', ')', ':'),
-                    Alias = templateAlias.CleanForXss('[', ']', '(', ')', ':'),
-                    Design = templateContents
-                };
+        //    Template t;
+        //    bool pathChanged = false;
+        //    try
+        //    {
+        //        t = new Template(templateId)
+        //        {
+        //            Text = templateName.CleanForXss('[', ']', '(', ')', ':'),
+        //            Alias = templateAlias.CleanForXss('[', ']', '(', ')', ':'),
+        //            Design = templateContents
+        //        };
 
-                //check if the master page has changed - we need to normalize both - if it's 0 or -1, then make it 0... this is easy
-                // to do with Math.Max
-                if (Math.Max(t.MasterTemplate, 0) != Math.Max(masterTemplateId, 0))
-                {
-                    t.MasterTemplate = Math.Max(masterTemplateId, 0);
-                    pathChanged = true;                  
-                }
-            }
-            catch (ArgumentException ex)
-            {
-                //the template does not exist
-                return Failed("Template does not exist", Services.TextService.Localize("speechBubbles/templateErrorHeader"), ex);
-            }
+        //        //check if the master page has changed - we need to normalize both - if it's 0 or -1, then make it 0... this is easy
+        //        // to do with Math.Max
+        //        if (Math.Max(t.MasterTemplate, 0) != Math.Max(masterTemplateId, 0))
+        //        {
+        //            t.MasterTemplate = Math.Max(masterTemplateId, 0);
+        //            pathChanged = true;                  
+        //        }
+        //    }
+        //    catch (ArgumentException ex)
+        //    {
+        //        //the template does not exist
+        //        return Failed("Template does not exist", Services.TextService.Localize("speechBubbles/templateErrorHeader"), ex);
+        //    }
 
-            try
-            {
-                t.Save();
+        //    try
+        //    {
+        //        t.Save();
 
-                //ensure the correct path is synced as the parent might have been changed
-                // http://issues.umbraco.org/issue/U4-2300                
-                if (pathChanged)
-                {
-                    //need to re-look it up
-                    t = new Template(templateId);
-                }
-                var syncPath = "-1,init," + t.Path.Replace("-1,", "");
+        //        //ensure the correct path is synced as the parent might have been changed
+        //        // http://issues.umbraco.org/issue/U4-2300                
+        //        if (pathChanged)
+        //        {
+        //            //need to re-look it up
+        //            t = new Template(templateId);
+        //        }
+        //        var syncPath = "-1,init," + t.Path.Replace("-1,", "");
 
-                return Success(Services.TextService.Localize("speechBubbles/templateSavedText"), Services.TextService.Localize("speechBubbles/templateSavedHeader"),
-                    new
-                    {
-                        path = syncPath,
-                        contents = t.Design,
-                        alias = t.Alias // might have been updated!
-                    });
-            }
-            catch (Exception ex)
-            {
-                return Failed(Services.TextService.Localize("speechBubbles/templateErrorText"), Services.TextService.Localize("speechBubbles/templateErrorHeader"), ex);
-            }
-        }
+        //        return Success(Services.TextService.Localize("speechBubbles/templateSavedText"), Services.TextService.Localize("speechBubbles/templateSavedHeader"),
+        //            new
+        //            {
+        //                path = syncPath,
+        //                contents = t.Design,
+        //                alias = t.Alias // might have been updated!
+        //            });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Failed(Services.TextService.Localize("speechBubbles/templateErrorText"), Services.TextService.Localize("speechBubbles/templateErrorHeader"), ex);
+        //    }
+        //}
 
         //[HttpPost]
         //public JsonResult SaveXslt(string fileName, string oldName, string fileContents, bool ignoreDebugging)

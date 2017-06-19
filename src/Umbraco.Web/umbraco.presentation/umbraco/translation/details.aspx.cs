@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Data;
 using System.Web.UI.WebControls;
-using umbraco.cms.businesslogic.task;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
+using Umbraco.Web._Legacy.BusinessLogic;
 
 namespace umbraco.presentation.umbraco.translation {
     public partial class details : Umbraco.Web.UI.Pages.UmbracoEnsuredPage {
@@ -29,7 +29,8 @@ namespace umbraco.presentation.umbraco.translation {
         protected void Page_Load(object sender, EventArgs e) {
             int translationId = int.Parse(Request["id"]);
             Task t = new Task(translationId);
-            Document page = new Document(t.Node.Id);
+            //Document page = new Document(t.Node.Id);
+            var page = Current.Services.ContentService.GetById(t.TaskEntity.EntityId);
 
             //Bind meta data and language... 
             Literal lt = new Literal();
@@ -83,7 +84,7 @@ namespace umbraco.presentation.umbraco.translation {
             
             DataRow pageRow = pageTable.NewRow();
             pageRow[Services.TextService.Localize("name")] = Services.TextService.Localize("nodeName");
-            pageRow[Services.TextService.Localize("value")] = page.Text;
+            pageRow[Services.TextService.Localize("value")] = page.Name;
             pageTable.Rows.Add(pageRow);
 
             //TODO: Make this work again with correct APIs and angularized - so none of this code will exist anymore

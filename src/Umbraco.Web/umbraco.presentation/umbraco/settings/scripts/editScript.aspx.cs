@@ -6,7 +6,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.cms.presentation.Trees;
-using umbraco.uicontrols;
+using Umbraco.Web._Legacy.Controls;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 
@@ -20,16 +20,16 @@ namespace umbraco.cms.presentation.settings.scripts
 
         }
         protected System.Web.UI.HtmlControls.HtmlForm Form1;
-        protected uicontrols.TabView Panel1;
+        protected Umbraco.Web._Legacy.Controls.TabView Panel1;
         protected System.Web.UI.WebControls.TextBox NameTxt;
-        protected uicontrols.Pane Pane7;
-        protected uicontrols.Pane Pane8;
+        protected Umbraco.Web._Legacy.Controls.Pane Pane7;
+        protected Umbraco.Web._Legacy.Controls.Pane Pane8;
 
         protected System.Web.UI.WebControls.Literal lttPath;
         protected System.Web.UI.WebControls.Literal editorJs;
-        protected umbraco.uicontrols.CodeArea editorSource;
-        protected umbraco.uicontrols.PropertyPanel pp_name;
-        protected umbraco.uicontrols.PropertyPanel pp_path;
+        protected Umbraco.Web._Legacy.Controls.CodeArea editorSource;
+        protected Umbraco.Web._Legacy.Controls.PropertyPanel pp_name;
+        protected Umbraco.Web._Legacy.Controls.PropertyPanel pp_path;
 
         protected MenuButton SaveButton;
 
@@ -80,9 +80,9 @@ namespace umbraco.cms.presentation.settings.scripts
 
             //need to change the editor type if it is XML
             if (filename.EndsWith("xml"))
-                editorSource.CodeBase = uicontrols.CodeArea.EditorType.XML;
+                editorSource.CodeBase = Umbraco.Web._Legacy.Controls.CodeArea.EditorType.XML;
             else if (filename.EndsWith("master"))
-                editorSource.CodeBase = uicontrols.CodeArea.EditorType.HTML;
+                editorSource.CodeBase = Umbraco.Web._Legacy.Controls.CodeArea.EditorType.HTML;
 
 
             var editor = Panel1.NewTabPage(Services.TextService.Localize("settings/script"));
@@ -98,17 +98,17 @@ namespace umbraco.cms.presentation.settings.scripts
             SaveButton.ID = "save";
             SaveButton.CssClass = "client-side";
 
-            if (editorSource.CodeBase == uicontrols.CodeArea.EditorType.HTML)
+            if (editorSource.CodeBase == Umbraco.Web._Legacy.Controls.CodeArea.EditorType.HTML)
             {
                 // Editing buttons
                 Panel1.Menu.InsertSplitter();
-                uicontrols.MenuIconI umbField = Panel1.Menu.NewIcon();
+                Umbraco.Web._Legacy.Controls.MenuIconI umbField = Panel1.Menu.NewIcon();
                 umbField.ImageURL = SystemDirectories.Umbraco + "/images/editor/insField.gif";
                 umbField.OnClickCommand = Umbraco.Web.UI.Pages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDATA", Services.TextService.Localize("template/insertPageField"), 640, 550);
                 umbField.AltText = Services.TextService.Localize("template/insertPageField");
 
                 // TODO: Update icon
-                uicontrols.MenuIconI umbDictionary = Panel1.Menu.NewIcon();
+                Umbraco.Web._Legacy.Controls.MenuIconI umbDictionary = Panel1.Menu.NewIcon();
                 umbDictionary.ImageURL = GlobalSettings.Path + "/images/editor/dictionaryItem.gif";
                 umbDictionary.OnClickCommand = Umbraco.Web.UI.Pages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY", Services.TextService.Localize("template/insertDictionaryItem"), 640, 550);
                 umbDictionary.AltText = "Insert umbraco dictionary item";
@@ -116,7 +116,7 @@ namespace umbraco.cms.presentation.settings.scripts
                 // Help
                 Panel1.Menu.InsertSplitter();
 
-                uicontrols.MenuIconI helpIcon = Panel1.Menu.NewIcon();
+                Umbraco.Web._Legacy.Controls.MenuIconI helpIcon = Panel1.Menu.NewIcon();
                 helpIcon.OnClickCommand = Umbraco.Web.UI.Pages.ClientTools.Scripts.OpenModalWindow(Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) + "/settings/modals/showumbracotags.aspx?alias=", Services.TextService.Localize("template/quickGuide"), 600, 580);
                 helpIcon.ImageURL = SystemDirectories.Umbraco + "/images/editor/help.png";
                 helpIcon.AltText = Services.TextService.Localize("template/quickGuide");

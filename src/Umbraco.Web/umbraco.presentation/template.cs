@@ -1,23 +1,16 @@
 using System;
-using System.Xml;
-using System.Web.Caching;
 using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
-
-using System.Data;
 using System.Web.UI;
 using System.Collections;
-using System.Collections.Generic;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
-using umbraco.DataLayer;
-using umbraco.BusinessLogic;
 using Umbraco.Core.IO;
 using System.Web;
+using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
@@ -534,8 +527,22 @@ where nodeId = @templateID",
             } else {
                 if (_masterTemplate == templateID)
                 {
-                    cms.businesslogic.template.Template t = cms.businesslogic.template.Template.GetTemplate(templateID);
-                    string templateName = (t != null) ? t.Text : string.Format("'Template with id: '{0}", templateID);
+                    var t = Current.Services.FileService.GetTemplate(templateID);
+                    var text = t.Name;
+                    if (text.StartsWith("#"))
+                    {
+                        var lang = Current.Services.LocalizationService.GetLanguageByIsoCode(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
+                        if (lang != null && Current.Services.LocalizationService.DictionaryItemExists(text.Substring(1)))
+                        {
+                            var di = Current.Services.LocalizationService.GetDictionaryItemByKey(text.Substring(1));
+                            text = di.GetTranslatedValue(lang.Id);
+                        }
+                        else
+                        {
+                            text = "[" + text + "]";
+                        }
+                    }
+                    string templateName = (t != null) ? text : string.Format("'Template with id: '{0}", templateID);
                     System.Web.HttpContext.Current.Trace.Warn("template",
                         String.Format("Master template is the same as the current template. It would cause an endless loop! Make sure that the current template '{0}' has another Master Template than itself. You can change this in the template editor under 'Settings'", templateName));
                     _templateOutput.Append(_templateDesign);

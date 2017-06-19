@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using umbraco.BusinessLogic;
+
 using Umbraco.Core.Models.Membership;
-using Umbraco.Web;
+
 using Umbraco.Web.UI.Controls;
 using Umbraco.Web._Legacy.Actions;
 using Action = Umbraco.Web._Legacy.Actions.Action;
@@ -96,8 +96,11 @@ namespace umbraco.cms.presentation.user
 
             string names = "";
             foreach (int id in m_nodeID) {
-                if(id > 0)
-                    names += new cms.businesslogic.web.Document(id).Text + ", ";
+                if (id > 0)
+                {
+                    var c = Services.ContentService.GetById(id);
+                    names += c.Name + ", ";
+                }
             }
 
 			lt_names.Text = names.Trim().Trim(',');

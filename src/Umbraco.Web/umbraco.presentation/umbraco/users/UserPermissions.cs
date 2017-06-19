@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.Actions;
@@ -106,13 +105,8 @@ namespace umbraco.cms.presentation.user
         /// <returns></returns>
         private static string GetNodePath(int iNodeId)
         {
-            if (Document.IsDocument(iNodeId))
-            {
-                var doc = new Document(iNodeId);
-                return doc.Path;
-            } 
-            
-            return "";
+            var e = Current.Services.EntityService.Get(iNodeId, UmbracoObjectTypes.Document);
+            return e == null ? string.Empty : e.Path;
         }
 
         /// <summary>
@@ -122,15 +116,12 @@ namespace umbraco.cms.presentation.user
         /// <returns></returns>
         private static IEnumerable<int> FindChildNodes(int nodeId)
         {
-            var docs = Document.GetChildrenForTree(nodeId);
+            var docs = Current.Services.EntityService.GetChildren(nodeId, UmbracoObjectTypes.Document);
             var nodeIds = new List<int>();
             foreach (var doc in docs)
             {
                 nodeIds.Add(doc.Id);
-                if (doc.HasChildren)
-                {
-                    nodeIds.AddRange(FindChildNodes(doc.Id));
-                }
+                nodeIds.AddRange(FindChildNodes(doc.Id));
             }
             return nodeIds;
         }

@@ -1,5 +1,6 @@
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.Composing;
 using Umbraco.Web.UI;
 using Umbraco.Web._Legacy.UI;
 
@@ -17,13 +18,16 @@ namespace umbraco
 
             if (masterId > 0)
             {
-                var id = cms.businesslogic.template.Template.MakeNew(Alias, User, new cms.businesslogic.template.Template(masterId)).Id;
-                _returnUrl = string.Format("{1}?treeType=templates&templateID={0}", id, editor);
+                //var id = cms.businesslogic.template.Template.MakeNew(Alias, User, new cms.businesslogic.template.Template(masterId)).Id;
+                var master = Current.Services.FileService.GetTemplate(masterId);
+                var t = Current.Services.FileService.CreateTemplateWithIdentity(Alias, null, master, User.Id);
+                _returnUrl = string.Format("{1}?treeType=templates&templateID={0}", t.Id, editor);
             }
             else
             {
-                var id = cms.businesslogic.template.Template.MakeNew(Alias, User).Id;
-                _returnUrl = string.Format("{1}?treeType=templates&templateID={0}", id, editor);
+                //var id = cms.businesslogic.template.Template.MakeNew(Alias, User).Id;
+                var t = Current.Services.FileService.CreateTemplateWithIdentity(Alias, null, null, User.Id);
+                _returnUrl = string.Format("{1}?treeType=templates&templateID={0}", t.Id, editor);
 
             }
             return true;
@@ -31,7 +35,9 @@ namespace umbraco
 
         public override bool PerformDelete()
         {
-            new cms.businesslogic.template.Template(ParentID).delete();
+            //new cms.businesslogic.template.Template(ParentID).delete();
+            var t = Current.Services.FileService.GetTemplate(ParentID);
+            if (t != null) Current.Services.FileService.DeleteTemplate(t.Alias);
             return false;
         }
 

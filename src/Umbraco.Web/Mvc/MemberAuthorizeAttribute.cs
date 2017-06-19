@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Security;
-using Umbraco.Web.Security;
-using umbraco.cms.businesslogic.member;
 using AuthorizeAttribute = System.Web.Mvc.AuthorizeAttribute;
 using Umbraco.Core;
 using Umbraco.Web.Composing;

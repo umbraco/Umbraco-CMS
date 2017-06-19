@@ -19,6 +19,6 @@ namespace umbraco.settings {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.UmbracoPanel Panel1;
+        protected global::Umbraco.Web._Legacy.Controls.UmbracoPanel Panel1;
     }
 }

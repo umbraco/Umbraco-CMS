@@ -1,11 +1,9 @@
 ﻿using Umbraco.Core.Services;
 using System.Web;
 using Umbraco.Core;
-using Umbraco.Web.UI;
 using Umbraco.Web;
 using System;
 using System.Web.UI.WebControls;
-using umbraco.BusinessLogic;
 using System.Linq;
 using Umbraco.Web._Legacy.UI;
 using UmbracoUserControl = Umbraco.Web.UI.Controls.UmbracoUserControl;

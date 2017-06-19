@@ -33,7 +33,8 @@ namespace umbraco.controls.Tree
         {
             Authorize();
 
-            var node = new CMSNode(id);
+            //var node = new CMSNode(id);
+            var node = Services.EntityService.Get(id);
             return new NodeInfo()
             {
                 Id = node.Id,
@@ -54,7 +55,8 @@ namespace umbraco.controls.Tree
         {
             return ids
                 .Where(x => x != -1)
-                .Select(x => new CMSNode(x).Text).ToArray();
+                //.Select(x => new CMSNode(x).Text).ToArray();
+                .Select(x => Services.EntityService.Get(x).Name).ToArray();
         }
 
         /// <summary>

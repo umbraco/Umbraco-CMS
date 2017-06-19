@@ -19,7 +19,7 @@ namespace Umbraco.Web.Macros
             // ensure the file exists
             var path = IOHelper.FindFile(filename);
             if (File.Exists(IOHelper.MapPath(path)) == false)
-                throw new UmbracoException($"Failed to load control, file {filename} does not exist.");
+                throw new Exception($"Failed to load control, file {filename} does not exist.");
 
             // load the control
             var control = (UserControl)new UserControl().LoadControl(path);

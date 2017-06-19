@@ -3,8 +3,6 @@ using System.Web.Services;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Web.WebServices;
-using umbraco.BusinessLogic;
-using umbraco.presentation.webservices;
 using Umbraco.Core.Xml;
 
 namespace umbraco.webservices
@@ -24,7 +22,7 @@ namespace umbraco.webservices
 			{
 				var xmlDoc = new XmlDocument();
 				var macros = xmlDoc.CreateElement("macros");
-				foreach (var m in cms.businesslogic.macro.Macro.GetAll()) 
+				foreach (var m in Services.MacroService.GetAll()) 
 				{
 					var mXml = xmlDoc.CreateElement("macro");
 					mXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "id", m.Id.ToString(CultureInfo.InvariantCulture)));
@@ -45,14 +43,14 @@ namespace umbraco.webservices
 			{
 				var xmlDoc = new XmlDocument();
 				var macro = xmlDoc.CreateElement("macro");
-				var m = new cms.businesslogic.macro.Macro(Id);
+			    var m = Services.MacroService.GetById(Id); //new cms.businesslogic.macro.Macro(Id);
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "id", m.Id.ToString(CultureInfo.InvariantCulture)));
-                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "refreshRate", m.RefreshRate.ToString(CultureInfo.InvariantCulture)));
+                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "refreshRate", m.CacheDuration.ToString(CultureInfo.InvariantCulture)));
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "useInEditor", m.UseInEditor.ToString()));
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "alias", m.Alias));
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "name", m.Name));
-                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "type", m.Type));
-                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "xslt", m.Xslt));
+                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "type", m.ControlType));
+                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "xslt", m.XsltPath));
 				var properties = xmlDoc.CreateElement("properties");
 				foreach (var mp in m.Properties) 
 				{

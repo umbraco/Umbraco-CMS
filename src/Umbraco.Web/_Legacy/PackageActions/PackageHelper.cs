@@ -1,6 +1,8 @@
 using System;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
 
 namespace Umbraco.Web._Legacy.PackageActions
@@ -8,7 +10,7 @@ namespace Umbraco.Web._Legacy.PackageActions
 	public class PackageHelper
 	{
 		//Helper method to replace umbraco tags that breaks the xml format..
-		public static string ParseToValidXml(global::umbraco.cms.businesslogic.template.Template templateObj, ref bool hasAspNetContentBeginning, string template, bool toValid)
+		public static string ParseToValidXml(ITemplate templateObj, ref bool hasAspNetContentBeginning, string template, bool toValid)
 		{
 			string retVal = template;
 			if (toValid)
@@ -55,7 +57,7 @@ namespace Umbraco.Web._Legacy.PackageActions
 				// add asp content element
 				if (hasAspNetContentBeginning)
 				{
-					retVal = templateObj.GetMasterContentElement(templateObj.MasterTemplate) + retVal + "</asp:content>";
+					retVal = MasterPageHelper.GetMasterContentElement(templateObj/*templateObj.MasterTemplate*/) + retVal + "</asp:content>";
 				}
 			}
 

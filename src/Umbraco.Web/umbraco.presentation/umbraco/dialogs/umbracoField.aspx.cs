@@ -132,7 +132,7 @@ namespace umbraco.dialogs
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.Pane pane_form;
+		protected global::Umbraco.Web._Legacy.Controls.Pane pane_form;
 
 		/// <summary>
 		/// pp_insertField control.
@@ -141,7 +141,7 @@ namespace umbraco.dialogs
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_insertField;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_insertField;
 
 		/// <summary>
 		/// fieldPicker control.
@@ -150,7 +150,7 @@ namespace umbraco.dialogs
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.FieldDropDownList fieldPicker;
+		protected global::Umbraco.Web._Legacy.Controls.FieldDropDownList fieldPicker;
 
 		/// <summary>
 		/// pp_insertAltField control.
@@ -159,7 +159,7 @@ namespace umbraco.dialogs
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_insertAltField;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_insertAltField;
 
 		/// <summary>
 		/// altFieldPicker control.
@@ -168,7 +168,7 @@ namespace umbraco.dialogs
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.FieldDropDownList altFieldPicker;
+		protected global::Umbraco.Web._Legacy.Controls.FieldDropDownList altFieldPicker;
 
 		/// <summary>
 		/// pp_insertAltText control.
@@ -177,7 +177,7 @@ namespace umbraco.dialogs
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_insertAltText;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_insertAltText;
 
 		/// <summary>
 		/// pp_recursive control.
@@ -186,7 +186,7 @@ namespace umbraco.dialogs
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_recursive;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_recursive;
 
 		/// <summary>
 		/// pp_insertBefore control.
@@ -195,7 +195,7 @@ namespace umbraco.dialogs
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_insertBefore;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_insertBefore;
 
 		/// <summary>
 		/// pp_insertAfter control.
@@ -204,7 +204,7 @@ namespace umbraco.dialogs
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_insertAfter;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_insertAfter;
 
 		/// <summary>
 		/// pp_FormatAsDate control.
@@ -213,7 +213,7 @@ namespace umbraco.dialogs
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_FormatAsDate;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_FormatAsDate;
 
 		/// <summary>
 		/// pp_casing control.
@@ -222,7 +222,7 @@ namespace umbraco.dialogs
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_casing;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_casing;
 
 		/// <summary>
 		/// pp_encode control.
@@ -231,7 +231,7 @@ namespace umbraco.dialogs
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_encode;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_encode;
 
 		/// <summary>
 		/// pp_convertLineBreaks control.
@@ -240,7 +240,7 @@ namespace umbraco.dialogs
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_convertLineBreaks;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_convertLineBreaks;
 
 		/// <summary>
 		/// pp_removePTags control.
@@ -249,6 +249,6 @@ namespace umbraco.dialogs
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.PropertyPanel pp_removePTags;
+		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_removePTags;
 	}
 }

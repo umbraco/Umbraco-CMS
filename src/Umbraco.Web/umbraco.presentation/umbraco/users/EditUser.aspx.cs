@@ -12,20 +12,16 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
 using Umbraco.Web.Security;
-using umbraco.BusinessLogic;
 using umbraco.controls;
-using umbraco.uicontrols;
-using umbraco.cms.presentation.Trees;
 using Umbraco.Core.IO;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.UI;
 using Umbraco.Web.UI.Pages;
-using System.Text.RegularExpressions;
-using System.Text;
 using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
+using Umbraco.Web._Legacy.Controls;
 
 namespace umbraco.cms.presentation.user
 {

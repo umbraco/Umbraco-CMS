@@ -1,7 +1,9 @@
 ﻿using Umbraco.Core.Services;
 using System;
+using System.Linq;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
@@ -22,16 +24,20 @@ namespace umbraco.presentation.umbraco.dialogs
             li.Selected = true;
             dd_detectedAlias.Items.Add(li);
 
-            var t = new cms.businesslogic.template.Template(int.Parse(Request["id"]));
+            //var t = new cms.businesslogic.template.Template(int.Parse(Request["id"]));
+            var t = Services.FileService.GetTemplate(int.Parse(Request["id"]));
 
 
-            if (t.MasterTemplate > 0)
+            //if (t.MasterTemplate > 0)
+            if (string.IsNullOrWhiteSpace(t.MasterTemplateAlias) != true)
             {
-                t = new cms.businesslogic.template.Template(t.MasterTemplate);
+                //t = new cms.businesslogic.template.Template(t.MasterTemplate);
+                t = Services.FileService.GetTemplate(t.MasterTemplateAlias);
 
             }
 
-            foreach (string cpId in t.contentPlaceholderIds())
+            //foreach (string cpId in t.contentPlaceholderIds())
+            foreach (string cpId in MasterPageHelper.GetContentPlaceholderIds(t))
             {
                 dd_detectedAlias.Items.Add(cpId);
             }

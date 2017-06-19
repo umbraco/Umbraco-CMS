@@ -1,26 +1,24 @@
 using System;
-using System.Linq;
 using System.Net.Mail;
 using System.Web;
+using System.Linq;
 using System.Web.UI.WebControls;
-using umbraco.cms.businesslogic;
-using umbraco.uicontrols;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
-using Language = umbraco.cms.businesslogic.language.Language;
 
 namespace umbraco.presentation.dialogs
 {
     public partial class sendToTranslation : UmbracoEnsuredPage
     {
-        private CMSNode _currentPage;
+        private IUmbracoEntity _currentPage;
 
         public sendToTranslation()
         {
@@ -29,45 +27,48 @@ namespace umbraco.presentation.dialogs
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            _currentPage = new CMSNode(Int32.Parse(Request.GetItemAsString("id")));
+            _currentPage = Services.EntityService.Get(Int32.Parse(Request.GetItemAsString("id")));
 
             pp_translator.Text = Services.TextService.Localize("translation/translator");
             pp_language.Text = Services.TextService.Localize("translation/translateTo");
             pp_includeSubs.Text = Services.TextService.Localize("translation/includeSubpages");
             pp_comment.Text = Services.TextService.Localize("comment");
-            pane_form.Text = Services.TextService.Localize("translation/sendToTranslate", new[] { _currentPage.Text});
-            
+            pane_form.Text = Services.TextService.Localize("translation/sendToTranslate", new[] { _currentPage.Name});
+
 
             if (!IsPostBack)
             {
                 // default language
                 var selectedLanguage = 0;
 
-                var domains = library.GetCurrentDomains(_currentPage.Id);
+                var domains = Current.Services.DomainService.GetAssignedDomains(_currentPage.Id, false).ToArray();
+                //var domains = library.GetCurrentDomains(_currentPage.Id);
                 if (domains != null)
                 {
-                    selectedLanguage = domains[0].Language.id;
-                    defaultLanguage.Text = Services.TextService.Localize("defaultLanguageIs") + " " + domains[0].Language.FriendlyName;
+                    var lang = Current.Services.LocalizationService.GetLanguageById(domains[0].LanguageId.Value);
+                    selectedLanguage = lang.Id;
+                    defaultLanguage.Text = Services.TextService.Localize("defaultLanguageIs") + " " + lang.CultureName;
                 }
                 else
                 {
                     defaultLanguage.Text = Services.TextService.Localize("defaultLanguageIsNotAssigned");
                 }
-                
+
                 // languages
                 language.Items.Add(new ListItem(Services.TextService.Localize("general/choose"), ""));
-                foreach (var l in Language.getAll)
+                foreach (var l in Current.Services.LocalizationService.GetAllLanguages())
                 {
                     var li = new ListItem();
-                    li.Text = l.FriendlyName;
-                    li.Value = l.id.ToString();
-                    if (selectedLanguage == l.id)
+                    li.Text = l.CultureName;
+                    li.Value = l.Id.ToString();
+                    if (selectedLanguage == l.Id)
                         li.Selected = true;
                     language.Items.Add(li);
                 }
 
                 // Subpages
-                if (_currentPage.Children.Length == 0)
+                var c = Services.EntityService.GetChildren(_currentPage.Id);
+                if (c.Any())
                     includeSubpages.Enabled = false;
 
                 // Translators
@@ -78,7 +79,7 @@ namespace umbraco.presentation.dialogs
 
                 if (translator.Items.Count == 0) {
                     feedback.Text = Services.TextService.Localize("translation/noTranslators");
-                    feedback.type = Feedback.feedbacktype.error;
+                    feedback.type = Umbraco.Web._Legacy.Controls.Feedback.feedbacktype.error;
                     doTranslation.Enabled = false;
                 }
 
@@ -87,9 +88,9 @@ namespace umbraco.presentation.dialogs
             }
         }
 
-        private bool UserHasTranslatePermission(IUser u, CMSNode node)
+        private bool UserHasTranslatePermission(IUser u, IUmbracoEntity node)
         {
-            //the permissions column in umbracoUserType is legacy and needs to be rewritten but for now this is the only way to test 
+            //the permissions column in umbracoUserType is legacy and needs to be rewritten but for now this is the only way to test
             var permissions = Services.UserService.GetPermissions(u, node.Path);
             return permissions.AssignedPermissions.Contains("4");
         }
@@ -104,41 +105,41 @@ namespace umbraco.presentation.dialogs
                     _currentPage,
                     Security.CurrentUser,
                     Services.UserService.GetUserById(int.Parse(translator.SelectedValue)),
-                    new Language(int.Parse(language.SelectedValue)),
+                    Current.Services.LocalizationService.GetLanguageById(int.Parse(language.SelectedValue)),
                     comment.Text, includeSubpages.Checked,
                     true);
 
                 pane_form.Visible = false;
                 pl_buttons.Visible = false;
 
-                feedback.Text = Services.TextService.Localize("translation/pageHasBeenSendToTranslation", _currentPage.Text) +
+                feedback.Text = Services.TextService.Localize("translation/pageHasBeenSendToTranslation", _currentPage.Name) +
                     "</p><p><a href=\"#\" onclick=\"" + ClientTools.Scripts.CloseModalWindow() + "\">" +
                     Services.TextService.Localize("defaultdialogs/closeThisWindow") + "</a></p>";
-                feedback.type = Feedback.feedbacktype.success;
+                feedback.type = Umbraco.Web._Legacy.Controls.Feedback.feedbacktype.success;
             }
             else
             {
                 feedback.Text = Services.TextService.Localize("translation/noLanguageSelected");
-                feedback.type = Feedback.feedbacktype.error;
+                feedback.type = Umbraco.Web._Legacy.Controls.Feedback.feedbacktype.error;
             }
         }
-        
-        public void MakeNew(CMSNode Node, IUser User, IUser Translator, Language Language, string Comment,
+
+        public void MakeNew(IUmbracoEntity Node, IUser User, IUser Translator, ILanguage Language, string Comment,
             bool IncludeSubpages, bool SendEmail)
         {
             // Get translation taskType for obsolete task constructor
             var taskType = Services.TaskService.GetTaskTypeByAlias("toTranslate");
 
             // Create pending task
-            var t = new cms.businesslogic.task.Task(new Task(taskType));
+            var t = new Umbraco.Web._Legacy.BusinessLogic.Task(new Task(taskType));
             t.Comment = Comment;
-            t.Node = Node;
+            t.TaskEntity.EntityId = Node.Id;
             t.ParentUser = User;
             t.User = Translator;
             t.Save();
 
             Services.AuditService.Add(AuditType.SendToTranslate,
-                "Translator: " + Translator.Name + ", Language: " + Language.FriendlyName,
+                "Translator: " + Translator.Name + ", Language: " + Language.CultureName,
                 User.Id, Node.Id);
 
             // send it
@@ -153,17 +154,17 @@ namespace umbraco.presentation.dialogs
                 serverName += IOHelper.ResolveUrl(SystemDirectories.Umbraco);
 
                 // Send mail
-                string[] subjectVars = { serverName, Node.Text };
+                string[] subjectVars = { serverName, Node.Name };
                 string[] bodyVars = {
-                    Translator.Name, Node.Text, User.Name,
+                    Translator.Name, Node.Name, User.Name,
                     serverName, t.Id.ToString(),
-                    Language.FriendlyName
+                    Language.CultureName
                 };
 
                 if (User.Email != "" && User.Email.Contains("@") && Translator.Email != "" &&
                     Translator.Email.Contains("@"))
                 {
-                    // create the mail message 
+                    // create the mail message
                     using (MailMessage mail = new MailMessage(User.Email, Translator.Email))
                     {
                         // populate the message
@@ -182,7 +183,7 @@ namespace umbraco.presentation.dialogs
                             Current.Logger.Error<sendToTranslation>("Error sending translation e-mail", ex);
                         }
                     }
-                        
+
                 }
                 else
                 {
@@ -194,8 +195,9 @@ namespace umbraco.presentation.dialogs
             if (IncludeSubpages)
             {
                 //store children array here because iterating over an Array property object is very inneficient.
-                var c = Node.Children;
-                foreach (CMSNode n in c)
+                var c = Services.EntityService.GetChildren(Node.Id);
+                //var c = Node.Children;
+                foreach (var n in c)
                 {
                     MakeNew(n, User, Translator, Language, Comment, true, false);
                 }

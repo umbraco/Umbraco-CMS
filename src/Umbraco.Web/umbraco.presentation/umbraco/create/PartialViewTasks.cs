@@ -1,5 +1,4 @@
 ﻿using Umbraco.Core.CodeAnnotations;
-using umbraco.BusinessLogic;
 using Umbraco.Core;
 
 namespace umbraco

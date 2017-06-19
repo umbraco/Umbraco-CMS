@@ -19,7 +19,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.TabView TabView1;
+        protected global::Umbraco.Web._Legacy.Controls.TabView TabView1;
         
         /// <summary>
         /// Pane1 control.
@@ -28,7 +28,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane1;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane1;
         
         /// <summary>
         /// pp_name control.
@@ -37,13 +37,13 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_name;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_name;
 
-        protected global::umbraco.uicontrols.PropertyPanel pp_icon;
-        protected global::umbraco.uicontrols.PropertyPanel pp_umbracoVersion;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_icon;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_umbracoVersion;
         protected global::System.Web.UI.WebControls.TextBox iconUrl;
         protected global::System.Web.UI.WebControls.TextBox umbracoVersion;
-        protected global::umbraco.uicontrols.Pane Pane5;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane5;
         protected global::System.Web.UI.WebControls.RegularExpressionValidator VersionValidator;
         protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator7;
 
@@ -73,7 +73,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_url;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_url;
         
         /// <summary>
         /// packageUrl control.
@@ -100,7 +100,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_version;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_version;
         
         /// <summary>
         /// packageVersion control.
@@ -127,7 +127,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_file;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_file;
         
         /// <summary>
         /// packageUmbFile control.
@@ -145,7 +145,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane1_1;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane1_1;
         
         /// <summary>
         /// pp_author control.
@@ -154,7 +154,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_author;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_author;
         
         /// <summary>
         /// packageAuthorName control.
@@ -181,7 +181,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_author_url;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_author_url;
         
         /// <summary>
         /// packageAuthorUrl control.
@@ -208,7 +208,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane1_2;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane1_2;
         
         /// <summary>
         /// pp_licens control.
@@ -217,7 +217,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_licens;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_licens;
         
         /// <summary>
         /// packageLicenseName control.
@@ -244,7 +244,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_license_url;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_license_url;
         
         /// <summary>
         /// packageLicenseUrl control.
@@ -271,7 +271,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane1_3;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane1_3;
         
         /// <summary>
         /// pp_readme control.
@@ -280,7 +280,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_readme;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_readme;
         
         /// <summary>
         /// packageReadme control.
@@ -298,7 +298,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane2;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane2;
         
         /// <summary>
         /// pp_content control.
@@ -307,7 +307,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_content;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_content;
         
         /// <summary>
         /// content control.
@@ -334,7 +334,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane2_1;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane2_1;
         
         /// <summary>
         /// documentTypes control.
@@ -352,7 +352,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane2_2;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane2_2;
         
         /// <summary>
         /// templates control.
@@ -370,7 +370,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane2_3;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane2_3;
         
         /// <summary>
         /// stylesheets control.
@@ -388,7 +388,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane2_4;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane2_4;
         
         /// <summary>
         /// macros control.
@@ -406,7 +406,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane2_5;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane2_5;
         
         /// <summary>
         /// languages control.
@@ -424,7 +424,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane2_6;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane2_6;
         
         /// <summary>
         /// dictionary control.
@@ -442,7 +442,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane2_7;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane2_7;
         
         /// <summary>
         /// cbl_datatypes control.
@@ -460,7 +460,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane3;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane3;
         
         /// <summary>
         /// Pane3_1 control.
@@ -469,7 +469,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane3_1;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane3_1;
         
         /// <summary>
         /// packageFilesRepeater control.
@@ -505,7 +505,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane3_2;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane3_2;
         
         /// <summary>
         /// packageControlPath control.
@@ -523,7 +523,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane4;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane4;
         
         /// <summary>
         /// actionsVal control.

@@ -7,13 +7,6 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 
 using System.Xml;
-
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.macro;
-using umbraco.cms.businesslogic.template;
-using umbraco.cms.businesslogic.web;
-using umbraco.cms.presentation.Trees;
 using umbraco.controls;
 using Umbraco.Core;
 using Umbraco.Core.IO;
@@ -30,12 +23,12 @@ namespace umbraco.presentation.developer.packages
             CurrentApp = Constants.Applications.Developer.ToString();
 
         }
-        public uicontrols.TabPage packageInfo;
-        public uicontrols.TabPage packageContents;
-        public uicontrols.TabPage packageFiles;
-        public uicontrols.TabPage packageOutput;
-        public uicontrols.TabPage packageAbout;
-        public uicontrols.TabPage packageActions;
+        public Umbraco.Web._Legacy.Controls.TabPage packageInfo;
+        public Umbraco.Web._Legacy.Controls.TabPage packageContents;
+        public Umbraco.Web._Legacy.Controls.TabPage packageFiles;
+        public Umbraco.Web._Legacy.Controls.TabPage packageOutput;
+        public Umbraco.Web._Legacy.Controls.TabPage packageAbout;
+        public Umbraco.Web._Legacy.Controls.TabPage packageActions;
 
         protected ContentPicker cp;
         private cms.businesslogic.packager.PackageInstance pack;
@@ -90,10 +83,11 @@ namespace umbraco.presentation.developer.packages
 
 
                     /*TEMPLATES */
-                    Template[] umbTemplates = Template.GetAllAsList().ToArray();
-                    foreach (Template tmp in umbTemplates)
+                    var nTemplates = Services.FileService.GetTemplates();
+                    //Template[] umbTemplates = Template.GetAllAsList().ToArray();
+                    foreach (var tmp in nTemplates)
                     {
-                        ListItem li = new ListItem(tmp.Text, tmp.Id.ToString());
+                        ListItem li = new ListItem(tmp.Name, tmp.Id.ToString());
 
                         if (pack.Templates.Contains(tmp.Id.ToString()))
                             li.Selected = true;
@@ -102,10 +96,12 @@ namespace umbraco.presentation.developer.packages
                     }
 
                     /* DOC TYPES */
-                    DocumentType[] docs = DocumentType.GetAllAsList().ToArray();
-                    foreach (DocumentType dc in docs)
+                    // fixme - media types? member types?
+                    var nContentTypes = Services.ContentTypeService.GetAll();
+                    //DocumentType[] docs = DocumentType.GetAllAsList().ToArray();
+                    foreach (var dc in nContentTypes)
                     {
-                        ListItem li = new ListItem(dc.Text, dc.Id.ToString());
+                        ListItem li = new ListItem(dc.Name, dc.Id.ToString());
                         if (pack.Documenttypes.Contains(dc.Id.ToString()))
                             li.Selected = true;
 
@@ -126,8 +122,9 @@ namespace umbraco.presentation.developer.packages
                     }
 
                     /* MACROS */
-                    Macro[] umbMacros = Macro.GetAll();
-                    foreach (Macro m in umbMacros)
+                    var nMacros = Services.MacroService.GetAll();
+                    //Macro[] umbMacros = Macro.GetAll();
+                    foreach (var m in nMacros)
                     {
                         ListItem li = new ListItem(m.Name, m.Id.ToString());
                         if (pack.Macros.Contains(m.Id.ToString()))
@@ -137,11 +134,12 @@ namespace umbraco.presentation.developer.packages
                     }
 
                     /*Langauges */
-                    Language[] umbLanguages = Language.getAll;
-                    foreach (Language l in umbLanguages)
+                    var nLanguages = Services.LocalizationService.GetAllLanguages();
+                    //Language[] umbLanguages = Language.getAll;
+                    foreach (var l in nLanguages)
                     {
-                        ListItem li = new ListItem(l.FriendlyName, l.id.ToString());
-                        if (pack.Languages.Contains(l.id.ToString()))
+                        ListItem li = new ListItem(l.CultureName, l.Id.ToString());
+                        if (pack.Languages.Contains(l.Id.ToString()))
                             li.Selected = true;
 
                         languages.Items.Add(li);
@@ -439,7 +437,7 @@ namespace umbraco.presentation.developer.packages
             saves.Text = Services.TextService.Localize("save");
             saves.CommandName = "save";
             saves.Command += new CommandEventHandler(saveOrPublish);
-            saves.ButtonType = uicontrols.MenuButtonType.Primary;
+            saves.ButtonType = Umbraco.Web._Legacy.Controls.MenuButtonType.Primary;
             saves.ID = "save";
 
 

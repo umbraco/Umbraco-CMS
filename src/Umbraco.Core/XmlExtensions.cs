@@ -209,15 +209,15 @@ namespace Umbraco.Core
         ///// </summary>
         ///// <param name="xElement"></param>
         ///// <returns></returns>
-        //public static XmlNode ToXmlElement(this XContainer xElement)
-        //{
-        //    var xmlDocument = new XmlDocument();
-        //    using (var xmlReader = xElement.CreateReader())
-        //    {
-        //        xmlDocument.Load(xmlReader);
-        //    }
-        //    return xmlDocument.DocumentElement;
-        //}
+        public static XmlNode ToXmlElement(this XContainer xElement)
+        {
+            var xmlDocument = new XmlDocument();
+            using (var xmlReader = xElement.CreateReader())
+            {
+                xmlDocument.Load(xmlReader);
+            }
+            return xmlDocument.DocumentElement;
+        }
 
         /// <summary>
         /// Converts from an XmlElement to an XElement

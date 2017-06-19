@@ -3,15 +3,18 @@ using System.Linq;
 using System.Globalization;
 using System.Linq;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 using System.Xml;
 using Umbraco.Core.IO;
 using Umbraco.Web;
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web._Legacy.Actions;
+using Button = System.Web.UI.WebControls.Button;
+using UserControl = System.Web.UI.UserControl;
 
 namespace umbraco.dialogs
 {
@@ -56,7 +59,8 @@ namespace umbraco.dialogs
                 //ensure they have access to create under this node!!
                 if (App.InvariantEquals(Constants.Applications.Media) || CheckCreatePermissions(nodeId))
                 {
-                    var c = new CMSNode(nodeId);
+                    //var c = new CMSNode(nodeId);
+                    var c = Services.EntityService.Get(nodeId);
                     path.Value = c.Path;
                     pane_chooseNode.Visible = false;
                     panel_buttons.Visible = false;
@@ -72,12 +76,11 @@ namespace umbraco.dialogs
                 }
                 else
                 {
-                    PageNameHolder.type = uicontrols.Feedback.feedbacktype.error;
+                    PageNameHolder.type = Umbraco.Web._Legacy.Controls.Feedback.feedbacktype.error;
                     PageNameHolder.Text = Services.TextService.Localize("rights") + " " + Services.TextService.Localize("error");
                     JTree.DataBind();
                 }
             }
-
         }
 
         protected override void OnPreRender(EventArgs e)
@@ -89,7 +92,8 @@ namespace umbraco.dialogs
 
         private bool CheckCreatePermissions(int nodeId)
         {
-            var permission = Services.UserService.GetPermissions(Security.CurrentUser, new CMSNode(nodeId).Path);
+            var c = Services.EntityService.Get(nodeId);
+            var permission = Services.UserService.GetPermissions(Security.CurrentUser, c.Path);
             return permission.AssignedPermissions.Contains(ActionNew.Instance.Letter.ToString(CultureInfo.InvariantCulture), StringComparer.Ordinal);
         }
 
@@ -110,7 +114,7 @@ namespace umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_chooseNode;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_chooseNode;
 
         /// <summary>
         /// JTree control.
@@ -137,7 +141,7 @@ namespace umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Feedback PageNameHolder;
+        protected global::Umbraco.Web._Legacy.Controls.Feedback PageNameHolder;
 
         /// <summary>
         /// pane_chooseName control.
@@ -146,7 +150,7 @@ namespace umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_chooseName;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_chooseName;
 
         /// <summary>
         /// phCreate control.

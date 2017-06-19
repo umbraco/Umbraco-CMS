@@ -1,28 +1,29 @@
-using Umbraco.Web.UI;
-using umbraco.BusinessLogic;
-using umbraco.DataLayer;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.UI;
 
 namespace umbraco
 {
     public class macroTasks : LegacyDialogTask
     {
-        
-        
         public override bool PerformSave()
         {
-            var checkingMacro =cms.businesslogic.macro.Macro.GetByAlias(Alias);
-            var id = checkingMacro != null
-                         ? checkingMacro.Id
-                         : cms.businesslogic.macro.Macro.MakeNew(Alias).Id;
-            _returnUrl = string.Format("developer/Macros/editMacro.aspx?macroID={0}", id);
+            var macro = Current.Services.MacroService.GetByAlias(Alias);
+            if (macro == null)
+            {
+                macro = new Macro(Alias, Alias);
+                Current.Services.MacroService.Save(macro);
+            }
+            _returnUrl = string.Format("developer/Macros/editMacro.aspx?macroID={0}", macro.Id);
             return true;
         }
 
         public override bool PerformDelete()
         {
-            new cms.businesslogic.macro.Macro(ParentID).Delete();
+            var macro = Current.Services.MacroService.GetById(ParentID);
+            if (macro != null)
+                Current.Services.MacroService.Delete(macro);
             return true;
         }
 

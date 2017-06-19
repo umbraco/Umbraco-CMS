@@ -27,7 +27,7 @@
 
 //        }
 //        private Document currentDoc = new Document(int.Parse(helper.Request("nodeId")));
-        
+
 //        protected void version_load(object sender, EventArgs e) {
 
 //            if (allVersions.SelectedValue != "")
@@ -95,7 +95,7 @@
 //                }
 
 //                Button1.Visible = true;
-                
+
 
 //            }
 //            else
@@ -135,7 +135,7 @@
 //            InitializeComponent();
 //            base.OnInit(e);
 //        }
-		
+
 //        /// <summary>
 //        /// Required method for Designer support - do not modify
 //        /// the contents of this method with the code editor.
@@ -151,13 +151,13 @@
 //            if (allVersions.SelectedValue.Trim() != "") {
 //                Document d = new Document(int.Parse(helper.Request("nodeId")));
 //                d.RollBack(new Guid(allVersions.SelectedValue), Security.CurrentUser);
-                
+
 //                BusinessLogic.Log.Add(BusinessLogic.LogTypes.RollBack, Security.CurrentUser, d.Id, "Version rolled back to revision '" + allVersions.SelectedValue + "'");
-                
+
 //                Document rollback = new Document(d.Id, new Guid(allVersions.SelectedValue));
-//                feedBackMsg.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
+//                feedBackMsg.type = global::Umbraco.Web._Legacy.Controls.Feedback.feedbacktype.success;
 //                string[] vars = {rollback.Text, rollback.VersionDate.ToLongDateString()};
-                
+
 //                feedBackMsg.Text = ui.Text("rollback", "documentRolledBack", vars, new global::umbraco.BusinessLogic.User(0)) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
 //                diffPanel.Visible = false;
 //                pl_buttons.Visible = false;

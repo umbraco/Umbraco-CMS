@@ -16,7 +16,7 @@
 //
 //using umbraco.cms.businesslogic.web;
 //using umbraco.interfaces;
-//using umbraco.uicontrols;
+//using Umbraco.Web._Legacy.Controls;
 //using Content = umbraco.cms.businesslogic.Content;
 //using ContentType = umbraco.cms.businesslogic.ContentType;
 //using Media = umbraco.cms.businesslogic.media.Media;
@@ -33,7 +33,7 @@
 //    public class ContentControl : TabView
 //    {
 
-        
+
 //        internal Dictionary<string, IDataType> DataTypes = new Dictionary<string, IDataType>();
 //        private readonly Content _content;
 //        private UmbracoEnsuredPage _prntpage;
@@ -55,7 +55,7 @@
 //        private bool _savePropertyDataWhenInvalid = true;
 //        private ContentType _contentType;
 
-        
+
 //        public Content ContentObject
 //        {
 //            get { return _content; }
@@ -92,7 +92,7 @@
 //        {
 //        }
 
-        
+
 //        /// <summary>
 //        /// Constructor to set default properties.
 //        /// </summary>
@@ -134,7 +134,7 @@
 //        {
 //            base.CreateChildControls();
 
-            
+
 //            _prntpage = (UmbracoEnsuredPage)Page;
 //            int i = 0;
 //            Hashtable inTab = new Hashtable();
@@ -634,7 +634,7 @@
 //            }
 //            else
 //            {
-                
+
 //                var ph = new Panel();
 
 //                var pp = new Pane();
@@ -645,15 +645,15 @@
 //                };
 
 //                pp.addProperty(p.PropertyType.Name, missingPropertyEditorLabel);
-                
+
 //                ph.Attributes.Add("style", "padding: 0; position: relative;");
-                
+
 //                ph.Controls.Add(pp);
 
 //                tp.Controls.Add(ph);
 //            }
 
-            
+
 //        }
 
 //        public enum publishModes

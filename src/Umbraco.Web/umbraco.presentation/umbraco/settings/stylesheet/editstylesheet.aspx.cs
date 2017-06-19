@@ -1,14 +1,9 @@
 ﻿using Umbraco.Core.Services;
 using System;
 using System.IO;
-using System.Linq;
 using System.Web.UI;
-using Umbraco.Core.IO;
-using Umbraco.Web;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.web;
 using umbraco.cms.presentation.Trees;
-using umbraco.uicontrols;
+using Umbraco.Web._Legacy.Controls;
 using Umbraco.Core;
 using Umbraco.Web.UI.Pages;
 
@@ -87,7 +82,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.TabView Panel1;
+        protected global::Umbraco.Web._Legacy.Controls.TabView Panel1;
 
         /// <summary>
         /// Pane7 control.
@@ -96,8 +91,8 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane7;
-        protected global::umbraco.uicontrols.Pane Pane8;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane7;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane8;
 
         /// <summary>
         /// pp_name control.
@@ -106,7 +101,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_name;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_name;
 
         /// <summary>
         /// NameTxt control.
@@ -124,7 +119,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_path;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_path;
 
         /// <summary>
         /// lttPath control.
@@ -142,7 +137,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_source;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_source;
 
         /// <summary>
         /// editorSource control.
@@ -151,7 +146,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.CodeArea editorSource;
+        protected global::Umbraco.Web._Legacy.Controls.CodeArea editorSource;
 
     }
 }

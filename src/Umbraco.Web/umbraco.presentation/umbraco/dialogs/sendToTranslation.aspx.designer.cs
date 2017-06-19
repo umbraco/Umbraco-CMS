@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 
 using System.Web.UI.WebControls;
-using umbraco.uicontrols;
+
 
 namespace umbraco.presentation.dialogs
 {
@@ -23,7 +23,7 @@ namespace umbraco.presentation.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected Feedback feedback;
+        protected Umbraco.Web._Legacy.Controls.Feedback feedback;
         
         /// <summary>
         /// pane_form control.
@@ -32,7 +32,7 @@ namespace umbraco.presentation.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected Pane pane_form;
+        protected Umbraco.Web._Legacy.Controls.Pane pane_form;
         
         /// <summary>
         /// pp_translator control.
@@ -41,7 +41,7 @@ namespace umbraco.presentation.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected PropertyPanel pp_translator;
+        protected Umbraco.Web._Legacy.Controls.PropertyPanel pp_translator;
         
         /// <summary>
         /// translator control.
@@ -59,7 +59,7 @@ namespace umbraco.presentation.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected PropertyPanel pp_language;
+        protected Umbraco.Web._Legacy.Controls.PropertyPanel pp_language;
         
         /// <summary>
         /// language control.
@@ -86,7 +86,7 @@ namespace umbraco.presentation.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected PropertyPanel pp_includeSubs;
+        protected Umbraco.Web._Legacy.Controls.PropertyPanel pp_includeSubs;
         
         /// <summary>
         /// includeSubpages control.
@@ -104,7 +104,7 @@ namespace umbraco.presentation.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected PropertyPanel pp_comment;
+        protected Umbraco.Web._Legacy.Controls.PropertyPanel pp_comment;
         
         /// <summary>
         /// comment control.

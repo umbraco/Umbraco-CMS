@@ -10,18 +10,6 @@ namespace Umbraco.Tests.CoreThings
     [TestFixture]
     public class UdiTests
     {
-        void foo()
-        {
-            var frenchContent = contentCache.Get(1234, "fr-FR");
-            var mobileFrenchContent = contentCache.Get(1234, "fr-FR", "mobile");
-
-            var group = frenchContent.GetVariantGroup();
-
-            var defaultCulture = group.DefaultCulture; // CultureInfo
-            var cultures = group.GetCultures(); // CultureInfo[]
-            var segments = group.GetSegments("fr-FR"); // string[]
-
-        }
         [Test]
         public void StringEntityCtorTest()
         {

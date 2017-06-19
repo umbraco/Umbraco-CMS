@@ -2,7 +2,6 @@
 using System.Web.UI.WebControls;
 using Umbraco.Core;
 using Umbraco.Web.UI.Pages;
-using umbraco.BusinessLogic;
 using Umbraco.Core.Models;
 
 namespace umbraco.cms.presentation.developer.RelationTypes

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using umbraco.cms.businesslogic;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web.Composing;
 
 namespace umbraco.presentation.settings {
 
@@ -11,15 +11,15 @@ namespace umbraco.presentation.settings {
     public partial class DictionaryItemList : Umbraco.Web.UI.Pages.UmbracoEnsuredPage {
         
 
-        private readonly cms.businesslogic.language.Language[] _languages = cms.businesslogic.language.Language.getAll;
+        private readonly ILanguage[] _languages = Current.Services.LocalizationService.GetAllLanguages().ToArray();
         
         
         protected void Page_Load(object sender, EventArgs e) {
             
             
             string header = "<thead><tr><td>Key</td>";
-            foreach (cms.businesslogic.language.Language lang in _languages) {
-                header += "<td>" + lang.FriendlyName + "</td>";
+            foreach (var lang in _languages) {
+                header += "<td>" + lang.CultureName + "</td>";
             }
             header += "</tr></thead>";
 
@@ -43,7 +43,7 @@ namespace umbraco.presentation.settings {
                 foreach (var lang in _languages) {
                     lt_table.Text += "<td>";
 
-                    var trans = di.Translations.FirstOrDefault(x => x.LanguageId == lang.id);
+                    var trans = di.Translations.FirstOrDefault(x => x.LanguageId == lang.Id);
                     
                     if (trans == null || string.IsNullOrEmpty(trans.Value))
                         lt_table.Text += "<i class='icon-alert'></i>";

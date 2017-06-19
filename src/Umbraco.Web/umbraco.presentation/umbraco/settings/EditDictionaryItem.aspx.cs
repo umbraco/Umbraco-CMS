@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web.UI;
 
 namespace umbraco.settings
@@ -19,7 +20,7 @@ namespace umbraco.settings
 	public partial class EditDictionaryItem : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
         protected LiteralControl keyTxt = new LiteralControl();
-        protected uicontrols.TabView tbv = new uicontrols.TabView();
+        protected Umbraco.Web._Legacy.Controls.TabView tbv = new Umbraco.Web._Legacy.Controls.TabView();
         private System.Collections.ArrayList languageFields = new System.Collections.ArrayList();
         private IDictionaryItem currentItem;
         protected TextBox boxChangeKey;
@@ -39,9 +40,9 @@ namespace umbraco.settings
             save.Click += save_Click;
 			save.ToolTip = Services.TextService.Localize("save");
             save.ID = "save";
-            save.ButtonType = uicontrols.MenuButtonType.Primary;
+            save.ButtonType = Umbraco.Web._Legacy.Controls.MenuButtonType.Primary;
 
-            uicontrols.Pane p = new uicontrols.Pane();
+            var p = new Umbraco.Web._Legacy.Controls.Pane();
 
             boxChangeKey = new TextBox
             {
@@ -68,21 +69,21 @@ namespace umbraco.settings
             txt.Text = "<p>" + Services.TextService.Localize("dictionaryItem/description", new[] { currentItem.ItemKey }) + "</p><br/>";
             p.addProperty(txt);
 
-            foreach (cms.businesslogic.language.Language l in cms.businesslogic.language.Language.getAll)
+            foreach (var l in Current.Services.LocalizationService.GetAllLanguages())
             {
 
                 TextBox languageBox = new TextBox();
                 languageBox.TextMode = TextBoxMode.MultiLine;
-                languageBox.ID = l.id.ToString();
+                languageBox.ID = l.Id.ToString();
                 languageBox.CssClass = "umbEditorTextFieldMultiple";
 
 			    if (!IsPostBack)
 			    {
-			        languageBox.Text = currentItem.GetTranslatedValue(l.id);
+			        languageBox.Text = currentItem.GetTranslatedValue(l.Id);
 			    }
 
                 languageFields.Add(languageBox);
-                p.addProperty(l.FriendlyName, languageBox);
+                p.addProperty(l.CultureName, languageBox);
 
             }
 

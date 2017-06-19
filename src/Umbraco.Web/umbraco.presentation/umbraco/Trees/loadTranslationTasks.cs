@@ -2,11 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using umbraco.cms.businesslogic.task;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web;
 using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web._Legacy.BusinessLogic;
 
 namespace umbraco {
     public class loadOpenTasks : BaseTree {
@@ -47,7 +47,7 @@ namespace umbraco {
                     xNode.Menu.Clear();
 
                     xNode.NodeID = t.Id.ToString();
-                    xNode.Text = t.Node.Text;
+                    xNode.Text = t.TaskEntityEntity.Name;
                     xNode.Action = "javascript:openTranslationTask(" + t.Id.ToString() + ")";
                     xNode.Icon = ".sprTreeSettingLanguage";
                     xNode.OpenIcon = ".sprTreeSettingLanguage";
@@ -98,7 +98,7 @@ namespace umbraco {
                     XmlTreeNode xNode = XmlTreeNode.Create(this);
                     xNode.Menu.Clear();
                     xNode.NodeID = t.Id.ToString();
-                    xNode.Text = t.Node.Text;
+                    xNode.Text = t.TaskEntityEntity.Name;
                     xNode.Action = "javascript:openTranslationTask(" + t.Id.ToString() + ")";
                     xNode.Icon = ".sprTreeSettingLanguage";
                     xNode.OpenIcon = ".sprTreeSettingLanguage";
