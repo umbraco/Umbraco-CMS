@@ -52,6 +52,7 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<IReadOnlyUserGroup, UserGroupBasic>()
                 .ForMember(detail => detail.StartContentId, opt => opt.Ignore())
+                .ForMember(detail => detail.UserCount, opt => opt.Ignore())
                 .ForMember(detail => detail.StartMediaId, opt => opt.Ignore())
                 .ForMember(detail => detail.Key, opt => opt.Ignore())
                 .ForMember(detail => detail.Sections, opt => opt.Ignore())

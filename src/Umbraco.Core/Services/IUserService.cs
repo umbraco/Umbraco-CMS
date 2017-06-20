@@ -182,7 +182,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
         IEnumerable<IUser> GetAllNotInGroup(int groupId);
 
-        #region User groups
+        #region User groups        
 
         /// <summary>
         /// Gets all UserGroups or those specified as parameters

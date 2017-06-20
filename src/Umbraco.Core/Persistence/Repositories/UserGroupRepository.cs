@@ -77,6 +77,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var innerSql = GetBaseQuery("umbracoUserGroup.id");
             innerSql.Where("umbracoUserGroup2App.app = " + SqlSyntax.GetQuotedValue(sectionAlias));
             sql.Where(string.Format("umbracoUserGroup.id IN ({0})", innerSql.SQL));
+            AppendGroupBy(sql);
             //must be included for relator to work
             sql.OrderBy<UserGroupDto>(x => x.Id, SqlSyntax);
 
@@ -122,7 +123,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
             repo.AssignPermission(groupId, permission, entityIds);
-        }
+        }        
 
         #region Overrides of RepositoryBase<int,IUserType>
 
@@ -130,6 +131,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
+            AppendGroupBy(sql);
             //must be included for relator to work
             sql.OrderBy<UserGroupDto>(x => x.Id, SqlSyntax);
 
@@ -154,6 +156,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 sql.Where<UserGroupDto>(x => x.Id >= 0);
             }
+            AppendGroupBy(sql);
             //must be included for relator to work
             sql.OrderBy<UserGroupDto>(x => x.Id, SqlSyntax);
 
@@ -166,6 +169,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IUserGroup>(sqlClause, query);
             var sql = translator.Translate();
+            AppendGroupBy(sql);
             //must be included for relator to work
             sql.OrderBy<UserGroupDto>(x => x.Id, SqlSyntax);
 
@@ -186,7 +190,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                return GetBaseQuery("*");
+                return GetBaseQuery("umbracoUserGroup.*, COUNT(umbracoUser.id) AS UserCount, umbracoUserGroup2App.*");
             }
             return sql;
         }
@@ -197,9 +201,20 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Select(columns)
                 .From<UserGroupDto>()
                 .LeftJoin<UserGroup2AppDto>()
-                .On<UserGroupDto, UserGroup2AppDto>(left => left.Id, right => right.UserGroupId);
+                .On<UserGroupDto, UserGroup2AppDto>(left => left.Id, right => right.UserGroupId)
+                .LeftJoin<User2UserGroupDto>()
+                .On<User2UserGroupDto, UserGroupDto>(left => left.UserGroupId, right => right.Id)
+                .LeftJoin<UserDto>()
+                .On<UserDto, User2UserGroupDto>(left => left.Id, right => right.UserId);                
 
             return sql;
+        }
+
+        private void AppendGroupBy(Sql sql)
+        {
+            sql.GroupBy(@"umbracoUserGroup.createDate, umbracoUserGroup.icon, umbracoUserGroup.id, umbracoUserGroup.startContentId,
+umbracoUserGroup.startMediaId, umbracoUserGroup.updateDate, umbracoUserGroup.userGroupAlias, umbracoUserGroup.userGroupDefaultPermissions,
+umbracoUserGroup.userGroupName, umbracoUserGroup2App.app, umbracoUserGroup2App.userGroupId");
         }
 
         protected override string GetBaseWhereClause()

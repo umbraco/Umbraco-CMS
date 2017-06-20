@@ -601,7 +601,7 @@ namespace Umbraco.Core.Services
             {
                 return repository.GetAllNotInGroup(groupId);
             }
-        }
+        }        
 
         #endregion
 

@@ -35,5 +35,10 @@ namespace Umbraco.Core.Models.Membership
         void AddAllowedSection(string sectionAlias);
 
         void ClearAllowedSections();
+
+        /// <summary>
+        /// Specifies the number of users assigned to this group
+        /// </summary>
+        int UserCount { get; }
     }
 }

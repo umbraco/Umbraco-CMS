@@ -59,5 +59,11 @@ namespace Umbraco.Core.Models.Rdbms
 
         [ResultColumn]
         public List<UserGroup2AppDto> UserGroup2AppDtos { get; set; }
+
+        /// <summary>
+        /// This is only relevant when this column is included in the results (i.e. GetUserGroupsWithUserCounts)
+        /// </summary>
+        [ResultColumn]
+        public int UserCount { get; set; }
     }
 }

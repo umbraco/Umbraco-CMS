@@ -25,5 +25,11 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "startMediaId")]
         public EntityBasic StartMediaId { get; set; }
+
+        /// <summary>
+        /// The number of users assigned to this group
+        /// </summary>
+        [DataMember(Name = "userCount")]
+        public int UserCount { get; set; }
     }
 }

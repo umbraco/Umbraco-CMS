@@ -10,22 +10,18 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public static IUserGroup BuildEntity(UserGroupDto dto)
         {
-            var userGroup = new UserGroup();
+            var userGroup = new UserGroup(dto.UserCount, dto.Alias, dto.Name,
+                dto.DefaultPermissions.IsNullOrWhiteSpace()
+                    ? Enumerable.Empty<string>()
+                    : dto.DefaultPermissions.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture)),
+                dto.Icon);
 
             try
             {
                 userGroup.DisableChangeTracking();
-
-                userGroup.Alias = dto.Alias;
-                userGroup.Id = dto.Id;
-                userGroup.Name = dto.Name;
-                userGroup.Permissions = dto.DefaultPermissions.IsNullOrWhiteSpace()
-                    ? Enumerable.Empty<string>()
-                    : dto.DefaultPermissions.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture));
+                userGroup.Id = dto.Id;                
                 userGroup.CreateDate = dto.CreateDate;
-                userGroup.UpdateDate = dto.UpdateDate;
-                userGroup.Icon = dto.Icon;
-
+                userGroup.UpdateDate = dto.UpdateDate;                
                 if (dto.UserGroup2AppDtos != null)
                 {
                     foreach (var app in dto.UserGroup2AppDtos)

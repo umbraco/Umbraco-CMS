@@ -40,9 +40,30 @@ namespace Umbraco.Core.Models.Membership
                     enum1 => enum1.GetHashCode());
         }
 
+        /// <summary>
+        /// Constructor to create a new user group
+        /// </summary>
         public UserGroup()
         {
             _sectionCollection = new List<string>();
+        }
+
+        /// <summary>
+        /// Constructor to create an existing user group
+        /// </summary>
+        /// <param name="userCount"></param>
+        /// <param name="alias"></param>
+        /// <param name="name"></param>
+        /// <param name="permissions"></param>
+        /// <param name="icon"></param>
+        public UserGroup(int userCount, string alias, string name, IEnumerable<string> permissions, string icon)
+            : this()
+        {
+            UserCount = userCount;
+            _alias = alias;
+            _name = name;
+            _permissions = permissions;            
+            _icon = icon;
         }
 
         [DataMember]
@@ -128,5 +149,7 @@ namespace Umbraco.Core.Models.Membership
         {
             _sectionCollection.Clear();
         }
+
+        public int UserCount { get; private set; }
     }
 }
