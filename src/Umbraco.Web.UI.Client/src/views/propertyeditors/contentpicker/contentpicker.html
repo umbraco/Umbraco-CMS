@@ -30,11 +30,11 @@
         <input type="hidden" name="maxCount" ng-model="renderModel" />
 
         <div class="help-inline" val-msg-for="minCount" val-toggle-msg="minCount">
-            You need to add at least {{model.config.minNumber}} items
+            <localize key="validation_valMinCount">You need to add at least</localize> {{model.config.minNumber}} <localize key="validation_valItems">items</localize>
         </div>
 
         <div class="help-inline" val-msg-for="maxCount" val-toggle-msg="maxCount">
-            You can only have {{model.config.maxNumber}} items selected
+            <localize key="validation_valMaxCount">You can only have</localize> {{model.config.maxNumber}} <localize key="validation_valItemsSel">items selected</localize>
         </div>
         
 
