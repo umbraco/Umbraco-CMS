@@ -140,14 +140,14 @@
                                   deferred.resolve(d);
                                 }
                               },
-                              error);
+                              installError);
                           }, 2000);
                         }
 
                         checkRestart();
                         
                         return deferred.promise;
-                    }, error)
+                    }, installError)
                 .then(function(pack) {
                     vm.installState.status = localizationService.localize("packager_installStateRestarting");
                         vm.installState.progress = "75";
