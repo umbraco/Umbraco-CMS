@@ -6,18 +6,12 @@ using System.Linq;
 using System.Reflection;
 using Moq;
 using NUnit.Framework;
-using SqlCE4Umbraco;
 using umbraco;
-
-using umbraco.cms.businesslogic;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
-using umbraco.DataLayer;
-using umbraco.uicontrols;
 using Umbraco.Core.Composing;
 using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
@@ -41,18 +35,15 @@ namespace Umbraco.Tests.Plugins
             _manager.AssembliesToScan = new[]
 			    {
 			        this.GetType().Assembly,
-			        typeof(SqlCEHelper).Assembly,
-			        typeof(CMSNode).Assembly,
 			        typeof(System.Guid).Assembly,
 			        typeof(NUnit.Framework.Assert).Assembly,
 			        typeof(Microsoft.CSharp.CSharpCodeProvider).Assembly,
 			        typeof(System.Xml.NameTable).Assembly,
 			        typeof(System.Configuration.GenericEnumConverter).Assembly,
 			        typeof(System.Web.SiteMap).Assembly,
-			        typeof(TabPage).Assembly,
+			        //typeof(TabPage).Assembly,
 			        typeof(System.Web.Mvc.ActionResult).Assembly,
 			        typeof(TypeFinder).Assembly,
-			        typeof(ISqlHelper).Assembly,
 					typeof(UmbracoContext).Assembly
 			    };
         }

@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Web.UI;
 using umbraco;
-using umbraco.BusinessLogic;
 using umbraco.cms.presentation.user;
 using Umbraco.Core.Composing;
 using Umbraco.Web._Legacy.UI;

@@ -11,20 +11,13 @@ using System.Threading;
 using System.Web;
 using System.Web.Compilation;
 using NUnit.Framework;
-using SqlCE4Umbraco;
 using umbraco;
-
-using umbraco.cms.businesslogic;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using umbraco.DataLayer;
-using umbraco.uicontrols;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
-using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Tests.Plugins
@@ -47,18 +40,15 @@ namespace Umbraco.Tests.Plugins
 		    _assemblies = new[]
 			    {
 			        this.GetType().Assembly,
-			        typeof(SqlCEHelper).Assembly,
-			        typeof(CMSNode).Assembly,
 			        typeof(System.Guid).Assembly,
 			        typeof(NUnit.Framework.Assert).Assembly,
 			        typeof(Microsoft.CSharp.CSharpCodeProvider).Assembly,
 			        typeof(System.Xml.NameTable).Assembly,
 			        typeof(System.Configuration.GenericEnumConverter).Assembly,
 			        typeof(System.Web.SiteMap).Assembly,
-			        typeof(TabPage).Assembly,
+			        //typeof(TabPage).Assembly,
 			        typeof(System.Web.Mvc.ActionResult).Assembly,
 			        typeof(TypeFinder).Assembly,
-			        typeof(ISqlHelper).Assembly,
                     typeof(global::UmbracoExamine.BaseUmbracoIndexer).Assembly
 			    };
 

@@ -20,6 +20,7 @@ using UmbracoExamine;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Tests.Testing;
 using LightInject;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -40,6 +41,19 @@ namespace Umbraco.Tests.PublishedContent
             Container.GetInstance<UrlSegmentProviderCollectionBuilder>()
                 .Clear()
                 .Append<DefaultUrlSegmentProvider>();
+        }
+
+        private IMediaType MakeNewMediaType(IUser user, string text, int parentId = -1)
+        {
+            var mt = new MediaType(parentId) { Name = text, Alias = text, Thumbnail = "icon-folder", Icon = "icon-folder" };
+            ServiceContext.MediaTypeService.Save(mt);
+            return mt;
+        }
+
+        private IMedia MakeNewMedia(string name, IMediaType mediaType, IUser user, int parentId)
+        {
+            var m = ServiceContext.MediaService.CreateMediaWithIdentity(name, parentId, mediaType.Alias);
+            return m;
         }
 
         /// <summary>
@@ -290,16 +304,16 @@ namespace Umbraco.Tests.PublishedContent
         public void Children_Without_Examine()
         {
             var user = ServiceContext.UserService.GetUserById(0);
-            var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
-            var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
+            var mType = MakeNewMediaType(user, "TestMediaType");
+            var mRoot = MakeNewMedia("MediaRoot", mType, user, -1);
 
-            var mChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child1", mType, user, mRoot.Id);
-            var mChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child2", mType, user, mRoot.Id);
-            var mChild3 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child3", mType, user, mRoot.Id);
+            var mChild1 = MakeNewMedia("Child1", mType, user, mRoot.Id);
+            var mChild2 = MakeNewMedia("Child2", mType, user, mRoot.Id);
+            var mChild3 = MakeNewMedia("Child3", mType, user, mRoot.Id);
 
-            var mSubChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild1", mType, user, mChild1.Id);
-            var mSubChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild2", mType, user, mChild1.Id);
-            var mSubChild3 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild3", mType, user, mChild1.Id);
+            var mSubChild1 = MakeNewMedia("SubChild1", mType, user, mChild1.Id);
+            var mSubChild2 = MakeNewMedia("SubChild2", mType, user, mChild1.Id);
+            var mSubChild3 = MakeNewMedia("SubChild3", mType, user, mChild1.Id);
 
             var publishedMedia = GetNode(mRoot.Id);
             var rootChildren = publishedMedia.Children();
@@ -314,16 +328,16 @@ namespace Umbraco.Tests.PublishedContent
         public void Descendants_Without_Examine()
         {
             var user = ServiceContext.UserService.GetUserById(0);
-            var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
-            var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
+            var mType = MakeNewMediaType(user, "TestMediaType");
+            var mRoot = MakeNewMedia("MediaRoot", mType, user, -1);
 
-            var mChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child1", mType, user, mRoot.Id);
-            var mChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child2", mType, user, mRoot.Id);
-            var mChild3 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child3", mType, user, mRoot.Id);
+            var mChild1 = MakeNewMedia("Child1", mType, user, mRoot.Id);
+            var mChild2 = MakeNewMedia("Child2", mType, user, mRoot.Id);
+            var mChild3 = MakeNewMedia("Child3", mType, user, mRoot.Id);
 
-            var mSubChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild1", mType, user, mChild1.Id);
-            var mSubChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild2", mType, user, mChild1.Id);
-            var mSubChild3 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild3", mType, user, mChild1.Id);
+            var mSubChild1 = MakeNewMedia("SubChild1", mType, user, mChild1.Id);
+            var mSubChild2 = MakeNewMedia("SubChild2", mType, user, mChild1.Id);
+            var mSubChild3 = MakeNewMedia("SubChild3", mType, user, mChild1.Id);
 
             var publishedMedia = GetNode(mRoot.Id);
             var rootDescendants = publishedMedia.Descendants();
@@ -338,16 +352,16 @@ namespace Umbraco.Tests.PublishedContent
         public void DescendantsOrSelf_Without_Examine()
         {
             var user = ServiceContext.UserService.GetUserById(0);
-            var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
-            var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
+            var mType = MakeNewMediaType(user, "TestMediaType");
+            var mRoot = MakeNewMedia("MediaRoot", mType, user, -1);
 
-            var mChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child1", mType, user, mRoot.Id);
-            var mChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child2", mType, user, mRoot.Id);
-            var mChild3 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child3", mType, user, mRoot.Id);
+            var mChild1 = MakeNewMedia("Child1", mType, user, mRoot.Id);
+            var mChild2 = MakeNewMedia("Child2", mType, user, mRoot.Id);
+            var mChild3 = MakeNewMedia("Child3", mType, user, mRoot.Id);
 
-            var mSubChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild1", mType, user, mChild1.Id);
-            var mSubChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild2", mType, user, mChild1.Id);
-            var mSubChild3 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild3", mType, user, mChild1.Id);
+            var mSubChild1 = MakeNewMedia("SubChild1", mType, user, mChild1.Id);
+            var mSubChild2 = MakeNewMedia("SubChild2", mType, user, mChild1.Id);
+            var mSubChild3 = MakeNewMedia("SubChild3", mType, user, mChild1.Id);
 
             var publishedMedia = GetNode(mRoot.Id);
             var rootDescendantsOrSelf = publishedMedia.DescendantsOrSelf();
@@ -364,16 +378,16 @@ namespace Umbraco.Tests.PublishedContent
         public void Parent_Without_Examine()
         {
             var user = ServiceContext.UserService.GetUserById(0);
-            var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
-            var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
+            var mType = MakeNewMediaType(user, "TestMediaType");
+            var mRoot = MakeNewMedia("MediaRoot", mType, user, -1);
 
-            var mChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child1", mType, user, mRoot.Id);
-            var mChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child2", mType, user, mRoot.Id);
-            var mChild3 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child3", mType, user, mRoot.Id);
+            var mChild1 = MakeNewMedia("Child1", mType, user, mRoot.Id);
+            var mChild2 = MakeNewMedia("Child2", mType, user, mRoot.Id);
+            var mChild3 = MakeNewMedia("Child3", mType, user, mRoot.Id);
 
-            var mSubChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild1", mType, user, mChild1.Id);
-            var mSubChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild2", mType, user, mChild1.Id);
-            var mSubChild3 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild3", mType, user, mChild1.Id);
+            var mSubChild1 = MakeNewMedia("SubChild1", mType, user, mChild1.Id);
+            var mSubChild2 = MakeNewMedia("SubChild2", mType, user, mChild1.Id);
+            var mSubChild3 = MakeNewMedia("SubChild3", mType, user, mChild1.Id);
 
             var publishedRoot = GetNode(mRoot.Id);
             Assert.AreEqual(null, publishedRoot.Parent);
@@ -389,16 +403,16 @@ namespace Umbraco.Tests.PublishedContent
         public void Ancestors_Without_Examine()
         {
             var user = ServiceContext.UserService.GetUserById(0);
-            var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
-            var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
+            var mType = MakeNewMediaType(user, "TestMediaType");
+            var mRoot = MakeNewMedia("MediaRoot", mType, user, -1);
 
-            var mChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child1", mType, user, mRoot.Id);
-            var mChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child2", mType, user, mRoot.Id);
-            var mChild3 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child3", mType, user, mRoot.Id);
+            var mChild1 = MakeNewMedia("Child1", mType, user, mRoot.Id);
+            var mChild2 = MakeNewMedia("Child2", mType, user, mRoot.Id);
+            var mChild3 = MakeNewMedia("Child3", mType, user, mRoot.Id);
 
-            var mSubChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild1", mType, user, mChild1.Id);
-            var mSubChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild2", mType, user, mChild1.Id);
-            var mSubChild3 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild3", mType, user, mChild1.Id);
+            var mSubChild1 = MakeNewMedia("SubChild1", mType, user, mChild1.Id);
+            var mSubChild2 = MakeNewMedia("SubChild2", mType, user, mChild1.Id);
+            var mSubChild3 = MakeNewMedia("SubChild3", mType, user, mChild1.Id);
 
             var publishedSubChild1 = GetNode(mSubChild1.Id);
             Assert.IsTrue(publishedSubChild1.Ancestors().Select(x => x.Id).ContainsAll(new[] { mChild1.Id, mRoot.Id }));
@@ -408,16 +422,16 @@ namespace Umbraco.Tests.PublishedContent
         public void AncestorsOrSelf_Without_Examine()
         {
             var user = ServiceContext.UserService.GetUserById(0);
-            var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
-            var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
+            var mType = MakeNewMediaType(user, "TestMediaType");
+            var mRoot = MakeNewMedia("MediaRoot", mType, user, -1);
 
-            var mChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child1", mType, user, mRoot.Id);
-            var mChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child2", mType, user, mRoot.Id);
-            var mChild3 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child3", mType, user, mRoot.Id);
+            var mChild1 = MakeNewMedia("Child1", mType, user, mRoot.Id);
+            var mChild2 = MakeNewMedia("Child2", mType, user, mRoot.Id);
+            var mChild3 = MakeNewMedia("Child3", mType, user, mRoot.Id);
 
-            var mSubChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild1", mType, user, mChild1.Id);
-            var mSubChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild2", mType, user, mChild1.Id);
-            var mSubChild3 = global::umbraco.cms.businesslogic.media.Media.MakeNew("SubChild3", mType, user, mChild1.Id);
+            var mSubChild1 = MakeNewMedia("SubChild1", mType, user, mChild1.Id);
+            var mSubChild2 = MakeNewMedia("SubChild2", mType, user, mChild1.Id);
+            var mSubChild3 = MakeNewMedia("SubChild3", mType, user, mChild1.Id);
 
             var publishedSubChild1 = GetNode(mSubChild1.Id);
             Assert.IsTrue(publishedSubChild1.AncestorsOrSelf().Select(x => x.Id).ContainsAll(

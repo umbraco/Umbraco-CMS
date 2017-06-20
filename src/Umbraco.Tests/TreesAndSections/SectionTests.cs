@@ -2,7 +2,6 @@
 using NUnit.Framework;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
-using umbraco.BusinessLogic;
 using System;
 using System.Linq;
 using Umbraco.Core;

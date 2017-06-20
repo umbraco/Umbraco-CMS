@@ -6,7 +6,6 @@ using System.IO;
 using Moq;
 using NPoco;
 using NUnit.Framework;
-using SQLCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -21,6 +20,9 @@ namespace Umbraco.Tests.Migrations.Upgrades
         public override void DatabaseSpecificSetUp()
         {
             string filePath = string.Concat(Path, "\\UmbracoNPocoTests.sdf");
+
+            // no more "clear database" just recreate it
+            if (File.Exists(filePath)) File.Delete(filePath);
 
             if (!File.Exists(filePath))
             {
@@ -50,7 +52,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             }
             else
             {
-                TestHelper.ClearDatabase();
+                //TestHelper.ClearDatabase();
             }
 
         }
@@ -58,9 +60,9 @@ namespace Umbraco.Tests.Migrations.Upgrades
         public override void DatabaseSpecificTearDown()
         {
             //legacy API database connection close
-            SqlCeContextGuardian.CloseBackgroundConnection();
+            //SqlCeContextGuardian.CloseBackgroundConnection();
 
-            TestHelper.ClearDatabase();
+            //TestHelper.ClearDatabase();
         }
 
         public override IUmbracoDatabase GetConfiguredDatabase()

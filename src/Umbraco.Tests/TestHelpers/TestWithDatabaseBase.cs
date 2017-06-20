@@ -7,7 +7,6 @@ using System.Web.Routing;
 using System.Xml;
 using Moq;
 using NUnit.Framework;
-using SQLCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -300,7 +299,7 @@ namespace Umbraco.Tests.TestHelpers
             //Ensure that any database connections from a previous test is disposed.
             //This is really just double safety as its also done in the TearDown.
             database?.Dispose();
-            SqlCeContextGuardian.CloseBackgroundConnection();
+            //SqlCeContextGuardian.CloseBackgroundConnection();
         }
 
         private void RemoveDatabaseFile(IUmbracoDatabase database, Action<Exception> onFail = null)

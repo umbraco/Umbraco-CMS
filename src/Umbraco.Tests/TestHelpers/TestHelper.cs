@@ -8,10 +8,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using NUnit.Framework;
-using SqlCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using umbraco.DataLayer;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Tests.TestHelpers
@@ -22,30 +20,7 @@ namespace Umbraco.Tests.TestHelpers
 	public static class TestHelper
 	{
 
-		/// <summary>
-		/// Clears an initialized database
-		/// </summary>
-		public static void ClearDatabase()
-		{
-            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
-            var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false) as SqlCEHelper;
-			
-			if (dataHelper == null)
-				throw new InvalidOperationException("The sql helper for unit tests must be of type SqlCEHelper, check the ensure the connection string used for this test is set to use SQLCE");
-
-			dataHelper.ClearDatabase();
-		}
-
-        public static void DropForeignKeys(string table)
-        {
-            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
-            var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false) as SqlCEHelper;
-
-            if (dataHelper == null)
-                throw new InvalidOperationException("The sql helper for unit tests must be of type SqlCEHelper, check the ensure the connection string used for this test is set to use SQLCE");
-
-            dataHelper.DropForeignKeys(table);
-        }
+		
 
 		/// <summary>
 		/// Gets the current assembly directory.

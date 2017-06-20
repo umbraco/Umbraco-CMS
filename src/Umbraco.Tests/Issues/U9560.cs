@@ -79,20 +79,20 @@ namespace Umbraco.Tests.Issues
             // and now it is OK
             Assert.AreEqual("alias", aliasName);
 
-            // get the legacy content type
-            var legacyContentType = new umbraco.cms.businesslogic.ContentType(contentType.Id);
-            Assert.AreEqual("test", legacyContentType.Alias);
+            //// get the legacy content type
+            //var legacyContentType = new umbraco.cms.businesslogic.ContentType(contentType.Id);
+            //Assert.AreEqual("test", legacyContentType.Alias);
 
-            // get the legacy properties
-            var legacyProperties = legacyContentType.PropertyTypes;
+            //// get the legacy properties
+            //var legacyProperties = legacyContentType.PropertyTypes;
 
-            // without the fix, due to some (swallowed) inner exception, we have no properties
-            //Assert.IsNull(legacyProperties);
+            //// without the fix, due to some (swallowed) inner exception, we have no properties
+            ////Assert.IsNull(legacyProperties);
 
-            // thanks to the fix, it works
-            Assert.IsNotNull(legacyProperties);
-            Assert.AreEqual(1, legacyProperties.Count);
-            Assert.AreEqual("prop", legacyProperties[0].Alias);
+            //// thanks to the fix, it works
+            //Assert.IsNotNull(legacyProperties);
+            //Assert.AreEqual(1, legacyProperties.Count);
+            //Assert.AreEqual("prop", legacyProperties[0].Alias);
         }
     }
 }

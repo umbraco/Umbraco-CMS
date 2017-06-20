@@ -7,9 +7,7 @@ using System.Text.RegularExpressions;
 using Moq;
 using NPoco;
 using NUnit.Framework;
-using SQLCE4Umbraco;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations.Initial;
@@ -86,7 +84,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
             //legacy API database connection close
-            SqlCeContextGuardian.CloseBackgroundConnection();
+            //SqlCeContextGuardian.CloseBackgroundConnection();
 
             string filePath = string.Concat(Path, "\\UmbracoNPocoTests.sdf");
             if (File.Exists(filePath))

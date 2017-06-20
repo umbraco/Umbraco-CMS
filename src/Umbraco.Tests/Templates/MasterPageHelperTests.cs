@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using umbraco.cms.businesslogic.template;
+﻿using NUnit.Framework;
 using Umbraco.Core.IO;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Templates
 {

@@ -3,7 +3,6 @@ using Moq;
 using NPoco;
 using NUnit.Framework;
 using Semver;
-using SQLCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -59,7 +58,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         public override void DatabaseSpecificTearDown()
         {
             //legacy API database connection close
-            SqlCeContextGuardian.CloseBackgroundConnection();
+            //SqlCeContextGuardian.CloseBackgroundConnection();
         }
 
         public override IUmbracoDatabase GetConfiguredDatabase()
