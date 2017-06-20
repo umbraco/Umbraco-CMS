@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $scope, $q, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService) {
+    function ($rootScope, $scope, $q, $locale, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService) {
 
         $scope.isLoading = true;
 
@@ -100,6 +100,22 @@ angular.module("umbraco")
             //stores a reference to the editor
             var tinyMceEditor = null;
 
+            //get localisation - angular localisation is in the format of ru-ru, de-de, en-gb, etc
+            //wheras tinymce is in the format of ru, de, en, etc.  We need to convert from one to the other
+            var lang = $locale.id;
+            var langParts = lang.split('-');
+
+            if (langParts.length > 1) {
+                //if both lang parts are the same, just use one (i.e. de-de = de, ru-ru = ru)
+                if (langParts[0] === langParts[1]) {
+                    lang = langParts[0];
+                }
+                //for english just use "en" (en-gb and en-us become en)
+                else if (langParts[0] === "en") {
+                    lang = langParts[0];
+                }
+            }
+
             //wait for queue to end
             $q.all(await).then(function () {
 
@@ -119,10 +135,11 @@ angular.module("umbraco")
                     toolbar: toolbar,
                     content_css: stylesheets,
                     relative_urls: false,
-                    style_formats: styleFormats
+                    style_formats: styleFormats,
+                    language: lang
                 };
-
-
+                              
+                
                 if (tinyMceConfig.customConfig) {
 
                     //if there is some custom config, we need to see if the string value of each item might actually be json and if so, we need to
@@ -295,10 +312,7 @@ angular.module("umbraco")
 
                     });
                 };
-
-
-
-
+                
                 /** Loads in the editor */
                 function loadTinyMce() {
 
