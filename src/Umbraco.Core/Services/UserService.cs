@@ -531,7 +531,10 @@ namespace Umbraco.Core.Services
                         break;
                     case "ISLOCKEDOUT":
                         sort = member => member.IsLockedOut;
-                        break;                    
+                        break;
+                    case "LASTLOGINDATE":
+                        sort = member => member.LastLoginDate;
+                        break;
                     default:
                         throw new IndexOutOfRangeException("The orderBy parameter " + orderBy + " is not valid");
                 }

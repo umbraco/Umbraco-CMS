@@ -138,15 +138,13 @@
         <div class="dropdown pull-right">
           <a class="btn btn-link dropdown-toggle flex" href="" data-toggle="dropdown">
             <span>Order by:</span>
-            <span class="bold" style="margin-left: 2px;">{{ vm.usersOptions.orderBy }} </span>
+            <span class="bold" style="margin-left: 2px;">{{ vm.getSortLabel(vm.usersOptions.orderBy, vm.usersOptions.orderDirection) }} </span>
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-            <li><a tabindex="-1" href="#" ng-click="vm.setOrderByFilter('NameAsc')" prevent-default>Name (A-Z)</a></li>
-            <li><a tabindex="-1" href="#" ng-click="vm.setOrderByFilter('NameDesc')" prevent-default>Name (Z-A)</a></li>
-            <li><a tabindex="-1" href="#" ng-click="vm.setOrderByFilter('Newest')" prevent-default>Newest</a></li>
-            <li><a tabindex="-1" href="#" ng-click="vm.setOrderByFilter('Oldest')" prevent-default>Oldest</a></li>
-            <li><a tabindex="-1" href="#" ng-click="vm.setOrderByFilter('lastLoginDate')" prevent-default>Last login</a></li>
+            <li ng-repeat="sortData in vm.userSortData">
+              <a tabindex="-1" href="#" ng-click="vm.setOrderByFilter(sortData.key, sortData.direction)" prevent-default>{{sortData.label}}</a>
+            </li>            
           </ul>
         </div>
 

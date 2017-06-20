@@ -12,6 +12,13 @@
         vm.selection = [];
         vm.newUser = {};
         vm.usersOptions = {};
+        vm.userSortData = [
+          { label: "Name (A-Z)", key: "Name", direction: "Ascending" },
+          { label: "Name (Z-A)", key: "Name", direction: "Descending" },
+          { label: "Newest", key: "CreateDate", direction: "Descending" },
+          { label: "Oldest", key: "CreateDate", direction: "Ascending" },
+          { label: "Last login", key: "LastLoginDate", direction: "Descending" }
+        ];
         vm.newUser.userGroups = [];
         vm.usersViewState = 'overview';
 
@@ -74,10 +81,12 @@
         vm.changePageNumber = changePageNumber;
         vm.createUser = createUser;
         vm.inviteUser = inviteUser;
+        vm.getSortLabel = getSortLabel;
 
         function init() {
 
             vm.usersOptions.orderBy = "Name";
+            vm.usersOptions.orderDirection = "Ascending";
 
             // Get users
             getUsers();
@@ -87,6 +96,14 @@
                 vm.userGroups = userGroups;
             });
 
+        }
+
+        function getSortLabel(sortKey, sortDirection) {
+          var found = _.find(vm.userSortData,
+            function (i) {
+              return i.key === sortKey && i.direction === sortDirection;
+            });
+          return found ? found.label : sortKey;
         }
 
         function setUsersViewState(state) {
@@ -288,8 +305,9 @@
             return name;
         }
 
-        function setOrderByFilter(value) {
+        function setOrderByFilter(value, direction) {
             vm.usersOptions.orderBy = value;
+            vm.usersOptions.orderDirection = direction;
             getUsers();
         }
 
