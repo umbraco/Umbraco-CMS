@@ -89,7 +89,26 @@
 
                             <div class="test-group">
                                 <div class="test-group-title">Default permissions</div>
-                                <div class="test-group-content">Some content here</div>
+
+                                <div ng-repeat="group in vm.userGroup.permissions">
+                                    <div class="test-group-sub-header" >
+                                        {{ group.groupName }}
+                                    </div>
+
+                                    <div class="test-group-content">
+                                        <div class="umb-permission" ng-repeat="permission in group.permissions">
+                                            <div>
+                                                <div>{{ permission.name }} </div>
+                                                <div style="font-size: 13px; color: #817f85;">{{ permission.description }}</div>
+                                            </div>
+                                            <umb-toggle
+                                                checked="permission.checked"
+                                                on-click="vm.togglePermission(permission)">
+                                            </umb-toggle>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
 
                             <div class="test-group">
