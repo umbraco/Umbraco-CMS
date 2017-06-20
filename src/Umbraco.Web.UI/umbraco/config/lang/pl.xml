@@ -137,7 +137,7 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="createDateDesc" version="7.0">Data/czas stworzenia tego dokumentu</key>
     <key alias="documentType">Rodzaj dokumentu</key>
     <key alias="editing">Edytowanie</key>
-    <key alias="expireDate">Usuń w </key>
+    <key alias="expireDate">Usuń w</key>
     <key alias="itemChanged">Ten element został zmieniony po publikacji</key>
     <key alias="itemNotPublished">Element nie jest opublikowany</key>
     <key alias="lastPublished">Opublikowane</key>
@@ -147,14 +147,14 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="mediaLinks">Link do elementu(ów) mediów</key>
     <key alias="membergroup">Członek grupy</key>
     <key alias="memberrole">Rola</key>
-    <key alias="membertype">Członek typ</key>
+    <key alias="membertype">Typ członka</key>
     <key alias="noDate">Brak daty</key>
     <key alias="nodeName">Tytuł strony</key>
     <key alias="otherElements">Właściwości</key>
     <key alias="parentNotPublished">Ten dokument jest opublikowany, ale jest niewidoczny, ponieważ jego rodzic '%0%' nie jest opublikowany</key>
-    <key alias="parentNotPublishedAnomaly">Ten dokument jest opublikowany ale nie jest w cache.</key>
-    <key alias="getUrlException">Nie znaleziono url</key>
-    <key alias="routeError">Ten dokument jest opublikowany ale jego url kolidowałby z elementem treści %0%</key>
+    <key alias="parentNotPublishedAnomaly">Ten dokument jest opublikowany, ale nie jest w cache.</key>
+    <key alias="getUrlException">Nie znaleziono URL</key>
+    <key alias="routeError">Ten dokument jest opublikowany ale jego URL kolidowałby z elementem treści %0%</key>
     <key alias="publish">Publikuj</key>
     <key alias="publishStatus">Status publikacji</key>
     <key alias="releaseDate">Opublikuj</key>
