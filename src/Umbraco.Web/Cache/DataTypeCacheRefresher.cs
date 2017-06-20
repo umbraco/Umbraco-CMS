@@ -101,8 +101,6 @@ namespace Umbraco.Web.Cache
             ClearAllIsolatedCacheByEntityType<IMediaType>();
             ClearAllIsolatedCacheByEntityType<IMember>();
             ClearAllIsolatedCacheByEntityType<IMemberType>();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
 
             var dataTypeCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
             foreach (var payload in payloads)
@@ -111,6 +109,7 @@ namespace Umbraco.Web.Cache
                 if (dataTypeCache)
                     dataTypeCache.Result.ClearCacheByKeySearch(string.Format("{0}_{1}", CacheKeys.DataTypePreValuesCacheKey, payload.Id));
 
+                ApplicationContext.Current.Services.IdkMap.ClearCache(payload.Id);
                 PublishedContentType.ClearDataType(payload.Id);
                 NestedContentHelper.ClearCache(payload.Id);
             }

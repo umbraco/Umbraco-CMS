@@ -152,12 +152,18 @@ namespace Umbraco.Core.Strings
         /// <returns>The short string helper.</returns>
         public DefaultShortStringHelper WithDefaultConfig()
         {
+            var urlSegmentConvertTo = CleanStringType.Utf8;
+            if (_umbracoSettings.RequestHandler.ConvertUrlsToAscii)
+                urlSegmentConvertTo = CleanStringType.Ascii;
+            if (_umbracoSettings.RequestHandler.TryConvertUrlsToAscii)
+                urlSegmentConvertTo = CleanStringType.TryAscii;
+
             return WithConfig(CleanStringType.UrlSegment, new Config
             {
                 PreFilter = ApplyUrlReplaceCharacters,
                 PostFilter = x => CutMaxLength(x, 240),
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
-                StringType = (_umbracoSettings.RequestHandler.ConvertUrlsToAscii ? CleanStringType.Ascii : CleanStringType.Utf8) | CleanStringType.LowerCase,
+                StringType = urlSegmentConvertTo | CleanStringType.LowerCase,
                 BreakTermsOnUpper = false,
                 Separator = '-'
             }).WithConfig(CleanStringType.FileName, new Config
@@ -542,9 +548,20 @@ function validateSafeAlias(input, value, immediate, callback) {{
 
             // recode
             var codeType = stringType & CleanStringType.CodeMask;
-            text = codeType == CleanStringType.Ascii 
-                ? Utf8ToAsciiConverter.ToAsciiString(text) 
-                : RemoveSurrogatePairs(text);
+            switch (codeType)
+            {
+                case CleanStringType.Ascii:
+                    text = Utf8ToAsciiConverter.ToAsciiString(text);
+                    break;
+                case CleanStringType.TryAscii:
+                    const char ESC = (char) 27;
+                    var ctext = Utf8ToAsciiConverter.ToAsciiString(text, ESC);
+                    if (ctext.Contains(ESC) == false) text = ctext;
+                    break;
+                default:
+                    text = RemoveSurrogatePairs(text);
+                    break;
+            }
 
             // clean
             text = CleanCodeString(text, stringType, separator.Value, culture, config);

@@ -16,50 +16,26 @@ namespace Umbraco.Core.Services
 {
     public class EntityService : ScopeRepositoryService, IEntityService
     {
-        private readonly IRuntimeCacheProvider _runtimeCache;
         private readonly Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>> _supportedObjectTypes;
-        
+        private readonly IdkMap _idkMap;
 
         public EntityService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory,
            IContentService contentService, IContentTypeService contentTypeService, IMediaService mediaService, IDataTypeService dataTypeService,
-           IMemberService memberService, IMemberTypeService memberTypeService, IRuntimeCacheProvider runtimeCache)
+           IMemberService memberService, IMemberTypeService memberTypeService, IdkMap idkMap)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
-            _runtimeCache = runtimeCache;
-            IContentTypeService contentTypeService1 = contentTypeService;
+            _idkMap = idkMap;
 
             _supportedObjectTypes = new Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>>
             {
                 {typeof (IDataTypeDefinition).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.DataType, dataTypeService.GetDataTypeDefinitionById)},
                 {typeof (IContent).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.Document, contentService.GetById)},
-                {typeof (IContentType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.DocumentType, contentTypeService1.GetContentType)},
+                {typeof (IContentType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.DocumentType, contentTypeService.GetContentType)},
                 {typeof (IMedia).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.Media, mediaService.GetById)},
-                {typeof (IMediaType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.MediaType, contentTypeService1.GetMediaType)},
+                {typeof (IMediaType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.MediaType, contentTypeService.GetMediaType)},
                 {typeof (IMember).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.Member, memberService.GetById)},
                 {typeof (IMemberType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.MemberType, memberTypeService.Get)},
-                //{typeof (IUmbracoEntity).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.EntityContainer, id =>
-                //{
-                //    using (var uow = UowProvider.GetUnitOfWork())
-                //    {
-                //        var found = uow.Database.FirstOrDefault<NodeDto>("SELECT * FROM umbracoNode WHERE id=@id", new { id = id });
-                //        return found == null ? null : new UmbracoEntity(found.Trashed)
-                //        {
-                //            Id = found.NodeId,
-                //            Name = found.Text,
-                //            Key = found.UniqueId,
-                //            SortOrder = found.SortOrder,
-                //            Path = found.Path,
-                //            NodeObjectTypeId = found.NodeObjectType.Value,
-                //            CreateDate = found.CreateDate,
-                //            CreatorId = found.UserId.Value,
-                //            Level = found.Level,
-                //            ParentId = found.ParentId
-                //        };
-                //    }
-                    
-                //})}
             };
-
         }
 
         #region Static Queries
@@ -67,6 +43,8 @@ namespace Umbraco.Core.Services
         private IQuery<IUmbracoEntity> _rootEntityQuery;
 
         #endregion
+
+        internal IdkMap IdkMap { get { return _idkMap; } }
 
         /// <summary>
         /// Returns the integer id for a given GUID
@@ -76,33 +54,12 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
         {
-            var result = _runtimeCache.GetCacheItem<int?>(CacheKeys.IdToKeyCacheKey + key, () =>
-            {
-                using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
-                {
-                    var nodeObjectType = GetNodeObjectTypeGuid(umbracoObjectType);
-
-                    var sql = new Sql()
-                        .Select("id")
-                        .From<NodeDto>()
-                        .Where<NodeDto>(
-                            dto =>
-                                dto.UniqueId == key &&
-                                dto.NodeObjectType == nodeObjectType);
-                    return uow.Database.ExecuteScalar<int?>(sql);
-                }                
-            });
-            return result.HasValue ? Attempt.Succeed(result.Value) : Attempt<int>.Fail();
+            return _idkMap.GetIdForKey(key, umbracoObjectType);
         }
 
         public Attempt<int> GetIdForUdi(Udi udi)
         {
-            var guidUdi = udi as GuidUdi;
-            if (guidUdi == null)
-                return Attempt<int>.Fail();
-
-            var umbracoType = Constants.UdiEntityType.ToUmbracoObjectType(guidUdi.EntityType);
-            return GetIdForKey(guidUdi.Guid, umbracoType);
+            return _idkMap.GetIdForUdi(udi);
         }
 
         /// <summary>
@@ -113,32 +70,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public Attempt<Guid> GetKeyForId(int id, UmbracoObjectTypes umbracoObjectType)
         {
-            var result = _runtimeCache.GetCacheItem<Guid?>(CacheKeys.KeyToIdCacheKey + id, () =>
-            {
-                using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
-                {
-                    var nodeObjectType = GetNodeObjectTypeGuid(umbracoObjectType);
-
-                    var sql = new Sql()
-                        .Select("uniqueID")
-                        .From<NodeDto>()
-                        .Where<NodeDto>(
-                            dto =>
-                                dto.NodeId == id &&
-                                dto.NodeObjectType == nodeObjectType);
-                    return uow.Database.ExecuteScalar<Guid?>(sql);
-                }
-            });
-            return result.HasValue ? Attempt.Succeed(result.Value) : Attempt<Guid>.Fail();
-        }
-
-        private static Guid GetNodeObjectTypeGuid(UmbracoObjectTypes umbracoObjectType)
-        {
-            var guid = umbracoObjectType.GetGuid();
-            if (guid == Guid.Empty)
-                throw new NotSupportedException("Unsupported object type (" + umbracoObjectType + ").");
-
-            return guid;            
+            return _idkMap.GetKeyForId(id, umbracoObjectType);
         }
 
         public IUmbracoEntity GetByKey(Guid key, bool loadBaseType = true)
@@ -404,7 +336,7 @@ namespace Umbraco.Core.Services
         /// <param name="totalRecords"></param>
         /// <param name="orderBy"></param>
         /// <param name="orderDirection"></param>
-        /// <param name="filter"></param>        
+        /// <param name="filter"></param>
         /// <returns></returns>
         public IEnumerable<IUmbracoEntity> GetPagedDescendants(int id, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
             string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "")
@@ -417,7 +349,7 @@ namespace Umbraco.Core.Services
                 var query = Query<IUmbracoEntity>.Builder;
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
-                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));                
+                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
 
                 IQuery<IUmbracoEntity> filterQuery = null;
                 if (filter.IsNullOrWhiteSpace() == false)
