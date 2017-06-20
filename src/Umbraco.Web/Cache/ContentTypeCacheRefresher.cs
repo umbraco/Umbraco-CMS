@@ -185,11 +185,10 @@ namespace Umbraco.Web.Cache
         {
             var needsContentRefresh = false;
 
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
-
             foreach (var payload in payloads)
             {
+                ApplicationContext.Current.Services.IdkMap.ClearCache(payload.Id);
+
                 //clear the cache for each item
                 ClearContentTypeCache(payload);
 

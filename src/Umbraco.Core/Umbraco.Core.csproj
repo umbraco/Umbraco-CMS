@@ -650,6 +650,7 @@
     <Compile Include="Services\ContentTypeServiceExtensions.cs" />
     <Compile Include="Models\RedirectUrl.cs" />
     <Compile Include="Services\IContentServiceBase.cs" />
+    <Compile Include="Services\IdkMap.cs" />
     <Compile Include="Services\RedirectUrlService.cs" />
     <Compile Include="Services\DomainService.cs" />
     <Compile Include="Services\ExternalLoginService.cs" />
