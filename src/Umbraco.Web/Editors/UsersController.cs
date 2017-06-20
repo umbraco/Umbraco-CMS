@@ -94,7 +94,7 @@ namespace Umbraco.Web.Editors
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
-           
+
             var user = Services.UserService.GetUserById(id);
             if (user == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -124,7 +124,7 @@ namespace Umbraco.Web.Editors
 
                 //track the temp file so the cleanup filter removes it
                 tempFiles.UploadedFiles.Add(new ContentItemFile
-                {                             
+                {
                     TempFilePath = file.LocalFileName
                 });
             }
@@ -298,7 +298,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(
                     Request.CreateNotificationValidationErrorResponse("No Email server is configured"));
             }
-            
+
             var user = Services.UserService.GetByEmail(userSave.Email);
             if (user != null && (user.LastLoginDate != default(DateTime) || user.EmailConfirmedDate.HasValue))
             {
@@ -328,12 +328,12 @@ namespace Umbraco.Web.Editors
 
             //map the save info over onto the user
             user = Mapper.Map(userSave, user);
-            
+
             //ensure the invited date is set
             user.InvitedDate = DateTime.Now;
 
             //Save the updated user
-            Services.UserService.Save(user);            
+            Services.UserService.Save(user);
             var display = Mapper.Map<UserDisplay>(user);
 
             //send the email
@@ -362,7 +362,7 @@ namespace Umbraco.Web.Editors
 
         private async Task SendEmailAsync(UserDisplay userDisplay, string from, IUser to, string message)
         {
-            var token = await UserManager.GenerateEmailConfirmationTokenAsync((int)userDisplay.Id);           
+            var token = await UserManager.GenerateEmailConfirmationTokenAsync((int)userDisplay.Id);
 
             var inviteToken = string.Format("{0}{1}{2}",
                 (int)userDisplay.Id,
@@ -389,7 +389,7 @@ namespace Umbraco.Web.Editors
             var emailBody = Services.TextService.Localize("user/inviteEmailCopyFormat",
                 //Ensure the culture of the found user is used for the email!
                 UserExtensions.GetUserCulture(to.Language, Services.TextService),
-                new[] {userDisplay.Name, from, message, inviteUri.ToString()});
+                new[] { userDisplay.Name, from, message, inviteUri.ToString() });
 
             await UserManager.EmailService.SendAsync(new IdentityMessage
             {
@@ -435,7 +435,7 @@ namespace Umbraco.Web.Editors
             {
                 ModelState.AddModelError("Email", "A user with the email already exists");
                 hasErrors = true;
-            }            
+            }
 
             if (hasErrors)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
@@ -450,6 +450,47 @@ namespace Umbraco.Web.Editors
             var display = Mapper.Map<UserDisplay>(user);
 
             display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserSaved"));
+            return display;
+        }
+
+        public UserGroupDisplay PostSaveUserGroup(UserGroupSave userGroupSave)
+        {
+            if (userGroupSave == null) throw new ArgumentNullException("userGroupSave");
+
+            if (ModelState.IsValid == false)
+            {
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+            }
+
+            var intId = userGroupSave.Id.TryConvertTo<int>();
+            if (intId.Success == false)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var found = Services.UserService.GetUserGroupById(intId.Result);
+            if (found == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var hasErrors = false;
+
+            var existing = Services.UserService.GetUserGroupByAlias(userGroupSave.Alias);
+            if (existing != null && existing.Id != userGroupSave.Id)
+            {
+                ModelState.AddModelError("Alias", "A user group with this alias already exists");
+                hasErrors = true;
+            }
+            //TODO: Validate the name is unique?
+
+            if (hasErrors)
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+
+            //merge the save data onto the user group
+            var userGroup = Mapper.Map(userGroupSave, found);
+
+            Services.UserService.Save(userGroup, userGroupSave.Users.ToArray());
+
+            var display = Mapper.Map<UserGroupDisplay>(userGroup);
+
+            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserGroupSaved"));
             return display;
         }
 

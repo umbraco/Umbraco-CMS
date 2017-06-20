@@ -22,6 +22,22 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
+            //Used for merging existing UserGroupSave to an existing IUserGroup instance - this will not create an IUserGroup instance!
+            config.CreateMap<UserGroupSave, IUserGroup>()
+                .IgnoreAllUnmapped()
+                .ForMember(user => user.Alias, expression => expression.MapFrom(save => save.Alias))
+                .ForMember(user => user.Name, expression => expression.MapFrom(save => save.Name))
+                .ForMember(user => user.StartMediaId, expression => expression.MapFrom(save => save.StartMediaId))
+                .ForMember(user => user.StartContentId, expression => expression.MapFrom(save => save.StartContentId))
+                .AfterMap((save, userGroup) =>
+                {
+                    userGroup.ClearAllowedSections();
+                    foreach (var section in save.Sections)
+                    {
+                        userGroup.AddAllowedSection(section);
+                    }
+                });
+
             //Used for merging existing UserSave to an existing IUser instance - this will not create an IUser instance!
             config.CreateMap<UserSave, IUser>()
                 .IgnoreAllUnmapped()
@@ -194,12 +210,12 @@ namespace Umbraco.Web.Models.Mapping
             if (group.StartMediaId > 0)
             {
                 display.StartMediaId = Mapper.Map<EntityBasic>(
-                    services.EntityService.Get<IMedia>(group.StartMediaId, false));
+                    services.EntityService.Get(group.StartMediaId, UmbracoObjectTypes.Media));
             }
             if (group.StartContentId > 0)
             {
                 display.StartContentId = Mapper.Map<EntityBasic>(
-                    services.EntityService.Get<IContent>(group.StartContentId, false));
+                    services.EntityService.Get(group.StartContentId, UmbracoObjectTypes.Document));
             }
             if (display.Icon.IsNullOrWhiteSpace())
             {

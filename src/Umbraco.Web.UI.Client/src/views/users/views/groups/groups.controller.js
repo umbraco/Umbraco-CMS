@@ -51,7 +51,7 @@
         }
 
         function goToUserGroup(userGroup) {
-            $location.path('users/users/group/' + userGroup.id);
+            $location.path('users/users/group/' + userGroup.id).search("create", null);
         }
 
         onInit();

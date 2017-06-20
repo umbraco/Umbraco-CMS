@@ -22,6 +22,8 @@ namespace Umbraco.Core.Persistence.Factories
                 userGroup.Id = dto.Id;                
                 userGroup.CreateDate = dto.CreateDate;
                 userGroup.UpdateDate = dto.UpdateDate;                
+                userGroup.StartContentId = dto.StartContentId;                
+                userGroup.StartMediaId = dto.StartMediaId;                
                 if (dto.UserGroup2AppDtos != null)
                 {
                     foreach (var app in dto.UserGroup2AppDtos)
@@ -49,7 +51,9 @@ namespace Umbraco.Core.Persistence.Factories
                 UserGroup2AppDtos = new List<UserGroup2AppDto>(),
                 CreateDate = entity.CreateDate,
                 UpdateDate = entity.UpdateDate,
-                Icon = entity.Icon
+                Icon = entity.Icon,
+                StartMediaId = entity.StartMediaId,
+                StartContentId = entity.StartContentId
             };
 
             foreach (var app in entity.AllowedSections)

@@ -652,7 +652,7 @@ function umbDataFormatter() {
     },
 
     /** formats the display model used to display the user to the model used to save the user */
-    formatUserPostData: function (displayModel, preValues, action) {
+    formatUserPostData: function (displayModel) {
 
       //create the save model from the display model
       var saveModel = _.pick(displayModel, 'id', 'parentId', 'name', 'username', 'culture', 'email', 'startContentIds', 'startMediaIds', 'userGroups', 'message');
@@ -682,6 +682,59 @@ function umbDataFormatter() {
           formattedIds.push(startIds[j].id);
         }
         saveModel[props[m]] = formattedIds;
+      }
+
+      return saveModel;
+    },
+
+    /** formats the display model used to display the user group to the model used to save the user group*/
+    formatUserGroupPostData: function (displayModel) {
+
+      //create the save model from the display model
+      var saveModel = _.pick(displayModel, 'id', 'alias', 'name', 'sections', 'users', 'startContentId', 'startMediaId');
+
+      //make sure the sections are just a string array
+      var currSections = saveModel.sections;
+      var formattedSections = [];
+      for (var i = 0; i < currSections.length; i++) {
+        if (!angular.isString(currSections[i])) {
+          formattedSections.push(currSections[i].alias);
+        }
+        else {
+          formattedSections.push(currSections[i]);
+        }
+      }
+      saveModel.sections = formattedSections;
+
+      //make sure the user are just an int array
+      var currUsers = saveModel.users;
+      var formattedUsers = [];
+      for (var j = 0; j < currUsers.length; j++) {
+        if (!angular.isNumber(currUsers[j])) {
+          formattedUsers.push(currUsers[j].id);
+        }
+        else {
+          formattedUsers.push(currUsers[j]);
+        }
+      }
+      saveModel.users = formattedUsers;
+
+      //make sure the startnodes are just an int
+      var props = ["startContentId", "startMediaId"];
+      for (var m = 0; m < props.length; m++) {
+        var startId = saveModel[props[m]];
+        if (!startId) {
+          continue;
+        }        
+        saveModel[props[m]] = startId.id;
+      }
+
+      saveModel.parentId = -1;
+      if (!saveModel.startContentId) {
+        saveModel.startContentId = -1;
+      }
+      if (!saveModel.startMediaId) {
+        saveModel.startMediaId = -1;
       }
 
       return saveModel;

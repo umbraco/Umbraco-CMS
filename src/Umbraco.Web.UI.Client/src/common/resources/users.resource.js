@@ -174,6 +174,23 @@
         "Failed to save user");
     }
 
+    function saveUserGroup(userGroup) {
+      if (!userGroup) {
+        throw "userGroup not specified";
+      }
+
+      //need to convert the user data into the correctly formatted save data - it is *not* the same and we don't want to over-post
+      var formattedSaveData = umbDataFormatter.formatUserGroupPostData(userGroup);
+
+      return umbRequestHelper.resourcePromise(
+        $http.post(
+          umbRequestHelper.getApiUrl(
+            "userApiBaseUrl",
+            "PostSaveUserGroup"),
+          formattedSaveData),
+        "Failed to save user group");
+    }
+
     function getUserGroup(id) {
 
       return umbRequestHelper.resourcePromise(
@@ -203,6 +220,7 @@
       createUser: createUser,
       inviteUser: inviteUser,
       saveUser: saveUser,
+      saveUserGroup: saveUserGroup,
       getUserGroup: getUserGroup,
       getUserGroups: getUserGroups,
       clearAvatar: clearAvatar,
