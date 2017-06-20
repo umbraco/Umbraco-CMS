@@ -1,0 +1,49 @@
+.umb-toggle {
+	display: flex;
+	align-items: center;
+}
+
+.umb-toggle__label {
+    font-size: 14px;
+    font-weight: 600;
+    color: @gray-2;
+}
+
+.umb-toggle__label--left {
+    margin-right: 8px;
+}
+
+.umb-toggle__label--right {
+    margin-left: 8px;
+}
+
+.umb-toggle__label--active {
+    color: @gray-1;
+}
+
+.umb-toggle__handler {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: @white;
+    border-radius: 50px;
+    transform: rotate(-45deg);
+}
+
+.umb-toggle__toggle {
+    cursor: pointer;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+    background: @gray-8;
+    border-radius: 90px;
+    transition: background-color 0.2s ease;
+}
+
+.umb-toggle--checked .umb-toggle__toggle {
+    background-color: @green;
+}
+
+.umb-toggle--checked .umb-toggle__handler {
+    transform: translate3d(21px, 0, 0) rotate(0);
+}
