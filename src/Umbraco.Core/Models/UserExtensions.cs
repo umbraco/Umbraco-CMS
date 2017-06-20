@@ -25,7 +25,7 @@ namespace Umbraco.Core.Models
         /// Returns all of the user's assigned start node ids based on ids assigned directly to the IUser object and it's groups
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<int> GetCombinedMediaContentIds(this IUser user)
+        public static IEnumerable<int> GetCombinedStartMediaIds(this IUser user)
         {
             return user.StartMediaIds.Concat(user.Groups.Select(x => x.StartMediaId)).Distinct();
         }
@@ -136,10 +136,10 @@ namespace Umbraco.Core.Models
             if (content == null) throw new ArgumentNullException("content");
             return HasPathAccess(content.Path, user.GetCombinedStartContentIds().ToArray(), Constants.System.RecycleBinContent);
         }
-
+        
         internal static bool HasPathAccess(string path, int[] startNodeIds, int recycleBinId)
         {
-            Mandate.ParameterNotNullOrEmpty(path, "path");
+            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", "path");
 
             var formattedPath = "," + path + ",";
             var formattedRecycleBinId = "," + recycleBinId.ToInvariantString() + ",";
@@ -178,7 +178,7 @@ namespace Umbraco.Core.Models
         {
             if (user == null) throw new ArgumentNullException("user");
             if (media == null) throw new ArgumentNullException("media");
-            return HasPathAccess(media.Path, user.GetCombinedMediaContentIds().ToArray(), Constants.System.RecycleBinMedia);
+            return HasPathAccess(media.Path, user.GetCombinedStartMediaIds().ToArray(), Constants.System.RecycleBinMedia);
         }
         
         /// <summary>

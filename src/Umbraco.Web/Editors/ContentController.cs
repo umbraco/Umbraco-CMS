@@ -802,12 +802,12 @@ namespace Umbraco.Web.Editors
             var hasPathAccess = (nodeId == Constants.System.Root)
                 ? UserExtensions.HasPathAccess(
                     Constants.System.Root.ToInvariantString(),
-                    user.StartContentIds,
+                    user.GetCombinedStartContentIds().ToArray(),
                     Constants.System.RecycleBinContent)
                 : (nodeId == Constants.System.RecycleBinContent)
                     ? UserExtensions.HasPathAccess(
                         Constants.System.RecycleBinContent.ToInvariantString(),
-                        user.StartContentIds,
+                        user.GetCombinedStartContentIds().ToArray(),
                         Constants.System.RecycleBinContent)
                     : user.HasPathAccess(contentItem);
 
