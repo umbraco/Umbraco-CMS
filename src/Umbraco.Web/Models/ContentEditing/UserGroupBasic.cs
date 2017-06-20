@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -9,6 +10,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public UserGroupBasic()
         {
             Notifications = new List<Notification>();
+            Sections = Enumerable.Empty<Section>();
         }        
 
         /// <summary>

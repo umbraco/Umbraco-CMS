@@ -688,10 +688,15 @@ function umbDataFormatter() {
     },
 
     /** formats the display model used to display the user group to the model used to save the user group*/
-    formatUserGroupPostData: function (displayModel) {
+    formatUserGroupPostData: function (displayModel, action) {
 
       //create the save model from the display model
       var saveModel = _.pick(displayModel, 'id', 'alias', 'name', 'sections', 'users', 'startContentId', 'startMediaId');
+      //set the action on the save model
+      saveModel.action = action;
+      if (!saveModel.id) {
+        saveModel.id = 0;
+      }
 
       //make sure the sections are just a string array
       var currSections = saveModel.sections;

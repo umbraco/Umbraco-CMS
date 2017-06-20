@@ -453,42 +453,14 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        [UserGroupValidate]
         public UserGroupDisplay PostSaveUserGroup(UserGroupSave userGroupSave)
         {
             if (userGroupSave == null) throw new ArgumentNullException("userGroupSave");
+            
+            Services.UserService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());
 
-            if (ModelState.IsValid == false)
-            {
-                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
-            }
-
-            var intId = userGroupSave.Id.TryConvertTo<int>();
-            if (intId.Success == false)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-
-            var found = Services.UserService.GetUserGroupById(intId.Result);
-            if (found == null)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-
-            var hasErrors = false;
-
-            var existing = Services.UserService.GetUserGroupByAlias(userGroupSave.Alias);
-            if (existing != null && existing.Id != userGroupSave.Id)
-            {
-                ModelState.AddModelError("Alias", "A user group with this alias already exists");
-                hasErrors = true;
-            }
-            //TODO: Validate the name is unique?
-
-            if (hasErrors)
-                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
-
-            //merge the save data onto the user group
-            var userGroup = Mapper.Map(userGroupSave, found);
-
-            Services.UserService.Save(userGroup, userGroupSave.Users.ToArray());
-
-            var display = Mapper.Map<UserGroupDisplay>(userGroup);
+            var display = Mapper.Map<UserGroupDisplay>(userGroupSave.PersistedUserGroup);
 
             display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserGroupSaved"));
             return display;

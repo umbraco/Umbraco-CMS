@@ -174,13 +174,13 @@
         "Failed to save user");
     }
 
-    function saveUserGroup(userGroup) {
+    function saveUserGroup(userGroup, isNew) {
       if (!userGroup) {
         throw "userGroup not specified";
       }
 
       //need to convert the user data into the correctly formatted save data - it is *not* the same and we don't want to over-post
-      var formattedSaveData = umbDataFormatter.formatUserGroupPostData(userGroup);
+      var formattedSaveData = umbDataFormatter.formatUserGroupPostData(userGroup, "save" + (isNew ? "New" : ""));
 
       return umbRequestHelper.resourcePromise(
         $http.post(

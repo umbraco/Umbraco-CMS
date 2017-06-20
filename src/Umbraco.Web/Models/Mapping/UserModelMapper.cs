@@ -22,8 +22,9 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
-            //Used for merging existing UserGroupSave to an existing IUserGroup instance - this will not create an IUserGroup instance!
+            
             config.CreateMap<UserGroupSave, IUserGroup>()
+                .ConstructUsing((UserGroupSave save) => new UserGroup() { CreateDate = DateTime.Now })
                 .IgnoreAllUnmapped()
                 .ForMember(user => user.Alias, expression => expression.MapFrom(save => save.Alias))
                 .ForMember(user => user.Name, expression => expression.MapFrom(save => save.Name))
