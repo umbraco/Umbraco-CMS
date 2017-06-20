@@ -161,7 +161,7 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="unpublishDate">Cofnij publikację</key>
     <key alias="removeDate">Data usunięcia</key>
     <key alias="sortDone">Porządek się zmienił</key>
-    <key alias="sortHelp">Aby posortować gałęzie, poprostu przeciągnij gałąż lub kliknij na jednym z nagłówków kolumn. Możesz wybrać kilka gałęzi poprzez przytrzymanie klawisza "shift" lub "control" podczas zaznaczania</key>
+    <key alias="sortHelp">Aby posortować gałęzie, po prostu przeciągnij gałąż lub kliknij na jednym z nagłówków kolumn. Możesz wybrać kilka gałęzi poprzez przytrzymanie klawisza "shift" lub "control" podczas zaznaczania</key>
     <key alias="statistics">Statystyki</key>
     <key alias="titleOptional">Tytuł (opcjonalny)</key>
     <key alias="altTextOptional">Alternatywny tekst (opcjonalny)</key>
@@ -182,7 +182,7 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="clickToUpload">Kliknij, aby załadować plik</key>
     <key alias="dropFilesHere">Przerzuć swoje pliki tutaj...</key>
 	  <key alias="urls">Link do mediów</key>
-    <key alias="orClickHereToUpload">lub kliknij tutaj aby wybrać pliki</key>
+    <key alias="orClickHereToUpload">lub kliknij tutaj, aby wybrać pliki</key>
     <key alias="onlyAllowedFiles">Jedyne dozwolone typy plików to</key>
     <key alias="maxFileSize">Maksymalny rozmiar pliku to</key>
   </area>
@@ -194,7 +194,7 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="chooseNode">Gdzie chcesz stworzyć nowy %0%?</key>
     <key alias="createUnder">Utwórz w</key>
     <key alias="updateData">Wybierz rodzaj oraz tytuł</key>
-    <key alias="noDocumentTypes" version="7.0"><![CDATA[Brak dostępnych dozwolonych typów dokumentów. Należy włączyć je w ustawieniach sekcji pod <strong>"typy dokmentów"</strong>.]]></key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[Brak dostępnych dozwolonych typów dokumentów. Należy włączyć je w ustawieniach sekcji pod <strong>"typy dokumentów"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Brak dostępnych dozwolonych typów mediów. Należy włączyć je w ustawieniach sekcji pod <strong>"typy mediów"</strong>.]]></key>
     <key alias="documentTypeWithoutTemplate">Typ Dokumentu bez szablonu</key>
     <key alias="newFolder">Nowy folder</key>
@@ -204,13 +204,13 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="newPartialViewMacro">Nowy Częściowy Widok makro</key>
     <key alias="newPartialViewFromSnippet">Nowy Częściowy Widok ze snippeta</key>
     <key alias="newEmptyPartialViewMacro">Nowy pusty Częściowy Widok makro</key>
-    <key alias="newPartialViewMacroFromSnippet">Nowy częściowy Widok makro ze snippeta</key>
+    <key alias="newPartialViewMacroFromSnippet">Nowy Częściowy Widok makro ze snippeta</key>
     <key alias="newPartialViewMacroNoMacro">Nowy Częściowy Widok makro (bez makro)</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Przeglądaj swoją stronę</key>
     <key alias="dontShowAgain">- Ukryj</key>
-    <key alias="nothinghappens">Jeśli Umbraco się nie otwiera, prawdopodbnie musisz zezwolić tej stronie na otwieranie wyskakujących okienek</key>
+    <key alias="nothinghappens">Jeśli Umbraco się nie otwiera, prawdopodobnie musisz zezwolić tej stronie na otwieranie wyskakujących okienek</key>
     <key alias="openinnew">zostało otwarte w nowym oknie</key>
     <key alias="restart">Restartuj</key>
     <key alias="visit">Odwiedź</key>
@@ -242,13 +242,13 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
 
     <key alias="movedItem">Przeniesiono %0% element</key>
     <key alias="movedItems">Przeniesiono %0% elementy(ów)</key>
-    <key alias="movedItemOfItem">Przeniesiono %0% out of %1% elementu</key>
-    <key alias="movedItemOfItems">Przeniesiono %0% out of %1% elementów</key>
+    <key alias="movedItemOfItem">Przeniesiono %0% z %1% elementu</key>
+    <key alias="movedItemOfItems">Przeniesiono %0% z %1% elementów</key>
 
     <key alias="copiedItem">Skopiowano %0% element</key>
     <key alias="copiedItems">Skopiowano %0% elementy(ów)</key>
-    <key alias="copiedItemOfItem">Skopiowano %0% out of %1% elementu</key>
-    <key alias="copiedItemOfItems">Skopiowano %0% out of %1% elementów</key>
+    <key alias="copiedItemOfItem">Skopiowano %0% z %1% elementu</key>
+    <key alias="copiedItemOfItems">Skopiowano %0% z %1% elementów</key>
   </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Nazwa</key>
@@ -274,27 +274,27 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="linkinternal">Link wewnętrzny:</key>
     <key alias="linklocaltip">Kiedy używasz odnośników lokalnych, wstaw znak "#" na początku linku</key>
     <key alias="linknewwindow">Otworzyć w nowym oknie?</key>
-    <key alias="macroContainerSettings">Ustawienia Makra</key>
+    <key alias="macroContainerSettings">Ustawienia Makro</key>
     <key alias="macroDoesNotHaveProperties">To makro nie posiada żadnych właściwości, które można edytować</key>
     <key alias="paste">Wklej</key>
     <key alias="permissionsEdit">Edytuj Uprawnienia dla</key>
     <key alias="recycleBinDeleting">Zawartość kosza jest teraz usuwana. Proszę nie zamykać tego okna do momentu zakończenia procesu.</key>
     <key alias="recycleBinIsEmpty">Zawartość kosza została usunięta</key>
     <key alias="recycleBinWarning">Usunięcie elementów z kosza powoduje ich trwałe i nieodwracalne skasowanie</key>
-    <key alias="regexSearchError"><![CDATA[Serwis <a target='_blank' href='http://regexlib.com'>regexlib.com</a> aktulanie nie jest dostępny, na co nie mamy wpływu. Bardzo przepraszamy za te utrudnienia.]]></key>
-    <key alias="regexSearchHelp">Przeszukaj dla wyrażeń regularnych aby dodać regułę sprawdzającą do formularza. Np. 'email' 'url'</key>
+    <key alias="regexSearchError"><![CDATA[Serwis <a target='_blank' href='http://regexlib.com'>regexlib.com</a> aktualnie nie jest dostępny, na co nie mamy wpływu. Bardzo przepraszamy za te utrudnienia.]]></key>
+    <key alias="regexSearchHelp">Przeszukaj dla wyrażeń regularnych, aby dodać regułę sprawdzającą do formularza. Np. 'email' 'url'</key>
     <key alias="removeMacro">Usuń Makro</key>
     <key alias="requiredField">Pole wymagane</key>
     <key alias="sitereindexed">Strona została przeindeksowana</key>
     <key alias="siterepublished">Cache strony zostało odświeżone. Cała opublikowana zawartość jest teraz aktualna. Natomiast cała nieopublikowana zawartość ciągle nie jest widoczna</key>
-    <key alias="siterepublishHelp">Cache strony zostanie odświeżone. Cała zawartość opublikowana będzie aktulana, lecz nieopublikowana zawartość pozostanie niewidoczna</key>
+    <key alias="siterepublishHelp">Cache strony zostanie odświeżone. Cała zawartość opublikowana będzie aktualna, lecz nieopublikowana zawartość pozostanie niewidoczna</key>
     <key alias="tableColumns">Liczba kolumn</key>
     <key alias="tableRows">Liczba wierszy</key>
     <key alias="templateContentAreaHelp"><![CDATA[<strong>Ustaw zastępczy ID</strong> Ustawiając ID na tym elemencie możesz później łączyć treść z podrzędnych szablonów, 
       ustawiając dowiązanie do tego ID na elemencie <code>&lt;asp:treści /&gt;</code>]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Wybierz zastępczy id</strong> z poniższej listy. Możesz wybierać tylko 
+    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Wybierz zastępczy ID</strong> z poniższej listy. Możesz wybierać tylko 
       spośród ID na szablonie nadrzędnym tego formularza.]]></key>
-    <key alias="thumbnailimageclickfororiginal">Kliknij na obrazie, aby zobaczyć je w pełnym rozmiarze</key>
+    <key alias="thumbnailimageclickfororiginal">Kliknij na obrazie, aby zobaczyć go w pełnym rozmiarze</key>
     <key alias="treepicker">Wybierz element</key>
     <key alias="viewCacheItem">Podgląd elementów Cache</key>
     <key alias="createFolder">Utwórz folder...</key>
@@ -309,7 +309,7 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="selectItem">Wybierz element</key>
     <key alias="selectLink">Wybierz link</key>
     <key alias="selectMacro">Wybierz makro</key>
-    <key alias="selectContent">Wybierz treść</key>
+    <key alias="selectContent">Wybierz zawartość</key>
     <key alias="selectMember">Wybierz członka</key>
     <key alias="selectMemberGroup">Wybierz członka grupy</key>
     <key alias="noIconsFound">Nie znaleziono ikon</key>
@@ -344,15 +344,15 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="entername">Wpisz nazwę...</key>
     <key alias="label">Etykieta...</key>
     <key alias="enterDescription">Wpisz opis...</key>
-    <key alias="search">Wpisz aby wyszukać...</key>
-    <key alias="filter">Wpisz aby filtrować...</key>
-    <key alias="enterTags">Wpisz aby dodać tagi (naciśnij enter po każdym tagu)...</key>
+    <key alias="search">Wpisz, aby wyszukać...</key>
+    <key alias="filter">Wpisz, aby filtrować...</key>
+    <key alias="enterTags">Wpisz, aby dodać tagi (naciśnij enter po każdym tagu)...</key>
     <key alias="email">Wpisz adres e-mail</key>
     <key alias="usernameHint">Twoja nazwa użytkownika to przeważnie Twój adres e-mail</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Zezwól w korzeniu</key>
-    <key alias="allowAtRootDesc" version="7.2">Tylko Typ Treści, który jest zaznaczony może być stworzony na pozomie korzenia drzew Treści i Mediów</key>
+    <key alias="allowAtRootDesc" version="7.2">Tylko Typ Zawartości, który jest zaznaczony może być stworzony na pozomie korzenia drzew Zawartości i Mediów</key>
     <key alias="allowedchildnodetypes">Dozwolone węzły pochodne</key>
     <key alias="contenttypecompositions">Kompozycje Typu Dokumentu</key>
     <key alias="create">Stwórz</key>
@@ -370,7 +370,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Dodaj wartość</key>
-    <key alias="dataBaseDatatype">Typ bazydanych</key>
+    <key alias="dataBaseDatatype">Typ bazy danych</key>
     <key alias="guid">Edytor GUID</key>
     <key alias="renderControl">Renderuj kontrolkę</key>
     <key alias="rteButtons">Przyciski</key>
@@ -382,8 +382,8 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="rteWidthAndHeight">Szerokość i wysokość</key>
   </area>
   <area alias="errorHandling">
-    <key alias="errorButDataWasSaved">Dane zostały zapisane, lecz wystąpiły błędy które musisz poprawić przed publikacją strony:</key>
-    <key alias="errorChangingProviderPassword">Bieżący dostawca Membership nie obsługuje zmiany hasła (EnablePasswordRetrieval musi mieć wartość true)</key>
+    <key alias="errorButDataWasSaved">Dane zostały zapisane, lecz wystąpiły błędy, które musisz poprawić przed publikacją strony:</key>
+    <key alias="errorChangingProviderPassword">Bieżący dostawca członkowstwa nie obsługuje zmiany hasła (EnablePasswordRetrieval musi mieć wartość 'true')</key>
     <key alias="errorExistsWithoutTab">%0% już istnieje</key>
     <key alias="errorHeader">Wystąpiły błędy:</key>
     <key alias="errorHeaderWithoutTab">Wystąpiły błędy:</key>
@@ -398,7 +398,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="receivedErrorFromServer">Otrzymano błąd serwera</key>
     <key alias="dissallowedMediaType">Określony typ pliku został ustawiony jako niedozwolony przez administratora</key>
     <key alias="codemirroriewarning">Pomimo tego, że CodeMirror jest włączony w konfiguracji, jest on wyłączony w Internet Explorerze ze względu na swoją niestabilność.</key>
-    <key alias="contentTypeAliasAndNameNotNull">Proszę uzupełnij zarówno alias jak i nazwę dla nowego typu właściwości</key>
+    <key alias="contentTypeAliasAndNameNotNull">Proszę uzupełnij zarówno alias, jak i nazwę dla nowego typu właściwości</key>
     <key alias="filePermissionsError">Wystąpił problem podczas zapisu/odczytu wymaganego pliku lub folderu</key>
     <key alias="macroErrorLoadingPartialView">Wystąpił błąd podczas ładowania skryptu Częściowego Widoku (plik: %0%)</key>
     <key alias="macroErrorLoadingUsercontrol">Wystąpił błąd podczas ładowania userControl '%0%'</key>
@@ -414,11 +414,11 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="startNodeDoesNotExists">Węzeł początkowy usunięto, proszę skontaktować się z administratorem</key>
     <key alias="stylesMustMarkBeforeSelect">Proszę zaznaczyć zawartość przed zmianą stylu</key>
     <key alias="stylesNoStylesOnPage">Brak dostępnych aktywnych stylów</key>
-    <key alias="tableColMergeLeft">Proszę ustaw kursor po lewej stronie dwóch cel które chcesz połączyć</key>
+    <key alias="tableColMergeLeft">Proszę ustaw kursor po lewej stronie dwóch komórek, które chcesz połączyć</key>
     <key alias="tableSplitNotSplittable">Nie możesz podzielić komórki, która nie była wcześniej połączona.</key>
     <key alias="xsltErrorHeader">Błąd w źródle XSLT</key>
     <key alias="xsltErrorText">Plik XSLT nie został zapisany, ponieważ wystąpiły błędy</key>
-    <key alias="missingPropertyEditorErrorMessage">Wystąpł błąd konfiguracji związany z typem danych użytych we właściwościach, proszę sprawdź typ danych</key>
+    <key alias="missingPropertyEditorErrorMessage">Wystąpił błąd konfiguracji związany z typem danych użytych we właściwościach, proszę sprawdź typ danych</key>
   </area>
   <area alias="general">
     <key alias="about">O...</key>
@@ -487,12 +487,12 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="open">Otwórz</key>
     <key alias="or">lub</key>
     <key alias="password">Hasło</key>
-    <key alias="path">Scieżka</key>
+    <key alias="path">Ścieżka</key>
     <key alias="placeHolderID">Zastępczy ID</key>
     <key alias="pleasewait">Proszę czekać...</key>
     <key alias="previous">Poprzedni</key>
     <key alias="properties">Właściwości</key>
-    <key alias="reciept">E-mail aby otrzymywać dane z formularzy</key>
+    <key alias="reciept">E-mail, aby otrzymywać dane z formularzy</key>
     <key alias="recycleBin">Kosz</key>
     <key alias="remaining">Pozostało</key>
     <key alias="rename">Zmień nazwę</key>
@@ -512,7 +512,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="type">Typ</key>
     <key alias="typeToSearch">Wpisz, aby wyszukać...</key>
     <key alias="up">W górę</key>
-    <key alias="update">Update</key>
+    <key alias="update">Aktualizacja</key>
     <key alias="upgrade">Aktualizacja</key>
     <key alias="upload">Wyślij plik</key>
     <key alias="url">URL</key>
@@ -562,7 +562,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
       <key alias="showShortcuts">Pokaż skróty</key>
 
       <key alias="toggleListView">Przełącz widok listy</key>
-      <key alias="toggleAllowAsRoot">Przełącz pozwolenia jako poziom główny</key>
+      <key alias="toggleAllowAsRoot">Przełącznik możliwy jako korzeń</key>
 
       <key alias="commentLine">Komentuj/Odkomentuj linie</key>
       <key alias="removeLine">Usuń linię</key>
@@ -579,7 +579,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="backgroundcolor">Kolor tła</key>
     <key alias="bold">Pogrubienie</key>
     <key alias="color">Kolor tekstu</key>
-    <key alias="font">Czcionka</key>
+    <key alias="font">Font</key>
     <key alias="text">Tekst</key>
   </area>
       
@@ -592,10 +592,10 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="databaseFound">Twoja baza danych została znaleziona i zidentyfikowana jako</key>
     <key alias="databaseHeader">Konfiguracja bazy danych</key>
     <key alias="databaseInstall"><![CDATA[
-Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbraco %0%
+Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umbraco %0%
 ]]></key>
-    <key alias="databaseInstallDone"><![CDATA[Umbraco %0% zostało skopiowane do Twojej bazy danych. Naciśnij <strong>Dalej</strong> aby kontynuować.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Nie odnaleziono bazy danych! Sprawdź czy informacje w sekcji "connection string" w pliku "web.config" są prawidłowe.</p> 
+    <key alias="databaseInstallDone"><![CDATA[Umbraco %0% zostało skopiowane do Twojej bazy danych. Naciśnij <strong>Dalej</strong>, aby kontynuować.]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>Nie odnaleziono bazy danych! Sprawdź, czy informacje w sekcji "connection string" w pliku "web.config" są prawidłowe.</p> 
                 <p>Aby kontynuować, dokonaj edycji pliku "web.config" (używając Visual Studio lub dowolnego edytora tekstu), przemieść kursor na koniec pliku, dodaj parametry połączenia do Twojej bazy danych w kluczu o nazwie "umbracoDbDSN" i zapisz plik.</p> 
                 <p>
                 Kliknij <strong>ponów próbę</strong> kiedy 
@@ -606,22 +606,22 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
                 W przypadku instalacji na lokalnej maszynie lub serwerze możesz potrzebować pomocy administratora.]]></key>
     <key alias="databaseUpgrade"><![CDATA[
                 <p>
-                Naciśnij przycisk <strong>aktualizuj</strong> by zaktualizować swoją bazę danych do Umbraco %0%</p> 
+                Naciśnij przycisk <strong>aktualizuj</strong>, aby zaktualizować swoją bazę danych do Umbraco %0%</p> 
                 <p>
                 Bez obaw - żadne dane nie zostaną usunięte i wszystko będzie działać jak należy!
                 </p>
                 ]]></key>
-    <key alias="databaseUpgradeDone"><![CDATA[Twoja baza danych została zaktualizowana do wersji %0%.<br />Naciśnij przycisk <strong>Dalej</strong> aby 
+    <key alias="databaseUpgradeDone"><![CDATA[Twoja baza danych została zaktualizowana do wersji %0%.<br />Naciśnij przycisk <strong>Dalej</strong>, aby 
                 kontynuować.]]></key>
-    <key alias="databaseUpToDate"><![CDATA[Twoja baza danych nie wymaga aktualizacji! Naciśnij przycisk <strong>Dalej</strong> aby kontynuować kreatora instalacji.]]></key>
+    <key alias="databaseUpToDate"><![CDATA[Twoja baza danych nie wymaga aktualizacji! Naciśnij przycisk <strong>Dalej</strong>, aby kontynuować kreatora instalacji.]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>Hasło domyślnego użytkownika musi zostać zmienione!</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>Konto domyślnego użytkownika została wyłączone lub nie ma on dostępu do Umbraco!</strong></p><p>Żadne dotatkowe czynności nie są konieczne. Naciśnij <strong>Dalej</strong> aby kontynuować.]]></key>
-    <key alias="defaultUserPassChanged"><![CDATA[<strong>Hasło domyślnego użytkownika zostało zmienione od czasu instalacji!</strong></p><p>Żadne dotatkowe czynności nie są konieczne. Naciśnij <strong>Dalej</strong> aby kontynuować.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>Konto domyślnego użytkownika zostało wyłączone lub nie ma on dostępu do Umbraco!</strong></p><p>Żadne dodatkowe czynności nie są konieczne. Naciśnij <strong>Dalej</strong>, aby kontynuować.]]></key>
+    <key alias="defaultUserPassChanged"><![CDATA[<strong>Hasło domyślnego użytkownika zostało zmienione od czasu instalacji!</strong></p><p>Żadne dodatkowe czynności nie są konieczne. Naciśnij <strong>Dalej</strong>, aby kontynuować.]]></key>
     <key alias="defaultUserPasswordChanged">Hasło zostało zmienione!</key>
     <key alias="defaultUserText"><![CDATA[
                 <p> 
                   Umbraco tworzy domyślne konto użytkownika o loginie <strong>('admin')</strong> i haśle <strong>('default')</strong>. Jest <strong>ważne</strong>, 
-                  by zmienić hasło na inne. 
+                  aby zmienić hasło na inne. 
                 </p> 
                 <p> 
                   Ten krok sprawdzi, czy hasło domyślnego użytkownika powinno być zmienione. 
@@ -634,13 +634,13 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="permissionsAffectedFoldersMoreInfo">Więcej informacji na temat ustalania pozwoleń dla Umbraco znajdziesz tutaj</key>
     <key alias="permissionsAffectedFoldersText">Musisz zezwolić procesowi ASP.NET na zmianę poniższych plików/folderów</key>
     <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Twoje ustawienia uprawnień są prawie idealne!</strong><br /><br /> 
-                Umbraco będzie działało bez problemów, ale nie będzie możliwa instalacja pakietów, które są rekomendowane aby w pełni wykorzystać możliwości Umbraco.]]></key>
+                Umbraco będzie działało bez problemów, ale nie będzie możliwa instalacja pakietów, które są rekomendowane, aby w pełni wykorzystać możliwości Umbraco.]]></key>
     <key alias="permissionsHowtoResolve">Jak to Rozwiązać</key>
     <key alias="permissionsHowtoResolveLink">Kliknij tutaj, aby przeczytać wersję tekstową</key>
-    <key alias="permissionsHowtoResolveText"><![CDATA[Obejrzyj nasz <strong>video tutorial</strong> pokazujący jak ustawić uprawnienia dostępu do folderów dla Umbraco albo przeczytaj wersję tekstową.]]></key>
+    <key alias="permissionsHowtoResolveText"><![CDATA[Obejrzyj nasz <strong>samouczek</strong>, pokazujący jak ustawić uprawnienia dostępu do folderów dla Umbraco, albo przeczytaj wersję tekstową.]]></key>
     <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Twoje ustawienia uprawnień mogą stanowić problem!</strong>
                 <br /><br />
-                Umbraco będzie działało bez problemów, ale nie będzie możliwa instalacja pakietów, które są rekomendowane aby w pełni wykorzystać możliwości Umbraco.]]></key>
+                Umbraco będzie działało bez problemów, ale nie będzie możliwa instalacja pakietów, które są rekomendowane, aby w pełni wykorzystać możliwości Umbraco.]]></key>
     <key alias="permissionsNotReady"><![CDATA[<strong>Twoje ustawienia uprawnień nie są gotowe na Umbraco!</strong> 
                 <br /><br /> 
                 Aby Umbraco mogło działać musisz uaktualnić swoje ustawienia zabezpieczeń.]]></key>
@@ -651,27 +651,27 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="permissionsSettingUpPermissions">Ustawianie uprawnień dostępu do folderów</key>
     <key alias="permissionsText"><![CDATA[
                 Umbraco potrzebuje uprawnień do zapisu/odczytu pewnych katalogów w celu przechowywania plików jak obrazki i PDFy. 
-                Umbraco przechowuje także tymczasowe dane (aka: cache) aby zwiększyć wydajność Twojej strony.
+                Umbraco przechowuje także tymczasowe dane (aka: cache), aby zwiększyć wydajność Twojej strony.
                 ]]></key>
-    <key alias="runwayFromScratch">Chce zacząć od zera</key>
+    <key alias="runwayFromScratch">Chcę zacząć od zera</key>
     <key alias="runwayFromScratchText"><![CDATA[
-                Twoja strona jest obecnie pusta. To idealna sytuacja, jeśli chcesz zacząć od zera i stworzyć własne typu dokumentów i szablony. 
+                Twoja strona jest obecnie pusta. To idealna sytuacja, jeśli chcesz zacząć od zera i stworzyć własne typy dokumentów i szablony. 
                 (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">dowiedz się jak</a>) 
                 Ciągle możesz wybrać, aby zainstalować Runway w późniejszym terminie. W tym celu przejdź do sekcji Deweloper i wybierz Pakiety.
                 ]]></key>
     <key alias="runwayHeader">Właśnie stworzyłeś czystą instalację platformy Umbraco. Co chcesz zrobić teraz?</key>
-    <key alias="runwayInstalled">Pakiet Runway zainstalowany pomyślnie</key>
+    <key alias="runwayInstalled">Pakiet Runway został zainstalowany pomyślnie</key>
     <key alias="runwayInstalledText"><![CDATA[
                 Twoje fundamenty są postawione właściwie. Wybierz, które moduły chcesz na nich zainstalować.<br /> 
                 To jest nasza lista rekomendowanych modułów. Zaznacz te, które chcesz zainstalować lub wyświetl <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">pełną listę modułów</a>  
                 ]]></key>
     <key alias="runwayOnlyProUsers">Rekomendowane tylko dla doświadczonych użytkowników</key>
-    <key alias="runwaySimpleSite">Chce rozpocząć z prostą stroną</key>
+    <key alias="runwaySimpleSite">Chcę rozpocząć z prostą stroną</key>
     <key alias="runwaySimpleSiteText"><![CDATA[
                 <p>
-                Pakiet "Runway" to prosta strona dostarczająca kilka podstawowych typów dokumentów i szablonów. Instalator może automatycznie zainstalować pakiet Runway za Ciebie, 
+                Pakiet "Runway" to prosta strona, dostarczająca kilku podstawowych typów dokumentów i szablonów. Instalator może automatycznie zainstalować pakiet Runway za Ciebie, 
                 ale możesz w łatwy sposób edytować, rozszerzyć lub usunąć go. Nie jest on potrzebny i możesz doskonale używać Umbraco bez niego. 
-                Jednakże pakiet Runway oferuje łatwą podstawę bazującą na najlepszych praktych, która pozwolić Ci rozpocząć pracę w mgnieniu oka. 
+                Jednakże pakiet Runway oferuje łatwą podstawę, bazującą na najlepszych praktykach, która pozwolić Ci rozpocząć pracę w mgnieniu oka. 
                 Jeśli zdecydujesz się zainstalować pakiet Runway, możesz opcjonalnie wybrać podstawowe klocki zwane Modułami Runway, aby poprawić swoje strony. 
                 </p> 
                 <small>
@@ -684,12 +684,12 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="step2">Krok 2/5: Konfiguracja bazy danych</key>
     <key alias="step3">Krok 3/5: Sprawdzanie uprawnień plików</key>
     <key alias="step4">Krok 4/5: Sprawdzanie zabezpieczeń Umbraco</key>
-    <key alias="step5">Krok 5/5: Umbraco jest gotowy do pracy</key>
+    <key alias="step5">Krok 5/5: Umbraco jest gotowe do pracy</key>
     <key alias="thankYou">Dziękujemy za wybór Umbraco</key>
     <key alias="theEndBrowseSite"><![CDATA[<h3>Przeglądaj swoją nową stronę</h3> 
                 Pakiet Runway został zainstalowany, zobacz zatem jak wygląda Twoja nowa strona.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Dalsza pomoc i informacje</h3> 
-                Zaczerpnij pomocy z naszej nagrodzonej społeczności, przeglądaj dokumentację lub obejrzyj niektóre darmowe filmy o tym jak budować proste strony, jak używać pakietów i szybki przewodnik po terminologii Umbraco]]></key>
+                Zaczerpnij pomocy z naszej nagrodzonej społeczności, przeglądaj dokumentację lub obejrzyj niektóre darmowe filmy o tym, jak budować proste strony, jak używać pakietów i szybki przewodnik po terminologii Umbraco]]></key>
     <key alias="theEndHeader">Umbraco %0% zostało zainstalowane i jest gotowe do użycia</key>
     <key alias="theEndInstallFailed"><![CDATA[Aby dokończyć instalację musisz 
                 ręcznie edytować <strong>plik web.config</strong> i zaktualizować klucz AppSetting o nazwie <strong>UmbracoConfigurationStatus</strong> na dole do wartości <strong>'%0%'</strong>.]]></key>
@@ -701,7 +701,7 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="Version3">Umbraco wersja 3</key>
     <key alias="Version4">Umbraco wersja 4</key>
     <key alias="watch">Zobacz</key>
-    <key alias="welcomeIntro"><![CDATA[Ten kreator przeprowadzi Cię przez proces konfiguracji <strong>Umbraco %0%</strong> dla świżej instalacji lub aktualizacji z wersji 3.0. 
+    <key alias="welcomeIntro"><![CDATA[Ten kreator przeprowadzi Cię przez proces konfiguracji <strong>Umbraco %0%</strong> dla świeżej instalacji lub aktualizacji z wersji 3.0. 
                 <br /><br /> 
                 Wciśnij <strong>"dalej"</strong>, aby rozpocząć proces konfigruacji.]]></key>
   </area>
@@ -727,14 +727,14 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Zapomniałeś hasła?</key>
     <key alias="forgottenPasswordInstruction">E-mail z linkiem do zresetowania hasła zostanie wysłany na podany adres</key>
-    <key alias="requestPasswordResetConfirmation">E-mail z instrukcjami do zresetowania hasła zostanie wysłany jeśli zgadza się z naszą bazą danych</key>
+    <key alias="requestPasswordResetConfirmation">E-mail z instrukcjami do zresetowania hasła zostanie wysłany, jeśli zgadza się z naszą bazą danych</key>
     <key alias="returnToLogin">Powrót do formularza logowania</key>
     <key alias="setPasswordInstruction">Proszę wpisać nowe hasło</key>
     <key alias="setPasswordConfirmation">Twoje hasło zostało zmienione</key>
     <key alias="resetCodeExpired">Link, na który kliknąłeś jest niewłaściwy lub wygasł</key>
     <key alias="resetPasswordEmailCopySubject">Umbraco: Resetowanie hasła</key>
     <key alias="resetPasswordEmailCopyFormat">
-      <![CDATA[<p>Twoja nazwa użytkownika do zalogowania się w Umbraco back-office to: <strong>%0%</strong></p><p>Kliknij <a href="%1%"><strong>here</strong></a>, aby zresetować Twoje hasło lub kopiuj/wklej ten URL w przeglądarce:</p><p><em>%1%</em></p>]]>
+      <![CDATA[<p>Twoja nazwa użytkownika do zalogowania się w Umbraco back-office to: <strong>%0%</strong></p><p>Kliknij <a href="%1%"><strong>tutaj</strong></a>, aby zresetować Twoje hasło lub kopiuj/wklej ten URL w przeglądarce:</p><p><em>%1%</em></p>]]>
     </key>
   </area>
   <area alias="main">
@@ -746,9 +746,9 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="choose">Wybierz stronę powyżej...</key>
     <key alias="copyDone">%0% zostało skopiowane do %1%</key>
     <key alias="copyTo">Wybierz, gdzie dokument %0% ma zostać skopiowany</key>
-    <key alias="moveDone">%0% został przesunięty do %1%</key>
+    <key alias="moveDone">%0% został przeniesiony do %1%</key>
     <key alias="moveTo">Wskaż gdzie dokument %0% ma zostać przeniesiony</key>
-    <key alias="nodeSelected">został wybrany jako korzeń nowej treści, kliknik 'ok' poniżej.</key>
+    <key alias="nodeSelected">został wybrany jako korzeń nowej zawartości, kliknik 'ok' poniżej.</key>
     <key alias="noNodeSelected">Nie wskazano węzła, proszę wybrać węzeł z listy powyżej przed kliknięciem "ok"</key>
     <key alias="notAllowedByContentType">Typ bieżącego węzła nie jest dozwolony dla wybranego węzła</key>
     <key alias="notAllowedByPath">Bieżący węzeł nie może być przeniesiony do jednej z jego podstron</key>
@@ -761,7 +761,7 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="mailBody"><![CDATA[
                 Witaj %0% 
 
-                To jest automatyczny e-mail, wysłany aby poinformować Cię, że polecenie '%1%' 
+                To jest automatyczny e-mail, wysłany, aby poinformować Cię, że polecenie '%1%' 
                 zostało wykonane na stronie '%2%' 
                 przez użytkownika '%3%'. 
 
@@ -773,7 +773,7 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
           ]]></key>
     <key alias="mailBodyHtml"><![CDATA[<p>Witaj %0%</p> 
 
-              <p>To jest automatyczny e-mail, wysłany aby poinformować Cię, że polecenie <strong>'%1%'</strong> 
+              <p>To jest automatyczny e-mail, wysłany, aby poinformować Cię, że polecenie <strong>'%1%'</strong> 
               zostało wykonane na stronie <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a> 
               przez użytkownika <strong>'%3%'</strong> 
               </p> 
@@ -803,7 +803,7 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
   </area>
   <area alias="packager">
     <key alias="chooseLocalPackageText"><!CDATA[
-      Wskaż pakiet z twojego komputera, poprzez kliknięcie na przycisk 'Przeglądaj'<br /> 
+      Wskaż pakiet z Twojego komputera, poprzez kliknięcie na przycisk 'Przeglądaj'<br /> 
       i wskaż gdzie jest zapisany. Pakiety Umbraco przeważnie posiadają rozszerzenie ".umb" lub ".zip".
       ]]></key>
     <key alias="packageAuthor">Autor</key>
@@ -822,9 +822,9 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="packageUninstalledHeader">Pakiet został odinstalowany</key>
     <key alias="packageUninstalledText">Pakiet został pomyślnie odinstalowany</key>
     <key alias="packageUninstallHeader">Odinstaluj pakiet</key>
-    <key alias="packageUninstallText"><![CDATA[Poniżej możesz odznaczyć elementy których nie chcesz usunąć tym razem. Kiedy klikniesz potwierdź odinstalowanie wszystkie zaznaczone elementy zostaną usunięte.<br/>
-      <span style="color: Red; font-weight: bold;">Uwaga:</span> wszystkie elementy, media itp w zależności od elementów, które usuwasz przestaną działać, i mogą spowodować niestabilność systemu, 
-      więc odinstalowuj z uwagą. W przypadku problemów kontaktuj się z autorem pakietu.]]></key>
+    <key alias="packageUninstallText"><![CDATA[Poniżej możesz odznaczyć elementy, których nie chcesz usunąć tym razem. Kiedy klikniesz 'potwierdź odinstalowanie', wszystkie zaznaczone elementy zostaną usunięte.<br/>
+      <span style="color: Red; font-weight: bold;">Uwaga:</span> wszystkie elementy, media, itp. w zależności od elementów, które usuwasz, przestaną działać i mogą spowodować niestabilność systemu, 
+      więc odinstalowuj z uwagą. W przypadku problemów skontaktuj się z autorem pakietu.]]></key>
     <key alias="packageUpgradeDownload">Pobierz aktualizację z repozytorium</key>
     <key alias="packageUpgradeHeader">Aktualizuj pakiet</key>
     <key alias="packageUpgradeInstructions">Instrukcja aktualizacji</key>
@@ -833,7 +833,7 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="packageVersionHistory">Historia wersji pakietu</key>
     <key alias="viewPackageWebsite">Odwiedź stronę pakietu</key>
     <key alias="packageAlreadyInstalled">Pakiet jest już zainstalowany</key>
-    <key alias="targetVersionMismatch">Ten pakiet nie może być zainstalowany, ponieważ wymaga przynajmniej Umbraco w wersji %0%</key>
+    <key alias="targetVersionMismatch">Ten pakiet nie może być zainstalowany, ponieważ wymaga Umbraco w wersji przynajmniej %0%</key>
     <key alias="installStateUninstalling">Odinstalowywanie...</key>
     <key alias="installStateDownloading">Pobieranie...</key>
     <key alias="installStateImporting">Importowanie...</key>
@@ -853,23 +853,23 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="paAdvancedHelp"><![CDATA[Jeśli chcesz kontrolować dostęp do strony przy użyciu uwierzytelniania opartego na rolach, <br /> użyj grup członkowskich Umbraco ]]></key>
     <key alias="paAdvancedNoGroups">Musisz utworzyć grupę przed użyciem uwierzytelniania opartego na rolach</key>
     <key alias="paErrorPage">Strona błędu</key>
-    <key alias="paErrorPageHelp">Używana kiedy użytkownicy są zalogowani, ale nie posiadają dostępu</key>
+    <key alias="paErrorPageHelp">Używana, kiedy użytkownicy są zalogowani, ale nie posiadają dostępu</key>
     <key alias="paHowWould">Wybierz sposób ograniczenia dostępu do tej strony</key>
     <key alias="paIsProtected">%0% jest teraz zabezpieczona</key>
     <key alias="paIsRemoved">Ze strony %0% usunięto zabezpieczenia dostępu</key>
     <key alias="paLoginPage">Strona logowania</key>
     <key alias="paLoginPageHelp">Wybierz stronę z formularzem logowania</key>
     <key alias="paRemoveProtection">Usuń ochronę</key>
-    <key alias="paSelectPages">Wybierz strony, które zawierają formularz logowania i komunikatów o błędach</key>
+    <key alias="paSelectPages">Wybierz strony, które zawierają formularz logowania i komunikaty o błędach</key>
     <key alias="paSelectRoles">Wybierz role, które mają mieć dostęp do tej strony</key>
-    <key alias="paSetLogin">Ustaw login i hasło dla tej strony</key>
+    <key alias="paSetLogin">Ustaw nazwę użytkownika i hasło dla tej strony</key>
     <key alias="paSimple">Ochrona pojedynczego użytkownika</key>
-    <key alias="paSimpleHelp">Jeżeli chcesz ustawić prostą ochronę używając pojedynczego loginu i hasła</key>
+    <key alias="paSimpleHelp">Jeżeli chcesz ustawić prostą ochronę używając pojedynczej nazwy użytkownika i hasła</key>
   </area>
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease">
       <![CDATA[
-      %0% nie może zostać opublikowany, ponieważ elemenet nie został zaplanowany do wydania.
+      %0% nie może zostać opublikowany, ponieważ element nie został zaplanowany do wydania.
     ]]>
     </key>
     <key alias="contentPublishedFailedExpired"><![CDATA[
@@ -879,7 +879,7 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
       %0% nie może zostać opublikowany, ponieważ następujące właściwości:  %1%  nie przeszły zasad walidacji.
     ]]></key>
     <key alias="contentPublishedFailedByEvent"><![CDATA[
-      %0% nie może zostać opublikowany, ze względu na odwołanie akcji przez rozszerzenie firm trzecich
+      %0% nie może zostać opublikowany ze względu na odwołanie akcji przez rozszerzenie firm trzecich
       ]]></key>
     <key alias="contentPublishedFailedByParent"><![CDATA[
       %0% nie może zostać opublikowany, ponieważ rodzic nie jest opublikowany.
@@ -889,8 +889,8 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="inProgressCounter">Opublikowano %0% z %1% stron...</key>
     <key alias="nodePublish">%0% został opublikowany</key>
     <key alias="nodePublishAll">%0% oraz podstrony zostały opublikowane</key>
-    <key alias="publishAll">Publikuj %0% z wszytkimi podstronami</key>
-    <key alias="publishHelp"><![CDATA[Kliknij <em> OK </ em>, aby publikować <strong>% 0% </ strong> i spowodować upublicznienie całej treści.<br/><br/> 
+    <key alias="publishAll">Publikuj %0% ze wszytkimi podstronami</key>
+    <key alias="publishHelp"><![CDATA[Kliknij <em> OK </ em>, aby publikować <strong>% 0% </ strong> i spowodować upublicznienie całej zawartości.<br/><br/> 
       Możesz opublikować tą stronę wraz ze wszystkimi podstronami zaznaczając poniżej <em>publikuj wszystkie węzły pochodne</em>
       ]]></key>
   </area>
@@ -911,9 +911,9 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Aktualna wersja</key>
-    <key alias="diffHelp"><![CDATA[Tu pokazane są różnice pomiędzy bieżącą oraz wybraną wersją <br/><del>Red</del> tekst nie będzie pokazany w wybranej wersji, <ins>zielony tekst został dodany</ins>]]></key>
+    <key alias="diffHelp"><![CDATA[Tu pokazane są różnice pomiędzy bieżącą oraz wybraną wersją <br/><del>Czerwony</del> tekst nie będzie pokazany w wybranej wersji, <ins>zielony tekst został dodany</ins>]]></key>
     <key alias="documentRolledBack">Dokument został przywrócony</key>
-    <key alias="htmlHelp">Tu widać wybraną wersję jako html, jeżeli chcesz zobaczyć różnicę pomiędzy 2 wersjami w tym samym czasie, użyj podglądu róznic</key>
+    <key alias="htmlHelp">Tu widać wybraną wersję jako html, jeżeli chcesz zobaczyć różnicę pomiędzy 2 wersjami w tym samym czasie, użyj podglądu różnic</key>
     <key alias="rollbackTo">Cofnij do</key>
     <key alias="selectVersion">Wybierz wersję</key>
     <key alias="view">Zobacz</key>
@@ -960,16 +960,16 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="contentTypeEnabled">Włączono Główny Typ Treści</key>
     <key alias="contentTypeUses">Ten Typ Treści używa</key>
     <key alias="asAContentMasterType">jako Główny Typ Treści. Zakładki Głównego Typu Treści nie są wyświetlone i mogą być edytowane jedynie w samym Głównym Typie Treści</key>
-    <key alias="noPropertiesDefinedOnTab">Żadne właściwości nie zostały zdefiniowane dla tej zakładki. Kliknij w link "dodaj nową właściwość", który znajduje się na górze, aby stworzyć nową właściwość.</key>
+    <key alias="noPropertiesDefinedOnTab">Żadne właściwości nie zostały zdefiniowane dla tej zakładki. Kliknij w link "dodaj nową właściwość", który znajduje się na górze strony, aby stworzyć nową właściwość.</key>
     <key alias="masterDocumentType">Główny Typ Dokumentu</key>
     <key alias="createMatchingTemplate">Stwórz pasujący szablon</key>
     <key alias="addIcon">Dodaj ikonę</key>
   </area>
   <area alias="sort">
-    <key alias="sortOrder">Sort order</key>
-    <key alias="sortCreationDate">Creation date</key>
+    <key alias="sortOrder">Porządek sortowania</key>
+    <key alias="sortCreationDate">Data utworzenia</key>
     <key alias="sortDone">Sortowanie zakończone.</key>
-    <key alias="sortHelp">Przesuń poszczególne elementy w górę oraz w dół aż będą w odpowiedniej kolejności, lub kliknij na nagłówku kolumny aby posortować całą kolekcję elementów</key>
+    <key alias="sortHelp">Przesuń poszczególne elementy w górę oraz w dół aż będą w odpowiedniej kolejności lub kliknij na nagłówku kolumny, aby posortować całą kolekcję elementów</key>
     <key alias="sortPleaseWait"><![CDATA[Proszę czekać. Trwa sortowanie elementów.<br/><br/>Nie zamykaj tego okna podczas sortowania]]></key>
   </area>
   <area alias="speechBubbles">
@@ -987,13 +987,13 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="contentTypeSavedHeader">Zakładka została zapisana</key>
     <key alias="contentTypeTabCreated">Zakładkę utworzono</key>
     <key alias="contentTypeTabDeleted">Zakładkę usunięto</key>
-    <key alias="contentTypeTabDeletedText">Usunięto zakładkę o id:%0%</key>
+    <key alias="contentTypeTabDeletedText">Usunięto zakładkę o ID:%0%</key>
     <key alias="cssErrorHeader">Arkusz stylów nie został zapisany</key>
     <key alias="cssSavedHeader">Arkusz stylów został zapisany</key>
     <key alias="cssSavedText">Arkusz stylów został zapisany bez żadnych błędów</key>
     <key alias="dataTypeSaved">Typ danych został zapisany</key>
     <key alias="dictionaryItemSaved">Element słownika został zapisany</key>
-    <key alias="editContentPublishedFailedByParent">Publikacja nie powiodła się ponieważ rodzic węzła nie jest opublikowany</key>
+    <key alias="editContentPublishedFailedByParent">Publikacja nie powiodła się, ponieważ rodzic węzła nie jest opublikowany</key>
     <key alias="editContentPublishedHeader">Treść została opublikowana</key>
     <key alias="editContentPublishedText">i jest widoczna na stronie</key>
     <key alias="editContentSavedHeader">Treść została zapisana</key>
@@ -1065,7 +1065,7 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="insertMacro">Makro</key>
     <key alias="insertMacroDesc">
       Makro to konfigurowalny komponent, który sprawdzi się
-      przy reużywalnych częściach Twojego projektu, kiedy potrzebujesz opcji dostarczenia parametrów,
+      przy wielokrotnie używanych częściach Twojego projektu, kiedy potrzebujesz opcji dostarczenia parametrów,
       takich jak galerie, formularze, czy listy.
     </key>
     
@@ -1158,15 +1158,15 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="insertControl">Wybierz typ treści</key>
     <key alias="chooseLayout">Wybierz układ</key>
     <key alias="addRows">Dodaj wiersz</key>
-    <key alias="addElement">Dodaj treść</key>
-    <key alias="dropElement">Upuść treść</key>
+    <key alias="addElement">Dodaj zawartość</key>
+    <key alias="dropElement">Upuść zawartość</key>
     <key alias="settingsApplied">Zastosowano ustawienia</key>
 
     <key alias="contentNotAllowed">Ta zawartość nie jest tu dozwolona</key>
     <key alias="contentAllowed">Ta zawartość jest tu dozwolona</key>
 
-    <key alias="clickToEmbed">Kliknij żeby osadzić</key>
-    <key alias="clickToInsertImage">Kliknij żeby dodać obraz</key>
+    <key alias="clickToEmbed">Kliknij, żeby osadzić</key>
+    <key alias="clickToInsertImage">Kliknij, żeby dodać obraz</key>
     <key alias="placeholderImageCaption">Podpis obrazu...</key>
     <key alias="placeholderWriteHere">Pisz tutaj...</key>
 
@@ -1183,10 +1183,10 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="columnsDetails">Całkowita liczba wszystkich kolumn w układzie siatki</key>
 
     <key alias="settings">Ustawienia</key>
-    <key alias="settingsDetails">Konfiguruj jakie ustawienia edytor może zmieniać</key>
+    <key alias="settingsDetails">Konfiguruj jakie ustawienia może zmieniać edytor</key>
 
     <key alias="styles">Style</key>
-    <key alias="stylesDetails">Konfiguruj jakie style edytor może zmieniać</key>
+    <key alias="stylesDetails">Konfiguruj jakie style może zmieniać edytor</key>
 
     <key alias="settingDialogDetails">Ustawienia zostaną zapisane tylko jeśli wprowadzona konfiguracja json jest prawidłowa</key>
 
@@ -1286,15 +1286,15 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="uppercase">Wielkie litery</key>
     <key alias="urlEncode">Kodowanie URL</key>
     <key alias="urlEncodeHelp">Formatuje znaki specjalne w URLach</key>
-    <key alias="usedIfAllEmpty">Zostanie użyte tylko wtedy gdy wartość pola jest pusta</key>
-    <key alias="usedIfEmpty">To pole jest używane tylko wtedy gdy główne pole jest puste</key>
+    <key alias="usedIfAllEmpty">Zostanie użyte tylko wtedy, gdy wartość pola jest pusta</key>
+    <key alias="usedIfEmpty">To pole jest używane tylko wtedy, gdy główne pole jest puste</key>
     <key alias="withTime">Tak, z czasem. Separator:</key>
   </area>
   <area alias="translation">
     <key alias="assignedTasks">Zadania przypisane dla Ciebie</key>
     <key alias="assignedTasksHelp"><![CDATA[Lista poniżej zawiera elementy do tłumaczenia <strong>przypisane do Ciebie</strong>. Aby zobaczyć szczegółowe informacje wraz z komentarzami, kliknij na "Szczegóły" lub po prostu na nazwę strony. 
       Możesz również pobrać stronę jako XML poprzez kliknięcie na link "Pobierz XML".<br/>
-      Aby zamknąć zadanie tłumaczenia, proszę w podglądzie szczegółowym kliknąć przycisk "Zamknij".
+      Aby zamknąć zadanie tłumaczenia, proszę kliknąć "Zamknij" w podglądzie szczegółowym.
       ]]></key>
     <key alias="closeTask">zamknij zadanie</key>
     <key alias="details">Szczegóły tłumaczenia</key>
@@ -1306,12 +1306,12 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="mailBody"><![CDATA[
       Witaj %0%
 
-      To jest automatyczny mail informujący że dokument '%1%' 
+      To jest automatyczny e-mail informujący, że dokument '%1%' 
       został zgłoszony jako wymagający tłumaczenia na '%5%' przez %2%. 
 
       Wejdź na http://%3%/translation/details.aspx?id=%4% aby edytować. 
 
-      Lub zaloguj się do Umbraco aby zobaczyć wszystkie zadania do tłumaczenia  
+      Lub zaloguj się do Umbraco, aby zobaczyć wszystkie zadania do tłumaczenia  
       http://%3%.
 
       Życzę miłego dnia! 
@@ -1323,7 +1323,7 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="ownedTasks">Zadania stworzone przez Ciebie</key>
     <key alias="ownedTasksHelp"><![CDATA[Lista poniżej pokazuje strony <strong>stworzone przez Ciebie</strong>. Aby zobaczyć szczegółowe informacje wraz z komentarzami, 
       kliknij na "Szczegóły" lub na nazwę strony. Możesz również pobrać stronę jako XML poprzez kliknięcie na link "Pobierz XML".
-      Aby zamknąć zadanie tłumaczenia, proszę w podglądzie szczegółowym kliknąć przycisk "Zamknij".
+      Aby zamknąć zadanie tłumaczenia, proszę kliknąć "Zamknij" w podglądzie szczegółowym.
     ]]></key>
     <key alias="pageHasBeenSendToTranslation">Strona '%0%' została wysłana do tłumaczenia</key>
     <key alias="noLanguageSelected">Proszę wybrać język, na jaki zawartość powinna zostać przetłumaczona</key>
@@ -1333,7 +1333,7 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="totalWords">Liczba słów</key>
     <key alias="translateTo">Przetłumacz na</key>
     <key alias="translationDone">Tłumaczenie zakończone.</key>
-    <key alias="translationDoneHelp">Możesz podglądnąć stronę, którą właśnie przetłumaczyłeś, poprzez kliknięcie poniżej. Jeżeli strona oryginalna istnieje, możesz porównać obie wersje</key>
+    <key alias="translationDoneHelp">Możesz podejrzeć stronę, którą właśnie przetłumaczyłeś, poprzez kliknięcie poniżej. Jeżeli strona oryginalna istnieje, możesz porównać obie wersje</key>
     <key alias="translationFailed">Błąd tłumaczenia, plik XML może być uszkodzony</key>
     <key alias="translationOptions">Opcje tłumaczeń</key>
     <key alias="translator">Tłumacz</key>
@@ -1346,8 +1346,8 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="dataTypes">Typy danych</key>
     <key alias="dictionary">Słownik</key>
     <key alias="installedPackages">Zainstalowane pakiety</key>
-    <key alias="installSkin">TRANSLATE ME: 'Install skin'</key>
-    <key alias="installStarterKit">TRANSLATE ME: 'Install starter kit'</key>
+    <key alias="installSkin">Zainstaluj skórkę</key>
+    <key alias="installStarterKit">Zainstaluj Starter Kit</key>
     <key alias="languages">Języki</key>
     <key alias="localPackage">Zainstaluj pakiet lokalny</key>
     <key alias="macros">Makra</key>
@@ -1375,7 +1375,7 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
   </area>
   <area alias="update">
     <key alias="updateAvailable">Aktualizacja jest gotowa</key>
-    <key alias="updateDownloadText">Gotowe jest %0%, kliknij tutaj aby pobrać</key>
+    <key alias="updateDownloadText">Gotowe jest %0%, kliknij tutaj, aby pobrać</key>
     <key alias="updateNoServer">Brak połączenia z serwerem</key>
     <key alias="updateNoServerError">Wystąpił błąd podczas sprawdzania aktualizacji. Przeglądnij trace-stack dla dalszych informacji</key>
   </area>
@@ -1406,13 +1406,13 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="passwordIsBlank">Nowe hasło nie może byc puste!</key>
     <key alias="passwordCurrent">Bieżące hasło</key>
     <key alias="passwordInvalid">Bieżące hasło jest nieprawidłowe</key>
-    <key alias="passwordIsDifferent">Nowe hasło i potwierdzenie nowego hasła nie są identyczne.Spróbuj ponownie!</key>
+    <key alias="passwordIsDifferent">Nowe hasło i potwierdzenie nowego hasła nie są identyczne. Spróbuj ponownie!</key>
     <key alias="passwordMismatch">Potwierdzone hasło nie jest identyczne z nowym hasłem!</key>
     <key alias="permissionReplaceChildren">Zastąp prawa dostępu dla węzłów potomnych</key>
     <key alias="permissionSelectedPages">Aktualnie zmieniasz uprawnienia dostępu do stron:</key>
     <key alias="permissionSelectPages">Wybierz strony, którym chcesz zmienić prawa dostępu</key>
     <key alias="searchAllChildren">Przeszukaj wszystkie węzły potomne</key>
-    <key alias="startnode">Węzeł początkowy w treści</key>
+    <key alias="startnode">Węzeł początkowy w zawartości</key>
     <key alias="username">Nazwa użytkownika</key>
     <key alias="userPermissions">Prawa dostępu użytkownika</key>
     <key alias="usertype">Typ</key>
@@ -1437,11 +1437,11 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
 	     0: Bieżąca wartość
 		   1: Rekomendowana wartość
 		   2: XPath
-		   3: ścieżka pliku konfiguracyjnego
+		   3: Ścieżka pliku konfiguracyjnego
 	  -->
     <key alias="checkSuccessMessage">Wartość jest ustawiona na rekomendowaną wartość: '%0%'.</key>
 	  <key alias="rectifySuccessMessage">Wartość została ustawiona na '%1%' dla XPath '%2%' w pliku konfiguracyjnym '%3%'.</key>
-    <key alias="checkErrorMessageDifferentExpectedValue">Oczekiwana wartość '%1%' dla '%2%' w pliku konfiguracyjnym '%3%', ale znaleziono '%0%'.</key>
+    <key alias="checkErrorMessageDifferentExpectedValue">Oczekiwana jest wartość '%1%' dla '%2%' w pliku konfiguracyjnym '%3%', ale znaleziono '%0%'.</key>
     <key alias="checkErrorMessageUnexpectedValue">Znaleziono nieoczekiwaną wartość '%0%' dla '%2%' w pliku konfiguracyjnym '%3%'.</key>
 
 	  <!-- Następujące klucze spowodują, że tokeny zostaną przekazane:
@@ -1515,7 +1515,7 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="optionalFilePermissionFailed"><![CDATA[Następujące pliki muszą być ustawione z uprawnieniami do zapisu dla pewnych operacji Umbraco, aby funkcjonować, ale nie można uzyskać do nich dostępu: <strong>%0%</strong>. Jeśli nie będzie nic w nich pisane, żadne działania nie muszą być podejmowane.]]></key>
 
     <key alias="clickJackingCheckHeaderFound"><![CDATA[Nagłówek lub meta-tag <strong>X-Frame-Options</strong> używany do kontrolowania czy strona może być IFRAME'owana przez inną został znaleziony.]]></key>
-    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> używany do kontrolowania czy strona może być IFRAME'owana przez inną nie został znaleziony.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Nagłówek lub meta-tag <strong>X-Frame-Options</strong> używany do kontrolowania czy strona może być IFRAME'owana przez inną nie został znaleziony.]]></key>
     <key alias="clickJackingSetHeaderInConfig">Ustaw nagłówek w Config</key>
     <key alias="clickJackingSetHeaderInConfigDescription">Dodaje wartość do sekcji httpProtocol/customHeaders pliku web.config, aby zapobiec IFRAME'owania strony przez inne witryny.</key>
     <key alias="clickJackingSetHeaderInConfigSuccess">Ustawienie do tworzenia nagłówka, zapobiegającego IFRAME'owania strony przez inne witryny zostało dodane do Twojego pliku web.config.</key>
@@ -1525,7 +1525,7 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
 	    0: Lista znalezionych nagłówków, oddzielonych przecinkami
   	-->
     <key alias="excessiveHeadersFound"><![CDATA[Znaleziono następujące nagłówki, ujawniające informacje o technologii strony: <strong>%0%</strong>.]]></key>
-    <key alias="excessiveHeadersNotFound">Nie znaleziono żadnych nagłówków, ujawniających informacje o technologii strony.</key>
+    <key alias="excessiveHeadersNotFound">Nie znaleziono żadnych nagłówków, ujawniających informacji o technologii strony.</key>
 
     <key alias="smtpMailSettingsNotFound">Nie znaleziono system.net/mailsettings w pliku Web.config.</key>
     <key alias="smtpMailSettingsHostNotConfigured">Host nie jest skonfigurowany w sekcji system.net/mailsettings pliku Web.config.</key>
@@ -1547,12 +1547,12 @@ Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbr
     <key alias="redirectRemoved">Przekierowanie URL zostało usunięte.</key>
     <key alias="redirectRemoveError">Wystąpił błąd podczas usuwania przekierowania URL.</key>
     <key alias="confirmDisable">Czy jesteś pewien, że chcesz wyłączyć śledzenie URL?</key>
-    <key alias="disabledConfirm">Śledzenie URL tracker zostało wyłączone.</key>
+    <key alias="disabledConfirm">Śledzenie URL zostało wyłączone.</key>
     <key alias="disableError">Wystąpił błąd podczas wyłączania śledzenia URL, więcej informacji znajdziesz w pliku z logami.</key>
     <key alias="enabledConfirm">Śledzenie URL zostało włączone.</key>
     <key alias="enableError">Wystąpił błąd podczas włączania śledzenia URL, więcej informacji znajdziesz w pliku z logami.</key>
   </area>
   <area alias="emptyStates">
-    <key alias="emptyDictionaryTree">Brak elementów słownika, z których można wybrać No Dictionary items to choose from</key>
+    <key alias="emptyDictionaryTree">Brak elementów słownika do wyboru</key>
   </area>    
 </language>
