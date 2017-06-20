@@ -60,7 +60,7 @@ namespace Umbraco.Web.Cache
 
         private void ClearCache(int id)
         {
-            ApplicationContext.Current.IdkMap.ClearCache(id);
+            ApplicationContext.Current.Services.IdkMap.ClearCache(id);
             ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
 
             ApplicationContext.Current.ApplicationCache.RuntimeCache.

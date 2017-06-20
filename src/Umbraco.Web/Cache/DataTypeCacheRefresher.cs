@@ -108,7 +108,7 @@ namespace Umbraco.Web.Cache
                 if (dataTypeCache)
                     dataTypeCache.Result.ClearCacheByKeySearch(string.Format("{0}_{1}", CacheKeys.DataTypePreValuesCacheKey, payload.Id));
 
-                ApplicationContext.Current.IdkMap.ClearCache(payload.Id);
+                ApplicationContext.Current.Services.IdkMap.ClearCache(payload.Id);
                 PublishedContentType.ClearDataType(payload.Id);
             }
 

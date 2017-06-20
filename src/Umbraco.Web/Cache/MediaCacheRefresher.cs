@@ -158,7 +158,7 @@ namespace Umbraco.Web.Cache
 
             foreach (var payload in payloads)
             {
-                ApplicationContext.Current.IdkMap.ClearCache(payload.Id);
+                ApplicationContext.Current.Services.IdkMap.ClearCache(payload.Id);
 
                 var mediaCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IMedia>();
 

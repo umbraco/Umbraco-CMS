@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    internal class IdkMap
+    public class IdkMap
     {
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();

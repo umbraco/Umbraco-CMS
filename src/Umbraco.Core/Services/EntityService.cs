@@ -21,10 +21,10 @@ namespace Umbraco.Core.Services
 
         public EntityService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory,
            IContentService contentService, IContentTypeService contentTypeService, IMediaService mediaService, IDataTypeService dataTypeService,
-           IMemberService memberService, IMemberTypeService memberTypeService, IRuntimeCacheProvider runtimeCache)
+           IMemberService memberService, IMemberTypeService memberTypeService, IdkMap idkMap)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
-            _idkMap = new IdkMap(provider);
+            _idkMap = idkMap;
 
             _supportedObjectTypes = new Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>>
             {

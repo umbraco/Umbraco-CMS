@@ -175,12 +175,6 @@ namespace Umbraco.Core
 		public CacheHelper ApplicationCache { get; private set; }
 
         /// <summary>
-        /// Gets the Id-Key Map.
-        /// </summary>
-        // this is not pretty but best we can do due to breaking changes yada
-        internal IdkMap IdkMap { get { return ((EntityService) Services.EntityService).IdkMap; } }
-
-        /// <summary>
         /// Exposes the global ProfilingLogger - this should generally not be accessed via the UmbracoContext and should normally just be exposed
         /// on most base classes or injected with IoC
         /// </summary>

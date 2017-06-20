@@ -187,7 +187,7 @@ namespace Umbraco.Web.Cache
 
             foreach (var payload in payloads)
             {
-                ApplicationContext.Current.IdkMap.ClearCache(payload.Id);
+                ApplicationContext.Current.Services.IdkMap.ClearCache(payload.Id);
 
                 //clear the cache for each item
                 ClearContentTypeCache(payload);
