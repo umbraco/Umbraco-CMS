@@ -5,7 +5,7 @@
     <div class="umb-user-group-preview__content">
         <div class="umb-user-group-preview__name">{{ name }}</div>
 
-        <div class="umb-user-group-preview__permission">
+        <div class="umb-user-group-preview__permission" ng-if="sections">
             <span>
                 <span class="bold">Sections:</span>
                 <span ng-repeat="section in sections">{{ section.name }}<span ng-if="!$last">, </span></span>
@@ -13,7 +13,7 @@
             </span>
         </div>
 
-        <div class="umb-user-group-preview__permission">
+        <div class="umb-user-group-preview__permission" ng-if="startContentId">
             <span>
                 <span class="bold">Content start node:</span>
                 <span ng-if="startContentId">{{ startNode.name }}</span>
@@ -21,11 +21,18 @@
             </span>
         </div>
         
-        <div class="umb-user-group-preview__permission">
+        <div class="umb-user-group-preview__permission" ng-if="startMediaId">
             <span>
                 <span class="bold">Media start node:</span>
                 <span ng-if="startMediaId">{{ startNode.name }}</span>
                 <span ng-if="!startMediaId">Media root</span>
+            </span>
+        </div>
+
+        <div class="umb-user-group-preview__permission" ng-if="permissions">
+            <span>
+                <span class="bold">Permissions:</span>
+                <span ng-repeat="permission in permissions">{{ permission.name }}<span ng-if="!$last">, </span></span>
             </span>
         </div>
 

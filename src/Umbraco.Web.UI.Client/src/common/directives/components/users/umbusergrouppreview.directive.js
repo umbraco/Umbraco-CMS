@@ -18,6 +18,7 @@
                 sections: "=?",
                 contentStartNode: "=?",
                 mediaStartNode: "=?",
+                permissions: "=?",
                 allowRemove: "=?",
                 onRemove: "&?"
             },
