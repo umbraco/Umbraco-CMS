@@ -24,7 +24,7 @@
     <key alias="notify">Powiadomienia</key>
     <key alias="protect">Publiczny dostęp</key>
     <key alias="publish">Opublikuj</key>
-    <key alias="unpublish">Odpublikuj</key>
+    <key alias="unpublish">Cofnij publikację</key>
     <key alias="refreshNode">Odśwież węzeł</key>
     <key alias="republish">Opublikuj ponownie całą stronę</key>
     <key alias="restore" version="7.3.0">Przywróć</key>
