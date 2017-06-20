@@ -27,8 +27,13 @@
             });
 
             if ($routeParams.create) {
+              // get user group scaffold
+              usersResource.getUserGroupScaffold().then(function (userGroup) {
+                vm.userGroup = userGroup;
+                setSectionIcon(vm.userGroup.sections);
                 makeBreadcrumbs();
                 vm.loading = false;
+              });
             } else {
                 // get user group
                 usersResource.getUserGroup($routeParams.id).then(function (userGroup) {

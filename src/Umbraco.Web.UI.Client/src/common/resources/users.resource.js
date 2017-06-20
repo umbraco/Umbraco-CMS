@@ -22,6 +22,16 @@
         'Failed to clear the user avatar ' + userId);
     }
 
+    function getUserGroupScaffold() {
+
+      return umbRequestHelper.resourcePromise(
+        $http.get(
+          umbRequestHelper.getApiUrl(
+            "userApiBaseUrl",
+            "GetEmptyUserGroup")),
+        'Failed to get the user group scaffold');
+    }
+
     function disableUsers(userIds) {
       if (!userIds) {
         throw "userIds not specified";
@@ -195,7 +205,8 @@
       saveUser: saveUser,
       getUserGroup: getUserGroup,
       getUserGroups: getUserGroups,
-      clearAvatar: clearAvatar
+      clearAvatar: clearAvatar,
+      getUserGroupScaffold: getUserGroupScaffold
     };
 
     return resource;

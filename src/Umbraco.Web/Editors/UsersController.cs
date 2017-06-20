@@ -343,6 +343,15 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        /// <summary>
+        /// Returns the scaffold for creating a new user group
+        /// </summary>        
+        /// <returns></returns>
+        public UserGroupDisplay GetEmptyUserGroup()
+        {
+            return new UserGroupDisplay();
+        }
+
         private HttpContextBase EnsureHttpContext()
         {
             var attempt = this.TryGetHttpContext();
