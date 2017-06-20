@@ -190,7 +190,9 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                return GetBaseQuery("umbracoUserGroup.*, COUNT(umbracoUser.id) AS UserCount, umbracoUserGroup2App.*");
+                return GetBaseQuery(@"umbracoUserGroup.createDate, umbracoUserGroup.icon, umbracoUserGroup.id, umbracoUserGroup.startContentId,
+umbracoUserGroup.startMediaId, umbracoUserGroup.updateDate, umbracoUserGroup.userGroupAlias, umbracoUserGroup.userGroupDefaultPermissions,
+umbracoUserGroup.userGroupName, COUNT(umbracoUser.id) AS UserCount, umbracoUserGroup2App.app, umbracoUserGroup2App.userGroupId");
             }
             return sql;
         }
