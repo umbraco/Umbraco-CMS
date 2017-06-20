@@ -56,7 +56,8 @@ namespace Umbraco.Web.Editors
         {
         }
 
-        public UsersController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper, BackOfficeUserManager<BackOfficeIdentityUser> backOfficeUserManager) : base(umbracoContext, umbracoHelper, backOfficeUserManager)
+        public UsersController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper, BackOfficeUserManager<BackOfficeIdentityUser> backOfficeUserManager) 
+            : base(umbracoContext, umbracoHelper, backOfficeUserManager)
         {
         }
 
@@ -338,7 +339,7 @@ namespace Umbraco.Web.Editors
 
             //send the email
 
-            await SendEmailAsync(display, Security.CurrentUser.Name, user, userSave.Message);
+            await SendUserInviteEmailAsync(display, Security.CurrentUser.Name, user, userSave.Message);
 
             return display;
         }
@@ -360,7 +361,7 @@ namespace Umbraco.Web.Editors
             return attempt.Result;
         }
 
-        private async Task SendEmailAsync(UserDisplay userDisplay, string from, IUser to, string message)
+        private async Task SendUserInviteEmailAsync(UserBasic userDisplay, string from, IUser to, string message)
         {
             var token = await UserManager.GenerateEmailConfirmationTokenAsync((int)userDisplay.Id);
 

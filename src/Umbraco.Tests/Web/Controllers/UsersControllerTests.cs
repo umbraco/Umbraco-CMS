@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
@@ -45,7 +46,7 @@ namespace Umbraco.Tests.Web.Controllers
                 userServiceMock.Setup(service => service.GetUserGroupsByAlias(It.IsAny<string[]>()))
                     .Returns(new[] { Mock.Of<IUserGroup>(group => group.Id == 123 && group.Alias == "writers" && group.Name == "Writers") });
                 userServiceMock.Setup(service => service.GetUserById(It.IsAny<int>()))
-                    .Returns(new User(1234, "Test", "asdf@asdf.com", "test", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]));
+                    .Returns(new User(1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]));
 
                 //we need to manually apply automapper mappings with the mocked applicationcontext
                 InitializeMappers(helper.UmbracoContext.Application);
@@ -55,7 +56,7 @@ namespace Umbraco.Tests.Web.Controllers
 
             var userSave = new UserSave
             {
-                Id = -1,
+                Id = 1234,
                 Email = "test@test.com",
                 Username = "test@test.com",
                 Culture = "en",
@@ -76,62 +77,7 @@ namespace Umbraco.Tests.Web.Controllers
                 Assert.IsTrue(userGroupAliases.Contains(group));
             }
         }
-
-        [TestCase("PostInviteUser")]
-        [TestCase("PostCreateUser")]
-        public async void Invite_And_Create(string action)
-        {
-            var runner = new TestRunner((message, helper) =>
-            {
-                //setup some mocks
-                Umbraco.Core.Configuration.GlobalSettings.HasSmtpServer = true;
-
-                var userServiceMock = Mock.Get(helper.UmbracoContext.Application.Services.UserService);
-
-                userServiceMock.Setup(service => service.Save(It.IsAny<IUser>(), It.IsAny<bool>()))
-                    .Callback((IUser u, bool raiseEvents) =>
-                    {
-                        u.Id = 1234;
-                    });
-                userServiceMock.Setup(service => service.GetAllUserGroups(It.IsAny<int[]>()))
-                    .Returns(new[] { Mock.Of<IUserGroup>(group => group.Id == 123 && group.Alias == "writers" && group.Name == "Writers") });
-                userServiceMock.Setup(service => service.GetUserGroupsByAlias(It.IsAny<string[]>()))
-                    .Returns(new[] { Mock.Of<IUserGroup>(group => group.Id == 123 && group.Alias == "writers" && group.Name == "Writers") });
-
-                //we need to manually apply automapper mappings with the mocked applicationcontext
-                InitializeMappers(helper.UmbracoContext.Application);
-
-                var emailService = new Mock<IIdentityMessageService>();
-                emailService.Setup(service => service.SendAsync(It.IsAny<IdentityMessage>())).Returns(System.Threading.Tasks.Task.FromResult(0));
-                var backofficeUserMgr = new BackOfficeUserManager(Mock.Of<IUserStore<BackOfficeIdentityUser, int>>())
-                {
-                    EmailService = emailService.Object
-                };
-                return new UsersController(helper.UmbracoContext, helper, backofficeUserMgr);
-            });
-
-            var invite = new UserInvite
-            {
-                Id = -1,
-                Email = "test@test.com",
-                Message = "Hello test!",
-                Name = "Test",
-                UserGroups = new[] { "writers" }
-            };
-            var response = await runner.Execute("Users", action, HttpMethod.Post,
-                new ObjectContent<UserInvite>(invite, new JsonMediaTypeFormatter()));
-
-            var obj = JsonConvert.DeserializeObject<UserDisplay>(response.Item2);
-
-            Assert.AreEqual(invite.Name, obj.Name);
-            Assert.AreEqual(1234, obj.Id);
-            Assert.AreEqual(invite.Email, obj.Email);
-            var userGroupAliases = obj.UserGroups.Select(x => x.Alias).ToArray();
-            foreach (var group in invite.UserGroups)
-            {
-                Assert.IsTrue(userGroupAliases.Contains(group));
-            }
-        }
+        
 
         [Test]
         public async void GetPagedUsers_Empty()
