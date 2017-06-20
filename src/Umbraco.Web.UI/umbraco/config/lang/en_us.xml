@@ -727,7 +727,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="resetCodeExpired">The link you have clicked on is invalid or has expired</key>
     <key alias="resetPasswordEmailCopySubject">Umbraco: Reset Password</key>
     <key alias="resetPasswordEmailCopyFormat">
-      <![CDATA[<p>Your username to login to the Umbraco back-office is: <strong>%0%</strong></p><p>Click <a href="%1%"><strong>here</strong></a> to reset your password or copy/paste this URL into your browser:</p><p><em>%1%</em></p>]]>
+      <![CDATA[<html><body><p>Your username to login to the Umbraco back-office is: <strong>%0%</strong></p><p>Click <a href="%1%"><strong>here</strong></a> to reset your password or copy/paste this URL into your browser:</p><p><em>%1%</em></p></body></html>]]>
     </key>
   </area>
   <area alias="main">
@@ -1434,10 +1434,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="yourProfile" version="7.0">Your profile</key>
     <key alias="yourHistory" version="7.0">Your recent history</key>
     <key alias="sessionExpires" version="7.0">Session expires in</key>
-  </area>
-  <area alias="users">
-      <key alias="inviteUser">Invite user</key>
-      <key alias="createUser">Create user</key>
+    <key alias="inviteUser">Invite user</key>
+    <key alias="createUser">Create user</key>
+    <key alias="inviteEmailCopySubject">Umbraco: Invitation</key>
+    <key alias="inviteEmailCopyFormat">
+      <![CDATA[<html><body><p>Hi %0%, you have been invited by %1% to the Umbraco Back Office.</p><p>Message from %1%: <em>%2</em></p><p>Click this <a href="%3" target="_blank">link</a> to accept the invite</p><p><small>If you cannot click on the link, copy and paste this URL into your browser window<br/><br/>%3</small></p></body></html>]]>
+    </key>
   </area>
   <area alias="validation">
     <key alias="validation">Validation</key>

@@ -48,7 +48,7 @@
         //don't set this if no email is configured
         if (Umbraco.Sys.ServerVariables.umbracoSettings.emailServerConfigured) {
             vm.defaultButton = {
-                labelKey: "users_inviteUser",
+                labelKey: "user_inviteUser",
                 handler: function () {
                     vm.setUsersViewState('inviteUser');
                 }
@@ -57,7 +57,7 @@
 
         vm.subButtons = [
             {
-                labelKey: "users_createUser",
+                labelKey: "user_createUser",
                 handler: function () {
                     vm.setUsersViewState('createUser');
                 }

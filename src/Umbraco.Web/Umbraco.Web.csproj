@@ -391,7 +391,6 @@
     <Compile Include="Models\ContentEditing\UserBasic.cs" />
     <Compile Include="Models\ContentEditing\UserGroupBasic.cs" />
     <Compile Include="Models\ContentEditing\UserGroupDisplay.cs" />
-    <Compile Include="Models\ContentEditing\UserInviteEmail.cs" />
     <Compile Include="Models\DetachedPublishedContent.cs" />
     <Compile Include="Models\DetachedPublishedProperty.cs" />
     <Compile Include="Models\ContentEditing\UserInvite.cs" />

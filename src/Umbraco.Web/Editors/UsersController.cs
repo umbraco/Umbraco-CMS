@@ -338,7 +338,7 @@ namespace Umbraco.Web.Editors
 
             //send the email
 
-            await SendEmailAsync(display, Security.CurrentUser.Name, userSave.Message);
+            await SendEmailAsync(display, Security.CurrentUser.Name, user, userSave.Message);
 
             return display;
         }
@@ -351,7 +351,7 @@ namespace Umbraco.Web.Editors
             return attempt.Result;
         }
 
-        private async Task SendEmailAsync(UserDisplay userDisplay, string from, string message)
+        private async Task SendEmailAsync(UserDisplay userDisplay, string from, IUser to, string message)
         {
             var token = await UserManager.GenerateEmailConfirmationTokenAsync((int)userDisplay.Id);           
 
@@ -374,43 +374,21 @@ namespace Umbraco.Web.Editors
             var applicationUri = new Uri(ApplicationContext.UmbracoApplicationUrl);
             var inviteUri = new Uri(applicationUri, action);
 
-            var virtualPath = SystemDirectories.Umbraco.EnsureEndsWith("/") + "Views/UserInvite.cshtml";
-            var view = IOHelper.MapPath(virtualPath);
+            var emailSubject = Services.TextService.Localize("user/inviteEmailCopySubject",
+                //Ensure the culture of the found user is used for the email!
+                UserExtensions.GetUserCulture(to.Language, Services.TextService));
+            var emailBody = Services.TextService.Localize("user/inviteEmailCopyFormat",
+                //Ensure the culture of the found user is used for the email!
+                UserExtensions.GetUserCulture(to.Language, Services.TextService),
+                new[] {userDisplay.Name, from, message, inviteUri.ToString()});
 
-            //This should always exist but just in case, we'll check
-            if (System.IO.File.Exists(view) == false)
+            await UserManager.EmailService.SendAsync(new IdentityMessage
             {
-                await UserManager.EmailService.SendAsync(new IdentityMessage
-                {
-                    Body = string.Format("<html><body>You have been invited to the Umbraco Back Office!<br/><br/>{0}\n\nClick this link to accept the invite\n\n{1}", message, inviteUri.ToString()),
-                    Destination = userDisplay.Email,
-                    Subject = "You have been invited to the Umbraco Back Office"
-                });
-            }
-            else
-            {     
-                //Send an email based on a razor view template
-                var requestContext = new RequestContext(http, new RouteData());                
-                var userInviteEmail = new UserInviteEmail
-                {
-                    StartContentIds = userDisplay.StartContentIds,
-                    StartMediaIds = userDisplay.StartMediaIds,
-                    Email = userDisplay.Email,
-                    Name = userDisplay.Name,
-                    UserGroups = userDisplay.UserGroups,
-                    Message = message,
-                    InviteUrl = inviteUri.ToString(),
-                    FromName = from
-                };
-                var viewResult = requestContext.RenderViewToString(new ViewDataDictionary(), new TempDataDictionary(), virtualPath, userInviteEmail, false);
-                await UserManager.EmailService.SendAsync(new IdentityMessage
-                {
-                    Body = viewResult,
-                    Destination = userDisplay.Email,
-                    Subject = "You have been invited to the Umbraco Back Office"
-                });
-            }
-            
+                Body = emailBody,
+                Destination = userDisplay.Email,
+                Subject = emailSubject
+            });
+
         }
 
         /// <summary>
