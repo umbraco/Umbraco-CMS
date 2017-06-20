@@ -56,7 +56,7 @@
     <key alias="domainUpdated">Domena '%0%' została zaktualizowana</key>
     <key alias="domainHelp"><![CDATA[Poprawne domeny to: "example.com", "www.example.com", "example.com:8080" lub
         "https://www.example.com/". Wspierane są jednopoziomowe ścieżki domen, np. "example.com/en" jednakże powinno się ich unikać. 
-Preferowane jest użycie ustawień języka.]]></key>
+Preferowane jest użycie powyższych ustawień języka.]]></key>
     <key alias="orEdit">Edycja aktualnych domen</key>
     <key alias="inherit">Odziedziczona</key>
     <key alias="setLanguage">Język</key>
