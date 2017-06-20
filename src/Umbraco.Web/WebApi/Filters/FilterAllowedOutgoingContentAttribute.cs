@@ -8,6 +8,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -46,7 +47,7 @@ namespace Umbraco.Web.WebApi.Filters
 
         protected override int[] GetUserStartNodes(IUser user)
         {
-            return user.StartContentIds;
+            return user.GetCombinedStartContentIds().ToArray();
         }
 
         protected override int RecycleBinId

@@ -33,7 +33,15 @@ namespace Umbraco.Core.Models.Identity
         /// Gets/sets the user's real name
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Content start nodes assigned to the User (not ones assigned to the user's groups)
+        /// </summary>
         public int[] StartContentIds { get; set; }
+
+        /// <summary>
+        /// Media start nodes assigned to the User (not ones assigned to the user's groups)
+        /// </summary>
         public int[] StartMediaIds { get; set; }
         public string[] AllowedSections { get; set; }
         public string[] Groups { get; set; }

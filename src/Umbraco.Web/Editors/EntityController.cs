@@ -667,14 +667,14 @@ namespace Umbraco.Web.Editors
                     type = "media";
 
                     AddExamineSearchFrom(searchFrom, sb);
-                    AddExamineUserStartNode(Security.CurrentUser.StartMediaIds, sb);
+                    AddExamineUserStartNode(Security.CurrentUser.GetCombinedStartMediaIds().ToArray(), sb);
 
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
 
                     AddExamineSearchFrom(searchFrom, sb);
-                    AddExamineUserStartNode(Security.CurrentUser.StartContentIds, sb);
+                    AddExamineUserStartNode(Security.CurrentUser.GetCombinedStartContentIds().ToArray(), sb);
                     
                     break;
                 default:

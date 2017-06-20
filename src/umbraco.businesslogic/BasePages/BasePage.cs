@@ -16,6 +16,7 @@ using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 
 namespace umbraco.BasePages
@@ -294,8 +295,8 @@ namespace umbraco.BasePages
                 RealName = u.Name,
                 //currently we only have one user type!
                 Roles = u.GetGroups(),
-                StartContentNodes = u.UserEntity.StartContentIds,
-                StartMediaNodes = u.UserEntity.StartMediaIds,
+                StartContentNodes = u.UserEntity.GetCombinedStartContentIds().ToArray(),
+                StartMediaNodes = u.UserEntity.GetCombinedStartMediaIds().ToArray(),
                 Username = u.LoginName,
                 Culture = ui.Culture(u)
 
