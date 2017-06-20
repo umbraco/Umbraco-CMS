@@ -105,7 +105,7 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">Aby zmienić typ dokumentu dla wybranej treści, najpierw wybierz typ z listy typów obowiązujących dla tej lokalizacji.</key>
-    <key alias="changeDocTypeInstruction2">Następnie potwierdź i/lub zmień mapowanie właściwości z bieżącego typu do nowego i kliknij Zapisz.</key>
+    <key alias="changeDocTypeInstruction2">Następnie potwierdź i/lub zmień mapowanie właściwości z bieżącego typu do nowego i kliknij "Zapisz".</key>
     <key alias="contentRepublished">Treść została opublikowana ponownie.</key>
     <key alias="currentProperty">Bieżąca właściwość</key>
     <key alias="currentType">Bieżący typ</key>
@@ -116,9 +116,9 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="newTemplate">Nowy Szablon</key>
     <key alias="newType">Nowy typ</key>
     <key alias="none">Nic</key>
-    <key alias="selectedContent">Zawarto</key>
+    <key alias="selectedContent">Zawartość</key>
     <key alias="selectNewDocType">Wybierz Nowy Typ Dokumentu</key>
-    <key alias="successMessage">Typ dokumentu wybranej zawartoci został zmieniony z powodzeniem do [new type] i następujące właściwości zostały zmapowane:</key>
+    <key alias="successMessage">Typ dokumentu wybranej zawartości został zmieniony z powodzeniem do [new type] i następujące właściwości zostały zmapowane:</key>
     <key alias="to">do</key>
     <key alias="validationErrorPropertyWithMoreThanOneMapping">Nie można dokończyć mapowania właściwości, ponieważ jedna lub więcej właściwości mają zdefiniowane więcej niż jedno mapowanie.</key>
     <key alias="validDocTypesNote">Wyświetlane są tylko alternatywne typy obowiązujące dla obecnej lokalizacji.</key>
@@ -803,7 +803,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   </area>
   <area alias="packager">
     <key alias="chooseLocalPackageText"><!CDATA[
-      Wskaż pakiet z Twojego komputera, poprzez kliknięcie na przycisk 'Przeglądaj'<br /> 
+      Wskaż pakiet z Twojego komputera, poprzez kliknięcie na przycisk "Przeglądaj"<br /> 
       i wskaż gdzie jest zapisany. Pakiety Umbraco przeważnie posiadają rozszerzenie ".umb" lub ".zip".
       ]]></key>
     <key alias="packageAuthor">Autor</key>
@@ -822,7 +822,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="packageUninstalledHeader">Pakiet został odinstalowany</key>
     <key alias="packageUninstalledText">Pakiet został pomyślnie odinstalowany</key>
     <key alias="packageUninstallHeader">Odinstaluj pakiet</key>
-    <key alias="packageUninstallText"><![CDATA[Poniżej możesz odznaczyć elementy, których nie chcesz usunąć tym razem. Kiedy klikniesz 'potwierdź odinstalowanie', wszystkie zaznaczone elementy zostaną usunięte.<br/>
+    <key alias="packageUninstallText"><![CDATA[Poniżej możesz odznaczyć elementy, których nie chcesz usunąć tym razem. Kiedy klikniesz "potwierdź odinstalowanie", wszystkie zaznaczone elementy zostaną usunięte.<br/>
       <span style="color: Red; font-weight: bold;">Uwaga:</span> wszystkie elementy, media, itp. w zależności od elementów, które usuwasz, przestaną działać i mogą spowodować niestabilność systemu, 
       więc odinstalowuj z uwagą. W przypadku problemów skontaktuj się z autorem pakietu.]]></key>
     <key alias="packageUpgradeDownload">Pobierz aktualizację z repozytorium</key>
@@ -1385,7 +1385,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="changePassword">Zmień hasło!</key>
     <key alias="newPassword">Nowe hasło</key>
     <key alias="confirmNewPassword">Potwierdź nowe hasło</key>
-    <key alias="changePasswordDescription">Możesz zmienić swoje hasło w Umbraco Back Office przez wypełnienie formularza poniżej i kliknięcie przycisku 'Zmień hasło'</key>
+    <key alias="changePasswordDescription">Możesz zmienić swoje hasło w Umbraco Back Office przez wypełnienie formularza poniżej i kliknięcie przycisku "Zmień hasło"</key>
     <key alias="contentChannel">Kanał zawartości</key>
     <key alias="descriptionField">Opis</key>
     <key alias="disabled">Wyłącz użytkownika</key>
