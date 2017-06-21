@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersOverviewController($scope, $location) {
+    function UsersOverviewController($scope, $location, $timeout, navigationService) {
 
         var vm = this;
         var usersUri =  $location.search().subview;
@@ -24,6 +24,10 @@
         ];
 
         function init() {
+
+            $timeout(function () {
+                navigationService.syncTree({ tree: "users", path: "-1" });
+            });
 
         }
  
