@@ -747,7 +747,7 @@
   <area alias="imagecropper">
     <key alias="reset">Сбросить</key>
     <key alias="defineCrop">Задать рамку</key>
-    <key alias="defineCropDescr">Задайте рамке имя (алиас), а также ширину и высоту по-умолчанию</key>
+    <key alias="defineCropDescription">Задайте рамке имя (алиас), а также ширину и высоту по-умолчанию</key>
     <key alias="saveCrop">Сохранить рамку</key>
     <key alias="addCrop">Добавить новую рамку</key>
   </area>
@@ -992,7 +992,7 @@
     <key alias="uploadPackage">Загрузить пакет</key>
     <key alias="localPackageDescr">Установите локальный пакет из файла, расположенного на Вашем компьютере. Остерегайтесь устанавливать пакеты из непроверенных источников!</key>
     <key alias="uploadAnother">Загрузить еще один пакет</key>
-    <key alias="cancelAndAnother">Отменить и загрузить другой пакет</key>
+    <key alias="cancelAndUploadAnother">Отменить и загрузить другой пакет</key>
     <key alias="packageLicense">Лицензия</key>
     <key alias="accept">Я принимаю</key>
     <key alias="termsOfUse">условия использования</key>
@@ -1000,11 +1000,11 @@
     <key alias="installFinish">Завершить</key>
     <key alias="installedPackages">Установленные пакеты</key>
     <key alias="noPackages">Ни одного пакета еще не установлено</key>
-    <key alias="noPackagesDescr"><![CDATA[Вы пока еще не устанавливали ни одного пакета. Вы можете установить как локальный пакет, выбрав файл на Вашем компьютере, так и пакет из репозитория, нажав на значок <strong>'Packages'</strong> наверху справа]]></key>
+    <key alias="noPackagesDescription"><![CDATA[Вы пока еще не устанавливали ни одного пакета. Вы можете установить как локальный пакет, выбрав файл на Вашем компьютере, так и пакет из репозитория, нажав на значок <strong>'Packages'</strong> наверху справа]]></key>
     <key alias="packageSearch">Поиск по пакетам</key>
     <key alias="packageSearchResults">Результаты поиска по</key>
     <key alias="packageNoResults">Ничего не найдено по запросу</key>
-    <key alias="packageNoResultsDescr">Пожалуйста, повторите поиск, уточнив запрос, или воспользуйтесь просмотром по категориям</key>
+    <key alias="packageNoResultsDescription">Пожалуйста, повторите поиск, уточнив запрос, или воспользуйтесь просмотром по категориям</key>
     <key alias="packagesPopular">Популярные</key>
     <key alias="packagesNew">Недавно созданные</key>
     <key alias="packageHas">имеет на счету</key>
@@ -1013,13 +1013,13 @@
     <key alias="packageOwner">Владелец</key>
     <key alias="packageContrib">Соавторы</key>
     <key alias="packageCreated">Создан</key>
-    <key alias="packageCurrVersion">Текущая версия</key>
+    <key alias="packageCurrentVersion">Текущая версия</key>
     <key alias="packageNetVersion">Версия .NET</key>
     <key alias="packageDownloads">Загрузок</key>
     <key alias="packageLikes">Нравится</key>
     <key alias="packageCompatibility">Совместимость</key>
-    <key alias="packageCompatDescr">Этот пакет совместим со следующими версиями Umbraco, по сообщениям участников сообщества. Полная совместимость не гарантируется для версий со значением ниже 100%</key>
-    <key alias="packageExtSources">Внешние источники</key>
+    <key alias="packageCompatibilityDescription">Этот пакет совместим со следующими версиями Umbraco, по сообщениям участников сообщества. Полная совместимость не гарантируется для версий со значением ниже 100%</key>
+    <key alias="packageExternalSources">Внешние источники</key>
     <key alias="packageAuthor">Автор</key>
     <key alias="packageDemonstration">Демонстрация</key>
     <key alias="packageDocumentation">Документация (описание)</key>
@@ -1598,12 +1598,12 @@
     <key alias="enterCustomValidation">...или указать свои правила валидации</key>
     <key alias="fieldIsMandatory">Обязательно к заполнению</key>
     <key alias="validationRegExp">Задайте регулярное выражение</key>
-    <key alias="valMinCount">Необходимо выбрать как минимум</key>
-    <key alias="valMaxCount">Возможно выбрать максимум</key>
-    <key alias="valItems">элементов</key>
-    <key alias="valItemsSel">элементов</key>
-    <key alias="valInvalidDate">Неверный формат даты</key>
-    <key alias="valInvalidNumber">Не является числом</key>
-    <key alias="valInvalidEmail">неверный формат email-адреса</key>
+    <key alias="minCount">Необходимо выбрать как минимум</key>
+    <key alias="maxCount">Возможно выбрать максимум</key>
+    <key alias="items">элементов</key>
+    <key alias="itemsSelected">элементов</key>
+    <key alias="invalidDate">Неверный формат даты</key>
+    <key alias="invalidNumber">Не является числом</key>
+    <key alias="invalidEmail">неверный формат email-адреса</key>
   </area>
 </language>

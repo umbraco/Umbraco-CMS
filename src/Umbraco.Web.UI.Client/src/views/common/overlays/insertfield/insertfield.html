@@ -29,7 +29,7 @@
 
             <div class="control-group umb-control-group -no-border" ng-hide="!vm.showAltField">
                 <div class="umb-el-wrap">
-                    <label class="control-label" for="altField"><localize key="templateEditor_alternativeField">Fallback field</loclize></label>
+                    <label class="control-label" for="altField"><localize key="templateEditor_fallbackField">Fallback field</localize></label>
                     <div class="controls">
                         <select ng-model="vm.altField" >
                             <optgroup localize="label" label="@templateEditor_customFields">
@@ -53,7 +53,7 @@
 
             <div class="control-group umb-control-group -no-border" ng-hide="!vm.showAltText">
                 <div class="umb-el-wrap">
-                    <label class="control-label" for="altText"><localize key="templateEditor_alternativeText">Default value</localize></label>
+                    <label class="control-label" for="altText"><localize key="templateEditor_defaultValue">Default value</localize></label>
                     <div class="controls">
                         <input type="text" name="altText" ng-model="vm.altText" umb-auto-focus>
                     </div>
@@ -163,7 +163,7 @@
                         </label>
                     </div>
                     <input type="checkbox" name="linebreaks" ng-model="vm.convertLinebreaks">
-                    <localize key="templateEditor_convertLineBreaks">Yes, convert line breaks</localize>
+                    <localize key="templateEditor_convertLineBreaksDescription">Yes, convert line breaks</localize>
                 </div>
             </div>
         </div>
@@ -179,7 +179,7 @@
                         </label>
                     </div>
                     <input type="checkbox" name="paragraph" ng-model="vm.removeParagraphTags">
-                    <localize key="templateEditor_removeParagraph">Yes, remove paragraph tags</localize>
+                    <localize key="templateEditor_removeParagraphDescription">Yes, remove paragraph tags</localize>
                 </div>
             </div>
         </div>
