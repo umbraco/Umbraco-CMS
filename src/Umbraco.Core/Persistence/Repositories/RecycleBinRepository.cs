@@ -42,6 +42,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Construct and execute delete statements for all trashed items by 'nodeObjectType'
             var deletes = new List<string>
             {
+                FormatDeleteStatement("cmsTask", "nodeId"),
                 FormatDeleteStatement("umbracoUser2NodeNotify", "nodeId"),
                 FormatDeleteStatement("umbracoUser2NodePermission", "nodeId"),
                 @"DELETE FROM umbracoAccessRule WHERE umbracoAccessRule.accessId IN (

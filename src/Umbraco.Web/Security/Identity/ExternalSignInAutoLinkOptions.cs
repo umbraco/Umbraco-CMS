@@ -10,7 +10,7 @@ namespace Umbraco.Web.Security.Identity
     /// <summary>
     /// Options used to configure auto-linking external OAuth providers
     /// </summary>
-    public sealed class ExternalSignInAutoLinkOptions
+    public class ExternalSignInAutoLinkOptions
     {
         public ExternalSignInAutoLinkOptions(
             bool autoLinkExternalAccount = false,
