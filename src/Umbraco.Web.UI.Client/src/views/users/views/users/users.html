@@ -159,16 +159,16 @@
     </umb-empty-state>
 
     <!-- Layout: Cards -->
-    <div class="umb-users" ng-if="vm.activeLayout.path === '1' && vm.loading === false">
-      <div class="umb-user" ng-repeat="user in vm.users" ng-click="vm.selectUser(user, vm.selection)">
-        <div class="umb-user__content" ng-class="{'umb-user__content--selected': user.selected}">
-          <umb-badge class="umb-user__badge"
+    <div class="umb-user-cards" ng-if="vm.activeLayout.path === '1' && vm.loading === false">
+      <a href="" class="umb-user-card" ng-repeat="user in vm.users" ng-click="vm.clickUser(user)">
+        <div class="umb-user-card__content" ng-class="{'umb-user-card__content--selected': user.selected}">
+          <umb-badge class="umb-user-card__badge"
                      size="xs"
                      ng-if="user.userDisplayState.alias !== 'active'"
                      color="{{user.userDisplayState.color}}">
             {{ user.userDisplayState.name }}
           </umb-badge>
-          <div class="umb-user__avatar">
+          <div class="umb-user-card__avatar">
             <umb-avatar size="l"
                         color="secondary"
                         name="{{user.name}}"
@@ -176,12 +176,14 @@
                         img-srcset="{{user.avatars[3]}} 2x, {{user.avatars[4]}} 3x">
             </umb-avatar>
           </div>
-          <div class="umb-user__checkmark" ng-if="user.selected"><umb-checkmark checked="user.selected" size="s"></umb-checkmark></div>
-          <a class="umb-user__name" href="" ng-click="vm.goToUser(user)">{{user.name}}</a>
-          <div class="umb-user__group">
+          <div class="umb-user-card__checkmark" ng-class="{'umb-user-card__checkmark--visible': user.selected || vm.selection.length > 0 }" ng-click="vm.selectUser(user, vm.selection, $event)">
+            <umb-checkmark checked="user.selected" size="s"></umb-checkmark>
+          </div>
+          <div class="umb-user-card__name" href="">{{user.name}}</div>
+          <div class="umb-user-card__group">
             <span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span>
           </div>
-          <div class="umb-user__last-login">
+          <div class="umb-user-card__last-login">
             <div ng-if="user.formattedLastLogin">
               <div>Last login on</div>
               {{ user.formattedLastLogin }}
@@ -192,7 +194,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </a>
     </div>
 
     <!-- Layout: Table -->
@@ -201,7 +203,7 @@
       <table class="table">
         <thead>
           <tr>
-            <th style="padding-left: 20px; width: 10px;">
+            <th style="padding-left: 10px; width: 10px;">
               <a href="" style="text-decoration: none;" ng-click="vm.selectAll()"><umb-checkmark checked="vm.areAllSelected()" size="xs"></umb-checkmark></a>
             </th>
             <th style="width: 70px;"></th>
@@ -212,13 +214,17 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="user in vm.users" ng-click="vm.selectUser(user, vm.selection)" style="cursor: pointer;">
-            <td style="padding-left: 20px;">
-              <umb-checkmark checked="user.selected"
-                             size="xs">
+          <tr ng-repeat="user in vm.users" ng-click="vm.clickUser(user)" style="cursor: pointer;" ng-mouseenter="user.hover = true" ng-mouseleave="user.hover = false">
+            <td style="padding-left: 10px;">
+              <div ng-click="vm.selectUser(user, vm.selection, $event)">
+              <umb-checkmark
+                ng-if="vm.selection.length > 0 || user.hover"
+                checked="user.selected"
+                size="xs">
               </umb-checkmark>
+              </div>
             </td>
-            <td scope="row" style="padding-left: 20px;">
+            <td scope="row">
               <umb-avatar size="xs"
                           color="secondary"
                           name="{{user.name}}"
@@ -226,7 +232,7 @@
                           img-srcset="{{user.avatars[1]}} 2x, {{user.avatars[2]}} 3x">
               </umb-avatar>
             </td>
-            <td class="bold"><a href="" ng-click="vm.goToUser(user)">{{user.name}}</a></td>
+            <td class="bold">{{user.name}}</td>
             <td><span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span></td>
             <td>{{ user.formattedLastLogin }}</td>
             <td style="text-transform: capitalize;">

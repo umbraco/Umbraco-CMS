@@ -68,7 +68,7 @@
         vm.selectLayout = selectLayout;
         vm.selectUser = selectUser;
         vm.clearSelection = clearSelection;
-        vm.goToUser = goToUser;
+        vm.clickUser = clickUser;
         vm.disableUsers = disableUsers;
         vm.enableUsers = enableUsers;
         vm.openUserGroupPicker = openUserGroupPicker;
@@ -118,7 +118,8 @@
             vm.activeLayout = selectedLayout;
         }
 
-        function selectUser(user, selection) {
+        function selectUser(user, selection, event) {
+            
             if (user.selected) {
                 var index = selection.indexOf(user.id);
                 selection.splice(index, 1);
@@ -127,7 +128,13 @@
                 user.selected = true;
                 vm.selection.push(user.id);
             }
+            
             setBulkActions(vm.users);
+
+            if(event){
+                event.preventDefault();
+                event.stopPropagation();
+            }
         }
 
         function clearSelection() {
@@ -137,8 +144,12 @@
             vm.selection = [];
         }
 
-        function goToUser(user) {
-            $location.path('users/users/user/' + user.id);
+        function clickUser(user) {
+            if(vm.selection.length > 0) {
+                selectUser(user, vm.selection);
+            } else {
+                $location.path('users/users/user/' + user.id);
+            }
         }
 
         function disableUsers() {
