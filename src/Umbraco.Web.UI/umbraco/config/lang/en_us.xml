@@ -820,7 +820,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="dropHere">Drop to upload</key>
     <key alias="orClickHereToUpload">or click here to choose package file</key>
     <key alias="uploadPackage">Upload package</key>
-    <key alias="localPackageDescr">Install a local package by selecting it from your machine. Only install packages from sources you know and trust</key>
+    <key alias="localPackageDescription">Install a local package by selecting it from your machine. Only install packages from sources you know and trust</key>
     <key alias="uploadAnother">Upload another package</key>
     <key alias="cancelAndUploadAnother">Cancel and upload another package</key>
     <key alias="packageLicense">License</key>
