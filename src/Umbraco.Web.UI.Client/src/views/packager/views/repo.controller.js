@@ -209,7 +209,7 @@
                             packageResource.checkRestart(pack).then(function (d) {
                                 count++;
                                 //if there is an id it means it's not restarted yet but we'll limit it to only check 10 times
-                                if (d.restartId && count < 10) {
+                                if (d.isRestarting && count < 10) {
                                   checkRestart();
                                 }
                                 else {
