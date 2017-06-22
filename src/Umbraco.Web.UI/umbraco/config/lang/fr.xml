@@ -387,8 +387,8 @@
     <key alias="allPropTypes">Tous les types de propriétés &amp; les données de propriétés</key>
     <key alias="willBeDeleted">utilisant ce type de données seront supprimés définitivement, veuillez confirmer que vous voulez également les supprimer</key>
     <key alias="yesDelete">Oui, supprimer</key>
-    <key alias="andAllRelated">et tous les types de propriétés &amp; et les données de propriété utilisant ce type de donnés</key>
-    <key alias="selectFolder">Sélectionnez le répertoire vers lequel déplacer</key>
+    <key alias="andAllRelated">et tous les types de propriétés &amp; les données de propriétés utilisant ce type de données</key>
+    <key alias="selectFolder">Sélectionnez le répertoire où déplacer</key>
     <key alias="inTheTree">dans l'arborescence ci-dessous</key>
     <key alias="wasMoved">a été déplacé sous</key>
   </area>
@@ -587,8 +587,8 @@
     <key alias="moveLineUp">Déplacer les lignes vers le haut</key>
     <key alias="moveLineDown">Déplacer les lignes vers le bas</key>
     
-    <key alias="generalHeader">General</key>
-    <key alias="editorHeader">Editor</key>
+    <key alias="generalHeader">Général</key>
+    <key alias="editorHeader">Editeur</key>
   </area>
 
   <area alias="graphicheadline">
@@ -1114,7 +1114,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="insertDesc">Choisissez l'élément à insérer dans votre modèle</key>
     
     <key alias="insertDictionaryItem">Elément de dictionnaire</key>
-    <key alias="insertDictionaryItemDesc">Un éléménet de dictionnaire est un espace pour un morceau de texte traduisible, ce qui facilite la création de designs pour des sites web multilangues.</key>
+    <key alias="insertDictionaryItemDesc">Un élément de dictionnaire est un espace pour un morceau de texte traduisible, ce qui facilite la création de designs pour des sites web multilangues.</key>
     
     <key alias="insertMacro">Macro</key>
     <key alias="insertMacroDesc">
@@ -1149,8 +1149,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="defineSectionDesc">
       <![CDATA[
          Définit une partie de votre modèle en tant que section nommée en l'entourant
-         de <code>@section { ... }</code>. Celle-ci peut être affiché dans une région
-          spécifique du parent de ce modèle, en utilisant<code>@RenderSection</code>.
+         de <code>@section { ... }</code>. Celle-ci peut être affichée dans une région
+          spécifique du parent de ce modèle, en utilisant <code>@RenderSection</code>.
       ]]>
     </key>
 
@@ -1186,7 +1186,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="before">avant</key>
     <key alias="beforeIncDate">avant (incluant la date sélectionnée)</key>
     <key alias="after">après</key>
-    <key alias="afterIncDate">après (ncluant la date sélectionnée)</key>
+    <key alias="afterIncDate">après (incluant la date sélectionnée)</key>
     <key alias="equals">égal</key>
     <key alias="doesNotEqual">n'est pas égal</key>
     <key alias="contains">contient</key>
@@ -1345,7 +1345,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="preContent">Insérer avant le champ</key>
     <key alias="recursive">Récursif</key>
     <key alias="recursiveDescr">Oui, rendre récursif</key>
-    <key alias="removeParagraph">Supprimer les balises de paragraphes</key>
+    <key alias="removeParagraph">Supprimer les balises de paragraphe</key>
     <key alias="removeParagraphDescription">Oui, supprimer les balises de paragraphe</key>
     <key alias="removeParagraphHelp">Supprimera toute balise &amp;lt;P&amp;gt; au début et à la fin du texte</key>
     <key alias="separator">Séparateur</key>
