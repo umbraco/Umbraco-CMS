@@ -384,7 +384,7 @@
     <key alias="rteRelatedStylesheets">CSS associées</key>
     <key alias="rteShowLabel">Afficher le libellé</key>
     <key alias="rteWidthAndHeight">Largeur et hauteur</key>
-    <key alias="allPropTypes">Tous les types de propriété &amp; les données de propriétés</key>
+    <key alias="allPropTypes">Tous les types de propriétés &amp; les données de propriétés</key>
     <key alias="willBeDeleted">utilisant ce type de données seront supprimés définitivement, veuillez confirmer que vous voulez également les supprimer</key>
     <key alias="yesDelete">Oui, supprimer</key>
     <key alias="andAllRelated">et tous les types de propriétés &amp; et les données de propriété utilisant ce type de donnés</key>
