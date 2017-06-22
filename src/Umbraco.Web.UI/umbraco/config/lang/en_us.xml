@@ -482,8 +482,10 @@
     <key alias="next">Next</key>
     <key alias="no">No</key>
     <key alias="of">of</key>
+    <key alias="off">Off</key>
     <key alias="ok">OK</key>
     <key alias="open">Open</key>
+    <key alias="on">On</key>
     <key alias="or">or</key>
     <key alias="password">Password</key>
     <key alias="path">Path</key>
