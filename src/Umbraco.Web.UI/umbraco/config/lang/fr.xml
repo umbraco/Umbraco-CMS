@@ -28,8 +28,8 @@
     <key alias="refreshNode">Rafraîchir</key>
     <key alias="republish">Republier le site tout entier</key>
     <key alias="restore" version="7.3.0">Récupérer</key>
-    <key alias="SetPermissionsForThePage">Spécifier les permissions pour la page %0%</key>
-    <key alias="chooseWhereToMove">Choisir où déplacer</key>
+    <key alias="SetPermissionsForThePage">Spécifiezles permissions pour la page %0%</key>
+    <key alias="chooseWhereToMove">Choisissez où déplacer</key>
     <key alias="toInTheTreeStructureBelow">dans l'arborescence ci-dessous</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Version antérieure</key>
