@@ -3,6 +3,35 @@
 	align-items: center;
 }
 
+.umb-toggle__handler {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background-color: @white;
+    border-radius: 50px;
+    transform: rotate(-45deg);
+}
+
+.umb-toggle__toggle {
+    cursor: pointer;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+    background: @gray-8;
+    border-radius: 90px;
+    position: relative;
+}
+
+.umb-toggle--checked .umb-toggle__toggle {
+    background-color: @green;
+}
+
+.umb-toggle--checked .umb-toggle__handler {
+    transform: translate3d(24px, 0, 0) rotate(0);
+}
+
+/* Labels */
+
 .umb-toggle__label {
     font-size: 12px;
     color: @gray-2;
@@ -16,29 +45,21 @@
     margin-left: 8px;
 }
 
-.umb-toggle__handler {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    background-color: @white;
-    border-radius: 50px;
-    transform: rotate(-45deg);
+/* Icons */
+
+.umb-toggle__icon {
+    position: absolute;
+    top: 3px;
+    text-decoration: none;
+    transition: all 0.2s ease;
 }
 
-.umb-toggle__toggle {
-    cursor: pointer;
-    display: inline-block;
-    width: 40px;
-    height: 20px;
-    background: @gray-8;
-    border-radius: 90px;
-    transition: background-color 0.2s ease;
+.umb-toggle__icon--left {
+    left: 7px;
+    color: @white;
 }
 
-.umb-toggle--checked .umb-toggle__toggle {
-    background-color: @green;
-}
-
-.umb-toggle--checked .umb-toggle__handler {
-    transform: translate3d(21px, 0, 0) rotate(0);
+.umb-toggle__icon--right {
+    right: 7px;
+    color: @gray-5;
 }

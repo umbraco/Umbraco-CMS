@@ -13,10 +13,17 @@
 
         <umb-toggle
             checked="vm.checked"
+            on-click="vm.toggle()">
+        </umb-toggle>
+
+        <umb-toggle
+            checked="vm.checked"
             on-click="vm.toggle()"
+            show-labels="true"
             label-on="Start"
             label-off="Stop"
-            label-position="right">
+            label-position="right"
+            hide-icons="true">
         </umb-toggle>
 
     </div>
@@ -46,9 +53,11 @@
 
 @param {boolean} checked Set to <code>true</code> or <code>false</code> to toggle the switch.
 @param {callback} onClick The function which should be called when the toggle is clicked.
+@param {string=} showLabels Set to <code>true</code> or <code>false</code> to show a "On" or "Off" label next to the switch.
 @param {string=} labelOn Set a custom label for when the switched is turned on. It will default to "On".
 @param {string=} labelOff Set a custom label for when the switched is turned off. It will default to "Off".
 @param {string=} labelPosition Sets the label position to the left or right of the switch. It will default to "left" ("left", "right").
+@param {string=} hideIcons Set to <code>true</code> or <code>false</code> to hide the icons on the switch.
 
 **/
 
@@ -107,7 +116,9 @@
                 onClick: "&",
                 labelOn: "@?",
                 labelOff: "@?",
-                labelPosition: "@?"
+                labelPosition: "@?",
+                showLabels: "@?",
+                hideIcons: "@?"
             },
             link: link
         };
