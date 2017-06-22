@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
@@ -22,10 +23,28 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Returns all of the user's assigned start node ids based on ids assigned directly to the BackOfficeIdentityUser object and it's groups
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<int> GetCombinedStartContentIds(this BackOfficeIdentityUser user)
+        {
+            return user.StartContentIds.Concat(user.Groups.Select(x => x.StartContentId)).Distinct();
+        }
+
+        /// <summary>
         /// Returns all of the user's assigned start node ids based on ids assigned directly to the IUser object and it's groups
         /// </summary>
         /// <returns></returns>
         public static IEnumerable<int> GetCombinedStartMediaIds(this IUser user)
+        {
+            return user.StartMediaIds.Concat(user.Groups.Select(x => x.StartMediaId)).Distinct();
+        }
+
+        /// <summary>
+        /// Returns all of the user's assigned start node ids based on ids assigned directly to the BackOfficeIdentityUser object and it's groups
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<int> GetCombinedStartMediaIds(this BackOfficeIdentityUser user)
         {
             return user.StartMediaIds.Concat(user.Groups.Select(x => x.StartMediaId)).Distinct();
         }

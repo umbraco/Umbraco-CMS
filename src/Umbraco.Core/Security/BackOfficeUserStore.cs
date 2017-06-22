@@ -399,12 +399,16 @@ namespace Umbraco.Core.Security
                 throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
             }
 
-            var foundUser = _userService.GetUserById(asInt.Result);
-            var foundGroup = _userService.GetUserGroupByAlias(roleName);
+            var foundUser = _userService.GetUserById(asInt.Result);            
 
-            if (foundUser != null && foundGroup != null)
+            if (foundUser != null)
             {
-                foundUser.AddGroup(foundGroup.ToReadOnlyGroup());
+                var foundGroup = _userService.GetUserGroupByAlias(roleName);
+
+                if (foundGroup != null)
+                {
+                    foundUser.AddGroup(foundGroup.ToReadOnlyGroup());
+                }
             }
 
             return Task.FromResult(0);
@@ -428,12 +432,16 @@ namespace Umbraco.Core.Security
                 throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
             }
 
-            var foundUser = _userService.GetUserById(asInt.Result);
-            var foundGroup = _userService.GetUserGroupByAlias(roleName);
+            var foundUser = _userService.GetUserById(asInt.Result);            
 
-            if (foundUser != null && foundGroup != null)
+            if (foundUser != null)
             {
-                foundUser.RemoveGroup(foundGroup.Alias);
+                var foundGroup = _userService.GetUserGroupByAlias(roleName);
+
+                if (foundGroup != null)
+                {
+                    foundUser.RemoveGroup(foundGroup.Alias);
+                }
             }
 
             return Task.FromResult(0);
@@ -448,7 +456,7 @@ namespace Umbraco.Core.Security
         {            
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
-            return Task.FromResult((IList<string>)user.Groups.ToList());
+            return Task.FromResult((IList<string>)user.Groups.Select(x => x.Alias).ToList());
         }
 
         /// <summary>
@@ -460,7 +468,7 @@ namespace Umbraco.Core.Security
         {            
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
-            return Task.FromResult(user.Groups.InvariantContains(roleName));
+            return Task.FromResult(user.Groups.Select(x => x.Alias).InvariantContains(roleName));
         }
 
         /// <summary>
@@ -691,21 +699,21 @@ namespace Umbraco.Core.Security
                 user.SecurityStamp = identityUser.SecurityStamp;
             }
 
-            var userGroups = user.Groups.Select(x => x.Alias).ToArray();
+            var userGroupAliases = user.Groups.Select(x => x.Alias).ToArray();
+            var identityUserGroupAliases = identityUser.Groups.Select(x => x.Alias).ToArray();
 
-            if (userGroups.ContainsAll(identityUser.Groups) == false
-                || identityUser.Groups.ContainsAll(userGroups) == false)
+            if (userGroupAliases.ContainsAll(identityUserGroupAliases) == false
+                || identityUserGroupAliases.ContainsAll(userGroupAliases) == false)
             {
                 anythingChanged = true;
 
                 //clear out the current groups (need to ToArray since we are modifying the iterator)
                 user.ClearGroups();
                 
-                //get all of the ones found by alias and add them
-                var foundGroups = _userService.GetUserGroupsByAlias(identityUser.Groups);
-                foreach (var group in foundGroups)
+                //use all of the ones assigned and add them
+                foreach (var group in identityUser.Groups)
                 {
-                    user.AddGroup(group.ToReadOnlyGroup());
+                    user.AddGroup(group);
                 }
             }
 

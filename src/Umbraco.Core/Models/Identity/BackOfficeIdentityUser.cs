@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Models.Identity
@@ -16,7 +17,7 @@ namespace Umbraco.Core.Models.Identity
         {
             StartMediaIds = new int[] { };
             StartContentIds = new int[] { };
-            Groups = new string[] { };
+            Groups = new IReadOnlyUserGroup[] { };
             AllowedSections = new string[] { };
             Culture = Configuration.GlobalSettings.DefaultUILanguage;
         }
@@ -44,7 +45,7 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public int[] StartMediaIds { get; set; }
         public string[] AllowedSections { get; set; }
-        public string[] Groups { get; set; }
+        public IReadOnlyUserGroup[] Groups { get; set; }
         public string Culture { get; set; }
 
         /// <summary>

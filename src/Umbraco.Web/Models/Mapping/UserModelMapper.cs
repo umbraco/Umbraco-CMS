@@ -28,6 +28,7 @@ namespace Umbraco.Web.Models.Mapping
                 .IgnoreAllUnmapped()
                 .ForMember(user => user.Alias, expression => expression.MapFrom(save => save.Alias))
                 .ForMember(user => user.Name, expression => expression.MapFrom(save => save.Name))
+                .ForMember(user => user.Icon, expression => expression.MapFrom(save => save.Icon))
                 .ForMember(user => user.StartMediaId, expression => expression.MapFrom(save => save.StartMediaId))
                 .ForMember(user => user.StartContentId, expression => expression.MapFrom(save => save.StartContentId))
                 .AfterMap((save, userGroup) =>

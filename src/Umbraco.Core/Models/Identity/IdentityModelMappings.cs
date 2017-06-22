@@ -25,7 +25,7 @@ namespace Umbraco.Core.Models.Identity
                 .ForMember(user => user.StartMediaIds, expression => expression.MapFrom(user => user.StartMediaIds))
                 .ForMember(user => user.StartContentIds, expression => expression.MapFrom(user => user.StartContentIds))
                 .ForMember(user => user.AccessFailedCount, expression => expression.MapFrom(user => user.FailedPasswordAttempts))
-                .ForMember(user => user.Groups, expression => expression.MapFrom(user => user.Groups.Select(x => x.Alias).ToArray()))
+                .ForMember(user => user.Groups, expression => expression.MapFrom(user => user.Groups.ToArray()))
                 .ForMember(user => user.AllowedSections, expression => expression.MapFrom(user => user.AllowedSections.ToArray()));
 
             config.CreateMap<BackOfficeIdentityUser, UserData>()
@@ -34,8 +34,10 @@ namespace Umbraco.Core.Models.Identity
                 .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections))
                 .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups))
                 .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
-                .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.StartContentIds))
-                .ForMember(detail => detail.StartMediaNodes, opt => opt.MapFrom(user => user.StartMediaIds))
+                //When mapping to UserData which is used in the authcookie we want ALL start nodes including ones defined on the groups
+                .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.GetCombinedStartContentIds()))
+                //When mapping to UserData which is used in the authcookie we want ALL start nodes including ones defined on the groups
+                .ForMember(detail => detail.StartMediaNodes, opt => opt.MapFrom(user => user.GetCombinedStartMediaIds()))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.UserName))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.Culture))
                 .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));
