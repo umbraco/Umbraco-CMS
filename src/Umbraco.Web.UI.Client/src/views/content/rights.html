@@ -61,15 +61,16 @@
 
                     <h5>{{ group.groupName }}</h5>
 
-                    <div class="umb-permission flex justify-between" ng-repeat="permission in group.permissions">
-                        <div>
-                            <div>{{ permission.name }} </div>
-                            <div style="font-size: 13px; color: #817f85;">{{ permission.description }}</div>
-                        </div>
+                    <div class="umb-permission" ng-repeat="permission in group.permissions">
                         <umb-toggle
+                            class="umb-permission__toggle"
                             checked="permission.checked"
                             on-click="vm.togglePermission(permission)">
                         </umb-toggle>
+                        <div>
+                            <div>{{ permission.name }} </div>
+                            <div class="umb-permission__description">{{ permission.description }}</div>
+                        </div>
                     </div>
 
                 </div>

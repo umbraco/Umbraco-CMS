@@ -25,7 +25,7 @@
                                 <div class="test-group-title">Something</div>
                                 <div class="test-group-content block-form">
 
-                                    <umb-control-group label="Sections" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
+                                    <umb-control-group style="margin-bottom: 20px;" label="Sections" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
                                         <umb-node-preview
                                             style="max-width: 100%;"
                                             ng-repeat="section in vm.userGroup.sections"
@@ -44,7 +44,7 @@
                                         </a>
                                     </umb-control-group>
 
-                                    <umb-control-group label="Content start node" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
+                                    <umb-control-group style="margin-bottom: 20px;" label="Content start node" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
                                         <umb-node-preview
                                             ng-if="vm.userGroup.startContentId.id"
                                             style="max-width: 100%;"
@@ -97,14 +97,15 @@
 
                                     <div class="test-group-content">
                                         <div class="umb-permission" ng-repeat="permission in group.permissions">
-                                            <div>
-                                                <div>{{ permission.name }} </div>
-                                                <div style="font-size: 13px; color: #817f85;">{{ permission.description }}</div>
-                                            </div>
                                             <umb-toggle
+                                                class="umb-permission__toggle"
                                                 checked="permission.checked"
                                                 on-click="vm.togglePermission(permission)">
                                             </umb-toggle>
+                                            <div>
+                                                <div>{{ permission.name }}</div>
+                                                <div class="umb-permission__description">{{ permission.description }}</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
