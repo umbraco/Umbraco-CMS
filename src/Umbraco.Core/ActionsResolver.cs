@@ -25,10 +25,10 @@ namespace Umbraco.Core
 
 		}
 
-		/// <summary>
-		/// Gets the <see cref="IPackageAction"/> implementations.
-		/// </summary>
-		public IEnumerable<IAction> Actions
+        /// <summary>
+        /// Gets the <see cref="IAction"/> implementations.
+        /// </summary>
+        public IEnumerable<IAction> Actions
 		{
 			get
 			{
