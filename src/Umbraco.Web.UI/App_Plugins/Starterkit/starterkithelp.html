@@ -1,0 +1,24 @@
+﻿<div class="umb-control-group" ng-controller="Umbraco.Starterkit.HelpController as vm">
+   
+    <div ng-hide="vm.currentLesson"> 
+        <h5>Learn Umbraco</h5>
+        <ul class="unstyled list-icons" >
+            <li ng-repeat="lesson in vm.lessons">
+                <i class="icon icon-help-alt"></i>
+                <a href title="{{lesson.name}}" ng-click="vm.loadLesson(lesson)">
+                    {{lesson.name}}
+                </a>
+                <small class="umb-detail">5 minute lesson</small>
+            </li>
+        </ul>
+    </div>
+
+    <div ng-if="vm.currentLesson">
+        <div class="help-markdown" ng-bind-html="vm.currentStep.content"></div>
+
+        <div class="help-markdown-navigation">
+            <button class="btn" prevent-default ng-if="vm.currentStepIndex > 0" ng-click="vm.loadStep(vm.currentStepIndex-1)">Previous</button>
+            <button class="btn btn-primary right" prevent-default ng-if="vm.currentStepIndex < vm.steps.length-1" ng-click="vm.loadStep(vm.currentStepIndex+1)">Next</button>
+        </div>
+     </div>
+</div>
