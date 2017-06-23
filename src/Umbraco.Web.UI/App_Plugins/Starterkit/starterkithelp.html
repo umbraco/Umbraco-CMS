@@ -19,6 +19,7 @@
         <div class="help-markdown-navigation">
             <button class="btn" prevent-default ng-if="vm.currentStepIndex > 0" ng-click="vm.loadStep(vm.currentStepIndex-1)">Previous</button>
             <button class="btn btn-primary right" prevent-default ng-if="vm.currentStepIndex < vm.steps.length-1" ng-click="vm.loadStep(vm.currentStepIndex+1)">Next</button>
+            <button class="btn" prevent-default ng-click="vm.exitLesson()">Back to overview</button>
         </div>
      </div>
 </div>
