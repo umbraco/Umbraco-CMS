@@ -28,8 +28,6 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public async Task<IEnumerable<Lesson>> GetLessons(string path, string baseUrl = "https://our.umbraco.org")
         {
-            baseUrl = "http://localhost:24292";
-
             //We need the umbraco context to fetch the currrent user and version
             var context = UmbracoContext;
 
@@ -86,9 +84,7 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public async Task< IEnumerable<LessonStep> > GetLessonSteps(string path, string baseUrl = "https://our.umbraco.org")
         {
-           // baseUrl = "http://localhost:24292";
             var url = string.Format(baseUrl + "/Umbraco/Documentation/Lessons/GetStepsForPath?path={0}", path);
-
             using (var web = new HttpClient())
             {
                 //fetch dashboard json and parse to JObject
