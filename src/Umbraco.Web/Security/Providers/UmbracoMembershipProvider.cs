@@ -410,7 +410,6 @@ namespace Umbraco.Web.Security.Providers
             //if (answer == null && RequiresQuestionAndAnswer)
             //{
             //    UpdateFailureCount(username, "passwordAnswer");
-
             //    throw new ProviderException("Password answer required for password reset.");
             //}
             

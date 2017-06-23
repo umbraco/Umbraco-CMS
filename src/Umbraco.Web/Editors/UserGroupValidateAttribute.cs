@@ -36,7 +36,7 @@ namespace Umbraco.Web.Editors
             var userGroupSave = (UserGroupSave)actionContext.ActionArguments["userGroupSave"];
 
             userGroupSave.Name = userGroupSave.Name.CleanForXss('[', ']', '(', ')', ':');
-            userGroupSave.Alias = userGroupSave.Name.CleanForXss('[', ']', '(', ')', ':');
+            userGroupSave.Alias = userGroupSave.Alias.CleanForXss('[', ']', '(', ')', ':');
             
             //Validate the usergroup exists or create one if required
             IUserGroup persisted;

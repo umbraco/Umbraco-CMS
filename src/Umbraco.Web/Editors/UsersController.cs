@@ -35,6 +35,7 @@ namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
     [UmbracoApplicationAuthorize(Constants.Applications.Users)]
+    [PrefixlessBodyModelValidator]
     public class UsersController : UmbracoAuthorizedJsonController
     {
         /// <summary>
@@ -239,7 +240,7 @@ namespace Umbraco.Web.Editors
             var existing = Services.UserService.GetByEmail(userSave.Email);
             if (existing != null)
             {
-                ModelState.AddModelError("email", "A user with the email already exists");
+                ModelState.AddModelError("Email", "A user with the email already exists");
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
@@ -284,7 +285,7 @@ namespace Umbraco.Web.Editors
             if (userSave == null) throw new ArgumentNullException("userSave");
 
             if (userSave.Message.IsNullOrWhiteSpace())
-                ModelState.AddModelError("message", "Message cannot be empty");
+                ModelState.AddModelError("Message", "Message cannot be empty");
 
             if (ModelState.IsValid == false)
             {
@@ -429,21 +430,24 @@ namespace Umbraco.Web.Editors
                 ModelState.AddModelError("Email", "A user with the email already exists");
                 hasErrors = true;
             }
-            existing = Services.UserService.GetByUsername(userSave.Name);
+            existing = Services.UserService.GetByUsername(userSave.Username);
             if (existing != null && existing.Id != userSave.Id)
             {
-                ModelState.AddModelError("Email", "A user with the email already exists");
+                ModelState.AddModelError("Username", "A user with the username already exists");
                 hasErrors = true;
             }
 
             var resetPasswordValue = string.Empty;
             if (userSave.ChangePassword != null)
             {
-                var passwordChangeResult = PasswordChangeControllerHelper.PostChangePassword(Security.CurrentUser, userSave.ChangePassword, ModelState, Members);
+                var passwordChangeResult = PasswordChangeControllerHelper.ChangePassword(found, userSave.ChangePassword, ModelState, Members);
                 if (passwordChangeResult.Success)
                 {
                     //depending on how the provider is configured, the password may be reset so let's store that for later
                     resetPasswordValue = passwordChangeResult.Result.ResetPassword;
+
+                    //need to re-get the user 
+                    found = Services.UserService.GetUserById(intId.Result);
                 }
                 else
                 {

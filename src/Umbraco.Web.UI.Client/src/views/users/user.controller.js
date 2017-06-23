@@ -26,6 +26,7 @@
         vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB"
         vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
         vm.toggleChangePassword = toggleChangePassword;
+        vm.emailIsUsername = true;
 
         //create the initial model for change password
         vm.changePasswordModel = {
@@ -43,6 +44,8 @@
                 makeBreadcrumbs(vm.user);
                 setUserDisplayState();
 
+                vm.emailIsUsername = user.email === user.username;
+
                 //go get the config for the membership provider and add it to the model
                 authResource.getMembershipProviderConfig().then(function (data) {
                   vm.changePasswordModel.config = data;
@@ -51,9 +54,7 @@
                   vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
 
                   vm.changePasswordModel.config.disableToggle = true;
-                  // disable reset password functionality beacuse it does not make sense inside the backoffice
-                  vm.changePasswordModel.config.enableReset = false;
-
+                  
                   vm.loading = false;
                 });
                 
@@ -69,6 +70,7 @@
         function save() {
 
             vm.page.saveButtonState = "busy";
+            vm.user.resetPasswordValue = null;
 
             contentEditingHelper.contentEditorPerformSave({
                 statusMessage: localizeSaving,
@@ -84,8 +86,12 @@
 
                 vm.user = saved;
                 setUserDisplayState();
+
                 vm.changePasswordModel.isChanging = false;
                 vm.page.saveButtonState = "success";
+
+                //the user has a password if they are not states: Invited, NoCredentials
+                vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
 
             }, function (err) {
 

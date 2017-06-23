@@ -38,7 +38,7 @@ namespace Umbraco.Web.Editors
         /// </returns>
         public ModelWithNotifications<string> PostChangePassword(ChangingPasswordModel data)
         {
-            var passwordChangeResult = PasswordChangeControllerHelper.PostChangePassword(Security.CurrentUser, data, ModelState, Members);
+            var passwordChangeResult = PasswordChangeControllerHelper.ChangePassword(Security.CurrentUser, data, ModelState, Members);
             
             if (passwordChangeResult.Success)
             {

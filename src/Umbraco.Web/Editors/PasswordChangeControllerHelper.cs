@@ -11,7 +11,7 @@ namespace Umbraco.Web.Editors
     internal class PasswordChangeControllerHelper
     {
         
-        public static Attempt<PasswordChangedModel> PostChangePassword(
+        public static Attempt<PasswordChangedModel> ChangePassword(
             IUser currentUser,
             ChangingPasswordModel data, 
             ModelStateDictionary modelState, 
