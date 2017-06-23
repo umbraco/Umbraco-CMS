@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
@@ -21,6 +22,9 @@ namespace Umbraco.Core.Models.Identity
             AllowedSections = new string[] { };
             Culture = Configuration.GlobalSettings.DefaultUILanguage;
         }
+
+        private int[] _allStartContentIds;
+        private int[] _allStartMediaIds;
 
         public virtual async Task<ClaimsIdentity> GenerateUserIdentityAsync(BackOfficeUserManager<BackOfficeIdentityUser> manager)
         {
@@ -111,6 +115,22 @@ namespace Umbraco.Core.Models.Identity
         {
             if (callback == null) throw new ArgumentNullException("callback");
             _getLogins = callback;
+        }
+
+        /// <summary>
+        /// Returns all start node Ids assigned to the user based on both the explicit start node ids assigned to the user and any start node Ids assigned to it's user groups
+        /// </summary>
+        public int[] AllStartContentIds
+        {
+            get { return _allStartContentIds ?? (_allStartContentIds = StartContentIds.Concat(Groups.Where(x => x.StartContentId.HasValue).Select(x => x.StartContentId.Value)).Distinct().ToArray()); }
+        }
+
+        /// <summary>
+        /// Returns all start node Ids assigned to the user based on both the explicit start node ids assigned to the user and any start node Ids assigned to it's user groups
+        /// </summary>
+        public int[] AllStartMediaIds
+        {
+            get { return _allStartMediaIds ?? (_allStartMediaIds = StartMediaIds.Concat(Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId.Value)).Distinct().ToArray()); }
         }
     }
 }

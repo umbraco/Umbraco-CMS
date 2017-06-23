@@ -10,8 +10,8 @@ namespace Umbraco.Core.Models.Membership
         string Name { get; }
         string Icon { get; }
         int Id { get; }
-        int StartContentId { get; }
-        int StartMediaId { get; }
+        int? StartContentId { get; }
+        int? StartMediaId { get; }
 
         /// <summary>
         /// The alias

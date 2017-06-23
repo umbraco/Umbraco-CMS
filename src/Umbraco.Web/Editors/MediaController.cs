@@ -887,12 +887,12 @@ namespace Umbraco.Web.Editors
             var hasPathAccess = (nodeId == Constants.System.Root)
                 ? UserExtensions.HasPathAccess(
                     Constants.System.Root.ToInvariantString(),
-                    user.GetCombinedStartMediaIds().ToArray(),
+                    user.AllStartMediaIds,
                     Constants.System.RecycleBinMedia)
                 : (nodeId == Constants.System.RecycleBinMedia)
                     ? UserExtensions.HasPathAccess(
                         Constants.System.RecycleBinMedia.ToInvariantString(),
-                        user.GetCombinedStartMediaIds().ToArray(),
+                        user.AllStartMediaIds,
                         Constants.System.RecycleBinMedia)
                     : user.HasPathAccess(media);
 

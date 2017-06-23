@@ -117,6 +117,8 @@ namespace Umbraco.Core.Models.Membership
         private DateTime _lastLockoutDate;
 
         private bool _defaultToLiveEditing;
+        private int[] _allStartContentIds;
+        private int[] _allStartMediaIds;
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
@@ -295,6 +297,24 @@ namespace Umbraco.Core.Models.Membership
         {
             get { return _avatar; }
             set { SetPropertyValueAndDetectChanges(value, ref _avatar, Ps.Value.AvatarSelector); }
+        }
+
+        /// <summary>
+        /// Returns all start node Ids assigned to the user based on both the explicit start node ids assigned to the user and any start node Ids assigned to it's user groups
+        /// </summary>
+        [IgnoreDataMember]
+        public int[] AllStartContentIds
+        {
+            get { return _allStartContentIds ?? (_allStartContentIds = StartContentIds.Concat(Groups.Where(x => x.StartContentId.HasValue).Select(x => x.StartContentId.Value)).Distinct().ToArray()); }
+        }
+
+        /// <summary>
+        /// Returns all start node Ids assigned to the user based on both the explicit start node ids assigned to the user and any start node Ids assigned to it's user groups
+        /// </summary>
+        [IgnoreDataMember]
+        public int[] AllStartMediaIds
+        {
+            get { return _allStartMediaIds ?? (_allStartMediaIds = StartMediaIds.Concat(Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId.Value)).Distinct().ToArray()); }
         }
 
         /// <summary>

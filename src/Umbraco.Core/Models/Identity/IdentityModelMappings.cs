@@ -35,9 +35,9 @@ namespace Umbraco.Core.Models.Identity
                 .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups))
                 .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
                 //When mapping to UserData which is used in the authcookie we want ALL start nodes including ones defined on the groups
-                .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.GetCombinedStartContentIds()))
+                .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.AllStartContentIds))
                 //When mapping to UserData which is used in the authcookie we want ALL start nodes including ones defined on the groups
-                .ForMember(detail => detail.StartMediaNodes, opt => opt.MapFrom(user => user.GetCombinedStartMediaIds()))
+                .ForMember(detail => detail.StartMediaNodes, opt => opt.MapFrom(user => user.AllStartMediaIds))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.UserName))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.Culture))
                 .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));

@@ -64,7 +64,7 @@ namespace Umbraco.Web.Trees
         private int[] _userStartNodes;
         protected override int[] UserStartNodes
         {
-            get { return _userStartNodes ?? (_userStartNodes = Security.CurrentUser.GetCombinedStartContentIds().ToArray()); }
+            get { return _userStartNodes ?? (_userStartNodes = Security.CurrentUser.AllStartContentIds); }
         }
         
         /// <summary>

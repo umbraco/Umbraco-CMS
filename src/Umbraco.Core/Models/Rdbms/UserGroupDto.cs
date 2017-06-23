@@ -51,11 +51,11 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("startContentId")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public int StartContentId { get; set; }
+        public int? StartContentId { get; set; }
 
         [Column("startMediaId")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public int StartMediaId { get; set; }
+        public int? StartMediaId { get; set; }
 
         [ResultColumn]
         public List<UserGroup2AppDto> UserGroup2AppDtos { get; set; }

@@ -7,8 +7,8 @@ namespace Umbraco.Core.Models.Membership
     {
         string Alias { get; set; }
 
-        int StartContentId { get; set; }
-        int StartMediaId { get; set; }
+        int? StartContentId { get; set; }
+        int? StartMediaId { get; set; }
 
         /// <summary>
         /// The icon

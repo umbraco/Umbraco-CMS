@@ -46,5 +46,15 @@ namespace Umbraco.Core.Models.Membership
         /// Will hold the media file system relative path of the users custom avatar if they uploaded one
         /// </summary>
         string Avatar { get; set; }
+
+        /// <summary>
+        /// Returns all start node Ids assigned to the user based on both the explicit start node ids assigned to the user and any start node Ids assigned to it's user groups
+        /// </summary>
+        int[] AllStartContentIds { get; }
+
+        /// <summary>
+        /// Returns all start node Ids assigned to the user based on both the explicit start node ids assigned to the user and any start node Ids assigned to it's user groups
+        /// </summary>
+        int[] AllStartMediaIds { get; }
     }
 }

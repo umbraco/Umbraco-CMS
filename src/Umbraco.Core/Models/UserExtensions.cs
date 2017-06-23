@@ -14,42 +14,6 @@ namespace Umbraco.Core.Models
     public static class UserExtensions
     {
         /// <summary>
-        /// Returns all of the user's assigned start node ids based on ids assigned directly to the IUser object and it's groups
-        /// </summary>
-        /// <returns></returns>
-        public static IEnumerable<int> GetCombinedStartContentIds(this IUser user)
-        {
-            return user.StartContentIds.Concat(user.Groups.Select(x => x.StartContentId)).Distinct();
-        }
-
-        /// <summary>
-        /// Returns all of the user's assigned start node ids based on ids assigned directly to the BackOfficeIdentityUser object and it's groups
-        /// </summary>
-        /// <returns></returns>
-        public static IEnumerable<int> GetCombinedStartContentIds(this BackOfficeIdentityUser user)
-        {
-            return user.StartContentIds.Concat(user.Groups.Select(x => x.StartContentId)).Distinct();
-        }
-
-        /// <summary>
-        /// Returns all of the user's assigned start node ids based on ids assigned directly to the IUser object and it's groups
-        /// </summary>
-        /// <returns></returns>
-        public static IEnumerable<int> GetCombinedStartMediaIds(this IUser user)
-        {
-            return user.StartMediaIds.Concat(user.Groups.Select(x => x.StartMediaId)).Distinct();
-        }
-
-        /// <summary>
-        /// Returns all of the user's assigned start node ids based on ids assigned directly to the BackOfficeIdentityUser object and it's groups
-        /// </summary>
-        /// <returns></returns>
-        public static IEnumerable<int> GetCombinedStartMediaIds(this BackOfficeIdentityUser user)
-        {
-            return user.StartMediaIds.Concat(user.Groups.Select(x => x.StartMediaId)).Distinct();
-        }
-
-        /// <summary>
         /// Tries to lookup the user's gravatar to see if the endpoint can be reached, if so it returns the valid URL
         /// </summary>
         /// <param name="user"></param>
@@ -153,7 +117,7 @@ namespace Umbraco.Core.Models
         {
             if (user == null) throw new ArgumentNullException("user");
             if (content == null) throw new ArgumentNullException("content");
-            return HasPathAccess(content.Path, user.GetCombinedStartContentIds().ToArray(), Constants.System.RecycleBinContent);
+            return HasPathAccess(content.Path, user.AllStartContentIds, Constants.System.RecycleBinContent);
         }
         
         internal static bool HasPathAccess(string path, int[] startNodeIds, int recycleBinId)
@@ -197,7 +161,7 @@ namespace Umbraco.Core.Models
         {
             if (user == null) throw new ArgumentNullException("user");
             if (media == null) throw new ArgumentNullException("media");
-            return HasPathAccess(media.Path, user.GetCombinedStartMediaIds().ToArray(), Constants.System.RecycleBinMedia);
+            return HasPathAccess(media.Path, user.AllStartMediaIds, Constants.System.RecycleBinMedia);
         }
         
         /// <summary>

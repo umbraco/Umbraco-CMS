@@ -47,7 +47,7 @@ namespace Umbraco.Web.WebApi.Filters
 
         protected override int[] GetUserStartNodes(IUser user)
         {
-            return user.GetCombinedStartContentIds().ToArray();
+            return user.AllStartContentIds;
         }
 
         protected override int RecycleBinId
