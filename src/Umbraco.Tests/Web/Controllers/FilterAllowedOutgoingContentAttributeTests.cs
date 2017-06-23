@@ -83,7 +83,7 @@ namespace Umbraco.Tests.Web.Controllers
 
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.StartContentIds).Returns(new []{ 5 });
+            userMock.Setup(u => u.AllStartContentIds).Returns(new []{ 5 });
             var user = userMock.Object;
             
             att.FilterBasedOnStartNode(list, user);

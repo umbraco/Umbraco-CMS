@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.StartMediaIds).Returns(new int[0]);
+            userMock.Setup(u => u.AllStartMediaIds).Returns(new int[0]);
             var user = userMock.Object;
             var mediaMock = new Mock<IMedia>();
             mediaMock.Setup(m => m.Path).Returns("-1,1234,5678");
@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.StartMediaIds).Returns(new int[0]);
+            userMock.Setup(u => u.AllStartMediaIds).Returns(new int[0]);
             var user = userMock.Object;
             var mediaMock = new Mock<IMedia>();
             mediaMock.Setup(m => m.Path).Returns("-1,1234,5678");
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.StartMediaIds).Returns(new[]{ 9876 });
+            userMock.Setup(u => u.AllStartMediaIds).Returns(new[]{ 9876 });
             var user = userMock.Object;
             var mediaMock = new Mock<IMedia>();
             mediaMock.Setup(m => m.Path).Returns("-1,1234,5678");
@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.StartMediaIds).Returns(new int[]{});
+            userMock.Setup(u => u.AllStartMediaIds).Returns(new int[]{});
             var user = userMock.Object;
             
             //act
@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.StartMediaIds).Returns(new[]{ 1234 });
+            userMock.Setup(u => u.AllStartMediaIds).Returns(new[]{ 1234 });
             var user = userMock.Object;
 
             //act
@@ -113,7 +113,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.StartMediaIds).Returns(new int[]{});
+            userMock.Setup(u => u.AllStartMediaIds).Returns(new int[]{});
             var user = userMock.Object;
 
             //act
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.StartMediaIds).Returns(new[]{ 1234 });
+            userMock.Setup(u => u.AllStartMediaIds).Returns(new[]{ 1234 });
             var user = userMock.Object;
 
             //act

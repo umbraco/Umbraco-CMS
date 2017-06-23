@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Models
         public void Determines_Path_Based_Access_To_Content(int userId, string contentPath, bool outcome)
         {
             var userMock = new Mock<IUser>();
-            userMock.Setup(u => u.StartContentIds).Returns(new[]{ userId });
+            userMock.Setup(u => u.AllStartContentIds).Returns(new[]{ userId });
             var user = userMock.Object;
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns(contentPath);
