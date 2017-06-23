@@ -97,8 +97,10 @@
           ng-submit="changePassword()"
           novalidate
           val-form-manager>
-
-          <umb-editor model="changePasswordModel"></umb-editor>
+         
+         <change-password password-values="changePasswordModel.value"
+                          config="changePasswordModel.config">
+         </change-password>
 
            <umb-button
                type="button"

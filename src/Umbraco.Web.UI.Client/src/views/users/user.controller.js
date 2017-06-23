@@ -1,13 +1,15 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, $timeout, $location, $routeParams, usersResource, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper) {
+    function UserEditController($scope, $timeout, $location, $routeParams, usersResource, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
 
         vm.page = {};
-        vm.user = {};
+        vm.user = {
+          changePassword: null
+        };
         vm.breadcrumbs = [];
         vm.avatarFile = {};
 
@@ -23,6 +25,13 @@
         vm.save = save;
         vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB"
         vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
+        vm.toggleChangePassword = toggleChangePassword;
+
+        //create the initial model for change password
+        vm.changePasswordModel = {
+          config: {},
+          isChanging: false
+        };
 
         function init() {
 
@@ -36,6 +45,22 @@
                 vm.loading = false;
             });
 
+            //go get the config for the membership provider and add it to the model
+            authResource.getMembershipProviderConfig().then(function (data) {
+              vm.changePasswordModel.config = data;
+              //ensure the hasPassword config option is set to true (the user of course has a password already assigned)
+              //this will ensure the oldPassword is shown so they can change it
+              // disable reset password functionality beacuse it does not make sense inside the backoffice
+              vm.changePasswordModel.config.hasPassword = true;
+              vm.changePasswordModel.config.disableToggle = true;
+              vm.changePasswordModel.config.enableReset = false;
+            });
+        }
+
+        function toggleChangePassword() {
+          vm.changePasswordModel.isChanging = !vm.changePasswordModel.isChanging;
+          //reset it
+          vm.user.changePassword = null;
         }
 
         function save() {
@@ -56,6 +81,7 @@
 
                 vm.user = saved;
                 setUserDisplayState();
+                vm.changePasswordModel.isChanging = false;
                 vm.page.saveButtonState = "success";
 
             }, function (err) {

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +6,7 @@ using System.Web.Http;
 using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
@@ -39,28 +38,15 @@ namespace Umbraco.Web.Editors
         /// </returns>
         public ModelWithNotifications<string> PostChangePassword(ChangingPasswordModel data)
         {
-            var userProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
-
-            //TODO: WE need to support this! - requires UI updates, etc...
-            if (userProvider.RequiresQuestionAndAnswer)
-            {
-                throw new NotSupportedException("Currently the user editor does not support providers that have RequiresQuestionAndAnswer specified");
-            }
-
-            var passwordChangeResult = Members.ChangePassword(Security.CurrentUser.Username, data, userProvider);
+            var passwordChangeResult = PasswordChangeControllerHelper.PostChangePassword(Security.CurrentUser, data, ModelState, Members);
+            
             if (passwordChangeResult.Success)
             {
                 //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
                 var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);
-                result.AddSuccessNotification(ui.Text("user", "password"), ui.Text("user", "passwordChanged"));
+                result.AddSuccessNotification(Services.TextService.Localize("user/password"), Services.TextService.Localize("user/passwordChanged"));
                 return result;
             }
-
-            //it wasn't successful, so add the change error to the model state, we've name the property alias _umb_password on the form
-            // so that is why it is being used here.
-            ModelState.AddPropertyError(
-                passwordChangeResult.Result.ChangeError,
-                string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
 
             throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
         }

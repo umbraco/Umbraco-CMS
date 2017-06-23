@@ -33,8 +33,6 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Web.Editors
 {
-
-
     [PluginController("UmbracoApi")]
     [UmbracoApplicationAuthorize(Constants.Applications.Users)]
     public class UsersController : UmbracoAuthorizedJsonController
@@ -438,10 +436,23 @@ namespace Umbraco.Web.Editors
                 hasErrors = true;
             }
 
+            var resetPasswordValue = string.Empty;
+            if (userSave.ChangePassword != null)
+            {
+                var passwordChangeResult = PasswordChangeControllerHelper.PostChangePassword(Security.CurrentUser, userSave.ChangePassword, ModelState, Members);
+                if (passwordChangeResult.Success)
+                {
+                    //depending on how the provider is configured, the password may be reset so let's store that for later
+                    resetPasswordValue = passwordChangeResult.Result.ResetPassword;
+                }
+                else
+                {
+                    hasErrors = true;
+                }
+            }
+
             if (hasErrors)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
-
-            //TODO: More validation, password changing logic, persisting
 
             //merge the save data onto the user
             var user = Mapper.Map(userSave, found);
@@ -449,6 +460,10 @@ namespace Umbraco.Web.Editors
             Services.UserService.Save(user);
 
             var display = Mapper.Map<UserDisplay>(user);
+
+            //re-map the password reset value (if any)
+            if (resetPasswordValue.IsNullOrWhiteSpace() == false)
+                display.ResetPasswordValue = resetPasswordValue;
 
             display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserSaved"));
             return display;

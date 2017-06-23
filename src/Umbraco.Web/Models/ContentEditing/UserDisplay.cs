@@ -35,10 +35,10 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "startMediaIds")]
         public IEnumerable<EntityBasic> StartMediaIds { get; set; }
 
-        ///// <summary>
-        ///// A list of sections the user is allowed to view based on their current groups assigned
-        ///// </summary>
-        //[DataMember(Name = "allowedSections")]
-        //public IEnumerable<string> AllowedSections { get; set; }        
+        /// <summary>
+        /// If the password is reset on save, this value will be populated
+        /// </summary>
+        [DataMember(Name = "resetPasswordValue")]
+        public string ResetPasswordValue { get; set; }
     }
 }

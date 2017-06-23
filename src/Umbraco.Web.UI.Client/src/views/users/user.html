@@ -24,13 +24,23 @@
                             <div class="test-group">
                                 <div class="test-group-title">Meta</div>
                                 <div class="test-group-content block-form">
-                                    <umb-control-group label="Email" description="Orci varius natoque penatibus et magnis dis parturient montes">
+                                    
+                                  <umb-control-group label="Email" description="Orci varius natoque penatibus et magnis dis parturient montes">
                                         <input type="text"
                                             localize="placeholder" 
                                             placeholder="@placeholders_entername" 
                                             class="input-block-level" 
                                             ng-model="vm.user.email"
                                             umb-auto-focus />
+                                    </umb-control-group>
+                                  
+                                    <umb-control-group label="Username" description="Orci varius natoque penatibus et magnis dis parturient montes" ng-if="vm.user.email !== vm.user.username">
+                                      <input type="text"
+                                             localize="placeholder" 
+                                             placeholder="@placeholders_entername" 
+                                             class="input-block-level" 
+                                             ng-model="vm.user.username"
+                                             umb-auto-focus />
                                     </umb-control-group>
 
                                     <umb-control-group label="Language" description="Orci varius natoque penatibus et magnis dis parturient montes">
@@ -39,6 +49,42 @@
                                         </select>
                                     </umb-control-group>
                                 </div>
+                            </div>
+                          
+                            <div class="test-group">
+                              <div class="test-group-title">Password</div>
+                              <div class="test-group-content block-form">
+                                    
+                                <umb-button
+                                  type="button"
+                                  action="vm.toggleChangePassword()"
+                                  label="Change password"
+                                  label-key="general_changePassword"
+                                  state="changePasswordButtonState"                                  
+                                  ng-if="vm.changePasswordModel.isChanging === false">
+                                </umb-button>
+
+                                <ng-form
+                                  ng-if="vm.changePasswordModel.isChanging"
+                                  name="passwordForm"
+                                  class="block-form"                                  
+                                  val-form-manager>
+         
+                                  <change-password password-values="vm.user.changePassword"
+                                                   config="vm.changePasswordModel.config">
+                                  </change-password>
+
+                                  <umb-button
+                                    type="button"
+                                    action="vm.toggleChangePassword()"
+                                    label="Cancel"
+                                    label-key="general_cancel"
+                                    button-style="cancel">
+                                  </umb-button>
+
+                                </ng-form>
+                                
+                              </div>
                             </div>
 
                             <div class="test-group">

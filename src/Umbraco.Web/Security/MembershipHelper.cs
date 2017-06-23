@@ -719,7 +719,7 @@ namespace Umbraco.Web.Security
             if (passwordModel.OldPassword.IsNullOrWhiteSpace() && membershipProvider.EnablePasswordRetrieval == false)
             {
                 //if password retrieval is not enabled but there is no old password we cannot continue
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "value" }) });
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "oldPassword" }) });
             }
 
             if (passwordModel.OldPassword.IsNullOrWhiteSpace() == false)
@@ -730,7 +730,7 @@ namespace Umbraco.Web.Security
                 {
                     var result = membershipProvider.ChangePassword(username, passwordModel.OldPassword, passwordModel.NewPassword);
                     return result == false
-                        ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "value" }) })
+                        ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "oldPassword" }) })
                         : Attempt.Succeed(new PasswordChangedModel());
                 }
                 catch (Exception ex)
@@ -743,7 +743,7 @@ namespace Umbraco.Web.Security
             if (membershipProvider.EnablePasswordRetrieval == false)
             {
                 //we cannot continue if we cannot get the current password
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "value" }) });
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "oldPassword" }) });
             }
             if (membershipProvider.RequiresQuestionAndAnswer && passwordModel.Answer.IsNullOrWhiteSpace())
             {

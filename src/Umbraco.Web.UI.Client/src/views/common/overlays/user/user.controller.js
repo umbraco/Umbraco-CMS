@@ -112,10 +112,8 @@ angular.module("umbraco")
 
         /* ---------- UPDATE PASSWORD ---------- */
 
-        //create the initial model for change password property editor
+        //create the initial model for change password
         $scope.changePasswordModel = {
-           alias: "_umb_password",
-           view: "changepassword",
            config: {},
            value: {}
         };

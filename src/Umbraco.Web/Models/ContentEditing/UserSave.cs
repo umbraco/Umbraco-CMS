@@ -15,7 +15,8 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "user", Namespace = "")]
     public class UserSave : EntityBasic, IValidatableObject
     {
-        //TODO: There will be more information to save along with the structure for changing passwords
+        [DataMember(Name = "changePassword", IsRequired = true)]
+        public ChangingPasswordModel ChangePassword { get; set; }
 
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
