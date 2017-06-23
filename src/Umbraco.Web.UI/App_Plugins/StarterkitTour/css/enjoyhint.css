@@ -1,0 +1,301 @@
+﻿/*
+    Enjoyhint - Custom Umbraco Styling
+    https://github.com/xbsoftware/enjoyhint
+*/
+
+
+.enjoyhint{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top:0;
+    left: 0;
+    z-index: 1010;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+
+.enjoyhint_hide{
+    display: none;
+}
+
+.enjoyhint_disable_events{
+    position:absolute;
+    width: 2000px;
+    height: 1500px;
+    z-index: 1011;
+    /*display: none;*/
+    pointer-events: all;
+}
+
+.enjoyhint_next_btn{
+    position:absolute;
+    z-index: 1012;
+    /*display: none;*/
+    pointer-events: all;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    width: 100px;
+    height: 40px;
+    cursor: pointer;
+    margin: 0 auto;
+    font: normal normal normal 17px/40px Helvetica, sans-serif;
+
+    text-align: center;
+
+    
+    color: #fff;
+    background-color: #35c786;
+    background-image: linear-gradient(to bottom,#35c786,#35c786);
+    background-repeat: repeat-x;
+    border-color: #35c786 #35c786 #258b5d;
+    border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
+}
+
+.enjoyhint_next_btn:active{
+    outline: 0;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.enjoyhint_skip_btn{
+    position:absolute;
+    position: absolute;
+    z-index: 1012;
+    /*display: none;*/
+    pointer-events: all;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    width: 100px;
+    height: 40px;
+    cursor: pointer;
+    margin: 0 auto;
+    border: 2px solid rgb(30,205,151);
+    /*-webkit-border-radius: 40px;
+    border-radius: 40px;*/
+    font: normal normal normal 17px/40px Helvetica, sans-serif;
+    color: rgb(30, 205, 151);
+    text-align: center;
+    -o-text-overflow: clip;
+    text-overflow: clip;
+    letter-spacing: 1px;
+    background: rgba(0,0,0,0);
+    -webkit-transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0), width 0.3s cubic-bezier(0, 0, 0, 0), border-width 0.3s cubic-bezier(0, 0, 0, 0), border-color 0.3s cubic-bezier(0, 0, 0, 0);
+    -moz-transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0), width 0.3s cubic-bezier(0, 0, 0, 0), border-width 0.3s cubic-bezier(0, 0, 0, 0), border-color 0.3s cubic-bezier(0, 0, 0, 0);
+    -o-transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0), width 0.3s cubic-bezier(0, 0, 0, 0), border-width 0.3s cubic-bezier(0, 0, 0, 0), border-color 0.3s cubic-bezier(0, 0, 0, 0);
+    transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0), width 0.3s cubic-bezier(0, 0, 0, 0), border-width 0.3s cubic-bezier(0, 0, 0, 0), border-color 0.3s cubic-bezier(0, 0, 0, 0);
+}
+
+.enjoyhint_skip_btn:hover{
+    color: rgba(255,255,255,1);
+    background: rgb(30, 205, 151);
+}
+
+.enjoyhint_skip_btn:active{
+    border: 2px solid rgba(33,224,163,1);
+    background: rgba(33,224,163,1);
+    -webkit-transition: none;
+    -moz-transition: none;
+    -o-transition: none;
+    transition: none;
+}
+
+.enjoyhint_close_btn {
+    display: inline-block;
+    position: absolute;
+    z-index: 1012;
+    pointer-events: all;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    width: .3em;
+    height: .3em;
+    border: none;
+    -webkit-border-radius: 1em;
+    border-radius: 1em;
+    font: 400 8em/normal Arial,Helvetica,sans-serif;
+    color: rgba(0,0,0,1);
+    -o-text-overflow: clip;
+    text-overflow: clip;
+    background: rgba(0,0,0,0);
+    border: 2px solid #35c786;
+}
+
+.enjoyhint_close_btn::before {
+    display: inline-block;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    width: 73%;
+    height: 2px;
+    position: absolute;
+    content: "";
+    top: 48%;
+    left: 14%;
+    border: none;
+    font: normal 100%/normal Arial,Helvetica,sans-serif;
+    color: rgba(0,0,0,1);
+    -o-text-overflow: clip;
+    text-overflow: clip;
+    background: #fff;
+    text-shadow: none;
+    -webkit-transform: rotateZ(45deg);
+    transform: rotateZ(45deg);
+}
+
+.enjoyhint_close_btn::after {
+    display: inline-block;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    width: 73%;
+    height: 2px;
+    position: absolute;
+    content: "";
+    top: 46%;
+    left: 15%;
+    border: none;
+    font: normal 100%/normal Arial,Helvetica,sans-serif;
+    color: rgba(0,0,0,1);
+    -o-text-overflow: clip;
+    text-overflow: clip;
+    background: #fff;
+    text-shadow: none;
+    -webkit-transform: rotateZ(-45deg);
+    transform: rotateZ(-45deg);
+}
+
+
+.enjoyhint_close_btn:hover{
+    color: rgba(255,255,255,1);
+    background: #35c786;
+    cursor: pointer;
+}
+
+.enjoyhint_close_btn:active{
+    border: 2px solid #35c786;
+    background: #35c786;
+    -webkit-transition: none;
+    -moz-transition: none;
+    -o-transition: none;
+    transition: none;
+}
+
+.enjoyhint_btn{
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    width: 150px;
+    height: 40px;
+    cursor: pointer;
+    margin: 0 auto;
+    border: 2px solid rgb(30,205,151);
+    /*-webkit-border-radius: 40px;
+    border-radius: 40px;*/
+    font: normal normal normal 17px/40px "Advent Pro", Helvetica, sans-serif;
+    color: rgb(30, 205, 151);
+    text-align: center;
+    -o-text-overflow: clip;
+    text-overflow: clip;
+    letter-spacing: 1px;
+    background: rgba(0,0,0,0);
+
+    /*-webkit-transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0), width 0.3s cubic-bezier(0, 0, 0, 0), border-width 0.3s cubic-bezier(0, 0, 0, 0), border-color 0.3s cubic-bezier(0, 0, 0, 0);
+    -moz-transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0), width 0.3s cubic-bezier(0, 0, 0, 0), border-width 0.3s cubic-bezier(0, 0, 0, 0), border-color 0.3s cubic-bezier(0, 0, 0, 0);
+    -o-transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0), width 0.3s cubic-bezier(0, 0, 0, 0), border-width 0.3s cubic-bezier(0, 0, 0, 0), border-color 0.3s cubic-bezier(0, 0, 0, 0);
+    transition: background-color 0.3s cubic-bezier(0, 0, 0, 0), color 0.3s cubic-bezier(0, 0, 0, 0), width 0.3s cubic-bezier(0, 0, 0, 0), border-width 0.3s cubic-bezier(0, 0, 0, 0), border-color 0.3s cubic-bezier(0, 0, 0, 0);*/
+
+}
+
+/*.enjoyhint_btn:hover{
+    color: rgba(255,255,255,1);
+    background: rgb(30, 205, 151);
+}*/
+
+.enjoyhint_btn:active {
+    border: 2px solid rgba(33,224,163,1);
+    background: rgba(33,224,163,1);
+    -webkit-transition: none;
+    -moz-transition: none;
+    -o-transition: none;
+    transition: none;
+}
+
+
+.enjoyhint div.canvas-container{
+    position: absolute;
+}
+
+.enjoyhint_canvas{
+    position: absolute;
+    z-index: 100;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#kinetic_container{
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top:0;
+    left: 0;
+}
+
+.enjoyhint_svg{
+}
+.enjoyhint_svg_wrapper{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top:0;
+    left: 0;
+    z-index: 100;
+    -webkit-transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
+    -moz-transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
+    transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
+}
+.enjoyhint_svg_wrapper svg{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top:0;
+    left: 0;
+}
+
+.enjoyhint_svg_transparent .enjoyhint_svg_wrapper,.enjoyhint_svg_transparent .enjoy_hint_label{
+    opacity:0;
+}
+
+
+.enjoy_hint_label{
+    position: absolute;
+    color: white;
+    z-index: 107;
+    font-size: 22px;
+    
+
+    -webkit-transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
+    -moz-transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
+    transition: opacity 400ms cubic-bezier(0.42, 0, 0.58, 1);
+
+    display: inline-block;
+    min-width: 200px;
+    text-align: left;
+    max-width: 45%;
+    line-height: 1.2em;
+}
+
+
+
+div.kineticjs-content{
+    position: absolute !important;
+}
+
+
+.enjoyhint_skip_btn {
+    position: fixed;
+}

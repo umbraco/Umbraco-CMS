@@ -1,0 +1,9 @@
+﻿{
+  "css": [
+    "~/App_Plugins/StarterkitTour/css/enjoyhint.css"
+  ],
+  "javascript": [
+    "~/App_Plugins/StarterkitTour/js/enjoyhint.js",
+    "~/App_Plugins/StarterkitTour/js/sk.tour.js"
+  ]
+}
