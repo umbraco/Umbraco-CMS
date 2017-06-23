@@ -368,6 +368,24 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets all content type aliases with the option to exclude one or more types by Id
+        /// </summary>
+        /// <param name="omitIds">Array of Ids to exclude when retrieving list of aliases</param>
+        /// <param name="objectTypes">
+        /// If this list is empty, it will return all content type aliases for media, members and content, otherwise
+        /// it will only return content type aliases for the object types specified
+        /// </param>
+        /// <returns></returns>
+        public IEnumerable<string> GetAllContentTypeAliases(int[] omitIds, params Guid[] objectTypes)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentTypeRepository(uow);
+                return repository.GetAllContentTypeAliases(omitIds, objectTypes);
+            }
+        }
+
+        /// <summary>
         /// Copies a content type as a child under the specified parent if specified (otherwise to the root)
         /// </summary>
         /// <param name="original">
