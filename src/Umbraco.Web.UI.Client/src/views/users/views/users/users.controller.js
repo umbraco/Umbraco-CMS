@@ -155,66 +155,46 @@
         function disableUsers() {
             vm.disableUserButtonState = "busy";
             usersResource.disableUsers(vm.selection).then(function (data) {
-                if (data === "true") {
-                    // update userState
-                    angular.forEach(vm.selection, function(userId){
-                        var user = getUserFromArrayById(userId, vm.users);
-                        if(user) {
-                            user.userState = 1;
-                        }
-                    });
-                    // show the correct badges
-                    setUserDisplayState(vm.users);
-                    // show notification
-                    localizationService.localize("speechBubbles_disableUsersSuccess", [vm.selection.length]).then(function (value) {
-                        notificationsService.success(value);
-                    });
-                    vm.disableUserButtonState = "init";
-                    clearSelection();
-                } else {
-                    vm.disableUserButtonState = "error";
-                    localizationService.localize("speechBubbles_disableUsersError").then(function (value) {
-                        notificationsService.error(value);
-                    });
+              // update userState
+              angular.forEach(vm.selection, function (userId) {
+                var user = getUserFromArrayById(userId, vm.users);
+                if (user) {
+                  user.userState = 1;
                 }
+              });
+              // show the correct badges
+              setUserDisplayState(vm.users);
+
+              formHelper.showNotifications(data);
+              
+              vm.disableUserButtonState = "init";
+              clearSelection();
+
             }, function(error){
                 vm.disableUserButtonState = "error";
-                localizationService.localize("speechBubbles_disableUsersError").then(function (value) {
-                    notificationsService.error(value);
-                });
+                formHelper.showNotifications(error.data);
             });
         }
 
         function enableUsers() {
             vm.enableUserButtonState = "busy";
             usersResource.enableUsers(vm.selection).then(function (data) {
-                if (data === "true") {
-                    // update userState
-                    angular.forEach(vm.selection, function(userId){
-                        var user = getUserFromArrayById(userId, vm.users);
-                        if(user) {
-                            user.userState = 0;
-                        }
-                    });
-                    // show the correct badges
-                    setUserDisplayState(vm.users);
-                    // show notification
-                    localizationService.localize("speechBubbles_enableUsersSuccess", [vm.selection.length]).then(function (value) {
-                        notificationsService.success(value);
-                    });
-                    vm.enableUserButtonState = "init";
-                    clearSelection();
-                } else {
-                    vm.enableUserButtonState = "error";
-                    localizationService.localize("speechBubbles_enableUsersError").then(function (value) {
-                        notificationsService.error(value);
-                    });
+              // update userState
+              angular.forEach(vm.selection, function (userId) {
+                var user = getUserFromArrayById(userId, vm.users);
+                if (user) {
+                  user.userState = 0;
                 }
+              });
+              // show the correct badges
+              setUserDisplayState(vm.users);
+              // show notification
+              formHelper.showNotifications(data);
+              vm.enableUserButtonState = "init";
+              clearSelection();
             }, function (error) {
                 vm.enableUserButtonState = "error";
-                localizationService.localize("speechBubbles_enableUsersError").then(function (value) {
-                    notificationsService.error(value);
-                });
+              formHelper.showNotifications(error.data);
             });
         }
 

@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, $timeout, $location, $routeParams, usersResource, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource) {
+    function UserEditController($scope, $timeout, $location, $routeParams, formHelper, usersResource, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -199,48 +199,26 @@
         function disableUser() {
             vm.disableUserButtonState = "busy";
             usersResource.disableUsers([vm.user.id]).then(function (data) {
-                if (data === "true") {
-                    vm.user.userState = 1;
-                    setUserDisplayState();
-                    vm.disableUserButtonState = "success";
-                    localizationService.localize("speechBubbles_disableUserSuccess", [vm.user.name]).then(function (value) {
-                        notificationsService.success(value);
-                    });
-                } else {
-                    vm.disableUserButtonState = "error";
-                    localizationService.localize("speechBubbles_disableUserError").then(function (value) {
-                        notificationsService.error(value);
-                    });
-                }
+              vm.user.userState = 1;
+              setUserDisplayState();
+              vm.disableUserButtonState = "success";
+              formHelper.showNotifications(data);
             }, function(error){
                 vm.disableUserButtonState = "error";
-                localizationService.localize("speechBubbles_disableUserError").then(function (value) {
-                    notificationsService.error(value);
-                });
+                formHelper.showNotifications(error.data);
             });
         }
 
         function enableUser() {
             vm.enableUserButtonState = "busy";
             usersResource.enableUsers([vm.user.id]).then(function (data) {
-                if (data === "true") {
-                    vm.user.userState = 0;
-                    setUserDisplayState();
-                    vm.enableUserButtonState = "success";
-                    localizationService.localize("speechBubbles_enableUserSuccess", [vm.user.name]).then(function (value) {
-                        notificationsService.success(value);
-                    });
-                } else {
-                    vm.enableUserButtonState = "error";
-                    localizationService.localize("speechBubbles_enableUserError").then(function (value) {
-                        notificationsService.error(value);
-                    });
-                }
+              vm.user.userState = 0;
+              setUserDisplayState();
+              vm.enableUserButtonState = "success";
+              formHelper.showNotifications(data);
             }, function(error){
                 vm.disableUserButtonState = "error";
-                localizationService.localize("speechBubbles_enableUserError").then(function (value) {
-                    notificationsService.error(value);
-                });
+                formHelper.showNotifications(error.data);
             });
         }
 

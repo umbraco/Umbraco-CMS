@@ -486,8 +486,14 @@ namespace Umbraco.Web.Editors
         /// Disables the users with the given user ids
         /// </summary>
         /// <param name="userIds"></param>
-        public bool PostDisableUsers([FromUri]int[] userIds)
+        public HttpResponseMessage PostDisableUsers([FromUri]int[] userIds)
         {
+            if (userIds.Contains(Security.GetUserId()))
+            {
+                throw new HttpResponseException(
+                    Request.CreateNotificationValidationErrorResponse("The current user cannot disable itself"));
+            }
+
             var users = Services.UserService.GetUsersById(userIds).ToArray();
             foreach (var u in users)
             {
@@ -495,14 +501,21 @@ namespace Umbraco.Web.Editors
             }
             Services.UserService.Save(users);
 
-            return true;
+            if (users.Length > 1)
+            {
+                return Request.CreateNotificationSuccessResponse(
+                    Services.TextService.Localize("speechBubbles/disableUsersSuccess", new[] {userIds.Length.ToString()}));
+            }
+
+            return Request.CreateNotificationSuccessResponse(
+                Services.TextService.Localize("speechBubbles/disableUserSuccess", new[] { users[0].Name }));
         }
 
         /// <summary>
         /// Enables the users with the given user ids
         /// </summary>
         /// <param name="userIds"></param>
-        public bool PostEnableUsers([FromUri]int[] userIds)
+        public HttpResponseMessage PostEnableUsers([FromUri]int[] userIds)
         {
             var users = Services.UserService.GetUsersById(userIds).ToArray();
             foreach (var u in users)
@@ -511,7 +524,14 @@ namespace Umbraco.Web.Editors
             }
             Services.UserService.Save(users);
 
-            return true;
+            if (users.Length > 1)
+            {
+                return Request.CreateNotificationSuccessResponse(
+                    Services.TextService.Localize("speechBubbles/enableUsersSuccess", new[] { userIds.Length.ToString() }));
+            }
+
+            return Request.CreateNotificationSuccessResponse(
+                Services.TextService.Localize("speechBubbles/enableUserSuccess", new[] { users[0].Name }));            
         }
 
         public class PagedUserResult : PagedResult<UserDisplay>
