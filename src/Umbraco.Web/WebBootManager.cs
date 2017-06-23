@@ -227,9 +227,11 @@ namespace Umbraco.Web
 
             //Now ensure webapi is initialized after everything
             GlobalConfiguration.Configuration.EnsureInitialized();
-
+            
             return this;
         }
+
+        
 
         internal static void ConfigureGlobalFilters()
         {

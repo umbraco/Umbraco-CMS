@@ -186,6 +186,13 @@ namespace Umbraco.Core.Models
         /// </summary>
         [UmbracoObjectType(Constants.ObjectTypes.FormsDataSource)]
         [FriendlyName("DataSource")]
-        FormsDataSource
+        FormsDataSource,
+
+        /// <summary>
+        /// Language
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.Language)]
+        [FriendlyName("Language")]
+        Language
     }
 }
