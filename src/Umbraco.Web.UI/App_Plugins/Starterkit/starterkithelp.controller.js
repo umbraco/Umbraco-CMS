@@ -10,7 +10,7 @@
     
     this.loadLesson = function (lesson) {
         vm.currentLesson = lesson;
-        helpService.getLessonSteps(lesson.path, "http://localhost:24292").then(function (steps) {
+        helpService.getLessonSteps(lesson.path).then(function (steps) {
             vm.steps = steps;
             vm.currentStep = steps[0];
             vm.currentStepIndex = 0;
@@ -28,7 +28,7 @@
         this.currentStepIndex = index;
     };
     
-    helpService.findLessons("Tutorials/Starter-kit/Lessons", "http://localhost:24292").then(function (lessons) {
+    helpService.findLessons("Tutorials/Starter-kit/Lessons").then(function (lessons) {
         vm.lessons = lessons;
     });
 });
