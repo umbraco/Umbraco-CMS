@@ -138,6 +138,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Udi, opt => opt.Ignore())
                 .ForMember(detail => detail.Icon, opt => opt.Ignore())
                 .ForMember(detail => detail.Trashed, opt => opt.Ignore())
+                .ForMember(detail => detail.ResetPasswordValue, opt => opt.Ignore())
                 .ForMember(detail => detail.Alias, opt => opt.Ignore())
                 .ForMember(detail => detail.Trashed, opt => opt.Ignore())
                 .ForMember(detail => detail.AdditionalData, opt => opt.Ignore())
