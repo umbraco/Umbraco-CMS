@@ -86,10 +86,10 @@ namespace Umbraco.Web.Cache
 
             // bind to stylesheet events
             // fixme why not in v8?
-            //Bind(() => FileService.SavedStylesheet += FileService_SavedStylesheet,
-            //    () => FileService.SavedStylesheet -= FileService_SavedStylesheet);
-            //Bind(() => FileService.DeletedStylesheet += FileService_DeletedStylesheet,
-            //    () => FileService.DeletedStylesheet -= FileService_DeletedStylesheet);
+            Bind(() => FileService.SavedStylesheet += FileService_SavedStylesheet,
+                () => FileService.SavedStylesheet -= FileService_SavedStylesheet);
+            Bind(() => FileService.DeletedStylesheet += FileService_DeletedStylesheet,
+                () => FileService.DeletedStylesheet -= FileService_DeletedStylesheet);
 
             // bind to domain events
             Bind(() => DomainService.Saved += DomainService_Saved,
@@ -106,10 +106,10 @@ namespace Umbraco.Web.Cache
             // bind to content type events
             Bind(() => ContentTypeService.Changed += ContentTypeService_Changed,
                 () => ContentTypeService.Changed -= ContentTypeService_Changed);
-            Bind(() => MediaTypeService.Changed += ContentTypeService_Changed,
-                () => MediaTypeService.Changed -= ContentTypeService_Changed);
-            Bind(() => MemberTypeService.Changed += ContentTypeService_Changed,
-                () => MemberTypeService.Changed -= ContentTypeService_Changed);
+            Bind(() => MediaTypeService.Changed += MediaTypeService_Changed,
+                () => MediaTypeService.Changed -= MediaTypeService_Changed);
+            Bind(() => MemberTypeService.Changed += MemberTypeService_Changed,
+                () => MemberTypeService.Changed -= MemberTypeService_Changed);
 
             // bind to permission events
             // fixme see v7 events? the PermissionNew/Updated/Deleted are not supported here?
@@ -325,6 +325,14 @@ namespace Umbraco.Web.Cache
             DistributedCache.Instance.RefreshContentCache(args.Changes.ToArray());
         }
 
+        // fixme our weird events handling wants this for now
+        private static void ContentService_Deleted(IContentService sender, DeleteEventArgs<IContent> e) { }
+        private static void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e) { }
+        private static void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e) { }
+        private static void ContentService_EmptiedRecycleBin(IContentService sender, RecycleBinEventArgs e) { }
+        private static void ContentService_Published(IContentService sender, PublishEventArgs<IContent> e) { }
+        private static void ContentService_UnPublished(IContentService sender, PublishEventArgs<IContent> e) { }
+
         #endregion
 
         #region ApplicationTreeService
@@ -456,15 +464,23 @@ namespace Umbraco.Web.Cache
             DistributedCache.Instance.RefreshContentTypeCache(args.Changes.ToArray());
         }
 
-        private static void ContentTypeService_Changed(IMediaTypeService sender, ContentTypeChange<IMediaType>.EventArgs args)
+        private static void MediaTypeService_Changed(IMediaTypeService sender, ContentTypeChange<IMediaType>.EventArgs args)
         {
             DistributedCache.Instance.RefreshContentTypeCache(args.Changes.ToArray());
         }
 
-        private static void ContentTypeService_Changed(IMemberTypeService sender, ContentTypeChange<IMemberType>.EventArgs args)
+        private static void MemberTypeService_Changed(IMemberTypeService sender, ContentTypeChange<IMemberType>.EventArgs args)
         {
             DistributedCache.Instance.RefreshContentTypeCache(args.Changes.ToArray());
         }
+
+        // fixme our weird events handling wants this for now
+        private static void ContentTypeService_Saved(IContentTypeService sender, SaveEventArgs<IContentType> args) { }
+        private static void MediaTypeService_Saved(IMediaTypeService sender, SaveEventArgs<IMediaType> args) { }
+        private static void MemberTypeService_Saved(IMemberTypeService sender, SaveEventArgs<IMemberType> args) { }
+        private static void ContentTypeService_Deleted(IContentTypeService sender, DeleteEventArgs<IContentType> args) { }
+        private static void MediaTypeService_Deleted(IMediaTypeService sender, DeleteEventArgs<IMediaType> args) { }
+        private static void MemberTypeService_Deleted(IMemberTypeService sender, DeleteEventArgs<IMemberType> args) { }
 
         #endregion
 
@@ -491,7 +507,7 @@ namespace Umbraco.Web.Cache
 
         #endregion
 
-        #region FileService / Template
+        #region FileService
 
         /// <summary>
         /// Removes cache for template
@@ -514,6 +530,10 @@ namespace Umbraco.Web.Cache
             foreach (var entity in e.SavedEntities)
                 DistributedCache.Instance.RefreshTemplateCache(entity.Id);
         }
+
+        // fixme our weird events handling wants this for now
+        private static void FileService_DeletedStylesheet(IFileService sender, DeleteEventArgs<Stylesheet> e) { }
+        private static void FileService_SavedStylesheet(IFileService sender, SaveEventArgs<Stylesheet> e) { }
 
         #endregion
 
@@ -539,6 +559,13 @@ namespace Umbraco.Web.Cache
         {
             DistributedCache.Instance.RefreshMediaCache(args.Changes.ToArray());
         }
+
+        // fixme our weird events handling wants this for now
+        private static void MediaService_Saved(IMediaService sender, SaveEventArgs<IMedia> e) { }
+        private static void MediaService_Deleted(IMediaService sender, DeleteEventArgs<IMedia> e) { }
+        private static void MediaService_Moved(IMediaService sender, MoveEventArgs<IMedia> e) { }
+        private static void MediaService_Trashed(IMediaService sender, MoveEventArgs<IMedia> e) { }
+        private static void MediaService_EmptiedRecycleBin(IMediaService sender, RecycleBinEventArgs e) { }
 
         #endregion
 

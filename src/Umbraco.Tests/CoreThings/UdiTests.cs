@@ -1,8 +1,13 @@
 using System;
 using System.Linq;
+using LightInject;
+using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.CoreThings
@@ -10,6 +15,21 @@ namespace Umbraco.Tests.CoreThings
     [TestFixture]
     public class UdiTests
     {
+        [SetUp]
+        public void SetUp()
+        {
+            // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
+            var container = new Mock<IServiceContainer>();
+            container.Setup(x => x.GetInstance(typeof (TypeLoader))).Returns(new TypeLoader(new NullCacheProvider(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
+            Current.Container = container.Object;
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Current.Reset();
+        }
+
         [Test]
         public void StringEntityCtorTest()
         {

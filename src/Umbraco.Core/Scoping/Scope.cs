@@ -65,7 +65,7 @@ namespace Umbraco.Core.Scoping
 
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
-            Console.WriteLine("create " + _instanceId.ToString("N").Substring(0, 8));
+            Console.WriteLine("create " + InstanceId.ToString("N").Substring(0, 8));
 #endif
 
             if (detachable)
@@ -88,16 +88,19 @@ namespace Umbraco.Core.Scoping
                 ParentScope = parent;
 
                 // cannot specify a different mode!
-                if (repositoryCacheMode != RepositoryCacheMode.Unspecified && parent.RepositoryCacheMode != repositoryCacheMode)
-                    throw new ArgumentException("Cannot be different from parent.", nameof(repositoryCacheMode));
+                // fixme - means that it's OK to go from L2 to None for reading purposes, but writing would be BAD!
+                // this is for XmlStore that wants to bypass caches when rebuilding XML (same for NuCache)
+                if (repositoryCacheMode != RepositoryCacheMode.Unspecified && parent.RepositoryCacheMode > repositoryCacheMode)
+                    throw new ArgumentException($"Value '{repositoryCacheMode}' cannot be lower than parent value '{parent.RepositoryCacheMode}'.", nameof(repositoryCacheMode));
 
                 // cannot specify a dispatcher!
                 if (_eventDispatcher != null)
-                    throw new ArgumentException("Cannot be specified on nested scope.", nameof(eventDispatcher));
+                    throw new ArgumentException("Value cannot be specified on nested scope.", nameof(eventDispatcher));
 
                 // cannot specify a different fs scope!
+                // fixme - in fact, can be 'true' only on outer scope, and false does not make much sense
                 if (scopeFileSystems != null && parent._scopeFileSystem != scopeFileSystems)
-                    throw new ArgumentException("Cannot be different from parent.", nameof(scopeFileSystems));
+                    throw new ArgumentException($"Value '{scopeFileSystems.Value}' be different from parent value '{parent._scopeFileSystem}'.", nameof(scopeFileSystems));
             }
             else
             {
@@ -334,8 +337,11 @@ namespace Umbraco.Core.Scoping
                 _logger.Debug<Scope>("Dispose error (" + (ambient == null ? "no" : "other") + " ambient)");
                 if (ambient == null)
                     throw new InvalidOperationException("Not the ambient scope (no ambient scope).");
-                var infos = _scopeProvider.GetScopeInfo(ambient);
-                throw new InvalidOperationException("Not the ambient scope (see current ambient ctor stack trace).\r\n" + infos.CtorStack);
+                var ambientInfos = _scopeProvider.GetScopeInfo(ambient);
+                var disposeInfos = _scopeProvider.GetScopeInfo(this);
+                throw new InvalidOperationException("Not the ambient scope (see ctor stack traces).\r\n"
+                    + "- ambient ctor ->\r\n" + ambientInfos.CtorStack + "\r\n"
+                    + "- dispose ctor ->\r\n" + disposeInfos.CtorStack + "\r\n");
 #else
                 throw new InvalidOperationException("Not the ambient scope.");
 #endif

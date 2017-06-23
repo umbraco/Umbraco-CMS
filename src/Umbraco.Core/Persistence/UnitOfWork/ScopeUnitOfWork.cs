@@ -52,6 +52,9 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
         #region IDatabaseContext
 
+        // fixme - stop using the actual Database here - it forces the creation of the DB
+        // should have a reference to a IDatabaseContext to use instead!
+
         /// <inheritdoc />
         public ISqlSyntaxProvider SqlSyntax => Database.SqlSyntax;
 

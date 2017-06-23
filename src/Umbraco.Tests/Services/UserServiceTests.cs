@@ -3,6 +3,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using NUnit.Framework;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Persistence.Querying;
@@ -484,7 +485,7 @@ namespace Umbraco.Tests.Services
             var userType = userService.GetUserTypeByAlias("admin");
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => userService.CreateUserWithIdentity(string.Empty, "john@umbraco.io", userType));
+            Assert.Throws<ArgumentNullOrEmptyException>(() => userService.CreateUserWithIdentity(string.Empty, "john@umbraco.io", userType));
         }
 
         [Test]

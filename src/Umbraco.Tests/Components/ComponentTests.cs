@@ -6,9 +6,11 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Components;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 
@@ -28,11 +30,14 @@ namespace Umbraco.Tests.Components
             var logger = Mock.Of<ILogger>();
             var s = testObjects.GetDefaultSqlSyntaxProviders(logger);
             var f = new UmbracoDatabaseFactory(s, logger, new MapperCollection(Enumerable.Empty<BaseMapper>()));
+            var fs = new FileSystems(logger);
+            var p = new ScopeProvider(f, fs, logger);
 
             var mock = new Mock<IServiceContainer>();
-            mock.Setup(x => x.GetInstance<ILogger>()).Returns(logger);
-            mock.Setup(x => x.GetInstance<ProfilingLogger>()).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            mock.Setup(x => x.GetInstance<IUmbracoDatabaseFactory>()).Returns(f);
+            mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
+            mock.Setup(x => x.GetInstance(typeof (ProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            mock.Setup(x => x.GetInstance(typeof (IUmbracoDatabaseFactory))).Returns(f);
+            mock.Setup(x => x.GetInstance(typeof (IScopeProvider))).Returns(p);
             setup?.Invoke(mock);
             return mock.Object;
         }

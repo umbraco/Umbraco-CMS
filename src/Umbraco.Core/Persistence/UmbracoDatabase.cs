@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text;
 using NPoco;
 using StackExchange.Profiling;
@@ -206,7 +207,7 @@ namespace Umbraco.Core.Persistence
             _logger.Error<UmbracoDatabase>("Exception (" + InstanceId + ").", x);
             _logger.Debug<UmbracoDatabase>("At:\r\n" + Environment.StackTrace);
             if (EnableSqlTrace == false)
-                _logger.Debug<UmbracoDatabase>("Sql:\r\n" + CommandToString(_cmd));
+                _logger.Debug<UmbracoDatabase>("Sql:\r\n" + CommandToString(LastSQL, LastArgs));
             base.OnException(x);
         }
 
@@ -232,23 +233,28 @@ namespace Umbraco.Core.Persistence
             base.OnExecutingCommand(cmd);
         }
 
-        private static string CommandToString(DbCommand cmd)
+        private string CommandToString(DbCommand cmd)
+        {
+            return CommandToString(cmd.CommandText, cmd.Parameters.Cast<DbParameter>().Select(x => x.Value).ToArray());
+        }
+
+        private string CommandToString(string sql, object[] args)
         {
             var sb = new StringBuilder();
 #if DEBUG_DATABASES
                 sb.Append(InstanceId);
                 sb.Append(": ");
 #endif
-            sb.Append(cmd.CommandText);
-            if (cmd.Parameters.Count > 0)
+            sb.Append(sql);
+            if (args.Length > 0)
                 sb.Append(" --");
             var i = 0;
-            foreach (DbParameter p in cmd.Parameters)
+            foreach (var arg in args)
             {
                 sb.Append(" @");
                 sb.Append(i++);
                 sb.Append(":");
-                sb.Append(p.Value);
+                sb.Append(arg);
             }
 
             return sb.ToString();

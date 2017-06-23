@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Runtime.Remoting.Messaging;
+using System.Text;
 using System.Web;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
@@ -110,8 +111,8 @@ namespace Umbraco.Core.Scoping
                 if (StaticCallContextObjects.TryGetValue(objectKey, out object callContextObject))
                 {
 #if DEBUG_SCOPES
-                    Logging.LogHelper.Debug<ScopeProvider>("Got " + typeof(T).Name + " Object " + objectKey.ToString("N").Substring(0, 8));
-                    //Logging.LogHelper.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
+                    Current.Logger.Debug<ScopeProvider>("Got " + typeof(T).Name + " Object " + objectKey.ToString("N").Substring(0, 8));
+                    //_logger.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
 #endif
                     return (T)callContextObject;
                 }
@@ -119,7 +120,7 @@ namespace Umbraco.Core.Scoping
                 // hard to inject into a static method :(
                 Current.Logger.Warn<ScopeProvider>("Missed " + typeof(T).Name + " Object " + objectKey.ToString("N").Substring(0, 8));
 #if DEBUG_SCOPES
-                //Logging.LogHelper.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
+                //Current.Logger.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
 #endif
                 return null;
             }
@@ -155,8 +156,8 @@ namespace Umbraco.Core.Scoping
                 lock (StaticCallContextObjectsLock)
                 {
 #if DEBUG_SCOPES
-                    Logging.LogHelper.Debug<ScopeProvider>("Remove Object " + objectKey.ToString("N").Substring(0, 8));
-                    //Logging.LogHelper.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
+                    Current.Logger.Debug<ScopeProvider>("Remove Object " + objectKey.ToString("N").Substring(0, 8));
+                    //Current.Logger.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
 #endif
                     StaticCallContextObjects.Remove(objectKey);
                 }
@@ -170,8 +171,8 @@ namespace Umbraco.Core.Scoping
                 lock (StaticCallContextObjectsLock)
                 {
 #if DEBUG_SCOPES
-                    Logging.LogHelper.Debug<ScopeProvider>("AddObject " + objectKey.ToString("N").Substring(0, 8));
-                    //Logging.LogHelper.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
+                    Current.Logger.Debug<ScopeProvider>("AddObject " + objectKey.ToString("N").Substring(0, 8));
+                    //Current.Logger.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
 #endif
                     StaticCallContextObjects.Add(objectKey, value);
                 }
@@ -466,7 +467,7 @@ namespace Umbraco.Core.Scoping
             lock (StaticScopeInfosLock)
             {
                 if (StaticScopeInfos.ContainsKey(scope)) throw new Exception("oops: already registered.");
-                Logging.LogHelper.Debug<ScopeProvider>("Register " + scope.InstanceId.ToString("N").Substring(0, 8));
+                _logger.Debug<ScopeProvider>("Register " + scope.InstanceId.ToString("N").Substring(0, 8));
                 StaticScopeInfos[scope] = new ScopeInfo(scope, Environment.StackTrace);
             }
         }
@@ -490,12 +491,12 @@ namespace Umbraco.Core.Scoping
                 {
                     if (sb.Length > 0) sb.Append(" < ");
                     sb.Append(s.InstanceId.ToString("N").Substring(0, 8));
-                    var ss = s as IScopeInternal;
-                    s = ss == null ? null : ss.ParentScope;
+                    var ss = s as Scope;
+                    s = ss?.ParentScope;
                 }
-                Logging.LogHelper.Debug<ScopeProvider>("Register " + (context ?? "null") + " context " + sb);
+                Current.Logger.Debug<ScopeProvider>("Register " + (context ?? "null") + " context " + sb);
                 if (context == null) info.NullStack = Environment.StackTrace;
-                //Logging.LogHelper.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 16));
+                //Current.Logger.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 16));
                 info.Context = context;
             }
         }
@@ -522,7 +523,7 @@ namespace Umbraco.Core.Scoping
                     // enable this by default
                     //Console.WriteLine("unregister " + scope.InstanceId.ToString("N").Substring(0, 8));
                     StaticScopeInfos.Remove(scope);
-                    Logging.LogHelper.Debug<ScopeProvider>("Remove " + scope.InstanceId.ToString("N").Substring(0, 8));
+                    _logger.Debug<ScopeProvider>("Remove " + scope.InstanceId.ToString("N").Substring(0, 8));
 
                     // instead, enable this to keep *all* scopes
                     // beware, there can be a lot of scopes!
@@ -544,16 +545,16 @@ namespace Umbraco.Core.Scoping
             CtorStack = ctorStack;
         }
 
-        public IScope Scope { get; private set; } // the scope itself
+        public IScope Scope { get; } // the scope itself
 
         // the scope's parent identifier
-        public Guid Parent { get { return (Scope is NoScope || ((Scope) Scope).ParentScope == null) ? Guid.Empty : ((Scope) Scope).ParentScope.InstanceId; } }
+        public Guid Parent => ((Scope) Scope).ParentScope == null ? Guid.Empty : ((Scope) Scope).ParentScope.InstanceId;
 
-        public DateTime Created { get; private set; } // the date time the scope was created
+        public DateTime Created { get; } // the date time the scope was created
         public bool Disposed { get; set; } // whether the scope has been disposed already
         public string Context { get; set; } // the current 'context' that contains the scope (null, "http" or "lcc")
 
-        public string CtorStack { get; private set; } // the stacktrace of the scope ctor
+        public string CtorStack { get; } // the stacktrace of the scope ctor
         public string DisposedStack { get; set; } // the stacktrace when disposed
         public string NullStack { get; set; } // the stacktrace when the 'context' that contains the scope went null
     }

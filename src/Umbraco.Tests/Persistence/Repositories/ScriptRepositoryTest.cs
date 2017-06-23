@@ -10,13 +10,14 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
     [TestFixture]
-    [UmbracoTest(WithApplication = true)]
-    public class ScriptRepositoryTest : UmbracoTestBase
+    [UmbracoTest(WithApplication = true, Database = UmbracoTestOptions.Database.NewEmptyPerFixture)]
+    public class ScriptRepositoryTest : TestWithDatabaseBase
     {
         private IFileSystem _fileSystem;
 

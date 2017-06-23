@@ -217,7 +217,7 @@ namespace Umbraco.Tests.TestHelpers
             return new Lazy<T>(() => container?.TryGetInstance<T>() ?? ctor());
         }
 
-        public IScopeProvider GetScopeProvider(ILogger logger, IUmbracoDatabaseFactory databaseFactory = null)
+        public IScopeProvider GetScopeProvider(ILogger logger, FileSystems fileSystems = null, IUmbracoDatabaseFactory databaseFactory = null)
         {
             if (databaseFactory == null)
             {
@@ -228,7 +228,7 @@ namespace Umbraco.Tests.TestHelpers
                 databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, mappers);
             }
 
-            var fileSystems = new FileSystems(logger);
+            fileSystems = fileSystems ?? new FileSystems(logger);
             var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger);
             return scopeProvider;
         }

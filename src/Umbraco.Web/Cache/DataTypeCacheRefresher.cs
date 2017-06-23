@@ -53,7 +53,7 @@ namespace Umbraco.Web.Cache
             //clears the prevalue cache
             if (dataTypeCache)
                 foreach (var payload in payloads)
-                    dataTypeCache.Result.ClearCacheByKeySearch($"{CacheKeys.DataTypePreValuesCacheKey}{payload.Id}");
+                    dataTypeCache.Result.ClearCacheByKeySearch(CacheKeys.DataTypePreValuesCacheKey + "_" + payload.Id);
 
             // fixme - not sure I like these?
             TagsValueConverter.ClearCaches();

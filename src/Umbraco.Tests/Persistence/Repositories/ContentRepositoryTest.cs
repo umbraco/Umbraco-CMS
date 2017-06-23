@@ -85,21 +85,23 @@ namespace Umbraco.Tests.Persistence.Repositories
                 contentTypeRepository.AddOrUpdate(hasPropertiesContentType);
                 repository.AddOrUpdate(content1);
                 unitOfWork.Flush();
-                versions.Add(content1.Version);
+                versions.Add(content1.Version); // the first version
 
                 //publish version
-                content1.ChangePublishedState(PublishedState.Published);
+                content1.ChangePublishedState(PublishedState.Publishing);
                 repository.AddOrUpdate(content1);
                 unitOfWork.Flush();
-                versions.Add(content1.Version);
+                versions.Add(content1.Version); // the first version got published, same id
 
                 //change something and make a pending version
                 content1.Name = "new name";
+                if (content1.Published)
+                    content1.ChangePublishedState(PublishedState.Saving);
                 repository.AddOrUpdate(content1);
                 unitOfWork.Flush();
-                versions.Add(content1.Version);
+                versions.Add(content1.Version); // the second version
 
-                Assert.AreEqual(3, versions.Distinct().Count());
+                Assert.AreEqual(2, versions.Distinct().Count());
 
                 var content = repository.GetByQuery(unitOfWork.Query<IContent>().Where(c => c.Id == content1.Id)).ToArray()[0];
                 Assert.AreEqual(versions[2], content.Version);

@@ -49,6 +49,7 @@ namespace Umbraco.Tests.Testing.TestingTests
             // unless we can inject them in MembershipHelper, we need need this
             Container.Register(_ => Mock.Of<IMemberService>());
             Container.Register(_ => Mock.Of<IMemberTypeService>());
+            Container.Register(_ => Mock.Of<IUserService>());
             Container.Register(_ => CacheHelper.CreateDisabledCacheHelper());
             Container.Register<ServiceContext>();
 

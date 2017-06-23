@@ -1661,14 +1661,18 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         #region Rebuild Database Xml
 
+        // RepositoryCacheMode.Scoped because we do NOT want to use the L2 cache that may be out-of-sync
+        // hopefully this does not cause issues and we're not nested in another scope w/different mode
+        // fixme - well, guess what?
+        // original code made sure the repository used no cache
+        // now we're using the Scoped scope cache mode
+        // and then?
+
         public void RebuildContentAndPreviewXml(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
 
-            // RepositoryCacheMode.Scoped because we do NOT want to use the L2 cache that may be out-of-sync
-            // hopefully this does not cause issues and we're not nested in another scope w/different mode
-            //
-            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.None))
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.ContentTree);
@@ -1682,10 +1686,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         public void RebuildContentXml(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
-            // RepositoryCacheMode.Scoped because we do NOT want to use the L2 cache that may be out-of-sync
-            // hopefully this does not cause issues and we're not nested in another scope w/different mode
-            //
-            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.None))
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.ContentTree);
@@ -1758,10 +1759,7 @@ WHERE cmsContentXml.nodeId IN (
 
         public void RebuildPreviewXml(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
-            // RepositoryCacheMode.Scoped because we do NOT want to use the L2 cache that may be out-of-sync
-            // hopefully this does not cause issues and we're not nested in another scope w/different mode
-            //
-            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.None))
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.ContentTree);
@@ -1838,10 +1836,7 @@ WHERE cmsPreviewXml.nodeId IN (
 
         public void RebuildMediaXml(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
-            // RepositoryCacheMode.Scoped because we do NOT want to use the L2 cache that may be out-of-sync
-            // hopefully this does not cause issues and we're not nested in another scope w/different mode
-            //
-            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.None))
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.MediaTree);
@@ -1912,10 +1907,7 @@ WHERE cmsContentXml.nodeId IN (
 
         public void RebuildMemberXml(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
-            // RepositoryCacheMode.Scoped because we do NOT want to use the L2 cache that may be out-of-sync
-            // hopefully this does not cause issues and we're not nested in another scope w/different mode
-            //
-            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.None))
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.MemberTree);

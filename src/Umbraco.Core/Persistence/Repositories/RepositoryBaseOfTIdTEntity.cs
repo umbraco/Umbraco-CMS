@@ -65,6 +65,8 @@ namespace Umbraco.Core.Persistence.Repositories
                     case RepositoryCacheMode.Scoped:
                         provider = scope.IsolatedRuntimeCache;
                         break;
+                    case RepositoryCacheMode.None:
+                        return new NullCacheProvider(); // fixme cache instance
                     default:
                         throw new Exception("oops: cache mode.");
                 }
@@ -130,16 +132,20 @@ namespace Umbraco.Core.Persistence.Repositories
                     return _cachePolicy = NoCacheRepositoryCachePolicy<TEntity, TId>.Instance;
 
                 // create the cache policy using IsolatedCache which is either global
-                // or scoped depending on the repository cache mode for the current scope
-                _cachePolicy = CreateCachePolicy(IsolatedCache);
+                // or scoped depending on the repository cache mode for the current scope                
                 var scope = UnitOfWork.Scope;
                 switch (scope.RepositoryCacheMode)
                 {
                     case RepositoryCacheMode.Default:
+                        _cachePolicy = CreateCachePolicy(IsolatedCache);
                         break;
                     case RepositoryCacheMode.Scoped:
+                        _cachePolicy = CreateCachePolicy(IsolatedCache);
                         var globalIsolatedCache = GetIsolatedCache(GlobalCache.IsolatedRuntimeCache);
                         _cachePolicy = _cachePolicy.Scoped(globalIsolatedCache, scope);
+                        break;
+                    case RepositoryCacheMode.None:
+                        _cachePolicy = NoCacheRepositoryCachePolicy<TEntity, TId>.Instance;
                         break;
                     default:
                         throw new Exception("oops: cache mode.");

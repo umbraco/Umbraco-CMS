@@ -80,7 +80,8 @@ namespace Umbraco.Tests.PropertyEditors
         public void CanConvertDropdownListMultiplePropertyEditor(object value, IEnumerable<string> expected)
         {
             var converter = new DropdownListMultipleValueConverter();
-            var result = converter.ConvertInterToObject(null, PropertyCacheLevel.Unknown, value, false);
+            var inter = converter.ConvertSourceToInter(null, value, false);
+            var result = converter.ConvertInterToObject(null, PropertyCacheLevel.Unknown, inter, false);
 
             Assert.AreEqual(expected, result);
         }
@@ -93,7 +94,8 @@ namespace Umbraco.Tests.PropertyEditors
         public void CanConvertDropdownListMultipleWithKeysPropertyEditor(object value, IEnumerable<int> expected)
         {
             var converter = new DropdownListMultipleWithKeysValueConverter();
-            var result = converter.ConvertInterToObject(null, PropertyCacheLevel.Unknown, value, false);
+            var inter = converter.ConvertSourceToInter(null, value, false);
+            var result = converter.ConvertInterToObject(null, PropertyCacheLevel.Unknown, inter, false);
 
             Assert.AreEqual(expected, result);
         }

@@ -424,7 +424,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var exists = repository.Exists(1034); //Content picker
+                var exists = repository.Exists(1046); //Content picker
                 var doesntExist = repository.Exists(-80);
 
                 // Assert
@@ -481,12 +481,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
-                    dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dtd);
                 unitOfWork.Flush();
 
-                unitOfWork.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
-                unitOfWork.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
+                unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
+                unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
 
                 //this will cache the result
                 var collection = repository.GetPreValuesCollectionByDataTypeId(dtd.Id);
@@ -496,7 +496,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var cache = CacheHelper.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
             Assert.IsTrue(cache);
             var cached = cache.Result
-                .GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + dtd.Id + "-");
+                .GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + "_" + dtd.Id);
 
             Assert.IsNotNull(cached);
             Assert.AreEqual(1, cached.Count());
@@ -527,7 +527,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var cache = CacheHelper.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
             Assert.IsTrue(cache);
             var cached = cache.Result
-                .GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + dtd.Id + "-");
+                .GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + "_" + dtd.Id);
 
             Assert.IsNotNull(cached);
             Assert.AreEqual(1, cached.Count());

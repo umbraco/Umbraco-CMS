@@ -132,6 +132,11 @@ namespace Umbraco.Core.Services
                     return;
                 }
 
+                if (string.IsNullOrWhiteSpace(macro.Name))
+                {
+                    throw new ArgumentException("Cannot save macro with empty name.");
+                }
+
                 var repository = uow.CreateRepository<IMacroRepository>();
                 repository.AddOrUpdate(macro);
 

@@ -40,7 +40,7 @@ namespace Umbraco.Core.Events
             {
                 var events = CandidateEvents.GetOrAdd(senderType, t =>
                 {
-                    return t.GetEvents(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                    return t.GetEvents(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)
                         //we can only look for events handlers with generic types because that is the only
                         // way that we can try to find a matching event based on the arg type passed in
                         .Where(x => x.EventHandlerType.IsGenericType)

@@ -22,6 +22,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
@@ -219,9 +220,7 @@ namespace Umbraco.Tests.Testing
                 {
                     Assembly.Load("Umbraco.Core"),
                     Assembly.Load("umbraco"),
-                    Assembly.Load("Umbraco.Tests"),
-                    Assembly.Load("cms"),
-                    Assembly.Load("controls"),
+                    Assembly.Load("Umbraco.Tests")
                 }
             };
         }
@@ -279,10 +278,15 @@ namespace Umbraco.Tests.Testing
                 sqlSyntaxProviders,
                 Logger,
                 Mock.Of<IMapperCollection>()));
+            Container.RegisterSingleton<IDatabaseContext>(f => f.TryGetInstance<IUmbracoDatabaseFactory>());
 
             Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
-            Container.Register(factory
-                => TestObjects.GetScopeUnitOfWorkProvider(factory.GetInstance<ILogger>(), factory.TryGetInstance<IUmbracoDatabaseFactory>(), factory.TryGetInstance<RepositoryFactory>()));
+            Container.RegisterSingleton(factory => new FileSystems(factory.TryGetInstance<ILogger>()));
+            Container.RegisterSingleton(factory
+                => TestObjects.GetScopeProvider(factory.TryGetInstance<ILogger>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
+            Container.RegisterSingleton(factory
+                => TestObjects.GetScopeUnitOfWorkProvider(factory.TryGetInstance<ILogger>(), factory.TryGetInstance<IUmbracoDatabaseFactory>(),
+                    factory.TryGetInstance<RepositoryFactory>(), factory.TryGetInstance<IScopeProvider>()));
 
             Container.RegisterFrom<ServicesCompositionRoot>();
             // composition root is doing weird things, fix
@@ -348,6 +352,20 @@ namespace Umbraco.Tests.Testing
 
         protected virtual void Reset()
         {
+            // reset and dispose scopes
+            // ensures we don't leak an opened database connection
+            // which would lock eg SqlCe .sdf files
+            var scopeProvider = Container?.TryGetInstance<IScopeProvider>() as ScopeProvider;
+            if (scopeProvider != null)
+            {
+                Core.Scoping.Scope scope;
+                while ((scope = scopeProvider.AmbientScope) != null)
+                {
+                    scope.Reset();
+                    scope.Dispose();
+                }
+            }
+
             Current.Reset();
 
             Container?.Dispose();

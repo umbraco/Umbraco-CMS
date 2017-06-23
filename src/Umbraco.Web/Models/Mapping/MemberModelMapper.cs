@@ -150,6 +150,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IMemberGroup TO MemberGroupDisplay
             config.CreateMap<IMemberGroup, MemberGroupDisplay>()
+                .ForMember(dst => dst.Udi, expression => expression.MapFrom(src => Udi.Create(Constants.UdiEntityType.MemberGroup, src.Key)))
                 .ForMember(x => x.Path, expression => expression.MapFrom(group => "-1," + group.Id))
                 .ForMember(x => x.Notifications, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())

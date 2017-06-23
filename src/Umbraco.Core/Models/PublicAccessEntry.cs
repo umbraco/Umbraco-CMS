@@ -27,6 +27,9 @@ namespace Umbraco.Core.Models
 
             _ruleCollection = new ObservableCollection<PublicAccessRule>(ruleCollection);
             _ruleCollection.CollectionChanged += _ruleCollection_CollectionChanged;
+
+            foreach (var rule in _ruleCollection)
+                rule.AccessEntryId = Key;
         }
 
         public PublicAccessEntry(Guid id, int protectedNodeId, int loginNodeId, int noAccessNodeId, IEnumerable<PublicAccessRule> ruleCollection)
@@ -40,6 +43,9 @@ namespace Umbraco.Core.Models
 
             _ruleCollection = new ObservableCollection<PublicAccessRule>(ruleCollection);
             _ruleCollection.CollectionChanged += _ruleCollection_CollectionChanged;
+
+            foreach (var rule in _ruleCollection)
+                rule.AccessEntryId = Key;
         }
 
         void _ruleCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

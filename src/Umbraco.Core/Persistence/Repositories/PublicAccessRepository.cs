@@ -101,6 +101,10 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Insert(rule);
             }
 
+            //update the id so HasEntity is correct
+            foreach (var rule in entity.Rules)
+                rule.Id = rule.Key.GetHashCode();
+
             entity.ResetDirtyProperties();
         }
 

@@ -13,6 +13,9 @@ namespace Umbraco.Core.IO
         // fixme - why are we managing logical call context here? should be bound
         // to the current scope, always => REFACTOR! but there should be something in
         // place (static?) to ensure we only have one concurrent shadow FS?
+        //
+        // => yes, that's _currentId - need to cleanup this entirely
+        // and, we probably need a way to stop shadowing entirely without cycling the app
 
         private const string ItemKey = "Umbraco.Core.IO.ShadowFileSystems";
 

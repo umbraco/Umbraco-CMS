@@ -296,11 +296,6 @@ AND umbracoNode.id <> @id",
             return GetCachedPreValueCollection(dataTypeId);
         }
 
-        internal static string GetCacheKeyRegex(int preValueId)
-        {
-            return CacheKeys.DataTypePreValuesCacheKey + @"[-\d]+-([\d]*,)*" + preValueId + @"(?!\d)[,\d$]*";
-        }
-
         public string GetPreValueAsString(int preValueId)
         {
             var collections = IsolatedCache.GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + "_");

@@ -231,6 +231,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //now remove a few rules from a few of the items and then add some more, this will put things 'out of order' which 
                 //we need to verify our sort order is working for the relator
+                // fixme - no "relator" in v8?!
                 for (int i = 0; i < allEntries.Count; i++)
                 {
                     //all the even ones

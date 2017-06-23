@@ -525,7 +525,7 @@ namespace Umbraco.Tests.Services
             var deletedContent = cs.GetById(content.Id);
             var deletedChildContentType = cts.Get(childContentType.Id);
             var deletedContentType = cts.Get(contentType.Id);
-            
+
             Assert.IsNull(deletedChildContentType);
             Assert.IsNull(deletedContent);
             Assert.IsNull(deletedContentType);
@@ -1534,7 +1534,8 @@ namespace Umbraco.Tests.Services
         public void Can_Remove_PropertyGroup_Without_Removing_Property_Types()
         {
             var service = ServiceContext.ContentTypeService;
-            var basePage = (IContentType)MockedContentTypes.CreateBasicContentType();
+
+            var basePage = (IContentType) MockedContentTypes.CreateBasicContentType();
             basePage.AddPropertyGroup("Content");
             basePage.AddPropertyGroup("Meta");
             service.Save(basePage);
@@ -1547,7 +1548,8 @@ namespace Umbraco.Tests.Services
                 SortOrder = 1,
                 DataTypeDefinitionId = -88
             };
-            var authorAdded = basePage.AddPropertyType(authorPropertyType, "Content");
+            Assert.IsTrue(basePage.AddPropertyType(authorPropertyType, "Content"));
+
             var titlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, "title")
             {
                 Name = "Title",
@@ -1556,20 +1558,20 @@ namespace Umbraco.Tests.Services
                 SortOrder = 1,
                 DataTypeDefinitionId = -88
             };
-            var titleAdded = basePage.AddPropertyType(authorPropertyType, "Meta");
+            Assert.IsTrue(basePage.AddPropertyType(titlePropertyType, "Meta"));
 
             service.Save(basePage);
-
             basePage = service.Get(basePage.Id);
 
-            var totalPt = basePage.PropertyTypes.Count();
+            var count = basePage.PropertyTypes.Count();
+            Assert.AreEqual(2, count);
 
             basePage.RemovePropertyGroup("Content");
-            service.Save(basePage);
 
+            service.Save(basePage);
             basePage = service.Get(basePage.Id);
 
-            Assert.AreEqual(totalPt, basePage.PropertyTypes.Count());
+            Assert.AreEqual(count, basePage.PropertyTypes.Count());
         }
 
         [Test]

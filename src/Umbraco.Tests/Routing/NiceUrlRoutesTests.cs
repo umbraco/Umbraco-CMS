@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
@@ -46,6 +47,14 @@ namespace Umbraco.Tests.Routing
         </Doc>
     </Doc>
 </root>";
+        }
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+
+            if (FirstTestInFixture)
+                ServiceContext.ContentTypeService.Save(new ContentType(-1) { Alias = "Doc", Name = "name" });
         }
 
         #endregion
@@ -181,6 +190,19 @@ DetermineRouteById(id):
         [TestCase(2004, false, "/x/b")]
         [TestCase(2005, false, "/x/b/c")]
         [TestCase(2006, false, "/x/b/e")]
+        public void GetRouteByIdNoHide(int id, bool hide, string expected)
+        {
+            var umbracoContext = GetUmbracoContext("/test", 0);
+            var cache = umbracoContext.ContentCache as PublishedContentCache;
+            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
+
+            SettingsForTests.HideTopLevelNodeFromPath = hide;
+
+            const bool preview = true; // make sure we don't cache
+            var route = cache.GetRouteById(preview, id);
+            Assert.AreEqual(expected, route);
+        }
+
         [TestCase(1000, true, "/")]
         [TestCase(1001, true, "/b")]
         [TestCase(1002, true, "/b/c")]
@@ -192,7 +214,7 @@ DetermineRouteById(id):
         [TestCase(2004, true, "/b")] // collision!
         [TestCase(2005, true, "/b/c")] // collision!
         [TestCase(2006, true, "/b/e")] // risky!
-        public void GetRouteById(int id, bool hide, string expected)
+        public void GetRouteByIdHide(int id, bool hide, string expected)
         {
             var umbracoContext = GetUmbracoContext("/test", 0);
             var cache = umbracoContext.ContentCache as PublishedContentCache;
@@ -214,10 +236,7 @@ DetermineRouteById(id):
 
             SettingsForTests.HideTopLevelNodeFromPath = false;
 
-            // make sure we cache
-            const bool preview = false;
-
-            var route = cache.GetRouteById(preview, 1000);
+            var route = cache.GetRouteById(false, 1000);
             Assert.AreEqual("/a", route);
 
             // GetRouteById registers a non-trusted route, which is cached for
@@ -239,6 +258,27 @@ DetermineRouteById(id):
         [TestCase("/a/b/c", false, 1002)]
         [TestCase("/a/b/c/d", false, 1003)]
         [TestCase("/x", false, 2000)]
+        public void GetByRouteNoHide(string route, bool hide, int expected)
+        {
+            var umbracoContext = GetUmbracoContext("/test", 0);
+            var cache = umbracoContext.ContentCache as PublishedContentCache;
+            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
+
+            SettingsForTests.HideTopLevelNodeFromPath = hide;
+
+            const bool preview = false; // make sure we don't cache - but HOW? should be some sort of switch?!
+            var content = cache.GetByRoute(preview, route);
+            if (expected < 0)
+            {
+                Assert.IsNull(content);
+            }
+            else
+            {
+                Assert.IsNotNull(content);
+                Assert.AreEqual(expected, content.Id);
+            }
+        }
+
         [TestCase("/", true, 1000)]
         [TestCase("/a", true, 2003)]
         [TestCase("/a/b", true, -1)]
@@ -248,7 +288,7 @@ DetermineRouteById(id):
         [TestCase("/y/z", true, 2002)]
         [TestCase("/b", true, 1001)] // (hence the 2004 collision)
         [TestCase("/b/c", true, 1002)] // (hence the 2005 collision)
-        public void GetByRoute(string route, bool hide, int expected)
+        public void GetByRouteHide(string route, bool hide, int expected)
         {
             var umbracoContext = GetUmbracoContext("/test", 0);
             var cache = umbracoContext.ContentCache as PublishedContentCache;
@@ -256,7 +296,7 @@ DetermineRouteById(id):
 
             SettingsForTests.HideTopLevelNodeFromPath = hide;
 
-            const bool preview = true; // make sure we don't cache
+            const bool preview = false; // make sure we don't cache - but HOW? should be some sort of switch?!
             var content = cache.GetByRoute(preview, route);
             if (expected < 0)
             {
@@ -278,10 +318,7 @@ DetermineRouteById(id):
 
             SettingsForTests.HideTopLevelNodeFromPath = false;
 
-            // make sure we cache
-            const bool preview = false;
-
-            var content = cache.GetByRoute(preview, "/a/b/c");
+            var content = cache.GetByRoute(false, "/a/b/c");
             Assert.IsNotNull(content);
             Assert.AreEqual(1002, content.Id);
 

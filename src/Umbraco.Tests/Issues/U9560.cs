@@ -4,11 +4,13 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Tests.Testing;
 using LightInject;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Issues
 {
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class U9560 : UmbracoTestBase
+    [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
+    public class U9560 : TestWithDatabaseBase
     {
         [Test]
         public void Test()

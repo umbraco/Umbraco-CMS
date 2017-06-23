@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Persistence
                             lock (locker)
                             {
                                 acquired++;
-                                if (acquired == 5) m2.Set();
+                                if (acquired == threadCount) m2.Set();
                             }
                             m1.Wait();
                             lock (locker)
@@ -99,7 +99,7 @@ namespace Umbraco.Tests.Persistence
 
             foreach (var thread in threads) thread.Join();
 
-            Assert.AreEqual(5, maxAcquired);
+            Assert.AreEqual(threadCount, maxAcquired);
             Assert.AreEqual(0, acquired);
 
             for (var i = 0; i < threadCount; i++)
@@ -115,8 +115,8 @@ namespace Umbraco.Tests.Persistence
             var locker = new object();
             var acquired = 0;
             var entered = 0;
-            var ms = new AutoResetEvent[5];
-            for (var i = 0; i < 5; i++) ms[i] = new AutoResetEvent(false);
+            var ms = new AutoResetEvent[threadCount];
+            for (var i = 0; i < threadCount; i++) ms[i] = new AutoResetEvent(false);
             var m1 = new ManualResetEventSlim(false);
 
             for (var i = 0; i < threadCount; i++)
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.Persistence
                             lock (locker)
                             {
                                 entered++;
-                                if (entered == 5) m1.Set();
+                                if (entered == threadCount) m1.Set();
                             }
                             ms[ic].WaitOne();
                             scope.Database.AcquireLockNodeWriteLock(Constants.Locks.Servers);
@@ -164,11 +164,11 @@ namespace Umbraco.Tests.Persistence
             // all threads have entered
             ms[0].Set(); // let 0 go
             Thread.Sleep(100);
-            for (var i = 1; i < 5; i++) ms[i].Set(); // let others go
+            for (var i = 1; i < threadCount; i++) ms[i].Set(); // let others go
             Thread.Sleep(500);
             // only 1 thread has locked
             Assert.AreEqual(1, acquired);
-            for (var i = 0; i < 5; i++) ms[i].Set(); // let all go
+            for (var i = 0; i < threadCount; i++) ms[i].Set(); // let all go
 
             foreach (var thread in threads) thread.Join();
 

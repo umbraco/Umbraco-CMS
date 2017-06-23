@@ -8,13 +8,9 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
@@ -761,6 +757,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
+                Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(2));
+                Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
+
                 // Act
                 var urlAlias = new PropertyType("test", DataTypeDatabaseType.Nvarchar, "urlAlias")
                     {
@@ -772,13 +771,17 @@ namespace Umbraco.Tests.Persistence.Repositories
                     };
 
                 var addedPropertyType = contentType.AddPropertyType(urlAlias);
+
+                Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(2));
+                Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(5));
+
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
 
                 // Assert
                 var updated = repository.Get(NodeDto.NodeIdSeed + 1);
                 Assert.That(addedPropertyType, Is.True);
-                Assert.That(updated.PropertyGroups.Count(), Is.EqualTo(2));
+                Assert.That(updated.PropertyGroups.Count, Is.EqualTo(2));
                 Assert.That(updated.PropertyTypes.Count(), Is.EqualTo(5));
                 Assert.That(updated.PropertyTypes.Any(x => x.Alias == "urlAlias"), Is.True);
                 Assert.That(updated.PropertyTypes.First(x => x.Alias == "urlAlias").PropertyGroupId, Is.Null);

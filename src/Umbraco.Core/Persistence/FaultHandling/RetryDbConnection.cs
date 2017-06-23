@@ -142,8 +142,8 @@ namespace Umbraco.Core.Persistence.FaultHandling
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && _inner != null)
-                _inner.Dispose();
+            if (disposing)
+                _inner?.Dispose();
             _inner = null;
             base.Dispose(disposing);
         }
@@ -153,21 +153,30 @@ namespace Umbraco.Core.Persistence.FaultHandling
             _inner.Cancel();
         }
 
-        public override string CommandText { get { return _inner.CommandText; } set { _inner.CommandText = value; } }
+        public override string CommandText
+        {
+            get => _inner.CommandText;
+            set => _inner.CommandText = value;
+        }
 
-        public override int CommandTimeout { get { return _inner.CommandTimeout; } set { _inner.CommandTimeout = value; } }
+        public override int CommandTimeout
+        {
+            get => _inner.CommandTimeout;
+            set => _inner.CommandTimeout = value;
+        }
 
-        public override CommandType CommandType { get { return _inner.CommandType; } set { _inner.CommandType = value; } }
+        public override CommandType CommandType
+        {
+            get => _inner.CommandType;
+            set => _inner.CommandType = value;
+        }
 
         protected override DbConnection DbConnection
         {
-            get
-            {
-                return _connection;
-            }
+            get => _connection;
             set
             {
-                if (value == null) throw new ArgumentNullException("value");
+                if (value == null) throw new ArgumentNullException(nameof(value));
                 var connection = value as RetryDbConnection;
                 if (connection == null) throw new ArgumentException("Value is not a FaultHandlingDbConnection instance.");
                 if (_connection != null && _connection != connection) throw new Exception("Value is another FaultHandlingDbConnection instance.");
@@ -181,12 +190,13 @@ namespace Umbraco.Core.Persistence.FaultHandling
             return _inner.CreateParameter();
         }
 
-        protected override DbParameterCollection DbParameterCollection
-        {
-            get { return _inner.Parameters; }
-        }
+        protected override DbParameterCollection DbParameterCollection => _inner.Parameters;
 
-        protected override DbTransaction DbTransaction { get { return _inner.Transaction; } set { _inner.Transaction = value; } }
+        protected override DbTransaction DbTransaction
+        {
+            get => _inner.Transaction;
+            set => _inner.Transaction = value;
+        }
 
         public override bool DesignTimeVisible { get; set; }
 
@@ -219,6 +229,10 @@ namespace Umbraco.Core.Persistence.FaultHandling
             _inner.Prepare();
         }
 
-        public override UpdateRowSource UpdatedRowSource { get { return _inner.UpdatedRowSource; } set { _inner.UpdatedRowSource = value; } }
+        public override UpdateRowSource UpdatedRowSource
+        {
+            get => _inner.UpdatedRowSource;
+            set => _inner.UpdatedRowSource = value;
+        }
     }
 }

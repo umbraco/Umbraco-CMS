@@ -39,11 +39,12 @@ namespace Umbraco.Core.Services
 
         protected void OnChanged(IScopeUnitOfWork uow, ContentTypeChange<TItem>.EventArgs args)
         {
-            uow.Events.Dispatch(Changed, This, args);
+            uow.Events.Dispatch(Changed, This, args, "Changed");
         }
 
         protected void OnUowRefreshedEntity(ContentTypeChange<TItem>.EventArgs args)
         {
+            // that one is always immediate (not dispatched, transactional)
             UowRefreshedEntity.RaiseEvent(args, This);
         }
 

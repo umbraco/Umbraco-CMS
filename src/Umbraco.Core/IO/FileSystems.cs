@@ -343,6 +343,8 @@ namespace Umbraco.Core.IO
 
         internal ICompletable Shadow(Guid id)
         {
+            if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
+
             var typed = _wrappers.ToArray();
             var wrappers = new ShadowWrapper[typed.Length + 7];
             var i = 0;

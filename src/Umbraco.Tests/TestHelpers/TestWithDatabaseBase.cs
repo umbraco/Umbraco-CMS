@@ -108,6 +108,7 @@ namespace Umbraco.Tests.TestHelpers
             var timer = profilingLogger?.TraceDuration<TestWithDatabaseBase>("teardown"); // fixme move that one up
             try
             {
+                // fixme - should we first kill all scopes?
                 if (Options.Database == UmbracoTestOptions.Database.NewSchemaPerTest)
                     RemoveDatabaseFile();
 

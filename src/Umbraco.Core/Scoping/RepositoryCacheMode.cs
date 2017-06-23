@@ -22,6 +22,16 @@
         /// <para>Reads from, and writes to, a scope-local cache.</para>
         /// <para>Upon scope completion, clears the global L2 cache.</para>
         /// </remarks>
-        Scoped = 2
+        Scoped = 2,
+
+        /// <summary>
+        /// No cache.
+        /// </summary>
+        /// <remarks>
+        /// <para>Bypasses caches entirely.</para>
+        /// <para>Upon scope completion, clears the global L2 cache.</para>
+        /// fixme - what about a L1 cache?
+        /// </remarks>
+        None = 3
     }
 }

@@ -27,6 +27,7 @@ namespace Umbraco.Tests.Scoping
         {
             base.TearDown();
             SafeCallContext.Clear();
+            ShadowFileSystems.ResetId();
             ClearFiles();
         }
 

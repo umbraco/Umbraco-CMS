@@ -23,6 +23,14 @@ namespace Umbraco.Tests.PublishedContent
         // and http://msmvps.com/blogs/jon_skeet/archive/2010/10/28/overloading-and-generic-constraints.aspx
         // and http://blogs.msdn.com/b/ericlippert/archive/2009/12/10/constraints-are-not-part-of-the-signature.aspx
 
+        public override void SetUp()
+        {
+            base.SetUp();
+
+            var umbracoContext = GetUmbracoContext();
+            Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
+        }
+
         protected override void Compose()
         {
             base.Compose();
@@ -42,7 +50,7 @@ namespace Umbraco.Tests.PublishedContent
             return pluginManager;
         }
 
-        private void InitializeUmbracoContext()
+        private UmbracoContext GetUmbracoContext()
         {
             RouteData routeData = null;
 
@@ -59,7 +67,7 @@ namespace Umbraco.Tests.PublishedContent
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>());
 
-            Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
+            return umbracoContext;
         }
 
         public override void TearDown()

@@ -2,23 +2,31 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Tests.Cache
 {
     [TestFixture]
-    public class CacheRefresherEventHandlerTests
+    [UmbracoTest(WithApplication = true)]
+    public class CacheRefresherEventHandlerTests : UmbracoTestBase
     {
         [Test]
         public void Can_Find_All_Event_Handlers()
         {
-            var testObjects = new TestObjects(null);
-            var serviceContext = testObjects.GetServiceContextMock();
+            // fixme - cannot work with mocks
+            // because the events are defined on actual static classes, not on the interfaces, so name matching fails
+            // we should really refactor events entirely - in the meantime, let it be an UmbracoTestBase ;(
+            //var testObjects = new TestObjects(null);
+            //var serviceContext = testObjects.GetServiceContextMock();
+            var serviceContext = Current.Services;
+
             var definitions = new IEventDefinition[]
             {
                 //I would test these but they are legacy events and we don't need them for deploy, when we migrate to new/better events we can wire up the check
@@ -58,8 +66,8 @@ namespace Umbraco.Tests.Cache
 
                 new EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>(null, serviceContext.ContentTypeService, new SaveEventArgs<IContentType>(Enumerable.Empty<IContentType>())),
                 new EventDefinition<IContentTypeService, DeleteEventArgs<IContentType>>(null, serviceContext.ContentTypeService, new DeleteEventArgs<IContentType>(Enumerable.Empty<IContentType>())),
-                new EventDefinition<IContentTypeService, SaveEventArgs<IMediaType>>(null, serviceContext.ContentTypeService, new SaveEventArgs<IMediaType>(Enumerable.Empty<IMediaType>())),
-                new EventDefinition<IContentTypeService, DeleteEventArgs<IMediaType>>(null, serviceContext.ContentTypeService, new DeleteEventArgs<IMediaType>(Enumerable.Empty<IMediaType>())),
+                new EventDefinition<IMediaTypeService, SaveEventArgs<IMediaType>>(null, serviceContext.MediaTypeService, new SaveEventArgs<IMediaType>(Enumerable.Empty<IMediaType>())),
+                new EventDefinition<IMediaTypeService, DeleteEventArgs<IMediaType>>(null, serviceContext.MediaTypeService, new DeleteEventArgs<IMediaType>(Enumerable.Empty<IMediaType>())),
 
                 new EventDefinition<IMemberTypeService, SaveEventArgs<IMemberType>>(null, serviceContext.MemberTypeService, new SaveEventArgs<IMemberType>(Enumerable.Empty<IMemberType>())),
                 new EventDefinition<IMemberTypeService, DeleteEventArgs<IMemberType>>(null, serviceContext.MemberTypeService, new DeleteEventArgs<IMemberType>(Enumerable.Empty<IMemberType>())),
@@ -100,11 +108,17 @@ namespace Umbraco.Tests.Cache
                 new EventDefinition<IRelationService, DeleteEventArgs<IRelationType>>(null, serviceContext.RelationService, new DeleteEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
             };
 
+            var ok = true;
             foreach (var definition in definitions)
             {
                 var found = CacheRefresherComponent.FindHandler(definition);
-                Assert.IsNotNull(found, "Couldn't find method for " + definition.EventName + " on " + definition.Sender.GetType());
+                if (found == null)
+                {
+                    Console.WriteLine("Couldn't find method for " + definition.EventName + " on " + definition.Sender.GetType());
+                    ok = false;
+                }
             }
+            Assert.IsTrue(ok, "see log for details");
         }
     }
 }

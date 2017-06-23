@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Scoping
             // need to rewrite these tests entirely using the XmlStore and such
             // need to create an equivalent test for NuCache once we understand it
 
-            Assert.Fail("oops");
+            Assert.Fail("need to rewrite these tests entirely for XmlStore");
         }
 
         //private CacheRefresherComponent _cacheRefresher;

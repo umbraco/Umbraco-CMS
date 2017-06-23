@@ -1079,51 +1079,30 @@ AND umbracoNode.id <> @id",
                 // query below is not safe + pointless if array is empty
                 if (contentTypeIds.Length == 0) return;
 
-                // first part Gets all property groups including property type data even when no property type exists on the group
-                // second part Gets all property types including ones that are not on a group
-                // therefore the union of the two contains all of the property type and property group information we need
-                // NOTE: MySQL requires a SELECT * FROM the inner union in order to be able to sort . lame.
+                var sql = @"SELECT  
+	pt.contentTypeId as contentTypeId, pt.uniqueID as ptUniqueID, pt.id as ptId,
+	pt.Alias as ptAlias, pt." + sqlSyntax.GetQuotedColumnName("Description") + @" as ptDesc, pt.mandatory as ptMandatory,
+	pt.Name as ptName, pt.sortOrder as ptSortOrder, pt.validationRegExp as ptRegExp,
 
-                var sqlBuilder = new StringBuilder(@"SELECT PG.contenttypeNodeId as contentTypeId,
-                            PT.ptUniqueId as ptUniqueID, PT.ptId, PT.ptAlias, PT.ptDesc,PT.ptMandatory,PT.ptName,PT.ptSortOrder,PT.ptRegExp,
-                            PT.dtId,PT.dtDbType,PT.dtPropEdAlias,
-                            PG.id as pgId, PG.uniqueID as pgKey, PG.sortorder as pgSortOrder, PG." + sqlSyntax.GetQuotedColumnName("text") + @" as pgText
-                        FROM cmsPropertyTypeGroup as PG
-                        LEFT JOIN
-                        (
-                            SELECT PT.uniqueID as ptUniqueId, PT.id as ptId, PT.Alias as ptAlias, PT." + sqlSyntax.GetQuotedColumnName("Description") + @" as ptDesc,
-                                    PT.mandatory as ptMandatory, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp,
-                                    PT.propertyTypeGroupId as ptGroupId,
-                                    DT.dbType as dtDbType, DT.nodeId as dtId, DT.propertyEditorAlias as dtPropEdAlias
-                            FROM cmsPropertyType as PT
-                            INNER JOIN cmsDataType as DT
-                            ON PT.dataTypeId = DT.nodeId
-                        )  as  PT
-                        ON PT.ptGroupId = PG.id
-                        WHERE (PG.contenttypeNodeId in (@contentTypeIds))
+    dt.nodeId as dtId, dt.dbType as dtDbType, dt.propertyEditorAlias as dtPropEdAlias,
 
-                        UNION
+	pg.id as pgId, pg.uniqueID as pgKey, pg.sortorder as pgSortOrder, pg." + sqlSyntax.GetQuotedColumnName("text") + @" as pgText
 
-                        SELECT  PT.contentTypeId as contentTypeId,
-                                PT.uniqueID as ptUniqueID, PT.id as ptId, PT.Alias as ptAlias, PT." + sqlSyntax.GetQuotedColumnName("Description") + @" as ptDesc,
-                                PT.mandatory as ptMandatory, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp,
-                                DT.nodeId as dtId, DT.dbType as dtDbType, DT.propertyEditorAlias as dtPropEdAlias,
-                                PG.id as pgId, PG.uniqueID as pgKey, PG.sortorder as pgSortOrder, PG." + sqlSyntax.GetQuotedColumnName("text") + @" as pgText
-                        FROM cmsPropertyType as PT
-                        INNER JOIN cmsDataType as DT
-                        ON PT.dataTypeId = DT.nodeId
-                        LEFT JOIN cmsPropertyTypeGroup as PG
-                        ON PG.id = PT.propertyTypeGroupId
-                        WHERE (PT.contentTypeId in (@contentTypeIds))");
+FROM cmsPropertyType as pt
+INNER JOIN cmsDataType as dt ON pt.dataTypeId = dt.nodeId
+LEFT JOIN cmsPropertyTypeGroup as pg ON pg.id = pt.propertyTypeGroupId
 
-                sqlBuilder.AppendLine(" ORDER BY (pgId)");
+WHERE pt.contentTypeId IN (@contentTypeIds)
+
+ORDER BY pgId
+";
 
                 //NOTE: we are going to assume there's not going to be more than 2100 content type ids since that is the max SQL param count!
                 // Since there are 2 groups of params, it will be half!
                 if (((contentTypeIds.Length / 2) - 1) > 2000)
                     throw new InvalidOperationException("Cannot perform this lookup, too many sql parameters");
 
-                var result = db.Fetch<dynamic>(sqlBuilder.ToString(), new { contentTypeIds = contentTypeIds });
+                var result = db.Fetch<dynamic>(sql, new { contentTypeIds = contentTypeIds });
 
                 foreach (var contentTypeId in contentTypeIds)
                 {

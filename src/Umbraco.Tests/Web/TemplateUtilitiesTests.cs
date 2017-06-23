@@ -1,15 +1,17 @@
 using System;
 using System.Web;
+using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -21,6 +23,30 @@ namespace Umbraco.Tests.Web
     [TestFixture]
     public class TemplateUtilitiesTests
     {
+        [SetUp]
+        public void SetUp()
+        {
+            // fixme - now UrlProvider depends on EntityService for GetUrl(guid) - this is bad
+            // should not depend on more than IdkMap maybe - fix this!
+            var entityService = new Mock<IEntityService>();
+            entityService.Setup(x => x.GetIdForKey(It.IsAny<Guid>(), It.IsAny<UmbracoObjectTypes>())).Returns(Attempt<int>.Fail());
+            var serviceContext = new ServiceContext(entityService: entityService.Object);
+
+            // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
+            var container = new Mock<IServiceContainer>();
+            container.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(new TypeLoader(new NullCacheProvider(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
+            container.Setup(x => x.GetInstance(typeof (ServiceContext))).Returns(serviceContext);
+            Current.Container = container.Object;
+
+            Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Current.Reset();
+        }
+
         [TestCase("", "")]
         [TestCase("hello href=\"{localLink:1234}\" world ", "hello href=\"/my-test-url\" world ")]
         [TestCase("hello href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"/my-test-url\" world ")]
@@ -48,7 +74,7 @@ namespace Umbraco.Tests.Web
                 });
 
             using (var umbCtx = UmbracoContext.EnsureContext(
-                Mock.Of<IUmbracoContextAccessor>(), 
+                Umbraco.Web.Composing.Current.UmbracoContextAccessor,
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IFacadeService>(),
                 new Mock<WebSecurity>(null, null).Object,

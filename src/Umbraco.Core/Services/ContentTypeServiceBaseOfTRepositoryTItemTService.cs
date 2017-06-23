@@ -391,6 +391,9 @@ namespace Umbraco.Core.Services
                     return;
                 }
 
+                if (string.IsNullOrWhiteSpace(item.Name))
+                    throw new ArgumentException("Cannot save item with empty name.");
+
                 var repo = uow.CreateRepository<TRepository>();
                 uow.WriteLock(WriteLockIds);
 
@@ -780,7 +783,7 @@ namespace Umbraco.Core.Services
             var evtMsgs = EventMessagesFactory.Get();
 
             var containerObjectType = ContainerObjectType;
-            if (container.ContainedObjectType != containerObjectType)
+            if (container.ContainerObjectType != containerObjectType)
             {
                 var ex = new InvalidOperationException("Not a container of the proper type.");
                 return OperationStatus.Attempt.Fail(evtMsgs, ex);

@@ -164,7 +164,11 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException("No content with that id.", nameof(parentId));
 
             var content = new Content(name, parentId, contentType);
-            CreateContent(null, content, parent, userId, false);
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                CreateContent(uow, content, parent, userId, false);
+                uow.Complete();
+            }
 
             return content;
         }
@@ -189,7 +193,11 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
 
             var content = new Content(name, -1, contentType);
-            CreateContent(null, content, null, userId, false);
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                CreateContent(uow, content, null, userId, false);
+                uow.Complete();
+            }
 
             return content;
         }
@@ -940,6 +948,11 @@ namespace Umbraco.Core.Services
                     return OperationStatus.Attempt.Cancel(evtMsgs);
                 }
 
+                if (string.IsNullOrWhiteSpace(content.Name))
+                {
+                    throw new ArgumentException("Cannot save content with empty name.");
+                }
+
                 var isNew = content.IsNewEntity();
 
                 uow.WriteLock(Constants.Locks.ContentTree);
@@ -1533,6 +1546,7 @@ namespace Umbraco.Core.Services
             //  because we want it now, we have to calculate it by ourselves
             //paths[content.Id] = content.Path;
             paths[content.Id] = (parent == null ? (parentId == Constants.System.RecycleBinContent ? "-1,-20" : "-1") : parent.Path) + "," + content.Id;
+            Console.WriteLine("path " + content.Id + " = " + paths[content.Id]);
 
             var descendants = GetDescendants(content);
             foreach (var descendant in descendants)
@@ -1540,14 +1554,16 @@ namespace Umbraco.Core.Services
                 moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
 
                 // update path and level since we do not update parentId
+                if (paths.ContainsKey(descendant.ParentId) == false)
+                    Console.WriteLine("oops on " + descendant.ParentId + " for " + content.Path + " " + parent?.Path);
                 descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
+                Console.WriteLine("path " + descendant.Id + " = " + paths[descendant.Id]);
                 descendant.Level += levelDelta;
                 PerformMoveContentLocked(repository, descendant, userId, trash);
             }
         }
 
-        private static void PerformMoveContentLocked(IContentRepository repository, IContent content, int userId,
-            bool? trash)
+        private static void PerformMoveContentLocked(IContentRepository repository, IContent content, int userId, bool? trash)
         {
             if (trash.HasValue) ((ContentBase) content).Trashed = trash.Value;
             content.WriterId = userId;
@@ -1868,7 +1884,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                return GetPublishedDescendantsLocked(repository, content);
+                return GetPublishedDescendantsLocked(repository, content).ToArray(); // ToArray important in uow!
             }
         }
 
@@ -2067,7 +2083,7 @@ namespace Umbraco.Core.Services
                 {
                     if (HasChildren(content.Id))
                     {
-                        var descendants = GetPublishedDescendants(content).ToArray();
+                        var descendants = GetPublishedDescendantsLocked(repository, content).ToArray();
                         uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
                     }
                     changeType = TreeChangeTypes.RefreshBranch; // whole branch

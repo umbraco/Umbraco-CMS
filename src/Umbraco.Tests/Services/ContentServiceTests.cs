@@ -61,6 +61,11 @@ namespace Umbraco.Tests.Services
         /// Regression test: http://issues.umbraco.org/issue/U4-9336
         /// </summary>
         [Test]
+        [Ignore("not applicable to v8")]
+
+        // fixme - this test was imported from 7.6 BUT it makes no sense for v8
+        // we should trust the PATH, full stop
+
         public void Moving_Node_To_Recycle_Bin_With_Invalid_Path()
         {
             var contentService = ServiceContext.ContentService;
@@ -917,10 +922,10 @@ namespace Umbraco.Tests.Services
             // to do it twice!
             subpage2.Name = "Text Page 2 Updated";
             subpage2.SetValue("author", "Jane Doe");
-            contentService.SaveAndPublishWithStatus(subpage2, 0); // publishes the current version
+            contentService.SaveAndPublishWithStatus(subpage2); // publishes the current version
             subpage2.Name = "Text Page 2 Updated1";
-            subpage2.SetValue("author", "Bop Hope");
-            contentService.SaveAndPublishWithStatus(subpage2, 0); // now creates a new version
+            subpage2.SetValue("author", "Bob Hope");
+            contentService.SaveAndPublishWithStatus(subpage2); // now creates a new version
 
             versions = contentService.GetVersions(NodeDto.NodeIdSeed + 3).ToList();
             Assert.AreEqual(2, versions.Count);
@@ -1450,7 +1455,7 @@ namespace Umbraco.Tests.Services
             }));
             Assert.IsTrue(ServiceContext.PublicAccessService.AddRule(content1, "test2", "test2").Success);
 
-            Assert.IsNotNull(ServiceContext.NotificationService.CreateNotification(ServiceContext.UserService.GetUserById(0), content1, "test"));
+            Assert.IsNotNull(ServiceContext.NotificationService.CreateNotification(ServiceContext.UserService.GetUserById(0), content1, "T"));
 
             ServiceContext.ContentService.AssignContentPermission(content1, 'A', new[] { 0 });
 
