@@ -139,6 +139,7 @@
       return !$scope.passwordValues.reset;
     };
 
+    //TODO: I don't think we need this or the cancel button, this can be up to the editor rendering this directive
     $scope.showCancelBtn = function () {
       return $scope.config.disableToggle !== true && $scope.config.hasPassword;
     };

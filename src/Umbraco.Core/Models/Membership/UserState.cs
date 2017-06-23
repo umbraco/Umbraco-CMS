@@ -9,6 +9,11 @@
         Active = 0,
         Disabled = 1,
         LockedOut = 2,
-        Invited = 3
+        Invited = 3,
+
+        /// <summary>
+        /// Occurs when the user has been created (not invited) and has no credentials assigned
+        /// </summary>
+        NoCredentials = 4
     }
 }

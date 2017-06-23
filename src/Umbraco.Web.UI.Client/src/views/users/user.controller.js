@@ -42,19 +42,22 @@
                 vm.user = user;
                 makeBreadcrumbs(vm.user);
                 setUserDisplayState();
-                vm.loading = false;
-            });
 
-            //go get the config for the membership provider and add it to the model
-            authResource.getMembershipProviderConfig().then(function (data) {
-              vm.changePasswordModel.config = data;
-              //ensure the hasPassword config option is set to true (the user of course has a password already assigned)
-              //this will ensure the oldPassword is shown so they can change it
-              // disable reset password functionality beacuse it does not make sense inside the backoffice
-              vm.changePasswordModel.config.hasPassword = true;
-              vm.changePasswordModel.config.disableToggle = true;
-              vm.changePasswordModel.config.enableReset = false;
-            });
+                //go get the config for the membership provider and add it to the model
+                authResource.getMembershipProviderConfig().then(function (data) {
+                  vm.changePasswordModel.config = data;
+
+                  //the user has a password if they are not states: Invited, NoCredentials
+                  vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
+
+                  vm.changePasswordModel.config.disableToggle = true;
+                  // disable reset password functionality beacuse it does not make sense inside the backoffice
+                  vm.changePasswordModel.config.enableReset = false;
+
+                  vm.loading = false;
+                });
+                
+            });           
         }
 
         function toggleChangePassword() {

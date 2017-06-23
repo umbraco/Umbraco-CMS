@@ -256,11 +256,16 @@ namespace Umbraco.Core.Models.Membership
         {
             get
             {
+                if (LastLoginDate == default(DateTime) && IsApproved == false && InvitedDate != null)
+                    return UserState.Invited;
+                if (LastLoginDate == default(DateTime) && InvitedDate == null && RawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix))
+                    return UserState.NoCredentials;
+
                 if (IsLockedOut)
                     return UserState.LockedOut;
                 if (IsApproved == false)
                     return UserState.Disabled;
-                //TODO: Fill in the invite details
+
                 return UserState.Active;
             }
         }
