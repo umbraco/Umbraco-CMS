@@ -16,34 +16,34 @@
     </div>
 
     <div class="form" ng-show="newItem">
-        <h4>Define crop</h4>
+        <h4><localize key="imagecropper_defineCrop">Define crop</localize></h4>
         <p>
-            Give the crop an alias and it's default width and height.
+            <localize key="imagecropper_defineCropDescription">Give the crop an alias and it's default width and height</localize>.
         </p>
 
         <div class="control-group">
-            <label>Alias</label>
+            <label><localize key="general_alias">Alias</localize></label>
             <input name="newItem.alias" type="text"
                    ng-model="newItem.alias" val-highlight="{{hasError}}" />
         </div>
 
         <div class="control-group">
-            <label>Size</label>
-            <input name="newItem.width" type="number" placeholder="Width"
+            <label><localize key="general_size">Size</localize></label>
+            <input name="newItem.width" type="number" localize="placeholder" placeholder="@general_width"
                    ng-model="newItem.width" class="umb-editor-small" val-highlight="{{hasError}}" />
             &times;
-            <input name="newItem.height" type="number" placeholder="Height"
+            <input name="newItem.height" type="number" localize="placeholder" placeholder="@general_height"
                    ng-model="newItem.height" class="umb-editor-small" val-highlight="{{hasError}}" />
         </div>
 
         <div class="control-group">
-            <button class="btn" ng-click="add($event)">Save crop</button>
-            <a href class="btn btn-link" ng-click="cancel($event)">Cancel</a>
+            <button class="btn" ng-click="add($event)"><localize key="imagecropper_saveCrop">Save crop</localize></button>
+            <a href class="btn btn-link" ng-click="cancel($event)"><localize key="general_cancel">Cancel</localize></a>
         </div>
     </div>
 
     <div class="control-group" ng-hide="newItem">
-        <button class="btn" ng-click="newItem = {}" prevent-default>Add new crop</button>
+        <button class="btn" ng-click="newItem = {}" prevent-default><localize key="imagecropper_addCrop">Add new crop</localize></button>
     </div>
 
 </div>

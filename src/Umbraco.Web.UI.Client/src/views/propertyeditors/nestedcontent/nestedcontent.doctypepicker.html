@@ -5,13 +5,13 @@
                 <tr>
                     <th/>
                     <th>
-                        Document Type
+                        <localize key="content_documentType">Document Type</localize>
                     </th>
                     <th>
-                        Tab
+                        <localize key="editcontenttype_tab">Tab</localize>
                     </th>
                     <th>
-                        Name Template
+                        <localize key="template_template">Template</localize>
                     </th>
                     <th />
                 </tr>
@@ -27,31 +27,35 @@
                     </td>
                     <td>
                         <select id="{{model.alias}}_tab_select"
-                            ng-options="t for t in selectedDocTypeTabs[config.ncAlias]"
+                            ng-options="t for t in docTypeTabs[config.ncAlias]"
                             ng-model="config.ncTabAlias" required></select>
                     </td>
                     <td>
                         <input type="text" ng-model="config.nameTemplate" />
                     </td>
                     <td>
-                        <a class="btn btn-danger" ng-click="remove($index)" ng-show="model.value.length > 1">Remove</a>
+                        <a class="btn btn-danger" ng-click="remove($index)" ng-show="model.value.length > 1">
+                            <localize key="general_delete">Delete</localize>
+                        </a>
                     </td>
                 </tr>
             </tbody>
         </table>
         <div>
-            <a class="btn" ng-click="add()">Add</a>
+            <a class="btn" ng-click="add()">
+                <localize key="general_add">Add</localize>
+            </a>
             <i class="icon icon-help-alt medium nested-content__help-icon" ng-click="showHelpText = !showHelpText"></i>
         </div>
     </div>
     <br/>
     <div class="nested-content__help-text" ng-show="showHelpText">
         <p>
-            <b>Tab:</b><br/>
-            Select the tab who's properties should be displayed. If left blank, the first tab on the doc type will be used.            
+            <b><localize key="editcontenttype_tab">Tab</localize>:</b><br/>
+            Select the tab who's properties should be displayed. If left blank, the first tab on the doc type will be used.
         </p>
         <p>
-            <b>Name template:</b><br/>
+            <b><localize key="template_template">Template</localize>:</b><br/>
             Enter an angular expression to evaluate against each item for its name. Use <code ng-non-bindable>{{$index}}</code> to display the item index  
         </p>
     </div>

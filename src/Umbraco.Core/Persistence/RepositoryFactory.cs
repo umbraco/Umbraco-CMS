@@ -145,6 +145,23 @@ namespace Umbraco.Core.Persistence
             };
         }
 
+        public virtual IContentRepository CreateContentBlueprintRepository(IScopeUnitOfWork uow)
+        {
+            return new ContentBlueprintRepository(
+                uow,
+                _cacheHelper,
+                _logger,
+                _sqlSyntax,
+                CreateContentTypeRepository(uow),
+                CreateTemplateRepository(uow),
+                CreateTagRepository(uow),
+                _settings.Content)
+            {
+                //duplicates are allowed
+                EnsureUniqueNaming = false
+            };
+        }
+
         public virtual IContentTypeRepository CreateContentTypeRepository(IScopeUnitOfWork uow)
         {
             return new ContentTypeRepository(

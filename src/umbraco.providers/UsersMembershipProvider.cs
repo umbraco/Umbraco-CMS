@@ -378,6 +378,7 @@ namespace umbraco.providers
         /// </summary>
         /// <param name="username">The user to reset the password for.</param>
         /// <param name="answer">The password answer for the specified user.</param>
+        /// <param name="generatedPassword"></param>
         /// <returns>The new password for the specified user.</returns>
         protected override string PerformResetPassword(string username, string answer, string generatedPassword)
         {            
@@ -385,7 +386,6 @@ namespace umbraco.providers
             //if (answer == null && RequiresQuestionAndAnswer)
             //{
             //    UpdateFailureCount(username, "passwordAnswer");
-
             //    throw new ProviderException("Password answer required for password reset.");
             //}
 

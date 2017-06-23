@@ -122,7 +122,7 @@
     });
 
     $scope.showReset = function () {
-      return $scope.config.hasPassword && $scope.config.enableReset;
+      return $scope.config.enableReset;
     };
 
     $scope.showOldPass = function () {

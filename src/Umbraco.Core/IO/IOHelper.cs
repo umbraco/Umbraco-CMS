@@ -97,6 +97,8 @@ namespace Umbraco.Core.IO
 
         public static string MapPath(string path, bool useHttpContext)
         {
+            if (path == null) throw new ArgumentNullException("path");
+
             // Check if the path is already mapped
             if ((path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)
                 || path.StartsWith(@"\\")) //UNC Paths start with "\\". If the site is running off a network drive mapped paths will look like "\\Whatever\Boo\Bar"

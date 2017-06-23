@@ -86,7 +86,7 @@ Use this directive to generate a pagination.
 (function() {
    'use strict';
 
-   function PaginationDirective() {
+   function PaginationDirective(localizationService) {
 
       function link(scope, el, attr, ctrl) {
 
@@ -123,12 +123,12 @@ Use this directive to generate a pagination.
 
                 //now, if the start is greater than 0 then '1' will not be displayed, so do the elipses thing
                 if (start > 0) {
-                    scope.pagination.unshift({ name: "First", val: 1, isActive: false }, {val: "...",isActive: false});
+                    scope.pagination.unshift({ name: localizationService.localize("general_first"), val: 1, isActive: false }, {val: "...",isActive: false});
                 }
 
                 //same for the end
                 if (start < maxIndex) {
-                    scope.pagination.push({ val: "...", isActive: false }, { name: "Last", val: scope.totalPages, isActive: false });
+                    scope.pagination.push({ val: "...", isActive: false }, { name: localizationService.localize("general_last"), val: scope.totalPages, isActive: false });
                 }
             }
 
