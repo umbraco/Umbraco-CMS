@@ -40,7 +40,7 @@
             // fake permissions
             vm.selectedUserGroup.permissions = [
                 {
-                    "groupName": "Group 1",
+                    "groupName": "Content",
                     "permissions": [
                         {
                             "name": "Edit content (save)",
@@ -75,7 +75,7 @@
                     ]
                 },
                 {
-                    "groupName": "Group 2",
+                    "groupName": "Structure",
                     "permissions": [
                         {
                             "name": "Move",
@@ -95,7 +95,7 @@
                     ]
                 },
                 {
-                    "groupName": "Group 3",
+                    "groupName": "Administration",
                     "permissions": [
                         {
                             "name": "Culture and Hostnames",
