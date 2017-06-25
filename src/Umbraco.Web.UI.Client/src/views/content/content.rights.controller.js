@@ -146,12 +146,18 @@
                     }
                 });
             });
-
+            
+            // set to selected so we can remove from the dropdown easily
+            group.selected = true;
+            
             vm.selectedUserGroups.push(group);
             setViewSate("manageGroups");
         }
 
         function removePermissions(index) {
+            // remove as selected so we can select it from the dropdown again
+            var group = vm.selectedUserGroups[index];
+            group.selected = false;
             vm.selectedUserGroups.splice(index, 1);
         }
 
