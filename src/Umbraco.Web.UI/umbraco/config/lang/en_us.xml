@@ -350,7 +350,7 @@
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
     <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
-    <key alias="email">Enter your email</key>
+    <key alias="email">Enter your email...</key>
   </area>
 
   <area alias="editcontenttype">
@@ -471,6 +471,7 @@
     <key alias="error">Error</key>
     <key alias="findDocument">Find</key>
     <key alias="first">First</key>
+    <key alias="groups">Groups</key>
     <key alias="height">Height</key>
     <key alias="help">Help</key>
     <key alias="icon">Icon</key>
@@ -491,6 +492,7 @@
     <key alias="logout">Logout</key>
     <key alias="macro">Macro</key>
     <key alias="mandatory">Mandatory</key>
+    <key alias="message">Message</key>
     <key alias="move">Move</key>
     <key alias="more">More</key>
     <key alias="name">Name</key>
@@ -1466,11 +1468,13 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="confirmNewPassword">Confirm new password</key>
     <key alias="changePasswordDescription">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
     <key alias="contentChannel">Content Channel</key>
+    <key alias="createAnotherUser">Create another user</key>
     <key alias="descriptionField">Description field</key>
     <key alias="disabled">Disable User</key>
     <key alias="documentType">Document Type</key>
     <key alias="editors">Editor</key>
     <key alias="excerptField">Excerpt field</key>
+    <key alias="goToProfile">Go to user profile</key>
     <key alias="language">Language</key>
     <key alias="loginname">Login</key>
     <key alias="mediastartnode">Start Node in Media Library</key>
@@ -1507,6 +1511,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="sessionExpires" version="7.0">Session expires in</key>
     <key alias="inviteUser">Invite user</key>
     <key alias="createUser">Create user</key>
+    <key alias="sendInvite">Send invite</key>
+    <key alias="backToUsers">Back to users</key>
     <key alias="inviteEmailCopySubject">Umbraco: Invitation</key>
     <key alias="inviteEmailCopyFormat">
       <![CDATA[<html><body><p>Hi %0%, you have been invited by %1% to the Umbraco Back Office.</p><p>Message from %1%: <em>%2</em></p><p>Click this <a href="%3" target="_blank">link</a> to accept the invite</p><p><small>If you cannot click on the link, copy and paste this URL into your browser window<br/><br/>%3</small></p></body></html>]]>

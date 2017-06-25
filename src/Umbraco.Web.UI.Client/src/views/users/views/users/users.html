@@ -120,7 +120,7 @@
         <!-- Groups filter -->
         <div class="dropdown pull-right">
           <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.showGroupFilter = !vm.showGroupFilter">
-            <span>Groups:</span>
+            <span><localize key="general_groups"></localize>:</span>
             <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getGroupFilterName() }}</span>
             <span class="caret"></span>
           </a>
@@ -264,7 +264,7 @@
 
     <umb-editor-sub-header>
       <umb-editor-sub-header-content-left>
-        <a class="umb-package-details__back-link" href="" ng-click="vm.setUsersViewState('overview');">&larr; Back to users</a>
+        <a class="umb-package-details__back-link" href="" ng-click="vm.setUsersViewState('overview');">&larr; <localize key="user_backToUsers">Back to users</localize></a>
       </umb-editor-sub-header-content-left>
     </umb-editor-sub-header>
 
@@ -272,16 +272,16 @@
       <form name="addUserForm" no-validate val-form-manager style="max-width: 500px;" class="block-form">
         <div>
           <div ng-if="vm.usersViewState === 'inviteUser'">
-            <h3 class="bold" style="margin-bottom: 0;">Invite user</h3>
+            <h3 class="bold" style="margin-bottom: 0;"><localize key="user_inviteUser">Invite User</localize></h3>
             <p style="line-height: 1.6em; margin-bottom: 15px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
           </div>
           <div ng-if="vm.usersViewState === 'createUser'">
-            <h3 class="bold" style="margin-bottom: 0;">Create user</h3>
+            <h3 class="bold" style="margin-bottom: 0;"><localize key="user_createUser">Create user</localize></h3>
             <p style="line-height: 1.6em; margin-bottom: 15px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
           </div>
         </div>
 
-        <umb-control-group label="Name" label-for="name">
+        <umb-control-group label="@general_name" label-for="name">
           <input type="text"
                  name="name"
                  localize="placeholder"
@@ -295,11 +295,11 @@
           <span class="help-inline" val-msg-for="name" val-toggle-msg="valServerField"></span>
         </umb-control-group>
 
-        <umb-control-group label="Email" label-for="email">
+        <umb-control-group label="@general_email" label-for="email">
           <input type="email"
                  name="email"
                  localize="placeholder"
-                 placeholder="@placeholders_entername"
+                 placeholder="@placeholders_email"
                  class="input-block-level"
                  ng-model="vm.newUser.email"
                  required
@@ -309,7 +309,7 @@
           <span class="help-inline" val-msg-for="email" val-toggle-msg="valServerField"></span>
         </umb-control-group>
 
-        <umb-control-group label="User group">
+        <umb-control-group label="@user_usergroup">
 
           <umb-user-group-preview ng-repeat="group in vm.newUser.userGroups"
                                   icon="group.icon"
@@ -331,7 +331,7 @@
 
         </umb-control-group>
 
-        <umb-control-group label="Message" ng-if="vm.usersViewState === 'inviteUser'" label-for="message">
+        <umb-control-group label="@general_message" ng-if="vm.usersViewState === 'inviteUser'" label-for="message">
           <textarea name="message"
                     type="text"
                     class="input-block-level"
@@ -351,7 +351,7 @@
                     state="vm.page.createButtonState"
                     type="button"
                     action="vm.inviteUser(addUserForm)"
-                    label="Send invite"
+                    label-key="user_sendInvite"
                     size="m">
         </umb-button>
 
@@ -360,7 +360,7 @@
                     state="vm.page.createButtonState"
                     type="button"
                     action="vm.createUser(addUserForm)"
-                    label="Create user"
+                    label-key="user_createUser"
                     size="m">
         </umb-button>
 
@@ -373,7 +373,7 @@
   <div ng-if="vm.usersViewState === 'createUserSuccess'">
     <umb-editor-sub-header>
       <umb-editor-sub-header-content-left>
-        <a class="umb-package-details__back-link" href="" ng-click="vm.setUsersViewState('overview');">&larr; Back to users</a>
+        <a class="umb-package-details__back-link" href="" ng-click="vm.setUsersViewState('overview');">&larr; <localize key="user_backToUsers">Back to users</localize></a>
       </umb-editor-sub-header-content-left>
     </umb-editor-sub-header>
 
@@ -388,15 +388,15 @@
         <p style="line-height: 1.6em; margin-bottom: 30px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
         <div>
           <umb-button type="button"
-                      button-style="success"
-                      label="Set permissions for {{ vm.newUser.name | umbWordLimit:1 }}"
-                      action="vm.goToUser(vm.newUser);"
+                      button-style="info"
+                      label-key="user_createAnotherUser"
+                      action="vm.setUsersViewState('createUser');"
                       size="m">
           </umb-button>
           <umb-button type="button"
-                      button-style="info"
-                      label="Create another user"
-                      action="vm.setUsersViewState('createUser');"
+                      button-style="success"
+                      label-key="user_goToProfile"
+                      action="vm.goToUser(vm.newUser);"
                       size="m">
           </umb-button>
         </div>

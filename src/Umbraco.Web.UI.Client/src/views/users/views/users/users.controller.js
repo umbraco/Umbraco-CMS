@@ -119,7 +119,7 @@
         }
 
         function selectUser(user, selection, event) {
-            
+
             if (user.selected) {
                 var index = selection.indexOf(user.id);
                 selection.splice(index, 1);

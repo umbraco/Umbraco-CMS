@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersOverviewController($scope, $location, $timeout, navigationService) {
+    function UsersOverviewController($scope, $location, $timeout, navigationService, localizationService) {
 
         var vm = this;
         var usersUri = $location.search().subview;
@@ -13,7 +13,7 @@
         vm.page.name = "User Management";
         vm.page.navigation = [
             {
-                "name": "Users",
+                "name": localizationService.localize("sections_users"),
                 "icon": "icon-user",
                 "action": function() {
                   $location.search("subview", "users")
@@ -22,7 +22,7 @@
                 "active": !usersUri || usersUri === "users"
             },
             {
-                "name": "Groups",
+                "name": localizationService.localize("general_groups"),
                 "icon": "icon-users",
                 "action": function () {
                   $location.search("subview", "groups")
