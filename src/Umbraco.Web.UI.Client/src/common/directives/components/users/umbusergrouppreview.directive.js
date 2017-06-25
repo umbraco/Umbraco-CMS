@@ -20,7 +20,9 @@
                 mediaStartNode: "=?",
                 permissions: "=?",
                 allowRemove: "=?",
-                onRemove: "&?"
+                allowEdit: "=?",
+                onRemove: "&?",
+                onEdit: "&?"
             },
             link: link
         };

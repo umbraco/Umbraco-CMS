@@ -30,7 +30,9 @@
                         name="group.name"
                         permissions="group.allowedPermissions"
                         allow-remove="true"
-                        on-remove="vm.removePermissions($index, vm.selectedUserGroups)">
+                        allow-edit="true"
+                        on-remove="vm.removePermissions($index, vm.selectedUserGroups)"
+                        on-edit="vm.editPermissions(group)">
                     </umb-user-group-preview>
                 </div>
 
