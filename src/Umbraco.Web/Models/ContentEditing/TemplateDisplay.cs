@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-using Umbraco.Core.Models.Validation;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -23,6 +19,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required]
         [DataMember(Name = "alias")]
         public string Alias { get; set; }
+
+        [DataMember(Name = "key")]
+        public Guid Key { get; set; }
 
         [DataMember(Name = "content")]
         public string Content { get; set; }

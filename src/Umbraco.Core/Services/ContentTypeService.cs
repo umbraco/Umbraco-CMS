@@ -367,6 +367,15 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IEnumerable<int> GetAllContentTypeIds(string[] aliases)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentTypeRepository(uow);
+                return repository.GetAllContentTypeIds(aliases);
+            }
+        }
+
         /// <summary>
         /// Copies a content type as a child under the specified parent if specified (otherwise to the root)
         /// </summary>

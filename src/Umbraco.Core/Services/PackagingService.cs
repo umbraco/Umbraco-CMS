@@ -1963,12 +1963,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after a package is imported
         /// </summary>
-        internal static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<InstallationSummary>> ImportedPackage;
+        public static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<InstallationSummary>> ImportedPackage;
 
         /// <summary>
         /// Occurs after a package is uninstalled
         /// </summary>
-        internal static event TypedEventHandler<IPackagingService, UninstallPackageEventArgs<UninstallationSummary>> UninstalledPackage;
+        public static event TypedEventHandler<IPackagingService, UninstallPackageEventArgs<UninstallationSummary>> UninstalledPackage;
 
         #endregion
     }

@@ -4,7 +4,7 @@ using System.Xml.Linq;
 
 namespace Umbraco.Core.Packaging.Models
 {
-    internal enum ActionRunAt
+    public enum ActionRunAt
     {
         Undefined = 0,
         Install,
@@ -13,7 +13,7 @@ namespace Umbraco.Core.Packaging.Models
 
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class PackageAction
+    public class PackageAction
     {
         private ActionRunAt _runAt;
         private bool? _undo;

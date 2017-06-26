@@ -26,14 +26,14 @@
             handle: ".icon-navigation"
         };
 
-        $scope.selectedDocTypeTabs = {};
+        $scope.docTypeTabs = {};
 
         ncResources.getContentTypes().then(function (docTypes) {
             $scope.model.docTypes = docTypes;
 
             // Populate document type tab dictionary
             docTypes.forEach(function (value) {
-                $scope.selectedDocTypeTabs[value.alias] = value.tabs;
+                $scope.docTypeTabs[value.alias] = value.tabs;
             });
         });
 
@@ -53,9 +53,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
     "contentResource",
     "localizationService",
     "iconHelper",
-    "Umbraco.PropertyEditors.NestedContent.Resources",
 
-    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, ncResources) {
+    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper) {
 
         //$scope.model.config.contentTypes;
         //$scope.model.config.minItems;
@@ -171,11 +170,13 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.deleteNode = function (idx) {
             if ($scope.nodes.length > $scope.model.config.minItems) {
                 if ($scope.model.config.confirmDeletes && $scope.model.config.confirmDeletes == 1) {
-                    if (confirm("Are you sure you want to delete this item?")) {
-                        $scope.nodes.splice(idx, 1);
-                        $scope.setDirty();
-                        updateModel();
-                    }
+                    localizationService.localize('content_nestedContentDeleteItem').then(function (value) {
+                        if (confirm(value)) {
+                            $scope.nodes.splice(idx, 1);
+                            $scope.setDirty();
+                            updateModel();
+                        }
+                    });
                 } else {
                     $scope.nodes.splice(idx, 1);
                     $scope.setDirty();
@@ -287,15 +288,16 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 });
                 scaffold.tabs = [];
                 if (tab) {
-                  scaffold.tabs.push(tab);
+                    scaffold.tabs.push(tab);
 
-                  angular.forEach(tab.properties,
-                    function(property) {
-                      if (_.find(notSupported, function (x) { return x === property.editor; })) {
-                        property.notSupported = true;
-                        property.notSupportedMessage = "Property " + property.label + " uses editor " + property.editor + " which is not supported by NestedContent.";
-                      }
-                    });
+                    angular.forEach(tab.properties,
+                      function (property) {
+                          if (_.find(notSupported, function (x) { return x === property.editor; })) {
+                              property.notSupported = true;
+                              //TODO: Not supported message to be replaced with 'content_nestedContentEditorNotSupported' dictionary key. Currently not possible due to async/timing quirk.
+                              property.notSupportedMessage = "Property " + property.label + " uses editor " + property.editor + " which is not supported by Nested Content.";
+                          }
+                      });
                 }
 
                 // Store the scaffold object
@@ -354,7 +356,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         var initNode = function (scaffold, item) {
             var node = angular.copy(scaffold);
 
-            node.key = guid();
+            node.key = item && item.key ? item.key : UUID.generate();
             node.ncContentTypeAlias = scaffold.contentTypeAlias;
 
             for (var t = 0; t < node.tabs.length; t++) {
@@ -424,13 +426,22 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             unsubscribe();
         });
 
-        var guid = function () {
-            function _p8(s) {
-                var p = (Math.random().toString(16) + "000000000").substr(2, 8);
-                return s ? "-" + p.substr(0, 4) + "-" + p.substr(4, 4) : p;
+        //TODO: Move this into a shared location?
+        var UUID = (function () {
+            var self = {};
+            var lut = []; for (var i = 0; i < 256; i++) { lut[i] = (i < 16 ? '0' : '') + (i).toString(16); }
+            self.generate = function () {
+                var d0 = Math.random() * 0xffffffff | 0;
+                var d1 = Math.random() * 0xffffffff | 0;
+                var d2 = Math.random() * 0xffffffff | 0;
+                var d3 = Math.random() * 0xffffffff | 0;
+                return lut[d0 & 0xff] + lut[d0 >> 8 & 0xff] + lut[d0 >> 16 & 0xff] + lut[d0 >> 24 & 0xff] + '-' +
+                  lut[d1 & 0xff] + lut[d1 >> 8 & 0xff] + '-' + lut[d1 >> 16 & 0x0f | 0x40] + lut[d1 >> 24 & 0xff] + '-' +
+                  lut[d2 & 0x3f | 0x80] + lut[d2 >> 8 & 0xff] + '-' + lut[d2 >> 16 & 0xff] + lut[d2 >> 24 & 0xff] +
+                  lut[d3 & 0xff] + lut[d3 >> 8 & 0xff] + lut[d3 >> 16 & 0xff] + lut[d3 >> 24 & 0xff];
             }
-            return _p8() + _p8(true) + _p8(true) + _p8();
-        };
+            return self;
+        })();
     }
 
 ]);

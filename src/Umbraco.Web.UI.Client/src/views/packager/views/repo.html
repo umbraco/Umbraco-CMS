@@ -7,7 +7,7 @@
 
         <div class="umb-packages-section">
             <div class="umb-packages-search">
-                <input class="-full-width-input" type="text" name="query" placeholder="Search for packages" umb-auto-focus ng-model="vm.searchQuery" ng-change="vm.search()" no-dirty-check>
+                <input class="-full-width-input" type="text" name="query" localize="placeholder" placeholder="@packager_packageSearch" umb-auto-focus ng-model="vm.searchQuery" ng-change="vm.search()" no-dirty-check>
             </div>
         </div>
 
@@ -26,7 +26,7 @@
             </div>
 
             <div class="umb-packages-section" ng-if="vm.searchQuery == ''">
-                <h4><strong>Popular</strong></h4>
+                <h4><strong><localize key="packager_packagesPopular">Popular</localize></strong></h4>
                 <div class="umb-packages clearfix">
 
                     <div class="umb-package" ng-repeat="package in vm.popular">
@@ -58,8 +58,8 @@
 
             <div class="umb-packages-section" ng-if="vm.packages.length > 0">
 
-                <h4 ng-if="vm.searchQuery === ''"><strong>New Releases</strong></h4>
-                <h4 ng-if="vm.searchQuery !== ''"><strong>Results for '{{ vm.searchQuery }}'</strong></h4>
+                <h4 ng-if="vm.searchQuery === ''"><strong><localize key="packager_packagesNew">New Releases</localize></strong></h4>
+                <h4 ng-if="vm.searchQuery !== ''"><strong><localize key="packager_packageSearchResults">Results for</localize> '{{ vm.searchQuery }}'</strong></h4>
 
                 <div class="umb-packages clearfix">
 
@@ -105,8 +105,8 @@
             <umb-empty-state
                 ng-if="vm.packages.length === 0 && vm.loading === false && vm.searchQuery !== ''"
                 position="center">
-                <h4><strong>We couldn't find anything for '{{ vm.searchQuery }}'</strong></h4>
-                <p class="faded">Please try searching for another package or browse through the categories.</p>
+                <h4><strong><localize key="packager_packageNoResults">We couldn't find anything for</localize> '{{ vm.searchQuery }}'</strong></h4>
+                <p class="faded"><localize key="packager_packageNoResultsDescription">Please try searching for another package or browse through the categories</localize>.</p>
             </umb-empty-state>
 
         </div>
@@ -119,7 +119,7 @@
 
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
-                <a class="umb-package-details__back-link" href="" ng-click="vm.setPackageViewState('packageList');">&larr; Take me back</a>
+                <a class="umb-package-details__back-link" href="" ng-click="vm.setPackageViewState('packageList');">&larr; <localize key="general_back">Back</localize></a>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
 
@@ -155,7 +155,7 @@
                     <div class="umb-package-details__section">
                         <button class="umb-era-button -green -full-width"
                                 ng-if="vm.package.isValid === true"
-                                ng-click="vm.downloadPackage(vm.package)">Install package</button>
+                                ng-click="vm.downloadPackage(vm.package)"><localize key="packager_packageInstall">Install package</localize></button>
 
                         <button class="umb-era-button -inactive -full-width" ng-if="vm.package.isValid === false" disabled>
                             <localize key="packager_packageAlreadyInstalled">Package is already installed</localize>
@@ -175,55 +175,55 @@
                             <div>
                                 <div class="umb-package-details__owner-profile-name">{{ vm.package.ownerInfo.owner }}</div>
                                 <div class="umb-package-details__owner-profile-karma">
-                                    {{ vm.package.ownerInfo.owner }} has <strong>{{ vm.package.ownerInfo.karma }}</strong> karma points
+                                    {{ vm.package.ownerInfo.owner }} <localize key="packager_packageHas">has</localize> <strong>{{ vm.package.ownerInfo.karma }}</strong> <localize key="packager_packageKarmaPoints">karma points</localize>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="umb-package-details__section">
-                        <div class="umb-package-details__section-title">Information</div>
+                        <div class="umb-package-details__section-title"><localize key="packager_packageInfo">Information</localize></div>
                         <div>
 
                             <div class="umb-package-details__information-item" ng-if="vm.package.ownerInfo.owner">
-                                <div class="umb-package-details__information-item-label">Owner:</div>
+                                <div class="umb-package-details__information-item-label"><localize key="packager_packageOwner">Owner</localize>:</div>
                                 <div class="umb-package-details__information-item-content">{{vm.package.ownerInfo.owner}}</div>
                             </div>
 
                             <div class="umb-package-details__information-item" ng-if="vm.package.ownerInfo.contributors">
-                                <div class="umb-package-details__information-item-label">Contributors:</div>
+                                <div class="umb-package-details__information-item-label"><localize key="packager_packageContrib">Contributors</localize>:</div>
                                 <div class="umb-package-details__information-item-content">
                                     <span ng-repeat="contributor in vm.package.ownerInfo.contributors">{{ contributor }}<span ng-if="!$last">,&nbsp;</span></span>
                                 </div>
                             </div>
 
                             <div class="umb-package-details__information-item" ng-if="vm.package.created">
-                                <div class="umb-package-details__information-item-label">Created:</div>
+                                <div class="umb-package-details__information-item-label"><localize key="packager_packageCreated">Created</localize>:</div>
                                 <div class="umb-package-details__information-item-content">{{vm.package.created | date:'yyyy-MM-dd HH:mm:ss'}}</div>
                             </div>
 
                             <div class="umb-package-details__information-item" ng-if="vm.package.latestVersion">
-                                <div class="umb-package-details__information-item-label">Current version:</div>
+                                <div class="umb-package-details__information-item-label"><localize key="packager_packageCurrentVersion">Current version</localize>:</div>
                                 <div class="umb-package-details__information-item-content">{{vm.package.latestVersion}}</div>
                             </div>
 
                             <div class="umb-package-details__information-item" ng-if="vm.package.information.netVersion">
-                                <div class="umb-package-details__information-item-label">.Net Version:</div>
+                                <div class="umb-package-details__information-item-label"><localize key="packager_packageNetVersion">.NET Version</localize>:</div>
                                 <div class="umb-package-details__information-item-content">{{vm.package.information.netVersion}}</div>
                             </div>
 
                             <div class="umb-package-details__information-item" ng-if="vm.package.licenseName">
-                                <div class="umb-package-details__information-item-label">License:</div>
+                                <div class="umb-package-details__information-item-label"><localize key="packager_packageLicense">License</localize>:</div>
                                 <div class="umb-package-details__information-item-content">{{vm.package.licenseName}}</div>
                             </div>
 
                             <div class="umb-package-details__information-item" ng-if="vm.package.downloads">
-                                <div class="umb-package-details__information-item-label">Downloads:</div>
+                                <div class="umb-package-details__information-item-label"><localize key="packager_packageDownloads">Downloads</localize>:</div>
                                 <div class="umb-package-details__information-item-content">{{vm.package.downloads}}</div>
                             </div>
 
                             <div class="umb-package-details__information-item" ng-if="vm.package.ownerInfo.karma">
-                                <div class="umb-package-details__information-item-label">Likes:</div>
+                                <div class="umb-package-details__information-item-label"><localize key="packager_packageLikes">Likes</localize>:</div>
                                 <div class="umb-package-details__information-item-content">{{vm.package.likes}}</div>
                             </div>
 
@@ -231,8 +231,8 @@
                     </div>
 
                     <div class="umb-package-details__section">
-                        <div class="umb-package-details__section-title">Compatibility</div>
-                        <div class="umb-package-details__section-description">This package is compatible with the following versions of Umbraco, as reported by community members. Full compatability cannot be gauranteed for versions reported below 100%</div>
+                        <div class="umb-package-details__section-title"><localize key="packager_packageCompatibility">Compatibility</localize></div>
+                        <div class="umb-package-details__section-description"><localize key="packager_packageCompatibilityDescription">This package is compatible with the following versions of Umbraco, as reported by community members. Full compatability cannot be gauranteed for versions reported below 100%</localize></div>
                         <div class="umb-package-details__compatability" ng-repeat="compatibility in vm.package.compatibility | filter:percentage > 0">
                             <div class="umb-package-details__compatability-label">
                                 <span class="umb-package-details__information-item-label">{{compatibility.version}}</span>
@@ -247,7 +247,7 @@
                     </div>
 
                     <div class="umb-package-details__section" ng-if="vm.package.externalSources">
-                        <div class="umb-package-details__section-title">External sources</div>
+                        <div class="umb-package-details__section-title"><localize key="packager_packageExternalSources">External sources</localize></div>
                         <div>
                             <div class="umb-package-details__information-item" ng-repeat="externalSource in vm.package.externalSources">
                                 <a class="umb-package-details__link" target="_blank" href="{{ externalSource.url }}">
@@ -269,7 +269,7 @@
     <div ng-if="vm.packageViewState === 'packageInstall' && vm.loading === false">
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
-                <a class="umb-package-details__back-link" href="" ng-click="vm.setPackageViewState('packageDetails');">&larr; Take me back</a>
+                <a class="umb-package-details__back-link" href="" ng-click="vm.setPackageViewState('packageDetails');">&larr; <localize key="general_back">Back</localize></a>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
 
@@ -295,17 +295,17 @@
                             </div>
 
                             <div class="umb-info-local-item">
-                                <strong>Version</strong>
+                                <strong><localize key="packager_packageVersion">Version</localize></strong>
                                 {{ vm.localPackage.version }}
                             </div>
 
                             <div class="umb-info-local-item">
-                                <strong>License</strong>
+                                <strong><localize key="packager_packageLicense">License</localize></strong>
                                 <a href="{{ vm.localPackage.licenseUrl }}" target="_blank">{{ vm.localPackage.license }}</a>
                             </div>
 
                             <div class="umb-info-local-item">
-                                <strong>Read me</strong>
+                                <strong><localize key="packager_packageReadme">Read me</localize></strong>
                                 <br>
                                 <small  ng-bind-html-unsafe="vm.localPackage.readMe"></small>
                             </div>
@@ -313,7 +313,7 @@
                             <div class="umb-info-local-item mt4 flex items-center flex-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
                                 <label for="license-accept" class="umb-package-installer-label">
                                     <input type="checkbox" id="license-accept" ng-model="vm.localPackage.packageLicenseAccept" required no-dirty-check>
-                                    <strong class="label-text">I accept <a href="{{ vm.localPackage.licenseUrl }}" target="_blank">terms of use</a></strong>
+                                    <strong class="label-text"><localize key="packager_accept">I accept</localize> <a href="{{ vm.localPackage.licenseUrl }}" target="_blank"><localize key="packager_termsOfUse">terms of use</localize></a></strong>
                                 </label>
                                 <button type="button"
                                         ng-if="vm.installState.type !== 'error'"
@@ -321,7 +321,7 @@
                                         ng-disabled="localPackageForm.$invalid"
                                         class="umb-era-button -green flex-inline mt3"
                                         ng-click="vm.installPackage(vm.localPackage)">
-                                    Install package
+                                    <localize key="packager_packageInstall">Install package</localize>
                                 </button>
                             </div>
 
@@ -333,7 +333,7 @@
                             </div>
 
                             <div class="umb-info-local-item text-error" ng-if="!vm.localPackage.isCompatible">
-                                This package cannot be installed, it requires a minimum Umbraco version of {{vm.localPackage.umbracoVersion}}
+                                <localize key="packager_targetVersionMismatch">This package cannot be installed, it requires a minimum Umbraco version of</localize> {{vm.localPackage.umbracoVersion}}
                             </div>
 
                             <div class="umb-info-local-item text-info" ng-class="{'text-info' : vm.installState.type !== 'error'}">
@@ -346,7 +346,7 @@
                                 <button type="button"
                                         class="btn btn-success flex-inline mt3"
                                         ng-click="vm.reloadPage()">
-                                    Finish
+                                    <localize key="packager_installFinish">Finish</localize>
                                 </button>
                             </div>
 

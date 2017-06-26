@@ -58,6 +58,9 @@
         <cc1:PropertyPanel runat="server" Text="Alias">
             <asp:TextBox ID="macroAlias" runat="server" CssClass="guiInputText"></asp:TextBox>
         </cc1:PropertyPanel>
+        <cc1:PropertyPanel runat="server" Text="Key">
+            <asp:Label ID="macroKey" runat="server" CssClass="guiLabel"></asp:Label>
+        </cc1:PropertyPanel>
     </cc1:Pane>
 
 

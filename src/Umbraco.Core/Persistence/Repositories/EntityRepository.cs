@@ -48,8 +48,8 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IUmbracoEntity> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, IQuery<IUmbracoEntity> filter = null)
         {   
-            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
-            bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            bool isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
+            bool isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
             var factory = new UmbracoEntityFactory();
             
             var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, sql =>
@@ -178,8 +178,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IUmbracoEntity GetByKey(Guid key, Guid objectTypeId)
         {
-            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
-            bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            bool isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
+            bool isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
 
             var sql = GetFullSqlForEntityType(key, isContent, isMedia, objectTypeId);
 
@@ -225,8 +225,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IUmbracoEntity Get(int id, Guid objectTypeId)
         {
-            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
-            bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            bool isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
+            bool isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
 
             var sql = GetFullSqlForEntityType(id, isContent, isMedia, objectTypeId);
 
@@ -280,8 +280,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private IEnumerable<IUmbracoEntity> PerformGetAll(Guid objectTypeId, Action<Sql> filter = null)
         {
-            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
-            bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            bool isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
+            bool isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
             var sql = GetFullSqlForEntityType(isContent, isMedia, objectTypeId, filter);
 
             var factory = new UmbracoEntityFactory();
@@ -324,8 +324,8 @@ namespace Umbraco.Core.Persistence.Repositories
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId)
         {
 
-            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
-            bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            bool isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
+            bool isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
 
             var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, null, objectTypeId);
             

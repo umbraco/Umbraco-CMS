@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -26,8 +27,21 @@ namespace umbraco.MacroEngines
             return "~/" + physicalPath;
         }
 
-        public string GetMd5(string text) {
-			return text.ToMd5();
+        [Obsolete("Please use the GetHash method instead. This may be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string GetMd5(string text)
+        {
+            return text.ToMd5();
+        }
+
+        /// <summary>
+        /// Generates a hash based on the text string passed in.  This method will detect the 
+        /// security requirements (is FIPS enabled) and return an appropriate hash.
+        /// </summary>
+        /// <param name="text">String value to hash</param>
+        /// <returns>The hash of the text string</returns>
+        public string GetHash(string text) {
+			return text.GenerateHash();
         }
 
         /// <summary>
@@ -145,7 +159,7 @@ namespace umbraco.MacroEngines
             //Get Rid Of Whitespace From Start/End
             razorSyntax = razorSyntax.Trim();
             //Use MD5 as a cache key
-            var syntaxMd5 = GetMd5(razorSyntax);
+            var syntaxMd5 = GetHash(razorSyntax);
             var fileName = "inline-" + syntaxMd5 + "." + scriptLanguage;
             return CreateTemporaryRazorFile(razorSyntax, fileName, true);
         }

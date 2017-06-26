@@ -22,7 +22,7 @@
 			<umb-control-group label="@content_target">
 				<select class="umb-editor umb-dropdown" ng-model="target.target">
 					<option value=""></option>
-					<option value="_blank">Opens the linked document in a new window or tab</option>
+					<option value="_blank"><localize key="defaultdialogs_openInNewWindow">Opens the linked document in a new window or tab</localize></option>
 					<option value="_top">Opens the linked document in the full body of the window</option>
 					<option value="_parent">Opens the linked document in the parent frame</option>
 				</select>
@@ -63,7 +63,7 @@
 	        		<localize key="general_cancel">Cancel</localize>
 				</a>
 
-				<a href ng-click="switchToMediaPicker()" class="btn">Link to file</a>
+				<a href ng-click="switchToMediaPicker()" class="btn"><localize key="defaultdialogs_linkToFile">Link to file</localize></a>
 
 				<button
 					class="btn btn-primary"

@@ -39,7 +39,7 @@ angular.module("umbraco.viewcache", [])
                     $delegate.get = function (url, config) {
 
                         if (Umbraco.Sys.ServerVariables.application && url.startsWith("views/") && url.endsWith(".html")) {
-                            var rnd = Umbraco.Sys.ServerVariables.application.version + "." + Umbraco.Sys.ServerVariables.application.cdf;
+                            var rnd = Umbraco.Sys.ServerVariables.application.cacheBuster;
                             var _op = (url.indexOf("?") > 0) ? "&" : "?";
                             url += _op + "umb__rnd=" + rnd;
                         }

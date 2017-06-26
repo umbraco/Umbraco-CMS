@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core
@@ -24,6 +23,10 @@ namespace Umbraco.Core
 
             [UdiType(UdiType.GuidUdi)]
             public const string Document = "document";
+
+            [UdiType(UdiType.GuidUdi)]
+            public const string DocumentBluePrint = "document-blueprint";
+
             [UdiType(UdiType.GuidUdi)]
             public const string Media = "media";
             [UdiType(UdiType.GuidUdi)]
@@ -84,6 +87,8 @@ namespace Umbraco.Core
             public const string PartialViewMacro = "partial-view-macro";
             [UdiType(UdiType.StringUdi)]
             public const string Xslt = "xslt";
+            [UdiType(UdiType.StringUdi)]
+            public const string Language = "language";
 
             public static string FromUmbracoObjectType(UmbracoObjectTypes umbracoObjectType)
             {
@@ -123,6 +128,8 @@ namespace Umbraco.Core
                         return FormsPreValue;
                     case UmbracoObjectTypes.FormsDataSource:
                         return FormsDataSource;
+                    case UmbracoObjectTypes.Language:
+                        return Language;
                 }
                 throw new NotSupportedException(string.Format("UmbracoObjectType \"{0}\" does not have a matching EntityType.", umbracoObjectType));
             }
@@ -165,6 +172,8 @@ namespace Umbraco.Core
                         return UmbracoObjectTypes.FormsPreValue;
                     case FormsDataSource:
                         return UmbracoObjectTypes.FormsDataSource;
+                    case Language:
+                        return UmbracoObjectTypes.Language;
                 }
                 throw new NotSupportedException(
                     string.Format("EntityType \"{0}\" does not have a matching UmbracoObjectType.", entityType));
