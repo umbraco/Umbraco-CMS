@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Core;
 
 namespace Umbraco.Tests.PropertyEditors
 {
@@ -106,6 +105,10 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase(null, null, true, 0)]
         [TestCase(null, "-1", false, -1)]
         [TestCase(null, "-1", true, -1)]
+        [TestCase(null, "1.65", false, 1.65)]
+        [TestCase(null, "1.65", true, 1.65)]
+        [TestCase(null, "-1.65", false, -1.65)]
+        [TestCase(null, "-1.65", true, -1.65)]
         public void CanConvertDecimalAliasPropertyEditor(Core.Models.PublishedContent.PublishedPropertyType propertyType, object value, bool preview, double expected)
         {
             var converter = new DecimalValueConverter();
