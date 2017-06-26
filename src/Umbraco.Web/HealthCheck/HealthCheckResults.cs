@@ -40,7 +40,7 @@ namespace Umbraco.Web.HealthCheck
             AllChecksSuccessful = true;
             foreach (var result in _results)
             {
-                var checkIsSuccess = result.Value.All(x => x.ResultType == StatusResultType.Success || x.ResultType == StatusResultType.Info);
+                var checkIsSuccess = result.Value.All(x => x.ResultType == StatusResultType.Success || x.ResultType == StatusResultType.Info || x.ResultType == StatusResultType.Warning);
                 if (checkIsSuccess == false)
                 {
                     AllChecksSuccessful = false;
