@@ -101,7 +101,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
                 Channel = Channel,
                 Attachments = attachments,
                 IconEmoji = icon,
-                Username = Username,
+                Username = string.Format("{0} [{1}]", Username, Environment.MachineName),
                 Text = messageText
             };
             await slackClient.PostAsync(slackMessage);
