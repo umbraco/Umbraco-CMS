@@ -59,6 +59,9 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             var checkStringPural = "Checks";
             var checkString = "Check";
 
+            var totalPasses = successResults.Count + warnResults.Count + infoResults.Count;
+            var messageText = string.Format("{0} Health Checks passed", totalPasses);
+
             if (successResults.Any())
             {
                 var passedTitle = string.Format("{0} Health {1} Passed", successResults.Count, successResults.Count > 1 ? checkStringPural : checkString);
@@ -89,6 +92,8 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
                 var errorAttachment = GenerateAttachment(errorResults, "danger", errorTitle);
                 attachments.Add(errorAttachment);
+
+                messageText = string.Format("{0} Health {1} failed {2} and", errorResults.Count, errorResults.Count > 1 ? checkStringPural : checkString, messageText);
             }
 
             var slackMessage = new SlackMessage
@@ -96,7 +101,8 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
                 Channel = Channel,
                 Attachments = attachments,
                 IconEmoji = icon,
-                Username = Username
+                Username = Username,
+                Text = messageText
             };
             await slackClient.PostAsync(slackMessage);
 
