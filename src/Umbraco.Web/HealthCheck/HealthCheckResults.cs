@@ -73,13 +73,9 @@ namespace Umbraco.Web.HealthCheck
             }
         }
 
-        public string ResultsAsMarkDown(HealthCheckNotificationVerbosity verbosity, bool slackMarkDown = false)
+        public string ResultsAsMarkDown(HealthCheckNotificationVerbosity verbosity)
         {
             var newItem = "- ";
-            if (slackMarkDown)
-            {
-                newItem = "• ";
-            }
 
             var sb = new StringBuilder();
 
@@ -111,7 +107,7 @@ namespace Umbraco.Web.HealthCheck
                     // With summary logging, only record details of warnings or errors
                     if (checkResult.ResultType != StatusResultType.Success || verbosity == HealthCheckNotificationVerbosity.Detailed)
                     {
-                        sb.AppendFormat(", Message: '{0}'", SimpleHtmlToMarkDown(checkResult.Message, slackMarkDown));
+                        sb.AppendFormat(", Message: '{0}'", SimpleHtmlToMarkDown(checkResult.Message));
                     }
 
                     sb.AppendLine(Environment.NewLine);
@@ -142,16 +138,8 @@ namespace Umbraco.Web.HealthCheck
                 .Replace("Result: '" + status + "'", "Result: <span style=\"color: #" + color + "\">" + status + "</span>");
         }
 
-        private string SimpleHtmlToMarkDown(string html, bool slackMarkDown = false)
+        private string SimpleHtmlToMarkDown(string html)
         {
-            if (slackMarkDown)
-            {
-                return html.Replace("<strong>", "*")
-                    .Replace("</strong>", "*")
-                    .Replace("<em>", "_")
-                    .Replace("</em>", "_");
-            }
-
             return html.Replace("<strong>", "**")
                 .Replace("</strong>", "**")
                 .Replace("<em>", "*")
