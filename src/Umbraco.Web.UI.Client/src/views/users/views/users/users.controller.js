@@ -19,6 +19,7 @@
           { label: "Oldest", key: "CreateDate", direction: "Ascending" },
           { label: "Last login", key: "LastLoginDate", direction: "Descending" }
         ];
+        vm.userStatesFilter = [];
         vm.newUser.userGroups = [];
         vm.usersViewState = 'overview';
 
@@ -76,7 +77,9 @@
         vm.selectAll = selectAll;
         vm.areAllSelected = areAllSelected;
         vm.searchUsers = searchUsers;
-        vm.getGroupFilterName = getGroupFilterName;
+        vm.getFilterName = getFilterName;
+        vm.setUserStatesFilter = setUserStatesFilter;
+        vm.setUserGroupFilter = setUserGroupFilter;
         vm.setOrderByFilter = setOrderByFilter;
         vm.changePageNumber = changePageNumber;
         vm.createUser = createUser;
@@ -271,29 +274,40 @@
             search();
         }
 
-        function getGroupFilterName() {
-
-            var name = "";
+        function getFilterName(array) {
+            var name = "All";
             var found = false;
-
-            angular.forEach(vm.usersOptions.filter, function(value, index){
-                angular.forEach(vm.userGroups, function(userGroup){
-                    if(value === userGroup.alias) {
-                        if(index === 0) {
-                            name = userGroup.name;
-                        } else {
-                            name = name + ", " + userGroup.name;
-                        }
+            angular.forEach(array, function (item) {
+                if (item.selected) {
+                    if(!found) {
+                        name = item.name
                         found = true;
+                    } else {
+                        name = name + ", " + item.name;
                     }
-                });
+                }
             });
+            return name;
+        }
 
-            if(!found) {
-                name = "All";
+        function setUserStatesFilter(value) {
+            getUsers();
+        }
+
+        function setUserGroupFilter(userGroup) {
+
+            if(!vm.usersOptions.userGroups) {
+                vm.usersOptions.userGroups = [];
             }
 
-            return name;
+            if(userGroup.selected) {
+                vm.usersOptions.userGroups.push(userGroup.alias);
+            } else {
+                var index = vm.usersOptions.userGroups.indexOf(userGroup.alias);
+                vm.usersOptions.userGroups.splice(index, 1);
+            }
+
+            getUsers();
         }
 
         function setOrderByFilter(value, direction) {
@@ -363,17 +377,18 @@
             vm.loading = true;
 
             // Get users
-            usersResource.getPagedResults(vm.usersOptions).then(function (users) {
+            usersResource.getPagedResults(vm.usersOptions).then(function (data) {
 
-                vm.users = users.items;
+                vm.users = data.items;
 
-                vm.usersOptions.pageNumber = users.pageNumber;
-                vm.usersOptions.pageSize = users.pageSize;
-                vm.usersOptions.totalItems = users.totalItems;
-                vm.usersOptions.totalPages = users.totalPages;
+                vm.usersOptions.pageNumber = data.pageNumber;
+                vm.usersOptions.pageSize = data.pageSize;
+                vm.usersOptions.totalItems = data.totalItems;
+                vm.usersOptions.totalPages = data.totalPages;
 
                 formatDates(vm.users);
                 setUserDisplayState(vm.users);
+                vm.userStatesFilter = usersHelper.getUserStatesFilter(data.userStates);
 
                 vm.loading = false;
 
@@ -411,15 +426,15 @@
                     return;
                 }
 
-                if(user.userDisplayState.alias === "disabled") {
+                if(user.userDisplayState.key === "Disabled") {
                     vm.allowDisableUser = false;
                 }
 
-                if(user.userDisplayState.alias === "active") {
+                if(user.userDisplayState.key === "Active") {
                     vm.allowEnableUser = false;
                 }
 
-                if(user.userDisplayState.alias === "invited") {
+                if(user.userDisplayState.key === "Invited") {
                     vm.allowEnableUser = false;
                 }
 
@@ -435,7 +450,6 @@
             // clear button state
             vm.page.createButtonState = "init";
         }
-
 
         init();
 
