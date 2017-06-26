@@ -96,7 +96,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
         private HealthCheckStatus CheckIfCurrentSchemeIsHttps()
         {
-            var uri = HttpContext.Current.Request.Url;
+            var uri = new Uri(HealthCheckContext.SiteUrl);
             var success = uri.Scheme == "https";
 
             var actions = new List<HealthCheckAction>();
@@ -112,7 +112,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         private HealthCheckStatus CheckHttpsConfigurationSetting()
         {
             var httpsSettingEnabled = Core.Configuration.GlobalSettings.UseSSL;
-            var uri = HttpContext.Current.Request.Url;
+            var uri = new Uri(HealthCheckContext.SiteUrl);
             var actions = new List<HealthCheckAction>();
 
             string resultMessage;
