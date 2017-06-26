@@ -93,7 +93,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
                 var errorAttachment = GenerateAttachment(errorResults, "danger", errorTitle);
                 attachments.Add(errorAttachment);
 
-                messageText = string.Format("{0} Health {1} failed {2} and", errorResults.Count, errorResults.Count > 1 ? checkStringPural : checkString, messageText);
+                messageText = string.Format("{0} Health {1} failed and {2}", errorResults.Count, errorResults.Count > 1 ? checkStringPural : checkString, messageText);
             }
 
             var slackMessage = new SlackMessage
