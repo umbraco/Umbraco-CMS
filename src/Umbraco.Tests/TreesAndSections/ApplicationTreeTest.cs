@@ -68,7 +68,7 @@ namespace Umbraco.Tests.TreesAndSections
             Assert.IsNotNull(app);
 
             //create the new app tree assigned to the new app
-            Current.Services.ApplicationTreeService.MakeNew(false, 0, app.Alias, treeName, treeName, "icon.jpg", "icon.jpg", "Umbraco.Web.Trees.ContentTreeController, umbraco");
+            Current.Services.ApplicationTreeService.MakeNew(false, 0, app.Alias, treeName, treeName, "icon.jpg", "icon.jpg", "Umbraco.Web.Trees.ContentTreeController, Umbraco.Web");
             var tree = Current.Services.ApplicationTreeService.GetByAlias(treeName);
             Assert.IsNotNull(tree);
 

@@ -117,11 +117,11 @@ namespace Umbraco.Core.Models
                     var parts = type.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                     if (parts.Length != 2)
                         throw new InvalidOperationException("Could not resolve type");
-                    if (parts[1].Trim() != "umbraco" || parts[0].StartsWith("Umbraco.Web.Trees") == false || parts[0].EndsWith("Controller"))
+                    if (parts[1].Trim() != "Umbraco.Web" || parts[0].StartsWith("Umbraco.Web.Trees") == false || parts[0].EndsWith("Controller"))
                         throw new InvalidOperationException("Could not resolve type");
 
                     //if it's one of our controllers but it's not suffixed with "Controller" then add it and try again
-                    var tempType = parts[0] + "Controller, umbraco";
+                    var tempType = parts[0] + "Controller, Umbraco.Web";
 
                     result = System.Type.GetType(tempType);
                     if (result != null)

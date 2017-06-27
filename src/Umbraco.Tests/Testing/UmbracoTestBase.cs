@@ -219,7 +219,7 @@ namespace Umbraco.Tests.Testing
                 AssembliesToScan = new[]
                 {
                     Assembly.Load("Umbraco.Core"),
-                    Assembly.Load("umbraco"),
+                    Assembly.Load("Umbraco.Web"),
                     Assembly.Load("Umbraco.Tests")
                 }
             };

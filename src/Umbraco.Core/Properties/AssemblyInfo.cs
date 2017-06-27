@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: Guid("130a6b5c-50e7-4df3-a0dd-e9e7eb0b7c5c")]
 
 // Umbraco Cms
-[assembly: InternalsVisibleTo("umbraco")]
+[assembly: InternalsVisibleTo("Umbraco.Web")]
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
 [assembly: InternalsVisibleTo("Umbraco.Extensions")] // fixme ?
 [assembly: InternalsVisibleTo("businesslogic")] // fixme ?

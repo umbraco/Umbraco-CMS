@@ -21,7 +21,7 @@ namespace umbraco.presentation.templateControls
     /// </summary>
     [DefaultProperty("Field")]
     [ToolboxData("<{0}:Item runat=\"server\"></{0}:Item>")]
-	[Designer("umbraco.presentation.templateControls.ItemDesigner, umbraco")]
+	[Designer("umbraco.presentation.templateControls.ItemDesigner, Umbraco.Web")]
     public class Item : CompositeControl
     {
 

@@ -6,7 +6,7 @@ namespace UmbracoExamine
 {
     /// <summary>
     /// This is only used for backward compatibility to get access to the umbraco.library object but this needs to be done
-    /// via reflection because of the circular reference we have between Umbraco.Web and UmbracoExamine. 
+    /// via reflection because of the circular reference we have between Umbraco.Web and UmbracoExamine.
     /// </summary>
     internal static class LegacyLibrary
 	{
@@ -22,12 +22,12 @@ namespace UmbracoExamine
 					{
 						if (_libraryType == null)
 						{
-							var ass = Assembly.Load("umbraco");
+							var ass = Assembly.Load("Umbraco.Web");
 							if (ass == null)
-								throw new InvalidOperationException("Could not load assembly umbraco.dll, the umbraco.dll needs to be loaded in the current app domain");
+								throw new InvalidOperationException("Could not load assembly Umbraco.Web.dll, the Umbraco.Web.dll needs to be loaded in the current app domain");
 							var lib = ass.GetType("umbraco.library");
 							if (lib == null)
-								throw new InvalidOperationException("Could not load type umbraco.library, the umbraco.dll needs to be loaded in the current app domain");
+								throw new InvalidOperationException("Could not load type umbraco.library, the Umbraco.Web.dll needs to be loaded in the current app domain");
 							_libraryType = lib;
 						}
 					}
@@ -35,13 +35,13 @@ namespace UmbracoExamine
 				return _libraryType;
 			}
 		}
-        
+
 
 		internal static XPathNodeIterator GetXmlNodeByXPath(string xpathQuery)
 		{
 			var meth = LibraryType.GetMethod("GetXmlNodeByXPath", BindingFlags.Public | BindingFlags.Static);
 			return (XPathNodeIterator)meth.Invoke(null, new object[] { xpathQuery });
 		}
-		
+
 	}
 }
