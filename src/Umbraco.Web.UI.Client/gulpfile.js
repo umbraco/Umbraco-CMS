@@ -2,7 +2,10 @@
 var watch = require('gulp-watch');
 var concat = require('gulp-concat');
 var rename = require('gulp-rename');
-var wrap = require('gulp-wrap');
+var sourcemaps = require('gulp-sourcemaps');
+var wrap = require("gulp-wrap-js");
+var sort = require('gulp-sort');
+var uglify = require('gulp-uglify');
 
 var _ = require('lodash');
 var MergeStream = require('merge-stream');
@@ -21,8 +24,12 @@ Helper functions
 function processJs(files, out) {
     
     return gulp.src(files)
+     .pipe(sort())
+     .pipe(sourcemaps.init())
      .pipe(concat(out))
-     .pipe(wrap('(function(){\n"use strict";\n<%= contents %>\n})();'))
+     .pipe(wrap('(function(){\n%= body %\n})();'))
+     .pipe(uglify({ mangle: false }))
+     .pipe(sourcemaps.write())
      .pipe(gulp.dest(root + targets.js));
 
      console.log(out + " compiled");

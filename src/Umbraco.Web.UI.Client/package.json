@@ -16,7 +16,8 @@
   },
   "scripts": {
     "install": "bower-installer",
-    "test": "karma start test/config/karma.conf.js --singlerun"
+    "test": "karma start test/config/karma.conf.js --singlerun",
+    "build": "gulp"
   },
   "dependencies": {},
   "devDependencies": {
@@ -28,13 +29,16 @@
     "gulp-less": "^3.1.0",
     "gulp-postcss": "^6.2.0",
     "gulp-rename": "^1.2.2",
-    "gulp-sourcemaps": "^1.6.0",
+    "gulp-sort": "^2.0.0",
+    "gulp-sourcemaps": "^2.6.0",
+    "gulp-uglify": "^3.0.0",
     "gulp-watch": "^4.3.10",
     "gulp-wrap": "^0.13.0",
+    "gulp-wrap-js": "^0.4.1",
     "jasmine-core": "^2.5.2",
-    "karma": "^1.3.0",
-    "karma-jasmine": "^0.1.0",
-    "karma-phantomjs-launcher": "^1.0.2",
+    "karma": "^1.7.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.4",
     "lodash": "^4.16.3",
     "merge-stream": "^1.0.1"
   }
