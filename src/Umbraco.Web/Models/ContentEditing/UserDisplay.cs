@@ -39,6 +39,14 @@ namespace Umbraco.Web.Models.ContentEditing
         /// If the password is reset on save, this value will be populated
         /// </summary>
         [DataMember(Name = "resetPasswordValue")]
+        [ReadOnly(true)]
         public string ResetPasswordValue { get; set; }
+
+        /// <summary>
+        /// This is an info flag to denote if this object is the equivalent of the currently logged in user
+        /// </summary>
+        [DataMember(Name = "isCurrentUser")]
+        [ReadOnly(true)]
+        public bool IsCurrentUser { get; set; }
     }
 }

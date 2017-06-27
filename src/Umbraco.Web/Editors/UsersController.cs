@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -37,6 +38,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoApplicationAuthorize(Constants.Applications.Users)]
     [PrefixlessBodyModelValidator]
+    [IsCurrentUserModelFilter]
     public class UsersController : UmbracoAuthorizedJsonController
     {
         /// <summary>
