@@ -242,7 +242,7 @@
 
                 <div style="margin-top: 20px;">
                   <div style="margin-bottom: 10px;">
-                    <umb-button ng-if="vm.user.userDisplayState.alias === 'active'"
+                    <umb-button ng-if="vm.user.userDisplayState.key === 'Active'"
                                 type="button"
                                 button-style="[danger,block]"
                                 action="vm.disableUser()"
@@ -253,7 +253,7 @@
                   </div>
 
                   <div style="margin-bottom: 10px;">
-                    <umb-button ng-if="vm.user.userDisplayState.alias === 'disabled' || vm.user.userDisplayState.alias === 'lockedOut'"
+                    <umb-button ng-if="vm.user.userDisplayState.key === 'Disabled' || vm.user.userDisplayState.key === 'LockedOut'"
                                 type="button"
                                 button-style="[success,block]"
                                 state="vm.enableUserButtonState"
