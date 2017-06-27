@@ -1,16 +1,10 @@
-using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Net.Mail;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Slack.Webhooks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Security;
 using Umbraco.Core.Sync;
 using Umbraco.Web.HealthCheck;
 

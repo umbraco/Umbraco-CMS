@@ -1,21 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using Umbraco.Core;
+using System.Configuration;
+using System.Reflection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Web.HealthCheck.NotificationMethods;
+using Umbraco.Core.Configuration.HealthChecks;
 
 namespace Umbraco.Web.HealthCheck
 {
-    using System.Configuration;
-    using System.Reflection;
 
-    using Umbraco.Core.Configuration.HealthChecks;
 
     /// <summary>
     /// Resolves all health check instances
@@ -41,7 +36,7 @@ namespace Umbraco.Web.HealthCheck
         /// <summary>
         /// This will ctor the IHealthCheckNotificatationMethod instances
         /// </summary>
-	    private class HealthCheckNotificationMethodServiceProvider : IServiceProvider
+        private class HealthCheckNotificationMethodServiceProvider : IServiceProvider
         {
             public object GetService(Type serviceType)
             {
