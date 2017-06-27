@@ -90,6 +90,7 @@ namespace Umbraco.Core.Security
             base.InitUserManager(manager, membershipProvider, options.DataProtectionProvider);
         }
 
+       
     }
 
     /// <summary>
@@ -152,15 +153,8 @@ namespace Umbraco.Core.Security
             };
 
             // Configure validation logic for passwords
-            manager.PasswordValidator = new PasswordValidator
-            {
-                RequiredLength = membershipProvider.MinRequiredPasswordLength,
-                RequireNonLetterOrDigit = membershipProvider.MinRequiredNonAlphanumericCharacters > 0,
-                RequireDigit = false,
-                RequireLowercase = false,
-                RequireUppercase = false
-                //TODO: Do we support the old regex match thing that membership providers used?
-            };
+            var provider = MembershipProviderExtensions.GetUsersMembershipProvider();            
+            manager.PasswordValidator = new MembershipProviderPasswordValidator(provider);
 
             //use a custom hasher based on our membership provider
             manager.PasswordHasher = new MembershipPasswordHasher(membershipProvider);
@@ -238,5 +232,39 @@ namespace Umbraco.Core.Security
         /// Gets/sets the default back office user password checker
         /// </summary>
         public IBackOfficeUserPasswordChecker BackOfficeUserPasswordChecker { get; set; }
+
+        /// <summary>
+        /// Helper method to generate a password for a user based on the current password validator
+        /// </summary>
+        /// <returns></returns>
+        public string GeneratePassword()
+        {
+            var passwordValidator = PasswordValidator as PasswordValidator;
+            if (passwordValidator != null)
+            {
+                var password = Membership.GeneratePassword(
+                    passwordValidator.RequiredLength,
+                    passwordValidator.RequireNonLetterOrDigit ? 2 : 0);
+
+                var random = new Random();
+
+                var passwordChars = password.ToCharArray();
+
+                if (passwordValidator.RequireDigit && passwordChars.ContainsAny(Enumerable.Range(48, 58).Select(x => (char)x)))
+                    password += Convert.ToChar(random.Next(48, 58));  // 0-9
+
+                if (passwordValidator.RequireLowercase && passwordChars.ContainsAny(Enumerable.Range(97, 123).Select(x => (char)x)))
+                    password += Convert.ToChar(random.Next(97, 123));  // a-z
+
+                if (passwordValidator.RequireUppercase && passwordChars.ContainsAny(Enumerable.Range(65, 91).Select(x => (char)x)))
+                    password += Convert.ToChar(random.Next(65, 91));  // A-Z
+
+                if (passwordValidator.RequireNonLetterOrDigit && passwordChars.ContainsAny(Enumerable.Range(33, 48).Select(x => (char)x)))
+                    password += Convert.ToChar(random.Next(33, 48));  // symbols !"#$%&'()*+,-./
+
+                return password;
+            }
+            throw new NotSupportedException("Cannot generate a password since the type of the password validator (" + PasswordValidator.GetType() + ") is not known");
+        }
     }
 }

@@ -10,6 +10,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.Security;
 using System.Web.WebPages;
 using AutoMapper;
 using ClientDependency.Core;
@@ -203,6 +204,7 @@ namespace Umbraco.Web.Editors
             string orderBy = "username",
             Direction orderDirection = Direction.Ascending,
             [FromUri]string[] userGroups = null,
+            //TODO: Add User state filtering
             string filter = "")
         {
             long pageIndex = pageNumber - 1;
@@ -246,16 +248,34 @@ namespace Umbraco.Web.Editors
 
             //we want to create the user with the UserManager, this ensures the 'empty' (special) password
             //format is applied without us having to duplicate that logic
-            var created = await UserManager.CreateAsync(new BackOfficeIdentityUser
+            var identityUser = new BackOfficeIdentityUser
             {
                 Email = userSave.Email,
                 Name = userSave.Name,
                 UserName = userSave.Email
-            });
+            };
+            var created = await UserManager.CreateAsync(identityUser);
             if (created.Succeeded == false)
             {
                 throw new HttpResponseException(
                     Request.CreateNotificationValidationErrorResponse(string.Join(", ", created.Errors)));
+            }
+
+            //we need to generate a password, however we can only do that if the user manager has a password validator that
+            //we can read values from
+            var passwordValidator = UserManager.PasswordValidator as PasswordValidator;
+            var resetPassword = string.Empty;
+            if (passwordValidator != null)
+            {
+                var password = UserManager.GeneratePassword();
+
+                var result = await UserManager.AddPasswordAsync(identityUser.Id, password);
+                if (result.Succeeded == false)
+                {
+                    throw new HttpResponseException(
+                        Request.CreateNotificationValidationErrorResponse(string.Join(", ", created.Errors)));
+                }
+                resetPassword = password;
             }
 
             //now re-look the user back up which will now exist
@@ -269,7 +289,9 @@ namespace Umbraco.Web.Editors
 
             Services.UserService.Save(user);
 
-            return Mapper.Map<UserDisplay>(user);
+            var display = Mapper.Map<UserDisplay>(user);
+            display.ResetPasswordValue = resetPassword;
+            return display;
         }
 
         /// <summary>
