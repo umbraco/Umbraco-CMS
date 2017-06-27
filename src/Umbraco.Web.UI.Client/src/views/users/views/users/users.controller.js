@@ -123,20 +123,24 @@
 
         function selectUser(user, selection, event) {
 
-            if (user.selected) {
-                var index = selection.indexOf(user.id);
-                selection.splice(index, 1);
-                user.selected = false;
-            } else {
-                user.selected = true;
-                vm.selection.push(user.id);
-            }
-            
-            setBulkActions(vm.users);
+            // prevent the current user to be selected
+            if(!user.isCurrentUser) {
 
-            if(event){
-                event.preventDefault();
-                event.stopPropagation();
+                if (user.selected) {
+                    var index = selection.indexOf(user.id);
+                    selection.splice(index, 1);
+                    user.selected = false;
+                } else {
+                    user.selected = true;
+                    vm.selection.push(user.id);
+                }
+                
+                setBulkActions(vm.users);
+
+                if(event){
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
             }
         }
 
@@ -252,15 +256,24 @@
                 vm.selection = [];
                 // select all users
                 angular.forEach(vm.users, function (user) {
-                    user.selected = true;
-                    vm.selection.push(user.id);
+                    // prevent the current user to be selected
+                    if(!user.isCurrentUser) {
+                        user.selected = true;
+                        vm.selection.push(user.id);
+                    }
                 });
             }
         }
 
         function areAllSelected() {
-            if (vm.selection.length === vm.users.length) {
-                return true;
+            // we need to check if the current user is part of the selection and 
+            // subtract the user from the total selection to find out if all users are selected
+            var includesCurrentUser = vm.users.some(function (user) { return user.isCurrentUser === true; });
+            
+            if(includesCurrentUser) {
+                if (vm.selection.length === vm.users.length - 1) { return true;}
+            } else {
+                if (vm.selection.length === vm.users.length) { return true;}
             }
         }
 
@@ -426,15 +439,23 @@
                     return;
                 }
 
-                if(user.userDisplayState.key === "Disabled") {
+                // if the current user is selected prevent any bulk actions with the user included
+                if(user.isCurrentUser) {
+                    vm.allowDisableUser = false;
+                    vm.allowEnableUser = false;
+                    vm.allowSetUserGroup = false;
+                    return;
+                }
+
+                if(user.userDisplayState && user.userDisplayState.key === "Disabled") {
                     vm.allowDisableUser = false;
                 }
 
-                if(user.userDisplayState.key === "Active") {
+                if(user.userDisplayState && user.userDisplayState.key === "Active") {
                     vm.allowEnableUser = false;
                 }
 
-                if(user.userDisplayState.key === "Invited") {
+                if(user.userDisplayState && user.userDisplayState.key === "Invited") {
                     vm.allowEnableUser = false;
                 }
 
