@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Persistence
 {
     // fixme.npoco - what shall we do with those tests?
     //
-    [TestFixture, Ignore]
+    [TestFixture, Ignore("fixme - ignored test")]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class PetaPocoCachesTest : TestWithSomeContentBase
     {

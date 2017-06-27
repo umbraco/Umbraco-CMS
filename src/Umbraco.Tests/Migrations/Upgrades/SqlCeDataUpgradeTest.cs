@@ -13,11 +13,11 @@ using Umbraco.Web.Strategies.Migrations;
 
 namespace Umbraco.Tests.Migrations.Upgrades
 {
-    [TestFixture, NUnit.Framework.Ignore]
+    [TestFixture, NUnit.Framework.Ignore("fixme - ignored test")]
     public class SqlCeDataUpgradeTest : BaseUpgradeTest
     {
 
-        [Test, NUnit.Framework.Ignore]
+        [Test, NUnit.Framework.Ignore("fixme - ignored test")]
         public override void Can_Upgrade_From_470_To_600()
         {
             var configuredVersion = new SemVersion(4, 11, 0);

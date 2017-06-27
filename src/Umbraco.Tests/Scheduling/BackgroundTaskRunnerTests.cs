@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Scheduling
     [Timeout(30000)]
     public class BackgroundTaskRunnerTests
     {
-        private ILogger _logger; 
+        private ILogger _logger;
 
         [TestFixtureSetUp]
         public void InitializeFixture()
@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void ShutdownWhenRunningWithWait()
+        public async Task ShutdownWhenRunningWithWait()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void ShutdownWhenRunningWithoutWait()
+        public async Task ShutdownWhenRunningWithoutWait()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -74,7 +74,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void ShutdownCompletesTheRunner()
+        public async Task ShutdownCompletesTheRunner()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -93,11 +93,11 @@ namespace Umbraco.Tests.Scheduling
                 {
                     runner.Add(new MyTask());
                 });
-            } 
+            }
         }
 
         [Test]
-        public async void ShutdownFlushesTheQueue()
+        public async Task ShutdownFlushesTheQueue()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -119,7 +119,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void ShutdownForceTruncatesTheQueue()
+        public async Task ShutdownForceTruncatesTheQueue()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void ShutdownThenForce()
+        public async Task ShutdownThenForce()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -168,7 +168,7 @@ namespace Umbraco.Tests.Scheduling
 
 
         [Test]
-        public async void HostingStopNonImmediate()
+        public async Task HostingStopNonImmediate()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void HostingStopImmediate()
+        public async Task HostingStopImmediate()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -242,7 +242,7 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
-        
+
         [Test]
         public void Create_IsNotRunning()
         {
@@ -252,9 +252,9 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
-        
+
         [Test]
-        public async void Create_AutoStart_IsRunning()
+        public async Task Create_AutoStart_IsRunning()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions
             {
@@ -279,7 +279,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void Dispose_IsRunning()
+        public async Task Dispose_IsRunning()
         {
             BackgroundTaskRunner<IBackgroundTask> runner;
             using (runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions { AutoStart = true, KeepAlive = true }, _logger))
@@ -296,7 +296,7 @@ namespace Umbraco.Tests.Scheduling
             // so that we don't have a runaway task in tests, etc - but it does NOT terminate
             // the runner - it really is NOT a nice way to end a runner - it's there for tests
         }
-      
+
         [Test]
         public void Startup_KeepAlive_IsRunning()
         {
@@ -310,7 +310,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void Create_AddTask_IsRunning()
+        public async Task Create_AddTask_IsRunning()
         {
             using (var runner = new BackgroundTaskRunner<BaseTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -346,7 +346,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void WaitOnRunner_OneTask()
+        public async Task WaitOnRunner_OneTask()
         {
             using (var runner = new BackgroundTaskRunner<BaseTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -359,9 +359,9 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
-        
+
         [Test]
-        public async void WaitOnRunner_Tasks()
+        public async Task WaitOnRunner_Tasks()
         {
             var tasks = new List<BaseTask>();
             for (var i = 0; i < 10; i++)
@@ -383,7 +383,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void WaitOnTask()
+        public async Task WaitOnTask()
         {
             using (var runner = new BackgroundTaskRunner<BaseTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -399,7 +399,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void WaitOnTasks()
+        public async Task WaitOnTasks()
         {
             var tasks = new Dictionary<BaseTask, ManualResetEvent>();
             for (var i = 0; i < 10; i++)
@@ -466,7 +466,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void Non_Persistent_Runner_Will_Start_New_Threads_When_Required()
+        public async Task Non_Persistent_Runner_Will_Start_New_Threads_When_Required()
         {
             Func<List<BaseTask>> getTasks = () =>
             {
@@ -504,7 +504,7 @@ namespace Umbraco.Tests.Scheduling
 
                 //wait till the thread is done
                 await tManager.CurrentThreadingTask;
-      
+
                 foreach (var task in tasks)
                 {
                     Assert.IsTrue(task.Ended != default(DateTime));
@@ -516,7 +516,7 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
-        
+
         [Test]
         public void RecurringTaskTest()
         {
@@ -532,7 +532,7 @@ namespace Umbraco.Tests.Scheduling
                 };
 
                 var task = new MyRecurringTask(runner, 200, 500);
-                
+
                 runner.Add(task);
 
                 Assert.IsTrue(runner.IsRunning); // waiting on delay
@@ -551,7 +551,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void LatchedTaskRuns()
+        public async Task LatchedTaskRuns()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -562,14 +562,16 @@ namespace Umbraco.Tests.Scheduling
                 Assert.IsTrue(runner.IsRunning); // still waiting for the task to release
                 Assert.IsFalse(task.HasRun);
                 task.Release();
-                await runner.CurrentThreadingTask; // wait for current task to complete
+                var runnerTask = runner.CurrentThreadingTask; // may be null if things go fast enough
+                if (runnerTask != null)
+                    await runnerTask; // wait for current task to complete
                 Assert.IsTrue(task.HasRun);
                 await runner.StoppedAwaitable; // wait for the entire runner operation to complete
             }
         }
 
         [Test]
-        public async void LatchedTaskStops()
+        public async Task LatchedTaskStops()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -577,7 +579,7 @@ namespace Umbraco.Tests.Scheduling
                 runner.Add(task);
                 Assert.IsTrue(runner.IsRunning);
                 Thread.Sleep(5000);
-                Assert.IsTrue(runner.IsRunning); // still waiting for the task to release               
+                Assert.IsTrue(runner.IsRunning); // still waiting for the task to release
                 Assert.IsFalse(task.HasRun);
                 runner.Shutdown(false, false);
                 await runner.StoppedAwaitable; // wait for the entire runner operation to complete
@@ -585,7 +587,7 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
-        
+
         [Test]
         public void LatchedRecurring()
         {
@@ -616,7 +618,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void FailingTaskSync()
+        public async Task FailingTaskSync()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -633,7 +635,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void FailingTaskDisposing()
+        public async Task FailingTaskDisposing()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -650,7 +652,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void FailingTaskAsync()
+        public async Task FailingTaskAsync()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -666,7 +668,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void FailingTaskDisposingAsync()
+        public async Task FailingTaskDisposingAsync()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -683,7 +685,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void CancelAsyncTask()
+        public async Task CancelAsyncTask()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -699,7 +701,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async void CancelLatchedTask()
+        public async Task CancelLatchedTask()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
@@ -842,7 +844,7 @@ namespace Umbraco.Tests.Scheduling
             }
 
             public override bool PerformRun()
-            {                
+            {
                 Thread.Sleep(_runMilliseconds);
                 return true; // repeat
             }
@@ -976,7 +978,7 @@ namespace Umbraco.Tests.Scheduling
             public virtual Task RunAsync(CancellationToken token)
             {
                 throw new NotImplementedException();
-                //return Task.Delay(500); 
+                //return Task.Delay(500);
             }
 
             public virtual bool IsAsync

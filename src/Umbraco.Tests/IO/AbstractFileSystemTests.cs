@@ -49,13 +49,15 @@ namespace Umbraco.Tests.IO
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void Cant_Overwrite_File()
         {
-            _fileSystem.AddFile("test.txt", CreateStream());
-            _fileSystem.AddFile("test.txt", CreateStream(), false);
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                _fileSystem.AddFile("test.txt", CreateStream());
+                _fileSystem.AddFile("test.txt", CreateStream(), false);
 
-            _fileSystem.DeleteFile("test.txt");
+                _fileSystem.DeleteFile("test.txt");
+            });
         }
 
         [Test]

@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Configurations
             Assert.That(Umbraco.Core.Configuration.GlobalSettings.DebugMode, Is.EqualTo(true));
         }
 
-        [Ignore]
+        [Ignore("fixme - ignored test")]
         [Test]
         public void Is_Version_From_Assembly_Correct()
         {

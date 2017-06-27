@@ -9,7 +9,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Tests.Migrations.Upgrades
 {
-    [TestFixture, NUnit.Framework.Ignore]
+    [TestFixture, NUnit.Framework.Ignore("fixme - ignored test")]
     public class MySqlUpgradeTest : BaseUpgradeTest
     {
         public override void DatabaseSpecificSetUp()

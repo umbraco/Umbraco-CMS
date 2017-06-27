@@ -50,7 +50,7 @@ namespace Umbraco.Tests.DI
 
         private class TestCollectionBuilder : OrderedCollectionBuilderBase<TestCollectionBuilder, TestCollection, Resolved>
         {
-            public TestCollectionBuilder(IServiceContainer container) 
+            public TestCollectionBuilder(IServiceContainer container)
                 : base(container)
             { }
 
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.DI
 
         private class TestCollectionBuilderTransient : OrderedCollectionBuilderBase<TestCollectionBuilderTransient, TestCollection, Resolved>
         {
-            public TestCollectionBuilderTransient(IServiceContainer container) 
+            public TestCollectionBuilderTransient(IServiceContainer container)
                 : base(container)
             { }
 
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.DI
 
         private class TestCollection : BuilderCollectionBase<Resolved>
         {
-            public TestCollection(IEnumerable<Resolved> items) 
+            public TestCollection(IEnumerable<Resolved> items)
                 : base(items)
             { }
         }
@@ -129,7 +129,6 @@ namespace Umbraco.Tests.DI
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void ClearOnceResolved()
         {
             var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
@@ -137,7 +136,8 @@ namespace Umbraco.Tests.DI
                 .Append<Resolved2>();
 
             var col = builder.CreateCollection();
-            builder.Clear();
+
+            Assert.Throws<InvalidOperationException>(() => builder.Clear());
         }
 
         [Test]
@@ -156,13 +156,15 @@ namespace Umbraco.Tests.DI
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void AppendOnceResolved()
         {
             var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>();
 
             var col = builder.CreateCollection();
-            builder.Append<Resolved1>();
+
+            Assert.Throws<InvalidOperationException>(() =>
+                builder.Append<Resolved1>()
+            );
         }
 
         [Test]
@@ -177,12 +179,13 @@ namespace Umbraco.Tests.DI
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void AppendInvalid()
         {
             var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>();
             //builder.Append<Resolved4>(); // does not compile
-            builder.Append(new[] { typeof(Resolved4) }); // throws
+            Assert.Throws<InvalidOperationException>(() =>
+                    builder.Append(new[] { typeof (Resolved4) }) // throws
+            );
         }
 
         [Test]
@@ -214,7 +217,6 @@ namespace Umbraco.Tests.DI
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void RemoveOnceResolved()
         {
             var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
@@ -222,7 +224,9 @@ namespace Umbraco.Tests.DI
                 .Append<Resolved2>();
 
             var col = builder.CreateCollection();
-            builder.Remove<Resolved2>(); // throws
+            Assert.Throws<InvalidOperationException>(() =>
+                builder.Remove<Resolved2>() // throws
+            );
         }
 
         [Test]
@@ -242,7 +246,6 @@ namespace Umbraco.Tests.DI
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void InsertOnceResolved()
         {
             var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
@@ -250,7 +253,9 @@ namespace Umbraco.Tests.DI
                 .Append<Resolved2>();
 
             var col = builder.CreateCollection();
-            builder.Insert<Resolved3>(); // throws
+            Assert.Throws<InvalidOperationException>(() =>
+                builder.Insert<Resolved3>() // throws
+            );
         }
 
         [Test]
@@ -276,25 +281,27 @@ namespace Umbraco.Tests.DI
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void InsertAtWrongIndex1()
         {
             var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
-            builder.Insert<Resolved3>(99); // throws
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                builder.Insert<Resolved3>(99) // throws
+            );
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void InsertAtWrongIndex2()
         {
             var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
-            builder.Insert<Resolved3>(-1); // throws
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                builder.Insert<Resolved3>(-1) // throws
+            );
         }
 
         [Test]
@@ -314,7 +321,6 @@ namespace Umbraco.Tests.DI
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void InsertBeforeOnceResolved()
         {
             var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
@@ -322,7 +328,9 @@ namespace Umbraco.Tests.DI
                 .Append<Resolved2>();
 
             var col = builder.CreateCollection();
-            builder.InsertBefore<Resolved2, Resolved3>();
+            Assert.Throws<InvalidOperationException>(() =>
+                builder.InsertBefore<Resolved2, Resolved3>()
+            );
         }
 
         [Test]
@@ -338,12 +346,14 @@ namespace Umbraco.Tests.DI
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void InsertBeforeAbsent()
         {
             var builder = _container.RegisterCollectionBuilder<TestCollectionBuilder>()
-                .Append<Resolved1>()
-                .InsertBefore<Resolved2, Resolved3>();
+                .Append<Resolved1>();
+
+            Assert.Throws<InvalidOperationException>(() =>
+                builder.InsertBefore<Resolved2, Resolved3>()
+            );
         }
 
         [Test]

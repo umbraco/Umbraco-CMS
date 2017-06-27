@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Web.PublishedCache.NuCache;
 
@@ -89,7 +90,7 @@ namespace Umbraco.Tests.Cache
         }
 
         [Test]
-        public async void CollectValues()
+        public async Task CollectValues()
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
@@ -175,7 +176,7 @@ namespace Umbraco.Tests.Cache
         }
 
         [Test]
-        public async void ProperlyCollects()
+        public async Task ProperlyCollects()
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
@@ -215,7 +216,7 @@ namespace Umbraco.Tests.Cache
         }
 
         [Test]
-        public async void CollectNulls()
+        public async Task CollectNulls()
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
@@ -313,7 +314,7 @@ namespace Umbraco.Tests.Cache
         }
 
         [Test]
-        public async void EventuallyCollectNulls()
+        public async Task EventuallyCollectNulls()
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
@@ -409,7 +410,7 @@ namespace Umbraco.Tests.Cache
         }
 
         [Test]
-        public async void CollectDisposedSnapshots()
+        public async Task CollectDisposedSnapshots()
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
@@ -469,7 +470,7 @@ namespace Umbraco.Tests.Cache
         }
 
         [Test]
-        public async void CollectGcSnapshots()
+        public async Task CollectGcSnapshots()
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
@@ -525,7 +526,7 @@ namespace Umbraco.Tests.Cache
         }
 
         [Test]
-        public async void RandomTest1()
+        public async Task RandomTest1()
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
@@ -571,7 +572,7 @@ namespace Umbraco.Tests.Cache
         }
 
         [Test]
-        public async void RandomTest2()
+        public async Task RandomTest2()
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;

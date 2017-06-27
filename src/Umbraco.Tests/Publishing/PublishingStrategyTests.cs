@@ -172,7 +172,7 @@ namespace Umbraco.Tests.Publishing
             Assert.IsTrue(result.First(x => x.Result.StatusType == PublishStatusType.Success).Result.ContentItem.Published);
         }
 
-        [NUnit.Framework.Ignore]
+        [NUnit.Framework.Ignore("fixme - ignored test")]
         [Test]
         public void Can_Publish_And_Update_Xml_Cache()
         {

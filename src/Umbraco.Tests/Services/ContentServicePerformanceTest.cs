@@ -19,7 +19,7 @@ using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Services
 {
-    [TestFixture, NUnit.Framework.Ignore]
+    [TestFixture, NUnit.Framework.Ignore("fixme - ignored test")]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ContentServicePerformanceTest : TestWithDatabaseBase
     {
@@ -180,7 +180,7 @@ namespace Umbraco.Tests.Services
 
         }
 
-        [Test, NUnit.Framework.Ignore]
+        [Test, NUnit.Framework.Ignore("fixme - ignored test")]
         public void Getting_1000_Uncached_Items()
         {
             // Arrange
@@ -243,7 +243,7 @@ namespace Umbraco.Tests.Services
             }
         }
 
-        [Test, NUnit.Framework.Ignore]
+        [Test, NUnit.Framework.Ignore("fixme - ignored test")]
         public void Getting_1000_Cached_Items()
         {
             // Arrange

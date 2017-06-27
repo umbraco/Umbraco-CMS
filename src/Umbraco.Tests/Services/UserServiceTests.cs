@@ -272,7 +272,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(12, found);
         }
 
-        [Ignore]
+        [Ignore("fixme - ignored test")]
         [Test]
         public void Count_All_Online_Users()
         {

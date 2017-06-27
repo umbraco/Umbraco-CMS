@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Plugins
             return new ProfilingLogger(logger, profiler);
         }
 
-        [Ignore]
+        [Ignore("fixme - ignored test")]
         [Test]
         public void Benchmark_Original_Finder()
         {
@@ -132,7 +132,7 @@ namespace Umbraco.Tests.Plugins
 
         }
 
-        [Ignore]
+        [Ignore("fixme - ignored test")]
         [Test]
         public void Benchmark_New_Finder()
         {

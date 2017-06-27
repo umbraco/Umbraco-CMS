@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Models
             return new ProfilingLogger(logger, profiler);
         }
 
-        [Ignore]
+        [Ignore("fixme - ignored test")]
         [Test]
         public void Can_Deep_Clone_Content_Type_Perf_Test()
         {

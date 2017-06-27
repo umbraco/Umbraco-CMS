@@ -10,7 +10,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.Migrations.Upgrades
 {
-    [TestFixture, NUnit.Framework.Ignore]
+    [TestFixture, NUnit.Framework.Ignore("fixme - ignored test")]
     public class SqlServerUpgradeTest : BaseUpgradeTest
     {
         public override void DatabaseSpecificSetUp()

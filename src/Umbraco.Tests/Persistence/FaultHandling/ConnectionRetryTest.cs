@@ -11,7 +11,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.Persistence.FaultHandling
 {
-    [TestFixture, NUnit.Framework.Ignore]
+    [TestFixture, Ignore("fixme - ignored test")]
     public class ConnectionRetryTest
     {
         [Test]

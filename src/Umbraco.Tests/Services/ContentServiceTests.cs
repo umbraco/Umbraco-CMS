@@ -1580,7 +1580,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("world", copiedTags[1].Text);
         }
 
-        [Test, NUnit.Framework.Ignore]
+        [Test, NUnit.Framework.Ignore("fixme - ignored test")]
         public void Can_Send_To_Publication()
         { }
 
