@@ -498,9 +498,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return previewXml ?? _xml;
         }
 
-        internal void Resync()
+        internal void Resync(XmlDocument xml)
         {
-            _xml = _xmlStore.Xml; // re-capture
+            _xml = xml; // re-capture
 
             // note: we're not resyncing "preview" because that would mean re-building the whole
             // preview set which is costly, so basically when previewing, there will be no resync.

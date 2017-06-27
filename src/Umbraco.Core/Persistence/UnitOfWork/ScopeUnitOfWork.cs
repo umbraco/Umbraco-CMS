@@ -31,11 +31,12 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <param name="repositoryFactory"></param>
         /// <param name="isolationLevel"></param>
         /// <param name="readOnly"></param>
+        /// <param name="immediate"></param>
         /// <remarks>
         /// This should normally not be used directly and should be created with the UnitOfWorkProvider
         /// </remarks>
-        internal ScopeUnitOfWork(IScopeProvider scopeProvider, RepositoryFactory repositoryFactory, IsolationLevel isolationLevel = IsolationLevel.Unspecified, bool readOnly = false)
-            : base(repositoryFactory, readOnly)
+        internal ScopeUnitOfWork(IScopeProvider scopeProvider, RepositoryFactory repositoryFactory, IsolationLevel isolationLevel = IsolationLevel.Unspecified, bool readOnly = false, bool immediate = false)
+            : base(repositoryFactory, readOnly, immediate)
         {
             _scopeProvider = scopeProvider;
             _isolationLevel = isolationLevel;

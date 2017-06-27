@@ -1536,19 +1536,20 @@ namespace Umbraco.Core.Services
 
             moves.Add(Tuple.Create(content, content.Path)); // capture original path
 
+            // get before moving, in case uow is immediate
+            var descendants = GetDescendants(content);
+
             // these will be updated by the repo because we changed parentId
             //content.Path = (parent == null ? "-1" : parent.Path) + "," + content.Id;
             //content.SortOrder = ((ContentRepository) repository).NextChildSortOrder(parentId);
             //content.Level += levelDelta;
             PerformMoveContentLocked(repository, content, userId, trash);
 
-            // BUT content.Path will be updated only when the UOW commits, and
-            //  because we want it now, we have to calculate it by ourselves
+            // if uow is not immediate, content.Path will be updated only when the UOW commits,
+            // and because we want it now, we have to calculate it by ourselves
             //paths[content.Id] = content.Path;
             paths[content.Id] = (parent == null ? (parentId == Constants.System.RecycleBinContent ? "-1,-20" : "-1") : parent.Path) + "," + content.Id;
-            Console.WriteLine("path " + content.Id + " = " + paths[content.Id]);
 
-            var descendants = GetDescendants(content);
             foreach (var descendant in descendants)
             {
                 moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
@@ -2505,7 +2506,11 @@ namespace Umbraco.Core.Services
             var moves = new List<Tuple<IContent, string>>();
             var contentTypeIdsA = contentTypeIds.ToArray();
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            // using an immediate uow here because we keep making changes with 
+            // PerformMoveLocked and DeleteLocked that must be applied immediately,
+            // no point queuing operations
+            //
+            using (var uow = UowProvider.CreateUnitOfWork(immediate: true))
             {
                 uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
@@ -2531,9 +2536,9 @@ namespace Umbraco.Core.Services
 
                     // if current content has children, move them to trash
                     var c = content;
-                    var childQuery = repository.QueryT.Where(x => x.Path.StartsWith(c.Path));
+                    var childQuery = repository.QueryT.Where(x => x.ParentId == c.Id);
                     var children = repository.GetByQuery(childQuery);
-                    foreach (var child in children.Where(x => contentTypeIdsA.Contains(x.ContentTypeId) == false))
+                    foreach (var child in children)
                     {
                         // see MoveToRecycleBin
                         PerformMoveLocked(repository, child, Constants.System.RecycleBinContent, null, userId, moves, true);
@@ -2550,7 +2555,7 @@ namespace Umbraco.Core.Services
                     .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
                     .ToArray();
                 if (moveInfos.Length > 0)
-                    uow.Events.Dispatch(Trashed, this, new MoveEventArgs<IContent>(false, moveInfos));
+                    uow.Events.Dispatch(Trashed, this, new MoveEventArgs<IContent>(false, moveInfos), "Trashed");
                 uow.Events.Dispatch(TreeChanged, this, changes.ToEventArgs());
 
                 Audit(uow, AuditType.Delete, $"Delete Content of Type {string.Join(",", contentTypeIdsA)} performed by user", userId, Constants.System.Root);

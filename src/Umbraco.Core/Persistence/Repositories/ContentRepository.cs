@@ -785,7 +785,8 @@ WHERE (@path LIKE {5})",
             return base.GetDatabaseFieldNameForOrderBy(orderBy);
         }
 
-        // fixme - missing the 'include all versions' thing here - see 7.6 ProcessQuery
+        // "many" corresponds to 7.6 "includeAllVersions"
+        // fixme - we are not implementing the double-query thing for pagination from 7.6?
         //
         private IEnumerable<IContent> MapQueryDtos(List<DocumentDto> dtos, bool withCache = false, bool many = false)
         {
@@ -794,16 +795,32 @@ WHERE (@path LIKE {5})",
             var contentTypes = new Dictionary<int, IContentType>();
             var templateIds = new List<int>();
 
+            // in case of data corruption we may have more than 1 "newest" - cleanup
+            var ix = new Dictionary<int, DocumentDto>();
+            foreach (var dto in dtos)
+            {
+                if (ix.TryGetValue(dto.NodeId, out DocumentDto ixDto) == false || ixDto.UpdateDate < dto.UpdateDate)
+                    ix[dto.NodeId] = dto;
+            }
+            dtos = ix.Values.ToList();
+
             // populate published data
             if (many)
             {
-                var publishedDtoIndex = Database.FetchByGroups<DocumentPublishedReadOnlyDto, int>(dtos.Select(x => x.NodeId), 2000, batch
+                var roDtos = Database.FetchByGroups<DocumentPublishedReadOnlyDto, int>(dtos.Select(x => x.NodeId), 2000, batch
                         => Sql()
                             .Select<DocumentPublishedReadOnlyDto>()
                             .From<DocumentDto>()
                             .WhereIn<DocumentDto>(x => x.NodeId, batch)
-                            .Where<DocumentDto>(x => x.Published))
-                    .ToDictionary(x => x.NodeId, x => x);
+                            .Where<DocumentDto>(x => x.Published));
+
+                // in case of data corruption we may have more than 1 "published" - cleanup
+                var publishedDtoIndex = new Dictionary<int, DocumentPublishedReadOnlyDto>();
+                foreach (var roDto in roDtos)
+                {
+                    if (publishedDtoIndex.TryGetValue(roDto.NodeId, out DocumentPublishedReadOnlyDto ixDto) == false || ixDto.VersionDate < roDto.VersionDate)
+                        publishedDtoIndex[roDto.NodeId] = roDto;
+                }
 
                 foreach (var dto in dtos)
                 {

@@ -351,6 +351,11 @@ namespace Umbraco.Core.Services
                     return;
                 }
 
+                if (string.IsNullOrWhiteSpace(dataTypeDefinition.Name))
+                {
+                    throw new ArgumentException("Cannot save datatype with empty name.");
+                }
+
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 repository.AddOrUpdate(dataTypeDefinition);
 

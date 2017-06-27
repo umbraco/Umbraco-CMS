@@ -17,7 +17,7 @@
     <dependencies>
       <dependency id="UmbracoCms.Core" version="[$version$]" />
       <dependency id="Newtonsoft.Json" version="[10.0.2, 11.0.0)" />
-      <dependency id="Umbraco.ModelsBuilder" version="[8.0.0, 9.0.0)" />
+      <dependency id="Umbraco.ModelsBuilder" version="[8.0.0-alpha0005, 9.0.0)" />
       <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.2.1, 3.0.0)" />
     </dependencies>
   </metadata>

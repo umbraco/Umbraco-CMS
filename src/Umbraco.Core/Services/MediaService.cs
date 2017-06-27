@@ -114,7 +114,11 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException("No media with that id.", nameof(parentId));
 
             var media = new Models.Media(name, parentId, mediaType);
-            CreateMedia(null, media, parent, userId, false);
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                CreateMedia(uow, media, parent, userId, false);
+                uow.Complete();
+            }
 
             return media;
         }
@@ -139,7 +143,11 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias));
 
             var media = new Models.Media(name, -1, mediaType);
-            CreateMedia(null, media, null, userId, false);
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                CreateMedia(uow, media, null, userId, false);
+                uow.Complete();
+            }
 
             return media;
         }
@@ -1122,18 +1130,20 @@ namespace Umbraco.Core.Services
 
             moves.Add(Tuple.Create(media, media.Path)); // capture original path
 
+            // get before moving, in case uow is immediate
+            var descendants = GetDescendants(media);
+
             // these will be updated by the repo because we changed parentId
             //media.Path = (parent == null ? "-1" : parent.Path) + "," + media.Id;
             //media.SortOrder = ((MediaRepository) repository).NextChildSortOrder(parentId);
             //media.Level += levelDelta;
             PerformMoveMediaLocked(repository, media, userId, trash);
 
-            // BUT media.Path will be updated only when the UOW commits, and
-            //  because we want it now, we have to calculate it by ourselves
+            // if uow is not immediate, content.Path will be updated only when the UOW commits,
+            // and because we want it now, we have to calculate it by ourselves
             //paths[media.Id] = media.Path;
             paths[media.Id] = (parent == null ? (parentId == Constants.System.RecycleBinMedia ? "-1,-21" : "-1") : parent.Path) + "," + media.Id;
 
-            var descendants = GetDescendants(media);
             foreach (var descendant in descendants)
             {
                 moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
@@ -1407,7 +1417,11 @@ namespace Umbraco.Core.Services
             var moves = new List<Tuple<IMedia, string>>();
             var mediaTypeIdsA = mediaTypeIds.ToArray();
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            // using an immediate uow here because we keep making changes with 
+            // PerformMoveLocked and DeleteLocked that must be applied immediately,
+            // no point queuing operations
+            //
+            using (var uow = UowProvider.CreateUnitOfWork(immediate: true))
             {
                 uow.WriteLock(Constants.Locks.MediaTree);
                 var repository = uow.CreateRepository<IMediaRepository>();
@@ -1446,7 +1460,7 @@ namespace Umbraco.Core.Services
                     .Select(x => new MoveEventInfo<IMedia>(x.Item1, x.Item2, x.Item1.ParentId))
                     .ToArray();
                 if (moveInfos.Length > 0)
-                    uow.Events.Dispatch(Trashed, this, new MoveEventArgs<IMedia>(false, moveInfos));
+                    uow.Events.Dispatch(Trashed, this, new MoveEventArgs<IMedia>(false, moveInfos), "Trashed");
                 uow.Events.Dispatch(TreeChanged, this, changes.ToEventArgs());
 
                 Audit(uow, AuditType.Delete, $"Delete Media of types {string.Join(",", mediaTypeIdsA)} performed by user", userId, Constants.System.Root);

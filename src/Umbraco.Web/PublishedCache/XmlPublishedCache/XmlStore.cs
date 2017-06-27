@@ -301,7 +301,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// </remarks>
         public Func<XmlDocument> GetXmlDocument { get; set; }
 
-        private readonly XmlDocument _xmlDocument; // supplied xml document (for tests)
+        private XmlDocument _xmlDocument; // supplied xml document (for tests)
         private volatile XmlDocument _xml; // master xml document
         private readonly AsyncLock _xmlLock = new AsyncLock(); // protects _xml
 
@@ -311,10 +311,18 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         {
             get
             {
+                if (_xml != null)
+                    return _xml;
+
                 if (_xmlDocument != null)
-                    return _xmlDocument;
+                {
+                    _xml = _xmlDocument;
+                    _xmlDocument = null;
+                    return _xml;
+                }
+
                 if (GetXmlDocument != null)
-                    return GetXmlDocument();
+                    return _xml = GetXmlDocument();
 
                 LazyInitializeContent();
                 ReloadXmlFromFileIfChanged();
@@ -590,24 +598,24 @@ AND (umbracoNode.id=@id)";
         // gets a locked safe read access to the main xml
         private SafeXmlReaderWriter GetSafeXmlReader()
         {
-            return SafeXmlReaderWriter.Get(_scopeProvider, _xmlLock, _xmlDocument,
-                _ => ResyncCurrentFacade(),
+            return SafeXmlReaderWriter.Get(_scopeProvider, _xmlLock, _xml,
+                ResyncCurrentFacade,
                 (xml, registerXmlChange) =>
                 {
                     SetXmlLocked(xml, registerXmlChange);
-                    ResyncCurrentFacade();
+                    ResyncCurrentFacade(xml);
                 }, false);
         }
 
         // gets a locked safe write access to the main xml (cloned)
         private SafeXmlReaderWriter GetSafeXmlWriter()
         {
-            return SafeXmlReaderWriter.Get(_scopeProvider, _xmlLock, _xmlDocument,
-                _ => ResyncCurrentFacade(),
+            return SafeXmlReaderWriter.Get(_scopeProvider, _xmlLock, _xml,
+                ResyncCurrentFacade,
                 (xml, registerXmlChange) =>
                 {
                     SetXmlLocked(xml, registerXmlChange);
-                    ResyncCurrentFacade();
+                    ResyncCurrentFacade(xml);
                 }, true);
         }
 
@@ -1184,10 +1192,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 }
 
                 if (publishedChanged)
-                {
                     safeXml.AcceptChanges();
-                    ResyncCurrentFacade();
-                }
             }
         }
 
@@ -1216,8 +1221,6 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 RefreshContentTypes(ids);
 
             // ignore media and member types - we're not caching them
-
-            ResyncCurrentFacade();
         }
 
         public void Notify(DataTypeCacheRefresher.JsonPayload[] payloads)
@@ -1236,15 +1239,13 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             // that's all we need to do as the changes have NO impact whatsoever on the Xml content
 
             // ignore media and member types - we're not caching them
-
-            ResyncCurrentFacade();
         }
 
-        private void ResyncCurrentFacade()
+        private void ResyncCurrentFacade(XmlDocument xml)
         {
             var facade = (Facade) _facadeAccessor.Facade;
             if (facade == null) return;
-            ((PublishedContentCache) facade.ContentCache).Resync();
+            ((PublishedContentCache) facade.ContentCache).Resync(xml);
             ((PublishedMediaCache) facade.MediaCache).Resync();
 
             // not trying to resync members or domains, which are not cached really

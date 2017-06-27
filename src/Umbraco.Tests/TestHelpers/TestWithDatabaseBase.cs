@@ -245,7 +245,8 @@ namespace Umbraco.Tests.TestHelpers
                     Current.Logger);
 
                 // testing=true so XmlStore will not use the file nor the database
-                var facadeAccessor = new TestFacadeAccessor();
+                //var facadeAccessor = new TestFacadeAccessor();
+                var facadeAccessor = new UmbracoContextFacadeAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
                 var service = new FacadeService(
                     Current.Services,
                     (ScopeProvider) Current.ScopeProvider,

@@ -1079,103 +1079,92 @@ AND umbracoNode.id <> @id",
                 // query below is not safe + pointless if array is empty
                 if (contentTypeIds.Length == 0) return;
 
-                var sql = @"SELECT  
-	pt.contentTypeId as contentTypeId, pt.uniqueID as ptUniqueID, pt.id as ptId,
-	pt.Alias as ptAlias, pt." + sqlSyntax.GetQuotedColumnName("Description") + @" as ptDesc, pt.mandatory as ptMandatory,
-	pt.Name as ptName, pt.sortOrder as ptSortOrder, pt.validationRegExp as ptRegExp,
+                var sqlGroups = @"SELECT
+    pg.contenttypeNodeId AS contentTypeId, 
+    pg.id AS id, pg.uniqueID AS " + sqlSyntax.GetQuotedColumnName("key") + @",
+    pg.sortOrder AS sortOrder, pg." + sqlSyntax.GetQuotedColumnName("text") + @" AS text
+FROM cmsPropertyTypeGroup pg
+WHERE pg.contenttypeNodeId IN (@ids)
+ORDER BY contentTypeId, id";
 
-    dt.nodeId as dtId, dt.dbType as dtDbType, dt.propertyEditorAlias as dtPropEdAlias,
-
-	pg.id as pgId, pg.uniqueID as pgKey, pg.sortorder as pgSortOrder, pg." + sqlSyntax.GetQuotedColumnName("text") + @" as pgText
-
-FROM cmsPropertyType as pt
+                var sqlProps = @"SELECT 
+	pt.contentTypeId AS contentTypeId, 
+    pt.id AS id, pt.uniqueID AS " + sqlSyntax.GetQuotedColumnName("key") + @", 
+    pt.propertyTypeGroupId AS groupId,
+	pt.Alias AS alias, pt." + sqlSyntax.GetQuotedColumnName("Description") + @" AS " + sqlSyntax.GetQuotedColumnName("desc") + @", pt.mandatory AS mandatory,
+	pt.Name AS name, pt.sortOrder AS sortOrder, pt.validationRegExp AS regexp,
+    dt.nodeId as dataTypeId, dt.dbType as dbType, dt.propertyEditorAlias as editorAlias
+FROM cmsPropertyType pt
 INNER JOIN cmsDataType as dt ON pt.dataTypeId = dt.nodeId
-LEFT JOIN cmsPropertyTypeGroup as pg ON pg.id = pt.propertyTypeGroupId
+WHERE pt.contentTypeId IN (@ids)
+ORDER BY contentTypeId, groupId, id";
 
-WHERE pt.contentTypeId IN (@contentTypeIds)
-
-ORDER BY pgId
-";
-
-                //NOTE: we are going to assume there's not going to be more than 2100 content type ids since that is the max SQL param count!
-                // Since there are 2 groups of params, it will be half!
-                if (((contentTypeIds.Length / 2) - 1) > 2000)
+                if (contentTypeIds.Length > 2000)
                     throw new InvalidOperationException("Cannot perform this lookup, too many sql parameters");
 
-                var result = db.Fetch<dynamic>(sql, new { contentTypeIds = contentTypeIds });
+                var groups = db.Fetch<dynamic>(sqlGroups, new { ids = contentTypeIds });
+                var groupsEnumerator = groups.GetEnumerator();
+                var group = groupsEnumerator.MoveNext() ? groupsEnumerator.Current : null;
+
+                var props = db.Fetch<dynamic>(sqlProps, new { ids = contentTypeIds });
+                var propsEnumerator = props.GetEnumerator();
+                var prop = propsEnumerator.MoveNext() ? propsEnumerator.Current : null;
+
+                // groups are ordered by content type, group id
+                // props are ordered by content type, group id, prop id
 
                 foreach (var contentTypeId in contentTypeIds)
                 {
-                    //from this we need to make :
-                    // * PropertyGroupCollection - Contains all property groups along with all property types associated with a group
-                    // * PropertyTypeCollection - Contains all property types that do not belong to a group
+                    var propertyTypeCollection = allPropertyTypeCollection[contentTypeId] = new PropertyTypeCollection();
+                    var propertyGroupCollection = allPropertyGroupCollection[contentTypeId] = new PropertyGroupCollection();
 
-                    //create the property group collection first, this means all groups (even empty ones) and all groups with properties
+                    while (prop != null && prop.contentTypeId == contentTypeId && prop.groupId == null)
+                    {
+                        AddPropertyType(propertyTypeCollection, prop);
+                        prop = propsEnumerator.MoveNext() ? propsEnumerator.Current : null;
+                    }
 
-                    int currId = contentTypeId;
-
-                    var propertyGroupCollection = new PropertyGroupCollection(result
-                        //get all rows that have a group id
-                        .Where(x => x.pgId != null)
-                        //filter based on the current content type
-                        .Where(x => x.contentTypeId == currId)
-                        //turn that into a custom object containing only the group info
-                        .Select(x => new { GroupId = x.pgId, SortOrder = x.pgSortOrder, Text = x.pgText, Key = x.pgKey })
-                        //get distinct data by id
-                        .DistinctBy(x => (int)x.GroupId)
-                        //for each of these groups, create a group object with it's associated properties
-                        .Select(group => new PropertyGroup(new PropertyTypeCollection(
-                            result
-                                .Where(row => row.pgId == group.GroupId && row.ptId != null)
-                                .Select(row => new PropertyType(row.dtPropEdAlias, Enum<DataTypeDatabaseType>.Parse(row.dtDbType), row.ptAlias)
-                                {
-                                    //fill in the rest of the property type properties
-                                    Description = row.ptDesc,
-                                    DataTypeDefinitionId = row.dtId,
-                                    Id = row.ptId,
-                                    Key = row.ptUniqueID,
-                                    Mandatory = Convert.ToBoolean(row.ptMandatory),
-                                    Name = row.ptName,
-                                    PropertyGroupId = new Lazy<int>(() => group.GroupId, false),
-                                    SortOrder = row.ptSortOrder,
-                                    ValidationRegExp = row.ptRegExp
-                                })))
+                    while (group != null && group.contentTypeId == contentTypeId)
+                    {
+                        var propertyGroup = new PropertyGroup(new PropertyTypeCollection())
                         {
-                            //fill in the rest of the group properties
-                            Id = group.GroupId,
-                            Name = group.Text,
-                            SortOrder = group.SortOrder,
-                            Key = group.Key
-                        }).ToArray());
+                            Id = group.id,
+                            Name = group.text,
+                            SortOrder = group.sortOrder,
+                            Key = group.key
+                        };
+                        propertyGroupCollection.Add(propertyGroup);
 
-                    allPropertyGroupCollection[currId] = propertyGroupCollection;
-
-                    //Create the property type collection now (that don't have groups)
-
-                    var propertyTypeCollection = new PropertyTypeCollection(result
-                        .Where(x => x.pgId == null)
-                        //filter based on the current content type
-                        .Where(x => x.contentTypeId == currId)
-                        .Select(row => new PropertyType(row.dtPropEdAlias, Enum<DataTypeDatabaseType>.Parse(row.dtDbType), row.ptAlias)
+                        while (prop != null && prop.groupId == group.id)
                         {
-                            //fill in the rest of the property type properties
-                            Description = row.ptDesc,
-                            DataTypeDefinitionId = row.dtId,
-                            Id = row.ptId,
-                            Key = row.ptUniqueID,
-                            Mandatory = Convert.ToBoolean(row.ptMandatory),
-                            Name = row.ptName,
-                            PropertyGroupId = null,
-                            SortOrder = row.ptSortOrder,
-                            ValidationRegExp = row.ptRegExp
-                        }).ToArray());
+                            AddPropertyType(propertyGroup.PropertyTypes, prop, propertyGroup);
+                            prop = propsEnumerator.MoveNext() ? propsEnumerator.Current : null;
+                        }
 
-                    allPropertyTypeCollection[currId] = propertyTypeCollection;
+                        group = groupsEnumerator.MoveNext() ? groupsEnumerator.Current : null;
+                    }
                 }
 
-
+                propsEnumerator.Dispose();
+                groupsEnumerator.Dispose();
             }
 
+            private static void AddPropertyType(PropertyTypeCollection propertyTypes, dynamic prop, PropertyGroup propertyGroup = null)
+            {
+                var propertyType = new PropertyType(prop.editorAlias, Enum<DataTypeDatabaseType>.Parse(prop.dbType), prop.alias)
+                {
+                    Description = prop.desc,
+                    DataTypeDefinitionId = prop.dataTypeId,
+                    Id = prop.id,
+                    Key = prop.key,
+                    Mandatory = Convert.ToBoolean(prop.mandatory),
+                    Name = prop.name,
+                    PropertyGroupId = propertyGroup == null ? null : new Lazy<int>(() => propertyGroup.Id),
+                    SortOrder = prop.sortOrder,
+                    ValidationRegExp = prop.regexp
+                };
+                propertyTypes.Add(propertyType);
+            }
         }
 
         protected abstract TEntity PerformGet(Guid id);

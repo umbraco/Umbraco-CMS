@@ -367,7 +367,7 @@ namespace Umbraco.Core.Scoping
         {
             // figure out completed
             var completed = _completed.HasValue && _completed.Value;
-
+            
             // deal with database
             var databaseException = false;
             if (_database != null)

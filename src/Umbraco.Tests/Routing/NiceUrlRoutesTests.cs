@@ -198,8 +198,7 @@ DetermineRouteById(id):
 
             SettingsForTests.HideTopLevelNodeFromPath = hide;
 
-            const bool preview = true; // make sure we don't cache
-            var route = cache.GetRouteById(preview, id);
+            var route = cache.GetRouteById(false, id);
             Assert.AreEqual(expected, route);
         }
 
@@ -222,8 +221,7 @@ DetermineRouteById(id):
 
             SettingsForTests.HideTopLevelNodeFromPath = hide;
 
-            const bool preview = true; // make sure we don't cache
-            var route = cache.GetRouteById(preview, id);
+            var route = cache.GetRouteById(false, id);
             Assert.AreEqual(expected, route);
         }
 

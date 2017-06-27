@@ -7,20 +7,28 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 {
     public abstract class UnitOfWorkBase : DisposableObject, IUnitOfWork
     {
-        private readonly Queue<Operation> _operations = new Queue<Operation>();
+        private Queue<Operation> _operations;
 
         // fixme - explain readonly
         // it means that the unit of work *will* complete no matter what
         // but if an exception is thrown from within the 'using' block
         // the calling code still can deal with it and cancel everything
+        //
+        // fixme - explain immediate
+        // do not queue things - save allocations + in some complex operations
+        // that are transactional queueing makes no sense (or we keep flushing)
 
-        protected UnitOfWorkBase(RepositoryFactory repositoryFactory, bool readOnly = false)
+        protected UnitOfWorkBase(RepositoryFactory repositoryFactory, bool readOnly = false, bool immediate = false)
         {
             RepositoryFactory = repositoryFactory;
             ReadOnly = readOnly;
+            Immediate = immediate;
         }
 
+        private Queue<Operation> Operations => _operations ?? (_operations = new Queue<Operation>());
+
         protected bool ReadOnly { get; }
+        protected bool Immediate { get; }
 
         protected RepositoryFactory RepositoryFactory { get; }
 
@@ -39,12 +47,15 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
             Completed = false;
 
-            _operations.Enqueue(new Operation
-            {
-                Entity = entity,
-                Repository = repository,
-                Type = OperationType.Insert
-            });
+            if (Immediate)
+                repository.PersistNewItem(entity);
+            else
+                Operations.Enqueue(new Operation
+                {
+                    Entity = entity,
+                    Repository = repository,
+                    Type = OperationType.Insert
+                });
         }
 
         /// <summary>
@@ -59,12 +70,15 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
             Completed = false;
 
-            _operations.Enqueue(new Operation
-            {
-                Entity = entity,
-                Repository = repository,
-                Type = OperationType.Update
-            });
+            if (Immediate)
+                repository.PersistUpdatedItem(entity);
+            else
+                Operations.Enqueue(new Operation
+                {
+                    Entity = entity,
+                    Repository = repository,
+                    Type = OperationType.Update
+                });
         }
 
         /// <summary>
@@ -79,12 +93,15 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
             Completed = false;
 
-            _operations.Enqueue(new Operation
-            {
-                Entity = entity,
-                Repository = repository,
-                Type = OperationType.Delete
-            });
+            if (Immediate)
+                repository.PersistDeletedItem(entity);
+            else
+                Operations.Enqueue(new Operation
+                {
+                    Entity = entity,
+                    Repository = repository,
+                    Type = OperationType.Delete
+                });
         }
 
         // fixme - we don't need Begin, really, or do we?
@@ -97,6 +114,9 @@ namespace Umbraco.Core.Persistence.UnitOfWork
                 throw new NotSupportedException("This unit of work is read-only.");
 
             Begin();
+
+            if (_operations == null)
+                return;
 
             while (_operations.Count > 0)
             {
@@ -137,7 +157,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         {
             // whatever hasn't been commited is lost
             // not sure we need this as we are being disposed...
-            _operations.Clear();
+            _operations?.Clear();
         }
 
         /// <summary>

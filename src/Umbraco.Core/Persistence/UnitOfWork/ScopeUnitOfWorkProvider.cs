@@ -37,21 +37,9 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         }
 
         /// <inheritdoc />
-        public IScopeUnitOfWork CreateUnitOfWork(IsolationLevel isolationLevel)
+        public IScopeUnitOfWork CreateUnitOfWork(IsolationLevel isolationLevel = IsolationLevel.Unspecified, bool readOnly = false, bool immediate = false)
         {
-            return new ScopeUnitOfWork(ScopeProvider, _repositoryFactory, isolationLevel);
-        }
-
-        /// <inheritdoc />
-        public IScopeUnitOfWork CreateUnitOfWork(bool readOnly)
-        {
-            return new ScopeUnitOfWork(ScopeProvider, _repositoryFactory, readOnly: readOnly);
-        }
-
-        /// <inheritdoc />
-        public IScopeUnitOfWork CreateUnitOfWork(IsolationLevel isolationLevel, bool readOnly)
-        {
-            return new ScopeUnitOfWork(ScopeProvider, _repositoryFactory, isolationLevel, readOnly: readOnly);
+            return new ScopeUnitOfWork(ScopeProvider, _repositoryFactory, isolationLevel, readOnly, immediate);
         }
     }
 }

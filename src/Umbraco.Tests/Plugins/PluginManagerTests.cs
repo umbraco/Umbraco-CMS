@@ -146,10 +146,9 @@ namespace Umbraco.Tests.Plugins
         [Test]
         public void Detect_Legacy_Plugin_File_List()
         {
-            var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
-            Directory.CreateDirectory(tempFolder);
-
-            var filePath= Path.Combine(tempFolder, string.Format("umbraco-plugins.{0}.list", NetworkHelper.FileSafeMachineName));
+            var filePath = _manager.GeTypesListFilePath();
+            var fileDir = Path.GetDirectoryName(filePath);
+            Directory.CreateDirectory(fileDir);
 
             File.WriteAllText(filePath, @"<?xml version=""1.0"" encoding=""utf-8""?>
 <plugins>

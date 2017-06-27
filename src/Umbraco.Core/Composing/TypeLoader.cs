@@ -364,7 +364,8 @@ namespace Umbraco.Core.Composing
             return cache;
         }
 
-        private string GeTypesListFilePath()
+        // internal for tests
+        internal string GeTypesListFilePath()
         {
             var filename = "umbraco-types." + NetworkHelper.FileSafeMachineName + ".list";
             return Path.Combine(_tempFolder, filename);

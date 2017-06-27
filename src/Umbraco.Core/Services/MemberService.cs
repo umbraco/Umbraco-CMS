@@ -122,7 +122,11 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException("No member type with that alias.", nameof(memberTypeAlias));
 
             var member = new Member(name, email.ToLower().Trim(), username, memberType);
-            CreateMember(null, member, 0, false);
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                CreateMember(uow, member, 0, false);
+                uow.Complete();
+            }
 
             return member;
         }
@@ -143,7 +147,11 @@ namespace Umbraco.Core.Services
             if (memberType == null) throw new ArgumentNullException(nameof(memberType));
 
             var member = new Member(name, email.ToLower().Trim(), username, memberType);
-            CreateMember(null, member, 0, false);
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                CreateMember(uow, member, 0, false);
+                uow.Complete();
+            }
 
             return member;
         }
@@ -348,7 +356,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        // fixme get rid of string filter, ignored here = bad!
+        // fixme get rid of string filter?
 
         public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "")
@@ -363,8 +371,9 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
-                var query = memberTypeAlias == null ? null : repository.QueryT.Where(x => x.ContentTypeAlias == memberTypeAlias);
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField /*, filter*/);
+                var query1 = memberTypeAlias == null ? null : repository.QueryT.Where(x => x.ContentTypeAlias == memberTypeAlias);
+                var query2 = filter == null ? null : repository.QueryT.Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
+                return repository.GetPagedResultsByQuery(query1, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, query2);
             }
         }
 
@@ -830,6 +839,11 @@ namespace Umbraco.Core.Services
                 {
                     uow.Complete();
                     return;
+                }
+
+                if (string.IsNullOrWhiteSpace(member.Name))
+                {
+                    throw new ArgumentException("Cannot save member with empty name.");
                 }
 
                 uow.WriteLock(Constants.Locks.MemberTree);

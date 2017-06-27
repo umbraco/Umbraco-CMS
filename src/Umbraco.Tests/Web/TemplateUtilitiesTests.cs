@@ -26,6 +26,8 @@ namespace Umbraco.Tests.Web
         [SetUp]
         public void SetUp()
         {
+            Current.Reset();
+
             // fixme - now UrlProvider depends on EntityService for GetUrl(guid) - this is bad
             // should not depend on more than IdkMap maybe - fix this!
             var entityService = new Mock<IEntityService>();

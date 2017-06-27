@@ -1,274 +1,303 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
+using System.Xml;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
+using LightInject;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
-using Umbraco.Tests.Cache.DistributedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Cache;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Tests.Scoping
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, FacadeServiceRepositoryEvents = true)]    
     public class ScopedXmlTests : TestWithDatabaseBase
     {
-        [Test]
-        public void Fail()
-        {
-            // fixme
-            // need to rewrite these tests entirely using the XmlStore and such
-            // need to create an equivalent test for NuCache once we understand it
+        private CacheRefresherComponent _cacheRefresher;
 
-            Assert.Fail("need to rewrite these tests entirely for XmlStore");
+        protected override void Compose()
+        {
+            base.Compose();
+
+            // the cache refresher component needs to trigger to refresh caches
+            // but then, it requires a lot of plumbing ;(
+            // fixme - and we cannot inject a DistributedCache yet
+            // so doing all this mess
+            Container.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
+            Container.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
+            Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
+                .Add(f => f.TryGetInstance<TypeLoader>().GetCacheRefreshers());
         }
 
-        //private CacheRefresherComponent _cacheRefresher;
+        [TearDown]
+        public void Teardown()
+        {
+            _cacheRefresher?.Unbind();
+            _cacheRefresher = null;
 
-        //// fixme ?
-        ////protected override void FreezeResolution()
-        ////{
-        ////    ServerRegistrarResolver.Current = new ServerRegistrarResolver(
-        ////        new DistributedCacheTests.TestServerRegistrar());
-        ////    ServerMessengerResolver.Current = new ServerMessengerResolver(
-        ////        new DatabaseServerMessenger(ApplicationContext, false, new DatabaseServerMessengerOptions()));
-        ////    CacheRefreshersResolver.Current = new CacheRefreshersResolver(
-        ////        new ActivatorServiceProvider(), Mock.Of<ILogger>(), () => new[]
-        ////        {
-        ////            typeof(PageCacheRefresher),
-        ////            typeof(UnpublishedPageCacheRefresher),
+            _onPublishedAssertAction = null;
+            ContentService.Published -= OnPublishedAssert;
+            SafeXmlReaderWriter.Cloning = null;
+        }
 
-        ////            typeof(DomainCacheRefresher),
-        ////            typeof(MacroCacheRefresher)
-        ////        });
+        private void OnPublishedAssert(IContentService sender, PublishEventArgs<IContent> args)
+        {
+            _onPublishedAssertAction?.Invoke();
+        }
 
-        ////    base.FreezeResolution();
-        ////}
+        private Action _onPublishedAssertAction;
 
-        //[TearDown]
-        //public void Teardown()
-        //{
-        //    _cacheRefresher?.Unbind();
-        //    _cacheRefresher = null;
+        // in 7.6, content.Instance
+        //  .XmlContent - comes from .XmlContentInternal and is cached in context items for current request
+        //  .XmlContentInternal - the actual main xml document
+        // become in 8
+        //  xmlStore.Xml - the actual main xml document
+        //  publishedContentCache.GetXml() - the captured xml
 
-        //    _onPublishedAssertAction = null;
-        //    content.HttpContextItemsGetter = null;
-        //    ContentService.Published -= OnPublishedAssert;
-        //    SafeXmlReaderWriter.Cloning = null;
+        private static XmlStore XmlStore => (Current.Container.GetInstance<IFacadeService>() as FacadeService).XmlStore;
+        private static XmlDocument XmlMaster => XmlStore.Xml;
+        private static XmlDocument XmlInContext => ((PublishedContentCache) Umbraco.Web.Composing.Current.UmbracoContext.ContentCache).GetXml(false);
 
-        //    ServerRegistrarResolver.Reset();
-        //    ServerMessengerResolver.Reset();
-        //    CacheRefreshersResolver.Reset();
-        //}
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestScope(bool complete)
+        {
+            var umbracoContext = GetUmbracoContext("http://example.com/", setSingleton: true);
 
-        //private void OnPublishedAssert(IContentService sender, PublishEventArgs<IContent> args)
-        //{
-        //    _onPublishedAssertAction?.Invoke();
-        //}
+            // sanity checks
+            Assert.AreSame(umbracoContext, Umbraco.Web.Composing.Current.UmbracoContext);
+            Assert.AreSame(XmlStore, ((PublishedContentCache) umbracoContext.ContentCache).XmlStore);
 
-        //private Action _onPublishedAssertAction;
+            // settings
+            var settings = SettingsForTests.GenerateMockSettings();
+            var contentMock = Mock.Get(settings.Content);
+            contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
+            SettingsForTests.ConfigureSettings(settings);
 
-        //[TestCase(true)]
-        //[TestCase(false)]
-        //public void TestScope(bool complete)
-        //{
-        //    content.TestingUpdateSitemapProvider = false;
+            // create document type, document
+            var contentType = new ContentType(-1) { Alias = "CustomDocument", Name = "Custom Document" };
+            Current.Services.ContentTypeService.Save(contentType);
+            var item = new Content("name", -1, contentType);
 
-        //    var httpContextItems = new Hashtable();
-        //    content.HttpContextItemsGetter = () => httpContextItems;
+            // wire cache refresher
+            _cacheRefresher = new CacheRefresherComponent(true);
+            _cacheRefresher.Initialize();
 
-        //    var settings = SettingsForTests.GenerateMockSettings();
-        //    var contentMock = Mock.Get(settings.Content);
-        //    contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
-        //    SettingsForTests.ConfigureSettings(settings);
+            // check xml in context = "before"
+            var xml = XmlInContext;
+            var beforeXml = xml;
+            var beforeOuterXml = beforeXml.OuterXml;
+            Console.WriteLine("Xml Before:");
+            Console.WriteLine(xml.OuterXml);
 
-        //    var contentType = new ContentType(-1) { Alias = "contenttype", Name = "test"};
-        //    Current.Services.ContentTypeService.Save(contentType);
+            // event handler
+            var evented = 0;
+            _onPublishedAssertAction = () =>
+            {
+                evented++;
 
-        //    _cacheRefresher = new CacheRefresherComponent(true);
-        //    _cacheRefresher.Initialize();
+                // should see the changes in context, not in master
+                xml = XmlInContext;
+                Assert.AreNotSame(beforeXml, xml);
+                Console.WriteLine("Xml Event:");
+                Console.WriteLine(xml.OuterXml);
+                var node = xml.GetElementById(item.Id.ToString());
+                Assert.IsNotNull(node);
 
-        //    var xml = content.Instance.XmlContent;
-        //    Assert.IsNotNull(xml);
-        //    Assert.AreSame(xml, httpContextItems[content.XmlContextContentItemKey]);
-        //    var beforeXml = xml;
-        //    var beforeOuterXml = beforeXml.OuterXml;
-        //    var item = new Content("name", -1, contentType);
+                xml = XmlMaster;
+                Assert.AreSame(beforeXml, xml);
+                Assert.AreEqual(beforeOuterXml, xml.OuterXml);
+            };
 
-        //    Console.WriteLine("Xml Before:");
-        //    Console.WriteLine(xml.OuterXml);
+            ContentService.Published += OnPublishedAssert;
 
-        //    var evented = 0;
-        //    _onPublishedAssertAction = () =>
-        //    {
-        //        evented++;
-        //        xml = content.Instance.XmlContent;
-        //        Assert.IsNotNull(xml);
-        //        Assert.AreNotSame(beforeXml, xml);
-        //        Console.WriteLine("Xml Event:");
-        //        Console.WriteLine(xml.OuterXml);
-        //        var node = xml.GetElementById(item.Id.ToString());
-        //        Assert.IsNotNull(node);
-        //    };
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                Current.Services.ContentService.SaveAndPublishWithStatus(item); // should create an xml clone
+                item.Name = "changed";
+                Current.Services.ContentService.SaveAndPublishWithStatus(item); // should re-use the xml clone
 
-        //    ContentService.Published += OnPublishedAssert;
+                // this should never change
+                Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);
 
-        //    using (var scope = ScopeProvider.CreateScope())
-        //    {
-        //        Current.Services.ContentService.SaveAndPublishWithStatus(item); // should create an xml clone
-        //        item.Name = "changed";
-        //        Current.Services.ContentService.SaveAndPublishWithStatus(item); // should re-use the xml clone
+                // this does not change, other thread don't see the changes
+                xml = XmlMaster;
+                Assert.AreSame(beforeXml, xml);
+                Console.WriteLine("XmlInternal During:");
+                Console.WriteLine(xml.OuterXml);
+                Assert.AreEqual(beforeOuterXml, xml.OuterXml);
 
-        //        // this should never change
-        //        Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);
+                // this does not change during the scope (only in events)
+                // because it is the events that trigger the changes
+                xml = XmlInContext;
+                Assert.IsNotNull(xml);
+                Assert.AreSame(beforeXml, xml);
+                Assert.AreEqual(beforeOuterXml, xml.OuterXml);
 
-        //        // this does not change, other thread don't see the changes
-        //        xml = content.Instance.XmlContentInternal;
-        //        Assert.IsNotNull(xml);
-        //        Assert.AreSame(beforeXml, xml);
-        //        Console.WriteLine("XmlInternal During:");
-        //        Console.WriteLine(xml.OuterXml);
-        //        Assert.AreEqual(beforeOuterXml, xml.OuterXml);
+                // note
+                // this means that, as long as ppl don't create scopes, they'll see their
+                // changes right after SaveAndPublishWithStatus, but if they create scopes,
+                // they will have to wail until the scope is completed, ie wait until the
+                // events trigger, to use eg GetUrl etc
 
-        //        // this does not change during the scope (only in events)
-        //        // because it is the events that trigger the changes
-        //        xml = content.Instance.XmlContent;
-        //        Assert.IsNotNull(xml);
-        //        Assert.AreSame(beforeXml, xml);
-
-        //        // note
-        //        // this means that, as long as ppl don't create scopes, they'll see their
-        //        // changes right after SaveAndPublishWithStatus, but if they create scopes,
-        //        // they will have to wail until the scope is completed, ie wait until the
-        //        // events trigger, to use eg GetUrl etc
-
-        //        if (complete)
-        //            scope.Complete();
-        //    }
+                if (complete)
+                    scope.Complete();
+            }
 
             //The reason why there is only 1 event occuring is because we are publishing twice for the same event for the same
-            //object and the scope deduplicates the events (uses the latest)
-        //    Assert.AreEqual(complete ? 1 : 0, evented);
+            //object and the scope deduplicates the events(uses the latest)
+            Assert.AreEqual(complete? 1 : 0, evented);
 
-        //    // this should never change
-        //    Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);
+            // this should never change
+            Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);
 
-        //    xml = content.Instance.XmlContent;
-        //    Assert.IsNotNull(xml);
-        //    Console.WriteLine("Xml After:");
-        //    Console.WriteLine(xml.OuterXml);
-        //    if (complete)
-        //    {
-        //        var node = xml.GetElementById(item.Id.ToString());
-        //        Assert.IsNotNull(node);
-        //    }
-        //    else
-        //    {
-        //        Assert.AreSame(beforeXml, xml);
-        //        Assert.AreEqual(beforeOuterXml, xml.OuterXml); // nothing has changed!
-        //    }
-        //}
+            xml = XmlInContext;
+            Console.WriteLine("Xml After:");
+            Console.WriteLine(xml.OuterXml);
+            if (complete)
+            {
+                var node = xml.GetElementById(item.Id.ToString());
+                Assert.IsNotNull(node);
+            }
+            else
+            {
+                Assert.AreSame(beforeXml, xml);
+                Assert.AreEqual(beforeOuterXml, xml.OuterXml); // nothing has changed!
+            }
 
-        //[TestCase(true)]
-        //[TestCase(false)]
-        //public void TestScopeMany(bool complete)
-        //{
-        //    content.TestingUpdateSitemapProvider = false;
+            xml = XmlMaster;
+            if (complete)
+            {
+                var node = xml.GetElementById(item.Id.ToString());
+                Assert.IsNotNull(node);
+            }
+            else
+            {
+                Assert.AreSame(beforeXml, xml);
+                Assert.AreEqual(beforeOuterXml, xml.OuterXml); // nothing has changed!
+            }
+        }
 
-        //    var settings = SettingsForTests.GenerateMockSettings();
-        //    var contentMock = Mock.Get(settings.Content);
-        //    contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
-        //    SettingsForTests.ConfigureSettings(settings);
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestScopeMany(bool complete)
+        {
+            var umbracoContext = GetUmbracoContext("http://example.com/", setSingleton: true);
 
-        //    var contentType = new ContentType(-1) { Alias = "contenttype", Name = "test" };
-        //    Current.Services.ContentTypeService.Save(contentType);
+            // sanity checks
+            Assert.AreSame(umbracoContext, Umbraco.Web.Composing.Current.UmbracoContext);
+            Assert.AreSame(XmlStore, ((PublishedContentCache)umbracoContext.ContentCache).XmlStore);
 
-        //    _cacheRefresher = new CacheRefresherComponent(true);
-        //    _cacheRefresher.Initialize();
+            // settings
+            var settings = SettingsForTests.GenerateMockSettings();
+            var contentMock = Mock.Get(settings.Content);
+            contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
+            SettingsForTests.ConfigureSettings(settings);
 
-        //    var xml = content.Instance.XmlContent;
-        //    Assert.IsNotNull(xml);
-        //    var beforeXml = xml;
-        //    var beforeOuterXml = beforeXml.OuterXml;
-        //    var item = new Content("name", -1, contentType);
-        //    const int count = 10;
-        //    var ids = new int[count];
-        //    var clones = 0;
+            // create document type
+            var contentType = new ContentType(-1) { Alias = "CustomDocument", Name = "Custom Document" };
+            Current.Services.ContentTypeService.Save(contentType);
 
-        //    SafeXmlReaderWriter.Cloning = () => { clones++; };
+            // wire cache refresher
+            _cacheRefresher = new CacheRefresherComponent(true);
+            _cacheRefresher.Initialize();
 
-        //    Console.WriteLine("Xml Before:");
-        //    Console.WriteLine(xml.OuterXml);
+            // check xml in context = "before"
+            var xml = XmlInContext;
+            var beforeXml = xml;
+            var beforeOuterXml = beforeXml.OuterXml;
+            var item = new Content("name", -1, contentType);
+            const int count = 10;
+            var ids = new int[count];
+            var clones = 0;
 
-        //    using (var scope = ScopeProvider.CreateScope())
-        //    {
-        //        Current.Services.ContentService.SaveAndPublishWithStatus(item);
+            SafeXmlReaderWriter.Cloning = () => { clones++; };
 
-        //        for (var i = 0; i < count; i++)
-        //        {
-        //            var temp = new Content("content_" + i, -1, contentType);
-        //            Current.Services.ContentService.SaveAndPublishWithStatus(temp);
-        //            ids[i] = temp.Id;
-        //        }
+            Console.WriteLine("Xml Before:");
+            Console.WriteLine(xml.OuterXml);
 
-        //        // this should never change
-        //        Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                Current.Services.ContentService.SaveAndPublishWithStatus(item);
 
-        //        xml = content.Instance.XmlContent;
-        //        Assert.IsNotNull(xml);
-        //        Console.WriteLine("Xml InScope (before complete):");
-        //        Console.WriteLine(xml.OuterXml);
-        //        Assert.AreEqual(beforeOuterXml, xml.OuterXml);
+                for (var i = 0; i < count; i++)
+                {
+                    var temp = new Content("content_" + i, -1, contentType);
+                    Current.Services.ContentService.SaveAndPublishWithStatus(temp);
+                    ids[i] = temp.Id;
+                }
 
-        //        if (complete)
-        //            scope.Complete();
+                // this should never change
+                Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);
 
-        //        xml = content.Instance.XmlContent;
-        //        Assert.IsNotNull(xml);
-        //        Console.WriteLine("Xml InScope (after complete):");
-        //        Console.WriteLine(xml.OuterXml);
-        //        Assert.AreEqual(beforeOuterXml, xml.OuterXml);
-        //    }
+                xml = XmlMaster;
+                Assert.IsNotNull(xml);
+                Console.WriteLine("Xml InScope (before complete):");
+                Console.WriteLine(xml.OuterXml);
+                Assert.AreEqual(beforeOuterXml, xml.OuterXml);
 
-        //    var scopeProvider = ScopeProvider;
-        //    Assert.IsNotNull(scopeProvider);
-        //    // ambient scope may be null, or maybe not, depending on whether the code that
-        //    // was called did proper scoped work, or some direct (NoScope) use of the database
-        //    Assert.IsNull(scopeProvider.AmbientContext);
+                if (complete)
+                    scope.Complete();
 
-        //    // limited number of clones!
-        //    Assert.AreEqual(complete ? 1 : 0, clones);
+                xml = XmlMaster;
+                Assert.IsNotNull(xml);
+                Console.WriteLine("Xml InScope (after complete):");
+                Console.WriteLine(xml.OuterXml);
+                Assert.AreEqual(beforeOuterXml, xml.OuterXml);
+            }
 
-        //    // this should never change
-        //    Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);
+            var scopeProvider = ScopeProvider;
+            Assert.IsNotNull(scopeProvider);
+            // ambient scope may be null, or maybe not, depending on whether the code that
+            // was called did proper scoped work, or some direct (NoScope) use of the database
+            Assert.IsNull(scopeProvider.AmbientContext);
 
-        //    xml = content.Instance.XmlContent;
-        //    Assert.IsNotNull(xml);
-        //    Console.WriteLine("Xml After:");
-        //    Console.WriteLine(xml.OuterXml);
-        //    if (complete)
-        //    {
-        //        var node = xml.GetElementById(item.Id.ToString());
-        //        Assert.IsNotNull(node);
+            // limited number of clones!
+            Assert.AreEqual(complete ? 1 : 0, clones);
 
-        //        for (var i = 0; i < 10; i++)
-        //        {
-        //            node = xml.GetElementById(ids[i].ToString());
-        //            Assert.IsNotNull(node);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        Assert.AreEqual(beforeOuterXml, xml.OuterXml); // nothing has changed!
-        //    }
-        //}
+            // this should never change
+            Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);
+
+            xml = XmlMaster;
+            Assert.IsNotNull(xml);
+            Console.WriteLine("Xml After:");
+            Console.WriteLine(xml.OuterXml);
+            if (complete)
+            {
+                var node = xml.GetElementById(item.Id.ToString());
+                Assert.IsNotNull(node);
+
+                for (var i = 0; i < 10; i++)
+                {
+                    node = xml.GetElementById(ids[i].ToString());
+                    Assert.IsNotNull(node);
+                }
+            }
+            else
+            {
+                Assert.AreEqual(beforeOuterXml, xml.OuterXml); // nothing has changed!
+            }
+        }
+
+        public class LocalServerMessenger : ServerMessengerBase
+        {
+            public LocalServerMessenger()
+                : base(false)
+            { }
+
+            protected override void DeliverRemote(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }
