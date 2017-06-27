@@ -104,7 +104,7 @@
                 </div>
               </div>
 
-              <div class="test-group">
+              <div class="test-group" ng-if="!vm.user.isCurrentUser">
                 <div class="test-group-title">Permissions</div>
                 <div class="test-group-content block-form">
 
@@ -243,7 +243,7 @@
 
                 <div style="margin-top: 20px;">
                   <div style="margin-bottom: 10px;">
-                    <umb-button ng-if="vm.user.userDisplayState.alias === 'active'"
+                    <umb-button ng-if="vm.user.userDisplayState.key === 'Active' && !vm.user.isCurrentUser"
                                 type="button"
                                 button-style="[danger,block]"
                                 action="vm.disableUser()"
@@ -254,7 +254,7 @@
                   </div>
 
                   <div style="margin-bottom: 10px;">
-                    <umb-button ng-if="vm.user.userDisplayState.alias === 'disabled' || vm.user.userDisplayState.alias === 'lockedOut'"
+                    <umb-button ng-if="vm.user.userDisplayState.key === 'Disabled' && !vm.user.isCurrentUser || vm.user.userDisplayState.key === 'LockedOut' && !vm.user.isCurrentUser"
                                 type="button"
                                 button-style="[success,block]"
                                 state="vm.enableUserButtonState"

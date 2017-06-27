@@ -178,7 +178,7 @@
             </umb-avatar>
           </div>
           <div class="umb-user-card__checkmark" ng-class="{'umb-user-card__checkmark--visible': user.selected || vm.selection.length > 0 }" ng-click="vm.selectUser(user, vm.selection, $event)">
-            <umb-checkmark checked="user.selected" size="s"></umb-checkmark>
+            <umb-checkmark ng-if="!user.isCurrentUser" checked="user.selected" size="s"></umb-checkmark>
           </div>
           <div class="umb-user-card__name" href="">{{user.name}}</div>
           <div class="umb-user-card__group">
@@ -217,12 +217,12 @@
         <tbody>
           <tr ng-repeat="user in vm.users" ng-click="vm.clickUser(user)" style="cursor: pointer;" ng-mouseenter="user.hover = true" ng-mouseleave="user.hover = false">
             <td style="padding-left: 10px;">
-              <div ng-click="vm.selectUser(user, vm.selection, $event)">
-              <umb-checkmark
-                ng-if="vm.selection.length > 0 || user.hover"
-                checked="user.selected"
-                size="xs">
-              </umb-checkmark>
+              <div ng-if="!user.isCurrentUser" ng-click="vm.selectUser(user, vm.selection, $event)">
+                <umb-checkmark
+                  ng-if="vm.selection.length > 0 || user.hover"
+                  checked="user.selected"
+                  size="xs">
+                </umb-checkmark>
               </div>
             </td>
             <td scope="row">
