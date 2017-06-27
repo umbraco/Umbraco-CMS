@@ -17,6 +17,8 @@ using umbraco;
 using legacyUser = umbraco.BusinessLogic.User;
 using System.Net.Http;
 using System.Collections.Specialized;
+using Umbraco.Core.Security;
+using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
 
@@ -28,7 +30,55 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class CurrentUserController : UmbracoAuthorizedJsonController
     {
-        
+
+        /// <summary>
+        /// When a user is invited and they click on the invitation link, they will be partially logged in
+        /// where they can set their username/password
+        /// </summary>
+        /// <param name="newPassword"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This only works when the user is logged in (partially)
+        /// </remarks>
+        [WebApi.UmbracoAuthorize(requireApproval: false)]
+        [OverrideAuthorization]
+        public async Task<UserDetail> PostSetInvitedUserPassword([FromBody]string newPassword)
+        {
+            var result = await UserManager.AddPasswordAsync(Security.GetUserId(), newPassword);
+
+            if (result.Succeeded == false)
+            {
+                //it wasn't successful, so add the change error to the model state, we've name the property alias _umb_password on the form
+                // so that is why it is being used here.
+                ModelState.AddModelError(
+                    "value",
+                    string.Join(", ", result.Errors));
+
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+            }
+
+            //They've successfully set their password, we can now update their user account to be approved
+            Security.CurrentUser.IsApproved = true;
+            Services.UserService.Save(Security.CurrentUser);
+
+            //now we can return their full object since they are now really logged into the back office
+            var userDisplay = Mapper.Map<UserDetail>(Security.CurrentUser);
+            var httpContextAttempt = TryGetHttpContext();
+            if (httpContextAttempt.Success)
+            {
+                //set their remaining seconds
+                userDisplay.SecondsUntilTimeout = httpContextAttempt.Result.GetRemainingAuthSeconds();
+            }
+            return userDisplay;
+        }
+
+        [FileUploadCleanupFilter(false)]
+        public async Task<HttpResponseMessage> PostSetAvatar()
+        {
+            //borrow the logic from the user controller
+            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, ApplicationContext.ApplicationCache.StaticCache, Security.GetUserId());
+        }
+
         /// <summary>
         /// Changes the users password
         /// </summary>
@@ -39,7 +89,7 @@ namespace Umbraco.Web.Editors
         public ModelWithNotifications<string> PostChangePassword(ChangingPasswordModel data)
         {
             var passwordChangeResult = PasswordChangeControllerHelper.ChangePassword(Security.CurrentUser, data, ModelState, Members);
-            
+
             if (passwordChangeResult.Success)
             {
                 //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword

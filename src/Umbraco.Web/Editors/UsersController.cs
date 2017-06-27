@@ -17,6 +17,7 @@ using AutoMapper;
 using ClientDependency.Core;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -80,7 +81,12 @@ namespace Umbraco.Web.Editors
         [FileUploadCleanupFilter(false)]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
-            if (Request.Content.IsMimeMultipartContent() == false)
+            return await PostSetAvatarInternal(Request, Services.UserService, ApplicationContext.ApplicationCache.StaticCache, id);
+        }
+
+        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, ICacheProvider staticCache, int id)
+        {
+            if (request.Content.IsMimeMultipartContent() == false)
             {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
@@ -90,22 +96,22 @@ namespace Umbraco.Web.Editors
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
 
-            var result = await Request.Content.ReadAsMultipartAsync(provider);
+            var result = await request.Content.ReadAsMultipartAsync(provider);
 
             //must have a file
             if (result.FileData.Count == 0)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                return request.CreateResponse(HttpStatusCode.NotFound);
             }
 
-            var user = Services.UserService.GetUserById(id);
+            var user = userService.GetUserById(id);
             if (user == null)
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                return request.CreateResponse(HttpStatusCode.NotFound);
 
             var tempFiles = new PostedFiles();
 
             if (result.FileData.Count > 1)
-                return Request.CreateValidationErrorResponse("The request was not formatted correctly, only one file can be attached to the request");
+                return request.CreateValidationErrorResponse("The request was not formatted correctly, only one file can be attached to the request");
 
             //get the file info
             var file = result.FileData[0];
@@ -123,7 +129,7 @@ namespace Umbraco.Web.Editors
                     FileSystemProviderManager.Current.MediaFileSystem.AddFile(user.Avatar, fs, true);
                 }
 
-                Services.UserService.Save(user);
+                userService.Save(user);
 
                 //track the temp file so the cleanup filter removes it
                 tempFiles.UploadedFiles.Add(new ContentItemFile
@@ -132,7 +138,7 @@ namespace Umbraco.Web.Editors
                 });
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, user.GetCurrentUserAvatarUrls(Services.UserService, ApplicationContext.ApplicationCache.StaticCache));
+            return request.CreateResponse(HttpStatusCode.OK, user.GetCurrentUserAvatarUrls(userService, staticCache));
         }
 
         public HttpResponseMessage PostClearAvatar(int id)

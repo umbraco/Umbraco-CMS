@@ -68,6 +68,7 @@
                     // set done status on file
                     vm.zipFile.uploadStatus = "done";
                     loadPackage();
+                    vm.zipFile.uploadProgress = 100;
                     vm.localPackage = data;
                 }
 

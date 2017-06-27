@@ -152,7 +152,7 @@ namespace Umbraco.Web.Editors
         [SetAngularAntiForgeryTokens]
         public UserDetail GetCurrentUser()
         {
-            var user = Services.UserService.GetUserById(UmbracoContext.Security.GetUserId());
+            var user = UmbracoContext.Security.CurrentUser;
             var result = Mapper.Map<UserDetail>(user);
             var httpContextAttempt = TryGetHttpContext();
             if (httpContextAttempt.Success)
@@ -176,7 +176,14 @@ namespace Umbraco.Web.Editors
         [SetAngularAntiForgeryTokens]
         public UserDetail GetCurrentInvitedUser()
         {
-            var user = Services.UserService.GetUserById(UmbracoContext.Security.GetUserId());
+            var user = UmbracoContext.Security.CurrentUser;
+
+            if (user.IsApproved)
+            {
+                //if they are approved, than they are no longer invited and we can return an error
+                throw new HttpResponseException(Request.CreateUserNoAccessResponse());
+            }
+
             var result = Mapper.Map<UserDetail>(user);
             var httpContextAttempt = TryGetHttpContext();
             if (httpContextAttempt.Success)
@@ -367,39 +374,7 @@ namespace Umbraco.Web.Editors
                     return Request.CreateValidationErrorResponse("Invalid code");
             }
         }
-
-        /// <summary>
-        /// When a user is invited and they click on the invitation link, they will be partially logged in
-        /// where they can set their username/password
-        /// </summary>
-        /// <param name="newPassword"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This only works when the user is logged in (partially)
-        /// </remarks>
-        [WebApi.UmbracoAuthorize(requireApproval: false)]
-        public async Task<HttpResponseMessage> PostSetInvitedUserPassword([FromBody]string newPassword)
-        {
-            var result = await UserManager.AddPasswordAsync(Security.GetUserId(), newPassword);
-
-            if (result.Succeeded == false)
-            {
-                //it wasn't successful, so add the change error to the model state, we've name the property alias _umb_password on the form
-                // so that is why it is being used here.
-                ModelState.AddModelError(
-                    "value",
-                    string.Join(", ", result.Errors));
-
-                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
-            }
-
-            //They've successfully set their password, we can now update their user account to be approved
-            Security.CurrentUser.IsApproved = true;
-            Services.UserService.Save(Security.CurrentUser);
-
-            return Request.CreateResponse(HttpStatusCode.OK);
-        }
-
+        
         /// <summary>
         /// Processes a set password request.  Validates the request and sets a new password.
         /// </summary>

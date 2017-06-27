@@ -10,6 +10,21 @@ function currentUserResource($q, $http, umbRequestHelper) {
   //the factory object returned
   return {
 
+    performSetInvitedUserPassword: function (newPassword) {
+
+      if (!newPassword) {
+        return angularHelper.rejectedPromise({ errorMsg: 'newPassword cannot be empty' });
+      }
+
+      return umbRequestHelper.resourcePromise(
+        $http.post(
+          umbRequestHelper.getApiUrl(
+            "currentUserApiBaseUrl",
+            "PostSetInvitedUserPassword"),
+          angular.toJson(newPassword)),
+        'Failed to change password');
+    },
+
     /**
      * @ngdoc method
      * @name umbraco.resources.currentUserResource#changePassword

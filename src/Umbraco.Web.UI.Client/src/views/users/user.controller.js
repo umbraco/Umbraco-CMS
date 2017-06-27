@@ -258,20 +258,22 @@
                 file: file
             }).progress(function (evt) {
 
-                // set uploading status on file
-                vm.avatarFile.uploadStatus = "uploading";
+                if (vm.avatarFile.uploadStatus !== "done" && vm.avatarFile.uploadStatus !== "error") {
+                  // set uploading status on file
+                  vm.avatarFile.uploadStatus = "uploading";
 
-                // calculate progress in percentage
-                var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
+                  // calculate progress in percentage
+                  var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
 
-                // set percentage property on file
-                vm.avatarFile.uploadProgress = progressPercentage;
+                  // set percentage property on file
+                  vm.avatarFile.uploadProgress = progressPercentage;
+                }               
 
             }).success(function (data, status, headers, config) {
 
                 // set done status on file
                 vm.avatarFile.uploadStatus = "done";
-
+                vm.avatarFile.uploadProgress = 100;
                 vm.user.avatars = data;
 
             }).error(function (evt, status, headers, config) {

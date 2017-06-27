@@ -1510,7 +1510,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="createUser">Create user</key>
     <key alias="inviteEmailCopySubject">Umbraco: Invitation</key>
     <key alias="inviteEmailCopyFormat">
-      <![CDATA[<html><body><p>Hi %0%, you have been invited by %1% to the Umbraco Back Office.</p><p>Message from %1%: <em>%2</em></p><p>Click this <a href="%3" target="_blank">link</a> to accept the invite</p><p><small>If you cannot click on the link, copy and paste this URL into your browser window<br/><br/>%3</small></p></body></html>]]>
+      <![CDATA[<html><body><p>Hi %0%, you have been invited by %1% to the Umbraco Back Office.</p><p>Message from %1%: <em>%2%</em></p><p>Click this <a href="%3%" target="_blank">link</a> to accept the invite</p><p><small>If you cannot click on the link, copy and paste this URL into your browser window<br/><br/>%3%</small></p></body></html>]]>
     </key>
     
   </area>

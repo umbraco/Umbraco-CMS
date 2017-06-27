@@ -1,5 +1,5 @@
 ﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController",
-  function ($scope, $cookies, $location, currentUserResource, formHelper, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, dialogService, $q) {
+  function ($scope, $cookies, $location, currentUserResource, formHelper, mediaHelper, umbRequestHelper, Upload, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, dialogService, $q) {
 
     $scope.invitedUser = null;
     $scope.invitedUserPasswordModel = {
@@ -9,10 +9,19 @@
       passwordPolicies: null,
       passwordPolicyText: ""
     }
+    $scope.avatarFile = {
+      filesHolder: null,
+      uploadStatus: null,
+      uploadProgress: 0,
+      maxFileSize: Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB",
+      acceptedFileTypes: mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes),
+      uploaded: false
+    }
 
     function init() {
       // Check if it is a new user
-      if ($location.search().invite) {
+      var inviteVal = $location.search().invite;
+      if (inviteVal && (inviteVal === "1" || inviteVal === "2")) {
 
         $q.all([
           //get the current invite user
@@ -36,10 +45,86 @@
                 $scope.invitedUserPasswordModel.passwordPolicyText = data;
             });
           })
-        ]).then(function() {
-          $scope.inviteSetPassword = true;
+        ]).then(function () {
+
+          $scope.inviteStep = Number(inviteVal);
+          
         });
       }
+    }
+
+    $scope.changeAvatar = function (files, event) {
+      if (files && files.length > 0) {
+        upload(files[0]);
+      }
+    };
+
+    $scope.getStarted = function() {
+      $location.search('invite', null);
+      $scope.submit(true);
+    }
+
+    function upload(file) {
+
+      $scope.avatarFile.uploadProgress = 0;
+
+      Upload.upload({
+        url: umbRequestHelper.getApiUrl("currentUserApiBaseUrl", "PostSetAvatar"),
+        fields: {},
+        file: file
+      }).progress(function (evt) {
+
+        if ($scope.avatarFile.uploadStatus !== "done" && $scope.avatarFile.uploadStatus !== "error") {
+          // set uploading status on file
+          $scope.avatarFile.uploadStatus = "uploading";
+
+          // calculate progress in percentage
+          var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
+
+          // set percentage property on file
+          $scope.avatarFile.uploadProgress = progressPercentage;  
+        }
+
+      }).success(function (data, status, headers, config) {
+
+        $scope.avatarFile.uploadProgress = 100;
+
+        // set done status on file
+        $scope.avatarFile.uploadStatus = "done";
+
+        $scope.invitedUser.avatars = data;
+
+        $scope.avatarFile.uploaded = true;
+
+      }).error(function (evt, status, headers, config) {
+
+        // set status done
+        $scope.avatarFile.uploadStatus = "error";
+
+        // If file not found, server will return a 404 and display this message
+        if (status === 404) {
+          $scope.avatarFile.serverErrorMessage = "File not found";
+        }
+        else if (status == 400) {
+          //it's a validation error
+          $scope.avatarFile.serverErrorMessage = evt.message;
+        }
+        else {
+          //it's an unhandled error
+          //if the service returns a detailed error
+          if (evt.InnerException) {
+            $scope.avatarFile.serverErrorMessage = evt.InnerException.ExceptionMessage;
+
+            //Check if its the common "too large file" exception
+            if (evt.InnerException.StackTrace && evt.InnerException.StackTrace.indexOf("ValidateRequestEntityLength") > 0) {
+              $scope.avatarFile.serverErrorMessage = "File too large to upload";
+            }
+
+          } else if (evt.Message) {
+            $scope.avatarFile.serverErrorMessage = evt.Message;
+          }
+        }
+      });
     }
 
     $scope.inviteSavePassword = function () {
@@ -48,15 +133,17 @@
 
         $scope.invitedUserPasswordModel.buttonState = "busy";
 
-        authResource.performSetInvitedUserPassword($scope.invitedUserPasswordModel.password)
+        currentUserResource.performSetInvitedUserPassword($scope.invitedUserPasswordModel.password)
           .then(function (data) {
 
             //success
             formHelper.resetForm({ scope: $scope, notifications: data.notifications });
             $scope.invitedUserPasswordModel.buttonState = "success";
+            //set the user and set them as logged in
+            $scope.invitedUser = data;
+            userService.setAuthenticationSuccessful(data);
 
-            $scope.inviteSetPassword = false;
-            $scope.inviteSetAvatar = true;
+            $scope.inviteStep = 2;
 
           }, function(err) {
 
