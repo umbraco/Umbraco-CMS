@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnostics.Windows;
+using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 
 namespace Umbraco.Tests.Benchmarks
@@ -25,7 +22,7 @@ namespace Umbraco.Tests.Benchmarks
                 // see benchmarkdotnet FAQ
                 Add(Job.Default
                     .WithLaunchCount(1) // benchmark process will be launched only once
-                    .WithIterationTime(100) // 100ms per iteration
+                    .WithIterationTime(TimeInterval.FromMilliseconds(100)) // 100ms per iteration
                     .WithWarmupCount(3) // 3 warmup iteration
                     .WithTargetCount(3)); // 3 target iteration                
             }

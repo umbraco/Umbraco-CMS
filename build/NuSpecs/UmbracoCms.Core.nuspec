@@ -34,10 +34,10 @@
       <dependency id="LightInject.Mvc" version="[1.0.0.4, 2.0.0)" />
       <dependency id="LightInject.Web" version="[1.0.0.7, 2.0.0)" />
       <dependency id="LightInject.WebApi" version="[1.0.0.4, 2.0.0)" />
-      <dependency id="Newtonsoft.Json" version="[10.0.2, 10.0.0)" />
+      <dependency id="Newtonsoft.Json" version="[10.0.3, 10.0.0)" />
       <dependency id="Examine" version="[2.0.0-beta2, 3.0.0)" />
       <dependency id="ImageProcessor" version="[2.5.4, 3.0.0)" />
-      <dependency id="ImageProcessor.Web" version="[4.8.3, 5.0.0)" />
+      <dependency id="ImageProcessor.Web" version="[4.8.4, 5.0.0)" />
       <dependency id="semver" version="[2.0.4, 3.0.0)" />
       <dependency id="UrlRewritingNet" version="[2.0.7, 3.0.0)" />
 	  <!-- Markdown can not be updated due to: https://github.com/hey-red/markdownsharp/issues/71#issuecomment-233585487 -->

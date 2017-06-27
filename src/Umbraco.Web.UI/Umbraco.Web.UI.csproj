@@ -47,7 +47,16 @@
     <IntermediateOutputPath>..\bin\Release\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ImageProcessor.Web, Version=4.8.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ImageProcessor.Web.4.8.4\lib\net45\ImageProcessor.Web.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=1.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IO.RecyclableMemoryStream.1.2.2\lib\net45\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Drawing" />
@@ -254,10 +263,6 @@
       <HintPath>../packages/ImageProcessor.2.5.4/lib/net45/ImageProcessor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ImageProcessor.Web">
-      <HintPath>../packages/ImageProcessor.Web.4.8.3/lib/net45/ImageProcessor.Web.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Lucene.Net">
       <HintPath>..\packages\Lucene.Net.3.0.3\lib\NET40\Lucene.Net.dll</HintPath>
       <Private>True</Private>
@@ -350,10 +355,6 @@
       <HintPath>../packages/MySql.Data.6.9.9/lib/net45/MySql.Data.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>../packages/Newtonsoft.Json.10.0.2/lib/net45/Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Owin">
       <HintPath>../packages/Owin.1.0/lib/net40/Owin.dll</HintPath>
       <Private>True</Private>
@@ -440,10 +441,6 @@
     </Reference>
     <Reference Include="System.Xml.XPath.XDocument">
       <HintPath>../packages/System.Xml.XPath.XDocument.4.0.1/lib/net46/System.Xml.XPath.XDocument.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.IO.RecyclableMemoryStream">
-      <HintPath>../packages/Microsoft.IO.RecyclableMemoryStream.1.2.1/lib/net45/Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>

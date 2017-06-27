@@ -74,7 +74,7 @@ namespace Umbraco.Tests.Dependencies
                         // guarantees that all packages have one version, solutionwide, so it's okay to take First() here
                         if (dependencyMinimumVersion != matchingPackages.First().PackageVersion)
                         {
-                            Debug.WriteLine("NuSpec dependency '{0}' with minimum version {1} doesn't match with version {2} in the solution",
+                            Console.WriteLine("NuSpec dependency '{0}' with minimum version {1} doesn't match with version {2} in the solution",
                                 dependency.Id, dependencyMinimumVersion, matchingPackages.First().PackageVersion);
                             failTest = true;
                         }
