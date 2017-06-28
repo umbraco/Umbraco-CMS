@@ -60,8 +60,7 @@ namespace Umbraco.Web.Cache
 
         private void RemoveFromCache(int id)
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
+            ApplicationContext.Current.Services.IdkMap.ClearCache(id);
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(
                 string.Format("{0}{1}", CacheKeys.TemplateFrontEndCacheKey, id));
 
