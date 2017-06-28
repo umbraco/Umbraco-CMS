@@ -1,0 +1,13 @@
+<div class="block-form" ng-controller="Umbraco.Overlays.NodePermissionsController as vm">
+    <p class="abstract" style="margin-bottom: 20px;">Nam tellus purus, malesuada sed purus ut, semper sollicitudin odio.</p>
+    <umb-control-group
+        ng-repeat="group in model.node.permissions"
+        label="{{group.groupName}}">
+        <umb-permission
+            ng-repeat="permission in group.permissions"
+            name="permission.name"
+            description="permission.description"
+            selected="permission.checked">
+        </umb-permission>
+    </umb-control-group>
+</div>

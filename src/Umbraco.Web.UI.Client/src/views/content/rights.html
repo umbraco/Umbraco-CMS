@@ -54,31 +54,20 @@
     <div ng-show="vm.viewState === 'managePermissions'">
 
         <div class="umb-dialog-body" ng-cloak>
-            <div class="umb-pane">
-
+            <div class="umb-pane block-form">
                 <h5>Set permissions for {{ vm.selectedUserGroup.name }}</h5>
                 <p class="abstract" style="margin-bottom: 20px;">Nam tellus purus, malesuada sed purus ut, semper sollicitudin odio.</p>
-
-                <div ng-repeat="group in vm.selectedUserGroup.permissions">
-
-                    <h5>{{ group.groupName }}</h5>
-
-                    <div class="umb-permission" ng-repeat="permission in group.permissions">
-                        <umb-toggle
-                            class="umb-permission__toggle"
-                            checked="permission.checked"
-                            on-click="vm.togglePermission(permission)">
-                        </umb-toggle>
-                        <div>
-                            <div>{{ permission.name }} </div>
-                            <div class="umb-permission__description">{{ permission.description }}</div>
-                        </div>
-                    </div>
-
-                </div>
-
+                <umb-control-group
+                    ng-repeat="group in vm.selectedUserGroup.permissions"
+                    label="{{group.groupName}}">
+                    <umb-permission
+                        ng-repeat="permission in group.permissions"
+                        name="permission.name"
+                        description="permission.description"
+                        selected="permission.checked">
+                    </umb-permission>
+                </umb-control-group>
             </div>
-
         </div>
 
         <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">

@@ -103,6 +103,7 @@
                 icon: "=?",
                 name: "=",
                 description: "=?",
+                permissions: "=?",
                 published: "=?",
                 sortable: "=?",
                 allowOpen: "=?",

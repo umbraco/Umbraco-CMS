@@ -20,6 +20,7 @@
     vm.getUserStateType = getUserStateType;
     vm.save = save;
     vm.togglePermission = togglePermission;
+    vm.openGranularPermissionsPicker = openGranularPermissionsPicker;
     
     function init() {
 
@@ -162,6 +163,66 @@
         close: function (oldModel) {
           vm.userPicker.show = false;
           vm.userPicker = null;
+        }
+      };
+    }
+
+    function openGranularPermissionsPicker() {
+      vm.contentPicker = {
+        title: "Select node",
+        view: "contentpicker",
+        hideSubmitButton: true,
+        show: true,
+        submit: function (model) {
+          if (model.selection) {
+            setPermissionsForNode(model.selection[0]);
+          }
+        },
+        close: function (oldModel) {
+          vm.firstPicker.show = false;
+          vm.firstPicker = null;
+        }
+      };
+    }
+
+    function setPermissionsForNode(node) {
+      vm.nodePermissions = {
+        title: "Set permissions for " + node.name,
+        view: "nodepermissions",
+        node: node,
+        show: true,
+        submit: function (model) {
+
+          if (model && model.node && model.node.permissions) {
+            // clear allowed permissions before we make the list 
+            // so we don't have deplicates
+            node.allowedPermissions = [];
+
+            // get list of checked permissions
+            angular.forEach(model.node.permissions, function (permissionGroup) {
+              angular.forEach(permissionGroup.permissions, function (permission) {
+                if (permission.checked) {
+                  node.allowedPermissions.push(permission);
+                }
+              });
+            });
+
+            if(!vm.userGroup.nodes) {
+              vm.userGroup.nodes = [];
+            }
+            vm.userGroup.nodes.push(node);
+          }
+
+          // close node permisssions overlay
+          vm.nodePermissions.show = false;
+          vm.nodePermissions = null;
+          // close content picker overlay
+          vm.contentPicker.show = false;
+          vm.contentPicker = null;
+        },
+        close: function (oldModel) {
+          vm.nodePermissions.show = false;
+          vm.nodePermissions = null;
         }
       };
     }

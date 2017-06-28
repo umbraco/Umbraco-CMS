@@ -14,7 +14,6 @@
         vm.editPermissions = editPermissions;
         vm.setPermissions = setPermissions;
         vm.removePermissions = removePermissions;
-        vm.togglePermission = togglePermission;
         vm.cancelManagePermissions = cancelManagePermissions;
 
         function onInit() {
@@ -124,10 +123,6 @@
 
         function setViewSate(state) {
             vm.viewState = state;
-        }
-
-        function togglePermission(permission) {
-            permission.checked = !permission.checked;
         }
 
         function editPermissions(group) {

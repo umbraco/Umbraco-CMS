@@ -89,32 +89,45 @@
 
                             <div class="test-group">
                                 <div class="test-group-title">Default permissions</div>
-
-                                <div ng-repeat="(category, permissions) in vm.userGroup.permissions">
-                                    <div class="test-group-sub-header" >
-                                        {{ category }}
-                                    </div>
-
-                                    <div class="test-group-content">
-                                        <div class="umb-permission" ng-repeat="permission in permissions">
-                                            <umb-toggle
-                                                class="umb-permission__toggle"
-                                                checked="permission.checked"
-                                                on-click="vm.togglePermission(permission)">
-                                            </umb-toggle>
-                                            <div>
-                                                <div>{{ permission.name }}</div>
-                                                <div class="umb-permission__description">{{ permission.description }}</div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="test-group-content block-form">
+                                    <umb-control-group
+                                        ng-repeat="(category, permissions) in vm.userGroup.permissions"
+                                        label="{{ category }}">
+                                        <umb-permission
+                                            ng-repeat="permission in permissions"
+                                            name="permission.name"
+                                            description="permission.description"
+                                            selected="permission.checked">
+                                        </umb-permission>
+                                    </umb-control-group>
                                 </div>
-
                             </div>
 
                             <div class="test-group">
                                 <div class="test-group-title">Granular permissions</div>
-                                <div class="test-group-content">Some content here</div>
+                                <div class="test-group-content block-form">
+                                    <umb-control-group label="Nodes" description="Donec quis lacinia ligula. Suspendisse ultrices risus ante">
+                                        
+                                        <umb-node-preview
+                                            ng-repeat="node in vm.userGroup.nodes"
+                                            style="max-width: 100%;"
+                                            icon="node.icon"
+                                            name="node.name"
+                                            permissions="node.allowedPermissions"
+                                            allow-remove="true"
+                                            on-remove="vm.removeSelectedItem($index, vm.userGroup.nodes)">
+                                        </umb-node-preview>
+
+                                        <a href=""
+                                            style="max-width: 100%;"
+                                            class="umb-node-preview-add"
+                                            ng-click="vm.openGranularPermissionsPicker()"
+                                            prevent-default>
+                                            <localize key="general_add">Add</localize>
+                                        </a>
+                                    </umb-control-group>
+                                    
+                                </div>
                             </div>
 
                         </div>
@@ -216,6 +229,13 @@
         ng-if="vm.userPicker.show"
         model="vm.userPicker"
         view="vm.userPicker.view"
+        position="right">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.nodePermissions.show"
+        model="vm.nodePermissions"
+        view="vm.nodePermissions.view"
         position="right">
     </umb-overlay>
 
