@@ -178,6 +178,7 @@
     <Compile Include="Cache\ScopedRepositoryCachePolicy.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
     <Compile Include="Cache\DeepCloneRuntimeCacheProvider.cs" />
+    <Compile Include="CodeAnnotations\ActionMetadataAttribute.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoObjectTypeAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoUdiTypeAttribute.cs" />

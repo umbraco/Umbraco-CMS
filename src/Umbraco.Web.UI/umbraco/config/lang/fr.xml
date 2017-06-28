@@ -33,10 +33,8 @@
     <key alias="sendtopublish">Envoyer pour publication</key>
     <key alias="sendToTranslate">Envoyer pour traduction</key>
     <key alias="sort">Trier</key>
-    <key alias="toPublish">Envoyer pour publication</key>
     <key alias="translate">Traduire</key>
     <key alias="update">Mettre à jour</key>
-    <key alias="defaultValue">Valeur par défaut</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permission refusée.</key>

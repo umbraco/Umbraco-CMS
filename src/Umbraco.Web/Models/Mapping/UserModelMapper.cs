@@ -7,6 +7,7 @@ using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco;
+using umbraco.BusinessLogic.Actions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -17,7 +18,6 @@ using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
 
 namespace Umbraco.Web.Models.Mapping
 {
-
     internal class UserModelMapper : MapperConfiguration
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
@@ -111,6 +111,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Path, opt => opt.MapFrom(userGroup => "-1," + userGroup.Id))
                 .ForMember(detail => detail.AdditionalData, opt => opt.Ignore())
                 .ForMember(detail => detail.Users, opt => opt.Ignore())
+                .ForMember(detail => detail.DefaultPermissions, expression => expression.ResolveUsing(new PermissionsResolver(applicationContext.Services.TextService)))
                 .AfterMap((group, display) =>
                 {
                     MapUserGroupBasic(applicationContext.Services, group, display);

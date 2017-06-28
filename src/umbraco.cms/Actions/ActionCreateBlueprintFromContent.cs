@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using umbraco.interfaces;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.businesslogic.Actions
 {
+    [ActionMetadata(Constants.Conventions.PermissionCategories.ContentCategory)]
     public class ActionCreateBlueprintFromContent : IAction
     {
         private static readonly ActionCreateBlueprintFromContent instance = new ActionCreateBlueprintFromContent();
@@ -31,5 +34,6 @@ namespace umbraco.businesslogic.Actions
             Icon = "blueprint";
             Alias = "createblueprint";
         }
+        
     }
 }

@@ -90,13 +90,13 @@
                             <div class="test-group">
                                 <div class="test-group-title">Default permissions</div>
 
-                                <div ng-repeat="group in vm.userGroup.permissions">
+                                <div ng-repeat="(category, permissions) in vm.userGroup.permissions">
                                     <div class="test-group-sub-header" >
-                                        {{ group.groupName }}
+                                        {{ category }}
                                     </div>
 
                                     <div class="test-group-content">
-                                        <div class="umb-permission" ng-repeat="permission in group.permissions">
+                                        <div class="umb-permission" ng-repeat="permission in permissions">
                                             <umb-toggle
                                                 class="umb-permission__toggle"
                                                 checked="permission.checked"

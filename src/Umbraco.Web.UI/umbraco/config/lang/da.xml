@@ -31,17 +31,13 @@
     <key alias="republish">Genudgiv hele sitet</key>
     <key alias="restore" version="7.3.0">Gendan</key>
     <key alias="SetPermissionsForThePage">Sæt rettigheder for siden %0%</key>
-     <key alias="chooseWhereToMove">Hvor vil du flytte</key>
-    <key alias="toInTheTreeStructureBelow">hen til i træstrukturen?</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
     <key alias="sendtopublish">Send til udgivelse</key>
     <key alias="sendToTranslate">Send til oversættelse</key>
     <key alias="sort">Sortér</key>
-    <key alias="toPublish">Send til udgivelse</key>
     <key alias="translate">Oversæt</key>
     <key alias="update">Opdatér</key>
-    <key alias="defaultValue">Standard værdi</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Tilladelse nægtet.</key>

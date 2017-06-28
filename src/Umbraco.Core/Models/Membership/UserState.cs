@@ -14,6 +14,9 @@
         /// <summary>
         /// Occurs when the user has been created (not invited) and has no credentials assigned
         /// </summary>
-        NoCredentials = 4
+        /// <remarks>
+        /// This state shouldn't really exist or occur
+        /// </remarks>
+        NoCredentials = 100
     }
 }

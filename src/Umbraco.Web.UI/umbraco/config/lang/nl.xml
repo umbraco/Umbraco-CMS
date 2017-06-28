@@ -28,18 +28,14 @@
     <key alias="refreshNode">Nodes opnieuw inladen</key>
     <key alias="republish">Herpubliceer de site</key>
 	<key alias="SetPermissionsForThePage">Stel rechten voor pagina %0% in</key>
-    <key alias="chooseWhereToMove">Waarheen verplaatsen/</key>
-    <key alias="toInTheTreeStructureBelow">Naar de onderstaande boomstructuur</key>
 	<key alias="restore" version="7.3.0">Herstellen</key>
     <key alias="rights">Rechten</key>
     <key alias="rollback">Vorige versies</key>
     <key alias="sendtopublish">Klaar voor publicatie</key>
     <key alias="sendToTranslate">Klaar voor vertalen</key>
     <key alias="sort">Sorteren</key>
-    <key alias="toPublish">Klaar voor publicatie</key>
     <key alias="translate">Vertalen</key>
     <key alias="update">Bijwerken</key>
-    <key alias="defaultValue">Standaardwaarde</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permission denied.</key>

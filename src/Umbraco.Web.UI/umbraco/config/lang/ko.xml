@@ -32,7 +32,6 @@
     <key alias="sendtopublish">발행 항목으로 전달</key>
     <key alias="sendToTranslate">번역 항목으로 전달</key>
     <key alias="sort">정렬</key>
-    <key alias="toPublish">발행 항목으로 전달</key>
     <key alias="translate">번역</key>
     <key alias="update">업데이트</key>
   </area>

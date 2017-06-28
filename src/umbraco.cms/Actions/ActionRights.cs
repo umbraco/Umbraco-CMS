@@ -1,13 +1,16 @@
 using System;
 using umbraco.interfaces;
 using umbraco.BasePages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.BusinessLogic.Actions
 {
-	/// <summary>
-	/// This action is invoked when rights are changed on a document
-	/// </summary>
-	public class ActionRights : IAction
+    /// <summary>
+    /// This action is invoked when rights are changed on a document
+    /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.ContentCategory)]
+    public class ActionRights : IAction
 	{
 		//create singleton
 #pragma warning disable 612,618

@@ -29,17 +29,13 @@
     <key alias="republish">重新发布整站</key>
     <key alias="restore" version="7.3.0">恢复</key>
     <key alias="SetPermissionsForThePage">为 %0%设置权限</key>
-    <key alias="chooseWhereToMove">选择移动目的地</key>
-    <key alias="toInTheTreeStructureBelow">到下列的树结构中</key>
     <key alias="rights">权限</key>
     <key alias="rollback">回滚</key>
     <key alias="sendtopublish">提交至发布者</key>
     <key alias="sendToTranslate">发送给翻译</key>
     <key alias="sort">排序</key>
-    <key alias="toPublish">提交至发布者</key>
     <key alias="translate">翻译</key>
     <key alias="update">更新</key>
-    <key alias="defaultValue">默认值</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">禁止访问</key>

@@ -29,18 +29,40 @@
     <key alias="republish">Republish entire site</key>
     <key alias="restore" version="7.3.0">Restore</key>
     <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
-    <key alias="chooseWhereToMove">Choose where to move</key>
-    <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
     <key alias="sendToTranslate">Send To Translation</key>
     <key alias="sort">Sort</key>
-    <key alias="toPublish">Send to publication</key>
     <key alias="translate">Translate</key>
     <key alias="update">Update</key>
-    <key alias="defaultValue">Default value</key>
     <key alias="createblueprint">Create blueprint</key>
+  </area>
+  <area alias="actionCategories">
+    <key alias="content">Content</key>
+    <key alias="administration">Administration</key>
+    <key alias="structure">Structure</key>
+    <key alias="other">Other</key>
+  </area>
+  <area alias="actionDescriptions">
+    <key alias="assignDomain">Culture and Hostnames, TODO: Fill in description</key>
+    <key alias="auditTrail">Audit Trail, TODO: Fill in description</key>
+    <key alias="browse">Browse Node, TODO: Fill in description</key>
+    <key alias="changeDocType">Change Document Type, TODO: Fill in description</key>
+    <key alias="copy">Copy, TODO: Fill in description</key>
+    <key alias="create">Create, TODO: Fill in description</key>
+    <key alias="delete">Delete, TODO: Fill in description</key>
+    <key alias="move">Move, TODO: Fill in description</key>
+    <key alias="protect">Public access, TODO: Fill in description</key>
+    <key alias="publish">Publish, TODO: Fill in description</key>
+    <key alias="rights">Permissions, TODO: Fill in description</key>
+    <key alias="rollback">Rollback, TODO: Fill in description</key>
+    <key alias="sendtopublish">Send To Publish, TODO: Fill in description</key>
+    <key alias="sendToTranslate">Send To Translation, TODO: Fill in description</key>
+    <key alias="sort">Sort, TODO: Fill in description</key>
+    <key alias="translate">Translate, TODO: Fill in description</key>
+    <key alias="update">Update, TODO: Fill in description</key>
+    <key alias="createblueprint">Create blueprint, TODO: Fill in description</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permission denied.</key>

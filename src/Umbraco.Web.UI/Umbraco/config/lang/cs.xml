@@ -32,10 +32,8 @@
     <key alias="sendtopublish">Odeslat k publikování</key>
     <key alias="sendToTranslate">Odeslat k překladu</key>
     <key alias="sort">Seřadit</key>
-    <key alias="toPublish">Odeslat k publikování</key>
     <key alias="translate">Přeložit</key>
     <key alias="update">Aktualizovat</key>
-    <key alias="defaultValue">Výchozí hodnota</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Přístup zakázán.</key>

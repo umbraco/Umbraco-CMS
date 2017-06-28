@@ -385,6 +385,7 @@
     <Compile Include="Models\ContentEditing\MemberPropertyTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\MemberTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\MemberTypeSave.cs" />
+    <Compile Include="Models\ContentEditing\Permission.cs" />
     <Compile Include="Models\ContentEditing\PostedFiles.cs" />
     <Compile Include="Models\ContentEditing\PropertyGroupBasic.cs" />
     <Compile Include="Models\ContentEditing\PropertyTypeBasic.cs" />
@@ -405,6 +406,7 @@
     <Compile Include="Models\Mapping\ContentTypeModelMapperExtensions.cs" />
     <Compile Include="Models\Mapping\ContentTypeUdiResolver.cs" />
     <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
+    <Compile Include="Models\Mapping\PermissionsResolver.cs" />
     <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />
     <Compile Include="Models\RelatedLink.cs" />
     <Compile Include="Models\Mapping\TemplateModelMapper.cs" />

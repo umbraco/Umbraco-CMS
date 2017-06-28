@@ -28,15 +28,12 @@
     <key alias="refreshNode">Обновить узлы</key>
     <key alias="republish">Опубликовать весь сайт</key>
     <key alias="SetPermissionsForThePage">Установить разрешения для страницы '%0%'</key>
-    <key alias="chooseWhereToMove">Выберите, куда переместить</key>
-    <key alias="toInTheTreeStructureBelow">В структуре документов ниже</key>
     <key alias="restore" version="7.3.0">Восстановить</key>
     <key alias="rights">Разрешения</key>
     <key alias="rollback">Откатить</key>
     <key alias="sendtopublish">Направить на публикацию</key>
     <key alias="sendToTranslate">Направить на перевод</key>
     <key alias="sort">Сортировать</key>
-    <key alias="toPublish">Направить на публикацию</key>
     <key alias="translate">Перевести</key>
     <key alias="unpublish">Скрыть</key>
     <key alias="update">Обновить</key>

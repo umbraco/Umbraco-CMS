@@ -12,7 +12,6 @@
     <key alias="copy">Kopiera</key>
     <key alias="create">Skapa</key>
     <key alias="createPackage">Skapa paket</key>
-    <key alias="defaultValue">Standardvärde</key>
     <key alias="delete">Ta bort</key>
     <key alias="disable">Avaktivera</key>
     <key alias="emptyTrashcan">Töm papperskorgen</key>
@@ -32,7 +31,6 @@
     <key alias="sendtopublish">Skicka för publicering</key>
     <key alias="sendToTranslate">Skicka för översättning</key>
     <key alias="sort">Sortera</key>
-    <key alias="toPublish">Skicka för publicering</key>
     <key alias="translate">Översätt</key>
     <key alias="unpublish">Avpublicera</key>
     <key alias="update">Uppdatera</key>

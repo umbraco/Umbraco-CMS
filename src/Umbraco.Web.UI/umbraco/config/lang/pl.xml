@@ -29,23 +29,19 @@
     <key alias="republish">Opublikuj ponownie całą stronę</key>
     <key alias="restore" version="7.3.0">Przywróć</key>
     <key alias="SetPermissionsForThePage">Ustaw  uprawnienia dla strony %0%</key>
-    <key alias="chooseWhereToMove">Wybierz miejsce docelowe</key>
-    <key alias="toInTheTreeStructureBelow">do w poniższej strukturze drzewa</key>
     <key alias="rights">Uprawnienia</key>
     <key alias="rollback">Cofnij</key>
     <key alias="sendtopublish">Wyślij do publikacji</key>
     <key alias="sendToTranslate">Wyślij do tłumaczenia</key>
     <key alias="sort">Sortuj</key>
-    <key alias="toPublish">Zapisz do opublikowania</key>
     <key alias="translate">Przetłumacz</key>
     <key alias="update">Aktualizuj</key>
-    <key alias="defaultValue">Domyślna wartość</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Brak odpowiednich uprawnień</key>
     <key alias="addNew">Dodaj nową domenę</key>
     <key alias="remove">Usuń domenę</key>
-    <key alias="invalidNode">Niepoprawny węzeł<./key>
+    <key alias="invalidNode">Niepoprawny węzeł</key>
     <key alias="invalidDomain">Niepoprawny format domeny.</key>
     <key alias="duplicateDomain">Domena została już przydzielona.</key>
     <key alias="language">Język</key>
