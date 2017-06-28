@@ -379,14 +379,57 @@
     </umb-editor-sub-header>
 
     <div class="flex justify-center">
-      <div style="max-width: 500px;" class="tc">
-        <div class="flex justify-center" style="margin-bottom: 15px;">
-          <umb-checkmark checked="vm.usersViewState === 'createUserSuccess'"
-                         size="xl">
+      <div style="max-width: 500px;">
+        <div class="flex items-center" style="margin-bottom: 15px;">
+          <umb-checkmark
+            checked="vm.usersViewState === 'createUserSuccess'"
+            size="m">
           </umb-checkmark>
+          <h3 class="bold" style="margin: 0 0 0 10px;">{{vm.newUser.name | umbWordLimit:1}} has been created</h3>
         </div>
-        <h3 class="bold" style="margin-bottom: 0;">{{vm.newUser.name | umbWordLimit:1}} has been created</h3>
-        <p style="line-height: 1.6em; margin-bottom: 30px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
+        <p style="line-height: 1.6em; margin-bottom: 20px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
+        <div>
+
+          <label class="bold">Password</label>
+
+          <div class="flex items-center justify-between" style="background-color: #f3f3f5; padding: 10px 20px; border-radius: 3px; margin-bottom: 30px;">
+            
+            <div ng-show="vm.newUser.showPassword">{{vm.newUser.resetPasswordValue}}</div>
+            <div ng-show="!vm.newUser.showPassword">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
+
+            <div>
+              <umb-button
+                ng-if="!vm.newUser.showPassword"
+                type="button"
+                action="vm.toggleNewUserPassword()"
+                label="Show"
+                size="xs">
+              </umb-button>
+
+              <umb-button
+                ng-if="vm.newUser.showPassword"
+                type="button"
+                action="vm.toggleNewUserPassword()"
+                label="Hide"
+                size="xs">
+              </umb-button>
+
+              <umb-button
+                  ng-if="vm.newUser.resetPasswordValue"
+                  umb-clipboard
+                  umb-clipboard-success="vm.copySuccess()"
+                  umb-clipboard-error="vm.copyError()"
+                  umb-clipboard-text="vm.newUser.resetPasswordValue"
+                  state="vm.page.copyPasswordButtonState"
+                  type="button"
+                  label="Copy"
+                  size="xs">
+              </umb-button>
+
+            </div>
+          </div>
+
+        </div>
         <div>
           <umb-button type="button"
                       button-style="info"
@@ -397,7 +440,7 @@
           <umb-button type="button"
                       button-style="success"
                       label-key="user_goToProfile"
-                      action="vm.goToUser(vm.newUser);"
+                      action="vm.goToUser(vm.newUser.id);"
                       size="m">
           </umb-button>
         </div>
