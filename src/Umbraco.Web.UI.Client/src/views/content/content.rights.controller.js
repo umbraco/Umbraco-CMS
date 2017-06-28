@@ -40,7 +40,7 @@
 
             // get list of checked permissions
             angular.forEach(group.permissions, function(permissionGroup) {
-                angular.forEach(permissionGroup.permissions, function(permission) {
+                angular.forEach(permissionGroup, function(permission) {
                     if(permission.checked) {
                         group.allowedPermissions.push(permission);
                     }
