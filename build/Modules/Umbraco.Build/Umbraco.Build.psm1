@@ -239,6 +239,7 @@ function Compile-Tests
     /t:Build `
     /tv:$toolsVersion `
     /p:UmbracoBuild=True `
+    /p:NugetPackages=$src\packages `
     > $tmp\msbuild.tests.log
     
   # /p:UmbracoBuild tells the csproj that we are building from PS
