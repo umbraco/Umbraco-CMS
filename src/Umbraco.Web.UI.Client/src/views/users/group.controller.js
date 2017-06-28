@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserGroupEditController($scope, $timeout, $location, $routeParams, usersResource, localizationService, contentEditingHelper) {
+    function UserGroupEditController($scope, $location, $routeParams, usersResource, localizationService, contentEditingHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -17,9 +17,7 @@
         vm.openUserPicker = openUserPicker;
         vm.removeSelectedItem = removeSelectedItem;
         vm.clearStartNode = clearStartNode;
-        vm.getUserStateType = getUserStateType;
         vm.save = save;
-        vm.togglePermission = togglePermission;
         vm.openGranularPermissionsPicker = openGranularPermissionsPicker;
 
         function init() {
@@ -71,9 +69,7 @@
                 vm.page.saveButtonState = "success";
 
             }, function (err) {
-
                 vm.page.saveButtonState = "error";
-
             });
         }
 
@@ -152,11 +148,6 @@
                 selection: vm.userGroup.users,
                 show: true,
                 submit: function (model) {
-                    /*
-                    if(model.selection) {
-                        vm.userGroup.startNodesMedia = model.selection;
-                    }
-                    */
                     vm.userPicker.show = false;
                     vm.userPicker = null;
                 },
@@ -179,8 +170,8 @@
                     }
                 },
                 close: function (oldModel) {
-                    vm.firstPicker.show = false;
-                    vm.firstPicker = null;
+                    vm.contentPicker.show = false;
+                    vm.contentPicker = null;
                 }
             };
         }
@@ -239,21 +230,6 @@
             } else if (type === "media") {
                 vm.userGroup.startMediaId = null;
             }
-        }
-
-        function getUserStateType(state) {
-            switch (state) {
-                case "disabled" || "umbracoDisabled":
-                    return "danger";
-                case "pending":
-                    return "warning";
-                default:
-                    return "success";
-            }
-        }
-
-        function togglePermission(permission) {
-            permission.checked = !permission.checked;
         }
 
         function makeBreadcrumbs() {
