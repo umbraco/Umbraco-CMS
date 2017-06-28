@@ -367,6 +367,7 @@
     <Compile Include="HealthCheck\StatusResultType.cs" />
     <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
+    <Compile Include="Models\ContentEditing\AssignedUserGroupPermissions.cs" />
     <Compile Include="Models\ContentEditing\ContentRedirectUrl.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />

@@ -5,16 +5,6 @@ using System.Runtime.Serialization;
 namespace Umbraco.Web.Models.ContentEditing
 {
     [DataContract(Name = "userGroup", Namespace = "")]
-    public class UserGroupPermission : EntityBasic
-    {
-        /// <summary>
-        /// The default permissions for the user group organized by permission group name
-        /// </summary>
-        [DataMember(Name = "permissions")]
-        public IDictionary<string, IEnumerable<Permission>> DefaultPermissions { get; set; }
-    }
-
-    [DataContract(Name = "userGroup", Namespace = "")]
     public class UserGroupBasic : EntityBasic, INotificationModel
     {
         public UserGroupBasic()

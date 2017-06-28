@@ -9,6 +9,7 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
+using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -80,6 +81,57 @@ namespace Umbraco.Web.Editors
         {
             var foundContent = Services.ContentService.GetByIds(ids);
             return foundContent.Select(Mapper.Map<IContent, ContentItemDisplay>);
+        }
+
+        /// <summary>
+        /// Returns the user group permissions for user groups assigned to this node
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Permission check is done for letter 'R' which is for <see cref="ActionRights"/> which the user must have access to to view
+        /// </remarks>
+        [EnsureUserPermissionForContent("contentId", 'R')]
+        public IEnumerable<AssignedUserGroupPermissions> GetDetailedPermissions(int contentId)
+        {
+            if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            var found = Services.ContentService.GetById(contentId);
+            if (found == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            
+
+            //get all user groups and map their default permissions to the AssignedUserGroupPermissions model.
+            //we do this because not all groups will have true assigned permissions for this node so if they don't have assigned permissions, we need to show the defaults.
+            var allUserGroups = Services.UserService.GetAllUserGroups();
+            var defaultPermissionsByGroup = Mapper.Map<IEnumerable<AssignedUserGroupPermissions>>(allUserGroups)
+                .ToDictionary(x => Convert.ToInt32(x.Id), x => x);
+
+            //get the actual assigned permissions
+            var assignedPermissionsByGroup = Services.ContentService.GetPermissionsForEntity(found).ToArray();
+
+            //iterate over assigned and update the defaults with the real values
+            foreach (var assignedGroupPermission in assignedPermissionsByGroup)
+            {
+                var defaultUserGroupPermissions = defaultPermissionsByGroup[assignedGroupPermission.UserGroupId];
+
+                //iterate each assigned permission for this group, the permission is essentially the letter of the action
+                foreach (var assignedPermission in assignedGroupPermission.AssignedPermissions)
+                {
+                    //find this permission letter in the default model
+
+                    //iterate through the dictionary
+                    foreach (var defaultUserGroupPermissionByGroup in defaultUserGroupPermissions.AssignedPermissions)
+                    {
+                        //iterate through the key/value pair values
+                        foreach (var permissionInGroup in defaultUserGroupPermissionByGroup.Value)
+                        {
+                            //assigned the checked parameter based on the actual assigned permission
+                            permissionInGroup.Checked = permissionInGroup.Letter == assignedPermission;
+                        }
+                    }
+                }
+            }
+
+            return defaultPermissionsByGroup.Values;
         }
 
         /// <summary>
@@ -303,6 +355,7 @@ namespace Umbraco.Web.Editors
 
         /// <summary>
         /// Returns permissions for all nodes passed in for the current user
+        /// TODO: This should be moved to the CurrentUserController?
         /// </summary>
         /// <param name="nodeIds"></param>
         /// <returns></returns>
@@ -314,6 +367,13 @@ namespace Umbraco.Web.Editors
                     .ToDictionary(x => x.EntityId, x => x.AssignedPermissions);
         }
 
+        /// <summary>
+        /// Checks a nodes permission for the current user
+        /// TODO: This should be moved to the CurrentUserController?
+        /// </summary>
+        /// <param name="permissionToCheck"></param>
+        /// <param name="nodeId"></param>
+        /// <returns></returns>
         [HttpGet]
         public bool HasPermission(string permissionToCheck, int nodeId)
         {

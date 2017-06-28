@@ -22,5 +22,11 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [IgnoreDataMember]
         internal string Category { get; set; }
+
+        /// <summary>
+        /// Used internall to carry the permission letter from the IAction
+        /// </summary>
+        [IgnoreDataMember]
+        internal string Letter { get; set; }
     }
 }

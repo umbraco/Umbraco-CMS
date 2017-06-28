@@ -40,6 +40,8 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     return {
 
+      
+
         getRecycleBin: function () {
             return umbRequestHelper.resourcePromise(
                   $http.get(
@@ -552,6 +554,15 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                                "HasPermission",
                                [{ permissionToCheck: permission }, { nodeId: id }])),
                    'Failed to check permission for item ' + id);
+        },
+
+        getDetailedPermissions: function (contentId) {
+          return umbRequestHelper.resourcePromise(
+            $http.get(
+              umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "GetDetailedPermissions", { contentId: contentId })),
+            'Failed to retrieve permissions for content item ' + contentId);
         },
 
         getPermissions: function (nodeIds) {

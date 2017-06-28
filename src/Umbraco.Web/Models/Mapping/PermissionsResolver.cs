@@ -46,9 +46,8 @@ namespace Umbraco.Web.Models.Mapping
                 : attribute.Name;
             result.Description = _textService.Localize(String.Format("actionDescriptions/{0}", action.Alias));
             result.Icon = action.Icon;
-
             result.Checked = source.Permissions.Contains(action.Letter.ToString(CultureInfo.InvariantCulture));
-
+            result.Letter = action.Letter.ToString(CultureInfo.InvariantCulture);
             return result;
         }
     }
