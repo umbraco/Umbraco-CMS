@@ -351,6 +351,8 @@
     <key alias="filter">Type to filter...</key>
     <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
     <key alias="email">Enter your email</key>
+	<key alias="usernameHint">Your username is usually your email</key>
+	<key alias="cssClass">Enter a CSS class</key>
   </area>
 
   <area alias="editcontenttype">
@@ -551,6 +553,7 @@
     <key alias="current">current</key>
     <key alias="embed">Embed</key>
     <key alias="selected">selected</key>
+	<key alias="cssClass">Class</key>
   </area>
   <area alias="colors">
     <key alias="black">Black</key>

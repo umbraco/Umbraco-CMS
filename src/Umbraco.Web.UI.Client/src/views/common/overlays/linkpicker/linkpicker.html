@@ -18,6 +18,14 @@
             ng-model="model.target.name" />
     </umb-control-group>
 
+	<umb-control-group label="Class">
+		<input type="text"
+			localize="placeholder"
+			placeholder="Class"
+			class="umb-editor umb-textstring"
+			ng-model="model.target.cssClass" />
+	</umb-control-group>
+
     <umb-control-group label="@content_target">
         <label class="checkbox no-indent">
             <input type="checkbox" ng-model="model.target.target" ng-true-value="_blank" ng-false-value="" /> <localize key="defaultdialogs_openInNewWindow">Opens the linked document in a new window or tab</localize>

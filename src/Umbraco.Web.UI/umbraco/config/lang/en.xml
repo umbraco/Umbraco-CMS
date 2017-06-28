@@ -353,6 +353,7 @@
     <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
     <key alias="email">Enter your email</key>
     <key alias="usernameHint">Your username is usually your email</key>
+	<key alias="cssClass">Enter a CSS class</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Allow at root</key>
@@ -551,6 +552,7 @@
     <key alias="current">current</key>
     <key alias="embed">Embed</key>
     <key alias="selected">selected</key>
+	<key alias="cssClass">Class</key>
   </area>
 
   <area alias="colors">
@@ -586,7 +588,7 @@
       <key alias="copyLineDown">Copy Lines Down</key>
       <key alias="moveLineUp">Move Lines Up</key>
       <key alias="moveLineDown">Move Lines Down</key>
-    
+
       <key alias="generalHeader">General</key>
       <key alias="editorHeader">Editor</key>
   </area>
@@ -1102,7 +1104,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="preview">Preview</key>
     <key alias="styles">Styles</key>
   </area>
-  
+
   <area alias="template">
     <key alias="edittemplate">Edit template</key>
 
@@ -1112,10 +1114,10 @@ To manage your website, simply open the Umbraco back office and start adding con
 
     <key alias="insert">Insert</key>
     <key alias="insertDesc">Choose what to insert into your template</key>
-    
+
     <key alias="insertDictionaryItem">Dictionary item</key>
     <key alias="insertDictionaryItemDesc">A dictionary item is a placeholder for a translatable piece of text, which makes it easy to create designs for multilingual websites.</key>
-    
+
     <key alias="insertMacro">Macro</key>
     <key alias="insertMacroDesc">
       A Macro is a configurable component which is great for
@@ -1125,13 +1127,13 @@ To manage your website, simply open the Umbraco back office and start adding con
 
     <key alias="insertPageField">Value</key>
     <key alias="insertPageFieldDesc">Displays the value of a named field from the current page, with options to modify the value or fallback to alternative values.</key>
-    
+
     <key alias="insertPartialView">Partial view</key>
     <key alias="insertPartialViewDesc">
       A partial view is a separate template file which can be rendered inside another
       template, it's great for reusing markup or for separating complex templates into separate files.
     </key>
-    
+
     <key alias="mastertemplate">Master template</key>
     <key alias="noMastertemplate">No master template</key>
     <key alias="noMaster">No master</key>
@@ -1143,8 +1145,8 @@ To manage your website, simply open the Umbraco back office and start adding con
      <code>@RenderBody()</code> placeholder.
       ]]>
     </key>
-    
-    
+
+
     <key alias="defineSection">Define a named section</key>
     <key alias="defineSectionDesc">
       <![CDATA[
@@ -1167,20 +1169,20 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="sectionMandatoryDesc">
       If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is shown.
     </key>
-    
-    
+
+
     <key alias="queryBuilder">Query builder</key>
     <key alias="buildQuery">Build a query</key>
     <key alias="itemsReturned">items returned, in</key>
 
-    <key alias="iWant">I want</key>   
+    <key alias="iWant">I want</key>
     <key alias="allContent">all content</key>
     <key alias="contentOfType">content of type &quot;%0%&quot;</key>
     <key alias="from">from</key>
     <key alias="websiteRoot">my website</key>
     <key alias="where">where</key>
     <key alias="and">and</key>
-    
+
     <key alias="is">is</key>
     <key alias="isNot">is not</key>
     <key alias="before">before</key>
@@ -1203,12 +1205,12 @@ To manage your website, simply open the Umbraco back office and start adding con
 
     <key alias="orderBy">order by</key>
     <key alias="ascending">ascending</key>
-    <key alias="descending">descending</key>    
-    
+    <key alias="descending">descending</key>
+
     <key alias="template">Template</key>
-    
+
   </area>
-  
+
   <area alias="grid">
     <key alias="insertControl">Choose type of content</key>
     <key alias="chooseLayout">Choose a layout</key>
