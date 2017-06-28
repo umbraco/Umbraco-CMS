@@ -154,6 +154,7 @@ function Compile-Umbraco
   &$uenv.VisualStudio.MsBuild "$src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" `
     /p:WarningLevel=0 `
     /p:Configuration=$buildConfiguration `
+    /p:Platform=AnyCPU `
     /p:UseWPP_CopyWebApplication=True `
     /p:PipelineDependsOnBuild=False `
     /p:OutDir=$tmp\bin\\ `
@@ -230,6 +231,7 @@ function Compile-Tests
   &$uenv.VisualStudio.MsBuild "$src\Umbraco.Tests\Umbraco.Tests.csproj" `
     /p:WarningLevel=0 `
     /p:Configuration=$buildConfiguration `
+    /p:Platform=AnyCPU `
     /p:UseWPP_CopyWebApplication=True `
     /p:PipelineDependsOnBuild=False `
     /p:OutDir=$out\\ `

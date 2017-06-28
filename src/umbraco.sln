@@ -6,16 +6,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.UI", "Umbraco.W
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\Build.bat = ..\build\Build.bat
-		..\build\Build.proj = ..\build\Build.proj
-		..\build\BuildBelle.bat = ..\build\BuildBelle.bat
+		..\build\build.md = ..\build\build.md
 		..\build\BuildDocs.ps1 = ..\build\BuildDocs.ps1
 		..\build\RevertToCleanInstall.bat = ..\build\RevertToCleanInstall.bat
 		..\build\RevertToEmptyInstall.bat = ..\build\RevertToEmptyInstall.bat
 		SolutionInfo.cs = SolutionInfo.cs
 		umbraco.presentation.targets = umbraco.presentation.targets
-		..\build\UmbracoVersion.txt = ..\build\UmbracoVersion.txt
-		..\build\webpihash.txt = ..\build\webpihash.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
@@ -94,6 +90,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Benchmarks", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Compat7", "Umbraco.Compat7\Umbraco.Compat7.csproj", "{185E098F-5706-4B97-B404-EB974F05F633}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{460C4687-9209-4100-AAB0-82867B592FDC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Umbraco.Build", "Umbraco.Build", "{F80CA2F0-168E-4364-AB75-A27DDD58643D}"
+	ProjectSection(SolutionItems) = preProject
+		..\build\Modules\Umbraco.Build\Get-UmbracoBuildEnv.ps1 = ..\build\Modules\Umbraco.Build\Get-UmbracoBuildEnv.ps1
+		..\build\Modules\Umbraco.Build\Get-UmbracoVersion.ps1 = ..\build\Modules\Umbraco.Build\Get-UmbracoVersion.ps1
+		..\build\Modules\Umbraco.Build\Get-VisualStudio.ps1 = ..\build\Modules\Umbraco.Build\Get-VisualStudio.ps1
+		..\build\Modules\Umbraco.Build\Set-UmbracoVersion.ps1 = ..\build\Modules\Umbraco.Build\Set-UmbracoVersion.ps1
+		..\build\Modules\Umbraco.Build\Umbraco.Build.psm1 = ..\build\Modules\Umbraco.Build\Umbraco.Build.psm1
+		..\build\Modules\Umbraco.Build\Utilities.ps1 = ..\build\Modules\Umbraco.Build\Utilities.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -142,5 +150,7 @@ Global
 		{E3F9F378-AFE1-40A5-90BD-82833375DBFE} = {227C3B55-80E5-4E7E-A802-BE16C5128B9D}
 		{5B03EF4E-E0AC-4905-861B-8C3EC1A0D458} = {227C3B55-80E5-4E7E-A802-BE16C5128B9D}
 		{86DEB346-089F-4106-89C8-D852B9CF2A33} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
+		{460C4687-9209-4100-AAB0-82867B592FDC} = {2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}
+		{F80CA2F0-168E-4364-AB75-A27DDD58643D} = {460C4687-9209-4100-AAB0-82867B592FDC}
 	EndGlobalSection
 EndGlobal
