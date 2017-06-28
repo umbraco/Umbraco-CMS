@@ -73,6 +73,7 @@
     <PackageReference Include="LightInject.Web" Version="2.0.0" />
     <PackageReference Include="LightInject.WebApi" Version="2.0.0" />
     <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="Log4Net.Async" Version="2.0.4" />
     <PackageReference Include="Markdown" Version="2.2.1" />
     <PackageReference Include="Lucene.Net" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.1" />
