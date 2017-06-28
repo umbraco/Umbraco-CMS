@@ -55,7 +55,7 @@ function Set-UmbracoVersion
     "$release" 
   Replace-FileText "$($uenv.SolutionRoot)\src\Umbraco.Core\Configuration\UmbracoVersion.cs" `
     "CurrentComment { get { return `"(.+)`"" `
-    "CurrentComment { get { return `"$semver.PreRelease`""
+    "CurrentComment { get { return `"$($semver.PreRelease)`""
   Write-Host "Update SolutionInfo.cs"
   Replace-FileText "$($uenv.SolutionRoot)\src\SolutionInfo.cs" `
     "AssemblyFileVersion\(`"(.+)?`"\)" `
