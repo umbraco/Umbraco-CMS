@@ -1403,6 +1403,7 @@ namespace Umbraco.Tests.Services
             }));
             Assert.IsTrue(ServiceContext.PublicAccessService.AddRule(content1, "test2", "test2").Success);
 
+            // how is that one even working since "test" is more than 1 char?
             Assert.IsNotNull(ServiceContext.NotificationService.CreateNotification(ServiceContext.UserService.GetUserById(0), content1, "test"));
 
             ServiceContext.ContentService.AssignContentPermission(content1, 'A', new[] {0});
@@ -1411,7 +1412,7 @@ namespace Umbraco.Tests.Services
             {
                 RootContentId = content1.Id
             }).Success);
-            
+
             // Act
             ServiceContext.ContentService.EmptyRecycleBin();
             var contents = ServiceContext.ContentService.GetContentInRecycleBin();
@@ -1814,7 +1815,7 @@ namespace Umbraco.Tests.Services
                 var c1 = MockedContent.CreateSimpleContent(contentType);
                 ServiceContext.ContentService.Save(c1);
             }
-            
+
             long total;
             var entities = service.GetPagedChildren(-1, 0, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(6));
@@ -1834,7 +1835,7 @@ namespace Umbraco.Tests.Services
 
             var contentType = MockedContentTypes.CreateSimpleContentType();
             ServiceContext.ContentTypeService.Save(contentType);
-            // only add 9 as we also add a content with children 
+            // only add 9 as we also add a content with children
             for (int i = 0; i < 9; i++)
             {
                 var c1 = MockedContent.CreateSimpleContent(contentType);
