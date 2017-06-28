@@ -58,10 +58,10 @@
                 <h5>Set permissions for {{ vm.selectedUserGroup.name }}</h5>
                 <p class="abstract" style="margin-bottom: 20px;">Nam tellus purus, malesuada sed purus ut, semper sollicitudin odio.</p>
                 <umb-control-group
-                    ng-repeat="group in vm.selectedUserGroup.permissions"
-                    label="{{group.groupName}}">
+                    ng-repeat="(category, permissions) in vm.selectedUserGroup.permissions"
+                    label="{{category}}">
                     <umb-permission
-                        ng-repeat="permission in group.permissions"
+                        ng-repeat="permission in permissions"
                         name="permission.name"
                         description="permission.description"
                         selected="permission.checked">
