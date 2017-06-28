@@ -72,6 +72,9 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             if (ValidTables.Count == 0)
                 return new Version(0, 0, 0);
 
+            // FIXME - but the whole detection is borked really
+            return new Version(8, 0, 0);
+
             //If Errors is empty or if TableDefinitions tables + columns correspond to valid tables + columns then we're at current version
             if (Errors.Any() == false ||
                 (TableDefinitions.All(x => ValidTables.Contains(x.Name))
@@ -129,8 +132,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 return new Version(7, 2, 0);
             }
 
-            //if the error is for umbracoDeployChecksum it must be the previous version to 7.4 since that is when it is added
-            if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.InvariantEquals("umbracoDeployChecksum"))))
+            //if the error is for cmsPropertyData.dataDecimal it must be the previous version to 7.4 since that is when it is added
+            if (Errors.Any(x => x.Item1.Equals("Column") && (x.Item2.InvariantEquals("cmsPropertyData,dataDecimal"))))
             {
                 return new Version(7, 3, 0);
             }

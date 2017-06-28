@@ -8,6 +8,13 @@ using System.Resources;
 
 [assembly: NeutralResourcesLanguage("en-US")]
 
+// versions
+// read https://stackoverflow.com/questions/64602/what-are-differences-between-assemblyversion-assemblyfileversion-and-assemblyin
+
+// this is the ONLY ONE the CLR cares about for compatibility
+// should change ONLY when "hard" breaking compatibility (manual change)
 [assembly: AssemblyVersion("8.0.0")]
-[assembly: AssemblyFileVersion("8.0.0.20")]
-[assembly: AssemblyInformationalVersion("8.0.0-alpha0020")]
+
+// these are FYI and changed automatically
+[assembly: AssemblyFileVersion("8.0.0")]
+[assembly: AssemblyInformationalVersion("8.0.0-alpha0021")]
