@@ -96,7 +96,18 @@ angular.module('umbraco.security.interceptor')
                 });
         };
     }])
-
+    //used to set headers on all requests where necessary
+  .factory('umbracoRequestInterceptor', function ($q, queryStrings) {
+      return {
+        //dealing with requests:
+        'request': function(config) {
+          if (queryStrings.getParams().umbDebug === "true" || queryStrings.getParams().umbdebug === "true") {
+            config.headers["X-UMB-DEBUG"] = "true";
+          }
+          return config;
+        }
+      };
+    })
     .value('requestInterceptorFilter', function() {
         return ["www.gravatar.com"];
     })
@@ -104,4 +115,5 @@ angular.module('umbraco.security.interceptor')
     // We have to add the interceptor to the queue as a string because the interceptor depends upon service instances that are not available in the config block.
     .config(['$httpProvider', function ($httpProvider) {
         $httpProvider.responseInterceptors.push('securityInterceptor');
+        $httpProvider.interceptors.push('umbracoRequestInterceptor');
     }]);

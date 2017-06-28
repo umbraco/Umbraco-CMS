@@ -574,7 +574,32 @@ function umbPropEditorHelper() {
 }
 angular.module('umbraco.services').factory('umbPropEditorHelper', umbPropEditorHelper);
 
+/**
+* @ngdoc service
+* @name umbraco.services.queryStrings
+* @description A helper used to get query strings in the real URL (not the hash URL)
+**/
+function queryStrings($window) {
 
+  var pl = /\+/g;  // Regex for replacing addition symbol with a space
+  var search = /([^&=]+)=?([^&]*)/g;
+  var decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); };
 
+  return {
+   
+    getParams: function () {
+      var match;
+      var query = $window.location.search.substring(1);
+
+      var urlParams = {};
+      while (match = search.exec(query)) {
+        urlParams[decode(match[1])] = decode(match[2]);
+      }
+
+      return urlParams;
+    }
+  };
+}
+angular.module('umbraco.services').factory('queryStrings', queryStrings);
 
 
