@@ -6,6 +6,7 @@
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
 
+        vm.page = {};
         vm.users = [];
         vm.userGroups = [];
         vm.userStates = [];
@@ -85,6 +86,10 @@
         vm.createUser = createUser;
         vm.inviteUser = inviteUser;
         vm.getSortLabel = getSortLabel;
+        vm.toggleNewUserPassword = toggleNewUserPassword;
+        vm.copySuccess = copySuccess;
+        vm.copyError = copyError;
+        vm.goToUser = goToUser;
 
         function init() {
 
@@ -110,6 +115,11 @@
         }
 
         function setUsersViewState(state) {
+
+            if (state === "createUser") {
+                clearAddUserForm();
+            }
+
             vm.usersViewState = state;
         }
 
@@ -155,7 +165,7 @@
             if(vm.selection.length > 0) {
                 selectUser(user, vm.selection);
             } else {
-                $location.path('users/users/user/' + user.id);
+                goToUser(user.id);
             }
         }
 
@@ -336,52 +346,61 @@
 
         function createUser(addUserForm) {
 
-          if (formHelper.submitForm({ formCtrl: addUserForm,scope: $scope, statusMessage: "Saving..." })) {
+            if (formHelper.submitForm({ formCtrl: addUserForm, scope: $scope, statusMessage: "Saving..." })) {
 
-            vm.newUser.id = -1;
-            vm.newUser.parentId = -1;
-            vm.page.createButtonState = "busy";
+                vm.newUser.id = -1;
+                vm.newUser.parentId = -1;
+                vm.page.createButtonState = "busy";
 
-            usersResource.createUser(vm.newUser)
-              .then(function (saved) {
-
-                //success
-                vm.page.createButtonState = "success";
-                vm.newUser = saved;
-                setUsersViewState('createUserSuccess');
-                clearAddUserForm();
-
-              }, function (err) {
-
-                //error
-                formHelper.handleError(err);
-                vm.page.createButtonState = "error";
-              });            
-          }
+                usersResource.createUser(vm.newUser)
+                    .then(function (saved) {
+                        vm.page.createButtonState = "success";
+                        vm.newUser = saved;
+                        setUsersViewState('createUserSuccess');
+                    }, function (err) {
+                        formHelper.handleError(err);
+                        vm.page.createButtonState = "error";
+                    });
+            }
 
         }
 
         function inviteUser(addUserForm) {
 
-          if (formHelper.submitForm({ formCtrl: addUserForm, scope: $scope, statusMessage: "Saving..." })) {
-            vm.newUser.id = -1;
-            vm.newUser.parentId = -1;
-            vm.page.createButtonState = "busy";
+            if (formHelper.submitForm({ formCtrl: addUserForm, scope: $scope, statusMessage: "Saving..." })) {
+                vm.newUser.id = -1;
+                vm.newUser.parentId = -1;
+                vm.page.createButtonState = "busy";
 
-            usersResource.inviteUser(vm.newUser)
-              .then(function (saved) {
+                usersResource.inviteUser(vm.newUser)
+                    .then(function (saved) {
+                        //success
+                        vm.page.createButtonState = "success";
+                    }, function (err) {
+                        //error
+                        formHelper.handleError(err);
+                        vm.page.createButtonState = "error";
+                    });
+            }
 
-                //success
-                vm.page.createButtonState = "success";
+        }
 
-              }, function (err) {
+        function toggleNewUserPassword() {
+            vm.newUser.showPassword = !vm.newUser.showPassword;
+        }
 
-                //error
-                formHelper.handleError(err);
-                vm.page.createButtonState = "error";
-              });                    
-          }
+        // copy to clip board success
+        function copySuccess() {
+            vm.page.copyPasswordButtonState = "success";
+        }
+        
+        // copy to clip board error
+        function copyError() {
+            vm.page.copyPasswordButtonState = "error";
+        }
 
+        function goToUser(userId) {
+            $location.path('users/users/user/' + userId);
         }
 
         // helpers

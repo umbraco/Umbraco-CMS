@@ -556,6 +556,10 @@ module.exports = function (grunt) {
                                 
                                 'src-min-noconflict/worker-javascript.js',
                             ]
+                        },
+                        'clipboard': {
+                            keepExpandedHierarchy: false,
+                            files: ['dist/clipboard.min.js']
                        }
                     }
                 }
