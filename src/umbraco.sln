@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.13
+VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.UI", "Umbraco.Web.UI\Umbraco.Web.UI.csproj", "{4C4C194C-B5E4-4991-8F87-4373E24CC19F}"
 EndProject
@@ -67,13 +67,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests", "Umbraco.Tests\Umbraco.Tests.csproj", "{5D3B8245-ADA6-453F-A008-50ED04BFE770}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoExamine", "UmbracoExamine\UmbracoExamine.csproj", "{07FBC26B-2927-4A22-8D96-D644C667FECC}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{D24664A0-49B7-44A8-B2A5-5E5B1CCB7A58}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{E3F9F378-AFE1-40A5-90BD-82833375DBFE}"
 	ProjectSection(SolutionItems) = preProject
