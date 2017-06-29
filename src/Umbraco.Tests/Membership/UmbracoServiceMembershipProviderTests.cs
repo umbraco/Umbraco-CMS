@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Specialized;
-using System.Configuration.Provider;
+﻿using System.Collections.Specialized;
 using System.Web.Security;
 using Moq;
 using NUnit.Framework;

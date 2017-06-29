@@ -820,6 +820,22 @@ namespace Umbraco.Core.Services
         /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
         /// <param name="memberTypeAlias">Alias of the Type</param>
         /// <returns><see cref="IMember"/></returns>
+        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias)
+        {
+            var memberType = FindMemberTypeByAlias(memberTypeAlias);
+            return CreateMemberWithIdentity(username, email, username, passwordValue, memberType);
+        }
+
+        /// <summary>
+        /// Creates and persists a new <see cref="IMember"/>
+        /// </summary>
+        /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
+        /// <param name="username">Username of the <see cref="IMembershipUser"/> to create</param>
+        /// <param name="email">Email of the <see cref="IMembershipUser"/> to create</param>
+        /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
+        /// <param name="memberTypeAlias">Alias of the Type</param>
+        /// <param name="isApproved">Is the member approved</param>
+        /// <returns><see cref="IMember"/></returns>
         IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved)
         {
             var memberType = FindMemberTypeByAlias(memberTypeAlias);
