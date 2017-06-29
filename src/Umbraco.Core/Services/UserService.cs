@@ -19,7 +19,6 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class UserService : ScopeRepositoryService, IUserService
     {
-
         //TODO: We need to change the isUpgrading flag to use an app state enum as described here: http://issues.umbraco.org/issue/U4-6816
         // in the meantime, we will use a boolean which we are currently using during upgrades to ensure that a user object is not persisted during this phase, otherwise
         // exceptions can occur if the db is not in it's correct state.
@@ -114,6 +113,26 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Creates and persists a new <see cref="IUser"/>
+        /// </summary>
+        /// <param name="username">Username of the <see cref="IUser"/> to create</param>
+        /// <param name="email">Email of the <see cref="IUser"/> to create</param>
+        /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
+        /// <param name="memberTypeAlias">Alias of the Type</param>
+        /// <param name="isApproved">Is the member approved</param>
+        /// <returns><see cref="IUser"/></returns>
+        IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved)
+        {
+            var userType = GetUserTypeByAlias(memberTypeAlias);
+            if (userType == null)
+            {
+                throw new EntityNotFoundException("The user type " + memberTypeAlias + " could not be resolved");
+            }
+
+            return CreateUserWithIdentity(username, email, passwordValue, userType, isApproved);
+        }
+
+        /// <summary>
         /// Creates and persists a Member
         /// </summary>
         /// <remarks>Using this method will persist the Member object before its returned
@@ -122,8 +141,9 @@ namespace Umbraco.Core.Services
         /// <param name="email">Email of the Member to create</param>
         /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
         /// <param name="userType">MemberType the Member should be based on</param>
+        /// <param name="isApproved">Is the user approved</param>
         /// <returns><see cref="IUser"/></returns>
-        private IUser CreateUserWithIdentity(string username, string email, string passwordValue, IUserType userType)
+        private IUser CreateUserWithIdentity(string username, string email, string passwordValue, IUserType userType, bool isApproved = true)
         {
             if (userType == null) throw new ArgumentNullException("userType");
 
@@ -152,7 +172,7 @@ namespace Umbraco.Core.Services
                     StartContentId = -1,
                     StartMediaId = -1,
                     IsLockedOut = false,
-                    IsApproved = true
+                    IsApproved = isApproved
                 };
                 //adding default sections content and media
                 user.AddAllowedSection("content");
