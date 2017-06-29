@@ -394,7 +394,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.IO.FileSystem.Primitives">
-      <HintPath>../packages/ystem.IO.FileSystem.Primitives.4.0.1/lib/net46/System.IO.FileSystem.Primitives.dll</HintPath>
+      <HintPath>../packages/System.IO.FileSystem.Primitives.4.0.1/lib/net46/System.IO.FileSystem.Primitives.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Net.Http.Formatting">
