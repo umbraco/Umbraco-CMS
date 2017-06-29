@@ -17,6 +17,7 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Migrations.Upgrades
 {
     [TestFixture]
+    [NUnit.Framework.Ignore("does not apply to v8")] // fixme - remove
     public class ValidateOlderSchemaTest
     {
         /// <summary>Regular expression that finds multiline block comments.</summary>
