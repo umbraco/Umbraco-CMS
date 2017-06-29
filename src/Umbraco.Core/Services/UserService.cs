@@ -102,7 +102,7 @@ namespace Umbraco.Core.Services
         /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
         /// <param name="memberTypeAlias">Alias of the Type</param>
         /// <returns><see cref="IUser"/></returns>
-        IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias)
+        IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved = true)
         {
             var userType = GetUserTypeByAlias(memberTypeAlias);
             if (userType == null)
@@ -122,8 +122,9 @@ namespace Umbraco.Core.Services
         /// <param name="email">Email of the Member to create</param>
         /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
         /// <param name="userType">MemberType the Member should be based on</param>
+        /// <param name="isApproved">Optional IsApproved parameter</param>
         /// <returns><see cref="IUser"/></returns>
-        private IUser CreateUserWithIdentity(string username, string email, string passwordValue, IUserType userType)
+        private IUser CreateUserWithIdentity(string username, string email, string passwordValue, IUserType userType, bool isApproved = true)
         {
             if (userType == null) throw new ArgumentNullException("userType");
 
@@ -152,7 +153,7 @@ namespace Umbraco.Core.Services
                     StartContentId = -1,
                     StartMediaId = -1,
                     IsLockedOut = false,
-                    IsApproved = true
+                    IsApproved = isApproved
                 };
                 //adding default sections content and media
                 user.AddAllowedSection("content");
