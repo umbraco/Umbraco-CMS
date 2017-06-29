@@ -441,6 +441,11 @@ function Package-NuGet
     -Properties BuildTmp="$tmp" `
     -Version $version.Semver.ToString() `
     -Verbosity quiet -outputDirectory $out
+
+  &$uenv.NuGet Pack "$nuspecs\UmbracoCms.Compat7.nuspec" `
+    -Properties BuildTmp="$tmp" `
+    -Version $version.Semver.ToString() `
+    -Verbosity quiet -outputDirectory $out
 }
 
 #
