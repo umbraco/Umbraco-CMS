@@ -40,7 +40,24 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     return {
 
-      
+
+      savePermissions: function (saveModel) {
+        if (!saveModel) {
+          throw "saveModel cannot be null";
+        }
+        if (!saveModel.contentId) {
+          throw "saveModel.contentId cannot be null";
+        }
+        if (!saveModel.permissions) {
+          throw "saveModel.permissions cannot be null";
+        }
+
+        return umbRequestHelper.resourcePromise(
+          $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostSaveUserGroupPermissions"),
+            saveModel),
+          'Failed to save permissions');
+      },
+
 
         getRecycleBin: function () {
             return umbRequestHelper.resourcePromise(

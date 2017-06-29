@@ -84,6 +84,55 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Updates the permissions for a content item for a particular user group
+        /// </summary>
+        /// <param name="saveModel"></param>
+        /// <returns></returns>
+        public IEnumerable<AssignedUserGroupPermissions> PostSaveUserGroupPermissions(UserGroupPermissionsSave saveModel)
+        {
+            if (saveModel.ContentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            var content = Services.ContentService.GetById(saveModel.ContentId);
+            if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            
+            //current permissions explicitly assigned to this content item
+            var contentPermissions = Services.ContentService.GetPermissionsForEntity(content)
+                .ToDictionary(x => x.UserGroupId, x => x);
+
+            var allUserGroups = Services.UserService.GetAllUserGroups().ToArray();
+
+            //loop through each user group
+            foreach (var userGroup in allUserGroups)
+            {
+                //check if there's a permission set posted up for this user group
+                IEnumerable<string> groupPermissions;
+                if (saveModel.AssignedPermissions.TryGetValue(userGroup.Id, out groupPermissions))
+                {
+                    //create a string collection of the assigned letters
+                    var groupPermissionCodes = groupPermissions.ToArray();
+
+                    //check if they are the defaults, if so we should just remove them if they exist since it's more overhead having them stored
+                    if (userGroup.Permissions.UnsortedSequenceEqual(groupPermissionCodes))
+                    {
+                        //only remove them if they are actually currently assigned
+                        if (contentPermissions.ContainsKey(userGroup.Id))
+                        {
+                            //remove these permissions from this node for this group since the ones being assigned are the same as the defaults
+                            Services.UserService.RemoveUserGroupPermissions(userGroup.Id, content.Id);
+                        }
+                    }
+                    else if (contentPermissions.ContainsKey(userGroup.Id) == false || contentPermissions[userGroup.Id].AssignedPermissions.UnsortedSequenceEqual(groupPermissionCodes) == false)
+                    {
+                        //if they are different we need to update, otherwise there's nothing to update
+                        Services.UserService.ReplaceUserGroupPermissions(userGroup.Id, groupPermissionCodes.Select(x => x[0]), content.Id);
+                    }                    
+                }                
+            }
+
+            return GetDetailedPermissions(content, allUserGroups);
+        }
+
+        /// <summary>
         /// Returns the user group permissions for user groups assigned to this node
         /// </summary>
         /// <param name="contentId"></param>
@@ -95,39 +144,36 @@ namespace Umbraco.Web.Editors
         public IEnumerable<AssignedUserGroupPermissions> GetDetailedPermissions(int contentId)
         {
             if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-            var found = Services.ContentService.GetById(contentId);
-            if (found == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            var content = Services.ContentService.GetById(contentId);
+            if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));            
             
+            var allUserGroups = Services.UserService.GetAllUserGroups();
 
+            return GetDetailedPermissions(content, allUserGroups);
+        }
+
+        private IEnumerable<AssignedUserGroupPermissions> GetDetailedPermissions(IContent content, IEnumerable<IUserGroup> allUserGroups)
+        {
             //get all user groups and map their default permissions to the AssignedUserGroupPermissions model.
             //we do this because not all groups will have true assigned permissions for this node so if they don't have assigned permissions, we need to show the defaults.
-            var allUserGroups = Services.UserService.GetAllUserGroups();
+
             var defaultPermissionsByGroup = Mapper.Map<IEnumerable<AssignedUserGroupPermissions>>(allUserGroups)
                 .ToDictionary(x => Convert.ToInt32(x.Id), x => x);
 
             //get the actual assigned permissions
-            var assignedPermissionsByGroup = Services.ContentService.GetPermissionsForEntity(found).ToArray();
+            var assignedPermissionsByGroup = Services.ContentService.GetPermissionsForEntity(content).ToArray();
 
             //iterate over assigned and update the defaults with the real values
             foreach (var assignedGroupPermission in assignedPermissionsByGroup)
             {
                 var defaultUserGroupPermissions = defaultPermissionsByGroup[assignedGroupPermission.UserGroupId];
 
-                //iterate each assigned permission for this group, the permission is essentially the letter of the action
-                foreach (var assignedPermission in assignedGroupPermission.AssignedPermissions)
+                //since there is custom permissions assigned to this node for this group, we need to clear all of the default permissions
+                //and we'll re-check it if it's one of the explicitly assigned ones
+                foreach (var permission in defaultUserGroupPermissions.AssignedPermissions.SelectMany(x => x.Value))
                 {
-                    //find this permission letter in the default model
-
-                    //iterate through the dictionary
-                    foreach (var defaultUserGroupPermissionByGroup in defaultUserGroupPermissions.AssignedPermissions)
-                    {
-                        //iterate through the key/value pair values
-                        foreach (var permissionInGroup in defaultUserGroupPermissionByGroup.Value)
-                        {
-                            //assigned the checked parameter based on the actual assigned permission
-                            permissionInGroup.Checked = permissionInGroup.PermissionCode == assignedPermission;
-                        }
-                    }
+                    permission.Checked = false;
+                    permission.Checked = assignedGroupPermission.AssignedPermissions.Contains(permission.PermissionCode, StringComparer.InvariantCulture);
                 }
             }
 

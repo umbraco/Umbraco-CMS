@@ -137,7 +137,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Used to bulk update the permissions set for a content item. This will replace all permissions
-        /// assigned to an entity with a list of user id & permission pairs.
+        /// assigned to an entity with a list of user group id & permission pairs.
         /// </summary>
         /// <param name="permissionSet"></param>
         void ReplaceContentPermissions(EntityPermissionSet permissionSet);
@@ -151,7 +151,7 @@ namespace Umbraco.Core.Services
         void AssignContentPermission(IContent entity, char permission, IEnumerable<int> groupIds);
 
         /// <summary>
-        /// Gets the list of permissions for the content item
+        /// Returns permissions directly assigned to the content item for all user groups
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>

@@ -130,7 +130,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// Returns permissions for all groups for a given entity
+        /// Returns permissions directly assigned to the content item for all user groups
         /// </summary>
         /// <param name="entityId"></param>
         /// <returns></returns>

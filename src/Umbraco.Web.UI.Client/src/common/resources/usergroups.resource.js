@@ -36,7 +36,7 @@
             "PostSaveUserGroup"),
           formattedSaveData),
         "Failed to save user group");
-    }
+    }    
 
     function getUserGroup(id) {
 

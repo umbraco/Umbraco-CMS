@@ -7,7 +7,7 @@ namespace Umbraco.Core.Services
     internal static class UserServiceExtensions
     {
         /// <summary>
-        /// Remove all permissions for this user for all nodes specified
+        /// Remove all permissions for this user group for all nodes specified
         /// </summary>
         /// <param name="userService"></param>
         /// <param name="groupId"></param>
@@ -18,7 +18,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Remove all permissions for this user for all nodes
+        /// Remove all permissions for this user group for all nodes
         /// </summary>
         /// <param name="userService"></param>
         /// <param name="groupId"></param>

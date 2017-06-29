@@ -130,7 +130,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets the list of permissions for the content item
+        /// Returns permissions directly assigned to the content item for all user groups
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>

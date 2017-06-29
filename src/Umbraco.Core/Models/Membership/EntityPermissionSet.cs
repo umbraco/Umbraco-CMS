@@ -3,7 +3,7 @@
 namespace Umbraco.Core.Models.Membership
 {
     /// <summary>
-    /// Represents an entity -> user & permission key value pair collection
+    /// Represents an entity -> user group & permission key value pair collection
     /// </summary>
     public class EntityPermissionSet
     {

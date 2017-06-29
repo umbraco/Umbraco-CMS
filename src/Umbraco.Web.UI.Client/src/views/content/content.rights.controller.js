@@ -13,6 +13,7 @@
         vm.setViewSate = setViewSate;
         vm.editPermissions = editPermissions;
         vm.setPermissions = setPermissions;
+        vm.save = save;
         vm.removePermissions = removePermissions;
         vm.cancelManagePermissions = cancelManagePermissions;
 
@@ -35,7 +36,7 @@
 
         function setPermissions(group) {
             // clear allowed permissions before we make the list 
-            // so we don't have deplicates
+            // so we don't have duplicates
             group.allowedPermissions = [];
 
             // get list of checked permissions
@@ -65,6 +66,27 @@
 
         function cancelManagePermissions() {
             setViewSate("manageGroups");
+        }
+
+        function save() {
+
+          //this is a dictionary that we need to format
+          var permissionsSave = {};
+          angular.forEach(vm.selectedUserGroups, function(g) {
+            permissionsSave[g.id] = [];
+            angular.forEach(g.allowedPermissions, function(p) {
+              permissionsSave[g.id].push(p.permissionCode);
+            });
+          });
+
+          var saveModel = {
+            contentId: $scope.currentNode.id,
+            permissions: permissionsSave
+          };
+
+          contentResource.savePermissions(saveModel).then(function() {
+            alert("hooray!");
+          });
         }
 
         onInit();

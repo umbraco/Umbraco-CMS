@@ -885,6 +885,11 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             repo.AssignEntityPermission(entity, permission, groupIds);
         }
 
+        /// <summary>
+        /// Returns permissions directly assigned to the content item for all user groups
+        /// </summary>
+        /// <param name="entityId"></param>
+        /// <returns></returns>
         public IEnumerable<UserGroupEntityPermission> GetPermissionsForEntity(int entityId)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);

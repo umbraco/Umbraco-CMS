@@ -27,12 +27,12 @@
         };
     }
 
-    if (!window.location.search.getParams) {
+    if (!window.location.getParams) {
       var pl = /\+/g;  // Regex for replacing addition symbol with a space
       var search = /([^&=]+)=?([^&]*)/g;
       var decode = function(s) { return decodeURIComponent(s.replace(pl, " ")); };
       
-      window.location.search.getParams = function() {
+      window.location.getParams = function() {
         var match;
         var query = window.location.search.substring(1);
 
@@ -393,7 +393,7 @@
               xhr.setRequestHeader("X-XSRF-TOKEN", cookieVal);  
             }
 
-            var queryString = window.location.search.getParams();
+            var queryString = window.location.getParams();
             if (queryString.umbDebug === "true") {
               xhr.setRequestHeader("X-UMB-DEBUG", cookieVal);  
             }
