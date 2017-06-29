@@ -20,17 +20,7 @@
             "PostClearAvatar",
             { id: userId })),
         'Failed to clear the user avatar ' + userId);
-    }
-
-    function getUserGroupScaffold() {
-
-      return umbRequestHelper.resourcePromise(
-        $http.get(
-          umbRequestHelper.getApiUrl(
-            "userApiBaseUrl",
-            "GetEmptyUserGroup")),
-        'Failed to get the user group scaffold');
-    }
+    }    
 
     function disableUsers(userIds) {
       if (!userIds) {
@@ -173,44 +163,7 @@
           formattedSaveData),
         "Failed to save user");
     }
-
-    function saveUserGroup(userGroup, isNew) {
-      if (!userGroup) {
-        throw "userGroup not specified";
-      }
-
-      //need to convert the user data into the correctly formatted save data - it is *not* the same and we don't want to over-post
-      var formattedSaveData = umbDataFormatter.formatUserGroupPostData(userGroup, "save" + (isNew ? "New" : ""));
-
-      return umbRequestHelper.resourcePromise(
-        $http.post(
-          umbRequestHelper.getApiUrl(
-            "userApiBaseUrl",
-            "PostSaveUserGroup"),
-          formattedSaveData),
-        "Failed to save user group");
-    }
-
-    function getUserGroup(id) {
-
-      return umbRequestHelper.resourcePromise(
-        $http.get(
-          umbRequestHelper.getApiUrl(
-            "userApiBaseUrl",
-            "GetUserGroup",
-            { id: id })),
-        "Failed to retrieve data for user group " + id);
-      
-    }
-
-    function getUserGroups() {
-      return umbRequestHelper.resourcePromise(
-        $http.get(
-          umbRequestHelper.getApiUrl(
-            "userApiBaseUrl",
-            "GetUserGroups")),
-        "Failed to retrieve user groups");
-    }
+    
 
     var resource = {
       disableUsers: disableUsers,
@@ -219,12 +172,8 @@
       getUser: getUser,
       createUser: createUser,
       inviteUser: inviteUser,
-      saveUser: saveUser,
-      saveUserGroup: saveUserGroup,
-      getUserGroup: getUserGroup,
-      getUserGroups: getUserGroups,
-      clearAvatar: clearAvatar,
-      getUserGroupScaffold: getUserGroupScaffold
+      saveUser: saveUser,      
+      clearAvatar: clearAvatar
     };
 
     return resource;

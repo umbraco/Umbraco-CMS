@@ -37,9 +37,15 @@ namespace Umbraco.Web.Models.ContentEditing
         public int StartMediaId { get; set; }
 
         /// <summary>
+        /// The list of letters (permission codes) to assign as the default for the user group
+        /// </summary>
+        [DataMember(Name = "permissions")]
+        public IEnumerable<string> Permissions { get; set; }
+
+        /// <summary>
         /// The real persisted user group
         /// </summary>
-        [JsonIgnore]
+        [IgnoreDataMember]
         internal IUserGroup PersistedUserGroup { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

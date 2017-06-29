@@ -126,6 +126,10 @@ namespace Umbraco.Web.Editors
                                 controller => controller.PostSaveUser(null))
                         },
                         {
+                            "userGroupsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UserGroupsController>(
+                                controller => controller.PostSaveUserGroup(null))
+                        },
+                        {
                             "contentApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentController>(
                                 controller => controller.PostSave(null))
                         },

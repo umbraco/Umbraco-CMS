@@ -38,6 +38,7 @@ namespace Umbraco.Web.Models.Mapping
             
             config.CreateMap<PropertyTypeBasic, PropertyType>()
                 .ConstructUsing(basic => new PropertyType(applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(basic.DataTypeId)))
+                .IgnoreEntityCommonProperties()
                 .ForMember(type => type.ValidationRegExp, expression => expression.ResolveUsing(basic => basic.Validation.Pattern))
                 .ForMember(type => type.Mandatory, expression => expression.ResolveUsing(basic => basic.Validation.Mandatory))
                 .ForMember(type => type.Name, expression => expression.ResolveUsing(basic => basic.Label))
@@ -45,10 +46,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(type => type.DataTypeId, expression => expression.Ignore())
                 .ForMember(type => type.PropertyEditorAlias, expression => expression.Ignore())
                 .ForMember(type => type.HelpText, expression => expression.Ignore())
-                .ForMember(type => type.Key, expression => expression.Ignore())
-                .ForMember(type => type.CreateDate, expression => expression.Ignore())
-                .ForMember(type => type.UpdateDate, expression => expression.Ignore())
-                .ForMember(type => type.DeletedDate, expression => expression.Ignore())
+                .ForMember(type => type.Key, expression => expression.Ignore())                                
+                .ForMember(type => type.DeletedDate, expression => expression.Ignore())                                
                 .ForMember(type => type.HasIdentity, expression => expression.Ignore());
 
             config.CreateMap<DocumentTypeSave, IContentType>()

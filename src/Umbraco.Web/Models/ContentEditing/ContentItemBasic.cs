@@ -89,7 +89,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <remarks>
         /// This is not used for outgoing model information.
         /// </remarks>
-        [JsonIgnore]
+        [IgnoreDataMember]
         internal TPersisted PersistedContent { get; set; }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// instead of having to look up all the data individually.
         /// This is not used for outgoing model information.
         /// </remarks>
-        [JsonIgnore]
+        [IgnoreDataMember]
         internal ContentItemDto<TPersisted> ContentDto { get; set; }
 
 

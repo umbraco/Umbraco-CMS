@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserGroupEditController($scope, $location, $routeParams, usersResource, localizationService, contentEditingHelper) {
+    function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -30,7 +30,7 @@
 
             if ($routeParams.create) {
                 // get user group scaffold
-                usersResource.getUserGroupScaffold().then(function (userGroup) {
+                userGroupsResource.getUserGroupScaffold().then(function (userGroup) {
                     vm.userGroup = userGroup;
                     setSectionIcon(vm.userGroup.sections);
                     makeBreadcrumbs();
@@ -38,7 +38,7 @@
                 });
             } else {
                 // get user group
-                usersResource.getUserGroup($routeParams.id).then(function (userGroup) {
+               userGroupsResource.getUserGroup($routeParams.id).then(function (userGroup) {
                     vm.userGroup = userGroup;
                     setSectionIcon(vm.userGroup.sections);
                     makeBreadcrumbs();
@@ -53,7 +53,7 @@
 
             contentEditingHelper.contentEditorPerformSave({
                 statusMessage: localizeSaving,
-                saveMethod: usersResource.saveUserGroup,
+                saveMethod: userGroupsResource.saveUserGroup,
                 scope: $scope,
                 content: vm.userGroup,
                 // We do not redirect on failure for users - this is because it is not possible to actually save a user

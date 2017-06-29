@@ -174,27 +174,7 @@ namespace Umbraco.Web.Editors
             return Mapper.Map<IUser, UserDisplay>(user);
         }
 
-        /// <summary>
-        /// Returns all user groups
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<UserGroupBasic> GetUserGroups()
-        {
-            return Mapper.Map<IEnumerable<IUserGroup>, IEnumerable<UserGroupBasic>>(Services.UserService.GetAllUserGroups());
-        }
-
-        /// <summary>
-        /// Return a user group
-        /// </summary>
-        /// <returns></returns>
-        public UserGroupDisplay GetUserGroup(int id)
-        {
-            var found = Services.UserService.GetUserGroupById(id);
-            if (found == null)
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-
-            return Mapper.Map<UserGroupDisplay>(found);
-        }
+        
         
         /// <summary>
         /// Returns a paged users collection
@@ -374,14 +354,7 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
-        /// <summary>
-        /// Returns the scaffold for creating a new user group
-        /// </summary>        
-        /// <returns></returns>
-        public UserGroupDisplay GetEmptyUserGroup()
-        {
-            return new UserGroupDisplay();
-        }
+        
 
         private HttpContextBase EnsureHttpContext()
         {
@@ -502,20 +475,7 @@ namespace Umbraco.Web.Editors
 
             display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserSaved"));
             return display;
-        }
-
-        [UserGroupValidate]
-        public UserGroupDisplay PostSaveUserGroup(UserGroupSave userGroupSave)
-        {
-            if (userGroupSave == null) throw new ArgumentNullException("userGroupSave");
-            
-            Services.UserService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());
-
-            var display = Mapper.Map<UserGroupDisplay>(userGroupSave.PersistedUserGroup);
-
-            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserGroupSaved"));
-            return display;
-        }
+        }        
 
         /// <summary>
         /// Disables the users with the given user ids

@@ -125,7 +125,7 @@ namespace Umbraco.Web.Editors
                         foreach (var permissionInGroup in defaultUserGroupPermissionByGroup.Value)
                         {
                             //assigned the checked parameter based on the actual assigned permission
-                            permissionInGroup.Checked = permissionInGroup.Letter == assignedPermission;
+                            permissionInGroup.Checked = permissionInGroup.PermissionCode == assignedPermission;
                         }
                     }
                 }

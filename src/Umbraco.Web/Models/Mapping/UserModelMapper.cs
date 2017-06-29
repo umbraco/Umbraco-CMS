@@ -25,12 +25,9 @@ namespace Umbraco.Web.Models.Mapping
             
             config.CreateMap<UserGroupSave, IUserGroup>()
                 .ConstructUsing((UserGroupSave save) => new UserGroup() { CreateDate = DateTime.Now })
-                .IgnoreAllUnmapped()
-                .ForMember(user => user.Alias, expression => expression.MapFrom(save => save.Alias))
-                .ForMember(user => user.Name, expression => expression.MapFrom(save => save.Name))
-                .ForMember(user => user.Icon, expression => expression.MapFrom(save => save.Icon))
-                .ForMember(user => user.StartMediaId, expression => expression.MapFrom(save => save.StartMediaId))
-                .ForMember(user => user.StartContentId, expression => expression.MapFrom(save => save.StartContentId))
+                .IgnoreDeletableEntityCommonProperties()
+                .ForMember(dest => dest.Id, map => map.Condition(source => GetIntId(source.Id) > 0))
+                .ForMember(dest => dest.Id, map => map.MapFrom(source => GetIntId(source.Id)))
                 .AfterMap((save, userGroup) =>
                 {
                     userGroup.ClearAllowedSections();
@@ -42,7 +39,24 @@ namespace Umbraco.Web.Models.Mapping
 
             //Used for merging existing UserSave to an existing IUser instance - this will not create an IUser instance!
             config.CreateMap<UserSave, IUser>()
-                .IgnoreAllUnmapped()
+                .IgnoreDeletableEntityCommonProperties()
+                .ForMember(dest => dest.Id, map => map.Condition(source => GetIntId(source.Id) > 0))
+                .ForMember(detail => detail.SessionTimeout, opt => opt.Ignore())
+                .ForMember(detail => detail.EmailConfirmedDate, opt => opt.Ignore())
+                .ForMember(detail => detail.InvitedDate, opt => opt.Ignore())
+                .ForMember(detail => detail.SecurityStamp, opt => opt.Ignore())
+                .ForMember(detail => detail.Avatar, opt => opt.Ignore())
+                .ForMember(detail => detail.ProviderUserKey, opt => opt.Ignore())
+                .ForMember(detail => detail.RawPasswordValue, opt => opt.Ignore())
+                .ForMember(detail => detail.RawPasswordAnswerValue, opt => opt.Ignore())
+                .ForMember(detail => detail.PasswordQuestion, opt => opt.Ignore())
+                .ForMember(detail => detail.Comments, opt => opt.Ignore())
+                .ForMember(detail => detail.IsApproved, opt => opt.Ignore())
+                .ForMember(detail => detail.IsLockedOut, opt => opt.Ignore())
+                .ForMember(detail => detail.LastLoginDate, opt => opt.Ignore())
+                .ForMember(detail => detail.LastPasswordChangeDate, opt => opt.Ignore())
+                .ForMember(detail => detail.LastLockoutDate, opt => opt.Ignore())
+                .ForMember(detail => detail.FailedPasswordAttempts, opt => opt.Ignore())                
                 .ForMember(user => user.Language, expression => expression.MapFrom(save => save.Culture))                
                 .AfterMap((save, user) =>
                 {
@@ -54,8 +68,29 @@ namespace Umbraco.Web.Models.Mapping
                     }
                 });
 
-            config.CreateMap<UserInvite, IUser>()                
-                .IgnoreAllUnmapped()                
+            config.CreateMap<UserInvite, IUser>()
+                .IgnoreDeletableEntityCommonProperties()
+                .ForMember(detail => detail.Id, opt => opt.Ignore())
+                .ForMember(detail => detail.StartContentIds, opt => opt.Ignore())
+                .ForMember(detail => detail.StartMediaIds, opt => opt.Ignore())
+                .ForMember(detail => detail.Language, opt => opt.Ignore())
+                .ForMember(detail => detail.Username, opt => opt.Ignore())
+                .ForMember(detail => detail.PasswordQuestion, opt => opt.Ignore())
+                .ForMember(detail => detail.SessionTimeout, opt => opt.Ignore())
+                .ForMember(detail => detail.EmailConfirmedDate, opt => opt.Ignore())
+                .ForMember(detail => detail.InvitedDate, opt => opt.Ignore())
+                .ForMember(detail => detail.SecurityStamp, opt => opt.Ignore())
+                .ForMember(detail => detail.Avatar, opt => opt.Ignore())
+                .ForMember(detail => detail.ProviderUserKey, opt => opt.Ignore())
+                .ForMember(detail => detail.RawPasswordValue, opt => opt.Ignore())
+                .ForMember(detail => detail.RawPasswordAnswerValue, opt => opt.Ignore())
+                .ForMember(detail => detail.Comments, opt => opt.Ignore())
+                .ForMember(detail => detail.IsApproved, opt => opt.Ignore())
+                .ForMember(detail => detail.IsLockedOut, opt => opt.Ignore())
+                .ForMember(detail => detail.LastLoginDate, opt => opt.Ignore())
+                .ForMember(detail => detail.LastPasswordChangeDate, opt => opt.Ignore())
+                .ForMember(detail => detail.LastLockoutDate, opt => opt.Ignore())
+                .ForMember(detail => detail.FailedPasswordAttempts, opt => opt.Ignore())                
                 //all invited users will not be approved, completing the invite will approve the user
                 .ForMember(user => user.IsApproved, expression => expression.UseValue(false))                
                 .AfterMap((invite, user) =>

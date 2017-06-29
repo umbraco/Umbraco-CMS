@@ -337,6 +337,7 @@
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
+    <Compile Include="Editors\UserGroupsController.cs" />
     <Compile Include="Editors\UserGroupValidateAttribute.cs" />
     <Compile Include="Extensions\UdiExtensions.cs" />
     <Compile Include="HealthCheck\Checks\Config\AbstractConfigCheck.cs" />
@@ -406,6 +407,7 @@
     <Compile Include="Models\Mapping\CodeFileDisplayMapper.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMapperExtensions.cs" />
     <Compile Include="Models\Mapping\ContentTypeUdiResolver.cs" />
+    <Compile Include="Models\Mapping\EntityModelMapperExtensions.cs" />
     <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
     <Compile Include="Models\Mapping\PermissionsResolver.cs" />
     <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />

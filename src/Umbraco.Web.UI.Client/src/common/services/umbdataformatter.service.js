@@ -117,12 +117,24 @@
       formatUserGroupPostData: function (displayModel, action) {
 
         //create the save model from the display model
-        var saveModel = _.pick(displayModel, 'id', 'alias', 'name', 'icon', 'sections', 'users', 'startContentId', 'startMediaId');
+        var saveModel = _.pick(displayModel, 'id', 'alias', 'name', 'icon', 'sections', 'users', 'startContentId', 'startMediaId', 'permissions');
         //set the action on the save model
         saveModel.action = action;
         if (!saveModel.id) {
           saveModel.id = 0;
         }
+
+        //the permissions need to just be the array of permission letters, currently it will be a dictionary of an array
+        var currPermissions = saveModel.permissions;
+        var savePermissions = [];
+        _.each(currPermissions, function(value, key, list) {
+          _.each(value, function (element, index, list) {
+              if (element.checked) {
+                savePermissions.push(element.permissionCode);  
+              }
+            });
+          });
+        saveModel.permissions = savePermissions;
 
         //make sure the sections are just a string array
         var currSections = saveModel.sections;
