@@ -486,7 +486,7 @@ SELECT 'CountOfInvited' AS name, COUNT(id) AS num FROM umbracoUser WHERE lastLog
         /// <remarks>
         /// The query supplied will ONLY work with data specifically on the umbracoUser table because we are using PetaPoco paging (SQL paging)
         /// </remarks>
-        public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, Expression<Func<IUser, object>> orderBy, Direction orderDirection, string[] userGroups = null, UserState? userState = null, IQuery<IUser> filter = null)
+        public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, Expression<Func<IUser, object>> orderBy, Direction orderDirection, string[] userGroups = null, UserState[] userState = null, IQuery<IUser> filter = null)
         {
             if (orderBy == null) throw new ArgumentNullException("orderBy");
 
@@ -503,8 +503,13 @@ SELECT 'CountOfInvited' AS name, COUNT(id) AS num FROM umbracoUser WHERE lastLog
 
         
 
-        private IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, string[] userGroups = null, UserState? userState = null, IQuery<IUser> filter = null)
+        private IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, 
+            string[] userGroups = null, 
+            UserState[] userState = null, 
+            IQuery<IUser> filter = null)
         {
+            //TODO: Implement userState filtering!
+
             if (string.IsNullOrWhiteSpace(orderBy)) throw new ArgumentException("Value cannot be null or whitespace.", "orderBy");
 
 

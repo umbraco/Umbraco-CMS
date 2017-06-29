@@ -131,6 +131,9 @@ namespace Umbraco.Web.Models.Mapping
                 .AfterMap((group, display) =>
                 {
                     MapUserGroupBasic(applicationContext.Services, group, display);
+
+                    //Important! Currently we are never mapping to multiple UserGroupDisplay objects but if we start doing that
+                    // this will cause an N+1 and we'll need to change how this works.
                     var users = applicationContext.Services.UserService.GetAllInGroup(group.Id);
                     display.Users = Mapper.Map<IEnumerable<UserBasic>>(users);
                 });

@@ -184,7 +184,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns all user groups
+        /// Return a user group
         /// </summary>
         /// <returns></returns>
         public UserGroupDisplay GetUserGroup(int id)
@@ -195,7 +195,7 @@ namespace Umbraco.Web.Editors
 
             return Mapper.Map<UserGroupDisplay>(found);
         }
-
+        
         /// <summary>
         /// Returns a paged users collection
         /// </summary>
@@ -204,6 +204,7 @@ namespace Umbraco.Web.Editors
         /// <param name="orderBy"></param>
         /// <param name="orderDirection"></param>
         /// <param name="userGroups"></param>
+        /// <param name="userStates"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
         public PagedUserResult GetPagedUsers(
@@ -212,7 +213,7 @@ namespace Umbraco.Web.Editors
             string orderBy = "username",
             Direction orderDirection = Direction.Ascending,
             [FromUri]string[] userGroups = null,
-            //TODO: Add User state filtering
+            [FromUri]UserState[] userStates = null,
             string filter = "")
         {
             long pageIndex = pageNumber - 1;

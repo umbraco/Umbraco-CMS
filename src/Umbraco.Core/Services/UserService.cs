@@ -498,7 +498,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState? userState = null, string[] userGroups = null, string filter = "")
+        public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[] userState = null, string[] userGroups = null, string filter = "")
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {

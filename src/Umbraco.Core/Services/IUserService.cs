@@ -29,7 +29,9 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, 
-            UserState? userState = null, string[] userGroups = null, string filter = "");
+            UserState[] userState = null, 
+            string[] userGroups = null,
+            string filter = "");
 
         /// <summary>
         /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method

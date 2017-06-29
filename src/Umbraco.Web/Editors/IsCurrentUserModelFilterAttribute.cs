@@ -38,7 +38,7 @@ namespace Umbraco.Web.Editors
                     else
                     {
                         var paged = objectContent.Value as UsersController.PagedUserResult;
-                        if (paged != null)
+                        if (paged != null && paged.Items != null)
                         {
                             foreach (var userDisplay in paged.Items)
                             {
