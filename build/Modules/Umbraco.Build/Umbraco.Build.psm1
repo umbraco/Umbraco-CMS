@@ -239,6 +239,7 @@ function Compile-Tests
     /t:Build `
     /tv:$toolsVersion `
     /p:UmbracoBuild=True `
+    /p:NugetPackages=$src\packages `
     > $tmp\msbuild.tests.log
     
   # /p:UmbracoBuild tells the csproj that we are building from PS
@@ -394,6 +395,22 @@ function Prepare-NuGet
 }
 
 #
+# Restores NuGet
+#
+function Restore-NuGet
+{
+  param (
+    $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
+  )
+
+  Write-Host ">> Restore NuGet" 
+  
+  $src = "$($uenv.SolutionRoot)\src"
+  
+  &$uenv.NuGet restore "$src\Umbraco.sln"
+}
+
+#
 # Creates the NuGet packages
 #
 function Package-NuGet
@@ -488,6 +505,10 @@ function Build-Umbraco
   {
     Prepare-NuGet $uenv
   }
+  elseif ($target -eq "restore-nuget")
+  {
+    Restore-NuGet $uenv
+  }
   elseif ($target -eq "pkg-zip")
   {
     Package-Zip $uenv
@@ -499,6 +520,7 @@ function Build-Umbraco
   elseif ($target -eq "all")
   {
     Prepare-Build $uenv
+    Restore-NuGet $uenv
     Compile-Belle $uenv $version
     Compile-Umbraco $uenv
     Prepare-Tests $uenv
