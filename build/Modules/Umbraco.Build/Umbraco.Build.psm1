@@ -165,7 +165,21 @@ function Compile-Umbraco
     /p:UmbracoBuild=True `
     > $tmp\msbuild.umbraco.log
     
-  # /p:UmbracoBuild tells the csproj that we are building from PS
+  &$uenv.VisualStudio.MsBuild "$src\Umbraco.Compat7\Umbraco.Compat7.csproj" `
+    /p:WarningLevel=0 `
+    /p:Configuration=$buildConfiguration `
+    /p:Platform=AnyCPU `
+    /p:UseWPP_CopyWebApplication=True `
+    /p:PipelineDependsOnBuild=False `
+    /p:OutDir=$tmp\bin\\ `
+    /p:WebProjectOutputDir=$tmp\WebApp\\ `
+    /p:Verbosity=minimal `
+    /t:Clean`;Rebuild `
+    /tv:$toolsVersion `
+    /p:UmbracoBuild=True `
+    > $tmp\msbuild.compat7.log
+
+    # /p:UmbracoBuild tells the csproj that we are building from PS
 }
 
 #
@@ -350,19 +364,19 @@ function Package-Zip
   Write-Host "Zip all binaries"  
   &$uenv.Zip a -r "$out\UmbracoCms.AllBinaries.$($version.Semver).zip" `
     "$tmp\bin\*" `
-    "-x!dotless.Core.*" `
+    "-x!dotless.Core.*" "-x!Umbraco.Compat7.*" `
     > $null
    
   Write-Host "Zip cms"  
   &$uenv.Zip a -r "$out\UmbracoCms.$($version.Semver).zip" `
     "$tmp\WebApp\*" `
-    "-x!dotless.Core.*" "-x!Content_Types.xml" `
+    "-x!dotless.Core.*" "-x!Content_Types.xml" "-x!Umbraco.Compat7.*" `
     > $null
 
   Write-Host "Zip WebPI"  
   &$uenv.Zip a -r "$out\UmbracoCms.WebPI.$($version.Semver).zip" `
     "$tmp\WebPi\*" `
-    "-x!dotless.Core.*" `
+    "-x!dotless.Core.*" "-x!Umbraco.Compat7.*" `
     > $null
   
     # hash the webpi file
