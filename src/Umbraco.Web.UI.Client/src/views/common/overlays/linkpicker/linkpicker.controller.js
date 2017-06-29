@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
-	function ($scope, eventsService, dialogService, entityResource, contentResource, mediaHelper, userService, localizationService) {
+	function ($scope, eventsService, dialogService, entityResource, contentResource, mediaHelper, userService, localizationService, $timeout) {
 	    var dialogOptions = $scope.model;
 
 	    var searchText = "Search...";
@@ -10,6 +10,23 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 
 		if(!$scope.model.title) {
 		    $scope.model.title = localizationService.localize("defaultdialogs_selectLink");
+		}
+
+	    /*
+        * A function to run when the controller initializes
+        */
+		$scope.Init = function () {
+		    
+            // what I want to do here, is grab the first box called "url-input-box". However, the modal needs time to render so I had to add a slight delay...
+		    $timeout(function () {
+
+		        var elements = document.getElementsByClassName("url-input-box");
+		        var input = elements[0];
+		        // now set the focus if the element exists
+                if(input != null && input != 'undefined')
+		            input.focus();
+
+		    }, 100);
 		}
 
 	    $scope.dialogTreeEventHandler = $({});

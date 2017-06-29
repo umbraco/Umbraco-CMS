@@ -1,10 +1,10 @@
-<div ng-controller="Umbraco.Overlays.LinkPickerController">
+<div ng-controller="Umbraco.Overlays.LinkPickerController" ng-init="Init();">
 
     <umb-control-group label="@content_urls">
         <input type="text"
             localize="placeholder"
             placeholder="@general_url"
-            class="umb-editor umb-textstring"
+            class="umb-editor umb-textstring url-input-box"
             ng-model="model.target.url"
             ng-disabled="model.target.id"
             focus-when="{{true}} "/>
