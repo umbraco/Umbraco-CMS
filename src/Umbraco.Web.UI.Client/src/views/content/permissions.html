@@ -1,0 +1,54 @@
+<div ng-controller="Umbraco.Editors.Content.PermissionsController as vm" ng-cloak>
+    
+    <div class="umb-dialog-body with-footer">
+        
+        <div class="umb-pane">
+
+            <umb-load-indicator
+                ng-show="vm.loading">
+            </umb-load-indicator>
+
+            <div ng-if="!vm.loading">
+
+                <p class="umb-abstract">Set permissions for the page {{ dialogOptions.currentNode }}</localize></p>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="w-100"></th>
+                            <th class="nowrap" ng-repeat="user in vm.users">{{ user.name }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="permission in vm.permissions">
+                            <td>{{ permission.name }}</td>
+                            <td ng-repeat="user in vm.users">
+                                <input type="checkbox" checklist-model="permission.users" checklist-value="user.id">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+        
+        <a class="btn btn-link" ng-click="nav.hideDialog()">
+            <localize key="general_cancel">Cancel</localize>
+        </a>
+
+        <umb-button
+            type="button" 
+            action="vm.save()"
+            state="vm.saveButtonState"
+            button-style="success"
+            label-key="buttons_save">
+        </umb-button>
+
+    </div>
+
+</div>
