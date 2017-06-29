@@ -6,6 +6,11 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
+
+    
+    /// <summary>
+    /// The user model used for paging and listing users in the UI
+    /// </summary>
     [DataContract(Name = "user", Namespace = "")]
     [ReadOnly(true)]
     public class UserBasic : EntityBasic, INotificationModel
@@ -13,6 +18,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public UserBasic()
         {
             Notifications = new List<Notification>();
+            UserGroups = new List<UserGroupBasic>();
         }
 
         [DataMember(Name = "username")]
@@ -41,6 +47,19 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "email", IsRequired = true)]
         public string Email { get; set; }
+
+        /// <summary>
+        /// The list of group aliases assigned to the user
+        /// </summary>
+        [DataMember(Name = "userGroups")]
+        public IEnumerable<UserGroupBasic> UserGroups { get; set; }
+
+        /// <summary>
+        /// This is an info flag to denote if this object is the equivalent of the currently logged in user
+        /// </summary>
+        [DataMember(Name = "isCurrentUser")]
+        [ReadOnly(true)]
+        public bool IsCurrentUser { get; set; }
 
         /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.

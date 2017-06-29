@@ -20,19 +20,19 @@ namespace Umbraco.Web.Editors
             var objectContent = actionExecutedContext.Response.Content as ObjectContent;
             if (objectContent != null)
             {
-                var model = objectContent.Value as UserDisplay;
+                var model = objectContent.Value as UserBasic;
                 if (model != null)
                 {
                     model.IsCurrentUser = (int) model.Id == user.Id;
                 }
                 else
                 {
-                    var collection = objectContent.Value as IEnumerable<UserDisplay>;
+                    var collection = objectContent.Value as IEnumerable<UserBasic>;
                     if (collection != null)
                     {
-                        foreach (var userDisplay in collection)
+                        foreach (var userBasic in collection)
                         {
-                            userDisplay.IsCurrentUser = (int) userDisplay.Id == user.Id;
+                            userBasic.IsCurrentUser = (int) userBasic.Id == user.Id;
                         }
                     }
                     else
@@ -40,9 +40,9 @@ namespace Umbraco.Web.Editors
                         var paged = objectContent.Value as UsersController.PagedUserResult;
                         if (paged != null && paged.Items != null)
                         {
-                            foreach (var userDisplay in paged.Items)
+                            foreach (var userBasic in paged.Items)
                             {
-                                userDisplay.IsCurrentUser = (int)userDisplay.Id == user.Id;
+                                userBasic.IsCurrentUser = (int)userBasic.Id == user.Id;
                             }
                         }
                     }

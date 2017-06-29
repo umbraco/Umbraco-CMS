@@ -142,7 +142,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(applicationContext.Services.UserService, applicationContext.ApplicationCache.RuntimeCache)))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(detail => detail.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?) user.LastLoginDate))
-                .ForMember(detail => detail.UserGroups, opt => opt.Ignore())
+                .ForMember(detail => detail.UserGroups, opt => opt.MapFrom(user => user.Groups))
                 .ForMember(detail => detail.StartContentIds, opt => opt.UseValue(Enumerable.Empty<EntityBasic>()))
                 .ForMember(detail => detail.StartMediaIds, opt => opt.UseValue(Enumerable.Empty<EntityBasic>()))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))                
@@ -165,9 +165,14 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.AdditionalData, opt => opt.Ignore())
                 .AfterMap((user, display) =>
                 {
+                    //Important! Currently we are never mapping to multiple UserDisplay objects but if we start doing that
+                    // this will cause an N+1 and we'll need to change how this works.
+
                     var startContentIds = user.StartContentIds.ToArray();
                     if (startContentIds.Length > 0)
                     {
+                        //TODO: Update GetAll to be able to pass in a parameter like on the normal Get to NOT load in the entire object!
+
                         var contentItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, startContentIds);
                         display.StartContentIds = Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(contentItems);
                     }
@@ -177,13 +182,17 @@ namespace Umbraco.Web.Models.Mapping
                         var mediaItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, startMediaIds);
                         display.StartMediaIds = Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(mediaItems);
                     }
-                    display.UserGroups = Mapper.Map<IEnumerable<IReadOnlyUserGroup>, IEnumerable<UserGroupBasic>>(user.Groups);
-                    
                 });
 
             config.CreateMap<IUser, UserBasic>()
-                .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(applicationContext.Services.UserService, applicationContext.ApplicationCache.RuntimeCache)))
+                //Loading in the user avatar's requires an external request if they don't have a local file avatar, this means that initial load of paging may incur a cost
+                //Alternatively, if this is annoying the back office UI would need to be updated to request the avatars for the list of users separately so it doesn't look
+                //like the load time is waiting.
+                .ForMember(detail => 
+                    detail.Avatars, 
+                    opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(applicationContext.Services.UserService, applicationContext.ApplicationCache.RuntimeCache)))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
+                .ForMember(detail => detail.UserGroups, opt => opt.MapFrom(user => user.Groups))
                 .ForMember(detail => detail.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?) user.LastLoginDate))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
                 .ForMember(
@@ -192,6 +201,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.ParentId, opt => opt.UseValue(-1))
                 .ForMember(detail => detail.Path, opt => opt.MapFrom(user => "-1," + user.Id))
                 .ForMember(detail => detail.Notifications, opt => opt.Ignore())
+                .ForMember(detail => detail.IsCurrentUser, opt => opt.Ignore())
                 .ForMember(detail => detail.Udi, opt => opt.Ignore())
                 .ForMember(detail => detail.Icon, opt => opt.Ignore())
                 .ForMember(detail => detail.Trashed, opt => opt.Ignore())

@@ -227,7 +227,7 @@ namespace Umbraco.Web.Editors
 
             var paged = new PagedUserResult(total, pageNumber, pageSize)
             {
-                Items = Mapper.Map<IEnumerable<UserDisplay>>(result),
+                Items = Mapper.Map<IEnumerable<UserBasic>>(result),
                 UserStates = Services.UserService.GetUserStates()
             };
 
@@ -569,7 +569,7 @@ namespace Umbraco.Web.Editors
                 Services.TextService.Localize("speechBubbles/enableUserSuccess", new[] { users[0].Name }));            
         }
 
-        public class PagedUserResult : PagedResult<UserDisplay>
+        public class PagedUserResult : PagedResult<UserBasic>
         {
             public PagedUserResult(long totalItems, long pageNumber, long pageSize) : base(totalItems, pageNumber, pageSize)
             {
