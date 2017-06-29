@@ -66,44 +66,6 @@
                 </div>
               </div>
 
-              <div class="test-group">
-                <div class="test-group-title">Password</div>
-                <div class="test-group-content block-form">
-
-                  <umb-button type="button"
-                              action="vm.toggleChangePassword()"
-                              label="Change password"
-                              label-key="general_changePassword"
-                              state="changePasswordButtonState"
-                              ng-if="vm.changePasswordModel.isChanging === false">
-                  </umb-button>
-
-                  <ng-form ng-if="vm.changePasswordModel.isChanging"
-                           name="passwordForm"
-                           class="block-form"
-                           val-form-manager>
-
-                    <change-password password-values="vm.user.changePassword"
-                                     config="vm.changePasswordModel.config">
-                    </change-password>
-
-                    <umb-button type="button"
-                                action="vm.toggleChangePassword()"
-                                label="Cancel"
-                                label-key="general_cancel"
-                                button-style="cancel">
-                    </umb-button>
-
-                  </ng-form>
-
-                  <div ng-if="vm.user.resetPasswordValue">
-
-                    <p><br />Password reset to value: <strong>{{vm.user.resetPasswordValue}}</strong></p>
-                  </div>
-
-                </div>
-              </div>
-
               <div class="test-group" ng-if="!vm.user.isCurrentUser">
                 <div class="test-group-title">Permissions</div>
                 <div class="test-group-content block-form">
@@ -262,13 +224,39 @@
                                 size="m">
                     </umb-button>
                   </div>
-
+                  
                   <umb-button type="button"
                               button-style="[info,block]"
-                              action="vm.resetPassword()"
-                              label="Reset password"
-                              size="m">
+                              action="vm.toggleChangePassword()"
+                              label="Change password"
+                              label-key="general_changePassword"
+                              state="changePasswordButtonState"
+                              ng-if="vm.changePasswordModel.isChanging === false">
                   </umb-button>
+
+                  <ng-form ng-if="vm.changePasswordModel.isChanging"
+                           name="passwordForm"
+                           class="block-form"
+                           val-form-manager>
+
+                    <change-password password-values="vm.user.changePassword"
+                                     config="vm.changePasswordModel.config">
+                    </change-password>
+
+                    <umb-button type="button"
+                                action="vm.toggleChangePassword()"
+                                label="Cancel"
+                                label-key="general_cancel"
+                                button-style="cancel">
+                    </umb-button>
+
+                  </ng-form>
+
+                  <div ng-if="vm.user.resetPasswordValue">
+
+                    <p><br />Password reset to value: <strong>{{vm.user.resetPasswordValue}}</strong></p>
+                  </div>
+
                 </div>
 
               </div>

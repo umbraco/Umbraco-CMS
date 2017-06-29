@@ -20,7 +20,6 @@
         vm.removeSelectedItem = removeSelectedItem;
         vm.disableUser = disableUser;
         vm.enableUser = enableUser;
-        vm.resetPassword = resetPassword;
         vm.clearAvatar = clearAvatar;
         vm.save = save;
         vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB"
@@ -230,10 +229,7 @@
                 formHelper.showNotifications(error.data);
             });
         }
-
-        function resetPassword() {
-            alert("reset password");
-        } 
+      
 
         function clearAvatar() {
             // get user
