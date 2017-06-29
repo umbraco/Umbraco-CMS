@@ -51,8 +51,6 @@
     <file src="$BuildTmp$\WebApp\bin\System.Data.SqlServerCe.Entity.dll" target="lib\System.Data.SqlServerCe.Entity.dll" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Core.dll" target="lib\Umbraco.Core.dll" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Core.xml" target="lib\Umbraco.Core.xml" />
-    <file src="$BuildTmp$\WebApp\bin\umbraco.DataLayer.dll" target="lib\umbraco.DataLayer.dll" />
-    <file src="$BuildTmp$\WebApp\bin\umbraco.DataLayer.xml" target="lib\umbraco.DataLayer.xml" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.dll" target="lib\Umbraco.Web.dll" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.xml" target="lib\Umbraco.Web.xml" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.UI.dll" target="lib\Umbraco.Web.UI.dll" />
