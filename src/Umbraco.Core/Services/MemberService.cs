@@ -820,10 +820,10 @@ namespace Umbraco.Core.Services
         /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
         /// <param name="memberTypeAlias">Alias of the Type</param>
         /// <returns><see cref="IMember"/></returns>
-        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias)
+        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved)
         {
             var memberType = FindMemberTypeByAlias(memberTypeAlias);
-            return CreateMemberWithIdentity(username, email, username, passwordValue, memberType);
+            return CreateMemberWithIdentity(username, email, username, passwordValue, memberType, isApproved);
         }
 
         /// <summary>
@@ -836,12 +836,13 @@ namespace Umbraco.Core.Services
         /// <param name="name">Name of the Member to create</param>
         /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
         /// <param name="memberType">MemberType the Member should be based on</param>
+        /// <param name="isApproved">Optional IsApproved of the Member to create</param>
         /// <returns><see cref="IMember"/></returns>
-        private IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, IMemberType memberType)
+        private IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, IMemberType memberType, bool isApproved = true)
         {
             if (memberType == null) throw new ArgumentNullException("memberType");
 
-            var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType);
+            var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved);
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
