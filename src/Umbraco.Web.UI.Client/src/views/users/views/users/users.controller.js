@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, usersResource, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService) {
+    function UsersController($scope, $timeout, $location, usersResource, userGroupsResource, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -100,7 +100,7 @@
             getUsers();
 
             // Get user groups
-            usersResource.getUserGroups().then(function (userGroups) {
+            userGroupsResource.getUserGroups().then(function (userGroups) {
                 vm.userGroups = userGroups;
             });
 
