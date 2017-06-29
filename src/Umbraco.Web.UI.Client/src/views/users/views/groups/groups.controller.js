@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserGroupsController($scope, $timeout, $location, usersResource) {
+    function UserGroupsController($scope, $timeout, $location, userGroupsResource) {
 
         var vm = this;
 
@@ -18,7 +18,7 @@
             vm.loading = true;
 
             // Get users
-            usersResource.getUserGroups().then(function (userGroups) {
+            userGroupsResource.getUserGroups().then(function (userGroups) {
                 vm.userGroups = userGroups;
                 vm.loading = false;
             });
