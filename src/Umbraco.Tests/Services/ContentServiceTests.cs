@@ -1514,7 +1514,7 @@ namespace Umbraco.Tests.Services
             {
                 RootContentId = content1.Id
             }).Success);
-            
+
             // Act
             ServiceContext.ContentService.EmptyRecycleBin();
             var contents = ServiceContext.ContentService.GetContentInRecycleBin();
@@ -1917,7 +1917,7 @@ namespace Umbraco.Tests.Services
                 var c1 = MockedContent.CreateSimpleContent(contentType);
                 ServiceContext.ContentService.Save(c1);
             }
-            
+
             long total;
             var entities = service.GetPagedChildren(-1, 0, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(6));
@@ -1937,7 +1937,7 @@ namespace Umbraco.Tests.Services
 
             var contentType = MockedContentTypes.CreateSimpleContentType();
             ServiceContext.ContentTypeService.Save(contentType);
-            // only add 9 as we also add a content with children 
+            // only add 9 as we also add a content with children
             for (int i = 0; i < 9; i++)
             {
                 var c1 = MockedContent.CreateSimpleContent(contentType);

@@ -1198,9 +1198,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="memberTypes">Medlemstype</key>
     <key alias="documentTypes">Dokumenttyper</key>
     <key alias="relationTypes">Relationstyper</key>
-
     <key alias="packager">Pakker</key>
     <key alias="packages">Pakker</key>
+    <key alias="partialViews">Partial Views</key>
+    <key alias="partialViewMacros">Partial View Makro Filer</key>
     <key alias="python">Python</key>
     <key alias="repositories">Installer fra "repository"</key>
     <key alias="runway">Installer Runway</key>

@@ -166,11 +166,11 @@ namespace Umbraco.Web.Security.Providers
                 username,
                 email, 
                 FormatPasswordForStorage(encodedPassword, salt), 
-                memberTypeAlias);
+                memberTypeAlias,
+                isApproved);
             
             member.PasswordQuestion = passwordQuestion;
             member.RawPasswordAnswerValue = EncryptString(passwordAnswer);
-            member.IsApproved = isApproved;
             member.LastLoginDate = DateTime.Now;
             member.LastPasswordChangeDate = DateTime.Now;
 
