@@ -795,6 +795,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="chooseLayout">Vælg layout</key>
     <key alias="addRows">Tilføj række</key>
     <key alias="addElement">Tilføj indhold</key>
+    <key alias="pasteElement">Indsæt indhold</key>
     <key alias="dropElement">Slip indhold</key>
     <key alias="settingsApplied">Indstillinger tilføjet</key>
 
