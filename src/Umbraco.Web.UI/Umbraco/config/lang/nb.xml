@@ -1003,8 +1003,6 @@ Vennlig hilsen Umbraco roboten
     <key alias="startnode">Startnode</key>
     <key alias="username">Navn</key>
     <key alias="userPermissions">Brukertillatelser</key>
-    <key alias="usertype">Brukertype</key>
-    <key alias="userTypes">Brukertyper</key>
     <key alias="writer">Forfatter</key>
     <key alias="translator">Oversetter</key>
     <key alias="change">Endre</key>

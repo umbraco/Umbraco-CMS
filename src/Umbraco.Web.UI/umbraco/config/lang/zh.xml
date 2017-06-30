@@ -1293,8 +1293,6 @@
     <key alias="startnode">默认打开内容项</key>
     <key alias="username">用户名</key>
     <key alias="userPermissions">用户权限</key>
-    <key alias="usertype">用户类型</key>
-    <key alias="userTypes">用户类型</key>
     <key alias="writer">撰稿人</key>
     <key alias="translator">翻译人</key>
     <key alias="change">更改</key>

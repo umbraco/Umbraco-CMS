@@ -925,8 +925,6 @@
     <key alias="startnode">Nodo de comienzo en contenido</key>
     <key alias="username">Nombre de usuario</key>
     <key alias="userPermissions">Permisos de usuarios</key>
-    <key alias="usertype">Tipo de usuario</key>
-    <key alias="userTypes">Tipos de usuarios</key>
     <key alias="writer">Redactor</key>
     <key alias="yourProfile" version="7.0">Tu perfil</key>
     <key alias="yourHistory" version="7.0">Tu historial reciente</key>

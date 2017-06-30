@@ -916,8 +916,6 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="startnode"><![CDATA[Nodo di inizio della sezione Contenuto]]></key>
     <key alias="username">Username</key>
     <key alias="userPermissions"><![CDATA[Permessi Utente]]></key>
-    <key alias="usertype"><![CDATA[Tipo di utente]]></key>
-    <key alias="userTypes"><![CDATA[Tipi Utente]]></key>
     <key alias="writer">Writer</key>
   </area>
 </language>

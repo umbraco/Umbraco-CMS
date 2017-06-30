@@ -366,10 +366,13 @@ namespace Umbraco.Core.Services
 
         }
 
+        /// <summary>
+        /// This is just the default user group that the membership provider will use
+        /// </summary>
+        /// <returns></returns>
         public string GetDefaultMemberType()
         {
-            // User types now being removed, there is no default user type to return
-            return "None";
+            return "writer";
         }
 
         /// <summary>

@@ -44,14 +44,14 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {
 
-                var userType = MockedUserGroup.CreateUserGroup();
+                var userGroup = MockedUserGroup.CreateUserGroup();
 
                 // Act
-                repository.AddOrUpdate(userType);
+                repository.AddOrUpdate(userGroup);
                 unitOfWork.Commit();
 
                 // Assert
-                Assert.That(userType.HasIdentity, Is.True);
+                Assert.That(userGroup.HasIdentity, Is.True);
             }
         }
 
@@ -87,12 +87,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
-                var userType = MockedUserGroup.CreateUserGroup();
-                repository.AddOrUpdate(userType);
+                var userGroup = MockedUserGroup.CreateUserGroup();
+                repository.AddOrUpdate(userGroup);
                 unitOfWork.Commit();
 
                 // Act
-                var resolved = repository.Get(userType.Id);
+                var resolved = repository.Get(userGroup.Id);
                 bool dirty = ((UserGroup) resolved).IsDirty();
 
                 // Assert
@@ -108,17 +108,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
-                var userType = MockedUserGroup.CreateUserGroup();
-                repository.AddOrUpdate(userType);
+                var userGroup = MockedUserGroup.CreateUserGroup();
+                repository.AddOrUpdate(userGroup);
                 unitOfWork.Commit();
 
                 // Act
-                var resolved = repository.Get(userType.Id);
+                var resolved = repository.Get(userGroup.Id);
                 resolved.Name = "New Name";
                 resolved.Permissions = new[]{"Z", "Y", "X"};
                 repository.AddOrUpdate(resolved);
                 unitOfWork.Commit();
-                var updatedItem = repository.Get(userType.Id);
+                var updatedItem = repository.Get(userGroup.Id);
 
                 // Assert
                 Assert.That(updatedItem.Id, Is.EqualTo(resolved.Id));
@@ -136,16 +136,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {
 
-                var userType = MockedUserGroup.CreateUserGroup();
+                var userGroup = MockedUserGroup.CreateUserGroup();
 
                 // Act
-                repository.AddOrUpdate(userType);
+                repository.AddOrUpdate(userGroup);
                 unitOfWork.Commit();
-                var id = userType.Id;
+                var id = userGroup.Id;
 
                 using (var repository2 = new UserGroupRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
                 {
-                    repository2.Delete(userType);
+                    repository2.Delete(userGroup);
                     unitOfWork.Commit();
 
                     var resolved = repository2.Get(id);
@@ -165,20 +165,20 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
-                var userType = MockedUserGroup.CreateUserGroup();
-                repository.AddOrUpdate(userType);
+                var userGroup = MockedUserGroup.CreateUserGroup();
+                repository.AddOrUpdate(userGroup);
                 unitOfWork.Commit();
 
                 // Act
-                var resolved = repository.Get(userType.Id);
+                var resolved = repository.Get(userGroup.Id);
 
                 // Assert
-                Assert.That(resolved.Id, Is.EqualTo(userType.Id));
+                Assert.That(resolved.Id, Is.EqualTo(userGroup.Id));
                 //Assert.That(resolved.CreateDate, Is.GreaterThan(DateTime.MinValue));
                 //Assert.That(resolved.UpdateDate, Is.GreaterThan(DateTime.MinValue));
-                Assert.That(resolved.Name, Is.EqualTo(userType.Name));
-                Assert.That(resolved.Alias, Is.EqualTo(userType.Alias));
-                Assert.That(resolved.Permissions, Is.EqualTo(userType.Permissions));
+                Assert.That(resolved.Name, Is.EqualTo(userGroup.Name));
+                Assert.That(resolved.Alias, Is.EqualTo(userGroup.Alias));
+                Assert.That(resolved.Permissions, Is.EqualTo(userGroup.Permissions));
             }
         }
 

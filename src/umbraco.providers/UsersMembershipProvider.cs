@@ -136,7 +136,6 @@ namespace umbraco.providers
             {
                 try
                 {
-                    // Get the usertype of the current user
                     //ensure the password is encrypted/hashed
                     string salt;
                     var encodedPass = EncryptOrHashNewPassword(password, out salt);

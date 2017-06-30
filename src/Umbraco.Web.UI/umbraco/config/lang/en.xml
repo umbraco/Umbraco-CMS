@@ -1518,8 +1518,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="username">Name</key>
     <key alias="userPermissions">User permissions</key>
     <key alias="userGroupPermissions">User group permissions</key>
-    <key alias="usertype">User type</key>
-    <key alias="userTypes">User types</key>
     <key alias="usergroup">User group</key>
     <key alias="userGroups">User groups</key>
     <key alias="writer">Writer</key>

@@ -1234,8 +1234,6 @@
     <key alias="startnode">預設打開內容項</key>
     <key alias="username">用戶名</key>
     <key alias="userPermissions">用戶許可權</key>
-    <key alias="usertype">用戶類型</key>
-    <key alias="userTypes">用戶類型</key>
     <key alias="writer">撰稿人</key>
     <key alias="translator">翻譯者</key>
     <key alias="change">改變</key>

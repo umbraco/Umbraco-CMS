@@ -39,20 +39,6 @@ Umbraco.Application.Actions = function() {
             else alert(msg);
         },
 
-        launchHelp: function(lang, userType) {
-            /// <summary>Launches the contextual help window</summary>
-            var rightUrl = UmbClientMgr.contentFrame().document.location.href.split("\/");
-            if (rightUrl.length > 0) {
-                rightUrl = rightUrl[rightUrl.length - 1];
-            }
-            if (rightUrl.indexOf("?") > 0) {
-                rightUrl = rightUrl.substring(0, rightUrl.indexOf("?"));
-            }
-            var url = "/umbraco/helpRedirect.aspx?Application=" + this._currApp + '&ApplicationURL=' + rightUrl + '&Language=' + lang + "&UserType=" + userType;
-            window.open(url);
-            return false;
-        },
-
         launchAbout: function() {
             /// <summary>Launches the about Umbraco window</summary>
             UmbClientMgr.openModalWindow("dialogs/about.aspx", UmbClientMgr.uiKeys()['general_about'], true, 450, 390);

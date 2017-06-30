@@ -280,7 +280,6 @@ SELECT 'CountOfInvited' AS name, COUNT(id) AS num FROM umbracoUser WHERE lastLog
             {
                 {"userDisabled", "IsApproved"},
                 {"userNoConsole", "IsLockedOut"},
-                {"userType", "UserType"},
                 {"startStructureID", "StartContentId"},
                 {"startMediaID", "StartMediaId"},
                 {"userName", "Name"},

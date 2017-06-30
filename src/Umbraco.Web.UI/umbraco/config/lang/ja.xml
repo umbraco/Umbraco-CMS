@@ -1235,8 +1235,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="startnode">コンテンツの開始ノード</key>
     <key alias="username">ユーザー名</key>
     <key alias="userPermissions">ユーザーの権限</key>
-    <key alias="usertype">ユーザーの種類</key>
-    <key alias="userTypes">ユーザーの種類</key>
     <key alias="writer">投稿者</key>
     <key alias="translator">翻訳者</key>
 	<key alias="change">変更</key>

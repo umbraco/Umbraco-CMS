@@ -1302,8 +1302,6 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="startnode">Startnode in Content</key>
     <key alias="username">Gebruikersnaam</key>
     <key alias="userPermissions">Gebruikersrechten</key>
-    <key alias="usertype">Gebruikerstype</key>
-    <key alias="userTypes">Gebruikerstypes</key>
     <key alias="writer">Auteur</key>
 	<key alias="translator">Vertaler</key>
     <key alias="change">Wijzig</key>

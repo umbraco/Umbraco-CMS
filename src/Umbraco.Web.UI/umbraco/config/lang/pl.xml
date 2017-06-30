@@ -1411,8 +1411,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="startnode">Węzeł początkowy w zawartości</key>
     <key alias="username">Nazwa użytkownika</key>
     <key alias="userPermissions">Prawa dostępu użytkownika</key>
-    <key alias="usertype">Typ</key>
-    <key alias="userTypes">Typy użytkowników</key>
     <key alias="writer">Pisarz</key>
     <key alias="translator">Tłumacz</key>
     <key alias="change">Zmień</key>

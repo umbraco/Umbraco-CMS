@@ -742,7 +742,6 @@
     <Content Include="Umbraco_Client\Jeditable\jquery.jeditable.js" />
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
-    <Content Include="Umbraco\helpRedirect.aspx" />
     <Content Include="Umbraco\Members\MemberSearch.ascx" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.idle-timer.js" />
     <Content Include="Umbraco_Client\MacroContainer\macroContainer.css" />

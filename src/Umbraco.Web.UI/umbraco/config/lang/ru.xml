@@ -1581,8 +1581,6 @@
     <key alias="translator">Переводчик</key>
     <key alias="username">Имя пользователя</key>
     <key alias="userPermissions">Разрешения для пользователя</key>
-    <key alias="usertype">Тип пользователя</key>
-    <key alias="userTypes">Типы пользователей</key>
     <key alias="writer">Автор</key>
     <key alias="yourHistory" version="7.0">Ваша недавняя история</key>
     <key alias="yourProfile" version="7.0">Ваш профиль</key>

@@ -916,8 +916,6 @@
     <key alias="startnode">컨텐츠의 시작노드</key>
     <key alias="username">사용자명</key>
     <key alias="userPermissions">사용자권한</key>
-    <key alias="usertype">사용자 타입</key>
-    <key alias="userTypes">사용자 타입</key>
     <key alias="writer">작성자</key>
   </area>
 </language>

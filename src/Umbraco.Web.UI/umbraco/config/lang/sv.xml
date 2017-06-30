@@ -929,8 +929,6 @@
     <key alias="startnode">Startnod i innehåll</key>
     <key alias="username">Användarens namn</key>
     <key alias="userPermissions">Användarrättigheter</key>
-    <key alias="usertype">Användartyp</key>
-    <key alias="userTypes">Användartyper</key>
     <key alias="writer">Skribent</key>
     <key alias="yourHistory">Din nuvarande historik</key>
     <key alias="translator">Översättare</key>

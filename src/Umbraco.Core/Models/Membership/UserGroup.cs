@@ -108,7 +108,7 @@ namespace Umbraco.Core.Models.Membership
         }
 
         /// <summary>
-        /// The set of default permissions for the user type
+        /// The set of default permissions for the user group
         /// </summary>
         /// <remarks>
         /// By default each permission is simply a single char but we've made this an enumerable{string} to support a more flexible permissions structure in the future.

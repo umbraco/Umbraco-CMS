@@ -293,7 +293,6 @@ namespace umbraco.BasePages
                 Id = u.Id,
                 AllowedApplications = u.GetApplications().Select(x => x.alias).ToArray(),
                 RealName = u.Name,
-                //currently we only have one user type!
                 Roles = u.GetGroups(),
                 StartContentNodes = u.UserEntity.AllStartContentIds,
                 StartMediaNodes = u.UserEntity.AllStartMediaIds,

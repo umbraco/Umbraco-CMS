@@ -59,7 +59,7 @@ namespace Umbraco.Web.Cache
             Bind(() => SectionService.New += SectionService_New,
                  () => SectionService.New -= SectionService_New);
             
-            // bind to user and user type events
+            // bind to user and user / user group events
             Bind(() => UserService.SavedUserGroup += UserService_SavedUserGroup,
                  () => UserService.SavedUserGroup -= UserService_SavedUserGroup);
             Bind(() => UserService.DeletedUserGroup += UserService_DeletedUserGroup,

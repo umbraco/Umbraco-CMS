@@ -1022,8 +1022,6 @@ Ihr freundlicher Umbraco-Robot
     <key alias="startnode">Startelement in den Inhalten</key>
     <key alias="username">Benutzername</key>
     <key alias="userPermissions">Berechtigungen</key>
-    <key alias="usertype">Rolle</key>
-    <key alias="userTypes">Rollen</key>
     <key alias="writer">Autor</key>
     <key alias="translator">Übersetzer</key>
     <key alias="yourProfile" version="7.0">Ihr Profil</key>

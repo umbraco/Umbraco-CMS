@@ -1037,8 +1037,6 @@
     <key alias="startnode">Úvodní uzel v obsahu</key>
     <key alias="username">Uživatelské jméno</key>
     <key alias="userPermissions">Oprávnění uživatele</key>
-    <key alias="usertype">Typ uživatele</key>
-    <key alias="userTypes">Typy uživatelů</key>
     <key alias="writer">Spisovatel</key>
     <key alias="yourProfile" version="7.0">Váš profil</key>
     <key alias="yourHistory" version="7.0">Vaše nedávná historie</key>

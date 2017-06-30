@@ -1480,8 +1480,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="startnode">Noeud de départ du contenu</key>
     <key alias="username">Nom d'utilisateur</key>
     <key alias="userPermissions">Permissions utilisateur</key>
-    <key alias="usertype">Type d'utilisateur</key>
-    <key alias="userTypes">Types d'utilisateurs</key>
     <key alias="writer">Rédacteur</key>
     <key alias="translator">Traducteur</key>
     <key alias="change">Modifier</key>
