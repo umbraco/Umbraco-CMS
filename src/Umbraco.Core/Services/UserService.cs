@@ -85,13 +85,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUser"/></returns>
         IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved)
         {
-            var userType = GetUserTypeByAlias(memberTypeAlias);
-            if (userType == null)
-            {
-                throw new EntityNotFoundException("The user type " + memberTypeAlias + " could not be resolved");
-            }
-
-            return CreateUserWithIdentity(username, email, passwordValue, userType, isApproved);
+            return CreateUserWithIdentity(username, email, passwordValue, isApproved);
         }
 
         /// <summary>
