@@ -138,12 +138,14 @@ namespace Umbraco.Web.Models.Mapping
             //create a map to assign a user group's default permissions to the AssignedUserGroupPermissions instance
             config.CreateMap<IUserGroup, AssignedUserGroupPermissions>()
                 .ForMember(detail => detail.Udi, opt => opt.Ignore())
-                .ForMember(detail => detail.Trashed, opt => opt.Ignore())
+                .ForMember(detail => detail.Trashed, opt => opt.Ignore())                
                 .ForMember(detail => detail.AdditionalData, opt => opt.Ignore())
                 .ForMember(detail => detail.Id, opt => opt.MapFrom(group => group.Id))
                 .ForMember(detail => detail.ParentId, opt => opt.UseValue(-1))
                 .ForMember(detail => detail.Path, opt => opt.MapFrom(userGroup => "-1," + userGroup.Id))
-                .ForMember(detail => detail.AssignedPermissions, expression => expression.ResolveUsing(new PermissionsResolver(applicationContext.Services.TextService)))
+                .ForMember(detail => detail.DefaultPermissions, expression => expression.ResolveUsing(new PermissionsResolver(applicationContext.Services.TextService)))
+                //these will be manually mapped and by default they are null
+                .ForMember(detail => detail.AssignedPermissions, opt => opt.Ignore())
                 .AfterMap((group, display) =>
                 {
                     if (display.Icon.IsNullOrWhiteSpace())

@@ -1,9 +1,10 @@
+using System;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
     [DataContract(Name = "permission", Namespace = "")]
-    public class Permission
+    public class Permission : ICloneable
     {
         [DataMember(Name = "name")]
         public string Name { get; set; }
@@ -28,5 +29,10 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "permissionCode")]
         public string PermissionCode { get; set; }
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
     }
 }

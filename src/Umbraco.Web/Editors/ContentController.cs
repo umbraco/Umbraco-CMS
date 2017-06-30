@@ -115,8 +115,14 @@ namespace Umbraco.Web.Editors
                     //create a string collection of the assigned letters
                     var groupPermissionCodes = groupPermissions.ToArray();
 
+                    //check if there are no permissions assigned for this group save model, if that is the case we want to reset the permissions
+                    //for this group/node which will go back to the defaults
+                    if (groupPermissionCodes.Length == 0)
+                    {
+                        Services.UserService.RemoveUserGroupPermissions(userGroup.Id, content.Id);
+                    }
                     //check if they are the defaults, if so we should just remove them if they exist since it's more overhead having them stored
-                    if (userGroup.Permissions.UnsortedSequenceEqual(groupPermissionCodes))
+                    else if (userGroup.Permissions.UnsortedSequenceEqual(groupPermissionCodes))
                     {
                         //only remove them if they are actually currently assigned
                         if (contentPermissions.ContainsKey(userGroup.Id))
@@ -125,9 +131,10 @@ namespace Umbraco.Web.Editors
                             Services.UserService.RemoveUserGroupPermissions(userGroup.Id, content.Id);
                         }
                     }
+                    //if they are different we need to update, otherwise there's nothing to update
                     else if (contentPermissions.ContainsKey(userGroup.Id) == false || contentPermissions[userGroup.Id].AssignedPermissions.UnsortedSequenceEqual(groupPermissionCodes) == false)
                     {
-                        //if they are different we need to update, otherwise there's nothing to update
+                        
                         Services.UserService.ReplaceUserGroupPermissions(userGroup.Id, groupPermissionCodes.Select(x => x[0]), content.Id);
                     }                    
                 }                
@@ -161,7 +168,9 @@ namespace Umbraco.Web.Editors
             //get all user groups and map their default permissions to the AssignedUserGroupPermissions model.
             //we do this because not all groups will have true assigned permissions for this node so if they don't have assigned permissions, we need to show the defaults.
 
-            var defaultPermissionsByGroup = Mapper.Map<IEnumerable<AssignedUserGroupPermissions>>(allUserGroups)
+            var defaultPermissionsByGroup = Mapper.Map<IEnumerable<AssignedUserGroupPermissions>>(allUserGroups).ToArray();
+
+            var defaultPermissionsAsDictionary = defaultPermissionsByGroup
                 .ToDictionary(x => Convert.ToInt32(x.Id), x => x);
 
             //get the actual assigned permissions
@@ -170,7 +179,10 @@ namespace Umbraco.Web.Editors
             //iterate over assigned and update the defaults with the real values
             foreach (var assignedGroupPermission in assignedPermissionsByGroup)
             {
-                var defaultUserGroupPermissions = defaultPermissionsByGroup[assignedGroupPermission.UserGroupId];
+                var defaultUserGroupPermissions = defaultPermissionsAsDictionary[assignedGroupPermission.UserGroupId];
+
+                //clone the default permissions model to the assigned ones
+                defaultUserGroupPermissions.AssignedPermissions = AssignedUserGroupPermissions.ClonePermissions(defaultUserGroupPermissions.DefaultPermissions);
 
                 //since there is custom permissions assigned to this node for this group, we need to clear all of the default permissions
                 //and we'll re-check it if it's one of the explicitly assigned ones
@@ -179,9 +191,10 @@ namespace Umbraco.Web.Editors
                     permission.Checked = false;
                     permission.Checked = assignedGroupPermission.AssignedPermissions.Contains(permission.PermissionCode, StringComparer.InvariantCulture);
                 }
+                
             }
-
-            return defaultPermissionsByGroup.Values;
+            
+            return defaultPermissionsByGroup;
         }
 
         /// <summary>
