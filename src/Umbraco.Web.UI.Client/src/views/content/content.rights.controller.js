@@ -21,7 +21,7 @@
             vm.loading = true;
             contentResource.getDetailedPermissions($scope.currentNode.id).then(function (userGroups) {
                 vm.availableUserGroups = userGroups;
-                vm.loading = false;              
+                vm.loading = false;
             });
         }
 
@@ -40,15 +40,15 @@
             group.allowedPermissions = [];
 
             // get list of checked permissions
-            angular.forEach(group.permissions, function(permissionGroup) {
-                angular.forEach(permissionGroup, function(permission) {
-                    if(permission.checked) {
+            angular.forEach(group.permissions, function (permissionGroup) {
+                angular.forEach(permissionGroup, function (permission) {
+                    if (permission.checked) {
                         group.allowedPermissions.push(permission);
                     }
                 });
             });
 
-            if(!group.selected) {
+            if (!group.selected) {
                 // set to selected so we can remove from the dropdown easily
                 group.selected = true;
                 vm.selectedUserGroups.push(group);
@@ -70,23 +70,31 @@
 
         function save() {
 
-          //this is a dictionary that we need to format
-          var permissionsSave = {};
-          angular.forEach(vm.selectedUserGroups, function(g) {
-            permissionsSave[g.id] = [];
-            angular.forEach(g.allowedPermissions, function(p) {
-              permissionsSave[g.id].push(p.permissionCode);
+            vm.saveState = "busy";
+            vm.saveError = false;
+            vm.saveSuccces = false;
+
+            //this is a dictionary that we need to format
+            var permissionsSave = {};
+            angular.forEach(vm.selectedUserGroups, function (g) {
+                permissionsSave[g.id] = [];
+                angular.forEach(g.allowedPermissions, function (p) {
+                    permissionsSave[g.id].push(p.permissionCode);
+                });
             });
-          });
 
-          var saveModel = {
-            contentId: $scope.currentNode.id,
-            permissions: permissionsSave
-          };
+            var saveModel = {
+                contentId: $scope.currentNode.id,
+                permissions: permissionsSave
+            };
 
-          contentResource.savePermissions(saveModel).then(function() {
-            alert("hooray!");
-          });
+            contentResource.savePermissions(saveModel).then(function () {
+                vm.saveState = "success";
+                vm.saveSuccces = true;
+            }, function(error){
+                vm.saveState = "error";
+                vm.saveError = error;
+            });
         }
 
         onInit();

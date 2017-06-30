@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserGroupPickerController($scope, usersResource) {
+    function UserGroupPickerController($scope, userGroupsResource) {
         
         var vm = this;
 
@@ -22,7 +22,7 @@
             }
 
             // get venues
-            usersResource.getUserGroups().then(function(userGroups){
+            userGroupsResource.getUserGroups().then(function(userGroups){
                 vm.userGroups = userGroups;
                 
                 if($scope.model.selection && $scope.model.selection.length > 0) {

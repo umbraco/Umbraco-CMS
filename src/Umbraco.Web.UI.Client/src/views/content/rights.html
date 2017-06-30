@@ -5,6 +5,19 @@
         <div class="umb-dialog-body" ng-cloak>
             <div class="umb-pane">
 
+                <div ng-show="vm.saveError">
+                    <div class="alert alert-error">
+                        <div><strong>{{vm.saveError.errorMsg}}</strong></div>
+                        <div>{{vm.saveError.data.message}}</div>
+                    </div>
+                </div>
+
+                <div ng-show="vm.saveSuccces">
+                    <div class="alert alert-success">
+                        Permissions saved for <strong>{{currentNode.name}}</strong>
+                    </div>
+                </div>
+
                 <h5>Ut tempor dui nec consectetur efficitur.</h5>
                 <p class="abstract" style="margin-bottom: 20px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tellus purus, malesuada sed purus ut, semper sollicitudin odio.</p>
 
@@ -39,13 +52,23 @@
             </div>
         </div>
 
-        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
-            <a class="btn btn-link" ng-click="nav.hideDialog()" ng-if="!busy">
-                <localize key="general_cancel">Cancel</localize>
-            </a>
-            <button class="btn btn-primary" ng-click="vm.save()" ng-disabled="busy">
-                <localize key="buttons_save">Save</localize>
-            </button>
+        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+            <umb-button
+                label-key="general_cancel"
+                disabled="vm.saveState === 'busy'"
+                action="nav.hideDialog()"
+                type="button"
+                button-style="link">
+            </umb-button>
+
+            <umb-button
+                label-key="buttons_save"
+                disabled="vm.saveState === 'busy'"
+                state="vm.saveState"
+                action="vm.save()"
+                type="button"
+                button-style="success">
+            </umb-button>
         </div>
 
     </div>
@@ -71,12 +94,21 @@
         </div>
 
         <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-            <a class="btn btn-link" ng-click="vm.cancelManagePermissions()">
-                <localize key="general_cancel">Cancel</localize>
-            </a>
-            <button class="btn btn-primary" type="button" ng-click="vm.setPermissions(vm.selectedUserGroup)">
-                Set permissions
-            </button>
+
+            <umb-button
+                label-key="general_cancel"
+                action="vm.cancelManagePermissions()"
+                type="button"
+                button-style="link">
+            </umb-button>
+
+            <umb-button
+                label="Set permissions"
+                action="vm.setPermissions(vm.selectedUserGroup)"
+                type="button"
+                button-style="success">
+            </umb-button>
+
         </div>
 
     </div>
