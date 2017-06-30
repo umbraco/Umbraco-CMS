@@ -25,6 +25,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
@@ -446,15 +447,18 @@ namespace Umbraco.Web.Editors
                             if (loginInfo.Email.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Email value cannot be null");
                             if (loginInfo.ExternalIdentity.Name.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Name value cannot be null");
 
+                            var groups = Services.UserService.GetUserGroupsByAlias(autoLinkOptions.GetDefaultUserGroups(UmbracoContext, loginInfo));
+
                             var autoLinkUser = new BackOfficeIdentityUser
                             {
                                 Email = loginInfo.Email,
                                 Name = loginInfo.ExternalIdentity.Name,
                                 AllowedSections = autoLinkOptions.GetDefaultAllowedSections(UmbracoContext, loginInfo),
                                 Culture = autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo),
-                                UserName = loginInfo.Email
+                                UserName = loginInfo.Email,
+                                Groups = groups.Select(x => x.ToReadOnlyGroup()).ToArray()
                             };
-
+                            
                             //call the callback if one is assigned
                             if (autoLinkOptions.OnAutoLinking != null)
                             {

@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core;
@@ -12,6 +13,8 @@ namespace Umbraco.Web.Security.Identity
     /// </summary>
     public class ExternalSignInAutoLinkOptions
     {
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the overload specifying user groups instead")]
         public ExternalSignInAutoLinkOptions(
             bool autoLinkExternalAccount = false,
             string defaultUserType = "editor", 
@@ -20,26 +23,54 @@ namespace Umbraco.Web.Security.Identity
         {
             Mandate.ParameterNotNullOrEmpty(defaultUserType, "defaultUserType");
 
-            _defaultUserType = defaultUserType;
+            _defaultUserGroups = new[] {defaultUserType};
             _defaultAllowedSections = defaultAllowedSections ?? new[] { "content", "media" };
             _autoLinkExternalAccount = autoLinkExternalAccount;
             _defaultCulture = defaultCulture ?? GlobalSettings.DefaultUILanguage;
         }
 
-        //TODO: Change this - it will be different when we have user groups!
-        private readonly string _defaultUserType;
+        /// <summary>
+        /// Creates a new <see cref="ExternalSignInAutoLinkOptions"/> instance
+        /// </summary>
+        /// <param name="autoLinkExternalAccount"></param>
+        /// <param name="defaultUserGroups">If null, the default will be the 'editor' group</param>
+        /// <param name="defaultAllowedSections">If null the default will the 'content' and 'media' section</param>
+        /// <param name="defaultCulture"></param>
+        public ExternalSignInAutoLinkOptions(
+            bool autoLinkExternalAccount = false,
+            string[] defaultUserGroups = null,
+            string[] defaultAllowedSections = null,
+            string defaultCulture = null)
+        {
+            _defaultUserGroups = defaultUserGroups ?? new[] { "editor" };
+            _defaultAllowedSections = defaultAllowedSections ?? new[] { "content", "media" };
+            _autoLinkExternalAccount = autoLinkExternalAccount;
+            _defaultCulture = defaultCulture ?? GlobalSettings.DefaultUILanguage;
+        }
+
+        private readonly string[] _defaultUserGroups;
 
         /// <summary>
         /// A callback executed during account auto-linking and before the user is persisted
         /// </summary>
         public Action<BackOfficeIdentityUser, ExternalLoginInfo> OnAutoLinking { get; set; }
 
-        /// <summary>
-        /// The default User Type alias to use for auto-linking users
-        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the overload specifying user groups instead")]
         public string GetDefaultUserType(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
-            return _defaultUserType;
+            return _defaultUserGroups.Length == 0 ? "editor" : _defaultUserGroups[0];
+        }
+
+        /// <summary>
+        /// The default User group aliases to use for auto-linking users
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        /// <param name="loginInfo"></param>
+        /// <returns></returns>
+        public string[] GetDefaultUserGroups(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        {
+            return _defaultUserGroups;
         }
 
         private readonly string[] _defaultAllowedSections;
