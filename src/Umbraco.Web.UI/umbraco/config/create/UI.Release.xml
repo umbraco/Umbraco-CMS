@@ -43,19 +43,19 @@
       <delete assembly="umbraco" type="XsltTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="user">
-    <header>User</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="userTasks" />
-    </tasks>
-  </nodeType>
   <nodeType alias="initmemberGroup">
     <header>membergroup</header>
     <usercontrol>/create/simple.ascx</usercontrol>
     <tasks>
       <create assembly="umbraco" type="MemberGroupTasks" />
     </tasks>
+  </nodeType>
+  <nodeType alias="memberGroups">
+    <header>membergroup</header>
+    <usercontrol>/create/simple.ascx</usercontrol>
+    <tasks>
+        <delete assembly="umbraco" type="MemberGroupTasks" />
+    </tasks> 
   </nodeType>
   <nodeType alias="initstylesheets">
     <header>Stylesheet</header>
@@ -69,27 +69,6 @@
     <usercontrol>/create/xslt.ascx</usercontrol>
     <tasks>
       <create assembly="umbraco" type="XsltTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="initmember">
-    <header>member</header>
-    <usercontrol>/create/member.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="memberTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="initmember">
-    <header>member</header>
-    <usercontrol>/create/member.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="memberTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="memberGroups">
-    <header>membergroup</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="MemberGroupTasks" />
     </tasks>
   </nodeType>
   <nodeType alias="stylesheet">
@@ -219,14 +198,6 @@
       <delete assembly="umbraco" type="CreatedPackageTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="userTypes">
-    <header>User Types</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="cms.presentation.user.UserTypeTasks" />
-      <delete assembly="umbraco" type="cms.presentation.user.UserTypeTasks" />
-    </tasks>
-  </nodeType>
   <nodeType alias="partialViews">
     <header>Macro</header>
     <usercontrol>/Create/PartialView.ascx</usercontrol>
@@ -235,28 +206,5 @@
       <delete assembly="umbraco" type="PartialViewTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="partialViewMacros">
-    <header>Macro</header>
-    <usercontrol>/Create/PartialViewMacro.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="PartialViewMacroTasks" />
-      <delete assembly="umbraco" type="PartialViewMacroTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="partialViewsFolder">
-    <header>Macro</header>
-    <usercontrol>/Create/PartialView.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="PartialViewTasks" />
-      <delete assembly="umbraco" type="PartialViewTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="partialViewMacrosFolder">
-    <header>Macro</header>
-    <usercontrol>/Create/PartialViewMacro.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="PartialViewMacroTasks" />
-      <delete assembly="umbraco" type="PartialViewMacroTasks" />
-    </tasks>
-  </nodeType>
+  
 </createUI>

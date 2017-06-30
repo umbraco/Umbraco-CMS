@@ -7,7 +7,6 @@ using Umbraco.Core;
 using Umbraco.Web.UI;
 using umbraco;
 using umbraco.BusinessLogic;
-using umbraco.cms.presentation.user;
 using umbraco.interfaces;
 
 namespace Umbraco.Tests.UI
@@ -28,7 +27,6 @@ namespace Umbraco.Tests.UI
         }
 
         [TestCase(typeof(XsltTasks), DefaultApps.developer)]
-        [TestCase(typeof(userTasks), DefaultApps.users)]
         [TestCase(typeof(templateTasks), DefaultApps.settings)]
         [TestCase(typeof(StylesheetTasks), DefaultApps.settings)]
         [TestCase(typeof(stylesheetPropertyTasks), DefaultApps.settings)]
@@ -39,7 +37,6 @@ namespace Umbraco.Tests.UI
         [TestCase(typeof(languageTasks), DefaultApps.settings)]
         [TestCase(typeof(DLRScriptingTasks), DefaultApps.developer)]
         [TestCase(typeof(CreatedPackageTasks), DefaultApps.developer)]
-        [TestCase(typeof(PartialViewTasks), DefaultApps.settings)]
         public void Check_Assigned_Apps_For_Tasks(Type taskType, DefaultApps app)
         {
             var task = (LegacyDialogTask)Activator.CreateInstance(taskType);

@@ -9,7 +9,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using umbraco.BasePages;
 using System.Linq;
-using umbraco.cms.presentation.user;
 using umbraco.interfaces;
 using Umbraco.Web;
 using Umbraco.Core;
