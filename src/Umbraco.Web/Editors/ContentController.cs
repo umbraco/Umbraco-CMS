@@ -88,6 +88,10 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="saveModel"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Permission check is done for letter 'R' which is for <see cref="ActionRights"/> which the user must have access to to update
+        /// </remarks>
+        [EnsureUserPermissionForContent("saveModel.ContentId", 'R')]
         public IEnumerable<AssignedUserGroupPermissions> PostSaveUserGroupPermissions(UserGroupPermissionsSave saveModel)
         {
             if (saveModel.ContentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
