@@ -195,6 +195,10 @@
     }
 }
 
+.umb-grid-add-more-content {
+    display:flex;
+}
+
 .umb-grid .cell-tools-add {
     color: @turquoise-d1;
     &:focus, &:hover {
@@ -217,8 +221,22 @@
     padding: 5px;
     border: 1px dashed @gray-7;
     margin: 10px;
+    flex: 1;
 }
 
+.umb-grid .cell-tools-button {
+    margin:10px;
+    padding:1px;
+}
+
+.umb-grid .cell-tools-button button {
+	  font-size: 12px;
+}
+
+.umb-grid .cell-tools-button .dropdown-menu {
+    font-size: 12px;
+    text-align: left;
+}
 
 .umb-grid .cell-tools-remove {
     display: inline-block;
