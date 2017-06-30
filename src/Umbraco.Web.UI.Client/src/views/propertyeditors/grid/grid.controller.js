@@ -616,23 +616,47 @@ angular.module("umbraco")
           $scope.showRowConfigurations = !$scope.showRowConfigurations;
         };
 
-        $scope.copy = function(control) {
-            localStorageService.set("grid-clipboard", $.extend({}, control));
+        var gridClipboardAlias = "grid-clipboard";
+
+        var setClipboard = function () {
+          $scope.clipboard = localStorageService.get(gridClipboardAlias);
+          if (!Array.isArray($scope.clipboard)) {
+            $scope.clipboard = [];
+          }
         }
 
-        $scope.paste = function(event, cell, index) {
-            var copied = localStorageService.get("grid-clipboard"),
-                newControl = $.extend({}, copied);
-            if (copied && copied.editor) {
-                
-                if (index === undefined) {
-                    index = cell.controls.length;
-                }
+        setClipboard();
+  
+        $scope.copy = function(control) {
+          if (!Array.isArray(localStorageService.get(gridClipboardAlias))) {
+            localStorageService.set(gridClipboardAlias, []);
+          }
 
-                newControl.active = true;
-                $scope.initControl(newControl, index + 1);
-                cell.controls.push(newControl);
+          var newClipboard = localStorageService.get(gridClipboardAlias);
+
+          newClipboard.push(control);
+
+          if (newClipboard.length > 10) { // could be a config setting instead, maybe?
+            newClipboard.splice(0, newClipboard.length - 10);
+          }
+
+          localStorageService.set(gridClipboardAlias, newClipboard);
+
+          setClipboard();
+        }
+
+        $scope.paste = function (event, cell, index, copied) {
+          var newControl = $.extend({}, copied);
+          if (copied && copied.editor) {
+
+            if (index === undefined) {
+              index = cell.controls.length;
             }
+
+            newControl.active = true;
+            $scope.initControl(newControl, index + 1);
+            cell.controls.push(newControl);
+          }
         }
 
         // *********************************************
