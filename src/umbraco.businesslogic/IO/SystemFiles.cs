@@ -10,7 +10,7 @@ using System.Web;
 namespace umbraco.IO
 {
 
-	[Obsolete("Use Umbraco.Core.UI.SystemFiles instead")]
+	[Obsolete("Use Umbraco.Core.IO.SystemFiles instead")]
 	public class SystemFiles
 	{
         [Obsolete("This file is no longer used and should not be accessed!")]

@@ -707,8 +707,9 @@ namespace Umbraco.Web.Editors
 
             var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
 
+            app.Add("cacheBuster", string.Format("{0}.{1}", version, ClientDependencySettings.Instance.Version).GenerateHash());
             app.Add("version", version);
-            app.Add("cdf", ClientDependencySettings.Instance.Version);
+            
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
             app.Add("applicationPath", HttpContext.Request.ApplicationPath.EnsureEndsWith('/'));
 
@@ -718,10 +719,18 @@ namespace Umbraco.Web.Editors
             return app;
         }
 
+        /// <summary>
+        /// A lazy reference to all tree controller types
+        /// </summary>
+        /// <remarks>
+        /// We are doing this because if we constantly resolve the tree controller types from the PluginManager it will re-scan and also re-log that
+        /// it's resolving which is unecessary and annoying. 
+        /// </remarks>
+        private static readonly Lazy<IEnumerable<Type>> TreeControllerTypes = new Lazy<IEnumerable<Type>>(() => PluginManager.Current.ResolveAttributedTreeControllers().ToArray());
 
         private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()
         {
-            var treeTypes = PluginManager.Current.ResolveAttributedTreeControllers();
+            var treeTypes = TreeControllerTypes.Value;
             //get all plugin trees with their attributes
             var treesWithAttributes = treeTypes.Select(x => new
             {

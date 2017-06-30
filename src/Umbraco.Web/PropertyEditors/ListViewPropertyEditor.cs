@@ -42,7 +42,7 @@ namespace Umbraco.Web.PropertyEditors
                             allowBulkPublish = true,
                             allowBulkUnpublish = true,
                             allowBulkCopy = true,
-                            allowBulkMove = true,
+                            allowBulkMove = false,
                             allowBulkDelete = true
                         }}
                 };

@@ -38,7 +38,6 @@ using System.Security;
 [assembly: InternalsVisibleTo("Umbraco.Deploy")]
 [assembly: InternalsVisibleTo("Umbraco.Deploy.UI")]
 [assembly: InternalsVisibleTo("Umbraco.Deploy.Cloud")]
-[assembly: InternalsVisibleTo("Umbraco.VisualStudio")]
 [assembly: InternalsVisibleTo("Umbraco.ModelsBuilder")]
 [assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.AspNet")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
@@ -47,3 +46,7 @@ using System.Security;
 [assembly: InternalsVisibleTo("Umbraco.Forms.Core.Providers")]
 [assembly: InternalsVisibleTo("Umbraco.Forms.Web")]
 
+
+//allow custom unit-testing code to access internals through custom adapters
+[assembly: InternalsVisibleTo("Umbraco.VisualStudio")]          // backwards compat.
+[assembly: InternalsVisibleTo("Umbraco.UnitTesting.Adapter")]   // new, more imperative name

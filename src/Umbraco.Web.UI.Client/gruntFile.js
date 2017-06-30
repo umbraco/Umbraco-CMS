@@ -382,6 +382,9 @@ module.exports = function (grunt) {
             html: {
                 files: ['src/views/**/*.html', 'src/*.html'],
                 tasks: ['watch-html', 'timestamp']
+            },
+			options: { 
+                interval: 500
             }
         },
 

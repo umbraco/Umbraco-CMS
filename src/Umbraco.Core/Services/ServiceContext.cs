@@ -63,6 +63,8 @@ namespace Umbraco.Core.Services
         private Lazy<IExternalLoginService> _externalLoginService;
         private Lazy<IRedirectUrlService> _redirectUrlService;
 
+        internal IdkMap IdkMap { get; private set; }
+
         /// <summary>
         /// public ctor - will generally just be used for unit testing all items are optional and if not specified, the defaults will be used
         /// </summary>
@@ -171,9 +173,11 @@ namespace Umbraco.Core.Services
 
             EventMessagesFactory = eventMessagesFactory;
 
+            IdkMap = new IdkMap(provider);
+
             BuildServiceCache(provider, cache,
                               repositoryFactory,
-                              logger, eventMessagesFactory);
+                              logger, eventMessagesFactory, IdkMap);
         }
 
         /// <summary>
@@ -184,7 +188,8 @@ namespace Umbraco.Core.Services
             CacheHelper cache,
             RepositoryFactory repositoryFactory,
             ILogger logger,
-            IEventMessagesFactory eventMessagesFactory)
+            IEventMessagesFactory eventMessagesFactory, 
+            IdkMap idkMap)
         {
             EventMessagesFactory = eventMessagesFactory;
 
@@ -256,10 +261,10 @@ namespace Umbraco.Core.Services
                 _memberService = new Lazy<IMemberService>(() => new MemberService(provider, repositoryFactory, logger, eventMessagesFactory, _memberGroupService.Value, _dataTypeService.Value));
 
             if (_contentService == null)
-                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory, logger, eventMessagesFactory, _dataTypeService.Value, _userService.Value));
+                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory, logger, eventMessagesFactory, _dataTypeService.Value, _userService.Value, idkMap));
 
             if (_mediaService == null)
-                _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory, logger, eventMessagesFactory, _dataTypeService.Value, _userService.Value));
+                _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory, logger, eventMessagesFactory, _dataTypeService.Value, _userService.Value, idkMap));
 
             if (_contentTypeService == null)
                 _contentTypeService = new Lazy<IContentTypeService>(() => new ContentTypeService(provider, repositoryFactory, logger, eventMessagesFactory, _contentService.Value, _mediaService.Value));
@@ -277,8 +282,7 @@ namespace Umbraco.Core.Services
                 _entityService = new Lazy<IEntityService>(() => new EntityService(
                     provider, repositoryFactory, logger, eventMessagesFactory,
                     _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value, _memberService.Value, _memberTypeService.Value,
-                    //TODO: Consider making this an isolated cache instead of using the global one
-                    cache.RuntimeCache));
+                    idkMap));
 
             if (_packagingService == null)
                 _packagingService = new Lazy<IPackagingService>(() => new PackagingService(logger, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _macroService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, _entityService.Value, _userService.Value, repositoryFactory, provider));

@@ -4,7 +4,7 @@ using Umbraco.Core.Packaging.Models;
 
 namespace Umbraco.Core.Events
 {
-    internal class ImportPackageEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>, IEquatable<ImportPackageEventArgs<TEntity>>
+    public class ImportPackageEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>, IEquatable<ImportPackageEventArgs<TEntity>>
     {
         private readonly MetaData _packageMetaData;
 
