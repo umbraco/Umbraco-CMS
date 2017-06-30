@@ -39,7 +39,6 @@ using System.Security.Permissions;
 [assembly: InternalsVisibleTo("UmbracoExamine")]
 
 [assembly: InternalsVisibleTo("Concorde.Sync")]
-[assembly: InternalsVisibleTo("Umbraco.VisualStudio")]
 [assembly: InternalsVisibleTo("Umbraco.Courier.Core")]
 [assembly: InternalsVisibleTo("Umbraco.Courier.Persistence")]
 
@@ -53,3 +52,7 @@ using System.Security.Permissions;
 
 //allow this to be mocked in our unit tests
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+
+//allow custom unit-testing code to access internals through custom adapters
+[assembly: InternalsVisibleTo("Umbraco.VisualStudio")]          // backwards compat.
+[assembly: InternalsVisibleTo("Umbraco.UnitTesting.Adapter")]   // new, more imperative name

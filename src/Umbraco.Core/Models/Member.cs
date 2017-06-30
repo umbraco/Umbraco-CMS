@@ -109,6 +109,30 @@ namespace Umbraco.Core.Models
             IsApproved = true;
         }
 
+        /// <summary>
+        /// Constructor for creating a Member object
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="email"></param>
+        /// <param name="username"></param>
+        /// <param name="rawPasswordValue">
+        /// The password value passed in to this parameter should be the encoded/encrypted/hashed format of the member's password
+        /// </param>
+        /// <param name="contentType"></param>
+        /// <param name="isApproved"></param>
+        public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType, bool isApproved)
+            : base(name, -1, contentType, new PropertyCollection())
+        {
+            Mandate.ParameterNotNull(contentType, "contentType");
+
+            _contentTypeAlias = contentType.Alias;
+            _contentType = contentType;
+            _email = email;
+            _username = username;
+            _rawPasswordValue = rawPasswordValue;
+            IsApproved = isApproved;
+        }
+
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         private class PropertySelectors

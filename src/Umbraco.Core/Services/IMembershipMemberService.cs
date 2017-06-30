@@ -73,6 +73,18 @@ namespace Umbraco.Core.Services
         T CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias);
 
         /// <summary>
+        /// Creates and persists a new <see cref="IMembershipUser"/>
+        /// </summary>
+        /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
+        /// <param name="username">Username of the <see cref="IMembershipUser"/> to create</param>
+        /// <param name="email">Email of the <see cref="IMembershipUser"/> to create</param>
+        /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
+        /// <param name="memberTypeAlias">Alias of the Type</param>
+        /// <param name="isApproved">IsApproved of the <see cref="IMembershipUser"/> to create</param>
+        /// <returns><see cref="IMembershipUser"/></returns>
+        T CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved);
+
+        /// <summary>
         /// Gets an <see cref="IMembershipUser"/> by its provider key
         /// </summary>
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
