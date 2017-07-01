@@ -645,18 +645,36 @@ angular.module("umbraco")
           setClipboard();
         }
 
-        $scope.paste = function (event, cell, index, copied) {
-          var newControl = $.extend({}, copied);
-          if (copied && copied.editor) {
+		$scope.allowedEditorsInClipboard = function (cell) {
+			var allowedEditors = cell.$allowedEditors.map(function (editor) { return editor.alias; });
+			return $scope.clipboard.filter(function (control) {
+				return allowedEditors.indexOf(control.editor.alias) > -1;
+			});
+		}
 
-            if (index === undefined) {
-              index = cell.controls.length;
+		$scope.paste = function (event, cell, index, copied) {
+			if (typeof (copied) == "undefined") {
+				// should be first allowed editor
+				var allowedEditors = $scope.allowedEditorsInClipboard(cell);
+				if (allowedEditors.length == 0) {
+					return false;
+				}
+				else {
+					copied = allowedEditors[allowedEditors.length - 1];
+				}
+			}
+
+            var newControl = $.extend({}, copied);
+            if (copied && copied.editor) {
+
+                if (index === undefined) {
+                  index = cell.controls.length;
+                }
+
+                newControl.active = true;
+                $scope.initControl(newControl, index + 1);
+                cell.controls.push(newControl);
             }
-
-            newControl.active = true;
-            $scope.initControl(newControl, index + 1);
-            cell.controls.push(newControl);
-          }
         }
 
         // *********************************************
