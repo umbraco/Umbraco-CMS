@@ -126,14 +126,19 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(BaseQueryType queryType)
         {
             var sql = new Sql();
-            sql.Select(queryType == BaseQueryType.Count ? "COUNT(*)" : (queryType == BaseQueryType.Ids ? "cmsDocument.nodeId" : "*"))
-                .From<DocumentDto>(SqlSyntax)
+            sql
+                .Select(
+                    queryType == BaseQueryType.Count
+                        ? "COUNT(*)"
+                        : (queryType == BaseQueryType.Ids ? "cmsDocument.nodeId" : "*")).From<DocumentDto>(SqlSyntax)
                 .InnerJoin<ContentVersionDto>(SqlSyntax)
                 .On<DocumentDto, ContentVersionDto>(SqlSyntax, left => left.VersionId, right => right.VersionId)
                 .InnerJoin<ContentDto>(SqlSyntax)
                 .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 .InnerJoin<NodeDto>(SqlSyntax)
-                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId);
+                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .LeftJoin<DocumentSearchDto>(SqlSyntax)
+                .On<DocumentDto, DocumentSearchDto>(SqlSyntax, left => left.NodeId, right => right.NodeId);
             //TODO: IF we want to enable querying on content type information this will need to be joined
             //.InnerJoin<ContentTypeDto>(SqlSyntax)
             //.On<ContentDto, ContentTypeDto>(SqlSyntax, left => left.ContentTypeId, right => right.NodeId, SqlSyntax);

@@ -85,5 +85,10 @@ namespace Umbraco.Core.Models
         /// Gets the unique identifier of the published version, if any.
         /// </summary>
         Guid PublishedVersionGuid { get; }
+
+        /// <summary>
+        /// Gets or Sets the database stored "index" of keywords for searching on for the content
+        /// </summary>
+        string SearchText { get; set; }
     }
 }

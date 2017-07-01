@@ -270,6 +270,11 @@ namespace Umbraco.Core.Models
         public Guid PublishedVersionGuid { get; internal set; }
 
         /// <summary>
+        /// Gets or Sets the database stored "index" of keywords for searching on for the content
+        /// </summary>
+        public string SearchText { get; set; }
+
+        /// <summary>
         /// Gets a value indicating whether the content has a published version.
         /// </summary>
         public bool HasPublishedVersion { get { return PublishedVersionGuid != default(Guid); } }

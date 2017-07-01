@@ -582,8 +582,11 @@ namespace Umbraco.Core.Services
                 IQuery<IContent> filterQuery = null;
                 if (filter.IsNullOrWhiteSpace() == false)
                 {
-                    filterQuery = Query<IContent>.Builder.Where(x => x.Name.Contains(filter));
+                    filterQuery = Query<IContent>.Builder
+                        .Where(x => x.Name.Contains(filter) ||
+                                    x.SearchText.Contains(filter));
                 }
+
                 return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filterQuery);
             }
         }

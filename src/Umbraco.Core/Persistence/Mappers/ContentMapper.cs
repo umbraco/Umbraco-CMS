@@ -57,6 +57,7 @@ namespace Umbraco.Core.Persistence.Mappers
                 CacheMap<Content, DocumentDto>(src => src.ExpireDate, dto => dto.ExpiresDate);
                 CacheMap<Content, DocumentDto>(src => src.ReleaseDate, dto => dto.ReleaseDate);
                 CacheMap<Content, DocumentDto>(src => src.Published, dto => dto.Published);
+                CacheMap<Content, DocumentSearchDto>(src => src.SearchText, dto => dto.SearchText);
                 //CacheMap<Content, DocumentDto>(src => src.Name, dto => dto.Alias);
                 //CacheMap<Content, DocumentDto>(src => src, dto => dto.Newest);
                 //CacheMap<Content, DocumentDto>(src => src.Template, dto => dto.TemplateId);
