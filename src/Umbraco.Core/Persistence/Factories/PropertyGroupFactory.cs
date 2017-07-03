@@ -73,6 +73,7 @@ namespace Umbraco.Core.Persistence.Factories
                             propertyType.Key = typeDto.UniqueId;
                             propertyType.Name = typeDto.Name;
                             propertyType.Mandatory = typeDto.Mandatory;
+                            propertyType.Searchable = typeDto.Searchable;
                             propertyType.SortOrder = typeDto.SortOrder;
                             propertyType.ValidationRegExp = typeDto.ValidationRegExp;
                             propertyType.PropertyGroupId = new Lazy<int>(() => tempGroupDto.Id);
@@ -137,6 +138,7 @@ namespace Umbraco.Core.Persistence.Factories
                 DataTypeId = propertyType.DataTypeDefinitionId,
                 Description = propertyType.Description,
                 Mandatory = propertyType.Mandatory,
+                Searchable = propertyType.Searchable,
                 Name = propertyType.Name,
                 SortOrder = propertyType.SortOrder,
                 ValidationRegExp = propertyType.ValidationRegExp,

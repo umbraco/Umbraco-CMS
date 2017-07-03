@@ -86,7 +86,19 @@
 
    </div>
 
-   <div class="umb-control-group clearfix" ng-if="model.contentType === 'memberType'">
+  <div class="umb-control-group clearfix">
+
+    <h5><localize key="editcontenttype_searchOptions"></localize></h5>
+
+    <label class="checkbox no-indent">
+      <input type="checkbox" ng-model="model.property.searchable">
+      <localize key="editcontenttype_fieldIsSearchable"></localize>
+      <div><small><localize key="editcontenttype_fieldIsSearchableInfo"></localize></small></div>
+    </label>
+
+  </div>
+  
+  <div class="umb-control-group clearfix" ng-if="model.contentType === 'memberType'">
 
        <h5><localize key="general_rights"></localize></h5>
 

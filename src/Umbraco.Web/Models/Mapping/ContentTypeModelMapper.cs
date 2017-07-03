@@ -40,6 +40,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ConstructUsing(basic => new PropertyType(applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(basic.DataTypeId)))
                 .ForMember(type => type.ValidationRegExp, expression => expression.ResolveUsing(basic => basic.Validation.Pattern))
                 .ForMember(type => type.Mandatory, expression => expression.ResolveUsing(basic => basic.Validation.Mandatory))
+                .ForMember(type => type.Searchable, expression => expression.ResolveUsing(basic => basic.Searchable))
                 .ForMember(type => type.Name, expression => expression.ResolveUsing(basic => basic.Label))
                 .ForMember(type => type.DataTypeDefinitionId, expression => expression.ResolveUsing(basic => basic.DataTypeId))
                 .ForMember(type => type.DataTypeId, expression => expression.Ignore())
@@ -195,6 +196,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(type => type.DataTypeId, expression => expression.Ignore())
                 .ForMember(type => type.Mandatory, expression => expression.MapFrom(display => display.Validation.Mandatory))
                 .ForMember(type => type.ValidationRegExp, expression => expression.MapFrom(display => display.Validation.Pattern))
+                .ForMember(type => type.Searchable, expression => expression.MapFrom(display => display.Searchable))
                 .ForMember(type => type.DataTypeDefinitionId, expression => expression.MapFrom(display => display.DataTypeId))
                 .ForMember(type => type.Name, expression => expression.MapFrom(display => display.Label));
 

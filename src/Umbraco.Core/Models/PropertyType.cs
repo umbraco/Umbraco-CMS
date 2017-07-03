@@ -28,6 +28,7 @@ namespace Umbraco.Core.Models
         private string _propertyEditorAlias;
         private DataTypeDatabaseType _dataTypeDatabaseType;
         private bool _mandatory;
+        private bool _searchable;
         private string _helpText;
         private int _sortOrder;
         private string _validationRegExp;
@@ -98,6 +99,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo PropertyEditorAliasSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.PropertyEditorAlias);
             public readonly PropertyInfo DataTypeDatabaseTypeSelector = ExpressionHelper.GetPropertyInfo<PropertyType, DataTypeDatabaseType>(x => x.DataTypeDatabaseType);
             public readonly PropertyInfo MandatorySelector = ExpressionHelper.GetPropertyInfo<PropertyType, bool>(x => x.Mandatory);
+            public readonly PropertyInfo SearchableSelector = ExpressionHelper.GetPropertyInfo<PropertyType, bool>(x => x.Searchable);
             public readonly PropertyInfo HelpTextSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.HelpText);
             public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
             public readonly PropertyInfo ValidationRegExpSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExp);
@@ -206,6 +208,16 @@ namespace Umbraco.Core.Models
         {
             get { return _mandatory; }
             set { SetPropertyValueAndDetectChanges(value, ref _mandatory, Ps.Value.MandatorySelector); }
+        }
+
+        /// <summary>
+        /// Gets of Sets the Boolean indicating whether the value for this PropertyType is searchable when filtered in the list view
+        /// </summary>
+        [DataMember]
+        public bool Searchable
+        {
+            get { return _searchable; }
+            set { SetPropertyValueAndDetectChanges(value, ref _searchable, Ps.Value.SearchableSelector); }
         }
 
         /// <summary>

@@ -210,6 +210,7 @@ namespace Umbraco.Web.Models.Mapping
                     Description = p.Description,
                     Editor = p.PropertyEditorAlias,
                     Validation = new PropertyTypeValidation {Mandatory = p.Mandatory, Pattern = p.ValidationRegExp},
+                    Searchable = p.Searchable,
                     Label = p.Name,
                     View = propertyEditor.ValueEditor.View,
                     Config = propertyEditor.PreValueEditor.ConvertDbToEditor(propertyEditor.DefaultPreValues, preValues),

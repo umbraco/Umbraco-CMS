@@ -371,6 +371,9 @@
     <key alias="currentListViewDesc" version="7.2">The active list view data type</key>
     <key alias="createListView" version="7.2">Create custom list view</key>
     <key alias="removeListView" version="7.2">Remove custom list view</key>
+    <key alias="searchOptions">Search options</key>
+    <key alias="fieldIsSearchable">Field is searchable when content presented in a list view</key>
+    <key alias="fieldIsSearchableInfo">Take care when enabling this option. To ensure optimal list view performance it is best to enable only for content presented in a list view, and then just for fields with small amounts of text that are sensible for the editor to search on.</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Add prevalue</key>

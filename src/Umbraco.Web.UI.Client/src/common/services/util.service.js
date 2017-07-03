@@ -608,7 +608,7 @@ function umbDataFormatter() {
                 });
 
                 var saveProperties = _.map(realProperties, function (p) {
-                    var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId', 'memberCanEdit', 'showOnMemberProfile');
+                    var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'searchable', 'label', 'sortOrder', 'dataTypeId', 'groupId', 'memberCanEdit', 'showOnMemberProfile');
                     return saveProperty;
                 });
 

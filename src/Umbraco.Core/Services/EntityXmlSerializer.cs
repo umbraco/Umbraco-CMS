@@ -284,6 +284,7 @@ namespace Umbraco.Core.Services
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
                                                    new XElement("Validation", propertyType.ValidationRegExp),
+                                                   new XElement("Searchable", propertyType.Searchable.ToString()),
                                                    new XElement("Description", new XCData(propertyType.Description)));
                 genericProperties.Add(genericProperty);
             }
@@ -403,6 +404,7 @@ namespace Umbraco.Core.Services
                                                    new XElement("SortOrder", propertyType.SortOrder),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
                                                    propertyType.ValidationRegExp != null ? new XElement("Validation", propertyType.ValidationRegExp) : null,
+                                                   new XElement("Searchable", propertyType.Searchable.ToString()),
                                                    propertyType.Description != null ? new XElement("Description", new XCData(propertyType.Description)) : null);
                 
                 genericProperties.Add(genericProperty);

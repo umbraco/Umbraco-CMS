@@ -46,6 +46,10 @@ namespace Umbraco.Core.Models.Rdbms
         [NullSetting(NullSetting = NullSettings.Null)]
         public string ValidationRegExp { get; set; }
 
+        [Column("Searchable")]
+        [Constraint(Default = "0")]
+        public bool Searchable { get; set; }
+
         [Column("Description")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(2000)]

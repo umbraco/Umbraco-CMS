@@ -32,6 +32,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "validation")]
         public PropertyTypeValidation Validation { get; set; }
 
+        [DataMember(Name = "searchable")]
+        public bool Searchable { get; set; }
+
         [DataMember(Name = "label")]
         [Required]
         public string Label { get; set; }

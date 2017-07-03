@@ -545,6 +545,7 @@
             property.dataTypeName = oldModel.property.dataTypeName;
             property.validation.mandatory = oldModel.property.validation.mandatory;
             property.validation.pattern = oldModel.property.validation.pattern;
+            property.searchable = oldModel.property.searchable;
             property.showOnMemberProfile = oldModel.property.showOnMemberProfile;
             property.memberCanEdit = oldModel.property.memberCanEdit;
 
@@ -593,7 +594,8 @@
           validation: {
             mandatory: false,
             pattern: null
-          }
+          },
+          searchable: false
         };
 
         // check if there already is an init property
