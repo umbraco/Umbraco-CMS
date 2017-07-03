@@ -892,6 +892,23 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
         }
 
         /// <summary>
+        /// Adds/updates the database held list view filter "index" for the content item
+        /// </summary>
+        /// <param name="content"></param>
+        public void AddOrUpdateSearchText(IContent content)
+        {
+            Database.Delete<DocumentSearchDto>(content.Id);
+            if (string.IsNullOrEmpty(content.SearchText) == false)
+            {
+                Database.InsertOrUpdate(new DocumentSearchDto
+                {
+                    NodeId = content.Id,
+                    SearchText = content.SearchText
+                });
+            }
+        }
+
+        /// <summary>
         /// Gets paged content results
         /// </summary>
         /// <param name="query">Query to excute</param>

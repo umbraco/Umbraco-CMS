@@ -83,7 +83,10 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="xml"></param>
         void AddOrUpdatePreviewXml(IContent content, Func<IContent, XElement> xml);
 
-        
-        
+        /// <summary>
+        /// Used to add/update the database held list view filter "index" for the content item
+        /// </summary>
+        /// <param name="content"></param>
+        void AddOrUpdateSearchText(IContent content);
     }
 }

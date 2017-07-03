@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
@@ -2189,6 +2190,9 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(content);
                     repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
 
+                    //Update database held list view filter "index"
+                    SaveContentSearchText(content, repository);
+
                     if (published)
                     {
                         //Content Xml
@@ -2263,6 +2267,9 @@ namespace Umbraco.Core.Services
                     //Generate a new preview
                     repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
 
+                    //Update database held list view filter "index"
+                    SaveContentSearchText(content, repository);
+
                     if (raiseEvents)
                         uow.Events.Dispatch(Saved, this, new SaveEventArgs<IContent>(content, false, evtMsgs));
 
@@ -2272,6 +2279,35 @@ namespace Umbraco.Core.Services
 
                 return OperationStatus.Success(evtMsgs);
             }
+        }
+
+        private void SaveContentSearchText(IContent content, IContentRepository repository)
+        {
+            var propertiesToSave = content.Properties
+                .Where(x => x.PropertyType.Searchable &&
+                            x.Value != null)
+                .ToList();
+
+            content.SearchText = string.Empty;
+            if (propertiesToSave.Any())
+            {
+                var sb = new StringBuilder();
+                foreach (var property in propertiesToSave)
+                {
+                    if (sb.Length > 0)
+                    {
+                        sb.Append(" ");
+                    }
+
+                    var stringValue = property.Value.ToString();
+                    stringValue = stringValue.StripHtml();
+                    sb.Append(stringValue);
+                }
+
+                content.SearchText = sb.ToString();
+            }
+
+            repository.AddOrUpdateSearchText(content);
         }
 
         /// <summary>
