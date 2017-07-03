@@ -1100,8 +1100,6 @@
     <key alias="postContent">欄位後插入</key>
     <key alias="preContent">欄位前插入</key>
     <key alias="recursive">遞迴</key>
-    <key alias="removeParagraph">移除段落符號</key>
-    <key alias="removeParagraphHelp">將會在字串首尾移除任何 &amp;lt;P&amp;gt; 符號</key>
     <key alias="standardFields">標準欄位</key>
     <key alias="uppercase">大寫</key>
     <key alias="urlEncode">URL編碼</key>
