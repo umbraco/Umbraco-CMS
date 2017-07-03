@@ -39,7 +39,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public UserGroupDisplay GetEmptyUserGroup()
         {
-            return new UserGroupDisplay();
+            return Mapper.Map<UserGroupDisplay>(new UserGroup());
         }
 
         /// <summary>

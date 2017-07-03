@@ -573,7 +573,6 @@
     <Content Include="Umbraco\Developer\Packages\installer.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco\umbraco.aspx" />
-    <Content Include="Umbraco\Users\EditUserGroup.aspx" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
     <Compile Include="Umbraco\umbraco.aspx.cs">
@@ -582,13 +581,6 @@
     </Compile>
     <Compile Include="Umbraco\umbraco.aspx.designer.cs">
       <DependentUpon>umbraco.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Users\EditUser.aspx.cs">
-      <DependentUpon>EditUser.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Users\EditUser.aspx.designer.cs">
-      <DependentUpon>EditUser.aspx</DependentUpon>
     </Compile>
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
@@ -1011,10 +1003,6 @@
     <None Include="Umbraco\Scripting\Templates\Rb\SubpagesAsThumnbnails.rb" />
     <None Include="Umbraco\Scripting\Templates\Rb\SubpagesFromAChangeableSource.rb" />
     <None Include="Umbraco\Scripting\Templates\Rb\SubpagesFromCurrentPage.rb" />
-    <Content Include="Umbraco\Users\NodePermissions.ascx" />
-    <Content Include="Umbraco\Users\PermissionEditor.aspx" />
-    <Content Include="Umbraco\Users\PermissionsEditor.js" />
-    <Content Include="Umbraco\Users\PermissionsHandler.asmx" />
     <Content Include="Umbraco\Webservices\CheckForUpgrade.asmx" />
     <Content Include="Umbraco\Xslt\searchResult.xslt" />
     <Content Include="Umbraco\Xslt\Templates\RelatedLinks.xslt" />
@@ -1068,7 +1056,6 @@
     <Content Include="Umbraco\Dialogs\sort.aspx" />
     <Content Include="Umbraco\tree.aspx" />
     <Content Include="Umbraco\treeInit.aspx" />
-    <Content Include="Umbraco\Users\EditUser.aspx" />
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="Umbraco\Webservices\ajax.js" />
     <Content Include="Umbraco\Webservices\CacheRefresher.asmx">

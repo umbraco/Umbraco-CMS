@@ -30,7 +30,7 @@ namespace Umbraco.Web.Security
         public WebSecurity(HttpContextBase httpContext, ApplicationContext applicationContext)
         {
             _httpContext = httpContext;
-            _applicationContext = applicationContext;
+            _applicationContext = applicationContext;            
         }
         
         /// <summary>
