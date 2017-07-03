@@ -100,6 +100,8 @@
     <key alias="styleShow">显示样式</key>
     <key alias="tableInsert">插入表格</key>
     <key alias="generateModels">生成模型</key>
+    <key alias="undo">撤销</key>
+    <key alias="redo">重做</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">要更改所选节点的文档类型，先在列表中选择合适的文档类型。</key>
@@ -151,8 +153,8 @@
     <key alias="otherElements">属性</key>
     <key alias="parentNotPublished">该文档不可见，因为其上级 '%0%' 未发布。</key>
     <key alias="parentNotPublishedAnomaly">该文档已发布，但是没有更新至缓存（内部错误）</key>
-    <key alias="getUrlException">Could not get the url</key>
-    <key alias="routeError">This document is published but its url would collide with content %0%</key>
+    <key alias="getUrlException">无法获取网址</key>
+    <key alias="routeError">此文档已发布，但其url将与内容相冲突 %0%</key>
     <key alias="publish">发布</key>
     <key alias="publishStatus">发布状态</key>
     <key alias="releaseDate">发布于</key>
@@ -162,7 +164,7 @@
     <key alias="sortHelp">拖拽项目或单击列头即可排序，可以按住Shift多选。</key>
     <key alias="statistics">统计</key>
     <key alias="titleOptional">标题（可选）</key>
-    <key alias="altTextOptional">Alternative text (optional)</key>
+    <key alias="altTextOptional">备选 (可选)</key>
     <key alias="type">类型</key>
     <key alias="unPublish">取消发布</key>
     <key alias="updateDate">最近编辑</key>
@@ -175,6 +177,8 @@
     <key alias="target" version="7.0">目标</key>
     <key alias="scheduledPublishServerTime">这将转换到服务器上的以下时间:</key>
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">这是什么意思？</a>]]></key>
+    <key alias="addTextBox">添加其他文本框</key>
+    <key alias="removeTextBox">删除此文本框</key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">点击上传</key>
@@ -197,6 +201,13 @@
     <key alias="documentTypeWithoutTemplate">没有模板的文档类型</key>
     <key alias="newFolder">新建文件夹</key>
     <key alias="newDataType">新数据类型</key>
+    <key alias="newJavascriptFile">新建 javascript 文件</key>
+    <key alias="newEmptyPartialView">新建空分部视图</key>
+    <key alias="newPartialViewMacro">新的分部视图宏</key>
+    <key alias="newPartialViewFromSnippet">从代码段中新建分部视图</key>
+    <key alias="newEmptyPartialViewMacro">新的空分部视图宏</key>
+    <key alias="newPartialViewMacroFromSnippet">从代码段中新建分部视图宏</key>
+    <key alias="newPartialViewMacroNoMacro">新的分部视图宏 (不带宏)</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">浏览您的网站</key>
@@ -313,6 +324,9 @@
     <key alias="unLinkYour">取消链接您的</key>
     <key alias="account">帐户</key>
     <key alias="selectEditor">选择编辑器</key>
+    <key alias="account">帐号</key>
+    <key alias="selectEditor">选择编辑器</key>
+    <key alias="selectSnippet">选择代码段</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
@@ -338,6 +352,7 @@
     <key alias="filter">输入过滤词...</key>
     <key alias="enterTags">键入添加tags (在每个tag之后按 enter)...</key>
     <key alias="email">输入您的电子邮件</key>
+    <key alias="usernameHint">您的用户名通常是您的电子邮件</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">允许在根目录</key>
@@ -369,6 +384,13 @@
     <key alias="rteRelatedStylesheets">关联的样式表</key>
     <key alias="rteShowLabel">显示标签</key>
     <key alias="rteWidthAndHeight">宽和高</key>
+    <key alias="allPropTypes">所有属性类型 &amp; 属性数据</key>
+    <key alias="willBeDeleted">使用此数据类型将被永久删除, 请确认您还要删除这些</key>
+    <key alias="yesDelete">是, 删除</key>
+    <key alias="andAllRelated">以及使用此数据类型的所有属性类型 &amp; 属性数据</key>
+    <key alias="selectFolder">选择要移动的文件夹</key>
+    <key alias="inTheTree">在树结构下面</key>
+    <key alias="wasMoved">被移到下面</key>
   </area>
   <area alias="errorHandling">
     <key alias="errorButDataWasSaved">数据已保存，但是发布前您需要修正一些错误：</key>
@@ -427,6 +449,7 @@
     <key alias="closewindow">关闭窗口</key>
     <key alias="comment">备注</key>
     <key alias="confirm">确认</key>
+    <key alias="constrain">约束</key>
     <key alias="constrainProportions">强制属性</key>
     <key alias="continue">继续</key>
     <key alias="copy">复制</key>
@@ -438,6 +461,7 @@
     <key alias="deleted">已删除</key>
     <key alias="deleting">正在删除…</key>
     <key alias="design">设计</key>
+    <key alias="dictionary">字典</key>
     <key alias="dimensions">规格</key>
     <key alias="down">下</key>
     <key alias="download">下载</key>
@@ -447,6 +471,7 @@
     <key alias="email">邮箱</key>
     <key alias="error">错误</key>
     <key alias="findDocument">查找文档</key>
+    <key alias="first">第一</key>
     <key alias="height">高</key>
     <key alias="help">帮助</key>
     <key alias="icon">图标</key>
@@ -457,6 +482,7 @@
     <key alias="invalid">无效</key>
     <key alias="justify">对齐</key>
     <key alias="language">语言</key>
+    <key alias="last">最后</key>
     <key alias="layout">布局</key>
     <key alias="loading">加载中</key>
     <key alias="locked">锁定</key>
@@ -484,12 +510,15 @@
     <key alias="reciept">接收数据邮箱</key>
     <key alias="recycleBin">回收站</key>
     <key alias="remaining">保持状态中</key>
+    <key alias="remove">移除</key>
     <key alias="rename">重命名</key>
     <key alias="renew">更新</key>
     <key alias="required" version="7.0">必填</key>
     <key alias="retry">重试</key>
     <key alias="rights">权限</key>
     <key alias="search">搜索</key>
+    <key alias="searchNoResult">对不起, 我们找不到你要找的东西。</key>
+    <key alias="noItemsInList">未添加任何项目</key>
     <key alias="server">服务器</key>
     <key alias="show">显示</key>
     <key alias="showPageOnSend">在发送时预览</key>
@@ -550,6 +579,16 @@
 
       <key alias="toggleListView">切换列表视图</key>
       <key alias="toggleAllowAsRoot">切换允许作为根</key>
+
+      <key alias="commentLine">注释/取消注释行</key>
+      <key alias="removeLine">移除行</key>
+      <key alias="copyLineUp">向上复制行</key>
+      <key alias="copyLineDown">向下复制行</key>
+      <key alias="moveLineUp">向上移动行</key>
+      <key alias="moveLineDown">向下移动线条</key>
+    
+      <key alias="generalHeader">一般</key>
+      <key alias="editorHeader">编辑</key>
   </area>
 
   <area alias="graphicheadline">
@@ -782,7 +821,40 @@
     <key alias="chooseLocalPackageText"><![CDATA[
       从本机安装扩展包，可以点击“浏览”按钮<br />
       选择 ".umb" 或者 ".zip" 文件
-    ]]></key>
+      ]]></key>
+    <key alias="dropHere">拖入上传</key>
+    <key alias="orClickHereToUpload">或单击此处选择文件</key>
+    <key alias="uploadPackage">上传包</key>
+    <key alias="localPackageDescription">通过从计算机中选择一个本地包来安装它。仅从您知道和信任的来源安装软件包</key>
+    <key alias="uploadAnother">上传另一包</key>
+    <key alias="cancelAndUploadAnother">取消并上载另一个包</key>
+    <key alias="packageLicense">许可证</key>
+    <key alias="accept">我接受</key>
+    <key alias="termsOfUse">使用条款</key>
+    <key alias="packageInstall">安装包</key>
+    <key alias="installFinish">完成</key>
+    <key alias="installedPackages">已安装的软件包</key>
+    <key alias="noPackages">您没有安装任何软件包</key>
+    <key alias="noPackagesDescription"><![CDATA[您没有安装任何软件包。通过从计算机中选择它来安装本地包, 或者使用屏幕右上方的 <strong> "程序包" </strong> 图标浏览可用的包]]></key>
+    <key alias="packageSearch">搜索包</key>
+    <key alias="packageSearchResults">结果为</key>
+    <key alias="packageNoResults">我们找不到任何东西</key>
+    <key alias="packageNoResultsDescription">请尝试搜索其他包或浏览类别</key>
+    <key alias="packagesPopular">流行</key>
+    <key alias="packagesNew">新版本</key>
+    <key alias="packageHas">有</key>
+    <key alias="packageKarmaPoints">karma 点</key>
+    <key alias="packageInfo">信息</key>
+    <key alias="packageOwner">所有者</key>
+    <key alias="packageContrib">贡献者</key>
+    <key alias="packageCreated">创建</key>
+    <key alias="packageCurrentVersion">当前版本</key>
+    <key alias="packageNetVersion">.NET 版本</key>
+    <key alias="packageDownloads">下载</key>
+    <key alias="packageLikes">喜欢</key>
+    <key alias="packageCompatibility">兼容性</key>
+    <key alias="packageCompatibilityDescription">此软件包与社区成员报告的 Umbraco 的以下版本兼容。报告100% 以下版本不能保证完全兼容</key>
+    <key alias="packageExternalSources">外部来源</key>
     <key alias="packageAuthor">作者</key>
     <key alias="packageDemonstration">演示</key>
     <key alias="packageDocumentation">文档</key>
@@ -818,6 +890,7 @@
     <key alias="installStateRestarting">重启中, 请稍候...</key>
     <key alias="installStateComplete">所有完成后, 您的浏览器将立即刷新, 请稍候...</key>
     <key alias="installStateCompleted">请单击 "完成" 以完成安装和重新加载页面。</key>
+    <key alias="installStateUploading">Uploading package...</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">带格式粘贴（不推荐）</key>
@@ -885,6 +958,10 @@
   </area>
   <area alias="imagecropper">
     <key alias="reset">Reset</key>
+    <key alias="defineCrop">Define crop</key>
+    <key alias="defineCropDescription">Give the crop an alias and its default width and height</key>
+    <key alias="saveCrop">Save crop</key>
+    <key alias="addCrop">Add new crop</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">当前版本</key>
@@ -1025,17 +1102,113 @@
     <key alias="preview">预览</key>
     <key alias="styles">样式</key>
   </area>
+  
   <area alias="template">
     <key alias="edittemplate">编辑模板</key>
+
+    <key alias="insertSections">部分</key>
     <key alias="insertContentArea">插入内容区</key>
     <key alias="insertContentAreaPlaceHolder">插入内容占位符</key>
+
+    <key alias="insert">插入</key>
+    <key alias="insertDesc">选择要插入到模板中的内容</key>
+
     <key alias="insertDictionaryItem">插入字典项</key>
+    <key alias="insertDictionaryItemDesc">字典项是可翻译的文本部分的占位符, 这使得为多语言网站创建设计变得容易。</key>
+    
     <key alias="insertMacro">插入宏</key>
+    <key alias="insertMacroDesc">
+      宏是一个可配置的组件, 对于
+      设计的可重用部分, 在这里您需要提供参数的选项,
+      如画廊、表格和列表。
+    </key>
+
     <key alias="insertPageField">插入页字段</key>
+    <key alias="insertPageFieldDesc">显示当前页中指定字段的值, 其中有用于修改值或回退到替代值的选项。</key>
+    
+    <key alias="insertPartialView">分部视图</key>
+    <key alias="insertPartialViewDesc">
+     分部视图是可以在另一个模板内呈现的单独的模板文件, 
+     它对于重用标记或将复杂的模板分离到单独的文件中非常重要。
+    </key>
+    
     <key alias="mastertemplate">母版</key>
-    <key alias="quickGuide">模板标签快速指南</key>
+    <key alias="noMastertemplate">无主模板</key>
+    <key alias="noMaster">无主</key>
+
+    <key alias="renderBody">呈现子模板</key>
+    <key alias="renderBodyDesc">
+      <![CDATA[
+     呈现子模板的内容, 通过插入
+     <code>@RenderBody()</code>.
+      ]]>
+    </key>
+    
+    
+    <key alias="defineSection">定义命名节</key>
+    <key alias="defineSectionDesc">
+      <![CDATA[
+         将模板的一部分定义为命名节, 将其包装在
+          <code>@section { ... }</code>. 这可以呈现在
+         此模板的父级的特定区域, 请使用 <code>@RenderSection</code>.
+      ]]>
+    </key>
+
+    <key alias="renderSection">呈现命名节</key>
+    <key alias="renderSectionDesc">
+      <![CDATA[
+      呈现子模板的命名区域，请使用<code>@RenderSection(name)</code>.
+      这将呈现子模板的一个区域, 它被包装在相应的 <code> @section [名称] {...} </code> 定义中.
+      ]]>
+    </key>
+
+    <key alias="sectionName">节名称</key>
+    <key alias="sectionMandatory">节是必需的</key>
+    <key alias="sectionMandatoryDesc">
+      如果强制, 子模板必须包含 <code> @section </code> 定义, 否则将显示错误。
+    </key>
+    
+    
+    <key alias="queryBuilder">查询生成器</key>
+    <key alias="buildQuery">生成查询</key>
+    <key alias="itemsReturned">返回的项, 在</key>
+
+    <key alias="iWant">我要</key>   
+    <key alias="allContent">所有内容</key>
+    <key alias="contentOfType">类型 &quot;%0%&quot;的内容</key>
+    <key alias="from">from</key>
+    <key alias="websiteRoot">我的网站</key>
+    <key alias="where">where</key>
+    <key alias="and">and</key>
+    
+    <key alias="is">is</key>
+    <key alias="isNot">is not</key>
+    <key alias="before">before</key>
+    <key alias="beforeIncDate">before (包含选定日期)</key>
+    <key alias="after">after</key>
+    <key alias="afterIncDate">after (包含选定日期)</key>
+    <key alias="equals">equals</key>
+    <key alias="doesNotEqual">does not equal</key>
+    <key alias="contains">contains</key>
+    <key alias="doesNotContain">does not contain</key>
+    <key alias="greaterThan">greater than</key>
+    <key alias="greaterThanEqual">greater than or equal to</key>
+    <key alias="lessThan">less than</key>
+    <key alias="lessThanEqual">less than or equal to</key>
+
+    <key alias="id">Id</key>
+    <key alias="name">Name</key>
+    <key alias="createdDate">Created Date</key>
+    <key alias="lastUpdatedDate">Last Updated Date</key>
+
+    <key alias="orderBy">order by</key>
+    <key alias="ascending">ascending</key>
+    <key alias="descending">descending</key>    
+    
     <key alias="template">模板</key>
+    
   </area>
+  
   <area alias="grid">
     <key alias="insertControl">选择内容类别</key>
     <key alias="chooseLayout">选择一项布局</key>
@@ -1143,27 +1316,39 @@
   </area>
 
   <area alias="templateEditor">
+    <key alias="addFallbackField">添加后备字段</key>
+    <key alias="fallbackField">后备字段</key>
+    <key alias="addDefaultValue">添加默认值</key>
+    <key alias="defaultValue">默认值</key>
     <key alias="alternativeField">替代字段</key>
     <key alias="alternativeText">替代文本</key>
     <key alias="casing">大小写</key>
+    <key alias="encoding">编码</key>
     <key alias="chooseField">选取字段</key>
     <key alias="convertLineBreaks">转换换行符</key>
+    <key alias="convertLineBreaksDescription">是, 转换换行符</key>
     <key alias="convertLineBreaksHelp">将换行符转化为&amp;lt;br&amp;gt;</key>
     <key alias="customFields">自定义字段</key>
     <key alias="dateOnly">是，仅日期</key>
-    <key alias="encoding">编码</key>
+    <key alias="formatAndEncoding">格式和编码</key>
     <key alias="formatAsDate">格式化时间</key>
+    <key alias="formatAsDateDescr">根据活动区域性将该值设置为日期或日期。</key>
     <key alias="htmlEncode">HTML编码</key>
     <key alias="htmlEncodeHelp">将替换HTML中的特殊字符</key>
     <key alias="insertedAfter">将在字段值后插入</key>
     <key alias="insertedBefore">将在字段值前插入</key>
     <key alias="lowercase">小写</key>
+    <key alias="modifyOutput">修改输出</key>
     <key alias="none">无</key>
+    <key alias="outputSample">输出示例</key>
     <key alias="postContent">字段后插入</key>
     <key alias="preContent">字段前插入</key>
     <key alias="recursive">递归</key>
+    <key alias="recursiveDescr">是, 让它递归</key>
     <key alias="removeParagraph">移除段落符号</key>
-    <key alias="removeParagraphHelp">将移除&amp;lt;P&amp;gt;标签</key>
+    <key alias="removeParagraphDescription">是, 删除段落标记</key>
+    <key alias="removeParagraphHelp">将删除文本开头和结尾的任何段落标记</key>
+    <key alias="separator">分隔符</key>
     <key alias="standardFields">标准字段</key>
     <key alias="uppercase">大写</key>
     <key alias="urlEncode">URL编码</key>
@@ -1242,6 +1427,8 @@
     <key alias="relationTypes">关系类型</key>
     <key alias="packager">扩展包</key>
     <key alias="packages">扩展包</key>
+	<key alias="partialViews">分部视图</key>
+    <key alias="partialViewMacros">分部视图宏文件</key>
     <key alias="python">Python文件</key>
     <key alias="repositories">从在线程序库安装</key>
     <key alias="runway">安装Runway</key>
@@ -1252,8 +1439,6 @@
     <key alias="templates">模板</key>
     <key alias="xslt">XSLT文件</key>
     <key alias="analytics">分析</key>
-	<key alias="partialViews">分部视图</key>
-    <key alias="partialViewMacros">分部视图宏文件</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">有可用更新</key>
@@ -1307,12 +1492,20 @@
     <key alias="sessionExpires" version="7.0">会话过期于</key>
   </area>
   <area alias="validation">
-      <key alias="validation">验证</key>
-      <key alias="validateAsEmail">验证为电子邮件</key>
-      <key alias="validateAsNumber">验证为数字</key>
-      <key alias="validateAsUrl">验证为 url</key>
-      <key alias="enterCustomValidation">...或输入自定义验证</key>
-      <key alias="fieldIsMandatory">字段是强制性的</key>
+    <key alias="validation">验证</key>
+    <key alias="validateAsEmail">验证为电子邮件</key>
+    <key alias="validateAsNumber">验证为数字</key>
+    <key alias="validateAsUrl">验证为 url</key>
+    <key alias="enterCustomValidation">...或输入自定义验证</key>
+    <key alias="fieldIsMandatory">字段是强制性的</key>
+    <key alias="validationRegExp">输入正则表达式</key>
+    <key alias="minCount">您需要添加至少</key>
+    <key alias="maxCount">你只能有</key>
+    <key alias="items">项</key>
+    <key alias="itemsSelected">选定的项</key>
+    <key alias="invalidDate">无效日期</key>
+    <key alias="invalidNumber">不是一个数字</key>
+    <key alias="invalidEmail">无效的电子邮件</key>
   </area>
   <area alias="healthcheck">
 	  <!-- The following keys get these tokens passed in:
@@ -1433,5 +1626,8 @@
     <key alias="disableError">禁用 url 跟踪程序时出错, 可以在日志文件中找到更多信息。</key>
     <key alias="enabledConfirm">现在已启用 url 跟踪程序。</key>
     <key alias="enableError">启用 url 跟踪程序时出错, 可以在日志文件中找到更多信息。</key>
+  </area>
+  <area alias="emptyStates">
+    <key alias="emptyDictionaryTree">没有可供选择的词典项目</key>
   </area>
 </language>
