@@ -7,69 +7,69 @@
  * Used by the users section to get users and send requests to create, invite, delete, etc. users.
  */
 (function () {
-  'use strict';
+    'use strict';
 
-  function userGroupsResource($http, umbRequestHelper, $q, umbDataFormatter) {
-    
-    function getUserGroupScaffold() {
+    function userGroupsResource($http, umbRequestHelper, $q, umbDataFormatter) {
 
-      return umbRequestHelper.resourcePromise(
-        $http.get(
-          umbRequestHelper.getApiUrl(
-            "userGroupsApiBaseUrl",
-            "GetEmptyUserGroup")),
-        'Failed to get the user group scaffold');
+        function getUserGroupScaffold() {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "userGroupsApiBaseUrl",
+                        "GetEmptyUserGroup")),
+                'Failed to get the user group scaffold');
+        }
+
+        function saveUserGroup(userGroup, isNew) {
+            if (!userGroup) {
+                throw "userGroup not specified";
+            }
+
+            //need to convert the user data into the correctly formatted save data - it is *not* the same and we don't want to over-post
+            var formattedSaveData = umbDataFormatter.formatUserGroupPostData(userGroup, "save" + (isNew ? "New" : ""));
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "userGroupsApiBaseUrl",
+                        "PostSaveUserGroup"),
+                    formattedSaveData),
+                "Failed to save user group");
+        }
+
+        function getUserGroup(id) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "userGroupsApiBaseUrl",
+                        "GetUserGroup",
+                        { id: id })),
+                "Failed to retrieve data for user group " + id);
+
+        }
+
+        function getUserGroups() {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "userGroupsApiBaseUrl",
+                        "GetUserGroups")),
+                "Failed to retrieve user groups");
+        }
+
+        var resource = {
+            saveUserGroup: saveUserGroup,
+            getUserGroup: getUserGroup,
+            getUserGroups: getUserGroups,
+            getUserGroupScaffold: getUserGroupScaffold
+        };
+
+        return resource;
+
     }
-    
-    function saveUserGroup(userGroup, isNew) {
-      if (!userGroup) {
-        throw "userGroup not specified";
-      }
 
-      //need to convert the user data into the correctly formatted save data - it is *not* the same and we don't want to over-post
-      var formattedSaveData = umbDataFormatter.formatUserGroupPostData(userGroup, "save" + (isNew ? "New" : ""));
-
-      return umbRequestHelper.resourcePromise(
-        $http.post(
-          umbRequestHelper.getApiUrl(
-            "userGroupsApiBaseUrl",
-            "PostSaveUserGroup"),
-          formattedSaveData),
-        "Failed to save user group");
-    }    
-
-    function getUserGroup(id) {
-
-      return umbRequestHelper.resourcePromise(
-        $http.get(
-          umbRequestHelper.getApiUrl(
-            "userGroupsApiBaseUrl",
-            "GetUserGroup",
-            { id: id })),
-        "Failed to retrieve data for user group " + id);
-      
-    }
-
-    function getUserGroups() {
-      return umbRequestHelper.resourcePromise(
-        $http.get(
-          umbRequestHelper.getApiUrl(
-            "userGroupsApiBaseUrl",
-            "GetUserGroups")),
-        "Failed to retrieve user groups");
-    }
-
-    var resource = {
-      saveUserGroup: saveUserGroup,
-      getUserGroup: getUserGroup,
-      getUserGroups: getUserGroups,
-      getUserGroupScaffold: getUserGroupScaffold
-    };
-
-    return resource;
-
-  }
-
-  angular.module('umbraco.resources').factory('userGroupsResource', userGroupsResource);
+    angular.module('umbraco.resources').factory('userGroupsResource', userGroupsResource);
 
 })();
