@@ -198,13 +198,8 @@ namespace Umbraco.Web.Editors
         {
             long pageIndex = pageNumber - 1;
             long total;
-            var result = Services.UserService.GetAll(pageIndex, pageSize, out total, orderBy, orderDirection, null, userGroups, filter);
-
-            if (total == 0)
-            {
-                return new PagedUserResult(0, 0, 0);
-            }
-
+            var result = Services.UserService.GetAll(pageIndex, pageSize, out total, orderBy, orderDirection, userStates, userGroups, filter);
+            
             var paged = new PagedUserResult(total, pageNumber, pageSize)
             {
                 Items = Mapper.Map<IEnumerable<UserBasic>>(result),

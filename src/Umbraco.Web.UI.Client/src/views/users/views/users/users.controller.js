@@ -313,7 +313,42 @@
             return name;
         }
 
-        function setUserStatesFilter(value) {
+        function setUserStatesFilter(userState) {
+            
+            if (!vm.usersOptions.userStates) {
+                vm.usersOptions.userStates = [];
+            }
+
+            //If the selection is "ALL" then we need to unselect everything else since this is an 'odd' filter
+            if (userState.key === "All") {
+                angular.forEach(vm.userStatesFilter, function(i) {
+                    i.selected = false;
+                });
+                //we can't unselect All
+                userState.selected = true;
+                //reset the selection passed to the server
+                vm.usersOptions.userStates = [];
+            }
+            else {
+                angular.forEach(vm.userStatesFilter, function (i) {
+                    if (i.key === "All") {
+                        i.selected = false;
+                    }
+                });
+                var indexOfAll = vm.usersOptions.userStates.indexOf("All");
+                if (indexOfAll >= 0) {
+                    vm.usersOptions.userStates.splice(indexOfAll, 1);    
+                }
+            }
+
+            if (userState.selected) {
+                vm.usersOptions.userStates.push(userState.key);
+            }
+            else {
+                var index = vm.usersOptions.userStates.indexOf(userState.key);
+                vm.usersOptions.userStates.splice(index, 1);
+            }
+
             getUsers();
         }
 

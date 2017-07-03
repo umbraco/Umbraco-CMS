@@ -79,15 +79,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IDictionary<UserState, int> GetUserStates()
         {
-            var sql = @"SELECT 'CountOfAll' AS name, COUNT(id) AS num FROM umbracoUser 
+            var sql = @"SELECT '1CountOfAll' AS colName, COUNT(id) AS num FROM umbracoUser 
 UNION
-SELECT 'CountOfActive' AS name, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL 
+SELECT '2CountOfActive' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL 
 UNION
-SELECT 'CountOfDisabled' AS name, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 1
+SELECT '3CountOfDisabled' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 1
 UNION
-SELECT 'CountOfLockedOut' AS name, COUNT(id) AS num FROM umbracoUser WHERE userNoConsole = 1
+SELECT '4CountOfLockedOut' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userNoConsole = 1
 UNION
-SELECT 'CountOfInvited' AS name, COUNT(id) AS num FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL";
+SELECT '5CountOfInvited' AS colName, COUNT(id) AS num FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL
+ORDER BY colName";
 
             var result = Database.Fetch<dynamic>(sql);
             
@@ -513,7 +514,7 @@ SELECT 'CountOfInvited' AS name, COUNT(id) AS num FROM umbracoUser WHERE lastLog
 
 
             Sql filterSql = null;
-            if (filter != null || (userGroups != null && userGroups.Length > 0))
+            if (filter != null || (userGroups != null && userGroups.Length > 0) || (userState != null && userState.Length > 0 && userState.Contains(UserState.All) == false))
                 filterSql = new Sql();
 
             if (filter != null)
@@ -532,9 +533,32 @@ SELECT 'CountOfInvited' AS name, COUNT(id) AS num FROM umbracoUser WHERE lastLog
 		            WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
                 filterSql.Append(subQuery, new {userGroups=  userGroups});
             }
+            if (userState != null && userState.Length > 0)
+            {
+                //the "ALL" state doesn't require any filtering so we ignore that, if it exists in the list we don't do any filtering
+                if (userState.Contains(UserState.All) == false)
+                {
+                    if (userState.Contains(UserState.Active))
+                    {
+                        filterSql.Append("AND (userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL)");
+                    }
+                    if (userState.Contains(UserState.Disabled))
+                    {
+                        filterSql.Append("AND (userDisabled = 1)");
+                    }
+                    if (userState.Contains(UserState.LockedOut))
+                    {
+                        filterSql.Append("AND (userNoConsole = 1)");
+                    }
+                    if (userState.Contains(UserState.Invited))
+                    {
+                        filterSql.Append("AND (lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL)");
+                    }
+                }
+            }
 
             // Get base query for returning IDs
-            var sqlBaseIds = GetBaseQuery("id");
+                var sqlBaseIds = GetBaseQuery("id");
             
             if (query == null) query = new Query<IUser>();
             var translatorIds = new SqlTranslator<IUser>(sqlBaseIds, query);
