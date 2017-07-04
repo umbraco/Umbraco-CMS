@@ -7,10 +7,12 @@ namespace Umbraco.Web.Models.ContentEditing
     /// <summary>
     /// The user group permissions assigned to a content node
     /// </summary>
-    [DataContract(Name = "contentPermission", Namespace = "")]
+    /// <remarks>
+    /// The underlying <see cref="EntityBasic"/> data such as Name, etc... is that of the User Group
+    /// </remarks>
+    [DataContract(Name = "userGroupPermissions", Namespace = "")]
     public class AssignedUserGroupPermissions : EntityBasic
     {
-
         /// <summary>
         /// The assigned permissions for the user group organized by permission group name
         /// </summary>

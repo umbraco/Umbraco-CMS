@@ -91,7 +91,7 @@
                                 <div class="test-group-title">Default permissions</div>
                                 <div class="test-group-content block-form">
                                     <umb-control-group
-                                        ng-repeat="(category, permissions) in vm.userGroup.permissions"
+                                        ng-repeat="(category, permissions) in vm.userGroup.defaultPermissions"
                                         label="{{ category }}">
                                         <umb-permission
                                             ng-repeat="permission in permissions"
@@ -109,13 +109,13 @@
                                     <umb-control-group label="Nodes" description="Donec quis lacinia ligula. Suspendisse ultrices risus ante">
                                         
                                         <umb-node-preview
-                                            ng-repeat="node in vm.userGroup.nodes"
+                                            ng-repeat="node in vm.userGroup.assignedPermissions"
                                             style="max-width: 100%;"
                                             icon="node.icon"
                                             name="node.name"
                                             permissions="node.allowedPermissions"
                                             allow-remove="true"
-                                            on-remove="vm.removeSelectedItem($index, vm.userGroup.nodes)">
+                                            on-remove="vm.removeSelectedItem($index, vm.userGroup.assignedPermissions)">
                                         </umb-node-preview>
 
                                         <a href=""

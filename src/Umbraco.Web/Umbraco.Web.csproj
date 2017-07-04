@@ -368,6 +368,7 @@
     <Compile Include="HealthCheck\StatusResultType.cs" />
     <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
+    <Compile Include="Models\ContentEditing\AssignedContentPermissions.cs" />
     <Compile Include="Models\ContentEditing\AssignedUserGroupPermissions.cs" />
     <Compile Include="Models\ContentEditing\ContentRedirectUrl.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
@@ -410,7 +411,7 @@
     <Compile Include="Models\Mapping\ContentTypeUdiResolver.cs" />
     <Compile Include="Models\Mapping\EntityModelMapperExtensions.cs" />
     <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
-    <Compile Include="Models\Mapping\PermissionsResolver.cs" />
+    <Compile Include="Models\Mapping\UserGroupDefaultPermissionsResolver.cs" />
     <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />
     <Compile Include="Models\RelatedLink.cs" />
     <Compile Include="Models\Mapping\TemplateModelMapper.cs" />

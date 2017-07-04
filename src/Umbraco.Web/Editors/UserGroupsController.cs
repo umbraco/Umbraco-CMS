@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using AutoMapper;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -61,7 +62,34 @@ namespace Umbraco.Web.Editors
             if (found == null)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
-            return Mapper.Map<UserGroupDisplay>(found);
+            var allContentPermissions = Services.UserService.GetPermissions(found, true)
+                .ToDictionary(x => x.EntityId, x => x);
+
+            var display =  Mapper.Map<UserGroupDisplay>(found);
+
+            var contentEntities = Services.EntityService.GetAll(UmbracoObjectTypes.Document, allContentPermissions.Keys.ToArray());
+            var allAssignedPermissions = new List<AssignedContentPermissions>();
+            foreach (var entity in contentEntities)
+            {
+                var contentPermissions = allContentPermissions[entity.Id];
+
+                var assignedContentPermissions = Mapper.Map<AssignedContentPermissions>(entity);
+                assignedContentPermissions.AssignedPermissions = AssignedUserGroupPermissions.ClonePermissions(display.DefaultPermissions);
+
+                //since there is custom permissions assigned to this node for this group, we need to clear all of the default permissions
+                //and we'll re-check it if it's one of the explicitly assigned ones
+                foreach (var permission in assignedContentPermissions.AssignedPermissions.SelectMany(x => x.Value))
+                {
+                    permission.Checked = false;
+                    permission.Checked = contentPermissions.AssignedPermissions.Contains(permission.PermissionCode, StringComparer.InvariantCulture);
+                }
+
+                allAssignedPermissions.Add(assignedContentPermissions);
+            }
+
+            display.AssignedPermissions = allAssignedPermissions;
+
+            return display;
         }
     }
 }

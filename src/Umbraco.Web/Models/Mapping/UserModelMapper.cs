@@ -143,7 +143,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Id, opt => opt.MapFrom(group => group.Id))
                 .ForMember(detail => detail.ParentId, opt => opt.UseValue(-1))
                 .ForMember(detail => detail.Path, opt => opt.MapFrom(userGroup => "-1," + userGroup.Id))
-                .ForMember(detail => detail.DefaultPermissions, expression => expression.ResolveUsing(new PermissionsResolver(applicationContext.Services.TextService)))
+                .ForMember(detail => detail.DefaultPermissions, expression => expression.ResolveUsing(new UserGroupDefaultPermissionsResolver(applicationContext.Services.TextService)))
                 //these will be manually mapped and by default they are null
                 .ForMember(detail => detail.AssignedPermissions, opt => opt.Ignore())
                 .AfterMap((group, display) =>
@@ -153,6 +153,20 @@ namespace Umbraco.Web.Models.Mapping
                         display.Icon = "icon-users";
                     }
                 });
+
+            config.CreateMap<UmbracoEntity, AssignedContentPermissions>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(x => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(x.NodeObjectTypeId), x.Key)))
+                .ForMember(basic => basic.Icon, expression => expression.MapFrom(entity => entity.ContentTypeIcon))
+                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
+                .ForMember(x => x.Alias, expression => expression.Ignore())
+                .AfterMap((entity, basic) =>
+                {
+                    if (entity.NodeObjectTypeId == Constants.ObjectTypes.MemberGuid && basic.Icon.IsNullOrWhiteSpace())
+                    {
+                        basic.Icon = "icon-user";
+                    }
+                });
+
             config.CreateMap<IUserGroup, UserGroupDisplay>()
                 .ForMember(detail => detail.StartContentId, opt => opt.Ignore())
                 .ForMember(detail => detail.StartMediaId, opt => opt.Ignore())
@@ -164,7 +178,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Path, opt => opt.MapFrom(userGroup => "-1," + userGroup.Id))
                 .ForMember(detail => detail.AdditionalData, opt => opt.Ignore())
                 .ForMember(detail => detail.Users, opt => opt.Ignore())
-                .ForMember(detail => detail.DefaultPermissions, expression => expression.ResolveUsing(new PermissionsResolver(applicationContext.Services.TextService)))
+                .ForMember(detail => detail.DefaultPermissions, expression => expression.ResolveUsing(new UserGroupDefaultPermissionsResolver(applicationContext.Services.TextService)))
                 .AfterMap((group, display) =>
                 {
                     MapUserGroupBasic(applicationContext.Services, group, display);

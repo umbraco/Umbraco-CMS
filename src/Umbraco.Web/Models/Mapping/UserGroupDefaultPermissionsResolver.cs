@@ -15,11 +15,11 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Converts an IUserGroup instance into a dictionary of permissions by category
     /// </summary>
-    internal class PermissionsResolver : ValueResolver<IUserGroup, IDictionary<string, IEnumerable<Permission>>>
+    internal class UserGroupDefaultPermissionsResolver : ValueResolver<IUserGroup, IDictionary<string, IEnumerable<Permission>>>
     {
         private readonly ILocalizedTextService _textService;
 
-        public PermissionsResolver(ILocalizedTextService textService)
+        public UserGroupDefaultPermissionsResolver(ILocalizedTextService textService)
         {
             if (textService == null) throw new ArgumentNullException("textService");
             _textService = textService;

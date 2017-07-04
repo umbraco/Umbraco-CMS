@@ -39,7 +39,8 @@
             } else {
                 // get user group
                userGroupsResource.getUserGroup($routeParams.id).then(function (userGroup) {
-                    vm.userGroup = userGroup;
+                   vm.userGroup = userGroup;
+                   formatGranularPermissionSelection();
                     setSectionIcon(vm.userGroup.sections);
                     makeBreadcrumbs();
                     vm.loading = false;
@@ -158,6 +159,28 @@
             };
         }
 
+        /**
+         * The granular permissions structure gets returned from the server in the dictionary format with each key being the permission category
+         * however the list to display the permissions isn't via the dictionary way so we need to format it
+         */
+        function formatGranularPermissionSelection() {
+            angular.forEach(vm.userGroup.assignedPermissions, function (node) {
+                formatGranularPermissionSelectionForNode(node);
+            });
+        }
+
+        function formatGranularPermissionSelectionForNode(node) {
+            //the dictionary is assigned via node.permissions we will reformat to node.allowedPermissions
+            node.allowedPermissions = [];
+            angular.forEach(node.permissions, function (permissions, key) {
+                angular.forEach(permissions, function (p) {
+                    if (p.checked) {
+                        node.allowedPermissions.push(p);
+                    }
+                });
+            });
+        }
+
         function openGranularPermissionsPicker() {
             vm.contentPicker = {
                 title: "Select node",
@@ -166,7 +189,13 @@
                 show: true,
                 submit: function (model) {
                     if (model.selection) {
-                        setPermissionsForNode(model.selection[0]);
+                        var node = model.selection[0];
+                        //check if this is already in our selection
+                        var found = _.find(vm.userGroup.assignedPermissions, function(i) {
+                            return i.id === node.id; 
+                        });
+                        node = found ? found : node;
+                        setPermissionsForNode(node);
                     }
                 },
                 close: function (oldModel) {
@@ -177,6 +206,12 @@
         }
 
         function setPermissionsForNode(node) {
+
+            //clone the current defaults to pass to the model
+            if (!node.permissions) {
+                node.permissions = angular.copy(vm.userGroup.defaultPermissions);    
+            }
+
             vm.nodePermissions = {
                 title: "Set permissions for " + node.name,
                 view: "nodepermissions",
@@ -185,23 +220,20 @@
                 submit: function (model) {
 
                     if (model && model.node && model.node.permissions) {
-                        // clear allowed permissions before we make the list 
-                        // so we don't have deplicates
-                        node.allowedPermissions = [];
 
-                        // get list of checked permissions
-                        angular.forEach(model.node.permissions, function (permissionGroup) {
-                            angular.forEach(permissionGroup.permissions, function (permission) {
-                                if (permission.checked) {
-                                    node.allowedPermissions.push(permission);
-                                }
-                            });
-                        });
+                        formatGranularPermissionSelectionForNode(node);
 
-                        if (!vm.userGroup.nodes) {
-                            vm.userGroup.nodes = [];
+                        if (!vm.userGroup.assignedPermissions) {
+                            vm.userGroup.assignedPermissions = [];
                         }
-                        vm.userGroup.nodes.push(node);
+
+                        //check if this is already in our selection
+                        var found = _.find(vm.userGroup.assignedPermissions, function (i) {
+                            return i.id === node.id;
+                        });
+                        if (!found) {
+                            vm.userGroup.assignedPermissions.push(node);    
+                        }
                     }
 
                     // close node permisssions overlay
