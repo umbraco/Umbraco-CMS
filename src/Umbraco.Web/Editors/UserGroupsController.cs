@@ -26,7 +26,28 @@ namespace Umbraco.Web.Editors
         {
             if (userGroupSave == null) throw new ArgumentNullException("userGroupSave");
 
+            //save the group
             Services.UserService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());
+
+            //deal with permissions
+
+            //remove ones that have been removed
+            var existing = Services.UserService.GetPermissions(userGroupSave.PersistedUserGroup, true)
+                .ToDictionary(x => x.EntityId, x => x);
+            var toRemove = existing.Keys.Except(userGroupSave.AssignedPermissions.Select(x => x.Key));
+            foreach (var contentId in toRemove)
+            {
+                Services.UserService.RemoveUserGroupPermissions(userGroupSave.PersistedUserGroup.Id, contentId);
+            }
+
+            //update existing
+            foreach (var assignedPermission in userGroupSave.AssignedPermissions)
+            {
+                Services.UserService.ReplaceUserGroupPermissions(
+                    userGroupSave.PersistedUserGroup.Id, 
+                    assignedPermission.Value.Select(x => x[0]),
+                    assignedPermission.Key);
+            }
 
             var display = Mapper.Map<UserGroupDisplay>(userGroupSave.PersistedUserGroup);
 
@@ -61,33 +82,8 @@ namespace Umbraco.Web.Editors
             var found = Services.UserService.GetUserGroupById(id);
             if (found == null)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-
-            var allContentPermissions = Services.UserService.GetPermissions(found, true)
-                .ToDictionary(x => x.EntityId, x => x);
-
+            
             var display =  Mapper.Map<UserGroupDisplay>(found);
-
-            var contentEntities = Services.EntityService.GetAll(UmbracoObjectTypes.Document, allContentPermissions.Keys.ToArray());
-            var allAssignedPermissions = new List<AssignedContentPermissions>();
-            foreach (var entity in contentEntities)
-            {
-                var contentPermissions = allContentPermissions[entity.Id];
-
-                var assignedContentPermissions = Mapper.Map<AssignedContentPermissions>(entity);
-                assignedContentPermissions.AssignedPermissions = AssignedUserGroupPermissions.ClonePermissions(display.DefaultPermissions);
-
-                //since there is custom permissions assigned to this node for this group, we need to clear all of the default permissions
-                //and we'll re-check it if it's one of the explicitly assigned ones
-                foreach (var permission in assignedContentPermissions.AssignedPermissions.SelectMany(x => x.Value))
-                {
-                    permission.Checked = false;
-                    permission.Checked = contentPermissions.AssignedPermissions.Contains(permission.PermissionCode, StringComparer.InvariantCulture);
-                }
-
-                allAssignedPermissions.Add(assignedContentPermissions);
-            }
-
-            display.AssignedPermissions = allAssignedPermissions;
 
             return display;
         }

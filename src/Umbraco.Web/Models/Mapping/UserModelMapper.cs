@@ -159,6 +159,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(basic => basic.Icon, expression => expression.MapFrom(entity => entity.ContentTypeIcon))
                 .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(x => x.AssignedPermissions, expression => expression.Ignore())
                 .AfterMap((entity, basic) =>
                 {
                     if (entity.NodeObjectTypeId == Constants.ObjectTypes.MemberGuid && basic.Icon.IsNullOrWhiteSpace())
@@ -179,6 +180,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.AdditionalData, opt => opt.Ignore())
                 .ForMember(detail => detail.Users, opt => opt.Ignore())
                 .ForMember(detail => detail.DefaultPermissions, expression => expression.ResolveUsing(new UserGroupDefaultPermissionsResolver(applicationContext.Services.TextService)))
+                .ForMember(detail => detail.AssignedPermissions, opt => opt.Ignore())
                 .AfterMap((group, display) =>
                 {
                     MapUserGroupBasic(applicationContext.Services, group, display);
@@ -187,6 +189,33 @@ namespace Umbraco.Web.Models.Mapping
                     // this will cause an N+1 and we'll need to change how this works.
                     var users = applicationContext.Services.UserService.GetAllInGroup(group.Id);
                     display.Users = Mapper.Map<IEnumerable<UserBasic>>(users);
+
+                    //Deal with assigned permissions:
+
+                    var allContentPermissions = applicationContext.Services.UserService.GetPermissions(group, true)
+                        .ToDictionary(x => x.EntityId, x => x);
+
+                    var contentEntities = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, allContentPermissions.Keys.ToArray());
+                    var allAssignedPermissions = new List<AssignedContentPermissions>();
+                    foreach (var entity in contentEntities)
+                    {
+                        var contentPermissions = allContentPermissions[entity.Id];
+
+                        var assignedContentPermissions = Mapper.Map<AssignedContentPermissions>(entity);
+                        assignedContentPermissions.AssignedPermissions = AssignedUserGroupPermissions.ClonePermissions(display.DefaultPermissions);
+
+                        //since there is custom permissions assigned to this node for this group, we need to clear all of the default permissions
+                        //and we'll re-check it if it's one of the explicitly assigned ones
+                        foreach (var permission in assignedContentPermissions.AssignedPermissions.SelectMany(x => x.Value))
+                        {
+                            permission.Checked = false;
+                            permission.Checked = contentPermissions.AssignedPermissions.Contains(permission.PermissionCode, StringComparer.InvariantCulture);
+                        }
+
+                        allAssignedPermissions.Add(assignedContentPermissions);
+                    }
+
+                    display.AssignedPermissions = allAssignedPermissions;
                 });
 
             config.CreateMap<IUser, UserDisplay>()

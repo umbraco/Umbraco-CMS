@@ -65,6 +65,7 @@
             }).then(function (saved) {
 
                 vm.userGroup = saved;
+                formatGranularPermissionSelection();
                 setSectionIcon(vm.userGroup.sections);
                 makeBreadcrumbs();
                 vm.page.saveButtonState = "success";
