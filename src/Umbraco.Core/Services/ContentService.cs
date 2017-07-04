@@ -2190,9 +2190,6 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(content);
                     repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
 
-                    //Update database held list view filter "index"
-                    SaveContentSearchText(content, repository);
-
                     if (published)
                     {
                         //Content Xml
@@ -2217,6 +2214,10 @@ namespace Umbraco.Core.Services
                     }
 
                     Audit(uow, AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
+                    uow.Commit();
+
+                    //Update database held list view filter "index" (in second commit so we have the content Id)
+                    SaveContentSearchText(content, repository);
                     uow.Commit();
 
                     return Attempt.If(publishStatus.StatusType == PublishStatusType.Success, publishStatus);
@@ -2267,13 +2268,14 @@ namespace Umbraco.Core.Services
                     //Generate a new preview
                     repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
 
-                    //Update database held list view filter "index"
-                    SaveContentSearchText(content, repository);
-
                     if (raiseEvents)
                         uow.Events.Dispatch(Saved, this, new SaveEventArgs<IContent>(content, false, evtMsgs));
 
                     Audit(uow, AuditType.Save, "Save Content performed by user", userId, content.Id);
+                    uow.Commit();
+
+                    //Update database held list view filter "index" (in second commit so we have the content Id)
+                    SaveContentSearchText(content, repository);
                     uow.Commit();
                 }
 
@@ -2296,7 +2298,8 @@ namespace Umbraco.Core.Services
                 {
                     if (sb.Length > 0)
                     {
-                        sb.Append(" ");
+                        // Use a separator that isn't going to create false search matches when the end of one field runs into the beginning of another
+                        sb.Append(" --|-- ");
                     }
 
                     var stringValue = property.Value.ToString();
