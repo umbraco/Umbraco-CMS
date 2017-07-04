@@ -262,7 +262,7 @@ namespace Umbraco.Core.IO
         internal ICompletable Shadow(Guid id)
         {
             var typed = _wrappers.ToArray();
-            var wrappers = new ShadowWrapper[typed.Length + 7];
+            var wrappers = new ShadowWrapper[typed.Length + 9];
             var i = 0;
             while (i < typed.Length) wrappers[i] = typed[i++];
             wrappers[i++] = _macroPartialFileSystem;
