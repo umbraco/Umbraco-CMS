@@ -1355,9 +1355,6 @@
     <key alias="preContent">字段前插入</key>
     <key alias="recursive">递归</key>
     <key alias="recursiveDescr">是, 让它递归</key>
-    <key alias="removeParagraph">移除段落符号</key>
-    <key alias="removeParagraphDescription">是, 删除段落标记</key>
-    <key alias="removeParagraphHelp">将删除文本开头和结尾的任何段落标记</key>
     <key alias="separator">分隔符</key>
     <key alias="standardFields">标准字段</key>
     <key alias="uppercase">大写</key>

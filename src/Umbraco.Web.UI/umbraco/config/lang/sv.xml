@@ -820,8 +820,6 @@
     <key alias="postContent">Infoga efter fält</key>
     <key alias="preContent">Infoga före fält</key>
     <key alias="recursive">Rekursiv</key>
-    <key alias="removeParagraph">Avlägsna stycke-taggar</key>
-    <key alias="removeParagraphHelp">Kommer att avlägsna alla &amp;lt;P&amp;gt; i början och slutet av texten</key>
     <key alias="standardFields">Standardfält</key>
     <key alias="uppercase">Versaler</key>
     <key alias="urlEncode">URL-koda</key>
