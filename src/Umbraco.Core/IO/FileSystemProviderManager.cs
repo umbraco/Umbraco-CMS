@@ -266,9 +266,11 @@ namespace Umbraco.Core.IO
             var i = 0;
             while (i < typed.Length) wrappers[i] = typed[i++];
             wrappers[i++] = _macroPartialFileSystem;
+            wrappers[i++] = _macroScriptsFileSystem;
             wrappers[i++] = _partialViewsFileSystem;
             wrappers[i++] = _stylesheetsFileSystem;
             wrappers[i++] = _scriptsFileSystem;
+            wrappers[i++] = _userControlsFileSystem;
             wrappers[i++] = _xsltFileSystem;
             wrappers[i++] = _masterPagesFileSystem;
             wrappers[i] = _mvcViewsFileSystem;
