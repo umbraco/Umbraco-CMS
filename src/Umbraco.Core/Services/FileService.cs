@@ -783,6 +783,26 @@ namespace Umbraco.Core.Services
             }
         }
 
+        [Obsolete("MacroScripts are obsolete - this is for backwards compatibility with upgraded sites.")]
+        public IPartialView GetMacroScript(string path)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateMacroScriptRepository(uow);
+                return repository.Get(path);
+            }
+        }
+
+        [Obsolete("UserControls are obsolete - this is for backwards compatibility with upgraded sites.")]
+        public IUserControl GetUserControl(string path)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateUserControlRepository(uow);
+                return repository.Get(path);
+            }
+        }
+
         public IEnumerable<IPartialView> GetPartialViewMacros(params string[] names)
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))

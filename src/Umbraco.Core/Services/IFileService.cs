@@ -17,6 +17,10 @@ namespace Umbraco.Core.Services
         void DeletePartialViewMacroFolder(string folderPath);
         IPartialView GetPartialView(string path);
         IPartialView GetPartialViewMacro(string path);
+        [Obsolete("MacroScripts are obsolete - this is for backwards compatibility with upgraded sites.")]
+        IPartialView GetMacroScript(string path);
+        [Obsolete("UserControls are obsolete - this is for backwards compatibility with upgraded sites.")]
+        IUserControl GetUserControl(string path);
         IEnumerable<IPartialView> GetPartialViewMacros(params string[] names);
         IXsltFile GetXsltFile(string path);
         IEnumerable<IXsltFile> GetXsltFiles(params string[] names);
