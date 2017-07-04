@@ -1612,7 +1612,7 @@ namespace umbraco
                     mail.Subject = subject;
                     mail.IsBodyHtml = isHtml;
                     mail.Body = body;
-                    using (var smtpClient = new SmtpClient())
+                    using (var smtpClient = new SmtpClientExtended())
                         smtpClient.Send(mail);
                 }
             }

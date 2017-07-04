@@ -66,7 +66,7 @@ namespace umbraco.cms.businesslogic.translation
                             mail.Subject = ui.Text("translation", "mailSubject", subjectVars, translator); ;
                             mail.IsBodyHtml = false;
                             mail.Body = ui.Text("translation", "mailBody", bodyVars, translator); ;
-                            using (var smtpClient = new SmtpClient())
+                            using (var smtpClient = new SmtpClientExtended())
                                 smtpClient.Send(mail);
                         }
                     }

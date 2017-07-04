@@ -8,7 +8,7 @@ namespace Umbraco.Core.Security
     {
         public async Task SendAsync(IdentityMessage message)
         {
-            using (var client = new SmtpClient())
+            using (var client = new SmtpClientExtended())
             using (var mailMessage = new MailMessage())
             {
                 mailMessage.Body = message.Body;

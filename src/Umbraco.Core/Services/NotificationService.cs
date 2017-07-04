@@ -609,7 +609,7 @@ namespace Umbraco.Core.Services
         {
             ThreadPool.QueueUserWorkItem(state =>
             {
-                var s = new SmtpClient();
+                var s = new SmtpClientExtended();
                 try
                 {
                     _logger.Debug<NotificationService>("Begin processing notifications.");
@@ -627,7 +627,7 @@ namespace Umbraco.Core.Services
                             {
                                 _logger.Error<NotificationService>("An error occurred sending notification", ex);
                                 s.Dispose();
-                                s = new SmtpClient();
+                                s = new SmtpClientExtended();
                             }
                             finally
                             {
@@ -651,7 +651,7 @@ namespace Umbraco.Core.Services
         }
 
         // for tests
-        internal static Action<SmtpClient, MailMessage, ILogger> Sendmail;
+        internal static Action<SmtpClientExtended, MailMessage, ILogger> Sendmail;
             //= (_, msg, logger) => logger.Debug<NotificationService>("Email " + msg.To.ToString());
 
         #endregion
