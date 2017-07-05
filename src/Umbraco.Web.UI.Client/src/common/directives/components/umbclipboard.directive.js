@@ -161,6 +161,6 @@
         return directive;
     }
 
-    angular.module('umbraco').directive('umbClipboard', umbClipboardDirective);
+    angular.module('umbraco.directives').directive('umbClipboard', umbClipboardDirective);
 
 })();
