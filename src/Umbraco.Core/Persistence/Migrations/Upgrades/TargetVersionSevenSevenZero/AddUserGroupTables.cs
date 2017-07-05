@@ -79,13 +79,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
 
             // Add each user to the group created from their type
             Execute.Sql(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
-                SELECT u.id,(
-	                SELECT ug.id
-	                FROM umbracoUserGroup ug
-	                INNER JOIN umbracoUserType ut ON ut.userTypeAlias = ug.userGroupAlias
-	                WHERE u.userType = ut.id
-                )
-                FROM umbracoUser u");
+                SELECT u.id, ug.id
+                FROM umbracoUser u
+                INNER JOIN umbracoUserType ut ON ut.id = u.userType
+                INNER JOIN umbracoUserGroup ug ON ug.userGroupAlias = ut.userTypeAlias");
 
             // Add the built-in administrator account to all apps
             Execute.Sql(@"INSERT INTO umbracoUserGroup2app (userGroupId,app)

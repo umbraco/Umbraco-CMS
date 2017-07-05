@@ -918,10 +918,12 @@ namespace Umbraco.Web.Editors
 
                 var ids = Services.EntityService.Get(id).Path.Split(',').Select(int.Parse).Distinct().ToArray();
 
-                return Services.EntityService.GetAll(objectType.Value, ids)
-                    .WhereNotNull()
-                    .OrderBy(x => x.Level)
-                    .Select(Mapper.Map<EntityBasic>);
+                return ids.Length == 0
+                    ? Enumerable.Empty<EntityBasic>()
+                    : Services.EntityService.GetAll(objectType.Value, ids)
+                        .WhereNotNull()
+                        .OrderBy(x => x.Level)
+                        .Select(Mapper.Map<EntityBasic>);
             }
             //now we need to convert the unknown ones
             switch (entityType)

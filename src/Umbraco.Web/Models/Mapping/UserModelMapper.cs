@@ -194,8 +194,11 @@ namespace Umbraco.Web.Models.Mapping
 
                     var allContentPermissions = applicationContext.Services.UserService.GetPermissions(group, true)
                         .ToDictionary(x => x.EntityId, x => x);
+                    
+                    var contentEntities = allContentPermissions.Keys.Count == 0
+                        ? new IUmbracoEntity[0]
+                        : applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, allContentPermissions.Keys.ToArray());
 
-                    var contentEntities = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, allContentPermissions.Keys.ToArray());
                     var allAssignedPermissions = new List<AssignedContentPermissions>();
                     foreach (var entity in contentEntities)
                     {

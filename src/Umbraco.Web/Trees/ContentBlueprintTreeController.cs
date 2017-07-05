@@ -45,9 +45,12 @@ namespace Umbraco.Web.Trees
                 //get all blueprint content types
                 var contentTypeAliases = entities.Select(x => ((UmbracoEntity) x).ContentTypeAlias).Distinct();
                 //get the ids
-                var contentTypeIds = Services.ContentTypeService.GetAllContentTypeIds(contentTypeAliases.ToArray());
+                var contentTypeIds = Services.ContentTypeService.GetAllContentTypeIds(contentTypeAliases.ToArray()).ToArray();
+
                 //now get the entities ... it's a bit round about but still smaller queries than getting all document types
-                var docTypeEntities = Services.EntityService.GetAll(UmbracoObjectTypes.DocumentType, contentTypeIds.ToArray()).ToArray();
+                var docTypeEntities = contentTypeIds.Length == 0 
+                    ? new IUmbracoEntity[0]
+                    : Services.EntityService.GetAll(UmbracoObjectTypes.DocumentType, contentTypeIds).ToArray();
 
                 nodes.AddRange(docTypeEntities
                     .Select(entity =>
