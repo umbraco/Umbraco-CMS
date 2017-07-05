@@ -28,6 +28,7 @@ namespace Umbraco.Web.Models.Mapping
                 .IgnoreDeletableEntityCommonProperties()
                 .ForMember(dest => dest.Id, map => map.Condition(source => GetIntId(source.Id) > 0))
                 .ForMember(dest => dest.Id, map => map.MapFrom(source => GetIntId(source.Id)))
+                .ForMember(dest => dest.Permissions, map => map.MapFrom(source => source.DefaultPermissions))
                 .AfterMap((save, userGroup) =>
                 {
                     userGroup.ClearAllowedSections();
