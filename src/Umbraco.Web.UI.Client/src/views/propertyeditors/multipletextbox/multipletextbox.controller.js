@@ -25,10 +25,6 @@
     $scope.addRemoveOnKeyDown = function (event, index) {
         var txtBoxValue = $scope.model.value[index];
 
-        var e = angular.element(elem[0].querySelector('[name="item_0"]'));
-
-        console.log(e);
-
         switch (event.keyCode) {
             case 13:
                 if ($scope.model.config.max <= 0 || $scope.model.value.length < $scope.model.config.max) {
