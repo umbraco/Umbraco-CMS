@@ -21,17 +21,19 @@
         }
     }
 
-    //TODO remove text box only when is empty
+    //TODO add focus to newly created text box or the first in line after deletion
     $scope.addRemoveOnKeyDown = function (event, index) {
-        console.log("Index: " + index);
-        console.log($scope.model.value);
-        console.log("KeyCode: " + event.keyCode);
         var txtBoxValue = $scope.model.value[index];
-        console.log(txtBoxValue.value);
+
+        var e = angular.element(elem[0].querySelector('[name="item_0"]'));
+
+        console.log(e);
+
         switch (event.keyCode) {
             case 13:
                 if ($scope.model.config.max <= 0 || $scope.model.value.length < $scope.model.config.max) {
                     $scope.model.value.push({ value: "" });
+
                 }
                 break;
             case 8:
@@ -50,6 +52,8 @@
             default:
         }
     }
+
+
 
     $scope.add = function () {
         if ($scope.model.config.max <= 0 || $scope.model.value.length < $scope.model.config.max) {
