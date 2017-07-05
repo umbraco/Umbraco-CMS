@@ -11,7 +11,7 @@
     if (!$scope.model.value) {
         $scope.model.value = [];
     }
-    
+
     //add any fields that there isn't values for
     if ($scope.model.config.min > 0) {
         for (var i = 0; i < $scope.model.config.min; i++) {
@@ -21,13 +21,43 @@
         }
     }
 
+    //TODO remove text box only when is empty
+    $scope.addRemoveOnKeyDown = function (event, index) {
+        console.log("Index: " + index);
+        console.log($scope.model.value);
+        console.log("KeyCode: " + event.keyCode);
+        var txtBoxValue = $scope.model.value[index];
+        console.log(txtBoxValue.value);
+        switch (event.keyCode) {
+            case 13:
+                if ($scope.model.config.max <= 0 || $scope.model.value.length < $scope.model.config.max) {
+                    $scope.model.value.push({ value: "" });
+                }
+                break;
+            case 8:
+                var remainder = [];
+                if ($scope.model.value.length > 1) {
+                    if (txtBoxValue.value === "") {
+                        for (var x = 0; x < $scope.model.value.length; x++) {
+                            if (x !== index) {
+                                remainder.push($scope.model.value[x]);
+                            }
+                        }
+                        $scope.model.value = remainder;
+                    }
+                }
+                break;
+            default:
+        }
+    }
+
     $scope.add = function () {
         if ($scope.model.config.max <= 0 || $scope.model.value.length < $scope.model.config.max) {
             $scope.model.value.push({ value: "" });
         }
     };
 
-    $scope.remove = function(index) {
+    $scope.remove = function (index) {
         var remainder = [];
         for (var x = 0; x < $scope.model.value.length; x++) {
             if (x !== index) {
