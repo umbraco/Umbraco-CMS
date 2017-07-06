@@ -105,9 +105,9 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             config.CreateMap<IReadOnlyUserGroup, UserGroupBasic>()
-                .ForMember(detail => detail.StartContentId, opt => opt.Ignore())
+                .ForMember(detail => detail.ContentStartNode, opt => opt.Ignore())
                 .ForMember(detail => detail.UserCount, opt => opt.Ignore())
-                .ForMember(detail => detail.StartMediaId, opt => opt.Ignore())
+                .ForMember(detail => detail.MediaStartNode, opt => opt.Ignore())
                 .ForMember(detail => detail.Key, opt => opt.Ignore())
                 .ForMember(detail => detail.Sections, opt => opt.Ignore())
                 .ForMember(detail => detail.Notifications, opt => opt.Ignore())
@@ -122,8 +122,8 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             config.CreateMap<IUserGroup, UserGroupBasic>()
-                .ForMember(detail => detail.StartContentId, opt => opt.Ignore())
-                .ForMember(detail => detail.StartMediaId, opt => opt.Ignore())
+                .ForMember(detail => detail.ContentStartNode, opt => opt.Ignore())
+                .ForMember(detail => detail.MediaStartNode, opt => opt.Ignore())
                 .ForMember(detail => detail.Sections, opt => opt.Ignore())
                 .ForMember(detail => detail.Notifications, opt => opt.Ignore())
                 .ForMember(detail => detail.Udi, opt => opt.Ignore())
@@ -170,8 +170,8 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             config.CreateMap<IUserGroup, UserGroupDisplay>()
-                .ForMember(detail => detail.StartContentId, opt => opt.Ignore())
-                .ForMember(detail => detail.StartMediaId, opt => opt.Ignore())
+                .ForMember(detail => detail.ContentStartNode, opt => opt.Ignore())
+                .ForMember(detail => detail.MediaStartNode, opt => opt.Ignore())
                 .ForMember(detail => detail.Sections, opt => opt.Ignore())
                 .ForMember(detail => detail.Notifications, opt => opt.Ignore())
                 .ForMember(detail => detail.Udi, opt => opt.Ignore())
@@ -327,12 +327,12 @@ namespace Umbraco.Web.Models.Mapping
             display.Sections = allSections.Where(x => Enumerable.Contains(group.AllowedSections, x.Alias)).Select(Mapper.Map<ContentEditing.Section>);
             if (group.StartMediaId > 0)
             {
-                display.StartMediaId = Mapper.Map<EntityBasic>(
+                display.MediaStartNode = Mapper.Map<EntityBasic>(
                     services.EntityService.Get(group.StartMediaId, UmbracoObjectTypes.Media));
             }
             if (group.StartContentId > 0)
             {
-                display.StartContentId = Mapper.Map<EntityBasic>(
+                display.ContentStartNode = Mapper.Map<EntityBasic>(
                     services.EntityService.Get(group.StartContentId, UmbracoObjectTypes.Document));
             }
             if (display.Icon.IsNullOrWhiteSpace())

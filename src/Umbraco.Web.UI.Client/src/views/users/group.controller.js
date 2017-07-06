@@ -108,7 +108,7 @@
                 show: true,
                 submit: function (model) {
                     if (model.selection) {
-                        vm.userGroup.startContentId = model.selection[0];
+                        vm.userGroup.contentStartNode = model.selection[0];
                     }
                     vm.contentPicker.show = false;
                     vm.contentPicker = null;
@@ -131,7 +131,7 @@
                 show: true,
                 submit: function (model) {
                     if (model.selection) {
-                        vm.userGroup.startMediaId = model.selection[0];
+                        vm.userGroup.mediaStartNode = model.selection[0];
                     }
                     vm.contentPicker.show = false;
                     vm.contentPicker = null;
@@ -259,9 +259,9 @@
 
         function clearStartNode(type) {
             if (type === "content") {
-                vm.userGroup.startContentId = null;
+                vm.userGroup.contentStartNode = null;
             } else if (type === "media") {
-                vm.userGroup.startMediaId = null;
+                vm.userGroup.mediaStartNode = null;
             }
         }
 

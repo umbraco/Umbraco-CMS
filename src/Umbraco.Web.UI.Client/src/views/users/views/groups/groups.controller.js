@@ -17,7 +17,7 @@
 
             vm.loading = true;
 
-            // Get users
+            // Get usergroups
             userGroupsResource.getUserGroups().then(function (userGroups) {
                 vm.userGroups = userGroups;
                 vm.loading = false;

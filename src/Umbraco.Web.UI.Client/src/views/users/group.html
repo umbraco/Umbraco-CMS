@@ -46,16 +46,16 @@
 
                                     <umb-control-group style="margin-bottom: 20px;" label="Content start node" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
                                         <umb-node-preview
-                                            ng-if="vm.userGroup.startContentId.id"
+                                            ng-if="vm.userGroup.contentStartNode.id"
                                             style="max-width: 100%;"
-                                            icon="vm.userGroup.startContentId.icon"
-                                            name="vm.userGroup.startContentId.name"
+                                            icon="vm.userGroup.contentStartNode.icon"
+                                            name="vm.userGroup.contentStartNode.name"
                                             allow-remove="true"
                                             on-remove="vm.clearStartNode('content')">
                                         </umb-node-preview>
 
                                         <a href=""
-                                            ng-if="!vm.userGroup.startContentId.id"
+                                            ng-if="!vm.userGroup.contentStartNode.id"
                                             style="max-width: 100%;"
                                             class="umb-node-preview-add"
                                             ng-click="vm.openContentPicker()"
@@ -66,16 +66,16 @@
 
                                     <umb-control-group label="Media start node" description="Donec quis lacinia ligula. Suspendisse ultrices risus ante">
                                         <umb-node-preview
-                                            ng-if="vm.userGroup.startMediaId.id"
+                                            ng-if="vm.userGroup.mediaStartNode.id"
                                             style="max-width: 100%;"
-                                            icon="vm.userGroup.startMediaId.icon"
-                                            name="vm.userGroup.startMediaId.name"
+                                            icon="vm.userGroup.mediaStartNode.icon"
+                                            name="vm.userGroup.mediaStartNode.name"
                                             allow-remove="true"
                                             on-remove="vm.clearStartNode('media')">
                                         </umb-node-preview>
 
                                         <a href=""
-                                            ng-if="!vm.userGroup.startMediaId.id"
+                                            ng-if="!vm.userGroup.mediaStartNode.id"
                                             style="max-width: 100%;"
                                             class="umb-node-preview-add"
                                             ng-click="vm.openMediaPicker()"

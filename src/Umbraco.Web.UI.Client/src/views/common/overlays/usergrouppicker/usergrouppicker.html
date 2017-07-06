@@ -39,16 +39,16 @@
                     <div class="umb-user-group-picker-list-item__permission">
                         <span>
                             <span class="bold">Content start node:</span>
-                            <span ng-if="userGroup.startContentId">{{ startNode.name }}</span>
-                            <span ng-if="!userGroup.startContentId">Content root</span>
+                            <span ng-if="userGroup.contentStartNode">{{ userGroup.contentStartNode.name }}</span>
+                            <span ng-if="!userGroup.contentStartNode">Content root</span>
                         </span>
                     </div>
                     
                     <div class="umb-user-group-picker-list-item__permission">
                         <span>
                             <span class="bold">Media start node:</span>
-                            <span ng-if="userGroup.startMediaId">{{ startNode.name }}</span>
-                            <span ng-if="!userGroup.startMediaId">Media root</span>
+                            <span ng-if="userGroup.mediaStartNode">{{ userGroup.mediaStartNode.name }}</span>
+                            <span ng-if="!userGroup.mediaStartNode">Media root</span>
                         </span>
                     </div>
                 </div>
