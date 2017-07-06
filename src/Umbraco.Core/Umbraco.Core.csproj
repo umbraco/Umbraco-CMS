@@ -500,6 +500,8 @@
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
     <Compile Include="Persistence\Migrations\LocalMigrationContext.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourOneZero\AddPreviewXmlTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\AddIndexToDictionaryKeyColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\ReduceDictionaryKeyColumnsSize.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddLockObjects.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\AddLockTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveFive\UpdateAllowedMediaTypesAtRoot.cs" />
