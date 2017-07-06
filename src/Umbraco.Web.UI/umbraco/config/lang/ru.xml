@@ -1447,8 +1447,6 @@
     <key alias="preContent">Вставить перед полем</key>
     <key alias="recursive">Рекурсивно</key>
     <key alias="recursiveDescr">Да, использовать рекурсию</key>
-    <key alias="removeParagraph">Удалить тэги параграфов</key>
-    <key alias="removeParagraphHelp">Удаляются тэги параграфа ('p') в начале и в конце абзацев</key>
     <key alias="separator">Разделитель</key>
     <key alias="standardFields">Стандартные</key>
     <key alias="uppercase">В верхнем регистре</key>

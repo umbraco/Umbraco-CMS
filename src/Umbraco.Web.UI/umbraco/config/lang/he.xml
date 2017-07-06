@@ -818,8 +818,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="postContent">הוסף אחרי השדה</key>
     <key alias="preContent">הוסף לפני השדה</key>
     <key alias="recursive">רקורסיבי</key>
-    <key alias="removeParagraph">הסר תגי פסקה</key>
-    <key alias="removeParagraphHelp">מסיר את כל ה- &amp;lt;P&amp;gt; בתחילת ובסוף הטקסט</key>
     <key alias="uppercase">אותיות גדולות</key>
     <key alias="urlEncode">קידוד URL</key>
     <key alias="urlEncodeHelp">תווים מיוחדים יעוצבו ב- URL</key>
