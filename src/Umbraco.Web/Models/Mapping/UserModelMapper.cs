@@ -260,10 +260,10 @@ namespace Umbraco.Web.Models.Mapping
                         var contentItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, startContentIds);
                         display.StartContentIds = Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(contentItems);
                     }
-                    var startMediaIds = user.StartContentIds.ToArray();
+                    var startMediaIds = user.StartMediaIds.ToArray();
                     if (startMediaIds.Length > 0)
                     {
-                        var mediaItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, startMediaIds);
+                        var mediaItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Media, startMediaIds);
                         display.StartMediaIds = Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(mediaItems);
                     }
                 });
