@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
@@ -508,8 +509,6 @@ ORDER BY colName";
             UserState[] userState = null, 
             IQuery<IUser> filter = null)
         {
-            //TODO: Implement userState filtering!
-
             if (string.IsNullOrWhiteSpace(orderBy)) throw new ArgumentException("Value cannot be null or whitespace.", "orderBy");
 
 
@@ -538,22 +537,33 @@ ORDER BY colName";
                 //the "ALL" state doesn't require any filtering so we ignore that, if it exists in the list we don't do any filtering
                 if (userState.Contains(UserState.All) == false)
                 {
+                    var sb = new StringBuilder("(");
+                    var appended = false;
+
                     if (userState.Contains(UserState.Active))
                     {
-                        filterSql.Append("AND (userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL)");
+                        sb.Append("(userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL)");
+                        appended = true;
                     }
                     if (userState.Contains(UserState.Disabled))
                     {
-                        filterSql.Append("AND (userDisabled = 1)");
+                        if (appended) sb.Append(" OR ");
+                        sb.Append("(userDisabled = 1)");
                     }
                     if (userState.Contains(UserState.LockedOut))
                     {
-                        filterSql.Append("AND (userNoConsole = 1)");
+                        if (appended) sb.Append(" OR ");
+                        sb.Append("(userNoConsole = 1)");
                     }
                     if (userState.Contains(UserState.Invited))
                     {
-                        filterSql.Append("AND (lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL)");
+                        if (appended) sb.Append(" OR ");
+                        sb.Append("(lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL)");
                     }
+
+                    sb.Append(")");
+
+                    filterSql.Append("AND " + sb);
                 }
             }
 
