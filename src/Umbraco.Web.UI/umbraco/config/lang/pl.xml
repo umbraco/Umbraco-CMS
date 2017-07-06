@@ -1276,8 +1276,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="postContent">Wstaw za polem</key>
     <key alias="preContent">Wstaw przed polem</key>
     <key alias="recursive">Rekurencyjne</key>
-    <key alias="removeParagraph">Usuń znaki paragrafu</key>
-    <key alias="removeParagraphHelp">Usuwa wszystkie &amp;lt;P&amp;gt; z początku i końca tekstu</key>
     <key alias="standardFields">Standardowe Pola</key>
     <key alias="uppercase">Wielkie litery</key>
     <key alias="urlEncode">Kodowanie URL</key>

@@ -6,6 +6,9 @@
 **/
 angular.module("umbraco.filters").filter('preserveNewLineInHtml', function () {
   return function (text) {
+	if (!text) {
+		return '';
+	}
     return text.replace(/\n/g, '<br />');
   };
 });
