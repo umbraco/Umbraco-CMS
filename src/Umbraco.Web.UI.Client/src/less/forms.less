@@ -193,7 +193,7 @@ input[type="tel"],
 input[type="color"],
 .uneditable-input {
   display: inline-block;
-  height: 32px;
+  height: @inputHeight;
   padding: 4px 6px;
   margin-bottom: @baseLineHeight / 2;
   font-size: @baseFontSize;
@@ -208,7 +208,6 @@ input.-full-width-input {
    width: 100%;
    box-sizing: border-box;
    padding: 4px 6px;
-   height: 30px;
 }
 
 // Reset appearance properties for textual inputs and textarea
@@ -581,9 +580,9 @@ input[type="checkbox"][readonly] {
   .add-on {
     display: inline-block;
     width: auto;
-    height: @baseLineHeight;
-    min-width: 16px;
-    padding: 4px 5px;
+    height: 22px;
+    min-width: 18px;
+    padding: 4px 6px;
     font-size: @baseFontSize;
     font-weight: normal;
     line-height: @baseLineHeight;
