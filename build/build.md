@@ -2,14 +2,29 @@ Umbraco Cms Build
 --
 ----
 
+# Quick!
+
+To build Umbraco, fire PowerShell and move to Umbraco's repository root (the directory that contains `src`, `build`, `README.md`...). There, trigger the build with the following command:
+
+    build\build.ps1
+    
+By default, this builds the current version. It is possible to specify a different version as a parameter to the build script: 
+
+    build\build.ps1 7.6.44
+
+Valid version strings are defined in the `Set-UmbracoVersion` documentation below.
+
 # Build
 
-The Umbraco Build solution relies on a PowerShell module. The module needs to be imported into PowerShell. From within the solution directory:
+The Umbraco Build solution relies on a PowerShell module. The module needs to be imported into PowerShell. From within Umbraco's repository root:
 
-    $env:PSModulePath = "$pwd\build\Modules\;$env:PSModulePath"
-    Import-Module Umbraco.Build -Force -DisableNameChecking
+    build\build.ps1 -ModuleOnly
 
-Once the module has been imported, a set of commands are added to PowerShell, and detailed below.
+Or the abbreviated form:
+
+    build\build.ps1 -mo
+
+Once the module has been imported, a set of commands are added to PowerShell.
 
 ## Get-UmbracoBuildEnv
 
@@ -78,6 +93,14 @@ Some log files, such as MsBuild logs, are produced in `build.tmp` too. The `buil
 ### web.config
 
 Building Umbraco requires a clean `web.config` file in the `Umbraco.Web.UI` project. If a `web.config` file already exists, the `pre-build` task (see below) will save it as `web.config.temp-build` and replace it with a clean copy of `web.Template.config`. The original file is replaced once it is safe to do so, by the `pre-packages` task.
+
+## Build-UmbracoDocs
+
+Builds umbraco documentation. Temporary files are generated in `build.tmp` while the actual artifacts (docs...) are produced in `build.out`. Example:
+
+    Build-UmbracoDocs
+
+Some log files, such as MsBuild logs, are produced in `build.tmp` too. The `build` directory should remain clean during a build.
 
 # VSTS
 
