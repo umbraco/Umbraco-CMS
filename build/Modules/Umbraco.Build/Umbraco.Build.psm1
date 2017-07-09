@@ -21,13 +21,19 @@
 . "$PSScriptRoot\Set-UmbracoVersion.ps1"
 . "$PSScriptRoot\Get-UmbracoVersion.ps1"
 
+. "$PSScriptRoot\Build-UmbracoDocs.ps1"
+
 #
 # Prepares the build
 #
 function Prepare-Build
 {
   param (
-    $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
+    $uenv, # an Umbraco build environment (see Get-UmbracoBuildEnv)
+    
+    [Alias("k")]
+    [switch]
+    $keep = $false
   )
 
   Write-Host ">> Prepare Build"
@@ -42,35 +48,18 @@ function Prepare-Build
   Remove-Directory "$src\Umbraco.Web.UI.Client\build"
   Remove-Directory "$src\Umbraco.Web.UI.Client\bower_components"
 
-  Remove-Directory "$tmp"
-  mkdir "$tmp" > $null
-  
-  Remove-Directory "$out"
-  mkdir "$out" > $null
-
-  # prepare web.config
-  $webUi = "$src\Umbraco.Web.UI"
-  if (test-path "$webUi\web.config")
+  if (-not $keep)
   {
-    if (test-path "$webUi\web.config.temp-build")
-    {
-      Write-Host "Found existing web.config.temp-build"
-      $i = 0
-      while (test-path "$webUi\web.config.temp-build.$i")
-      {
-        $i = $i + 1
-      }
-      Write-Host "Save existing web.config as web.config.temp-build.$i"
-      Write-Host "(WARN: the original web.config.temp-build will be restored during post-build)"
-      mv "$webUi\web.config" "$webUi\web.config.temp-build.$i"
-    }
-    else
-    {
-      Write-Host "Save existing web.config as web.config.temp-build"
-      Write-Host "(will be restored during post-build)"
-      mv "$webUi\web.config" "$webUi\web.config.temp-build"
-    }
+    Remove-Directory "$tmp"
+    mkdir "$tmp" > $null
+    
+    Remove-Directory "$out"
+    mkdir "$out" > $null
   }
+
+  # ensure proper web.config
+  $webUi = "$src\Umbraco.Web.UI"
+  Store-WebConfig $webUi
   Write-Host "Create clean web.config"
   Copy-File "$webUi\web.Template.config" "$webUi\web.config"
 }
@@ -125,14 +114,13 @@ function Compile-Belle
 function Compile-Umbraco
 {
   param (
-    $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
+    $uenv, # an Umbraco build environment (see Get-UmbracoBuildEnv)
+    [string] $buildConfiguration = "Release"
   )
 
   $src = "$($uenv.SolutionRoot)\src"
   $tmp = "$($uenv.SolutionRoot)\build.tmp"
   $out = "$($uenv.SolutionRoot)\build.out"
-
-  $buildConfiguration = "Release"
   
   if ($uenv.VisualStudio -eq $null)
   {
@@ -179,7 +167,7 @@ function Compile-Umbraco
     /p:UmbracoBuild=True `
     > $tmp\msbuild.compat7.log
 
-    # /p:UmbracoBuild tells the csproj that we are building from PS
+  # /p:UmbracoBuild tells the csproj that we are building from PS
 }
 
 #
@@ -238,7 +226,8 @@ function Compile-Tests
     $toolsVersion = "15.0"
   }
     
-  Write-Host ">> Compile Tests (logging to $tmp\msbuild.tests.log)"
+  Write-Host ">> Compile Tests"
+  Write-Host "Logging to $tmp\msbuild.tests.log"
 
   # beware of the weird double \\ at the end of paths
   # see http://edgylogic.com/blog/powershell-and-external-commands-done-right/
@@ -277,13 +266,7 @@ function Prepare-Packages
   $buildConfiguration = "Release"
 
   # restore web.config
-  $webUi = "$src\Umbraco.Web.UI"
-  if (test-path "$webUi\web.config.temp-build")
-  {
-    Write-Host "Restoring existing web.config"
-    Remove-File "$webUi\web.config"
-    mv "$webUi\web.config.temp-build" "$webUi\web.config"
-  }
+  Restore-WebConfig "$src\Umbraco.Web.UI"
 
   # cleanup build
   Write-Host "Clean build"
@@ -417,11 +400,13 @@ function Restore-NuGet
     $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
   )
 
-  Write-Host ">> Restore NuGet" 
-  
   $src = "$($uenv.SolutionRoot)\src"
+  $tmp = "$($uenv.SolutionRoot)\build.tmp"
+
+  Write-Host ">> Restore NuGet"
+  Write-Host "Logging to $tmp\nuget.restore.log" 
   
-  &$uenv.NuGet restore "$src\Umbraco.sln"
+  &$uenv.NuGet restore "$src\Umbraco.sln" > "$tmp\nuget.restore.log"
 }
 
 #
@@ -470,11 +455,13 @@ function Build-Umbraco
   [CmdletBinding()]
   param (
     [string]
-    $target = "all"
+    $target = "all",
+    [string]
+    $buildConfiguration = "Release"
   )
   
   $target = $target.ToLowerInvariant()
-  Write-Host ">> Build-Umbraco <$target>"
+  Write-Host ">> Build-Umbraco <$target> <$configuration>"
 
   Write-Host "Get Build Environment"
   $uenv = Get-UmbracoBuildEnv
@@ -514,7 +501,7 @@ function Build-Umbraco
   }
   elseif ($target -eq "compile-umbraco")
   {
-    Compile-Umbraco $uenv
+    Compile-Umbraco $uenv $buildConfiguration
   }
   elseif ($target -eq "pre-packages")
   {
@@ -541,7 +528,7 @@ function Build-Umbraco
     Prepare-Build $uenv
     Restore-NuGet $uenv
     Compile-Belle $uenv $version
-    Compile-Umbraco $uenv
+    Compile-Umbraco $uenv $buildConfiguration
     Prepare-Tests $uenv
     Compile-Tests $uenv
     # not running tests...
@@ -563,5 +550,6 @@ Export-ModuleMember -function Get-UmbracoBuildEnv
 Export-ModuleMember -function Set-UmbracoVersion
 Export-ModuleMember -function Get-UmbracoVersion
 Export-ModuleMember -function Build-Umbraco
+Export-ModuleMember -function Build-UmbracoDocs
 
 #eof
