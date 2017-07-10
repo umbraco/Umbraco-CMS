@@ -203,7 +203,6 @@
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
-    <Compile Include="Dependencies\NuGet.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="Issues\U9560.cs" />
     <Compile Include="Integration\ContentEventsTests.cs" />

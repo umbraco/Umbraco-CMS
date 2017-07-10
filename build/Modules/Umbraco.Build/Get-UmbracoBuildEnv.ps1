@@ -81,6 +81,16 @@ function Get-UmbracoBuildEnv
     mv "$file" $semver
     Remove-Directory $dir
   }
+
+  try
+  {
+    [Reflection.Assembly]::LoadFile($semver) > $null
+  }
+  catch
+  {
+    Write-Error -Exception $_.Exception -Message "Failed to load $semver"
+    break
+  }
   
   # ensure we have node
   $node = "$path\node-v6.9.1-win-x86"
