@@ -69,8 +69,8 @@ namespace Umbraco.Web.Editors
             // else we check the rules and only allow if one matches
             else
             {
-                // check if this item has any grant-by-section arguments, if so check if the user has access to any of the sections approved, if so they will
-                // be allowed to see it (so far)
+                // check if this item has any grant-by-section arguments.
+                // if so check if the user has access to any of the sections approved, if so they will be allowed to see it (so far)
                 if (grantedBySectionTypes.Any())
                 {
                     var allowedApps = sectionService.GetAllowedSections(Convert.ToInt32(user.Id))
@@ -84,9 +84,9 @@ namespace Umbraco.Web.Editors
                     }
                 }
 
-                // check if this item as any grant arguments, if so check if the user is in one of the user groups approved, if so they will
-                // be allowed to see it (so far)
-                if (grantedTypes.Any())
+                // if not already granted access, check if this item as any grant arguments.
+                // if so check if the user is in one of the user groups approved, if so they will be allowed to see it (so far)
+                if (allowedSoFar == false && grantedTypes.Any())
                 {
                     var allApprovedUserTypes = grantedTypes.SelectMany(g => g.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)).ToArray();
                     foreach (var userGroup in user.Groups)
