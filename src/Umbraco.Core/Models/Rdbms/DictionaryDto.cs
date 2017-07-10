@@ -24,7 +24,8 @@ namespace Umbraco.Core.Models.Rdbms
         public Guid? Parent { get; set; }
 
         [Column("key")]
-        [Length(1000)]
+        [Length(450)]
+        [Index(IndexTypes.NonClustered, Name = "IX_cmsDictionary_key")]
         public string Key { get; set; }
 
         [ResultColumn]
