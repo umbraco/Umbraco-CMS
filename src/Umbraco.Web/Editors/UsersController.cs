@@ -435,6 +435,27 @@ namespace Umbraco.Web.Editors
                 ModelState.AddModelError("Username", "A user with the username already exists");
                 hasErrors = true;
             }
+            // going forward we prefer to align usernames with email, so we should cross-check to make sure
+            // the email or username isn't somehow being used by anyone.
+            existing = Services.UserService.GetByEmail(userSave.Username);
+            if (existing != null && existing.Id != userSave.Id)
+            {
+                ModelState.AddModelError("Username", "A user using this as their email already exists");
+                hasErrors = true;
+            }
+            existing = Services.UserService.GetByUsername(userSave.Email);
+            if (existing != null && existing.Id != userSave.Id)
+            {
+                ModelState.AddModelError("Email", "A user using this as their username already exists");
+                hasErrors = true;
+            }
+
+            // if the found user has his email for username, we want to keep this synced when changing the email.
+            // we have already cross-checked above that the email isn't colliding with anything, so we can safely assign it here.
+            if (found.Username == found.Email && userSave.Username != userSave.Email)
+            {
+                userSave.Username = userSave.Email;
+            }
 
             var resetPasswordValue = string.Empty;
             if (userSave.ChangePassword != null)
