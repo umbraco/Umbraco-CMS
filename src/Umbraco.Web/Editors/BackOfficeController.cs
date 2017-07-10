@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Configuration;
-using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +20,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
@@ -32,9 +28,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.Security.Identity;
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
-using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
-using Umbraco.Web.Security;
 using Action = umbraco.BusinessLogic.Actions.Action;
 using Constants = Umbraco.Core.Constants;
 
@@ -501,8 +495,6 @@ namespace Umbraco.Web.Editors
 
             return false;
         }
-        
-        
 
         /// <summary>
         /// Returns the JavaScript blocks for any legacy trees declared

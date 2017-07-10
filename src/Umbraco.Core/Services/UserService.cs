@@ -362,8 +362,6 @@ namespace Umbraco.Core.Services
                 if (raiseEvents)
                     uow.Events.Dispatch(SavedUser, this, new SaveEventArgs<IUser>(asArray, false));
             }
-
-
         }
 
         /// <summary>

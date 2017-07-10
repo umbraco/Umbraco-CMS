@@ -6,8 +6,6 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-
-    
     /// <summary>
     /// The user model used for paging and listing users in the UI
     /// </summary>
