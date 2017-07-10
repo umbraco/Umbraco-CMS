@@ -56,9 +56,9 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 if (filter != null)
                 {
-                    foreach (var filterClaus in filter.GetWhereClauses())
+                    foreach (var filterClause in filter.GetWhereClauses())
                     {
-                        sql.Where(filterClaus.Item1, filterClaus.Item2);
+                        sql.Where(filterClause.Item1, filterClause.Item2);
                     }
                 }
             }, objectTypeId);
@@ -149,9 +149,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     if (filter != null)
                     {
-                        foreach (var filterClaus in filter.GetWhereClauses())
+                        foreach (var filterClause in filter.GetWhereClauses())
                         {
-                            sql.Where(filterClaus.Item1, filterClaus.Item2);
+                            sql.Where(filterClause.Item1, filterClause.Item2);
                         }
                     }
                 }, objectTypeId);
