@@ -212,6 +212,8 @@ function Verify-NuGet
         
         public static void ReadPackagesConfig(string filename, List<Package> packages)
         {
+          //Console.WriteLine("read " + filename);
+
           PackagesConfigPackages pkgs;
           var serializer = new XmlSerializer(typeof(PackagesConfigPackages));
           using (var reader = new StreamReader(filename))
@@ -228,6 +230,14 @@ function Verify-NuGet
         
         public static void ReadCsProj(string filename, List<Package> packages)
         {
+          //Console.WriteLine("read " + filename);
+          
+          // if xmlns then it's not a VS2017 with PackageReference
+          var text = File.ReadAllLines(filename);
+          var line = text.FirstOrDefault(x => x.Contains("<Project"));
+          if (line == null) return;
+          if (line.Contains("xmlns")) return;         
+
           CsProjProject proj;
           var serializer = new XmlSerializer(typeof(CsProjProject));
           using (var reader = new StreamReader(filename))
@@ -348,10 +358,7 @@ function Verify-NuGet
   )
   
   add-type -referencedAssemblies $assem -typeDefinition $source -language CSharp
-  if (-not $?)
-  {
-    break
-  }
+  if (-not $?) { break }
   
   $nuspecs = (
     "UmbracoCms",
@@ -369,9 +376,11 @@ function Verify-NuGet
    
   $src = "$($uenv.SolutionRoot)\src"
   $pkgs = [Umbraco.Build.NuGet]::GetProjectsPackages($src, $projects)
+  if (-not $?) { break }
   #Write-Package "All" $pkgs
   
   $errs = [Umbraco.Build.NuGet]::GetPackageErrors($pkgs)
+  if (-not $?) { break }
   
   if ($errs.Length -gt 0)
   {
@@ -396,9 +405,11 @@ function Verify-NuGet
   foreach ($nuspec in $nuspecs)
   {  
     $deps = [Umbraco.Build.NuGet]::GetNuSpecDependencies("$nupath\$nuspec.nuspec")
+    if (-not $?) { break }
     #Write-NuSpec $nuspec $deps
     
     $errs = [Umbraco.Build.NuGet]::GetNuSpecErrors($pkgs, $deps)
+    if (-not $?) { break }
     
     if ($errs.Length -gt 0)
     {
