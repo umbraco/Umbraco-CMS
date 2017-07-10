@@ -102,6 +102,12 @@ Builds umbraco documentation. Temporary files are generated in `build.tmp` while
 
 Some log files, such as MsBuild logs, are produced in `build.tmp` too. The `build` directory should remain clean during a build.
 
+## Verify-NuGet
+
+Verifies that projects all require the same version of their dependencies, and that NuSpec files require versions that are consistent with projects. Example:
+
+    Verify-NuGet
+
 # VSTS
 
 Continuous integration, nightly builds and release builds run on VSTS.

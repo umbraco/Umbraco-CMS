@@ -20,6 +20,7 @@
 . "$PSScriptRoot\Get-UmbracoBuildEnv.ps1"
 . "$PSScriptRoot\Set-UmbracoVersion.ps1"
 . "$PSScriptRoot\Get-UmbracoVersion.ps1"
+. "$PSScriptRoot\Verify-NuGet.ps1"
 
 . "$PSScriptRoot\Build-UmbracoDocs.ps1"
 
@@ -515,6 +516,7 @@ function Build-Umbraco
     # not running tests...
     Prepare-Packages $uenv
     Package-Zip $uenv
+    Verify-NuGet $uenv
     Prepare-NuGet $uenv
     Package-NuGet $uenv $version
   }
@@ -532,5 +534,6 @@ Export-ModuleMember -function Set-UmbracoVersion
 Export-ModuleMember -function Get-UmbracoVersion
 Export-ModuleMember -function Build-Umbraco
 Export-ModuleMember -function Build-UmbracoDocs
+Export-ModuleMember -function Verify-NuGet
 
 #eof

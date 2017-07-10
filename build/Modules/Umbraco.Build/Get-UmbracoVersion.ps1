@@ -6,16 +6,6 @@ function Get-UmbracoVersion
 {  
   $uenv = Get-UmbracoBuildEnv
   
-  try
-  {
-    [Reflection.Assembly]::LoadFile($uenv.Semver) > $null
-  }
-  catch
-  {
-    Write-Error -Exception $_.Exception -Message "Failed to load $uenv.Semver"
-    break
-  }
-  
   # parse SolutionInfo and retrieve the version string
   $filepath = "$($uenv.SolutionRoot)\src\SolutionInfo.cs"
   $text = [System.IO.File]::ReadAllText($filepath)
