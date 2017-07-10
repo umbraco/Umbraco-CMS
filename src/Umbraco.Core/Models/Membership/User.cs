@@ -258,10 +258,6 @@ namespace Umbraco.Core.Models.Membership
             {
                 if (LastLoginDate == default(DateTime) && IsApproved == false && InvitedDate != null)
                     return UserState.Invited;
-                
-                //This state shouldn't really exist or occur
-                if (LastLoginDate == default(DateTime) && InvitedDate == null && RawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix))
-                    return UserState.NoCredentials;
 
                 if (IsLockedOut)
                     return UserState.LockedOut;

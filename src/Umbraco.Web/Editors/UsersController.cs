@@ -509,6 +509,7 @@ namespace Umbraco.Web.Editors
             foreach (var u in users)
             {
                 u.IsApproved = false;
+                u.InvitedDate = null;
             }
             Services.UserService.Save(users);
 
