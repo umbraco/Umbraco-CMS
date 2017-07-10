@@ -947,9 +947,9 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             var filterSql = new Sql().Append("AND (cmsDocument.newest = 1)");
             if (filter != null)
             {
-                foreach (var filterClaus in filter.GetWhereClauses())
+                foreach (var filterClause in filter.GetWhereClauses())
                 {
-                    filterSql.Append(string.Format("AND ({0})", filterClaus.Item1), filterClaus.Item2);
+                    filterSql.Append(string.Format("AND ({0})", filterClause.Item1), filterClause.Item2);
                 }
             }
 
