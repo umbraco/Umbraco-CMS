@@ -32,6 +32,7 @@ namespace Umbraco.Web.Cache
     public class CacheRefresherComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         private static readonly ConcurrentDictionary<IEventDefinition, MethodInfo> FoundHandlers = new ConcurrentDictionary<IEventDefinition, MethodInfo>();
+        private DistributedCache _distributedCache;
         private List<Action> _unbinders;
 
         public CacheRefresherComponent()
@@ -44,9 +45,11 @@ namespace Umbraco.Web.Cache
                 _unbinders = new List<Action>();
         }
 
-        public void Initialize()
+        public void Initialize(DistributedCache distributedCache)
         {
             Current.Logger.Info<CacheRefresherComponent>("Initializing Umbraco internal event handlers for cache refreshing.");
+
+            _distributedCache = distributedCache;
 
             // bind to application tree events
             Bind(() => ApplicationTreeService.Deleted += ApplicationTreeService_Deleted,
@@ -196,7 +199,7 @@ namespace Umbraco.Web.Cache
             var underscore = new[] { '_' };
 
             return typeof(CacheRefresherComponent)
-                .GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 .Select(x =>
                 {
                     if (x.Name.Contains("_") == false) return null;
@@ -252,14 +255,14 @@ namespace Umbraco.Web.Cache
 
         #region PublicAccessService
 
-        private static void PublicAccessService_Saved(IPublicAccessService sender, SaveEventArgs<PublicAccessEntry> e)
+        private void PublicAccessService_Saved(IPublicAccessService sender, SaveEventArgs<PublicAccessEntry> e)
         {
-            DistributedCache.Instance.RefreshPublicAccess();
+            _distributedCache.RefreshPublicAccess();
         }
 
-        private static void PublicAccessService_Deleted(IPublicAccessService sender, DeleteEventArgs<PublicAccessEntry> e)
+        private void PublicAccessService_Deleted(IPublicAccessService sender, DeleteEventArgs<PublicAccessEntry> e)
         {
-            DistributedCache.Instance.RefreshPublicAccess();
+            _distributedCache.RefreshPublicAccess();
         }
 
         #endregion
@@ -275,13 +278,13 @@ namespace Umbraco.Web.Cache
         /// When an entity is copied new permissions may be assigned to it based on it's parent, if that is the
         /// case then we need to clear all user permissions cache.
         /// </remarks>
-        private static void ContentService_Copied(IContentService sender, CopyEventArgs<IContent> e)
+        private void ContentService_Copied(IContentService sender, CopyEventArgs<IContent> e)
         {
             //check if permissions have changed
             var permissionsChanged = ((Content)e.Copy).WasPropertyDirty("PermissionsChanged");
             if (permissionsChanged)
             {
-                DistributedCache.Instance.RefreshAllUserPermissionsCache();
+                _distributedCache.RefreshAllUserPermissionsCache();
             }
         }
 
@@ -297,7 +300,7 @@ namespace Umbraco.Web.Cache
         /// When an entity is created new permissions may be assigned to it based on it's parent, if that is the
         /// case then we need to clear all user permissions cache.
         /// </remarks>
-        private static void ContentService_Saved(IContentService sender, SaveEventArgs<IContent> e)
+        private void ContentService_Saved(IContentService sender, SaveEventArgs<IContent> e)
         {
             var clearUserPermissions = false;
             foreach (var entity in e.SavedEntities)
@@ -316,117 +319,118 @@ namespace Umbraco.Web.Cache
 
             if (clearUserPermissions)
             {
-                DistributedCache.Instance.RefreshAllUserPermissionsCache();
+                _distributedCache.RefreshAllUserPermissionsCache();
             }
         }
 
-        private static void ContentService_Changed(IContentService sender, TreeChange<IContent>.EventArgs args)
+        private void ContentService_Changed(IContentService sender, TreeChange<IContent>.EventArgs args)
         {
-            DistributedCache.Instance.RefreshContentCache(args.Changes.ToArray());
+            _distributedCache.RefreshContentCache(args.Changes.ToArray());
         }
 
         // fixme our weird events handling wants this for now
-        private static void ContentService_Deleted(IContentService sender, DeleteEventArgs<IContent> e) { }
-        private static void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e) { }
-        private static void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e) { }
-        private static void ContentService_EmptiedRecycleBin(IContentService sender, RecycleBinEventArgs e) { }
-        private static void ContentService_Published(IContentService sender, PublishEventArgs<IContent> e) { }
-        private static void ContentService_UnPublished(IContentService sender, PublishEventArgs<IContent> e) { }
+        private void ContentService_Deleted(IContentService sender, DeleteEventArgs<IContent> e) { }
+        private void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e) { }
+        private void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e) { }
+        private void ContentService_EmptiedRecycleBin(IContentService sender, RecycleBinEventArgs e) { }
+        private void ContentService_Published(IContentService sender, PublishEventArgs<IContent> e) { }
+        private void ContentService_UnPublished(IContentService sender, PublishEventArgs<IContent> e) { }
 
         #endregion
 
         #region ApplicationTreeService
 
-        private static void ApplicationTreeService_New(ApplicationTree sender, EventArgs e)
+        private void ApplicationTreeService_New(ApplicationTree sender, EventArgs e)
         {
-            DistributedCache.Instance.RefreshAllApplicationTreeCache();
+            _distributedCache.RefreshAllApplicationTreeCache();
         }
 
-        private static void ApplicationTreeService_Updated(ApplicationTree sender, EventArgs e)
+        private void ApplicationTreeService_Updated(ApplicationTree sender, EventArgs e)
         {
-            DistributedCache.Instance.RefreshAllApplicationTreeCache();
+            _distributedCache.RefreshAllApplicationTreeCache();
         }
 
-        private static void ApplicationTreeService_Deleted(ApplicationTree sender, EventArgs e)
+        private void ApplicationTreeService_Deleted(ApplicationTree sender, EventArgs e)
         {
-            DistributedCache.Instance.RefreshAllApplicationTreeCache();
+            _distributedCache.RefreshAllApplicationTreeCache();
         }
+
         #endregion
 
         #region Application event handlers
 
-        private static void SectionService_New(Section sender, EventArgs e)
+        private void SectionService_New(Section sender, EventArgs e)
         {
-            DistributedCache.Instance.RefreshAllApplicationCache();
+            _distributedCache.RefreshAllApplicationCache();
         }
 
-        private static void SectionService_Deleted(Section sender, EventArgs e)
+        private void SectionService_Deleted(Section sender, EventArgs e)
         {
-            DistributedCache.Instance.RefreshAllApplicationCache();
+            _distributedCache.RefreshAllApplicationCache();
         }
 
         #endregion
 
         #region UserService / UserType
 
-        private static void UserService_DeletedUserType(IUserService sender, DeleteEventArgs<IUserType> e)
+        private void UserService_DeletedUserType(IUserService sender, DeleteEventArgs<IUserType> e)
         {
             foreach (var entity in e.DeletedEntities)
-                DistributedCache.Instance.RemoveUserTypeCache(entity.Id);
+                _distributedCache.RemoveUserTypeCache(entity.Id);
         }
 
-        private static void UserService_SavedUserType(IUserService sender, SaveEventArgs<IUserType> e)
+        private void UserService_SavedUserType(IUserService sender, SaveEventArgs<IUserType> e)
         {
             foreach (var entity in e.SavedEntities)
-                DistributedCache.Instance.RefreshUserTypeCache(entity.Id);
+                _distributedCache.RefreshUserTypeCache(entity.Id);
         }
 
         #endregion
 
         #region LocalizationService / Dictionary
 
-        private static void LocalizationService_SavedDictionaryItem(ILocalizationService sender, SaveEventArgs<IDictionaryItem> e)
+        private void LocalizationService_SavedDictionaryItem(ILocalizationService sender, SaveEventArgs<IDictionaryItem> e)
         {
             foreach (var entity in e.SavedEntities)
-                DistributedCache.Instance.RefreshDictionaryCache(entity.Id);
+                _distributedCache.RefreshDictionaryCache(entity.Id);
         }
 
-        private static void LocalizationService_DeletedDictionaryItem(ILocalizationService sender, DeleteEventArgs<IDictionaryItem> e)
+        private void LocalizationService_DeletedDictionaryItem(ILocalizationService sender, DeleteEventArgs<IDictionaryItem> e)
         {
             foreach (var entity in e.DeletedEntities)
-                DistributedCache.Instance.RemoveDictionaryCache(entity.Id);
+                _distributedCache.RemoveDictionaryCache(entity.Id);
         }
 
         #endregion
 
         #region DataTypeService
 
-        private static void DataTypeService_Saved(IDataTypeService sender, SaveEventArgs<IDataTypeDefinition> e)
+        private void DataTypeService_Saved(IDataTypeService sender, SaveEventArgs<IDataTypeDefinition> e)
         {
             foreach (var entity in e.SavedEntities)
-                DistributedCache.Instance.RefreshDataTypeCache(entity);
+                _distributedCache.RefreshDataTypeCache(entity);
         }
 
-        private static void DataTypeService_Deleted(IDataTypeService sender, DeleteEventArgs<IDataTypeDefinition> e)
+        private void DataTypeService_Deleted(IDataTypeService sender, DeleteEventArgs<IDataTypeDefinition> e)
         {
             foreach (var entity in e.DeletedEntities)
-                DistributedCache.Instance.RemoveDataTypeCache(entity);
+                _distributedCache.RemoveDataTypeCache(entity);
         }
 
         #endregion
 
         #region DomainService
 
-        private static void DomainService_Saved(IDomainService sender, SaveEventArgs<IDomain> e)
+        private void DomainService_Saved(IDomainService sender, SaveEventArgs<IDomain> e)
         {
             foreach (var entity in e.SavedEntities)
-                DistributedCache.Instance.RefreshDomainCache(entity);
+                _distributedCache.RefreshDomainCache(entity);
         }
 
-        private static void DomainService_Deleted(IDomainService sender, DeleteEventArgs<IDomain> e)
+        private void DomainService_Deleted(IDomainService sender, DeleteEventArgs<IDomain> e)
         {
             foreach (var entity in e.DeletedEntities)
-                DistributedCache.Instance.RemoveDomainCache(entity);
+                _distributedCache.RemoveDomainCache(entity);
         }
 
         #endregion
@@ -438,10 +442,10 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void LocalizationService_DeletedLanguage(ILocalizationService sender, DeleteEventArgs<ILanguage> e)
+        private void LocalizationService_DeletedLanguage(ILocalizationService sender, DeleteEventArgs<ILanguage> e)
         {
             foreach (var entity in e.DeletedEntities)
-                DistributedCache.Instance.RemoveLanguageCache(entity);
+                _distributedCache.RemoveLanguageCache(entity);
         }
 
         /// <summary>
@@ -449,60 +453,60 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void LocalizationService_SavedLanguage(ILocalizationService sender, SaveEventArgs<ILanguage> e)
+        private void LocalizationService_SavedLanguage(ILocalizationService sender, SaveEventArgs<ILanguage> e)
         {
             foreach (var entity in e.SavedEntities)
-                DistributedCache.Instance.RefreshLanguageCache(entity);
+                _distributedCache.RefreshLanguageCache(entity);
         }
 
         #endregion
 
         #region Content|Media|MemberTypeService
 
-        private static void ContentTypeService_Changed(IContentTypeService sender, ContentTypeChange<IContentType>.EventArgs args)
+        private void ContentTypeService_Changed(IContentTypeService sender, ContentTypeChange<IContentType>.EventArgs args)
         {
-            DistributedCache.Instance.RefreshContentTypeCache(args.Changes.ToArray());
+            _distributedCache.RefreshContentTypeCache(args.Changes.ToArray());
         }
 
-        private static void MediaTypeService_Changed(IMediaTypeService sender, ContentTypeChange<IMediaType>.EventArgs args)
+        private void MediaTypeService_Changed(IMediaTypeService sender, ContentTypeChange<IMediaType>.EventArgs args)
         {
-            DistributedCache.Instance.RefreshContentTypeCache(args.Changes.ToArray());
+            _distributedCache.RefreshContentTypeCache(args.Changes.ToArray());
         }
 
-        private static void MemberTypeService_Changed(IMemberTypeService sender, ContentTypeChange<IMemberType>.EventArgs args)
+        private void MemberTypeService_Changed(IMemberTypeService sender, ContentTypeChange<IMemberType>.EventArgs args)
         {
-            DistributedCache.Instance.RefreshContentTypeCache(args.Changes.ToArray());
+            _distributedCache.RefreshContentTypeCache(args.Changes.ToArray());
         }
 
         // fixme our weird events handling wants this for now
-        private static void ContentTypeService_Saved(IContentTypeService sender, SaveEventArgs<IContentType> args) { }
-        private static void MediaTypeService_Saved(IMediaTypeService sender, SaveEventArgs<IMediaType> args) { }
-        private static void MemberTypeService_Saved(IMemberTypeService sender, SaveEventArgs<IMemberType> args) { }
-        private static void ContentTypeService_Deleted(IContentTypeService sender, DeleteEventArgs<IContentType> args) { }
-        private static void MediaTypeService_Deleted(IMediaTypeService sender, DeleteEventArgs<IMediaType> args) { }
-        private static void MemberTypeService_Deleted(IMemberTypeService sender, DeleteEventArgs<IMemberType> args) { }
+        private void ContentTypeService_Saved(IContentTypeService sender, SaveEventArgs<IContentType> args) { }
+        private void MediaTypeService_Saved(IMediaTypeService sender, SaveEventArgs<IMediaType> args) { }
+        private void MemberTypeService_Saved(IMemberTypeService sender, SaveEventArgs<IMemberType> args) { }
+        private void ContentTypeService_Deleted(IContentTypeService sender, DeleteEventArgs<IContentType> args) { }
+        private void MediaTypeService_Deleted(IMediaTypeService sender, DeleteEventArgs<IMediaType> args) { }
+        private void MemberTypeService_Deleted(IMemberTypeService sender, DeleteEventArgs<IMemberType> args) { }
 
         #endregion
 
         #region UserService & PermissionRepository
 
-        private static void PermissionRepository_AssignedPermissions(PermissionRepository<IContent> sender, SaveEventArgs<EntityPermission> e)
+        private void PermissionRepository_AssignedPermissions(PermissionRepository<IContent> sender, SaveEventArgs<EntityPermission> e)
         {
             var userIds = e.SavedEntities.Select(x => x.UserId).Distinct();
             foreach (var id in userIds)
-                DistributedCache.Instance.RefreshUserPermissionsCache(id);
+                _distributedCache.RefreshUserPermissionsCache(id);
         }
 
-        private static void UserService_SavedUser(IUserService sender, SaveEventArgs<IUser> e)
+        private void UserService_SavedUser(IUserService sender, SaveEventArgs<IUser> e)
         {
             foreach (var entity in e.SavedEntities)
-                DistributedCache.Instance.RefreshUserCache(entity.Id);
+                _distributedCache.RefreshUserCache(entity.Id);
         }
 
-        private static void UserService_DeletedUser(IUserService sender, DeleteEventArgs<IUser> e)
+        private void UserService_DeletedUser(IUserService sender, DeleteEventArgs<IUser> e)
         {
             foreach (var entity in e.DeletedEntities)
-                DistributedCache.Instance.RemoveUserCache(entity.Id);
+                _distributedCache.RemoveUserCache(entity.Id);
         }
 
         #endregion
@@ -514,10 +518,10 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void FileService_DeletedTemplate(IFileService sender, DeleteEventArgs<ITemplate> e)
+        private void FileService_DeletedTemplate(IFileService sender, DeleteEventArgs<ITemplate> e)
         {
             foreach (var entity in e.DeletedEntities)
-                DistributedCache.Instance.RemoveTemplateCache(entity.Id);
+                _distributedCache.RemoveTemplateCache(entity.Id);
         }
 
         /// <summary>
@@ -525,95 +529,95 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void FileService_SavedTemplate(IFileService sender, SaveEventArgs<ITemplate> e)
+        private void FileService_SavedTemplate(IFileService sender, SaveEventArgs<ITemplate> e)
         {
             foreach (var entity in e.SavedEntities)
-                DistributedCache.Instance.RefreshTemplateCache(entity.Id);
+                _distributedCache.RefreshTemplateCache(entity.Id);
         }
 
         // fixme our weird events handling wants this for now
-        private static void FileService_DeletedStylesheet(IFileService sender, DeleteEventArgs<Stylesheet> e) { }
-        private static void FileService_SavedStylesheet(IFileService sender, SaveEventArgs<Stylesheet> e) { }
+        private void FileService_DeletedStylesheet(IFileService sender, DeleteEventArgs<Stylesheet> e) { }
+        private void FileService_SavedStylesheet(IFileService sender, SaveEventArgs<Stylesheet> e) { }
 
         #endregion
 
         #region MacroService
 
-        private static void MacroService_Deleted(IMacroService sender, DeleteEventArgs<IMacro> e)
+        private void MacroService_Deleted(IMacroService sender, DeleteEventArgs<IMacro> e)
         {
             foreach (var entity in e.DeletedEntities)
-                DistributedCache.Instance.RemoveMacroCache(entity);
+                _distributedCache.RemoveMacroCache(entity);
         }
 
-        private static void MacroService_Saved(IMacroService sender, SaveEventArgs<IMacro> e)
+        private void MacroService_Saved(IMacroService sender, SaveEventArgs<IMacro> e)
         {
             foreach (var entity in e.SavedEntities)
-                DistributedCache.Instance.RefreshMacroCache(entity);
+                _distributedCache.RefreshMacroCache(entity);
         }
 
         #endregion
 
         #region MediaService
 
-        private static void MediaService_Changed(IMediaService sender, TreeChange<IMedia>.EventArgs args)
+        private void MediaService_Changed(IMediaService sender, TreeChange<IMedia>.EventArgs args)
         {
-            DistributedCache.Instance.RefreshMediaCache(args.Changes.ToArray());
+            _distributedCache.RefreshMediaCache(args.Changes.ToArray());
         }
 
         // fixme our weird events handling wants this for now
-        private static void MediaService_Saved(IMediaService sender, SaveEventArgs<IMedia> e) { }
-        private static void MediaService_Deleted(IMediaService sender, DeleteEventArgs<IMedia> e) { }
-        private static void MediaService_Moved(IMediaService sender, MoveEventArgs<IMedia> e) { }
-        private static void MediaService_Trashed(IMediaService sender, MoveEventArgs<IMedia> e) { }
-        private static void MediaService_EmptiedRecycleBin(IMediaService sender, RecycleBinEventArgs e) { }
+        private void MediaService_Saved(IMediaService sender, SaveEventArgs<IMedia> e) { }
+        private void MediaService_Deleted(IMediaService sender, DeleteEventArgs<IMedia> e) { }
+        private void MediaService_Moved(IMediaService sender, MoveEventArgs<IMedia> e) { }
+        private void MediaService_Trashed(IMediaService sender, MoveEventArgs<IMedia> e) { }
+        private void MediaService_EmptiedRecycleBin(IMediaService sender, RecycleBinEventArgs e) { }
 
         #endregion
 
         #region MemberService
 
-        private static void MemberService_Deleted(IMemberService sender, DeleteEventArgs<IMember> e)
+        private void MemberService_Deleted(IMemberService sender, DeleteEventArgs<IMember> e)
         {
-            DistributedCache.Instance.RemoveMemberCache(e.DeletedEntities.ToArray());
+            _distributedCache.RemoveMemberCache(e.DeletedEntities.ToArray());
         }
 
-        private static void MemberService_Saved(IMemberService sender, SaveEventArgs<IMember> e)
+        private void MemberService_Saved(IMemberService sender, SaveEventArgs<IMember> e)
         {
-            DistributedCache.Instance.RefreshMemberCache(e.SavedEntities.ToArray());
+            _distributedCache.RefreshMemberCache(e.SavedEntities.ToArray());
         }
 
         #endregion
 
         #region MemberGroupService
 
-        private static void MemberGroupService_Deleted(IMemberGroupService sender, DeleteEventArgs<IMemberGroup> e)
+        private void MemberGroupService_Deleted(IMemberGroupService sender, DeleteEventArgs<IMemberGroup> e)
         {
             foreach (var m in e.DeletedEntities.ToArray())
             {
-                DistributedCache.Instance.RemoveMemberGroupCache(m.Id);
+                _distributedCache.RemoveMemberGroupCache(m.Id);
             }
         }
 
-        private static void MemberGroupService_Saved(IMemberGroupService sender, SaveEventArgs<IMemberGroup> e)
+        private void MemberGroupService_Saved(IMemberGroupService sender, SaveEventArgs<IMemberGroup> e)
         {
             foreach (var m in e.SavedEntities.ToArray())
             {
-                DistributedCache.Instance.RemoveMemberGroupCache(m.Id);
+                _distributedCache.RemoveMemberGroupCache(m.Id);
             }
         }
         #endregion
 
         #region RelationType
 
-        private static void RelationService_SavedRelationType(IRelationService sender, SaveEventArgs<IRelationType> args)
+        private void RelationService_SavedRelationType(IRelationService sender, SaveEventArgs<IRelationType> args)
         {
-            var dc = DistributedCache.Instance;
+            var dc = _distributedCache;
             foreach (var e in args.SavedEntities)
                 dc.RefreshRelationTypeCache(e.Id);
         }
 
-        private static void RelationService_DeletedRelationType(IRelationService sender, DeleteEventArgs<IRelationType> args)
+        private void RelationService_DeletedRelationType(IRelationService sender, DeleteEventArgs<IRelationType> args)
         {
-            var dc = DistributedCache.Instance;
+            var dc = _distributedCache;
             foreach (var e in args.DeletedEntities)
                 dc.RemoveRelationTypeCache(e.Id);
         }

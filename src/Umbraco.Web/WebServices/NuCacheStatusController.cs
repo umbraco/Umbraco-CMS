@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.Http;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.WebApi;
@@ -58,7 +59,7 @@ namespace Umbraco.Web.WebServices
         [HttpPost]
         public void ReloadCache()
         {
-            DistributedCache.Instance.RefreshAllFacade();
+            Current.DistributedCache.RefreshAllFacade();
         }
     }
 }

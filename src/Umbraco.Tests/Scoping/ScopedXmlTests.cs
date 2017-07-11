@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Scoping
 
             // wire cache refresher
             _cacheRefresher = new CacheRefresherComponent(true);
-            _cacheRefresher.Initialize();
+            _cacheRefresher.Initialize(new DistributedCache());
 
             // check xml in context = "before"
             var xml = XmlInContext;
@@ -209,7 +209,7 @@ namespace Umbraco.Tests.Scoping
 
             // wire cache refresher
             _cacheRefresher = new CacheRefresherComponent(true);
-            _cacheRefresher.Initialize();
+            _cacheRefresher.Initialize(new DistributedCache());
 
             // check xml in context = "before"
             var xml = XmlInContext;

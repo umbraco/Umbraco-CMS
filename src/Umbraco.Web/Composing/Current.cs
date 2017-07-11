@@ -19,6 +19,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Core._Legacy.PackageActions;
+using Umbraco.Web.Cache;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Media;
@@ -93,6 +94,9 @@ namespace Umbraco.Web.Composing
 
         public static UmbracoContext UmbracoContext
             => UmbracoContextAccessor.UmbracoContext;
+
+        public static DistributedCache DistributedCache
+            => Container.GetInstance<DistributedCache>();
 
         public static IFacade Facade
             => Container.GetInstance<IFacadeAccessor>().Facade;

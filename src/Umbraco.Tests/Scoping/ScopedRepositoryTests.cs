@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Scoping
             user = service.GetUserById(user.Id);
 
             _cacheRefresher = new CacheRefresherComponent(true);
-            _cacheRefresher.Initialize();
+            _cacheRefresher.Initialize(new DistributedCache());
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
@@ -159,7 +159,7 @@ namespace Umbraco.Tests.Scoping
             Assert.AreEqual("fr-FR", globalCached.IsoCode);
 
             _cacheRefresher = new CacheRefresherComponent(true);
-            _cacheRefresher.Initialize();
+            _cacheRefresher.Initialize(new DistributedCache());
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
@@ -251,7 +251,7 @@ namespace Umbraco.Tests.Scoping
             Assert.AreEqual("item-key", globalCached.ItemKey);
 
             _cacheRefresher = new CacheRefresherComponent(true);
-            _cacheRefresher.Initialize();
+            _cacheRefresher.Initialize(new DistributedCache());
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))

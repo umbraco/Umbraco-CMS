@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Sync;
 using Umbraco.Core.Cache;
 using Umbraco.Web.Composing;
 
@@ -22,32 +21,6 @@ namespace Umbraco.Web.Cache
     /// </remarks>
     public sealed class DistributedCache
     {
-        #region Constructor & Singleton
-
-        // note - should inject into the application instead of using a singleton
-        private static readonly DistributedCache InstanceObject = new DistributedCache();
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DistributedCache"/> class.
-        /// </summary>
-        private DistributedCache()
-        { }
-
-        /// <summary>
-        /// Gets the static unique instance of the <see cref="DistributedCache"/> class.
-        /// </summary>
-        /// <returns>The static unique instance of the <see cref="DistributedCache"/> class.</returns>
-        /// <remarks>Exists so that extension methods can be added to the distributed cache.</remarks>
-        public static DistributedCache Instance
-        {
-            get
-            {
-                return InstanceObject;
-            }
-        }
-
-        #endregion
-
         #region Core notification methods
 
         /// <summary>

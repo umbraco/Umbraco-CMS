@@ -24,6 +24,7 @@ using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
+using Umbraco.Web.Cache;
 using Umbraco.Web.DI;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
@@ -81,6 +82,9 @@ namespace Umbraco.Web
             // register the umbraco helper
             // fixme - FUCK! how can this even work, it's not a singleton!
             composition.Container.RegisterSingleton<UmbracoHelper>();
+
+            // register distributed cache
+            composition.Container.RegisterSingleton(f => new DistributedCache());
 
             // replace some services
             composition.Container.RegisterSingleton<IEventMessagesFactory, DefaultEventMessagesFactory>();

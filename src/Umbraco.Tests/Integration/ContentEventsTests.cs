@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Integration
             base.SetUp();
 
             _h1 = new CacheRefresherComponent(true);
-            _h1.Initialize();
+            _h1.Initialize(new DistributedCache());
 
             _events = new List<EventInstance>();
 

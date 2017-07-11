@@ -553,7 +553,7 @@ where nodeId = @templateID",
         [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearCacheForTemplate instead")]
         public static void ClearCachedTemplate(int templateID)
         {
-            DistributedCache.Instance.RefreshTemplateCache(templateID);
+            Current.DistributedCache.RefreshTemplateCache(templateID);
         }
 
         public template(String templateContent)

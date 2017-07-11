@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using LightInject;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Tests.Cache.DistributedCache
@@ -18,6 +15,8 @@ namespace Umbraco.Tests.Cache.DistributedCache
     [TestFixture]
     public class DistributedCacheTests
     {
+        private Umbraco.Web.Cache.DistributedCache _distributedCache;
+
         [SetUp]
         public void Setup()
         {
@@ -29,6 +28,8 @@ namespace Umbraco.Tests.Cache.DistributedCache
 
             container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add<TestCacheRefresher>();
+
+            _distributedCache = new Umbraco.Web.Cache.DistributedCache();
         }
 
         [TearDown]
@@ -42,7 +43,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
         {
             for (var i = 1; i < 11; i++)
             {
-                global::Umbraco.Web.Cache.DistributedCache.Instance.Refresh(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), i);
+                _distributedCache.Refresh(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), i);
             }
             Assert.AreEqual(10, ((TestServerMessenger)Current.ServerMessenger).IntIdsRefreshed.Count);
         }
@@ -52,7 +53,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
         {
             for (var i = 0; i < 10; i++)
             {
-                global::Umbraco.Web.Cache.DistributedCache.Instance.Refresh(
+                _distributedCache.Refresh(
                     Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"),
                     x => x.Id,
                     new TestObjectWithId{Id = i});
@@ -65,7 +66,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
         {
             for (var i = 0; i < 11; i++)
             {
-                global::Umbraco.Web.Cache.DistributedCache.Instance.Refresh(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), Guid.NewGuid());
+                _distributedCache.Refresh(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), Guid.NewGuid());
             }
             Assert.AreEqual(11, ((TestServerMessenger)Current.ServerMessenger).GuidIdsRefreshed.Count);
         }
@@ -75,7 +76,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
         {
             for (var i = 1; i < 13; i++)
             {
-                global::Umbraco.Web.Cache.DistributedCache.Instance.Remove(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), i);
+                _distributedCache.Remove(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), i);
             }
             Assert.AreEqual(12, ((TestServerMessenger)Current.ServerMessenger).IntIdsRemoved.Count);
         }
@@ -85,7 +86,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
         {
             for (var i = 0; i < 13; i++)
             {
-                global::Umbraco.Web.Cache.DistributedCache.Instance.RefreshAll(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"));
+                _distributedCache.RefreshAll(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"));
             }
             Assert.AreEqual(13, ((TestServerMessenger)Current.ServerMessenger).CountOfFullRefreshes);
         }
