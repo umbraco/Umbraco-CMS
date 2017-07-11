@@ -5,13 +5,15 @@ namespace Umbraco.Core.Models.Membership
 {
     public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGroup>
     {
-        public ReadOnlyUserGroup(int id, string name, string icon, int? startContentId, int? startMediaId, string @alias, IEnumerable<string> allowedSections)
+        public ReadOnlyUserGroup(int id, string name, string icon, int? startContentId, int? startMediaId, string @alias, 
+            IEnumerable<string> allowedSections, IEnumerable<string> permissions)
         {
             Name = name;
             Icon = icon;
             Id = id;
             Alias = alias;
             AllowedSections = allowedSections;
+            Permissions = permissions;
 
             //Zero is invalid and will be treated as Null
             StartContentId = startContentId == 0 ? null : startContentId;
@@ -24,6 +26,14 @@ namespace Umbraco.Core.Models.Membership
         public int? StartContentId { get; private set; }
         public int? StartMediaId { get; private set; }
         public string Alias { get; private set; }
+
+        /// <summary>
+        /// The set of default permissions
+        /// </summary>
+        /// <remarks>
+        /// By default each permission is simply a single char but we've made this an enumerable{string} to support a more flexible permissions structure in the future.
+        /// </remarks>
+        public IEnumerable<string> Permissions { get; set; }
         public IEnumerable<string> AllowedSections { get; private set; }
 
         public bool Equals(ReadOnlyUserGroup other)

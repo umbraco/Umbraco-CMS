@@ -89,7 +89,7 @@ namespace umbraco.dialogs
                     if (a.CanBePermissionAssigned == false) continue;
 
                     var permissions = userService.GetPermissionsForPath(group, _node.Path);
-                    if (permissions.Contains(a.Letter))
+                    if (permissions.AssignedPermissions.Contains(a.Letter.ToString()))
                     {
                         chk.Checked = true;
                     }

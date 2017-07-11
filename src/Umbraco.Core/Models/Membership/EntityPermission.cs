@@ -11,6 +11,14 @@ namespace Umbraco.Core.Models.Membership
         {
             EntityId = entityId;
             AssignedPermissions = assignedPermissions;
+            IsDefaultPermissions = false;
+        }
+
+        public EntityPermission(int entityId, string[] assignedPermissions, bool isDefaultPermissions)
+        {
+            EntityId = entityId;
+            AssignedPermissions = assignedPermissions;
+            IsDefaultPermissions = isDefaultPermissions;
         }
 
         public int EntityId { get; private set; }
@@ -19,6 +27,14 @@ namespace Umbraco.Core.Models.Membership
         /// The assigned permissions for the user/entity combo
         /// </summary>
         public string[] AssignedPermissions { get; private set; }
+
+        /// <summary>
+        /// True if the permissions assigned to this object are the group's default permissions and not explicitly defined permissions
+        /// </summary>
+        /// <remarks>
+        /// This will be the case when looking up entity permissions and falling back to the default permissions
+        /// </remarks>
+        public bool IsDefaultPermissions { get; private set; }
 
         /// <summary>
         /// Adds additional permissions to an existing instance of <see cref="EntityPermission"/>

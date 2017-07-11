@@ -136,10 +136,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var hasPropertiesContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 content1 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
-                
+
                 contentTypeRepository.AddOrUpdate(hasPropertiesContentType);
-                repository.AddOrUpdate(content1);                
-                unitOfWork.Commit();                
+                repository.AddOrUpdate(content1);
+                unitOfWork.Commit();
             }
 
             var versionDtos = new List<ContentVersionDto>();
@@ -167,7 +167,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     VersionId = version,
                     WriterUserId = 0,
                     UpdateDate = versionDate,
-                    TemplateId = content1.Template == null || content1.Template.Id <= 0 ? null : (int?) content1.Template.Id
+                    TemplateId = content1.Template == null || content1.Template.Id <= 0 ? null : (int?)content1.Template.Id
                 });
             }
 
@@ -188,7 +188,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(contentItem.Version, versionDtos.Single(x => x.Id == versionDtos.Max(y => y.Id)).VersionId);
 
                 var allVersions = repository.GetAllVersions(content[0].Id);
-                var allKnownVersions = versionDtos.Select(x => x.VersionId).Union(new[]{ content1.Version }).ToArray();
+                var allKnownVersions = versionDtos.Select(x => x.VersionId).Union(new[] { content1.Version }).ToArray();
                 Assert.IsTrue(allKnownVersions.ContainsAll(allVersions.Select(x => x.Version)));
                 Assert.IsTrue(allVersions.Select(x => x.Version).ContainsAll(allKnownVersions));
             }
@@ -549,7 +549,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
             }
 
-                ContentTypeRepository contentTypeRepository;
+            ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
@@ -563,7 +563,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
 
                 // Act
-                repository.AssignEntityPermission(parentPage, 'A', new [] { 1 });
+                repository.AssignEntityPermission(parentPage, 'A', new[] { 1 });
                 var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
                 repository.AddOrUpdate(childPage);
                 unitOfWork.Commit();
