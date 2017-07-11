@@ -192,7 +192,7 @@ namespace Umbraco.Core.Persistence
                 // these are created here because it is the UmbracoDatabaseFactory that determines
                 // the sql syntax, poco data factory, and database type - so it "owns" the context
                 // and the query factory
-                _sqlContext = new SqlContext(_sqlSyntax, _pocoDataFactory, _databaseType, _mappers);               
+                _sqlContext = new SqlContext(_sqlSyntax, _pocoDataFactory, _databaseType, _mappers);
 
                 _logger.Debug<UmbracoDatabaseFactory>("Configured.");
                 Configured = true;

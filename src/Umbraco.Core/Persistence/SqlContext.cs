@@ -10,17 +10,13 @@ namespace Umbraco.Core.Persistence
     {
         public SqlContext(ISqlSyntaxProvider sqlSyntax, IPocoDataFactory pocoDataFactory, DatabaseType databaseType, IMapperCollection mappers = null)
         {
-            if (sqlSyntax == null) throw new ArgumentNullException(nameof(sqlSyntax));
-            if (pocoDataFactory == null) throw new ArgumentNullException(nameof(pocoDataFactory));
-            if (databaseType == null) throw new ArgumentNullException(nameof(databaseType));
-            
             // for tests
             if (mappers == null) mappers = new Mappers.MapperCollection(Enumerable.Empty<BaseMapper>());
-
-            SqlSyntax = sqlSyntax;
-            PocoDataFactory = pocoDataFactory;
-            DatabaseType = databaseType;
             Mappers = mappers;
+
+            SqlSyntax = sqlSyntax ?? throw new ArgumentNullException(nameof(sqlSyntax));
+            PocoDataFactory = pocoDataFactory ?? throw new ArgumentNullException(nameof(pocoDataFactory));
+            DatabaseType = databaseType ?? throw new ArgumentNullException(nameof(databaseType));
         }
 
         public ISqlSyntaxProvider SqlSyntax { get; }

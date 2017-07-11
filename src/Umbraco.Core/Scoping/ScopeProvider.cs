@@ -80,9 +80,6 @@ namespace Umbraco.Core.Scoping
         // and we can retrieve the actual objects from the table.
         // only issue: how are we supposed to clear the table? we can't, really. objects should take
         // care of de-registering themselves from context.
-        // everything we use does, except the NoScope scope, which just stays there
-        //
-        // during tests, NoScope can to into call context... nothing much we can do about it
 
         private static readonly object StaticCallContextObjectsLock = new object();
         private static readonly Dictionary<Guid, object> StaticCallContextObjects
