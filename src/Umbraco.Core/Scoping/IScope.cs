@@ -16,6 +16,11 @@ namespace Umbraco.Core.Scoping
         IUmbracoDatabase Database { get; }
 
         /// <summary>
+        /// Gets the database context.
+        /// </summary>
+        IDatabaseContext DatabaseContext { get; }
+
+        /// <summary>
         /// Gets the scope event messages.
         /// </summary>
         EventMessages Messages { get; }
@@ -41,5 +46,17 @@ namespace Umbraco.Core.Scoping
         /// <returns>A value indicating whether the scope has been successfully completed.</returns>
         /// <remarks>Can return false if any child scope has not completed.</remarks>
         bool Complete();
+
+        /// <summary>
+        /// Read-locks some lock objects.
+        /// </summary>
+        /// <param name="lockIds">The lock object identifiers.</param>
+        void ReadLock(params int[] lockIds);
+
+        /// <summary>
+        /// Write-locks some lock objects.
+        /// </summary>
+        /// <param name="lockIds">The lock object identifiers.</param>
+        void WriteLock(params int[] lockIds);
     }
 }

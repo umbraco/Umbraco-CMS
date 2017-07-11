@@ -63,6 +63,8 @@ namespace Umbraco.Core.Scoping
 
         public IUmbracoDatabaseFactory DatabaseFactory { get; }
 
+        public IDatabaseContext DatabaseContext => DatabaseFactory;
+
         #region Context
 
         // objects that go into the logical call context better be serializable else they'll eventually

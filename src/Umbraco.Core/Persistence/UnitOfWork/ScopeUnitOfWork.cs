@@ -86,18 +86,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <inheritdoc />
         public void ReadLock(params int[] lockIds)
         {
-            // soon as we get Database, a transaction is started
-
-            if (Database.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
-                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
-
-            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
-            foreach (var lockId in lockIds)
-            {
-                var i = Database.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new { id = lockId });
-                if (i == null) // ensure we are actually locking!
-                    throw new Exception($"LockObject with id={lockId} does not exist.");
-            }
+            Scope.ReadLock(lockIds);
         }
 
         /// <inheritdoc />
@@ -106,18 +95,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             if (ReadOnly)
                 throw new NotSupportedException("This unit of work is read-only.");
 
-            // soon as we get Database, a transaction is started
-
-            if (Database.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
-                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
-
-            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
-            foreach (var lockId in lockIds)
-            {
-                var i = Database.Execute("UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
-                if (i == 0) // ensure we are actually locking!
-                    throw new Exception($"LockObject with id={lockId} does not exist.");
-            }
+            Scope.WriteLock(lockIds);
         }
 
         public override void Complete()

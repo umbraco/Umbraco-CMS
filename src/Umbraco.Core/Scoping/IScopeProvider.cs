@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data;
 using Umbraco.Core.Events;
+using Umbraco.Core.Persistence;
+
 #if DEBUG_SCOPES
 using System.Collections.Generic;
 #endif
@@ -75,6 +77,11 @@ namespace Umbraco.Core.Scoping
         /// Gets the scope context.
         /// </summary>
         IScopeContext Context { get; }
+
+        /// <summary>
+        /// Gets the database context.
+        /// </summary>
+        IDatabaseContext DatabaseContext { get; }
 
 #if DEBUG_SCOPES
         Dictionary<Guid, object> CallContextObjects { get; }

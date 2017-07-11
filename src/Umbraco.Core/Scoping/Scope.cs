@@ -136,6 +136,8 @@ namespace Umbraco.Core.Scoping
 
         public Guid InstanceId { get; } = Guid.NewGuid();
 
+        public IDatabaseContext DatabaseContext => _scopeProvider.DatabaseContext;
+
         // a value indicating whether to force call-context
         public bool CallContext
         {
@@ -481,5 +483,39 @@ namespace Umbraco.Core.Scoping
         // true if Umbraco.CoreDebug.LogUncompletedScope appSetting is set to "true"
         private static bool LogUncompletedScopes => (_logUncompletedScopes
             ?? (_logUncompletedScopes = UmbracoConfig.For.CoreDebug().LogUncompletedScopes)).Value;
+
+        /// <inheritdoc />
+        public void ReadLock(params int[] lockIds)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (Database.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+            {
+                var i = Database.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new { id = lockId });
+                if (i == null) // ensure we are actually locking!
+                    throw new Exception($"LockObject with id={lockId} does not exist.");
+            }
+        }
+
+        /// <inheritdoc />
+        public void WriteLock(params int[] lockIds)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (Database.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+            {
+                var i = Database.Execute("UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
+                if (i == 0) // ensure we are actually locking!
+                    throw new Exception($"LockObject with id={lockId} does not exist.");
+            }
+        }
     }
 }
