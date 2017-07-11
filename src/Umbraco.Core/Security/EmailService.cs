@@ -9,17 +9,33 @@ namespace Umbraco.Core.Security
     {
         public async Task SendAsync(IdentityMessage message)
         {
-            using (var client = new SmtpClient())
-            using (var mailMessage = new MailMessage(
-                UmbracoConfig.For.UmbracoSettings().Content.NotificationEmailAddress, 
+            var mailMessage = new MailMessage(
+                UmbracoConfig.For.UmbracoSettings().Content.NotificationEmailAddress,
                 message.Destination,
                 message.Subject,
-                message.Body))
-            {                
-                mailMessage.IsBodyHtml = message.Body.IsNullOrWhiteSpace() == false 
-                    && message.Body.Contains("<") && message.Body.Contains("</");
+                message.Body)
+            {
+                IsBodyHtml = message.Body.IsNullOrWhiteSpace() == false
+                             && message.Body.Contains("<") && message.Body.Contains("</")
+            };
 
-                await client.SendMailAsync(mailMessage);
+            try
+            {
+                using (var client = new SmtpClient())
+                {
+                    if (client.DeliveryMethod == SmtpDeliveryMethod.Network)
+                    {
+                        await client.SendMailAsync(mailMessage);
+                    }
+                    else
+                    {
+                        client.Send(mailMessage);
+                    }
+                }
+            }
+            finally
+            {
+                mailMessage.Dispose();
             }
         }
     }
