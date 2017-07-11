@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public class NotificationsRepository : DisposableObject, INotificationsRepository
     {
-        private readonly IDatabaseUnitOfWork _unitOfWork;
+        private readonly IScopeUnitOfWork _unitOfWork;
 
         public NotificationsRepository(IScopeUnitOfWork unitOfWork)
         {

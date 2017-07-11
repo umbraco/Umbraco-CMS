@@ -73,12 +73,6 @@ namespace Umbraco.Core.Persistence
         /// <inheritdoc />
         public ISqlSyntaxProvider SqlSyntax => SqlContext.SqlSyntax;
 
-        public Sql<SqlContext> Sql() => new Sql<SqlContext>(SqlContext);
-
-        public Sql<SqlContext> Sql(string sql, params object[] args) => Sql().Append(sql, args);
-
-        public IQuery<T> Query<T>() => new Query<T>(SqlContext);
-
         #region Testing, Debugging and Troubleshooting
 
         private bool _enableCount;

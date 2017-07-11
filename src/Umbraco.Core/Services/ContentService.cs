@@ -390,7 +390,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                var query = repository.QueryT.Where(x => x.Key == key);
+                var query = uow.Query<IContent>().Where(x => x.Key == key);
                 return repository.GetByQuery(query).SingleOrDefault();
             }
         }
@@ -406,7 +406,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                var query = repository.QueryT.Where(x => x.ContentTypeId == id);
+                var query = uow.Query<IContent>().Where(x => x.ContentTypeId == id);
                 return repository.GetByQuery(query);
             }
         }
@@ -417,7 +417,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                var query = repository.QueryT.Where(x => x.ContentTypeId == id);
+                var query = uow.Query<IContent>().Where(x => x.ContentTypeId == id);
                 return repository.GetByPublishedVersion(query);
             }
         }
@@ -434,7 +434,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                var query = repository.QueryT.Where(x => x.Level == level && x.Trashed == false);
+                var query = uow.Query<IContent>().Where(x => x.Level == level && x.Trashed == false);
                 return repository.GetByQuery(query);
             }
         }
@@ -531,7 +531,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                var query = repository.QueryT.Where(x => x.ParentId == id);
+                var query = uow.Query<IContent>().Where(x => x.ParentId == id);
                 return repository.GetByQuery(query).OrderBy(x => x.SortOrder);
             }
         }
@@ -547,7 +547,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                var query = repository.QueryT.Where(x => x.ParentId == id && x.Published);
+                var query = uow.Query<IContent>().Where(x => x.ParentId == id && x.Published);
                 return repository.GetByQuery(query).OrderBy(x => x.SortOrder);
             }
         }
@@ -572,7 +572,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IContentRepository>();
                 var filterQuery = filter.IsNullOrWhiteSpace()
                     ? null
-                    : repository.QueryT.Where(x => x.Name.Contains(filter));
+                    : uow.Query<IContent>().Where(x => x.Name.Contains(filter));
                 // fixme nesting uow?!
                 return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filterQuery);
             }
@@ -601,7 +601,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
-                var query = repository.QueryT;
+                var query = uow.Query<IContent>();
                 //if the id is System Root, then just get all - NO! does not make sense!
                 //if (id != Constants.System.Root)
                 query.Where(x => x.ParentId == id);
@@ -628,7 +628,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IContentRepository>();
                 var filterQuery = filter.IsNullOrWhiteSpace()
                     ? null
-                    : repository.QueryT.Where(x => x.Name.Contains(filter));
+                    : uow.Query<IContent>().Where(x => x.Name.Contains(filter));
                 // fixme nesting uow?
                 return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filterQuery);
             }
@@ -656,7 +656,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
-                var query = repository.QueryT;
+                var query = uow.Query<IContent>();
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                     query.Where(x => x.Path.SqlContains($",{id},", TextColumnType.NVarchar));
@@ -676,7 +676,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                var query = repository.QueryT.Where(x => x.ParentId == parentId && x.Name.Contains(name));
+                var query = uow.Query<IContent>().Where(x => x.ParentId == parentId && x.Name.Contains(name));
                 return repository.GetByQuery(query);
             }
         }
@@ -699,7 +699,7 @@ namespace Umbraco.Core.Services
                     return Enumerable.Empty<IContent>();
                 }
                 var pathMatch = content.Path + ",";
-                var query = repository.QueryT.Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch));
+                var query = uow.Query<IContent>().Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch));
                 return repository.GetByQuery(query);
             }
         }
@@ -716,7 +716,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var pathMatch = content.Path + ",";
-                var query = repository.QueryT.Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch));
+                var query = uow.Query<IContent>().Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch));
                 return repository.GetByQuery(query);
             }
         }
@@ -780,7 +780,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                var query = repository.QueryT.Where(x => x.ParentId == Constants.System.Root);
+                var query = uow.Query<IContent>().Where(x => x.ParentId == Constants.System.Root);
                 return repository.GetByQuery(query);
             }
         }
@@ -812,10 +812,10 @@ namespace Umbraco.Core.Services
             }
         }
 
-        private IEnumerable<IContent> GetContentForExpiration(IDatabaseUnitOfWork uow)
+        private IEnumerable<IContent> GetContentForExpiration(IScopeUnitOfWork uow)
         {
             var repository = uow.CreateRepository<IContentRepository>();
-            var query = repository.QueryT.Where(x => x.Published && x.ExpireDate <= DateTime.Now);
+            var query = uow.Query<IContent>().Where(x => x.Published && x.ExpireDate <= DateTime.Now);
             return repository.GetByQuery(query);
         }
 
@@ -832,10 +832,10 @@ namespace Umbraco.Core.Services
             }
         }
 
-        private IEnumerable<IContent> GetContentForRelease(IDatabaseUnitOfWork uow)
+        private IEnumerable<IContent> GetContentForRelease(IScopeUnitOfWork uow)
         {
             var repository = uow.CreateRepository<IContentRepository>();
-            var query = repository.QueryT.Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
+            var query = uow.Query<IContent>().Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
             return repository.GetByQuery(query);
         }
 
@@ -850,7 +850,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var bin = $"{Constants.System.Root},{Constants.System.RecycleBinContent},";
-                var query = repository.QueryT.Where(x => x.Path.StartsWith(bin));
+                var query = uow.Query<IContent>().Where(x => x.Path.StartsWith(bin));
                 return repository.GetByQuery(query);
             }
         }
@@ -876,7 +876,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                var query = repository.QueryT.Where(x => x.Published && x.Id == id && x.Trashed == false);
+                var query = uow.Query<IContent>().Where(x => x.Published && x.Id == id && x.Trashed == false);
                 var count = repository.Count(query);
                 return count > 0;
             }
@@ -1597,7 +1597,7 @@ namespace Umbraco.Core.Services
                 }
 
                 // emptying the recycle bin means deleting whetever is in there - do it properly!
-                var query = repository.QueryT.Where(x => x.ParentId == Constants.System.RecycleBinContent);
+                var query = uow.Query<IContent>().Where(x => x.ParentId == Constants.System.RecycleBinContent);
                 var contents = repository.GetByQuery(query).ToArray();
                 foreach (var content in contents)
                 {
@@ -1885,14 +1885,14 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                return GetPublishedDescendantsLocked(repository, content).ToArray(); // ToArray important in uow!
+                return GetPublishedDescendantsLocked(uow, repository, content).ToArray(); // ToArray important in uow!
             }
         }
 
-        internal IEnumerable<IContent> GetPublishedDescendantsLocked(IContentRepository repository, IContent content)
+        internal IEnumerable<IContent> GetPublishedDescendantsLocked(IScopeUnitOfWork uow, IContentRepository repository, IContent content)
         {
             var pathMatch = content.Path + ",";
-            var query = repository.QueryT.Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch) /*&& x.Trashed == false*/);
+            var query = uow.Query<IContent>().Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch) /*&& x.Trashed == false*/);
             var contents = repository.GetByPublishedVersion(query);
 
             // beware! contents contains all published version below content
@@ -2084,7 +2084,7 @@ namespace Umbraco.Core.Services
                 {
                     if (HasChildren(content.Id))
                     {
-                        var descendants = GetPublishedDescendantsLocked(repository, content).ToArray();
+                        var descendants = GetPublishedDescendantsLocked(uow, repository, content).ToArray();
                         uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
                     }
                     changeType = TreeChangeTypes.RefreshBranch; // whole branch
@@ -2515,7 +2515,7 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
-                var query = repository.QueryT.WhereIn(x => x.ContentTypeId, contentTypeIdsA);
+                var query = uow.Query<IContent>().WhereIn(x => x.ContentTypeId, contentTypeIdsA);
                 var contents = repository.GetByQuery(query).ToArray();
 
                 if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IContent>(contents)))
@@ -2536,7 +2536,7 @@ namespace Umbraco.Core.Services
 
                     // if current content has children, move them to trash
                     var c = content;
-                    var childQuery = repository.QueryT.Where(x => x.ParentId == c.Id);
+                    var childQuery = uow.Query<IContent>().Where(x => x.ParentId == c.Id);
                     var children = repository.GetByQuery(childQuery);
                     foreach (var child in children)
                     {
@@ -2583,7 +2583,7 @@ namespace Umbraco.Core.Services
             uow.ReadLock(Constants.Locks.ContentTypes);
 
             var repository = uow.CreateRepository<IContentTypeRepository>();
-            var query = repository.QueryT.Where(x => x.Alias == contentTypeAlias);
+            var query = uow.Query<IContentType>().Where(x => x.Alias == contentTypeAlias);
             var contentType = repository.GetByQuery(query).FirstOrDefault();
 
             if (contentType == null)

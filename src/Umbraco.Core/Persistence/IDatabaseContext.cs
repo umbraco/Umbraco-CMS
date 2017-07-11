@@ -4,6 +4,17 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
 {
+    // the main implementation of IDatabaseContext is IUmbracoDatabaseFactory
+    // it is registered as a singleton <IDatabaseContext> and can be injected
+    //
+    // then for convenience,
+    //  fixme - IScopeProvider exposes .DatabaseContext
+    //  fixme - IScope : IDatabaseContext
+    //  IUnitOfWorkProvider exposes .DatabaseContext
+    //  IScopeUnitOfWork : IDatabaseContext
+    //  IMigrationContext : IDatabaseContext
+    //   NPocoRepositoryBase : IDatabaseContext
+
     public interface IDatabaseContext
     {
         /// <summary>

@@ -235,7 +235,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var languageRepository = Container.GetInstance<IDatabaseUnitOfWork, ILanguageRepository>(unitOfWork);
+                var languageRepository = Container.GetInstance<IScopeUnitOfWork, ILanguageRepository>(unitOfWork);
                 var repository = CreateRepository(unitOfWork);
 
                 var language = languageRepository.Get(1);

@@ -1171,12 +1171,9 @@
     <Compile Include="Persistence\UmbracoDatabaseExtensions.cs" />
     <Compile Include="Persistence\UmbracoDatabaseFactory.cs" />
     <Compile Include="Persistence\UnitOfWorkExtensions.cs" />
-    <Compile Include="Persistence\UnitOfWork\IDatabaseUnitOfWork.cs" />
-    <Compile Include="Persistence\UnitOfWork\IDatabaseUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\IScopeUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\IScopeUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWork.cs" />
-    <Compile Include="Persistence\UnitOfWork\IUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkRepository.cs" />
     <Compile Include="Persistence\UnitOfWork\ScopeUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\ScopeUnitOfWorkProvider.cs" />

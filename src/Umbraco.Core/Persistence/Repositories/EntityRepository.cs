@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Gets the repository's unit of work.
         /// </summary>
-        protected internal IDatabaseUnitOfWork UnitOfWork { get; }
+        protected internal IScopeUnitOfWork UnitOfWork { get; }
 
         #region Query Methods
 

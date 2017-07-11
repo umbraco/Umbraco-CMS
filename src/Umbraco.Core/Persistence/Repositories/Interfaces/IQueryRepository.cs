@@ -8,16 +8,6 @@ namespace Umbraco.Core.Persistence.Repositories
     public interface IQueryRepository<in TId, TEntity> : IRepository<TId, TEntity>
     {
         /// <summary>
-        /// Creates a new query.
-        /// </summary>
-        IQuery<TEntity> QueryT { get; }
-
-        /// <summary>
-        /// Creates a new query.
-        /// </summary>
-        IQuery<T> Query<T>();
-
-        /// <summary>
         /// Gets all entities of the specified type and query
         /// </summary>
         /// <param name="query"></param>

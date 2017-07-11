@@ -226,7 +226,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // before I read it? NO! because the WHOLE content tree is read-locked using WithReadLocked.
         // don't panic.
 
-        private void LockAndLoadContent(Action<IDatabaseUnitOfWork> action)
+        private void LockAndLoadContent(Action<IScopeUnitOfWork> action)
         {
             _contentStore.WriteLocked(() =>
             {
@@ -239,7 +239,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             });
         }
 
-        private void LoadContentFromDatabaseLocked(IDatabaseUnitOfWork uow)
+        private void LoadContentFromDatabaseLocked(IScopeUnitOfWork uow)
         {
             // locks:
             // contentStore is wlocked (1 thread)
@@ -259,7 +259,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _logger.Debug<FacadeService>("Loaded content from database (" + sw.ElapsedMilliseconds + "ms).");
         }
 
-        private void LoadContentFromLocalDbLocked(IDatabaseUnitOfWork uow)
+        private void LoadContentFromLocalDbLocked(IScopeUnitOfWork uow)
         {
             var contentTypes = _serviceContext.ContentTypeService.GetAll()
                 .Select(x => new PublishedContentType(PublishedItemType.Content, x));
@@ -296,7 +296,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         //    _contentStore.Set(contentNode);
         //}
 
-        private void LockAndLoadMedia(Action<IDatabaseUnitOfWork> action)
+        private void LockAndLoadMedia(Action<IScopeUnitOfWork> action)
         {
             _mediaStore.WriteLocked(() =>
             {
@@ -309,7 +309,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             });
         }
 
-        private void LoadMediaFromDatabaseLocked(IDatabaseUnitOfWork uow)
+        private void LoadMediaFromDatabaseLocked(IScopeUnitOfWork uow)
         {
             // locks & notes: see content
 
@@ -327,7 +327,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _logger.Debug<FacadeService>("Loaded media from database (" + sw.ElapsedMilliseconds + "ms).");
         }
 
-        private void LoadMediaFromLocalDbLocked(IDatabaseUnitOfWork uow)
+        private void LoadMediaFromLocalDbLocked(IScopeUnitOfWork uow)
         {
             var mediaTypes = _serviceContext.MediaTypeService.GetAll()
                 .Select(x => new PublishedContentType(PublishedItemType.Media, x));
@@ -1178,7 +1178,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // assumes content tree lock
-        private void RebuildContentDbCacheLocked(IDatabaseUnitOfWork uow, int groupSize, IEnumerable<int> contentTypeIds)
+        private void RebuildContentDbCacheLocked(IScopeUnitOfWork uow, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
             var contentObjectType = Guid.Parse(Constants.ObjectTypes.Document);
@@ -1249,7 +1249,7 @@ WHERE cmsContentNu.nodeId IN (
         }
 
         // assumes media tree lock
-        public void RebuildMediaDbCacheLocked(IDatabaseUnitOfWork uow, int groupSize, IEnumerable<int> contentTypeIds)
+        public void RebuildMediaDbCacheLocked(IScopeUnitOfWork uow, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
             var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
@@ -1310,7 +1310,7 @@ WHERE cmsContentNu.nodeId IN (
         }
 
         // assumes member tree lock
-        public void RebuildMemberDbCacheLocked(IDatabaseUnitOfWork uow, int groupSize, IEnumerable<int> contentTypeIds)
+        public void RebuildMemberDbCacheLocked(IScopeUnitOfWork uow, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
             var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
@@ -1370,7 +1370,7 @@ WHERE cmsContentNu.nodeId IN (
         }
 
         // assumes content tree lock
-        private bool VerifyContentDbCacheLocked(IDatabaseUnitOfWork uow)
+        private bool VerifyContentDbCacheLocked(IScopeUnitOfWork uow)
         {
             // every published content item should have a corresponding row in cmsContentXml
             // every content item should have a corresponding row in cmsPreviewXml
@@ -1401,7 +1401,7 @@ AND cmsContentNu.nodeId IS NULL;"
         }
 
         // assumes media tree lock
-        public bool VerifyMediaDbCacheLocked(IDatabaseUnitOfWork uow)
+        public bool VerifyMediaDbCacheLocked(IScopeUnitOfWork uow)
         {
             // every non-trashed media item should have a corresponding row in cmsContentXml
 
@@ -1431,7 +1431,7 @@ AND cmsContentNu.nodeId IS NULL
         }
 
         // assumes member tree lock
-        public bool VerifyMemberDbCacheLocked(IDatabaseUnitOfWork uow)
+        public bool VerifyMemberDbCacheLocked(IScopeUnitOfWork uow)
         {
             // every member item should have a corresponding row in cmsContentXml
 

@@ -24,22 +24,10 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <inheritdoc />
         public IDatabaseContext DatabaseContext { get; }
 
-        // explicit implementation
-        IDatabaseUnitOfWork IDatabaseUnitOfWorkProvider.CreateUnitOfWork()
-        {
-            return new ScopeUnitOfWork(ScopeProvider, _repositoryFactory);
-        }
-
-        /// <inheritdoc />
-        public virtual IScopeUnitOfWork CreateUnitOfWork()
-        {
-            return new ScopeUnitOfWork(ScopeProvider, _repositoryFactory);
-        }
-
         /// <inheritdoc />
         public IScopeUnitOfWork CreateUnitOfWork(IsolationLevel isolationLevel = IsolationLevel.Unspecified, bool readOnly = false, bool immediate = false)
         {
-            return new ScopeUnitOfWork(ScopeProvider, _repositoryFactory, isolationLevel, readOnly, immediate);
+            return new ScopeUnitOfWork(ScopeProvider, DatabaseContext, _repositoryFactory, isolationLevel, readOnly, immediate);
         }
     }
 }

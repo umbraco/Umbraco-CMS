@@ -22,7 +22,7 @@ namespace Umbraco.Web.Services
         private readonly IUserService _userService;
         private readonly Lazy<IEnumerable<Section>> _allAvailableSections;
         private readonly IApplicationTreeService _applicationTreeService;
-        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
+        private readonly IScopeUnitOfWorkProvider _uowProvider;
         private readonly CacheHelper _cache;
         internal const string AppConfigFileName = "applications.config";
         private static string _appConfig;

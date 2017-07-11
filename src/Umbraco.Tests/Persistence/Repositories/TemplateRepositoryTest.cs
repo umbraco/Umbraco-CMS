@@ -765,7 +765,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             return stream;
         }
 
-        private IEnumerable<ITemplate> CreateHierarchy(ITemplateRepository repository, IDatabaseUnitOfWork unitOfWork)
+        private IEnumerable<ITemplate> CreateHierarchy(ITemplateRepository repository, IScopeUnitOfWork unitOfWork)
         {
             var parent = new Template("parent", "parent")
             {

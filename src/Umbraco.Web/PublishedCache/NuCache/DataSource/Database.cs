@@ -14,7 +14,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     // provides efficient database access for NuCache
     class Database
     {
-        public ContentNodeKit GetContentSource(IDatabaseUnitOfWork uow, int id)
+        public ContentNodeKit GetContentSource(IScopeUnitOfWork uow, int id)
         {
             var dto = uow.Database.Fetch<ContentSourceDto>(new Sql(@"SELECT
 n.id Id, n.uniqueId Uid,
@@ -36,7 +36,7 @@ WHERE n.nodeObjectType=@objType AND n.id=@id
             return dto == null ? new ContentNodeKit() : CreateContentNodeKit(dto);
         }
 
-        public ContentNodeKit GetMediaSource(IDatabaseUnitOfWork uow, int id)
+        public ContentNodeKit GetMediaSource(IScopeUnitOfWork uow, int id)
         {
             // should be only 1 version for medias
 
@@ -58,7 +58,7 @@ WHERE n.nodeObjectType=@objType AND n.id=@id
 
         // we want arrays, we want them all loaded, not an enumerable
 
-        public IEnumerable<ContentNodeKit> GetAllContentSources(IDatabaseUnitOfWork uow)
+        public IEnumerable<ContentNodeKit> GetAllContentSources(IScopeUnitOfWork uow)
         {
             return uow.Database.Query<ContentSourceDto>(new Sql(@"SELECT
 n.id Id, n.uniqueId Uid,
@@ -80,7 +80,7 @@ ORDER BY n.level, n.sortOrder
 ", new { objType = Constants.ObjectTypes.DocumentGuid })).Select(CreateContentNodeKit);
         }
 
-        public IEnumerable<ContentNodeKit> GetAllMediaSources(IDatabaseUnitOfWork uow)
+        public IEnumerable<ContentNodeKit> GetAllMediaSources(IScopeUnitOfWork uow)
         {
             // should be only 1 version for medias
 
@@ -100,7 +100,7 @@ ORDER BY n.level, n.sortOrder
 ", new { objType = Constants.ObjectTypes.MediaGuid })).Select(CreateMediaNodeKit);
         }
 
-        public IEnumerable<ContentNodeKit> GetBranchContentSources(IDatabaseUnitOfWork uow, int id)
+        public IEnumerable<ContentNodeKit> GetBranchContentSources(IScopeUnitOfWork uow, int id)
         {
             return uow.Database.Query<ContentSourceDto>(new Sql(@"SELECT
 n.id Id, n.uniqueId Uid,
@@ -123,7 +123,7 @@ ORDER BY n.level, n.sortOrder
 ", new { objType = Constants.ObjectTypes.DocumentGuid, /*id =*/ id })).Select(CreateContentNodeKit);
         }
 
-        public IEnumerable<ContentNodeKit> GetBranchMediaSources(IDatabaseUnitOfWork uow, int id)
+        public IEnumerable<ContentNodeKit> GetBranchMediaSources(IScopeUnitOfWork uow, int id)
         {
             // should be only 1 version for medias
 
@@ -144,7 +144,7 @@ ORDER BY n.level, n.sortOrder
 ", new { objType = Constants.ObjectTypes.MediaGuid, /*id =*/ id })).Select(CreateMediaNodeKit);
         }
 
-        public IEnumerable<ContentNodeKit> GetTypeContentSources(IDatabaseUnitOfWork uow, IEnumerable<int> ids)
+        public IEnumerable<ContentNodeKit> GetTypeContentSources(IScopeUnitOfWork uow, IEnumerable<int> ids)
         {
             return uow.Database.Query<ContentSourceDto>(new Sql(@"SELECT
 n.id Id, n.uniqueId Uid,
@@ -166,7 +166,7 @@ ORDER BY n.level, n.sortOrder
 ", new { objType = Constants.ObjectTypes.DocumentGuid, /*id =*/ ids })).Select(CreateContentNodeKit);
         }
 
-        public IEnumerable<ContentNodeKit> GetTypeMediaSources(IDatabaseUnitOfWork uow, IEnumerable<int> ids)
+        public IEnumerable<ContentNodeKit> GetTypeMediaSources(IScopeUnitOfWork uow, IEnumerable<int> ids)
         {
             // should be only 1 version for medias
 

@@ -898,26 +898,26 @@ ORDER BY contentNodeId, versionId, propertytypeid
 
         public class UnitOfWorkEntityEventArgs : EventArgs
         {
-            public UnitOfWorkEntityEventArgs(IDatabaseUnitOfWork unitOfWork, TEntity entity)
+            public UnitOfWorkEntityEventArgs(IScopeUnitOfWork unitOfWork, TEntity entity)
             {
                 UnitOfWork = unitOfWork;
                 Entity = entity;
             }
 
-            public IDatabaseUnitOfWork UnitOfWork { get; }
+            public IScopeUnitOfWork UnitOfWork { get; }
             public TEntity Entity { get; }
         }
 
         public class UnitOfWorkVersionEventArgs : EventArgs
         {
-            public UnitOfWorkVersionEventArgs(IDatabaseUnitOfWork unitOfWork, int entityId, Guid versionId)
+            public UnitOfWorkVersionEventArgs(IScopeUnitOfWork unitOfWork, int entityId, Guid versionId)
             {
                 UnitOfWork = unitOfWork;
                 EntityId = entityId;
                 VersionId = versionId;
             }
 
-            public IDatabaseUnitOfWork UnitOfWork { get; }
+            public IScopeUnitOfWork UnitOfWork { get; }
             public int EntityId { get; }
             public Guid VersionId { get; }
         }

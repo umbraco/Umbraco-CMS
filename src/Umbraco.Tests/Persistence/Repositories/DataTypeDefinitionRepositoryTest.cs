@@ -480,7 +480,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             DataTypeDefinition dtd;
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
+                var repository = Container.GetInstance<IScopeUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
                 dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dtd);
                 unitOfWork.Flush();
@@ -511,7 +511,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             object id;
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
+                var repository = Container.GetInstance<IScopeUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
                 dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dtd);
                 unitOfWork.Flush();
@@ -535,7 +535,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
+                var repository = Container.GetInstance<IScopeUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
                 //ensure it still gets resolved!
                 var val = repository.GetPreValueAsString(Convert.ToInt32(id));
                 Assert.AreEqual("test1", val);

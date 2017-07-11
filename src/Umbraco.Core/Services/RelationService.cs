@@ -72,7 +72,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IRelationTypeRepository>();
-                var query = repository.QueryT.Where(x => x.Alias == alias);
+                var query = uow.Query<IRelationType>().Where(x => x.Alias == alias);
                 return repository.GetByQuery(query).FirstOrDefault();
             }
         }
@@ -111,7 +111,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IRelationRepository>();
-                var query = repository.QueryT.Where(x => x.RelationTypeId == relationTypeId);
+                var query = uow.Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
                 return repository.GetByQuery(query);
             }
         }
@@ -140,7 +140,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IRelationRepository>();
-                var query = repository.QueryT.Where(x => x.ParentId == id);
+                var query = uow.Query<IRelation>().Where(x => x.ParentId == id);
                 return repository.GetByQuery(query);
             }
         }
@@ -176,7 +176,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IRelationRepository>();
-                var query = repository.QueryT.Where(x => x.ChildId == id);
+                var query = uow.Query<IRelation>().Where(x => x.ChildId == id);
                 return repository.GetByQuery(query);
             }
         }
@@ -213,7 +213,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IRelationRepository>();
-                var query = repository.QueryT.Where(x => x.ChildId == id || x.ParentId == id);
+                var query = uow.Query<IRelation>().Where(x => x.ChildId == id || x.ParentId == id);
                 return repository.GetByQuery(query);
             }
         }
@@ -224,13 +224,13 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IRelationTypeRepository>();
 
-                var rtQuery = repository.QueryT.Where(x => x.Alias == relationTypeAlias);
+                var rtQuery = uow.Query<IRelationType>().Where(x => x.Alias == relationTypeAlias);
                 var relationType = repository.GetByQuery(rtQuery).FirstOrDefault();
                 if (relationType == null)
                     return Enumerable.Empty<IRelation>();
 
                 var relationRepo = uow.CreateRepository<IRelationRepository>();
-                var query = relationRepo.QueryT.Where(x => (x.ChildId == id || x.ParentId == id) && x.RelationTypeId == relationType.Id);
+                var query = uow.Query<IRelation>().Where(x => (x.ChildId == id || x.ParentId == id) && x.RelationTypeId == relationType.Id);
                 return relationRepo.GetByQuery(query);
             }
         }
@@ -246,7 +246,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IRelationTypeRepository>();
-                var query = repository.QueryT.Where(x => x.Name == relationTypeName);
+                var query = uow.Query<IRelationType>().Where(x => x.Name == relationTypeName);
                 var relationTypes = repository.GetByQuery(query);
                 relationTypeIds = relationTypes.Select(x => x.Id).ToList();
             }
@@ -267,7 +267,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IRelationTypeRepository>();
-                var query = repository.QueryT.Where(x => x.Alias == relationTypeAlias);
+                var query = uow.Query<IRelationType>().Where(x => x.Alias == relationTypeAlias);
                 var relationTypes = repository.GetByQuery(query);
                 relationTypeIds = relationTypes.Select(x => x.Id).ToList();
             }
@@ -287,7 +287,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IRelationRepository>();
-                var query = repository.QueryT.Where(x => x.RelationTypeId == relationTypeId);
+                var query = uow.Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
                 return repository.GetByQuery(query);
             }
         }
@@ -458,7 +458,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IRelationRepository>();
-                var query = repository.QueryT.Where(x => x.RelationTypeId == relationType.Id);
+                var query = uow.Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
                 return repository.GetByQuery(query).Any();
             }
         }
@@ -473,7 +473,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IRelationRepository>();
-                var query = repository.QueryT.Where(x => x.ParentId == id || x.ChildId == id);
+                var query = uow.Query<IRelation>().Where(x => x.ParentId == id || x.ChildId == id);
                 return repository.GetByQuery(query).Any();
             }
         }
@@ -489,7 +489,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IRelationRepository>();
-                var query = repository.QueryT.Where(x => x.ParentId == parentId && x.ChildId == childId);
+                var query = uow.Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId);
                 return repository.GetByQuery(query).Any();
             }
         }
@@ -523,7 +523,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IRelationRepository>();
-                var query = repository.QueryT.Where(x => x.ParentId == parentId && x.ChildId == childId && x.RelationTypeId == relationType.Id);
+                var query = uow.Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId && x.RelationTypeId == relationType.Id);
                 return repository.GetByQuery(query).Any();
             }
         }
@@ -650,7 +650,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IRelationRepository>();
-                var query = repository.QueryT.Where(x => x.RelationTypeId == relationType.Id);
+                var query = uow.Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
                 relations.AddRange(repository.GetByQuery(query).ToList());
 
                 foreach (var relation in relations)
@@ -673,7 +673,7 @@ namespace Umbraco.Core.Services
                 foreach (var relationTypeId in relationTypeIds)
                 {
                     var id = relationTypeId;
-                    var query = repository.QueryT.Where(x => x.RelationTypeId == id);
+                    var query = uow.Query<IRelation>().Where(x => x.RelationTypeId == id);
                     relations.AddRange(repository.GetByQuery(query));
                 }
             }

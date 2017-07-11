@@ -15,6 +15,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     {
 	    private readonly IsolationLevel _isolationLevel;
         private readonly IScopeProvider _scopeProvider;
+        private readonly IDatabaseContext _databaseContext;
         private bool _completeScope;
         private IScope _scope;
         private Guid _key;
@@ -28,6 +29,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// Creates a new unit of work instance
         /// </summary>
         /// <param name="scopeProvider"></param>
+        /// <param name="databaseContext"></param>
         /// <param name="repositoryFactory"></param>
         /// <param name="isolationLevel"></param>
         /// <param name="readOnly"></param>
@@ -35,10 +37,11 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <remarks>
         /// This should normally not be used directly and should be created with the UnitOfWorkProvider
         /// </remarks>
-        internal ScopeUnitOfWork(IScopeProvider scopeProvider, RepositoryFactory repositoryFactory, IsolationLevel isolationLevel = IsolationLevel.Unspecified, bool readOnly = false, bool immediate = false)
+        internal ScopeUnitOfWork(IScopeProvider scopeProvider, IDatabaseContext databaseContext, RepositoryFactory repositoryFactory, IsolationLevel isolationLevel = IsolationLevel.Unspecified, bool readOnly = false, bool immediate = false)
             : base(repositoryFactory, readOnly, immediate)
         {
             _scopeProvider = scopeProvider;
+            _databaseContext = databaseContext;
             _isolationLevel = isolationLevel;
 
             // fixme only 1!
@@ -53,20 +56,17 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
         #region IDatabaseContext
 
-        // fixme - stop using the actual Database here - it forces the creation of the DB
-        // should have a reference to a IDatabaseContext to use instead!
+        /// <inheritdoc />
+        public ISqlSyntaxProvider SqlSyntax => _databaseContext.SqlSyntax;
 
         /// <inheritdoc />
-        public ISqlSyntaxProvider SqlSyntax => Database.SqlSyntax;
+        public Sql<SqlContext> Sql() => _databaseContext.Sql();
 
         /// <inheritdoc />
-        public Sql<SqlContext> Sql() => new Sql<SqlContext>(Database.SqlContext);
+        public Sql<SqlContext> Sql(string sql, params object[] args) => _databaseContext.Sql(sql, args);
 
         /// <inheritdoc />
-        public Sql<SqlContext> Sql(string sql, params object[] args) => new Sql<SqlContext>(Database.SqlContext, sql, args);
-
-        /// <inheritdoc />
-        public IQuery<T> Query<T>() => new Query<T>(Database.SqlContext);
+        public IQuery<T> Query<T>() => _databaseContext.Query<T>();
 
         #endregion
 

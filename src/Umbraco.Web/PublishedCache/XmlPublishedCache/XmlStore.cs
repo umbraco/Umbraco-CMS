@@ -1699,7 +1699,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         }
 
         // assumes content tree lock
-        private void RebuildContentXmlLocked(IDatabaseUnitOfWork unitOfWork, IContentRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
+        private void RebuildContentXmlLocked(IScopeUnitOfWork unitOfWork, IContentRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
             var contentObjectType = Guid.Parse(Constants.ObjectTypes.Document);
@@ -1772,7 +1772,7 @@ WHERE cmsContentXml.nodeId IN (
         }
 
         // assumes content tree lock
-        private void RebuildPreviewXmlLocked(IDatabaseUnitOfWork unitOfWork, IContentRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
+        private void RebuildPreviewXmlLocked(IScopeUnitOfWork unitOfWork, IContentRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
             var contentObjectType = Guid.Parse(Constants.ObjectTypes.Document);
@@ -1849,7 +1849,7 @@ WHERE cmsPreviewXml.nodeId IN (
         }
 
         // assumes media tree lock
-        public void RebuildMediaXmlLocked(IDatabaseUnitOfWork unitOfWork, IMediaRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
+        public void RebuildMediaXmlLocked(IScopeUnitOfWork unitOfWork, IMediaRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
             var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
@@ -1920,7 +1920,7 @@ WHERE cmsContentXml.nodeId IN (
         }
 
         // assumes member tree lock
-        public void RebuildMemberXmlLocked(IDatabaseUnitOfWork unitOfWork, IMemberRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
+        public void RebuildMemberXmlLocked(IScopeUnitOfWork unitOfWork, IMemberRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
             var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
@@ -1989,7 +1989,7 @@ WHERE cmsContentXml.nodeId IN (
         }
 
         // assumes content tree lock
-        private static bool VerifyContentAndPreviewXmlLocked(IDatabaseUnitOfWork unitOfWork)
+        private static bool VerifyContentAndPreviewXmlLocked(IScopeUnitOfWork unitOfWork)
         {
             // every published content item should have a corresponding row in cmsContentXml
             // every content item should have a corresponding row in cmsPreviewXml
@@ -2031,7 +2031,7 @@ AND cmsPreviewXml.nodeId IS NULL OR cmsPreviewXml.xml NOT LIKE '% key=""'
         }
 
         // assumes media tree lock
-        public bool VerifyMediaXmlLocked(IDatabaseUnitOfWork unitOfWork, IMediaRepository repository)
+        public bool VerifyMediaXmlLocked(IScopeUnitOfWork unitOfWork, IMediaRepository repository)
         {
             // every non-trashed media item should have a corresponding row in cmsContentXml
             // and that row should have the key="..." attribute
@@ -2064,7 +2064,7 @@ AND cmsContentXml.nodeId IS NULL OR cmsContentXml.xml NOT LIKE '% key=""'
         }
 
         // assumes member tree lock
-        public bool VerifyMemberXmlLocked(IDatabaseUnitOfWork unitOfWork, IMemberRepository repository)
+        public bool VerifyMemberXmlLocked(IScopeUnitOfWork unitOfWork, IMemberRepository repository)
         {
             // every member item should have a corresponding row in cmsContentXml
 

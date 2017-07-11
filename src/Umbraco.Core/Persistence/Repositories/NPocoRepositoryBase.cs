@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     /// <typeparam name="TId"></typeparam>
     /// <typeparam name="TEntity"></typeparam>
-    internal abstract class NPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
+    internal abstract class NPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>, IDatabaseContext
         where TEntity : class, IAggregateRoot
     {
         /// <summary>
@@ -52,7 +52,13 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Creates a new Sql statement.
         /// </summary>
         /// <returns>A new Sql statement.</returns>
-        protected Sql<SqlContext> Sql() => UnitOfWork.Sql();
+        public Sql<SqlContext> Sql() => UnitOfWork.Sql();
+
+        /// <summary>
+        /// Creates a new Sql statement.
+        /// </summary>
+        /// <returns>A new Sql statement.</returns>
+        public Sql<SqlContext> Sql(string sql, params object[] args) => UnitOfWork.Sql(sql, args);
 
         #region Abstract Methods
 

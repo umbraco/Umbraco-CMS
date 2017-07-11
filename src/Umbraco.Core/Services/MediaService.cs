@@ -61,7 +61,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var repo = uow.CreateRepository<IMediaRepository>();
-                var query = repo.QueryT.Where(x => x.Trashed == false);
+                var query = uow.Query<IMedia>().Where(x => x.Trashed == false);
                 if (mediaTypeId > 0)
                     query = query.Where(x => x.ContentTypeId == mediaTypeId);
                 return repo.Count(query);
@@ -334,7 +334,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MediaTree);
                 var repository = uow.CreateRepository<IMediaRepository>();
-                var query = repository.QueryT.Where(x => x.Key == key);
+                var query = uow.Query<IMedia>().Where(x => x.Key == key);
                 return repository.GetByQuery(query).SingleOrDefault();
             }
         }
@@ -350,7 +350,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MediaTree);
                 var repository = uow.CreateRepository<IMediaRepository>();
-                var query = repository.QueryT.Where(x => x.ContentTypeId == id);
+                var query = uow.Query<IMedia>().Where(x => x.ContentTypeId == id);
                 return repository.GetByQuery(query);
             }
         }
@@ -367,7 +367,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MediaTree);
                 var repository = uow.CreateRepository<IMediaRepository>();
-                var query = repository.QueryT.Where(x => x.Level == level && x.Trashed == false);
+                var query = uow.Query<IMedia>().Where(x => x.Level == level && x.Trashed == false);
                 return repository.GetByQuery(query);
             }
         }
@@ -449,7 +449,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MediaTree);
                 var repository = uow.CreateRepository<IMediaRepository>();
-                var query = repository.QueryT.Where(x => x.ParentId == id);
+                var query = uow.Query<IMedia>().Where(x => x.ParentId == id);
                 return repository.GetByQuery(query).OrderBy(x => x.SortOrder);
             }
         }
@@ -497,7 +497,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MediaTree);
                 var repository = uow.CreateRepository<IMediaRepository>();
-                var query = repository.QueryT;
+                var query = uow.Query<IMedia>();
                 //if the id is System Root, then just get all - NO! does not make sense!
                 //if (id != Constants.System.Root)
                 query.Where(x => x.ParentId == id);
@@ -530,7 +530,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.MediaTree);
                 var repository = uow.CreateRepository<IMediaRepository>();
 
-                var query = repository.QueryT;
+                var query = uow.Query<IMedia>();
                 // always check for a parent - else it will also get decendants (and then you should use the GetPagedDescendants method)
                 query.Where(x => x.ParentId == id);
 
@@ -589,7 +589,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.MediaTree);
                 var repository = uow.CreateRepository<IMediaRepository>();
 
-                var query = repository.QueryT;
+                var query = uow.Query<IMedia>();
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                     query.Where(x => x.Path.SqlContains($",{id},", TextColumnType.NVarchar));
@@ -613,7 +613,7 @@ namespace Umbraco.Core.Services
                     return Enumerable.Empty<IMedia>();
 
                 var pathMatch = media.Path + ",";
-                var query = repository.QueryT.Where(x => x.Id != media.Id && x.Path.StartsWith(pathMatch));
+                var query = uow.Query<IMedia>().Where(x => x.Id != media.Id && x.Path.StartsWith(pathMatch));
                 return repository.GetByQuery(query);
             }
         }
@@ -630,7 +630,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.MediaTree);
                 var repository = uow.CreateRepository<IMediaRepository>();
                 var pathMatch = media.Path + ",";
-                var query = repository.QueryT.Where(x => x.Id != media.Id && x.Path.StartsWith(pathMatch));
+                var query = uow.Query<IMedia>().Where(x => x.Id != media.Id && x.Path.StartsWith(pathMatch));
                 return repository.GetByQuery(query);
             }
         }
@@ -670,7 +670,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MediaTree);
                 var repository = uow.CreateRepository<IMediaRepository>();
-                var query = repository.QueryT.Where(x => x.ParentId == Constants.System.Root);
+                var query = uow.Query<IMedia>().Where(x => x.ParentId == Constants.System.Root);
                 return repository.GetByQuery(query);
             }
         }
@@ -686,7 +686,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.MediaTree);
                 var repository = uow.CreateRepository<IMediaRepository>();
                 var bin = $"{Constants.System.Root},{Constants.System.RecycleBinMedia},";
-                var query = repository.QueryT.Where(x => x.Path.StartsWith(bin));
+                var query = uow.Query<IMedia>().Where(x => x.Path.StartsWith(bin));
                 return repository.GetByQuery(query);
             }
         }
@@ -701,7 +701,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IMediaRepository>();
-                var query = repository.QueryT.Where(x => x.ParentId == id);
+                var query = uow.Query<IMedia>().Where(x => x.ParentId == id);
                 var count = repository.Count(query);
                 return count > 0;
             }
@@ -1188,7 +1188,7 @@ namespace Umbraco.Core.Services
                 }
 
                 // emptying the recycle bin means deleting whetever is in there - do it properly!
-                var query = repository.QueryT.Where(x => x.ParentId == Constants.System.RecycleBinMedia);
+                var query = uow.Query<IMedia>().Where(x => x.ParentId == Constants.System.RecycleBinMedia);
                 var medias = repository.GetByQuery(query).ToArray();
                 foreach (var media in medias)
                 {
@@ -1426,7 +1426,7 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(Constants.Locks.MediaTree);
                 var repository = uow.CreateRepository<IMediaRepository>();
 
-                var query = repository.QueryT.WhereIn(x => x.ContentTypeId, mediaTypeIdsA);
+                var query = uow.Query<IMedia>().WhereIn(x => x.ContentTypeId, mediaTypeIdsA);
                 var medias = repository.GetByQuery(query).ToArray();
 
                 if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMedia>(medias)))
@@ -1441,7 +1441,7 @@ namespace Umbraco.Core.Services
                 {
                     // if current media has children, move them to trash
                     var m = media;
-                    var childQuery = repository.QueryT.Where(x => x.Path.StartsWith(m.Path));
+                    var childQuery = uow.Query<IMedia>().Where(x => x.Path.StartsWith(m.Path));
                     var children = repository.GetByQuery(childQuery);
                     foreach (var child in children.Where(x => mediaTypeIdsA.Contains(x.ContentTypeId) == false))
                     {
@@ -1489,7 +1489,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.MediaTypes);
 
                 var repository = uow.CreateRepository<IMediaTypeRepository>();
-                var query = repository.QueryT.Where(x => x.Alias == mediaTypeAlias);
+                var query = uow.Query<IMediaType>().Where(x => x.Alias == mediaTypeAlias);
                 var mediaType = repository.GetByQuery(query).FirstOrDefault();
 
                 if (mediaType == null)
