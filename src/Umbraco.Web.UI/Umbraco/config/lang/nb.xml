@@ -884,8 +884,6 @@ Vennlig hilsen Umbraco roboten
     <key alias="postContent">Sett inn etter felt</key>
     <key alias="preContent">Sett inn før felt</key>
     <key alias="recursive">Rekursivt</key>
-    <key alias="removeParagraph">Fjern paragraftagger</key>
-    <key alias="removeParagraphHelp">Fjerner eventuelle &lt;P&gt; rundt teksten</key>
     <key alias="standardFields">Standardfelter</key>
     <key alias="uppercase">Store bokstaver</key>
     <key alias="urlEncode">URL koding</key>

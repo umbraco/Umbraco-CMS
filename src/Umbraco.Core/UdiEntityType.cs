@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core
@@ -71,6 +70,10 @@ namespace Umbraco.Core
             public const string AnyString = "any-string"; // that one is for tests
 
             [UdiType(UdiType.StringUdi)]
+            public const string Language = "language";
+            [UdiType(UdiType.StringUdi)]
+            public const string MacroScript = "macroscript";
+            [UdiType(UdiType.StringUdi)]
             public const string MediaFile = "media-file";
             [UdiType(UdiType.StringUdi)]
             public const string TemplateFile = "template-file";
@@ -82,6 +85,8 @@ namespace Umbraco.Core
             public const string PartialView = "partial-view";
             [UdiType(UdiType.StringUdi)]
             public const string PartialViewMacro = "partial-view-macro";
+            [UdiType(UdiType.StringUdi)]
+            public const string UserControl = "usercontrol";
             [UdiType(UdiType.StringUdi)]
             public const string Xslt = "xslt";
 
@@ -123,6 +128,8 @@ namespace Umbraco.Core
                         return FormsPreValue;
                     case UmbracoObjectTypes.FormsDataSource:
                         return FormsDataSource;
+                    case UmbracoObjectTypes.Language:
+                        return Language;
                 }
                 throw new NotSupportedException(string.Format("UmbracoObjectType \"{0}\" does not have a matching EntityType.", umbracoObjectType));
             }
@@ -165,6 +172,8 @@ namespace Umbraco.Core
                         return UmbracoObjectTypes.FormsPreValue;
                     case FormsDataSource:
                         return UmbracoObjectTypes.FormsDataSource;
+                    case Language:
+                        return UmbracoObjectTypes.Language;
                 }
                 throw new NotSupportedException(
                     string.Format("EntityType \"{0}\" does not have a matching UmbracoObjectType.", entityType));

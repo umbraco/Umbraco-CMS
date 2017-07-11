@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Specialized;
-using System.Configuration.Provider;
+﻿using System.Collections.Specialized;
 using System.Web.Security;
 using Moq;
 using NUnit.Framework;
@@ -83,10 +81,10 @@ namespace Umbraco.Tests.Membership
             mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
             mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
             mServiceMock.Setup(
-                service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                        .Callback((string u, string e, string p, string m) =>
+                service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                        .Callback((string u, string e, string p, string m, bool isApproved) =>
                             {
-                                createdMember = new Member("test", e, u, p, memberType);
+                                createdMember = new Member("test", e, u, p, memberType, isApproved);
                             })
                         .Returns(() => createdMember);
             var provider = new MembersMembershipProvider(mServiceMock.Object);            
@@ -114,10 +112,10 @@ namespace Umbraco.Tests.Membership
             mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
             mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
             mServiceMock.Setup(
-                service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                        .Callback((string u, string e, string p, string m) =>
+                service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                        .Callback((string u, string e, string p, string m, bool isApproved) =>
                             {
-                                createdMember = new Member("test", e, u, p, memberType);
+                                createdMember = new Member("test", e, u, p, memberType, isApproved);
                             })
                         .Returns(() => createdMember);
 
@@ -147,10 +145,10 @@ namespace Umbraco.Tests.Membership
             mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
             mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
             mServiceMock.Setup(
-                service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                        .Callback((string u, string e, string p, string m) =>
+                service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                        .Callback((string u, string e, string p, string m, bool isApproved) =>
                         {
-                            createdMember = new Member("test", e, u, p, memberType);
+                            createdMember = new Member("test", e, u, p, memberType, isApproved);
                         })
                         .Returns(() => createdMember);
 

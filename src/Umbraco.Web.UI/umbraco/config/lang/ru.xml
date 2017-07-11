@@ -187,12 +187,12 @@
     <key alias="mediaLinks">Ссылка на медиа-элементы</key>
     <key alias="mediatype">Тип медиа-контента</key>
     <key alias="membergroup">Группа участников</key>
-    <key alias="memberof">Член групп(ы)</key>
+    <key alias="memberof">Включен в группу(ы)</key>
     <key alias="memberrole">Роль участника</key>
     <key alias="membertype">Тип участника</key>
     <key alias="noDate">Дата не указана</key>
     <key alias="nodeName">Заголовок ссылки</key>
-    <key alias="notmemberof">Не является членом групп(ы)</key>
+    <key alias="notmemberof">Доступные группы</key>
     <key alias="otherElements">Свойства</key>
     <key alias="parentNotPublished">Этот документ опубликован, но скрыт, потому что его родительский документ '%0%' не опубликован</key>
     <key alias="parentNotPublishedAnomaly">ВНИМАНИЕ: этот документ опубликован, но его нет в глобальном кэше (внутренняя ошибка - подробности в системном журнале)</key>
@@ -216,13 +216,15 @@
     <key alias="updatedBy" version="7.0">Обновлено</key>
     <key alias="uploadClear">Удалить файл</key>
     <key alias="urls">Ссылка на документ</key>
+    <key alias="addTextBox">Добавить новое поле текста</key>
+    <key alias="removeTextBox">Удалить это поле текста</key>
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Композиции</key>
     <key alias="noTabs">Вы не добавили ни одной вкладки</key>
     <key alias="addNewTab">Добавить вкладку</key>
     <key alias="addAnotherTab">Добавить новую вкладку</key>
-    <key alias="inheritedFrom">Унаследован от</key>
+    <key alias="inheritedFrom">Унаследовано от</key>
     <key alias="addProperty">Добавить свойство</key>
     <key alias="requiredLabel">Обязательная метка</key>
 
@@ -364,6 +366,7 @@
     <key alias="selectMember">Выбрать участника</key>
     <key alias="selectMemberGroup">Выбрать группу участников</key>
     <key alias="noMacroParams">Это макрос без параметров</key>
+    <key alias="noMacros">Нет макросов доступных для вставки в редактор</key>
     <key alias="externalLoginProviders">Провайдеры аутентификации</key>
     <key alias="exceptionDetail">Подробное сообщение об ошибке</key>
     <key alias="stacktrace">Трассировка стека</key>
@@ -372,6 +375,7 @@
     <key alias="unLinkYour">Разорвать связь</key>
     <key alias="account">учетную запись</key>
     <key alias="selectEditor">Выбрать редактор</key>
+    <key alias="selectSnippet">Выбрать образец</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
@@ -415,6 +419,13 @@
     <key alias="rteRelatedStylesheets">Сопоставленные стили CSS</key>
     <key alias="rteShowLabel">Показать метку</key>
     <key alias="rteWidthAndHeight">Ширина и высота</key>
+    <key alias="allPropTypes">ВСЕ типы свойств и данные в свойствах документов,</key>
+    <key alias="willBeDeleted">использующие этот тип данных, будут удалены безвозвратно, подтвердите их удаление</key>
+    <key alias="yesDelete">Да, можно удалить</key>
+    <key alias="andAllRelated">и все типы свойств и данные свойств, использующие этот тип данных</key>
+    <key alias="selectFolder">Выберите папку, чтобы переместить в нее</key>
+    <key alias="inTheTree">в структуре дерева ниже</key>
+    <key alias="wasMoved">был перемещен в папку</key>
   </area>
   <area alias="emptyStates">
     <key alias="emptyDictionaryTree">Нет доступных элементов словаря</key>
@@ -487,6 +498,7 @@
     <key alias="deleted">Удалено</key>
     <key alias="deleting">Удаляется...</key>
     <key alias="design">Дизайн</key>
+    <key alias="dictionary">Словарь</key>
     <key alias="dimensions">Размеры</key>
     <key alias="down">Вниз</key>
     <key alias="download">Скачать</key>
@@ -496,6 +508,7 @@
     <key alias="email">Email адрес</key>
     <key alias="error">Ошибка</key>
     <key alias="findDocument">Найти</key>
+    <key alias="first">Начало</key>
     <key alias="folder">Папка</key>
     <key alias="height">Высота</key>
     <key alias="help">Справка</key>
@@ -508,10 +521,11 @@
     <key alias="justify">Выравнивание</key>
     <key alias="label">Название</key>
     <key alias="language">Язык</key>
+    <key alias="last">Конец</key>
     <key alias="layout">Макет</key>
     <key alias="loading">Загрузка</key>
     <key alias="locked">БЛОКИРОВКА</key>
-    <key alias="login">Логин</key>
+    <key alias="login">Войти</key>
     <key alias="logoff">Выйти</key>
     <key alias="logout">Выход</key>
     <key alias="macro">Макрос</key>
@@ -520,7 +534,7 @@
     <key alias="move">Переместить</key>
     <key alias="name">Название</key>
     <key alias="new">Новый</key>
-    <key alias="next">Следующий</key>
+    <key alias="next">След</key>
     <key alias="no">Нет</key>
     <key alias="of">из</key>
     <key alias="ok">Ok</key>
@@ -530,12 +544,13 @@
     <key alias="path">Путь</key>
     <key alias="placeHolderID">Идентификатор контейнера</key>
     <key alias="pleasewait">Минуточку...</key>
-    <key alias="previous">Предыдущий</key>
+    <key alias="previous">Пред</key>
     <key alias="properties">Свойства</key>
     <key alias="reciept">Email адрес для получения данных</key>
     <key alias="recycleBin">Корзина</key>
     <key alias="recycleBinEmpty">Ваша корзина пуста</key>
     <key alias="remaining">Осталось</key>
+    <key alias="remove">Удалить</key>
     <key alias="rename">Переименовать</key>
     <key alias="renew">Обновить</key>
     <key alias="required" version="7.0">Обязательное</key>
@@ -731,6 +746,10 @@
   </area>
   <area alias="imagecropper">
     <key alias="reset">Сбросить</key>
+    <key alias="defineCrop">Задать рамку</key>
+    <key alias="defineCropDescription">Задайте рамке имя (алиас), а также ширину и высоту по-умолчанию</key>
+    <key alias="saveCrop">Сохранить рамку</key>
+    <key alias="addCrop">Добавить новую рамку</key>
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">Программа установки не может установить подключение к базе данных.</key>
@@ -799,7 +818,7 @@
     <key alias="runwayFromScratchText"><![CDATA[
 		В настоящий момент Ваш сайт абсолютно пустой, что является наилучшим вариантом для старта
 		"с чистого листа", чтобы начать создавать свои собственные типы документов и шаблоны.
-		(<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Здесь можно узнать об этом подробнее</a>) Вы также можете отложить установку "Runway" на более позднее время. Перейдите к разделу "Для разработчиков" и выберите пункт "Пакеты".
+		(<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Здесь можно узнать об этом подробнее</a>) Вы также можете отложить установку "Runway" на более позднее время. Перейдите к разделу "Разработка" и выберите пункт "Пакеты".
 		]]></key>
     <key alias="runwayHeader">Вы только что установили чистую платформу Umbraco. Какой шаг будет следующим?</key>
     <key alias="runwayInstalled">"Runway" установлен</key>
@@ -968,6 +987,39 @@
 		Выберите файл пакета на своем компьютере, нажав на кнопку 'Обзор'<br />
 		и указав на нужный файл. Пакеты Umbraco обычно являются архивами с расширением ".umb" или ".zip".
 		]]></key>
+    <key alias="dropHere">Перетащите сюда</key>
+    <key alias="orClickHereToUpload">или нажмите здесь для выбора файла пакета</key>
+    <key alias="uploadPackage">Загрузить пакет</key>
+    <key alias="localPackageDescr">Установите локальный пакет из файла, расположенного на Вашем компьютере. Остерегайтесь устанавливать пакеты из непроверенных источников!</key>
+    <key alias="uploadAnother">Загрузить еще один пакет</key>
+    <key alias="cancelAndUploadAnother">Отменить и загрузить другой пакет</key>
+    <key alias="packageLicense">Лицензия</key>
+    <key alias="accept">Я принимаю</key>
+    <key alias="termsOfUse">условия использования</key>
+    <key alias="packageInstall">Установить пакет</key>
+    <key alias="installFinish">Завершить</key>
+    <key alias="installedPackages">Установленные пакеты</key>
+    <key alias="noPackages">Ни одного пакета еще не установлено</key>
+    <key alias="noPackagesDescription"><![CDATA[Вы пока еще не устанавливали ни одного пакета. Вы можете установить как локальный пакет, выбрав файл на Вашем компьютере, так и пакет из репозитория, нажав на значок <strong>'Packages'</strong> наверху справа]]></key>
+    <key alias="packageSearch">Поиск по пакетам</key>
+    <key alias="packageSearchResults">Результаты поиска по</key>
+    <key alias="packageNoResults">Ничего не найдено по запросу</key>
+    <key alias="packageNoResultsDescription">Пожалуйста, повторите поиск, уточнив запрос, или воспользуйтесь просмотром по категориям</key>
+    <key alias="packagesPopular">Популярные</key>
+    <key alias="packagesNew">Недавно созданные</key>
+    <key alias="packageHas">имеет на счету</key>
+    <key alias="packageKarmaPoints">очков кармы</key>
+    <key alias="packageInfo">Информация</key>
+    <key alias="packageOwner">Владелец</key>
+    <key alias="packageContrib">Соавторы</key>
+    <key alias="packageCreated">Создан</key>
+    <key alias="packageCurrentVersion">Текущая версия</key>
+    <key alias="packageNetVersion">Версия .NET</key>
+    <key alias="packageDownloads">Загрузок</key>
+    <key alias="packageLikes">Нравится</key>
+    <key alias="packageCompatibility">Совместимость</key>
+    <key alias="packageCompatibilityDescription">Этот пакет совместим со следующими версиями Umbraco, по сообщениям участников сообщества. Полная совместимость не гарантируется для версий со значением ниже 100%</key>
+    <key alias="packageExternalSources">Внешние источники</key>
     <key alias="packageAuthor">Автор</key>
     <key alias="packageDemonstration">Демонстрация</key>
     <key alias="packageDocumentation">Документация (описание)</key>
@@ -980,7 +1032,7 @@
     <key alias="packageOptions">Опции пакета</key>
     <key alias="packageReadme">Краткий обзор пакета</key>
     <key alias="packageRepository">Репозиторий пакета</key>
-    <key alias="packageUninstallConfirm">Подтверждение деинсталляции</key>
+    <key alias="packageUninstallConfirm">Подтверждение деинсталляции пакета</key>
     <key alias="packageUninstalledHeader">Пакет деинсталлирован</key>
     <key alias="packageUninstalledText">Указанный пакет успешно удален из системы</key>
     <key alias="packageUninstallHeader">Деинсталлировать пакет</key>
@@ -995,14 +1047,15 @@
     <key alias="packageVersionHistory">История версий пакета</key>
     <key alias="viewPackageWebsite">Перейти на веб-сайт пакета</key>
     <key alias="packageAlreadyInstalled">Этот пакет уже установлен в системе</key>
-    <key alias="targetVersionMismatch">Этот пакет не может быть установлен, он требует наличия Umbraco версии как минимум %0%</key>
+    <key alias="targetVersionMismatch">Этот пакет не может быть установлен, он требует наличия Umbraco версии как минимум</key>
     <key alias="installStateUninstalling">Удаление...</key>
     <key alias="installStateDownloading">Загрузка...</key>
     <key alias="installStateImporting">Импорт...</key>
     <key alias="installStateInstalling">Установка...</key>
     <key alias="installStateRestarting">Перезапуск, подождите, пожалуйста...</key>
     <key alias="installStateComplete">Все готово, сейчас браузер перезагрузит страницу, подождите, пожалуйста...</key>
-    <key alias="installStateCompleted">Пожалуйста, нажмите кнопку 'finish' для завершения установки и перезагрузки страницы.</key>
+    <key alias="installStateCompleted">Пожалуйста, нажмите кнопку 'Завершить' для завершения установки и перезагрузки страницы.</key>
+    <key alias="installStateUploading">Загрузка пакета...</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Вставить, полностью сохранив форматирование (не рекомендуется)</key>
@@ -1119,7 +1172,7 @@
     <key alias="concierge">Смотритель</key>
     <key alias="content">Содержимое</key>
     <key alias="courier">Курьер</key>
-    <key alias="developer">Для Разработчиков</key>
+    <key alias="developer">Разработка</key>
     <key alias="forms">Формы</key>
     <key alias="help" version="7.0">Помощь</key>
     <key alias="installer">Мастер конфигурирования Umbraco</key>
@@ -1184,7 +1237,7 @@
     <key alias="sortOrder">Порядок сортировки</key>
     <key alias="sortCreationDate">Дата создания</key>
     <key alias="sortDone">Сортировка завершена</key>
-    <key alias="sortHelp">Перетаскивайте элементы на нужное место вверх или вниз для определения необходимого Вам порядка сортировки. Также можно щелкнуть по заголовкам столбцов, чтобы отсортировать все элементы сразу.</key>
+    <key alias="sortHelp">Перетаскивайте элементы на нужное место вверх или вниз для определения необходимого Вам порядка сортировки. Также можно использовать заголовки столбцов, чтобы отсортировать все элементы сразу.</key>
     <key alias="sortPleaseWait"><![CDATA[Пожалуйста, подождите... Страницы сортируются, это может занять некоторое время.<br/> <br/> Не закрывайте это окно до окончания процесса сортировки.]]></key>
   </area>
   <area alias="speechBubbles">
@@ -1330,6 +1383,7 @@
     </key>   
     
     <key alias="queryBuilder">Генератор запросов</key>
+    <key alias="buildQuery">Построить запрос</key>
     <key alias="itemsReturned">элементов в результате, за</key>
 
     <key alias="iWant">Мне нужны</key>   
@@ -1367,34 +1421,40 @@
     <key alias="template">Шаблон</key>
   </area>
   <area alias="templateEditor">
+    <key alias="addFallbackField">Добавить поле замены</key>
+    <key alias="addDefaultValue">Добавить значение по-умолчанию</key>
     <key alias="alternativeField">Альтернативное поле</key>
-    <key alias="alternativeText">Альтернативный текст</key>
+    <key alias="alternativeText">Текст по-умолчанию</key>
     <key alias="casing">Регистр</key>
     <key alias="chooseField">Выбрать поле</key>
     <key alias="convertLineBreaks">Преобразовать переводы строк</key>
-    <key alias="convertLineBreaksHelp">Заменяет переводы строк на тэг html &lt;br&gt;</key>
+    <key alias="convertLineBreaksHelp">Заменяет переводы строк на тэг html 'br'</key>
     <key alias="customFields">Пользовательские</key>
     <key alias="dateOnly">Только дата</key>
     <key alias="encoding">Кодировка</key>
+    <key alias="formatAndEncoding">Форматирование и кодировка</key>
     <key alias="formatAsDate">Форматировать как дату</key>
+    <key alias="formatAsDateDescr">Форматировать значение как дату, или как дату и время, в соответствии с текущей культурой</key>
     <key alias="htmlEncode">Кодировка HTML</key>
     <key alias="htmlEncodeHelp">Заменяет спецсимволы эквивалентами в формате HTML</key>
     <key alias="insertedAfter">Будет добавлено после поля</key>
     <key alias="insertedBefore">Будет вставлено перед полем</key>
     <key alias="lowercase">В нижнем регистре</key>
+    <key alias="modifyOutput">Модификации при выводе</key>
     <key alias="none">-Не указано-</key>
+    <key alias="outputSample">Пример результата</key>
     <key alias="postContent">Вставить после поля</key>
     <key alias="preContent">Вставить перед полем</key>
     <key alias="recursive">Рекурсивно</key>
-    <key alias="removeParagraph">Удалить тэги параграфов</key>
-    <key alias="removeParagraphHelp">Удаляются тэги &lt;p&gt; в начале и в конце абзацев</key>
+    <key alias="recursiveDescr">Да, использовать рекурсию</key>
+    <key alias="separator">Разделитель</key>
     <key alias="standardFields">Стандартные</key>
     <key alias="uppercase">В верхнем регистре</key>
     <key alias="urlEncode">Кодирование URL</key>
     <key alias="urlEncodeHelp">Форматирование специальных символов в URL</key>
     <key alias="usedIfAllEmpty">Это значение будет использовано только если предыдущие поля пусты</key>
     <key alias="usedIfEmpty">Это значение будет использовано только если первичное поле пусто</key>
-    <key alias="withTime">Дата и время. Разделитель:</key>
+    <key alias="withTime">Дата и время</key>
   </area>
   <area alias="translation">
     <key alias="assignedTasks">Задачи, назначенные Вам</key>
@@ -1535,5 +1595,13 @@
     <key alias="validateAsUrl">Валидация по формату Url</key>
     <key alias="enterCustomValidation">...или указать свои правила валидации</key>
     <key alias="fieldIsMandatory">Обязательно к заполнению</key>
+    <key alias="validationRegExp">Задайте регулярное выражение</key>
+    <key alias="minCount">Необходимо выбрать как минимум</key>
+    <key alias="maxCount">Возможно выбрать максимум</key>
+    <key alias="items">элементов</key>
+    <key alias="itemsSelected">элементов</key>
+    <key alias="invalidDate">Неверный формат даты</key>
+    <key alias="invalidNumber">Не является числом</key>
+    <key alias="invalidEmail">неверный формат email-адреса</key>
   </area>
 </language>

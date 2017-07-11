@@ -17,6 +17,7 @@
 
                    <ng-form name="headerNameForm">
                        <input
+                        title="{{key}}"
                         type="text"
                         class="umb-panel-header-name-input"
                         localize="placeholder"
@@ -30,7 +31,7 @@
                         required />
                    </ng-form>
 
-                  <div class="umb-panel-header-name" ng-if="nameLocked">{{ name }}</div>
+                  <div class="umb-panel-header-name" ng-if="nameLocked" title="{{key}}">{{ name }}</div>
 
                   <umb-generate-alias class="umb-panel-header-alias"
                                       ng-if="!hideAlias"
@@ -38,16 +39,18 @@
                                       alias-from="$parent.name"
                                       enable-lock="true"
                                       server-validation-field="Alias"></umb-generate-alias>
+                
 
-                  <input
-                    type="text"
-                    class="umb-panel-header-description"
-                    localize="placeholder"
-                    placeholder="@placeholders_enterDescription"
-                    ng-if="!hideDescription && !descriptionLocked"
-                    ng-model="$parent.description" />
+                        <input
+                            type="text"
+                            class="umb-panel-header-description"
+                            localize="placeholder"
+                            placeholder="@placeholders_enterDescription"
+                            ng-if="!hideDescription && !descriptionLocked"
+                            ng-model="$parent.description" />
 
-                    <div class="umb-panel-header-locked-description" ng-show="descriptionLocked">{{ description }}</div>
+                        <div class="umb-panel-header-locked-description" ng-show="descriptionLocked">{{ description }}</div>
+
 
                </div>
 
