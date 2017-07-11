@@ -809,8 +809,6 @@
     <key alias="postContent">Insertar después del campo</key>
     <key alias="preContent">Insertar antes del campo</key>
     <key alias="recursive">Recursivo</key>
-    <key alias="removeParagraph">Borrar los tags del párrafo</key>
-    <key alias="removeParagraphHelp">Borrará cualquier &amp;lt;P&amp;gt; al principio y al final del texto</key>
     <key alias="uppercase">Mayúscula</key>
     <key alias="urlEncode">Codificar URL</key>
     <key alias="urlEncodeHelp">Formateará los caracteres especiales de las URLs</key>

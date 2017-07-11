@@ -903,8 +903,6 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="postContent">An den Feldinhalt anhängen</key>
     <key alias="preContent">Dem Feldinhalt voranstellen</key>
     <key alias="recursive">Rekursiv</key>
-    <key alias="removeParagraph">Textabsatz entfernen</key>
-    <key alias="removeParagraphHelp">Alle &lt;p&gt; am Anfang und am Ende des Feldinhalts werden entfernt</key>
     <key alias="standardFields">Standardfelder</key>
     <key alias="uppercase">Großbuchstaben</key>
     <key alias="urlEncode">URL kodieren</key>

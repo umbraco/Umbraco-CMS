@@ -70,6 +70,10 @@ namespace Umbraco.Core
             public const string AnyString = "any-string"; // that one is for tests
 
             [UdiType(UdiType.StringUdi)]
+            public const string Language = "language";
+            [UdiType(UdiType.StringUdi)]
+            public const string MacroScript = "macroscript";
+            [UdiType(UdiType.StringUdi)]
             public const string MediaFile = "media-file";
             [UdiType(UdiType.StringUdi)]
             public const string TemplateFile = "template-file";
@@ -82,9 +86,9 @@ namespace Umbraco.Core
             [UdiType(UdiType.StringUdi)]
             public const string PartialViewMacro = "partial-view-macro";
             [UdiType(UdiType.StringUdi)]
-            public const string Xslt = "xslt";
+            public const string UserControl = "usercontrol";
             [UdiType(UdiType.StringUdi)]
-            public const string Language = "language";
+            public const string Xslt = "xslt";
 
             public static string FromUmbracoObjectType(UmbracoObjectTypes umbracoObjectType)
             {

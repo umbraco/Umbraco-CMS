@@ -195,6 +195,17 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="entity">The entity.</param>
         /// <returns>The entity identifier of the entity.</returns>
+        public static StringUdi GetUdi(this IUserControl entity)
+        {
+            if (entity == null) throw new ArgumentNullException("entity");
+            return new StringUdi(Constants.UdiEntityType.UserControl, entity.Path.TrimStart('/')).EnsureClosed();
+        }
+
+        /// <summary>
+        /// Gets the entity identifier of the entity.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <returns>The entity identifier of the entity.</returns>
         public static StringUdi GetUdi(this IPartialView entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
