@@ -20,7 +20,7 @@ namespace Umbraco.Web.Cache
 
         #region Define
 
-        protected override DataTypeCacheRefresher Instance => this;
+        protected override DataTypeCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("35B16C25-A17E-45D7-BC8F-EDAB1DCC28D2");
 

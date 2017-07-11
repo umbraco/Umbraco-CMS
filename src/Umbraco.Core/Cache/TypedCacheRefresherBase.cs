@@ -23,12 +23,12 @@ namespace Umbraco.Core.Cache
 
         public virtual void Refresh(TEntityType instance)
         {
-            OnCacheUpdated(Instance, new CacheRefresherEventArgs(instance, MessageType.RefreshByInstance));
+            OnCacheUpdated(This, new CacheRefresherEventArgs(instance, MessageType.RefreshByInstance));
         }
 
         public virtual void Remove(TEntityType instance)
         {
-            OnCacheUpdated(Instance, new CacheRefresherEventArgs(instance, MessageType.RemoveByInstance));
+            OnCacheUpdated(This, new CacheRefresherEventArgs(instance, MessageType.RemoveByInstance));
         }
 
         #endregion

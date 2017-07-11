@@ -35,7 +35,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Gets the typed 'this' for events.
         /// </summary>
-        protected abstract TInstanceType Instance { get; }
+        protected abstract TInstanceType This { get; }
 
         /// <summary>
         /// Gets the unique identifier of the refresher.
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Cache
         /// </summary>
         public virtual void RefreshAll()
         {
-            OnCacheUpdated(Instance, new CacheRefresherEventArgs(null, MessageType.RefreshAll));
+            OnCacheUpdated(This, new CacheRefresherEventArgs(null, MessageType.RefreshAll));
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Umbraco.Core.Cache
         /// <param name="id">The entity's identifier.</param>
         public virtual void Refresh(int id)
         {
-            OnCacheUpdated(Instance, new CacheRefresherEventArgs(id, MessageType.RefreshById));
+            OnCacheUpdated(This, new CacheRefresherEventArgs(id, MessageType.RefreshById));
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Cache
         /// <param name="id">The entity's identifier.</param>
         public virtual void Refresh(Guid id)
         {
-            OnCacheUpdated(Instance, new CacheRefresherEventArgs(id, MessageType.RefreshById));
+            OnCacheUpdated(This, new CacheRefresherEventArgs(id, MessageType.RefreshById));
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Umbraco.Core.Cache
         /// <param name="id">The entity's identifier.</param>
         public virtual void Remove(int id)
         {
-            OnCacheUpdated(Instance, new CacheRefresherEventArgs(id, MessageType.RemoveById));
+            OnCacheUpdated(This, new CacheRefresherEventArgs(id, MessageType.RemoveById));
         }
 
         #endregion

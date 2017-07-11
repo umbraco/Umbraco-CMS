@@ -47,7 +47,7 @@ namespace Umbraco.Core.Cache
         /// <param name="payloads">The payload.</param>
         public virtual void Refresh(TPayload[] payloads)
         {
-            OnCacheUpdated(Instance, new CacheRefresherEventArgs(payloads, MessageType.RefreshByPayload));
+            OnCacheUpdated(This, new CacheRefresherEventArgs(payloads, MessageType.RefreshByPayload));
         }
 
         #endregion
