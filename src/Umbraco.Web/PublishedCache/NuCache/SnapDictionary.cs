@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -52,93 +53,141 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Locking
 
-        public void WriteLocked(Action action)
+        // Lock has a 'forceGen' parameter:
+        //  used to start a set of changes that may not commit, to isolate the set from any pending
+        //  changes that would not have been snapshotted yet, so they cannot be rolled back by accident
+        //
+        // Release has a 'commit' parameter:
+        //  if false, the live gen is scrapped and changes that have been applied as part of the lock
+        //  are all ignored - Release is private and meant to be invoked with 'commit' being false only
+        //  only on the outermost lock (by SnapDictionaryWriter)
+
+        // using (...) {} for locking is prone to nasty leaks in case of weird exceptions
+        // such as thread-abort or out-of-memory, but let's not worry about it now
+
+        private readonly string _instanceId = Guid.NewGuid().ToString("N");
+
+        // a scope contextual that represents a locked writer to the dictionary
+        private class SnapDictionaryWriter : ScopeContextualBase
         {
-            var wtaken = false;
-            var wcount = false;
+            private SnapDictionary<TKey, TValue> _dictionary;
+            private WriteLock _wl;
+
+            public SnapDictionaryWriter(SnapDictionary<TKey, TValue> dictionary)
+            {
+                _dictionary = dictionary;
+                _wl = new WriteLock();
+                dictionary.Lock(_wl, true);
+            }
+
+            public override void Release(bool completed)
+            {
+                if (_wl == null) return;
+                _dictionary.Release(_wl, completed);
+                _wl = null;
+                _dictionary = null;
+            }
+        }
+
+        // gets a scope contextual representing a locked writer to the dictionary
+        public IDisposable GetWriter(IScopeProvider scopeProvider)
+        {
+            return ScopeContextualBase.Get(scopeProvider, _instanceId, () => new SnapDictionaryWriter(this));
+        }
+
+        private class WriteLock
+        {
+            public bool Taken;
+            public bool Count;
+        }
+
+        private void Lock(WriteLock wl, bool forceGen)
+        {
+            Monitor.Enter(_wlocko, ref wl.Taken);
+
+            var rtaken = false;
             try
             {
-                Monitor.Enter(_wlocko, ref wtaken);
+                Monitor.Enter(_rlocko, ref rtaken);
 
-                var rtaken = false;
+                // assume everything in finally runs atomically
+                // http://stackoverflow.com/questions/18501678/can-this-unexpected-behavior-of-prepareconstrainedregions-and-thread-abort-be-ex
+                // http://joeduffyblog.com/2005/03/18/atomicity-and-asynchronous-exception-failures/
+                // http://joeduffyblog.com/2007/02/07/introducing-the-new-readerwriterlockslim-in-orcas/
+                // http://chabster.blogspot.fr/2013/12/readerwriterlockslim-fails-on-dual.html
+                //RuntimeHelpers.PrepareConstrainedRegions();
                 try
-                {
-                    Monitor.Enter(_rlocko, ref rtaken);
-
-                    // assume everything in finally runs atomically
-                    // http://stackoverflow.com/questions/18501678/can-this-unexpected-behavior-of-prepareconstrainedregions-and-thread-abort-be-ex
-                    // http://joeduffyblog.com/2005/03/18/atomicity-and-asynchronous-exception-failures/
-                    // http://joeduffyblog.com/2007/02/07/introducing-the-new-readerwriterlockslim-in-orcas/
-                    // http://chabster.blogspot.fr/2013/12/readerwriterlockslim-fails-on-dual.html
-                    //RuntimeHelpers.PrepareConstrainedRegions();
-                    try
-                    { }
-                    finally
-                    {
-                        _wlocked++;
-                        wcount = true;
-                        if (_nextGen == false)
-                        {
-                            // because we are changing things, a new generation
-                            // is created, which will trigger a new snapshot
-                            _nextGen = true;
-                            _liveGen += 1;
-                        }
-                    }
-                }
+                { }
                 finally
                 {
-                    if (rtaken) Monitor.Exit(_rlocko);
+                    _wlocked++;
+                    wl.Count = true;
+                    if (_nextGen == false || (forceGen && _wlocked == 1)) // if true already... ok to have "holes" in generation objects
+                    {
+                        // because we are changing things, a new generation
+                        // is created, which will trigger a new snapshot
+                        _nextGen = true;
+                        _liveGen += 1;
+                    }
                 }
+            }
+            finally
+            {
+                if (rtaken) Monitor.Exit(_rlocko);
+            }
+        }
 
+        private void Release(WriteLock wl, bool commit = true)
+        {
+            if (commit == false)
+            {
+                _nextGen = false;
+                _liveGen -= 1;
+
+                foreach (var item in _items)
+                {
+                    var link = item.Value;
+                    if (link.Gen <= _liveGen) continue;
+
+                    var key = item.Key;
+                    if (link.Next == null)
+                        _items.TryRemove(key, out link);
+                    else
+                        _items.TryUpdate(key, link.Next, link);
+                }
+            }
+
+            if (wl.Count) _wlocked--;
+            if (wl.Taken) Monitor.Exit(_wlocko);
+        }
+
+        public void WriteLocked(Action action)
+        {
+            var wl = new WriteLock();
+            try
+            {
+                // lock (again) - don't force a next gen if there's already one
+                Lock(wl, false);
                 action();
             }
             finally
             {
-                if (wcount) _wlocked--;
-                if (wtaken) Monitor.Exit(_wlocko);
+                Release(wl);
             }
         }
 
         public T WriteLocked<T>(Func<T> func)
         {
-            var wtaken = false;
-            var wcount = false;
+            var wl = new WriteLock();
             try
             {
-                Monitor.Enter(_wlocko, ref wtaken);
-
-                var rtaken = false;
-                try
-                {
-                    Monitor.Enter(_rlocko, ref rtaken);
-
-                    try
-                    { }
-                    finally
-                    {
-                        _wlocked++;
-                        wcount = true;
-                        if (_nextGen == false)
-                        {
-                            // because we are changing things, a new generation
-                            // is created, which will trigger a new snapshot
-                            _nextGen = true;
-                            _liveGen += 1;
-                        }
-                    }
-                }
-                finally
-                {
-                    if (rtaken) Monitor.Exit(_rlocko);
-                }
-
+                // lock (again) - don't force a next gen if there's already one
+                Lock(wl, false);
                 return func();
             }
             finally
             {
-                if (wcount) _wlocked--;
-                if (wtaken) Monitor.Exit(_wlocko);
+                Release(wl);
             }
         }
 
@@ -168,8 +217,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private LinkedNode GetHead(TKey key)
         {
-            LinkedNode link;
-            _items.TryGetValue(key, out link); // else null
+            _items.TryGetValue(key, out LinkedNode link); // else null
             return link;
         }
 
@@ -364,8 +412,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private void Collect()
         {
             // see notes in CreateSnapshot
-            GenerationObject generationObject;
-            while (_generationObjects.TryPeek(out generationObject) && (generationObject.Count == 0 || generationObject.WeakReference.IsAlive == false))
+            while (_generationObjects.TryPeek(out GenerationObject generationObject) && (generationObject.Count == 0 || generationObject.WeakReference.IsAlive == false))
             {
                 _generationObjects.TryDequeue(out generationObject); // cannot fail since TryPeek has succeeded
                 _floorGen = generationObject.Gen;
@@ -471,10 +518,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             public ConcurrentQueue<GenerationObject> GenerationObjects => _dict._generationObjects;
 
+            public Snapshot LiveSnapshot => new Snapshot(_dict, _dict._liveGen);
+
             public GenVal[] GetValues(TKey key)
             {
-                LinkedNode link;
-                _dict._items.TryGetValue(key, out link); // else null
+                _dict._items.TryGetValue(key, out LinkedNode link); // else null
 
                 if (link == null)
                     return new GenVal[0];
@@ -538,6 +586,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _generationReference.GenerationObject.Reference();
             }
 
+            internal Snapshot(SnapDictionary<TKey, TValue> store, long gen)
+            {
+                _store = store;
+                _gen = gen;
+            }
+
             public TValue Get(TKey key)
             {
                 if (_gen < 0)
@@ -576,7 +630,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 if (_gen < 0) return;
                 _gen = -1;
-                _generationReference.GenerationObject.Release();
+                _generationReference?.GenerationObject.Release();
                 GC.SuppressFinalize(this);
             }
         }
