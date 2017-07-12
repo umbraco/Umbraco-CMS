@@ -13,20 +13,20 @@ namespace Umbraco.Web.Trees
         /// <summary>
         /// Inheritors can override this method to modify the file node that is created.
         /// </summary>
-        /// <param name="xNode"></param>
+        /// <param name="treeNode"></param>
         protected virtual void OnRenderFileNode(ref TreeNode treeNode) { }
 
         /// <summary>
         /// Inheritors can override this method to modify the folder node that is created.
         /// </summary>
-        /// <param name="xNode"></param>
+        /// <param name="treeNode"></param>
         protected virtual void OnRenderFolderNode(ref TreeNode treeNode) { }
 
-        protected override Models.Trees.TreeNodeCollection GetTreeNodes(string id, System.Net.Http.Formatting.FormDataCollection queryStrings)
+        protected override TreeNodeCollection GetTreeNodes(string id, System.Net.Http.Formatting.FormDataCollection queryStrings)
         {
-            string orgPath = "";
-            string path = "";
-            if (!string.IsNullOrEmpty(id) && id != "-1")
+            var orgPath = "";
+            string path;
+            if (string.IsNullOrEmpty(id) == false && id != "-1")
             {
                 orgPath = id;
                 path = IOHelper.MapPath(FilePath + "/" + orgPath);
@@ -37,16 +37,16 @@ namespace Umbraco.Web.Trees
                 path = IOHelper.MapPath(FilePath);
             }
 
-            DirectoryInfo dirInfo = new DirectoryInfo(path);
-            DirectoryInfo[] dirInfos = dirInfo.GetDirectories();
+            var dirInfo = new DirectoryInfo(path);
+            var dirInfos = dirInfo.GetDirectories();
 
             var nodes = new TreeNodeCollection();
-            foreach (DirectoryInfo dir in dirInfos)
+            foreach (var dir in dirInfos)
             {
                 if ((dir.Attributes & FileAttributes.Hidden) == 0)
                 {
-                    var HasChildren = dir.GetFiles().Length > 0 || dir.GetDirectories().Length > 0;
-                    var node = CreateTreeNode(orgPath + dir.Name, orgPath, queryStrings, dir.Name, "icon-folder", HasChildren);
+                    var hasChildren = dir.GetFiles().Length > 0 || dir.GetDirectories().Length > 0;
+                    var node = CreateTreeNode(orgPath + dir.Name, orgPath, queryStrings, dir.Name, "icon-folder", hasChildren);
 
                     OnRenderFolderNode(ref node);
                     if (node != null)
@@ -56,8 +56,8 @@ namespace Umbraco.Web.Trees
 
             //this is a hack to enable file system tree to support multiple file extension look-up
             //so the pattern both support *.* *.xml and xml,js,vb for lookups
-            string[] allowedExtensions = new string[0];
-            bool filterByMultipleExtensions = FileSearchPattern.Contains(",");
+            var allowedExtensions = new string[0];
+            var filterByMultipleExtensions = FileSearchPattern.Contains(",");
             FileInfo[] fileInfo;
 
             if (filterByMultipleExtensions)
@@ -68,11 +68,11 @@ namespace Umbraco.Web.Trees
             else
                 fileInfo = dirInfo.GetFiles(FileSearchPattern);
 
-            foreach (FileInfo file in fileInfo)
+            foreach (var file in fileInfo)
             {
                 if ((file.Attributes & FileAttributes.Hidden) == 0)
                 {
-                    if (filterByMultipleExtensions && Array.IndexOf<string>(allowedExtensions, file.Extension.ToLower().Trim('.')) < 0)
+                    if (filterByMultipleExtensions && Array.IndexOf(allowedExtensions, file.Extension.ToLower().Trim('.')) < 0)
                         continue;
 
                     var node = CreateTreeNode(orgPath + file.Name, orgPath, queryStrings, file.Name, "icon-file", false);
@@ -83,7 +83,6 @@ namespace Umbraco.Web.Trees
                         nodes.Add(node);
                 }
             }
-
             return nodes;
         }
     }
