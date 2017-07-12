@@ -240,5 +240,39 @@ namespace Umbraco.Web
                 }
             }
         }
+
+        /// <summary>
+        /// Returns the length of the words from a html block
+        /// </summary>
+        /// <param name="html">Html text</param>
+        /// <param name="words">Amount of words you would like to measure</param>
+        /// <returns></returns>
+        public int WordsToLength(string html, int words)
+        {
+            int wordCount = 0;
+            int length = 0;
+            int maxWords = words;
+
+            while (length < html.Length)
+            {
+                // Check to see if the current wordCount reached the maxWords allowed
+                if (wordCount.Equals(maxWords)) break;
+                // Check if current char is part of a word
+                while (length < html.Length && char.IsWhiteSpace(html[length]) == false)
+                {
+                    length++;
+                }
+
+                wordCount++;
+
+                // Skip whitespace until the next word
+                while (length < html.Length && char.IsWhiteSpace(html[length]))
+                {
+                    length++;
+                }
+            }
+
+            return length;
+        }
     }
 }
