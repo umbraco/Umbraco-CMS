@@ -44,8 +44,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // volatile because we read it with no lock
         private volatile bool _isReady;
 
-        private readonly ContentStore2 _contentStore;
-        private readonly ContentStore2 _mediaStore;
+        private readonly ContentStore _contentStore;
+        private readonly ContentStore _mediaStore;
         private readonly SnapDictionary<int, Domain> _domainStore;
         private readonly object _storesLock = new object();
 
@@ -130,13 +130,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // stores are created with a db so they can write to it, but they do not read from it,
                 // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
                 // figure out whether it can read the dbs or it should populate them from sql
-                _contentStore = new ContentStore2(facadeAccessor, logger, _localContentDb);
-                _mediaStore = new ContentStore2(facadeAccessor, logger, _localMediaDb);
+                _contentStore = new ContentStore(facadeAccessor, logger, _localContentDb);
+                _mediaStore = new ContentStore(facadeAccessor, logger, _localMediaDb);
             }
             else
             {
-                _contentStore = new ContentStore2(facadeAccessor, logger);
-                _mediaStore = new ContentStore2(facadeAccessor, logger);
+                _contentStore = new ContentStore(facadeAccessor, logger);
+                _mediaStore = new ContentStore(facadeAccessor, logger);
             }
 
             _domainStore = new SnapDictionary<int, Domain>();
@@ -910,7 +910,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // nothing like that...
             // for snapshot cache, StaticCacheProvider is a No-No, use something better.
 
-            ContentStore2.Snapshot contentSnap, mediaSnap;
+            ContentStore.Snapshot contentSnap, mediaSnap;
             SnapDictionary<int, Domain>.Snapshot domainSnap;
             ICacheProvider snapshotCache;
             lock (_storesLock)
@@ -1003,7 +1003,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private static bool HasChangesImpactingAllVersions(IContent icontent)
         {
-            var content = (Core.Models.Content) icontent;
+            var content = (Content) icontent;
 
             // UpdateDate will be dirty
             // Published may be dirty if saving a Published entity
@@ -1022,7 +1022,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             OnRepositoryRefreshed(db, content, false);
 
             // if unpublishing, remove from table
-            if (((Core.Models.Content) content).PublishedState == PublishedState.Unpublishing)
+            if (((Content) content).PublishedState == PublishedState.Unpublishing)
             {
                 db.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id AND published=1", new { id = content.Id });
                 return;

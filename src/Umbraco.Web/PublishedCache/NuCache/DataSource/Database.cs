@@ -12,7 +12,7 @@ using Umbraco.Web.Composing;
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     // provides efficient database access for NuCache
-    class Database
+    internal class Database
     {
         public ContentNodeKit GetContentSource(IScopeUnitOfWork uow, int id)
         {

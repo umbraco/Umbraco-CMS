@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml.XPath;
 
 namespace Umbraco.Web.PublishedCache.NuCache.Navigable
 {
-    class NavigableContent : INavigableContent
+    internal class NavigableContent : INavigableContent
     {
         private readonly IPublishedContent _icontent;
         private readonly PublishedContent _content;
@@ -61,36 +60,21 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
 
         #region INavigableContent
 
-        public IPublishedContent InnerContent
-        {
-            get { return _icontent; }
-        }
+        public IPublishedContent InnerContent => _icontent;
 
-        public int Id
-        {
-            get { return _content.Id; }
-        }
+        public int Id => _content.Id;
 
-        public int ParentId
-        {
-            get { return _content.ParentId; }
-        }
+        public int ParentId => _content.ParentId;
 
-        public INavigableContentType Type
-        {
-            get { return NavigableContentType.GetContentType(_content.ContentType); }
-        }
+        public INavigableContentType Type => NavigableContentType.GetContentType(_content.ContentType);
 
         // returns all child ids, will be filtered by the source
-        public IList<int> ChildIds
-        {
-            get { return _content.ChildIds; }
-        }
+        public IList<int> ChildIds => _content.ChildIds;
 
         public object Value(int index)
         {
             if (index < 0)
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
 
             if (index < NavigableContentType.BuiltinProperties.Length)
             {
@@ -102,7 +86,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
             index -= NavigableContentType.BuiltinProperties.Length;
             var properties = _content.PropertiesArray;
             if (index >= properties.Length)
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
 
             // custom property, ie element
             return properties[index].XPathValue;

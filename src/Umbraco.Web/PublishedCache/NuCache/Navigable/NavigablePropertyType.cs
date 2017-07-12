@@ -11,7 +11,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
             XmlStringConverter = xmlStringConverter;
         }
 
-        public string Name { get; private set; }
-        public Func<object, string> XmlStringConverter { get; private set; }
+        public string Name { get; }
+        public Func<object, string> XmlStringConverter { get; }
     }
 }

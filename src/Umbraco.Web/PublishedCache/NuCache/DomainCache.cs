@@ -4,7 +4,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    class DomainCache : IDomainCache
+    internal class DomainCache : IDomainCache
     {
         private readonly SnapDictionary<int, Domain>.Snapshot _snapshot;
 

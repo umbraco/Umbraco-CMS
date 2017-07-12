@@ -6,7 +6,6 @@ using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 using Umbraco.Core.Xml.XPath;
@@ -17,14 +16,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
 {
     internal class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigableData, IDisposable
     {
-        private readonly ContentStore2.Snapshot _snapshot;
+        private readonly ContentStore.Snapshot _snapshot;
         private readonly ICacheProvider _facadeCache;
         private readonly ICacheProvider _snapshotCache;
         private readonly DomainHelper _domainHelper;
 
         #region Constructor
 
-        public ContentCache(bool previewDefault, ContentStore2.Snapshot snapshot, ICacheProvider facadeCache, ICacheProvider snapshotCache, DomainHelper domainHelper)
+        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, ICacheProvider facadeCache, ICacheProvider snapshotCache, DomainHelper domainHelper)
             : base(previewDefault)
         {
             _snapshot = snapshot;
@@ -32,6 +31,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _snapshotCache = snapshotCache;
             _domainHelper = domainHelper;
         }
+
+        // fixme - inject settings
+        private static bool HideTopLevelNodeFromPath => GlobalSettings.HideTopLevelNodeFromPath;
 
         #endregion
 
@@ -53,16 +55,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null)
         {
-            if (route == null) throw new ArgumentNullException("route");
+            if (route == null) throw new ArgumentNullException(nameof(route));
 
-            var cache = (preview == false || FacadeService.FullCacheWhenPreviewing) ? _snapshotCache : _facadeCache;
+            var cache = preview == false || FacadeService.FullCacheWhenPreviewing ? _snapshotCache : _facadeCache;
             var key = CacheKeys.ContentCacheContentByRoute(route, preview);
             return cache.GetCacheItem<IPublishedContent>(key, () => GetByRouteInternal(preview, route, hideTopLevelNode));
         }
 
         private IPublishedContent GetByRouteInternal(bool preview, string route, bool? hideTopLevelNode)
         {
-            hideTopLevelNode = hideTopLevelNode ?? GlobalSettings.HideTopLevelNodeFromPath; // default = settings
+            hideTopLevelNode = hideTopLevelNode ?? HideTopLevelNodeFromPath; // default = settings
 
             // the route always needs to be lower case because we only store the urlName attribute in lower case
             route = route.ToLowerInvariant();
@@ -129,7 +131,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (node == null)
                 return null;
 
-            hideTopLevelNode = hideTopLevelNode ?? GlobalSettings.HideTopLevelNodeFromPath; // default = settings
+            hideTopLevelNode = hideTopLevelNode ?? HideTopLevelNodeFromPath; // default = settings
 
             // walk up from that node until we hit a node with a domain,
             // or we reach the content root, collecting urls in the way
@@ -154,7 +156,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // assemble the route
             pathParts.Reverse();
             var path = "/" + string.Join("/", pathParts); // will be "/" or "/foo" or "/foo/bar" etc
-            var route = (n == null ? "" : n.Id.ToString(CultureInfo.InvariantCulture)) + path;
+            var route = (n?.Id.ToString(CultureInfo.InvariantCulture) ?? "") + path;
 
             return route;
         }
@@ -300,10 +302,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (iterator.MoveNext() == false) return null;
 
             var xnav = iterator.Current as NavigableNavigator;
-            if (xnav == null) return null;
-
-            var xcontent = xnav.UnderlyingObject as NavigableContent;
-            return xcontent == null ? null : xcontent.InnerContent;
+            var xcontent = xnav?.UnderlyingObject as NavigableContent;
+            return xcontent?.InnerContent;
         }
 
         public override IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, XPathVariable[] vars)
@@ -325,9 +325,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             while (iterator.MoveNext())
             {
                 var xnav = iterator.Current as NavigableNavigator;
-                if (xnav == null) continue;
-
-                var xcontent = xnav.UnderlyingObject as NavigableContent;
+                var xcontent = xnav?.UnderlyingObject as NavigableContent;
                 if (xcontent == null) continue;
 
                 yield return xcontent.InnerContent;

@@ -6,7 +6,7 @@ using CSharpTest.Net.Serialization;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    class BTree
+    internal class BTree
     {
         public static BPlusTree<int, ContentNodeKit> GetTree(string filepath, bool exists)
         {
@@ -28,7 +28,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return tree;
         }
 
-        class ContentNodeKitSerializer : ISerializer<ContentNodeKit>
+        private class ContentNodeKitSerializer : ISerializer<ContentNodeKit>
         {
             static readonly ContentDataSerializer DataSerializer = new ContentDataSerializer();
             //static readonly ListOfIntSerializer ChildContentIdsSerializer = new ListOfIntSerializer();
@@ -82,7 +82,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         class ContentDataSerializer : ISerializer<ContentData>
         {
-            private readonly static DictionaryOfValuesSerializer PropertiesSerializer = new DictionaryOfValuesSerializer();
+            private static readonly DictionaryOfValuesSerializer PropertiesSerializer = new DictionaryOfValuesSerializer();
 
             public ContentData ReadFrom(Stream stream)
             {
@@ -131,7 +131,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         }
         */
 
-        class DictionaryOfValuesSerializer : ISerializer<IDictionary<string, object>>
+        private class DictionaryOfValuesSerializer : ISerializer<IDictionary<string, object>>
         {
             public IDictionary<string, object> ReadFrom(Stream stream)
             {

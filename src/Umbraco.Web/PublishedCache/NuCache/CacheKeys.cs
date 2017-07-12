@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    static class CacheKeys
+    internal static class CacheKeys
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string DraftOrPub(bool previewing)

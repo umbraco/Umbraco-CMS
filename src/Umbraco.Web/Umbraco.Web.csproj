@@ -228,7 +228,7 @@
     <Compile Include="PublishedCache\NuCache\ContentCache.cs" />
     <Compile Include="PublishedCache\NuCache\ContentNode.cs" />
     <Compile Include="PublishedCache\NuCache\ContentNodeKit.cs" />
-    <Compile Include="PublishedCache\NuCache\ContentStore2.cs" />
+    <Compile Include="PublishedCache\NuCache\ContentStore.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentData.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentSourceDto.cs" />

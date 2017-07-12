@@ -12,13 +12,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 {
     internal class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableData, IDisposable
     {
-        private readonly ContentStore2.Snapshot _snapshot;
+        private readonly ContentStore.Snapshot _snapshot;
         private readonly ICacheProvider _facadeCache;
         private readonly ICacheProvider _snapshotCache;
 
         #region Constructors
 
-        public MediaCache(bool previewDefault, ContentStore2.Snapshot snapshot, ICacheProvider facadeCache, ICacheProvider snapshotCache)
+        public MediaCache(bool previewDefault, ContentStore.Snapshot snapshot, ICacheProvider facadeCache, ICacheProvider snapshotCache)
             : base(previewDefault)
         {
             _snapshot = snapshot;

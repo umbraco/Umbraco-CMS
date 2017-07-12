@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel.Security;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
@@ -13,7 +11,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
     // the whole PublishedMember thing should be refactored because as soon as a member
     // is wrapped on in a model, the inner IMember and all associated properties are lost
 
-    class PublishedMember : PublishedContent //, IPublishedMember
+    internal class PublishedMember : PublishedContent //, IPublishedMember
     {
         private readonly IMember _member;
 
@@ -87,65 +85,29 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region IPublishedMember
 
-        public IMember Member
-        {
-            get { return _member; }
-        }
+        public IMember Member => _member;
 
-        public string Email
-        {
-            get { return _member.Email; }
-        }
+        public string Email => _member.Email;
 
-        public string UserName
-        {
-            get { return _member.Username; }
-        }
+        public string UserName => _member.Username;
 
-        public string PasswordQuestion
-        {
-            get { return _member.PasswordQuestion; }
-        }
+        public string PasswordQuestion => _member.PasswordQuestion;
 
-        public string Comments
-        {
-            get { return _member.Comments; }
-        }
+        public string Comments => _member.Comments;
 
-        public bool IsApproved
-        {
-            get { return _member.IsApproved; }
-        }
+        public bool IsApproved => _member.IsApproved;
 
-        public bool IsLockedOut
-        {
-            get { return _member.IsLockedOut; }
-        }
+        public bool IsLockedOut => _member.IsLockedOut;
 
-        public DateTime LastLockoutDate
-        {
-            get { return _member.LastLockoutDate; }
-        }
+        public DateTime LastLockoutDate => _member.LastLockoutDate;
 
-        public DateTime CreationDate
-        {
-            get { return _member.CreateDate; }
-        }
+        public DateTime CreationDate => _member.CreateDate;
 
-        public DateTime LastLoginDate
-        {
-            get { return _member.LastLoginDate; }
-        }
+        public DateTime LastLoginDate => _member.LastLoginDate;
 
-        public DateTime LastActivityDate
-        {
-            get { return _member.LastLoginDate; }
-        }
+        public DateTime LastActivityDate => _member.LastLoginDate;
 
-        public DateTime LastPasswordChangedDate
-        {
-            get { return _member.LastPasswordChangeDate; }
-        }
+        public DateTime LastPasswordChangedDate => _member.LastPasswordChangeDate;
 
         #endregion
     }

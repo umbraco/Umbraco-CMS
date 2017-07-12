@@ -1,13 +1,11 @@
 ﻿using System;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
     // implements the facade
-    class Facade : IFacade, IDisposable
+    internal class Facade : IFacade, IDisposable
     {
         private readonly FacadeService _service;
         private bool _defaultPreview;
@@ -51,7 +49,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Caches
 
-        public ICacheProvider FacadeCache { get; private set; }
+        public ICacheProvider FacadeCache { get; }
 
         public ICacheProvider SnapshotCache => Elements.SnapshotCache;
 

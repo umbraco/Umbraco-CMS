@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
@@ -73,7 +72,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // clone parent
-        private ContentNode(ContentNode origin, IFacadeAccessor facadeAccessor)
+        private ContentNode(ContentNode origin)
         {
             // everything is the same, except for the child items
             // list which is a clone of the original list
@@ -138,7 +137,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public ContentNode CloneParent(IFacadeAccessor facadeAccessor)
         {
-            return new ContentNode(this, facadeAccessor);
+            return new ContentNode(this);
         }
 
         public ContentNodeKit ToKit()
@@ -147,10 +146,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 Node = this,
                 ContentTypeId = ContentType.Id,
-                // ReSharper disable MergeConditionalExpression
-                DraftData = Draft == null ? null : ((PublishedContent) Draft)._contentData,
-                PublishedData = Published == null ? null : ((PublishedContent) Published)._contentData
-                // ReSharper restore MergeConditionalExpression
+                
+                DraftData = ((PublishedContent) Draft)?._contentData,
+                PublishedData = ((PublishedContent) Published)?._contentData
             };
         }
     }

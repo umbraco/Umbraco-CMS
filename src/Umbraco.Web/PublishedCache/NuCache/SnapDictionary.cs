@@ -164,10 +164,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Set, Clear, Get, Has
 
-        public int Count
-        {
-            get { return _items.Count; }
-        }
+        public int Count => _items.Count;
 
         private LinkedNode GetHead(TKey key)
         {
@@ -187,7 +184,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // already in the dict
                     if (link.Gen != _liveGen)
                     {
-                        // for an older gen - if value is different then insert a new 
+                        // for an older gen - if value is different then insert a new
                         // link for the new gen, with the new value
                         if (link.Value != value)
                             _items.TryUpdate(key, new LinkedNode(value, _liveGen, link), link);
@@ -349,7 +346,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             if (_collectTask != null)
                 return _collectTask;
-            
+
             // ReSharper disable InconsistentlySynchronizedField
             var task = _collectTask = Task.Run(() => Collect());
             _collectTask.ContinueWith(_ =>
@@ -398,7 +395,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var link = kvp.Value;
 
                 //Console.WriteLine("Collect id=" + kvp.Key + " gen=" + link.Gen
-                //    + " nxt=" + (link.Next == null ? null : "next") 
+                //    + " nxt=" + (link.Next == null ? null : "next")
                 //    + " val=" + link.Value);
 
                 // reasons to collect the head:
@@ -409,7 +406,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (link.Gen < liveGen && link.Value == null
                     && (link.Next == null || link.Gen <= _floorGen))
                 {
-                    // not live, null value, no next link = remove that one -- but only if 
+                    // not live, null value, no next link = remove that one -- but only if
                     // the dict has not been updated, have to do it via ICollection<> (thanks
                     // Mr Toub) -- and if the dict has been updated there is nothing to collect
                     var idict = dict as ICollection<KeyValuePair<TKey, LinkedNode>>;
@@ -442,18 +439,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             //    await task;
         }
 
-        public long GenCount
-        {
-            get { return _generationObjects.Count; }
-        }
+        public long GenCount => _generationObjects.Count;
 
-        public long SnapCount
-        {
-            get
-            {
-                return _generationObjects.Sum(x => x.Count);
-            }
-        }
+        public long SnapCount => _generationObjects.Sum(x => x.Count);
 
         #endregion
 
@@ -471,12 +459,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _dict = dict;
             }
 
-            public long LiveGen { get { return _dict._liveGen; } }
-            public long FloorGen { get { return _dict._floorGen; } }
-            public bool NextGen { get { return _dict._nextGen; } }
-            public bool CollectAuto { get { return _dict._collectAuto; } set { _dict._collectAuto = value; } }
+            public long LiveGen => _dict._liveGen;
+            public long FloorGen => _dict._floorGen;
+            public bool NextGen => _dict._nextGen;
 
-            public ConcurrentQueue<GenerationObject> GenerationObjects { get { return _dict._generationObjects; } }
+            public bool CollectAuto
+            {
+                get => _dict._collectAuto;
+                set => _dict._collectAuto = value;
+            }
+
+            public ConcurrentQueue<GenerationObject> GenerationObjects => _dict._generationObjects;
 
             public GenVal[] GetValues(TKey key)
             {
@@ -503,13 +496,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     Value = value;
                 }
 
-                public long Gen { get; private set; }
-                public TValue Value { get; private set; }
+                public long Gen { get; }
+                public TValue Value { get; }
             }
         }
 
-        internal TestHelper Test { get { return _unitTesting ?? (_unitTesting = new TestHelper(this)); } }
-        
+        internal TestHelper Test => _unitTesting ?? (_unitTesting = new TestHelper(this));
+
         #endregion
 
         #region Classes

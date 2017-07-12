@@ -3,7 +3,7 @@ using Umbraco.Core.Xml.XPath;
 
 namespace Umbraco.Web.PublishedCache.NuCache.Navigable
 {
-    class Source : INavigableSource
+    internal class Source : INavigableSource
     {
         private readonly INavigableData _data;
         private readonly bool _preview;
@@ -26,14 +26,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
             return content == null ? null : new NavigableContent(content);
         }
 
-        public int LastAttributeIndex
-        {
-            get { return NavigableContentType.BuiltinProperties.Length - 1; }
-        }
+        public int LastAttributeIndex => NavigableContentType.BuiltinProperties.Length - 1;
 
-        public INavigableContent Root
-        {
-            get { return _root; }
-        }
+        public INavigableContent Root => _root;
     }
 }

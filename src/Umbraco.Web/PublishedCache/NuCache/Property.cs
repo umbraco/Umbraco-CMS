@@ -8,7 +8,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 {
     [Serializable]
     [XmlType(Namespace = "http://umbraco.org/webservices/")]
-    class Property : PublishedPropertyBase
+    internal class Property : PublishedPropertyBase
     {
         private readonly IFacadeAccessor _facadeAccessor;
         private readonly object _sourceValue;

@@ -4,7 +4,7 @@ using Umbraco.Core.Xml.XPath;
 
 namespace Umbraco.Web.PublishedCache.NuCache.Navigable
 {
-    class RootContent : INavigableContent
+    internal class RootContent : INavigableContent
     {
         private static readonly RootContentType ContentType = new RootContentType();
         private readonly int[] _childIds;
@@ -14,25 +14,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
             _childIds = childIds.ToArray();
         }
 
-        public int Id
-        {
-            get { return -1; }
-        }
+        public int Id => -1;
 
-        public int ParentId
-        {
-            get { return -1; }
-        }
+        public int ParentId => -1;
 
-        public INavigableContentType Type
-        {
-            get { return ContentType; }
-        }
+        public INavigableContentType Type => ContentType;
 
-        public IList<int> ChildIds
-        {
-            get { return _childIds; }
-        }
+        public IList<int> ChildIds => _childIds;
 
         public object Value(int index)
         {
@@ -40,17 +28,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
             return index == 0 ? "-1" : null;
         }
 
-        class RootContentType : INavigableContentType
+        private class RootContentType : INavigableContentType
         {
-            public string Name
-            {
-                get { return "root"; }
-            }
+            public string Name => "root";
 
-            public INavigableFieldType[] FieldTypes
-            {
-                get { return NavigableContentType.BuiltinProperties; }
-            }
+            public INavigableFieldType[] FieldTypes => NavigableContentType.BuiltinProperties;
         }
     }
 }

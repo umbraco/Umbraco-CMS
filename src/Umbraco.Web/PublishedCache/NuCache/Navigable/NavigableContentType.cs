@@ -7,7 +7,7 @@ using Umbraco.Core.Xml.XPath;
 
 namespace Umbraco.Web.PublishedCache.NuCache.Navigable
 {
-    class NavigableContentType : INavigableContentType
+    internal class NavigableContentType : INavigableContentType
     {
         public static readonly INavigableFieldType[] BuiltinProperties;
         private readonly object _locko = new object();
@@ -22,7 +22,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
         // changes, but they are replaced by a new instance, so our map here will clean itself automatically and
         // we don't have to manage cache - ConditionalWeakTable does not prevent keys from beeing GCed
 
-        static private readonly ConditionalWeakTable<PublishedContentType, NavigableContentType> TypesMap
+        private static readonly ConditionalWeakTable<PublishedContentType, NavigableContentType> TypesMap
              = new ConditionalWeakTable<PublishedContentType,NavigableContentType>();
 
         public static NavigableContentType GetContentType(PublishedContentType contentType)
