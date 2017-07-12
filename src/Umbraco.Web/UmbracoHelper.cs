@@ -1460,26 +1460,6 @@ namespace Umbraco.Web
             return _stringUtilities.Truncate(html, length, addElipsis, treatTagsAsContent);
         }
         #region Truncate by Words
-        public IHtmlString TruncateByWords(DynamicNull html, int words)
-        {
-            return new HtmlString(string.Empty);
-        }
-
-        /// <summary>
-        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
-        /// </summary>
-        public IHtmlString TruncateByWords(DynamicNull html, int words, bool addElipsis)
-        {
-            return new HtmlString(string.Empty);
-        }
-
-        /// <summary>
-        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
-        /// </summary>
-        public IHtmlString TruncateByWords(DynamicNull html, int words, bool addElipsis, bool treatTagsAsContent)
-        {
-            return new HtmlString(string.Empty);
-        }
 
         /// <summary>
         /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
