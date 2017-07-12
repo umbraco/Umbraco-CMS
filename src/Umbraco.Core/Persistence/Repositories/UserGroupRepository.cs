@@ -97,7 +97,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="groupId">Id of group</param>
         /// <param name="entityIds">Array of entity Ids, if empty will return permissions for the group for all entities</param>
-        public IEnumerable<EntityPermission> GetPermissionsForEntities(int groupId, params int[] entityIds)
+        public EntityPermissionCollection GetPermissionsForEntities(int groupId, params int[] entityIds)
         {
             return _permissionRepository.GetPermissionsForEntities(groupId, entityIds);
         }
@@ -108,12 +108,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="group">The group</param>
         /// <param name="fallbackToDefaultPermissions">If true will include the group's default permissions if no permissions are explicitly assigned</param>
         /// <param name="nodeIds">Array of entity Ids, if empty will return permissions for the group for all entities</param>
-        public IEnumerable<EntityPermission> GetPermissionsForEntities(IReadOnlyUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds)
+        public EntityPermissionCollection GetPermissionsForEntities(IReadOnlyUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
             if (group == null) throw new ArgumentNullException("group");
 
             var explicitPermissions = GetPermissionsForEntities(group.Id, nodeIds);
-            var result = new List<EntityPermission>(explicitPermissions);
+            var result = new EntityPermissionCollection(explicitPermissions);
 
             // If requested, and no permissions are assigned to a particular node, then we will fill in those permissions with the group's defaults
             if (fallbackToDefaultPermissions)
@@ -121,8 +121,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 var missingIds = nodeIds.Except(result.Select(x => x.EntityId)).ToArray();
                 if (missingIds.Length > 0)
                 {
-                    result.AddRange(missingIds
-                        .Select(i => new EntityPermission(group.Id, i, group.Permissions.ToArray(), isDefaultPermissions: true)));
+                    foreach (var permission in missingIds
+                        .Select(i => new EntityPermission(group.Id, i, group.Permissions.ToArray(), isDefaultPermissions: true)))
+                    {
+                        result.Add(permission);
+                    }
                 }
             }
             return result;

@@ -84,7 +84,7 @@ namespace Umbraco.Core.Services
         /// <remarks>This is useful when an entire section is removed from config</remarks>
         /// <param name="sectionAlias">Alias of the section to remove</param>
         void DeleteSectionFromAllUserGroups(string sectionAlias);
-        
+
         /// <summary>
         /// Get explicitly assigned permissions for a user and optional node ids
         /// </summary>
@@ -95,8 +95,8 @@ namespace Umbraco.Core.Services
         /// <remarks>
         /// This will return the default permissions for the user's groups for nodes that don't have explicitly defined permissions
         /// </remarks>
-        IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds);
-        
+        EntityPermissionCollection GetPermissions(IUser user, params int[] nodeIds);
+
         /// <summary>
         /// Get explicitly assigned permissions for a group and optional node Ids
         /// </summary>
@@ -106,7 +106,7 @@ namespace Umbraco.Core.Services
         /// </param>
         /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        IEnumerable<EntityPermission> GetPermissions(IUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds);
+        EntityPermissionCollection GetPermissions(IUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds);
 
         /// <summary>
         /// Gets the implicit/inherited permissions for the user for the given path

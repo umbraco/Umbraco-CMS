@@ -134,7 +134,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public IEnumerable<EntityPermission> GetPermissionsForEntity(IContent content)
+        public EntityPermissionCollection GetPermissionsForEntity(IContent content)
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
@@ -1673,14 +1673,14 @@ namespace Umbraco.Core.Services
                     copy.WriterId = userId;
 
                     //get the current permissions, if there are any explicit ones they need to be copied
-                    var currentPermissions = GetPermissionsForEntity(content)
-                        .Where(x => x.IsDefaultPermissions == false).ToArray();
+                    var currentPermissions = GetPermissionsForEntity(content);
+                    currentPermissions.RemoveWhere(p => p.IsDefaultPermissions);
 
                     repository.AddOrUpdate(copy);
                     repository.AddOrUpdatePreviewXml(copy, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                     
                     //add permissions
-                    if (currentPermissions.Length > 0)
+                    if (currentPermissions.Count > 0)
                     {
                         var permissionSet = new ContentPermissionSet(copy, currentPermissions);
                         repository.AddOrUpdatePermissions(permissionSet);

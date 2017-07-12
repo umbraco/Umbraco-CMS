@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Web.Controllers
             contentServiceMock.Setup(x => x.GetById(0)).Returns(content);
             var contentService = contentServiceMock.Object;
             var userServiceMock = new Mock<IUserService>();    
-            var permissions = new List<EntityPermission>();
+            var permissions = new EntityPermissionCollection();
             var permissionSet = new EntityPermissionSet(1234, permissions);
             userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-1,1234,5678")).Returns(permissionSet);
             var userService = userServiceMock.Object;
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Web.Controllers
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
             var userServiceMock = new Mock<IUserService>();    
-            var permissions = new List<EntityPermission>();
+            var permissions = new EntityPermissionCollection();
             var permissionSet = new EntityPermissionSet(1234, permissions);
             userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-1,1234")).Returns(permissionSet);
             var userService = userServiceMock.Object;
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Web.Controllers
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
             var userServiceMock = new Mock<IUserService>();    
-            var permissions = new List<EntityPermission>
+            var permissions = new EntityPermissionCollection
                 {
                     new EntityPermission(9876, 1234, new string[]{ "A", "B", "C" })
                 };
@@ -130,7 +130,7 @@ namespace Umbraco.Tests.Web.Controllers
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
             var userServiceMock = new Mock<IUserService>();    
-            var permissions = new List<EntityPermission>
+            var permissions = new EntityPermissionCollection
                 {
                     new EntityPermission(9876, 1234, new string[]{ "A", "F", "C" })
                 };
@@ -219,7 +219,7 @@ namespace Umbraco.Tests.Web.Controllers
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
-            var permissions = new List<EntityPermission>
+            var permissions = new EntityPermissionCollection
                 {
                     new EntityPermission(9876, 1234, new string[]{ "A" })
                 };
@@ -244,7 +244,7 @@ namespace Umbraco.Tests.Web.Controllers
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
-            var permissions = new List<EntityPermission>
+            var permissions = new EntityPermissionCollection
                 {
                     new EntityPermission(9876, 1234, new string[]{ "A" })
                 };
@@ -269,7 +269,7 @@ namespace Umbraco.Tests.Web.Controllers
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
-            var permissions = new List<EntityPermission>
+            var permissions = new EntityPermissionCollection
             {
                 new EntityPermission(9876, 1234, new string[]{ "A" })
             };
@@ -295,7 +295,7 @@ namespace Umbraco.Tests.Web.Controllers
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
-            var permissions = new List<EntityPermission>
+            var permissions = new EntityPermissionCollection
                 {
                     new EntityPermission(9876, 1234, new string[]{ "A" })
                 };

@@ -110,7 +110,7 @@ namespace Umbraco.Tests.Web.Controllers
 
             var userServiceMock = new Mock<IUserService>();
             //we're only assigning 3 nodes browse permissions so that is what we expect as a result
-            var permissions = new List<EntityPermission>
+            var permissions = new EntityPermissionCollection
                 {
                     new EntityPermission(9876, 1, new string[]{ "F" }),
                     new EntityPermission(9876, 2, new string[]{ "F" }),

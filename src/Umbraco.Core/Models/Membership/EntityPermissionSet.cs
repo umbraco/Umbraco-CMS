@@ -14,10 +14,10 @@ namespace Umbraco.Core.Models.Membership
         /// <returns></returns>
         public static EntityPermissionSet Empty()
         {
-            return new EntityPermissionSet(-1, new EntityPermission[0]);
+            return new EntityPermissionSet(-1, new EntityPermissionCollection());
         }
 
-        public EntityPermissionSet(int entityId, IEnumerable<EntityPermission> permissionsSet)
+        public EntityPermissionSet(int entityId, EntityPermissionCollection permissionsSet)
         {
             EntityId = entityId;
             PermissionsSet = permissionsSet;
@@ -31,10 +31,11 @@ namespace Umbraco.Core.Models.Membership
         /// <summary>
         /// The key/value pairs of user group id & single permission
         /// </summary>
-        public IEnumerable<EntityPermission> PermissionsSet { get; private set; }
+        public EntityPermissionCollection PermissionsSet { get; private set; }
+
 
         /// <summary>
-        /// Returns the aggregte permissions in the permission set
+        /// Returns the aggregate permissions in the permission set
         /// </summary>
         /// <returns></returns>
         /// <remarks>
@@ -42,15 +43,11 @@ namespace Umbraco.Core.Models.Membership
         /// </remarks>
         public IEnumerable<string> GetAllPermissions()
         {
-            return _calculatedPermissions ?? (_calculatedPermissions =
-                       PermissionsSet.SelectMany(x => x.AssignedPermissions).Distinct().ToArray());
+            return PermissionsSet.GetAllPermissions();
         }
 
-        private string[] _calculatedPermissions;
 
 
 
-
-       
     }
 }

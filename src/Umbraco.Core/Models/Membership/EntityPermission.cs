@@ -1,11 +1,11 @@
-﻿using System.Linq;
+﻿using System;
 
 namespace Umbraco.Core.Models.Membership
 {
     /// <summary>
     /// Represents an entity permission (defined on the user group and derived to retrieve permissions for a given user)
     /// </summary>
-    public class EntityPermission
+    public class EntityPermission : IEquatable<EntityPermission>
     {
         public EntityPermission(int groupId, int entityId, string[] assignedPermissions)
         {
@@ -37,25 +37,30 @@ namespace Umbraco.Core.Models.Membership
         /// <remarks>
         /// This will be the case when looking up entity permissions and falling back to the default permissions
         /// </remarks>
-        public bool IsDefaultPermissions { get; private set; }
+        public bool IsDefaultPermissions { get; private set; }        
 
-        /// <summary>
-        /// Adds additional permissions to an existing instance of <see cref="EntityPermission"/>
-        /// ensuring that only ones that aren't already assigned are added
-        /// </summary>
-        /// <param name="additionalPermissions"></param>
-        public void AddAdditionalPermissions(string[] additionalPermissions)
+        public bool Equals(EntityPermission other)
         {
-            //TODO: Fix the performance of this, we need to use things like HashSet and equality checkers, we are iterating too much
-
-            var newPermissions = AssignedPermissions.ToList();
-            newPermissions.AddRange(additionalPermissions);
-            AssignedPermissions = newPermissions
-                .Distinct()
-                .ToArray();
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return EntityId == other.EntityId && UserGroupId == other.UserGroupId;
         }
 
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((EntityPermission) obj);
+        }
 
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (EntityId * 397) ^ UserGroupId;
+            }
+        }
     }
 
 }

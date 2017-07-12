@@ -346,6 +346,7 @@
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
     <Compile Include="Models\Membership\ContentPermissionSet.cs" />
+    <Compile Include="Models\Membership\EntityPermissionCollection.cs" />
     <Compile Include="Models\Membership\IReadOnlyUserGroup.cs" />
     <Compile Include="Models\Membership\ReadOnlyUserGroup.cs" />
     <Compile Include="Models\Membership\UserGroupExtensions.cs" />

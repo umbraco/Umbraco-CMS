@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models.Membership
     {
         private readonly IContent _content;
 
-        public ContentPermissionSet(IContent content, IEnumerable<EntityPermission> permissionsSet)
+        public ContentPermissionSet(IContent content, EntityPermissionCollection permissionsSet)
             : base(content.Id, permissionsSet)
         {
             _content = content;

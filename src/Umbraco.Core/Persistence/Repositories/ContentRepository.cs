@@ -847,7 +847,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
         /// </summary>
         /// <param name="entityId"></param>
         /// <returns></returns>
-        public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
+        public EntityPermissionCollection GetPermissionsForEntity(int entityId)
         {
             return _permissionRepository.GetPermissionsForEntity(entityId);
         }        

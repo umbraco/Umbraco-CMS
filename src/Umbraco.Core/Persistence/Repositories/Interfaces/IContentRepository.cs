@@ -61,7 +61,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="entityId"></param>
         /// <returns></returns>
-        IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId);
+        EntityPermissionCollection GetPermissionsForEntity(int entityId);
 
         ///// <summary>
         ///// Gets the implicit/inherited list of permissions for the content item

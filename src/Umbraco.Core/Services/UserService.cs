@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -845,15 +846,17 @@ namespace Umbraco.Core.Services
         /// <param name="user">User to retrieve permissions for</param>
         /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        public IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds)
+        public EntityPermissionCollection GetPermissions(IUser user, params int[] nodeIds)
         {
-            var result = new List<EntityPermission>();
+            //TODO: we don't need to run this query for each group assigned, we can do this in one query
+
+            var result = new EntityPermissionCollection();
 
             foreach (var group in user.Groups)
             {
                 foreach (var permission in GetPermissions(group, true, nodeIds))
                 {
-                    AddOrAmendPermissionList(result, permission);
+                    result.Add(permission);
                 }
             }
 
@@ -889,35 +892,13 @@ namespace Umbraco.Core.Services
         /// </param>
         /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        public IEnumerable<EntityPermission> GetPermissions(IUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds)
+        public EntityPermissionCollection GetPermissions(IUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
             if (group == null) throw new ArgumentNullException("group");
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateUserGroupRepository(uow);
                 return repository.GetPermissionsForEntities(group.ToReadOnlyGroup(), fallbackToDefaultPermissions, nodeIds);
-            }
-        }
-
-        /// <summary>
-        /// For an existing list of <see cref="EntityPermission"/>, takes a new <see cref="EntityPermission"/> and aggregates it.
-        /// If a permission for the entity associated with the new permission already exists, it's updated with those permissions to create a distinct, most permissive set.
-        /// If it doesn't, it's added to the list.
-        /// </summary>
-        /// <param name="permissions">List of already found permissions</param>
-        /// <param name="groupPermission">New permission to aggregate</param>
-        private static void AddOrAmendPermissionList(ICollection<EntityPermission> permissions, EntityPermission groupPermission)
-        {
-            //TODO: Fix the performance of this, we need to use things like HashSet and equality checkers, we are iterating too much
-
-            var existingPermission = permissions.FirstOrDefault(x => x.EntityId == groupPermission.EntityId);
-            if (existingPermission != null)
-            {
-                existingPermission.AddAdditionalPermissions(groupPermission.AssignedPermissions);
-            }
-            else
-            {
-                permissions.Add(groupPermission);
             }
         }
 
@@ -980,7 +961,7 @@ namespace Umbraco.Core.Services
             //The actual entity id being looked at (deepest part of the path)
             var entityId = pathIds[0];
 
-            var resultPermissions = new List<EntityPermission>();
+            var resultPermissions = new EntityPermissionCollection();
 
             //create a grouped by dictionary of another grouped by dictionary
             var permissionsByGroup = groupPermissions
@@ -1008,9 +989,8 @@ namespace Umbraco.Core.Services
                     {
                         if (entityPermission.IsDefaultPermissions == false)
                         {
-                            //explicit permision found so we'll append it and move on, of course if there was two explicit permissions
-                            //found for this group the ones after this one wouldn't matter but considering there should only be one per
-                            //group anyways, that is fine.
+                            //explicit permision found so we'll append it and move on, the collection is a hashset anyways
+                            //so only supports adding one element per groupid/contentid
                             resultPermissions.Add(entityPermission);
                             added = true;
                             break;
