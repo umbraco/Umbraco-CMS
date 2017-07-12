@@ -215,7 +215,6 @@
     <key alias="updateDateDesc" version="7.0">Дата/время редактирования документа</key>
     <key alias="updatedBy" version="7.0">Обновлено</key>
     <key alias="uploadClear">Удалить файл</key>
-    <key alias="url">Интернет-ссылка</key>
     <key alias="urls">Ссылка на документ</key>
     <key alias="addTextBox">Добавить новое поле текста</key>
     <key alias="removeTextBox">Удалить это поле текста</key>
@@ -575,7 +574,7 @@
     <key alias="update">Обновить</key>
     <key alias="upgrade">Обновление</key>
     <key alias="upload">Загрузить</key>
-    <key alias="url">URL</key>
+    <key alias="url">Интернет-ссылка</key>
     <key alias="user">Пользователь</key>
     <key alias="username">Имя пользователя</key>
     <key alias="value">Значение</key>
