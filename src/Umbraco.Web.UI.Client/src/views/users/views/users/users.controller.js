@@ -392,6 +392,7 @@
                         vm.page.createButtonState = "success";
                         vm.newUser = saved;
                         setUsersViewState('createUserSuccess');
+                        getUsers();
                     }, function (err) {
                         formHelper.handleError(err);
                         vm.page.createButtonState = "error";
