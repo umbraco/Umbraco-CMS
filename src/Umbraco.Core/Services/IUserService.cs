@@ -102,8 +102,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="group">Group to retrieve permissions for</param>
         /// <param name="fallbackToDefaultPermissions">
-        /// Flag indicating if we want to get just the permissions directly assigned for the group and path, 
-        /// or fall back to the group's default permissions when nothing is directly assigned
+        /// Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
         /// </param>
         /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
@@ -115,15 +114,14 @@ namespace Umbraco.Core.Services
         /// <param name="user">User to check permissions for</param>
         /// <param name="path">Path to check permissions for</param>
         EntityPermissionSet GetPermissionsForPath(IUser user, string path);
-        
+
         /// <summary>
         /// Gets the permissions for the provided group and path
         /// </summary>
         /// <param name="group">Group to check permissions for</param>
         /// <param name="path">Path to check permissions for</param>
         /// <param name="fallbackToDefaultPermissions">
-        /// Flag indicating if we want to get just the permissions directly assigned for the group and path, 
-        /// or fall back to the group's default permissions when nothing is directly assigned
+        /// Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
         /// </param>
         EntityPermission GetPermissionsForPath(IUserGroup group, string path, bool fallbackToDefaultPermissions = false);
 

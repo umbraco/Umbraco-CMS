@@ -572,7 +572,7 @@ namespace umbraco.BusinessLogic
 
             var userService = ApplicationContext.Current.Services.UserService;
             return string.Join("",
-                userService.GetPermissionsForPath(UserEntity, path).PermissionsSet.SelectMany(x => x.Permission));
+                userService.GetPermissionsForPath(UserEntity, path).GetAllPermissions());
         }
 
         /// <summary>

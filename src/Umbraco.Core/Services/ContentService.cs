@@ -130,11 +130,11 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Returns permissions directly assigned to the content item for all user groups
+        /// Returns implicit/inherited permissions assigned to the content item for all user groups
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public IEnumerable<UserGroupEntityPermission> GetPermissionsForEntity(IContent content)
+        public IEnumerable<EntityPermission> GetPermissionsForEntity(IContent content)
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
@@ -1672,8 +1672,20 @@ namespace Umbraco.Core.Services
                     copy.CreatorId = userId;
                     copy.WriterId = userId;
 
+                    //get the current permissions, if there are any explicit ones they need to be copied
+                    var currentPermissions = GetPermissionsForEntity(content)
+                        .Where(x => x.IsDefaultPermissions == false).ToArray();
+
                     repository.AddOrUpdate(copy);
                     repository.AddOrUpdatePreviewXml(copy, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                    
+                    //add permissions
+                    if (currentPermissions.Length > 0)
+                    {
+                        var permissionSet = new ContentPermissionSet(copy, currentPermissions);
+                        repository.AddOrUpdatePermissions(permissionSet);
+                    }
+
                     uow.Commit(); // todo - this should flush, not commit
 
                     //Special case for the associated tags

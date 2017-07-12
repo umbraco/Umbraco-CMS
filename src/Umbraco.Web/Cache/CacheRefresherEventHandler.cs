@@ -599,10 +599,13 @@ namespace Umbraco.Web.Cache
 
         #region User/permissions event handlers
 
-        static void CacheRefresherEventHandler_AssignedPermissions(PermissionRepository<IContent> sender, SaveEventArgs<UserGroupEntityPermission> e)
+        static void CacheRefresherEventHandler_AssignedPermissions(PermissionRepository<IContent> sender, SaveEventArgs<EntityPermission> e)
         {
             var groupIds = e.SavedEntities.Select(x => x.UserGroupId).Distinct();
-            groupIds.ForEach(x => DistributedCache.Instance.RefreshUserGroupPermissionsCache(x));
+            foreach (var groupId in groupIds)
+            {
+                DistributedCache.Instance.RefreshUserGroupPermissionsCache(groupId);
+            }
         }
 
         static void PermissionDeleted(UserGroupPermission sender, DeleteEventArgs e)

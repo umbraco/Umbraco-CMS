@@ -7,21 +7,24 @@ namespace Umbraco.Core.Models.Membership
     /// </summary>
     public class EntityPermission
     {
-        public EntityPermission(int entityId, string[] assignedPermissions)
+        public EntityPermission(int groupId, int entityId, string[] assignedPermissions)
         {
+            UserGroupId = groupId;
             EntityId = entityId;
             AssignedPermissions = assignedPermissions;
             IsDefaultPermissions = false;
         }
 
-        public EntityPermission(int entityId, string[] assignedPermissions, bool isDefaultPermissions)
+        public EntityPermission(int groupId, int entityId, string[] assignedPermissions, bool isDefaultPermissions)
         {
+            UserGroupId = groupId;
             EntityId = entityId;
             AssignedPermissions = assignedPermissions;
             IsDefaultPermissions = isDefaultPermissions;
         }
 
         public int EntityId { get; private set; }
+        public int UserGroupId { get; private set; }
 
         /// <summary>
         /// The assigned permissions for the user/entity combo
@@ -51,6 +54,8 @@ namespace Umbraco.Core.Models.Membership
                 .Distinct()
                 .ToArray();
         }
+
+
     }
 
 }

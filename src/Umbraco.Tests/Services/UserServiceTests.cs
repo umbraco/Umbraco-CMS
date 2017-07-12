@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -10,6 +11,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Services
 {
@@ -159,6 +161,132 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(3, permissions[0].AssignedPermissions.Length);
             Assert.AreEqual(2, permissions[1].AssignedPermissions.Length);
             Assert.AreEqual(17,permissions[2].AssignedPermissions.Length);
+        }
+
+        [Test]
+
+        [Test]
+        public void Calculate_Permissions_For_User_For_Path_1()
+        {
+            //see: http://issues.umbraco.org/issue/U4-10075#comment=67-40085
+            // for an overview of what this is testing
+
+            const string path = "-1,1,2,3,4";
+            var pathIds = path.GetIdsFromPathReversed();
+
+            const int groupA = 7;
+            const int groupB = 8;
+            const int groupC = 9;
+
+            var userGroups = new Dictionary<int, string[]>
+            {
+                {groupA, new[] {"S", "D", "F"}},
+                {groupB, new[] {"S", "D", "G", "K"}},
+                {groupC, new[] {"F", "G"}}
+            };
+
+            var permissions = new []
+            {
+                new EntityPermission(groupA, 1, userGroups[groupA], isDefaultPermissions:true),
+                new EntityPermission(groupA, 2, userGroups[groupA], isDefaultPermissions:true),
+                new EntityPermission(groupA, 3, userGroups[groupA], isDefaultPermissions:true),
+                new EntityPermission(groupA, 4, userGroups[groupA], isDefaultPermissions:true),
+
+                new EntityPermission(groupB, 1, userGroups[groupB], isDefaultPermissions:true),
+                new EntityPermission(groupB, 2, new []{"F", "R"}, isDefaultPermissions:false),
+                new EntityPermission(groupB, 3, userGroups[groupB], isDefaultPermissions:true),
+                new EntityPermission(groupB, 4, userGroups[groupB], isDefaultPermissions:true),
+
+                new EntityPermission(groupC, 1, userGroups[groupC], isDefaultPermissions:true),
+                new EntityPermission(groupC, 2, userGroups[groupC], isDefaultPermissions:true),
+                new EntityPermission(groupC, 3, new []{"Q", "Z"}, isDefaultPermissions:false),
+                new EntityPermission(groupC, 4, userGroups[groupC], isDefaultPermissions:true),
+            };
+
+            //Permissions for Id 4
+            var result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds);
+            Assert.AreEqual(4, result.EntityId);
+            var allPermissions = result.GetAllPermissions().ToArray();
+            Assert.AreEqual(6, allPermissions.Length, string.Join(",", allPermissions));
+            Assert.IsTrue(allPermissions.ContainsAll(new[] { "S", "D", "F", "R", "Q", "Z" }));
+
+            //Permissions for Id 3
+            result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds.Skip(1).ToArray());
+            Assert.AreEqual(3, result.EntityId);
+            allPermissions = result.GetAllPermissions().ToArray();
+            Assert.AreEqual(6, allPermissions.Length, string.Join(",", allPermissions));
+            Assert.IsTrue(allPermissions.ContainsAll(new[] { "S", "D", "F", "R", "Q", "Z" }));
+
+            //Permissions for Id 2
+            result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds.Skip(2).ToArray());
+            Assert.AreEqual(2, result.EntityId);
+            allPermissions = result.GetAllPermissions().ToArray();
+            Assert.AreEqual(5, allPermissions.Length, string.Join(",", allPermissions));
+            Assert.IsTrue(allPermissions.ContainsAll(new[] { "S", "D", "F", "G", "R" }));
+
+            //Permissions for Id 1
+            result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds.Skip(3).ToArray());
+            Assert.AreEqual(1, result.EntityId);
+            allPermissions = result.GetAllPermissions().ToArray();
+            Assert.AreEqual(5, allPermissions.Length, string.Join(",", allPermissions));
+            Assert.IsTrue(allPermissions.ContainsAll(new[] { "S", "D", "F", "G", "K" }));
+            
+        }
+
+        [Test]
+        public void Determine_Deepest_Explicit_Permissions_For_Group_For_Path_1()
+        {
+            var path = "-1,1,2,3";
+            var pathIds = path.GetIdsFromPathReversed();
+            var defaults = new[] {"A", "B"};
+            var permissions = new List<EntityPermission>
+            {
+                new EntityPermission(9876, 1, defaults, isDefaultPermissions:true),
+                new EntityPermission(9876, 2, new []{"B","C", "D"}, isDefaultPermissions:false),
+                new EntityPermission(9876, 3, defaults, isDefaultPermissions:true)
+            };
+            var result = UserService.GetPermissionsForPathForGroup(permissions, pathIds, fallbackToDefaultPermissions: true);
+            Assert.AreEqual(3, result.AssignedPermissions.Length);
+            Assert.IsFalse(result.IsDefaultPermissions);
+            Assert.IsTrue(result.AssignedPermissions.ContainsAll(new[] { "B", "C", "D" }));
+            Assert.AreEqual(2, result.EntityId);
+            Assert.AreEqual(9876, result.UserGroupId);
+        }
+
+        [Test]
+        public void Determine_Deepest_Explicit_Permissions_For_Group_For_Path_2()
+        {
+            var path = "-1,1,2,3";
+            var pathIds = path.GetIdsFromPathReversed();
+            var defaults = new[] { "A", "B", "C" };
+            var permissions = new List<EntityPermission>
+            {
+                new EntityPermission(9876, 1, defaults, isDefaultPermissions:true),
+                new EntityPermission(9876, 2, defaults, isDefaultPermissions:true),
+                new EntityPermission(9876, 3, defaults, isDefaultPermissions:true)
+            };
+            var result = UserService.GetPermissionsForPathForGroup(permissions, pathIds, fallbackToDefaultPermissions:false);
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        public void Determine_Deepest_Explicit_Permissions_For_Group_For_Path_3()
+        {
+            var path = "-1,1,2,3";
+            var pathIds = path.GetIdsFromPathReversed();
+            var defaults = new[] { "A", "B" };
+            var permissions = new List<EntityPermission>
+            {
+                new EntityPermission(9876, 1, defaults, isDefaultPermissions:true),
+                new EntityPermission(9876, 2, defaults, isDefaultPermissions:true),
+                new EntityPermission(9876, 3, defaults, isDefaultPermissions:true)
+            };
+            var result = UserService.GetPermissionsForPathForGroup(permissions, pathIds, fallbackToDefaultPermissions: true);
+            Assert.AreEqual(2, result.AssignedPermissions.Length);
+            Assert.IsTrue(result.IsDefaultPermissions);
+            Assert.IsTrue(result.AssignedPermissions.ContainsAll(defaults));
+            Assert.AreEqual(3, result.EntityId);
+            Assert.AreEqual(9876, result.UserGroupId); 
         }
 
         [Test]

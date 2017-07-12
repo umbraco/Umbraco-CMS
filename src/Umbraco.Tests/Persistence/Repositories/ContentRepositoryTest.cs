@@ -533,48 +533,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(dateValue, persistedTextpage.GetValue(dateTimePropertyAlias));
                 Assert.AreEqual(persistedTextpage.GetValue(dateTimePropertyAlias), textpage.GetValue(dateTimePropertyAlias));
             }
-        }
-
-        [Test]
-        public void Ensures_Permissions_Are_Set_If_Parent_Entity_Permissions_Exist()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            using (var repository = CreateUserGroupRepository(unitOfWork))
-            {
-                var userGroup = MockedUserGroup.CreateUserGroup("1");
-                repository.AddOrUpdate(userGroup);
-                unitOfWork.Commit();
-            }
-
-            ContentTypeRepository contentTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
-            {
-                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
-                contentType.AllowedContentTypes = new List<ContentTypeSort>
-                {
-                    new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias)
-                };
-                var parentPage = MockedContent.CreateSimpleContent(contentType);
-                contentTypeRepository.AddOrUpdate(contentType);
-                repository.AddOrUpdate(parentPage);
-                unitOfWork.Commit();
-
-                // Act
-                repository.AssignEntityPermission(parentPage, 'A', new[] { 1 });
-                var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
-                repository.AddOrUpdate(childPage);
-                unitOfWork.Commit();
-
-                // Assert
-                var permissions = repository.GetPermissionsForEntity(childPage.Id);
-                Assert.AreEqual(1, permissions.Count());
-                Assert.AreEqual("A", permissions.Single().AssignedPermissions.First());
-            }
-
-        }
+        }        
 
         [Test]
         public void Can_Perform_Add_On_ContentRepository()

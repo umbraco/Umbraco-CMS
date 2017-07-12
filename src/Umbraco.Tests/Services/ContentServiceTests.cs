@@ -1459,7 +1459,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Ensures_Permissions_Are_Set_On_Copied_Entity_To_Parent_Without_Permissions()
+        public void Ensures_Permissions_Are_Retained_For_Copied_Descendants_With_Explicit_Permissions()
         {
             // Arrange
             var userGroup = MockedUserGroup.CreateUserGroup("1");
@@ -1472,27 +1472,28 @@ namespace Umbraco.Tests.Services
             };
             ServiceContext.ContentTypeService.Save(contentType);
 
-            var parentPage = MockedContent.CreateSimpleContent(contentType);            
-            ServiceContext.ContentService.Save(parentPage);
-            ServiceContext.ContentService.AssignContentPermission(parentPage, 'A', new[] { 1 });
+            var parentPage = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(parentPage);            
 
             var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
             ServiceContext.ContentService.Save(childPage);
-            
-            //Ok, now copy, what should happen is the childPage will not have any permissions assigned since it's new parent 
-            //doesn't have any assigned
+            //assign explicit permissions to the child
+            ServiceContext.ContentService.AssignContentPermission(childPage, 'A', new[] { userGroup.Id });
+
+            //Ok, now copy, what should happen is the childPage will retain it's own permissions
             var parentPage2 = MockedContent.CreateSimpleContent(contentType);
             ServiceContext.ContentService.Save(parentPage2);
 
             var copy = ServiceContext.ContentService.Copy(childPage, parentPage2.Id, false, true);
 
-            //Re-get the permissions, since there was none assigned to the new parent, the child shouldn't have any directly assigned
-            var copyPermissions = ServiceContext.ContentService.GetPermissionsForEntity(copy);
-            Assert.AreEqual(0, copyPermissions.Count());
+            //get the permissions and verify
+            var permissions = ServiceContext.UserService.GetPermissionsForPath(userGroup, copy.Path, fallbackToDefaultPermissions: true);
+            Assert.AreEqual(1, permissions.AssignedPermissions.Length);
+            Assert.AreEqual("A", permissions.AssignedPermissions[0]);
         }
 
         [Test]
-        public void Ensures_Permissions_Are_Set_On_Copied_Entity_To_Parent_With_Permissions()
+        public void Ensures_Permissions_Are_Inherited_For_Copied_Descendants()
         {
             // Arrange
             var userGroup = MockedUserGroup.CreateUserGroup("1");
@@ -1507,41 +1508,7 @@ namespace Umbraco.Tests.Services
 
             var parentPage = MockedContent.CreateSimpleContent(contentType);
             ServiceContext.ContentService.Save(parentPage);
-            ServiceContext.ContentService.AssignContentPermission(parentPage, 'A', new[] { 1 });
-
-            var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
-            ServiceContext.ContentService.Save(childPage);
-            
-            //Ok, now copy, what should happen is the childPage will have it's new parent permissions copied over
-            var parentPage2 = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(parentPage2);
-            ServiceContext.ContentService.AssignContentPermission(parentPage2, 'B', new[] { 1 });
-
-            var copy = ServiceContext.ContentService.Copy(childPage, parentPage2.Id, false, true);
-
-            //Re-get the permissions, since there was none assigned to the new parent, the child shouldn't have any directly assigned
-            var copyPermissions = ServiceContext.ContentService.GetPermissionsForEntity(copy);
-            Assert.AreEqual(1, copyPermissions.Count());
-            Assert.AreEqual("B", copyPermissions.Single().AssignedPermissions.First());
-        }
-
-        [Test]
-        public void Ensures_Permissions_Are_Set_On_Copied_Descendants_To_Parent_With_Permissions()
-        {
-            // Arrange
-            var userGroup = MockedUserGroup.CreateUserGroup("1");
-            ServiceContext.UserService.Save(userGroup);
-
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
-            contentType.AllowedContentTypes = new List<ContentTypeSort>
-            {
-                new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias)
-            };
-            ServiceContext.ContentTypeService.Save(contentType);
-
-            var parentPage = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(parentPage);
-            ServiceContext.ContentService.AssignContentPermission(parentPage, 'A', new[] { 1 });
+            ServiceContext.ContentService.AssignContentPermission(parentPage, 'A', new[] { userGroup.Id });
 
             var childPage1 = MockedContent.CreateSimpleContent(contentType, "child1", parentPage);
             ServiceContext.ContentService.Save(childPage1);
@@ -1550,83 +1517,33 @@ namespace Umbraco.Tests.Services
             var childPage3 = MockedContent.CreateSimpleContent(contentType, "child3", childPage2);
             ServiceContext.ContentService.Save(childPage3);
 
-            //Ok, now copy, what should happen is the childPage will have it's new parent permissions copied over
-            var parentPage2 = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(parentPage2);
-            ServiceContext.ContentService.AssignContentPermission(parentPage2, 'B', new[] { 1 });
-
-            var copy = ServiceContext.ContentService.Copy(childPage1, parentPage2.Id, false, true);
-
-            //Re-get the permissions, since there was none assigned to the new parent, the child shouldn't have any directly assigned
-            var copyPermissions = ServiceContext.ContentService.GetPermissionsForEntity(copy);
-            Assert.AreEqual(1, copyPermissions.Count());
-            Assert.AreEqual("B", copyPermissions.Single().AssignedPermissions.First());
-
-            var descendants = ServiceContext.ContentService.GetDescendants(copy).ToArray();
-            Assert.AreEqual(2, descendants.Length);
-
-            foreach (var descendant in descendants)
-            {
-                var permissions = ServiceContext.ContentService.GetPermissionsForEntity(descendant);
-                Assert.AreEqual(1, permissions.Count());
-                Assert.AreEqual("B", permissions.Single().AssignedPermissions.First());
-            }
-        }
-
-        [Test]
-        public void Ensures_Permissions_Are_Set_On_Descendants_When_Permissions_Added()
-        {
-            // Arrange
-            var userGroup = MockedUserGroup.CreateUserGroup("1");
-            ServiceContext.UserService.Save(userGroup);
-
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
-            contentType.AllowedContentTypes = new List<ContentTypeSort>
-            {
-                new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias)
-            };
-            ServiceContext.ContentTypeService.Save(contentType);
-
-            var parentPage = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(parentPage);
-            var childPage1 = MockedContent.CreateSimpleContent(contentType, "child1", parentPage);
-            ServiceContext.ContentService.Save(childPage1);
-            var childPage2 = MockedContent.CreateSimpleContent(contentType, "child2", childPage1);
-            ServiceContext.ContentService.Save(childPage2);
-            var childPage3 = MockedContent.CreateSimpleContent(contentType, "child3", childPage2);
-            ServiceContext.ContentService.Save(childPage3);
-
-            //ensure there are no permissions on any node
-
-            var permissions = ServiceContext.ContentService.GetPermissionsForEntity(parentPage);
-            Assert.AreEqual(0, permissions.Count());
-
+            //Verify that the children have the inherited permissions
             var descendants = ServiceContext.ContentService.GetDescendants(parentPage).ToArray();
             Assert.AreEqual(3, descendants.Length);
 
             foreach (var descendant in descendants)
             {
-                permissions = ServiceContext.ContentService.GetPermissionsForEntity(descendant);
-                Assert.AreEqual(0, permissions.Count());
+                var permissions = ServiceContext.UserService.GetPermissionsForPath(userGroup, descendant.Path, fallbackToDefaultPermissions:true);
+                Assert.AreEqual(1, permissions.AssignedPermissions.Length);
+                Assert.AreEqual("A", permissions.AssignedPermissions[0]);
             }
 
-            //Ok, now assign permissions to the parent, all descenents should get these right?
-            ServiceContext.ContentService.AssignContentPermission(parentPage, 'A', new[] { 1 });
+            //create a new parent with a new permission structure
+            var parentPage2 = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(parentPage2);
+            ServiceContext.ContentService.AssignContentPermission(parentPage2, 'B', new[] { userGroup.Id });
+
+            //Now copy, what should happen is the child pages will now have permissions inherited from the new parent
+            var copy = ServiceContext.ContentService.Copy(childPage1, parentPage2.Id, false, true);
             
-            //re-test 
-
-            permissions = ServiceContext.ContentService.GetPermissionsForEntity(parentPage);
-            Assert.AreEqual(1, permissions.Count());
-            Assert.AreEqual("A", permissions.Single().AssignedPermissions.First());
-
-            descendants = ServiceContext.ContentService.GetDescendants(parentPage).ToArray();
+            descendants = ServiceContext.ContentService.GetDescendants(parentPage2).ToArray();
             Assert.AreEqual(3, descendants.Length);
 
             foreach (var descendant in descendants)
             {
-                permissions = ServiceContext.ContentService.GetPermissionsForEntity(descendant);
-                Assert.AreEqual(1, permissions.Count());
-                Assert.AreEqual("A", permissions.Single().AssignedPermissions.First());
+                var permissions = ServiceContext.UserService.GetPermissionsForPath(userGroup, descendant.Path, fallbackToDefaultPermissions: true);
+                Assert.AreEqual(1, permissions.AssignedPermissions.Length);
+                Assert.AreEqual("B", permissions.AssignedPermissions[0]);
             }
         }
 

@@ -22,12 +22,14 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly CacheHelper _cacheHelper;
         private readonly UserGroupWithUsersRepository _userGroupWithUsersRepository;
+        private readonly PermissionRepository<IContent> _permissionRepository;
 
         public UserGroupRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cacheHelper, logger, sqlSyntax)
         {
             _cacheHelper = cacheHelper;
             _userGroupWithUsersRepository = new UserGroupWithUsersRepository(this, work, cacheHelper, logger, sqlSyntax);
+            _permissionRepository = new PermissionRepository<IContent>(work, _cacheHelper, logger, sqlSyntax);
         }
 
         public const string GetByAliasCacheKeyPrefix = "UserGroupRepository_GetByAlias_";
@@ -97,8 +99,33 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entityIds">Array of entity Ids, if empty will return permissions for the group for all entities</param>
         public IEnumerable<EntityPermission> GetPermissionsForEntities(int groupId, params int[] entityIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            return repo.GetPermissionsForEntities(groupId, entityIds);
+            return _permissionRepository.GetPermissionsForEntities(groupId, entityIds);
+        }
+
+        /// <summary>
+        /// Gets explicilt and default permissions (if requested) permissions for the group for specified entities
+        /// </summary>
+        /// <param name="group">The group</param>
+        /// <param name="fallbackToDefaultPermissions">If true will include the group's default permissions if no permissions are explicitly assigned</param>
+        /// <param name="nodeIds">Array of entity Ids, if empty will return permissions for the group for all entities</param>
+        public IEnumerable<EntityPermission> GetPermissionsForEntities(IReadOnlyUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds)
+        {
+            if (group == null) throw new ArgumentNullException("group");
+
+            var explicitPermissions = GetPermissionsForEntities(group.Id, nodeIds);
+            var result = new List<EntityPermission>(explicitPermissions);
+
+            // If requested, and no permissions are assigned to a particular node, then we will fill in those permissions with the group's defaults
+            if (fallbackToDefaultPermissions)
+            {
+                var missingIds = nodeIds.Except(result.Select(x => x.EntityId)).ToArray();
+                if (missingIds.Length > 0)
+                {
+                    result.AddRange(missingIds
+                        .Select(i => new EntityPermission(group.Id, i, group.Permissions.ToArray(), isDefaultPermissions: true)));
+                }
+            }
+            return result;
         }
 
         /// <summary>
@@ -109,8 +136,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
         public void ReplaceGroupPermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            repo.ReplacePermissions(groupId, permissions, entityIds);
+            _permissionRepository.ReplacePermissions(groupId, permissions, entityIds);
         }
 
         /// <summary>
@@ -121,9 +147,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entityIds">Specify the nodes to replace permissions for</param>
         public void AssignGroupPermission(int groupId, char permission, params int[] entityIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            repo.AssignPermission(groupId, permission, entityIds);
-        }        
+            _permissionRepository.AssignPermission(groupId, permission, entityIds);
+        }
 
         #region Overrides of RepositoryBase<int,IUserType>
 

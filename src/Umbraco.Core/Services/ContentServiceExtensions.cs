@@ -17,7 +17,7 @@ namespace Umbraco.Core.Services
         /// <param name="contentId"></param>
         public static void RemoveContentPermissions(this IContentService contentService, int contentId)
         {
-            contentService.ReplaceContentPermissions(new EntityPermissionSet(contentId, Enumerable.Empty<EntityPermissionSet.UserGroupPermission>()));
+            contentService.ReplaceContentPermissions(new EntityPermissionSet(contentId, Enumerable.Empty<EntityPermission>()));
         }
 
         /// <summary>
