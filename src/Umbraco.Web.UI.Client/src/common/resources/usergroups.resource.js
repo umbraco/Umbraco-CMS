@@ -59,11 +59,23 @@
                 "Failed to retrieve user groups");
         }
 
+        function deleteUserGroups(userGroupIds) {
+            var query = "userGroupIds=" + userGroupIds.join("&userGroupIds=");
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "userGroupsApiBaseUrl",
+                        "PostDeleteUserGroups",
+                        query)),
+                'Failed to delete user groups');
+        }
+
         var resource = {
             saveUserGroup: saveUserGroup,
             getUserGroup: getUserGroup,
             getUserGroups: getUserGroups,
-            getUserGroupScaffold: getUserGroupScaffold
+            getUserGroupScaffold: getUserGroupScaffold,
+            deleteUserGroups: deleteUserGroups
         };
 
         return resource;

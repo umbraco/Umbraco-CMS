@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserGroupsController($scope, $timeout, $location, userGroupsResource) {
+    function UserGroupsController($scope, $timeout, $location, userGroupsResource, formHelper) {
 
         var vm = this;
 
@@ -12,6 +12,7 @@
         vm.clickUserGroup = clickUserGroup;
         vm.clearSelection = clearSelection;
         vm.selectUserGroup = selectUserGroup;
+        vm.deleteUserGroups = deleteUserGroups;
 
         function onInit() {
 
@@ -54,6 +55,18 @@
             if(event){
                 event.preventDefault();
                 event.stopPropagation();
+            }
+        }
+
+        function deleteUserGroups() {
+            if (vm.selection.length > 0) {
+                userGroupsResource.deleteUserGroups(vm.selection).then(function (data) {
+                    clearSelection();
+                    onInit();
+                    formHelper.showNotifications(data);
+                }, function(error) {
+                    formHelper.showNotifications(error.data);
+                });
             }
         }
 
