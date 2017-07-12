@@ -22,7 +22,7 @@
         vm.enableUser = enableUser;
         vm.clearAvatar = clearAvatar;
         vm.save = save;
-        vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB"
+        vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
         vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
         vm.toggleChangePassword = toggleChangePassword;
         vm.emailIsUsername = true;
@@ -56,8 +56,7 @@
                   
                   vm.loading = false;
                 });
-                
-            });           
+            });
         }
 
         function toggleChangePassword() {
@@ -91,13 +90,9 @@
 
                 //the user has a password if they are not states: Invited, NoCredentials
                 vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
-
             }, function (err) {
-
                 vm.page.saveButtonState = "error";
-
             });
-
         }
 
         function goToPage(ancestor) {
@@ -303,7 +298,6 @@
             });
         }
 
-
         function makeBreadcrumbs() {
             vm.breadcrumbs = [
                 {
@@ -322,9 +316,6 @@
         }
 
         init();
-
     }
-
     angular.module("umbraco").controller("Umbraco.Editors.Users.UserController", UserEditController);
-
 })();
