@@ -549,7 +549,7 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage PostSetUserGroupsOnUsers([FromUri]string[] userGroupAliases, [FromUri]int[] userIds)
         {
             var users = Services.UserService.GetUsersById(userIds).ToArray();
-            var userGroups = Services.UserService.GetUserGroupsByAlias(userGroupAliases).Select(x => new ReadOnlyUserGroup(x.Id, x.Name, x.Icon, x.StartContentId, x.StartMediaId, x.Alias, x.AllowedSections)).ToArray();
+            var userGroups = Services.UserService.GetUserGroupsByAlias(userGroupAliases).Select(x => x.ToReadOnlyGroup()).ToArray();
             foreach (var u in users)
             {
                 u.ClearGroups();
