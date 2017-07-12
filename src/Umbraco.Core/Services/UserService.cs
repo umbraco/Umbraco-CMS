@@ -13,7 +13,6 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Security;
-using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
 {
@@ -841,16 +840,13 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Get permissions set for a user and node Id
+        /// Get explicitly assigned permissions for a user and optional node ids
         /// </summary>
         /// <param name="user">User to retrieve permissions for</param>
         /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         public IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds)
         {
-            if (nodeIds.Length == 0)
-                return Enumerable.Empty<EntityPermission>();
-
             var result = new List<EntityPermission>();
 
             foreach (var group in user.Groups)
@@ -865,29 +861,15 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Get permissions set for a group and node Id
+        /// Get explicitly assigned permissions for a group and optional node Ids
         /// </summary>
-        /// <param name="groupAlias">Group to retrieve permissions for</param>
+        /// <param name="group">Group to retrieve permissions for</param>
         /// <param name="fallbackToDefaultPermissions">
         /// Flag indicating if we want to get just the permissions directly assigned for the group and path, 
         /// or fall back to the group's default permissions when nothing is directly assigned
         /// </param>
         /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        public IEnumerable<EntityPermission> GetPermissions(string groupAlias, bool fallbackToDefaultPermissions, params int[] nodeIds)
-        {
-            if (nodeIds.Length == 0)
-                return Enumerable.Empty<EntityPermission>();
-
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
-            {
-                var repository = RepositoryFactory.CreateUserGroupRepository(uow);
-                var group = repository.Get(groupAlias);
-                if (group == null) throw new InvalidOperationException("No group found with alias " + groupAlias);
-                return GetPermissionsInternal(repository, group.ToReadOnlyGroup(), fallbackToDefaultPermissions, nodeIds);
-            }
-        }
-
         private IEnumerable<EntityPermission> GetPermissions(IReadOnlyUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
             if (group == null) throw new ArgumentNullException("group");
@@ -901,29 +883,8 @@ namespace Umbraco.Core.Services
             }
         }
 
-        private IEnumerable<EntityPermission> GetPermissions(int groupId, bool fallbackToDefaultPermissions, params int[] nodeIds)
-        {
-            if (nodeIds.Length == 0)
-                return Enumerable.Empty<EntityPermission>();
-
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
-            {
-                var repository = RepositoryFactory.CreateUserGroupRepository(uow);
-
-                if (fallbackToDefaultPermissions == false)
-                {
-                    //if fallbackToDefaultPermissions is false, we don't have to lookup the group
-                    return repository.GetPermissionsForEntities(groupId, nodeIds);
-                }
-
-                var group = repository.Get(groupId);
-                if (group == null) throw new InvalidOperationException("No group found with id " + groupId);
-                return GetPermissionsInternal(repository, group.ToReadOnlyGroup(), true, nodeIds);
-            }
-        }
-
         /// <summary>
-        /// Get permissions set for a group and optional node Ids
+        /// Get explicitly assigned permissions for a group and optional node Ids
         /// </summary>
         /// <param name="group">Group to retrieve permissions for</param>
         /// <param name="fallbackToDefaultPermissions">
@@ -945,10 +906,7 @@ namespace Umbraco.Core.Services
         private static IEnumerable<EntityPermission> GetPermissionsInternal(IUserGroupRepository repository, IReadOnlyUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
             if (group == null) throw new ArgumentNullException("group");
-
-            if (nodeIds.Length == 0)
-                return Enumerable.Empty<EntityPermission>();
-
+            
             var explicitPermissions = repository.GetPermissionsForEntities(group.Id, nodeIds);
             var result = new List<EntityPermission>(explicitPermissions);
 
@@ -972,7 +930,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="permissions">List of already found permissions</param>
         /// <param name="groupPermission">New permission to aggregate</param>
-        private void AddOrAmendPermissionList(IList<EntityPermission> permissions, EntityPermission groupPermission)
+        private static void AddOrAmendPermissionList(ICollection<EntityPermission> permissions, EntityPermission groupPermission)
         {
             //TODO: Fix the performance of this, we need to use things like HashSet and equality checkers, we are iterating too much
 
@@ -988,7 +946,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets the permissions for the provided user and path
+        /// Gets the implicit/inherited permissions for the user for the given path
         /// </summary>
         /// <param name="user">User to check permissions for</param>
         /// <param name="path">Path to check permissions for</param>
@@ -997,13 +955,13 @@ namespace Umbraco.Core.Services
             var nodeIds = GetIdsFromPath(path);
 
             if (nodeIds.Length == 0)
-                return null;
+                return EntityPermissionSet.Empty();
 
             var permissionsByGroup = GetPermissionsForGroupsAndPath(user.Groups, nodeIds);
 
             // not sure this will ever happen, it shouldn't since this should return defaults, but maybe those are empty?
             if (permissionsByGroup.Count == 0)
-                return null;
+                return EntityPermissionSet.Empty();
 
             var entityId = nodeIds[0];
 
@@ -1036,25 +994,7 @@ namespace Umbraco.Core.Services
                     permissions = GetPermissionsForPath(g, pathIds, fallbackToDefaultPermissions: true)
                 })
                 .ToDictionary(x => x.group, x => x.permissions);
-        }
-
-        /// <summary>
-        /// Gets the permissions for the provided group and path
-        /// </summary>
-        /// <param name="groupAlias">User to check permissions for</param>
-        /// <param name="path">Path to check permissions for</param>
-        /// <param name="fallbackToDefaultPermissions">
-        /// Flag indicating if we want to get just the permissions directly assigned for the group and path, 
-        /// or fall back to the group's default permissions when nothing is directly assigned
-        /// </param>
-        /// <returns>String indicating permissions for provided user and path</returns>
-        public EntityPermission GetPermissionsForPath(string groupAlias, string path, bool fallbackToDefaultPermissions = false)
-        {
-            var nodeIds = GetIdsFromPath(path);
-            //get permissions for all nodes in the path
-            var permissions = GetPermissions(groupAlias, fallbackToDefaultPermissions, nodeIds);
-            return GetPermissionsForPath(permissions, nodeIds, fallbackToDefaultPermissions);
-        }
+        }        
 
         /// <summary>
         /// Gets the permissions for the provided group and path
@@ -1078,15 +1018,7 @@ namespace Umbraco.Core.Services
             var permissions = GetPermissions(group, fallbackToDefaultPermissions, pathIds);
             return GetPermissionsForPath(permissions, pathIds, fallbackToDefaultPermissions);
         }
-
-        //private EntityPermission GetPermissionsForPath(int groupId, string path, bool fallbackToDefaultPermissions = false)
-        //{
-        //    var nodeIds = GetIdsFromPath(path);
-        //    //get permissions for all nodes in the path
-        //    var permissions = GetPermissions(groupId, fallbackToDefaultPermissions, nodeIds);
-        //    return GetPermissionsForPath(permissions, groupId, nodeIds, fallbackToDefaultPermissions);
-        //}
-
+        
         /// <summary>
         /// Returns the permissions for the path ids
         /// </summary>
@@ -1136,19 +1068,7 @@ namespace Umbraco.Core.Services
                 .ToArray();
             return nodeIds;
         }
-
-        ///// <summary>
-        ///// Parses a path to find the lowermost node id
-        ///// </summary>
-        ///// <param name="path">Path as string</param>
-        ///// <returns>Node id</returns>
-        //private static int GetNodeIdFromPath(string path)
-        //{
-        //    return path.Contains(",")
-        //        ? int.Parse(path.Substring(path.LastIndexOf(",", StringComparison.Ordinal) + 1))
-        //        : int.Parse(path);
-        //}
-
+        
         /// <summary>
         /// Checks in a set of permissions associated with a user for those related to a given nodeId
         /// </summary>

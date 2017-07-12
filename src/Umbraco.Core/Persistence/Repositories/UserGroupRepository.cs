@@ -91,10 +91,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
         
         /// <summary>
-        /// Gets the group permissions for the specified entities
+        /// Gets explicilty defined permissions for the group for specified entities
         /// </summary>
         /// <param name="groupId">Id of group</param>
-        /// <param name="entityIds">Array of entity Ids</param>
+        /// <param name="entityIds">Array of entity Ids, if empty will return permissions for the group for all entities</param>
         public IEnumerable<EntityPermission> GetPermissionsForEntities(int groupId, params int[] entityIds)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
