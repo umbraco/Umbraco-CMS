@@ -514,6 +514,7 @@
     <key alias="rename">Rename</key>
     <key alias="renew">Renew</key>
     <key alias="required" version="7.0">Required</key>
+    <key alias="retrieve">Retrieve</key>
     <key alias="retry">Retry</key>
     <key alias="rights">Permissions</key>
     <key alias="search">Search</key>
