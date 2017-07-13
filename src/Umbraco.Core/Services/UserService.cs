@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using Umbraco.Core.Configuration;
@@ -680,15 +681,26 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified group.</remarks>
         /// <param name="groupId">Id of the group</param>
-        /// <param name="permissions">Permissions as enumerable list of <see cref="char"/></param>
-        /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
+        /// <param name="permissions">Permissions as enumerable list of <see cref="char"/> If nothing is specified all permissions are removed.</param>
+        /// <param name="entityIds">Specify the nodes to replace permissions for. </param>
         public void ReplaceUserGroupPermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds)
         {
+            if (entityIds.Length == 0)
+                return;
+
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateUserGroupRepository(uow);
                 repository.ReplaceGroupPermissions(groupId, permissions, entityIds);
                 uow.Commit();
+
+                uow.Events.Dispatch(UserGroupPermissionsAssigned, this, new SaveEventArgs<EntityPermission>(
+                    entityIds.Select(
+                            x => new EntityPermission(
+                                groupId,
+                                x,
+                                permissions.Select(p => p.ToString(CultureInfo.InvariantCulture)).ToArray()))
+                        .ToArray(), false));
             }
         }
 
@@ -700,11 +712,22 @@ namespace Umbraco.Core.Services
         /// <param name="entityIds">Specify the nodes to replace permissions for</param>
         public void AssignUserGroupPermission(int groupId, char permission, params int[] entityIds)
         {
+            if (entityIds.Length == 0)
+                return;
+
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateUserGroupRepository(uow);
                 repository.AssignGroupPermission(groupId, permission, entityIds);
                 uow.Commit();
+
+                uow.Events.Dispatch(UserGroupPermissionsAssigned, this, new SaveEventArgs<EntityPermission>(
+                    entityIds.Select(
+                            x => new EntityPermission(
+                                groupId,
+                                x,
+                                new[] {permission.ToString(CultureInfo.InvariantCulture)}))
+                        .ToArray(), false));
             }
         }
 
@@ -853,45 +876,45 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateUserGroupRepository(uow);
 
                 return repository.GetPermissions(user.Groups.ToArray(), true, nodeIds);
-            }            
-        }
-
-        /// <summary>
-        /// Get explicitly assigned permissions for a group and optional node Ids
-        /// </summary>
-        /// <param name="group">Group to retrieve permissions for</param>
-        /// <param name="fallbackToDefaultPermissions">
-        /// Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
-        /// </param>
-        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
-        /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        private IEnumerable<EntityPermission> GetPermissions(IReadOnlyUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds)
-        {
-            if (group == null) throw new ArgumentNullException("group");
-
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
-            {
-                var repository = RepositoryFactory.CreateUserGroupRepository(uow);
-                return repository.GetPermissions(new[] { group }, fallbackToDefaultPermissions, nodeIds);
             }
         }
 
         /// <summary>
         /// Get explicitly assigned permissions for a group and optional node Ids
         /// </summary>
-        /// <param name="group">Group to retrieve permissions for</param>
+        /// <param name="groups">Groups to retrieve permissions for</param>
         /// <param name="fallbackToDefaultPermissions">
         /// Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
         /// </param>
         /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        public EntityPermissionCollection GetPermissions(IUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds)
+        private IEnumerable<EntityPermission> GetPermissions(IReadOnlyUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
-            if (group == null) throw new ArgumentNullException("group");
+            if (groups == null) throw new ArgumentNullException("group");
+
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateUserGroupRepository(uow);
-                return repository.GetPermissions(new[] { group.ToReadOnlyGroup() }, fallbackToDefaultPermissions, nodeIds);
+                return repository.GetPermissions(groups, fallbackToDefaultPermissions, nodeIds);
+            }
+        }
+
+        /// <summary>
+        /// Get explicitly assigned permissions for a group and optional node Ids
+        /// </summary>
+        /// <param name="groups"></param>
+        /// <param name="fallbackToDefaultPermissions">
+        ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
+        /// </param>
+        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
+        /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
+        public EntityPermissionCollection GetPermissions(IUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
+        {
+            if (groups == null) throw new ArgumentNullException("groups");
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateUserGroupRepository(uow);
+                return repository.GetPermissions(groups.Select(x => x.ToReadOnlyGroup()).ToArray(), fallbackToDefaultPermissions, nodeIds);
             }
         }
 
@@ -908,9 +931,7 @@ namespace Umbraco.Core.Services
                 return EntityPermissionSet.Empty();
 
             //collect all permissions structures for all nodes for all groups belonging to the user
-            var groupPermissions = user.Groups
-                .Select(g => GetPermissionsForPath(g, nodeIds, fallbackToDefaultPermissions: true))
-                .ToArray();
+            var groupPermissions = GetPermissionsForPath(user.Groups.ToArray(), nodeIds, fallbackToDefaultPermissions: true).ToArray();
 
             return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
         }
@@ -918,23 +939,36 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the permissions for the provided group and path
         /// </summary>
-        /// <param name="group">Group to check permissions for</param>
+        /// <param name="groups"></param>
         /// <param name="path">Path to check permissions for</param>
         /// <param name="fallbackToDefaultPermissions">
-        /// Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
+        ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
         /// </param>
         /// <returns>String indicating permissions for provided user and path</returns>
-        public EntityPermission GetPermissionsForPath(IUserGroup group, string path, bool fallbackToDefaultPermissions = false)
+        public EntityPermissionSet GetPermissionsForPath(IUserGroup[] groups, string path, bool fallbackToDefaultPermissions = false)
         {
             var nodeIds = path.GetIdsFromPathReversed();
-            return GetPermissionsForPath(group.ToReadOnlyGroup(), nodeIds, fallbackToDefaultPermissions);
+
+            if (nodeIds.Length == 0)
+                return EntityPermissionSet.Empty();
+
+            //collect all permissions structures for all nodes for all groups
+            var groupPermissions = GetPermissionsForPath(groups.Select(x => x.ToReadOnlyGroup()).ToArray(), nodeIds, fallbackToDefaultPermissions: true).ToArray();
+
+            return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
         }
 
-        private EntityPermission GetPermissionsForPath(IReadOnlyUserGroup group, int[] pathIds, bool fallbackToDefaultPermissions = false)
+        private EntityPermissionCollection GetPermissionsForPath(IReadOnlyUserGroup[] groups, int[] pathIds, bool fallbackToDefaultPermissions = false)
         {
-            //get permissions for all nodes in the path
-            var permissions = GetPermissions(group, fallbackToDefaultPermissions, pathIds);
-            return GetPermissionsForPathForGroup(permissions, pathIds, fallbackToDefaultPermissions);
+            if (pathIds.Length == 0)
+                return new EntityPermissionCollection(Enumerable.Empty<EntityPermission>());
+
+            //get permissions for all nodes in the path by group
+            var permissions = GetPermissions(groups, fallbackToDefaultPermissions, pathIds)
+                .GroupBy(x => x.UserGroupId);
+
+            return new EntityPermissionCollection(
+                permissions.Select(x => GetPermissionsForPathForGroup(x, pathIds, fallbackToDefaultPermissions)));
         }
 
         /// <summary>
@@ -1011,7 +1045,10 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Returns the resulting permission set for a group for the path based on all permissions provided for the branch
         /// </summary>
-        /// <param name="pathPermissions">The collective set of permissions provided to calculate the resulting permissions set for the path</param>
+        /// <param name="pathPermissions">
+        /// The collective set of permissions provided to calculate the resulting permissions set for the path 
+        /// based on a single group
+        /// </param>
         /// <param name="pathIds">Must be ordered deepest to shallowest (right to left)</param>
         /// <param name="fallbackToDefaultPermissions">
         /// Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
@@ -1123,5 +1160,9 @@ namespace Umbraco.Core.Services
         /// Occurs after Delete
         /// </summary>
         public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserGroup>> DeletedUserGroup;
+
+        //TODO: still don't know if we need this yet unless we start caching permissions, but that also means we'll need another
+        // event on the ContentService since there's a method there to modify node permissions too, or we can proxy events if needed.
+        internal static event TypedEventHandler<IUserService, SaveEventArgs<EntityPermission>> UserGroupPermissionsAssigned;
     }
 }

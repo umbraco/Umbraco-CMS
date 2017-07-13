@@ -432,7 +432,8 @@ namespace Umbraco.Tests.Services
             var permissions = userService.GetPermissionsForPath(userGroup, child2.Path);
 
             //assert
-            Assert.AreEqual(3, permissions.AssignedPermissions.Length);
+            var allPermissions = permissions.GetAllPermissions().ToArray();
+            Assert.AreEqual(3, allPermissions.Length);
         }
 
         [Test]

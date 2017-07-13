@@ -132,6 +132,10 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     foreach (var nodeId in nodeIds)
                     {
+                        //TODO: We could/should change the EntityPermissionsCollection into a KeyedCollection and they key could be
+                        // a struct of the nodeid + groupid so then we don't actually allocate this class just to check if it's not 
+                        // going to be included in the result!
+
                         var defaultPermission = new EntityPermission(group.Id, nodeId, group.Permissions.ToArray(), isDefaultPermissions: true);
                         //Since this is a hashset, this will not add anything that already exists by group/node combination
                         result.Add(defaultPermission);
@@ -145,8 +149,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Replaces the same permission set for a single group to any number of entities
         /// </summary>
         /// <param name="groupId">Id of group</param>
-        /// <param name="permissions">Permissions as enumerable list of <see cref="char"/></param>
-        /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
+        /// <param name="permissions">Permissions as enumerable list of <see cref="char"/> If nothing is specified all permissions are removed.</param>
+        /// <param name="entityIds">Specify the nodes to replace permissions for. </param>
         public void ReplaceGroupPermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds)
         {
             _permissionRepository.ReplacePermissions(groupId, permissions, entityIds);

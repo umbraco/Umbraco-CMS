@@ -98,15 +98,15 @@ namespace Umbraco.Core.Services
         EntityPermissionCollection GetPermissions(IUser user, params int[] nodeIds);
 
         /// <summary>
-        /// Get explicitly assigned permissions for a group and optional node Ids
+        /// Get explicitly assigned permissions for groups and optional node Ids
         /// </summary>
-        /// <param name="group">Group to retrieve permissions for</param>
+        /// <param name="groups"></param>
         /// <param name="fallbackToDefaultPermissions">
-        /// Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
+        ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
         /// </param>
         /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        EntityPermissionCollection GetPermissions(IUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds);
+        EntityPermissionCollection GetPermissions(IUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds);        
 
         /// <summary>
         /// Gets the implicit/inherited permissions for the user for the given path
@@ -116,14 +116,14 @@ namespace Umbraco.Core.Services
         EntityPermissionSet GetPermissionsForPath(IUser user, string path);
 
         /// <summary>
-        /// Gets the permissions for the provided group and path
+        /// Gets the permissions for the provided groups and path
         /// </summary>
-        /// <param name="group">Group to check permissions for</param>
+        /// <param name="groups"></param>
         /// <param name="path">Path to check permissions for</param>
         /// <param name="fallbackToDefaultPermissions">
-        /// Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
+        ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
         /// </param>
-        EntityPermission GetPermissionsForPath(IUserGroup group, string path, bool fallbackToDefaultPermissions = false);
+        EntityPermissionSet GetPermissionsForPath(IUserGroup[] groups, string path, bool fallbackToDefaultPermissions = false);
 
         /// <summary>
         /// Replaces the same permission set for a single group to any number of entities

@@ -9,6 +9,9 @@ namespace Umbraco.Web.Cache
     /// <summary>
     /// Handles User group cache invalidation/refreshing
     /// </summary>
+    /// <remarks>
+    /// This also needs to clear the user cache since IReadOnlyUserGroup's are attached to IUser objects
+    /// </remarks>
     public sealed class UserGroupCacheRefresher : CacheRefresherBase<UserGroupCacheRefresher>
     {
         protected override UserGroupCacheRefresher Instance
@@ -35,6 +38,9 @@ namespace Umbraco.Web.Cache
                 userGroupCache.Result.ClearCacheByKeySearch(UserGroupRepository.GetByAliasCacheKeyPrefix);
             }
 
+            //We'll need to clear all user cache too
+            ClearAllIsolatedCacheByEntityType<IUser>();
+
             base.RefreshAll();
         }
 
@@ -52,8 +58,12 @@ namespace Umbraco.Web.Cache
                 userGroupCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUserGroup>(id));
                 userGroupCache.Result.ClearCacheByKeySearch(UserGroupRepository.GetByAliasCacheKeyPrefix);
             }
-            
+
+            //we don't know what user's belong to this group without doing a look up so we'll need to just clear them all
+            ClearAllIsolatedCacheByEntityType<IUser>();
+
             base.Remove(id);
         }
+        
     }
 }

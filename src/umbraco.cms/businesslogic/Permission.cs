@@ -32,24 +32,8 @@ namespace umbraco.BusinessLogic
         
         public static void MakeNew(IUserGroup userGroup, CMSNode node, char permissionKey)
         {
-            MakeNew(userGroup, node, permissionKey, true);
-        }
-
-        private static void MakeNew(IUserGroup userGroup, IEnumerable<CMSNode> nodes, char permissionKey, bool raiseEvents)
-        {
-            var asArray = nodes.ToArray();
-
-            ApplicationContext.Current.Services.UserService.AssignUserGroupPermission(userGroup.Id, permissionKey, asArray.Select(x => x.Id).ToArray());
-
-            if (raiseEvents)
-            {
-                OnNew(new UserGroupPermission(userGroup, asArray, new[] { permissionKey }), new NewEventArgs());
-            }
-        }
-
-        private static void MakeNew(IUserGroup userGroup, CMSNode Node, char PermissionKey, bool raiseEvents)
-        {
-            MakeNew(userGroup, new[] {Node}, PermissionKey, raiseEvents);
+            ApplicationContext.Current.Services.UserService.AssignUserGroupPermission(
+                userGroup.Id, permissionKey, node.Id);
         }
 
         /// <summary>
@@ -100,16 +84,7 @@ namespace umbraco.BusinessLogic
         /// <param name="node"></param>
         public static void DeletePermissions(IUserGroup userGroup, CMSNode node)
         {
-            DeletePermissions(userGroup, node, true);
-        }
-
-        internal static void DeletePermissions(IUserGroup userGroup, CMSNode node, bool raiseEvents)
-        {
             ApplicationContext.Current.Services.UserService.RemoveUserGroupPermissions(userGroup.Id, node.Id);
-            if (raiseEvents)
-            {
-                OnDeleted(new UserGroupPermission(userGroup, node, null), new DeleteEventArgs());
-            }
         }
 
         /// <summary>
@@ -119,15 +94,13 @@ namespace umbraco.BusinessLogic
         public static void DeletePermissions(IUserGroup userGroup)
         {
             ApplicationContext.Current.Services.UserService.RemoveUserGroupPermissions(userGroup.Id);
-
-            OnDeleted(new UserGroupPermission(userGroup, Enumerable.Empty<CMSNode>(), null), new DeleteEventArgs());
+            
         }
 
         public static void DeletePermissions(int userGroupId, int[] iNodeIDs)
         {
             ApplicationContext.Current.Services.UserService.RemoveUserGroupPermissions(userGroupId, iNodeIDs);
-
-            OnDeleted(new UserGroupPermission(userGroupId, iNodeIDs), new DeleteEventArgs());
+            
         }
         public static void DeletePermissions(int userGroupId, int iNodeID)
         {
@@ -142,7 +115,6 @@ namespace umbraco.BusinessLogic
         {
             ApplicationContext.Current.Services.ContentService.RemoveContentPermissions(node.Id);
             
-            OnDeleted(new UserGroupPermission(null, node, null), new DeleteEventArgs());
         }
 
         public static void UpdateCruds(IUserGroup userGroup, CMSNode node, string permissions)
@@ -151,103 +123,9 @@ namespace umbraco.BusinessLogic
                 userGroup.Id, 
                 permissions.ToCharArray(), 
                 node.Id);
-
-            OnUpdated(new UserGroupPermission(userGroup, node, permissions.ToCharArray()), new SaveEventArgs());
-        }
-
-        internal static event TypedEventHandler<UserGroupPermission, DeleteEventArgs> Deleted;
-        private static void OnDeleted(UserGroupPermission permission, DeleteEventArgs args)
-        {
-            if (Deleted != null)
-            {
-                Deleted(permission, args);
-            }
-        }
-
-        internal static event TypedEventHandler<UserGroupPermission, SaveEventArgs> Updated;
-        private static void OnUpdated(UserGroupPermission permission, SaveEventArgs args)
-        {
-            if (Updated != null)
-            {
-                Updated(permission, args);
-            }
-        }
-
-        internal static event TypedEventHandler<UserGroupPermission, NewEventArgs> New;
-        private static void OnNew(UserGroupPermission permission, NewEventArgs args)
-        {
-            if (New != null)
-            {
-                New(permission, args);
-            }
+            
         }
 
     }
 
-    internal class UserGroupPermission
-    {
-        private int? _userGroupId;
-        private readonly int[] _nodeIds;
-
-        internal UserGroupPermission(int userGroupId)
-        {
-            _userGroupId = userGroupId;
-        }
-
-        internal UserGroupPermission(int userGroupId, IEnumerable<int> nodeIds)
-        {
-            _userGroupId = userGroupId;
-            _nodeIds = nodeIds.ToArray();
-        }
-
-        internal UserGroupPermission(IUserGroup userGroup, CMSNode node, char[] permissionKeys)
-        {
-            UserGroup = userGroup;
-            Nodes = new[] { node };
-            PermissionKeys = permissionKeys;
-        }
-
-        internal UserGroupPermission(IUserGroup userGroup, IEnumerable<CMSNode> nodes, char[] permissionKeys)
-        {
-            UserGroup = userGroup;
-            Nodes = nodes;
-            PermissionKeys = permissionKeys;
-        }
-
-        internal int UserId
-        {
-            get
-            {
-                if (_userGroupId.HasValue)
-                {
-                    return _userGroupId.Value;
-                }
-                if (UserGroup != null)
-                {
-                    return UserGroup.Id;
-                }
-                return -1;
-            }
-        }
-
-        internal IEnumerable<int> NodeIds
-        {
-            get
-            {
-                if (_nodeIds != null)
-                {
-                    return _nodeIds;
-                }
-                if (Nodes != null)
-                {
-                    return Nodes.Select(x => x.Id);
-                }
-                return Enumerable.Empty<int>();
-            }
-        }
-
-        internal IUserGroup UserGroup { get; private set; }
-        internal IEnumerable<CMSNode> Nodes { get; private set; }
-        internal char[] PermissionKeys { get; private set; }
-    }
 }

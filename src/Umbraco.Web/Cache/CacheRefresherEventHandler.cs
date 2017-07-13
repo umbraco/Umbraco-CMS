@@ -68,6 +68,8 @@ namespace Umbraco.Web.Cache
                  () => UserService.SavedUser -= UserService_SavedUser);
             Bind(() => UserService.DeletedUser += UserService_DeletedUser,
                  () => UserService.DeletedUser -= UserService_DeletedUser);
+            Bind(() => UserService.UserGroupPermissionsAssigned += UserService_UserGroupPermissionsAssigned,
+                 () => UserService.UserGroupPermissionsAssigned -= UserService_UserGroupPermissionsAssigned);
 
             // bind to dictionary events
             Bind(() => LocalizationService.DeletedDictionaryItem += LocalizationService_DeletedDictionaryItem,
@@ -111,8 +113,10 @@ namespace Umbraco.Web.Cache
             Bind(() => MemberTypeService.Saved += MemberTypeService_Saved,
                  () => MemberTypeService.Saved -= MemberTypeService_Saved);
             Bind(() => MemberTypeService.Deleted += MemberTypeService_Deleted,
-                 () => MemberTypeService.Deleted -= MemberTypeService_Deleted);            
-            
+                 () => MemberTypeService.Deleted -= MemberTypeService_Deleted);
+
+           
+
             // bind to template events
             Bind(() => FileService.SavedTemplate += FileService_SavedTemplate,
                  () => FileService.SavedTemplate -= FileService_SavedTemplate);
@@ -554,7 +558,16 @@ namespace Umbraco.Web.Cache
         #endregion
 
         #region User/permissions event handlers
-        
+
+        static void UserService_UserGroupPermissionsAssigned(IUserService sender, SaveEventArgs<EntityPermission> e)
+        {
+            //TODO: Not sure if we need this yet depends if we start caching permissions
+            //var groupIds = e.SavedEntities.Select(x => x.UserGroupId).Distinct();
+            //foreach (var groupId in groupIds)
+            //{
+            //    DistributedCache.Instance.RefreshUserGroupPermissionsCache(groupId);
+            //}
+        }
 
         static void UserService_SavedUser(IUserService sender, SaveEventArgs<IUser> e)
         {

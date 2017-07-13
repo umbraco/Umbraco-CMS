@@ -135,6 +135,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </remarks>
         public void ReplacePermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds)
         {
+            if (entityIds.Length == 0)
+                return;
+
             var db = UnitOfWork.Database;
 
             //we need to batch these in groups of 2000 so we don't exceed the max 2100 limit

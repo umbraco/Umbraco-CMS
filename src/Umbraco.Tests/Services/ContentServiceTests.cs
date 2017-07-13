@@ -1488,8 +1488,9 @@ namespace Umbraco.Tests.Services
 
             //get the permissions and verify
             var permissions = ServiceContext.UserService.GetPermissionsForPath(userGroup, copy.Path, fallbackToDefaultPermissions: true);
-            Assert.AreEqual(1, permissions.AssignedPermissions.Length);
-            Assert.AreEqual("A", permissions.AssignedPermissions[0]);
+            var allPermissions = permissions.GetAllPermissions().ToArray();
+            Assert.AreEqual(1, allPermissions.Length);
+            Assert.AreEqual("A", allPermissions[0]);
         }
 
         [Test]
@@ -1523,9 +1524,10 @@ namespace Umbraco.Tests.Services
 
             foreach (var descendant in descendants)
             {
-                var permissions = ServiceContext.UserService.GetPermissionsForPath(userGroup, descendant.Path, fallbackToDefaultPermissions:true);
-                Assert.AreEqual(1, permissions.AssignedPermissions.Length);
-                Assert.AreEqual("A", permissions.AssignedPermissions[0]);
+                var permissions = ServiceContext.UserService.GetPermissionsForPath(userGroup, descendant.Path, fallbackToDefaultPermissions: true);
+                var allPermissions = permissions.GetAllPermissions().ToArray();
+                Assert.AreEqual(1, allPermissions.Length);
+                Assert.AreEqual("A", allPermissions[0]);
             }
 
             //create a new parent with a new permission structure
@@ -1542,8 +1544,9 @@ namespace Umbraco.Tests.Services
             foreach (var descendant in descendants)
             {
                 var permissions = ServiceContext.UserService.GetPermissionsForPath(userGroup, descendant.Path, fallbackToDefaultPermissions: true);
-                Assert.AreEqual(1, permissions.AssignedPermissions.Length);
-                Assert.AreEqual("B", permissions.AssignedPermissions[0]);
+                var allPermissions = permissions.GetAllPermissions().ToArray();
+                Assert.AreEqual(1, allPermissions.Length);
+                Assert.AreEqual("B", allPermissions[0]);
             }
         }
 

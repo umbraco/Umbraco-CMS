@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Umbraco.Core.Models.Membership
@@ -8,13 +9,14 @@ namespace Umbraco.Core.Models.Membership
     /// </summary>    
     public class EntityPermissionSet
     {
+        private static readonly Lazy<EntityPermissionSet> EmptyInstance = new Lazy<EntityPermissionSet>(() => new EntityPermissionSet(-1, new EntityPermissionCollection()));
         /// <summary>
         /// Returns an empty permission set
         /// </summary>
         /// <returns></returns>
         public static EntityPermissionSet Empty()
         {
-            return new EntityPermissionSet(-1, new EntityPermissionCollection());
+            return EmptyInstance.Value;
         }
 
         public EntityPermissionSet(int entityId, EntityPermissionCollection permissionsSet)
