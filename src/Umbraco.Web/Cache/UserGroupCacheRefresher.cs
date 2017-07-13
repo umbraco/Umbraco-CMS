@@ -34,10 +34,6 @@ namespace Umbraco.Web.Cache
             {
                 userGroupCache.Result.ClearCacheByKeySearch(UserGroupRepository.GetByAliasCacheKeyPrefix);
             }
-            if (UserGroupPermissionsCache)
-            {
-                UserGroupPermissionsCache.Result.ClearCacheByKeySearch(CacheKeys.UserGroupPermissionsCacheKey);
-            }
 
             base.RefreshAll();
         }
@@ -56,20 +52,8 @@ namespace Umbraco.Web.Cache
                 userGroupCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUserGroup>(id));
                 userGroupCache.Result.ClearCacheByKeySearch(UserGroupRepository.GetByAliasCacheKeyPrefix);
             }
-
-            if (UserGroupPermissionsCache)
-            {
-                //TODO: Is this good enough for all users attached to this?
-                var keyStartsWith = string.Format("{0}{1}", CacheKeys.UserGroupPermissionsCacheKey, id);
-                UserGroupPermissionsCache.Result.ClearCacheByKeySearch(keyStartsWith);
-            }
-
+            
             base.Remove(id);
-        }
-
-        private Attempt<IRuntimeCacheProvider> UserGroupPermissionsCache
-        {
-            get { return ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<EntityPermission>(); }
         }
     }
 }

@@ -159,9 +159,6 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             UnitOfWork.Database.BulkInsertRecords(toInsert, SqlSyntax);
-
-            //Raise the event
-            UnitOfWork.Events.Dispatch(AssignedPermissions, this, new SaveEventArgs<EntityPermission>(ConvertToPermissionList(toInsert), false));
             
         }
 
@@ -191,10 +188,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }).ToArray();
 
             UnitOfWork.Database.BulkInsertRecords(actions, SqlSyntax);
-
-            //Raise the event
-            UnitOfWork.Events.Dispatch(AssignedPermissions, this, new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false));
-
+            
         }
 
         /// <summary>
@@ -223,10 +217,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }).ToArray();
 
             UnitOfWork.Database.BulkInsertRecords(actions, SqlSyntax);
-
-            //Raise the event
-            UnitOfWork.Events.Dispatch(AssignedPermissions, this, new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false));
-
+            
         }
 
         /// <summary>
@@ -258,11 +249,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             UnitOfWork.Database.BulkInsertRecords(toInsert, SqlSyntax);
-
-            //Raise the event
-            UnitOfWork.Events.Dispatch(AssignedPermissions, this, new SaveEventArgs<EntityPermission>(permissionSet.PermissionsSet, false));
-
-
+            
         }
 
 
@@ -350,7 +337,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return permissions;
         }
-
-        public static event TypedEventHandler<PermissionRepository<TEntity>, SaveEventArgs<EntityPermission>> AssignedPermissions;
+        
     }
 }
