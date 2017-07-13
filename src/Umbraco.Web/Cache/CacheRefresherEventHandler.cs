@@ -797,9 +797,6 @@ namespace Umbraco.Web.Cache
             //TODO: We should remove this in v8, this is a backwards compat hack and is needed because when we are using Deploy, the events will be raised on a background
             //thread which means that cache refreshers will also execute on a background thread and in many cases developers may be using UmbracoContext.Current in their
             //cache refresher handlers, so before we execute all of the events, we'll ensure a context
-            //
-            // note that this means we must *exclusively* use this method in a background task else we'd replace and dispose a real context
-            //
             UmbracoContext tempContext = null;
             if (UmbracoContext.Current == null)
             {
