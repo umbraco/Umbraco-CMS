@@ -64,18 +64,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {
 
-                var userType1 = MockedUserGroup.CreateUserGroup("1");
-                var userType2 = MockedUserGroup.CreateUserGroup("2");
+                var userGroup1 = MockedUserGroup.CreateUserGroup("1");
+                var userGroup2 = MockedUserGroup.CreateUserGroup("2");
 
                 // Act
-                repository.AddOrUpdate(userType1);
+                repository.AddOrUpdate(userGroup1);
                 unitOfWork.Commit();
-                repository.AddOrUpdate(userType2);
+                repository.AddOrUpdate(userGroup2);
                 unitOfWork.Commit();
 
                 // Assert
-                Assert.That(userType1.HasIdentity, Is.True);
-                Assert.That(userType2.HasIdentity, Is.True);
+                Assert.That(userGroup1.HasIdentity, Is.True);
+                Assert.That(userGroup2.HasIdentity, Is.True);
             }
         }
 
@@ -209,10 +209,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
-                var userTypes = CreateAndCommitMultipleUserGroups(repository, unitOfWork);
+                var userGroups = CreateAndCommitMultipleUserGroups(repository, unitOfWork);
 
                 // Act
-                var result = repository.GetAll(userTypes[0].Id, userTypes[1].Id);
+                var result = repository.GetAll(userGroups[0].Id, userGroups[1].Id);
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -249,10 +249,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
-                var userTypes = CreateAndCommitMultipleUserGroups(repository, unitOfWork);
+                var userGroups = CreateAndCommitMultipleUserGroups(repository, unitOfWork);
 
                 // Act
-                var exists = repository.Exists(userTypes[0].Id);
+                var exists = repository.Exists(userGroups[0].Id);
 
                 // Assert
                 Assert.That(exists, Is.True);
@@ -267,7 +267,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
-                var userTypes = CreateAndCommitMultipleUserGroups(repository, unitOfWork);
+                var userGroups = CreateAndCommitMultipleUserGroups(repository, unitOfWork);
 
                 // Act
                 var query = Query<IUserGroup>.Builder.Where(x => x.Alias == "testUserGroup1" || x.Alias == "testUserGroup2");
