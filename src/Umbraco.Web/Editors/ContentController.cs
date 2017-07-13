@@ -242,7 +242,7 @@ namespace Umbraco.Web.Editors
             //set a custom path since the tree that renders this has the content type id as the parent
             content.Path = string.Format("-1,{0},{1}", persistedContent.ContentTypeId, content.Id);
 
-            content.AllowedActions = new[] {'A'};
+            content.AllowedActions = new[] {"A"};
 
             var excludeProps = new[] {"_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template"};
             var propsTab = content.Tabs.Last();
@@ -440,8 +440,8 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public bool HasPermission(string permissionToCheck, int nodeId)
         {
-            var p = Services.UserService.GetPermissions(Security.CurrentUser, nodeId).FirstOrDefault();
-            if (p != null && p.AssignedPermissions.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
+            var p = Services.UserService.GetPermissions(Security.CurrentUser, nodeId).GetAllPermissions();
+            if (p.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
             {
                 return true;
             }
