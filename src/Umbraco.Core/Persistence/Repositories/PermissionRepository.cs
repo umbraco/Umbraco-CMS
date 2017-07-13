@@ -39,43 +39,53 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Returns explicitly defined permissions for a user group for any number of nodes
         /// </summary>
-        /// <param name="groupId"></param>
+        /// <param name="groupIds">
+        /// The group ids to lookup permissions for
+        /// </param>
         /// <param name="entityIds"></param>
         /// <returns></returns>        
-        public EntityPermissionCollection GetPermissionsForEntities(int groupId, params int[] entityIds)
+        /// <remarks>
+        /// This method will not support passing in more than 2000 group Ids
+        /// </remarks>
+        public EntityPermissionCollection GetPermissionsForEntities(int[] groupIds, params int[] entityIds)
         {
             var result = new EntityPermissionCollection();
 
-            if (entityIds.Length == 0)
+            foreach (var groupOfGroupIds in groupIds.InGroupsOf(2000))
             {
-                var sql = new Sql();
-                sql.Select("*")
-                    .From<UserGroup2NodePermissionDto>(SqlSyntax)
-                    .Where<UserGroup2NodePermissionDto>(dto => dto.UserGroupId == groupId, SqlSyntax);
-                var permissions = UnitOfWork.Database.Fetch<UserGroup2NodePermissionDto>(sql);
-                foreach (var permission in ConvertToPermissionList(permissions))
-                {
-                    result.Add(permission);
-                }
-            }
-            else
-            {
-                //iterate in groups of 2000 since we don't want to exceed the max SQL param count
-                foreach (var groupOfIds in entityIds.InGroupsOf(2000))
-                {
-                    var ids = groupOfIds;
+                //copy local
+                var localIds = groupOfGroupIds.ToArray();
 
-                    var sql = new Sql();
+                if (entityIds.Length == 0)
+                {
+                    var sql = new Sql();                    
                     sql.Select("*")
                         .From<UserGroup2NodePermissionDto>(SqlSyntax)
-                        .Where<UserGroup2NodePermissionDto>(dto => dto.UserGroupId == groupId && ids.Contains(dto.NodeId), SqlSyntax);
+                        .Where<UserGroup2NodePermissionDto>(dto => localIds.Contains(dto.UserGroupId), SqlSyntax);
                     var permissions = UnitOfWork.Database.Fetch<UserGroup2NodePermissionDto>(sql);
                     foreach (var permission in ConvertToPermissionList(permissions))
                     {
                         result.Add(permission);
                     }
                 }
-            }    
+                else
+                {
+                    //iterate in groups of 2000 since we don't want to exceed the max SQL param count
+                    foreach (var groupOfEntityIds in entityIds.InGroupsOf(2000))
+                    {
+                        var ids = groupOfEntityIds;
+                        var sql = new Sql();
+                        sql.Select("*")
+                            .From<UserGroup2NodePermissionDto>(SqlSyntax)
+                            .Where<UserGroup2NodePermissionDto>(dto => localIds.Contains(dto.UserGroupId) && ids.Contains(dto.NodeId), SqlSyntax);
+                        var permissions = UnitOfWork.Database.Fetch<UserGroup2NodePermissionDto>(sql);
+                        foreach (var permission in ConvertToPermissionList(permissions))
+                        {
+                            result.Add(permission);
+                        }
+                    }
+                }
+            }
             
             return result;
         }        

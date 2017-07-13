@@ -848,18 +848,18 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         public EntityPermissionCollection GetPermissions(IUser user, params int[] nodeIds)
         {
-            //TODO: we don't need to run this query for each group assigned, we can do this in one query
-
             var result = new EntityPermissionCollection();
 
-            foreach (var group in user.Groups)
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
-                foreach (var permission in GetPermissions(group, true, nodeIds))
+                var repository = RepositoryFactory.CreateUserGroupRepository(uow);
+
+                foreach (var permission in repository.GetPermissions(user.Groups.ToArray(), true, nodeIds))
                 {
                     result.Add(permission);
                 }
             }
-
+            
             return result;
         }
 
@@ -879,7 +879,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateUserGroupRepository(uow);
-                return repository.GetPermissionsForEntities(group, fallbackToDefaultPermissions, nodeIds);
+                return repository.GetPermissions(new[] { group }, fallbackToDefaultPermissions, nodeIds);
             }
         }
 
@@ -898,7 +898,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateUserGroupRepository(uow);
-                return repository.GetPermissionsForEntities(group.ToReadOnlyGroup(), fallbackToDefaultPermissions, nodeIds);
+                return repository.GetPermissions(new[] { group.ToReadOnlyGroup() }, fallbackToDefaultPermissions, nodeIds);
             }
         }
 

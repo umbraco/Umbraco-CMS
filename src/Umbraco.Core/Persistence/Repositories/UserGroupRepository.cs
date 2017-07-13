@@ -91,42 +91,46 @@ namespace Umbraco.Core.Persistence.Repositories
             _userGroupWithUsersRepository.AddOrUpdate(new UserGroupWithUsers(userGroup, userIds));
         }
 
-        
+
         /// <summary>
         /// Gets explicilty defined permissions for the group for specified entities
         /// </summary>
-        /// <param name="groupId">Id of group</param>
+        /// <param name="groupIds"></param>
         /// <param name="entityIds">Array of entity Ids, if empty will return permissions for the group for all entities</param>
-        public EntityPermissionCollection GetPermissionsForEntities(int groupId, params int[] entityIds)
+        public EntityPermissionCollection GetPermissions(int[] groupIds, params int[] entityIds)
         {
-            return _permissionRepository.GetPermissionsForEntities(groupId, entityIds);
+            return _permissionRepository.GetPermissionsForEntities(groupIds, entityIds);
         }
 
         /// <summary>
         /// Gets explicilt and default permissions (if requested) permissions for the group for specified entities
         /// </summary>
-        /// <param name="group">The group</param>
+        /// <param name="groups"></param>
         /// <param name="fallbackToDefaultPermissions">If true will include the group's default permissions if no permissions are explicitly assigned</param>
         /// <param name="nodeIds">Array of entity Ids, if empty will return permissions for the group for all entities</param>
-        public EntityPermissionCollection GetPermissionsForEntities(IReadOnlyUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds)
+        public EntityPermissionCollection GetPermissions(IReadOnlyUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
-            if (group == null) throw new ArgumentNullException("group");
+            if (groups == null) throw new ArgumentNullException("groups");
 
-            var explicitPermissions = GetPermissionsForEntities(group.Id, nodeIds);
+            var groupIds = groups.Select(x => x.Id).ToArray();
+            var explicitPermissions = GetPermissions(groupIds, nodeIds);
             var result = new EntityPermissionCollection(explicitPermissions);
 
             // If requested, and no permissions are assigned to a particular node, then we will fill in those permissions with the group's defaults
             if (fallbackToDefaultPermissions)
             {
-                var missingIds = nodeIds.Except(result.Select(x => x.EntityId)).ToArray();
-                if (missingIds.Length > 0)
+                foreach (var group in groups)
                 {
-                    foreach (var permission in missingIds
-                        .Select(i => new EntityPermission(group.Id, i, group.Permissions.ToArray(), isDefaultPermissions: true)))
+                    var missingIds = nodeIds.Except(result.Select(x => x.EntityId)).ToArray();
+                    if (missingIds.Length > 0)
                     {
-                        result.Add(permission);
+                        foreach (var permission in missingIds
+                            .Select(i => new EntityPermission(group.Id, i, group.Permissions.ToArray(), isDefaultPermissions: true)))
+                        {
+                            result.Add(permission);
+                        }
                     }
-                }
+                }                
             }
             return result;
         }
