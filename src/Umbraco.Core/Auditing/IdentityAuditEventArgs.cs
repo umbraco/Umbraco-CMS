@@ -16,7 +16,7 @@ namespace Umbraco.Core.Auditing
         public AuditEvent Action { get; set; }
 
         /// <summary>
-        /// Current data/time in UTC format
+        /// Current date/time in UTC format
         /// </summary>
         public DateTime DateTimeUtc { get; private set; }
 
@@ -31,7 +31,7 @@ namespace Umbraco.Core.Auditing
         public int AffectedUser { get; set; }
 
         /// <summary>
-        /// If a user is perfoming an action on a different user then this will be set, otherwise it will be -1
+        /// If a user is perfoming an action on a different user, then this will be set. Otherwise it will be -1
         /// </summary>
         public int PerformingUser { get; set; }
 
@@ -49,7 +49,7 @@ namespace Umbraco.Core.Auditing
         /// Sets the properties on the event being raised, all parameters are optional except for the action being performed
         /// </summary>
         /// <param name="action">An action based on the AuditEvent enum</param>
-        /// <param name="ipAddress">The client's IP address. This is usually automatically set but could be overridden is necessary</param>
+        /// <param name="ipAddress">The client's IP address. This is usually automatically set but could be overridden if necessary</param>
         /// <param name="performingUser">The Id of the user performing the action (if different from the user affected by the action)</param>
         public IdentityAuditEventArgs(AuditEvent action, string ipAddress = "", int performingUser = -1)
         {
