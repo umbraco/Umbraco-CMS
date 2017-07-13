@@ -90,10 +90,10 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <remarks>If no permissions are found for a particular entity then the user's default permissions will be applied</remarks>
         /// <param name="user">User to retrieve permissions for</param>
-        /// <param name="nodeIds">Specifiying nothing will return all user permissions for all nodes</param>
+        /// <param name="nodeIds">Specifiying nothing will return all user permissions for all nodes that have explicit permissions defined</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         /// <remarks>
-        /// This will return the default permissions for the user's groups for nodes that don't have explicitly defined permissions
+        /// This will return the default permissions for the user's groups for node ids that don't have explicitly defined permissions
         /// </remarks>
         EntityPermissionCollection GetPermissions(IUser user, params int[] nodeIds);
 

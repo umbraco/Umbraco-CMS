@@ -164,16 +164,20 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Get_All_User_Permissions_For_All_Nodes()
+        public void Get_All_User_Permissions_For_All_Nodes_With_Explicit_Permission()
         {
             // Arrange
             var userService = ServiceContext.UserService;
             var userGroup1 = CreateTestUserGroup();
             var userGroup2 = CreateTestUserGroup("test2", "Test 2");
+            var userGroup3 = CreateTestUserGroup("test3", "Test 3");
             var user = userService.CreateUserWithIdentity("John Doe", "john@umbraco.io");
+
+            var defaultPermissionCount = userGroup3.Permissions.Count();
 
             user.AddGroup(userGroup1);
             user.AddGroup(userGroup2);
+            user.AddGroup(userGroup3);
             userService.Save(user);
 
             var contentType = MockedContentTypes.CreateSimpleContentType();
@@ -185,6 +189,7 @@ namespace Umbraco.Tests.Services
                 MockedContent.CreateSimpleContent(contentType)
             };
             ServiceContext.ContentService.Save(content);
+            //assign permissions - we aren't assigning anything explicit for group3 and nothing explicit for content[2] /w group2
             ServiceContext.ContentService.AssignContentPermission(content[0], ActionBrowse.Instance.Letter, new int[] { userGroup1.Id });
             ServiceContext.ContentService.AssignContentPermission(content[0], ActionDelete.Instance.Letter, new int[] { userGroup1.Id });
             ServiceContext.ContentService.AssignContentPermission(content[0], ActionMove.Instance.Letter, new int[] { userGroup2.Id });
@@ -200,21 +205,42 @@ namespace Umbraco.Tests.Services
                 .ToDictionary(x => x.Key, x => x.GroupBy(a => a.UserGroupId).ToDictionary(a => a.Key, a => a.ToArray()));
 
             //assert
+
+            //there will be 3 since that is how many content items there are
             Assert.AreEqual(3, permissions.Count);
+            
+            //test permissions contains content[0]
             Assert.IsTrue(permissions.ContainsKey(content[0].Id));
+            //test that this permissions set contains permissions for all groups
             Assert.IsTrue(permissions[content[0].Id].ContainsKey(userGroup1.Id));
             Assert.IsTrue(permissions[content[0].Id].ContainsKey(userGroup2.Id));
+            Assert.IsTrue(permissions[content[0].Id].ContainsKey(userGroup3.Id));
+            //test that the correct number of permissions are returned for each group
             Assert.AreEqual(2, permissions[content[0].Id][userGroup1.Id].SelectMany(x => x.AssignedPermissions).Count());
             Assert.AreEqual(1, permissions[content[0].Id][userGroup2.Id].SelectMany(x => x.AssignedPermissions).Count());
+            Assert.AreEqual(defaultPermissionCount, permissions[content[0].Id][userGroup3.Id].SelectMany(x => x.AssignedPermissions).Count());
+            
+            //test permissions contains content[1]
             Assert.IsTrue(permissions.ContainsKey(content[1].Id));
+            //test that this permissions set contains permissions for all groups
             Assert.IsTrue(permissions[content[1].Id].ContainsKey(userGroup1.Id));
             Assert.IsTrue(permissions[content[1].Id].ContainsKey(userGroup2.Id));
+            Assert.IsTrue(permissions[content[1].Id].ContainsKey(userGroup3.Id));
+            //test that the correct number of permissions are returned for each group
             Assert.AreEqual(1, permissions[content[1].Id][userGroup1.Id].SelectMany(x => x.AssignedPermissions).Count());
             Assert.AreEqual(1, permissions[content[1].Id][userGroup2.Id].SelectMany(x => x.AssignedPermissions).Count());
+            Assert.AreEqual(defaultPermissionCount, permissions[content[1].Id][userGroup3.Id].SelectMany(x => x.AssignedPermissions).Count());
+
+            //test permissions contains content[2]
             Assert.IsTrue(permissions.ContainsKey(content[2].Id));
+            //test that this permissions set contains permissions for all groups
             Assert.IsTrue(permissions[content[2].Id].ContainsKey(userGroup1.Id));
-            Assert.IsFalse(permissions[content[2].Id].ContainsKey(userGroup2.Id));
+            Assert.IsTrue(permissions[content[2].Id].ContainsKey(userGroup2.Id));
+            Assert.IsTrue(permissions[content[2].Id].ContainsKey(userGroup3.Id));
+            //test that the correct number of permissions are returned for each group
             Assert.AreEqual(1, permissions[content[2].Id][userGroup1.Id].SelectMany(x => x.AssignedPermissions).Count());
+            Assert.AreEqual(defaultPermissionCount, permissions[content[2].Id][userGroup2.Id].SelectMany(x => x.AssignedPermissions).Count());
+            Assert.AreEqual(defaultPermissionCount, permissions[content[2].Id][userGroup3.Id].SelectMany(x => x.AssignedPermissions).Count());
         }
 
         [Test]

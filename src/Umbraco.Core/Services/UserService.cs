@@ -848,19 +848,12 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         public EntityPermissionCollection GetPermissions(IUser user, params int[] nodeIds)
         {
-            var result = new EntityPermissionCollection();
-
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateUserGroupRepository(uow);
 
-                foreach (var permission in repository.GetPermissions(user.Groups.ToArray(), true, nodeIds))
-                {
-                    result.Add(permission);
-                }
-            }
-            
-            return result;
+                return repository.GetPermissions(user.Groups.ToArray(), true, nodeIds);
+            }            
         }
 
         /// <summary>

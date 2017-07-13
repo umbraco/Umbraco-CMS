@@ -9,15 +9,15 @@ using Umbraco.Core.Events;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using DeleteEventArgs = umbraco.cms.businesslogic.DeleteEventArgs;
 
 namespace umbraco.BusinessLogic
 {
-    /// <summary>
-    /// Summary description for Permission.
-    /// </summary>
+    [Obsolete("This is no longer used and will be removed in future versions, use the IUserService to manage permissions for Users")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class Permission
     {
 

@@ -119,16 +119,22 @@ namespace Umbraco.Core.Persistence.Repositories
             // If requested, and no permissions are assigned to a particular node, then we will fill in those permissions with the group's defaults
             if (fallbackToDefaultPermissions)
             {
+                //if no node ids are passed in, then we need to determine the node ids for the explicit permissions set
+                nodeIds = nodeIds.Length == 0
+                    ? explicitPermissions.Select(x => x.EntityId).Distinct().ToArray()
+                    : nodeIds;
+
+                //if there are still no nodeids we can just exit
+                if (nodeIds.Length == 0)
+                    return result;
+
                 foreach (var group in groups)
                 {
-                    var missingIds = nodeIds.Except(result.Select(x => x.EntityId)).ToArray();
-                    if (missingIds.Length > 0)
+                    foreach (var nodeId in nodeIds)
                     {
-                        foreach (var permission in missingIds
-                            .Select(i => new EntityPermission(group.Id, i, group.Permissions.ToArray(), isDefaultPermissions: true)))
-                        {
-                            result.Add(permission);
-                        }
+                        var defaultPermission = new EntityPermission(group.Id, nodeId, group.Permissions.ToArray(), isDefaultPermissions: true);
+                        //Since this is a hashset, this will not add anything that already exists by group/node combination
+                        result.Add(defaultPermission);
                     }
                 }                
             }
