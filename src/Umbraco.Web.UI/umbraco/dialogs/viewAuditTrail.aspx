@@ -5,6 +5,7 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 <style type="text/css">
+body{overflow:hidden;overflow-y:scroll}
 .gridHeader{border-bottom:2px solid #D9D7D7;}
 .gridItem{border-color: #D9D7D7;}
 </style>
