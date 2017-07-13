@@ -30,6 +30,8 @@
                 if ($scope.model.config.max <= 0 || $scope.model.value.length < $scope.model.config.max) {
                     $scope.model.value.push({ value: "" });
 
+                    //Focus on the newly added value
+                  $scope.focusMe = true;
                 }
                 break;
             case 8:
