@@ -167,7 +167,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _permissionRepository.AssignPermission(groupId, permission, entityIds);
         }
 
-        #region Overrides of RepositoryBase<int,IUserType>
+        #region Overrides of RepositoryBase<int,IUserGroup>
 
         protected override IUserGroup PerformGet(int id)
         {

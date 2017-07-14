@@ -176,6 +176,12 @@ namespace Umbraco.Core.Services
             string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
+        /// Returns a paged collection of descendants
+        /// </summary>
+        IEnumerable<IUmbracoEntity> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
+
+        /// <summary>
         /// Returns a paged collection of descendants from the root
         /// </summary>
         /// <param name="umbracoObjectType"></param>

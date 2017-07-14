@@ -250,6 +250,13 @@ namespace Umbraco.Web.Editors
         }
 
         #region GetChildren
+
+        private int[] _userStartNodes;
+        protected int[] UserStartNodes
+        {
+            get { return _userStartNodes ?? (_userStartNodes = Security.CurrentUser.AllStartMediaIds); }
+        }
+
         /// <summary>
         /// Returns the child media objects - using the entity INT id
         /// </summary>
@@ -262,6 +269,25 @@ namespace Umbraco.Web.Editors
             bool orderBySystemField = true,
             string filter = "")
         {
+            //if a request is made for the root node data but the user's start node is not the default, then
+            // we need to return their start nodes
+            if (id == Constants.System.Root && UserStartNodes.Length > 0 && UserStartNodes.Contains(Constants.System.Root) == false)
+            {
+                if (pageNumber > 0)
+                    return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(0, 0, 0);
+                var nodes = Services.MediaService.GetByIds(UserStartNodes).ToArray();
+                if (nodes.Length == 0)
+                    return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(0, 0, 0);
+                if (pageSize < nodes.Length) pageSize = nodes.Length; // bah
+                var pr = new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(nodes.Length, pageNumber, pageSize)
+                {
+                    Items = nodes.Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>)
+                };
+                return pr;
+            }
+
+            // else proceed as usual
+
             long totalChildren;
             IMedia[] children;
             if (pageNumber > 0 && pageSize > 0)

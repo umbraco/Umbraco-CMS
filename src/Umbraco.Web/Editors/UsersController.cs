@@ -546,6 +546,23 @@ namespace Umbraco.Web.Editors
                 Services.TextService.Localize("speechBubbles/enableUserSuccess", new[] { users[0].Name }));            
         }
 
+        public HttpResponseMessage PostSetUserGroupsOnUsers([FromUri]string[] userGroupAliases, [FromUri]int[] userIds)
+        {
+            var users = Services.UserService.GetUsersById(userIds).ToArray();
+            var userGroups = Services.UserService.GetUserGroupsByAlias(userGroupAliases).Select(x => x.ToReadOnlyGroup()).ToArray();
+            foreach (var u in users)
+            {
+                u.ClearGroups();
+                foreach (var userGroup in userGroups)
+                {
+                    u.AddGroup(userGroup);
+                }
+            }
+            Services.UserService.Save(users);
+            return Request.CreateNotificationSuccessResponse(
+                Services.TextService.Localize("speechBubbles/setUserGroupOnUsersSuccess"));
+        }
+
         public class PagedUserResult : PagedResult<UserBasic>
         {
             public PagedUserResult(long totalItems, long pageNumber, long pageSize) : base(totalItems, pageNumber, pageSize)

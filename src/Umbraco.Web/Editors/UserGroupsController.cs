@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using AutoMapper;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -86,6 +85,22 @@ namespace Umbraco.Web.Editors
             var display =  Mapper.Map<UserGroupDisplay>(found);
 
             return display;
+        }
+
+        [HttpPost]
+        [HttpDelete]
+        public HttpResponseMessage PostDeleteUserGroups([FromUri] int[] userGroupIds)
+        {
+            var userGroups = Services.UserService.GetAllUserGroups(userGroupIds).ToArray();
+            foreach (var userGroup in userGroups)
+            {
+                Services.UserService.DeleteUserGroup(userGroup);
+            }
+            if (userGroups.Length > 1)
+                return Request.CreateNotificationSuccessResponse(
+                    Services.TextService.Localize("speechBubbles/deleteUserGroupsSuccess", new[] {userGroups.Length.ToString()}));
+            return Request.CreateNotificationSuccessResponse(
+                Services.TextService.Localize("speechBubbles/deleteUserGroupSuccess", new[] {userGroups[0].Name}));
         }
     }
 }

@@ -24,6 +24,8 @@
         vm.newUser.userGroups = [];
         vm.usersViewState = 'overview';
 
+        vm.selectedBulkUserGroups = [];
+
         vm.allowDisableUser = true;
         vm.allowEnableUser = true;
         vm.allowSetUserGroup = true;
@@ -73,6 +75,7 @@
         vm.clickUser = clickUser;
         vm.disableUsers = disableUsers;
         vm.enableUsers = enableUsers;
+        vm.openBulkUserGroupPicker = openBulkUserGroupPicker;
         vm.openUserGroupPicker = openUserGroupPicker;
         vm.removeSelectedUserGroup = removeSelectedUserGroup;
         vm.selectAll = selectAll;
@@ -216,13 +219,47 @@
         }
 
         function getUserFromArrayById(userId, users) {
-            var userFound;
-            angular.forEach(users, function(user){
-                if(userId === user.id) {
-                    userFound = user;
+            return _.find(users, function(u) { return u.id === userId });
+        }
+
+        function openBulkUserGroupPicker(event) {
+            var firstSelectedUser = getUserFromArrayById(vm.selection[0], vm.users);
+
+            vm.selectedBulkUserGroups = _.clone(firstSelectedUser.userGroups);
+
+            vm.userGroupPicker = {
+                title: "Select user groups",
+                view: "usergrouppicker",
+                selection: vm.selectedBulkUserGroups,
+                closeButtonLabel: "Cancel",
+                show: true,
+                submit: function (model) {
+                    usersResource.setUserGroupsOnUsers(model.selection, vm.selection).then(function (data) {
+                        // sorting to ensure they show up in right order when updating the UI
+                        vm.selectedBulkUserGroups.sort(function (a, b) {
+                            return a.alias > b.alias ? 1 : a.alias < b.alias ? -1 : 0;
+                        });
+                        // apply changes to UI
+                        _.each(vm.selection,
+                            function(userId) {
+                                var user = getUserFromArrayById(userId, vm.users);
+                                user.userGroups = vm.selectedBulkUserGroups;
+                            });
+                        vm.selectedBulkUserGroups = [];
+                        vm.userGroupPicker.show = false;
+                        vm.userGroupPicker = null;
+                        formHelper.showNotifications(data);
+                        clearSelection();
+                    }, function (error) {
+                        formHelper.showNotifications(error.data);
+                    });
+                },
+                close: function (oldModel) {
+                    vm.selectedBulkUserGroups = [];
+                    vm.userGroupPicker.show = false;
+                    vm.userGroupPicker = null;
                 }
-            });
-            return userFound;
+            };
         }
 
         function openUserGroupPicker(event) {
@@ -488,6 +525,8 @@
             vm.allowEnableUser = true;
             vm.allowSetUserGroup = true;
 
+            var firstSelectedUserGroups;
+
             angular.forEach(users, function (user) {
 
                 if (!user.selected) {
@@ -514,6 +553,19 @@
                     vm.allowEnableUser = false;
                 }
 
+                // store the user group aliases of the first selected user
+                if (!firstSelectedUserGroups) {
+                    firstSelectedUserGroups = user.userGroups.map(function (ug) { return ug.alias; });
+                    vm.allowSetUserGroup = true;
+                } else if (vm.allowSetUserGroup === true) {
+                    // for 2nd+ selected user, compare the user group aliases to determine if we should allow bulk editing.
+                    // we don't allow bulk editing of users not currently having the same assigned user groups, as we can't
+                    // really support that in the user group picker.
+                    var userGroups = user.userGroups.map(function(ug) { return ug.alias; });
+                    if (_.difference(firstSelectedUserGroups, userGroups).length > 0) {
+                        vm.allowSetUserGroup = false;
+                    }
+                }
             });
         }
 
