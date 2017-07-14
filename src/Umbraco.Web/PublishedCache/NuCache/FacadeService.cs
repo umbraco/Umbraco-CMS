@@ -427,7 +427,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void LockAndLoadDomains()
         {
-            _domainStore.WriteLocked(() =>
+            using (_domainStore.GetWriter(_scopeProvider))
             {
                 using (var uow = _uowProvider.CreateUnitOfWork())
                 {
@@ -435,7 +435,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     LoadDomainsLocked();
                     uow.Complete();
                 }
-            });
+            }
         }
 
         private void LoadDomainsLocked()
@@ -758,7 +758,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (_isReady == false)
                 return;
 
-            _domainStore.WriteLocked(() =>
+            using (_domainStore.GetWriter(_scopeProvider))
             {
                 foreach (var payload in payloads)
                 {
@@ -787,7 +787,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                             break;
                     }
                 }
-            });
+            }
         }
 
         #endregion

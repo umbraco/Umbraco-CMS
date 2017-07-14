@@ -9,15 +9,15 @@ namespace Umbraco.Core.Scoping
     {
         private bool _using, _scoped;
 
-        public static T Get<T>(IScopeProvider scopeProvider, string key, Func<T> ctor)
+        public static T Get<T>(IScopeProvider scopeProvider, string key, Func<bool, T> ctor)
             where T : ScopeContextualBase
         {
             var scopeContext = scopeProvider.Context;
             if (scopeContext == null)
-                return ctor();
+                return ctor(false);
 
             var w = scopeContext.Enlist("ScopeContextualBase_" + key,
-                ctor,
+                () => ctor(true),
                 (completed, item) => { item.Release(completed); });
 
             if (w._using) throw new InvalidOperationException("panic: used.");

@@ -632,7 +632,7 @@ namespace Umbraco.Tests.Cache
             Assert.AreEqual(1, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            d.WriteLocked(() =>
+            using (d.GetWriter(GetScopeProvider()))
             {
                 var s1 = d.CreateSnapshot();
 
@@ -640,7 +640,7 @@ namespace Umbraco.Tests.Cache
                 Assert.AreEqual(1, d.Test.LiveGen);
                 Assert.IsTrue(d.Test.NextGen);
                 Assert.IsNull(s1.Get(1));
-            });
+            }
 
             var s2 = d.CreateSnapshot();
 
@@ -685,7 +685,7 @@ namespace Umbraco.Tests.Cache
             Assert.IsFalse(d.Test.NextGen);
             Assert.AreEqual("uno", s2.Get(1));
 
-            d.WriteLocked(() =>
+            using (d.GetWriter(GetScopeProvider()))
             {
                 // gen 3
                 Assert.AreEqual(2, d.Test.GetValues(1).Length);
@@ -701,7 +701,7 @@ namespace Umbraco.Tests.Cache
                 Assert.AreEqual(3, d.Test.LiveGen);
                 Assert.IsTrue(d.Test.NextGen); // has NOT changed when (non) creating snapshot
                 Assert.AreEqual("uno", s3.Get(1));
-            });
+            }
 
             var s4 = d.CreateSnapshot();
 
@@ -717,13 +717,14 @@ namespace Umbraco.Tests.Cache
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
 
-            d.WriteLocked(() =>
+            var scopeProvider = GetScopeProvider();
+            using (d.GetWriter(scopeProvider))
             {
-                d.WriteLocked(() =>
+                using (d.GetWriter(scopeProvider))
                 {
                     d.Set(1, "one");
-                });
-            });
+                }
+            }
         }
 
         [Test]
@@ -761,9 +762,7 @@ namespace Umbraco.Tests.Cache
             Assert.IsFalse(d.Test.NextGen);
             Assert.AreEqual("uno", s2.Get(1));
 
-            var scopeProviderMock = new Mock<IScopeProvider>();
-            scopeProviderMock.Setup(x => x.Context).Returns<ScopeContext>(null);
-            var scopeProvider = scopeProviderMock.Object;
+            var scopeProvider = GetScopeProvider();
 
             using (d.GetWriter(scopeProvider))
             {
@@ -808,9 +807,7 @@ namespace Umbraco.Tests.Cache
             Assert.AreEqual(2, s2.Gen);
             Assert.AreEqual("uno", s2.Get(1));
 
-            var scopeProviderMock = new Mock<IScopeProvider>();
-            scopeProviderMock.Setup(x => x.Context).Returns<ScopeContext>(null);
-            var scopeProvider = scopeProviderMock.Object;
+            var scopeProvider = GetScopeProvider();
 
             using (d.GetWriter(scopeProvider))
             {
@@ -849,10 +846,7 @@ namespace Umbraco.Tests.Cache
             Assert.AreEqual(2, s2.Gen);
             Assert.AreEqual("uno", s2.Get(1));
 
-            var scopeProviderMock = new Mock<IScopeProvider>();
-            var scopeContext = new ScopeContext();
-            scopeProviderMock.Setup(x => x.Context).Returns(scopeContext);
-            var scopeProvider = scopeProviderMock.Object;
+            var scopeProvider = GetScopeProvider(true);
 
             using (d.GetWriter(scopeProvider))
             {
@@ -873,7 +867,7 @@ namespace Umbraco.Tests.Cache
             Assert.AreEqual(2, s4.Gen);
             Assert.AreEqual("uno", s4.Get(1));
 
-            scopeContext.ScopeExit(true);
+            ((ScopeContext) scopeProvider.Context).ScopeExit(true);
 
             var s5 = d.CreateSnapshot();
             Assert.AreEqual(3, s5.Gen);
@@ -959,6 +953,15 @@ namespace Umbraco.Tests.Cache
             Assert.AreEqual(4, all.Length);
             Assert.AreEqual("uno", all[0]);
             Assert.AreEqual("four", all[3]);
+        }
+
+        private IScopeProvider GetScopeProvider(bool withContext = false)
+        {
+            var scopeProviderMock = new Mock<IScopeProvider>();
+            var scopeContext = withContext ? new ScopeContext() : null;
+            scopeProviderMock.Setup(x => x.Context).Returns(scopeContext);
+            var scopeProvider = scopeProviderMock.Object;
+            return scopeProvider;
         }
     }
 }

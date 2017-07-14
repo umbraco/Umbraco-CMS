@@ -53,6 +53,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Locking
 
+        // read and write locks are not exclusive
+        // it is not possible to write-lock while someone is read-locked
+        // it is possible to read-lock while someone is write-locked
+        //
+        // so when getting a read-lock,
+        //  either we are write-locked or not, but if not, we won't be write-locked
+        //  otoh the write-lock may be released in the meantime
+
         // Lock has a 'forceGen' parameter:
         //  used to start a set of changes that may not commit, to isolate the set from any pending
         //  changes that would not have been snapshotted yet, so they cannot be rolled back by accident
@@ -67,43 +75,47 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private readonly string _instanceId = Guid.NewGuid().ToString("N");
 
-        // a scope contextual that represents a locked writer to the dictionary
-        private class SnapDictionaryWriter : ScopeContextualBase
+        private class ReadLockInfo
         {
-            private SnapDictionary<TKey, TValue> _dictionary;
-            private WriteLock _wl;
-
-            public SnapDictionaryWriter(SnapDictionary<TKey, TValue> dictionary)
-            {
-                _dictionary = dictionary;
-                _wl = new WriteLock();
-                dictionary.Lock(_wl, true);
-            }
-
-            public override void Release(bool completed)
-            {
-                if (_wl == null) return;
-                _dictionary.Release(_wl, completed);
-                _wl = null;
-                _dictionary = null;
-            }
+            public bool Taken;
         }
 
-        // gets a scope contextual representing a locked writer to the dictionary
-        public IDisposable GetWriter(IScopeProvider scopeProvider)
-        {
-            return ScopeContextualBase.Get(scopeProvider, _instanceId, () => new SnapDictionaryWriter(this));
-        }
-
-        private class WriteLock
+        private class WriteLockInfo
         {
             public bool Taken;
             public bool Count;
         }
 
-        private void Lock(WriteLock wl, bool forceGen)
+        // a scope contextual that represents a locked writer to the dictionary
+        private class SnapDictionaryWriter : ScopeContextualBase
         {
-            Monitor.Enter(_wlocko, ref wl.Taken);
+            private readonly WriteLockInfo _lockinfo = new WriteLockInfo();
+            private SnapDictionary<TKey, TValue> _dictionary;
+
+            public SnapDictionaryWriter(SnapDictionary<TKey, TValue> dictionary, bool scoped)
+            {
+                _dictionary = dictionary;
+                dictionary.Lock(_lockinfo, scoped);
+            }
+
+            public override void Release(bool completed)
+            {
+                if (_dictionary == null) return;
+                _dictionary.Release(_lockinfo, completed);
+                _dictionary = null;
+            }
+        }
+
+        // gets a scope contextual representing a locked writer to the dictionary
+        // fixme GetScopedWriter? should the dict have a ref onto the scope provider?
+        public IDisposable GetWriter(IScopeProvider scopeProvider)
+        {
+            return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new SnapDictionaryWriter(this, scoped));
+        }
+
+        private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
+        {
+            Monitor.Enter(_wlocko, ref lockInfo.Taken);
 
             var rtaken = false;
             try
@@ -116,12 +128,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // http://joeduffyblog.com/2007/02/07/introducing-the-new-readerwriterlockslim-in-orcas/
                 // http://chabster.blogspot.fr/2013/12/readerwriterlockslim-fails-on-dual.html
                 //RuntimeHelpers.PrepareConstrainedRegions();
-                try
-                { }
-                finally
+                try { } finally
                 {
                     _wlocked++;
-                    wl.Count = true;
+                    lockInfo.Count = true;
                     if (_nextGen == false || (forceGen && _wlocked == 1)) // if true already... ok to have "holes" in generation objects
                     {
                         // because we are changing things, a new generation
@@ -137,12 +147,29 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        private void Release(WriteLock wl, bool commit = true)
+        private void Lock(ReadLockInfo lockInfo)
+        {
+            Monitor.Enter(_rlocko, ref lockInfo.Taken);
+        }
+
+        private void Release(WriteLockInfo lockInfo, bool commit = true)
         {
             if (commit == false)
             {
-                _nextGen = false;
-                _liveGen -= 1;
+                var rtaken = false;
+                try
+                {
+                    Monitor.Enter(_rlocko, ref rtaken);
+                    try { } finally
+                    {
+                        _nextGen = false;
+                        _liveGen -= 1;
+                    }
+                }
+                finally
+                {
+                    if (rtaken) Monitor.Exit(_rlocko);
+                }
 
                 foreach (var item in _items)
                 {
@@ -157,56 +184,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
             }
 
-            if (wl.Count) _wlocked--;
-            if (wl.Taken) Monitor.Exit(_wlocko);
+            if (lockInfo.Count) _wlocked--;
+            if (lockInfo.Taken) Monitor.Exit(_wlocko);
         }
 
-        public void WriteLocked(Action action)
+        private void Release(ReadLockInfo lockInfo)
         {
-            var wl = new WriteLock();
-            try
-            {
-                // lock (again) - don't force a next gen if there's already one
-                Lock(wl, false);
-                action();
-            }
-            finally
-            {
-                Release(wl);
-            }
-        }
-
-        public T WriteLocked<T>(Func<T> func)
-        {
-            var wl = new WriteLock();
-            try
-            {
-                // lock (again) - don't force a next gen if there's already one
-                Lock(wl, false);
-                return func();
-            }
-            finally
-            {
-                Release(wl);
-            }
-        }
-
-        private T ReadLocked<T>(Func<bool, T> func)
-        {
-            var rtaken = false;
-            try
-            {
-                Monitor.Enter(_rlocko, ref rtaken);
-
-                // we have rlock, so it cannot ++
-                // it could -- though, so... volatile
-                var wlocked = _wlocked > 0;
-                return func(wlocked);
-            }
-            finally
-            {
-                if (rtaken) Monitor.Exit(_rlocko);
-            }
+            if (lockInfo.Taken) Monitor.Exit(_rlocko);
         }
 
         #endregion
@@ -223,8 +207,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public void Set(TKey key, TValue value)
         {
-            WriteLocked(() =>
+            var lockInfo = new WriteLockInfo();
+            try
             {
+                Lock(lockInfo);
+
                 // this is safe only because we're write-locked
                 var link = GetHead(key);
                 if (link != null)
@@ -251,7 +238,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     _items.TryAdd(key, new LinkedNode(value, _liveGen));
                 }
-            });
+            }
+            finally
+            {
+                Release(lockInfo);
+            }
         }
 
         public void Clear(TKey key)
@@ -261,8 +252,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public void Clear()
         {
-            WriteLocked(() =>
+            var lockInfo = new WriteLockInfo();
+            try
             {
+                Lock(lockInfo);
+
                 // this is safe only because we're write-locked
                 foreach (var kvp in _items.Where(x => x.Value != null))
                 {
@@ -276,7 +270,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         kvp.Value.Value = null;
                     }
                 }
-            });
+            }
+            finally
+            {
+                Release(lockInfo);
+            }
         }
 
         public TValue Get(TKey key, long gen)
@@ -335,8 +333,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public Snapshot CreateSnapshot()
         {
-            return ReadLocked(wlocked =>
+            var lockInfo = new ReadLockInfo();
+            try
             {
+                Lock(lockInfo);
+
                 // if no next generation is required, and we already have one,
                 // use it and create a new snapshot
                 if (_nextGen == false && _generationObject != null)
@@ -345,7 +346,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // else we need to try to create a new gen ref
                 // whether we are wlocked or not, noone can rlock while we do,
                 // so _liveGen and _nextGen are safe
-                if (wlocked)
+                if (_wlocked > 0) // volatile, cannot ++ but could --
                 {
                     // write-locked, cannot use latest gen (at least 1) so use previous
                     var snapGen = _nextGen ? _liveGen - 1 : _liveGen;
@@ -379,7 +380,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     CollectAsyncLocked();
 
                 return snapshot;
-            });
+            }
+            finally
+            {
+                Release(lockInfo);
+            }
         }
 
         public Task CollectAsync()
