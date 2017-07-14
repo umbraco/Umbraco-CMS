@@ -87,6 +87,8 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        [HttpPost]
+        [HttpDelete]
         public HttpResponseMessage PostDeleteUserGroups([FromUri] int[] userGroupIds)
         {
             var userGroups = Services.UserService.GetAllUserGroups(userGroupIds).ToArray();
