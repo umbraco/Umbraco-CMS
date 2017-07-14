@@ -47,7 +47,7 @@
         <umb-editor-sub-header-section>
           <umb-button type="button"
                       label="Clear selection"
-                            size="xs"
+                      size="xs"
                       label-key="buttons_clearSelection"
                       action="vm.clearSelection()"
                       disabled="actionInProgress">
@@ -60,32 +60,32 @@
 
       <umb-editor-sub-header-content-right ng-if="vm.selection.length > 0">
         <div style="margin-right: 5px;">
-          <umb-button ng-if="vm.allowSetUserGroup"
-                      type="button"
-                            size="xs"
-                      label="Set group"
-                      icon="icon-users"
-                      action="vm.setUserGroup()">
+            <umb-button ng-if="vm.allowSetUserGroup"
+                        type="button"
+                        size="xs"
+                        label="Set group"
+                        icon="icon-users"
+                        action="vm.openBulkUserGroupPicker()">
           </umb-button>
         </div>
         <div style="margin-right: 5px;">
-          <umb-button ng-if="vm.allowEnableUser"
-                      type="button"
-                            size="xs"
-                            state="vm.enableUserButtonState"
-                      label="Enable"
-                      icon="icon-check"
-                            action="vm.enableUsers()">
+            <umb-button ng-if="vm.allowEnableUser"
+                        type="button"
+                        size="xs"
+                        state="vm.enableUserButtonState"
+                        label="Enable"
+                        icon="icon-check"
+                        action="vm.enableUsers()">
           </umb-button>
         </div>
         <div>
-          <umb-button ng-if="vm.allowDisableUser"
-                      type="button"
-                            size="xs"
-                            state="vm.disableUserButtonState"
-                      label="Disable"
-                      icon="icon-block"
-                            action="vm.disableUsers()">
+            <umb-button ng-if="vm.allowDisableUser"
+                        type="button"
+                        size="xs"
+                        state="vm.disableUserButtonState"
+                        label="Disable"
+                        icon="icon-block"
+                        action="vm.disableUsers()">
           </umb-button>
         </div>
       </umb-editor-sub-header-content-right>

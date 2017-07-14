@@ -55,6 +55,18 @@
                 'Failed to enable the users ' + userIds.join(","));
         }
 
+        function setUserGroupsOnUsers(userGroups, userIds) {
+            var userGroupAliases = userGroups.map(function(o) { return o.alias; });
+            var query = "userGroupAliases=" + userGroupAliases.join("&userGroupAliases=") + "&userIds=" + userIds.join("&userIds=");
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "userApiBaseUrl",
+                        "PostSetUserGroupsOnUsers",
+                        query)),
+                'Failed to set user groups ' + userGroupAliases.join(",") + ' on the users ' + userIds.join(","));
+        }
+
         function getPagedResults(options) {
             var defaults = {
                 pageSize: 25,
@@ -173,6 +185,7 @@
         var resource = {
             disableUsers: disableUsers,
             enableUsers: enableUsers,
+            setUserGroupsOnUsers: setUserGroupsOnUsers,
             getPagedResults: getPagedResults,
             getUser: getUser,
             createUser: createUser,
