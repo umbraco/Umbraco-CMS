@@ -24,17 +24,22 @@ function Build-UmbracoDocs
 
   Write-Host "Build UI documentation"
 
-  push-location "$src\Umbraco.Web.UI.Client"
+    # get a temp clean path (will be restored)
   $p = $env:path
-  $env:path = $uenv.NpmPath + ";" + $uenv.NodePath + ";" + $env:path
-  
-  write "cache clean" > $tmp\belle-docs.log
+  $nodePath = $uenv.NodePath
+  $gitExe = (get-command git).Source  
+  $gitPath = [System.IO.Path]::GetDirectoryName($gitExe)
+  $env:path = "$nodePath;$gitPath"
+ 
+  push-location "$src\Umbraco.Web.UI.Client"
+  write "" > $tmp\belle-docs.log
   &npm cache clean --quiet >> $tmp\belle-docs.log 2>&1
   &npm install --quiet >> $tmp\belle-docs.log 2>&1
   &npm install -g grunt-cli --quiet >> $tmp\belle-docs.log 2>&1
   #&npm install -g bower --quiet >> $tmp\belle.log 2>&1
   #&grunt build --buildversion=$version.Release >> $tmp\belle.log 2>&1
   &grunt --gruntfile "$src/Umbraco.Web.UI.Client/gruntfile.js" docs >> $tmp\belle-docs.log 2>&1
+  pop-location
   
   # fixme - should we filter the log to find errors?
   #get-content .\build.tmp\belle-docs.log | %{ if ($_ -match "build") { write $_}}
@@ -45,7 +50,6 @@ function Build-UmbracoDocs
   (Get-Content $indexPath).Replace("location.href.replace(rUrl, indexFile)", "'$baseUrl'") `
     | Set-Content $indexPath
     
-  pop-location
   $env:path = $p
   
   # zip
@@ -100,8 +104,7 @@ function Get-DocFx($uenv, $buildTemp)
   {
     Write-Host "Download DocFx..."
     $source = "https://github.com/dotnet/docfx/releases/download/v2.19.2/docfx.zip"
-    $client = new-object Net.WebClient
-    $client.DownloadFile($source, "$buildTemp\docfx.zip")
+    Invoke-WebRequest $source -OutFile "$buildTemp\docfx.zip"
     
     &$uenv.Zip x "$buildTemp\docfx.zip" -o"$buildTemp\docfx" -aos > $nul
     Remove-File "$buildTemp\docfx.zip"  

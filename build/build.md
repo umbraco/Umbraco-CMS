@@ -14,6 +14,10 @@ By default, this builds the current version. It is possible to specify a differe
 
 Valid version strings are defined in the `Set-UmbracoVersion` documentation below.
 
+## Notes
+
+Git might have issues dealing with long file paths during build. You may want/need to enable `core.longpaths` support (see [this page](https://github.com/msysgit/msysgit/wiki/Git-cannot-create-a-file-or-directory-with-a-long-path) for details).
+
 # Build
 
 The Umbraco Build solution relies on a PowerShell module. The module needs to be imported into PowerShell. From within Umbraco's repository root:
