@@ -25,16 +25,19 @@
     $scope.addRemoveOnKeyDown = function (event, index) {
         var txtBoxValue = $scope.model.value[index];
 
+        event.preventDefault();
+
         switch (event.keyCode) {
             case 13:
                 if ($scope.model.config.max <= 0 || $scope.model.value.length < $scope.model.config.max) {
                     $scope.model.value.push({ value: "" });
 
                     //Focus on the newly added value
-                  $scope.focusMe = true;
+                    $scope.focusMe = false;
                 }
                 break;
             case 8:
+
                 var remainder = [];
                 if ($scope.model.value.length > 1) {
                     if (txtBoxValue.value === "") {
@@ -44,6 +47,9 @@
                             }
                         }
                         $scope.model.value = remainder;
+
+                        // The role of this statement is to trigger the observe event
+                        $scope.focusMe = ($scope.focusMe === true) ? false : true;
                     }
                 }
                 break;
@@ -56,6 +62,7 @@
     $scope.add = function () {
         if ($scope.model.config.max <= 0 || $scope.model.value.length < $scope.model.config.max) {
             $scope.model.value.push({ value: "" });
+            $scope.focusMe = false;
         }
     };
 
@@ -67,6 +74,7 @@
             }
         }
         $scope.model.value = remainder;
+        $scope.focusMe = true;
     };
 
 }
