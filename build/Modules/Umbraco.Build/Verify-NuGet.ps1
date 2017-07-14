@@ -345,7 +345,7 @@ function Verify-NuGet
     
 "@
 
-  Write-Host "Verify NuGet consistency"
+  Write-Host ">> Verify NuGet consistency"
 
   $assem = (
     "System.Xml",

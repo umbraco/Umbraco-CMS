@@ -443,7 +443,7 @@ function Build-Umbraco
   )
   
   $target = $target.ToLowerInvariant()
-  Write-Host ">> Build-Umbraco <$target> <$configuration>"
+  Write-Host ">> Build-Umbraco <$target> <$buildConfiguration>"
 
   Write-Host "Get Build Environment"
   $uenv = Get-UmbracoBuildEnv

@@ -14,7 +14,7 @@ function Get-UmbracoBuildEnv
   {
     mkdir $path > $null
   }
-
+  
   # ensure we have NuGet
   $nuget = "$path\nuget.exe"
   $source = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
