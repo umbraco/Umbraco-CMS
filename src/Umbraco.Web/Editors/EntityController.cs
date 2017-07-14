@@ -19,6 +19,7 @@ using Umbraco.Web.Dynamics;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.Editors
@@ -541,11 +542,30 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(type);
             if (objectType.HasValue)
             {
+                IEnumerable<IUmbracoEntity> entities;
                 long totalRecords;
-                //if it's from root, don't return recycled
-                var entities = id == Constants.System.Root
-                    ? Services.EntityService.GetPagedDescendantsFromRoot(objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter, includeTrashed:false)
-                    : Services.EntityService.GetPagedDescendants(id, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
+
+                if (id == Constants.System.Root)
+                {
+                    int[] aids = null;
+                    switch (type)
+                    {
+                        case UmbracoEntityTypes.Document:
+                            aids = Security.CurrentUser.AllStartContentIds;
+                            break;
+                        case UmbracoEntityTypes.Media:
+                            aids = Security.CurrentUser.AllStartMediaIds;
+                            break;
+                    }
+
+                    entities = aids != null && aids.Length > 0
+                        ? Services.EntityService.GetPagedDescendants(aids, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter)
+                        : Services.EntityService.GetPagedDescendantsFromRoot(objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter, includeTrashed: false);
+                }
+                else
+                {
+                    entities = Services.EntityService.GetPagedDescendants(id, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
+                }
 
                 if (totalRecords == 0)
                 {
@@ -618,9 +638,17 @@ namespace Umbraco.Web.Editors
             {
                 if (startNode > 0)
                 {
+                    // descendants
+                    // "__Path: -1*,1234,*" -- the first "*" stands for path-to-1234
                     sb.Append("__Path: \\-1*\\,");
                     sb.Append(startNode.ToString(CultureInfo.InvariantCulture));
                     sb.Append("\\,* ");
+
+                    // self
+                    // "__Path: -1*,1234" -- the first "*" stands for path-to-1234
+                    sb.Append("__Path: \\-1*\\,");
+                    sb.Append(startNode.ToString(CultureInfo.InvariantCulture));
+                    sb.Append(" ");
                 }
             }
             if (startNodes.Length > 0)
@@ -917,6 +945,37 @@ namespace Umbraco.Web.Editors
                 //TODO: Need to check for Object types that support hierarchic here, some might not.
 
                 var ids = Services.EntityService.Get(id).Path.Split(',').Select(int.Parse).Distinct().ToArray();
+
+                int[] aids = null;
+                switch (entityType)
+                {
+                    case UmbracoEntityTypes.Document:
+                        aids = Security.CurrentUser.AllStartContentIds;
+                        break;
+                    case UmbracoEntityTypes.Media:
+                        aids = Security.CurrentUser.AllStartMediaIds;
+                        break;
+                }
+
+                if (aids != null && aids.Length > 0)
+                {
+                    var lids = new List<int>();
+                    var ok = false;
+                    foreach (var i in ids)
+                    {
+                        if (ok)
+                        {
+                            lids.Add(i);
+                            continue;
+                        }
+                        if (aids.Contains(i))
+                        {
+                            lids.Add(i);
+                            ok = true;
+                        }
+                    }
+                    ids = lids.ToArray();
+                }
 
                 return ids.Length == 0
                     ? Enumerable.Empty<EntityBasic>()
