@@ -104,30 +104,31 @@ function Get-UmbracoBuildEnv
     Remove-File "$path\node-v6.9.1-win-x86.7z"    
   }
   
-  # ensure we have npm
-  $npm = "$path\npm.*"
-  $getNpm = $true
-  if (test-path $npm)
-  {
-    $getNpm = $false
-    $tmpNpm = ls "$path\npm.*" | sort -property Name -descending | select -first 1
-    if ($tmpNpm.CreationTime -lt [DateTime]::Now.AddDays(-$cache))
-    {
-      $getNpm = $true
-    }
-    else
-    {
-      $npm = $tmpNpm.ToString()
-    }
-  }
-  if ($getNpm)
-  {
-    Write-Host "Download Npm..."
-    &$nuget install npm -OutputDirectory $path -Verbosity quiet
-    $npm = ls "$path\npm.*" | sort -property Name -descending | select -first 1
-    $npm.CreationTime = [DateTime]::Now
-    $npm = $npm.ToString()
-  }
+  # note: why? node already brings everything we need!
+  ## ensure we have npm
+  #$npm = "$path\npm.*"
+  #$getNpm = $true
+  #if (test-path $npm)
+  #{
+  #  $getNpm = $false
+  #  $tmpNpm = ls "$path\npm.*" | sort -property Name -descending | select -first 1
+  #  if ($tmpNpm.CreationTime -lt [DateTime]::Now.AddDays(-$cache))
+  #  {
+  #    $getNpm = $true
+  #  }
+  #  else
+  #  {
+  #    $npm = $tmpNpm.ToString()
+  #  }
+  #}
+  #if ($getNpm)
+  #{
+  #  Write-Host "Download Npm..."
+  #  &$nuget install npm -OutputDirectory $path -Verbosity quiet
+  #  $npm = ls "$path\npm.*" | sort -property Name -descending | select -first 1
+  #  $npm.CreationTime = [DateTime]::Now
+  #  $npm = $npm.ToString()
+  #}
   
   # find visual studio
   # will not work on VSO but VSO does not need it
@@ -175,7 +176,7 @@ function Get-UmbracoBuildEnv
   $uenv | add-member -memberType NoteProperty -name VsWhere -value $vswhere
   $uenv | add-member -memberType NoteProperty -name Semver -value $semver
   $uenv | add-member -memberType NoteProperty -name NodePath -value $node
-  $uenv | add-member -memberType NoteProperty -name NpmPath -value $npm
+  #$uenv | add-member -memberType NoteProperty -name NpmPath -value $npm
   
   return $uenv
 }

@@ -80,24 +80,28 @@ function Compile-Belle
   
   Write-Host ">> Compile Belle"
   Write-Host "Logging to $tmp\belle.log"
-
-  push-location "$($uenv.SolutionRoot)\src\Umbraco.Web.UI.Client"
-  $p = $env:path
-  $env:path = $uenv.NpmPath + ";" + $uenv.NodePath + ";" + $env:path
   
-  write "cache clean" > $tmp\belle.log
+  # get a temp clean path (will be restored)
+  $p = $env:path
+  $nodePath = $uenv.NodePath
+  $gitExe = (get-command git).Source  
+  $gitPath = [System.IO.Path]::GetDirectoryName($gitExe)
+  $env:path = "$nodePath;$gitPath"
+  
+  push-location "$($uenv.SolutionRoot)\src\Umbraco.Web.UI.Client"
+  write "" > $tmp\belle.log
   &npm cache clean --quiet >> $tmp\belle.log 2>&1
   &npm install --quiet >> $tmp\belle.log 2>&1
   &npm install -g grunt-cli --quiet >> $tmp\belle.log 2>&1
   &npm install -g bower --quiet >> $tmp\belle.log 2>&1
   &grunt build --buildversion=$version.Release >> $tmp\belle.log 2>&1
+  pop-location
   
   # fixme - should we filter the log to find errors?
   #get-content .\build.tmp\belle.log | %{ if ($_ -match "build") { write $_}}
-  
-  pop-location
-  $env:path = $p
 
+  # restore path
+  $env:path = $p
   
   # setting node_modules folder to hidden
   # used to prevent VS13 from crashing on it while loading the websites project
