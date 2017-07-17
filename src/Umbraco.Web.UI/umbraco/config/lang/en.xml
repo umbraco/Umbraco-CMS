@@ -514,6 +514,7 @@
     <key alias="rename">Rename</key>
     <key alias="renew">Renew</key>
     <key alias="required" version="7.0">Required</key>
+    <key alias="retrieve">Retrieve</key>
     <key alias="retry">Retry</key>
     <key alias="rights">Permissions</key>
     <key alias="search">Search</key>
@@ -1626,5 +1627,8 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="emptyStates">
     <key alias="emptyDictionaryTree">No Dictionary items to choose from</key>
+  </area>
+  <area alias="textbox">
+    <key alias="characters_left">characters left</key>
   </area>
 </language>
