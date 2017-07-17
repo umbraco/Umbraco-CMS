@@ -88,6 +88,10 @@ function Compile-Belle
   $gitPath = [System.IO.Path]::GetDirectoryName($gitExe)
   $env:path = "$nodePath;$gitPath"
   
+  Write-Host "DEBUG"
+  Write-Host "NodePath: $($uenv.NodePath)"
+  ls $uenv.NodePath
+  
   push-location "$($uenv.SolutionRoot)\src\Umbraco.Web.UI.Client"
   write "" > $tmp\belle.log
   &npm cache clean --quiet >> $tmp\belle.log 2>&1
