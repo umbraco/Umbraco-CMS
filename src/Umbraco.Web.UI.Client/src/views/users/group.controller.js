@@ -112,7 +112,7 @@
                         vm.userGroup.contentStartNode = model.selection[0];
                         if (vm.userGroup.contentStartNode.id === "-1") {
                             vm.userGroup.contentStartNode.name = "Content Root";
-                            vm.userGroup.contentStartNode.icon = "icon-document";
+                            vm.userGroup.contentStartNode.icon = "icon-folder";
                         }
                     }
                     vm.contentPicker.show = false;
@@ -133,13 +133,14 @@
                 treeAlias: "media",
                 entityType: "media",
                 hideSubmitButton: true,
+                hideHeader: false,
                 show: true,
                 submit: function (model) {
                     if (model.selection) {
                         vm.userGroup.mediaStartNode = model.selection[0];
                         if (vm.userGroup.mediaStartNode.id === "-1") {
                             vm.userGroup.mediaStartNode.name = "Media Root";
-                            vm.userGroup.mediaStartNode.icon = "icon-picture";
+                            vm.userGroup.mediaStartNode.icon = "icon-folder";
                         }
                     }
                     vm.contentPicker.show = false;

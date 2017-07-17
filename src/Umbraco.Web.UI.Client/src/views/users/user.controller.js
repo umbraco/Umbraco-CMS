@@ -131,11 +131,16 @@
                 view: "contentpicker",
                 multiPicker: true,
                 selection: vm.user.startContentIds,
+                hideHeader: false,
                 show: true,
                 submit: function (model) {
                     // select items
                     if (model.selection) {
-                        angular.forEach(model.selection, function(item){
+                        angular.forEach(model.selection, function (item) {
+                            if (item.id === "-1") {
+                                item.name = "Content Root";
+                                item.icon = "icon-folder";
+                            }
                             multiSelectItem(item, vm.user.startContentIds);
                         });
                     }
@@ -159,11 +164,16 @@
                 treeAlias: "media",
                 entityType: "media",
                 multiPicker: true,
+                hideHeader: false,
                 show: true,
                 submit: function (model) {
                     // select items
                     if (model.selection) {
-                        angular.forEach(model.selection, function(item){
+                        angular.forEach(model.selection, function (item) {
+                            if (item.id === "-1") {
+                                item.name = "Media Root";
+                                item.icon = "icon-folder";
+                            }
                             multiSelectItem(item, vm.user.startMediaIds);
                         });
                     }
