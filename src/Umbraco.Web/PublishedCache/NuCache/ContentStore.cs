@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CSharpTest.Net.Collections;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -22,7 +23,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ConcurrentDictionary<int, LinkedNode<object>> _contentRootNodes;
         private readonly ConcurrentDictionary<int, LinkedNode<PublishedContentType>> _contentTypesById;
         private readonly ConcurrentDictionary<string, LinkedNode<PublishedContentType>> _contentTypesByAlias;
-        private readonly Dictionary<int, HashSet<int>> _contentTypeNodes;
 
         private readonly ILogger _logger;
         private BPlusTree<int, ContentNodeKit> _localDb;
@@ -34,6 +34,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private bool _nextGen, _collectAuto;
         private Task _collectTask;
         private volatile int _wlocked;
+        private List<KeyValuePair<int, ContentNodeKit>> _wchanges;
 
         // fixme - collection trigger (ok for now)
         // see SnapDictionary notes
@@ -51,7 +52,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _contentRootNodes = new ConcurrentDictionary<int, LinkedNode<object>>();
             _contentTypesById = new ConcurrentDictionary<int, LinkedNode<PublishedContentType>>();
             _contentTypesByAlias = new ConcurrentDictionary<string, LinkedNode<PublishedContentType>>(StringComparer.InvariantCultureIgnoreCase);
-            _contentTypeNodes = new Dictionary<int, HashSet<int>>();
 
             _genRefRefs = new ConcurrentQueue<GenRefRef>();
             _genRefRef = null; // no initial gen exists
@@ -64,107 +64,144 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Locking
 
-        public void WriteLocked(Action action)
+        // see notes on SnapDictionary
+
+        private readonly string _instanceId = Guid.NewGuid().ToString("N");
+
+        private class ReadLockInfo
         {
-            var wtaken = false;
-            var wcount = false;
-            try
+            public bool Taken;
+        }
+
+        private class WriteLockInfo
+        {
+            public bool Taken;
+            public bool Count;
+        }
+
+        // a scope contextual that represents a locked writer to the dictionary
+        private class ContentStoreWriter : ScopeContextualBase
+        {
+            private readonly WriteLockInfo _lockinfo = new WriteLockInfo();
+            private ContentStore _store;
+
+            public ContentStoreWriter(ContentStore store, bool scoped)
             {
-                Monitor.Enter(_wlocko, ref wtaken);
-
-                var rtaken = false;
-                try
-                {
-                    Monitor.Enter(_rlocko, ref rtaken);
-
-                    // see SnapDictionary
-                    try
-                    { }
-                    finally
-                    {
-                        _wlocked++;
-                        wcount = true;
-                        if (_nextGen == false)
-                        {
-                            // because we are changing things, a new generation
-                            // is created, which will trigger a new snapshot
-                            _nextGen = true;
-                            _liveGen += 1;
-                        }
-                    }
-                }
-                finally
-                {
-                    if (rtaken) Monitor.Exit(_rlocko);
-                }
-
-                action();
+                _store = store;
+                store.Lock(_lockinfo, scoped);
             }
-            finally
+
+            public override void Release(bool completed)
             {
-                if (wcount) _wlocked--;
-                if (wtaken) Monitor.Exit(_wlocko);
+                if (_store== null) return;
+                _store.Release(_lockinfo, completed);
+                _store = null;
             }
         }
 
-        public T WriteLocked<T>(Func<T> func)
+        // gets a scope contextual representing a locked writer to the dictionary
+        // fixme GetScopedWriter? should the dict have a ref onto the scope provider?
+        public IDisposable GetWriter(IScopeProvider scopeProvider)
         {
-            var wtaken = false;
-            var wcount = false;
-            try
-            {
-                Monitor.Enter(_wlocko, ref wtaken);
-
-                var rtaken = false;
-                try
-                {
-                    Monitor.Enter(_rlocko, ref rtaken);
-
-                    try
-                    { }
-                    finally
-                    {
-                        _wlocked++;
-                        wcount = true;
-                        if (_nextGen == false)
-                        {
-                            // because we are changing things, a new generation
-                            // is created, which will trigger a new snapshot
-                            _nextGen = true;
-                            _liveGen += 1;
-                        }
-                    }
-                }
-                finally
-                {
-                    if (rtaken) Monitor.Exit(_rlocko);
-                }
-
-                return func();
-            }
-            finally
-            {
-                if (wcount) _wlocked--;
-                if (wtaken) Monitor.Exit(_wlocko);
-            }
+            return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new ContentStoreWriter(this, scoped));
         }
 
-        private T ReadLocked<T>(Func<bool, T> func)
+        private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
         {
+            Monitor.Enter(_wlocko, ref lockInfo.Taken);
+
             var rtaken = false;
             try
             {
                 Monitor.Enter(_rlocko, ref rtaken);
 
-                // we have rlock, so it cannot ++
-                // it could -- though, so... volatile
-                var wlocked = _wlocked > 0;
-                return func(wlocked);
+                // see SnapDictionary
+                try { } finally
+                {
+                    _wlocked++;
+                    lockInfo.Count = true;
+                    if (_nextGen == false || (forceGen && _wlocked == 1)) // if true already... ok to have "holes" in generation objects
+                    {
+                        // because we are changing things, a new generation
+                        // is created, which will trigger a new snapshot
+                        _nextGen = true;
+                        _liveGen += 1;
+                    }
+                }
             }
             finally
             {
                 if (rtaken) Monitor.Exit(_rlocko);
             }
+        }
+
+        private void Lock(ReadLockInfo lockInfo)
+        {
+            Monitor.Enter(_rlocko, ref lockInfo.Taken);
+        }
+
+        private void Release(WriteLockInfo lockInfo, bool commit = true)
+        {
+            if (commit == false)
+            {
+                var rtaken = false;
+                try
+                {
+                    Monitor.Enter(_rlocko, ref rtaken);
+                    try { }
+                    finally
+                    {
+                        _nextGen = false;
+                        _liveGen -= 1;
+                    }
+                }
+                finally
+                {
+                    if (rtaken) Monitor.Exit(_rlocko);
+                }
+
+                Rollback(_contentNodes);
+                Rollback(_contentRootNodes);
+                Rollback(_contentTypesById);
+                Rollback(_contentTypesByAlias);
+            }
+            else if (_localDb != null && _wchanges != null)
+            {
+                foreach (var change in _wchanges)
+                {
+                    if (change.Value.IsNull)
+                        _localDb.TryRemove(change.Key, out ContentNodeKit unused);
+                    else
+                        _localDb[change.Key] = change.Value;
+                }
+                _wchanges = null;
+                _localDb.Commit();
+            }
+
+            if (lockInfo.Count) _wlocked--;
+            if (lockInfo.Taken) Monitor.Exit(_wlocko);
+        }
+
+        private void Release(ReadLockInfo lockInfo)
+        {
+            if (lockInfo.Taken) Monitor.Exit(_rlocko);
+        }
+
+        private void Rollback<TKey, TValue>(ConcurrentDictionary<TKey, LinkedNode<TValue>> dictionary)
+            where TValue : class
+        {
+            foreach (var item in dictionary)
+            {
+                var link = item.Value;
+                if (link.Gen <= _liveGen) continue;
+
+                var key = item.Key;
+                if (link.Next == null)
+                    dictionary.TryRemove(key, out link);
+                else
+                    dictionary.TryUpdate(key, link.Next, link);
+            }
+
         }
 
         #endregion
@@ -173,12 +210,25 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public void ReleaseLocalDb()
         {
-            WriteLocked(() =>
+            var lockInfo = new WriteLockInfo();
+            try
             {
+                Lock(lockInfo);
+
                 if (_localDb == null) return;
                 _localDb.Dispose();
                 _localDb = null;
-            });
+            }
+            finally
+            {
+                Release(lockInfo);
+            }
+        }
+
+        private void RegisterChange(int id, ContentNodeKit kit)
+        {
+            if (_wchanges == null) _wchanges = new List<KeyValuePair<int, ContentNodeKit>>();
+            _wchanges.Add(new KeyValuePair<int, ContentNodeKit>(id, kit));
         }
 
         #endregion
@@ -187,97 +237,119 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public void UpdateContentTypes(IEnumerable<int> removedIds, IEnumerable<PublishedContentType> refreshedTypes, IEnumerable<ContentNodeKit> kits)
         {
-            removedIds = removedIds ?? Enumerable.Empty<int>();
-            refreshedTypes = refreshedTypes ?? Enumerable.Empty<PublishedContentType>();
-            kits = kits ?? new ContentNodeKit[0];
+            var removedIdsA = removedIds?.ToArray() ?? Array.Empty<int>();
+            var refreshedTypesA = refreshedTypes?.ToArray() ?? Array.Empty<PublishedContentType>();
+            var refreshedIdsA = refreshedTypesA.Select(x => x.Id).ToArray();
+            kits = kits ?? Array.Empty<ContentNodeKit>();
 
-            WriteLocked(() =>
+            var lockInfo = new WriteLockInfo();
+            try
             {
-                foreach (var id in removedIds)
-                {
-                    // all content should have been deleted - but
-                    if (_contentTypeNodes.ContainsKey(id))
-                    {
-                        foreach (var node in _contentTypeNodes[id])
-                            ClearBranchLocked(node);
-                        _contentTypeNodes.Remove(id);
-                    }
+                Lock(lockInfo);
 
+                var removedContentTypeNodes = new List<int>();
+                var refreshedContentTypeNodes = new List<int>();
+
+                foreach (var link in _contentNodes.Values)
+                {
+                    var node = link.Value;
+                    if (node == null) continue;
+                    var contentTypeId = node.ContentType.Id;
+                    if (removedIdsA.Contains(contentTypeId)) removedContentTypeNodes.Add(node.Id);
+                    if (refreshedIdsA.Contains(contentTypeId)) refreshedContentTypeNodes.Add(node.Id);
+                }
+
+                // all content should have been deleted - but
+                foreach (var node in removedContentTypeNodes)
+                    ClearBranchLocked(node);
+
+                foreach (var id in removedIdsA)
+                {
                     if (_contentTypesById.TryGetValue(id, out LinkedNode<PublishedContentType> link) == false || link.Value == null)
                         continue;
                     SetValueLocked(_contentTypesById, id, null);
                     SetValueLocked(_contentTypesByAlias, link.Value.Alias, null);
                 }
 
-                var temp = new Dictionary<int, HashSet<int>>();
-
-                foreach (var type in refreshedTypes)
+                foreach (var type in refreshedTypesA)
                 {
-                    if (_contentTypeNodes.ContainsKey(type.Id) == false)
-                        _contentTypeNodes[type.Id] = new HashSet<int>();
-
                     SetValueLocked(_contentTypesById, type.Id, type);
                     SetValueLocked(_contentTypesByAlias, type.Alias, type);
-
-                    temp.Add(type.Id, new HashSet<int>(_contentTypeNodes[type.Id]));
                 }
 
                 // skip missing type
                 // skip missing parents & unbuildable kits - what else could we do?
+                var visited = new List<int>();
                 foreach (var kit in kits.Where(x =>
-                    temp.ContainsKey(x.ContentTypeId) &&
+                    refreshedIdsA.Contains(x.ContentTypeId) &&
                     ParentExistsLocked(x) &&
                     BuildKit(x)))
                 {
                     SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
-                    if (_localDb != null)
-                        _localDb[kit.Node.Id] = kit;
-                    temp[kit.ContentTypeId].Remove(kit.Node.Id);
+                    visited.Add(kit.Node.Id);
+                    if (_localDb != null) RegisterChange(kit.Node.Id, kit);
                 }
 
                 // all content should have been refreshed - but...
-                foreach (var id in temp.Values.SelectMany(x => x))
-                    ClearBranchLocked(id);
 
-                _localDb?.Commit();
-            });
+                var orphans = refreshedContentTypeNodes.Except(visited);
+                foreach (var id in orphans)
+                    ClearBranchLocked(id);
+            }
+            finally
+            {
+                Release(lockInfo);
+            }
         }
 
         public void UpdateDataTypes(IEnumerable<int> dataTypeIds, Func<int, PublishedContentType> getContentType)
         {
-            WriteLocked(() =>
+            var lockInfo = new WriteLockInfo();
+            try
             {
+                Lock(lockInfo);
+
                 var contentTypes = _contentTypesById
                     .Where(kvp =>
                         kvp.Value.Value != null &&
                         kvp.Value.Value.PropertyTypes.Any(p => dataTypeIds.Contains(p.DataTypeId)))
                     .Select(kvp => kvp.Value.Value)
-                    .Select(x => getContentType(x.Id));
+                    .Select(x => getContentType(x.Id))
+                    .Where(x => x != null) // poof, gone, very unlikely and probably an anomaly
+                    .ToArray();
+
+                var contentTypeIdsA = contentTypes.Select(x => x.Id).ToArray();
+                var contentTypeNodes = new Dictionary<int, List<int>>();
+                foreach (var id in contentTypeIdsA)
+                    contentTypeNodes[id] = new List<int>();
+                foreach (var link in _contentNodes.Values)
+                {
+                    var node = link.Value;
+                    if (node != null && contentTypeIdsA.Contains(node.ContentType.Id))
+                        contentTypeNodes[node.ContentType.Id].Add(node.Id);
+                }
 
                 foreach (var contentType in contentTypes)
                 {
-                    // poof, gone, very unlikely and probably an anomaly
-                    if (contentType == null)
-                        continue;
-
                     // again, weird situation
-                    if (_contentTypeNodes.ContainsKey(contentType.Id) == false)
+                    if (contentTypeNodes.ContainsKey(contentType.Id) == false)
                         continue;
 
-                    foreach (var id in _contentTypeNodes[contentType.Id])
+                    foreach (var id in contentTypeNodes[contentType.Id])
                     {
                         _contentNodes.TryGetValue(id, out LinkedNode<ContentNode> link);
                         if (link?.Value == null)
                             continue;
                         var node = new ContentNode(link.Value, contentType, _facadeAccessor);
                         SetValueLocked(_contentNodes, id, node);
-                        if (_localDb != null)
-                            _localDb[id] = node.ToKit();
+                        if (_localDb != null) RegisterChange(id, node.ToKit());
                     }
                 }
-
-                _localDb?.Commit();
-            });
+            }
+            finally
+            {
+                Release(lockInfo);
+            }
         }
 
         private bool BuildKit(ContentNodeKit kit)
@@ -286,29 +358,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (kit.DraftData == null && kit.PublishedData == null)
                 return false;
 
-
             // unknown = bad
             if (_contentTypesById.TryGetValue(kit.ContentTypeId, out LinkedNode<PublishedContentType> link) == false || link.Value == null)
                 return false;
-
-            // not checking ByAlias, assuming we don't have internal errors
-
-            // register
-            if (_contentTypeNodes.ContainsKey(kit.ContentTypeId) == false)
-                _contentTypeNodes[kit.ContentTypeId] = new HashSet<int>();
-            _contentTypeNodes[kit.ContentTypeId].Add(kit.Node.Id);
 
             // and use
             kit.Build(link.Value, _facadeAccessor);
 
             return true;
-        }
-
-        private void ReleaseContentTypeLocked(ContentNode content)
-        {
-            if (_contentTypeNodes.ContainsKey(content.ContentType.Id) == false)
-                return; // though, ?!
-            _contentTypeNodes[content.ContentType.Id].Remove(content.Id);
         }
 
         #endregion
@@ -335,8 +392,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _logger.Debug<ContentStore>("Set content ID:" + kit.Node.Id);
 
-            WriteLocked(() =>
+            var lockInfo = new WriteLockInfo();
+            try
             {
+                Lock(lockInfo);
+
                 // get existing
                 _contentNodes.TryGetValue(kit.Node.Id, out LinkedNode<ContentNode> link);
                 var existing = link?.Value;
@@ -354,8 +414,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 // set
                 SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
-                if (_localDb != null)
-                    _localDb[kit.Node.Id] = kit;
+                if (_localDb != null) RegisterChange(kit.Node.Id, kit);
 
                 // manage the tree
                 if (existing == null)
@@ -369,15 +428,20 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     RemoveFromParentLocked(existing);
                     AddToParentLocked(kit.Node);
                 }
-
-                _localDb?.Commit();
-            });
+            }
+            finally
+            {
+                Release(lockInfo);
+            }
         }
 
         public void SetAll(IEnumerable<ContentNodeKit> kits)
         {
-            WriteLocked(() =>
+            var lockInfo = new WriteLockInfo();
+            try
             {
+                Lock(lockInfo);
+
                 ClearLocked(_contentNodes);
                 ClearLocked(_contentRootNodes);
 
@@ -389,19 +453,23 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 foreach (var kit in kits.Where(x => ParentExistsLocked(x) && BuildKit(x)))
                 {
                     SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
-                    if (_localDb != null)
-                        _localDb[kit.Node.Id] = kit;
+                    if (_localDb != null) RegisterChange(kit.Node.Id, kit);
                     AddToParentLocked(kit.Node);
                 }
-
-                _localDb?.Commit();
-            });
+            }
+            finally
+            {
+                Release(lockInfo);
+            }
         }
 
         public void SetBranch(int rootContentId, IEnumerable<ContentNodeKit> kits)
         {
-            WriteLocked(() =>
+            var lockInfo = new WriteLockInfo();
+            try
             {
+                Lock(lockInfo);
+
                 // get existing
                 _contentNodes.TryGetValue(rootContentId, out LinkedNode<ContentNode> link);
                 var existing = link?.Value;
@@ -418,19 +486,23 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 foreach (var kit in kits.Where(x => ParentExistsLocked(x) && BuildKit(x)))
                 {
                     SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
-                    if (_localDb != null)
-                        _localDb[kit.Node.Id] = kit;
+                    if (_localDb != null) RegisterChange(kit.Node.Id, kit);
                     AddToParentLocked(kit.Node);
                 }
-
-                _localDb?.Commit();
-            });
+            }
+            finally
+            {
+                Release(lockInfo);
+            }
         }
 
         public bool Clear(int id)
         {
-            return WriteLocked(() =>
+            var lockInfo = new WriteLockInfo();
+            try
             {
+                Lock(lockInfo);
+
                 // try to find the content
                 // if it is not there, nothing to do
                 _contentNodes.TryGetValue(id, out LinkedNode<ContentNode> link); // else null
@@ -446,7 +518,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 RemoveFromParentLocked(content);
 
                 return true;
-            });
+            }
+            finally
+            {
+                Release(lockInfo);
+            }
         }
 
         private void ClearBranchLocked(int id)
@@ -461,8 +537,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private void ClearBranchLocked(ContentNode content)
         {
             SetValueLocked(_contentNodes, content.Id, null);
-            _localDb?.TryRemove(content.Id, out ContentNodeKit unused);
-            ReleaseContentTypeLocked(content);
+            if (_localDb != null) RegisterChange(content.Id, ContentNodeKit.Null);
+
             foreach (var childId in content.ChildContentIds)
             {
                 if (_contentNodes.TryGetValue(childId, out LinkedNode<ContentNode> link) == false || link.Value == null) continue;
@@ -564,22 +640,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private void ClearLocked<TKey, TValue>(ConcurrentDictionary<TKey, LinkedNode<TValue>> dict)
             where TValue : class
         {
-            WriteLocked(() =>
+            // this is safe only because we're write-locked
+            foreach (var kvp in dict.Where(x => x.Value != null))
             {
-                // this is safe only because we're write-locked
-                foreach (var kvp in dict.Where(x => x.Value != null))
+                if (kvp.Value.Gen < _liveGen)
                 {
-                    if (kvp.Value.Gen < _liveGen)
-                    {
-                        var link = new LinkedNode<TValue>(null, _liveGen, kvp.Value);
-                        dict.TryUpdate(kvp.Key, link, kvp.Value);
-                    }
-                    else
-                    {
-                        kvp.Value.Value = null;
-                    }
+                    var link = new LinkedNode<TValue>(null, _liveGen, kvp.Value);
+                    dict.TryUpdate(kvp.Key, link, kvp.Value);
                 }
-            });
+                else
+                {
+                    kvp.Value.Value = null;
+                }
+            }
         }
 
         public ContentNode Get(int id, long gen)
@@ -671,8 +744,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public Snapshot CreateSnapshot()
         {
-            return ReadLocked(wlocked =>
+            var lockInfo = new ReadLockInfo();
+            try
             {
+                Lock(lockInfo);
+
                 // if no next generation is required, and we already have one,
                 // use it and create a new snapshot
                 if (_nextGen == false && _genRefRef != null)
@@ -685,7 +761,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // else we need to try to create a new gen ref
                 // whether we are wlocked or not, noone can rlock while we do,
                 // so _liveGen and _nextGen are safe
-                if (wlocked)
+                if (_wlocked > 0) // volatile, cannot ++ but could --
                 {
                     // write-locked, cannot use latest gen (at least 1) so use previous
                     var snapGen = _nextGen ? _liveGen - 1 : _liveGen;
@@ -723,7 +799,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     CollectAsyncLocked();
 
                 return snapshot;
-            });
+            }
+            finally
+            {
+                Release(lockInfo);
+            }
         }
 
         public Task CollectAsync()
@@ -759,8 +839,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 #if DEBUG
             _logger.Debug<ContentStore>("Collect.");
 #endif
-            GenRefRef genRefRef;
-            while (_genRefRefs.TryPeek(out genRefRef) && (genRefRef.Count == 0 || genRefRef.WGenRef.IsAlive == false))
+            while (_genRefRefs.TryPeek(out GenRefRef genRefRef) && (genRefRef.Count == 0 || genRefRef.WGenRef.IsAlive == false))
             {
                 _genRefRefs.TryDequeue(out genRefRef); // cannot fail since TryPeek has succeeded
                 _floorGen = genRefRef.Gen;
@@ -868,6 +947,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 set => _store._collectAuto = value;
             }
 
+            public Snapshot LiveSnapshot => new Snapshot(_store, _store._liveGen);
+
             public Tuple<long, ContentNode>[] GetValues(int id)
             {
                 _store._contentNodes.TryGetValue(id, out LinkedNode<ContentNode> link); // else null
@@ -937,6 +1018,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _logger = logger;
                 _logger.Debug<Snapshot>("Creating snapshot.");
 #endif
+            }
+
+            internal Snapshot(ContentStore store, long gen)
+            {
+                _store = store;
+                _gen = gen;
             }
 
             public ContentNode Get(int id)
@@ -1013,7 +1100,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _logger.Debug<Snapshot>("Dispose snapshot (" + _genRef.GenRefRef.Count + ").");
 #endif
                 _gen = -1;
-                Interlocked.Decrement(ref _genRef.GenRefRef.Count);
+                if (_genRef != null)
+                    Interlocked.Decrement(ref _genRef.GenRefRef.Count);
                 GC.SuppressFinalize(this);
             }
         }

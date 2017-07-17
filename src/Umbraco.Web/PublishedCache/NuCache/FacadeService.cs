@@ -228,7 +228,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void LockAndLoadContent(Action<IScopeUnitOfWork> action)
         {
-            _contentStore.WriteLocked(() =>
+            using (_contentStore.GetWriter(_scopeProvider))
             {
                 using (var uow = _uowProvider.CreateUnitOfWork())
                 {
@@ -236,7 +236,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     action(uow);
                     uow.Complete();
                 }
-            });
+            }
         }
 
         private void LoadContentFromDatabaseLocked(IScopeUnitOfWork uow)
@@ -298,7 +298,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void LockAndLoadMedia(Action<IScopeUnitOfWork> action)
         {
-            _mediaStore.WriteLocked(() =>
+            using (_mediaStore.GetWriter(_scopeProvider))
             {
                 using (var uow = _uowProvider.CreateUnitOfWork())
                 {
@@ -306,7 +306,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     action(uow);
                     uow.Complete();
                 }
-            });
+            }
         }
 
         private void LoadMediaFromDatabaseLocked(IScopeUnitOfWork uow)
@@ -481,14 +481,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return;
             }
 
-            var draftChanged2 = false;
-            var publishedChanged2 = false;
-            _contentStore.WriteLocked(() =>
+            using (_contentStore.GetWriter(_scopeProvider))
             {
-                NotifyLocked(payloads, out draftChanged2, out publishedChanged2);
-            });
-            draftChanged = draftChanged2;
-            publishedChanged = publishedChanged2;
+                NotifyLocked(payloads, out bool draftChanged2, out bool publishedChanged2);
+                draftChanged = draftChanged2;
+                publishedChanged = publishedChanged2;
+            }
 
             if (draftChanged || publishedChanged)
                 ((Facade)CurrentFacade).Resync();
@@ -581,12 +579,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return;
             }
 
-            var anythingChanged2 = false;
-            _mediaStore.WriteLocked(() =>
+            using (_mediaStore.GetWriter(_scopeProvider))
             {
-                NotifyLocked(payloads, out anythingChanged2);
-            });
-            anythingChanged = anythingChanged2;
+                NotifyLocked(payloads, out bool anythingChanged2);
+                anythingChanged = anythingChanged2;
+            }
 
             if (anythingChanged)
                 ((Facade)CurrentFacade).Resync();
@@ -686,12 +683,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 .ToArray();
 
             if (removedIds.Length > 0 || refreshedIds.Length > 0)
-                _contentStore.WriteLocked(() =>
+                using (_contentStore.GetWriter(_scopeProvider))
                 {
                     // ReSharper disable AccessToModifiedClosure
                     RefreshContentTypesLocked(removedIds, refreshedIds);
                     // ReSharper restore AccessToModifiedClosure
-                });
+                }
 
             // same for media cache
 
@@ -706,10 +703,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 .ToArray();
 
             if (removedIds.Length > 0 || refreshedIds.Length > 0)
-                _mediaStore.WriteLocked(() =>
+                using (_mediaStore.GetWriter(_scopeProvider))
                 {
                     RefreshMediaTypesLocked(removedIds, refreshedIds);
-                });
+                }
 
             ((Facade)CurrentFacade).Resync();
         }
@@ -725,9 +722,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             foreach (var payload in payloads)
                 _logger.Debug<FacadeService>($"Notified {(payload.Removed ? "Removed" : "Refreshed")} for data type {payload.Id}");
 
-            _contentStore.WriteLocked(() =>
-                _mediaStore.WriteLocked(() =>
-                {
+            using (_contentStore.GetWriter(_scopeProvider))
+            using (_mediaStore.GetWriter(_scopeProvider))
+            {
                     var contentService = _serviceContext.ContentService as ContentService;
                     if (contentService == null) throw new Exception("oops");
 
@@ -747,7 +744,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         _mediaStore.UpdateDataTypes(idsA, id => CreateContentType(PublishedItemType.Media, id));
                         uow.Complete();
                     }
-                }));
+                }
 
             ((Facade) CurrentFacade).Resync();
         }

@@ -13,6 +13,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public bool IsEmpty => Node == null;
 
+        public bool IsNull => ContentTypeId < 0;
+
+        public static ContentNodeKit Null { get; } = new ContentNodeKit { ContentTypeId = -1 };
+
         public void Build(PublishedContentType contentType, IFacadeAccessor facadeAccessor)
         {
             Node.SetContentTypeAndData(contentType, DraftData, PublishedData, facadeAccessor);
