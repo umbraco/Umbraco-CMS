@@ -334,7 +334,7 @@ namespace Umbraco.Web.Models.Mapping
             else if (group.StartMediaId == -1)
             {
                 //create the root node
-                display.MediaStartNode = RootNode();
+                display.MediaStartNode = RootNode("Media Root", "icon-picture");
             }
 
             if (group.StartContentId > 0)
@@ -345,7 +345,7 @@ namespace Umbraco.Web.Models.Mapping
             else if (group.StartContentId == -1)
             {
                 //create the root node
-                display.ContentStartNode = RootNode();
+                display.ContentStartNode = RootNode("Content Root", "icon-document");
             }
 
             if (display.Icon.IsNullOrWhiteSpace())
@@ -354,13 +354,13 @@ namespace Umbraco.Web.Models.Mapping
             }
         }
 
-        private EntityBasic RootNode()
+        private EntityBasic RootNode(string name, string icon)
         {
             return new EntityBasic
             {               
-                Name = "ROOT",
+                Name = name,
                 Path = "-1",
-                Icon = "icon-document",
+                Icon = icon,
                 Id = -1,
                 Trashed = false,
                 ParentId = -1

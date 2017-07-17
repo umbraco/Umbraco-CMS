@@ -9,7 +9,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         $scope.section = dialogOptions.section;
         $scope.treeAlias = dialogOptions.treeAlias;
         $scope.multiPicker = dialogOptions.multiPicker;
-        $scope.hideHeader = true;
+        $scope.hideHeader = (typeof dialogOptions.hideHeader) === "boolean" ? dialogOptions.hideHeader : false;
         // if you need to load a not initialized tree set this value to false - default is true
         $scope.onlyInitialized = dialogOptions.onlyInitialized;
         $scope.searchInfo = {
@@ -28,7 +28,9 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         $scope.emptyStateMessage = dialogOptions.emptyStateMessage;
 
 
-        //TODO: I don't think this is used or called anywhere!!
+        //This is called from ng-init
+        //it turns out it is called from the angular html : / Have a look at views/common / overlays / contentpicker / contentpicker.html you'll see ng-init. 
+        //this is probably an anti pattern IMO and shouldn't be used
         $scope.init = function (contentType) {
 
             if (contentType === "content") {
