@@ -201,7 +201,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 }
             }
 
-            return source;
+            return null;
         }
 
         private static readonly ConcurrentDictionary<int, bool> Storages = new ConcurrentDictionary<int, bool>();
