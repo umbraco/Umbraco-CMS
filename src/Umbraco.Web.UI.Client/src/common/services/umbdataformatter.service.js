@@ -180,7 +180,7 @@
                 }
                 saveModel.users = formattedUsers;
 
-                //make sure the startnodes are just an int
+                //make sure the startnodes are just an int if one is set
                 var props = ["startContentId", "startMediaId"];
                 for (var m = 0; m < props.length; m++) {
                     var startId = saveModel[props[m]];
@@ -190,14 +190,7 @@
                     saveModel[props[m]] = startId.id;
                 }
 
-                saveModel.parentId = -1;
-                if (!saveModel.startContentId) {
-                    saveModel.startContentId = -1;
-                }
-                if (!saveModel.startMediaId) {
-                    saveModel.startMediaId = -1;
-                }
-
+                saveModel.parentId = -1; 
                 return saveModel;
             },
 

@@ -27,7 +27,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ConstructUsing((UserGroupSave save) => new UserGroup() { CreateDate = DateTime.Now })
                 .IgnoreDeletableEntityCommonProperties()
                 .ForMember(dest => dest.Id, map => map.Condition(source => GetIntId(source.Id) > 0))
-                .ForMember(dest => dest.Id, map => map.MapFrom(source => GetIntId(source.Id)))
+                .ForMember(dest => dest.Id, map => map.MapFrom(source => GetIntId(source.Id)))                
                 .ForMember(dest => dest.Permissions, map => map.MapFrom(source => source.DefaultPermissions))
                 .AfterMap((save, userGroup) =>
                 {
@@ -296,8 +296,8 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IUser, UserDetail>()
                 .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(applicationContext.Services.UserService, applicationContext.ApplicationCache.RuntimeCache)))
                 .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))
-                .ForMember(detail => detail.StartContentIds, opt => opt.MapFrom(user => user.StartContentIds))
-                .ForMember(detail => detail.StartMediaIds, opt => opt.MapFrom(user => user.StartMediaIds))
+                .ForMember(detail => detail.StartContentIds, opt => opt.MapFrom(user => user.AllStartContentIds))
+                .ForMember(detail => detail.StartMediaIds, opt => opt.MapFrom(user => user.AllStartMediaIds))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
                 .ForMember(
                     detail => detail.EmailHash,
@@ -313,8 +313,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections))
                 .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
                 .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups.ToArray()))
-                .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.StartContentIds))
-                .ForMember(detail => detail.StartMediaNodes, opt => opt.MapFrom(user => user.StartMediaIds))
+                .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.AllStartContentIds))
+                .ForMember(detail => detail.StartMediaNodes, opt => opt.MapFrom(user => user.AllStartMediaIds))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
                 .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));
@@ -325,20 +325,46 @@ namespace Umbraco.Web.Models.Mapping
         {
             var allSections = services.SectionService.GetSections();
             display.Sections = allSections.Where(x => Enumerable.Contains(group.AllowedSections, x.Alias)).Select(Mapper.Map<ContentEditing.Section>);
+
             if (group.StartMediaId > 0)
             {
                 display.MediaStartNode = Mapper.Map<EntityBasic>(
                     services.EntityService.Get(group.StartMediaId, UmbracoObjectTypes.Media));
             }
+            else if (group.StartMediaId == -1)
+            {
+                //create the root node
+                display.MediaStartNode = RootNode();
+            }
+
             if (group.StartContentId > 0)
             {
                 display.ContentStartNode = Mapper.Map<EntityBasic>(
                     services.EntityService.Get(group.StartContentId, UmbracoObjectTypes.Document));
             }
+            else if (group.StartContentId == -1)
+            {
+                //create the root node
+                display.ContentStartNode = RootNode();
+            }
+
             if (display.Icon.IsNullOrWhiteSpace())
             {
                 display.Icon = "icon-users";
             }
+        }
+
+        private EntityBasic RootNode()
+        {
+            return new EntityBasic
+            {               
+                Name = "ROOT",
+                Path = "-1",
+                Icon = "icon-document",
+                Id = -1,
+                Trashed = false,
+                ParentId = -1
+            };
         }
 
         private static int GetIntId(object id)

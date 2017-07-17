@@ -33,10 +33,10 @@ namespace Umbraco.Web.Models.ContentEditing
         public IEnumerable<int> Users { get; set; }
 
         [DataMember(Name = "startContentId")]
-        public int StartContentId { get; set; }
+        public int? StartContentId { get; set; }
 
         [DataMember(Name = "startMediaId")]
-        public int StartMediaId { get; set; }
+        public int? StartMediaId { get; set; }
 
         /// <summary>
         /// The list of letters (permission codes) to assign as the default for the user group
