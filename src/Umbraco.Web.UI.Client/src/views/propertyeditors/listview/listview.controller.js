@@ -649,6 +649,15 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       return alias;
    }
 
+   function getItemKey(itemId) {
+      for (var i = 0; i < $scope.listViewResultSet.items.length; i++) {
+         var item = $scope.listViewResultSet.items[i];
+         if (item.id === itemId) {
+            return item.key;
+         }
+      }
+   }
+
    //GO!
    initView();
 }
