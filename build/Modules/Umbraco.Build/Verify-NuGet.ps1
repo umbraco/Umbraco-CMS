@@ -357,7 +357,19 @@ function Verify-NuGet
     $uenv.Semver
   )
   
-  add-type -referencedAssemblies $assem -typeDefinition $source -language CSharp
+  try
+  {
+    # as long as the code hasn't changed it's fine to re-add, but if the code
+    # has changed this will throw - better warn the dev that we have an issue
+    add-type -referencedAssemblies $assem -typeDefinition $source -language CSharp
+  }
+  catch
+  {
+    if ($_.FullyQualifiedErrorId.StartsWith("TYPE_ALREADY_EXISTS,"))
+      { Write-Error "Failed to add type, did you change the code?" }
+    else
+      { Write-Error $_ }
+  }
   if (-not $?) { break }
   
   $nuspecs = (

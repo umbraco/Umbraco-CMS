@@ -104,8 +104,7 @@ function Get-DocFx($uenv, $buildTemp)
   {
     Write-Host "Download DocFx..."
     $source = "https://github.com/dotnet/docfx/releases/download/v2.19.2/docfx.zip"
-    $client = new-object Net.WebClient
-    $client.DownloadFile($source, "$buildTemp\docfx.zip")
+    Invoke-WebRequest $source -OutFile "$buildTemp\docfx.zip"
     
     &$uenv.Zip x "$buildTemp\docfx.zip" -o"$buildTemp\docfx" -aos > $nul
     Remove-File "$buildTemp\docfx.zip"  

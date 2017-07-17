@@ -14,7 +14,7 @@ function Get-UmbracoBuildEnv
   {
     mkdir $path > $null
   }
-  
+
   # ensure we have NuGet
   $nuget = "$path\nuget.exe"
   $source = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
@@ -25,8 +25,7 @@ function Get-UmbracoBuildEnv
   if (-not (test-path $nuget))
   {
     Write-Host "Download NuGet..."
-    $client = new-object Net.WebClient
-    $client.DownloadFile($source, $nuget)
+    Invoke-WebRequest $source -OutFile $nuget
   }
   
   # ensure we have 7-Zip
@@ -98,8 +97,7 @@ function Get-UmbracoBuildEnv
   if (-not (test-path $node))
   {
     Write-Host "Download Node..."
-    $client = new-object Net.WebClient
-    $client.DownloadFile($source, "$path\node-v6.9.1-win-x86.7z")
+    Invoke-WebRequest $source -OutFile "$path\node-v6.9.1-win-x86.7z"
     &$sevenZip x "$path\node-v6.9.1-win-x86.7z" -o"$path" -aos > $nul
     Remove-File "$path\node-v6.9.1-win-x86.7z"    
   }
