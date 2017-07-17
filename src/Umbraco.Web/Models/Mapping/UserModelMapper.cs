@@ -256,15 +256,28 @@ namespace Umbraco.Web.Models.Mapping
                     if (startContentIds.Length > 0)
                     {
                         //TODO: Update GetAll to be able to pass in a parameter like on the normal Get to NOT load in the entire object!
-
+                        var startNodes = new List<EntityBasic>();
+                        if (startContentIds.Contains(-1))
+                        {
+                            startNodes.Add(RootNode("Content Root"));
+                        }
                         var contentItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, startContentIds);
-                        display.StartContentIds = Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(contentItems);
+                        startNodes.AddRange(Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(contentItems));                        
+                        display.StartContentIds = startNodes;
+
+
                     }
                     var startMediaIds = user.StartMediaIds.ToArray();
                     if (startMediaIds.Length > 0)
                     {
+                        var startNodes = new List<EntityBasic>();
+                        if (startContentIds.Contains(-1))
+                        {
+                            startNodes.Add(RootNode("Media Root"));
+                        }
                         var mediaItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Media, startMediaIds);
-                        display.StartMediaIds = Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(mediaItems);
+                        startNodes.AddRange(Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(mediaItems));
+                        display.StartMediaIds = startNodes;
                     }
                 });
 

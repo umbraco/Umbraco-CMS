@@ -105,7 +105,7 @@
                     }
                     var formattedIds = [];
                     for (var j = 0; j < startIds.length; j++) {
-                        formattedIds.push(startIds[j].id);
+                        formattedIds.push(Number(startIds[j].id));
                     }
                     saveModel[props[m]] = formattedIds;
                 }
