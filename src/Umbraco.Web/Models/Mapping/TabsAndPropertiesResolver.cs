@@ -172,6 +172,11 @@ namespace Umbraco.Web.Models.Mapping
             //add the entity type to the config
             listViewConfig["entityType"] = entityType;
 
+            //Override Tab Label if tabName is provided
+            if (listViewConfig.ContainsKey("tabName") && !String.IsNullOrWhiteSpace(listViewConfig["tabName"].ToString())) {
+                listViewTab.Label = listViewConfig["tabName"].ToString();
+            }
+
             var listViewProperties = new List<ContentPropertyDisplay>();
             listViewProperties.Add(new ContentPropertyDisplay
             {
