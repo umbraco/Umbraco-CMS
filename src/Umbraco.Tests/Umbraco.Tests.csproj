@@ -217,6 +217,7 @@
     <Compile Include="Scoping\ScopedXmlTests.cs" />
     <Compile Include="Scoping\ScopeEventDispatcherTests.cs" />
     <Compile Include="Scoping\ScopeFileSystemsTests.cs" />
+    <Compile Include="Scoping\ScopedNuCacheTests.cs" />
     <Compile Include="Scoping\ScopeTests.cs" />
     <Compile Include="Services\CachedDataTypeServiceTests.cs" />
     <Compile Include="TestHelpers\ConsoleLogger.cs" />

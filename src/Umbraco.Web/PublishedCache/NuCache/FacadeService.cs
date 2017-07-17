@@ -152,7 +152,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 try
                 {
-                    if (_localDbExists)
+                    if (_localDbExists) // fixme?
                     {
                         LockAndLoadContent(LoadContentFromLocalDbLocked);
                         LockAndLoadMedia(LoadMediaFromLocalDbLocked);
@@ -194,6 +194,29 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ContentTypeService.UowRefreshedEntity += OnContentTypeRefreshedEntity;
             MediaTypeService.UowRefreshedEntity+= OnMediaTypeRefreshedEntity;
             MemberTypeService.UowRefreshedEntity += OnMemberTypeRefreshedEntity;
+        }
+
+        private void TearDownRepositoryEvents()
+        {
+            ContentRepository.UowRemovingEntity -= OnContentRemovingEntity;
+            //ContentRepository.RemovedVersion -= OnContentRemovedVersion;
+            ContentRepository.UowRefreshedEntity -= OnContentRefreshedEntity;
+            MediaRepository.UowRemovingEntity -= OnMediaRemovingEntity;
+            //MediaRepository.RemovedVersion -= OnMediaRemovedVersion;
+            MediaRepository.UowRefreshedEntity -= OnMediaRefreshedEntity;
+            MemberRepository.UowRemovingEntity -= OnMemberRemovingEntity;
+            //MemberRepository.RemovedVersion -= OnMemberRemovedVersion;
+            MemberRepository.UowRefreshedEntity -= OnMemberRefreshedEntity;
+
+            ContentTypeService.UowRefreshedEntity -= OnContentTypeRefreshedEntity;
+            MediaTypeService.UowRefreshedEntity -= OnMediaTypeRefreshedEntity;
+            MemberTypeService.UowRefreshedEntity -= OnMemberTypeRefreshedEntity;
+        }
+
+        public override void Dispose()
+        {
+            TearDownRepositoryEvents();
+            base.Dispose();
         }
 
         public class Options
@@ -672,43 +695,43 @@ namespace Umbraco.Web.PublishedCache.NuCache
             foreach (var payload in payloads)
                 _logger.Debug<XmlStore>($"Notified {payload.ChangeTypes} for {payload.ItemType} {payload.Id}");
 
-            var removedIds = payloads
-                .Where(x => x.ItemType == typeof(IContentType).Name && x.ChangeTypes.HasType(ContentTypeChangeTypes.Remove))
-                .Select(x => x.Id)
-                .ToArray();
-
-            var refreshedIds = payloads
-                .Where(x => x.ItemType == typeof(IContentType).Name && x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
-                .Select(x => x.Id)
-                .ToArray();
-
-            if (removedIds.Length > 0 || refreshedIds.Length > 0)
-                using (_contentStore.GetWriter(_scopeProvider))
-                {
-                    // ReSharper disable AccessToModifiedClosure
-                    RefreshContentTypesLocked(removedIds, refreshedIds);
-                    // ReSharper restore AccessToModifiedClosure
-                }
-
-            // same for media cache
-
-            removedIds = payloads
-                .Where(x => x.ItemType == typeof(IMediaType).Name && x.ChangeTypes.HasType(ContentTypeChangeTypes.Remove))
-                .Select(x => x.Id)
-                .ToArray();
-
-            refreshedIds = payloads
-                .Where(x => x.ItemType == typeof(IMediaType).Name && x.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
-                .Select(x => x.Id)
-                .ToArray();
-
-            if (removedIds.Length > 0 || refreshedIds.Length > 0)
-                using (_mediaStore.GetWriter(_scopeProvider))
-                {
-                    RefreshMediaTypesLocked(removedIds, refreshedIds);
-                }
+            Notify<IContentType>(_contentStore, payloads, RefreshContentTypesLocked);
+            Notify<IMediaType>(_mediaStore, payloads, RefreshMediaTypesLocked);
 
             ((Facade)CurrentFacade).Resync();
+        }
+
+        private void Notify<T>(ContentStore store, ContentTypeCacheRefresher.JsonPayload[] payloads, Action<IEnumerable<int>, IEnumerable<int>, IEnumerable<int>, IEnumerable<int>> action)
+        {
+            var nameOfT = typeof (T).Name;
+
+            var removedIds = new List<int>();
+            var refreshedIds = new List<int>();
+            var otherIds = new List<int>();
+            var newIds = new List<int>();
+
+            foreach (var payload in payloads)
+            {
+                if (payload.ItemType != nameOfT) continue;
+
+                if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.Remove))
+                    removedIds.Add(payload.Id);
+                else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
+                    refreshedIds.Add(payload.Id);
+                else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther))
+                    otherIds.Add(payload.Id);
+                else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.Create))
+                    newIds.Add(payload.Id);
+            }
+
+            if (removedIds.Count == 0 && refreshedIds.Count == 0 && otherIds.Count == 0) return;
+
+            using (store.GetWriter(_scopeProvider))
+            {
+                // ReSharper disable AccessToModifiedClosure
+                action(removedIds, refreshedIds, otherIds, newIds);
+                // ReSharper restore AccessToModifiedClosure
+            }
         }
 
         public override void Notify(DataTypeCacheRefresher.JsonPayload[] payloads)
@@ -835,7 +858,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return contentType == null ? null : new PublishedContentType(itemType, contentType);
         }
 
-        private void RefreshContentTypesLocked(IEnumerable<int> removedIds, IEnumerable<int> refreshedIds)
+        private void RefreshContentTypesLocked(IEnumerable<int> removedIds, IEnumerable<int> refreshedIds, IEnumerable<int> otherIds, IEnumerable<int> newIds)
         {
             // locks:
             // content (and content types) are read-locked while reading content
@@ -853,11 +876,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var typesA = CreateContentTypes(PublishedItemType.Content, refreshedIdsA).ToArray();
                 var kits = _dataSource.GetTypeContentSources(uow, refreshedIdsA);
                 _contentStore.UpdateContentTypes(removedIds, typesA, kits);
+                _contentStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Content, otherIds.ToArray()).ToArray());
+                _contentStore.NewContentTypes(CreateContentTypes(PublishedItemType.Content, newIds.ToArray()).ToArray());
                 uow.Complete();
             }
         }
 
-        private void RefreshMediaTypesLocked(IEnumerable<int> removedIds, IEnumerable<int> refreshedIds)
+        private void RefreshMediaTypesLocked(IEnumerable<int> removedIds, IEnumerable<int> refreshedIds, IEnumerable<int> otherIds, IEnumerable<int> newIds)
         {
             // locks:
             // media (and content types) are read-locked while reading media
@@ -875,6 +900,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var typesA = CreateContentTypes(PublishedItemType.Media, refreshedIdsA).ToArray();
                 var kits = _dataSource.GetTypeMediaSources(uow, refreshedIdsA);
                 _mediaStore.UpdateContentTypes(removedIds, typesA, kits);
+                _mediaStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Media, otherIds.ToArray()).ToArray());
+                _mediaStore.NewContentTypes(CreateContentTypes(PublishedItemType.Media, newIds.ToArray()).ToArray());
                 uow.Complete();
             }
         }

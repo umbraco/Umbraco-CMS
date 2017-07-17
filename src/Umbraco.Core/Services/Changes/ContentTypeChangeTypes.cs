@@ -6,8 +6,9 @@ namespace Umbraco.Core.Services.Changes
     public enum ContentTypeChangeTypes : byte
     {
         None = 0,
-        RefreshMain = 1, // changed, impacts content (adding ppty or composition does NOT)
-        RefreshOther = 2, // changed, other changes
-        Remove = 4 // item type has been removed
+        Create = 1, // item type has been created, no impact
+        RefreshMain = 2, // changed, impacts content (adding ppty or composition does NOT)
+        RefreshOther = 4, // changed, other changes
+        Remove = 8 // item type has been removed
     }
 }

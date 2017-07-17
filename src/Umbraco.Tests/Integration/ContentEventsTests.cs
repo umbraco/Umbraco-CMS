@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using LightInject;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -13,7 +12,6 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.Cache.DistributedCache;
 using Umbraco.Tests.Services;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Cache;

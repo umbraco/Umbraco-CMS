@@ -235,6 +235,55 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Content types
 
+        public void NewContentTypes(IEnumerable<PublishedContentType> types)
+        {
+            var lockInfo = new WriteLockInfo();
+            try
+            {
+                Lock(lockInfo);
+
+                foreach (var type in types)
+                {
+                    SetValueLocked(_contentTypesById, type.Id, type);
+                    SetValueLocked(_contentTypesByAlias, type.Alias, type);
+                }
+            }
+            finally
+            {
+                Release(lockInfo);
+            }
+        }
+
+        public void UpdateContentTypes(IEnumerable<PublishedContentType> types)
+        {
+            var lockInfo = new WriteLockInfo();
+            try
+            {
+                Lock(lockInfo);
+
+                var index = types.ToDictionary(x => x.Id, x => x);
+
+                foreach (var type in index.Values)
+                {
+                    SetValueLocked(_contentTypesById, type.Id, type);
+                    SetValueLocked(_contentTypesByAlias, type.Alias, type);
+                }
+
+                foreach (var link in _contentNodes.Values)
+                {
+                    var node = link.Value;
+                    if (node == null) continue;
+                    var contentTypeId = node.ContentType.Id;
+                    if (index.TryGetValue(contentTypeId, out PublishedContentType contentType) == false) continue;
+                    SetValueLocked(_contentNodes, node.Id, new ContentNode(node, contentType, _facadeAccessor));
+                }
+            }
+            finally
+            {
+                Release(lockInfo);
+            }
+        }
+
         public void UpdateContentTypes(IEnumerable<int> removedIds, IEnumerable<PublishedContentType> refreshedTypes, IEnumerable<ContentNodeKit> kits)
         {
             var removedIdsA = removedIds?.ToArray() ?? Array.Empty<int>();

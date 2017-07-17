@@ -125,7 +125,7 @@ namespace Umbraco.Core.Services
                 var isNewContentType = dirty.WasPropertyDirty("HasIdentity");
                 if (isNewContentType)
                 {
-                    AddChange(changes, contentType, ContentTypeChangeTypes.RefreshOther);
+                    AddChange(changes, contentType, ContentTypeChangeTypes.Create);
                     continue;
                 }
 

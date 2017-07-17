@@ -1634,7 +1634,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         private void OnContentTypeRefreshedEntity(IContentTypeService sender, ContentTypeChange<IContentType>.EventArgs args)
         {
             const ContentTypeChangeTypes types // only for those that have been refreshed
-                = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
+                = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther | ContentTypeChangeTypes.Create;
             var contentTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
             if (contentTypeIds.Any())
                 RebuildContentAndPreviewXml(contentTypeIds: contentTypeIds);
@@ -1643,7 +1643,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         private void OnMediaTypeRefreshedEntity(IMediaTypeService sender, ContentTypeChange<IMediaType>.EventArgs args)
         {
             const ContentTypeChangeTypes types // only for those that have been refreshed
-                = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
+                = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther | ContentTypeChangeTypes.Create;
             var mediaTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
             if (mediaTypeIds.Any())
                 RebuildMediaXml(contentTypeIds: mediaTypeIds);
@@ -1652,7 +1652,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         private void OnMemberTypeRefreshedEntity(IMemberTypeService sender, ContentTypeChange<IMemberType>.EventArgs args)
         {
             const ContentTypeChangeTypes types // only for those that have been refreshed
-                = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
+                = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther | ContentTypeChangeTypes.Create;
             var memberTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
             if (memberTypeIds.Any())
                 RebuildMemberXml(contentTypeIds: memberTypeIds);

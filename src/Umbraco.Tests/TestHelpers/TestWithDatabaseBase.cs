@@ -46,7 +46,6 @@ namespace Umbraco.Tests.TestHelpers
     public abstract class TestWithDatabaseBase : UmbracoTestBase
     {
         private CacheHelper _disabledCacheHelper;
-        private IFacadeService _facadeService;
 
         private string _databasePath;
         private static byte[] _databaseBytes;
@@ -76,7 +75,7 @@ namespace Umbraco.Tests.TestHelpers
             base.Compose();
 
             Container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
-            Container.Register(factory => _facadeService);
+            Container.Register(factory => FacadeService);
 
             Container.GetInstance<PropertyEditorCollectionBuilder>()
                 .Clear()
@@ -115,8 +114,8 @@ namespace Umbraco.Tests.TestHelpers
                 AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
                 // make sure we dispose of the service to unbind events
-                _facadeService?.Dispose();
-                _facadeService = null;
+                FacadeService?.Dispose();
+                FacadeService = null;
             }
             finally
             {
@@ -227,6 +226,8 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
+        protected IFacadeService FacadeService { get; set; }
+
         protected override void Initialize() // fixme - should NOT be here!
         {
             base.Initialize();
@@ -234,35 +235,40 @@ namespace Umbraco.Tests.TestHelpers
             CreateAndInitializeDatabase();
 
             // ensure we have a FacadeService
-            if (_facadeService == null)
+            if (FacadeService == null)
             {
-                var cache = new NullCacheProvider();
-
-                ContentTypesCache = new PublishedContentTypeCache(
-                    Current.Services.ContentTypeService,
-                    Current.Services.MediaTypeService,
-                    Current.Services.MemberTypeService,
-                    Current.Logger);
-
-                // testing=true so XmlStore will not use the file nor the database
-                //var facadeAccessor = new TestFacadeAccessor();
-                var facadeAccessor = new UmbracoContextFacadeAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
-                var service = new FacadeService(
-                    Current.Services,
-                    (ScopeProvider) Current.ScopeProvider,
-                    UowProvider,
-                    cache, facadeAccessor, Current.Logger, ContentTypesCache, null, true, Options.FacadeServiceRepositoryEvents);
-
-                // initialize PublishedCacheService content with an Xml source
-                service.XmlStore.GetXmlDocument = () =>
-                {
-                    var doc = new XmlDocument();
-                    doc.LoadXml(GetXmlContent(0));
-                    return doc;
-                };
-
-                _facadeService = service;
+                FacadeService = CreateFacadeService();
             }
+        }
+
+        protected virtual IFacadeService CreateFacadeService()
+        {
+            var cache = new NullCacheProvider();
+
+            ContentTypesCache = new PublishedContentTypeCache(
+                Current.Services.ContentTypeService,
+                Current.Services.MediaTypeService,
+                Current.Services.MemberTypeService,
+                Current.Logger);
+
+            // testing=true so XmlStore will not use the file nor the database
+            //var facadeAccessor = new TestFacadeAccessor();
+            var facadeAccessor = new UmbracoContextFacadeAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
+            var service = new FacadeService(
+                Current.Services,
+                (ScopeProvider) Current.ScopeProvider,
+                UowProvider,
+                cache, facadeAccessor, Current.Logger, ContentTypesCache, null, true, Options.FacadeServiceRepositoryEvents);
+
+            // initialize PublishedCacheService content with an Xml source
+            service.XmlStore.GetXmlDocument = () =>
+            {
+                var doc = new XmlDocument();
+                doc.LoadXml(GetXmlContent(0));
+                return doc;
+            };
+
+            return service;
         }
 
         /// <summary>
@@ -331,7 +337,7 @@ namespace Umbraco.Tests.TestHelpers
         protected UmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)
         {
             // ensure we have a PublishedCachesService
-            var service = _facadeService as FacadeService;
+            var service = FacadeService as FacadeService;
             if (service == null)
                 throw new Exception("Not a proper XmlPublishedCache.PublishedCachesService.");
 

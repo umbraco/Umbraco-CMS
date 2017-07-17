@@ -224,7 +224,7 @@ namespace Umbraco.Core.Persistence
         // ensures that the database is configured, else throws
         private void EnsureConfigured()
         {
-            using (new ReadLock(_lock))
+            using (new ReadLock(_lock)) // fixme - bad, allocations!
             {
                 if (Configured == false)
                     throw new InvalidOperationException("Not configured.");
