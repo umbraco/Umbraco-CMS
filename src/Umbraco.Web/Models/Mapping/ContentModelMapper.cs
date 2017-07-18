@@ -130,6 +130,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("content/documentType"),
+                    //TODO: This is not pretty, the backend should not be serving html to the frontend. This should be served as a config or a "ValueDescription" and then rendered with angular in frontend.
                     Value = currentDocumentTypeName + (currentDocumentTypeDescription != null ? "<br/><small class='muted'>" + currentDocumentTypeDescription + "</small>" : string.Empty),
                     View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
                 },
