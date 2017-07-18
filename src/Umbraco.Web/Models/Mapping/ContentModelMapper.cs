@@ -180,6 +180,7 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         var currentDocumentType = contentTypeService.GetContentType(display.ContentTypeAlias);
                         var currentDocumentTypeName = currentDocumentType == null ? string.Empty : localizedText.UmbracoDictionaryTranslate(currentDocumentType.Name);
+                        var currentDocumentTypeDescription = currentDocumentType == null ? string.Empty : localizedText.UmbracoDictionaryTranslate(currentDocumentType.Description);
 
                         var currentDocumentTypeId = currentDocumentType == null ? string.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
                         //TODO: Hard coding this is not good
@@ -192,6 +193,7 @@ namespace Umbraco.Web.Models.Mapping
                             new
                             {
                                 linkText = currentDocumentTypeName,
+                                linkDescription = currentDocumentTypeDescription,
                                 url = docTypeLink,
                                 target = "_self",
                                 icon = "icon-item-arrangement"
