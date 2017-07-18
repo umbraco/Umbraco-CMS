@@ -54,12 +54,17 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters && propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultipleMediaPickerAlias))
             {
-                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultipleMediaPickerAlias) ||
-                       propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPickerAlias); // this is the double legacy media picker, it can pick only single media items
+                return true;
             }
-            
+
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters && propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPickerAlias))
+            {
+                // this is the double legacy media picker, it can pick only single media items
+                return true;
+            }
+
             return false;
         }
 
