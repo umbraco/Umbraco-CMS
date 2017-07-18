@@ -8,6 +8,22 @@ ECHO Current folder: %CD%
 SET nodeFileName=node-v6.9.1-win-x86.7z
 SET nodeExtractFolder=%toolsFolder%node.js.691
 
+SET nuGetExecutable=%CD%\tools\nuget.exe
+IF NOT EXIST "%nuGetExecutable%" (
+	ECHO Downloading https://dist.nuget.org/win-x86-commandline/latest/nuget.exe to %nuGetExecutable%
+	powershell -Command "(New-Object Net.WebClient).DownloadFile('https://dist.nuget.org/win-x86-commandline/latest/nuget.exe', '%nuGetExecutable%')"
+)
+
+:: We need 7za.exe for BuildBelle.bat
+IF NOT EXIST "%toolsFolder%7za.exe" (
+	ECHO 7zip not found - fetching now
+	"%nuGetExecutable%" install 7-Zip.CommandLine -OutputDirectory tools -Verbosity quiet
+)
+
+:: Put 7za.exe and vswhere.exe in a predictable path (not version specific)
+FOR /f "delims=" %%A in ('dir "%toolsFolder%7-Zip.CommandLine.*" /b') DO SET "sevenZipExePath=%toolsFolder%%%A\"
+MOVE "%sevenZipExePath%tools\7za.exe" "%toolsFolder%7za.exe"
+
 IF NOT EXIST "%nodeExtractFolder%" (
 	ECHO Downloading http://nodejs.org/dist/v6.9.1/%nodeFileName% to %toolsFolder%%nodeFileName%
 	powershell -Command "(New-Object Net.WebClient).DownloadFile('http://nodejs.org/dist/v6.9.1/%nodeFileName%', '%toolsFolder%%nodeFileName%')"
@@ -15,13 +31,6 @@ IF NOT EXIST "%nodeExtractFolder%" (
 	"%toolsFolder%\7za.exe" x "%toolsFolder%\%nodeFileName%" -o"%nodeExtractFolder%" -aos > nul
 )
 FOR /f "delims=" %%A in ('dir "%nodeExtractFolder%\node*" /b') DO SET "nodePath=%nodeExtractFolder%\%%A"
-
-
-SET nuGetExecutable=%CD%\tools\nuget.exe
-IF NOT EXIST "%nuGetExecutable%" (
-	ECHO Downloading https://dist.nuget.org/win-x86-commandline/latest/nuget.exe to %nuGetExecutable%
-	powershell -Command "(New-Object Net.WebClient).DownloadFile('https://dist.nuget.org/win-x86-commandline/latest/nuget.exe', '%nuGetExecutable%')"
-)
 
 SET drive=%CD:~0,2%
 SET nuGetFolder=%drive%\packages\
