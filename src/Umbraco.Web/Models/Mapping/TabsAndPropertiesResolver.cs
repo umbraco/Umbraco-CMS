@@ -68,9 +68,12 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     Alias = string.Format("{0}id", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = "Id",
-                    //TODO: This is not pretty, the backend should not be serving html to the frontend. This should be served as a config or a "ValueDescription" and then rendered with angular in frontend.
-                    Value = Convert.ToInt32(display.Id).ToInvariantString() + "<br/><small class='muted'>" + display.Key + "</small>",
+                    Value = Convert.ToInt32(display.Id).ToInvariantString(),
                     View = labelEditor,
+                    Config = new Dictionary<string, object>
+                    {
+                        { "valueDescription", display.Key}
+                    }
                 },
                 new ContentPropertyDisplay
                 {

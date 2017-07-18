@@ -30,6 +30,7 @@ function ReadOnlyValueController($rootScope, $scope, $filter) {
             $scope.displayvalue = $scope.model.value;
         }
 
+      $scope.valueDescription = $scope.model.config.valueDescription;
     }
 
     //format the display value on init:
