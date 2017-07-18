@@ -130,7 +130,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("content/documentType"),
-                    Value = currentDocumentTypeName,
+                    Value = currentDocumentTypeName + (currentDocumentTypeDescription != null ? "<br/><small class='muted'>" + currentDocumentTypeDescription + "</small>" : string.Empty),
                     View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
                 },
                 new ContentPropertyDisplay
