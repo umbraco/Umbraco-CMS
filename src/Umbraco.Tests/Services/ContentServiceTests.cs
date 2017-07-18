@@ -1459,6 +1459,98 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Ensures_Permissions_Are_Retained_For_Copied_Descendants_With_Explicit_Permissions()
+        {
+            // Arrange
+            var userGroup = MockedUserGroup.CreateUserGroup("1");
+            ServiceContext.UserService.Save(userGroup);
+
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
+            contentType.AllowedContentTypes = new List<ContentTypeSort>
+            {
+                new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias)
+            };
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            var parentPage = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(parentPage);            
+
+            var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
+            ServiceContext.ContentService.Save(childPage);
+            //assign explicit permissions to the child
+            ServiceContext.ContentService.AssignContentPermission(childPage, 'A', new[] { userGroup.Id });
+
+            //Ok, now copy, what should happen is the childPage will retain it's own permissions
+            var parentPage2 = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(parentPage2);
+
+            var copy = ServiceContext.ContentService.Copy(childPage, parentPage2.Id, false, true);
+
+            //get the permissions and verify
+            var permissions = ServiceContext.UserService.GetPermissionsForPath(userGroup, copy.Path, fallbackToDefaultPermissions: true);
+            var allPermissions = permissions.GetAllPermissions().ToArray();
+            Assert.AreEqual(1, allPermissions.Length);
+            Assert.AreEqual("A", allPermissions[0]);
+        }
+
+        [Test]
+        public void Ensures_Permissions_Are_Inherited_For_Copied_Descendants()
+        {
+            // Arrange
+            var userGroup = MockedUserGroup.CreateUserGroup("1");
+            ServiceContext.UserService.Save(userGroup);
+
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
+            contentType.AllowedContentTypes = new List<ContentTypeSort>
+            {
+                new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias)
+            };
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            var parentPage = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(parentPage);
+            ServiceContext.ContentService.AssignContentPermission(parentPage, 'A', new[] { userGroup.Id });
+
+            var childPage1 = MockedContent.CreateSimpleContent(contentType, "child1", parentPage);
+            ServiceContext.ContentService.Save(childPage1);
+            var childPage2 = MockedContent.CreateSimpleContent(contentType, "child2", childPage1);
+            ServiceContext.ContentService.Save(childPage2);
+            var childPage3 = MockedContent.CreateSimpleContent(contentType, "child3", childPage2);
+            ServiceContext.ContentService.Save(childPage3);
+
+            //Verify that the children have the inherited permissions
+            var descendants = ServiceContext.ContentService.GetDescendants(parentPage).ToArray();
+            Assert.AreEqual(3, descendants.Length);
+
+            foreach (var descendant in descendants)
+            {
+                var permissions = ServiceContext.UserService.GetPermissionsForPath(userGroup, descendant.Path, fallbackToDefaultPermissions: true);
+                var allPermissions = permissions.GetAllPermissions().ToArray();
+                Assert.AreEqual(1, allPermissions.Length);
+                Assert.AreEqual("A", allPermissions[0]);
+            }
+
+            //create a new parent with a new permission structure
+            var parentPage2 = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(parentPage2);
+            ServiceContext.ContentService.AssignContentPermission(parentPage2, 'B', new[] { userGroup.Id });
+
+            //Now copy, what should happen is the child pages will now have permissions inherited from the new parent
+            var copy = ServiceContext.ContentService.Copy(childPage1, parentPage2.Id, false, true);
+            
+            descendants = ServiceContext.ContentService.GetDescendants(parentPage2).ToArray();
+            Assert.AreEqual(3, descendants.Length);
+
+            foreach (var descendant in descendants)
+            {
+                var permissions = ServiceContext.UserService.GetPermissionsForPath(userGroup, descendant.Path, fallbackToDefaultPermissions: true);
+                var allPermissions = permissions.GetAllPermissions().ToArray();
+                Assert.AreEqual(1, allPermissions.Length);
+                Assert.AreEqual("B", allPermissions[0]);
+            }
+        }
+
+        [Test]
         public void Can_Empty_RecycleBin_With_Content_That_Has_All_Related_Data()
         {
             // Arrange

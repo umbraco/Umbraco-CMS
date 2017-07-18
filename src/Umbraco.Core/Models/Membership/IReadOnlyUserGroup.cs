@@ -18,6 +18,14 @@ namespace Umbraco.Core.Models.Membership
         /// </summary>
         string Alias { get; }
 
+        /// <summary>
+        /// The set of default permissions
+        /// </summary>
+        /// <remarks>
+        /// By default each permission is simply a single char but we've made this an enumerable{string} to support a more flexible permissions structure in the future.
+        /// </remarks>
+        IEnumerable<string> Permissions { get; set; }
+
         IEnumerable<string> AllowedSections { get; }
     }
 }

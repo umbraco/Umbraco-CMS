@@ -151,11 +151,11 @@ namespace Umbraco.Core.Services
         void AssignContentPermission(IContent entity, char permission, IEnumerable<int> groupIds);
 
         /// <summary>
-        /// Returns permissions directly assigned to the content item for all user groups
+        /// Returns implicit/inherited permissions assigned to the content item for all user groups
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        IEnumerable<UserGroupEntityPermission> GetPermissionsForEntity(IContent content);
+        EntityPermissionCollection GetPermissionsForEntity(IContent content);
 
         bool SendToPublication(IContent content, int userId = 0);
 

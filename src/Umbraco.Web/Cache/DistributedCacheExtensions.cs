@@ -88,7 +88,8 @@ namespace Umbraco.Web.Cache
 
         public static void RefreshUserGroupPermissionsCache(this DistributedCache dc, int groupId)
         {
-            dc.Refresh(DistributedCache.UserGroupPermissionsCacheRefresherGuid, groupId);
+            //TODO: Not sure if we need this yet depends if we start caching permissions
+            //dc.Refresh(DistributedCache.UserGroupPermissionsCacheRefresherGuid, groupId);
         }
 
         public static void RefreshAllUserGroupPermissionsCache(this DistributedCache dc)

@@ -242,7 +242,7 @@ namespace Umbraco.Web.Editors
             //set a custom path since the tree that renders this has the content type id as the parent
             content.Path = string.Format("-1,{0},{1}", persistedContent.ContentTypeId, content.Id);
 
-            content.AllowedActions = new[] {'A'};
+            content.AllowedActions = new[] {"A"};
 
             var excludeProps = new[] {"_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template"};
             var propsTab = content.Tabs.Last();
@@ -440,8 +440,8 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public bool HasPermission(string permissionToCheck, int nodeId)
         {
-            var p = Services.UserService.GetPermissions(Security.CurrentUser, nodeId).FirstOrDefault();
-            if (p != null && p.AssignedPermissions.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
+            var p = Services.UserService.GetPermissions(Security.CurrentUser, nodeId).GetAllPermissions();
+            if (p.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
             {
                 return true;
             }
@@ -1076,17 +1076,21 @@ namespace Umbraco.Web.Editors
                 return false;
             }
 
-            if (permissionsToCheck == null || permissionsToCheck.Any() == false)
+            if (permissionsToCheck == null || permissionsToCheck.Length == 0)
             {
                 return true;
             }
 
-            var permission = userService.GetPermissions(user, nodeId).FirstOrDefault();
+            //get the implicit/inherited permissions for the user for this path,
+            //if there is no content item for this id, than just use the id as the path (i.e. -1 or -20)
+            var path = contentItem != null ? contentItem.Path : nodeId.ToString();
+            var permission = userService.GetPermissionsForPath(user, path);
 
             var allowed = true;
             foreach (var p in permissionsToCheck)
             {
-                if (permission == null || permission.AssignedPermissions.Contains(p.ToString(CultureInfo.InvariantCulture)) == false)
+                if (permission == null 
+                    || permission.GetAllPermissions().Contains(p.ToString(CultureInfo.InvariantCulture)) == false)
                 {
                     allowed = false;
                 }

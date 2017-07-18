@@ -12,6 +12,9 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using CacheKeys = Umbraco.Core.Cache.CacheKeys;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -19,114 +22,89 @@ namespace Umbraco.Core.Persistence.Repositories
     /// A repository that exposes functionality to modify assigned permissions to a node
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    internal class PermissionRepository<TEntity>
+    /// <remarks>
+    /// This repo implements the base <see cref="PetaPocoRepositoryBase{TId,TEntity}"/> class so that permissions can be queued to be persisted
+    /// like the normal repository pattern but the standard repository Get commands don't apply and will throw <see cref="NotImplementedException"/>
+    /// </remarks>
+    internal class PermissionRepository<TEntity> : PetaPocoRepositoryBase<int, ContentPermissionSet>
         where TEntity : class, IAggregateRoot
     {
-        private readonly IScopeUnitOfWork _unitOfWork;
-        private readonly IRuntimeCacheProvider _runtimeCache;
-        private readonly ISqlSyntaxProvider _sqlSyntax;
 
-        internal PermissionRepository(IScopeUnitOfWork unitOfWork, CacheHelper cache, ISqlSyntaxProvider sqlSyntax)
+        public PermissionRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, cache, logger, sqlSyntax)
         {
-            _unitOfWork = unitOfWork;
-            //Make this repository use an isolated cache
-            _runtimeCache = cache.IsolatedRuntimeCache.GetOrCreateCache<EntityPermission>();
-            _sqlSyntax = sqlSyntax;
+            
         }
 
         /// <summary>
-        /// Returns permissions for a given group for any number of nodes
+        /// Returns explicitly defined permissions for a user group for any number of nodes
         /// </summary>
-        /// <param name="groupId"></param>
+        /// <param name="groupIds">
+        /// The group ids to lookup permissions for
+        /// </param>
         /// <param name="entityIds"></param>
         /// <returns></returns>        
-        public IEnumerable<EntityPermission> GetPermissionsForEntities(int groupId, params int[] entityIds)
+        /// <remarks>
+        /// This method will not support passing in more than 2000 group Ids
+        /// </remarks>
+        public EntityPermissionCollection GetPermissionsForEntities(int[] groupIds, params int[] entityIds)
         {
-            var entityIdKey = GetEntityIdKey(entityIds);
-            return _runtimeCache.GetCacheItem<IEnumerable<EntityPermission>>(
-                string.Format("{0}{1}{2}",
-                    CacheKeys.UserGroupPermissionsCacheKey,
-                    groupId,
-                    entityIdKey),
-                () =>
-                {
-                    var whereCriteria = GetPermissionsForEntitiesCriteria(groupId, entityIds);
-                    var sql = new Sql();
-                    sql.Select("*")
-                        .From<UserGroup2NodePermissionDto>()
-                        .Where(whereCriteria);
-                    var result = _unitOfWork.Database.Fetch<UserGroup2NodePermissionDto>(sql).ToArray();
-                    // ToArray() to ensure it's all fetched from the db once
-                    return ConvertToPermissionList(result);
-                },
-                GetCacheTimeout(),
-                priority: GetCachePriority());
-        }
+            var result = new EntityPermissionCollection();
 
-        private static string GetEntityIdKey(int[] entityIds)
-        {
-            return string.Join(",", entityIds.Select(x => x.ToString(CultureInfo.InvariantCulture)));
-        }
-
-        private string GetPermissionsForEntitiesCriteria(int groupId, params int[] entityIds)
-        {
-            var whereBuilder = new StringBuilder();
-            whereBuilder.Append(_sqlSyntax.GetQuotedColumnName("userGroupId"));
-            whereBuilder.Append("=");
-            whereBuilder.Append(groupId);
-
-            if (entityIds.Any())
+            foreach (var groupOfGroupIds in groupIds.InGroupsOf(2000))
             {
-                whereBuilder.Append(" AND ");
+                //copy local
+                var localIds = groupOfGroupIds.ToArray();
 
-                //where nodeId = @nodeId1 OR nodeId = @nodeId2, etc...
-                whereBuilder.Append("(");
-                for (var index = 0; index < entityIds.Length; index++)
+                if (entityIds.Length == 0)
                 {
-                    var entityId = entityIds[index];
-                    whereBuilder.Append(_sqlSyntax.GetQuotedColumnName("nodeId"));
-                    whereBuilder.Append("=");
-                    whereBuilder.Append(entityId);
-                    if (index < entityIds.Length - 1)
+                    var sql = new Sql();                    
+                    sql.Select("*")
+                        .From<UserGroup2NodePermissionDto>(SqlSyntax)
+                        .Where<UserGroup2NodePermissionDto>(dto => localIds.Contains(dto.UserGroupId), SqlSyntax);
+                    var permissions = UnitOfWork.Database.Fetch<UserGroup2NodePermissionDto>(sql);
+                    foreach (var permission in ConvertToPermissionList(permissions))
                     {
-                        whereBuilder.Append(" OR ");
+                        result.Add(permission);
                     }
                 }
-
-                whereBuilder.Append(")");
-            }
-
-            return whereBuilder.ToString();
-        }
-
-        private static TimeSpan GetCacheTimeout()
-        {
-            //Since this cache can be quite large (http://issues.umbraco.org/issue/U4-2161) we will only have this exist in cache for 20 minutes, 
-            // then it will refresh from the database.
-            return new TimeSpan(0, 20, 0);
-        }
-
-        private static CacheItemPriority GetCachePriority()
-        {
-            //Since this cache can be quite large (http://issues.umbraco.org/issue/U4-2161) we will make this priority below average
-            return CacheItemPriority.BelowNormal;
-        }
-
-        private static IEnumerable<UserGroupEntityPermission> ConvertToPermissionList(IEnumerable<UserGroup2NodePermissionDto> result)
-        {
-            var permissions = new List<UserGroupEntityPermission>();
-            var nodePermissions = result.GroupBy(x => x.NodeId);
-            foreach (var np in nodePermissions)
-            {
-                var userGroupPermissions = np.GroupBy(x => x.UserGroupId);
-                foreach (var permission in userGroupPermissions)
+                else
                 {
-                    var perms = permission.Select(x => x.Permission).ToArray();
-                    permissions.Add(new UserGroupEntityPermission(permission.Key, permission.First().NodeId, perms));
+                    //iterate in groups of 2000 since we don't want to exceed the max SQL param count
+                    foreach (var groupOfEntityIds in entityIds.InGroupsOf(2000))
+                    {
+                        var ids = groupOfEntityIds;
+                        var sql = new Sql();
+                        sql.Select("*")
+                            .From<UserGroup2NodePermissionDto>(SqlSyntax)
+                            .Where<UserGroup2NodePermissionDto>(dto => localIds.Contains(dto.UserGroupId) && ids.Contains(dto.NodeId), SqlSyntax);
+                        var permissions = UnitOfWork.Database.Fetch<UserGroup2NodePermissionDto>(sql);
+                        foreach (var permission in ConvertToPermissionList(permissions))
+                        {
+                            result.Add(permission);
+                        }
+                    }
                 }
             }
+            
+            return result;
+        }        
 
-            return permissions;
+        /// <summary>
+        /// Returns permissions directly assigned to the content items for all user groups
+        /// </summary>
+        /// <param name="entityIds"></param>
+        /// <returns></returns>
+        public IEnumerable<EntityPermission> GetPermissionsForEntities(int[] entityIds)
+        {
+            var sql = new Sql();
+            sql.Select("*")
+                .From<UserGroup2NodePermissionDto>(SqlSyntax)
+                .Where<UserGroup2NodePermissionDto>(dto => entityIds.Contains(dto.NodeId), SqlSyntax)
+                .OrderBy<UserGroup2NodePermissionDto>(dto => dto.NodeId, SqlSyntax);
+
+            var result = UnitOfWork.Database.Fetch<UserGroup2NodePermissionDto>(sql);
+            return ConvertToPermissionList(result);
         }
 
         /// <summary>
@@ -134,16 +112,15 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="entityId"></param>
         /// <returns></returns>
-        public IEnumerable<UserGroupEntityPermission> GetPermissionsForEntity(int entityId)
+        public EntityPermissionCollection GetPermissionsForEntity(int entityId)
         {
             var sql = new Sql();
             sql.Select("*")
-                .From<UserGroup2NodePermissionDto>()
-                .Where<UserGroup2NodePermissionDto>(dto => dto.NodeId == entityId)
-                .OrderBy<UserGroup2NodePermissionDto>(dto => dto.NodeId);
+                .From<UserGroup2NodePermissionDto>(SqlSyntax)
+                .Where<UserGroup2NodePermissionDto>(dto => dto.NodeId == entityId, SqlSyntax)
+                .OrderBy<UserGroup2NodePermissionDto>(dto => dto.NodeId, SqlSyntax);
 
-            var result = _unitOfWork.Database.Fetch<UserGroup2NodePermissionDto>(sql).ToArray();
-            // ToArray() to ensure it's all fetched from the db once
+            var result = UnitOfWork.Database.Fetch<UserGroup2NodePermissionDto>(sql);
             return ConvertToPermissionList(result);
         }
 
@@ -158,7 +135,10 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </remarks>
         public void ReplacePermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds)
         {
-            var db = _unitOfWork.Database;
+            if (entityIds.Length == 0)
+                return;
+
+            var db = UnitOfWork.Database;
 
             //we need to batch these in groups of 2000 so we don't exceed the max 2100 limit
             var sql = "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND nodeId in (@nodeIds)";
@@ -181,10 +161,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            _unitOfWork.Database.BulkInsertRecords(toInsert, _sqlSyntax);
-
-            //Raise the event
-            _unitOfWork.Events.Dispatch(AssignedPermissions, this, new SaveEventArgs<UserGroupEntityPermission>(ConvertToPermissionList(toInsert), false));
+            UnitOfWork.Database.BulkInsertRecords(toInsert, SqlSyntax);
             
         }
 
@@ -196,7 +173,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entityIds"></param>
         public void AssignPermission(int groupId, char permission, params int[] entityIds)
         {
-            var db = _unitOfWork.Database;
+            var db = UnitOfWork.Database;
             var sql = "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND permission=@permission AND nodeId in (@entityIds)";
             db.Execute(sql,
             new
@@ -213,11 +190,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 UserGroupId = groupId
             }).ToArray();
 
-            _unitOfWork.Database.BulkInsertRecords(actions, _sqlSyntax);
-
-            //Raise the event
-            _unitOfWork.Events.Dispatch(AssignedPermissions, this, new SaveEventArgs<UserGroupEntityPermission>(ConvertToPermissionList(actions), false));
-
+            UnitOfWork.Database.BulkInsertRecords(actions, SqlSyntax);
+            
         }
 
         /// <summary>
@@ -228,7 +202,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="groupIds"></param>
         public void AssignEntityPermission(TEntity entity, char permission, IEnumerable<int> groupIds)
         {
-            var db = _unitOfWork.Database;
+            var db = UnitOfWork.Database;
             var sql = "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId AND permission = @permission AND userGroupId in (@groupIds)";
             db.Execute(sql,
                 new
@@ -245,15 +219,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 UserGroupId = id
             }).ToArray();
 
-            _unitOfWork.Database.BulkInsertRecords(actions, _sqlSyntax);
-
-            //Raise the event
-            _unitOfWork.Events.Dispatch(AssignedPermissions, this, new SaveEventArgs<UserGroupEntityPermission>(ConvertToPermissionList(actions), false));
-
+            UnitOfWork.Database.BulkInsertRecords(actions, SqlSyntax);
+            
         }
 
         /// <summary>
-        /// Assigns permissions to an entity for multiple users/permission entries
+        /// Assigns permissions to an entity for multiple group/permission entries
         /// </summary>
         /// <param name="permissionSet">
         /// </param>
@@ -262,25 +233,113 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </remarks>
         public void ReplaceEntityPermissions(EntityPermissionSet permissionSet)
         {
-            var db = _unitOfWork.Database;
+            var db = UnitOfWork.Database;
             var sql = "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId";
             db.Execute(sql, new { nodeId = permissionSet.EntityId });
 
-            var actions = permissionSet.PermissionsSet.Select(p => new UserGroup2NodePermissionDto
+            var toInsert = new List<UserGroup2NodePermissionDto>();
+            foreach (var entityPermission in permissionSet.PermissionsSet)
             {
-                NodeId = permissionSet.EntityId,
-                Permission = p.Permission,
-                UserGroupId = p.UserGroupId
-            }).ToArray();
+                foreach (var permission in entityPermission.AssignedPermissions)
+                {
+                    toInsert.Add(new UserGroup2NodePermissionDto
+                    {
+                        NodeId = permissionSet.EntityId,
+                        Permission = permission,
+                        UserGroupId = entityPermission.UserGroupId
+                    });
+                }
+            }
 
-            _unitOfWork.Database.BulkInsertRecords(actions, _sqlSyntax);
-
-            //Raise the event
-            _unitOfWork.Events.Dispatch(AssignedPermissions, this, new SaveEventArgs<UserGroupEntityPermission>(ConvertToPermissionList(actions), false));
-
-
+            UnitOfWork.Database.BulkInsertRecords(toInsert, SqlSyntax);
+            
         }
 
-        public static event TypedEventHandler<PermissionRepository<TEntity>, SaveEventArgs<UserGroupEntityPermission>> AssignedPermissions;
+
+        #region Not implemented (don't need to for the purposes of this repo)
+        protected override ContentPermissionSet PerformGet(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override IEnumerable<ContentPermissionSet> PerformGetAll(params int[] ids)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override IEnumerable<ContentPermissionSet> PerformGetByQuery(IQuery<ContentPermissionSet> query)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override Sql GetBaseQuery(bool isCount)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override string GetBaseWhereClause()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override IEnumerable<string> GetDeleteClauses()
+        {
+            return new List<string>();
+        }
+
+        protected override Guid NodeObjectTypeId
+        {
+            get { throw new NotImplementedException(); }
+        }
+        
+        protected override void PersistDeletedItem(ContentPermissionSet entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Used to add or update entity permissions during a content item being updated
+        /// </summary>
+        /// <param name="entity"></param>
+        protected override void PersistNewItem(ContentPermissionSet entity)
+        {
+            //does the same thing as update
+            PersistUpdatedItem(entity);
+        }
+
+        /// <summary>
+        /// Used to add or update entity permissions during a content item being updated
+        /// </summary>
+        /// <param name="entity"></param>
+        protected override void PersistUpdatedItem(ContentPermissionSet entity)
+        {
+            var asAggregateRoot = (IAggregateRoot)entity;
+            if (asAggregateRoot.HasIdentity == false)
+            {
+                throw new InvalidOperationException("Cannot create permissions for an entity without an Id");
+            }
+
+            ReplaceEntityPermissions(entity);
+        }
+
+        private static EntityPermissionCollection ConvertToPermissionList(IEnumerable<UserGroup2NodePermissionDto> result)
+        {
+            var permissions = new EntityPermissionCollection();
+            var nodePermissions = result.GroupBy(x => x.NodeId);
+            foreach (var np in nodePermissions)
+            {
+                var userGroupPermissions = np.GroupBy(x => x.UserGroupId);
+                foreach (var permission in userGroupPermissions)
+                {
+                    var perms = permission.Select(x => x.Permission).Distinct().ToArray();
+                    permissions.Add(new EntityPermission(permission.Key, np.Key, perms));
+                }
+            }
+
+            return permissions;
+        }
+        
     }
 }

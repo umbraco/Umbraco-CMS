@@ -19,7 +19,8 @@ namespace umbraco.dialogs
     /// <summary>
     /// Summary description for cruds.
     /// </summary>
-    public partial class cruds : BasePages.UmbracoEnsuredPage
+    [Obsolete("Remove this for 7.7 release!")]
+    public class cruds : BasePages.UmbracoEnsuredPage
     {
 
         public cruds()
@@ -37,78 +38,9 @@ namespace umbraco.dialogs
             pane_form.Text = ui.Text("actions", "SetPermissionsForThePage",_node.Text); 
         }
 
-        override protected void OnInit(EventArgs e)
+        protected override void OnInit(EventArgs e)
         {
-            base.OnInit(e);
-
-            _node = new CMSNode(Request.GetItemAs<int>("id"));
-
-            var ht = new HtmlTable();
-            ht.Attributes.Add("class", "table");
-
-            var names = new HtmlTableRow();
-
-            var corner = new HtmlTableCell("th");
-            corner.Style.Add("border", "none");
-            names.Cells.Add(corner);
-            
-            foreach (var a in ActionsResolver.Current.Actions)
-            {
-                if (a.CanBePermissionAssigned == false) continue;
-
-                var permissionRow = new HtmlTableRow();
-                var label = new HtmlTableCell
-                    {
-                        InnerText = ui.Text("actions", a.Alias)
-                    };
-                permissionRow.Cells.Add(label);
-                _permissions.Add(a.Alias, permissionRow);
-            }
-
-            ht.Rows.Add(names);
-
-            var userService = ApplicationContext.Current.Services.UserService;
-            foreach (var group in userService.GetAllUserGroups())
-            {
-                var hc = new HtmlTableCell("th")
-                    {
-                        InnerText = group.Name
-                    };
-                hc.Style.Add("text-align", "center");
-                hc.Style.Add("border", "none");
-                names.Cells.Add(hc);
-
-                foreach (var a in ActionsResolver.Current.Actions)
-                {
-                    var chk = new CheckBox
-                        {
-                            //Each checkbox is named with the group _ permission alias so we can parse
-                            ID = group.Id + "_" + a.Letter                                
-                        };
-
-                    if (a.CanBePermissionAssigned == false) continue;
-
-                    var permissions = userService.GetPermissionsForPath(group, _node.Path);
-                    if (permissions.Contains(a.Letter))
-                    {
-                        chk.Checked = true;
-                    }
-
-                    var cell = new HtmlTableCell();
-                    cell.Style.Add("text-align", "center");
-                    cell.Controls.Add(chk);
-
-                    _permissions[a.Alias].Cells.Add(cell);
-                }
-            }
-
-            //add all collected rows
-            foreach (var perm in _permissions.Values)
-            {
-                ht.Rows.Add(perm);    
-            }
-
-            PlaceHolder1.Controls.Add(ht);
+            throw new NotSupportedException("This cruds.aspx.cs needs to be removed, it is no longer required");
         }
 
 

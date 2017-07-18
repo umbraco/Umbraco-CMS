@@ -26,11 +26,19 @@ namespace Umbraco.Core.Persistence.Repositories
         void AddOrUpdateGroupWithUsers(IUserGroup userGroup, int[] userIds);
 
         /// <summary>
-        /// Gets the group permissions for the specified entities
+        /// Gets explicilty defined permissions for the group for specified entities
         /// </summary>
-        /// <param name="groupId">Id of group</param>
-        /// <param name="entityIds">Array of entity Ids</param>
-        IEnumerable<EntityPermission> GetPermissionsForEntities(int groupId, params int[] entityIds);
+        /// <param name="groupIds"></param>
+        /// <param name="entityIds">Array of entity Ids, if empty will return permissions for the group for all entities</param>
+        EntityPermissionCollection GetPermissions(int[] groupIds, params int[] entityIds);
+
+        /// <summary>
+        /// Gets explicilt and default permissions (if requested) permissions for the group for specified entities
+        /// </summary>
+        /// <param name="groups"></param>
+        /// <param name="fallbackToDefaultPermissions">If true will include the group's default permissions if no permissions are explicitly assigned</param>
+        /// <param name="nodeIds">Array of entity Ids, if empty will return permissions for the group for all entities</param>
+        EntityPermissionCollection GetPermissions(IReadOnlyUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds);
 
         /// <summary>
         /// Replaces the same permission set for a single group to any number of entities
@@ -47,6 +55,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="permission">Permissions as enumerable list of <see cref="char"/></param>
         /// <param name="entityIds">Specify the nodes to replace permissions for</param>
         void AssignGroupPermission(int groupId, char permission, params int[] entityIds);
-        
+
     }
 }

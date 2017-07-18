@@ -9,6 +9,9 @@ namespace Umbraco.Web.Cache
     /// <summary>
     /// Handles User group cache invalidation/refreshing
     /// </summary>
+    /// <remarks>
+    /// This also needs to clear the user cache since IReadOnlyUserGroup's are attached to IUser objects
+    /// </remarks>
     public sealed class UserGroupCacheRefresher : CacheRefresherBase<UserGroupCacheRefresher>
     {
         protected override UserGroupCacheRefresher Instance
@@ -34,10 +37,9 @@ namespace Umbraco.Web.Cache
             {
                 userGroupCache.Result.ClearCacheByKeySearch(UserGroupRepository.GetByAliasCacheKeyPrefix);
             }
-            if (UserGroupPermissionsCache)
-            {
-                UserGroupPermissionsCache.Result.ClearCacheByKeySearch(CacheKeys.UserGroupPermissionsCacheKey);
-            }
+
+            //We'll need to clear all user cache too
+            ClearAllIsolatedCacheByEntityType<IUser>();
 
             base.RefreshAll();
         }
@@ -57,19 +59,11 @@ namespace Umbraco.Web.Cache
                 userGroupCache.Result.ClearCacheByKeySearch(UserGroupRepository.GetByAliasCacheKeyPrefix);
             }
 
-            if (UserGroupPermissionsCache)
-            {
-                //TODO: Is this good enough for all users attached to this?
-                var keyStartsWith = string.Format("{0}{1}", CacheKeys.UserGroupPermissionsCacheKey, id);
-                UserGroupPermissionsCache.Result.ClearCacheByKeySearch(keyStartsWith);
-            }
+            //we don't know what user's belong to this group without doing a look up so we'll need to just clear them all
+            ClearAllIsolatedCacheByEntityType<IUser>();
 
             base.Remove(id);
         }
-
-        private Attempt<IRuntimeCacheProvider> UserGroupPermissionsCache
-        {
-            get { return ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<EntityPermission>(); }
-        }
+        
     }
 }

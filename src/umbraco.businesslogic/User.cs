@@ -571,7 +571,8 @@ namespace umbraco.BusinessLogic
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
 
             var userService = ApplicationContext.Current.Services.UserService;
-            return userService.GetPermissionsForPath(UserEntity, path);
+            return string.Join("",
+                userService.GetPermissionsForPath(UserEntity, path).GetAllPermissions());
         }
 
         /// <summary>

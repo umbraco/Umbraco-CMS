@@ -1,60 +1,55 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Umbraco.Core.Models.Membership
 {
     /// <summary>
     /// Represents an entity -> user group & permission key value pair collection
-    /// </summary>
+    /// </summary>    
     public class EntityPermissionSet
     {
+        private static readonly Lazy<EntityPermissionSet> EmptyInstance = new Lazy<EntityPermissionSet>(() => new EntityPermissionSet(-1, new EntityPermissionCollection()));
         /// <summary>
-        /// The entity id with permissions assigned
+        /// Returns an empty permission set
         /// </summary>
-        public int EntityId { get; private set; }
+        /// <returns></returns>
+        public static EntityPermissionSet Empty()
+        {
+            return EmptyInstance.Value;
+        }
 
-        /// <summary>
-        /// The key/value pairs of user group id & single permission
-        /// </summary>
-        public IEnumerable<UserGroupPermission> PermissionsSet { get; private set; }
-
-        public EntityPermissionSet(int entityId, IEnumerable<UserGroupPermission> permissionsSet)
+        public EntityPermissionSet(int entityId, EntityPermissionCollection permissionsSet)
         {
             EntityId = entityId;
             PermissionsSet = permissionsSet;
         }
 
-        public class UserGroupPermission
+        /// <summary>
+        /// The entity id with permissions assigned
+        /// </summary>
+        public virtual int EntityId { get; private set; }
+
+        /// <summary>
+        /// The key/value pairs of user group id & single permission
+        /// </summary>
+        public EntityPermissionCollection PermissionsSet { get; private set; }
+
+
+        /// <summary>
+        /// Returns the aggregate permissions in the permission set
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// This value is only calculated once
+        /// </remarks>
+        public IEnumerable<string> GetAllPermissions()
         {
-            public UserGroupPermission(int groupId, string permission)
-            {
-                UserGroupId = groupId;
-                Permission = permission;
-            }
-
-            public int UserGroupId { get; private set; }
-
-            public string Permission { get; private set; }
-
-            protected bool Equals(UserGroupPermission other)
-            {
-                return UserGroupId == other.UserGroupId && string.Equals(Permission, other.Permission);
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
-                return Equals((UserGroupPermission) obj);
-            }
-
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    return (UserGroupId * 397) ^ Permission.GetHashCode();
-                }
-            }
+            return PermissionsSet.GetAllPermissions();
         }
+
+
+
+
     }
 }

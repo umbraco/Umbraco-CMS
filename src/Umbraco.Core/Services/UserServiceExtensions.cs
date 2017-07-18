@@ -4,8 +4,37 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Services
 {
-    internal static class UserServiceExtensions
+    public static class UserServiceExtensions
     {
+        /// <summary>
+        /// Get explicitly assigned permissions for a group and optional node Ids
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="group"></param>
+        /// <param name="fallbackToDefaultPermissions">
+        ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
+        /// </param>
+        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
+        /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
+        public static EntityPermissionCollection GetPermissions(this IUserService service, IUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds)
+        {
+            return service.GetPermissions(new[] {group}, fallbackToDefaultPermissions, nodeIds);
+        }
+
+        /// <summary>
+        /// Gets the permissions for the provided group and path
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="group"></param>
+        /// <param name="path">Path to check permissions for</param>
+        /// <param name="fallbackToDefaultPermissions">
+        ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
+        /// </param>
+        public static EntityPermissionSet GetPermissionsForPath(this IUserService service, IUserGroup group, string path, bool fallbackToDefaultPermissions = false)
+        {
+            return service.GetPermissionsForPath(new[] { group }, path, fallbackToDefaultPermissions);
+        }
+
         /// <summary>
         /// Remove all permissions for this user group for all nodes specified
         /// </summary>
@@ -36,7 +65,7 @@ namespace Umbraco.Core.Services
         /// To maintain compatibility we have to check the login name if the provider key lookup fails but otherwise
         /// we'll store the provider user key in the login column.
         /// </remarks>
-        public static IUser CreateUserMappingForCustomProvider(this IUserService userService, MembershipUser member)
+        internal static IUser CreateUserMappingForCustomProvider(this IUserService userService, MembershipUser member)
         {
             if (member == null) throw new ArgumentNullException("member");
 

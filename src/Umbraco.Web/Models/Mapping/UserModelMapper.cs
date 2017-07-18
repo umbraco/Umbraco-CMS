@@ -193,7 +193,7 @@ namespace Umbraco.Web.Models.Mapping
 
                     //Deal with assigned permissions:
 
-                    var allContentPermissions = applicationContext.Services.UserService.GetPermissions(group, true)
+                    var allContentPermissions = applicationContext.Services.UserService.GetPermissions(@group, true)
                         .ToDictionary(x => x.EntityId, x => x);
                     
                     var contentEntities = allContentPermissions.Keys.Count == 0

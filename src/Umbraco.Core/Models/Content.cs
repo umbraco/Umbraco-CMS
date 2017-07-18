@@ -87,7 +87,6 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
             public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.WriterId);
             public readonly PropertyInfo NodeNameSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.NodeName);
-            public readonly PropertyInfo PermissionsChangedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.PermissionsChanged);
         }
 
         /// <summary>
@@ -196,16 +195,7 @@ namespace Umbraco.Core.Models
             get { return _nodeName; }
             set { SetPropertyValueAndDetectChanges(value, ref _nodeName, Ps.Value.NodeNameSelector); }
         }
-
-        /// <summary>
-        /// Used internally to track if permissions have been changed during the saving process for this entity
-        /// </summary>
-        [IgnoreDataMember]
-        internal bool PermissionsChanged
-        {
-            get { return _permissionsChanged; }
-            set { SetPropertyValueAndDetectChanges(value, ref _permissionsChanged, Ps.Value.PermissionsChangedSelector); }
-        }
+        
 
         /// <summary>
         /// Gets the ContentType used by this content object

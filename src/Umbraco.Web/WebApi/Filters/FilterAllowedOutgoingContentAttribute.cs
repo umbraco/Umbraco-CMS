@@ -74,7 +74,7 @@ namespace Umbraco.Web.WebApi.Filters
                     var nodePermission = permissions.Where(x => x.EntityId == Convert.ToInt32(item.Id)).ToArray();
                     //if there are no permissions for this id then we need to check what the user's default
                     // permissions are.
-                    if (nodePermission.Any() == false)
+                    if (nodePermission.Length == 0)
                     {
                         //var defaultP = user.DefaultPermissions
 
