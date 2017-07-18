@@ -144,3 +144,9 @@ build/msbuild.log
 .vs/
 src/packages/
 build/tools/
+src/PrecompiledWeb/*
+
+
+build.out/
+build.tmp/
+build/Modules/*/temp/

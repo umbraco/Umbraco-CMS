@@ -24,6 +24,7 @@ using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.preview;
+using Umbraco.Core.Events;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -104,6 +105,36 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        public ContentItemDisplay GetBlueprintById(int id)
+        {
+            var foundContent = Services.ContentService.GetBlueprintById(id);
+            if (foundContent == null)
+            {
+                HandleContentNotFound(id);
+            }
+
+            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+
+            SetupBlueprint(content, foundContent);
+
+            return content;
+        }
+
+        private static void SetupBlueprint(ContentItemDisplay content, IContent persistedContent)
+        {
+            content.AllowPreview = false;
+
+            //set a custom path since the tree that renders this has the content type id as the parent
+            content.Path = string.Format("-1,{0},{1}", persistedContent.ContentTypeId, content.Id);
+
+            content.AllowedActions = new[] {'A'};
+
+            var excludeProps = new[] {"_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template"};
+            var propsTab = content.Tabs.Last();
+            propsTab.Properties = propsTab.Properties
+                .Where(p => excludeProps.Contains(p.Alias) == false);
+        }
+
         /// <summary>
         /// Gets the content json for the content id
         /// </summary>
@@ -156,6 +187,26 @@ namespace Umbraco.Web.Editors
 
             var emptyContent = Services.ContentService.CreateContent("", parentId, contentType.Alias, UmbracoUser.Id);
             var mapped = Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
+
+            //remove this tab if it exists: umbContainerView
+            var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
+            mapped.Tabs = mapped.Tabs.Except(new[] { containerTab });
+            return mapped;
+        }
+
+        [OutgoingEditorModelEvent]
+        public ContentItemDisplay GetEmpty(int blueprintId)
+        {
+            var blueprint = Services.ContentService.GetBlueprintById(blueprintId);
+            if (blueprint == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            blueprint.Id = 0;
+            blueprint.Name = string.Empty;
+
+            var mapped = Mapper.Map<ContentItemDisplay>(blueprint);
 
             //remove this tab if it exists: umbContainerView
             var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
@@ -276,6 +327,69 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Creates a blueprint from a content item 
+        /// </summary>
+        /// <param name="contentId">The content id to copy</param>
+        /// <param name="name">The name of the blueprint</param>
+        /// <returns></returns>
+        [HttpPost]
+        public SimpleNotificationModel CreateBlueprintFromContent([FromUri]int contentId, [FromUri]string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+
+            var content = Services.ContentService.GetById(contentId);
+            if (content == null)
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            EnsureUniqueName(name, content, "name");
+
+            var blueprint = Services.ContentService.CreateContentFromBlueprint(content, name, Security.GetUserId());
+
+            Services.ContentService.SaveBlueprint(blueprint, Security.GetUserId());
+
+            var notificationModel = new SimpleNotificationModel();
+            notificationModel.AddSuccessNotification(
+                Services.TextService.Localize("content/createdBlueprintHeading"),
+                Services.TextService.Localize("content/createdBlueprintMessage", new[]{ content.Name})
+            );
+
+            return notificationModel;
+        }
+
+        private void EnsureUniqueName(string name, IContent content, string modelName)
+        {
+            var existing = Services.ContentService.GetBlueprintsForContentTypes(content.ContentTypeId);
+            if (existing.Any(x => x.Name == name && x.Id != content.Id))
+            {
+                ModelState.AddModelError(modelName, Services.TextService.Localize("content/duplicateBlueprintMessage"));
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+            }
+        }
+
+        /// <summary>
+        /// Saves content
+        /// </summary>
+        /// <returns></returns>
+        [FileUploadCleanupFilter]
+        [ContentPostValidate]
+        public ContentItemDisplay PostSaveBlueprint(
+            [ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
+        {
+            var contentItemDisplay = PostSaveInternal(contentItem,
+                content =>
+                {
+                    EnsureUniqueName(content.Name, content, "Name");
+
+                    Services.ContentService.SaveBlueprint(contentItem.PersistedContent, Security.CurrentUser.Id);
+                    //we need to reuse the underlying logic so return the result that it wants
+                    return Attempt<OperationStatus>.Succeed(new OperationStatus(OperationStatusType.Success, new EventMessages()));
+                });
+            SetupBlueprint(contentItemDisplay, contentItemDisplay.PersistedContent);
+
+            return contentItemDisplay;
+        }
+
+        /// <summary>
         /// Saves content
         /// </summary>
         /// <returns></returns>
@@ -285,13 +399,18 @@ namespace Umbraco.Web.Editors
                 [ModelBinder(typeof(ContentItemBinder))]
                                 ContentItemSave contentItem)
         {
+            return PostSaveInternal(contentItem, 
+                content => Services.ContentService.WithResult().Save(contentItem.PersistedContent, Security.CurrentUser.Id));
+        }
+
+        private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, Attempt<OperationStatus>> saveMethod)
+        {
             //If we've reached here it means:
             // * Our model has been bound
             // * and validated
             // * any file attachments have been saved to their temporary location for us to use
             // * we have a reference to the DTO object and the persisted object
             // * Permissions are valid
-
             MapPropertyValues(contentItem);
 
             //We need to manually check the validation results here because:
@@ -331,7 +450,7 @@ namespace Umbraco.Web.Editors
             if (contentItem.Action == ContentSaveAction.Save || contentItem.Action == ContentSaveAction.SaveNew)
             {
                 //save the item
-                var saveResult = Services.ContentService.WithResult().Save(contentItem.PersistedContent, Security.CurrentUser.Id);
+                var saveResult = saveMethod(contentItem.PersistedContent);
 
                 wasCancelled = saveResult.Success == false && saveResult.Result.StatusType == OperationStatusType.FailedCancelledByEvent;
             }
@@ -361,8 +480,8 @@ namespace Umbraco.Web.Editors
                     if (wasCancelled == false)
                     {
                         display.AddSuccessNotification(
-                                Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
-                                Services.TextService.Localize("speechBubbles/editContentSavedText"));
+                            Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
+                            Services.TextService.Localize("speechBubbles/editContentSavedText"));
                     }
                     else
                     {
@@ -374,8 +493,8 @@ namespace Umbraco.Web.Editors
                     if (wasCancelled == false)
                     {
                         display.AddSuccessNotification(
-                                Services.TextService.Localize("speechBubbles/editContentSendToPublish"),
-                                Services.TextService.Localize("speechBubbles/editContentSendToPublishText"));
+                            Services.TextService.Localize("speechBubbles/editContentSendToPublish"),
+                            Services.TextService.Localize("speechBubbles/editContentSendToPublishText"));
                     }
                     else
                     {
@@ -397,6 +516,8 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
             }
+
+            display.PersistedContent = contentItem.PersistedContent;
 
             return display;
         }
@@ -432,6 +553,22 @@ namespace Umbraco.Web.Editors
             //return ok
             return Request.CreateResponse(HttpStatusCode.OK);
 
+        }
+
+        [HttpDelete]
+        [HttpPost]
+        public HttpResponseMessage DeleteBlueprint(int id)
+        {
+            var found = Services.ContentService.GetBlueprintById(id);
+
+            if (found == null)
+            {
+                return HandleContentNotFound(id, false);
+            }
+
+            Services.ContentService.DeleteBlueprint(found);
+
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         /// <summary>

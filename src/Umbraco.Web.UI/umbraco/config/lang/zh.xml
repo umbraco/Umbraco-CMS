@@ -1252,6 +1252,8 @@
     <key alias="templates">模板</key>
     <key alias="xslt">XSLT文件</key>
     <key alias="analytics">分析</key>
+	<key alias="partialViews">分部视图</key>
+    <key alias="partialViewMacros">分部视图宏文件</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">有可用更新</key>

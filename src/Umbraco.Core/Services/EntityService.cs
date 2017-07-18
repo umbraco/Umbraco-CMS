@@ -95,6 +95,16 @@ namespace Umbraco.Core.Services
             return result.HasValue ? Attempt.Succeed(result.Value) : Attempt<int>.Fail();
         }
 
+        public Attempt<int> GetIdForUdi(Udi udi)
+        {
+            var guidUdi = udi as GuidUdi;
+            if (guidUdi == null)
+                return Attempt<int>.Fail();
+
+            var umbracoType = Constants.UdiEntityType.ToUmbracoObjectType(guidUdi.EntityType);
+            return GetIdForKey(guidUdi.Guid, umbracoType);
+        }
+
         /// <summary>
         /// Returns the GUID for a given integer id
         /// </summary>

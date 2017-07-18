@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/ikpgqxiw9v8opltv/branch/dev-v7?svg=true)](https://ci.appveyor.com/project/Umbraco/umbraco-cms-hs8dx/branch/dev-v7)
+
 Umbraco CMS
 ===========
 The friendliest, most flexible and fastest growing ASP.NET CMS used by more than 390,000 websites worldwide: [https://umbraco.com](https://umbraco.com)

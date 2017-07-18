@@ -1,23 +1,22 @@
-﻿using Umbraco.Core;
+﻿using System;
+using System.ComponentModel;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Extensions
 {
+    [Obsolete("Use methods on UmbracoHelper instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class UdiExtensions
     {
-        /// <summary>
-        /// An extension method to easily acquire a typed version of content, media or member item for a given Udi
-        /// </summary>
-        /// <param name="udi"></param>
-        /// <returns>An <see cref="IPublishedContent"/> item if the item is a Document, Media or Member</returns>
+        [Obsolete("Use methods on UmbracoHelper instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IPublishedContent ToPublishedContent(this Udi udi)
         {
-            Udi identifier;
-            if (Udi.TryParse(udi.ToString(), out identifier) == false)
-                return null;
+            var guidUdi = udi as GuidUdi;
+            if (guidUdi == null) return null;
 
-            var guidUdi = GuidUdi.Parse(udi.ToString());
-            var umbracoType = Constants.UdiEntityType.ToUmbracoObjectType(identifier.EntityType);
+            var umbracoType = Constants.UdiEntityType.ToUmbracoObjectType(guidUdi.EntityType);
 
             var umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
             var entityService = ApplicationContext.Current.Services.EntityService;
@@ -36,7 +35,7 @@ namespace Umbraco.Web.Extensions
                         return umbracoHelper.TypedMember(memberAttempt.Result);
                     break;
             }
-            
+
             return null;
         }
     }

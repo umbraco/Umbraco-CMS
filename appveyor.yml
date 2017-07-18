@@ -11,26 +11,22 @@ build_script:
     CD build
 
     SET "release="
-
-    FOR /F "skip=1 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED release SET "release=%%i"
-
-    ECHO "Restoring NuGet into %PACKAGES%"
     
-    %SRC%\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/ >NUL
-    
-    %SRC%\.nuget\NuGet.exe restore %SRC%\umbraco.sln -Verbosity Quiet -NonInteractive -PackagesDirectory %PACKAGES%
+    SET "comment="
 
-    ECHO Building Release %release% build%APPVEYOR_BUILD_NUMBER%
+    FOR /F "skip=1 delims=" %%i IN (Version.txt) DO IF NOT DEFINED release SET "release=%%i"
+    
+    FOR /F "skip=2 delims=" %%i IN (Version.txt) DO IF NOT DEFINED comment SET "comment=%%i"
+
+    ECHO AppVeyor Build %release% %comment% %APPVEYOR_BUILD_NUMBER%
     
     SET PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
     
-    SET MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MsBuild.exe"
+    %SRC%\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/ >NUL
 
     XCOPY "%SRC%\Umbraco.Tests\unit-test-log4net.CI.config" "%SRC%\Umbraco.Tests\unit-test-log4net.config" /Y
     
-    %MSBUILD% "%SLN%/src/Umbraco.Tests/Umbraco.Tests.csproj" /consoleloggerparameters:Summary;ErrorsOnly;WarningsOnly /p:NugetPackagesDirectory=%PACKAGES%
-    
-    build.bat -integration -release:%release% -comment:build%APPVEYOR_BUILD_NUMBER% -nugetfolder:%PACKAGES%
+    build.bat -integration -build:%APPVEYOR_BUILD_NUMBER% -tests -nugetfolder:%PACKAGES%
     
 test:
   assemblies: src\Umbraco.Tests\bin\Debug\Umbraco.Tests.dll
