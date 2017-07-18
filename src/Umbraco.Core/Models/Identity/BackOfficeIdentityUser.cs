@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Models.Identity
 {
-    public class BackOfficeIdentityUser : IdentityUser<int, IIdentityUserLogin, IdentityUserRole<string>, IdentityUserClaim<int>>
+    public class BackOfficeIdentityUser : IdentityUser<int, IIdentityUserLogin, IdentityUserRole<string>, IdentityUserClaim<int>>, IRememberBeingDirty
     {
 
         public BackOfficeIdentityUser()
@@ -32,6 +34,24 @@ namespace Umbraco.Core.Models.Identity
             // defined in CookieAuthenticationOptions.AuthenticationType
             var userIdentity = await manager.CreateIdentityAsync(this, Constants.Security.BackOfficeAuthenticationType);
             return userIdentity;
+        }
+        
+        /// <summary>
+        /// Override Email so we can track changes to it
+        /// </summary>
+        public override string Email
+        {
+            get { return _email; }
+            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _email, Ps.Value.EmailSelector); }
+        }
+
+        /// <summary>
+        /// Override UserName so we can track changes to it
+        /// </summary>
+        public override string UserName
+        {
+            get { return _userName; }
+            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _userName, Ps.Value.UsernameSelector); }
         }
 
         /// <summary>
@@ -58,7 +78,7 @@ namespace Umbraco.Core.Models.Identity
         public override bool LockoutEnabled
         {
             get { return true; }
-            set 
+            set
             {
                 //do nothing 
             }
@@ -132,5 +152,74 @@ namespace Umbraco.Core.Models.Identity
         {
             get { return _allStartMediaIds ?? (_allStartMediaIds = StartMediaIds.Concat(Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId.Value)).Distinct().ToArray()); }
         }
+
+        #region Change tracking
+        /// <summary>
+        /// Since this class only has change tracking turned on for Email/Username this will return true if either of those have changed
+        /// </summary>
+        /// <returns></returns>
+        bool ICanBeDirty.IsDirty()
+        {
+            return _tracker.IsDirty();
+        }
+
+        /// <summary>
+        /// Returns true if the specified property is dirty
+        /// </summary>
+        /// <param name="propName"></param>
+        /// <returns></returns>
+        bool ICanBeDirty.IsPropertyDirty(string propName)
+        {
+            return _tracker.IsPropertyDirty(propName);
+        }
+
+        /// <summary>
+        /// Resets dirty properties
+        /// </summary>
+        void ICanBeDirty.ResetDirtyProperties()
+        {
+            _tracker.ResetDirtyProperties();
+        }
+
+        bool IRememberBeingDirty.WasDirty()
+        {
+            return _tracker.WasDirty();
+        }
+
+        bool IRememberBeingDirty.WasPropertyDirty(string propertyName)
+        {
+            return _tracker.WasPropertyDirty(propertyName);
+        }
+
+        void IRememberBeingDirty.ForgetPreviouslyDirtyProperties()
+        {
+            _tracker.ForgetPreviouslyDirtyProperties();
+        }
+
+        void IRememberBeingDirty.ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        {
+            _tracker.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+        }
+
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.Email);
+            public readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.UserName);
+        }
+
+        private readonly ChangeTracker _tracker = new ChangeTracker();
+        private string _email;
+        private string _userName;
+
+        /// <summary>
+        /// internal class used to track changes for properties that have it enabled
+        /// </summary>        
+        private class ChangeTracker : TracksChangesEntityBase
+        {
+        } 
+        #endregion
+
+
     }
 }

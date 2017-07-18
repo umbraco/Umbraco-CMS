@@ -69,7 +69,20 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="id">Id of the user to retrieve</param>
         /// <returns><see cref="IUser"/></returns>
-        IUser GetUserById(int id);
+        IUser GetUserById(int id);        
+
+        /// <summary>
+        /// Get an <see cref="IUser"/> by username
+        /// </summary>
+        /// <param name="username">Username to use for retrieval</param>
+        /// <param name="includeSecurityData">
+        /// Can be used for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes).
+        /// This is really only used for a shim in order to upgrade to 7.6.
+        /// </param>
+        /// <returns>
+        /// A non cached <see cref="IUser"/> instance
+        /// </returns>
+        IUser GetByUsername(string username, bool includeSecurityData);
 
         /// <summary>
         /// Gets a users by Id

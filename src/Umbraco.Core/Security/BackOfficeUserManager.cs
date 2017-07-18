@@ -146,7 +146,7 @@ namespace Umbraco.Core.Security
             IDataProtectionProvider dataProtectionProvider)
         {
             // Configure validation logic for usernames
-            manager.UserValidator = new UserValidator<T, int>(manager)
+            manager.UserValidator = new BackOfficeUserValidator<T>(manager)
             {
                 AllowOnlyAlphanumericUserNames = false,
                 RequireUniqueEmail = true
@@ -191,6 +191,32 @@ namespace Umbraco.Core.Security
             //});
 
             //manager.SmsService = new SmsService();            
+        }
+        
+        /// <summary>
+        /// Looks up a <see cref="BackOfficeIdentityUser"/> by username 
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="includeSecurityData">
+        /// Can be used for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes).
+        /// This is really only used for a shim in order to upgrade to 7.6.
+        /// </param>
+        /// <returns></returns>        
+        public async Task<T> FindByNameAsync(string userName, bool includeSecurityData)
+        {
+            T result;
+            if (includeSecurityData)
+            {
+                result = await Store.FindByNameAsync(userName);
+                return result;
+            }
+
+            var backOfficeUserStore = Store as BackOfficeUserStore;
+            if (backOfficeUserStore == null)
+                throw new InvalidOperationException("A custom IUserStore is in use which does not support querying users without security data");
+
+            result = (T)await backOfficeUserStore.FindByNameAsync(userName, false);
+            return result;
         }
 
         /// <summary>
@@ -266,5 +292,6 @@ namespace Umbraco.Core.Security
             }
             throw new NotSupportedException("Cannot generate a password since the type of the password validator (" + PasswordValidator.GetType() + ") is not known");
         }
+        
     }
 }

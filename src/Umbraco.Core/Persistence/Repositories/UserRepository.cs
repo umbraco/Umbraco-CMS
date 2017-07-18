@@ -52,6 +52,88 @@ namespace Umbraco.Core.Persistence.Repositories
             return user;
         }
 
+        /// <summary>
+        /// Returns a user by username
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="includeSecurityData">
+        /// Can be used for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes).
+        /// This is really only used for a shim in order to upgrade to 7.6.
+        /// </param>
+        /// <returns>
+        /// A non cached <see cref="IUser"/> instance
+        /// </returns>
+        public IUser GetByUsername(string username, bool includeSecurityData)
+        {
+            UserDto dto;
+            if (includeSecurityData)
+            {
+                var sql = GetQueryWithGroups();
+                sql.Where<UserDto>(userDto => userDto.Login == username, SqlSyntax);
+                sql //must be included for relator to work
+                    .OrderBy<UserDto>(d => d.Id, SqlSyntax)
+                    .OrderBy<UserGroupDto>(d => d.Id, SqlSyntax)
+                    .OrderBy<UserStartNodeDto>(d => d.Id, SqlSyntax);
+                dto = Database
+                    .Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(
+                        new UserGroupRelator().Map, sql)
+                    .FirstOrDefault();
+            }
+            else
+            {
+                var sql = GetBaseQuery("umbracoUser.*");
+                sql.Where<UserDto>(userDto => userDto.Login == username, SqlSyntax);
+                dto = Database.FirstOrDefault<UserDto>(sql);
+            }
+
+            if (dto == null)
+                return null;
+
+            var user = UserFactory.BuildEntity(dto);
+            return user;
+        }
+
+        /// <summary>
+        /// Returns a user by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="includeSecurityData">
+        /// This is really only used for a shim in order to upgrade to 7.6 but could be used 
+        /// for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes)
+        /// </param>
+        /// <returns>
+        /// A non cached <see cref="IUser"/> instance
+        /// </returns>
+        public IUser Get(int id, bool includeSecurityData)
+        {
+            UserDto dto;
+            if (includeSecurityData)
+            {
+                var sql = GetQueryWithGroups();
+                sql.Where(GetBaseWhereClause(), new { Id = id });
+                sql //must be included for relator to work
+                    .OrderBy<UserDto>(d => d.Id, SqlSyntax)
+                    .OrderBy<UserGroupDto>(d => d.Id, SqlSyntax)
+                    .OrderBy<UserStartNodeDto>(d => d.Id, SqlSyntax);
+                dto = Database
+                    .Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(
+                        new UserGroupRelator().Map, sql)
+                    .FirstOrDefault();
+            }
+            else
+            {
+                var sql = GetBaseQuery("umbracoUser.*");
+                sql.Where(GetBaseWhereClause(), new { Id = id });
+                dto = Database.FirstOrDefault<UserDto>(sql);                
+            }
+
+            if (dto == null)
+                return null;
+
+            var user = UserFactory.BuildEntity(dto);
+            return user;
+        }
+
         public IProfile GetProfile(string username)
         {
             var sql = GetBaseQuery(false).Where<UserDto>(userDto => userDto.UserName == username, SqlSyntax);

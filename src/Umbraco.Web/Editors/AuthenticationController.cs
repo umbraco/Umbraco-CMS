@@ -220,7 +220,7 @@ namespace Umbraco.Web.Editors
                 case SignInStatus.Success:
 
                     //get the user
-                    var user = Security.GetBackOfficeUser(loginModel.Username);
+                    var user = Security.GetOrCreateBackOfficeUser(loginModel.Username);
                     return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.RequiresVerification:
 
@@ -246,7 +246,7 @@ namespace Umbraco.Web.Editors
                                 typeof(IUmbracoBackOfficeTwoFactorOptions) + ".GetTwoFactorView returned an empty string"));
                     }
 
-                    var attemptedUser = Security.GetBackOfficeUser(loginModel.Username);
+                    var attemptedUser = Security.GetOrCreateBackOfficeUser(loginModel.Username);
                     
                     //create a with information to display a custom two factor send code view
                     var verifyResponse = Request.CreateResponse(HttpStatusCode.PaymentRequired, new
@@ -365,7 +365,7 @@ namespace Umbraco.Web.Editors
             {
                 case SignInStatus.Success:
                     //get the user
-                    var user = Security.GetBackOfficeUser(userName);
+                    var user = Security.GetOrCreateBackOfficeUser(userName);
                     return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.LockedOut:
                     return Request.CreateValidationErrorResponse("User is locked out");                    

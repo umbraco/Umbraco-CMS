@@ -55,8 +55,35 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, Expression<Func<IUser, object>> orderBy, Direction orderDirection, string[] userGroups = null, UserState[] userState = null, IQuery<IUser> filter = null);
 
+        /// <summary>
+        /// Returns a user by username
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="includeSecurityData">
+        /// This is really only used for a shim in order to upgrade to 7.6 but could be used 
+        /// for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes)
+        /// </param>
+        /// <returns>
+        /// A non cached <see cref="IUser"/> instance
+        /// </returns>
+        IUser GetByUsername(string username, bool includeSecurityData);
+
+        /// <summary>
+        /// Returns a user by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="includeSecurityData">
+        /// This is really only used for a shim in order to upgrade to 7.6 but could be used 
+        /// for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes)
+        /// </param>
+        /// <returns>
+        /// A non cached <see cref="IUser"/> instance
+        /// </returns>
+        IUser Get(int id, bool includeSecurityData);
+
         IProfile GetProfile(string username);
         IProfile GetProfile(int id);
         IDictionary<UserState, int> GetUserStates();
+        
     }
 }

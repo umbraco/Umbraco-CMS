@@ -8,9 +8,11 @@ using System.Web.Security;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using IUser = Umbraco.Core.Models.Membership.IUser;
 
 namespace Umbraco.Core.Security
 {
@@ -191,6 +193,29 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
+        /// Looks up a <see cref="BackOfficeIdentityUser"/> by username
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="includeSecurityData">
+        /// Can be used for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes).
+        /// This is really only used for a shim in order to upgrade to 7.6.
+        /// </param>
+        /// <returns></returns>    
+        public virtual async Task<BackOfficeIdentityUser> FindByNameAsync(string userName, bool includeSecurityData)
+        {
+            ThrowIfDisposed();
+            var user = _userService.GetByUsername(userName, includeSecurityData);
+            if (user == null)
+            {
+                return null;
+            }
+
+            var result = AssignLoginsCallback(Mapper.Map<BackOfficeIdentityUser>(user));
+
+            return await Task.FromResult(result);
+        }        
+
+        /// <summary>
         /// Set the user password hash
         /// </summary>
         /// <param name="user"/><param name="passwordHash"/>
@@ -367,12 +392,17 @@ namespace Umbraco.Core.Security
             var result = _externalLoginService.Find(login).ToArray();
             if (result.Any())
             {
-                //return the first member that matches the result
-                var output = (from l in result
-                            select _userService.GetUserById(l.UserId)
-                                into user
-                                where user != null
-                                  select Mapper.Map<BackOfficeIdentityUser>(user)).FirstOrDefault();
+                //return the first user that matches the result
+                BackOfficeIdentityUser output = null;
+                foreach (var l in result)
+                {
+                    var user = _userService.GetUserById(l.UserId);
+                    if (user != null)
+                    {
+                        output = Mapper.Map<BackOfficeIdentityUser>(user);
+                        break;
+                    }
+                }
 
                 return Task.FromResult(AssignLoginsCallback(output));
             }
@@ -717,6 +747,9 @@ namespace Umbraco.Core.Security
                 }
             }
 
+            //reset all changes
+            ((IRememberBeingDirty) identityUser).ResetDirtyProperties(false);
+
             return anythingChanged;
         }
 
@@ -726,7 +759,6 @@ namespace Umbraco.Core.Security
             if (_disposed)
                 throw new ObjectDisposedException(GetType().Name);
         }
-
-      
+        
     }
 }

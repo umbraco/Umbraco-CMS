@@ -190,30 +190,27 @@ namespace Umbraco.Web.Security
 
         /// <summary>
         /// Gets (and creates if not found) the back office <see cref="IUser"/> instance for the username specified
+        /// and updates the user's online flag
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
         /// <remarks>
+        /// <para>
         /// This will return an <see cref="IUser"/> instance no matter what membership provider is installed for the back office, it will automatically
-        /// create any missing <see cref="IUser"/> accounts if one is not found and a custom membership provider or <see cref="IBackOfficeUserPasswordChecker"/> is being used. 
+        /// create any missing <see cref="IUser"/> accounts if one is not found and a custom membership provider is being used. 
+        /// </para>
+        /// <para>
+        /// This will try to deal with any custom membership provider that may exist, though this is not a recommended approach anymore people still
+        /// have these so we need to maintain compat.
+        /// </para>
+        /// TODO: I don't think this method is needed so the todo statment below, pretty sure we can simplify this whole thing
         /// </remarks>
-        internal IUser GetBackOfficeUser(string username)
+        internal IUser GetOrCreateBackOfficeUser(string username)
         {
-            //get the membership user (set user to be 'online' in the provider too)
-            var membershipUser = GetBackOfficeMembershipUser(username, true);
-            var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
+            //See if this user object already exists in the umbraco data
+            var user = _applicationContext.Services.UserService.GetByUsername(username);
 
-            if (membershipUser == null)
-            {
-                throw new InvalidOperationException(
-                    "The username & password validated but the membership provider '" +
-                    provider.Name +
-                    "' did not return a MembershipUser with the username supplied");
-            }
-
-            //regarldess of the membership provider used, see if this user object already exists in the umbraco data
-            var user = _applicationContext.Services.UserService.GetByUsername(membershipUser.UserName);
-
+            var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();            
             //we're using the built-in membership provider so the user will already be available
             if (provider.IsUmbracoUsersProvider())
             {
@@ -225,9 +222,24 @@ namespace Umbraco.Web.Security
                 return user;
             }
 
+            //TODO: I don't think this logic can ever get hit! This will only ever get called after the PasswordSignInAsync method will 
+            // be executed and that requires that a user exists locally, it will not work if one doesn't!
+            // VERIFY THIS!
+
             //we are using a custom membership provider for the back office, in this case we need to create user accounts for the logged in member.
             //if we already have a user object in Umbraco we don't need to do anything, otherwise we need to create a mapped Umbraco account.
             if (user != null) return user;
+
+            //get the membership user from the custom provider (set user to be 'online' in the provider too)
+            var membershipUser = GetBackOfficeMembershipUser(username, true);
+
+            if (membershipUser == null)
+            {
+                throw new InvalidOperationException(
+                    "The username & password validated but the membership provider '" +
+                    provider.Name +
+                    "' did not return a MembershipUser with the username supplied");
+            }
 
             var email = membershipUser.Email;
             if (email.IsNullOrWhiteSpace())
