@@ -50,17 +50,8 @@
           
           <ng-form name="avatarForm">
             
-            <umb-avatar style="margin-bottom: 10px;"
-                        ng-if="invitedUser.avatars.length > 0"
-                        color="secondary"
-                        size="xxl"
-                        name="{{invitedUser.name}}"
-                        img-src="{{invitedUser.avatars[3]}}"
-                        img-srcset="{{invitedUser.avatars[4]}} 2x, {{invitedUser.avatars[4]}} 3x">
-            </umb-avatar>
-
-            <umb-progress-bar style="max-width: 100px;"
-                              ng-if="avatarFile.uploadStatus === 'uploading'"
+            <umb-progress-bar style="max-width: 100px; margin-bottom: 5px;"
+                              ng-show="avatarFile.uploadStatus === 'uploading'"
                               progress="{{ avatarFile.uploadProgress }}"
                               size="s">
             </umb-progress-bar>
@@ -69,14 +60,21 @@
               {{ avatarFile.serverErrorMessage }}
             </div>
 
-            <a style="border-radius: 50%; width: 100px; height: 100px; font-size: 50px; text-align: center; display: flex; align-items: center; justify-content: center; background-color: #F3F3F5; border: 2px dashed #A2A1A6; color: #A2A1A6;"
-               ng-if="avatarFile.uploadStatus !== 'uploading'"
-               ngf-select
-               ng-model="avatarFile.filesHolder"
-               ngf-change="changeAvatar($files, $event)"
-               ngf-multiple="false"
-               ngf-pattern="{{avatarFile.acceptedFileTypes}}"
-               ngf-max-size="{{ avatarFile.maxFileSize }}">+</a>
+              <a class="umb-avatar-btn"
+                 ngf-select
+                 ng-model="avatarFile.filesHolder"
+                 ngf-change="changeAvatar($files, $event)"
+                 ngf-multiple="false"
+                 ngf-pattern="{{avatarFile.acceptedFileTypes}}"
+                 ngf-max-size="{{ avatarFile.maxFileSize }}">
+                  
+                  <umb-avatar color="gray"
+                              size="xl"
+                              unknown-char="+"
+                              img-src="{{invitedUser.avatars[3]}}"
+                              img-srcset="{{invitedUser.avatars[4]}} 2x, {{invitedUser.avatars[4]}} 3x">
+                  </umb-avatar>
+              </a>
             
           </ng-form>
         </div>

@@ -58,6 +58,9 @@ Use this directive to render an avatar.
             scope.initials = "";
 
             function onInit() {
+                if (!scope.unknownChar) {
+                    scope.unknownChar = "?";
+                }
                 scope.initials = getNameInitials(scope.name);
             }
 
@@ -67,6 +70,7 @@ Use this directive to render an avatar.
                     initials = ((initials.shift() || '') + (initials.pop() || '')).toUpperCase();
                     return initials;
                 }
+                return null;
             }
 
             eventBindings.push(scope.$watch('name', function (newValue, oldValue) {
@@ -88,7 +92,8 @@ Use this directive to render an avatar.
                 name: "@",
                 color: "@",
                 imgSrc: "@",
-                imgSrcset: "@"
+                imgSrcset: "@",
+                unknownChar: "@"
             },
             link: link
         };
