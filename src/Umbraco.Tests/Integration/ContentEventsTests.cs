@@ -313,6 +313,13 @@ namespace Umbraco.Tests.Integration
             _msgCount++;
         }
 
+        private void WriteEvents()
+        {
+            Console.WriteLine("EVENTS");
+            foreach (var e in _events)
+                Console.WriteLine(e);
+        }
+
         #endregion
 
         #region Save, Publish & UnPublish single content

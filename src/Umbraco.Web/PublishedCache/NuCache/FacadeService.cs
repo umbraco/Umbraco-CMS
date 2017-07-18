@@ -939,10 +939,28 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ICacheProvider snapshotCache;
             lock (_storesLock)
             {
-                contentSnap = _contentStore.CreateSnapshot();
-                mediaSnap = _mediaStore.CreateSnapshot();
-                domainSnap = _domainStore.CreateSnapshot();
-                snapshotCache = _snapshotCache;
+                var scopeContext = _scopeProvider.Context;
+
+                if (scopeContext == null)
+                {
+                    contentSnap = _contentStore.CreateSnapshot();
+                    mediaSnap = _mediaStore.CreateSnapshot();
+                    domainSnap = _domainStore.CreateSnapshot();
+                    snapshotCache = _snapshotCache;
+                }
+                else
+                {
+                    // FIXME
+                    contentSnap = _contentStore.LiveSnapshot;
+                    mediaSnap = _mediaStore.LiveSnapshot;
+                    domainSnap = _domainStore.Test.LiveSnapshot;
+                    snapshotCache = _snapshotCache;
+
+                    scopeContext.Enlist("Umbraco.Web.PublishedCache.NuCache.FacadeService.FooDang", () => this, (completed, svc) =>
+                    {
+                        ((Facade) svc.CurrentFacade).Resync();
+                    });
+                }
 
                 // create a new snapshot cache if snapshots are different gens
                 if (contentSnap.Gen != _contentGen || mediaSnap.Gen != _mediaGen || domainSnap.Gen != _domainGen || _snapshotCache == null)
@@ -954,9 +972,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
             }
 
+            // FIXME the facade cache is a problem here when it's the request cache?!
             var facadeCache = _options.FacadeCacheIsApplicationRequestCache
                 ? Current.ApplicationCache.RequestCache
                 : new StaticCacheProvider(); // assuming that's OK for tests, etc
+
             var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _logger);
 
             var domainCache = new DomainCache(domainSnap);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Routing;
 using LightInject;
@@ -8,7 +9,9 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -48,9 +51,16 @@ namespace Umbraco.Tests.Scoping
             _cacheRefresher?.Unbind();
             _cacheRefresher = null;
 
-            //_onPublishedAssertAction = null;
-            //ContentService.Published -= OnPublishedAssert;
+            _onPublishedAssertAction = null;
+            ContentService.Published -= OnPublishedAssert;
         }
+
+        private void OnPublishedAssert(IContentService sender, PublishEventArgs<IContent> args)
+        {
+            _onPublishedAssertAction?.Invoke();
+        }
+
+        private Action _onPublishedAssertAction;
 
         protected override IFacadeService CreateFacadeService()
         {
@@ -92,7 +102,7 @@ namespace Umbraco.Tests.Scoping
 
         [TestCase(true)]
         [TestCase(false)]
-        public void WipTest(bool complete)
+        public void TestScope(bool complete)
         {
             var umbracoContext = GetUmbracoContextNu("http://example.com/", setSingleton: true);
 
@@ -105,9 +115,34 @@ namespace Umbraco.Tests.Scoping
             Current.Services.ContentTypeService.Save(contentType);
             var item = new Content("name", -1, contentType);
 
+            // event handler
+            var evented = 0;
+            _onPublishedAssertAction = () =>
+            {
+                evented++;
+
+                var e = umbracoContext.ContentCache.GetById(item.Id);
+
+                // during events, due to LiveSnapshot, we see the changes
+                Assert.IsNotNull(e);
+                Assert.AreEqual("changed", e.Name);
+            };
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 Current.Services.ContentService.SaveAndPublishWithStatus(item);
+                scope.Complete();
+            }
+
+            // been created
+            var x = umbracoContext.ContentCache.GetById(item.Id);
+            Assert.IsNotNull(x);
+            Assert.AreEqual("name", x.Name);
+
+            ContentService.Published += OnPublishedAssert;
+
+            using (var scope = ScopeProvider.CreateScope())
+            {
                 item.Name = "changed";
                 Current.Services.ContentService.SaveAndPublishWithStatus(item);
 
@@ -115,22 +150,16 @@ namespace Umbraco.Tests.Scoping
                     scope.Complete();
             }
 
-            // fixme - some exceptions are badly swallowed by the scope 'robust exit'?
-            // fixme - the plumbing of 'other' content types is badly borked
+            // only 1 event occuring because we are publishing twice for the same event for
+            // the same object and the scope deduplicates the events (uses the latest)
+            Assert.AreEqual(complete ? 1 : 0, evented);
 
-            var x = umbracoContext.ContentCache.GetById(item.Id);
-
-            if (complete)
-            {
-                Assert.IsNotNull(x);
-                Assert.AreEqual("changed", x.Name);
-            }
-            else
-            {
-                Assert.IsNull(x);
-            }
-
-            // fixme - should do more tests & ensure it's all consistent even after rollback
+            // after the scope,
+            // if completed, we see the changes
+            // else changes have been rolled back
+            x = umbracoContext.ContentCache.GetById(item.Id);
+            Assert.IsNotNull(x);
+            Assert.AreEqual(complete ? "changed" : "name", x.Name);
         }
     }
 }

@@ -855,6 +855,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        public Snapshot LiveSnapshot => new Snapshot(this, _liveGen
+#if DEBUG
+            , _logger
+#endif
+        );
+
         public Task CollectAsync()
         {
             lock (_rlocko)
@@ -996,8 +1002,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 set => _store._collectAuto = value;
             }
 
-            public Snapshot LiveSnapshot => new Snapshot(_store, _store._liveGen);
-
             public Tuple<long, ContentNode>[] GetValues(int id)
             {
                 _store._contentNodes.TryGetValue(id, out LinkedNode<ContentNode> link); // else null
@@ -1069,10 +1073,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
 #endif
             }
 
-            internal Snapshot(ContentStore store, long gen)
+            internal Snapshot(ContentStore store, long gen
+#if DEBUG
+                , ILogger logger
+#endif
+                )
             {
                 _store = store;
                 _gen = gen;
+
+#if DEBUG
+                _logger = logger;
+                _logger.Debug<Snapshot>("Creating live.");
+#endif
             }
 
             public ContentNode Get(int id)
@@ -1146,7 +1159,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 if (_gen < 0) return;
 #if DEBUG
-                _logger.Debug<Snapshot>("Dispose snapshot (" + _genRef.GenRefRef.Count + ").");
+                _logger.Debug<Snapshot>("Dispose snapshot (" + (_genRef?.GenRefRef.Count.ToString() ?? "live") + ").");
 #endif
                 _gen = -1;
                 if (_genRef != null)

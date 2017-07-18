@@ -1857,10 +1857,10 @@ namespace Umbraco.Core.Services
                 if (raiseEvents)
                     uow.Events.Dispatch(Saved, this, new SaveEventArgs<IContent>(saved, false));
 
+                uow.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
+
                 if (raiseEvents && published.Any())
                     uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(published, false, false), "Published");
-
-                uow.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
 
                 Audit(uow, AuditType.Sort, "Sorting content performed by user", userId, 0);
 
@@ -1969,8 +1969,8 @@ namespace Umbraco.Core.Services
                     publishedItems.Add(publishedItem);
                 }
 
-                uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedItems, false, false), "Published");
                 uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
+                uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedItems, false, false), "Published");
                 Audit(uow, AuditType.Publish, "Publish with Children performed by user", userId, content.Id);
 
                 uow.Complete();
@@ -2075,23 +2075,22 @@ namespace Umbraco.Core.Services
                     return status;
                 }
 
+                if (isNew == false && previouslyPublished == false)
+                    changeType = TreeChangeTypes.RefreshBranch; // whole branch
+
+                // invalidate the node/branch
+                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
+
                 uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false), "Published");
 
                 // if was not published and now is... descendants that were 'published' (but
                 // had an unpublished ancestor) are 're-published' ie not explicitely published
                 // but back as 'published' nevertheless
-                if (isNew == false && previouslyPublished == false)
+                if (isNew == false && previouslyPublished == false &&HasChildren(content.Id))
                 {
-                    if (HasChildren(content.Id))
-                    {
-                        var descendants = GetPublishedDescendantsLocked(uow, repository, content).ToArray();
-                        uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
-                    }
-                    changeType = TreeChangeTypes.RefreshBranch; // whole branch
+                    var descendants = GetPublishedDescendantsLocked(uow, repository, content).ToArray();
+                    uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
                 }
-
-                // invalidate the node/branch
-                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
 
                 Audit(uow, AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
 
