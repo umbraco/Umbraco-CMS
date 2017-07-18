@@ -56,14 +56,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
             {
-                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultipleMediaPickerAlias);
+                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultipleMediaPickerAlias) ||
+                       propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPickerAlias); // this is the double legacy media picker, it can pick only single media items
             }
-
-            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
-            {
-                // this is the double legacy media picker, it can pick only single media items
-                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPickerAlias);
-            }
+            
             return false;
         }
 
