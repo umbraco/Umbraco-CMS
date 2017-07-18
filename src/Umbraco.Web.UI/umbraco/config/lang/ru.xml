@@ -353,7 +353,8 @@
     <key alias="theFriendliestCommunity">Самое дружелюбное сообщество</key>
     <key alias="linkToPage">Ссылка на страницу</key>
     <key alias="openInNewWindow">Открывать ссылку в новом окне или вкладке браузера</key>
-    <key alias="linkToMedia">Ссылка на медиа-файл</key>
+    <key alias="linkToMedia">Ссылка на медиа-элемент</key>
+    <key alias="linkToFile">Ссылка на файл</key>
     <key alias="selectMedia">Выбрать медиа</key>
     <key alias="selectIcon">Выбрать значок</key>
     <key alias="selectItem">Выбрать элемент</key>
@@ -363,7 +364,7 @@
     <key alias="selectMember">Выбрать участника</key>
     <key alias="selectMemberGroup">Выбрать группу участников</key>
     <key alias="noMacroParams">Это макрос без параметров</key>
-    <key alias="noMacros">Нет макросов доступных для вставки в редактор</key>
+    <key alias="noMacros">Нет макросов, доступных для вставки в редактор</key>
     <key alias="externalLoginProviders">Провайдеры аутентификации</key>
     <key alias="exceptionDetail">Подробное сообщение об ошибке</key>
     <key alias="stacktrace">Трассировка стека</key>
@@ -484,6 +485,7 @@
     <key alias="closewindow">Закрыть окно</key>
     <key alias="comment">Примечание</key>
     <key alias="confirm">Подтвердить</key>
+    <key alias="constrain">Сохранять пропорции</key>
     <key alias="constrainProportions">Сохранять пропорции</key>
     <key alias="continue">Далее</key>
     <key alias="copy">Копировать</key>
@@ -551,6 +553,7 @@
     <key alias="rename">Переименовать</key>
     <key alias="renew">Обновить</key>
     <key alias="required" version="7.0">Обязательное</key>
+    <key alias="retrieve">Получить</key>
     <key alias="retry">Повторить</key>
     <key alias="rights">Разрешения</key>
     <key alias="search">Поиск</key>
@@ -568,7 +571,7 @@
     <key alias="update">Обновить</key>
     <key alias="upgrade">Обновление</key>
     <key alias="upload">Загрузить</key>
-    <key alias="url">URL</key>
+    <key alias="url">Интернет-ссылка</key>
     <key alias="user">Пользователь</key>
     <key alias="username">Имя пользователя</key>
     <key alias="value">Значение</key>
@@ -987,7 +990,7 @@
     <key alias="dropHere">Перетащите сюда</key>
     <key alias="orClickHereToUpload">или нажмите здесь для выбора файла пакета</key>
     <key alias="uploadPackage">Загрузить пакет</key>
-    <key alias="localPackageDescr">Установите локальный пакет из файла, расположенного на Вашем компьютере. Остерегайтесь устанавливать пакеты из непроверенных источников!</key>
+    <key alias="localPackageDescription">Установите локальный пакет из файла, расположенного на Вашем компьютере. Остерегайтесь устанавливать пакеты из непроверенных источников!</key>
     <key alias="uploadAnother">Загрузить еще один пакет</key>
     <key alias="cancelAndUploadAnother">Отменить и загрузить другой пакет</key>
     <key alias="packageLicense">Лицензия</key>
@@ -1419,12 +1422,15 @@
   </area>
   <area alias="templateEditor">
     <key alias="addFallbackField">Добавить поле замены</key>
+    <key alias="fallbackField">Поле замены</key>
     <key alias="addDefaultValue">Добавить значение по-умолчанию</key>
+    <key alias="defaultValue">Значение по-умолчанию</key>
     <key alias="alternativeField">Альтернативное поле</key>
     <key alias="alternativeText">Текст по-умолчанию</key>
     <key alias="casing">Регистр</key>
     <key alias="chooseField">Выбрать поле</key>
     <key alias="convertLineBreaks">Преобразовать переводы строк</key>
+    <key alias="convertLineBreaksDescription">Да, преобразовывать</key>
     <key alias="convertLineBreaksHelp">Заменяет переводы строк на тэг html 'br'</key>
     <key alias="customFields">Пользовательские</key>
     <key alias="dateOnly">Только дата</key>
@@ -1523,6 +1529,8 @@
     <key alias="documentTypes">Типы документов</key>
     <key alias="packager">Пакеты дополнений</key>
     <key alias="packages">Пакеты дополнений</key>
+    <key alias="partialViews">Частичные представления</key>
+    <key alias="partialViewMacros">Файлы макросов</key>
     <key alias="python">Скрипты Python</key>
     <key alias="relationTypes">Типы связей</key>
     <key alias="repositories">Установить из репозитория</key>

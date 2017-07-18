@@ -230,7 +230,7 @@ namespace Umbraco.Web.Editors
                 basic.Description = TranslateItem(basic.Description);
             }
 
-            return basics;
+            return basics.OrderBy(x => x.Name);
         }
 
         /// <summary>

@@ -47,10 +47,25 @@ h5.-black {
     background: none;
     border: none
 }
-.datepicker td.active,
-.datepicker td span.active {
-    background: @turquoise !important;
+.bootstrap-datetimepicker-widget {
+    td {
+        &.active, span.active {
+            background: @turquoise !important;
+        }
+        &.today:not(.active):before {
+            border-bottom-color: @purple-l1 !important;
+        }
+        a[data-action] {
+            padding: 0 !important;
+        }
+        .timepicker-hour,
+        .timepicker-minute,
+        .timepicker-second {
+            margin: 8px 0;
+        }
+    }
 }
+
 .umb-datetime-picker div.info {
     vertical-align: middle
 }

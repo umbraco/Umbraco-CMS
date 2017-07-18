@@ -1285,4 +1285,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="enabledConfirm">URL tracker er nu slået fra.</key>
     <key alias="enableError">Der opstod en fejl under forsøget på at slå URL trackeren til, der findes mere information i logfilen.</key>
   </area>
+  <area alias="textbox">
+    <key alias="characters_left">Karakterer tilbage</key>
+  </area>
 </language>
