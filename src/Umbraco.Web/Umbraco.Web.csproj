@@ -439,7 +439,7 @@
     <Compile Include="PropertyEditors\ValueConverters\MediaPickerPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MemberPickerPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerPropertyConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\MultipleMediaPickerPropertyConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\LegacyMediaPickerPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentSingleValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentManyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentPublishedPropertyTypeExtensions.cs" />
@@ -467,6 +467,7 @@
     <Compile Include="SingletonHttpContextAccessor.cs" />
     <Compile Include="Trees\ContentBlueprintTreeController.cs" />
     <Compile Include="Trees\ContentTypeTreeController.cs" />
+    <Compile Include="Trees\FileSystemTreeController.cs" />
     <Compile Include="Trees\PackagesTreeController.cs" />
     <Compile Include="Trees\MediaTypeTreeController.cs" />
     <Compile Include="Trees\MemberTypeTreeController.cs" />
@@ -721,7 +722,7 @@
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
-    <Compile Include="Trees\FileSystemTreeController.cs" />
+    <Compile Include="Trees\FileSystemTreeController2.cs" />
     <Compile Include="Trees\LanguageTreeController.cs" />
     <Compile Include="Trees\LegacyBaseTreeAttribute.cs" />
     <Compile Include="Trees\MemberTreeController.cs" />

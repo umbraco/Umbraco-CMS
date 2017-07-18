@@ -115,7 +115,7 @@ namespace Umbraco.Web.Cache
             }
 
             TagsValueConverter.ClearCaches();
-            MultipleMediaPickerPropertyConverter.ClearCaches();
+            LegacyMediaPickerPropertyConverter.ClearCaches();
             SliderValueConverter.ClearCaches();
             MediaPickerPropertyConverter.ClearCaches();
 

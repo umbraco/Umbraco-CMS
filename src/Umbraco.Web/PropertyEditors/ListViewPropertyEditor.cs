@@ -51,6 +51,9 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class ListViewPreValueEditor : PreValueEditor
         {
+            [PreValueField("tabName", "Tab Name", "textstring", Description = "The name of the listview tab (default if empty: 'Child Items')")]
+            public int TabName { get; set; }
+
             [PreValueField("displayAtTabNumber", "Display At Tab Number", "number", Description = "Which tab position that the list of child items will be displayed")]
             public int DisplayAtTabNumber { get; set; }
 

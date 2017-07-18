@@ -165,12 +165,20 @@ namespace Umbraco.Web.Models.Mapping
             var listViewTab = new Tab<ContentPropertyDisplay>();
             listViewTab.Alias = Constants.Conventions.PropertyGroups.ListViewGroupName;
             listViewTab.Label = localizedTextService.Localize("content/childItems");
-            listViewTab.Id = 25;
+            listViewTab.Id = display.Tabs.Count() + 1;
             listViewTab.IsActive = true;
 
             var listViewConfig = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals);
             //add the entity type to the config
             listViewConfig["entityType"] = entityType;
+
+            //Override Tab Label if tabName is provided
+            if (listViewConfig.ContainsKey("tabName"))
+            {
+                var configTabName = listViewConfig["tabName"];
+                if (configTabName != null && string.IsNullOrWhiteSpace(configTabName.ToString()) == false)
+                    listViewTab.Label = configTabName.ToString();
+            }
 
             var listViewProperties = new List<ContentPropertyDisplay>();
             listViewProperties.Add(new ContentPropertyDisplay

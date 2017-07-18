@@ -344,7 +344,9 @@
     <Compile Include="HashCodeHelper.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
+    <Compile Include="Models\IUserControl.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeConverter.cs" />
+    <Compile Include="Models\UserControl.cs" />
     <Compile Include="OrderedHashSet.cs" />
     <Compile Include="Events\UninstallPackageEventArgs.cs" />
     <Compile Include="Models\GridValue.cs" />
@@ -578,12 +580,15 @@
     <Compile Include="Persistence\Repositories\Interfaces\IRedirectUrlRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IServerRegistrationRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IDeleteMediaFilesRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IUserControlRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IXsltFileRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskTypeRepository.cs" />
+    <Compile Include="Persistence\Repositories\MacroScriptRepository.cs" />
     <Compile Include="Persistence\Repositories\MigrationEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepository.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepository.cs" />
+    <Compile Include="Persistence\Repositories\UserControlRepository.cs" />
     <Compile Include="Persistence\Repositories\XsltFileRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />

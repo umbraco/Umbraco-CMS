@@ -19,6 +19,8 @@ namespace Umbraco.Core.IO
 
         private ShadowWrapper _macroPartialFileSystem;
         private ShadowWrapper _partialViewsFileSystem;
+        private ShadowWrapper _macroScriptsFileSystem;
+        private ShadowWrapper _userControlsFileSystem;
         private ShadowWrapper _stylesheetsFileSystem;
         private ShadowWrapper _scriptsFileSystem;
         private ShadowWrapper _xsltFileSystem;
@@ -61,6 +63,8 @@ namespace Umbraco.Core.IO
         {
             var macroPartialFileSystem = new PhysicalFileSystem(SystemDirectories.MacroPartials);
             var partialViewsFileSystem = new PhysicalFileSystem(SystemDirectories.PartialViews);
+            var macroScriptsFileSystem = new PhysicalFileSystem(SystemDirectories.MacroScripts);
+            var userControlsFileSystem = new PhysicalFileSystem(SystemDirectories.UserControls);
             var stylesheetsFileSystem = new PhysicalFileSystem(SystemDirectories.Css);
             var scriptsFileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
             var xsltFileSystem = new PhysicalFileSystem(SystemDirectories.Xslt);
@@ -69,6 +73,8 @@ namespace Umbraco.Core.IO
 
             _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", ScopeProvider);
             _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", ScopeProvider);
+            _macroScriptsFileSystem = new ShadowWrapper(macroScriptsFileSystem, "macroScripts", ScopeProvider);
+            _userControlsFileSystem = new ShadowWrapper(userControlsFileSystem, "usercontrols", ScopeProvider);
             _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", ScopeProvider);
             _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", ScopeProvider);
             _xsltFileSystem = new ShadowWrapper(xsltFileSystem, "xslt", ScopeProvider);
@@ -85,6 +91,10 @@ namespace Umbraco.Core.IO
 
         public IFileSystem2 MacroPartialsFileSystem { get { return _macroPartialFileSystem; } }
         public IFileSystem2 PartialViewsFileSystem { get { return _partialViewsFileSystem; } }
+        // Legacy /macroScripts folder
+        public IFileSystem2 MacroScriptsFileSystem { get { return _macroScriptsFileSystem; } }
+        // Legacy /usercontrols folder
+        public IFileSystem2 UserControlsFileSystem { get { return _userControlsFileSystem; } }
         public IFileSystem2 StylesheetsFileSystem { get { return _stylesheetsFileSystem; } }
         public IFileSystem2 ScriptsFileSystem { get { return _scriptsFileSystem; } }
         public IFileSystem2 XsltFileSystem { get { return _xsltFileSystem; } }
@@ -252,13 +262,15 @@ namespace Umbraco.Core.IO
         internal ICompletable Shadow(Guid id)
         {
             var typed = _wrappers.ToArray();
-            var wrappers = new ShadowWrapper[typed.Length + 7];
+            var wrappers = new ShadowWrapper[typed.Length + 9];
             var i = 0;
             while (i < typed.Length) wrappers[i] = typed[i++];
             wrappers[i++] = _macroPartialFileSystem;
+            wrappers[i++] = _macroScriptsFileSystem;
             wrappers[i++] = _partialViewsFileSystem;
             wrappers[i++] = _stylesheetsFileSystem;
             wrappers[i++] = _scriptsFileSystem;
+            wrappers[i++] = _userControlsFileSystem;
             wrappers[i++] = _xsltFileSystem;
             wrappers[i++] = _masterPagesFileSystem;
             wrappers[i] = _mvcViewsFileSystem;
