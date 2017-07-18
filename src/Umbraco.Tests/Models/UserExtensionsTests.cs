@@ -1,5 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 
@@ -23,7 +24,7 @@ namespace Umbraco.Tests.Models
             contentMock.Setup(c => c.Path).Returns(contentPath);
             var content = contentMock.Object;
 
-            Assert.AreEqual(outcome, user.HasPathAccess(content));
+            Assert.AreEqual(outcome, user.HasPathAccess(content, ApplicationContext.Current.Services.EntityService));
         }
     }
 }

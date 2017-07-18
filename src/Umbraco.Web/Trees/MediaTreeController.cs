@@ -163,7 +163,7 @@ namespace Umbraco.Web.Trees
             {
                 return false;
             }
-            return Security.CurrentUser.HasPathAccess(media);
+            return Security.CurrentUser.HasPathAccess(media, Services.EntityService);
         }
     }
 }

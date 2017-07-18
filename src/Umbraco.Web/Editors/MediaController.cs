@@ -254,7 +254,7 @@ namespace Umbraco.Web.Editors
         private int[] _userStartNodes;
         protected int[] UserStartNodes
         {
-            get { return _userStartNodes ?? (_userStartNodes = Security.CurrentUser.AllStartMediaIds); }
+            get { return _userStartNodes ?? (_userStartNodes = Security.CurrentUser.GetAllMediaStartNodes(Services.EntityService)); }
         }
 
         /// <summary>
@@ -910,17 +910,12 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
+            var entityService = Core.ApplicationContext.Current.Services.EntityService;
             var hasPathAccess = (nodeId == Constants.System.Root)
-                ? UserExtensions.HasPathAccess(
-                    Constants.System.Root.ToInvariantString(),
-                    user.AllStartMediaIds,
-                    Constants.System.RecycleBinMedia)
+                ? user.HasMediaRootAccess(entityService)
                 : (nodeId == Constants.System.RecycleBinMedia)
-                    ? UserExtensions.HasPathAccess(
-                        Constants.System.RecycleBinMedia.ToInvariantString(),
-                        user.AllStartMediaIds,
-                        Constants.System.RecycleBinMedia)
-                    : user.HasPathAccess(media);
+                    ? user.HasMediaBinAccess(entityService)
+                    : user.HasPathAccess(media, entityService);
 
             return hasPathAccess;
         }

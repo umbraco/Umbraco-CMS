@@ -107,19 +107,36 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Checks if the user has access to the content item based on their start noe
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="content"></param>
-        /// <returns></returns>
-        internal static bool HasPathAccess(this IUser user, IContent content)
+        internal static bool HasContentRootAccess(this IUser user, IEntityService entityService)
         {
-            if (user == null) throw new ArgumentNullException("user");
-            if (content == null) throw new ArgumentNullException("content");
-            return HasPathAccess(content.Path, user.AllStartContentIds, Constants.System.RecycleBinContent);
+            return HasPathAccess(Constants.System.Root.ToInvariantString(), user.GetAllContentStartNodes(entityService), Constants.System.RecycleBinContent);
         }
-        
+
+        internal static bool HasContentBinAccess(this IUser user, IEntityService entityService)
+        {
+            return HasPathAccess(Constants.System.RecycleBinContent.ToInvariantString(), user.GetAllContentStartNodes(entityService), Constants.System.RecycleBinContent);
+        }
+
+        internal static bool HasMediaRootAccess(this IUser user, IEntityService entityService)
+        {
+            return HasPathAccess(Constants.System.Root.ToInvariantString(), user.GetAllMediaStartNodes(entityService), Constants.System.RecycleBinMedia);
+        }
+
+        internal static bool HasMediaBinAccess(this IUser user, IEntityService entityService)
+        {
+            return HasPathAccess(Constants.System.RecycleBinMedia.ToInvariantString(), user.GetAllMediaStartNodes(entityService), Constants.System.RecycleBinMedia);
+        }
+
+        internal static bool HasPathAccess(this IUser user, IContent content, IEntityService entityService)
+        {
+            return HasPathAccess(content.Path, user.GetAllContentStartNodes(entityService), Constants.System.RecycleBinContent);
+        }
+
+        internal static bool HasPathAccess(this IUser user, IMedia media, IEntityService entityService)
+        {
+            return HasPathAccess(media.Path, user.GetAllMediaStartNodes(entityService), Constants.System.RecycleBinMedia);
+        }
+
         internal static bool HasPathAccess(string path, int[] startNodeIds, int recycleBinId)
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", "path");
@@ -152,19 +169,6 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Checks if the user has access to the media item based on their start noe
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="media"></param>
-        /// <returns></returns>
-        internal static bool HasPathAccess(this IUser user, IMedia media)
-        {
-            if (user == null) throw new ArgumentNullException("user");
-            if (media == null) throw new ArgumentNullException("media");
-            return HasPathAccess(media.Path, user.AllStartMediaIds, Constants.System.RecycleBinMedia);
-        }
-        
-        /// <summary>
         /// Determines whether this user is an admin.
         /// </summary>
         /// <param name="user"></param>
@@ -175,6 +179,64 @@ namespace Umbraco.Core.Models
         {
             if (user == null) throw new ArgumentNullException("user");
             return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.AdminGroupAlias);
+        }
+
+        public static int[] GetAllContentStartNodes(this IUser user, IEntityService entityService)
+        {
+            var gsn = user.Groups.Where(x => x.StartContentId.HasValue).Select(x => x.StartContentId.Value).Distinct().ToArray();
+            var usn = user.StartContentIds;
+            return CombineStartNodes(gsn, usn, entityService);
+        }
+
+        public static int[] GetAllMediaStartNodes(this IUser user, IEntityService entityService)
+        {
+            var gsn = user.Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId.Value).Distinct().ToArray();
+            var usn = user.StartMediaIds;
+            return CombineStartNodes(gsn, usn, entityService);
+        }
+
+        private static bool StartsWithPath(string test, string path)
+        {
+            return test.StartsWith(path) && test.Length > path.Length && test[path.Length] == ',';
+        }
+
+        private static int[] CombineStartNodes(int[] groupSn, int[] userSn, IEntityService entityService)
+        {
+            // assume groupSn and userSn each don't contain duplicates
+
+            var asn = groupSn.Concat(userSn).Distinct().ToArray();
+            var paths = entityService.GetAll(UmbracoObjectTypes.Document, asn).ToDictionary(x => x.Id, x => x.Path);
+
+            paths[-1] = "-1"; // entityService does not get that one
+
+            var lsn = new List<int>();
+            foreach (var sn in groupSn)
+            {
+                var snp = paths[sn];
+                if (lsn.Any(x => StartsWithPath(snp, paths[x]))) continue; // skip if something above this sn
+                lsn.RemoveAll(x => StartsWithPath(paths[x], snp)); // remove anything below this sn
+                lsn.Add(sn);
+            }
+
+            var usn = new List<int>();
+            foreach (var sn in userSn)
+            {
+                if (groupSn.Contains(sn)) continue;
+
+                var snp = paths[sn];
+                if (usn.Any(x => StartsWithPath(paths[x], snp))) continue; // skip if something below this sn
+                usn.RemoveAll(x => StartsWithPath(snp, paths[x])); // remove anything above this sn
+                usn.Add(sn);
+            }
+
+            foreach (var sn in usn)
+            {
+                var snp = paths[sn];
+                lsn.RemoveAll(x => StartsWithPath(snp, paths[x]) || StartsWithPath(paths[x], snp)); // remove anything above or below this sn
+                lsn.Add(sn);
+            }
+
+            return lsn.ToArray();
         }
     }
 }

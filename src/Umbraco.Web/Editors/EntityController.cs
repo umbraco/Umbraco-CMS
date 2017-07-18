@@ -551,10 +551,10 @@ namespace Umbraco.Web.Editors
                     switch (type)
                     {
                         case UmbracoEntityTypes.Document:
-                            aids = Security.CurrentUser.AllStartContentIds;
+                            aids = Security.CurrentUser.GetAllContentStartNodes(Services.EntityService);
                             break;
                         case UmbracoEntityTypes.Media:
-                            aids = Security.CurrentUser.AllStartMediaIds;
+                            aids = Security.CurrentUser.GetAllMediaStartNodes(Services.EntityService);
                             break;
                     }
 
@@ -695,14 +695,14 @@ namespace Umbraco.Web.Editors
                     type = "media";
 
                     AddExamineSearchFrom(searchFrom, sb);
-                    AddExamineUserStartNode(Security.CurrentUser.AllStartMediaIds, sb);
+                    AddExamineUserStartNode(Security.CurrentUser.GetAllMediaStartNodes(Services.EntityService), sb);
 
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
 
                     AddExamineSearchFrom(searchFrom, sb);
-                    AddExamineUserStartNode(Security.CurrentUser.AllStartContentIds, sb);
+                    AddExamineUserStartNode(Security.CurrentUser.GetAllContentStartNodes(Services.EntityService), sb);
                     
                     break;
                 default:
@@ -950,10 +950,10 @@ namespace Umbraco.Web.Editors
                 switch (entityType)
                 {
                     case UmbracoEntityTypes.Document:
-                        aids = Security.CurrentUser.AllStartContentIds;
+                        aids = Security.CurrentUser.GetAllContentStartNodes(Services.EntityService);
                         break;
                     case UmbracoEntityTypes.Media:
-                        aids = Security.CurrentUser.AllStartMediaIds;
+                        aids = Security.CurrentUser.GetAllMediaStartNodes(Services.EntityService);
                         break;
                 }
 

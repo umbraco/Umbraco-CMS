@@ -308,7 +308,7 @@ namespace Umbraco.Core.Models.Membership
         [IgnoreDataMember]
         public int[] AllStartContentIds
         {
-            get { return _allStartContentIds ?? (_allStartContentIds = StartContentIds.Concat(Groups.Where(x => x.StartContentId.HasValue).Select(x => x.StartContentId.Value)).Distinct().ToArray()); }
+            get { return this.GetAllContentStartNodes(ApplicationContext.Current.Services.EntityService); }
         }
 
         /// <summary>
@@ -317,7 +317,7 @@ namespace Umbraco.Core.Models.Membership
         [IgnoreDataMember]
         public int[] AllStartMediaIds
         {
-            get { return _allStartMediaIds ?? (_allStartMediaIds = StartMediaIds.Concat(Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId.Value)).Distinct().ToArray()); }
+            get { return this.GetAllMediaStartNodes(ApplicationContext.Current.Services.EntityService); }
         }
 
         /// <summary>

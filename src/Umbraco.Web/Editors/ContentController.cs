@@ -1059,17 +1059,12 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
+            var entityService = ApplicationContext.Current.Services.EntityService;
             var hasPathAccess = (nodeId == Constants.System.Root)
-                ? UserExtensions.HasPathAccess(
-                    Constants.System.Root.ToInvariantString(),
-                    user.AllStartContentIds,
-                    Constants.System.RecycleBinContent)
+                ? user.HasContentRootAccess(entityService)
                 : (nodeId == Constants.System.RecycleBinContent)
-                    ? UserExtensions.HasPathAccess(
-                        Constants.System.RecycleBinContent.ToInvariantString(),
-                        user.AllStartContentIds,
-                        Constants.System.RecycleBinContent)
-                    : user.HasPathAccess(contentItem);
+                    ? user.HasContentBinAccess(entityService)
+                    : user.HasPathAccess(contentItem, entityService);
 
             if (hasPathAccess == false)
             {

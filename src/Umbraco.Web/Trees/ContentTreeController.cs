@@ -215,7 +215,7 @@ namespace Umbraco.Web.Trees
             {
                 return false;
             }
-            return Security.CurrentUser.HasPathAccess(content);
+            return Security.CurrentUser.HasPathAccess(content, Services.EntityService);
         }
 
         /// <summary>
