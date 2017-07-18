@@ -185,14 +185,14 @@ namespace Umbraco.Core.Models
         {
             var gsn = user.Groups.Where(x => x.StartContentId.HasValue).Select(x => x.StartContentId.Value).Distinct().ToArray();
             var usn = user.StartContentIds;
-            return CombineStartNodes(gsn, usn, entityService);
+            return CombineStartNodes(UmbracoObjectTypes.Document, gsn, usn, entityService);
         }
 
         public static int[] GetAllMediaStartNodes(this IUser user, IEntityService entityService)
         {
             var gsn = user.Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId.Value).Distinct().ToArray();
             var usn = user.StartMediaIds;
-            return CombineStartNodes(gsn, usn, entityService);
+            return CombineStartNodes(UmbracoObjectTypes.Media, gsn, usn, entityService);
         }
 
         private static bool StartsWithPath(string test, string path)
@@ -200,12 +200,12 @@ namespace Umbraco.Core.Models
             return test.StartsWith(path) && test.Length > path.Length && test[path.Length] == ',';
         }
 
-        private static int[] CombineStartNodes(int[] groupSn, int[] userSn, IEntityService entityService)
+        private static int[] CombineStartNodes(UmbracoObjectTypes objectType, int[] groupSn, int[] userSn, IEntityService entityService)
         {
             // assume groupSn and userSn each don't contain duplicates
 
             var asn = groupSn.Concat(userSn).Distinct().ToArray();
-            var paths = entityService.GetAll(UmbracoObjectTypes.Document, asn).ToDictionary(x => x.Id, x => x.Path);
+            var paths = entityService.GetAll(objectType, asn).ToDictionary(x => x.Id, x => x.Path);
 
             paths[-1] = "-1"; // entityService does not get that one
 
