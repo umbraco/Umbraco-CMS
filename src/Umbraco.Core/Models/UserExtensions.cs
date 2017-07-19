@@ -81,7 +81,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="user"></param>
         /// <param name="textService"></param>
-        /// <returns></returns>      
+        /// <returns></returns>
         public static CultureInfo GetUserCulture(this IUser user, ILocalizedTextService textService)
         {
             if (user == null) throw new ArgumentNullException("user");
@@ -94,7 +94,7 @@ namespace Umbraco.Core.Models
             try
             {
                 var culture = CultureInfo.GetCultureInfo(userLanguage.Replace("_", "-"));
-                //TODO: This is a hack because we store the user language as 2 chars instead of the full culture 
+                //TODO: This is a hack because we store the user language as 2 chars instead of the full culture
                 // which is actually stored in the language files (which are also named with 2 chars!) so we need to attempt
                 // to convert to a supported full culture
                 var result = textService.ConvertToSupportedCultureWithRegionCode(culture);
@@ -153,11 +153,11 @@ namespace Umbraco.Core.Models
             if (formattedPath.Contains(formattedRecycleBinId))
             {
                 return false;
-            }            
+            }
 
             //check for normal paths
             foreach (var startNodeId in startNodeIds)
-            {                
+            {
                 var formattedStartNodeId = "," + startNodeId.ToInvariantString() + ",";
 
                 var hasAccess = formattedPath.Contains(formattedStartNodeId);
@@ -253,8 +253,9 @@ namespace Umbraco.Core.Models
             var lsn = new List<int>();
             foreach (var sn in groupSn)
             {
-                //TODO: Change this to TryGetValue
-                var snp = paths[sn];
+                string snp;
+                if (paths.TryGetValue(sn, out snp) == false) continue; // ignore
+
                 if (lsn.Any(x => StartsWithPath(snp, paths[x]))) continue; // skip if something above this sn
                 lsn.RemoveAll(x => StartsWithPath(paths[x], snp)); // remove anything below this sn
                 lsn.Add(sn);
@@ -265,8 +266,9 @@ namespace Umbraco.Core.Models
             {
                 if (groupSn.Contains(sn)) continue;
 
-                //TODO: Change this to TryGetValue
-                var snp = paths[sn];
+                string snp;
+                if (paths.TryGetValue(sn, out snp) == false) continue; // ignore
+
                 if (usn.Any(x => StartsWithPath(paths[x], snp))) continue; // skip if something below this sn
                 usn.RemoveAll(x => StartsWithPath(snp, paths[x])); // remove anything above this sn
                 usn.Add(sn);
@@ -274,7 +276,7 @@ namespace Umbraco.Core.Models
 
             foreach (var sn in usn)
             {
-                var snp = paths[sn];
+                var snp = paths[sn]; // has to be here now
                 lsn.RemoveAll(x => StartsWithPath(snp, paths[x]) || StartsWithPath(paths[x], snp)); // remove anything above or below this sn
                 lsn.Add(sn);
             }
