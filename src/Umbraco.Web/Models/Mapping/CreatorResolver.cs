@@ -9,7 +9,7 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Maps the Creator for content
     /// </summary>
-    internal class CreatorResolver : ValueResolver<IContent, UserBasic>
+    internal class CreatorResolver
     {
         private readonly IUserService _userService;
 
@@ -18,7 +18,7 @@ namespace Umbraco.Web.Models.Mapping
             _userService = userService;
         }
 
-        protected override UserBasic ResolveCore(IContent source)
+        public UserBasic Resolve(IContent source)
         {
             return Mapper.Map<IProfile, UserBasic>(source.GetWriterProfile(_userService));
         }

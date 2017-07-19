@@ -12,7 +12,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class PreValueDisplayResolver : ValueResolver<IDataTypeDefinition, IEnumerable<PreValueFieldDisplay>>
+    internal class PreValueDisplayResolver
     {
         private readonly Lazy<IDataTypeService> _dataTypeService;
 
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Models.Mapping
             }
         }
 
-        internal IEnumerable<PreValueFieldDisplay> Convert(IDataTypeDefinition source)
+        public IEnumerable<PreValueFieldDisplay> Resolve(IDataTypeDefinition source)
         {
             PropertyEditor propEd = null;
             if (source.PropertyEditorAlias.IsNullOrWhiteSpace() == false)
@@ -71,11 +71,6 @@ namespace Umbraco.Web.Models.Mapping
             MapPreValueValuesToPreValueFields(result, dictionaryVals);
 
             return result;
-        }
-
-        protected override IEnumerable<PreValueFieldDisplay> ResolveCore(IDataTypeDefinition source)
-        {
-            return Convert(source);
         }
     }
 }

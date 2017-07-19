@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
@@ -15,13 +16,11 @@ namespace Umbraco.Web.Models.Mapping
     {
         public ContentPropertyDisplayConverter(Lazy<IDataTypeService> dataTypeService)
             : base(dataTypeService)
-        {
+        { }
 
-        }
-
-        protected override ContentPropertyDisplay ConvertCore(Property originalProp)
+        public override ContentPropertyDisplay Convert(Property originalProp, ContentPropertyDisplay dest, ResolutionContext context)
         {
-            var display = base.ConvertCore(originalProp);
+            var display = base.Convert(originalProp, dest, context);
 
             var dataTypeService = DataTypeService.Value;
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(originalProp.PropertyType.DataTypeDefinitionId);

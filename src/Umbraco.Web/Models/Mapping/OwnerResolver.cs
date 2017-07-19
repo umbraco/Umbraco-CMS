@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -11,7 +10,7 @@ namespace Umbraco.Web.Models.Mapping
     /// Maps the Owner for IContentBase
     /// </summary>
     /// <typeparam name="TPersisted"></typeparam>
-    internal class OwnerResolver<TPersisted> : ValueResolver<TPersisted, UserBasic>
+    internal class OwnerResolver<TPersisted>
         where TPersisted : IContentBase
     {
         private readonly IUserService _userService;
@@ -21,7 +20,7 @@ namespace Umbraco.Web.Models.Mapping
             _userService = userService;
         }
 
-        protected override UserBasic ResolveCore(TPersisted source)
+        public UserBasic Resolve(TPersisted source)
         {
             return Mapper.Map<IProfile, UserBasic>(source.GetCreatorProfile(_userService));
         }

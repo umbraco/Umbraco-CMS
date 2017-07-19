@@ -60,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
-    <PackageReference Include="AutoMapper" Version="4.2.1" />
+    <PackageReference Include="AutoMapper" Version="6.1.1" />
     <!-- do not update -->
     <PackageReference Include="ClientDependency" Version="1.9.2" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
@@ -139,7 +139,7 @@
     <Compile Include="HybridEventMessagesAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Cache\RelationTypeCacheRefresher.cs" />
-    <Compile Include="DI\WebModelMappersCompositionRoot.cs" />
+    <Compile Include="DI\WebMappingProfilesCompositionRoot.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="IPublishedContentQuery.cs" />
     <Compile Include="Editors\MemberGroupController.cs" />
@@ -189,9 +189,14 @@
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Models\ContentEditing\SnippetDisplay.cs" />
     <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
-    <Compile Include="Models\Mapping\CodeFileDisplayMapper.cs" />
+    <Compile Include="Models\Mapping\ActionButtonsResolver.cs" />
+    <Compile Include="Models\Mapping\CodeFileProfile.cs" />
     <Compile Include="Models\Mapping\ContentTypeUdiResolver.cs" />
-    <Compile Include="Models\Mapping\TemplateModelMapper.cs" />
+    <Compile Include="Models\Mapping\MemberDtoPropertiesResolver.cs" />
+    <Compile Include="Models\Mapping\MemberProviderFieldResolver.cs" />
+    <Compile Include="Models\Mapping\MembershipScenarioResolver.cs" />
+    <Compile Include="Models\Mapping\MemberTabsAndPropertiesResolver.cs" />
+    <Compile Include="Models\Mapping\TemplateProfile.cs" />
     <Compile Include="Models\RelatedLink.cs" />
     <Compile Include="Models\RelatedLinkBase.cs" />
     <Compile Include="Models\RelatedLinks.cs" />
@@ -414,7 +419,7 @@
     <Compile Include="Models\ContentExtensions.cs" />
     <Compile Include="ITagQuery.cs" />
     <Compile Include="IUmbracoComponentRenderer.cs" />
-    <Compile Include="Models\Mapping\RelationModelMapper.cs" />
+    <Compile Include="Models\Mapping\RelationProfile.cs" />
     <Compile Include="Mvc\DisableClientCacheAttribute.cs" />
     <Compile Include="Models\UnLinkLoginModel.cs" />
     <Compile Include="Mvc\MvcVersionCheck.cs" />
@@ -560,10 +565,10 @@
     <Compile Include="Models\ContentEditing\RichTextEditorPlugin.cs" />
     <Compile Include="Models\ContentEditing\StylesheetRule.cs" />
     <Compile Include="Models\ContentEditing\UmbracoEntityTypes.cs" />
-    <Compile Include="Models\Mapping\DashboardModelsMapper.cs" />
-    <Compile Include="Models\Mapping\MacroModelMapper.cs" />
-    <Compile Include="Models\Mapping\MemberModelMapper.cs" />
-    <Compile Include="Models\Mapping\TabModelMapper.cs" />
+    <Compile Include="Models\Mapping\DashboardProfile.cs" />
+    <Compile Include="Models\Mapping\MacroProfile.cs" />
+    <Compile Include="Models\Mapping\MemberProfile.cs" />
+    <Compile Include="Models\Mapping\TabProfile.cs" />
     <Compile Include="Models\TagModel.cs" />
     <Compile Include="Models\UpgradeCheckResponse.cs" />
     <Compile Include="Models\PasswordChangedModel.cs" />
@@ -603,8 +608,8 @@
     <Compile Include="Models\ContentEditing\PropertyEditorBasic.cs" />
     <Compile Include="Models\Mapping\AvailablePropertyEditorsResolver.cs" />
     <Compile Include="Models\Mapping\DatabaseTypeResolver.cs" />
-    <Compile Include="Models\Mapping\DataTypeModelMapper.cs" />
-    <Compile Include="Models\Mapping\EntityModelMapper.cs" />
+    <Compile Include="Models\Mapping\DataTypeProfile.cs" />
+    <Compile Include="Models\Mapping\EntityProfile.cs" />
     <Compile Include="Models\Mapping\PreValueDisplayResolver.cs" />
     <Compile Include="PropertyEditors\CheckBoxListPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ColorPickerPropertyEditor.cs" />
@@ -762,15 +767,15 @@
     <Compile Include="Models\Mapping\ContentPropertyBasicConverter.cs" />
     <Compile Include="Models\Mapping\ContentPropertyDisplayConverter.cs" />
     <Compile Include="Models\Mapping\ContentPropertyDtoConverter.cs" />
-    <Compile Include="Models\Mapping\ContentPropertyModelMapper.cs" />
+    <Compile Include="Models\Mapping\ContentPropertyProfile.cs" />
     <Compile Include="Models\Mapping\CreatorResolver.cs" />
-    <Compile Include="Models\Mapping\MediaModelMapper.cs" />
-    <Compile Include="Models\Mapping\ContentTypeModelMapper.cs" />
-    <Compile Include="Models\Mapping\ContentModelMapper.cs" />
+    <Compile Include="Models\Mapping\MediaProfile.cs" />
+    <Compile Include="Models\Mapping\ContentTypeProfile.cs" />
+    <Compile Include="Models\Mapping\ContentProfile.cs" />
     <Compile Include="Models\Mapping\OwnerResolver.cs" />
-    <Compile Include="Models\Mapping\SectionModelMapper.cs" />
+    <Compile Include="Models\Mapping\SectionProfile.cs" />
     <Compile Include="Models\Mapping\TabsAndPropertiesResolver.cs" />
-    <Compile Include="Models\Mapping\UserModelMapper.cs" />
+    <Compile Include="Models\Mapping\UserProfile.cs" />
     <Compile Include="PropertyEditors\ContentPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\FileUploadPropertyEditor.cs" />
     <Compile Include="PropertyEditors\FileUploadPropertyValueEditor.cs" />

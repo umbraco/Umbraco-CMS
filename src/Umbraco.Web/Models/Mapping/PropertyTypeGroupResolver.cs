@@ -10,7 +10,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class PropertyTypeGroupResolver<TPropertyType> : ValueResolver<IContentTypeComposition, IEnumerable<PropertyGroupDisplay<TPropertyType>>> 
+    internal class PropertyTypeGroupResolver<TPropertyType>
         where TPropertyType : PropertyTypeDisplay, new()
     {
         private readonly PropertyEditorCollection _propertyEditors;
@@ -62,7 +62,7 @@ namespace Umbraco.Web.Models.Mapping
                 .FirstOrDefault(x => x != null);
         }
 
-        protected override IEnumerable<PropertyGroupDisplay<TPropertyType>> ResolveCore(IContentTypeComposition source)
+        public IEnumerable<PropertyGroupDisplay<TPropertyType>> Resolve(IContentTypeComposition source)
         {
             // deal with groups
             var groups = new List<PropertyGroupDisplay<TPropertyType>>();

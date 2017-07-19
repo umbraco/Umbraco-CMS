@@ -1,18 +1,17 @@
 ﻿using AutoMapper;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Mapping;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class TemplateModelMapper : ModelMapperConfiguration
+    internal class TemplateProfile : Profile
     {
-        public override void ConfigureMappings(IMapperConfiguration config)
+        public TemplateProfile()
         {
-            config.CreateMap<ITemplate, TemplateDisplay>()
+            CreateMap<ITemplate, TemplateDisplay>()
                 .ForMember(x => x.Notifications, exp => exp.Ignore());
 
-            config.CreateMap<TemplateDisplay, Template>()
+            CreateMap<TemplateDisplay, Template>()
                 .ForMember(x => x.DeletedDate, exp => exp.Ignore())
                 .ForMember(x => x.Key, exp => exp.Ignore())
                 .ForMember(x => x.Path, exp => exp.Ignore())

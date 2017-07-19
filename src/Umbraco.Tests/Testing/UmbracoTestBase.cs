@@ -15,7 +15,6 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
-using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
@@ -185,8 +184,8 @@ namespace Umbraco.Tests.Testing
         {
             if (configure == false) return;
 
-            Container.RegisterFrom<CoreModelMappersCompositionRoot>();
-            Container.RegisterFrom<WebModelMappersCompositionRoot>();
+            Container.RegisterFrom<CoreMappingProfilesCompositionRoot>();
+            Container.RegisterFrom<WebMappingProfilesCompositionRoot>();
         }
 
         protected virtual void ComposePluginManager(UmbracoTestOptions.PluginManager pluginManager)
@@ -313,9 +312,9 @@ namespace Umbraco.Tests.Testing
 
             Mapper.Initialize(configuration =>
             {
-                var mappers = Container.GetAllInstances<ModelMapperConfiguration>();
-                foreach (var mapper in mappers)
-                    mapper.ConfigureMappings(configuration);
+                var profiles = Container.GetAllInstances<Profile>();
+                foreach (var profile in profiles)
+                    configuration.AddProfile(profile);
             });
         }
 

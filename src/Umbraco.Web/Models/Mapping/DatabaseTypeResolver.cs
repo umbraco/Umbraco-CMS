@@ -1,7 +1,5 @@
 ﻿using System;
-using AutoMapper;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -10,9 +8,9 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Gets the DataTypeDatabaseType from the selected property editor for the data type
     /// </summary>
-    internal class DatabaseTypeResolver : ValueResolver<DataTypeSave, DataTypeDatabaseType>
+    internal class DatabaseTypeResolver
     {
-        protected override DataTypeDatabaseType ResolveCore(DataTypeSave source)
+        public DataTypeDatabaseType Resolve(DataTypeSave source)
         {
             var propertyEditor = Current.PropertyEditors[source.SelectedEditor];
             if (propertyEditor == null)

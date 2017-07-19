@@ -33,8 +33,50 @@ namespace Umbraco.Tests.Models.Mapping
         }
 
         [Test]
-        public void Assert_Valid_Mappings()
+        public void AssertConfigurationIsValid()
         {
+            var profiles = Container.GetAllInstances<Profile>().ToArray();
+
+            var config = new MapperConfiguration(cfg =>
+            {
+                foreach (var profile in profiles)
+                    cfg.AddProfile(profile);
+            });
+
+            // validate each profile (better granularity for error reports)
+
+            foreach (var profile in profiles)
+            {
+                try
+                {
+                    config.AssertConfigurationIsValid(profile.GetType().FullName);
+                    Console.WriteLine("OK " + profile.GetType().FullName);
+                }
+                catch
+                {
+                    Console.WriteLine("KO " + profile.GetType().FullName);
+                }
+            }
+
+            Console.WriteLine();
+
+            foreach (var profile in profiles)
+            {
+                try
+                {
+                    config.AssertConfigurationIsValid(profile.GetType().FullName);
+                }
+                catch
+                {
+                    Console.WriteLine("KO " + profile.GetType().FullName);
+                    throw;
+                }
+            }
+
+            // validate the global config
+            config.AssertConfigurationIsValid();
+
+            // validate the static config (should be the same)
             Mapper.AssertConfigurationIsValid();
         }
     }

@@ -8,7 +8,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class AvailablePropertyEditorsResolver : ValueResolver<IDataTypeDefinition, IEnumerable<PropertyEditorBasic>>
+    internal class AvailablePropertyEditorsResolver
     {
         private readonly IContentSection _contentSection;
 
@@ -17,7 +17,7 @@ namespace Umbraco.Web.Models.Mapping
             _contentSection = contentSection;
         }
 
-        protected override IEnumerable<PropertyEditorBasic> ResolveCore(IDataTypeDefinition source)
+        public IEnumerable<PropertyEditorBasic> Resolve(IDataTypeDefinition source)
         {
             return Current.PropertyEditors
                 .Where(x =>

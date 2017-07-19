@@ -1,7 +1,6 @@
 ﻿using System;
-using Umbraco.Core;
+using AutoMapper;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -14,12 +13,11 @@ namespace Umbraco.Web.Models.Mapping
     {
         public ContentPropertyDtoConverter(Lazy<IDataTypeService> dataTypeService)
             : base(dataTypeService)
-        {
-        }
+        { }
 
-        protected override ContentPropertyDto ConvertCore(Property originalProperty)
+        public override ContentPropertyDto Convert(Property originalProperty, ContentPropertyDto dest, ResolutionContext context)
         {
-            var propertyDto = base.ConvertCore(originalProperty);
+            var propertyDto = base.Convert(originalProperty, dest, context);
 
             var dataTypeService = DataTypeService.Value;
 

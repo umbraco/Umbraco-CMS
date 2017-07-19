@@ -53,7 +53,7 @@ namespace Umbraco.Web
         {
             base.Compose(composition);
 
-            composition.Container.RegisterFrom<WebModelMappersCompositionRoot>();
+            composition.Container.RegisterFrom<WebMappingProfilesCompositionRoot>();
 
             var pluginManager = composition.Container.GetInstance<TypeLoader>();
             var logger = composition.Container.GetInstance<ILogger>();

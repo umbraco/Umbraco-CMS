@@ -20,14 +20,13 @@ namespace Umbraco.Web.Models.Mapping
     /// </remarks>
     internal static class ContentTypeModelMapperExtensions
     {
-
         public static IMappingExpression<TSource, PropertyGroup> MapPropertyGroupBasicToPropertyGroupPersistence<TSource, TPropertyTypeBasic>(
             this IMappingExpression<TSource, PropertyGroup> mapping)
             where TSource : PropertyGroupBasic<TPropertyTypeBasic> 
             where TPropertyTypeBasic : PropertyTypeBasic
         {
             return mapping
-                .ForMember(dest => dest.Id, map => map.Condition(source => source.Id > 0))
+                .ForMember(dest => dest.Id, map => map.Condition(src => src.Id > 0))
                 .ForMember(dest => dest.Key, map => map.Ignore())
                 .ForMember(dest => dest.HasIdentity, map => map.Ignore())
                 .ForMember(dest => dest.CreateDate, map => map.Ignore())
@@ -43,11 +42,11 @@ namespace Umbraco.Web.Models.Mapping
             where TPropertyTypeDisplay : PropertyTypeDisplay
         {
             return mapping
-                .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
-                .ForMember(g => g.ContentTypeId, expression => expression.Ignore())
-                .ForMember(g => g.ParentTabContentTypes, expression => expression.Ignore())
-                .ForMember(g => g.ParentTabContentTypeNames, expression => expression.Ignore())
-                .ForMember(g => g.Properties, expression => expression.MapFrom(display => display.Properties.Select(Mapper.Map<TPropertyTypeDisplay>)));
+                .ForMember(dest => dest.Id, opt => opt.Condition(src => src.Id > 0))
+                .ForMember(dest => dest.ContentTypeId, opt => opt.Ignore())
+                .ForMember(dest => dest.ParentTabContentTypes, opt => opt.Ignore())
+                .ForMember(dest => dest.ParentTabContentTypeNames, opt => opt.Ignore())
+                .ForMember(dest => dest.Properties, opt => opt.MapFrom(src => src.Properties.Select(Mapper.Map<TPropertyTypeDisplay>)));
         }
 
         public static void AfterMapContentTypeSaveToEntity<TSource, TDestination>(TSource source, TDestination dest, IContentTypeService contentTypeService)
@@ -107,14 +106,16 @@ namespace Umbraco.Web.Models.Mapping
             where TPropertyTypeDestination : PropertyTypeDisplay 
             where TPropertyTypeSource : PropertyTypeBasic
         {
+            var propertyGroupDisplayResolver = new PropertyGroupDisplayResolver<TSource, TPropertyTypeSource, TPropertyTypeDestination>();
+
             return mapping
-                .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
-                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
-                .ForMember(dto => dto.ListViewEditorName, expression => expression.Ignore())
-                .ForMember(dto => dto.Notifications, expression => expression.Ignore())
-                .ForMember(dto => dto.Errors, expression => expression.Ignore())
-                .ForMember(dto => dto.LockedCompositeContentTypes, exp => exp.Ignore())
-                .ForMember(dto => dto.Groups, expression => expression.ResolveUsing(new PropertyGroupDisplayResolver<TSource, TPropertyTypeSource, TPropertyTypeDestination>()));
+                .ForMember(dest => dest.CreateDate, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdateDate, opt => opt.Ignore())
+                .ForMember(dest => dest.ListViewEditorName, opt => opt.Ignore())
+                .ForMember(dest => dest.Notifications, opt => opt.Ignore())
+                .ForMember(dest => dest.Errors, opt => opt.Ignore())
+                .ForMember(dest => dest.LockedCompositeContentTypes, opt => opt.Ignore())
+                .ForMember(dest => dest.Groups, opt => opt.ResolveUsing(src => propertyGroupDisplayResolver.Resolve(src)));
         }
 
         public static IMappingExpression<TSource, TDestination> MapBaseContentTypeEntityToDisplay<TSource, TDestination, TPropertyTypeDisplay>(
@@ -124,30 +125,23 @@ namespace Umbraco.Web.Models.Mapping
             where TDestination : ContentTypeCompositionDisplay<TPropertyTypeDisplay>
             where TPropertyTypeDisplay : PropertyTypeDisplay, new()
         {
+            var contentTypeUdiResolver = new ContentTypeUdiResolver();
+            var lockedCompositionsResolver = new LockedCompositionsResolver(contentTypeService);
+            var propertyTypeGroupResolver = new PropertyTypeGroupResolver<TPropertyTypeDisplay>(propertyEditors, dataTypeService);
+
             return mapping
-                .ForMember(x => x.Udi, expression => expression.ResolveUsing(new ContentTypeUdiResolver()))
-                .ForMember(display => display.Notifications, expression => expression.Ignore())
-                .ForMember(display => display.Errors, expression => expression.Ignore())
-                .ForMember(display => display.AllowAsRoot, expression => expression.MapFrom(type => type.AllowedAsRoot))
-                .ForMember(display => display.ListViewEditorName, expression => expression.Ignore())
+                .ForMember(dest => dest.Udi, opt => opt.ResolveUsing(src => contentTypeUdiResolver.Resolve(src)))
+                .ForMember(dest => dest.Notifications, opt => opt.Ignore())
+                .ForMember(dest => dest.Errors, opt => opt.Ignore())
+                .ForMember(dest => dest.AllowAsRoot, opt => opt.MapFrom(src => src.AllowedAsRoot))
+                .ForMember(dest => dest.ListViewEditorName, opt => opt.Ignore())
                 //Ignore because this is not actually used for content types
-                .ForMember(display => display.Trashed, expression => expression.Ignore())
+                .ForMember(dest => dest.Trashed, opt => opt.Ignore())
 
-                .ForMember(
-                    dto => dto.AllowedContentTypes,
-                    expression => expression.MapFrom(dto => dto.AllowedContentTypes.Select(x => x.Id.Value)))
-                    
-                .ForMember(
-                    dto => dto.CompositeContentTypes,
-                    expression => expression.MapFrom(dto => dto.ContentTypeComposition))
-
-                .ForMember(
-                    dto => dto.LockedCompositeContentTypes,
-                    expression => expression.ResolveUsing(new LockedCompositionsResolver(contentTypeService)))
-
-                .ForMember(
-                    dto => dto.Groups,
-                    expression => expression.ResolveUsing(new PropertyTypeGroupResolver<TPropertyTypeDisplay>(propertyEditors, dataTypeService)));
+                .ForMember(dest => dest.AllowedContentTypes, opt => opt.MapFrom(src => src.AllowedContentTypes.Select(x => x.Id.Value)))                 
+                .ForMember(dest => dest.CompositeContentTypes, opt => opt.MapFrom(src => src.ContentTypeComposition))
+                .ForMember(dest => dest.LockedCompositeContentTypes, opt => opt.ResolveUsing(src => lockedCompositionsResolver.Resolve(src)))
+                .ForMember(dest => dest.Groups, opt => opt.ResolveUsing(src => propertyTypeGroupResolver.Resolve(src)));
         }
 
         /// <summary>
@@ -167,29 +161,29 @@ namespace Umbraco.Web.Models.Mapping
         {
             return mapping
                 //only map id if set to something higher then zero
-                .ForMember(dto => dto.Id, expression => expression.Condition(display => (Convert.ToInt32(display.Id) > 0)))
-                .ForMember(dto => dto.Id, expression => expression.MapFrom(display => Convert.ToInt32(display.Id)))
+                .ForMember(dest => dest.Id, opt => opt.Condition(src => (Convert.ToInt32(src.Id) > 0)))
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Convert.ToInt32(src.Id)))
 
                 //These get persisted as part of the saving procedure, nothing to do with the display model
-                .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
-                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
-                .ForMember(dto => dto.DeletedDate, expression => expression.Ignore())
+                .ForMember(dest => dest.CreateDate, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdateDate, opt => opt.Ignore())
+                .ForMember(dest => dest.DeletedDate, opt => opt.Ignore())
 
-                .ForMember(dto => dto.AllowedAsRoot, expression => expression.MapFrom(display => display.AllowAsRoot))
-                .ForMember(dto => dto.CreatorId, expression => expression.Ignore())
-                .ForMember(dto => dto.Level, expression => expression.Ignore())
-                .ForMember(dto => dto.SortOrder, expression => expression.Ignore())
+                .ForMember(dest => dest.AllowedAsRoot, opt => opt.MapFrom(src => src.AllowAsRoot))
+                .ForMember(dest => dest.CreatorId, opt => opt.Ignore())
+                .ForMember(dest => dest.Level, opt => opt.Ignore())
+                .ForMember(dest => dest.SortOrder, opt => opt.Ignore())
                 //ignore, we'll do this in after map
-                .ForMember(dto => dto.PropertyGroups, expression => expression.Ignore())
-                .ForMember(dto => dto.NoGroupPropertyTypes, expression => expression.Ignore())
+                .ForMember(dest => dest.PropertyGroups, opt => opt.Ignore())
+                .ForMember(dest => dest.NoGroupPropertyTypes, opt => opt.Ignore())
                 // ignore, composition is managed in AfterMapContentTypeSaveToEntity
                 .ForMember(dest => dest.ContentTypeComposition, opt => opt.Ignore())
                 
                 .ForMember(
-                    dto => dto.AllowedContentTypes,
-                    expression => expression.MapFrom(dto => dto.AllowedContentTypes.Select((t, i) => new ContentTypeSort(t, i))))
+                    dest => dest.AllowedContentTypes,
+                    opt => opt.MapFrom(src => src.AllowedContentTypes.Select((t, i) => new ContentTypeSort(t, i))))
 
-                .AfterMap((source, dest) =>
+                .AfterMap((src, dest) =>
                 {
                     // handle property groups and property types
                     // note that ContentTypeSave has
@@ -211,7 +205,7 @@ namespace Umbraco.Web.Models.Mapping
                     var destOrigGroups = dest.PropertyGroups.ToArray(); // local groups
                     var destOrigProperties = dest.PropertyTypes.ToArray(); // all properties, in groups or not
                     var destGroups = new List<PropertyGroup>();
-                    var sourceGroups = source.Groups.Where(x => x.IsGenericProperties == false).ToArray();
+                    var sourceGroups = src.Groups.Where(x => x.IsGenericProperties == false).ToArray();
                     foreach (var sourceGroup in sourceGroups)
                     {
                         // get the dest group
@@ -242,7 +236,7 @@ namespace Umbraco.Web.Models.Mapping
                     // the old groups - they are just gone and will be cleared by the repository
 
                     // handle non-grouped (ie generic) properties
-                    var genericPropertiesGroup = source.Groups.FirstOrDefault(x => x.IsGenericProperties);
+                    var genericPropertiesGroup = src.Groups.FirstOrDefault(x => x.IsGenericProperties);
                     if (genericPropertiesGroup != null)
                     {
                         // handle local properties

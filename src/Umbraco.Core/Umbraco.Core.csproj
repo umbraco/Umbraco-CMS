@@ -53,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
-    <PackageReference Include="AutoMapper" Version="4.2.1" />
+    <PackageReference Include="AutoMapper" Version="6.1.1" />
     <!-- do not update -->
     <PackageReference Include="HtmlAgilityPack" Version="1.5.1" />
     <PackageReference Include="ImageProcessor" Version="2.5.4" />
@@ -152,7 +152,7 @@
     <Compile Include="Composing\BuilderCollectionBase.cs" />
     <Compile Include="Composing\CollectionBuilderBase.cs" />
     <Compile Include="Composing\CompositionRoots\ConfigurationCompositionRoot.cs" />
-    <Compile Include="Composing\CompositionRoots\CoreModelMappersCompositionRoot.cs" />
+    <Compile Include="Composing\CompositionRoots\CoreMappingProfilesCompositionRoot.cs" />
     <Compile Include="Composing\CompositionRoots\RepositoryCompositionRoot.cs" />
     <Compile Include="Composing\CompositionRoots\ServicesCompositionRoot.cs" />
     <Compile Include="Composing\Current.cs" />
@@ -530,7 +530,7 @@
     <Compile Include="Models\IDataTypeDefinition.cs" />
     <Compile Include="Models\IDeepCloneable.cs" />
     <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
-    <Compile Include="Models\Identity\IdentityModelMappings.cs" />
+    <Compile Include="Models\Identity\IdentityProfile.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityUserClaim.cs" />
     <Compile Include="Models\Identity\IdentityUserLogin.cs" />
@@ -562,7 +562,6 @@
     <Compile Include="Models\MacroProperty.cs" />
     <Compile Include="Models\MacroPropertyCollection.cs" />
     <Compile Include="Models\MacroTypes.cs" />
-    <Compile Include="Models\Mapping\ModelMapperConfiguration.cs" />
     <Compile Include="Models\Media.cs" />
     <Compile Include="Models\MediaExtensions.cs" />
     <Compile Include="Models\MediaType.cs" />

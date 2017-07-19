@@ -13,7 +13,6 @@ using Umbraco.Core.Composing.CompositionRoots;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
-using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
@@ -37,7 +36,7 @@ namespace Umbraco.Core
             composition.Container.RegisterFrom<ConfigurationCompositionRoot>();
             composition.Container.RegisterFrom<RepositoryCompositionRoot>();
             composition.Container.RegisterFrom<ServicesCompositionRoot>();
-            composition.Container.RegisterFrom<CoreModelMappersCompositionRoot>();
+            composition.Container.RegisterFrom<CoreMappingProfilesCompositionRoot>();
 
             // register database builder
             // *not* a singleton, don't want to keep it around
@@ -124,17 +123,17 @@ namespace Umbraco.Core
             composition.Container.RegisterSingleton<IPublishedContentModelFactory, NoopPublishedContentModelFactory>();
         }
 
-        internal void Initialize(IEnumerable<ModelMapperConfiguration> modelMapperConfigurations)
+        internal void Initialize(IEnumerable<Profile> mapperProfiles)
         {
             //TODO: Remove these for v8!
             LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
             LegacyParameterEditorAliasConverter.CreateMappingsForCoreEditors();
 
-            // model mapper configurations have been registered & are created by the container
+            // mapper profiles have been registered & are created by the container
             Mapper.Initialize(configuration =>
             {
-                foreach (var m in modelMapperConfigurations)
-                    m.ConfigureMappings(configuration);
+                foreach (var profile in mapperProfiles)
+                    configuration.AddProfile(profile);
             });
 
             // ensure we have some essential directories

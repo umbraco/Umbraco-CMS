@@ -59,10 +59,10 @@ namespace Umbraco.Tests.Models.Mapping
             Mapper.Initialize(configuration =>
             {
                 //initialize our content type mapper
-                var mapper = new ContentTypeModelMapper(_editorsMock.Object, _dataTypeService.Object, _fileService.Object, _contentTypeService.Object, Mock.Of<IMediaTypeService>());
-                mapper.ConfigureMappings(configuration);
-                var entityMapper = new EntityModelMapper();
-                entityMapper.ConfigureMappings(configuration);
+                var profile1 = new ContentTypeProfile(_editorsMock.Object, _dataTypeService.Object, _fileService.Object, _contentTypeService.Object, Mock.Of<IMediaTypeService>());
+                configuration.AddProfile(profile1);
+                var profile2 = new EntityProfile();
+                configuration.AddProfile(profile2);
             });
         }
 

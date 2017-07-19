@@ -13,11 +13,10 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Creates a base generic ContentPropertyBasic from a Property
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    internal class ContentPropertyBasicConverter<T> : TypeConverter<Property, T>
-        where T : ContentPropertyBasic, new()
+    internal class ContentPropertyBasicConverter<TDestination> : ITypeConverter<Property, TDestination>
+        where TDestination : ContentPropertyBasic, new()
     {
-        protected Lazy<IDataTypeService> DataTypeService { get; private set; }
+        protected Lazy<IDataTypeService> DataTypeService { get; }
 
         public ContentPropertyBasicConverter(Lazy<IDataTypeService> dataTypeService)
         {
@@ -27,24 +26,23 @@ namespace Umbraco.Web.Models.Mapping
         /// <summary>
         /// Assigns the PropertyEditor, Id, Alias and Value to the property
         /// </summary>
-        /// <param name="property"></param>
         /// <returns></returns>
-        protected override T ConvertCore(Property property)
+        public virtual TDestination Convert(Property property, TDestination dest, ResolutionContext context)
         {
             var editor = Current.PropertyEditors[property.PropertyType.PropertyEditorAlias];
             if (editor == null)
             {
-                Current.Logger.Error<ContentPropertyBasicConverter<T>>(
+                Current.Logger.Error<ContentPropertyBasicConverter<TDestination>>(
                     "No property editor found, converting to a Label",
                     new NullReferenceException("The property editor with alias " + property.PropertyType.PropertyEditorAlias + " does not exist"));
 
                 editor = Current.PropertyEditors[Constants.PropertyEditors.NoEditAlias];
             }
-            var result = new T
+            var result = new TDestination
                 {
                     Id = property.Id,
                     Value = editor.ValueEditor.ConvertDbToEditor(property, property.PropertyType, DataTypeService.Value),
-                    Alias = property.Alias, 
+                    Alias = property.Alias,
                     PropertyEditor = editor,
                     Editor = editor.Alias
                 };

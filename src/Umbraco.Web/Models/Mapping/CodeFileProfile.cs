@@ -5,29 +5,28 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Umbraco.Core;
-using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    public class CodeFileDisplayMapper : ModelMapperConfiguration
+    public class CodeFileProfile : Profile
     {
-        public override void ConfigureMappings(IMapperConfiguration config)
+        public CodeFileProfile()
         {
-            config.CreateMap<IPartialView, CodeFileDisplay>()
+            CreateMap<IPartialView, CodeFileDisplay>()
                 .ForMember(x => x.FileType, exp => exp.Ignore())
                 .ForMember(x => x.Notifications, exp => exp.Ignore())
                 .ForMember(x => x.Path, exp => exp.Ignore())
                 .ForMember(x => x.Snippet, exp => exp.Ignore());
 
-            config.CreateMap<Script, CodeFileDisplay>()
+            CreateMap<Script, CodeFileDisplay>()
                 .ForMember(x => x.FileType, exp => exp.Ignore())
                 .ForMember(x => x.Notifications, exp => exp.Ignore())
                 .ForMember(x => x.Path, exp => exp.Ignore())
                 .ForMember(x => x.Snippet, exp => exp.Ignore());
 
-            config.CreateMap<CodeFileDisplay, IPartialView>()
+            CreateMap<CodeFileDisplay, IPartialView>()
                 .ForMember(x => x.DeletedDate, exp => exp.Ignore())
                 .ForMember(x => x.Id, exp => exp.Ignore())
                 .ForMember(x => x.Key, exp => exp.Ignore())
@@ -40,7 +39,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.OriginalPath, exp => exp.Ignore())
                 .ForMember(x => x.HasIdentity, exp => exp.Ignore());
 
-            config.CreateMap<CodeFileDisplay, Script>()
+            CreateMap<CodeFileDisplay, Script>()
                 .ForMember(x => x.DeletedDate, exp => exp.Ignore())
                 .ForMember(x => x.Id, exp => exp.Ignore())
                 .ForMember(x => x.Key, exp => exp.Ignore())

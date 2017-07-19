@@ -7,7 +7,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class LockedCompositionsResolver : ValueResolver<IContentTypeComposition, IEnumerable<string>>
+    internal class LockedCompositionsResolver
     {
         private readonly IContentTypeService _contentTypeService;
 
@@ -16,7 +16,7 @@ namespace Umbraco.Web.Models.Mapping
             _contentTypeService = contentTypeService;
         }
 
-        protected override IEnumerable<string> ResolveCore(IContentTypeComposition source)
+        public IEnumerable<string> Resolve(IContentTypeComposition source)
         {
             var aliases = new List<string>();
             // get ancestor ids from path of parent if not root

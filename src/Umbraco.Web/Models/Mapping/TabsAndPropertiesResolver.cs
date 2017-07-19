@@ -4,10 +4,8 @@ using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using umbraco;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -15,7 +13,7 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Creates the tabs collection with properties assigned for display models
     /// </summary>
-    internal class TabsAndPropertiesResolver : ValueResolver<IContentBase, IEnumerable<Tab<ContentPropertyDisplay>>>
+    internal class TabsAndPropertiesResolver
     {
         private readonly ILocalizedTextService _localizedTextService;
         protected IEnumerable<string> IgnoreProperties { get; set; }
@@ -219,7 +217,7 @@ namespace Umbraco.Web.Models.Mapping
             display.Tabs = tabs;
         }
 
-        protected override IEnumerable<Tab<ContentPropertyDisplay>> ResolveCore(IContentBase content)
+        public virtual IEnumerable<Tab<ContentPropertyDisplay>> Resolve(IContentBase content)
         {
             var tabs = new List<Tab<ContentPropertyDisplay>>();
 
