@@ -41,7 +41,7 @@ namespace Umbraco.Web
             contentWithKey = content as IPublishedContentWithKey;
             if (contentWithKey != null) return contentWithKey.Key;
 
-            LogHelper.Debug(typeof(PublishedContentExtensions), "Could not get key for IPublishedContent of type " + content.GetType().FullName);
+            LogHelper.Debug(typeof(PublishedContentExtensions), string.Format("Could not get key for IPublishedContent with id {0} of type {1}.", content.Id, content.GetType().FullName));
             return Guid.Empty;
         }
 
