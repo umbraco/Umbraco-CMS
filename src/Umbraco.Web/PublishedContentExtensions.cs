@@ -10,6 +10,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
 using ContentType = umbraco.cms.businesslogic.ContentType;
 
@@ -38,7 +39,10 @@ namespace Umbraco.Web
 
             // again
             contentWithKey = content as IPublishedContentWithKey;
-            return contentWithKey == null ? Guid.Empty : contentWithKey.Key;
+            if (contentWithKey != null) return contentWithKey.Key;
+
+            LogHelper.Debug(typeof(PublishedContentExtensions), "Could not get key for IPublishedContent of type " + content.GetType().FullName);
+            return Guid.Empty;
         }
 
         #endregion
