@@ -3,6 +3,7 @@ using System.Web.Http;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
@@ -18,7 +19,6 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.AllStartContentIds).Returns(new int[0]);
             var user = userMock.Object;
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
@@ -26,9 +26,13 @@ namespace Umbraco.Tests.Web.Controllers
             var contentServiceMock = new Mock<IContentService>();
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            var entityService = entityServiceMock.Object;
+            var userServiceMock = new Mock<IUserService>();
+            var userService = userServiceMock.Object;
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, null, contentService, 1234);
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, entityService, 1234);
 
             //assert
             Assert.IsTrue(result);
@@ -40,7 +44,6 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.AllStartContentIds).Returns(new int[0]);
             var user = userMock.Object;
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
@@ -53,9 +56,11 @@ namespace Umbraco.Tests.Web.Controllers
             var permissionSet = new EntityPermissionSet(1234, permissions);
             userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-1,1234,5678")).Returns(permissionSet);
             var userService = userServiceMock.Object;
-            
+            var entityServiceMock = new Mock<IEntityService>();
+            var entityService = entityServiceMock.Object;
+
             //act/assert
-            Assert.Throws<HttpResponseException>(() => ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, new[] { 'F' }));
+            Assert.Throws<HttpResponseException>(() => ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, entityService, 1234, new[] { 'F' }));
         }
 
         [Test]
@@ -64,7 +69,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.AllStartContentIds).Returns(new[]{ 9876 });
+            userMock.Setup(u => u.StartContentIds).Returns(new[]{ 9876 });
             var user = userMock.Object;
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
@@ -77,9 +82,13 @@ namespace Umbraco.Tests.Web.Controllers
             var permissionSet = new EntityPermissionSet(1234, permissions);
             userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-1,1234")).Returns(permissionSet);
             var userService = userServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            entityServiceMock.Setup(x => x.GetAll(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+                .Returns(new[] { Mock.Of<IUmbracoEntity>(entity => entity.Id == 9876 && entity.Path == "-1,9876") });
+            var entityService = entityServiceMock.Object;
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, new[] { 'F'});
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, entityService, 1234, new[] { 'F'});
 
             //assert
             Assert.IsFalse(result);
@@ -91,7 +100,6 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.AllStartContentIds).Returns(new int[0]);
             var user = userMock.Object;
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
@@ -107,9 +115,11 @@ namespace Umbraco.Tests.Web.Controllers
             var permissionSet = new EntityPermissionSet(1234, permissions);
             userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-1,1234,5678")).Returns(permissionSet);
             var userService = userServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            var entityService = entityServiceMock.Object;
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, new[] { 'F'});
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, entityService, 1234, new[] { 'F'});
 
             //assert
             Assert.IsFalse(result);
@@ -121,7 +131,6 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.AllStartContentIds).Returns(new int[0]);
             var user = userMock.Object;
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
@@ -129,17 +138,19 @@ namespace Umbraco.Tests.Web.Controllers
             var contentServiceMock = new Mock<IContentService>();
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
-            var userServiceMock = new Mock<IUserService>();    
             var permissions = new EntityPermissionCollection
                 {
                     new EntityPermission(9876, 1234, new string[]{ "A", "F", "C" })
                 };
             var permissionSet = new EntityPermissionSet(1234, permissions);
+            var userServiceMock = new Mock<IUserService>();
             userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-1,1234,5678")).Returns(permissionSet);
             var userService = userServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            var entityService = entityServiceMock.Object;
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, new[] { 'F'});
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, entityService, 1234, new[] { 'F'});
 
             //assert
             Assert.IsTrue(result);
@@ -151,11 +162,16 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.AllStartContentIds).Returns(new int[0]);
             var user = userMock.Object;
-            
+            var contentServiceMock = new Mock<IContentService>();
+            var contentService = contentServiceMock.Object;
+            var userServiceMock = new Mock<IUserService>();
+            var userService = userServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            var entityService = entityServiceMock.Object;
+
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, null, null, -1);
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, entityService, -1);
 
             //assert
             Assert.IsTrue(result);
@@ -167,11 +183,16 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.AllStartContentIds).Returns(new int[0]);
             var user = userMock.Object;
-            
+            var contentServiceMock = new Mock<IContentService>();
+            var contentService = contentServiceMock.Object;
+            var userServiceMock = new Mock<IUserService>();
+            var userService = userServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            var entityService = entityServiceMock.Object;
+
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, null, null, -20);
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, entityService, -20);
 
             //assert
             Assert.IsTrue(result);
@@ -183,11 +204,19 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.AllStartContentIds).Returns(new []{ 1234 });
+            userMock.Setup(u => u.StartContentIds).Returns(new []{ 1234 });
             var user = userMock.Object;
+            var contentServiceMock = new Mock<IContentService>();
+            var contentService = contentServiceMock.Object;
+            var userServiceMock = new Mock<IUserService>();
+            var userService = userServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            entityServiceMock.Setup(x => x.GetAll(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+                .Returns(new[] { Mock.Of<IUmbracoEntity>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
+            var entityService = entityServiceMock.Object;
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, null, null, -20);
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, entityService, -20);
 
             //assert
             Assert.IsFalse(result);
@@ -199,11 +228,19 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.AllStartContentIds).Returns(new []{ 1234 });
+            userMock.Setup(u => u.StartContentIds).Returns(new []{ 1234 });
             var user = userMock.Object;
+            var contentServiceMock = new Mock<IContentService>();
+            var contentService = contentServiceMock.Object;
+            var userServiceMock = new Mock<IUserService>();
+            var userService = userServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            entityServiceMock.Setup(x => x.GetAll(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+                .Returns(new[] { Mock.Of<IUmbracoEntity>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
+            var entityService = entityServiceMock.Object;
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, null, null, -1);
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, entityService, -1);
 
             //assert
             Assert.IsFalse(result);
@@ -215,7 +252,6 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.AllStartContentIds).Returns(new int[0]);
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
@@ -225,10 +261,15 @@ namespace Umbraco.Tests.Web.Controllers
                 };
             var permissionSet = new EntityPermissionSet(1234, permissions);
             userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-1")).Returns(permissionSet);
+            var contentServiceMock = new Mock<IContentService>();
+            var contentService = contentServiceMock.Object;
             var userService = userServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            var entityService = entityServiceMock.Object;
+            
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, null, -1, new[] { 'A'});
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, entityService, -1, new[] { 'A'});
 
             //assert
             Assert.IsTrue(result);
@@ -240,7 +281,6 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.AllStartContentIds).Returns(new int[0]);
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
@@ -251,9 +291,13 @@ namespace Umbraco.Tests.Web.Controllers
             var permissionSet = new EntityPermissionSet(1234, permissions);
             userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-1")).Returns(permissionSet);
             var userService = userServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            var entityService = entityServiceMock.Object;
+            var contentServiceMock = new Mock<IContentService>();
+            var contentService = contentServiceMock.Object;            
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, null, -1, new[] { 'B'});
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, entityService, -1, new[] { 'B'});
 
             //assert
             Assert.IsFalse(result);
@@ -265,7 +309,6 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.AllStartContentIds).Returns(new int[0]);
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
@@ -277,9 +320,13 @@ namespace Umbraco.Tests.Web.Controllers
             
             userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-20")).Returns(permissionSet);
             var userService = userServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            var entityService = entityServiceMock.Object;
+            var contentServiceMock = new Mock<IContentService>();
+            var contentService = contentServiceMock.Object;            
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, null, -20, new[] { 'A'});
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, entityService, -20, new[] { 'A'});
 
             //assert
             Assert.IsTrue(result);
@@ -291,7 +338,6 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.AllStartContentIds).Returns(new int[0]);
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
@@ -302,9 +348,13 @@ namespace Umbraco.Tests.Web.Controllers
             var permissionSet = new EntityPermissionSet(1234, permissions);
             userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-20")).Returns(permissionSet);
             var userService = userServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            var entityService = entityServiceMock.Object;
+            var contentServiceMock = new Mock<IContentService>();
+            var contentService = contentServiceMock.Object;            
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, null, -20, new[] { 'B'});
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, entityService, -20, new[] { 'B'});
 
             //assert
             Assert.IsFalse(result);

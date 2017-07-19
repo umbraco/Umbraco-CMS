@@ -1023,7 +1023,6 @@ namespace Umbraco.Web.Editors
         }
 
 
-
         /// <summary>
         /// Performs a permissions check for the user to check if it has access to the node based on 
         /// start node and/or permissions for the node
@@ -1032,6 +1031,7 @@ namespace Umbraco.Web.Editors
         /// <param name="user"></param>
         /// <param name="userService"></param>
         /// <param name="contentService"></param>
+        /// <param name="entityService"></param>
         /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
         /// <param name="permissionsToCheck"></param>
         /// <param name="contentItem">Specifies the already resolved content item to check against</param>
@@ -1041,10 +1041,16 @@ namespace Umbraco.Web.Editors
                 IUser user,
                 IUserService userService,
                 IContentService contentService,
+                IEntityService entityService,
                 int nodeId,
                 char[] permissionsToCheck = null,
                 IContent contentItem = null)
         {
+            if (storage == null) throw new ArgumentNullException("storage");
+            if (user == null) throw new ArgumentNullException("user");
+            if (userService == null) throw new ArgumentNullException("userService");
+            if (contentService == null) throw new ArgumentNullException("contentService");
+            if (entityService == null) throw new ArgumentNullException("entityService");
 
             if (contentItem == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinContent)
             {
@@ -1058,8 +1064,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-
-            var entityService = ApplicationContext.Current.Services.EntityService;
+            
             var hasPathAccess = (nodeId == Constants.System.Root)
                 ? user.HasContentRootAccess(entityService)
                 : (nodeId == Constants.System.RecycleBinContent)

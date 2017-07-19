@@ -6,6 +6,8 @@ using System.Net.Http.Headers;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -19,7 +21,12 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public void GetValueFromResponse_Already_EnumerableContent()
         {
-            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>));
+            var userServiceMock = new Mock<IUserService>();
+            var userService = userServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            var entityService = entityServiceMock.Object;
+
+            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), userService, entityService);
             var val = new List<ContentItemBasic>() {new ContentItemBasic()};
             var result = att.GetValueFromResponse(
                 new ObjectContent(typeof (IEnumerable<ContentItemBasic>),
@@ -34,7 +41,12 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public void GetValueFromResponse_From_Property()
         {
-            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), "MyList");
+            var userServiceMock = new Mock<IUserService>();
+            var userService = userServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            var entityService = entityServiceMock.Object;
+
+            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), "MyList", userService, entityService);
             var val = new List<ContentItemBasic>() { new ContentItemBasic() };
             var container = new MyTestClass() {MyList = val};
 
@@ -51,7 +63,12 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public void GetValueFromResponse_Returns_Null_Not_Found_Property()
         {
-            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), "DontFind");
+            var userServiceMock = new Mock<IUserService>();
+            var userService = userServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            var entityService = entityServiceMock.Object;
+
+            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), "DontFind", userService, entityService);
             var val = new List<ContentItemBasic>() { new ContentItemBasic() };
             var container = new MyTestClass() { MyList = val };
 
@@ -68,7 +85,18 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public void Filter_On_Start_Node()
         {
-            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>));
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.StartContentIds).Returns(new[] { 5 });
+            var user = userMock.Object;
+            var userServiceMock = new Mock<IUserService>();
+            var userService = userServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            entityServiceMock.Setup(x => x.GetAll(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+                .Returns(new[] { Mock.Of<IUmbracoEntity>(entity => entity.Id == 5 && entity.Path == "-1,5") });
+            var entityService = entityServiceMock.Object;
+
+            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), userService, entityService);
             var list = new List<dynamic>();
             var path = "";
             for (var i = 0; i < 10; i++)
@@ -80,11 +108,6 @@ namespace Umbraco.Tests.Web.Controllers
                 path += i.ToInvariantString();
                 list.Add(new ContentItemBasic { Id = i, Name = "Test" + i, ParentId = i, Path = path });
             }
-
-            var userMock = new Mock<IUser>();
-            userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.AllStartContentIds).Returns(new []{ 5 });
-            var user = userMock.Object;
             
             att.FilterBasedOnStartNode(list, user);
 
@@ -94,8 +117,7 @@ namespace Umbraco.Tests.Web.Controllers
 
         [Test]
         public void Filter_On_Permissions()
-        {
-            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>));
+        {            
             var list = new List<dynamic>();
             for (var i = 0; i < 10; i++)
             {
@@ -119,8 +141,11 @@ namespace Umbraco.Tests.Web.Controllers
                 };
             userServiceMock.Setup(x => x.GetPermissions(user, ids)).Returns(permissions);
             var userService = userServiceMock.Object;
+            var entityServiceMock = new Mock<IEntityService>();
+            var entityService = entityServiceMock.Object;
 
-            att.FilterBasedOnPermissions(list, user, userService);
+            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), userService, entityService);
+            att.FilterBasedOnPermissions(list, user);
 
             Assert.AreEqual(3, list.Count);
             Assert.AreEqual(1, list.ElementAt(0).Id);
