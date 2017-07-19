@@ -447,7 +447,6 @@ namespace Umbraco.Web.Editors
                             {
                                 Email = loginInfo.Email,
                                 Name = loginInfo.ExternalIdentity.Name,
-                                AllowedSections = autoLinkOptions.GetDefaultAllowedSections(UmbracoContext, loginInfo),
                                 Culture = autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo),
                                 UserName = loginInfo.Email,
                                 Groups = groups.Select(x => x.ToReadOnlyGroup()).ToArray()

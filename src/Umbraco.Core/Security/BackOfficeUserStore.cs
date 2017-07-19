@@ -78,7 +78,7 @@ namespace Umbraco.Core.Security
             var emptyPasswordValue = Constants.Security.EmptyPasswordPrefix +
                                       aspHasher.HashPassword(Guid.NewGuid().ToString("N"));
 
-            var member = new User(user.Name, user.Email, user.UserName, emptyPasswordValue)
+            var userEntity = new User(user.Name, user.Email, user.UserName, emptyPasswordValue)
             {
                 DefaultToLiveEditing = false,
                 Language = user.Culture ?? Configuration.GlobalSettings.DefaultUILanguage,
@@ -87,14 +87,14 @@ namespace Umbraco.Core.Security
                 IsLockedOut = user.IsLockedOut,
             };
 
-            UpdateMemberProperties(member, user);
+            UpdateMemberProperties(userEntity, user);
             
-            _userService.Save(member);
+            _userService.Save(userEntity);
 
-            if (member.Id == 0) throw new DataException("Could not create the user, check logs for details");
+            if (userEntity.Id == 0) throw new DataException("Could not create the user, check logs for details");
 
             //re-assign id
-            user.Id = member.Id;
+            user.Id = userEntity.Id;
 
             return Task.FromResult(0);
         }
@@ -421,7 +421,9 @@ namespace Umbraco.Core.Security
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
-            if (user.AllowedSections.InvariantContains(roleName)) return Task.FromResult(0);
+            var currentRoles = user.Groups.Select(x => x.Alias).ToArray();
+
+            if (currentRoles.InvariantContains(roleName)) return Task.FromResult(0);
             
             var asInt = user.Id.TryConvertTo<int>();
             if (asInt == false)
@@ -454,7 +456,9 @@ namespace Umbraco.Core.Security
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
-            if (user.AllowedSections.InvariantContains(roleName) == false) return Task.FromResult(0);
+            var currentRoles = user.Groups.Select(x => x.Alias).ToArray();
+
+            if (currentRoles.InvariantContains(roleName) == false) return Task.FromResult(0);
 
             var asInt = user.Id.TryConvertTo<int>();
             if (asInt == false)
@@ -653,34 +657,40 @@ namespace Umbraco.Core.Security
         }
         #endregion
 
-        private bool UpdateMemberProperties(Models.Membership.IUser user, BackOfficeIdentityUser identityUser)
+        private bool UpdateMemberProperties(IUser user, BackOfficeIdentityUser identityUser)
         {
             var anythingChanged = false;
-            //don't assign anything if nothing has changed as this will trigger
-            //the track changes of the model
-            if ((user.LastLoginDate != default(DateTime) && identityUser.LastLoginDateUtc.HasValue == false)
+            
+            //don't assign anything if nothing has changed as this will trigger the track changes of the model
+
+            if (identityUser.IsPropertyDirty("LastLoginDateUtc")
+                || (user.LastLoginDate != default(DateTime) && identityUser.LastLoginDateUtc.HasValue == false)
                 || identityUser.LastLoginDateUtc.HasValue && user.LastLoginDate.ToUniversalTime() != identityUser.LastLoginDateUtc.Value)
             {
                 anythingChanged = true;
                 user.LastLoginDate = identityUser.LastLoginDateUtc.Value.ToLocalTime();
             }
-            if ((user.EmailConfirmedDate.HasValue && user.EmailConfirmedDate.Value != default(DateTime) && identityUser.EmailConfirmed == false)
+            if (identityUser.IsPropertyDirty("EmailConfirmed")
+                || (user.EmailConfirmedDate.HasValue && user.EmailConfirmedDate.Value != default(DateTime) && identityUser.EmailConfirmed == false)
                 || ((user.EmailConfirmedDate.HasValue == false || user.EmailConfirmedDate.Value == default(DateTime)) && identityUser.EmailConfirmed))                
             {
                 anythingChanged = true;
                 user.EmailConfirmedDate = identityUser.EmailConfirmed ? (DateTime?)DateTime.Now : null;
             }
-            if (user.Name != identityUser.Name && identityUser.Name.IsNullOrWhiteSpace() == false)
+            if (identityUser.IsPropertyDirty("Name")
+                && user.Name != identityUser.Name && identityUser.Name.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 user.Name = identityUser.Name;
             }
-            if (user.Email != identityUser.Email && identityUser.Email.IsNullOrWhiteSpace() == false)
+            if (identityUser.IsPropertyDirty("Email")
+                && user.Email != identityUser.Email && identityUser.Email.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 user.Email = identityUser.Email;
             }
-            if (user.FailedPasswordAttempts != identityUser.AccessFailedCount)
+            if (identityUser.IsPropertyDirty("AccessFailedCount")
+                && user.FailedPasswordAttempts != identityUser.AccessFailedCount)
             {
                 anythingChanged = true;
                 user.FailedPasswordAttempts = identityUser.AccessFailedCount;
@@ -697,28 +707,33 @@ namespace Umbraco.Core.Security
                 }
 
             }
-            if (user.Username != identityUser.UserName && identityUser.UserName.IsNullOrWhiteSpace() == false)
+            if (identityUser.IsPropertyDirty("UserName")
+                && user.Username != identityUser.UserName && identityUser.UserName.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 user.Username = identityUser.UserName;
             }
-            if (user.RawPasswordValue != identityUser.PasswordHash && identityUser.PasswordHash.IsNullOrWhiteSpace() == false)
+            if (identityUser.IsPropertyDirty("PasswordHash")
+                && user.RawPasswordValue != identityUser.PasswordHash && identityUser.PasswordHash.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 user.RawPasswordValue = identityUser.PasswordHash;
             }
 
-            if (user.Language != identityUser.Culture && identityUser.Culture.IsNullOrWhiteSpace() == false)
+            if (identityUser.IsPropertyDirty("Culture")
+                && user.Language != identityUser.Culture && identityUser.Culture.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 user.Language = identityUser.Culture;
             }
-            if (user.StartMediaIds.UnsortedSequenceEqual(identityUser.StartMediaIds) == false)
+            if (identityUser.IsPropertyDirty("StartMediaIds")
+                && user.StartMediaIds.UnsortedSequenceEqual(identityUser.StartMediaIds) == false)
             {
                 anythingChanged = true;
                 user.StartMediaIds = identityUser.StartMediaIds;
             }
-            if (user.StartContentIds.UnsortedSequenceEqual(identityUser.StartContentIds) == false)
+            if (identityUser.IsPropertyDirty("StartContentIds")
+                && user.StartContentIds.UnsortedSequenceEqual(identityUser.StartContentIds) == false)
             {
                 anythingChanged = true;
                 user.StartContentIds = identityUser.StartContentIds;
@@ -729,26 +744,29 @@ namespace Umbraco.Core.Security
                 user.SecurityStamp = identityUser.SecurityStamp;
             }
 
-            var userGroupAliases = user.Groups.Select(x => x.Alias).ToArray();
-            var identityUserGroupAliases = identityUser.Groups.Select(x => x.Alias).ToArray();
-
-            if (userGroupAliases.ContainsAll(identityUserGroupAliases) == false
-                || identityUserGroupAliases.ContainsAll(userGroupAliases) == false)
+            if (identityUser.IsPropertyDirty("Groups"))
             {
-                anythingChanged = true;
+                var userGroupAliases = user.Groups.Select(x => x.Alias).ToArray();
+                var identityUserGroupAliases = identityUser.Groups.Select(x => x.Alias).ToArray();
 
-                //clear out the current groups (need to ToArray since we are modifying the iterator)
-                user.ClearGroups();
-                
-                //use all of the ones assigned and add them
-                foreach (var group in identityUser.Groups)
+                if (userGroupAliases.ContainsAll(identityUserGroupAliases) == false
+                    || identityUserGroupAliases.ContainsAll(userGroupAliases) == false)
                 {
-                    user.AddGroup(group);
+                    anythingChanged = true;
+
+                    //clear out the current groups (need to ToArray since we are modifying the iterator)
+                    user.ClearGroups();
+
+                    //use all of the ones assigned and add them
+                    foreach (var group in identityUser.Groups)
+                    {
+                        user.AddGroup(group);
+                    }
                 }
             }
 
             //reset all changes
-            ((IRememberBeingDirty) identityUser).ResetDirtyProperties(false);
+            identityUser.ResetDirtyProperties(false);
 
             return anythingChanged;
         }

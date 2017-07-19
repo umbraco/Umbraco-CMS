@@ -104,6 +104,7 @@ namespace Umbraco.Core.Security
         {
         }
 
+
         #region What we support do not currently
 
         //NOTE: Not sure if we really want/need to ever support this 
@@ -244,12 +245,23 @@ namespace Umbraco.Core.Security
             if (BackOfficeUserPasswordChecker != null)
             {
                 var result = await BackOfficeUserPasswordChecker.CheckPasswordAsync(user, password);
+
+                if (user.HasIdentity == false)
+                {
+                    return false;
+                }
+
                 //if the result indicates to not fallback to the default, then return true if the credentials are valid
                 if (result != BackOfficeUserPasswordCheckerResult.FallbackToDefaultChecker)
                 {
                     return result == BackOfficeUserPasswordCheckerResult.ValidCredentials;
                 }
             }
+
+            //we cannot proceed if the user passed in does not have an identity
+            if (user.HasIdentity == false)
+                return false;
+
             //use the default behavior
             return await base.CheckPasswordAsync(user, password);
         }

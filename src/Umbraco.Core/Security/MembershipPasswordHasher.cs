@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNet.Identity;
 
 namespace Umbraco.Core.Security
@@ -21,6 +22,8 @@ namespace Umbraco.Core.Security
 
         public PasswordVerificationResult VerifyHashedPassword(string hashedPassword, string providedPassword)
         {
+            if (string.IsNullOrWhiteSpace(hashedPassword)) throw new ArgumentException("Value cannot be null or whitespace.", "hashedPassword");
+
             return _provider.VerifyPassword(providedPassword, hashedPassword)
                 ? PasswordVerificationResult.Success
                 : PasswordVerificationResult.Failed;

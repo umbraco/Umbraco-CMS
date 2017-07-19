@@ -28,6 +28,7 @@ namespace Umbraco.Core.Security
 
         public bool VerifyPassword(string password, string hashedPassword)
         {
+            if (string.IsNullOrWhiteSpace(hashedPassword)) throw new ArgumentException("Value cannot be null or whitespace.", "hashedPassword");
             return CheckPassword(password, hashedPassword);
         }
 
@@ -733,6 +734,7 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         protected internal bool CheckPassword(string password, string dbPassword)
         {
+            if (string.IsNullOrWhiteSpace(dbPassword)) throw new ArgumentException("Value cannot be null or whitespace.", "dbPassword");
             switch (PasswordFormat)
             {
                 case MembershipPasswordFormat.Encrypted:
@@ -794,6 +796,7 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         internal string StoredPassword(string storedString, out string salt)
         {
+            if (string.IsNullOrWhiteSpace(storedString)) throw new ArgumentException("Value cannot be null or whitespace.", "storedString");
             if (UseLegacyEncoding)
             {
                 salt = string.Empty;

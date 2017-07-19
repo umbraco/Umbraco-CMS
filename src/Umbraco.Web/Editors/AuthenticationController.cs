@@ -212,6 +212,8 @@ namespace Umbraco.Web.Editors
         {
             var http = EnsureHttpContext();
 
+            //Sign the user in with username/password, this also gives a chance for developers to 
+            //custom verify the credentials and auto-link user accounts with a custom IBackOfficePasswordChecker
             var result = await SignInManager.PasswordSignInAsync(
                 loginModel.Username, loginModel.Password, isPersistent: true, shouldLockout: true);
 
@@ -220,7 +222,7 @@ namespace Umbraco.Web.Editors
                 case SignInStatus.Success:
 
                     //get the user
-                    var user = Security.GetOrCreateBackOfficeUser(loginModel.Username);
+                    var user = Services.UserService.GetByUsername(loginModel.Username);
                     return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.RequiresVerification:
 
@@ -246,7 +248,7 @@ namespace Umbraco.Web.Editors
                                 typeof(IUmbracoBackOfficeTwoFactorOptions) + ".GetTwoFactorView returned an empty string"));
                     }
 
-                    var attemptedUser = Security.GetOrCreateBackOfficeUser(loginModel.Username);
+                    var attemptedUser = Services.UserService.GetByUsername(loginModel.Username);
                     
                     //create a with information to display a custom two factor send code view
                     var verifyResponse = Request.CreateResponse(HttpStatusCode.PaymentRequired, new
@@ -365,7 +367,7 @@ namespace Umbraco.Web.Editors
             {
                 case SignInStatus.Success:
                     //get the user
-                    var user = Security.GetOrCreateBackOfficeUser(userName);
+                    var user = Services.UserService.GetByUsername(userName);
                     return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.LockedOut:
                     return Request.CreateValidationErrorResponse("User is locked out");                    

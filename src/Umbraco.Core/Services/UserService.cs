@@ -153,7 +153,8 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
-                return repository.Get(id);
+                var result =  repository.Get(id);
+                return result;
             }
         }
 
@@ -702,7 +703,8 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateUserRepository(uow);
                 try
                 {
-                    return repository.Get(id);
+                    var result = repository.Get(id);
+                    return result;
                 }
                 catch (SqlException ex)
                 {

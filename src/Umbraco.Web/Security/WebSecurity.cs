@@ -176,92 +176,12 @@ namespace Umbraco.Web.Security
             return membershipProvider != null && membershipProvider.ValidateUser(username, password);
         }
         
-        /// <summary>
-        /// Returns the MembershipUser from the back office membership provider
-        /// </summary>
-        /// <param name="username"></param>
-        /// <param name="setOnline"></param>
-        /// <returns></returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Back office users shouldn't be resolved from the membership provider, they should be resolved usign the BackOfficeUserManager or the IUserService")]
         public virtual MembershipUser GetBackOfficeMembershipUser(string username, bool setOnline)
         {
             var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
             return membershipProvider != null ? membershipProvider.GetUser(username, setOnline) : null;
-        }
-
-        /// <summary>
-        /// Gets (and creates if not found) the back office <see cref="IUser"/> instance for the username specified
-        /// and updates the user's online flag
-        /// </summary>
-        /// <param name="username"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// <para>
-        /// This will return an <see cref="IUser"/> instance no matter what membership provider is installed for the back office, it will automatically
-        /// create any missing <see cref="IUser"/> accounts if one is not found and a custom membership provider is being used. 
-        /// </para>
-        /// <para>
-        /// This will try to deal with any custom membership provider that may exist, though this is not a recommended approach anymore people still
-        /// have these so we need to maintain compat.
-        /// </para>
-        /// TODO: I don't think this method is needed so the todo statment below, pretty sure we can simplify this whole thing
-        /// </remarks>
-        internal IUser GetOrCreateBackOfficeUser(string username)
-        {
-            //See if this user object already exists in the umbraco data
-            var user = _applicationContext.Services.UserService.GetByUsername(username);
-
-            var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();            
-            //we're using the built-in membership provider so the user will already be available
-            if (provider.IsUmbracoUsersProvider())
-            {
-                if (user == null)
-                {
-                    //this should never happen
-                    throw new InvalidOperationException("The user '" + username + "' could not be found in the Umbraco database");
-                }
-                return user;
-            }
-
-            //TODO: I don't think this logic can ever get hit! This will only ever get called after the PasswordSignInAsync method will 
-            // be executed and that requires that a user exists locally, it will not work if one doesn't!
-            // VERIFY THIS!
-
-            //we are using a custom membership provider for the back office, in this case we need to create user accounts for the logged in member.
-            //if we already have a user object in Umbraco we don't need to do anything, otherwise we need to create a mapped Umbraco account.
-            if (user != null) return user;
-
-            //get the membership user from the custom provider (set user to be 'online' in the provider too)
-            var membershipUser = GetBackOfficeMembershipUser(username, true);
-
-            if (membershipUser == null)
-            {
-                throw new InvalidOperationException(
-                    "The username & password validated but the membership provider '" +
-                    provider.Name +
-                    "' did not return a MembershipUser with the username supplied");
-            }
-
-            var email = membershipUser.Email;
-            if (email.IsNullOrWhiteSpace())
-            {
-                //in some cases if there is no email we have to generate one since it is required!
-                email = Guid.NewGuid().ToString("N") + "@example.com";
-            }
-
-            user = new Core.Models.Membership.User
-            {
-                Email = email,
-                Language = GlobalSettings.DefaultUILanguage,
-                Name = membershipUser.UserName,
-                RawPasswordValue = Guid.NewGuid().ToString("N"), //Need to set this to something - will not be used though
-                Username = membershipUser.UserName,
-                IsLockedOut = false,
-                IsApproved = true
-            };
-
-            _applicationContext.Services.UserService.Save(user);
-
-            return user;
         }
 
         /// <summary>

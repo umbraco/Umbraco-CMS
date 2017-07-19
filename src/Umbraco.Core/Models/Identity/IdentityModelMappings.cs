@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using AutoMapper;
-
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
@@ -13,6 +13,10 @@ namespace Umbraco.Core.Models.Identity
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<IUser, BackOfficeIdentityUser>()
+                .BeforeMap((user, identityUser) =>
+                {
+                    identityUser.DisableChangeTracking();
+                })
                 .ForMember(user => user.LastLoginDateUtc, expression => expression.MapFrom(user => user.LastLoginDate.ToUniversalTime()))
                 .ForMember(user => user.Email, expression => expression.MapFrom(user => user.Email))
                 .ForMember(user => user.EmailConfirmed, expression => expression.MapFrom(user => user.EmailConfirmedDate.HasValue))
@@ -26,13 +30,18 @@ namespace Umbraco.Core.Models.Identity
                 .ForMember(user => user.StartContentIds, expression => expression.MapFrom(user => user.StartContentIds))
                 .ForMember(user => user.AccessFailedCount, expression => expression.MapFrom(user => user.FailedPasswordAttempts))
                 .ForMember(user => user.Groups, expression => expression.MapFrom(user => user.Groups.ToArray()))
-                .ForMember(user => user.AllowedSections, expression => expression.MapFrom(user => user.AllowedSections.ToArray()));
-
+                .ForMember(user => user.AllowedSections, expression => expression.Ignore())
+                .AfterMap((user, identityUser) =>
+                {
+                    identityUser.ResetDirtyProperties(true);
+                    identityUser.EnableChangeTracking();
+                });
+            
             config.CreateMap<BackOfficeIdentityUser, UserData>()
                 .ConstructUsing((BackOfficeIdentityUser user) => new UserData(Guid.NewGuid().ToString("N"))) //this is the 'session id'
                 .ForMember(detail => detail.Id, opt => opt.MapFrom(user => user.Id))
                 .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections))
-                .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups))
+                .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups.Select(x => x.Alias).ToArray()))
                 .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
                 //When mapping to UserData which is used in the authcookie we want ALL start nodes including ones defined on the groups
                 .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.AllStartContentIds))

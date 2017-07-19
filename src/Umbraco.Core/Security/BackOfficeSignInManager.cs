@@ -112,14 +112,8 @@ namespace Umbraco.Core.Security
                 : await UserManager.FindByNameAsync(userName);
             
             //if the user is null, create an empty one which can be used for auto-linking
-            if (user == null)
-            {
-                user = new BackOfficeIdentityUser
-                {
-                    UserName = userName,
-                    Culture = GlobalSettings.DefaultUILanguage
-                };        
-            }
+            if (user == null)            
+                user = BackOfficeIdentityUser.CreateNew(userName, GlobalSettings.DefaultUILanguage);            
             
             //check the password for the user, this will allow a developer to auto-link 
             //an account if they have specified an IBackOfficeUserPasswordChecker
@@ -135,7 +129,7 @@ namespace Umbraco.Core.Security
                 return await SignInOrTwoFactor(user, isPersistent);
             }
 
-            if (shouldLockout)
+            if (user.HasIdentity && shouldLockout)
             {
                 // If lockout is requested, increment access failed count which might lock out the user
                 await UserManager.AccessFailedAsync(user.Id);

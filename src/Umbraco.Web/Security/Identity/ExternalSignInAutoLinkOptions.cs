@@ -14,7 +14,7 @@ namespace Umbraco.Web.Security.Identity
     public class ExternalSignInAutoLinkOptions
     {
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the overload specifying user groups instead")]
+        [Obsolete("Use the overload specifying user groups instead and defaultAllowedSections now serves no purpose")]
         public ExternalSignInAutoLinkOptions(
             bool autoLinkExternalAccount = false,
             string defaultUserType = "editor", 
@@ -24,7 +24,6 @@ namespace Umbraco.Web.Security.Identity
             Mandate.ParameterNotNullOrEmpty(defaultUserType, "defaultUserType");
 
             _defaultUserGroups = new[] {defaultUserType};
-            _defaultAllowedSections = defaultAllowedSections ?? new[] { "content", "media" };
             _autoLinkExternalAccount = autoLinkExternalAccount;
             _defaultCulture = defaultCulture ?? GlobalSettings.DefaultUILanguage;
         }
@@ -34,16 +33,13 @@ namespace Umbraco.Web.Security.Identity
         /// </summary>
         /// <param name="autoLinkExternalAccount"></param>
         /// <param name="defaultUserGroups">If null, the default will be the 'editor' group</param>
-        /// <param name="defaultAllowedSections">If null the default will the 'content' and 'media' section</param>
         /// <param name="defaultCulture"></param>
         public ExternalSignInAutoLinkOptions(
             bool autoLinkExternalAccount = false,
             string[] defaultUserGroups = null,
-            string[] defaultAllowedSections = null,
             string defaultCulture = null)
         {
             _defaultUserGroups = defaultUserGroups ?? new[] { "editor" };
-            _defaultAllowedSections = defaultAllowedSections ?? new[] { "content", "media" };
             _autoLinkExternalAccount = autoLinkExternalAccount;
             _defaultCulture = defaultCulture ?? GlobalSettings.DefaultUILanguage;
         }
@@ -73,14 +69,11 @@ namespace Umbraco.Web.Security.Identity
             return _defaultUserGroups;
         }
 
-        private readonly string[] _defaultAllowedSections;
-
-        /// <summary>
-        /// The default allowed sections to use for auto-linking users
-        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("The default sections are based on the default user group, this is no longer used")]
         public string[] GetDefaultAllowedSections(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
-            return _defaultAllowedSections;
+            return new string[0];
         }
 
         private readonly bool _autoLinkExternalAccount;
