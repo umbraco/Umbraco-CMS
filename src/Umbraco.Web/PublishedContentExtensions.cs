@@ -10,6 +10,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
 using ContentType = umbraco.cms.businesslogic.ContentType;
 
@@ -24,8 +25,24 @@ namespace Umbraco.Web
 
         public static Guid GetKey(this IPublishedContent content)
         {
+            // fast
             var contentWithKey = content as IPublishedContentWithKey;
-            return contentWithKey == null ? Guid.Empty : contentWithKey.Key;
+            if (contentWithKey != null) return contentWithKey.Key;
+
+            // try to unwrap (models...)
+            var contentWrapped = content as PublishedContentWrapped;
+            while (contentWrapped != null)
+            {
+                content = contentWrapped.Unwrap();
+                contentWrapped = content as PublishedContentWrapped;
+            }
+
+            // again
+            contentWithKey = content as IPublishedContentWithKey;
+            if (contentWithKey != null) return contentWithKey.Key;
+
+            LogHelper.Debug(typeof(PublishedContentExtensions), string.Format("Could not get key for IPublishedContent with id {0} of type {1}.", content.Id, content.GetType().FullName));
+            return Guid.Empty;
         }
 
         #endregion
