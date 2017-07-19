@@ -185,24 +185,6 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// Validates the user node tree permissions.
-        /// </summary>
-        /// <param name="umbracoUser"></param>
-        /// <param name="path">The path.</param>
-        /// <param name="action">The action.</param>
-        /// <returns></returns>
-        internal bool ValidateUserNodeTreePermissions(User umbracoUser, string path, string action)
-        {
-            var permissions = umbracoUser.GetPermissions(path);
-            if (permissions.IndexOf(action, StringComparison.Ordinal) > -1 && (path.Contains("-20") || ("," + path + ",").Contains("," + umbracoUser.StartNodeId + ",")))
-                return true;
-
-            var user = umbracoUser;
-            LogHelper.Info<WebSecurity>("User {0} has insufficient permissions in UmbracoEnsuredPage: '{1}', '{2}', '{3}'", () => user.Name, () => path, () => permissions, () => action);
-            return false;
-        }
-
-        /// <summary>
         /// Validates the current user to see if they have access to the specified app
         /// </summary>
         /// <param name="app"></param>
