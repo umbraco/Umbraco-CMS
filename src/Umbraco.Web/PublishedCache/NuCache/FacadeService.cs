@@ -221,10 +221,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public class Options
         {
-            // indicates that the facade cache should reuse the application request cache
-            // otherwise a new cache object would be created for the facade specifically,
-            // which is the default - web boot manager uses this to optimze facades
-            public bool FacadeCacheIsApplicationRequestCache;
+            // disabled: prevents the facade from updating and exposing changes
+            //           or even creating a new facade to see changes, uses old cache = bad
+            //
+            //// indicates that the facade cache should reuse the application request cache
+            //// otherwise a new cache object would be created for the facade specifically,
+            //// which is the default - web boot manager uses this to optimze facades
+            //public bool FacadeCacheIsApplicationRequestCache;
 
             public bool IgnoreLocalDb;
         }
@@ -950,16 +953,22 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
                 else
                 {
-                    // FIXME
                     contentSnap = _contentStore.LiveSnapshot;
                     mediaSnap = _mediaStore.LiveSnapshot;
                     domainSnap = _domainStore.Test.LiveSnapshot;
                     snapshotCache = _snapshotCache;
 
-                    scopeContext.Enlist("Umbraco.Web.PublishedCache.NuCache.FacadeService.FooDang", () => this, (completed, svc) =>
+                    // this is tricky
+                    // we are returning elements composed from live snapshots, which we need to replace
+                    // with actual snapshots when the context is gone - but when the action runs, there
+                    // still is a context - so we cannot get elements - just resync = nulls the current
+                    // elements
+                    // just need to make sure nothing gets elements in another enlisted action... so using
+                    // a MaxValue to make sure this one runs last, and it should be ok
+                    scopeContext.Enlist("Umbraco.Web.PublishedCache.NuCache.FacadeService.Resync", () => this, (completed, svc) =>
                     {
                         ((Facade) svc.CurrentFacade).Resync();
-                    });
+                    }, int.MaxValue);
                 }
 
                 // create a new snapshot cache if snapshots are different gens
@@ -972,10 +981,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
             }
 
-            // FIXME the facade cache is a problem here when it's the request cache?!
-            var facadeCache = _options.FacadeCacheIsApplicationRequestCache
-                ? Current.ApplicationCache.RequestCache
-                : new StaticCacheProvider(); // assuming that's OK for tests, etc
+            var facadeCache = new StaticCacheProvider();
 
             var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _logger);
 

@@ -16,7 +16,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // register the NuCache facade service
             composition.SetFacadeService(factory => new FacadeService(
-                new FacadeService.Options { FacadeCacheIsApplicationRequestCache = true },
+                new FacadeService.Options(),
                 factory.GetInstance<MainDom>(),
                 factory.GetInstance<IRuntimeState>(),
                 factory.GetInstance<ServiceContext>(),
