@@ -244,9 +244,7 @@ namespace Umbraco.Core.Models
             // assume groupSn and userSn each don't contain duplicates
 
             var asn = groupSn.Concat(userSn).Distinct().ToArray();
-
-            //TODO: Change this to a more optimal lookup just to retrieve paths
-            var paths = entityService.GetAll(objectType, asn).ToDictionary(x => x.Id, x => x.Path);
+            var paths = entityService.GetAllPaths(objectType, asn).ToDictionary(x => x.Id, x => x.Path);
 
             paths[-1] = "-1"; // entityService does not get that one
 
