@@ -22,7 +22,7 @@
       <dependency id="Microsoft.Owin.Security.OAuth" version="[3.1.0, 4.0.0)" />
       <dependency id="Microsoft.Owin.Host.SystemWeb" version="[3.1.0, 4.0.0)" />
       <dependency id="MiniProfiler" version="[3.2.0.157, 4.0.0)" />
-      <dependency id="HtmlAgilityPack" version="[1.4.9, 2.0.0)" />
+      <dependency id="HtmlAgilityPack" version="[1.5.1, 2.0.0)" />
       <dependency id="Lucene.Net" version="[3.0.3, 4.0.0.0)" />
       <dependency id="SharpZipLib" version="[0.86.0, 1.0.0)" />
       <dependency id="MySql.Data" version="[6.9.9, 7.0.0)" />

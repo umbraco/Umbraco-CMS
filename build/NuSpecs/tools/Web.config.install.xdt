@@ -338,7 +338,7 @@
     <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
       <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="HtmlAgilityPack" publicKeyToken="bd319b19eaf3b43a" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-1.4.9.0" newVersion="1.4.9.0" />
+        <bindingRedirect oldVersion="0.0.0.0-1.5.1.0" newVersion="1.5.1.0" />
       </dependentAssembly>
       <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="AutoMapper" publicKeyToken="be96cd2c38ef1005" culture="neutral" />
