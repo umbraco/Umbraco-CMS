@@ -28,10 +28,21 @@ namespace Umbraco.Web.WebApi.Filters
         public override async Task OnActionExecutedAsync(HttpActionExecutedContext actionExecutedContext, CancellationToken cancellationToken)
         {
             await CheckStaleData(actionExecutedContext.ActionContext);
+
+            //lastly we need new tokens if changes have been made
+            if (actionExecutedContext.ActionContext.Request.Properties.ContainsKey(typeof(VerifyIfUserTicketDataIsStaleAttribute).Name))
+            {                
+                var tokenFilter = new SetAngularAntiForgeryTokensAttribute();
+                tokenFilter.OnActionExecuted(actionExecutedContext);
+            }
         }
 
         private async Task CheckStaleData(HttpActionContext actionContext)
         {
+            //don't execute if it's already been done
+            if (actionContext.Request.Properties.ContainsKey(typeof(VerifyIfUserTicketDataIsStaleAttribute).Name))
+                return;
+
             var identity = actionContext.RequestContext.Principal.Identity as UmbracoBackOfficeIdentity;
             if (identity == null) return;
 
@@ -43,7 +54,7 @@ namespace Umbraco.Web.WebApi.Filters
 
             if (user.Username != identity.Username)
             {
-                await ReSync(user, identity, actionContext);
+                await ReSync(user, actionContext);
                 return;
             }
 
@@ -51,35 +62,33 @@ namespace Umbraco.Web.WebApi.Filters
             if (culture != identity.Culture)
             {
                 //TODO: Might have to log out if this happens or somehow refresh the back office UI with a special header maybe?
-                await ReSync(user, identity, actionContext);
+                await ReSync(user, actionContext);
                 return;
             }
 
             if (user.AllowedSections.UnsortedSequenceEqual(identity.AllowedApplications) == false)
             {
-                await ReSync(user, identity, actionContext);
+                await ReSync(user, actionContext);
                 return;
             }
 
             if (user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.Roles) == false)
             {
-                await ReSync(user, identity, actionContext);
+                await ReSync(user, actionContext);
                 return;
             }
-
-            //TODO: This will need to be changed when http://issues.umbraco.org/issue/U4-10173 is merged
-            var startContentIds = user.AllStartContentIds;
+            
+            var startContentIds = UserExtensions.CalculateContentStartNodeIds(user, ApplicationContext.Current.Services.EntityService);
             if (startContentIds.UnsortedSequenceEqual(identity.StartContentNodes) == false)
             {
-                await ReSync(user, identity, actionContext);
+                await ReSync(user, actionContext);
                 return;
             }
-
-            //TODO: This will need to be changed when http://issues.umbraco.org/issue/U4-10173 is merged
-            var startMediaIds = user.AllStartMediaIds;
+            
+            var startMediaIds = UserExtensions.CalculateMediaStartNodeIds(user, ApplicationContext.Current.Services.EntityService);
             if (startMediaIds.UnsortedSequenceEqual(identity.StartMediaNodes) == false)
             {
-                await ReSync(user, identity, actionContext);
+                await ReSync(user, actionContext);
                 return;
             }
         }
@@ -88,10 +97,9 @@ namespace Umbraco.Web.WebApi.Filters
         /// This will update the current request IPrincipal to be correct and re-create the auth ticket
         /// </summary>
         /// <param name="user"></param>
-        /// <param name="identityUser"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        private async Task ReSync(IUser user, UmbracoBackOfficeIdentity identityUser, HttpActionContext actionContext)
+        private async Task ReSync(IUser user, HttpActionContext actionContext)
         {
             var owinCtx = actionContext.Request.TryGetOwinContext().Result;
             var signInManager = owinCtx.GetBackOfficeSignInManager();
@@ -101,6 +109,9 @@ namespace Umbraco.Web.WebApi.Filters
 
             var backOfficeIdentityUser = Mapper.Map<BackOfficeIdentityUser>(user);
             await signInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true, rememberBrowser: false);
+
+            //flag that we've made changes
+            actionContext.Request.Properties[typeof(VerifyIfUserTicketDataIsStaleAttribute).Name] = true;
         }
     }
 }
