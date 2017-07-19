@@ -32,7 +32,8 @@ namespace Umbraco.Core.Security
                 var identity = Thread.CurrentPrincipal.GetUmbracoIdentity();
                 if (identity != null)
                 {
-                    var user = userService.GetByUsername(identity.Username);
+                    var user = userService.GetUserById(identity.Id.TryConvertTo<int>().Result);
+                    if (user == null) throw new InvalidOperationException("No user with username " + identity.Username + " found");
                     var userIsAdmin = user.IsAdmin();
                     if (userIsAdmin)
                     {

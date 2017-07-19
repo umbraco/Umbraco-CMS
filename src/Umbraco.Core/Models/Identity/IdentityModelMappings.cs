@@ -32,7 +32,8 @@ namespace Umbraco.Core.Models.Identity
                 .ConstructUsing((BackOfficeIdentityUser user) => new UserData(Guid.NewGuid().ToString("N"))) //this is the 'session id'
                 .ForMember(detail => detail.Id, opt => opt.MapFrom(user => user.Id))
                 .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections))
-                .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups))
+                //TODO: This should really be mapping Roles -> Roles
+                .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups.Select(x => x.Alias).ToArray()))
                 .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
                 //When mapping to UserData which is used in the authcookie we want ALL start nodes including ones defined on the groups
                 .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.AllStartContentIds))

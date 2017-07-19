@@ -106,6 +106,16 @@ namespace Umbraco.Core.Models.Identity
 
         private ObservableCollection<IIdentityUserLogin> _logins;
         private Lazy<IEnumerable<IIdentityUserLogin>> _getLogins;
+        private List<IdentityUserRole<string>> _roles;
+
+        //TODO: We need to override this but need to wait until the rest of the PRs are merged in
+        ///// <summary>
+        ///// Override Roles because the value of these are the user's group aliases
+        ///// </summary>
+        //public override ICollection<IdentityUserRole<string>> Roles
+        //{
+        //    get { return _roles ?? (_roles = Groups.Select(x => x.Alias).ToArray()); }
+        //}
 
         /// <summary>
         /// Used to set a lazy call back to populate the user's Login list

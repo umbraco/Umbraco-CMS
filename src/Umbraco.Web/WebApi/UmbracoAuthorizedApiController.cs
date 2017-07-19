@@ -22,6 +22,7 @@ namespace Umbraco.Web.WebApi
     [UmbracoAuthorize]
     [DisableBrowserCache]
     [UmbracoWebApiRequireHttps]
+    [VerifyIfUserTicketDataIsStale]
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
     {
         

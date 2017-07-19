@@ -325,7 +325,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Id, opt => opt.MapFrom(user => user.Id))
                 .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections))
                 .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
-                .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups.ToArray()))
+                .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups.Select(x => x.Alias).ToArray()))
                 .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.AllStartContentIds))
                 .ForMember(detail => detail.StartMediaNodes, opt => opt.MapFrom(user => user.AllStartMediaIds))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))

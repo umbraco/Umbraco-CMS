@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
@@ -214,14 +215,8 @@ namespace Umbraco.Core.Services
             Save(membershipUser);
         }
 
-        /// <summary>
-        /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
-        /// </summary>
-        /// <remarks>
-        /// This method exists so that Umbraco developers can use one entry point to create/update users if they choose to.
-        /// </remarks>
-        /// <param name="user">The user to save the password for</param>
-        /// <param name="password">The password to save</param>
+        [Obsolete("ASP.NET Identity APIs like the BackOfficeUserManager should be used to manage passwords, this will not work with correct security practices because you would need the existing password")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public void SavePassword(IUser user, string password)
         {
             if (user == null) throw new ArgumentNullException("user");

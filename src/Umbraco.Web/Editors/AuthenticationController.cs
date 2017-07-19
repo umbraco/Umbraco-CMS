@@ -150,6 +150,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [WebApi.UmbracoAuthorize]
         [SetAngularAntiForgeryTokens]
+        [VerifyIfUserTicketDataIsStale]
         public UserDetail GetCurrentUser()
         {
             var user = UmbracoContext.Security.CurrentUser;
@@ -195,6 +196,7 @@ namespace Umbraco.Web.Editors
             return result;
         }
 
+        //TODO: This should be on the CurrentUserController?
         [WebApi.UmbracoAuthorize]
         [ValidateAngularAntiForgeryToken]
         public async Task<Dictionary<string, string>>  GetCurrentUserLinkedLogins()
