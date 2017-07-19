@@ -294,8 +294,8 @@ namespace umbraco.BasePages
                 AllowedApplications = u.GetApplications().Select(x => x.alias).ToArray(),
                 RealName = u.Name,
                 Roles = u.GetGroups(),
-                StartContentNodes = u.UserEntity.GetAllContentStartNodes(ApplicationContext.Current.Services.EntityService),
-                StartMediaNodes = u.UserEntity.GetAllMediaStartNodes(ApplicationContext.Current.Services.EntityService),
+                StartContentNodes = u.UserEntity.CalculateContentStartNodeIds(ApplicationContext.Current.Services.EntityService),
+                StartMediaNodes = u.UserEntity.CalculateMediaStartNodeIds(ApplicationContext.Current.Services.EntityService),
                 Username = u.LoginName,
                 Culture = ui.Culture(u)
 

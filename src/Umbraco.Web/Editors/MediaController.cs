@@ -254,7 +254,7 @@ namespace Umbraco.Web.Editors
         private int[] _userStartNodes;
         protected int[] UserStartNodes
         {
-            get { return _userStartNodes ?? (_userStartNodes = Security.CurrentUser.GetAllMediaStartNodes(Services.EntityService)); }
+            get { return _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService)); }
         }
 
         /// <summary>
@@ -680,7 +680,9 @@ namespace Umbraco.Web.Editors
             if (CheckPermissions(
                new Dictionary<string, object>(),
                Security.CurrentUser,
-               Services.MediaService, parentId) == false)
+               Services.MediaService,
+               Services.EntityService,
+               parentId) == false)
             {
                 return Request.CreateResponse(
                     HttpStatusCode.Forbidden,
@@ -892,11 +894,17 @@ namespace Umbraco.Web.Editors
         /// <param name="storage">The storage to add the content item to so it can be reused</param>
         /// <param name="user"></param>
         /// <param name="mediaService"></param>
+        /// <param name="entityService"></param>
         /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
         /// <param name="media">Specifies the already resolved content item to check against, setting this ignores the nodeId</param>
         /// <returns></returns>
-        internal static bool CheckPermissions(IDictionary<string, object> storage, IUser user, IMediaService mediaService, int nodeId, IMedia media = null)
+        internal static bool CheckPermissions(IDictionary<string, object> storage, IUser user, IMediaService mediaService, IEntityService entityService, int nodeId, IMedia media = null)
         {
+            if (storage == null) throw new ArgumentNullException("storage");
+            if (user == null) throw new ArgumentNullException("user");
+            if (mediaService == null) throw new ArgumentNullException("mediaService");
+            if (entityService == null) throw new ArgumentNullException("entityService");
+
             if (media == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinMedia)
             {
                 media = mediaService.GetById(nodeId);
@@ -910,7 +918,6 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var entityService = Core.ApplicationContext.Current.Services.EntityService;
             var hasPathAccess = (nodeId == Constants.System.Root)
                 ? user.HasMediaRootAccess(entityService)
                 : (nodeId == Constants.System.RecycleBinMedia)
