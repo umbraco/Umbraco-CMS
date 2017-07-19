@@ -18,36 +18,70 @@ namespace Umbraco.Web.WebApi.Filters
     /// </summary>
     internal sealed class FilterAllowedOutgoingContentAttribute : FilterAllowedOutgoingMediaAttribute
     {
+        private readonly IUserService _userService;
+        private readonly IEntityService _entityService;
         private readonly char _permissionToCheck;
 
         public FilterAllowedOutgoingContentAttribute(Type outgoingType) 
-            : base(outgoingType)
+            : this(outgoingType, ApplicationContext.Current.Services.UserService, ApplicationContext.Current.Services.EntityService)
         {
             _permissionToCheck = ActionBrowse.Instance.Letter;
         }
 
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, char permissionToCheck)
-            : base(outgoingType)
+            : this(outgoingType, ApplicationContext.Current.Services.UserService, ApplicationContext.Current.Services.EntityService)
         {
             _permissionToCheck = permissionToCheck;
         }
 
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, string propertyName)
-            : base(outgoingType, propertyName)
+            : this(outgoingType, propertyName, ApplicationContext.Current.Services.UserService, ApplicationContext.Current.Services.EntityService)
         {
             _permissionToCheck = ActionBrowse.Instance.Letter;
         }
+
+
+        public FilterAllowedOutgoingContentAttribute(Type outgoingType, IUserService userService, IEntityService entityService)
+            : base(outgoingType)
+        {
+            if (userService == null) throw new ArgumentNullException("userService");
+            if (entityService == null) throw new ArgumentNullException("entityService");
+            _userService = userService;
+            _entityService = entityService;
+            _permissionToCheck = ActionBrowse.Instance.Letter;
+        }
+
+        public FilterAllowedOutgoingContentAttribute(Type outgoingType, char permissionToCheck, IUserService userService, IEntityService entityService)
+            : base(outgoingType)
+        {
+            if (userService == null) throw new ArgumentNullException("userService");
+            if (entityService == null) throw new ArgumentNullException("entityService");
+            _userService = userService;
+            _entityService = entityService;
+            _permissionToCheck = permissionToCheck;
+        }
+
+        public FilterAllowedOutgoingContentAttribute(Type outgoingType, string propertyName, IUserService userService, IEntityService entityService)
+            : base(outgoingType, propertyName)
+        {
+            if (userService == null) throw new ArgumentNullException("userService");
+            if (entityService == null) throw new ArgumentNullException("entityService");
+            _userService = userService;
+            _entityService = entityService;
+            _permissionToCheck = ActionBrowse.Instance.Letter;
+        }
+
 
         protected override void FilterItems(IUser user, IList items)
         {
             base.FilterItems(user, items);
 
-            FilterBasedOnPermissions(items, user, ApplicationContext.Current.Services.UserService);
+            FilterBasedOnPermissions(items, user);
         }
 
         protected override int[] GetUserStartNodes(IUser user)
         {
-            return user.AllStartContentIds;
+            return user.CalculateContentStartNodeIds(_entityService);
         }
 
         protected override int RecycleBinId
@@ -55,7 +89,7 @@ namespace Umbraco.Web.WebApi.Filters
             get { return Constants.System.RecycleBinContent; }
         }
 
-        internal void FilterBasedOnPermissions(IList items, IUser user, IUserService userService)
+        internal void FilterBasedOnPermissions(IList items, IUser user)
         {
             var length = items.Count;
 
@@ -67,7 +101,7 @@ namespace Umbraco.Web.WebApi.Filters
                     ids.Add(((dynamic)items[i]).Id);
                 }
                 //get all the permissions for these nodes in one call
-                var permissions = userService.GetPermissions(user, ids.ToArray()).ToArray();
+                var permissions = _userService.GetPermissions(user, ids.ToArray()).ToArray();
                 var toRemove = new List<dynamic>();
                 foreach (dynamic item in items)
                 {

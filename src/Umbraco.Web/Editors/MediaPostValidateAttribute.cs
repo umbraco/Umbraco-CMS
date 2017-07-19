@@ -19,23 +19,30 @@ namespace Umbraco.Web.Editors
     internal sealed class MediaPostValidateAttribute : ActionFilterAttribute
     {
         private readonly IMediaService _mediaService;
+        private readonly IEntityService _entityService;
         private readonly WebSecurity _security;
 
         public MediaPostValidateAttribute()
         {
         }
 
-        public MediaPostValidateAttribute(IMediaService mediaService, WebSecurity security)
+        public MediaPostValidateAttribute(IMediaService mediaService, IEntityService entityService, WebSecurity security)
         {
             if (mediaService == null) throw new ArgumentNullException("mediaService");
             if (security == null) throw new ArgumentNullException("security");
             _mediaService = mediaService;
+            _entityService = entityService;
             _security = security;
         }
 
         private IMediaService MediaService
         {
             get { return _mediaService ?? ApplicationContext.Current.Services.MediaService; }
+        }
+
+        private IEntityService EntityService
+        {
+            get { return _entityService ?? ApplicationContext.Current.Services.EntityService; }
         }
 
         private WebSecurity Security
@@ -81,6 +88,7 @@ namespace Umbraco.Web.Editors
                 actionContext.Request.Properties,
                 Security.CurrentUser,
                 MediaService,
+                EntityService,
                 contentIdToCheck,
                 contentToCheck) == false)
             {
