@@ -123,7 +123,9 @@ namespace Umbraco.Web.WebApi.Filters
             if (MediaController.CheckPermissions(
                 actionContext.Request.Properties,
                 UmbracoContext.Current.Security.CurrentUser, 
-                ApplicationContext.Current.Services.MediaService, nodeId))
+                ApplicationContext.Current.Services.MediaService, 
+                ApplicationContext.Current.Services.EntityService, 
+                nodeId))
             {
                 base.OnActionExecuting(actionContext);
             }

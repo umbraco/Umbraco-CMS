@@ -309,8 +309,8 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IUser, UserDetail>()
                 .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(applicationContext.Services.UserService, applicationContext.ApplicationCache.RuntimeCache)))
                 .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))
-                .ForMember(detail => detail.StartContentIds, opt => opt.MapFrom(user => user.AllStartContentIds))
-                .ForMember(detail => detail.StartMediaIds, opt => opt.MapFrom(user => user.AllStartMediaIds))
+                .ForMember(detail => detail.StartContentIds, opt => opt.MapFrom(user => user.CalculateContentStartNodeIds(applicationContext.Services.EntityService)))
+                .ForMember(detail => detail.StartMediaIds, opt => opt.MapFrom(user => user.CalculateMediaStartNodeIds(applicationContext.Services.EntityService)))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
                 .ForMember(
                     detail => detail.EmailHash,
@@ -326,8 +326,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections))
                 .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
                 .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups.Select(x => x.Alias).ToArray()))
-                .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.AllStartContentIds))
-                .ForMember(detail => detail.StartMediaNodes, opt => opt.MapFrom(user => user.AllStartMediaIds))
+                .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.CalculateContentStartNodeIds(applicationContext.Services.EntityService)))
+                .ForMember(detail => detail.StartMediaNodes, opt => opt.MapFrom(user => user.CalculateMediaStartNodeIds(applicationContext.Services.EntityService)))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
                 .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));

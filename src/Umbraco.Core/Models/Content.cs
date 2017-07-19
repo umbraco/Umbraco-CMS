@@ -23,7 +23,7 @@ namespace Umbraco.Core.Models
         private DateTime? _expireDate;
         private int _writer;
         private string _nodeName;//NOTE Once localization is introduced this will be the non-localized Node Name.
-        private bool _permissionsChanged;
+
         /// <summary>
         /// Constructor for creating a Content object
         /// </summary>
@@ -32,7 +32,7 @@ namespace Umbraco.Core.Models
         /// <param name="contentType">ContentType for the current Content object</param>
         public Content(string name, IContent parent, IContentType contentType)
 			: this(name, parent, contentType, new PropertyCollection())
-		{			
+		{
 		}
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Umbraco.Core.Models
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
-        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties) 
+        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties)
 			: base(name, parentId, contentType, properties)
         {
             Mandate.ParameterNotNull(contentType, "contentType");
@@ -94,7 +94,7 @@ namespace Umbraco.Core.Models
         /// This is used to override the default one from the ContentType.
         /// </summary>
         /// <remarks>
-        /// If no template is explicitly set on the Content object, 
+        /// If no template is explicitly set on the Content object,
         /// the Default template from the ContentType will be returned.
         /// </remarks>
         [DataMember]
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Models
             get { return _nodeName; }
             set { SetPropertyValueAndDetectChanges(value, ref _nodeName, Ps.Value.NodeNameSelector); }
         }
-        
+
 
         /// <summary>
         /// Gets the ContentType used by this content object
@@ -283,7 +283,7 @@ namespace Umbraco.Core.Models
                 ChangePublishedState(PublishedState.Unpublished);
             }
         }
-        
+
         /// <summary>
         /// Method to call when Entity is being updated
         /// </summary>
