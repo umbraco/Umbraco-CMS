@@ -120,21 +120,21 @@ namespace Umbraco.Web.Editors
             
             foreach (var searchableTree in searchableTrees)
             {
-                if (allowedSections.Contains(searchableTree.AppAlias))
+                if (allowedSections.Contains(searchableTree.Value.AppAlias))
                 {
-                    var tree = Services.ApplicationTreeService.GetByAlias(searchableTree.TreeAlias);
+                    var tree = Services.ApplicationTreeService.GetByAlias(searchableTree.Key);
                     if (tree == null) continue; //shouldn't occur
                     
-                    var searchableTreeAttribute = searchableTree.SearchableTree.GetType().GetCustomAttribute<SearchableTreeAttribute>(false);
+                    var searchableTreeAttribute = searchableTree.Value.SearchableTree.GetType().GetCustomAttribute<SearchableTreeAttribute>(false);
                     var treeAttribute = tree.GetTreeAttribute();
 
                     long total;
 
                     result[treeAttribute.GetRootNodeDisplayName(Services.TextService)] = new TreeSearchResult
                     {
-                        Results = searchableTree.SearchableTree.Search(query, 200, 0, out total),
-                        TreeAlias = searchableTree.TreeAlias,
-                        AppAlias = searchableTree.AppAlias,
+                        Results = searchableTree.Value.SearchableTree.Search(query, 200, 0, out total),
+                        TreeAlias = searchableTree.Key,
+                        AppAlias = searchableTree.Value.AppAlias,
                         JsFormatterService = searchableTreeAttribute == null ? "" : searchableTreeAttribute.ServiceName,
                         JsFormatterMethod = searchableTreeAttribute == null ? "" : searchableTreeAttribute.MethodName
                     };

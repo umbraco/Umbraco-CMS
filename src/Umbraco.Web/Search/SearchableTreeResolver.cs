@@ -23,13 +23,13 @@ namespace Umbraco.Web.Search
             _treeService = treeService;
         }        
 
-        private SearchableTreeCollection _resolved;
+        private IReadOnlyDictionary<string, SearchableApplicationTree> _resolved;
         private static readonly object Locker = new object();
 
         /// <summary>
         /// Returns the a dictionary of tree alias with it's affiliated <see cref="ISearchableTree"/>
         /// </summary>
-        public SearchableTreeCollection SearchableTrees
+        public IReadOnlyDictionary<string, SearchableApplicationTree> SearchableTrees
         {
             get
             {
@@ -38,16 +38,17 @@ namespace Umbraco.Web.Search
                 lock (Locker)
                 {
                     var appTrees = _treeService.GetAll().ToArray();
-                    _resolved = new SearchableTreeCollection();
+                    var collection = new SearchableTreeCollection();
                     var searchableTrees = Values.ToArray();
                     foreach (var searchableTree in searchableTrees)
                     {
                         var found = appTrees.FirstOrDefault(x => x.Alias == searchableTree.TreeAlias);
                         if (found != null)
                         {
-                            _resolved.Add(new SearchableApplicationTree(found.ApplicationAlias, found.Alias, searchableTree));
+                            collection.Add(new SearchableApplicationTree(found.ApplicationAlias, found.Alias, searchableTree));
                         }
                     }
+                    _resolved = collection.AsReadOnlyDictionary();
                     return _resolved;
                 }
             }
