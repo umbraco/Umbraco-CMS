@@ -302,8 +302,25 @@ namespace Umbraco.Core.Security
         public override Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
         {
             return base.ChangePasswordAsync(userId, currentPassword, newPassword);
-        }      
-        
+        }
+
+        /// <summary>
+        /// Override to determine how to hash the password
+        /// </summary>
+        /// <param name="store"></param>
+        /// <param name="user"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        protected override async Task<bool> VerifyPasswordAsync(IUserPasswordStore<T, int> store, T user, string password)
+        {
+            var userAwarePasswordHasher = PasswordHasher as IUserAwarePasswordHasher<BackOfficeIdentityUser, int>;
+            if (userAwarePasswordHasher == null)
+                return await base.VerifyPasswordAsync(store, user, password);
+
+            var hash = await store.GetPasswordHashAsync(user);
+            return userAwarePasswordHasher.VerifyHashedPassword(user, hash, password) != PasswordVerificationResult.Failed;
+        }
+
         /// <summary>
         /// Override to determine how to hash the password
         /// </summary>
