@@ -32,19 +32,19 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Providers can override this setting, default is 7
+        /// Providers can override this setting, default is 10
         /// </summary>
         public virtual int DefaultMinPasswordLength
         {
-            get { return 7; }
+            get { return 10; }
         }
 
         /// <summary>
-        /// Providers can override this setting, default is 1
+        /// Providers can override this setting, default is 0
         /// </summary>
         public virtual int DefaultMinNonAlphanumericChars
         {
-            get { return 1; }
+            get { return 0; }
         }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace Umbraco.Core.Security
             base.Initialize(name, config);
 
             _enablePasswordRetrieval = config.GetValue("enablePasswordRetrieval", false);
-            _enablePasswordReset = config.GetValue("enablePasswordReset", false);
+            _enablePasswordReset = config.GetValue("enablePasswordReset", true);
             _requiresQuestionAndAnswer = config.GetValue("requiresQuestionAndAnswer", false);
             _requiresUniqueEmail = config.GetValue("requiresUniqueEmail", true);
             _maxInvalidPasswordAttempts = GetIntValue(config, "maxInvalidPasswordAttempts", 5, false, 0);

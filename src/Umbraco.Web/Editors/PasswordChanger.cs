@@ -41,7 +41,7 @@ namespace Umbraco.Web.Editors
             var membershipPasswordHasher = userMgr.PasswordHasher as IMembershipProviderPasswordHasher;
 
             //check if this identity implementation is powered by an IUserAwarePasswordHasher (it will be by default in 7.7+ but not for upgrades)
-            var userAwarePasswordHasher = userMgr.PasswordHasher as IUserAwarePasswordHasher<int>;
+            var userAwarePasswordHasher = userMgr.PasswordHasher as IUserAwarePasswordHasher<BackOfficeIdentityUser, int>;
 
             if (membershipPasswordHasher != null && userAwarePasswordHasher == null)
             {
@@ -49,22 +49,22 @@ namespace Umbraco.Web.Editors
                 if (membershipPasswordHasher.MembershipProvider.RequiresQuestionAndAnswer)
                     throw new NotSupportedException("Currently the user editor does not support providers that have RequiresQuestionAndAnswer specified");
                 return ChangePasswordWithMembershipProvider(currentUser.Username, passwordModel, membershipPasswordHasher.MembershipProvider);
-            }            
+            }
 
-            //get the real password validator, thsi should not be null but in some very rare cases it could be, in which case
-            //we need to create a default password validator to use since we have no idea what it actually is or what it's rules are
-            //this is an Edge Case!
-            var passwordValidator = userMgr.PasswordValidator as PasswordValidator
-                                    ?? (membershipPasswordHasher != null
-                                        ? new MembershipProviderPasswordValidator(membershipPasswordHasher.MembershipProvider)
-                                        : new PasswordValidator());
+            //if we are here, then a IUserAwarePasswordHasher is available, however we cannot proceed in that case if for some odd reason
+            //the user has configured the membership provider to not be hashed. This will actually never occur because the BackOfficeUserManager
+            //will throw if it's not hashed, but we should make sure to check anyways (i.e. in case we want to unit test!)
+            if (membershipPasswordHasher != null && membershipPasswordHasher.MembershipProvider.PasswordFormat != MembershipPasswordFormat.Hashed)
+            {
+                throw new InvalidOperationException("The membership provider cannot have a password format of " + membershipPasswordHasher.MembershipProvider.PasswordFormat + " and be configured with secured hashed passwords");
+            }
 
             //Are we resetting the password??
             if (passwordModel.Reset.HasValue && passwordModel.Reset.Value)
             {
                 //ok, we should be able to reset it
                 var resetToken = await userMgr.GeneratePasswordResetTokenAsync(currentUser.Id);
-                var newPass = Membership.GeneratePassword(passwordValidator.RequiredLength, passwordValidator.RequireNonLetterOrDigit ? 2 : 0);
+                var newPass = userMgr.GeneratePassword();
                 var resetResult = await userMgr.ResetPasswordAsync(currentUser.Id, resetToken, newPass);
 
                 if (resetResult.Succeeded == false)

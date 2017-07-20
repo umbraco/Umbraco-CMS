@@ -1,22 +1,52 @@
 using System;
 using Microsoft.AspNet.Identity;
+using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.Security
 {
-    public interface IUserAwarePasswordHasher<TKey>
+    /// <summary>
+    /// A password hasher that is User aware so that it can process the hashing based on the user's settings
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TUser"></typeparam>
+    public interface IUserAwarePasswordHasher<in TUser, TKey>
+        where TUser : class, IUser<TKey>
         where TKey : IEquatable<TKey>
     {
-        string HashPassword(TKey id, string password);
-        string VerifyHashedPassword(TKey id, string hashedPassword, string providedPassword);
+        string HashPassword(TUser user, string password);
+        string VerifyHashedPassword(TUser user, string hashedPassword, string providedPassword);
     }
 
+    /// <summary>
+    /// A password hasher that is based on the rules configured for a membership provider
+    /// </summary>
     public interface IMembershipProviderPasswordHasher : IPasswordHasher
     {
         MembershipProviderBase MembershipProvider { get; }
     }
 
     /// <summary>
-    /// A custom password hasher that conforms to the password hashing done with membership providers
+    /// The default password hasher that is User aware so that it can process the hashing based on the user's settings
+    /// </summary>
+    public class UserAwareMembershipProviderPasswordHasher : MembershipProviderPasswordHasher, IUserAwarePasswordHasher<BackOfficeIdentityUser, int>
+    {
+        public UserAwareMembershipProviderPasswordHasher(MembershipProviderBase provider) : base(provider)
+        {
+        }
+
+        public string HashPassword(BackOfficeIdentityUser user, string password)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string VerifyHashedPassword(BackOfficeIdentityUser user, string hashedPassword, string providedPassword)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// A password hasher that conforms to the password hashing done with membership providers
     /// </summary>
     public class MembershipProviderPasswordHasher : IMembershipProviderPasswordHasher
     {
