@@ -5,8 +5,10 @@
     using System.Net.Http.Formatting;
 
     using global::umbraco;
+    using global::umbraco.BusinessLogic.Actions;
 
     using Umbraco.Core;
+    using Umbraco.Core.Services;
     using Umbraco.Web.Models.Trees;
     using Umbraco.Web.WebApi.Filters;
 
@@ -20,7 +22,7 @@
         /// <summary>
         /// The method called to render the contents of the tree structure
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the tree item</param>
         /// <param name="queryStrings">
         /// All of the query string parameters passed from jsTree
         /// </param>
@@ -66,7 +68,8 @@
                         id,
                         queryStrings,
                         x.ItemKey,
-                        "icon-book-alt", true)));
+                        "icon-book-alt",
+                        true)));
             }
 
             return nodes;
@@ -75,12 +78,16 @@
         /// <summary>
         /// Returns the menu structure for the node
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="queryStrings"></param>
+        /// <param name="id">The id of the tree item</param>
+        /// <param name="queryStrings">
+        /// All of the query string parameters passed from jsTree
+        /// </param>
         /// <returns></returns>
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
+
+            menu.Items.Add<RefreshNode, ActionRefresh>(this.Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
 
             return menu;
         }
