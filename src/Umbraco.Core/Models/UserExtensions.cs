@@ -212,22 +212,23 @@ namespace Umbraco.Core.Models
         private static int[] FromUserCache(IUser user, string cacheKey)
         {
             var entityUser = user as User;
-            if (entityUser != null)
+            if (entityUser == null) return null;
+
+            lock (entityUser.AdditionalDataLock)
             {
                 object allContentStartNodes;
-                if (entityUser.AdditionalData.TryGetValue(cacheKey, out allContentStartNodes))
-                {
-                    var asArray = allContentStartNodes as int[];
-                    if (asArray != null) return asArray;
-                }
+                return entityUser.AdditionalData.TryGetValue(cacheKey, out allContentStartNodes)
+                    ? allContentStartNodes as int[]
+                    : null;
             }
-            return null;
         }
 
         private static void ToUserCache(IUser user, string cacheKey, int[] vals)
         {
             var entityUser = user as User;
-            if (entityUser != null)
+            if (entityUser == null) return;
+
+            lock (entityUser.AdditionalDataLock)
             {
                 entityUser.AdditionalData[cacheKey] = vals;
             }
