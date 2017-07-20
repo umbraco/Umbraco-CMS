@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -6,37 +6,37 @@ using Umbraco.Web.UI.Pages;
 
 namespace umbraco.dialogs
 {
-	/// <summary>
-	/// Summary description for about.
-	/// </summary>
-	public partial class about : UmbracoEnsuredPage
-	{
+    /// <summary>
+    /// Summary description for about.
+    /// </summary>
+    public partial class about : UmbracoEnsuredPage
+    {
 
-		protected void Page_Load(object sender, EventArgs e)
-		{
-		    // Put user code to initialize the page here
-			thisYear.Text = DateTime.Now.Year.ToString(CultureInfo.InvariantCulture);
-		    version.Text = UmbracoVersion.SemanticVersion.ToSemanticString();
-		}
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            // Put user code to initialize the page here
+            thisYear.Text = DateTime.Now.Year.ToString(CultureInfo.InvariantCulture);
+            version.Text = UmbracoVersion.SemanticVersion.ToSemanticString();
+        }
 
-	    #region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
+        #region Web Form Designer generated code
+        override protected void OnInit(EventArgs e)
+        {
+            //
+            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
+            //
+            InitializeComponent();
+            base.OnInit(e);
+        }
 
-		}
-		#endregion
-	}
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+
+        }
+        #endregion
+    }
 }

@@ -7,25 +7,25 @@ namespace Umbraco.Core.Models.PublishedContent
     internal class PropertyResult : IPublishedProperty, IHtmlString
     {
         private readonly IPublishedProperty _source;
-	    private readonly string _alias;
-	    private readonly object _value;
+        private readonly string _alias;
+        private readonly object _value;
 
         internal PropertyResult(IPublishedProperty source, PropertyResultType type)
         {
-    		if (source == null) throw new ArgumentNullException(nameof(source));
-            
+            if (source == null) throw new ArgumentNullException(nameof(source));
+
             PropertyType = type;
             _source = source;
         }
 
-		internal PropertyResult(string alias, object value, PropertyResultType type)
+        internal PropertyResult(string alias, object value, PropertyResultType type)
         {
-        	if (alias == null) throw new ArgumentNullException(nameof(alias));
-        	if (value == null) throw new ArgumentNullException(nameof(value));
+            if (alias == null) throw new ArgumentNullException(nameof(alias));
+            if (value == null) throw new ArgumentNullException(nameof(value));
 
             PropertyType = type;
             _alias = alias;
-			_value = value;
+            _value = value;
         }
 
         internal PropertyResultType PropertyType { get; }
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public string ToHtmlString()
         {
             var value = Value;
-			return value?.ToString() ?? string.Empty;
+            return value?.ToString() ?? string.Empty;
         }
     }
 }

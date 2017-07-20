@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             _forTesting = forTesting;
         }
 
-        public AddIndexToCmsMacroTable(IMigrationContext context) 
+        public AddIndexToCmsMacroTable(IMigrationContext context)
             : base(context)
         { }
 
@@ -63,11 +63,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                         }
                     }
                 }
-                
 
-                Create.Index("IX_cmsMacro_Alias").OnTable("cmsMacro").OnColumn("macroAlias").Unique();            
+
+                Create.Index("IX_cmsMacro_Alias").OnTable("cmsMacro").OnColumn("macroAlias").Unique();
             }
-            
+
         }
 
         public override void Down()

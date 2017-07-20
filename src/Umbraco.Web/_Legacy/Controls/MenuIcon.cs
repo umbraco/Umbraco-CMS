@@ -1,16 +1,16 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Web.UI;
 using ClientDependency.Core;
 
 namespace Umbraco.Web._Legacy.Controls
 {
 
-	[ClientDependency(ClientDependencyType.Css, "menuicon/style.css", "UmbracoClient")]
-    internal class MenuIcon : System.Web.UI.WebControls.Image, MenuIconI 
-	{
+    [ClientDependency(ClientDependencyType.Css, "menuicon/style.css", "UmbracoClient")]
+    internal class MenuIcon : System.Web.UI.WebControls.Image, MenuIconI
+    {
         private string _OnClickCommand = "";
         private string _AltText = "init";
-        
+
         public string AltText {
             get { return this.AlternateText; }
             set {
@@ -41,7 +41,7 @@ namespace Umbraco.Web._Legacy.Controls
         protected override void OnLoad(System.EventArgs EventArguments) {
 
 
-            // NH 17-01-2007. Trying to avoid inline styling soup 
+            // NH 17-01-2007. Trying to avoid inline styling soup
             //        Me.Width = WebControls.Unit.Pixel(22)
             //       Me.Height = WebControls.Unit.Pixel(23)
             //Me.Style.Add("border", "0px")

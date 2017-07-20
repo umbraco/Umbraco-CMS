@@ -25,12 +25,12 @@ namespace Umbraco.Web.Models.Mapping
         /// Maps pre-values in the dictionary to the values for the fields
         /// </summary>
         /// <param name="fields"></param>
-        /// <param name="preValues"></param>        
+        /// <param name="preValues"></param>
         internal static void MapPreValueValuesToPreValueFields(PreValueFieldDisplay[] fields, IDictionary<string, object> preValues)
         {
             if (fields == null) throw new ArgumentNullException("fields");
             if (preValues == null) throw new ArgumentNullException("preValues");
-            //now we need to wire up the pre-values values with the actual fields defined            
+            //now we need to wire up the pre-values values with the actual fields defined
             foreach (var field in fields)
             {
                 var found = preValues.Any(x => x.Key.InvariantEquals(field.Key));

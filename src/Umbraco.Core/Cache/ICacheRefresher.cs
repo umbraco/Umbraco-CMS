@@ -5,7 +5,7 @@ namespace Umbraco.Core.Cache
 {
     /// <summary>
     /// The IcacheRefresher Interface is used for loadbalancing.
-    /// 
+    ///
     /// </summary>
     public interface ICacheRefresher : IDiscoverable
     {
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Cache
     /// <typeparam name="T"></typeparam>
     /// <remarks>
     /// This is much better for performance when we're not running in a load balanced environment so we can refresh the cache
-    /// against a already resolved object instead of looking the object back up by id. 
+    /// against a already resolved object instead of looking the object back up by id.
     /// </remarks>
     interface ICacheRefresher<T> : ICacheRefresher
     {

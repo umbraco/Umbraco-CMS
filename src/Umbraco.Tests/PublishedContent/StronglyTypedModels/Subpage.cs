@@ -5,12 +5,12 @@ using Umbraco.Core.Models.PublishedContent;
 namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 {
     /// <summary>
-    /// Represents a Subpage which acts as the strongly typed model for a Doc Type 
+    /// Represents a Subpage which acts as the strongly typed model for a Doc Type
     /// with alias "Subpage" and "Subpage" as the allowed child type.
-    /// 
+    ///
     /// Similar to the Textpage this model could also be generated, but it could also
     /// act as a Code-First model by using the attributes shown on the various properties,
-    /// which decorate the model with information about the Document Type, its 
+    /// which decorate the model with information about the Document Type, its
     /// Property Groups and Property Types.
     /// </summary>
     public class Subpage : TypedModelBase

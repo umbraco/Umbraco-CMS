@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
@@ -132,7 +132,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     return _cachePolicy = NoCacheRepositoryCachePolicy<TEntity, TId>.Instance;
 
                 // create the cache policy using IsolatedCache which is either global
-                // or scoped depending on the repository cache mode for the current scope                
+                // or scoped depending on the repository cache mode for the current scope
                 var scope = UnitOfWork.Scope;
                 switch (scope.RepositoryCacheMode)
                 {

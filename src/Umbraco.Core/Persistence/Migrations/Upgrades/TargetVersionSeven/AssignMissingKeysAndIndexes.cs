@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -8,13 +8,13 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 {
     /// <summary>
     /// I'm not actually sure how this is possible but I've come across one install that was missing these PKs
-    /// and it wasn't a MySQL install. 
+    /// and it wasn't a MySQL install.
     /// see: http://issues.umbraco.org/issue/U4-5707
     /// </summary>
     [Migration("7.0.0", 0, Constants.System.UmbracoMigrationName)]
     public class AssignMissingKeysAndIndexes : MigrationBase
     {
-        public AssignMissingKeysAndIndexes(IMigrationContext context) 
+        public AssignMissingKeysAndIndexes(IMigrationContext context)
             : base(context)
         { }
 
@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
         public override void Up()
         {
 
-            //Some very old schemas don't have an index on the cmsContent.nodeId column, I'm not actually sure when it was added but 
+            //Some very old schemas don't have an index on the cmsContent.nodeId column, I'm not actually sure when it was added but
             // it is absolutely required to exist in order to have it as a foreign key reference, so we'll need to check it's existence
             // this came to light from this issue: http://issues.umbraco.org/issue/U4-4133
             var dbIndexes = SqlSyntax.GetDefinedIndexes(Context.Database)

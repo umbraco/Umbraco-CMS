@@ -98,7 +98,7 @@ namespace Umbraco.Core.Cache
             // on the Lazy lock to ensure that getCacheItem runs once and everybody waits on it, while the global
             // application lock has been released.
 
-            // NOTE 
+            // NOTE
             //   The Lazy value creation may produce a null value.
             //   Must make sure (for backward compatibility) that we pretend they are not in the cache.
             //   So if we find an entry in the cache that already has its value created and is null,

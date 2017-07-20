@@ -23,8 +23,8 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             var val = new List<ContentItemBasic>() {new ContentItemBasic()};
             var result = att.GetValueFromResponse(
                 new ObjectContent(typeof (IEnumerable<ContentItemBasic>),
-                                  val, 
-                                  new JsonMediaTypeFormatter(), 
+                                  val,
+                                  new JsonMediaTypeFormatter(),
                                   new MediaTypeHeaderValue("html/text")));
 
             Assert.AreEqual(val, result);
@@ -85,11 +85,11 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             userMock.Setup(u => u.Id).Returns(9);
             userMock.Setup(u => u.StartContentId).Returns(5);
             var user = userMock.Object;
-            
+
             att.FilterBasedOnStartNode(list, user);
 
             Assert.AreEqual(5, list.Count);
-            
+
         }
 
         [Test]
@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
                 list.Add(new ContentItemBasic{Id = i, Name = "Test" + i, ParentId = -1});
             }
             var ids = list.Select(x => (int)x.Id).ToArray();
-            
+
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
             userMock.Setup(u => u.StartContentId).Returns(-1);
@@ -127,10 +127,10 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             Assert.AreEqual(2, list.ElementAt(1).Id);
             Assert.AreEqual(3, list.ElementAt(2).Id);
         }
-        
+
         private class MyTestClass
         {
-            public IEnumerable<ContentItemBasic> MyList { get; set; } 
+            public IEnumerable<ContentItemBasic> MyList { get; set; }
         }
     }
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,11 +11,11 @@ using File = System.IO.File;
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
 {
     /// <summary>
-    /// Ensures that any stylesheets that have properties defined at the db level have the correct new syntax 
+    /// Ensures that any stylesheets that have properties defined at the db level have the correct new syntax
     /// in their files before we remove the stylesheet db tables
     /// </summary>
     /// <remarks>
-    /// Instead of modifying the files directly (since we cannot roll them back) we will create temporary migrated files. 
+    /// Instead of modifying the files directly (since we cannot roll them back) we will create temporary migrated files.
     /// These files will then be copied over once the entire migration is complete so that if any migration fails and the db changes are
     /// rolled back, the original files won't be affected.
     /// </remarks>
@@ -32,14 +32,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
             if (tables.InvariantContains("cmsStylesheet") == false) return;
 
-            //This is all rather nasty but it's how stylesheets used to work in the 2 various ugly ways so we just have to 
+            //This is all rather nasty but it's how stylesheets used to work in the 2 various ugly ways so we just have to
             // deal with that to get this migration done
 
 
             var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/CssMigration/");
             if (Directory.Exists(tempFolder))
             {
-                //clear any existing css files (we back the real ones up so if this migration is run again for whatever reason anything that 
+                //clear any existing css files (we back the real ones up so if this migration is run again for whatever reason anything that
                 // was previously backed up is still there, backup happens in a post migration: OverwriteStylesheetFilesFromTempFiles class)
                 var files = Directory.GetFiles(tempFolder, "*.css", SearchOption.AllDirectories);
                 foreach (var file in files)
@@ -65,7 +65,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
 
                 var fileContent = string.Empty;
 
-                //check for file and read in it's data - umbraco properties will only be kept that are in the db, 
+                //check for file and read in it's data - umbraco properties will only be kept that are in the db,
                 // anything below the infamous: /* EDITOR PROPERTIES - PLEASE DON'T DELETE THIS LINE TO AVOID DUPLICATE PROPERTIES */
                 // line is an Umbraco property and therefore anything that is there that is not in the db will be cleared.
 

@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Web.AngularIntegration
                             Description = "Description " + propertyIndex,
                             View = "~/Views/View" + propertyIndex,
                             HideLabel = false
-                        });                    
+                        });
                 }
                 tabs.Add(new Tab<ContentPropertyDisplay>()
                     {
@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Web.AngularIntegration
                     Assert.AreEqual("Description " + prop, jObject["tabs"][tab]["properties"][prop]["description"].ToString());
                     Assert.AreEqual(false, jObject["tabs"][tab]["properties"][prop]["hideLabel"].Value<bool>());
                 }
-            }                
+            }
         }
 
     }

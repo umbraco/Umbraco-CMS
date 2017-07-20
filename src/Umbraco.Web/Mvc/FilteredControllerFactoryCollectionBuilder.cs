@@ -5,7 +5,7 @@ namespace Umbraco.Web.Mvc
 {
     public class FilteredControllerFactoryCollectionBuilder : OrderedCollectionBuilderBase<FilteredControllerFactoryCollectionBuilder, FilteredControllerFactoryCollection, IFilteredControllerFactory>
     {
-        public FilteredControllerFactoryCollectionBuilder(IServiceContainer container) 
+        public FilteredControllerFactoryCollectionBuilder(IServiceContainer container)
             : base(container)
         { }
 

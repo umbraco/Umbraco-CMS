@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Models
             // Arrange
             var stylesheet = new Stylesheet("/css/styles.css") { Content = @"body { color:#000; } /**umb_name:Hello*/p{font-size:2em;} .bold {font-weight:bold;}" };
 
-            
+
             Assert.AreEqual(1, stylesheet.Properties.Count());
 
             stylesheet.RemoveProperty("Hello");

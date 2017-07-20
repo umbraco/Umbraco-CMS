@@ -24,7 +24,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
-            container.Register<IShortStringHelper>(_ 
+            container.Register<IShortStringHelper>(_
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefault())));
         }
 
@@ -55,7 +55,7 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase("TEXT", "hello", "hello")]
         [TestCase("INT", "123", 123)]
         [TestCase("INTEGER", "123", 123)]
-        [TestCase("INTEGER", "", null)] //test empty string for int  
+        [TestCase("INTEGER", "", null)] //test empty string for int
         [TestCase("DATETIME", "", null)] //test empty string for date
         public void Value_Editor_Can_Convert_To_Clr_Type(string valueType, string val, object expected)
         {
@@ -109,7 +109,7 @@ namespace Umbraco.Tests.PropertyEditors
             Assert.IsTrue(result.Success);
             Assert.IsNull(result.Result);
         }
-        
+
         [Test]
         public void Value_Editor_Can_Convert_To_Date_Clr_Type()
         {
@@ -127,7 +127,7 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase(PropertyEditorValueTypes.Text, "hello", "hello")]
         [TestCase(PropertyEditorValueTypes.Integer, 123, "123")]
         [TestCase(PropertyEditorValueTypes.IntegerAlternative, 123, "123")]
-        [TestCase(PropertyEditorValueTypes.Integer, "", "")] //test empty string for int        
+        [TestCase(PropertyEditorValueTypes.Integer, "", "")] //test empty string for int
         [TestCase(PropertyEditorValueTypes.DateTime, "", "")] //test empty string for date
         public void Value_Editor_Can_Serialize_Value(string valueType, object val, string expected)
         {

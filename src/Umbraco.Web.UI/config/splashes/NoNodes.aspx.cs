@@ -15,10 +15,10 @@ namespace Umbraco.Web.UI.Config.Splashes
 
             var store = UmbracoContext.Current.ContentCache;
             if (store.HasContent())
-			{
+            {
                 //if there is actually content, go to the root
-			    Response.Redirect("~/");
-			}
+                Response.Redirect("~/");
+            }
         }
 
     }

@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 9, Constants.System.UmbracoMigrationName)]
     public class AlterTagsTable : MigrationBase
     {
-        public AlterTagsTable(IMigrationContext context) 
+        public AlterTagsTable(IMigrationContext context)
             : base(context)
         { }
 

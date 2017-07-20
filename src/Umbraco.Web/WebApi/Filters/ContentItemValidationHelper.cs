@@ -27,7 +27,7 @@ namespace Umbraco.Web.WebApi.Filters
         where TPersisted : class, IContentBase
         where TModelSave : ContentBaseItemSave<TPersisted>
     {
-     
+
         public void ValidateItem(HttpActionContext actionContext, string argumentName)
         {
             var contentItem = actionContext.ActionArguments[argumentName] as TModelSave;
@@ -101,7 +101,7 @@ namespace Umbraco.Web.WebApi.Filters
 
             }
             return true;
-        } 
+        }
 
         /// <summary>
         /// Validates the data for each property
@@ -172,13 +172,13 @@ namespace Umbraco.Web.WebApi.Filters
                             actionContext.ModelState.AddPropertyError(result, p.Alias);
                         }
                     }
-                    
+
                 }
             }
 
             return actionContext.ModelState.IsValid;
         }
 
-        
+
     }
 }

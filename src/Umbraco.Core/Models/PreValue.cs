@@ -8,14 +8,14 @@
         public PreValue(int id, string value, int sortOrder)
         {
             Id = id;
-            Value = value;       
+            Value = value;
             SortOrder = sortOrder;
         }
 
         public PreValue(int id, string value)
         {
-            Id = id; 
-            Value = value;            
+            Id = id;
+            Value = value;
         }
 
         public PreValue(string value)
@@ -41,7 +41,7 @@
         public virtual object DeepClone()
         {
             //Memberwise clone on PreValue will work since it doesn't have any deep elements
-            var clone = (PreValue)MemberwiseClone();            
+            var clone = (PreValue)MemberwiseClone();
             return clone;
         }
     }

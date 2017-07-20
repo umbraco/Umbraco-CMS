@@ -14,7 +14,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             InternalPreValues["idType"] = "int";
         }
-        
+
         protected override PreValueEditor CreatePreValueEditor()
         {
             var preValEditor = base.CreatePreValueEditor();

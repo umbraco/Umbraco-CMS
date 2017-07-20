@@ -8,7 +8,7 @@ namespace Umbraco.Web.HealthCheck
 {
     public class HealthCheckResolver : LazyManyObjectsResolverBase<HealthCheckCollectionBuilder, HealthCheckCollection, HealthCheck>
     {
-        private HealthCheckResolver(HealthCheckCollectionBuilder builder) 
+        private HealthCheckResolver(HealthCheckCollectionBuilder builder)
             : base(builder)
         { }
 

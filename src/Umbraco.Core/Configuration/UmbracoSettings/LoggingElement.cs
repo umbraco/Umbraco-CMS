@@ -5,7 +5,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class LoggingElement : UmbracoConfigurationElement, ILoggingSection
     {
-        
+
         [ConfigurationProperty("autoCleanLogs")]
         internal InnerTextConfigurationElement<bool> AutoCleanLogs
         {
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 return false;
             }
         }
-        
+
         bool ILoggingSection.AutoCleanLogs
         {
             get { return AutoCleanLogs; }
@@ -72,7 +72,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return EnableLogging; }
         }
-        
+
         int ILoggingSection.CleaningMiliseconds
         {
             get { return CleaningMiliseconds; }

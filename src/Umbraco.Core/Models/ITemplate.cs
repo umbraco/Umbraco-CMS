@@ -28,7 +28,7 @@ namespace Umbraco.Core.Models
         /// returns the master template alias
         /// </summary>
         string MasterTemplateAlias { get; }
-        
+
         /// <summary>
         /// Set the mastertemplate
         /// </summary>

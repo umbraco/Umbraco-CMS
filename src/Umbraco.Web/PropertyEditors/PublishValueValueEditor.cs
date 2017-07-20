@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -60,7 +60,7 @@ namespace Umbraco.Web.PropertyEditors
                     _logger.Warn<PublishValueValueEditor>("Could not find a pre value with ID " + preValId + " for property alias " + property.Alias);
                 }
             }
-            
+
             return base.ConvertDbToString(property, propertyType, dataTypeService);
         }
 

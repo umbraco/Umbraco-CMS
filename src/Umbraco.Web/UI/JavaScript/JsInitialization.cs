@@ -20,7 +20,7 @@ namespace Umbraco.Web.UI.JavaScript
     /// main Umbraco initialization output.
     /// </summary>
     internal class JsInitialization : AssetInitialization
-    {        
+    {
         private readonly ManifestParser _parser;
 
         public JsInitialization(ManifestParser parser)
@@ -45,7 +45,7 @@ namespace Umbraco.Web.UI.JavaScript
         public string GetJavascriptInitialization(HttpContextBase httpContext, JArray umbracoInit, JArray additionalJsFiles = null)
         {
             var result = GetJavascriptInitializationArray(httpContext, umbracoInit, additionalJsFiles);
-                
+
             return ParseMain(
                 result.ToString(),
                 IOHelper.ResolveUrl(SystemDirectories.Umbraco));

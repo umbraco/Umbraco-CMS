@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Events;
@@ -114,7 +114,7 @@ namespace Umbraco.Core.Services
                 Audit(uow, AuditType.Delete, "Delete Macro performed by user", userId, -1);
 
                 uow.Complete();
-            }          
+            }
         }
 
         /// <summary>
@@ -176,22 +176,22 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Delete
         /// </summary>
-		public static event TypedEventHandler<IMacroService, DeleteEventArgs<IMacro>> Deleting;
+        public static event TypedEventHandler<IMacroService, DeleteEventArgs<IMacro>> Deleting;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
-		public static event TypedEventHandler<IMacroService, DeleteEventArgs<IMacro>> Deleted;
+        public static event TypedEventHandler<IMacroService, DeleteEventArgs<IMacro>> Deleted;
 
         /// <summary>
         /// Occurs before Save
         /// </summary>
-		public static event TypedEventHandler<IMacroService, SaveEventArgs<IMacro>> Saving;
+        public static event TypedEventHandler<IMacroService, SaveEventArgs<IMacro>> Saving;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-		public static event TypedEventHandler<IMacroService, SaveEventArgs<IMacro>> Saved;
+        public static event TypedEventHandler<IMacroService, SaveEventArgs<IMacro>> Saved;
         #endregion
     }
 }

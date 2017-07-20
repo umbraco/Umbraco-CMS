@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using NPoco;
@@ -161,6 +161,6 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Guid GetEntityId(PublicAccessEntry entity)
         {
             return entity.Key;
-        }    
+        }
     }
 }

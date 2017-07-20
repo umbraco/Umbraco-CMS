@@ -43,7 +43,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Deletes the section
-        /// </summary>        
+        /// </summary>
         void DeleteSection(Section section);
     }
 
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Deletes the section
-        /// </summary>        
+        /// </summary>
         public void DeleteSection(Section section)
         {
             throw new System.NotImplementedException();

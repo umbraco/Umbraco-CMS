@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Scoping;

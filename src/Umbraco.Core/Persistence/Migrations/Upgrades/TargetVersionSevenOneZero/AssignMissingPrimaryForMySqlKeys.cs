@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenOneZero
     [Migration("7.0.0", "7.1.0", 0, Constants.System.UmbracoMigrationName)]
     public class AssignMissingPrimaryForMySqlKeys : MigrationBase
     {
-        public AssignMissingPrimaryForMySqlKeys(IMigrationContext context) 
+        public AssignMissingPrimaryForMySqlKeys(IMigrationContext context)
             : base(context)
         { }
 

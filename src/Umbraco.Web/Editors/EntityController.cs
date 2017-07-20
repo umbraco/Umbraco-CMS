@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -45,7 +45,7 @@ namespace Umbraco.Web.Editors
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
 
-                    //This is a special case, we'll accept a String here so that we can get page members when the special "all-members" 
+                    //This is a special case, we'll accept a String here so that we can get page members when the special "all-members"
                     //id is passed in eventually we'll probably want to support GUID + Udi too
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPagedChildren", "id", typeof(int), typeof(string)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPath", "id", typeof(int), typeof(Guid), typeof(Udi)),
@@ -182,7 +182,7 @@ namespace Umbraco.Web.Editors
             {
                 return GetPath(guidUdi.Guid, type);
             }
-            throw new HttpResponseException(HttpStatusCode.NotFound);            
+            throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
         /// <summary>
@@ -206,7 +206,7 @@ namespace Umbraco.Web.Editors
                     {
                         Content = new StringContent(returnUrl)
                     };
-                }   
+                }
             }
 
             var ancestors = GetAncestors(id, type);
@@ -223,7 +223,7 @@ namespace Umbraco.Web.Editors
                 Content = new StringContent(returnUrl)
             };
         }
-        
+
         [Obsolete("Use GetyById instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public EntityBasic GetByKey(Guid id, UmbracoEntityTypes type)
@@ -308,7 +308,7 @@ namespace Umbraco.Web.Editors
                 return GetResultForKey(guidUdi.Guid, type);
             }
             throw new HttpResponseException(HttpStatusCode.NotFound);
-        } 
+        }
         #endregion
 
         #region GetByIds
@@ -387,7 +387,7 @@ namespace Umbraco.Web.Editors
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
-        }       
+        }
         #endregion
 
         [Obsolete("Use GetyByIds instead")]
@@ -456,7 +456,7 @@ namespace Umbraco.Web.Editors
                 return GetPagedChildren(intId, type, pageNumber, pageSize, orderBy, orderDirection, filter);
             }
 
-            //the EntityService cannot search members of a certain type, this is currently not supported and would require 
+            //the EntityService cannot search members of a certain type, this is currently not supported and would require
             //quite a bit of plumbing to do in the Services/Repository, we'll revert to a paged search
 
             int total;
@@ -465,7 +465,7 @@ namespace Umbraco.Web.Editors
             return new PagedResult<EntityBasic>(total, pageNumber, pageSize)
             {
                 Items = searchResult
-            };            
+            };
         }
 
         /// <summary>
@@ -482,7 +482,7 @@ namespace Umbraco.Web.Editors
         public PagedResult<EntityBasic> GetPagedChildren(
             int id,
             UmbracoEntityTypes type,
-            int pageNumber, 
+            int pageNumber,
             int pageSize,
             string orderBy = "SortOrder",
             Direction orderDirection = Direction.Ascending,
@@ -492,7 +492,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             if (pageSize <= 0)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            
+
             var objectType = ConvertToObjectType(type);
             if (objectType.HasValue)
             {
@@ -773,26 +773,26 @@ namespace Umbraco.Web.Editors
             //must match index type
             sb.Append("+__IndexType:");
             sb.Append(type);
-            
+
             var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
-            
+
             // fixme - ISearcher has not been updated in Examine for v8?
             throw new NotImplementedException();
             //var result = internalSearcher
             //    //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
-            //    .Search(raw, pageSize * (pageIndex + 1)); 
+            //    .Search(raw, pageSize * (pageIndex + 1));
             var result = new SR();
 
             totalFound = result.TotalItemCount;
 
             var pagedResult = result.Skip(pageIndex);
-            
+
             switch (entityType)
             {
                 case UmbracoEntityTypes.Member:
                     return MemberFromSearchResults(pagedResult.ToArray());
                 case UmbracoEntityTypes.Media:
-                    return MediaFromSearchResults(pagedResult);                    
+                    return MediaFromSearchResults(pagedResult);
                 case UmbracoEntityTypes.Document:
                     return ContentFromSearchResults(pagedResult);
                 default:

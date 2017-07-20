@@ -15,12 +15,12 @@ namespace Umbraco.Web.Models.Trees
     public class MenuItemList : List<MenuItem>
     {
         public MenuItemList()
-        {           
+        {
         }
 
         public MenuItemList(IEnumerable<MenuItem> items)
             : base(items)
-        {            
+        {
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace Umbraco.Web.Models.Trees
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="hasSeparator"></param>
@@ -153,7 +153,7 @@ namespace Umbraco.Web.Models.Trees
         }
 
         /// <summary>
-        /// Checks if the IAction type passed in is attributed with LegacyActionMenuItemAttribute and if so 
+        /// Checks if the IAction type passed in is attributed with LegacyActionMenuItemAttribute and if so
         /// ensures that the correct action metadata is added.
         /// </summary>
         /// <param name="actionType"></param>

@@ -13,7 +13,7 @@ namespace Umbraco.Core.Events
         /// <param name="xml"></param>
         /// <param name="canCancel"></param>
         public ExportEventArgs(TEntity eventObject, XElement xml, bool canCancel)
-			: base(new List<TEntity> { eventObject }, canCancel)
+            : base(new List<TEntity> { eventObject }, canCancel)
         {
             Xml = xml;
         }

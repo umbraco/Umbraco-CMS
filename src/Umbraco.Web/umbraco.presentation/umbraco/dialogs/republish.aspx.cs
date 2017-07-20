@@ -1,4 +1,4 @@
-//TODO: Re-create this in angular and new APIS! then remove it
+﻿//TODO: Re-create this in angular and new APIS! then remove it
 
 //using System;
 //using System.Collections;
@@ -29,7 +29,7 @@
 //            if (Request.GetItemAsString("xml") != "")
 //            {
 //                Server.ScriptTimeout = 100000;
-//                Services.ContentService.RePublishAll();                
+//                Services.ContentService.RePublishAll();
 //            }
 //            else if (Request.GetItemAsString("previews") != "")
 //            {
@@ -50,7 +50,7 @@
 //                    Response.Flush();
 //                }
 //            }
-            
+
 //            //PPH changed this to a general library call for load balancing support
 //            library.RefreshContent();
 
@@ -63,6 +63,6 @@
 //            bt_go.Text = Services.TextService.Localize("republish");
 //        }
 
-		
+
 //    }
 //}

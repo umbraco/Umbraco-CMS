@@ -26,7 +26,7 @@ namespace Umbraco.Tests.PropertyEditors
             var result = validator.Validate(new JArray("hello", "world"), null, new ColorPickerPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>()));
             Assert.AreEqual(0, result.Count());
         }
-        
+
         [Test]
         public void Validates_Color_Vals()
         {

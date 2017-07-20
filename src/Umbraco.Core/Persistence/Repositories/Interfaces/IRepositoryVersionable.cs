@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="id">Id of the <see cref="TEntity"/> to retrieve versions from</param>
         /// <returns>An enumerable list of the same <see cref="TEntity"/> object with different versions</returns>
-        IEnumerable<TEntity> GetAllVersions(int id);        
+        IEnumerable<TEntity> GetAllVersions(int id);
 
         /// <summary>
         /// Gets a list of all version Ids for the given content item

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Security.Identity
         {
             var request = context.Request;
             var response = context.Response;
-            
+
             if (request.Uri.Scheme.InvariantStartsWith("http")
                 && request.Uri.AbsolutePath.InvariantEquals(
                     string.Format("{0}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds", GlobalSettings.Path)))
@@ -65,7 +65,7 @@ namespace Umbraco.Web.Security.Identity
                         response.Headers.Add("Expires", new[] { "-1" });
                         response.Headers.Add("Date", new[] { _authOptions.SystemClock.UtcNow.ToString("R") });
 
-                        //Ok, so here we need to check if we want to process/renew the auth ticket for each 
+                        //Ok, so here we need to check if we want to process/renew the auth ticket for each
                         // of these requests. If that is the case, the user will really never be logged out until they
                         // close their browser (there will be edge cases of that, especially when debugging)
                         if (_security.KeepUserLoggedIn)
@@ -98,7 +98,7 @@ namespace Umbraco.Web.Security.Identity
 
                                     remainingSeconds = (ticket.Properties.ExpiresUtc.Value - currentUtc).TotalSeconds;
                                 }
-                            }                            
+                            }
                         }
                         else if (remainingSeconds <= 30)
                         {

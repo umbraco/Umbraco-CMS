@@ -1,4 +1,4 @@
-using Umbraco.Core.Configuration;
+﻿using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
@@ -41,7 +41,7 @@ namespace Umbraco.Web.Routing
                     isProfile = true;
                     Logger.Debug<ContentFinderByProfile>("Path \"{0}\" is the profile path", () => path);
 
-					var route = frequest.HasDomain ? (frequest.Domain.ContentId + path) : path;
+                    var route = frequest.HasDomain ? (frequest.Domain.ContentId + path) : path;
                     node = FindContent(frequest, route);
 
                     if (node != null)

@@ -14,7 +14,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
 
         // called by the conditional weak table -- must be public
 // ReSharper disable EmptyConstructor
-        public NavigableContentType() 
+        public NavigableContentType()
 // ReSharper restore EmptyConstructor
         { }
 
@@ -34,16 +34,16 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
         {
             BuiltinProperties = new INavigableFieldType[]
                     {
-                        new NavigablePropertyType("nodeName"), 
-                        new NavigablePropertyType("parentId"), 
+                        new NavigablePropertyType("nodeName"),
+                        new NavigablePropertyType("parentId"),
                         new NavigablePropertyType("createDate", v => XmlConvert.ToString((DateTime)v, "yyyy-MM-ddTHH:mm:ss")),
-                        new NavigablePropertyType("updateDate", v => XmlConvert.ToString((DateTime)v,  "yyyy-MM-ddTHH:mm:ss")), 
-                        new NavigablePropertyType("isDoc", v => XmlConvert.ToString((bool)v)), 
-                        new NavigablePropertyType("sortOrder"), 
-                        new NavigablePropertyType("level"), 
-                        new NavigablePropertyType("templateId"), 
-                        new NavigablePropertyType("writerId"), 
-                        new NavigablePropertyType("creatorId"), 
+                        new NavigablePropertyType("updateDate", v => XmlConvert.ToString((DateTime)v,  "yyyy-MM-ddTHH:mm:ss")),
+                        new NavigablePropertyType("isDoc", v => XmlConvert.ToString((bool)v)),
+                        new NavigablePropertyType("sortOrder"),
+                        new NavigablePropertyType("level"),
+                        new NavigablePropertyType("templateId"),
+                        new NavigablePropertyType("writerId"),
+                        new NavigablePropertyType("creatorId"),
                         new NavigablePropertyType("urlName"),
                         new NavigablePropertyType("isDraft", v => XmlConvert.ToString((bool)v))
                     };

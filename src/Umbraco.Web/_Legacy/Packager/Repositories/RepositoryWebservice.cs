@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Web.Services;
@@ -1792,7 +1792,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
-    public delegate void fetchPackageByVersionCompletedEventHandler(object sender, fetchPackageByVersionCompletedEventArgs e);    
+    public delegate void fetchPackageByVersionCompletedEventHandler(object sender, fetchPackageByVersionCompletedEventArgs e);
 
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]

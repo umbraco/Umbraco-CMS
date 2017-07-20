@@ -14,7 +14,7 @@
         /// </summary>
         public byte ID;
         /// <summary>
-        /// The offset to the first IFD section from the 
+        /// The offset to the first IFD section from the
         /// start of the TIFF header.
         /// </summary>
         public uint IFDOffset;
@@ -28,7 +28,7 @@
         /// </summary>
         /// <param name="byteOrder">The byte order.</param>
         /// <param name="id">The TIFF ID. This value should always be 42.</param>
-        /// <param name="ifdOffset">The offset to the first IFD section from the 
+        /// <param name="ifdOffset">The offset to the first IFD section from the
         /// start of the TIFF header.</param>
         /// <param name="headerByteOrder">The byte order of the TIFF header itself.</param>
         public TIFFHeader(BitConverterEx.ByteOrder byteOrder, byte id, uint ifdOffset, BitConverterEx.ByteOrder headerByteOrder)

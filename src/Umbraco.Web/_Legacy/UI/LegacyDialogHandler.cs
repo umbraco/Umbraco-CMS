@@ -72,7 +72,7 @@ namespace Umbraco.Web._Legacy.UI
                 return null;
             }
             var taskAssembly = del.AttributeValue<string>("assembly");
-            
+
             if (!del.Attributes.HasAttribute("type"))
             {
                 return null;
@@ -98,7 +98,7 @@ namespace Umbraco.Web._Legacy.UI
                 typeInstance.UserId = umbracoUser.Id;
             }
 
-            //put in contextual cache 
+            //put in contextual cache
             httpContext.Items[ctxKey] = typeInstance;
 
             return typeInstance;
@@ -114,7 +114,7 @@ namespace Umbraco.Web._Legacy.UI
         /// <remarks>
         /// If the ITask doesn't implement LegacyDialogTask then we will return 'true' since we cannot validate
         /// the application assigned.
-        /// 
+        ///
         /// TODO: Create an API to assign a nodeType to an app so developers can manually secure it
         /// </remarks>
         internal static bool UserHasCreateAccess(HttpContextBase httpContext, IUser umbracoUser, string nodeType)
@@ -131,7 +131,7 @@ namespace Umbraco.Web._Legacy.UI
         public static void Delete(HttpContextBase httpContext, IUser umbracoUser, string nodeType, int nodeId, string text)
         {
             var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Delete, nodeType);
-            
+
             typeInstance.ParentID = nodeId;
             typeInstance.Alias = text;
 
@@ -141,7 +141,7 @@ namespace Umbraco.Web._Legacy.UI
         public static string Create(HttpContextBase httpContext, IUser umbracoUser, string nodeType, int nodeId, string text, int typeId = 0)
         {
             var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
-            
+
             typeInstance.TypeID = typeId;
             typeInstance.ParentID = nodeId;
             typeInstance.Alias = text;
@@ -175,9 +175,9 @@ namespace Umbraco.Web._Legacy.UI
                 // otherwise cast to returnUrl interface
                 returnUrlTask = typeInstance as ITaskReturnUrl;
             }
-            
+
             typeInstance.Save();
-            
+
             return returnUrlTask != null
                 ? returnUrlTask.ReturnUrl
                 : "";
@@ -192,7 +192,7 @@ namespace Umbraco.Web._Legacy.UI
                 createDef.Load(defReader);
                 defReader.Close();
                 return createDef;
-            }            
+            }
         }
     }
 }

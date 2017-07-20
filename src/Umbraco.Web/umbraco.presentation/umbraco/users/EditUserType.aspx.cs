@@ -1,4 +1,4 @@
-using Umbraco.Core.Services;
+﻿using Umbraco.Core.Services;
 using System;
 using System.Web.UI.WebControls;
 using System.Collections.Generic;
@@ -33,7 +33,7 @@ namespace umbraco.cms.presentation.user
             pp_name.Text = Services.TextService.Localize("usertype") + " " + Services.TextService.Localize("name");
 
             pp_rights.Text = Services.TextService.Localize("default") + " " + Services.TextService.Localize("rights");
-            
+
             //ensure we have a query string
             if (string.IsNullOrEmpty(Request.QueryString["id"]))
                 return;
@@ -109,6 +109,6 @@ namespace umbraco.cms.presentation.user
         }
 
 
-        
+
     }
 }

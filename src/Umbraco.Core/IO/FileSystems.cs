@@ -114,7 +114,7 @@ namespace Umbraco.Core.IO
                 if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
                 return _masterPagesFileSystem;// fixme - see 7.6?!
             }
-        } 
+        }
 
         public IFileSystem MvcViewsFileSystem
         {
@@ -173,11 +173,11 @@ namespace Umbraco.Core.IO
         /// used to cache the lookup of how to construct this object so we don't have to reflect each time.
         /// </summary>
         private class ProviderConstructionInfo
-		{
-			public object[] Parameters { get; set; }
-			public ConstructorInfo Constructor { get; set; }
-			//public string ProviderAlias { get; set; }
-		}
+        {
+            public object[] Parameters { get; set; }
+            public ConstructorInfo Constructor { get; set; }
+            //public string ProviderAlias { get; set; }
+        }
 
         /// <summary>
         /// Gets an underlying (non-typed) filesystem supporting a strongly-typed filesystem.

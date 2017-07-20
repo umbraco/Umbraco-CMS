@@ -36,7 +36,7 @@ namespace Umbraco.Web.Routing
             if (Enum<UrlProviderMode>.TryParse(routingSettings.UrlProviderMode, out provider))
             {
                 Mode = provider;
-            }    
+            }
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace Umbraco.Web.Routing
         internal string GetUrlFromRoute(int id, string route)
         {
             var provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
-            var url = provider == null 
+            var url = provider == null
                 ? route // what else?
                 : provider.GetUrlFromRoute(route, UmbracoContext.Current, id, _umbracoContext.CleanedUmbracoUrl, Mode);
             return url ?? "#";

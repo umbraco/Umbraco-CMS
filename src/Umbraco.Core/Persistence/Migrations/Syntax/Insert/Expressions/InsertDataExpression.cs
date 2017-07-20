@@ -8,8 +8,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
     public class InsertDataExpression : MigrationExpressionBase
     {
         private readonly List<InsertionDataDefinition> _rows = new List<InsertionDataDefinition>();
-        
-        public InsertDataExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes) 
+
+        public InsertDataExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
             : base(context, supportedDatabaseTypes)
         { }
 
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
         {
             if (IsExpressionSupported() == false)
                 return string.Empty;
-            
+
             var sb = new StringBuilder();
 
             if (EnabledIdentityInsert && SqlSyntax.SupportsIdentityInsert())
@@ -76,6 +76,6 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
             return sb.ToString();
         }
 
-        
+
     }
 }

@@ -140,7 +140,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the element with the specified PropertyType.
         /// </summary>
-        /// 
+        ///
         /// <returns>
         /// The element with the specified PropertyType. If an element with the specified PropertyType is not found, an exception is thrown.
         /// </returns>

@@ -68,7 +68,7 @@ namespace Umbraco.Web.PropertyEditors
             /// </summary>
             /// <remarks>
             /// This will become legacy as soon as we implement overridable pre-values.
-            /// 
+            ///
             /// The default validator used is the RequiredValueValidator but this can be overridden by property editors
             /// if they need to do some custom validation, or if the value being validated is a json object.
             /// </remarks>
@@ -76,7 +76,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 get { return new RequiredTagsValueValidator(); }
             }
-            
+
             /// <summary>
             /// Custom validator to validate a required value against an empty json value
             /// </summary>

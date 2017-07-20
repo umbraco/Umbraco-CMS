@@ -64,19 +64,19 @@ namespace Umbraco.Core.Models
         /// <param name="contentType"></param>
         /// <param name="properties"></param>
         protected ContentBase(string name, IContentBase parent, IContentTypeComposition contentType, PropertyCollection properties)
-		{
-		    if (parent == null) throw new ArgumentNullException(nameof(parent));
+        {
+            if (parent == null) throw new ArgumentNullException(nameof(parent));
 
-		    ContentTypeBase = contentType ?? throw new ArgumentNullException(nameof(contentType));
+            ContentTypeBase = contentType ?? throw new ArgumentNullException(nameof(contentType));
             Version = Guid.NewGuid();
 
-			_parentId = new Lazy<int>(() => parent.Id);
+            _parentId = new Lazy<int>(() => parent.Id);
             _name = name;
-			_contentTypeId = contentType.Id;
-		    _properties = properties ?? throw new ArgumentNullException(nameof(properties));
-			_properties.EnsurePropertyTypes(PropertyTypes);
+            _contentTypeId = contentType.Id;
+            _properties = properties ?? throw new ArgumentNullException(nameof(properties));
+            _properties.EnsurePropertyTypes(PropertyTypes);
             _additionalData = new Dictionary<string, object>();
-		}
+        }
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
@@ -106,12 +106,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
-	            var val = _parentId.Value;
-				if (val == 0)
-				{
-					throw new InvalidOperationException("The ParentId cannot have a value of 0. Perhaps the parent object used to instantiate this object has not been persisted to the data store.");
-				}
-				return val;
+                var val = _parentId.Value;
+                if (val == 0)
+                {
+                    throw new InvalidOperationException("The ParentId cannot have a value of 0. Perhaps the parent object used to instantiate this object has not been persisted to the data store.");
+                }
+                return val;
             }
             set
             {

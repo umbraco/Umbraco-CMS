@@ -29,10 +29,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private LanguageRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
-            return new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());            
+            return new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
         }
 
-     
+
 
         [Test]
         public void Can_Perform_Get_On_LanguageRepository()
@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(language, Is.Not.Null);
                 Assert.That(language.HasIdentity, Is.True);
                 Assert.That(language.CultureName, Is.EqualTo("en-US"));
-                Assert.That(language.IsoCode, Is.EqualTo("en-US"));   
+                Assert.That(language.IsoCode, Is.EqualTo("en-US"));
             }
         }
 
@@ -71,7 +71,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(language);
                 unitOfWork.Flush();
 
-                //re-get 
+                //re-get
                 language = repository.GetByIsoCode(au.Name);
 
                 // Assert
@@ -98,7 +98,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(language);
                 unitOfWork.Flush();
 
-                //re-get 
+                //re-get
                 language = repository.GetByCultureName(au.DisplayName);
 
                 // Assert
@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         [Test]
         public void Can_Perform_GetAll_With_Params_On_LanguageRepository()
-        { 
+        {
             // Arrange
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())

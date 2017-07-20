@@ -1,4 +1,4 @@
-//TODO: REbuild this in angular and then remove
+﻿//TODO: REbuild this in angular and then remove
 
 //using System;
 //using System.Collections;
@@ -53,7 +53,7 @@
 //                        if (p.Value != null)
 //                        {
 
-//                            //new property value... 
+//                            //new property value...
 //                            string thevalue = p.Value.ToString();
 
 //                            if (rbl_mode.SelectedValue == "diff")
@@ -141,7 +141,7 @@
 //        /// the contents of this method with the code editor.
 //        /// </summary>
 //        private void InitializeComponent()
-//        {    
+//        {
 
 //        }
 //        #endregion

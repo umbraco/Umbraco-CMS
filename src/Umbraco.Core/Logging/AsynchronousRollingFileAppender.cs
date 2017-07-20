@@ -1,4 +1,4 @@
-using log4net.Core;
+﻿using log4net.Core;
 using log4net.Util;
 using System;
 using System.ComponentModel;
@@ -13,14 +13,14 @@ namespace Umbraco.Core.Logging
     /// <summary>
     /// Based on https://github.com/cjbhaines/Log4Net.Async
     /// which is based on code by Chris Haines http://cjbhaines.wordpress.com/2012/02/13/asynchronous-log4net-appenders/
-    /// This is an old/deprecated logger and has been superceded by ParallelForwardingAppender which is included in Umbraco and 
+    /// This is an old/deprecated logger and has been superceded by ParallelForwardingAppender which is included in Umbraco and
     /// also by AsyncForwardingAppender in the Log4Net.Async library.
-	/// </summary>
-	[Obsolete("This is superceded by the ParallelForwardingAppender, this will be removed in v8, do not use this")]
+    /// </summary>
+    [Obsolete("This is superceded by the ParallelForwardingAppender, this will be removed in v8, do not use this")]
     [EditorBrowsable(EditorBrowsableState.Never)]
-	public class AsynchronousRollingFileAppender : RollingFileAppender
-	{
-		private RingBuffer<LoggingEvent> pendingAppends;
+    public class AsynchronousRollingFileAppender : RollingFileAppender
+    {
+        private RingBuffer<LoggingEvent> pendingAppends;
         private readonly ManualResetEvent manualResetEvent;
         private bool shuttingDown;
         private bool hasFinished;

@@ -6,7 +6,7 @@ namespace Umbraco.Web.Mvc
 {
     /// <summary>
     /// Will ensure that client-side cache does not occur by sending the correct response headers
-    /// </summary>    
+    /// </summary>
     public class DisableClientCacheAttribute : ActionFilterAttribute
     {
         public override void OnResultExecuting(ResultExecutingContext filterContext)

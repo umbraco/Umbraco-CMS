@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
         { }
 
         public override void Up()
-        {            
+        {
             //tuple = tablename, indexname, columnname, unique
             var indexes = SqlSyntax.GetDefinedIndexes(Context.Database).ToArray();
             var found = indexes.FirstOrDefault(
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
             if (found != null)
             {
                 //drop the index
-                Delete.Index("IX_cmsPropertyData").OnTable("cmsPropertyData");             
+                Delete.Index("IX_cmsPropertyData").OnTable("cmsPropertyData");
             }
         }
 

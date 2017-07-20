@@ -7,8 +7,8 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 namespace Umbraco.Tests.PropertyEditors
 {
     [TestFixture]
-	public class PropertyEditorValueConverterTests
-	{
+    public class PropertyEditorValueConverterTests
+    {
         // see notes in the converter
         // only ONE date format is expected here
 
@@ -24,14 +24,14 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase("2012-11-10 13:14:15", true)]
         [TestCase("2012-11-10T13:14:15", true)]
         [TestCase("", false)]
-		public void CanConvertDatePickerPropertyEditor(string date, bool expected)
-		{
-			var converter = new DatePickerValueConverter();
-			var dateTime = new DateTime(2012, 11, 10, 13, 14, 15);
-			var result = converter.ConvertSourceToInter(null, date, false); // does not use type for conversion
+        public void CanConvertDatePickerPropertyEditor(string date, bool expected)
+        {
+            var converter = new DatePickerValueConverter();
+            var dateTime = new DateTime(2012, 11, 10, 13, 14, 15);
+            var result = converter.ConvertSourceToInter(null, date, false); // does not use type for conversion
 
-		    if (expected)
-		        Assert.AreEqual(dateTime.Date, ((DateTime) result).Date);
+            if (expected)
+                Assert.AreEqual(dateTime.Date, ((DateTime) result).Date);
             else
                 Assert.AreNotEqual(dateTime.Date, ((DateTime)result).Date);
         }

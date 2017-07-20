@@ -44,7 +44,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         }
 
         protected void Page_Load(object sender, EventArgs e)
-        {           
+        {
             Panel1.Text = Services.TextService.Localize("stylesheet/editstylesheet");
             pp_name.Text = Services.TextService.Localize("name");
             pp_path.Text = Services.TextService.Localize("path");

@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models
 
         protected Property()
         {
-            
+
         }
 
         public Property(PropertyType propertyType)
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Models
             {
                 if (o == null && o1 == null) return true;
 
-                //custom comparer for strings.                        
+                //custom comparer for strings.
                 if (o is string || o1 is string)
                 {
                     //if one is null and another is empty then they are the same
@@ -79,7 +79,7 @@ namespace Umbraco.Core.Models
                 }
                 return o.Equals(o1);
             }, o => o.GetHashCode());
-        
+
         /// <summary>
         /// Returns the instance of the tag support, by default tags are not enabled
         /// </summary>
@@ -117,12 +117,12 @@ namespace Umbraco.Core.Models
         /// </summary>
         [IgnoreDataMember]
         public PropertyType PropertyType { get { return _propertyType; } }
-        
+
         /// <summary>
         /// Gets or Sets the version id for the Property
         /// </summary>
         /// <remarks>
-        /// The version will be the same for all Property objects in a collection on a Content 
+        /// The version will be the same for all Property objects in a collection on a Content
         /// object, so not sure how much this makes sense but adding it to align with:
         /// umbraco.interfaces.IProperty
         /// </remarks>
@@ -144,7 +144,7 @@ namespace Umbraco.Core.Models
         /// Gets or Sets the value of the Property
         /// </summary>
         /// <remarks>
-        /// Setting the value will trigger a type validation. 
+        /// Setting the value will trigger a type validation.
         /// The type of the value has to be valid in order to be saved.
         /// </remarks>
         [DataMember]
@@ -238,7 +238,7 @@ namespace Umbraco.Core.Models
             clone.ResetDirtyProperties(false);
             //re-enable tracking
             clone.EnableChangeTracking();
-            
+
             return clone;
         }
     }

@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 var memberType = (IMemberType)MockedContentTypes.CreateSimpleMemberType();
-                
+
                 repository.AddOrUpdate(memberType);
                 unitOfWork.Complete();
 

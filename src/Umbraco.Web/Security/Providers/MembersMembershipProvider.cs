@@ -17,7 +17,7 @@ using Umbraco.Web.Composing;
 namespace Umbraco.Web.Security.Providers
 {
     /// <summary>
-    /// Custom Membership Provider for Umbraco Members (User authentication for Frontend applications NOT umbraco CMS)  
+    /// Custom Membership Provider for Umbraco Members (User authentication for Frontend applications NOT umbraco CMS)
     /// </summary>
     public class MembersMembershipProvider : UmbracoMembershipProvider<IMembershipMemberService, IMember>, IUmbracoMemberTypeMembershipProvider
     {
@@ -51,7 +51,7 @@ namespace Umbraco.Web.Security.Providers
         {
             get { return "MembersMembershipProvider"; }
         }
-        
+
         protected override MembershipUser ConvertToMembershipUser(IMember entity)
         {
             return entity.AsConcreteMembershipUser(Name, _providerKeyAsGuid);

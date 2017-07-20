@@ -5,8 +5,8 @@ using Umbraco.Core.Security;
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// This will check if the request is authenticated and if there's an auth ticket present we will 
-    /// add a custom header to the response indicating how many seconds are remaining for the current 
+    /// This will check if the request is authenticated and if there's an auth ticket present we will
+    /// add a custom header to the response indicating how many seconds are remaining for the current
     /// user's session. This allows us to keep track of a user's session effectively in the back office.
     /// </summary>
     public sealed class UmbracoUserTimeoutFilterAttribute : ActionFilterAttribute

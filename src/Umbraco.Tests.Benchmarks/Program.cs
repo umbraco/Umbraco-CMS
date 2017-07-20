@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Benchmarks
                 typeof(XmlPublishedContentInitBenchmarks),
 
             });
-            switcher.Run(args);            
+            switcher.Run(args);
         }
     }
 }

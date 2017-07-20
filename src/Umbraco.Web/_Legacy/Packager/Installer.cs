@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -22,10 +22,10 @@ namespace umbraco.cms.businesslogic.packager
 {
     /// <summary>
     /// The packager is a component which enables sharing of both data and functionality components between different umbraco installations.
-    /// 
+    ///
     /// The output is a .umb (a zip compressed file) which contains the exported documents/medias/macroes/documenttypes (etc.)
     /// in a Xml document, along with the physical files used (images/usercontrols/xsl documents etc.)
-    /// 
+    ///
     /// Partly implemented, import of packages is done, the export is *under construction*.
     /// </summary>
     /// <remarks>
@@ -296,12 +296,12 @@ namespace umbraco.cms.businesslogic.packager
                         //   <guid>my-icon.png</guid>
                         //   <orgPath>/umbraco/Images/</orgPath>
                         //   <orgName>my-icon.png</orgName>
-                        // </file> 
+                        // </file>
                         // <file>
                         //   <guid>my-icon.png</guid>
                         //   <orgPath>/App_Plugins/MyPlugin/Images</orgPath>
                         //   <orgName>my-icon.png</orgName>
-                        // </file> 
+                        // </file>
                         //
                         // Since this file unzips as a flat list of files, moving the file the first time means
                         // that when you try to do that a second time, it would result in a FileNotFoundException
@@ -312,7 +312,7 @@ namespace umbraco.cms.businesslogic.packager
 
                     }
 
-                    // Once we're done copying, remove all the files 
+                    // Once we're done copying, remove all the files
                     foreach (XmlNode n in Config.DocumentElement.SelectNodes("//file"))
                     {
                         var sourceFile = GetFileName(tempDir, XmlHelper.GetNodeValue(n.SelectSingleNode("guid")));
@@ -331,7 +331,7 @@ namespace umbraco.cms.businesslogic.packager
                 {
                     Current.Services.AuditService.Add(AuditType.PackagerInstall,
                                             string.Format("Package '{0}' installed. Package guid: {1}", insPack.Data.Name, insPack.Data.PackageGuid),
-                                            _currentUserId, -1);                    
+                                            _currentUserId, -1);
                 }
 
                 insPack.Save();
@@ -522,7 +522,7 @@ namespace umbraco.cms.businesslogic.packager
                         }
                     }
                     #endregion
-                
+
                     insPack.Save();
                 }
                 catch (Exception exception)
@@ -614,7 +614,7 @@ namespace umbraco.cms.businesslogic.packager
                 }
             }
 
-          
+
 
             //this will check for existing macros with the same alias
             //since we will not overwrite on import it's a good idea to inform the user what will be overwritten
@@ -728,7 +728,7 @@ namespace umbraco.cms.businesslogic.packager
                 path = path.Replace("[$DATA]", SystemDirectories.Data);
             }
 
-            //to support virtual dirs we try to lookup the file... 
+            //to support virtual dirs we try to lookup the file...
             path = IOHelper.FindFile(path);
 
 

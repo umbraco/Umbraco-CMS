@@ -12,7 +12,7 @@ namespace Umbraco.Core.PropertyEditors
             : base(builder)
         { }
 
-        public static PropertyValueConvertersResolver Current { get; } 
+        public static PropertyValueConvertersResolver Current { get; }
             = new PropertyValueConvertersResolver(CoreCurrent.Container.GetInstance<PropertyValueConverterCollectionBuilder>());
 
         public IEnumerable<IPropertyValueConverter> Converters => CoreCurrent.PropertyValueConverters;

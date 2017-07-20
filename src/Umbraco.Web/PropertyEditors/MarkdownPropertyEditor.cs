@@ -1,4 +1,4 @@
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
@@ -16,7 +16,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override PreValueEditor CreatePreValueEditor()
         {
-            return new MarkdownPreValueEditor();   
+            return new MarkdownPreValueEditor();
         }
 
         internal class MarkdownPreValueEditor : PreValueEditor

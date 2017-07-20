@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Benchmarks
                     .WithLaunchCount(1) // benchmark process will be launched only once
                     .WithIterationTime(TimeInterval.FromMilliseconds(100)) // 100ms per iteration
                     .WithWarmupCount(3) // 3 warmup iteration
-                    .WithTargetCount(3)); // 3 target iteration                
+                    .WithTargetCount(3)); // 3 target iteration
             }
         }
 
@@ -80,8 +80,8 @@ namespace Umbraco.Tests.Benchmarks
             SetupSqlCe(path, logger);
             SetupSqlServer(logger);
 
-            
-        }        
+
+        }
 
         private void SetupSqlServer(ILogger logger)
         {
@@ -94,16 +94,16 @@ namespace Umbraco.Tests.Benchmarks
 
             //re-create it
             _dbSqlServer.Execute(@"CREATE TABLE [umbracoServer](
-	[id] [int] IDENTITY(1,1) NOT NULL,
-	[address] [nvarchar](500) NOT NULL,
-	[computerName] [nvarchar](255) NOT NULL,
-	[registeredDate] [datetime] NOT NULL CONSTRAINT [DF_umbracoServer_registeredDate]  DEFAULT (getdate()),
-	[lastNotifiedDate] [datetime] NOT NULL,
-	[isActive] [bit] NOT NULL,
-	[isMaster] [bit] NOT NULL,
- CONSTRAINT [PK_umbracoServer] PRIMARY KEY CLUSTERED 
+    [id] [int] IDENTITY(1,1) NOT NULL,
+    [address] [nvarchar](500) NOT NULL,
+    [computerName] [nvarchar](255) NOT NULL,
+    [registeredDate] [datetime] NOT NULL CONSTRAINT [DF_umbracoServer_registeredDate]  DEFAULT (getdate()),
+    [lastNotifiedDate] [datetime] NOT NULL,
+    [isActive] [bit] NOT NULL,
+    [isMaster] [bit] NOT NULL,
+ CONSTRAINT [PK_umbracoServer] PRIMARY KEY CLUSTERED
 (
-	[id] ASC
+    [id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 )");
         }
@@ -113,7 +113,7 @@ namespace Umbraco.Tests.Benchmarks
             var dbName = string.Concat("Umb", Guid.NewGuid(), ".sdf");
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
             var sqlCeConnectionString = $"Datasource=|DataDirectory|\\{dbName};Flush Interval=1;";
-            
+
             _dbFile = Path.Combine(path, dbName);
 
             //only create the db one time
@@ -130,12 +130,12 @@ namespace Umbraco.Tests.Benchmarks
                     var creation = new DatabaseSchemaCreation(_dbSqlCe, logger);
                     creation.InitializeDatabaseSchema();
                 }
-                _initDbBytes = File.ReadAllBytes(_dbFile);            
+                _initDbBytes = File.ReadAllBytes(_dbFile);
             }
             else
             {
                 File.WriteAllBytes(_dbFile, _initDbBytes);
-            }            
+            }
 
             //create the db
             _dbSqlCe = GetSqlCeDatabase(sqlCeConnectionString, logger);

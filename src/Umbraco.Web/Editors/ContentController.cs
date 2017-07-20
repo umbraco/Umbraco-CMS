@@ -191,7 +191,7 @@ namespace Umbraco.Web.Editors
             {
                 return GetNiceUrl(guidUdi.Guid);
             }
-            throw new HttpResponseException(HttpStatusCode.NotFound);            
+            throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
         /// <summary>

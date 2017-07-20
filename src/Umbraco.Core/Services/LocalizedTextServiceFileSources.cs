@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// This is used to configure the file sources with the main file sources shipped with Umbraco and also including supplemental/plugin based
-        /// localization files. The supplemental files will be loaded in and merged in after the primary files. 
+        /// localization files. The supplemental files will be loaded in and merged in after the primary files.
         /// The supplemental files must be named with the 4 letter culture name with a hyphen such as : en-AU.xml
         /// </summary>
         /// <param name="logger"></param>
@@ -37,9 +37,9 @@ namespace Umbraco.Core.Services
         /// <param name="supplementFileSources"></param>
         public LocalizedTextServiceFileSources(
             ILogger logger,
-            IRuntimeCacheProvider cache, 
+            IRuntimeCacheProvider cache,
             DirectoryInfo fileSourceFolder,
-            IEnumerable<LocalizedTextServiceSupplementaryFileSource> supplementFileSources)           
+            IEnumerable<LocalizedTextServiceSupplementaryFileSource> supplementFileSources)
         {
             if (logger == null) throw new ArgumentNullException("logger");
             if (cache == null) throw new ArgumentNullException("cache");
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Services
                         culture = CultureInfo.GetCultureInfo(filename);
                     }
 
-                    //get the lazy value from cache                
+                    //get the lazy value from cache
                     result[culture] = new Lazy<XDocument>(() => _cache.GetCacheItem<XDocument>(
                         string.Format("{0}-{1}", typeof(LocalizedTextServiceFileSources).Name, culture.Name), () =>
                         {
@@ -144,7 +144,7 @@ namespace Umbraco.Core.Services
         public LocalizedTextServiceFileSources(ILogger logger, IRuntimeCacheProvider cache, DirectoryInfo fileSourceFolder)
             : this(logger, cache, fileSourceFolder, Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>())
         {
-            
+
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace Umbraco.Core.Services
                     var fileName = Path.GetFileName(x.File.FullName);
                     return fileName.InvariantStartsWith(culture.Name) && fileName.InvariantEndsWith(".xml");
                 });
-                
+
                 foreach (var supplementaryFile in found)
                 {
                     using (var fs = supplementaryFile.File.OpenRead())

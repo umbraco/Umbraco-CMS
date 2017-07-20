@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
@@ -34,55 +34,55 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     internal class PublishedMediaCache : PublishedCacheBase, IPublishedMediaCache
     {
         private readonly IMediaService _mediaService;
-	    private readonly IUserService _userService;
+        private readonly IUserService _userService;
 
         // by default these are null unless specified by the ctor dedicated to tests
         // when they are null the cache derives them from the ExamineManager, see
         // method GetExamineManagerSafe().
         //
-	    private readonly ILuceneSearcher _searchProvider;
+        private readonly ILuceneSearcher _searchProvider;
         private readonly BaseIndexProvider _indexProvider;
         private readonly XmlStore _xmlStore;
         private readonly PublishedContentTypeCache _contentTypeCache;
 
         // must be specified by the ctor
-	    private readonly ICacheProvider _cacheProvider;
+        private readonly ICacheProvider _cacheProvider;
 
-	    public PublishedMediaCache(XmlStore xmlStore, IMediaService mediaService, IUserService userService, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
-	        : base(false)
-		{
+        public PublishedMediaCache(XmlStore xmlStore, IMediaService mediaService, IUserService userService, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
+            : base(false)
+        {
             if (mediaService == null) throw new ArgumentNullException(nameof(mediaService));
             if (userService == null) throw new ArgumentNullException(nameof(userService));
             _mediaService = mediaService;
             _userService = userService;
 
             _cacheProvider = cacheProvider;
-	        _xmlStore = xmlStore;
-	        _contentTypeCache = contentTypeCache;
-		}
+            _xmlStore = xmlStore;
+            _contentTypeCache = contentTypeCache;
+        }
 
         /// <summary>
         /// Generally used for unit testing to use an explicit examine searcher
         /// </summary>
-	    /// <param name="mediaService"></param>
-	    /// <param name="userService"></param>
+        /// <param name="mediaService"></param>
+        /// <param name="userService"></param>
         /// <param name="searchProvider"></param>
         /// <param name="indexProvider"></param>
-	    /// <param name="cacheProvider"></param>
-	    /// <param name="contentTypeCache"></param>
-	    internal PublishedMediaCache(IMediaService mediaService, IUserService userService, ILuceneSearcher searchProvider, BaseIndexProvider indexProvider, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
+        /// <param name="cacheProvider"></param>
+        /// <param name="contentTypeCache"></param>
+        internal PublishedMediaCache(IMediaService mediaService, IUserService userService, ILuceneSearcher searchProvider, BaseIndexProvider indexProvider, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
             : base(false)
         {
             if (mediaService == null) throw new ArgumentNullException(nameof(mediaService));
             if (userService == null) throw new ArgumentNullException(nameof(userService));
             if (searchProvider == null) throw new ArgumentNullException(nameof(searchProvider));
-	        if (indexProvider == null) throw new ArgumentNullException(nameof(indexProvider));
+            if (indexProvider == null) throw new ArgumentNullException(nameof(indexProvider));
 
             _mediaService = mediaService;
             _userService = userService;
             _searchProvider = searchProvider;
             _indexProvider = indexProvider;
-	        _cacheProvider = cacheProvider;
+            _cacheProvider = cacheProvider;
             _contentTypeCache = contentTypeCache;
         }
 
@@ -102,15 +102,15 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         }
 
         public override bool HasById(bool preview, int contentId)
-	    {
+        {
             return GetUmbracoMedia(contentId) != null;
-	    }
+        }
 
-	    public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
+        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
         {
             //TODO: We should be able to look these ids first in Examine!
 
-		    var rootMedia = _mediaService.GetRootMedia();
+            var rootMedia = _mediaService.GetRootMedia();
             return rootMedia.Select(m => GetUmbracoMedia(m.Id));
         }
 
@@ -210,49 +210,49 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 return _indexProvider;
 
             var eMgr = GetExamineManagerSafe();
-	        if (eMgr == null) return null;
+            if (eMgr == null) return null;
 
-	        try
-	        {
-	            //by default use the InternalSearcher
+            try
+            {
+                //by default use the InternalSearcher
                 var indexer = eMgr.IndexProviderCollection[Constants.Examine.InternalIndexer];
-	            if (indexer.IndexerData.IncludeNodeTypes.Any() || indexer.IndexerData.ExcludeNodeTypes.Any())
-	            {
-	                Current.Logger.Warn<PublishedMediaCache>("The InternalIndexer for examine is configured incorrectly, it should not list any include/exclude node types or field names, it should simply be configured as: " + "<IndexSet SetName=\"InternalIndexSet\" IndexPath=\"~/App_Data/TEMP/ExamineIndexes/Internal/\" />");
-	            }
-	            return indexer;
-	        }
-	        catch (Exception ex)
-	        {
-	            Current.Logger.Error<PublishedMediaCache>("Could not retrieve the InternalIndexer", ex);
-	            //something didn't work, continue returning null.
-	        }
-	        return null;
+                if (indexer.IndexerData.IncludeNodeTypes.Any() || indexer.IndexerData.ExcludeNodeTypes.Any())
+                {
+                    Current.Logger.Warn<PublishedMediaCache>("The InternalIndexer for examine is configured incorrectly, it should not list any include/exclude node types or field names, it should simply be configured as: " + "<IndexSet SetName=\"InternalIndexSet\" IndexPath=\"~/App_Data/TEMP/ExamineIndexes/Internal/\" />");
+                }
+                return indexer;
+            }
+            catch (Exception ex)
+            {
+                Current.Logger.Error<PublishedMediaCache>("Could not retrieve the InternalIndexer", ex);
+                //something didn't work, continue returning null.
+            }
+            return null;
         }
 
-	    private ILuceneSearcher GetSearchProviderSafe()
+        private ILuceneSearcher GetSearchProviderSafe()
         {
             if (_searchProvider != null)
                 return _searchProvider;
 
             var eMgr = GetExamineManagerSafe();
-	        if (eMgr == null) return null;
+            if (eMgr == null) return null;
 
             try
             {
                 //by default use the InternalSearcher
                 return eMgr.GetSearcher(Constants.Examine.InternalIndexer);
-		    }
-		    catch (FileNotFoundException)
-		    {
-		        //Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
-		        //See this thread: http://examine.cdodeplex.com/discussions/264341
-		        //Catch the exception here for the time being, and just fallback to GetMedia
-		        //TODO: Need to fix examine in LB scenarios!
-		    }
-		    catch (NullReferenceException)
-		    {
-		        //This will occur when the search provider cannot be initialized. In newer examine versions the initialization is lazy and therefore
+            }
+            catch (FileNotFoundException)
+            {
+                //Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
+                //See this thread: http://examine.cdodeplex.com/discussions/264341
+                //Catch the exception here for the time being, and just fallback to GetMedia
+                //TODO: Need to fix examine in LB scenarios!
+            }
+            catch (NullReferenceException)
+            {
+                //This will occur when the search provider cannot be initialized. In newer examine versions the initialization is lazy and therefore
                 // the manager will return the singleton without throwing initialization errors, however if examine isn't configured correctly a null
                 // reference error will occur because the examine settings are null.
             }
@@ -335,7 +335,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     () => ExamineIndexMissMax);
 
             return ConvertFromIMedia(media);
-		}
+        }
 
         private const int ExamineIndexMissMax = 10;
         private int _examineIndexMiss;
@@ -359,7 +359,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         internal CacheValues ConvertFromSearchResult(SearchResult searchResult)
         {
             // note: fixing fields in 7.x, removed by Shan for 8.0
-			var values = new Dictionary<string, string>(searchResult.Fields);
+            var values = new Dictionary<string, string>(searchResult.Fields);
 
             return new CacheValues
             {
@@ -370,7 +370,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         internal CacheValues ConvertFromXPathNavigator(XPathNavigator xpath, bool forceNav = false)
         {
-			if (xpath == null) throw new ArgumentNullException(nameof(xpath));
+            if (xpath == null) throw new ArgumentNullException(nameof(xpath));
 
             var values = new Dictionary<string, string> { { "nodeName", xpath.GetAttribute("nodeName", "") } };
             values["nodeTypeAlias"] = xpath.Name;
@@ -420,8 +420,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             {
                 Values = values,
                 XPath = forceNav ? xpath : null // outside of tests we do NOT want to cache the navigator!
-		    };
-		}
+            };
+        }
 
         internal CacheValues ConvertFromIMedia(IMedia media)
         {
@@ -533,10 +533,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                         }
 
                         //if there's no result then return null. Previously we defaulted back to library.GetMedia below
-					    //but this will always get called for when we are getting descendents since many items won't have
-					    //children and then we are hitting the database again!
-					    //So instead we're going to rely on Examine to have the correct results like it should.
-					    return Enumerable.Empty<IPublishedContent>();
+                        //but this will always get called for when we are getting descendents since many items won't have
+                        //children and then we are hitting the database again!
+                        //So instead we're going to rely on Examine to have the correct results like it should.
+                        return Enumerable.Empty<IPublishedContent>();
                     }
                     catch (FileNotFoundException)
                     {
@@ -634,14 +634,14 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 XPathNavigator nav,
                 bool fromExamine)
             {
-				if (valueDictionary == null) throw new ArgumentNullException(nameof(valueDictionary));
-				if (getParent == null) throw new ArgumentNullException(nameof(getParent));
-				if (getProperty == null) throw new ArgumentNullException(nameof(getProperty));
+                if (valueDictionary == null) throw new ArgumentNullException(nameof(valueDictionary));
+                if (getParent == null) throw new ArgumentNullException(nameof(getParent));
+                if (getProperty == null) throw new ArgumentNullException(nameof(getProperty));
 
                 _getParent = new Lazy<IPublishedContent>(() => getParent(ParentId));
                 _getChildren = new Lazy<IEnumerable<IPublishedContent>>(() => getChildren(Id, nav));
                 _getProperty = getProperty;
-			    _cacheProvider = cacheProvider;
+                _cacheProvider = cacheProvider;
 
                 LoadedFromExamine = fromExamine;
 
@@ -651,11 +651,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 ValidateAndSetProperty(valueDictionary, val => _sortOrder = int.Parse(val), "sortOrder");
                 ValidateAndSetProperty(valueDictionary, val => _name = val, "nodeName", "__nodeName");
                 ValidateAndSetProperty(valueDictionary, val => _urlName = val, "urlName");
-				ValidateAndSetProperty(valueDictionary, val => _documentTypeAlias = val, "nodeTypeAlias", LuceneIndexer.NodeTypeAliasFieldName);
+                ValidateAndSetProperty(valueDictionary, val => _documentTypeAlias = val, "nodeTypeAlias", LuceneIndexer.NodeTypeAliasFieldName);
                 ValidateAndSetProperty(valueDictionary, val => _documentTypeId = int.Parse(val), "nodeType");
-				//ValidateAndSetProperty(valueDictionary, val => _writerName = val, "writerName");
+                //ValidateAndSetProperty(valueDictionary, val => _writerName = val, "writerName");
                 ValidateAndSetProperty(valueDictionary, val => _creatorName = val, "creatorName", "writerName"); //this is a bit of a hack fix for: U4-1132
-				//ValidateAndSetProperty(valueDictionary, val => _writerId = int.Parse(val), "writerID");
+                //ValidateAndSetProperty(valueDictionary, val => _writerId = int.Parse(val), "writerID");
                 ValidateAndSetProperty(valueDictionary, val => _creatorId = int.Parse(val), "creatorID", "writerID"); //this is a bit of a hack fix for: U4-1132
                 ValidateAndSetProperty(valueDictionary, val => _path = val, "path", "__Path");
                 ValidateAndSetProperty(valueDictionary, val => _createDate = ParseDateTimeValue(val), "createDate");
@@ -671,7 +671,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     }
                 }, "parentID");
 
-			    _contentType = contentTypeCache.Get(PublishedItemType.Media, _documentTypeAlias);
+                _contentType = contentTypeCache.Get(PublishedItemType.Media, _documentTypeAlias);
                 _properties = new Collection<IPublishedProperty>();
 
                 //handle content type properties
@@ -709,18 +709,18 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             private DateTime ParseDateTimeValue(string val)
             {
-			    if (LoadedFromExamine == false)
+                if (LoadedFromExamine == false)
                     return DateTime.Parse(val);
 
-			    //we need to parse the date time using Lucene converters
-			    var ticks = long.Parse(val);
-			    return new DateTime(ticks);
+                //we need to parse the date time using Lucene converters
+                var ticks = long.Parse(val);
+                return new DateTime(ticks);
             }
 
             /// <summary>
             /// Flag to get/set if this was laoded from examine cache
             /// </summary>
-			internal bool LoadedFromExamine { get; }
+            internal bool LoadedFromExamine { get; }
 
             //private readonly Func<DictionaryPublishedContent, IPublishedContent> _getParent;
             private readonly Lazy<IPublishedContent> _getParent;
@@ -732,51 +732,51 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             /// <summary>
             /// Returns 'Media' as the item type
             /// </summary>
-			public override PublishedItemType ItemType => PublishedItemType.Media;
+            public override PublishedItemType ItemType => PublishedItemType.Media;
 
-		    public override IPublishedContent Parent => _getParent.Value;
+            public override IPublishedContent Parent => _getParent.Value;
 
             public int ParentId { get; private set; }
 
-			public override int Id => _id;
+            public override int Id => _id;
 
-		    public override Guid Key => _key;
+            public override Guid Key => _key;
 
-		    public override int TemplateId => 0;
+            public override int TemplateId => 0;
 
-		    public override int SortOrder => _sortOrder;
+            public override int SortOrder => _sortOrder;
 
-		    public override string Name => _name;
+            public override string Name => _name;
 
-		    public override string UrlName => _urlName;
+            public override string UrlName => _urlName;
 
-		    public override string DocumentTypeAlias => _documentTypeAlias;
+            public override string DocumentTypeAlias => _documentTypeAlias;
 
-		    public override int DocumentTypeId => _documentTypeId;
+            public override int DocumentTypeId => _documentTypeId;
 
-		    public override string WriterName => _creatorName;
+            public override string WriterName => _creatorName;
 
-		    public override string CreatorName => _creatorName;
+            public override string CreatorName => _creatorName;
 
-		    public override int WriterId => _creatorId;
+            public override int WriterId => _creatorId;
 
-		    public override int CreatorId => _creatorId;
+            public override int CreatorId => _creatorId;
 
-		    public override string Path => _path;
+            public override string Path => _path;
 
-		    public override DateTime CreateDate => _createDate;
+            public override DateTime CreateDate => _createDate;
 
-		    public override DateTime UpdateDate => _updateDate;
+            public override DateTime UpdateDate => _updateDate;
 
-		    public override Guid Version => Guid.Empty;
+            public override Guid Version => Guid.Empty;
 
-		    public override int Level => _level;
+            public override int Level => _level;
 
-		    public override bool IsDraft => false;
+            public override bool IsDraft => false;
 
-		    public override IEnumerable<IPublishedProperty> Properties => _properties;
+            public override IEnumerable<IPublishedProperty> Properties => _properties;
 
-		    public override IEnumerable<IPublishedContent> Children => _getChildren.Value;
+            public override IEnumerable<IPublishedContent> Children => _getChildren.Value;
 
             public override IPublishedProperty GetProperty(string alias)
             {
@@ -785,7 +785,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             public override PublishedContentType ContentType => _contentType;
 
-		    // override to implement cache
+            // override to implement cache
             //   cache at context level, ie once for the whole request
             //   but cache is not shared by requests because we wouldn't know how to clear it
             public override IPublishedProperty GetProperty(string alias, bool recurse)
@@ -831,8 +831,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
         }
 
-	    internal void Resync()
-	    {
+        internal void Resync()
+        {
             // clear recursive properties cached by XmlPublishedContent.GetProperty
             // assume that nothing else is going to cache IPublishedProperty items (else would need to do ByKeySearch)
             // NOTE all properties cleared when clearing the content cache (see content cache)
@@ -852,12 +852,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return _contentTypeCache.Get(PublishedItemType.Media, alias);
         }
 
-	    public override IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType)
-	    {
-	        throw new NotImplementedException();
-	    }
+        public override IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType)
+        {
+            throw new NotImplementedException();
+        }
 
-	    #endregion
+        #endregion
 
         // REFACTORING
 

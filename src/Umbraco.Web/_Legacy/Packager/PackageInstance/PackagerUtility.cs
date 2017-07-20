@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.IO;
 using System.Xml;
@@ -8,13 +8,13 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
-namespace umbraco.cms.businesslogic.packager 
+namespace umbraco.cms.businesslogic.packager
 {
     /// <summary>
     /// A utillity class for working with packager data.
     /// It provides basic methods for adding new items to a package manifest, moving files and other misc.
     /// </summary>
-    public class PackagerUtility 
+    public class PackagerUtility
     {
         /// <summary>
         /// Creates a package manifest containing name, license, version and other meta data.
@@ -223,7 +223,7 @@ namespace umbraco.cms.businesslogic.packager
         /// <param name="guid">The GUID.</param>
         /// <param name="doc">The doc.</param>
         /// <returns>
-        /// 	<c>true</c> if [is file in manifest]; otherwise, <c>false</c>.
+        ///     <c>true</c> if [is file in manifest]; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsFileInManifest(string guid, XmlDocument doc)
         {

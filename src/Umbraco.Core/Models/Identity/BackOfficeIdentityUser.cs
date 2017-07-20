@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -44,9 +44,9 @@ namespace Umbraco.Core.Models.Identity
         public override bool LockoutEnabled
         {
             get { return true; }
-            set 
+            set
             {
-                //do nothing 
+                //do nothing
             }
         }
 

@@ -179,7 +179,7 @@ namespace Umbraco.Core.Composing
         internal static readonly string[] KnownAssemblyExclusionFilter = new[]
                 {
                     "mscorlib,",
-					"System.",
+                    "System.",
                     "Antlr3.",
                     "Autofac.",
                     "Autofac,",
@@ -200,8 +200,8 @@ namespace Umbraco.Core.Composing
                     "SqlCE4Umbraco,",
                     "umbraco.datalayer,",
                     "umbraco.interfaces,",
-					//"umbraco.providers,",
-					//"Umbraco.Web.UI,",
+                    //"umbraco.providers,",
+                    //"Umbraco.Web.UI,",
                     "umbraco.webservices",
                     "Lucene.",
                     "Examine,",

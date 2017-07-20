@@ -21,13 +21,13 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.IO
 {
-	/// <summary>
-	/// A custom file system provider for media
-	/// </summary>
-	[FileSystemProvider("media")]
-	public class MediaFileSystem : FileSystemWrapper
-	{
-	    private readonly object _folderCounterLock = new object();
+    /// <summary>
+    /// A custom file system provider for media
+    /// </summary>
+    [FileSystemProvider("media")]
+    public class MediaFileSystem : FileSystemWrapper
+    {
+        private readonly object _folderCounterLock = new object();
         private long _folderCounter;
         private bool _folderCounterInitialized;
 
@@ -38,7 +38,7 @@ namespace Umbraco.Core.IO
         //    { 500, "big-thumb" }
         //};
 
-        public MediaFileSystem(IFileSystem wrapped) 
+        public MediaFileSystem(IFileSystem wrapped)
             : base(wrapped)
         {
             // due to how FileSystems is written at the moment, the ctor cannot be used to inject
@@ -59,7 +59,7 @@ namespace Umbraco.Core.IO
 
         internal UploadAutoFillProperties UploadAutoFillProperties { get; }
 
-	    // note - this is currently experimental / being developed
+        // note - this is currently experimental / being developed
         //public static bool UseTheNewMediaPathScheme { get; set; }
         public const bool UseTheNewMediaPathScheme = false;
 
@@ -109,40 +109,40 @@ namespace Umbraco.Core.IO
             return allsuccess;
         }
 
-	    public void DeleteMediaFiles(IEnumerable<string> files)
-	    {
-	        files = files.Distinct();
+        public void DeleteMediaFiles(IEnumerable<string> files)
+        {
+            files = files.Distinct();
 
-	        Parallel.ForEach(files, file =>
-	        {
-	            try
-	            {
-	                if (file.IsNullOrWhiteSpace()) return;
-	                if (FileExists(file) == false) return;
-	                DeleteFile(file);
+            Parallel.ForEach(files, file =>
+            {
+                try
+                {
+                    if (file.IsNullOrWhiteSpace()) return;
+                    if (FileExists(file) == false) return;
+                    DeleteFile(file);
 
-	                if (UseTheNewMediaPathScheme == false)
-	                {
-	                    // old scheme: filepath is "<int>/<filename>" OR "<int>-<filename>"
-	                    // remove the directory if any
-	                    var dir = Path.GetDirectoryName(file);
-	                    if (string.IsNullOrWhiteSpace(dir) == false)
-	                        DeleteDirectory(dir, true);
-	                }
-	                else
-	                {
-	                    // new scheme: path is "<xuid>/<filename>" where xuid is a combination of cuid and puid
-	                    // remove the directory
-	                    var dir = Path.GetDirectoryName(file);
-	                    DeleteDirectory(dir, true);
-	                }
-	            }
-	            catch (Exception e)
-	            {
-	                Logger.Error<MediaFileSystem>("Failed to delete attached file \"" + file + "\".", e);
-	            }
-	        });
-	    }
+                    if (UseTheNewMediaPathScheme == false)
+                    {
+                        // old scheme: filepath is "<int>/<filename>" OR "<int>-<filename>"
+                        // remove the directory if any
+                        var dir = Path.GetDirectoryName(file);
+                        if (string.IsNullOrWhiteSpace(dir) == false)
+                            DeleteDirectory(dir, true);
+                    }
+                    else
+                    {
+                        // new scheme: path is "<xuid>/<filename>" where xuid is a combination of cuid and puid
+                        // remove the directory
+                        var dir = Path.GetDirectoryName(file);
+                        DeleteDirectory(dir, true);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error<MediaFileSystem>("Failed to delete attached file \"" + file + "\".", e);
+                }
+            });
+        }
 
         #region Media Path
 
@@ -184,14 +184,14 @@ namespace Umbraco.Core.IO
         }
 
         private static byte[] Combine(Guid guid1, Guid guid2)
-	    {
-	        var bytes1 = guid1.ToByteArray();
-	        var bytes2 = guid2.ToByteArray();
-	        var bytes = new byte[bytes1.Length];
-	        for (var i = 0; i < bytes1.Length; i++)
-	            bytes[i] = (byte) (bytes1[i] ^ bytes2[i]);
-	        return bytes;
-	    }
+        {
+            var bytes1 = guid1.ToByteArray();
+            var bytes2 = guid2.ToByteArray();
+            var bytes = new byte[bytes1.Length];
+            for (var i = 0; i < bytes1.Length; i++)
+                bytes[i] = (byte) (bytes1[i] ^ bytes2[i]);
+            return bytes;
+        }
 
         /// <summary>
         /// Gets the file path of a media file.
@@ -242,8 +242,8 @@ namespace Umbraco.Core.IO
             return Interlocked.Increment(ref _folderCounter).ToString(CultureInfo.InvariantCulture);
         }
 
-	    private void EnsureFolderCounterIsInitialized()
-	    {
+        private void EnsureFolderCounterIsInitialized()
+        {
             lock (_folderCounterLock)
             {
                 if (_folderCounterInitialized) return;
@@ -433,7 +433,7 @@ namespace Umbraco.Core.IO
 
         #endregion
 
-	    // fixme - remove
+        // fixme - remove
 
         //#region Manage thumbnails
 

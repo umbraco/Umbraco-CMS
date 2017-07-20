@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Core;
 using System.Collections.Specialized;
 using Umbraco.Core.Models.PublishedContent;
@@ -110,8 +110,8 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <returns></returns>
         /// <remarks>
-        /// this is useful if you need to redirect 
-        /// to the current page but the current page is actually a rewritten URL normally done with something like 
+        /// this is useful if you need to redirect
+        /// to the current page but the current page is actually a rewritten URL normally done with something like
         /// Server.Transfer.
         /// </remarks>
         protected RedirectToUmbracoUrlResult RedirectToCurrentUmbracoUrl()
@@ -161,8 +161,8 @@ namespace Umbraco.Web.Mvc
                 if (currentRouteData.DataTokens.ContainsKey(Core.Constants.Web.UmbracoRouteDefinitionDataToken))
                     return Attempt.Succeed((RouteDefinition)currentRouteData.DataTokens[Core.Constants.Web.UmbracoRouteDefinitionDataToken]);
 
-                currentContext = currentContext.IsChildAction 
-                    ? currentContext.ParentActionViewContext 
+                currentContext = currentContext.IsChildAction
+                    ? currentContext.ParentActionViewContext
                     : null;
             }
             return Attempt<RouteDefinition>.Fail(

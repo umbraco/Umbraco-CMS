@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -43,18 +43,18 @@ namespace Umbraco.Web.PropertyEditors
                     new PreValueField(new EnsureUniqueValuesValidator())
                         {
                             Description = "Add and remove values for the list",
-                            //we're going to call this 'items' because we are going to override the 
-                            //serialization of the pre-values to ensure that each one gets saved with it's own key 
+                            //we're going to call this 'items' because we are going to override the
+                            //serialization of the pre-values to ensure that each one gets saved with it's own key
                             //(new db row per pre-value, thus to maintain backwards compatibility)
 
-                            //It's also important to note that by default the dropdown angular controller is expecting the 
+                            //It's also important to note that by default the dropdown angular controller is expecting the
                             // config options to come in with a property called 'items'
                             Key = "items",
                             Name = _textService.Localize("editdatatype/addPrevalue"), // todo: inject
                             View = "multivalues"
-                        }                   
+                        }
                 };
-        } 
+        }
 
         /// <summary>
         /// The editor is expecting a json array for a field with a key named "items" so we need to format the persisted values
@@ -71,7 +71,7 @@ namespace Umbraco.Web.PropertyEditors
                 // the sorted order and the js has to sort anyways.
                 .OrderBy(x => x.SortOrder)
                 .ToList();
-          
+
             //the items list will be a dictionary of it's id -> value we need to use the id for persistence for backwards compatibility
             return new Dictionary<string, object> {{"items", arrayOfVals.ToDictionary(x => x.Id, x => PreValueAsDictionary(x))}};
         }
@@ -101,7 +101,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             var val = editorValue["items"] as JArray;
             var result = new Dictionary<string, PreValue>();
-            
+
             if (val == null)
             {
                 return result;
@@ -111,12 +111,12 @@ namespace Umbraco.Web.PropertyEditors
             {
                 var index = 0;
 
-                //get all values in the array that are not empty 
+                //get all values in the array that are not empty
                 foreach (var item in val.OfType<JObject>()
                     .Where(jItem => jItem["value"] != null)
                     .Select(jItem => new
                         {
-                            idAsString = jItem["id"] == null ? "0" : jItem["id"].ToString(), 
+                            idAsString = jItem["id"] == null ? "0" : jItem["id"].ToString(),
                             valAsString = jItem["value"].ToString()
                         })
                     .Where(x => x.valAsString.IsNullOrWhiteSpace() == false))
@@ -129,7 +129,7 @@ namespace Umbraco.Web.PropertyEditors
             }
             catch (Exception ex)
             {
-                _logger.Error<ValueListPreValueEditor>("Could not deserialize the posted value: " + val, ex);                
+                _logger.Error<ValueListPreValueEditor>("Could not deserialize the posted value: " + val, ex);
             }
 
             return result;
@@ -151,7 +151,7 @@ namespace Umbraco.Web.PropertyEditors
                                         .Select((jItem, index) => new {value = jItem["value"].ToString(), index = index})
                                         .Where(asString => asString.value.IsNullOrWhiteSpace() == false)
                                         .GroupBy(x => x.value);
-                
+
                 foreach (var g in groupedValues.Where(g => g.Count() > 1))
                 {
                     yield return new ValidationResult("The value " + g.Last().value + " must be unique", new[]

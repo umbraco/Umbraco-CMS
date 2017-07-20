@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
@@ -67,7 +67,7 @@ namespace umbraco.cms.businesslogic.packager {
 
         public void Delete(int userId)
         {
-            Current.Services.AuditService.Add(AuditType.PackagerUninstall, string.Format("Package '{0}' uninstalled. Package guid: {1}", Data.Name, Data.PackageGuid), userId, -1);            
+            Current.Services.AuditService.Add(AuditType.PackagerUninstall, string.Format("Package '{0}' uninstalled. Package guid: {1}", Data.Name, Data.PackageGuid), userId, -1);
             Delete();
         }
 
@@ -78,18 +78,18 @@ namespace umbraco.cms.businesslogic.packager {
         }
 
         public static bool isPackageInstalled(string packageGuid) {
-			try
-			{
-				if (data.GetFromGuid(packageGuid, IOHelper.MapPath(Settings.InstalledPackagesSettings), true) == null)
-					return false;
-				else
-					return true;
-			}
-			catch (Exception ex)
-			{
+            try
+            {
+                if (data.GetFromGuid(packageGuid, IOHelper.MapPath(Settings.InstalledPackagesSettings), true) == null)
+                    return false;
+                else
+                    return true;
+            }
+            catch (Exception ex)
+            {
                 Current.Logger.Error<InstalledPackage>("An error occured in isPackagedInstalled", ex);
-				return false;
-			}
+                return false;
+            }
         }
 
         //EVENTS

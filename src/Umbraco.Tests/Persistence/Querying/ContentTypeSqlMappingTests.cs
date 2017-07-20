@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntax.GetQuotedTableName("umbracoNode"))));                
+                scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntax.GetQuotedTableName("umbracoNode"))));
                 scope.Database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 99997, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1,99997", SortOrder = 0, UniqueId = new Guid("BB3241D5-6842-4EFA-A82A-5F56885CF528"), Text = "Test Media Type 1", NodeObjectType = new Guid(Constants.ObjectTypes.MediaType), CreateDate = DateTime.Now });
                 scope.Database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 99998, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1,99998", SortOrder = 0, UniqueId = new Guid("EEA66B06-302E-49BA-A8B2-EDF07248BC59"), Text = "Test Media Type 2", NodeObjectType = new Guid(Constants.ObjectTypes.MediaType), CreateDate = DateTime.Now });
                 scope.Database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 99999, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1,99999", SortOrder = 0, UniqueId = new Guid("C45CC083-BB27-4C1C-B448-6F703CC9B799"), Text = "Test Media Type 2", NodeObjectType = new Guid(Constants.ObjectTypes.MediaType), CreateDate = DateTime.Now });

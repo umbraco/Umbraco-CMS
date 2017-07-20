@@ -37,7 +37,7 @@ namespace Umbraco.Tests.PropertyEditors
 
         [Test]
         public void Does_Not_Allow_Multiple_Values()
-        {            
+        {
             var validator = new ValueListPreValueEditor.EnsureUniqueValuesValidator();
             var result = validator.Validate(new JArray(JObject.FromObject(new { value = "hello" }), JObject.FromObject(new { value = "hello" })),
                                             null, new ColorPickerPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>()));
@@ -49,7 +49,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             var validator = new ValueListPreValueEditor.EnsureUniqueValuesValidator();
             var result = validator.Validate(new JArray(
-                                                JObject.FromObject(new { value = "hello" }), 
+                                                JObject.FromObject(new { value = "hello" }),
                                                 JObject.FromObject(new { value = "hello" }),
                                                 JObject.FromObject(new { value = "world" }),
                                                 JObject.FromObject(new { value = "world" })),

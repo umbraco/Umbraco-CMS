@@ -13,7 +13,7 @@ namespace Umbraco.Web
     /// </summary>
     /// <remarks>
     /// This should 100% supercede the StateManager.Cookies
-    /// </remarks> 
+    /// </remarks>
     internal static class HttpCookieExtensions
     {
         /// <summary>

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -99,7 +99,7 @@ namespace Umbraco.Web
             {
                 WriteInstructions(instructionsBatch);
             }
-            
+
         }
 
         private void WriteInstructions(IEnumerable<RefreshInstruction> instructions)
@@ -125,7 +125,7 @@ namespace Umbraco.Web
             // can get the http context from it
             var httpContext = (UmbracoContext.Current == null ? null : UmbracoContext.Current.HttpContext)
                 // if this is null, it could be that an async thread is calling this method that we weren't aware of and the UmbracoContext
-                // wasn't ensured at the beginning of the thread. We can try to see if the HttpContext.Current is available which might be 
+                // wasn't ensured at the beginning of the thread. We can try to see if the HttpContext.Current is available which might be
                 // the case if the asp.net synchronization context has kicked in
                 ?? (HttpContext.Current == null ? null : new HttpContextWrapper(HttpContext.Current));
 
@@ -165,7 +165,7 @@ namespace Umbraco.Web
             {
                 batch.Add(new RefreshInstructionEnvelope(servers, refresher, instructions));
             }
-                
-        }        
+
+        }
     }
 }

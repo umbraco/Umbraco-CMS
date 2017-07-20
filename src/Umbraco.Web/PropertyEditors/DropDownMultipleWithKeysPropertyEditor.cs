@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -11,7 +11,7 @@ namespace Umbraco.Web.PropertyEditors
     /// A property editor to allow multiple selection of pre-defined items
     /// </summary>
     /// <remarks>
-    /// Due to maintaining backwards compatibility this data type stores the value as a string which is a comma separated value of the 
+    /// Due to maintaining backwards compatibility this data type stores the value as a string which is a comma separated value of the
     /// ids of the individual items so we have logic in here to deal with that.
     /// </remarks>
     [PropertyEditor(Constants.PropertyEditors.DropdownlistMultiplePublishKeysAlias, "Dropdown list multiple, publish keys", "dropdown", Group = "lists", Icon = "icon-bulleted-list")]
@@ -38,7 +38,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <summary>
-        /// A pre-value editor for the 'drop down list multiple' property editor that ensures that 'multiple' is saved for the config in the db but is not 
+        /// A pre-value editor for the 'drop down list multiple' property editor that ensures that 'multiple' is saved for the config in the db but is not
         /// rendered as a pre-value field.
         /// </summary>
         /// <remarks>
@@ -46,7 +46,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </remarks>
         internal class DropDownMultiplePreValueEditor : ValueListPreValueEditor
         {
-            public DropDownMultiplePreValueEditor(ILocalizedTextService textService, ILogger logger) 
+            public DropDownMultiplePreValueEditor(ILocalizedTextService textService, ILogger logger)
                 : base(textService, logger)
             {
                 //add the multiple field, we'll make it hidden so it is not seen in the pre-value editor
@@ -56,7 +56,7 @@ namespace Umbraco.Web.PropertyEditors
                         Name = "multiple",
                         View = "hidden",
                         HideLabel = true
-                    });                
+                    });
             }
 
             /// <summary>

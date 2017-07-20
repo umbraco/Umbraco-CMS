@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IContentSection _contentConfig;
 
         public ScriptRepository(IUnitOfWork work, [Inject("ScriptFileSystem")] IFileSystem fileSystem, IContentSection contentConfig)
-			: base(work, fileSystem)
+            : base(work, fileSystem)
         {
             if (contentConfig == null) throw new ArgumentNullException(nameof(contentConfig));
             _contentConfig = contentConfig;

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Models
                     AdditionalData["previousName"] = _name;
                 }
 
-                SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);                
+                SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);
             }
         }
 

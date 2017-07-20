@@ -47,7 +47,7 @@ namespace Umbraco.Web.WebApi
                 return base.WriteToStreamAsync(type, value, writeStream, content, transportContext);
             }
 
-            
+
         }
 
     }

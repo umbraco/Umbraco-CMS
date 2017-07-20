@@ -94,8 +94,8 @@ namespace Umbraco.Core.Cache
 
             get
             {
-                return HasContextItems 
-                    ? (IDisposable) new MonitorLock(ContextItems.SyncRoot) 
+                return HasContextItems
+                    ? (IDisposable) new MonitorLock(ContextItems.SyncRoot)
                     : new NoopLocker();
             }
         }

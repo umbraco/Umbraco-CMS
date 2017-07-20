@@ -11,7 +11,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             Assert.IsTrue(SettingsSection.Logging.EnableLogging == true);
         }
-     
+
         [Test]
         public virtual void DisabledLogTypes()
         {
@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(SettingsSection.Logging.DisabledLogTypes.ElementAt(0).LogTypeAlias == "[alias-of-log-type-in-lowercase]");
             Assert.IsTrue(SettingsSection.Logging.DisabledLogTypes.ElementAt(1).LogTypeAlias == "anotherlogalias");
         }
-     
+
         [Test]
         public void AutoCleanLogs()
         {

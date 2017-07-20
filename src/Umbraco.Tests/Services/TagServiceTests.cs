@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Services
             content3.SetTags("tags", new[] { "cow" }, true);
             contentService.Publish(content3);
 
-            // Act            
+            // Act
             var tags = tagService.GetAllContentTags()
                 .OrderByDescending(x => x.NodeCount)
                 .ToList();

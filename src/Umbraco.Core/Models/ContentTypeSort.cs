@@ -55,7 +55,7 @@ namespace Umbraco.Core.Models
 
         protected bool Equals(ContentTypeSort other)
         {
-            return Id.Value.Equals(other.Id.Value) && string.Equals(Alias, other.Alias);    
+            return Id.Value.Equals(other.Id.Value) && string.Equals(Alias, other.Alias);
         }
 
         public override bool Equals(object obj)

@@ -25,7 +25,7 @@ namespace Umbraco.Core
 
         public bool IsConfigured => Composing.Current.RuntimeState.Level == RuntimeLevel.Run;
 
-	    public bool IsUpgrading => Composing.Current.RuntimeState.Level == RuntimeLevel.Upgrade;
+        public bool IsUpgrading => Composing.Current.RuntimeState.Level == RuntimeLevel.Upgrade;
 
         public DatabaseContext DatabaseContext { get; }
 

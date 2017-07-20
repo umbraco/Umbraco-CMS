@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models.Membership
 {
     /// <summary>
     /// Represents a backoffice user
-    /// </summary>    
+    /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
     public class User : Entity, IUser
@@ -73,8 +73,8 @@ namespace Umbraco.Core.Models.Membership
         private DateTime _lastLoginDate;
         private DateTime _lastLockoutDate;
 
-        private IEnumerable<string> _defaultPermissions; 
-        
+        private IEnumerable<string> _defaultPermissions;
+
         private bool _defaultToLiveEditing;
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Models.Membership
             public readonly PropertyInfo DefaultToLiveEditingSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.DefaultToLiveEditing);
             public readonly PropertyInfo UserTypeSelector = ExpressionHelper.GetPropertyInfo<User, IUserType>(x => x.UserType);
         }
-        
+
         #region Implementation of IMembershipUser
 
         [IgnoreDataMember]
@@ -183,10 +183,10 @@ namespace Umbraco.Core.Models.Membership
         [IgnoreDataMember]
         public string RawPasswordAnswerValue { get; set; }
         [IgnoreDataMember]
-        public string Comments { get; set; }               
-        
+        public string Comments { get; set; }
+
         #endregion
-        
+
         #region Implementation of IUser
 
         [DataMember]
@@ -320,14 +320,14 @@ namespace Umbraco.Core.Models.Membership
                     throw new InvalidOperationException("Cannot assign a User Type that has not been persisted");
                 }
 
-                SetPropertyValueAndDetectChanges(value, ref _userType, Ps.Value.UserTypeSelector);                
+                SetPropertyValueAndDetectChanges(value, ref _userType, Ps.Value.UserTypeSelector);
             }
         }
 
         #endregion
 
         /// <summary>
-        /// Whenever resetting occurs, clear the remembered add/removed collections, even if 
+        /// Whenever resetting occurs, clear the remembered add/removed collections, even if
         /// rememberPreviouslyChangedProperties is true, the AllowedSections property will still
         /// be flagged as dirty.
         /// </summary>
@@ -363,7 +363,7 @@ namespace Umbraco.Core.Models.Membership
 
                 if (_removedSections.Contains(item) == false)
                 {
-                    _removedSections.Add(item);    
+                    _removedSections.Add(item);
                 }
 
             }

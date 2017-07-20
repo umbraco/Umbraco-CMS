@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -20,7 +20,7 @@ namespace umbraco.presentation.actions
                 throw new ArgumentException("The current user doesn't have access to this application. Please contact the system administrator.");
             if (Security.ValidateUserNodeTreePermissions(Security.CurrentUser, c.Path, "D") == false)
                 throw new ArgumentException("The current user doesn't have permissions to delete this document. Please contact the system administrator.");
-            
+
             pane_delete.Text = Services.TextService.Localize("delete") + " '" + c.Name + "'";
             Panel2.Text = Services.TextService.Localize("delete");
             warning.Text = Services.TextService.Localize("confirmdelete") + " '" + c.Name + "'";
@@ -33,7 +33,7 @@ namespace umbraco.presentation.actions
             deleted.Text =  "'" + c.Name + "' " + Services.TextService.Localize("deleted");
             deleteMessage.Visible = true;
             confirm.Visible = false;
-            
+
             Current.Services.ContentService.Delete(c);
         }
     }

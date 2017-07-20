@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
     [Migration("6.0.0", 10, Constants.System.UmbracoMigrationName)]
     public class DeleteAppTables : MigrationBase
     {
-        public DeleteAppTables(IMigrationContext context) 
+        public DeleteAppTables(IMigrationContext context)
             : base(context)
         { }
 
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
             Delete.Table("umbracoAppTree");
 
             //NOTE: this is a hack since old umbraco versions might not have had their db's upgraded correctly so they are all quite inconsistent.
-            // This is actually done in migration: RemoveUmbracoAppConstraints to target 4.9.0 but we've found with some db's that are currently at 4.9.1, 
+            // This is actually done in migration: RemoveUmbracoAppConstraints to target 4.9.0 but we've found with some db's that are currently at 4.9.1,
             // these upgrades did not run. So, now we not only have to check if these constraints exist, but we also have to check if the RemoveUmbracoAppConstraints
             // has executed since we cannot drop the same foreign key twice or we'll get errors.
 

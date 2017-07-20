@@ -1,4 +1,4 @@
-using Umbraco.Core.Services;
+﻿using Umbraco.Core.Services;
 using System;
 using System.Collections;
 using System.Linq;

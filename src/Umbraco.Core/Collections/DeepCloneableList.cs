@@ -15,12 +15,12 @@ namespace Umbraco.Core.Collections
     internal class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
     {
         private readonly ListCloneBehavior _listCloneBehavior;
-        
+
         public DeepCloneableList(ListCloneBehavior listCloneBehavior)
         {
             _listCloneBehavior = listCloneBehavior;
         }
-        
+
         public DeepCloneableList(IEnumerable<T> collection, ListCloneBehavior listCloneBehavior) : base(collection)
         {
             _listCloneBehavior = listCloneBehavior;

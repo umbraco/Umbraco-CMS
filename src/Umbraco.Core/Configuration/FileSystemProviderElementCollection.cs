@@ -7,7 +7,7 @@ using System.Text;
 namespace Umbraco.Core.Configuration
 {
     [ConfigurationCollection(typeof(FileSystemProviderElement), AddItemName = "Provider")]
-    public class FileSystemProviderElementCollection : ConfigurationElementCollection   
+    public class FileSystemProviderElementCollection : ConfigurationElementCollection
     {
         protected override ConfigurationElement CreateNewElement()
         {

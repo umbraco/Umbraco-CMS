@@ -16,7 +16,7 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Security.Providers
 {
-    
+
 
     /// <summary>
     /// Abstract Membership Provider that users any implementation of IMembershipMemberService{TEntity} service
@@ -27,7 +27,7 @@ namespace Umbraco.Web.Security.Providers
     {
 
         protected IMembershipMemberService<TEntity> MemberService { get; private set; }
-        
+
         protected UmbracoMembershipProvider(IMembershipMemberService<TEntity> memberService)
         {
             MemberService = memberService;
@@ -53,10 +53,10 @@ namespace Umbraco.Web.Security.Providers
         /// <param name="name">The friendly name of the provider.</param>
         /// <param name="config">A collection of the name/value pairs representing the provider-specific attributes specified in the configuration for this provider.</param>
         /// <exception cref="T:System.ArgumentNullException">The name of the provider is null.</exception>
-        /// <exception cref="T:System.InvalidOperationException">An attempt is made to call 
-        /// <see cref="M:System.Configuration.Provider.ProviderBase.Initialize(System.String,System.Collections.Specialized.NameValueCollection)"></see> on a provider after the provider 
+        /// <exception cref="T:System.InvalidOperationException">An attempt is made to call
+        /// <see cref="M:System.Configuration.Provider.ProviderBase.Initialize(System.String,System.Collections.Specialized.NameValueCollection)"></see> on a provider after the provider
         /// has already been initialized.</exception>
-        /// <exception cref="T:System.ArgumentException">The name of the provider has a length of zero.</exception>       
+        /// <exception cref="T:System.ArgumentException">The name of the provider has a length of zero.</exception>
         public override void Initialize(string name, NameValueCollection config)
         {
             if (config == null) {throw new ArgumentNullException("config");}
@@ -80,14 +80,14 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         protected override bool PerformChangePassword(string username, string oldPassword, string newPassword)
         {
-            //NOTE: due to backwards compatibilty reasons (and UX reasons), this provider doesn't care about the old password and 
+            //NOTE: due to backwards compatibilty reasons (and UX reasons), this provider doesn't care about the old password and
             // allows simply setting the password manually so we don't really care about the old password.
             // This is allowed based on the overridden AllowManuallyChangingPassword option.
 
             // in order to support updating passwords from the umbraco core, we can't validate the old password
             var m = MemberService.GetByUsername(username);
             if (m == null) return false;
-            
+
             string salt;
             var encodedPassword = EncryptOrHashNewPassword(newPassword, out salt);
 
@@ -140,7 +140,7 @@ namespace Umbraco.Web.Security.Providers
         /// <returns>
         /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
         /// </returns>
-        protected override MembershipUser PerformCreateUser(string memberTypeAlias, string username, string password, string email, string passwordQuestion, 
+        protected override MembershipUser PerformCreateUser(string memberTypeAlias, string username, string password, string email, string passwordQuestion,
                                                             string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
             // See if the user already exists
@@ -165,10 +165,10 @@ namespace Umbraco.Web.Security.Providers
 
             var member = MemberService.CreateWithIdentity(
                 username,
-                email, 
-                FormatPasswordForStorage(encodedPassword, salt), 
+                email,
+                FormatPasswordForStorage(encodedPassword, salt),
                 memberTypeAlias);
-            
+
             member.PasswordQuestion = passwordQuestion;
             member.RawPasswordAnswerValue = EncryptString(passwordAnswer);
             member.IsApproved = isApproved;
@@ -215,7 +215,7 @@ namespace Umbraco.Web.Security.Providers
             long totalRecords2;
             var byEmail = MemberService.FindByEmail(emailToMatch, pageIndex, pageSize, out totalRecords2, StringPropertyMatchType.Wildcard).ToArray();
             totalRecords = Convert.ToInt32(totalRecords2);
-            
+
             var collection = new MembershipUserCollection();
             foreach (var m in byEmail)
             {
@@ -264,7 +264,7 @@ namespace Umbraco.Web.Security.Providers
             long totalRecords2;
             var pagedMembers = MemberService.GetAll(pageIndex, pageSize, out totalRecords2);
             totalRecords = Convert.ToInt32(totalRecords2);
-            
+
             foreach (var m in pagedMembers)
             {
                 membersList.Add(ConvertToMembershipUser(m));
@@ -276,7 +276,7 @@ namespace Umbraco.Web.Security.Providers
         /// Gets the number of users currently accessing the application.
         /// </summary>
         /// <returns>
-        /// The number of users currently accessing the application.       
+        /// The number of users currently accessing the application.
         /// </returns>
         /// <remarks>
         /// The way this is done is the same way that it is done in the MS SqlMembershipProvider - We query for any members
@@ -297,7 +297,7 @@ namespace Umbraco.Web.Security.Providers
         /// The password for the specified user name.
         /// </returns>
         protected override string PerformGetPassword(string username, string answer)
-        {            
+        {
             var m = MemberService.GetByUsername(username);
             if (m == null)
             {
@@ -420,7 +420,7 @@ namespace Umbraco.Web.Security.Providers
 
             //    throw new ProviderException("Password answer required for password reset.");
             //}
-            
+
             var m = MemberService.GetByUsername(username);
             if (m == null)
             {
@@ -444,7 +444,7 @@ namespace Umbraco.Web.Security.Providers
             m.RawPasswordValue = FormatPasswordForStorage(encodedPassword, salt);
             m.LastPasswordChangeDate = DateTime.Now;
             MemberService.Save(m);
-            
+
             return generatedPassword;
         }
 
@@ -462,7 +462,7 @@ namespace Umbraco.Web.Security.Providers
             if (member == null)
             {
                 throw new ProviderException(string.Format("No member with the username '{0}' found", username));
-            }                
+            }
 
             // Non need to update
             if (member.IsLockedOut == false) return true;
@@ -478,7 +478,7 @@ namespace Umbraco.Web.Security.Providers
         /// <summary>
         /// Updates e-mail  approved status, lock status and comment on a user.
         /// </summary>
-        /// <param name="user">A <see cref="T:System.Web.Security.MembershipUser"></see> object that represents the user to update and the updated information for the user.</param>      
+        /// <param name="user">A <see cref="T:System.Web.Security.MembershipUser"></see> object that represents the user to update and the updated information for the user.</param>
         public override void UpdateUser(MembershipUser user)
         {
             var m = MemberService.GetByUsername(user.UserName);
@@ -498,7 +498,7 @@ namespace Umbraco.Web.Security.Providers
                 }
             }
             m.Email = user.Email;
-            
+
             m.IsApproved = user.IsApproved;
             m.IsLockedOut = user.IsLockedOut;
             if (user.IsLockedOut)
@@ -611,7 +611,7 @@ namespace Umbraco.Web.Security.Providers
 
 
 
-        
+
 
     }
 }

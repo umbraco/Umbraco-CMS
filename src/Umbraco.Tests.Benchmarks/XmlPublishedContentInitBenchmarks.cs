@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Benchmarks
                     .WithLaunchCount(1) // benchmark process will be launched only once
                     .WithIterationTime(TimeInterval.FromMilliseconds(100)) // 100ms per iteration
                     .WithWarmupCount(3) // 3 warmup iteration
-                    .WithTargetCount(3)); // 3 target iteration              
+                    .WithTargetCount(3)); // 3 target iteration
             }
         }
 
@@ -279,7 +279,7 @@ namespace Umbraco.Tests.Benchmarks
             var nodes = xmlNode.SelectNodes(dataXPath);
 
             contentType = GetPublishedContentType(PublishedItemType.Content, docTypeAlias);
-            
+
             var propertyNodes = new Dictionary<string, XmlNode>();
             if (nodes != null)
                 foreach (XmlNode n in nodes)

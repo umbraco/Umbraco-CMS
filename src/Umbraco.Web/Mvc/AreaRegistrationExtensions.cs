@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -55,8 +55,8 @@ namespace Umbraco.Web.Mvc
             var umbracoArea = GlobalSettings.UmbracoMvcArea;
 
             //routes are explicitly named with controller names and IDs
-            var url = umbracoArea + "/" + 
-                (areaPathPrefix.IsNullOrWhiteSpace() ? "" : areaPathPrefix + "/") + 
+            var url = umbracoArea + "/" +
+                (areaPathPrefix.IsNullOrWhiteSpace() ? "" : areaPathPrefix + "/") +
                 area.AreaName + "/" + controllerName + "/" + routeTokens;
 
             Route controllerPluginRoute;
@@ -108,7 +108,7 @@ namespace Umbraco.Web.Mvc
             //Don't look anywhere else except this namespace!
             controllerPluginRoute.DataTokens.Add("UseNamespaceFallback", false);
 
-            //constraints: only match controllers ending with 'controllerSuffixName' and only match this controller's ID for this route            
+            //constraints: only match controllers ending with 'controllerSuffixName' and only match this controller's ID for this route
             if (controllerSuffixName.IsNullOrWhiteSpace() == false)
             {
                 controllerPluginRoute.Constraints = new RouteValueDictionary(

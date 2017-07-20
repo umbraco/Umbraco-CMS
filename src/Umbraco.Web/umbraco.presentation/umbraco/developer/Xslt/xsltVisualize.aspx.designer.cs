@@ -9,10 +9,10 @@
 //------------------------------------------------------------------------------
 
 namespace umbraco.presentation.umbraco.developer.Xslt {
-    
-    
+
+
     public partial class xsltVisualize {
-        
+
         /// <summary>
         /// Pane1 control.
         /// </summary>
@@ -21,7 +21,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Umbraco.Web._Legacy.Controls.Pane Pane1;
-        
+
         /// <summary>
         /// PropertyPanel1 control.
         /// </summary>
@@ -30,7 +30,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel1;
-        
+
         /// <summary>
         /// xsltSelection control.
         /// </summary>
@@ -39,7 +39,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlInputHidden xsltSelection;
-        
+
         /// <summary>
         /// contentPicker control.
         /// </summary>
@@ -48,7 +48,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::umbraco.controls.ContentPicker contentPicker;
-        
+
         /// <summary>
         /// visualizeDo control.
         /// </summary>
@@ -57,7 +57,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button visualizeDo;
-        
+
         /// <summary>
         /// visualizeContainer control.
         /// </summary>
@@ -66,7 +66,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Umbraco.Web._Legacy.Controls.Pane visualizeContainer;
-        
+
         /// <summary>
         /// visualizePanel control.
         /// </summary>
@@ -75,7 +75,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Umbraco.Web._Legacy.Controls.PropertyPanel visualizePanel;
-        
+
         /// <summary>
         /// visualizeArea control.
         /// </summary>

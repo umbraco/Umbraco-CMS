@@ -148,7 +148,7 @@ namespace Umbraco.Web.Editors
                                 HttpStatusCode.BadRequest,
                                 "UserManager does not implement " + typeof(IUmbracoBackOfficeTwoFactorOptions)));
                     }
-                    
+
                     var twofactorView = twofactorOptions.GetTwoFactorView(
                         TryGetOwinContext().Result,
                         UmbracoContext,
@@ -163,7 +163,7 @@ namespace Umbraco.Web.Editors
                     }
 
                     var attemptedUser = Security.GetBackOfficeUser(loginModel.Username);
-                    
+
                     //create a with information to display a custom two factor send code view
                     var verifyResponse = Request.CreateResponse(HttpStatusCode.PaymentRequired, new
                     {
@@ -284,7 +284,7 @@ namespace Umbraco.Web.Editors
                     var user = Security.GetBackOfficeUser(userName);
                     return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.LockedOut:
-                    return Request.CreateValidationErrorResponse("User is locked out");                    
+                    return Request.CreateValidationErrorResponse("User is locked out");
                 case SignInStatus.Failure:
                 default:
                     return Request.CreateValidationErrorResponse("Invalid code");
@@ -390,8 +390,8 @@ namespace Umbraco.Web.Editors
             var applicationUri = Current.RuntimeState.ApplicationUrl;
             var callbackUri = new Uri(applicationUri, action);
             return callbackUri.ToString();
-        }      
-            
+        }
+
 
         private HttpContextBase EnsureHttpContext()
         {
@@ -401,7 +401,7 @@ namespace Umbraco.Web.Editors
             return attempt.Result;
         }
 
-        
+
 
         private void AddModelErrors(IdentityResult result, string prefix = "")
         {

@@ -14,7 +14,7 @@ namespace umbraco.presentation.create
 
 
     /// <summary>
-    ///		Summary description for xslt.
+    ///        Summary description for xslt.
     /// </summary>
     public partial class xslt : UmbracoUserControl
     {
@@ -49,7 +49,7 @@ namespace umbraco.presentation.create
                     createMacroVal = 1;
 
                 var xsltName = Path.Combine("schema2", xsltTemplate.SelectedValue);
-                    
+
 
                 var returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),

@@ -28,6 +28,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 return intAttempt.Result;
 
             return null;
-        }        
+        }
     }
 }

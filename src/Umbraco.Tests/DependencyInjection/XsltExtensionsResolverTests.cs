@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using LightInject;
 using NUnit.Framework;
 using Umbraco.Core.Macros;

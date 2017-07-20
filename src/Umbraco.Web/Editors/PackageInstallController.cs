@@ -229,7 +229,7 @@ namespace Umbraco.Web.Editors
 
                     if (File.Exists(filePath))
                         File.Delete(filePath);
-                        
+
                 }
                 pack.Data.Files.Remove(file);
             }

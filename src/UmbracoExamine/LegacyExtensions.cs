@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Examine;
 using Examine.LuceneEngine.Config;
 using Umbraco.Core.Services;
@@ -9,7 +9,7 @@ namespace UmbracoExamine
     {
 
         private static readonly object Locker = new object();
-      
+
         public static IIndexCriteria ToIndexCriteria(this IndexSet set, IContentTypeService contentTypeService)
         {
             if (set.IndexUserFields.Count == 0)

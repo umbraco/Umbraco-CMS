@@ -68,7 +68,7 @@ namespace umbraco.controls
             {
                 _model.NewPassword = umbPasswordChanger_passwordNew.Text;
                 _model.OldPassword = umbPasswordChanger_passwordCurrent.Text;
-                _model.Reset = ResetPasswordCheckBox.Checked;           
+                _model.Reset = ResetPasswordCheckBox.Checked;
                 return _model;
             }
         }

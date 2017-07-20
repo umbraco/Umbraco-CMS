@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -15,7 +15,7 @@ namespace Umbraco.Web.Models
     [TypeConverter(typeof(ImageCropDataSetTypeConverter))]
     [DataContract(Name="imageCropDataSet")]
     public class ImageCropDataSet : IHtmlString, IEquatable<ImageCropDataSet>
-    {   
+    {
 
         [DataMember(Name="src")]
         public string Src { get; set;}
@@ -89,7 +89,7 @@ namespace Umbraco.Web.Models
         {
             return Crops.Any() ? JsonConvert.SerializeObject(this) : Src;
         }
-               
+
 
         /// <summary>
         /// Indicates whether the current object is equal to another object of the same type.
@@ -102,7 +102,7 @@ namespace Umbraco.Web.Models
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Src, other.Src) && Equals(FocalPoint, other.FocalPoint) 
+            return string.Equals(Src, other.Src) && Equals(FocalPoint, other.FocalPoint)
                 && Crops.SequenceEqual(other.Crops);
         }
 
@@ -122,7 +122,7 @@ namespace Umbraco.Web.Models
         }
 
         /// <summary>
-        /// Serves as the default hash function. 
+        /// Serves as the default hash function.
         /// </summary>
         /// <returns>
         /// A hash code for the current object.

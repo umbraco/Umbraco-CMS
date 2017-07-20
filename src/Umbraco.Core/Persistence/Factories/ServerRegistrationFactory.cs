@@ -3,7 +3,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class ServerRegistrationFactory 
+    internal class ServerRegistrationFactory
     {
         public ServerRegistration BuildEntity(ServerRegistrationDto dto)
         {

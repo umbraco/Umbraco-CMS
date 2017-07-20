@@ -1,23 +1,23 @@
-namespace Umbraco.Core.Models.PublishedContent
+﻿namespace Umbraco.Core.Models.PublishedContent
 {
     /// <summary>
-	/// The type of published content, ie whether it is a content or a media.
-	/// </summary>
-	public enum PublishedItemType
-	{
+    /// The type of published content, ie whether it is a content or a media.
+    /// </summary>
+    public enum PublishedItemType
+    {
         /// <summary>
         /// A content, ie what was formerly known as a document.
         /// </summary>
-		Content,
+        Content,
 
         /// <summary>
         /// A media.
         /// </summary>
-		Media,
+        Media,
 
         /// <summary>
         /// A member.
         /// </summary>
         Member
-	}
+    }
 }

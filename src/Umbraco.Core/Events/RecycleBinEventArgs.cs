@@ -12,7 +12,7 @@ namespace Umbraco.Core.Events
         {
             AllPropertyData = allPropertyData;
             NodeObjectType = nodeObjectType;
-            Ids = AllPropertyData.Select(x => x.Key);            
+            Ids = AllPropertyData.Select(x => x.Key);
             RecycleBinEmptiedSuccessfully = emptiedSuccessfully;
             Files = new List<string>();
         }
@@ -97,11 +97,11 @@ namespace Umbraco.Core.Events
         }
 
         /// <summary>
-        /// Gets the Id of the node object type of the items 
+        /// Gets the Id of the node object type of the items
         /// being deleted from the Recycle Bin.
         /// </summary>
         public Guid NodeObjectType { get; private set; }
-        
+
         /// <summary>
         /// Gets the list of Ids for each of the items being deleted from the Recycle Bin.
         /// </summary>

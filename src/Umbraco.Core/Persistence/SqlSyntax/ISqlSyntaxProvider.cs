@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         bool SupportsClustered();
         bool SupportsIdentityInsert();
         bool? SupportsCaseInsensitiveQueries(IDatabase db);
-        
+
         string ConvertIntegerToOrderableString { get; }
         string ConvertDateToOrderableString { get; }
         string ConvertDecimalToOrderableString { get; }

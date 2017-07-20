@@ -15,13 +15,13 @@ namespace Umbraco.Core.Persistence
     /// <remarks>
     /// We are using a custom data reader so that tons of memory is not consumed when rebuilding this table, previously
     /// we'd generate SQL insert statements, but we'd have to put all of the XML structures into memory first. Alternatively
-    /// we can use .net's DataTable, but this also requires putting everything into memory. By using a DataReader we don't have to 
-    /// store every content item and it's XML structure in memory to get it into the DB, we can stream it into the db with this 
+    /// we can use .net's DataTable, but this also requires putting everything into memory. By using a DataReader we don't have to
+    /// store every content item and it's XML structure in memory to get it into the DB, we can stream it into the db with this
     /// reader.
     /// </remarks>
-    internal class PocoDataDataReader<T, TSyntax> : BulkDataReader 
+    internal class PocoDataDataReader<T, TSyntax> : BulkDataReader
         where TSyntax : ISqlSyntaxProvider
-    {        
+    {
         private readonly MicrosoftSqlSyntaxProviderBase<TSyntax> _sqlSyntaxProvider;
         private readonly TableDefinition _tableDefinition;
         private readonly PocoColumn[] _readerColumns;
@@ -30,21 +30,21 @@ namespace Umbraco.Core.Persistence
         private int _recordsAffected = -1;
 
         public PocoDataDataReader(
-            IEnumerable<T> dataSource,             
+            IEnumerable<T> dataSource,
             PocoData pd,
             MicrosoftSqlSyntaxProviderBase<TSyntax> sqlSyntaxProvider)
         {
-            if (dataSource == null) throw new ArgumentNullException(nameof(dataSource));            
+            if (dataSource == null) throw new ArgumentNullException(nameof(dataSource));
             if (sqlSyntaxProvider == null) throw new ArgumentNullException(nameof(sqlSyntaxProvider));
 
             _tableDefinition = DefinitionFactory.GetTableDefinition(pd.Type, sqlSyntaxProvider);
             if (_tableDefinition == null) throw new InvalidOperationException("No table definition found for type " + pd.Type);
-            
+
             _readerColumns = pd.Columns.Select(x => x.Value).ToArray();
             _sqlSyntaxProvider = sqlSyntaxProvider;
             _enumerator = dataSource.GetEnumerator();
             _columnDefinitions = _tableDefinition.Columns.ToArray();
-            
+
         }
 
         protected override string SchemaName => _tableDefinition.SchemaName;
@@ -88,13 +88,13 @@ namespace Umbraco.Core.Persistence
                     //get the SqlDbType from the clr type
                     sqlDbType = _sqlSyntaxProvider.GetSqlDbType(col.PropertyType);
                 }
-                
+
                 AddSchemaTableRow(
-                    col.Name, 
+                    col.Name,
                     col.Size > 0 ? (int?)col.Size : null,
-                    col.Precision > 0  ? (short?)col.Precision : null, 
-                    null, col.IsUnique, col.IsIdentity, col.IsNullable, sqlDbType, 
-                    null, null, null, null, null);                
+                    col.Precision > 0  ? (short?)col.Precision : null,
+                    null, col.IsUnique, col.IsIdentity, col.IsNullable, sqlDbType,
+                    null, null, null, null, null);
             }
         }
 

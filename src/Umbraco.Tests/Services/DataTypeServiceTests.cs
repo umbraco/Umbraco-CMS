@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Services
             var dataTypeService = ServiceContext.DataTypeService;
             var textfieldId = "Umbraco.Textbox";
             var dataTypeDefinitions = dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(textfieldId);
-            
+
             // Act
             var definition = dataTypeDefinitions.First();
             var definitionId = definition.Id;
@@ -184,7 +184,7 @@ namespace Umbraco.Tests.Services
             // Assert
 
             Assert.AreEqual(1, preValsAgain.FormatAsDictionary().Count);
-            Assert.AreEqual(preVals.PreValuesAsDictionary.Values.First().Id, preValsAgain.PreValuesAsDictionary.Values.First().Id);            
+            Assert.AreEqual(preVals.PreValuesAsDictionary.Values.First().Id, preValsAgain.PreValuesAsDictionary.Values.First().Id);
             Assert.AreEqual("preVal1", preValsAgain.PreValuesAsDictionary.Keys.First());
 
         }
@@ -201,7 +201,7 @@ namespace Umbraco.Tests.Services
             dataTypeService.Save(dataTypeDefinition);
             dataTypeService.SavePreValues(dataTypeDefinition.Id, new[] {"preVal1", "preVal2"});
 
-            //re-get            
+            //re-get
             dataTypeDefinition = dataTypeService.GetDataTypeDefinitionById(dataTypeDefinition.Id);
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
 
@@ -211,7 +211,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(false, preVals.IsDictionaryBased);
             Assert.AreEqual(2, preVals.PreValuesAsArray.Count());
             Assert.AreEqual("preVal1", preVals.PreValuesAsArray.First().Value);
-            Assert.AreEqual("preVal2", preVals.PreValuesAsArray.Last().Value);            
+            Assert.AreEqual("preVal2", preVals.PreValuesAsArray.Last().Value);
         }
 
         [Test]

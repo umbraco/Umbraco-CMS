@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Web.Security;
 using Umbraco.Core.Models.Membership;

@@ -25,6 +25,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         {
             return source?.ToString() ?? string.Empty;
         }
-        
+
     }
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data;
@@ -84,7 +84,7 @@ namespace Umbraco.Web._Legacy.Controls
                     ClientDependencyLoader.Instance.RegisterDependency(1, "lib/CodeMirror/mode/javascript/javascript.js", "UmbracoRoot", ClientDependencyType.Javascript);
                     ClientDependencyLoader.Instance.RegisterDependency(1, "lib/CodeMirror/mode/css/css.js", "UmbracoRoot", ClientDependencyType.Javascript);
                     ClientDependencyLoader.Instance.RegisterDependency(1, "lib/CodeMirror/mode/htmlmixed/htmlmixed.js", "UmbracoRoot", ClientDependencyType.Javascript);
-                    
+
                 }
 
                 ClientDependencyLoader.Instance.RegisterDependency(1, "lib/CodeMirror/addon/edit/matchbrackets.js", "UmbracoRoot", ClientDependencyType.Javascript);
@@ -165,10 +165,10 @@ namespace Umbraco.Web._Legacy.Controls
                 jsEventCode.Append(RenderCodeEditor());
             }
 
-            jsEventCode.Append(@"   
-					//TODO: for now this is a global var, need to refactor all this so that is using proper js standards
-					//with correct objects, and proper accessors to these objects.
-					var UmbEditor;                 
+            jsEventCode.Append(@"
+                    //TODO: for now this is a global var, need to refactor all this so that is using proper js standards
+                    //with correct objects, and proper accessors to these objects.
+                    var UmbEditor;
                     $(document).ready(function () {
                         //create the editor
                        UmbEditor = new Umbraco.Controls.CodeEditor.UmbracoEditor(" + (CodeMirrorEnabled == false).ToString().ToLower() + @", '" + ClientID + @"');");
@@ -185,16 +185,16 @@ namespace Umbraco.Web._Legacy.Controls
                 //add the resize code
                 jsEventCode.Append(@"
                         var m_textEditor = jQuery('#" + ClientID + @"');
-                   
+
                        //with codemirror adding divs for line numbers, we need to target a different element
                        m_textEditor = m_textEditor.find('iframe').length > 0 ? m_textEditor.children('div').get(0) : m_textEditor.get(0);
-                   
+
                        jQuery(window).resize(function(){  resizeTextArea(m_textEditor, " + OffSetX + "," + OffSetY + @"); });
-            	       jQuery(document).ready(function(){  resizeTextArea(m_textEditor, " + OffSetX + "," + OffSetY + @"); });");
+                       jQuery(document).ready(function(){  resizeTextArea(m_textEditor, " + OffSetX + "," + OffSetY + @"); });");
 
             }
 
-            jsEventCode.Append(@"                       
+            jsEventCode.Append(@"
                     });");
 
             writer.WriteLine(@"<script type=""text/javascript"">{0}</script>", jsEventCode);
@@ -203,8 +203,8 @@ namespace Umbraco.Web._Legacy.Controls
 
         protected string RenderBasicEditor()
         {
-            string jsEventCode = @"                                   
-                                    var m_textEditor = document.getElementById('" + this.ClientID + @"');                                   
+            string jsEventCode = @"
+                                    var m_textEditor = document.getElementById('" + this.ClientID + @"');
                                     tab.watch('" + this.ClientID + @"');
                                     ";
             return jsEventCode;
@@ -216,7 +216,7 @@ namespace Umbraco.Web._Legacy.Controls
             var editorMimetype = "";
 
             if (string.IsNullOrEmpty(EditorMimeType) == false)
-                editorMimetype = @", 
+                editorMimetype = @",
                                      mode: """ + EditorMimeType + "\"";
 
 
@@ -233,7 +233,7 @@ namespace Umbraco.Web._Legacy.Controls
                                                 editorMimetype + @",
                                                 lineNumbers: true" +
                                                 extraKeys + @"
-                                                });                                    
+                                                });
                                 ";
 
             return jsEventCode;

@@ -20,7 +20,7 @@ namespace Umbraco.Tests.PropertyEditors
     [TestFixture]
     public class ImageCropperTest
     {
-        private const string CropperJson1 = "{\"focalPoint\": {\"left\": 0.96,\"top\": 0.80827067669172936},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\":\"thumb\",\"width\": 100,\"height\": 100,\"coordinates\": {\"x1\": 0.58729977382575338,\"y1\": 0.055768992440203169,\"x2\": 0,\"y2\": 0.32457553600198386}}]}";        
+        private const string CropperJson1 = "{\"focalPoint\": {\"left\": 0.96,\"top\": 0.80827067669172936},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\":\"thumb\",\"width\": 100,\"height\": 100,\"coordinates\": {\"x1\": 0.58729977382575338,\"y1\": 0.055768992440203169,\"x2\": 0,\"y2\": 0.32457553600198386}}]}";
         private const string CropperJson2 = "{\"focalPoint\": {\"left\": 0.98,\"top\": 0.80827067669172936},\"src\": \"/media/1005/img_0672.jpg\",\"crops\": [{\"alias\":\"thumb\",\"width\": 100,\"height\": 100,\"coordinates\": {\"x1\": 0.58729977382575338,\"y1\": 0.055768992440203169,\"x2\": 0,\"y2\": 0.32457553600198386}}]}";
         private const string CropperJson3 = "{\"focalPoint\": {\"left\": 0.98,\"top\": 0.80827067669172936},\"src\": \"/media/1005/img_0672.jpg\",\"crops\": []}";
         private const string MediaPath = "/media/1005/img_0671.jpg";
@@ -57,7 +57,7 @@ namespace Umbraco.Tests.PropertyEditors
         }
 
         [TestCase(CropperJson1, CropperJson1, true)]
-        [TestCase(CropperJson1, CropperJson2, false)]        
+        [TestCase(CropperJson1, CropperJson2, false)]
         public void CanConvertImageCropperPropertyEditor(string val1, string val2, bool expected)
         {
             try
@@ -188,7 +188,7 @@ namespace Umbraco.Tests.PropertyEditors
             var urlStringPad = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Pad);
             var urlString = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode:ImageCropMode.Max);
             var urlStringStretch = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Stretch);
-            
+
             Assert.AreEqual(MediaPath + "?mode=min&width=300&height=150", urlStringMin);
             Assert.AreEqual(MediaPath + "?mode=boxpad&width=300&height=150", urlStringBoxPad);
             Assert.AreEqual(MediaPath + "?mode=pad&width=300&height=150", urlStringPad);

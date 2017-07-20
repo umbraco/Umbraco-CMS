@@ -9,7 +9,7 @@ namespace Umbraco.MSBuild.Tasks
     {
         [Required]
         public string strFilePathAssemblyInfo { get; set; }
-        
+
         [Output]
         public string strAssemblyFileVersion { get; set; }
 

@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 7, Constants.System.UmbracoMigrationName)]
     public class RemoveCmsMacroPropertyTypeTable : MigrationBase
     {
-        public RemoveCmsMacroPropertyTypeTable(IMigrationContext context) 
+        public RemoveCmsMacroPropertyTypeTable(IMigrationContext context)
             : base(context)
         { }
 

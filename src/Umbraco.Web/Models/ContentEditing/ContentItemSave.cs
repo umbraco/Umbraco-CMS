@@ -9,7 +9,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// A model representing a content item to be saved
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
-    public class ContentItemSave : ContentBaseItemSave<IContent> 
+    public class ContentItemSave : ContentBaseItemSave<IContent>
     {
         /// <summary>
         /// The template alias to save

@@ -27,9 +27,9 @@ namespace Umbraco.Core.IO
         // the "~/" is mandatory.
         public PhysicalFileSystem(string virtualRoot)
         {
-	        if (virtualRoot == null) throw new ArgumentNullException("virtualRoot");
-			if (virtualRoot.StartsWith("~/") == false)
-				throw new ArgumentException("The virtualRoot argument must be a virtual path and start with '~/'");
+            if (virtualRoot == null) throw new ArgumentNullException("virtualRoot");
+            if (virtualRoot.StartsWith("~/") == false)
+                throw new ArgumentException("The virtualRoot argument must be a virtual path and start with '~/'");
 
             _rootPath = EnsureDirectorySeparatorChar(IOHelper.MapPath(virtualRoot)).TrimEnd(Path.DirectorySeparatorChar);
             _rootPathFwd = EnsureUrlSeparatorChar(_rootPath);
@@ -40,7 +40,7 @@ namespace Umbraco.Core.IO
         {
             if (string.IsNullOrEmpty(rootPath)) throw new ArgumentNullOrEmptyException(nameof(rootPath));
             if (string.IsNullOrEmpty(rootUrl)) throw new ArgumentNullOrEmptyException(nameof(rootUrl));
-			if (rootPath.StartsWith("~/")) throw new ArgumentException("The rootPath argument cannot be a virtual path and cannot start with '~/'");
+            if (rootPath.StartsWith("~/")) throw new ArgumentException("The rootPath argument cannot be a virtual path and cannot start with '~/'");
 
             // rootPath should be... rooted, as in, it's a root path!
             if (Path.IsPathRooted(rootPath) == false)

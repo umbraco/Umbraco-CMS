@@ -66,7 +66,7 @@ namespace Umbraco.Core.Packaging
                     string.Format("Error - file isn't a package. only extentions: \"{0}\" is allowed", string.Join(", ", alowedExtension)));
             }
         }
-        
+
         public void CopyFileFromArchive(string packageFilePath, string fileInPackageName, string destinationfilePath)
         {
             CopyFilesFromArchive(packageFilePath, new[]{new KeyValuePair<string, string>(fileInPackageName, destinationfilePath) } );
@@ -157,7 +157,7 @@ namespace Umbraco.Core.Packaging
                     ZipEntry zipEntry;
                     while ((zipEntry = zipInputStream.GetNextEntry()) != null)
                     {
-                        
+
                         if (zipEntry.IsDirectory) continue;
 
                         if (files.Contains(zipEntry.Name))

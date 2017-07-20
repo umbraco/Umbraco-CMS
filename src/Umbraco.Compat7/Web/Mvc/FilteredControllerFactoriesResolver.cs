@@ -9,7 +9,7 @@ namespace Umbraco.Web.Mvc
 {
     public class FilteredControllerFactoriesResolver : ManyObjectsResolverBase<FilteredControllerFactoryCollectionBuilder, FilteredControllerFactoryCollection, IFilteredControllerFactory>
     {
-        public FilteredControllerFactoriesResolver(FilteredControllerFactoryCollectionBuilder builder) 
+        public FilteredControllerFactoriesResolver(FilteredControllerFactoryCollectionBuilder builder)
             : base(builder)
         { }
 

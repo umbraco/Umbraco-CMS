@@ -11,7 +11,7 @@ namespace Umbraco.Web.Cache
     {
         private readonly IFacadeService _facadeService;
 
-        public ContentTypeCacheRefresher(CacheHelper cacheHelper, IFacadeService facadeService) 
+        public ContentTypeCacheRefresher(CacheHelper cacheHelper, IFacadeService facadeService)
             : base(cacheHelper)
         {
             _facadeService = facadeService;
@@ -123,7 +123,7 @@ namespace Umbraco.Web.Cache
             // that cache is disabled because we could not clear it properly
             //global::umbraco.cms.businesslogic.ContentType.RemoveFromDataTypeCache(contentTypeAlias);
         }
-        
+
         #endregion
 
         #region Json

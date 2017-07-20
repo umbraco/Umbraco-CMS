@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -31,7 +31,7 @@ namespace Umbraco.Web
         /// The crop alias e.g. thumbnail
         /// </param>
         /// <param name="htmlEncode">
-        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be 
+        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be
         /// set to false if using the result of this method for CSS.
         /// </param>
         /// <returns></returns>
@@ -55,7 +55,7 @@ namespace Umbraco.Web
         /// The crop alias e.g. thumbnail
         /// </param>
         /// <param name="htmlEncode">
-        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be 
+        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be
         /// set to false if using the result of this method for CSS.
         /// </param>
         /// <returns>
@@ -119,9 +119,9 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="urlHelper"></param>
         /// <param name="htmlEncode">
-        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be 
+        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be
         /// set to false if using the result of this method for CSS.
-        /// </param>        
+        /// </param>
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -200,9 +200,9 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="urlHelper"></param>
         /// <param name="htmlEncode">
-        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be 
+        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be
         /// set to false if using the result of this method for CSS.
-        /// </param>        
+        /// </param>
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -226,7 +226,7 @@ namespace Umbraco.Web
             var url = imageUrl.GetCropUrl(width, height, imageCropperValue, cropAlias, quality, imageCropMode,
                 imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode,
                 upScale);
-            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);            
+            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
         }
 
         #endregion

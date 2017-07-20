@@ -14,7 +14,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
     public class ContentItemBasic : EntityBasic
-    {   
+    {
 
         [DataMember(Name = "updateDate")]
         public DateTime UpdateDate { get; set; }
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "sortOrder")]
         public int SortOrder { get; set; }
-        
+
         protected bool Equals(ContentItemBasic other)
         {
             return Id == other.Id;

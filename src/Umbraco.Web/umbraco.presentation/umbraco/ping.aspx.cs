@@ -13,7 +13,7 @@ namespace umbraco.presentation
 {
 
     [Obsolete("This class will be removed in future versions.")]
-	[EditorBrowsable(EditorBrowsableState.Never)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public partial class ping : System.Web.UI.Page
     {
         #region Web Form Designer generated code

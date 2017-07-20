@@ -3,7 +3,7 @@
 namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
-    /// Allows for specifying an attribute on a property of a custm PreValueEditor to be included in the field list. OTherwise it can be attributed 
+    /// Allows for specifying an attribute on a property of a custm PreValueEditor to be included in the field list. OTherwise it can be attributed
     /// on a custom implemention of a PreValueField to have the properties auto-filled.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class, AllowMultiple = false)]

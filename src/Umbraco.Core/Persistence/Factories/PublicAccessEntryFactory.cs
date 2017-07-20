@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public PublicAccessEntry BuildEntity(AccessDto dto)
         {
-            var entity = new PublicAccessEntry(dto.Id, dto.NodeId, dto.LoginNodeId, dto.NoAccessNodeId, 
+            var entity = new PublicAccessEntry(dto.Id, dto.NodeId, dto.LoginNodeId, dto.NoAccessNodeId,
                 dto.Rules.Select(x => new PublicAccessRule(x.Id, x.AccessId)
                 {
                     RuleValue = x.RuleValue,

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Globalization;
 using System.IO;
@@ -224,25 +224,25 @@ namespace Umbraco.Web
             //TODO: This is real nasty and we should re-write the 'item' and 'ItemRenderer' class but si fine for now
 
             var attributes = new Dictionary<string, string>
-				{
-					{"field", fieldAlias},
-					{"recursive", recursive.ToString().ToLowerInvariant()},
-					{"useifempty", altFieldAlias},
-					{"textifempty", altText},
-					{"stripparagraph", removeParagraphTags.ToString().ToLowerInvariant()},
-					{
-						"case", casing == RenderFieldCaseType.Lower ? "lower"
-						        	: casing == RenderFieldCaseType.Upper ? "upper"
-						        	  	: casing == RenderFieldCaseType.Title ? "title"
-						        	  	  	: string.Empty
-						},
-					{"inserttextbefore", insertBefore},
-					{"inserttextafter", insertAfter},
-					{"convertlinebreaks", convertLineBreaks.ToString().ToLowerInvariant()},
+                {
+                    {"field", fieldAlias},
+                    {"recursive", recursive.ToString().ToLowerInvariant()},
+                    {"useifempty", altFieldAlias},
+                    {"textifempty", altText},
+                    {"stripparagraph", removeParagraphTags.ToString().ToLowerInvariant()},
+                    {
+                        "case", casing == RenderFieldCaseType.Lower ? "lower"
+                                    : casing == RenderFieldCaseType.Upper ? "upper"
+                                          : casing == RenderFieldCaseType.Title ? "title"
+                                                : string.Empty
+                        },
+                    {"inserttextbefore", insertBefore},
+                    {"inserttextafter", insertAfter},
+                    {"convertlinebreaks", convertLineBreaks.ToString().ToLowerInvariant()},
                     {"formatasdate", formatAsDate.ToString().ToLowerInvariant()},
                     {"formatasdatewithtime", formatAsDateWithTime.ToString().ToLowerInvariant()},
                     {"formatasdatewithtimeseparator", formatAsDateWithTimeSeparator}
-				};
+                };
             switch (encoding)
             {
                 case RenderFieldEncodingType.Url:

@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
+﻿namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
 {
     /// <summary>
     /// Represents a database index definition retreived by querying the database

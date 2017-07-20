@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Web;
 using umbraco.cms.businesslogic.packager;
@@ -6,7 +6,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep(InstallationType.NewInstall, 
+    [InstallSetupStep(InstallationType.NewInstall,
         "StarterKitCleanup", 32, "Almost done")]
     internal class StarterKitCleanupStep : InstallSetupStep<object>
     {
@@ -18,7 +18,7 @@ namespace Umbraco.Web.Install.InstallSteps
             var packageFile = (string)previousStep.AdditionalData["packageFile"];
 
             CleanupInstallation(manifestId, packageFile);
-            
+
             return null;
         }
 

@@ -19,7 +19,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="context"></param>
         /// <remarks>
-        /// By using the context to register the routes it means that the area is already applied to them all 
+        /// By using the context to register the routes it means that the area is already applied to them all
         /// and that the namespaces searched for the controllers are ONLY the ones specified.
         /// </remarks>
         public override void RegisterArea(AreaRegistrationContext context)
@@ -28,15 +28,15 @@ namespace Umbraco.Web.Mvc
                 "Umbraco_back_office",
                 GlobalSettings.UmbracoMvcArea + "/{action}/{id}",
                 new {controller = "BackOffice", action = "Default", id = UrlParameter.Optional},
-                //limit the action/id to only allow characters - this is so this route doesn't hog all other 
+                //limit the action/id to only allow characters - this is so this route doesn't hog all other
                 // routes like: /umbraco/channels/word.aspx, etc...
                 new
                     {
-                        action = @"[a-zA-Z]*", 
+                        action = @"[a-zA-Z]*",
                         id = @"[a-zA-Z]*"
                     },
                 new[] {typeof (BackOfficeController).Namespace});
-            
+
             //Create the REST/web/script service routes
             context.MapRoute(
                 "Umbraco_web_services",

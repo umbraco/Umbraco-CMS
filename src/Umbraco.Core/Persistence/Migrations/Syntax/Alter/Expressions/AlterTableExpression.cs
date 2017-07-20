@@ -4,7 +4,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 {
     public class AlterTableExpression : MigrationExpressionBase
     {
-        public AlterTableExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes) 
+        public AlterTableExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
             : base(context, supportedDatabaseTypes)
         { }
 

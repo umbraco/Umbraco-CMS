@@ -29,9 +29,9 @@ namespace Umbraco.Core.Persistence.Repositories
         { }
 
         /// <summary>
-		/// Gets the repository's unit of work.
-		/// </summary>
-		protected internal new IScopeUnitOfWork UnitOfWork => base.UnitOfWork;
+        /// Gets the repository's unit of work.
+        /// </summary>
+        protected internal new IScopeUnitOfWork UnitOfWork => base.UnitOfWork;
 
         /// <summary>
         /// Gets the repository's database.

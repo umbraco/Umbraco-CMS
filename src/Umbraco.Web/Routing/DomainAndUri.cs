@@ -31,7 +31,7 @@ namespace Umbraco.Web.Routing
             }
             catch (UriFormatException)
             {
-                throw new ArgumentException($"Failed to parse invalid domain: node id={domain.ContentId}, hostname=\"{Name.ToCSharpString()}\"." 
+                throw new ArgumentException($"Failed to parse invalid domain: node id={domain.ContentId}, hostname=\"{Name.ToCSharpString()}\"."
                     + " Hostname should be a valid uri.", nameof(domain));
             }
         }

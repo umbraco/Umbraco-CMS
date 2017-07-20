@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Services
+﻿namespace Umbraco.Core.Services
 {
     /// <summary>
     /// A value indicating the result of an operation.

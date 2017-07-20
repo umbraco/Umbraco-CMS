@@ -1,4 +1,4 @@
-using Umbraco.Core.Services;
+﻿using Umbraco.Core.Services;
 using System;
 using System.Web.UI;
 using Umbraco.Core;
@@ -10,25 +10,25 @@ using Umbraco.Web.UI.Pages;
 namespace umbraco.cms.presentation.user
 {
 
-	public partial class PermissionEditor : UmbracoEnsuredPage
+    public partial class PermissionEditor : UmbracoEnsuredPage
     {
-	    public PermissionEditor()
-	    {
+        public PermissionEditor()
+        {
             CurrentApp = Constants.Applications.Users;
 
-	    }
+        }
 
-		protected override void OnInit(EventArgs e)
-		{
-			base.OnInit(e);
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
 
-			if (!IsPostBack)
-			{
-			    JTree.App = Constants.Applications.Content;
-				JTree.ShowContextMenu = false;
-				JTree.IsDialog = true;
-			}
-		}
+            if (!IsPostBack)
+            {
+                JTree.App = Constants.Applications.Content;
+                JTree.ShowContextMenu = false;
+                JTree.IsDialog = true;
+            }
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -49,12 +49,12 @@ namespace umbraco.cms.presentation.user
             pnlUmbraco.Text = Services.TextService.Localize("user/userPermissions");
             pnl1.Text = Services.TextService.Localize("user/permissionSelectPages");
 
-			if (!IsPostBack)
-			{	
-				ClientTools cTools = new ClientTools(this);
-				cTools.SetActiveTreeType(Constants.Trees.UserPermissions)
-					.SyncTree(Request.QueryString["id"], false);
-			}
+            if (!IsPostBack)
+            {
+                ClientTools cTools = new ClientTools(this);
+                cTools.SetActiveTreeType(Constants.Trees.UserPermissions)
+                    .SyncTree(Request.QueryString["id"], false);
+            }
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace umbraco.cms.presentation.user
                 return Services.UserService.GetUserById(Convert.ToInt32(Request.QueryString["id"]));
             }
         }
-      
+
         /// <summary>
         /// Makes sure the user exists with the id specified
         /// </summary>
@@ -84,7 +84,7 @@ namespace umbraco.cms.presentation.user
                 throw new Exception("No user found with id: " + strID);
         }
 
-       
+
         protected override void OnPreRender(EventArgs e) {
             base.OnPreRender(e);
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(SystemDirectories.Umbraco + "/users/PermissionsHandler.asmx"));

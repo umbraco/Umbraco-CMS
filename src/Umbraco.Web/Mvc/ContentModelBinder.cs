@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -14,17 +14,17 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// Maps view models, supporting mapping to and from any IPublishedContent or IContentModel.
     /// </summary>
-	public class ContentModelBinder : DefaultModelBinder, IModelBinderProvider
+    public class ContentModelBinder : DefaultModelBinder, IModelBinderProvider
     {
-		/// <summary>
-		/// Binds the model to a value by using the specified controller context and binding context.
-		/// </summary>
-		/// <returns>
-		/// The bound value.
-		/// </returns>
-		/// <param name="controllerContext">The controller context.</param><param name="bindingContext">The binding context.</param>
-		public override object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
-		{
+        /// <summary>
+        /// Binds the model to a value by using the specified controller context and binding context.
+        /// </summary>
+        /// <returns>
+        /// The bound value.
+        /// </returns>
+        /// <param name="controllerContext">The controller context.</param><param name="bindingContext">The binding context.</param>
+        public override object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
+        {
             object model;
             if (controllerContext.RouteData.DataTokens.TryGetValue(Core.Constants.Web.UmbracoDataToken, out model) == false)
                 return null;
@@ -42,10 +42,10 @@ namespace Umbraco.Web.Mvc
 
             //if for any reason the model is not either IContentModel or IPublishedContent, then we return since those are the only
             // types this binder is dealing with.
-		    if ((model is IContentModel) == false && (model is IPublishedContent) == false) return null;
+            if ((model is IContentModel) == false && (model is IPublishedContent) == false) return null;
 
-		    return BindModel(model, bindingContext.ModelType);
-		}
+            return BindModel(model, bindingContext.ModelType);
+        }
 
         // source is the model that we have
         // modelType is the type of the model that we need to bind to
@@ -115,34 +115,34 @@ namespace Umbraco.Web.Mvc
             return null;
         }
 
-	    private static void ThrowModelBindingException(bool sourceContent, bool modelContent, Type sourceType, Type modelType)
-	    {
-	        var msg = new StringBuilder();
+        private static void ThrowModelBindingException(bool sourceContent, bool modelContent, Type sourceType, Type modelType)
+        {
+            var msg = new StringBuilder();
 
-	        msg.Append("Cannot bind source");
-	        if (sourceContent) msg.Append(" content");
-	        msg.Append(" type ");
-	        msg.Append(sourceType.FullName);
-	        msg.Append(" to model");
-	        if (modelContent) msg.Append(" content");
-	        msg.Append(" type ");
+            msg.Append("Cannot bind source");
+            if (sourceContent) msg.Append(" content");
+            msg.Append(" type ");
+            msg.Append(sourceType.FullName);
+            msg.Append(" to model");
+            if (modelContent) msg.Append(" content");
+            msg.Append(" type ");
             msg.Append(modelType.FullName);
             msg.Append(".");
 
             // compare FullName for the time being because when upgrading ModelsBuilder,
             // Umbraco does not know about the new attribute type - later on, can compare
             // on type directly (ie after v7.4.2).
-	        var sourceAttr = sourceType.Assembly.CustomAttributes.FirstOrDefault(x =>
+            var sourceAttr = sourceType.Assembly.CustomAttributes.FirstOrDefault(x =>
                 x.AttributeType.FullName == "Umbraco.ModelsBuilder.PureLiveAssemblyAttribute");
-	        var modelAttr = modelType.Assembly.CustomAttributes.FirstOrDefault(x =>
+            var modelAttr = modelType.Assembly.CustomAttributes.FirstOrDefault(x =>
                 x.AttributeType.FullName == "Umbraco.ModelsBuilder.PureLiveAssemblyAttribute");
 
             // bah.. names are App_Web_all.generated.cs.8f9494c4.jjuvxz55 so they ARE different, fuck!
             // we cannot compare purely on type.FullName 'cos we might be trying to map Sub to Main = fails!
             if (sourceAttr != null && modelAttr != null
                 && sourceType.Assembly.GetName().Version.Revision != modelType.Assembly.GetName().Version.Revision)
-	        {
-	            msg.Append(" Types come from two PureLive assemblies with different versions,");
+            {
+                msg.Append(" Types come from two PureLive assemblies with different versions,");
                 msg.Append(" this usually indicates that the application is in an unstable state.");
                 msg.Append(" The application is restarting now, reload the page and it should work.");
                 var context = HttpContext.Current;
@@ -152,8 +152,8 @@ namespace Umbraco.Web.Mvc
                     Current.RestartAppPool(new HttpContextWrapper(context));
             }
 
-	        throw new ModelBindingException(msg.ToString());
-	    }
+            throw new ModelBindingException(msg.ToString());
+        }
 
         public IModelBinder GetBinder(Type modelType)
         {

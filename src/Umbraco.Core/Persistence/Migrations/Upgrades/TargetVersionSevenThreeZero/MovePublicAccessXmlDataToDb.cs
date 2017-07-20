@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             }
 
             var xmlFile = IOHelper.MapPath(SystemDirectories.Data + "/access.config");
-            
+
             if (File.Exists(xmlFile) == false) return;
 
             using (var fileStream = File.OpenRead(xmlFile))

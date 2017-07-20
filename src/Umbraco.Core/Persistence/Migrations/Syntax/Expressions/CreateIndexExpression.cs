@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
         {
             Index = new IndexDefinition();
         }
-        
+
         public IndexDefinition Index { get; set; }
 
         public override string ToString()

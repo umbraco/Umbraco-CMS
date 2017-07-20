@@ -7,15 +7,15 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-    public abstract class TabbedContentItem<T, TPersisted> : ContentItemBasic<T, TPersisted> 
-        where T : ContentPropertyBasic 
+    public abstract class TabbedContentItem<T, TPersisted> : ContentItemBasic<T, TPersisted>
+        where T : ContentPropertyBasic
         where TPersisted : IContentBase
     {
         protected TabbedContentItem()
         {
             Tabs = new List<Tab<T>>();
-        }        
-        
+        }
+
         /// <summary>
         /// Defines the tabs containing display properties
         /// </summary>

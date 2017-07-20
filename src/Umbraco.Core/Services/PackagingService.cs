@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -64,7 +64,7 @@ namespace Umbraco.Core.Services
             ILocalizationService localizationService,
             IEntityService entityService,
             IUserService userService,
-            IScopeUnitOfWorkProvider uowProvider, 
+            IScopeUnitOfWorkProvider uowProvider,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
         {
             _logger = logger;
@@ -168,7 +168,7 @@ namespace Umbraco.Core.Services
         {
             var contents = new List<IContent>();
             foreach (var root in roots)
-            {                
+            {
                 var contentTypeAlias = root.Name.LocalName;
 
                 if (_importedContentTypes.ContainsKey(contentTypeAlias) == false)
@@ -425,7 +425,7 @@ namespace Umbraco.Core.Services
             var list = _importedContentTypes.Select(x => x.Value).ToList();
             _contentTypeService.Save(list, userId);
 
-            //Now we can finish the import by updating the 'structure', 
+            //Now we can finish the import by updating the 'structure',
             //which requires the doc types to be saved/available in the db
             if (importStructure)
             {
@@ -459,7 +459,7 @@ namespace Umbraco.Core.Services
             {
                 var foldersAttribute = documentType.Attribute("Folders");
                 var infoElement = documentType.Element("Info");
-                if (foldersAttribute != null && infoElement != null 
+                if (foldersAttribute != null && infoElement != null
                     //don't import any folder if this is a child doc type - the parent doc type will need to
                     //exist which contains it's folders
                     && ((string)infoElement.Element("Master")).IsNullOrWhiteSpace())
@@ -680,7 +680,7 @@ namespace Umbraco.Core.Services
                 //If no DataTypeDefinition with the guid from the xml wasn't found OR the ControlId on the DataTypeDefinition didn't match the DataType Id
                 //We look up a DataTypeDefinition that matches
 
-                
+
                 //get the alias as a string for use below
                 var propertyEditorAlias = property.Element("Type").Value.Trim();
 
@@ -868,7 +868,7 @@ namespace Umbraco.Core.Services
             foreach (var dataTypeElement in dataTypeElements)
             {
                 var dataTypeDefinitionName = dataTypeElement.Attribute("Name").Value;
-                
+
                 var dataTypeDefinitionId = new Guid(dataTypeElement.Attribute("Definition").Value);
                 var databaseTypeAttribute = dataTypeElement.Attribute("DatabaseType");
 
@@ -943,7 +943,7 @@ namespace Umbraco.Core.Services
                         {
                             _logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
                             throw tryCreateFolder.Exception;
-                        }                        
+                        }
                         current = _dataTypeService.GetContainer(tryCreateFolder.Result.Value.Id);
                     }
 
@@ -1489,7 +1489,7 @@ namespace Umbraco.Core.Services
                     throw new ConnectionException("An error occuring downloading the package from " + url, ex);
                 }
 
-                //successfull 
+                //successfull
                 if (bytes.Length > 0)
                 {
                     var packagePath = IOHelper.MapPath(SystemDirectories.Packages);
@@ -1517,7 +1517,7 @@ namespace Umbraco.Core.Services
             var auditRepo = uow.CreateRepository<IAuditRepository>();
             auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
         }
-        
+
         #endregion
 
         #region Templates

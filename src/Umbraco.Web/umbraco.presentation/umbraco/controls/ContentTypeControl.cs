@@ -1,4 +1,4 @@
-//TODO: This needs a full rewrite in angular! kept here for reference for now
+ï»¿//TODO: This needs a full rewrite in angular! kept here for reference for now
 
 //using System;
 //using System.Web.UI.HtmlControls;
@@ -14,7 +14,7 @@
 //    /// <summary>
 //    /// Summary description for ContentTypeControl.
 //    /// </summary>
-//	[Obsolete("No longer used, will be removed in v8")]
+//    [Obsolete("No longer used, will be removed in v8")]
 //    [EditorBrowsable(EditorBrowsableState.Never)]
 //    public class ContentTypeControl : Umbraco.Web._Legacy.Controls.TabView
 //    {
@@ -58,7 +58,7 @@
 //            Save.Click += new System.Web.UI.ImageClickEventHandler(save_click);
 //            Save.ID = "Panel1Save";
 //            Save.ImageUrl = UmbracoPath + "/images/editor/save.gif";
-		
+
 
 //            Panel2 = this.NewTabPage("Faneblade");
 //            Save = Panel2.Menu.NewImageButton();
@@ -72,7 +72,7 @@
 //            Save.ID = "Panel3Save";
 //            Save.Click += new System.Web.UI.ImageClickEventHandler(save_click);
 //            Save.ImageUrl = UmbracoPath + "/images/editor/save.gif";
-			
+
 //            Panel4 = this.NewTabPage("Generiske egenskaber");
 //            Save = Panel4.Menu.NewImageButton();
 //            Save.ID = "Panel4Save";
@@ -99,12 +99,12 @@
 //            br = new HtmlGenericControl();
 //            br.TagName = "br";
 //            Panel4.Controls.Add(br);
-		
+
 //        }
 
-//        protected void tmp_OnSave(object sender, System.EventArgs e) 
+//        protected void tmp_OnSave(object sender, System.EventArgs e)
 //        {
-			
+
 //        }
 
 //        protected override void OnLoad(EventArgs e)
@@ -124,15 +124,15 @@
 //            AllowedContentTypes = new ListBox();
 //            AllowedContentTypes.ID = "AllowedContentTypes";
 //            AllowedContentTypes.SelectionMode = ListSelectionMode.Multiple;
-		
+
 
 //            int[] allowedIds = docType.AllowedChildContentTypeIDs;
 
-//            foreach (cms.businesslogic.ContentType ct in docType.GetAll()) 
+//            foreach (cms.businesslogic.ContentType ct in docType.GetAll())
 //            {
 //                ListItem li = new ListItem(ct.Text,ct.Id.ToString());
 //                AllowedContentTypes.Items.Add(li);
-//                if (!Page.IsPostBack) 
+//                if (!Page.IsPostBack)
 //                {foreach (int i in allowedIds) if (i == ct.Id) li.Selected= true;}
 //            }
 
@@ -141,9 +141,9 @@
 //            Panel3.Controls.Add(pp);
 //        }
 
-		
 
-//        public void save_click(object sender, System.Web.UI.ImageClickEventArgs e) 
+
+//        public void save_click(object sender, System.Web.UI.ImageClickEventArgs e)
 //        {
 //            OnSave(this, new System.EventArgs());
 //            docType.Text = NameTxt.Text;
@@ -152,7 +152,7 @@
 
 
 //            string xtra = "";
-//            if (TabTxt.Text.Trim() != "") 
+//            if (TabTxt.Text.Trim() != "")
 //            {
 //                docType.AddVirtualTab(TabTxt.Text);
 //                xtra = Services.TextService.Localize("speechBubbles/contentTypeTabCreated");
@@ -171,7 +171,7 @@
 
 //        private void SaveAllowedChildTypes() {
 //            ArrayList tmp = new ArrayList();
-//            foreach (ListItem li in AllowedContentTypes.Items) 
+//            foreach (ListItem li in AllowedContentTypes.Items)
 //            {
 //                if (li.Selected)
 //                tmp.Add(int.Parse(li.Value));
@@ -181,27 +181,27 @@
 //            docType.AllowedChildContentTypeIDs = ids;
 //        }
 
-//        private void setupGeneralInfoTab() 
+//        private void setupGeneralInfoTab()
 //        {
 //            Umbraco.Web._Legacy.Controls.Pane pp = new Umbraco.Web._Legacy.Controls.Pane();
-					
+
 //            DirectoryInfo dirInfo = new DirectoryInfo( IOHelper.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
 //            FileInfo[] fileInfo = dirInfo.GetFiles();
-			
-//            for(int i = 0; i < fileInfo.Length;i++) 
+
+//            for(int i = 0; i < fileInfo.Length;i++)
 //            {
 //                ListItem li = new ListItem(fileInfo[i].Name);
 //                if (!this.Page.IsPostBack && li.Value == docType.IconUrl) li.Selected = true;
 //                IconDDL.Items.Add(li);
 //            }
 
-//            if (!this.Page.IsPostBack) 
+//            if (!this.Page.IsPostBack)
 //            {
 //                NameTxt.Text = docType.Text;
 //                AliasTxt.Text = docType.Alias;
 
 //            }
-	
+
 //            pp.addProperty("Navn",NameTxt);
 //            pp.addProperty("Alias",AliasTxt);
 //            pp.addProperty("Ikon",IconDDL);
@@ -217,24 +217,24 @@
 
 
 //        #region "Generic properties"
-//        private void setupGenericPropertyTypesTab() 
+//        private void setupGenericPropertyTypesTab()
 //        {
 //            // Add new generic propertytype
 //            pp = new Umbraco.Web._Legacy.Controls.Pane();
-			
+
 //            AddPropertyTypeCtrl = new NodeTypeAddPropertyTypeControl(docType,this);
-//            pp.addProperty(AddPropertyTypeCtrl); 
-//            Panel4.Controls.Add(pp);	
+//            pp.addProperty(AddPropertyTypeCtrl);
+//            Panel4.Controls.Add(pp);
 
 //            tabDDLs.Add(AddPropertyTypeCtrl.TabDDL);
 //            br = new HtmlGenericControl();
 //            br.TagName = "br";
 //            Panel4.Controls.Add(br);
 
-//            loadGenericPropertyTypesOnPane();			
+//            loadGenericPropertyTypesOnPane();
 //        }
 
-//        private void loadGenericPropertyTypesOnPane() 
+//        private void loadGenericPropertyTypesOnPane()
 //        {
 //            // View/ Edit all propertytypes..
 //            GenericPropertyTypes = new Umbraco.Web._Legacy.Controls.Pane();
@@ -248,7 +248,7 @@
 
 //        #region "Tabs Add Delete Update DDL's"
 
-//        private void setupTabTab() 
+//        private void setupTabTab()
 //        {
 //            pp = new Umbraco.Web._Legacy.Controls.Pane();
 //            pp.addProperty("Ny tab", TabTxt);
@@ -258,14 +258,14 @@
 //            br.TagName = "br";
 //            Panel2.Controls.Add(br);
 
-			
+
 //            LoadExistingTabsOnTabsPane();
-		
-			
+
+
 //        }
 
 
-//        private void LoadExistingTabsOnTabsPane()  
+//        private void LoadExistingTabsOnTabsPane()
 //        {
 //            Umbraco.Web._Legacy.Controls.Pane TabsPane = new Umbraco.Web._Legacy.Controls.Pane();
 //            foreach (cms.businesslogic.ContentType.TabI t in docType.getVirtualTabs.ToList())
@@ -278,30 +278,30 @@
 //            }
 //            Panel2.Controls.Add(TabsPane);
 //        }
-		
-		
-//        private void deleteTab(object sender, System.EventArgs e) 
+
+
+//        private void deleteTab(object sender, System.EventArgs e)
 //        {
 //            Button b = (Button) sender;
 //            docType.DeleteVirtualTab(int.Parse(b.ID.Replace("tab","")));
 
 //            TabsPane.Controls.Clear();
 //            LoadExistingTabsOnTabsPane();
-			
+
 //            populateTabDDLs();
 //            prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.info, Services.TextService.Localize("speechBubbles/contentTypeTabDeleted"), ui.Text("speechBubbles", "contentTypeTabDeletedText", b.ID));
 //        }
 
 
-//        private void populateTabDDLs() 
+//        private void populateTabDDLs()
 //        {
-//            foreach (DropDownList ddl in tabDDLs) 
+//            foreach (DropDownList ddl in tabDDLs)
 //            {
 //                string selVal = "0";
 //                if(ddl.SelectedIndex >= 0) selVal = ddl.SelectedValue;
 
 //                ddl.Items.Clear();
-//                foreach (cms.businesslogic.web.DocumentType.TabI t in docType.getVirtualTabs.ToList()) 
+//                foreach (cms.businesslogic.web.DocumentType.TabI t in docType.getVirtualTabs.ToList())
 //                {
 //                    ListItem li = new ListItem();
 //                    li.Text  = t.Caption;
@@ -309,7 +309,7 @@
 //                    ddl.Items.Add(li);
 //                }
 //                ddl.Items.Add(new ListItem("Egenskaber","0"));
-//                try 
+//                try
 //                {
 //                    ddl.SelectedValue = selVal;
 //                }
@@ -322,9 +322,9 @@
 
 
 //        #endregion
-		
+
 //        #region "Custom controls"
-//        private class NodeTypeAddPropertyTypeControl : System.Web.UI.HtmlControls.HtmlTable 
+//        private class NodeTypeAddPropertyTypeControl : System.Web.UI.HtmlControls.HtmlTable
 //        {
 //            private TextBox NameTxt = new TextBox();
 //            private TextBox AliasTxt = new TextBox();
@@ -332,7 +332,7 @@
 //            public DropDownList TabDDL = new DropDownList();
 //            private cms.businesslogic.ContentType _dt;
 //            private ContentTypeControl ctctrl;
-//            public NodeTypeAddPropertyTypeControl(cms.businesslogic.ContentType dt, ContentTypeControl parent) 
+//            public NodeTypeAddPropertyTypeControl(cms.businesslogic.ContentType dt, ContentTypeControl parent)
 //            {
 //                ctctrl = parent;
 //                this.Attributes.Add("width","100%");
@@ -377,7 +377,7 @@
 
 //                td = new HtmlTableCell();
 //                Button btn = new Button();
-					
+
 //                td.Controls.Add(btn);
 //                btn.Text = "Opret";
 //                tr.Cells.Add(td);
@@ -387,7 +387,7 @@
 //                btn.Click += new System.EventHandler(this.AddPropertyType);
 
 
-//                foreach (cms.businesslogic.ContentType.TabI t in dt.getVirtualTabs.ToList()) 
+//                foreach (cms.businesslogic.ContentType.TabI t in dt.getVirtualTabs.ToList())
 //                {
 //                    ListItem li = new ListItem();
 //                    li.Value = t.Id.ToString();
@@ -398,8 +398,8 @@
 //                lie.Text = "Egenskaber";
 //                lie.Value = "0";
 //                TabDDL.Items.Add(lie);
-				
-//                foreach(cms.businesslogic.datatype.DataTypeDefinition DataType in cms.businesslogic.datatype.DataTypeDefinition.GetAll()) 
+
+//                foreach(cms.businesslogic.datatype.DataTypeDefinition DataType in cms.businesslogic.datatype.DataTypeDefinition.GetAll())
 //                {
 //                    ListItem li = new ListItem();
 //                    li.Value = DataType.Id.ToString();
@@ -410,16 +410,16 @@
 //            }
 
 
-//            private void AddPropertyType(object sender, System.EventArgs e) 
+//            private void AddPropertyType(object sender, System.EventArgs e)
 //            {
-				
-//                if (NameTxt.Text.Trim() != "" && AliasTxt.Text.Trim() != "") 
+
+//                if (NameTxt.Text.Trim() != "" && AliasTxt.Text.Trim() != "")
 //                {
 //                    string[] info = {NameTxt.Text, DataTypeDDL.SelectedItem.Value};
 //                    ctctrl.prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.info, Services.TextService.Localize("speechBubbles/contentTypePropertyTypeCreated"), ui.Text("speechBubbles", "contentTypePropertyTypeCreatedText", info));
 //                    _dt.AddPropertyType(cms.businesslogic.datatype.DataTypeDefinition.GetDataTypeDefinition(int.Parse(DataTypeDDL.SelectedValue)),AliasTxt.Text,NameTxt.Text);
-					
-//                    if (int.Parse(TabDDL.SelectedValue) != 0) 
+
+//                    if (int.Parse(TabDDL.SelectedValue) != 0)
 //                    {
 //                        _dt.SetTabOnPropertyType(_dt.getPropertyType(AliasTxt.Text),int.Parse(TabDDL.SelectedValue));
 //                    }
@@ -429,10 +429,10 @@
 //                    AliasTxt.Text = "";
 //                    // fire event to tell that a new propertytype is created!!
 //                    ctctrl.OnPropertyTypeCreate(this, new System.EventArgs());
-//                } 
+//                }
 //                else
 //                {
-					
+
 //                    ctctrl.prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.error, Services.TextService.Localize("error"), Services.TextService.Localize("errors/contentTypeAliasAndNameNotNull"));
 //                }
 //            }
@@ -443,7 +443,7 @@
 //        {
 //            private System.Collections.ArrayList PropertyTypes = new System.Collections.ArrayList();
 //            private ContentTypeControl prnt;
-//            public NodeTypeEditorControl(ContentTypeControl parent) 
+//            public NodeTypeEditorControl(ContentTypeControl parent)
 //            {
 //                prnt = parent;
 //                this.Attributes.Add("width","100%");
@@ -468,58 +468,58 @@
 //                tr.Cells.Add(td);
 
 //                this.Rows.Add(tr);
-               
-//                cms.businesslogic.ContentType.TabI[] tbs = prnt.docType.getVirtualTabs;
-	
 
-//                foreach (cms.businesslogic.propertytype.PropertyType pt in prnt.docType.PropertyTypes) 
+//                cms.businesslogic.ContentType.TabI[] tbs = prnt.docType.getVirtualTabs;
+
+
+//                foreach (cms.businesslogic.propertytype.PropertyType pt in prnt.docType.PropertyTypes)
 //                {
 //                    editor e = new editor(pt,prnt);
 //                    PropertyTypes.Add(e);
 //                    this.Controls.Add(e);
 //                }
-				
+
 //            }
 
-//            public string Save() 
+//            public string Save()
 //            {
-				
-//                foreach (editor e in PropertyTypes) 
+
+//                foreach (editor e in PropertyTypes)
 //                {
 //                    e.save();
 //                }
-//                return "2 egenskabstyper ændret";
+//                return "2 egenskabstyper ï¿½ndret";
 //            }
 
-			
 
-//            private class editor : System.Web.UI.HtmlControls.HtmlTableRow 
+
+//            private class editor : System.Web.UI.HtmlControls.HtmlTableRow
 //            {
 //                private DropDownList TabDDL = new DropDownList();
 //                private cms.businesslogic.propertytype.PropertyType pt;
 //                ContentTypeControl ent;
-//                public editor(cms.businesslogic.propertytype.PropertyType pt,ContentTypeControl parent) 
+//                public editor(cms.businesslogic.propertytype.PropertyType pt,ContentTypeControl parent)
 //                {
-//                    this.pt = pt;	
+//                    this.pt = pt;
 //                    ent = parent;
 //                }
 
 //                protected override void OnLoad(EventArgs e)
 //                {
 //                    base.OnLoad (e);
-					
-					
+
+
 //                    ent.tabDDLs.Add(TabDDL);
 
-//                    foreach (cms.businesslogic.ContentType.TabI t in ent.docType.getVirtualTabs.ToList()) 
+//                    foreach (cms.businesslogic.ContentType.TabI t in ent.docType.getVirtualTabs.ToList())
 //                        TabDDL.Items.Add(new ListItem(t.Caption,t.Id.ToString()));
 //                    TabDDL.Items.Add(new ListItem("Egenskaber","0"));
-//                    if (!Parent.Page.IsPostBack) 
+//                    if (!Parent.Page.IsPostBack)
 //                    {
 //                        int tabID  = cms.businesslogic.ContentType.getTabIdFromPropertyType(pt);
 //                        TabDDL.SelectedValue = tabID.ToString();
 //                    }
-					
+
 //                    HtmlTableCell td = new HtmlTableCell();
 
 //                    td.InnerText = pt.Alias;
@@ -542,17 +542,17 @@
 //                    btn.Text = "Slet";
 //                    btn.ID = "propertytype" + pt.Id;
 //                    btn.Click += new EventHandler(deletepropertytype_click);
-					
+
 //                    td.Controls.Add(btn);
 //                    this.Cells.Add(td);
 //                }
 
-//                public void deletepropertytype_click(object sender, System.EventArgs e) 
+//                public void deletepropertytype_click(object sender, System.EventArgs e)
 //                {
 //                    Button s = (Button) sender;
 //                    int propertytypeId = int.Parse(s.ID.Replace("propertytype",""));
 //                    cms.businesslogic.propertytype.PropertyType.GetPropertyType(propertytypeId).delete();
-				
+
 //                    ent.GenericPropertyTypes.Controls.Clear();
 //                    ent.loadGenericPropertyTypesOnPane();
 
@@ -561,12 +561,12 @@
 //                    ent.OnPropertyTypeDelete(this, new System.EventArgs());
 //                }
 
-//                public void save() 
+//                public void save()
 //                {
 //                    if (int.Parse(TabDDL.SelectedValue) > 0)
 //                    {
 //                        ent.docType.SetTabOnPropertyType(pt,int.Parse(TabDDL.SelectedValue));
-//                    } 
+//                    }
 //                    else
 //                    {
 //                        ent.docType.removePropertyTypeFromTab(pt);

@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     public class Tag : Entity, ITag
     {
         public Tag()
-        {            
+        {
         }
 
         public Tag(int id, string text, string @group)
@@ -24,7 +24,7 @@ namespace Umbraco.Core.Models
         public Tag(int id, string text, string @group, int nodeCount)
             : this(id, text, @group)
         {
-            NodeCount = nodeCount;            
+            NodeCount = nodeCount;
         }
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();

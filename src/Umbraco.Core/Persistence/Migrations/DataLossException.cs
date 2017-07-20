@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace Umbraco.Core.Persistence.Migrations
 {
@@ -10,13 +10,13 @@ namespace Umbraco.Core.Persistence.Migrations
         public DataLossException(string msg)
             : base(msg)
         {
-            
+
         }
 
         public DataLossException(string msg, Exception inner)
             : base(msg, inner)
         {
-            
+
         }
     }
 }

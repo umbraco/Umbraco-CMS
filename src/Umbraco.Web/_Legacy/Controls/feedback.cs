@@ -5,9 +5,9 @@ using ClientDependency.Core;
 
 namespace Umbraco.Web._Legacy.Controls
 {
-    
+
     [ClientDependency(ClientDependencyType.Css, "ui/default.css", "UmbracoClient")]
-    public class Feedback : System.Web.UI.WebControls.Panel 
+    public class Feedback : System.Web.UI.WebControls.Panel
     {
 
         public Feedback() {
@@ -25,7 +25,7 @@ namespace Umbraco.Web._Legacy.Controls
         private string _text = string.Empty;
         public string Text {
             get {
-              
+
                 return _text;
 
             }
@@ -37,7 +37,7 @@ namespace Umbraco.Web._Legacy.Controls
             error,
             success
         }
-       
+
         protected override void Render(System.Web.UI.HtmlTextWriter writer) {
             if (_text != string.Empty) {
                 base.CreateChildControls();
@@ -50,7 +50,7 @@ namespace Umbraco.Web._Legacy.Controls
                 writer.WriteLine("<div id=\"" + this.ClientID + "\" style=\"" + styleString + "\" class=\"alert alert-" + type.ToString() + "\"><p>");
                 writer.WriteLine(_text);
                 writer.WriteLine("</p></div>");
-            }  
+            }
         }
     }
 }

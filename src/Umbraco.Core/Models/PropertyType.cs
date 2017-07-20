@@ -183,7 +183,7 @@ namespace Umbraco.Core.Models
                 //don't allow setting this if an explicit declaration has been made in the ctor
                 if (_isExplicitDbType) return;
 
-                SetPropertyValueAndDetectChanges(value, ref _dataTypeDatabaseType, Ps.Value.DataTypeDatabaseTypeSelector);                
+                SetPropertyValueAndDetectChanges(value, ref _dataTypeDatabaseType, Ps.Value.DataTypeDatabaseTypeSelector);
             }
         }
 

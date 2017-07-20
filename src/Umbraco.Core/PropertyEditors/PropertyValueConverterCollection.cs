@@ -7,7 +7,7 @@ namespace Umbraco.Core.PropertyEditors
 {
     public class PropertyValueConverterCollection : BuilderCollectionBase<IPropertyValueConverter>
     {
-        public PropertyValueConverterCollection(IEnumerable<IPropertyValueConverter> items) 
+        public PropertyValueConverterCollection(IEnumerable<IPropertyValueConverter> items)
             : base(items)
         { }
 

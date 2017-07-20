@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core.Models.Identity;
@@ -11,7 +11,7 @@ namespace Umbraco.Core.Security
         /// Gets the back office sign in manager out of OWIN
         /// </summary>
         /// <param name="owinContext"></param>
-        /// <returns></returns>        
+        /// <returns></returns>
         public static BackOfficeSignInManager GetBackOfficeSignInManager(this IOwinContext owinContext)
         {
             var mgr = owinContext.Get<BackOfficeSignInManager>();
@@ -28,9 +28,9 @@ namespace Umbraco.Core.Security
         /// <param name="owinContext"></param>
         /// <returns></returns>
         /// <remarks>
-        /// This is required because to extract the user manager we need to user a custom service since owin only deals in generics and 
+        /// This is required because to extract the user manager we need to user a custom service since owin only deals in generics and
         /// developers could register their own user manager types
-        /// </remarks> 
+        /// </remarks>
         public static BackOfficeUserManager<BackOfficeIdentityUser> GetBackOfficeUserManager(this IOwinContext owinContext)
         {
             var marker = owinContext.Get<IBackOfficeUserManagerMarker>(BackOfficeUserManager.OwinMarkerKey);

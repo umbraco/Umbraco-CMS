@@ -21,7 +21,7 @@ namespace Umbraco.Core.Logging
         /// <returns>A step.</returns>
         /// <remarks>The returned <see cref="IDisposable"/> is meant to be used within a <c>using (...) {{ ... }}</c> block.</remarks>
         IDisposable Step(string name);
-   
+
         /// <summary>
         /// Starts the profiler.
         /// </summary>

@@ -170,15 +170,15 @@ namespace Umbraco.Core.Services
                     {
                         var content = entitiesL[j];
                         var path = paths[j];
-                        
+
                         // test if the notification applies to the path ie to this entity
                         if (path.Contains(notifications[i].EntityId) == false) continue; // next entity
-                        
+
                         if (prevVersionDictionary.ContainsKey(content.Id) == false)
                         {
                             prevVersionDictionary[content.Id] = GetPreviousVersion(content.Id);
                         }
-                        
+
                         // queue notification
                         var req = CreateNotificationRequest(operatingUser, user, content, prevVersionDictionary[content.Id], actionName, http, createSubject, createBody);
                         Enqueue(req);
@@ -190,7 +190,7 @@ namespace Umbraco.Core.Services
                     {
                         i++;
                     } while (i < notifications.Count && notifications[i].UserId == user.Id);
-                    
+
                     if (i >= notifications.Count) break; // break if no more notifications
                 }
 
@@ -356,7 +356,7 @@ namespace Umbraco.Core.Services
         /// <param name="http"></param>
         /// <param name="createSubject">Callback to create the mail subject</param>
         /// <param name="createBody">Callback to create the mail body</param>
-        private NotificationRequest CreateNotificationRequest(IUser performingUser, IUser mailingUser, IContentBase content, IContentBase oldDoc,            
+        private NotificationRequest CreateNotificationRequest(IUser performingUser, IUser mailingUser, IContentBase content, IContentBase oldDoc,
             string actionName, HttpContextBase http,
             Func<IUser, string[], string> createSubject,
             Func<IUser, string[], string> createBody)
@@ -366,8 +366,8 @@ namespace Umbraco.Core.Services
             if (content == null) throw new ArgumentNullException("content");
             if (http == null) throw new ArgumentNullException("http");
             if (createSubject == null) throw new ArgumentNullException("createSubject");
-            if (createBody == null) throw new ArgumentNullException("createBody");            
-            
+            if (createBody == null) throw new ArgumentNullException("createBody");
+
             // build summary
             var summary = new StringBuilder();
             var props = content.Properties.ToArray();

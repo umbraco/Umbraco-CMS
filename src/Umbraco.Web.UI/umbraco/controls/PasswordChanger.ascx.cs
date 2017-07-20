@@ -21,8 +21,8 @@ namespace Umbraco.Web.UI.Umbraco.Controls
             //reset the flag always
             IsChangingPasswordField.Value = "false";
             this.DataBind();
-        } 
+        }
 
-       
+
     }
 }

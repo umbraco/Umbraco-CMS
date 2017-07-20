@@ -5,7 +5,7 @@ namespace Umbraco.Web.Routing
 {
     public class UrlProviderCollectionBuilder : OrderedCollectionBuilderBase<UrlProviderCollectionBuilder, UrlProviderCollection, IUrlProvider>
     {
-        public UrlProviderCollectionBuilder(IServiceContainer container) 
+        public UrlProviderCollectionBuilder(IServiceContainer container)
             : base(container)
         { }
 

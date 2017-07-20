@@ -24,25 +24,25 @@ namespace Umbraco.Tests.Routing
 <!ATTLIST Doc id ID #REQUIRED>
 ]>
 <root id=""-1"">
-	<Doc id=""1000"" parentID=""-1"" level=""1"" path=""-1,1000"" nodeName=""A"" urlName=""a"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" writerName=""admin"" creatorName=""admin"" isDoc="""">
-		<Doc id=""1001"" parentID=""1000"" level=""2"" path=""-1,1000,1001"" nodeName=""B"" urlName=""b"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" writerName=""admin"" creatorName=""admin"" isDoc="""">
-		    <Doc id=""1002"" parentID=""1001"" level=""3"" path=""-1,1000,1001,1002"" nodeName=""C"" urlName=""c"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" writerName=""admin"" creatorName=""admin"" isDoc="""">
-		        <Doc id=""1003"" parentID=""1002"" level=""4"" path=""-1,1000,1001,1002,1003"" nodeName=""D"" urlName=""d"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" writerName=""admin"" creatorName=""admin"" isDoc="""">
+    <Doc id=""1000"" parentID=""-1"" level=""1"" path=""-1,1000"" nodeName=""A"" urlName=""a"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" writerName=""admin"" creatorName=""admin"" isDoc="""">
+        <Doc id=""1001"" parentID=""1000"" level=""2"" path=""-1,1000,1001"" nodeName=""B"" urlName=""b"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" writerName=""admin"" creatorName=""admin"" isDoc="""">
+            <Doc id=""1002"" parentID=""1001"" level=""3"" path=""-1,1000,1001,1002"" nodeName=""C"" urlName=""c"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" writerName=""admin"" creatorName=""admin"" isDoc="""">
+                <Doc id=""1003"" parentID=""1002"" level=""4"" path=""-1,1000,1001,1002,1003"" nodeName=""D"" urlName=""d"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" writerName=""admin"" creatorName=""admin"" isDoc="""">
                 </Doc>
             </Doc>
         </Doc>
     </Doc>
-	<Doc id=""2000"" parentID=""-1"" level=""1"" path=""-1,2000"" nodeName=""X"" urlName=""x"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" writerName=""admin"" creatorName=""admin"" isDoc="""">
-	    <Doc id=""2001"" parentID=""2000"" level=""2"" path=""-1,2000,2001"" nodeName=""Y"" urlName=""y"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" writerName=""admin"" creatorName=""admin"" isDoc="""">
-	        <Doc id=""2002"" parentID=""2001"" level=""3"" path=""-1,2000,2001,2002"" nodeName=""Z"" urlName=""z"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" writerName=""admin"" creatorName=""admin"" isDoc="""">
+    <Doc id=""2000"" parentID=""-1"" level=""1"" path=""-1,2000"" nodeName=""X"" urlName=""x"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" writerName=""admin"" creatorName=""admin"" isDoc="""">
+        <Doc id=""2001"" parentID=""2000"" level=""2"" path=""-1,2000,2001"" nodeName=""Y"" urlName=""y"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" writerName=""admin"" creatorName=""admin"" isDoc="""">
+            <Doc id=""2002"" parentID=""2001"" level=""3"" path=""-1,2000,2001,2002"" nodeName=""Z"" urlName=""z"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" writerName=""admin"" creatorName=""admin"" isDoc="""">
             </Doc>
         </Doc>
-	    <Doc id=""2003"" parentID=""2000"" level=""2"" path=""-1,2000,2003"" nodeName=""A"" urlName=""a"" sortOrder=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" writerName=""admin"" creatorName=""admin"" isDoc="""">
+        <Doc id=""2003"" parentID=""2000"" level=""2"" path=""-1,2000,2003"" nodeName=""A"" urlName=""a"" sortOrder=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" writerName=""admin"" creatorName=""admin"" isDoc="""">
         </Doc>
-	    <Doc id=""2004"" parentID=""2000"" level=""2"" path=""-1,2000,2004"" nodeName=""B"" urlName=""b"" sortOrder=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" writerName=""admin"" creatorName=""admin"" isDoc="""">
-	        <Doc id=""2005"" parentID=""2004"" level=""3"" path=""-1,2000,2004,2005"" nodeName=""C"" urlName=""c"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" writerName=""admin"" creatorName=""admin"" isDoc="""">
+        <Doc id=""2004"" parentID=""2000"" level=""2"" path=""-1,2000,2004"" nodeName=""B"" urlName=""b"" sortOrder=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" writerName=""admin"" creatorName=""admin"" isDoc="""">
+            <Doc id=""2005"" parentID=""2004"" level=""3"" path=""-1,2000,2004,2005"" nodeName=""C"" urlName=""c"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" writerName=""admin"" creatorName=""admin"" isDoc="""">
             </Doc>
-	        <Doc id=""2006"" parentID=""2004"" level=""3"" path=""-1,2000,2004,2006"" nodeName=""E"" urlName=""e"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" writerName=""admin"" creatorName=""admin"" isDoc="""">
+            <Doc id=""2006"" parentID=""2004"" level=""3"" path=""-1,2000,2004,2006"" nodeName=""E"" urlName=""e"" sortOrder=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" writerName=""admin"" creatorName=""admin"" isDoc="""">
             </Doc>
         </Doc>
     </Doc>
@@ -64,72 +64,72 @@ namespace Umbraco.Tests.Routing
 
 GetByRoute(route, hide = null):
 
-	route is "[id]/[path]"
+    route is "[id]/[path]"
 
-	hide = hide ?? global.hide
+    hide = hide ?? global.hide
 
-	root = id ? node(id) : document
+    root = id ? node(id) : document
 
-	content = cached(route) ?? DetermineIdByRoute(route, hide)
+    content = cached(route) ?? DetermineIdByRoute(route, hide)
 
-	# route is "1234/path/to/content", finds "content"
-	# but if there is domain 5678 on "to", the *true* route of "content" is "5678/content"
-	# so although the route does match, we don't cache it
-	# there are not other reason not to cache it
+    # route is "1234/path/to/content", finds "content"
+    # but if there is domain 5678 on "to", the *true* route of "content" is "5678/content"
+    # so although the route does match, we don't cache it
+    # there are not other reason not to cache it
 
-	if content and no domain between root and content:
-		cache route (as trusted)
+    if content and no domain between root and content:
+        cache route (as trusted)
 
-	return content
+    return content
 
 
 DetermineIdByRoute(route, hide):
 
-	route is "[id]/[path]"
+    route is "[id]/[path]"
 
-	try return NavigateRoute(id ?? 0, path, hide:hide)
-	return null
+    try return NavigateRoute(id ?? 0, path, hide:hide)
+    return null
 
 
 NavigateRoute(id, path, hide):
 
-	if path:
-		if id:
-			start = node(id)
-		else:
-			start = document
+    if path:
+        if id:
+            start = node(id)
+        else:
+            start = document
 
-		# 'navigate ... from ...' uses lowest sortOrder in case of collision
+        # 'navigate ... from ...' uses lowest sortOrder in case of collision
 
-		if hide and ![id]:
-			# if hiding, then for "/foo" we want to look for "/[any]/foo"
-			for each child of start:
-				try return navigate path from child
+        if hide and ![id]:
+            # if hiding, then for "/foo" we want to look for "/[any]/foo"
+            for each child of start:
+                try return navigate path from child
 
-			# but if it fails, we also want to try "/foo"
-			# fail now if more than one part eg "/foo/bar"
-			if path is "/[any]/...":
-				fail
+            # but if it fails, we also want to try "/foo"
+            # fail now if more than one part eg "/foo/bar"
+            if path is "/[any]/...":
+                fail
 
-		try return navigate path from start
+        try return navigate path from start
 
-	else:
-		if id:
-			return node(id)
-		else:
-			return root node with lowest sortOrder
+    else:
+        if id:
+            return node(id)
+        else:
+            return root node with lowest sortOrder
 
 
 GetRouteById(id):
 
 
     route = cached(id)
-	if route:
-		return route
+    if route:
+        return route
 
-	# never cache the route, it may be colliding
+    # never cache the route, it may be colliding
 
-	route = DetermineRouteById(id)
+    route = DetermineRouteById(id)
     if route:
         cache route (as not trusted)
 
@@ -144,20 +144,20 @@ DetermineRouteById(id):
 
     walk up from node to domain or root, assemble parts = url segments
 
-	if !domain and global.hide:
-		if id.parent:
-			# got /top/[path]content, can remove /top
-			remove top part
-		else:
-			# got /content, should remove only if it is the
-			# node with lowest sort order
-			root = root node with lowest sortOrder
-			if root == node:
-				remove top part
+    if !domain and global.hide:
+        if id.parent:
+            # got /top/[path]content, can remove /top
+            remove top part
+        else:
+            # got /content, should remove only if it is the
+            # node with lowest sort order
+            root = root node with lowest sortOrder
+            if root == node:
+                remove top part
 
     compose path from parts
     route = assemble "[domain.id]/[path]"
-	return route
+    return route
 
          */
 

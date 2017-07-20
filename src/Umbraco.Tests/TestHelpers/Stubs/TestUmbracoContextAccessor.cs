@@ -1,4 +1,4 @@
-using Umbraco.Web;
+﻿using Umbraco.Web;
 
 namespace Umbraco.Tests.TestHelpers.Stubs
 {

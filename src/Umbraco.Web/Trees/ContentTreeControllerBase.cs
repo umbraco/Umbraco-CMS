@@ -215,7 +215,7 @@ namespace Umbraco.Web.Trees
         {
             IUmbracoEntity current = GetEntityFromId(id);
 
-            //before we get the children we need to see if this is a container node            
+            //before we get the children we need to see if this is a container node
 
             //test if the parent is a listview / container
             if (current != null && current.IsContainer())

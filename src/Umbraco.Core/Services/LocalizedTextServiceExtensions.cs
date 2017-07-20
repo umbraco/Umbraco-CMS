@@ -98,7 +98,7 @@ namespace Umbraco.Core.Services
             return cultureDictionary[text].IfNullOrWhiteSpace(text);
         }
 
-        private static ICultureDictionary CultureDictionary 
+        private static ICultureDictionary CultureDictionary
             => _cultureDictionary ?? (_cultureDictionary = Current.CultureDictionaryFactory.CreateDictionary());
     }
 }

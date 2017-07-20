@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;

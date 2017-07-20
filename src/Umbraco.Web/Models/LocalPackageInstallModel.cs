@@ -15,9 +15,9 @@ namespace Umbraco.Web.Models
             UploadedFiles = new List<ContentItemFile>();
             Notifications = new List<Notification>();
         }
-        
+
         public List<ContentItemFile> UploadedFiles { get; }
-        
+
         [DataMember(Name = "notifications")]
         public List<Notification> Notifications { get; }
 

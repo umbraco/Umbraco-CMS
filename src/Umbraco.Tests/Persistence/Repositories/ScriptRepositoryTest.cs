@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             _fileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
             using (var stream = CreateStream("Umbraco.Sys.registerNamespace(\"Umbraco.Utils\");"))
             {
-                _fileSystem.AddFile("test-script.js", stream);    
+                _fileSystem.AddFile("test-script.js", stream);
             }
         }
 

@@ -24,8 +24,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
         {
-            return IsRangeDataType(propertyType.DataTypeId) 
-                ? typeof(Range<decimal>) 
+            return IsRangeDataType(propertyType.DataTypeId)
+                ? typeof(Range<decimal>)
                 : typeof(decimal);
         }
 

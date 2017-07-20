@@ -86,7 +86,7 @@ namespace umbraco.dialogs
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
-            
+
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices) + "/legacyAjaxCalls.asmx"));
         }
 

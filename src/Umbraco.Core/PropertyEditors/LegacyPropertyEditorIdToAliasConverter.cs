@@ -27,7 +27,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// The map consists of a key which is always the GUID (lowercase, no hyphens + alias (trimmed))
         /// </summary>
-        private static ConcurrentDictionary<string, Tuple<Guid, string>> _map = new ConcurrentDictionary<string, Tuple<Guid, string>>(); 
+        private static ConcurrentDictionary<string, Tuple<Guid, string>> _map = new ConcurrentDictionary<string, Tuple<Guid, string>>();
 
         /// <summary>
         /// Creates a map for the specified legacy id and property editor alias
@@ -89,7 +89,7 @@ namespace Umbraco.Core.PropertyEditors
             }
             return found.Value.Item1;
         }
-        
+
         internal static int Count()
         {
             return _map.Count;
@@ -109,12 +109,12 @@ namespace Umbraco.Core.PropertyEditors
             CreateMap(Guid.Parse(Constants.PropertyEditors.ColorPicker), Constants.PropertyEditors.ColorPickerAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.ContentPicker), Constants.PropertyEditors.ContentPickerAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.Date), Constants.PropertyEditors.DateAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.DateTime), Constants.PropertyEditors.DateTimeAlias);            
+            CreateMap(Guid.Parse(Constants.PropertyEditors.DateTime), Constants.PropertyEditors.DateTimeAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.DropDownList), Constants.PropertyEditors.DropDownListAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.DropDownListMultiple), Constants.PropertyEditors.DropDownListMultipleAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.DropdownlistMultiplePublishKeys), Constants.PropertyEditors.DropdownlistMultiplePublishKeysAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.DropdownlistPublishingKeys), Constants.PropertyEditors.DropdownlistPublishingKeysAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.FolderBrowser), Constants.PropertyEditors.FolderBrowserAlias);            
+            CreateMap(Guid.Parse(Constants.PropertyEditors.FolderBrowser), Constants.PropertyEditors.FolderBrowserAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.Integer), Constants.PropertyEditors.IntegerAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.ListView), Constants.PropertyEditors.ListViewAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.MacroContainer), Constants.PropertyEditors.MacroContainerAlias);
@@ -122,7 +122,7 @@ namespace Umbraco.Core.PropertyEditors
             CreateMap(Guid.Parse(Constants.PropertyEditors.MemberPicker), Constants.PropertyEditors.MemberPickerAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.MultiNodeTreePicker), Constants.PropertyEditors.MultiNodeTreePickerAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.MultipleTextstring), Constants.PropertyEditors.MultipleTextstringAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.NoEdit), Constants.PropertyEditors.NoEditAlias);            
+            CreateMap(Guid.Parse(Constants.PropertyEditors.NoEdit), Constants.PropertyEditors.NoEditAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.RadioButtonList), Constants.PropertyEditors.RadioButtonListAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.RelatedLinks), Constants.PropertyEditors.RelatedLinksAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.Slider), Constants.PropertyEditors.SliderAlias);
@@ -130,8 +130,8 @@ namespace Umbraco.Core.PropertyEditors
             CreateMap(Guid.Parse(Constants.PropertyEditors.Textbox), Constants.PropertyEditors.TextboxAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.TextboxMultiple), Constants.PropertyEditors.TextboxMultipleAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.TinyMCEv3), Constants.PropertyEditors.TinyMCEAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.TrueFalse), Constants.PropertyEditors.TrueFalseAlias);            
-            CreateMap(Guid.Parse(Constants.PropertyEditors.UserPicker), Constants.PropertyEditors.UserPickerAlias);            
+            CreateMap(Guid.Parse(Constants.PropertyEditors.TrueFalse), Constants.PropertyEditors.TrueFalseAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.UserPicker), Constants.PropertyEditors.UserPickerAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.UploadField), Constants.PropertyEditors.UploadFieldAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.XPathCheckBoxList), Constants.PropertyEditors.XPathCheckBoxListAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.XPathDropDownList), Constants.PropertyEditors.XPathDropDownListAlias);
@@ -141,13 +141,13 @@ namespace Umbraco.Core.PropertyEditors
             //TODO: Map this somewhere!
             CreateMap(Guid.Parse(Constants.PropertyEditors.PickerRelations), Constants.PropertyEditors.PickerRelationsAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.UltimatePicker), Constants.PropertyEditors.ContentPickerAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.UltraSimpleEditor), Constants.PropertyEditors.MarkdownEditorAlias);            
+            CreateMap(Guid.Parse(Constants.PropertyEditors.UltraSimpleEditor), Constants.PropertyEditors.MarkdownEditorAlias);
 
             //Not being converted - convert to label
             CreateMap(Guid.Parse(Constants.PropertyEditors.DictionaryPicker), Constants.PropertyEditors.NoEditAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.UmbracoUserControlWrapper), Constants.PropertyEditors.NoEditAlias);
-            
-            
+
+
         }
 
     }

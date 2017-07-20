@@ -49,10 +49,10 @@ namespace umbraco.presentation.developer.packages
                 ButtonLoadPackage.Attributes.Add("onClick", "jQuery(this).hide(); jQuery('#loadingbar').show();; return true;");
             }
 
-            //if we are actually in the middle of installing something... meaning we keep redirecting back to this page with 
-            // custom query strings 
+            //if we are actually in the middle of installing something... meaning we keep redirecting back to this page with
+            // custom query strings
             // TODO: SD: This process needs to be fixed/changed/etc... to use the InstallPackageController
-            //	http://issues.umbraco.org/issue/U4-1047
+            //    http://issues.umbraco.org/issue/U4-1047
             if (!string.IsNullOrEmpty(Request.GetItemAsString("installing")))
             {
                 HideAllPanes();
@@ -344,13 +344,13 @@ namespace umbraco.presentation.developer.packages
         /// <param name="packageId"></param>
         /// <param name="dir"></param>
         private void PerformPostInstallCleanup(int packageId, string dir)
-        {   
+        {
             _installer.InstallCleanUp(packageId, dir);
 
             // Update ClientDependency version
             var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration(Current.Logger);
             var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
-            
+
             //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.
             ClientTools.ClearClientTreeCache().RefreshTree("packager");
             TreeDefinitionCollection.Instance.ReRegisterTrees();
@@ -369,9 +369,9 @@ namespace umbraco.presentation.developer.packages
             //and then copy over the files. This will take some time if it contains .dlls that will reboot the system..
             _installer.InstallFiles(pId, tempFile.Value);
 
-            //TODO: This is a total hack, we need to refactor the installer to be just like the package installer during the 
+            //TODO: This is a total hack, we need to refactor the installer to be just like the package installer during the
             // install process and use AJAX to ensure that app pool restarts and restarts PROPERLY before installing the business
-            // logic. Until then, we are going to put a thread sleep here for 2 seconds in hopes that we always fluke out and the app 
+            // logic. Until then, we are going to put a thread sleep here for 2 seconds in hopes that we always fluke out and the app
             // pool will be restarted after redirect.
             Thread.Sleep(2000);
 

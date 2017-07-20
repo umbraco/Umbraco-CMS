@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 
@@ -6,7 +6,7 @@ namespace Umbraco.Web.Cache
 {
     public sealed class PublicAccessCacheRefresher : CacheRefresherBase<PublicAccessCacheRefresher>
     {
-        public PublicAccessCacheRefresher(CacheHelper cacheHelper) 
+        public PublicAccessCacheRefresher(CacheHelper cacheHelper)
             : base(cacheHelper)
         { }
 

@@ -5,7 +5,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Update.Expressions
 {
     public class UpdateDataExpression : MigrationExpressionBase
     {
-        public UpdateDataExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes) 
+        public UpdateDataExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
             : base(context, supportedDatabaseTypes)
         { }
 
@@ -47,7 +47,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Update.Expressions
             }
             return string.Format(SqlSyntax.UpdateData,
                                  SqlSyntax.GetQuotedTableName(TableName),
-                                 string.Join(", ", updateItems.ToArray()), 
+                                 string.Join(", ", updateItems.ToArray()),
                                  string.Join(" AND ", whereClauses.ToArray()));
         }
     }

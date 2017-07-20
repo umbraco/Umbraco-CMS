@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Xml;
 using System.Xml.Serialization;
 using Umbraco.Core.Models.PublishedContent;
@@ -8,14 +8,14 @@ using Umbraco.Core.Xml;
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
 
-	/// <summary>
-	/// Represents an IDocumentProperty which is created based on an Xml structure.
-	/// </summary>
-	[Serializable]
-	[XmlType(Namespace = "http://umbraco.org/webservices/")]
-	internal class XmlPublishedProperty : PublishedPropertyBase
-	{
-		private readonly string _sourceValue; // the raw, xml node value
+    /// <summary>
+    /// Represents an IDocumentProperty which is created based on an Xml structure.
+    /// </summary>
+    [Serializable]
+    [XmlType(Namespace = "http://umbraco.org/webservices/")]
+    internal class XmlPublishedProperty : PublishedPropertyBase
+    {
+        private readonly string _sourceValue; // the raw, xml node value
 
         // Xml cache not using XPath value... and as for the rest...
         // we're single threaded here, keep it simple
@@ -28,14 +28,14 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// </summary>
         public override object SourceValue => _sourceValue;
 
-	    // in the Xml cache, everything is a string, and to have a value
+        // in the Xml cache, everything is a string, and to have a value
         // you want to have a non-null, non-empty string.
-	    public override bool HasValue => _sourceValue.Trim().Length > 0;
+        public override bool HasValue => _sourceValue.Trim().Length > 0;
 
-	    public override object Value
-	    {
-	        get
-	        {
+        public override object Value
+        {
+            get
+            {
                 // NOT caching the source (intermediate) value since we'll never need it
                 // everything in Xml cache is per-request anyways
                 // also, properties should not be shared between requests and therefore
@@ -54,10 +54,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public XmlPublishedProperty(PublishedPropertyType propertyType, bool isPreviewing, XmlNode propertyXmlData)
             : this(propertyType, isPreviewing)
-		{
-		    if (propertyXmlData == null)
-		        throw new ArgumentNullException(nameof(propertyXmlData), "Property xml source is null");
-		    _sourceValue = XmlHelper.GetNodeValue(propertyXmlData);
+        {
+            if (propertyXmlData == null)
+                throw new ArgumentNullException(nameof(propertyXmlData), "Property xml source is null");
+            _sourceValue = XmlHelper.GetNodeValue(propertyXmlData);
         }
 
         public XmlPublishedProperty(PublishedPropertyType propertyType, bool isPreviewing, string propertyData)
@@ -74,5 +74,5 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _sourceValue = string.Empty;
             _isPreviewing = isPreviewing;
         }
-	}
+    }
 }

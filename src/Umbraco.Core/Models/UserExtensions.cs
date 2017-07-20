@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
         /// Determines whether this user is an admin.
         /// </summary>
         /// <returns>
-        /// 	<c>true</c> if this user is admin; otherwise, <c>false</c>.
+        ///     <c>true</c> if this user is admin; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsAdmin(this IUser user)
         {
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="user"></param>
         /// <param name="textService"></param>
-        /// <returns></returns>      
+        /// <returns></returns>
         public static CultureInfo GetUserCulture(this IUser user, ILocalizedTextService textService)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Models
             try
             {
                 var culture = CultureInfo.GetCultureInfo(userLanguage.Replace("_", "-"));
-                //TODO: This is a hack because we store the user language as 2 chars instead of the full culture 
+                //TODO: This is a hack because we store the user language as 2 chars instead of the full culture
                 // which is actually stored in the language files (which are also named with 2 chars!) so we need to attempt
                 // to convert to a supported full culture
                 var result = textService.ConvertToSupportedCultureWithRegionCode(culture);

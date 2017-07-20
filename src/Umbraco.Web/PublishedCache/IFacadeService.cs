@@ -17,20 +17,20 @@ namespace Umbraco.Web.PublishedCache
         /* Various places (such as Node) want to access the XML content, today as an XmlDocument
          * but to migrate to a new cache, they're migrating to an XPathNavigator. Still, they need
          * to find out how to get that navigator.
-         * 
+         *
          * Because a cache such as the DrippingCache is contextual ie it has a "snapshot" nothing
          * and remains consistent over the snapshot, the navigator should come from the "current"
          * snapshot.
-         * 
+         *
          * The service creates those snapshots in IPublishedCaches objects.
-         * 
+         *
          * Places such as Node need to be able to find the "current" one so the factory has a
          * notion of what is "current". In most cases, the IPublishedCaches object is created
          * and registered against an UmbracoContext, and that context is then used as "current".
-         * 
+         *
          * But for tests we need to have a way to specify what's the "current" object & preview.
          * Which is defined in PublishedCachesServiceBase.
-         * 
+         *
          */
 
         /// <summary>
@@ -60,10 +60,10 @@ namespace Umbraco.Web.PublishedCache
          * the content only, or the content's branch, or the whole tree + it could be possible
          * to register filters against the factory to filter out which nodes should be preview
          * vs non preview.
-         * 
+         *
          * EnterPreview() returns the previewToken. It is up to callers to store that token
          * wherever they want, most probably in a cookie.
-         * 
+         *
          */
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Umbraco.Web.PublishedCache
          * and the order-of-execution of the handlers cannot be guaranteed, which means that some
          * user code may run before Umbraco is finished updating itself. Instead, the cache refreshers
          * explicitely notify the service of changes.
-         * 
+         *
          */
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="sourceValue">The source value.</param>
         /// <returns>A fragment property.</returns>
         IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
-        
+
         #endregion
     }
 }

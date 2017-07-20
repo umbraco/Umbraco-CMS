@@ -44,7 +44,7 @@ namespace Umbraco.Tests.CoreThings
         [TestCase("http://www.domain.com/MyVdir/Umbraco/", "myvdir", true)]
         [TestCase("http://www.domain.com/MyVdir/Umbraco/restServices/blah", "/myvdir", true)]
         [TestCase("http://www.domain.com/umbraco/webservices/legacyAjaxCalls.asmx/js", "", true)]
-        [TestCase("http://www.domain.com/umbraco/test/legacyAjaxCalls.ashx?some=query&blah=js", "", true)]  
+        [TestCase("http://www.domain.com/umbraco/test/legacyAjaxCalls.ashx?some=query&blah=js", "", true)]
         public void Is_Back_Office_Request(string input, string virtualPath, bool expected)
         {
             SystemDirectories.Root = virtualPath;

@@ -34,7 +34,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 return (decimal.TryParse(sourceString, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,  out d)) ? d : 0M;
             }
 
-            // in the database an a decimal is an a decimal 
+            // in the database an a decimal is an a decimal
             // default value is zero
             return (source is decimal) ? source : 0M;
         }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -14,10 +14,10 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Security
 {
-    public class BackOfficeUserStore : DisposableObject, 
-        IUserStore<BackOfficeIdentityUser, int>, 
-        IUserPasswordStore<BackOfficeIdentityUser, int>, 
-        IUserEmailStore<BackOfficeIdentityUser, int>, 
+    public class BackOfficeUserStore : DisposableObject,
+        IUserStore<BackOfficeIdentityUser, int>,
+        IUserPasswordStore<BackOfficeIdentityUser, int>,
+        IUserEmailStore<BackOfficeIdentityUser, int>,
         IUserLoginStore<BackOfficeIdentityUser, int>,
         IUserRoleStore<BackOfficeIdentityUser, int>,
         IUserSecurityStampStore<BackOfficeIdentityUser, int>,
@@ -89,7 +89,7 @@ namespace Umbraco.Core.Security
             UpdateMemberProperties(member, user);
 
             //the password must be 'something' it could be empty if authenticating
-            // with an external provider so we'll just generate one and prefix it, the 
+            // with an external provider so we'll just generate one and prefix it, the
             // prefix will help us determine if the password hasn't actually been specified yet.
             if (member.RawPasswordValue.IsNullOrWhiteSpace())
             {
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Security
                     var logins = await GetLoginsAsync(user);
                     _externalLoginService.SaveUserLogins(found.Id, logins);
                 }
-            }           
+            }
         }
 
         /// <summary>
@@ -368,7 +368,7 @@ namespace Umbraco.Core.Security
         /// </summary>
         /// <returns/>
         public Task<BackOfficeIdentityUser> FindAsync(UserLoginInfo login)
-        {            
+        {
             ThrowIfDisposed();
             if (login == null) throw new ArgumentNullException("login");
 
@@ -396,12 +396,12 @@ namespace Umbraco.Core.Security
         /// <param name="user"/><param name="roleName"/>
         /// <returns/>
         public Task AddToRoleAsync(BackOfficeIdentityUser user, string roleName)
-        {            
+        {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
             if (user.AllowedSections.InvariantContains(roleName)) return Task.FromResult(0);
-            
+
             var asInt = user.Id.TryConvertTo<int>();
             if (asInt == false)
             {
@@ -424,7 +424,7 @@ namespace Umbraco.Core.Security
         /// <param name="user"/><param name="roleName"/>
         /// <returns/>
         public Task RemoveFromRoleAsync(BackOfficeIdentityUser user, string roleName)
-        {            
+        {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
@@ -452,7 +452,7 @@ namespace Umbraco.Core.Security
         /// <param name="user"/>
         /// <returns/>
         public Task<IList<string>> GetRolesAsync(BackOfficeIdentityUser user)
-        {            
+        {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
             return Task.FromResult((IList<string>)user.AllowedSections.ToList());
@@ -464,7 +464,7 @@ namespace Umbraco.Core.Security
         /// <param name="user"/><param name="roleName"/>
         /// <returns/>
         public Task<bool> IsInRoleAsync(BackOfficeIdentityUser user, string roleName)
-        {            
+        {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
             return Task.FromResult(user.AllowedSections.InvariantContains(roleName));
@@ -476,7 +476,7 @@ namespace Umbraco.Core.Security
         /// <param name="user"/><param name="stamp"/>
         /// <returns/>
         public Task SetSecurityStampAsync(BackOfficeIdentityUser user, string stamp)
-        {   
+        {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
@@ -490,12 +490,12 @@ namespace Umbraco.Core.Security
         /// <param name="user"/>
         /// <returns/>
         public Task<string> GetSecurityStampAsync(BackOfficeIdentityUser user)
-        {            
+        {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
             //the stamp cannot be null, so if it is currently null then we'll just return a hash of the password
-            return Task.FromResult(user.SecurityStamp.IsNullOrWhiteSpace() 
+            return Task.FromResult(user.SecurityStamp.IsNullOrWhiteSpace()
                 ? user.PasswordHash.ToMd5()
                 : user.SecurityStamp);
         }
@@ -532,7 +532,7 @@ namespace Umbraco.Core.Security
         }
 
         #region IUserLockoutStore
-        
+
         /// <summary>
         /// Returns the DateTimeOffset that represents the end of a user's lockout, any time in the past should be considered not locked out.
         /// </summary>
@@ -691,7 +691,7 @@ namespace Umbraco.Core.Security
                 anythingChanged = true;
                 user.SecurityStamp = identityUser.SecurityStamp;
             }
-            
+
             if (user.AllowedSections.ContainsAll(identityUser.AllowedSections) == false
                 || identityUser.AllowedSections.ContainsAll(user.AllowedSections) == false)
             {
@@ -716,6 +716,6 @@ namespace Umbraco.Core.Security
                 throw new ObjectDisposedException(GetType().Name);
         }
 
-      
+
     }
 }

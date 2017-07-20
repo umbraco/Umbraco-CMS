@@ -18,22 +18,22 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "command")]
         public string Command { get; set; }
-        
+
         [DataMember(Name = "alias")]
         public string Alias { get; set; }
-        
+
         [DataMember(Name = "userInterface")]
         public string UserInterface { get; set; }
-        
+
         [DataMember(Name = "frontEndCommand")]
         public string FrontEndCommand { get; set; }
-        
+
         [DataMember(Name = "value")]
         public string Value { get; set; }
-        
+
         [DataMember(Name = "priority")]
         public int Priority { get; set; }
-        
+
         [DataMember(Name = "isStylePicker")]
         public bool IsStylePicker { get; set; }
     }

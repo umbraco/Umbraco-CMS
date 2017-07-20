@@ -191,7 +191,7 @@ namespace Umbraco.Core.Media.Exif
             /// <exception cref="System.ArgumentNullException">s is null</exception>
             /// <exception cref="System.FormatException">s is not in the correct format</exception>
             /// <exception cref="System.OverflowException">
-            /// s represents a number less than System.UInt32.MinValue or greater than 
+            /// s represents a number less than System.UInt32.MinValue or greater than
             /// System.UInt32.MaxValue.
             /// </exception>
             public static Fraction32 Parse(string s)
@@ -469,7 +469,7 @@ namespace Umbraco.Core.Media.Exif
             /// Indicates whether this instance and a specified object are equal value-wise.
             /// </summary>
             /// <param name="obj">Another object to compare to.</param>
-            /// <returns>true if obj and this instance are the same type and represent 
+            /// <returns>true if obj and this instance are the same type and represent
             /// the same value; otherwise, false.</returns>
             public override bool Equals(object obj)
             {
@@ -486,7 +486,7 @@ namespace Umbraco.Core.Media.Exif
             /// Indicates whether this instance and a specified object are equal value-wise.
             /// </summary>
             /// <param name="obj">Another fraction object to compare to.</param>
-            /// <returns>true if obj and this instance represent the same value; 
+            /// <returns>true if obj and this instance represent the same value;
             /// otherwise, false.</returns>
             public bool Equals(Fraction32 obj)
             {
@@ -507,11 +507,11 @@ namespace Umbraco.Core.Media.Exif
             /// </summary>
             /// <param name="format">A numeric format string.</param>
             /// <param name="formatProvider">
-            /// An System.IFormatProvider that supplies culture-specific 
+            /// An System.IFormatProvider that supplies culture-specific
             /// formatting information.
             /// </param>
             /// <returns>
-            /// The string representation of the value of this instance as 
+            /// The string representation of the value of this instance as
             /// specified by format and provider.
             /// </returns>
             /// <exception cref="System.FormatException">
@@ -531,7 +531,7 @@ namespace Umbraco.Core.Media.Exif
             /// </summary>
             /// <param name="format">A numeric format string.</param>
             /// <returns>
-            /// The string representation of the value of this instance as 
+            /// The string representation of the value of this instance as
             /// specified by format.
             /// </returns>
             /// <exception cref="System.FormatException">
@@ -550,11 +550,11 @@ namespace Umbraco.Core.Media.Exif
             /// Returns a string representation of the fraction.
             /// </summary>
             /// <param name="formatProvider">
-            /// An System.IFormatProvider that supplies culture-specific 
+            /// An System.IFormatProvider that supplies culture-specific
             /// formatting information.
             /// </param>
             /// <returns>
-            /// The string representation of the value of this instance as 
+            /// The string representation of the value of this instance as
             /// specified by provider.
             /// </returns>
             public string ToString(IFormatProvider formatProvider)
@@ -587,7 +587,7 @@ namespace Umbraco.Core.Media.Exif
             /// <returns>
             /// A signed number indicating the relative values of this instance and value.
             /// Less than zero: This instance is less than obj.
-            /// Zero: This instance is equal to obj. 
+            /// Zero: This instance is equal to obj.
             /// Greater than zero: This instance is greater than obj or obj is null.
             /// </returns>
             /// <exception cref="System.ArgumentException">obj is not a Fraction.</exception>
@@ -607,7 +607,7 @@ namespace Umbraco.Core.Media.Exif
             /// <returns>
             /// A signed number indicating the relative values of this instance and value.
             /// Less than zero: This instance is less than obj.
-            /// Zero: This instance is equal to obj. 
+            /// Zero: This instance is equal to obj.
             /// Greater than zero: This instance is greater than obj or obj is null.
             /// </returns>
             public int CompareTo(Fraction32 obj)
@@ -686,7 +686,7 @@ namespace Umbraco.Core.Media.Exif
             /// <exception cref="System.ArgumentNullException">s is null.</exception>
             /// <exception cref="System.FormatException">s is not formatted as numerator/denominator.</exception>
             /// <exception cref="System.OverflowException">
-            /// s represents numbers less than System.Int32.MinValue or greater than 
+            /// s represents numbers less than System.Int32.MinValue or greater than
             /// System.Int32.MaxValue.
             /// </exception>
             private static Fraction32 FromString(string s)
@@ -833,7 +833,7 @@ namespace Umbraco.Core.Media.Exif
             /// <exception cref="System.ArgumentNullException">s is null</exception>
             /// <exception cref="System.FormatException">s is not in the correct format</exception>
             /// <exception cref="System.OverflowException">
-            /// s represents a number less than System.UInt32.MinValue or greater than 
+            /// s represents a number less than System.UInt32.MinValue or greater than
             /// System.UInt32.MaxValue.
             /// </exception>
             public static UFraction32 Parse(string s)
@@ -1097,7 +1097,7 @@ namespace Umbraco.Core.Media.Exif
             /// Indicates whether this instance and a specified object are equal value-wise.
             /// </summary>
             /// <param name="obj">Another object to compare to.</param>
-            /// <returns>true if obj and this instance are the same type and represent 
+            /// <returns>true if obj and this instance are the same type and represent
             /// the same value; otherwise, false.</returns>
             public override bool Equals(object obj)
             {
@@ -1114,7 +1114,7 @@ namespace Umbraco.Core.Media.Exif
             /// Indicates whether this instance and a specified object are equal value-wise.
             /// </summary>
             /// <param name="obj">Another fraction object to compare to.</param>
-            /// <returns>true if obj and this instance represent the same value; 
+            /// <returns>true if obj and this instance represent the same value;
             /// otherwise, false.</returns>
             public bool Equals(UFraction32 obj)
             {
@@ -1135,11 +1135,11 @@ namespace Umbraco.Core.Media.Exif
             /// </summary>
             /// <param name="format">A numeric format string.</param>
             /// <param name="formatProvider">
-            /// An System.IFormatProvider that supplies culture-specific 
+            /// An System.IFormatProvider that supplies culture-specific
             /// formatting information.
             /// </param>
             /// <returns>
-            /// The string representation of the value of this instance as 
+            /// The string representation of the value of this instance as
             /// specified by format and provider.
             /// </returns>
             /// <exception cref="System.FormatException">
@@ -1159,7 +1159,7 @@ namespace Umbraco.Core.Media.Exif
             /// </summary>
             /// <param name="format">A numeric format string.</param>
             /// <returns>
-            /// The string representation of the value of this instance as 
+            /// The string representation of the value of this instance as
             /// specified by format.
             /// </returns>
             /// <exception cref="System.FormatException">
@@ -1178,11 +1178,11 @@ namespace Umbraco.Core.Media.Exif
             /// Returns a string representation of the fraction.
             /// </summary>
             /// <param name="formatProvider">
-            /// An System.IFormatProvider that supplies culture-specific 
+            /// An System.IFormatProvider that supplies culture-specific
             /// formatting information.
             /// </param>
             /// <returns>
-            /// The string representation of the value of this instance as 
+            /// The string representation of the value of this instance as
             /// specified by provider.
             /// </returns>
             public string ToString(IFormatProvider formatProvider)
@@ -1215,7 +1215,7 @@ namespace Umbraco.Core.Media.Exif
             /// <returns>
             /// A signed number indicating the relative values of this instance and value.
             /// Less than zero: This instance is less than obj.
-            /// Zero: This instance is equal to obj. 
+            /// Zero: This instance is equal to obj.
             /// Greater than zero: This instance is greater than obj or obj is null.
             /// </returns>
             /// <exception cref="System.ArgumentException">obj is not a Fraction.</exception>
@@ -1235,7 +1235,7 @@ namespace Umbraco.Core.Media.Exif
             /// <returns>
             /// A signed number indicating the relative values of this instance and value.
             /// Less than zero: This instance is less than obj.
-            /// Zero: This instance is equal to obj. 
+            /// Zero: This instance is equal to obj.
             /// Greater than zero: This instance is greater than obj or obj is null.
             /// </returns>
             public int CompareTo(UFraction32 obj)
@@ -1314,7 +1314,7 @@ namespace Umbraco.Core.Media.Exif
             /// <exception cref="System.ArgumentNullException">s is null.</exception>
             /// <exception cref="System.FormatException">s is not formatted as numerator/denominator.</exception>
             /// <exception cref="System.OverflowException">
-            /// s represents numbers less than System.UInt32.MinValue or greater than 
+            /// s represents numbers less than System.UInt32.MinValue or greater than
             /// System.UInt32.MaxValue.
             /// </exception>
             private static UFraction32 FromString(string s)

@@ -2,6 +2,6 @@
 {
     public interface IAlterColumnOptionSyntax : IColumnOptionSyntax<IAlterColumnOptionSyntax, IAlterColumnOptionForeignKeyCascadeSyntax>
     {
-         
+
     }
 }

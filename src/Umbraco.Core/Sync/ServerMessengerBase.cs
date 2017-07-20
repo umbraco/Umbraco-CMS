@@ -228,7 +228,7 @@ namespace Umbraco.Core.Sync
                     throw new NotSupportedException("Invalid message type " + messageType);
             }
         }
-        
+
         /// <summary>
         /// Executes the strongly typed <see cref="ICacheRefresher{T}"/> on the local/current server
         /// </summary>

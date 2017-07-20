@@ -20,7 +20,7 @@ namespace Umbraco.Tests.IO
         [SetUp]
         public void Setup()
         {
-            
+
         }
 
         [TearDown]

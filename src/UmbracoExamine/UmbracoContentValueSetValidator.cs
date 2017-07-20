@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Examine;
 using Examine.LuceneEngine.Providers;
@@ -8,7 +8,7 @@ using Umbraco.Core.Services;
 namespace UmbracoExamine
 {
     /// <summary>
-    /// Used to validate a ValueSet for content - based on permissions, parent id, etc.... 
+    /// Used to validate a ValueSet for content - based on permissions, parent id, etc....
     /// </summary>
     public class UmbracoContentValueSetValidator : IValueSetValidator
     {
@@ -42,14 +42,14 @@ namespace UmbracoExamine
             // Test for access if we're only indexing published content
             // return nothing if we're not supporting protected content and it is protected, and we're not supporting unpublished content
             if (valueSet.IndexCategory == IndexTypes.Content
-                && _options.SupportUnpublishedContent == false 
-                && _options.SupportProtectedContent == false 
+                && _options.SupportUnpublishedContent == false
+                && _options.SupportProtectedContent == false
                 && _publicAccessService.IsProtected(path))
             {
                 return false;
             }
 
-            //check if this document is a descendent of the parent  
+            //check if this document is a descendent of the parent
             if (_options.ParentId.HasValue && _options.ParentId.Value > 0)
             {
                 if (path.IsNullOrWhiteSpace()) return false;

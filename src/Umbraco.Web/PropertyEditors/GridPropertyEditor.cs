@@ -16,7 +16,7 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.GridAlias, "Grid layout", "grid", HideLabel = true, IsParameterEditor = false, ValueType = PropertyEditorValueTypes.Json, Group="rich content", Icon="icon-layout")]
     public class GridPropertyEditor : PropertyEditor
     {
-        public GridPropertyEditor(ILogger logger) 
+        public GridPropertyEditor(ILogger logger)
             : base(logger)
         { }
 
@@ -48,7 +48,7 @@ namespace Umbraco.Web.PropertyEditors
 
                                     foreach (var areaVal in areaVals)
                                     {
-                                        //TODO: If it's not a string, then it's a json formatted value - 
+                                        //TODO: If it's not a string, then it's a json formatted value -
                                         // we cannot really index this in a smart way since it could be 'anything'
                                         if (areaVal.Type == JTokenType.String)
                                         {
@@ -86,12 +86,12 @@ namespace Umbraco.Web.PropertyEditors
                         catch (InvalidCastException)
                         {
                             //swallow...on purpose, there's a chance that this isn't the json format we are looking for
-                            // and we don't want that to affect the website. 
+                            // and we don't want that to affect the website.
                         }
                         catch (JsonException)
                         {
-                            //swallow...on purpose, there's a chance that this isn't json and we don't want that to affect 
-                            // the website. 
+                            //swallow...on purpose, there's a chance that this isn't json and we don't want that to affect
+                            // the website.
                         }
                         catch (ArgumentException)
                         {

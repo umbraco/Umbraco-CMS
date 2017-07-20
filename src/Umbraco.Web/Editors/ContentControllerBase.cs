@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -82,7 +82,7 @@ namespace Umbraco.Web.Editors
                 var files = contentItem.UploadedFiles.Where(x => x.PropertyAlias == property.Alias).ToArray();
                 if (files.Length > 0)
                 {
-                    dictionary.Add("files", files);                    
+                    dictionary.Add("files", files);
                 }
                 foreach (var file in files)
                     file.FileName = file.FileName.ToSafeFileName();

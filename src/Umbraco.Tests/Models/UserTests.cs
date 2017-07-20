@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Models
         {
             var item = new User(new UserType(){Id = 3})
             {
-                Id = 3,                
+                Id = 3,
                 Key = Guid.NewGuid(),
                 UpdateDate = DateTime.Now,
                 CreateDate = DateTime.Now,
@@ -38,9 +38,9 @@ namespace Umbraco.Tests.Models
                 SessionTimeout = 5,
                 StartContentId = 3,
                 StartMediaId = 8,
-                Username = "username"                            
+                Username = "username"
             };
-          
+
             item.AddAllowedSection("test");
 
             var clone = (User)item.DeepClone();

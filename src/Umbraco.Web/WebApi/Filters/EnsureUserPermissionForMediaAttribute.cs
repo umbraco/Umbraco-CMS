@@ -127,6 +127,6 @@ namespace Umbraco.Web.WebApi.Filters
             {
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
             }
-        }        
+        }
     }
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -29,7 +29,7 @@ namespace Umbraco.Tests.PublishedContent
             var umbracoContext = GetUmbracoContext("/test");
             var facadeRouter = CreateFacadeRouter();
             var request = facadeRouter.CreateRequest(umbracoContext);
-            var content = GetPublishedContentMock();            
+            var content = GetPublishedContentMock();
             request.PublishedContent = content.Object;
             request.Culture = new CultureInfo("en-AU");
             request.SetRedirect("/hello");
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.PublishedContent
             request.PublishedContent = content.Object;
             request.Culture = new CultureInfo("en-AU");
             facadeRouter.ConfigureRequest(request);
-            
+
             Assert.AreEqual(1, umbracoContext.HttpContext.Items["pageID"]);
             Assert.AreEqual(request.UmbracoPage.Elements.Count, ((Hashtable) umbracoContext.HttpContext.Items["pageElements"]).Count);
         }

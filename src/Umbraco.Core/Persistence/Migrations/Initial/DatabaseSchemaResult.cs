@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -61,7 +61,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         /// Determines the version of the currently installed database by detecting the current database structure
         /// </summary>
         /// <returns>
-        /// A <see cref="Version"/> with Major and Minor values for 
+        /// A <see cref="Version"/> with Major and Minor values for
         /// non-empty database, otherwise "0.0.0" for empty databases.
         /// </returns>
         public Version DetermineInstalledVersion()
@@ -102,7 +102,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 return new Version(6, 0, 0);
             }
 
-            //if the error indicates a problem with the column cmsMacroProperty.macroPropertyType then it is not version 7 
+            //if the error indicates a problem with the column cmsMacroProperty.macroPropertyType then it is not version 7
             // since these columns get removed in v7
             if (Errors.Any(x => x.Item1.Equals("Column") && (x.Item2.InvariantEquals("cmsMacroProperty,macroPropertyType"))))
             {
@@ -119,7 +119,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 }
             }
 
-            //if the error indicates a problem with the constraint FK_cmsContent_cmsContentType_nodeId then it is not version 7.2 
+            //if the error indicates a problem with the constraint FK_cmsContent_cmsContentType_nodeId then it is not version 7.2
             // since this gets added in 7.2.0 so it must be the previous version
             if (Errors.Any(x => x.Item1.Equals("Constraint") && (x.Item2.InvariantEquals("FK_cmsContent_cmsContentType_nodeId"))))
             {

@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class RedirectUrlRepository : NPocoRepositoryBase<Guid, IRedirectUrl>, IRedirectUrlRepository
     {
-        public RedirectUrlRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger) 
+        public RedirectUrlRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         { }
 
@@ -204,6 +204,6 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
             var rules = result.Items.Select(Map);
             return rules;
-        }     
+        }
     }
 }

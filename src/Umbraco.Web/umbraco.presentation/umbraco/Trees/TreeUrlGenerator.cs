@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Text;
 
 namespace umbraco.cms.presentation.Trees
 {
     /// <summary>
-    /// This class will generate the URLs for iframe tree pages. 
-    /// Generally used to get the a tree picker url.    
+    /// This class will generate the URLs for iframe tree pages.
+    /// Generally used to get the a tree picker url.
     /// </summary>
     /// <remarks>
     /// This was created in 4.1 so that this helper class can be exposed to other assemblies since
@@ -160,8 +160,8 @@ namespace umbraco.cms.presentation.Trees
         public string GetPickerUrl()
         {
             return Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) + "/dialogs/" + GetUrl(PICKER_URL);
-        }        
-        
+        }
+
         /// <summary>
         /// Generates the URL parameters for the tree service.
         /// </summary>

@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void Change_Password_Without_AllowManuallyChangingPassword_And_No_Pass_Validation()
         {
-            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };         
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
             providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
             var provider = providerMock.Object;
 
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void Change_Password_With_AllowManuallyChangingPassword_And_Invalid_Creds()
         {
-            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };         
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
             providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
             providerMock.Setup(@base => @base.ValidateUser("test", "test")).Returns(false);
             var provider = providerMock.Object;
@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Membership
             Assert.IsFalse(provider.ChangePassword("test", "test", "test"));
 
         }
-        
+
         [Test]
         public void ChangePasswordQuestionAndAnswer_Without_RequiresQuestionAndAnswer()
         {
@@ -161,7 +161,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void Sets_Defaults()
         {
-            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };                  
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
             var provider = providerMock.Object;
             provider.Initialize("test", new NameValueCollection());
 
@@ -183,7 +183,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void Throws_Exception_With_Hashed_Password_And_Password_Retrieval()
         {
-            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };         
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
             var provider = providerMock.Object;
 
             Assert.Throws<ProviderException>(() => provider.Initialize("test", new NameValueCollection()
@@ -222,16 +222,16 @@ namespace Umbraco.Tests.Membership
             for (var i = 0; i < 10000; i++)
             {
                 var result = MembershipProviderBase.GenerateSalt();
-                
+
                 if (i > 0)
                 {
                     Assert.AreEqual(lastLength, result.Length);
                 }
 
-                lastLength = result.Length;                
+                lastLength = result.Length;
             }
         }
-        
+
         [Test]
         public void Get_Stored_Password_Hashed()
         {
@@ -368,7 +368,7 @@ namespace Umbraco.Tests.Membership
             string salt;
             var pass = "ThisIsAnEncryptedPassword";
             var encrypted = provider.EncryptOrHashNewPassword(pass, out salt);
-            
+
             var result = provider.CheckPassword("ThisIsAnEncryptedPassword", encrypted);
 
             Assert.IsTrue(result);
@@ -398,7 +398,7 @@ namespace Umbraco.Tests.Membership
             string salt;
             var pass = "ThisIsAnEncryptedPassword";
             var encrypted = provider.EncryptOrHashNewPassword(pass, out salt);
-            
+
             var result = provider.DecryptPassword(encrypted);
 
             Assert.AreEqual(pass, result);

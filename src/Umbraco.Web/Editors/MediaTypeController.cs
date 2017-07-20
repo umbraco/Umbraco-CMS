@@ -268,7 +268,7 @@ namespace Umbraco.Web.Editors
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
-        } 
+        }
         #endregion
 
         /// <summary>

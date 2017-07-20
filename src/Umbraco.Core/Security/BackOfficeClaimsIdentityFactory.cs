@@ -45,7 +45,7 @@ namespace Umbraco.Core.Security
     }
 
     public class BackOfficeClaimsIdentityFactory : BackOfficeClaimsIdentityFactory<BackOfficeIdentityUser>
-    {       
+    {
 
     }
 }

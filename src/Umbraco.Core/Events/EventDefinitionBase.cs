@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reflection;
 
 namespace Umbraco.Core.Events
@@ -27,7 +27,7 @@ namespace Umbraco.Core.Events
         public object Sender { get; }
         public object Args { get; }
         public string EventName { get; }
-        
+
         public abstract void RaiseEvent();
 
         public bool Equals(EventDefinitionBase other)

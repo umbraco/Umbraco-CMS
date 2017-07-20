@@ -8,7 +8,7 @@ namespace Umbraco.Web.UI.Umbraco
 {
     [Obsolete("Used the TreeControl control instead. This does however get used by the TreeService when requesting the tree init url.")]
     public partial class TreeInit : Pages.UmbracoEnsuredPage
-	{
+    {
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
@@ -17,5 +17,5 @@ namespace Umbraco.Web.UI.Umbraco
         }
 
         protected TreeService TreeParams { get; private set; }
-	}
+    }
 }

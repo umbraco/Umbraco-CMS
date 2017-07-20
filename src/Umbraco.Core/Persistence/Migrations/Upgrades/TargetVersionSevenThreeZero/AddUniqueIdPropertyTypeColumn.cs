@@ -1,10 +1,10 @@
-using System.Linq;
+﻿using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
-{    
+{
     [Migration("7.3.0", 13, Constants.System.UmbracoMigrationName)]
     public class AddUniqueIdPropertyTypeColumn : MigrationBase
     {

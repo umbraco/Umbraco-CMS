@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Core;
 using System.Threading.Tasks;
 using Microsoft.Owin;
@@ -72,7 +72,7 @@ namespace Umbraco.Web.Security.Identity
             var httpCtx = Context.TryGetHttpContext();
             //check for the special flag in either the owin or http context
             var shouldRenew = Context.Get<bool?>("umbraco-force-auth") != null || (httpCtx.Success && httpCtx.Result.Items["umbraco-force-auth"] != null);
-            
+
             if (shouldRenew)
             {
                 var signin = Helper.LookupSignIn(Options.AuthenticationType);
@@ -107,16 +107,16 @@ namespace Umbraco.Web.Security.Identity
                                 //now save back all the required cookie details
                                 var cookieValue = Options.TicketDataFormat.Protect(ticket);
 
-                                var cookieOptions = ((UmbracoBackOfficeCookieAuthOptions)Options).CreateRequestCookieOptions(Context, ticket);                                
+                                var cookieOptions = ((UmbracoBackOfficeCookieAuthOptions)Options).CreateRequestCookieOptions(Context, ticket);
 
                                 Options.CookieManager.AppendResponseCookie(
                                     Context,
                                     Options.CookieName,
                                     cookieValue,
                                     cookieOptions);
-                            }                            
+                            }
 
-                            
+
                         }
                     }
                 }

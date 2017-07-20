@@ -48,7 +48,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("userEmail")]
         public string Email { get; set; }
-        
+
         [Column("userLanguage")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(10)]
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("lastLoginDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? LastLoginDate { get; set; }
-        
+
         [ResultColumn]
         [Reference(ReferenceType.Many, ReferenceMemberName = "UserId")]
         public List<User2AppDto> User2AppDtos { get; set; }

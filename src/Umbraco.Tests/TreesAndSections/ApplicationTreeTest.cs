@@ -10,8 +10,8 @@ using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.TreesAndSections
 {
-    
-    
+
+
     /// <summary>
     ///This is a test class for ApplicationTreeTest and is intended
     ///to contain all ApplicationTreeTest Unit Tests
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.TreesAndSections
 
             if (Directory.Exists(TestHelper.MapPathForTest("~/TEMP/TreesAndSections")))
             {
-                Directory.Delete(TestHelper.MapPathForTest("~/TEMP/TreesAndSections"), true);    
+                Directory.Delete(TestHelper.MapPathForTest("~/TEMP/TreesAndSections"), true);
             }
             ApplicationTreeService.TreeConfigFilePath = null;
             SectionService.AppConfigFilePath = null;
@@ -359,11 +359,11 @@ namespace Umbraco.Tests.TreesAndSections
         //    actual = target.Type;
         //    Assert.AreEqual(expected, actual);
         //    Assert.Inconclusive("Verify the correctness of this test method.");
-        //} 
+        //}
         #endregion
 
         #region Additional test attributes
-        // 
+        //
         //You can use the following additional attributes as you write your tests:
         //
         //Use ClassInitialize to run code before running the first test in the class

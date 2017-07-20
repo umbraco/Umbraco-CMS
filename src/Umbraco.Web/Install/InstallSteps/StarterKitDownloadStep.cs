@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -56,7 +56,7 @@ namespace Umbraco.Web.Install.InstallSteps
         }
 
         private Tuple<string, int> DownloadPackageFiles(Guid kitGuid)
-        {          
+        {
             var installer = new Installer();
 
             //Go get the package file from the package repo

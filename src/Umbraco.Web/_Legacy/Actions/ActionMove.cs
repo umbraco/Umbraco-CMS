@@ -1,93 +1,93 @@
-using System;
+﻿using System;
 using Umbraco.Web.UI.Pages;
 
 namespace Umbraco.Web._Legacy.Actions
 {
-	/// <summary>
-	/// This action is invoked upon creation of a document, media, member
-	/// </summary>
-	public class ActionMove : IAction
-	{
-		//create singleton
+    /// <summary>
+    /// This action is invoked upon creation of a document, media, member
+    /// </summary>
+    public class ActionMove : IAction
+    {
+        //create singleton
 #pragma warning disable 612,618
-		private static readonly ActionMove m_instance = new ActionMove();
+        private static readonly ActionMove m_instance = new ActionMove();
 #pragma warning restore 612,618
 
-		/// <summary>
-		/// A public constructor exists ONLY for backwards compatibility in regards to 3rd party add-ons.
-		/// All Umbraco assemblies should use the singleton instantiation (this.Instance)
-		/// When this applicatio is refactored, this constuctor should be made private.
-		/// </summary>
-		[Obsolete("Use the singleton instantiation instead of a constructor")]
-		public ActionMove() { }
+        /// <summary>
+        /// A public constructor exists ONLY for backwards compatibility in regards to 3rd party add-ons.
+        /// All Umbraco assemblies should use the singleton instantiation (this.Instance)
+        /// When this applicatio is refactored, this constuctor should be made private.
+        /// </summary>
+        [Obsolete("Use the singleton instantiation instead of a constructor")]
+        public ActionMove() { }
 
-		public static ActionMove Instance
-		{
-			get { return m_instance; }
-		}
+        public static ActionMove Instance
+        {
+            get { return m_instance; }
+        }
 
-		#region IAction Members
+        #region IAction Members
 
-		public char Letter
-		{
-			get
-			{
+        public char Letter
+        {
+            get
+            {
 
-				return 'M';
-			}
-		}
+                return 'M';
+            }
+        }
 
-		public string JsFunctionName
-		{
-			get
-			{
-				return string.Format("{0}.actionMove()", ClientTools.Scripts.GetAppActions);
-			}
-		}
+        public string JsFunctionName
+        {
+            get
+            {
+                return string.Format("{0}.actionMove()", ClientTools.Scripts.GetAppActions);
+            }
+        }
 
-		public string JsSource
-		{
-			get
-			{
+        public string JsSource
+        {
+            get
+            {
 
-				return null;
-			}
-		}
+                return null;
+            }
+        }
 
-		public string Alias
-		{
-			get
-			{
+        public string Alias
+        {
+            get
+            {
 
-				return "move";
-			}
-		}
+                return "move";
+            }
+        }
 
-		public string Icon
-		{
-			get
-			{
+        public string Icon
+        {
+            get
+            {
 
                 return "enter";
-			}
-		}
+            }
+        }
 
-		public bool ShowInNotifier
-		{
-			get
-			{
+        public bool ShowInNotifier
+        {
+            get
+            {
 
-				return true;
-			}
-		}
-		public bool CanBePermissionAssigned
-		{
-			get
-			{
+                return true;
+            }
+        }
+        public bool CanBePermissionAssigned
+        {
+            get
+            {
 
-				return true;
-			}
-		}
-		#endregion
-	}
+                return true;
+            }
+        }
+        #endregion
+    }
 }

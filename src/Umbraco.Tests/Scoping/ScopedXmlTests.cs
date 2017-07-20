@@ -19,7 +19,7 @@ using Umbraco.Web.PublishedCache.XmlPublishedCache;
 namespace Umbraco.Tests.Scoping
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, FacadeServiceRepositoryEvents = true)]    
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, FacadeServiceRepositoryEvents = true)]
     public class ScopedXmlTests : TestWithDatabaseBase
     {
         private CacheRefresherComponent _cacheRefresher;

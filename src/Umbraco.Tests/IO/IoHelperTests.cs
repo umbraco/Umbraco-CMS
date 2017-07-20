@@ -11,8 +11,8 @@ namespace Umbraco.Tests.IO
         [TestCase("~/Scripts", "/Scripts", null)]
         [TestCase("/Scripts", "/Scripts", null)]
         [TestCase("../Scripts", "/Scripts", typeof(ArgumentException))]
-		public void IOHelper_ResolveUrl(string input, string expected, Type expectedExceptionType)
-		{
+        public void IOHelper_ResolveUrl(string input, string expected, Type expectedExceptionType)
+        {
             if (expectedExceptionType != null)
             {
                 Assert.Throws(expectedExceptionType, () => IOHelper.ResolveUrl(input));
@@ -22,7 +22,7 @@ namespace Umbraco.Tests.IO
                 var result = IOHelper.ResolveUrl(input);
                 Assert.AreEqual(expected, result);
             }
-		}
+        }
 
         /// <summary>
         ///A test for MapPath verifying that HttpContext method (which includes vdirs) matches non-HttpContext method

@@ -11,13 +11,13 @@ namespace Umbraco.Web.Routing
     {
         /// <summary>
         /// Gets the nice url of a published content.
-		/// </summary>
+        /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="id">The published content id.</param>
-		/// <param name="current">The current absolute url.</param>
-		/// <param name="mode">The url mode.</param>
-		/// <returns>The url for the published content.</returns>
-		/// <remarks>
+        /// <param name="current">The current absolute url.</param>
+        /// <param name="mode">The url mode.</param>
+        /// <returns>The url for the published content.</returns>
+        /// <remarks>
         /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
         /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
         /// </remarks>

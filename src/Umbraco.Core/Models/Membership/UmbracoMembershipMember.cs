@@ -49,7 +49,7 @@ namespace Umbraco.Core.Models.Membership
             _lastPasswordChangedDate = member.LastPasswordChangeDate.ToUniversalTime();
             _lastLockoutDate = member.LastLockoutDate.ToUniversalTime();
         }
-        
+
         internal IMembershipUser Member
         {
             get { return _member; }

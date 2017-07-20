@@ -63,7 +63,7 @@ namespace Umbraco.Tests.TestHelpers
             settings.Setup(x => x.Content.UmbracoLibraryCacheDuration).Returns(1800);
             settings.Setup(x => x.WebRouting.UrlProviderMode).Returns("AutoLegacy");
             settings.Setup(x => x.Templates.DefaultRenderingEngine).Returns(RenderingEngine.Mvc);
-            
+
             return settings.Object;
         }
 

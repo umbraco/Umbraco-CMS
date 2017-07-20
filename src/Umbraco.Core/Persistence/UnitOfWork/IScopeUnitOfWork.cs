@@ -1,4 +1,4 @@
-using Umbraco.Core.Events;
+﻿using Umbraco.Core.Events;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.UnitOfWork

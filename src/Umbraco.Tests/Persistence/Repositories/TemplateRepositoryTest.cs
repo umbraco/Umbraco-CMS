@@ -176,7 +176,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(repository.Get("test"), Is.Not.Null);
                 Assert.That(_viewsFileSystem.FileExists("test.cshtml"), Is.True);
                 Assert.AreEqual(
-                    @"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage @{ Layout = null;}".StripWhitespace(), 
+                    @"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage @{ Layout = null;}".StripWhitespace(),
                     template.Content.StripWhitespace());
             }
 

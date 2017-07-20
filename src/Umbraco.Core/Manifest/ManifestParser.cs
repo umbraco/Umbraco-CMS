@@ -19,7 +19,7 @@ namespace Umbraco.Core.Manifest
     internal class ManifestParser
     {
         private readonly ILogger _logger;
-        
+
         private readonly DirectoryInfo _pluginsDir;
         private readonly IRuntimeCacheProvider _cache;
 
@@ -72,7 +72,7 @@ namespace Umbraco.Core.Manifest
                 jsonEditors.ToString(),
                 new ParameterEditorConverter());
         }
-        
+
         /// <summary>
         /// Get all registered manifests
         /// </summary>
@@ -98,7 +98,7 @@ namespace Umbraco.Core.Manifest
         private IEnumerable<string> GetAllManifestFileContents(DirectoryInfo currDir)
         {
             var depth = FolderDepth(_pluginsDir, currDir);
-            
+
             if (depth < 1)
             {
                 var result = new List<string>();
@@ -109,7 +109,7 @@ namespace Umbraco.Core.Manifest
                     foreach (var d in dirs)
                     {
                         result.AddRange(GetAllManifestFileContents(d));
-                    }    
+                    }
                 }
                 return result;
             }
@@ -145,7 +145,7 @@ namespace Umbraco.Core.Manifest
         {
             var result = new List<PackageManifest>();
             foreach (var m in manifestFileContents)
-            { 
+            {
                 var manifestContent = m;
 
                 if (manifestContent.IsNullOrWhiteSpace()) continue;
@@ -246,7 +246,7 @@ namespace Umbraco.Core.Manifest
                         }
                     }
                 }
-                
+
                 var manifest = new PackageManifest()
                     {
                         JavaScriptInitialize = jConfig,
@@ -319,7 +319,7 @@ namespace Umbraco.Core.Manifest
         /// <param name="donor"></param>
         /// <param name="keepOriginal">set to true if we will keep the receiver value if the proeprty already exists</param>
         /// <remarks>
-        /// taken from 
+        /// taken from
         /// http://stackoverflow.com/questions/4002508/does-c-sharp-have-a-library-for-parsing-multi-level-cascading-json/4002550#4002550
         /// </remarks>
         internal static void MergeJObjects(JObject receiver, JObject donor, bool keepOriginal = false)
@@ -350,11 +350,11 @@ namespace Umbraco.Core.Manifest
             {
                 if (!receiver.Any(x => x.Equals(item)))
                 {
-                    receiver.Add(item);   
+                    receiver.Add(item);
                 }
             }
         }
 
-        
+
     }
 }

@@ -40,6 +40,6 @@ namespace Umbraco.Core.IO
                         throw new ArgumentOutOfRangeException();
                 }
             }
-        }        
+        }
     }
 }

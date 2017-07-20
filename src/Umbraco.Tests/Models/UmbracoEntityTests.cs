@@ -173,7 +173,7 @@ namespace Umbraco.Tests.Models
                 HasPendingChanges = true,
                 IsDraft = true,
                 IsPublished = true,
-                NodeObjectTypeId = Guid.NewGuid()            
+                NodeObjectTypeId = Guid.NewGuid()
             };
             item.AdditionalData.Add("test1", 3);
             item.AdditionalData.Add("test2", "valuie");
@@ -198,7 +198,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.CreatorId, item.CreatorId);
             Assert.AreEqual(clone.Id, item.Id);
             Assert.AreEqual(clone.Key, item.Key);
-            Assert.AreEqual(clone.Level, item.Level);            
+            Assert.AreEqual(clone.Level, item.Level);
             Assert.AreEqual(clone.Name, item.Name);
             Assert.AreEqual(clone.ParentId, item.ParentId);
             Assert.AreEqual(clone.SortOrder, item.SortOrder);
@@ -213,7 +213,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.UpdateDate, item.UpdateDate);
             Assert.AreEqual(clone.AdditionalData.Count, item.AdditionalData.Count);
             Assert.AreEqual(clone.AdditionalData, item.AdditionalData);
-            
+
             //This double verifies by reflection
             var allProps = clone.GetType().GetProperties();
             foreach (var propertyInfo in allProps)

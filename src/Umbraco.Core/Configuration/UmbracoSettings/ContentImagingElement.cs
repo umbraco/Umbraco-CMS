@@ -4,7 +4,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class ContentImagingElement : ConfigurationElement
     {
-     
+
         [ConfigurationProperty("imageFileTypes")]
         internal CommaDelimitedConfigurationElement ImageFileTypes
         {
@@ -61,7 +61,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                         };
                     return _defaultImageAutoFill;
                 }
-                
+
                 return (ImagingAutoFillPropertiesCollection) base["autoFillImageProperties"];
             }
         }

@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -10,13 +10,13 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
     {
         private readonly bool _skipIndexCheck;
 
-        internal AddIndexToUmbracoNodeTable(bool skipIndexCheck, IMigrationContext context) 
+        internal AddIndexToUmbracoNodeTable(bool skipIndexCheck, IMigrationContext context)
             : base(context)
         {
             _skipIndexCheck = skipIndexCheck;
         }
 
-        public AddIndexToUmbracoNodeTable(IMigrationContext context) 
+        public AddIndexToUmbracoNodeTable(IMigrationContext context)
             : base(context)
         { }
 

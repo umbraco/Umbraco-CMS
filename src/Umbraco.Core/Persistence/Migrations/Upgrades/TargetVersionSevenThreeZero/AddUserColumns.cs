@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
 
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("failedLoginAttempts")) == false)
                 Create.Column("failedLoginAttempts").OnTable("umbracoUser").AsInt32().Nullable();
-            
+
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("lastLockoutDate")) == false)
                 Create.Column("lastLockoutDate").OnTable("umbracoUser").AsDateTime().Nullable();
 

@@ -6,6 +6,6 @@ namespace Umbraco.Core.Packaging
     {
         IPackageManager LocalPackageManager { get; }
         IPackageManager PublicPackageManager { get; }
-        IPackagePathResolver LocalPathResolver { get; } 
+        IPackagePathResolver LocalPathResolver { get; }
     }
 }

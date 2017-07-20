@@ -17,12 +17,12 @@ namespace Umbraco.Core.Models
     public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, INotifyCollectionChanged, IDeepCloneable
     {
         private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
-        
+
         internal Action OnAdd;
 
         internal PropertyGroupCollection()
         {
-            
+
         }
 
         public PropertyGroupCollection(IEnumerable<PropertyGroup> groups)
@@ -98,7 +98,7 @@ namespace Umbraco.Core.Models
                         }
                     }
                 }
-                
+
                 base.Add(item);
                 OnAdd.IfNotNull(x => x.Invoke());//Could this not be replaced by a Mandate/Contract for ensuring item is not null
 
@@ -175,7 +175,7 @@ namespace Umbraco.Core.Models
             foreach (var p in this)
             {
                 newGroup.Add((PropertyGroup)p.DeepClone());
-            }            
+            }
             return newGroup;
         }
     }

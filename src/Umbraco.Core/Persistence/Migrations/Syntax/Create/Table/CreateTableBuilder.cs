@@ -87,7 +87,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         {
             CurrentColumn.IsPrimaryKey = true;
 
-            //For MySQL, the PK will be created WITH the create table expression, however for 
+            //For MySQL, the PK will be created WITH the create table expression, however for
             // SQL Server, the PK get's created in a different Alter table expression afterwords.
             // MySQL will choke if the same constraint is again added afterword
             // TODO: This is a super hack, I'd rather not add another property like 'CreatesPkInCreateTableDefinition' to check
@@ -115,7 +115,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
             CurrentColumn.IsPrimaryKey = true;
             CurrentColumn.PrimaryKeyName = primaryKeyName;
 
-            //For MySQL, the PK will be created WITH the create table expression, however for 
+            //For MySQL, the PK will be created WITH the create table expression, however for
             // SQL Server, the PK get's created in a different Alter table expression afterwords.
             // MySQL will choke if the same constraint is again added afterword
             // TODO: This is a super hack, I'd rather not add another property like 'CreatesPkInCreateTableDefinition' to check
@@ -136,7 +136,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
                 };
                 _context.Expressions.Add(expression);
             }
-            
+
             return this;
         }
 

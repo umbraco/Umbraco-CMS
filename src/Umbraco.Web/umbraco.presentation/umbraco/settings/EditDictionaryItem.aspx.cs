@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -17,7 +17,7 @@ namespace umbraco.settings
     /// Summary description for EditDictionaryItem.
     /// </summary>
     [WebformsPageTreeAuthorize(Constants.Trees.Dictionary)]
-	public partial class EditDictionaryItem : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
+    public partial class EditDictionaryItem : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
         protected LiteralControl keyTxt = new LiteralControl();
         protected Umbraco.Web._Legacy.Controls.TabView tbv = new Umbraco.Web._Legacy.Controls.TabView();
@@ -29,16 +29,16 @@ namespace umbraco.settings
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
-		    currentItem = Services.LocalizationService.GetDictionaryItemById(int.Parse(Request.QueryString["id"]));
+            currentItem = Services.LocalizationService.GetDictionaryItemById(int.Parse(Request.QueryString["id"]));
 
             // Put user code to initialize the page here
             Panel1.hasMenu = true;
-			Panel1.Text = Services.TextService.Localize("editdictionary") + ": " + currentItem.ItemKey;
+            Panel1.Text = Services.TextService.Localize("editdictionary") + ": " + currentItem.ItemKey;
 
             var save = Panel1.Menu.NewButton();
             save.Text = Services.TextService.Localize("save");
             save.Click += save_Click;
-			save.ToolTip = Services.TextService.Localize("save");
+            save.ToolTip = Services.TextService.Localize("save");
             save.ID = "save";
             save.ButtonType = Umbraco.Web._Legacy.Controls.MenuButtonType.Primary;
 
@@ -77,10 +77,10 @@ namespace umbraco.settings
                 languageBox.ID = l.Id.ToString();
                 languageBox.CssClass = "umbEditorTextFieldMultiple";
 
-			    if (!IsPostBack)
-			    {
-			        languageBox.Text = currentItem.GetTranslatedValue(l.Id);
-			    }
+                if (!IsPostBack)
+                {
+                    languageBox.Text = currentItem.GetTranslatedValue(l.Id);
+                }
 
                 languageFields.Add(languageBox);
                 p.addProperty(l.CultureName, languageBox);
@@ -92,17 +92,17 @@ namespace umbraco.settings
             {
                 var path = BuildPath(currentItem);
                 ClientTools
-					.SetActiveTreeType(Constants.Trees.Dictionary)
+                    .SetActiveTreeType(Constants.Trees.Dictionary)
                     .SyncTree(path, false);
             }
 
             Panel1.Controls.Add(p);
         }
 
-	    private string BuildPath(IDictionaryItem current)
+        private string BuildPath(IDictionaryItem current)
         {
-	        var parentPath = current.ParentId.HasValue == false ? "" : BuildPath(current) + ",";
-	        return parentPath + current.Id;
+            var parentPath = current.ParentId.HasValue == false ? "" : BuildPath(current) + ",";
+            return parentPath + current.Id;
         }
 
         void save_Click(object sender, EventArgs e)
@@ -172,5 +172,5 @@ namespace umbraco.settings
         }
 
         #endregion
-	}
+    }
 }

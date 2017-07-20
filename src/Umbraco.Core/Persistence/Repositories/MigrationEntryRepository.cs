@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using LightInject;
@@ -89,7 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
             {
-                "DELETE FROM umbracoMigration WHERE id = @Id"                               
+                "DELETE FROM umbracoMigration WHERE id = @Id"
             };
             return list;
         }

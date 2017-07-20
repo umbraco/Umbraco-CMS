@@ -42,7 +42,7 @@ namespace Umbraco.Tests.UmbracoExamine
                         m.Name == (string)x.Attribute("nodeName") &&
                         m.Path == (string)x.Attribute("path") &&
                         m.Properties == new PropertyCollection() &&
-                        m.Published == true && 
+                        m.Published == true &&
                         m.ContentType == Mock.Of<IContentType>(mt =>
                             mt.Icon == "test" &&
                             mt.Alias == x.Name.LocalName &&
@@ -61,7 +61,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 indexer.RebuildIndex();
                 session.WaitForChanges();
 
-                var searcher = indexer.GetSearcher();                
+                var searcher = indexer.GetSearcher();
 
                 var numberSortedCriteria = searcher.CreateSearchCriteria()
                     .ParentId(1148).And()
@@ -104,7 +104,7 @@ namespace Umbraco.Tests.UmbracoExamine
         //        var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir,
         //            new GermanAnalyzer());
         //        indexer.RebuildIndex();
-        //        var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);    
+        //        var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
         //    }
         //}
 

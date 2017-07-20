@@ -27,7 +27,7 @@ namespace Umbraco.Web.WebApi.Filters
                 //if they are not valid for some strange reason - we need to continue setting valid ones
                 string failedReason;
                 if (AngularAntiForgeryHelper.ValidateHeaders(context.Request.Headers, out failedReason))
-                {                    
+                {
                     return;
                 }
             }

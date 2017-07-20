@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using NPoco;
@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected virtual IEnumerable<TDto> PerformFetch(Sql sql)
         {
             return Database.Fetch<TDto>(sql);
-        } 
+        }
 
         protected override TEntity PerformGet(TId id)
         {
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
-                dirtyEntity.ResetDirtyProperties(false);    
+                dirtyEntity.ResetDirtyProperties(false);
             }
 
             return entity;
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 sql.Where(GetWhereInClauseForGetAll(), new { /*ids =*/ ids });
             }
-            
+
             return Database.Fetch<TDto>(sql).Select(ConvertToEntity);
         }
 

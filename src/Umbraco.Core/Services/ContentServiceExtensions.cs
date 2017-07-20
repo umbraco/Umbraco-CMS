@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Services

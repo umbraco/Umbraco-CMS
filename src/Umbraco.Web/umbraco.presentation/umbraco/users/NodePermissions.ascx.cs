@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 using Umbraco.Core.Models.Membership;
@@ -64,20 +64,20 @@ namespace umbraco.cms.presentation.user
         public override void DataBind()
         {
             base.DataBind();
-            
-            
+
+
             if (m_umbracoUser == null)
                 throw new ArgumentNullException("No User specified");
 
             //get the logged in user's permissions
             UserPermissions currUserPermissions = new UserPermissions(Security.CurrentUser);
-            
+
             //lookup permissions for last node selected
             int selectedNodeId = m_nodeID[m_nodeID.Length - 1];
-            
+
             List<IAction> lstCurrUserActions = currUserPermissions.GetExistingNodePermission(selectedNodeId);
             List<IAction> lstLookupUserActions = m_userPermissions.GetExistingNodePermission(selectedNodeId);
-            
+
             List<IAction> lstAllActions = Action.GetPermissionAssignable();
 
             //no node is selected, disable the check boxes
@@ -103,19 +103,19 @@ namespace umbraco.cms.presentation.user
                 }
             }
 
-			lt_names.Text = names.Trim().Trim(',');
+            lt_names.Text = names.Trim().Trim(',');
         }
 
         private void ShowMessage(string msg)
         {
             lblMessage.Visible = true;
             lblMessage.Text = msg;
-            
+
         }
 
         private void BindExistingPermissions(List<IAction> allActions, List<IAction> userActions)
         {
-            
+
             List<AssignedPermission> assignedPermissions = new List<AssignedPermission>();
             foreach (var a in allActions)
             {
@@ -124,11 +124,11 @@ namespace umbraco.cms.presentation.user
                 p.HasPermission = (userActions != null ? userActions.Contains(a) : false);
                 assignedPermissions.Add(p);
             }
-            
+
             rptPermissionsList.DataSource = assignedPermissions;
             rptPermissionsList.DataBind();
-            
-        }        
+
+        }
 
         protected struct AssignedPermission
         {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Models
         }
 
         /// <summary>
-        /// Serves as the default hash function. 
+        /// Serves as the default hash function.
         /// </summary>
         /// <returns>
         /// A hash code for the current object.

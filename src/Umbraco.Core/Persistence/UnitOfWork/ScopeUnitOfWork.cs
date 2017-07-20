@@ -8,12 +8,12 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
-	/// <summary>
-	/// Represents a scoped unit of work.
-	/// </summary>
-	internal class ScopeUnitOfWork : UnitOfWorkBase, IScopeUnitOfWork
+    /// <summary>
+    /// Represents a scoped unit of work.
+    /// </summary>
+    internal class ScopeUnitOfWork : UnitOfWorkBase, IScopeUnitOfWork
     {
-	    private readonly IsolationLevel _isolationLevel;
+        private readonly IsolationLevel _isolationLevel;
         private readonly IScopeProvider _scopeProvider;
         private readonly IDatabaseContext _databaseContext;
         private bool _completeScope;
@@ -45,8 +45,8 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             _isolationLevel = isolationLevel;
 
             // fixme only 1!
-			_key = Guid.NewGuid();
-			InstanceId = Guid.NewGuid();
+            _key = Guid.NewGuid();
+            InstanceId = Guid.NewGuid();
 
             // be false by default
             // if set to true... the UnitOfWork is "auto-commit" which means that even in the case of
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             _key = Guid.NewGuid(); // fixme kill!
         }
 
-		public object Key => _key;
+        public object Key => _key;
 
         // fixme v8
         // once we are absolutely sure that our UOW cannot be disposed more than once,
@@ -118,21 +118,21 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
         public IEventDispatcher Events => Scope.Events;
 
-		/// <summary>
-		/// Ensures disposable objects are disposed
-		/// </summary>
-		/// <remarks>
-		/// Ensures that the Transaction instance is disposed of
-		/// </remarks>
-		protected override void DisposeResources()
-		{
+        /// <summary>
+        /// Ensures disposable objects are disposed
+        /// </summary>
+        /// <remarks>
+        /// Ensures that the Transaction instance is disposed of
+        /// </remarks>
+        protected override void DisposeResources()
+        {
             // base deals with the operation's queue
             base.DisposeResources();
 
-		    if (_scope == null) return;
-		    if (_completeScope) _scope.Complete();
-		    _scope.Dispose();
-		    _scope = null;
-		}
+            if (_scope == null) return;
+            if (_completeScope) _scope.Complete();
+            _scope.Dispose();
+            _scope = null;
+        }
     }
 }

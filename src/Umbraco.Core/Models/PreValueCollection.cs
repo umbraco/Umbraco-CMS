@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models
     /// <remarks>
     /// Due to the legacy nature of the data that can be stored for pre-values, we have this class which encapsulates the 2 different
     /// ways that pre-values are stored: A string array or a Dictionary.
-    /// 
+    ///
     /// Most legacy property editors won't support the dictionary format but new property editors should always use the dictionary format.
     /// In order to get overrideable pre-values working we need a dictionary since we'll have to reference a pre-value by a key.
     /// </remarks>
@@ -88,13 +88,13 @@ namespace Umbraco.Core.Models
             var clone = (PreValueCollection) MemberwiseClone();
             if (_preValuesAsArray != null)
             {
-                clone._preValuesAsArray = _preValuesAsArray.Select(x => (PreValue)x.DeepClone()).ToArray();    
+                clone._preValuesAsArray = _preValuesAsArray.Select(x => (PreValue)x.DeepClone()).ToArray();
             }
             if (_preValuesAsDictionary != null)
             {
-                clone._preValuesAsDictionary = _preValuesAsDictionary.ToDictionary(x => x.Key, x => (PreValue)x.Value.DeepClone());    
+                clone._preValuesAsDictionary = _preValuesAsDictionary.ToDictionary(x => x.Key, x => (PreValue)x.Value.DeepClone());
             }
-            
+
 
             return clone;
         }

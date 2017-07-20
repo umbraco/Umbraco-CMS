@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data;
@@ -14,7 +14,7 @@ namespace Umbraco.Web._Legacy.Controls
 
     public class TabPage : WebControl
     {
-        // Ensure that a TabPage cannot be instatiated outside 
+        // Ensure that a TabPage cannot be instatiated outside
         // this assembly -> New instances of a tabpage can only be retrieved through the tabview
         private bool _hasMenu = true;
         protected LiteralControl ErrorHeaderControl = new LiteralControl();
@@ -48,7 +48,7 @@ namespace Umbraco.Web._Legacy.Controls
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
-            
+
             _vs.ShowSummary = true;
             _vs.Attributes.Remove("style");
             _vs.Style.Clear();
@@ -82,7 +82,7 @@ namespace Umbraco.Web._Legacy.Controls
         {
             _closeButtonControl.Text = "<div id=\"errorPane_" + this.ClientID + "\" style='margin: 10px 0px 10px 0px; text-align: left;' class=\"error\"><div style=\"float: right; padding: 5px;\"><a href=\"#\" onClick=\"javascript:document.getElementById('errorPane_" + this.ClientID + "').style.display = 'none'; return false;\">" + CloseCaption + "</a></div><h3>";
             ErrorHeaderControl.Text = ErrorHeader;
-           
+
             var activeClass = string.Empty;
 
             if (this.ID == parent.ActiveTabId)

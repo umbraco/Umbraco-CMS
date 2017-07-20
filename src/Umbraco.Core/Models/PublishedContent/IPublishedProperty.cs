@@ -1,14 +1,14 @@
-namespace Umbraco.Core.Models.PublishedContent
+﻿namespace Umbraco.Core.Models.PublishedContent
 {
     /// <summary>
     /// Represents a property of an <c>IPublishedContent</c>.
     /// </summary>
-	public interface IPublishedProperty
-	{
+    public interface IPublishedProperty
+    {
         /// <summary>
         /// Gets the alias of the property.
         /// </summary>
-		string PropertyTypeAlias { get; }
+        string PropertyTypeAlias { get; }
 
         /// <summary>
         /// Gets a value indicating whether the property has a value.
@@ -56,5 +56,5 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <para>It has been fully prepared and processed by the appropriate converter.</para>
         /// </remarks>
         object XPathValue { get; }
-	}
+    }
 }

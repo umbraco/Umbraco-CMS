@@ -54,7 +54,7 @@ namespace Umbraco.Core.Persistence.Migrations
         public bool Execute(IMigrationContext migrationContext, bool isUpgrade = true)
         {
             _logger.Info<MigrationRunner>("Initializing database migrations");
-            
+
             var foundMigrations = FindMigrations(migrationContext);
 
             //filter all non-schema migrations
@@ -175,7 +175,7 @@ namespace Umbraco.Core.Persistence.Migrations
                     _logger.Info<MigrationRunner>($"Added DOWNGRADE migration '{migration.GetType().Name}' to context");
                 }
             }
-            
+
         }
 
         private void ExecuteMigrations(IMigrationContext context)

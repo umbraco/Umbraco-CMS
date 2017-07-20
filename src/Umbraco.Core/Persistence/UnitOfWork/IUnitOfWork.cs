@@ -4,11 +4,11 @@ using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
-	/// <summary>
+    /// <summary>
     /// Represents a persistence unit of work.
     /// </summary>
     public interface IUnitOfWork : IDisposable
-	{
+    {
         /// <summary>
         /// Registers an entity to be created as part of this unit of work.
         /// </summary>
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <typeparam name="TRepository">The type of the repository.</typeparam>
         /// <param name="name">The optional name of the repository.</param>
         /// <returns>The created repository for the unit of work.</returns>
-        TRepository CreateRepository<TRepository>(string name = null) 
+        TRepository CreateRepository<TRepository>(string name = null)
             where TRepository : IRepository;
     }
 }

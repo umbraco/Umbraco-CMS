@@ -1,4 +1,4 @@
-using Umbraco.Core.Logging;
+﻿using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
 using Umbraco.Core;
 using Umbraco.Web;
@@ -9,7 +9,7 @@ namespace umbraco
 {
     public class CreatedPackageTasks : LegacyDialogTask
     {
-        
+
         public override bool PerformSave()
         {
             Current.Logger.Info<CreatedPackageTasks>("Xml save started");

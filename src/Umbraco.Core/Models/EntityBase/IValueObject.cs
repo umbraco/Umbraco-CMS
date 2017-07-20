@@ -6,6 +6,6 @@
     /// </summary>
     public interface IValueObject
     {
-         
+
     }
 }

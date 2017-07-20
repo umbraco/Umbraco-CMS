@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             _skipIndexCheck = skipIndexCheck;
         }
 
-        public AddIndexToCmsMacroPropertyTable(IMigrationContext context) 
+        public AddIndexToCmsMacroPropertyTable(IMigrationContext context)
             : base(context)
         { }
 

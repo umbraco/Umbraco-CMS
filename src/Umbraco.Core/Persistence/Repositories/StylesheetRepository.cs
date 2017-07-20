@@ -91,7 +91,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// Gets a list of all <see cref="Stylesheet"/> that exist at the relative path specified. 
+        /// Gets a list of all <see cref="Stylesheet"/> that exist at the relative path specified.
         /// </summary>
         /// <param name="rootPath">
         /// If null or not specified, will return the stylesheets at the root path relative to the IFileSystem

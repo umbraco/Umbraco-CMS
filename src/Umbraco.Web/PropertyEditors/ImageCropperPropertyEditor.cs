@@ -211,7 +211,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <param name="model">The content.</param>
         private void AutoFillProperties(IContentBase model)
         {
-            var properties = model.Properties.Where(x => IsCropperField(x, false));            
+            var properties = model.Properties.Where(x => IsCropperField(x, false));
 
             foreach (var property in properties)
             {
@@ -249,7 +249,7 @@ namespace Umbraco.Web.PropertyEditors
                     _autoFillProperties.Reset(model, autoFillConfig);
                 else
                     _autoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(src));
-            }            
+            }
         }
 
         internal class ImageCropperPreValueEditor : PreValueEditor

@@ -14,7 +14,7 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.MediaPickerAlias, "(Obsolete) Media Picker", PropertyEditorValueTypes.Integer, "mediapicker", Group="media", Icon="icon-picture", IsDeprecated = true)]
     public class MediaPickerPropertyEditor : MediaPicker2PropertyEditor
     {
-        public MediaPickerPropertyEditor(ILogger logger) 
+        public MediaPickerPropertyEditor(ILogger logger)
             : base(logger)
         {
             InternalPreValues = new Dictionary<string, object>

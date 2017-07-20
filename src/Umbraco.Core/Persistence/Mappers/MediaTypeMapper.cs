@@ -5,7 +5,7 @@ using Umbraco.Core.Models.Rdbms;
 namespace Umbraco.Core.Persistence.Mappers
 {
     /// <summary>
-    /// Represents a <see cref="MediaType"/> to DTO mapper used to translate the properties of the public api 
+    /// Represents a <see cref="MediaType"/> to DTO mapper used to translate the properties of the public api
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
     [MapperFor(typeof(IMediaType))]

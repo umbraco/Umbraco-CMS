@@ -13,7 +13,7 @@ namespace Umbraco.Web.Security.Identity
     /// A custom cookie manager that is used to read the cookie from the request.
     /// </summary>
     /// <remarks>
-    /// Umbraco's back office cookie needs to be read on two paths: /umbraco and /install and /base therefore we cannot just set the cookie path to be /umbraco, 
+    /// Umbraco's back office cookie needs to be read on two paths: /umbraco and /install and /base therefore we cannot just set the cookie path to be /umbraco,
     /// instead we'll specify our own cookie manager and return null if the request isn't for an acceptable path.
     /// </remarks>
     internal class BackOfficeCookieManager : ChunkingCookieManager, ICookieManager
@@ -47,12 +47,12 @@ namespace Umbraco.Web.Security.Identity
             {
                 return null;
             }
-            
+
             return ShouldAuthenticateRequest(
-                context, 
-                _umbracoContextAccessor.UmbracoContext.OriginalRequestUrl) == false 
+                context,
+                _umbracoContextAccessor.UmbracoContext.OriginalRequestUrl) == false
                     //Don't auth request, don't return a cookie
-                    ? null 
+                    ? null
                     //Return the default implementation
                     : GetRequestCookie(context, key);
         }
@@ -84,23 +84,23 @@ namespace Umbraco.Web.Security.Identity
 
             var request = owinContext.Request;
             var httpContext = owinContext.TryGetHttpContext();
-            
+
             //check the explicit paths
             if (_explicitPaths != null)
             {
                 return _explicitPaths.Any(x => x.InvariantEquals(request.Uri.AbsolutePath));
             }
-            
+
             //check user seconds path
             if (request.Uri.AbsolutePath.InvariantEquals(_getRemainingSecondsPath)) return false;
 
             if (//check the explicit flag
                 (checkForceAuthTokens && owinContext.Get<bool?>("umbraco-force-auth") != null)
-                || (checkForceAuthTokens && httpContext.Success && httpContext.Result.Items["umbraco-force-auth"] != null)                
+                || (checkForceAuthTokens && httpContext.Success && httpContext.Result.Items["umbraco-force-auth"] != null)
                 //check back office
                 || request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
                 //check installer
-                || request.Uri.IsInstallerRequest())         
+                || request.Uri.IsInstallerRequest())
             {
                 return true;
             }

@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.2.0", 3, Constants.System.UmbracoMigrationName)]
     public class AddChangeDocumentTypePermission : MigrationBase
     {
-        public AddChangeDocumentTypePermission(IMigrationContext context) 
+        public AddChangeDocumentTypePermission(IMigrationContext context)
             : base(context)
         { }
 

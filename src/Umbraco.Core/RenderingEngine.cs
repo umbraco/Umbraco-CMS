@@ -1,4 +1,4 @@
-namespace Umbraco.Core
+﻿namespace Umbraco.Core
 {
     public enum RenderingEngine
     {

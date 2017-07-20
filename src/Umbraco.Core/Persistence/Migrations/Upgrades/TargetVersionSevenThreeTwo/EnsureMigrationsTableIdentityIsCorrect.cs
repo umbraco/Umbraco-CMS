@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Rdbms;
@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeTw
     [Migration("7.3.2", 0, Constants.System.UmbracoMigrationName)]
     public class EnsureMigrationsTableIdentityIsCorrect : MigrationBase
     {
-        public EnsureMigrationsTableIdentityIsCorrect(IMigrationContext context) 
+        public EnsureMigrationsTableIdentityIsCorrect(IMigrationContext context)
             : base(context)
         { }
 

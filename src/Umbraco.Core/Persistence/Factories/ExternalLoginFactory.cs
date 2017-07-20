@@ -1,4 +1,4 @@
-using Umbraco.Core.Models.Identity;
+﻿using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Factories
                 CreateDate = entity.CreateDate,
                 LoginProvider = entity.LoginProvider,
                 ProviderKey = entity.ProviderKey,
-                UserId = entity.UserId               
+                UserId = entity.UserId
             };
 
             return dto;

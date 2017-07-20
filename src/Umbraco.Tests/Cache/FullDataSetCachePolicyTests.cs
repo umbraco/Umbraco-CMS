@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Cache
             var getAll = new AuditItem[] {};
 
             var cached = new List<string>();
-            
+
             IList list = null;
 
             var cache = new Mock<IRuntimeCacheProvider>();

@@ -18,7 +18,7 @@ namespace Umbraco.Core
             /// The prefix used for external identity providers for their authentication type
             /// </summary>
             /// <remarks>
-            /// By default we don't want to interfere with front-end external providers and their default setup, for back office the 
+            /// By default we don't want to interfere with front-end external providers and their default setup, for back office the
             /// providers need to be setup differently and each auth type for the back office will be prefixed with this value
             /// </remarks>
             public const string BackOfficeExternalAuthenticationTypePrefix = "Umbraco.";

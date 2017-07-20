@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -7,19 +7,19 @@ using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.Mvc
 {
-	/// <summary>
-	/// Extension methods for UrlHelper
-	/// </summary>
-	public static class UrlHelperExtensions
-	{
-	    /// <summary>
-	    /// Utility method for checking for valid proxy urls or redirect urls to prevent Open Redirect security issues
-	    /// </summary>
-	    /// <param name="urlHelper"></param>
-	    /// <param name="url">The url to validate</param>
-	    /// <param name="callerUrl">The url of the current local domain (to ensure we can validate if the requested url is local without dependency on the request)</param>
-	    /// <returns>True if it's an allowed url</returns>
-	    public static bool ValidateProxyUrl(this UrlHelper urlHelper, string url, string callerUrl)
+    /// <summary>
+    /// Extension methods for UrlHelper
+    /// </summary>
+    public static class UrlHelperExtensions
+    {
+        /// <summary>
+        /// Utility method for checking for valid proxy urls or redirect urls to prevent Open Redirect security issues
+        /// </summary>
+        /// <param name="urlHelper"></param>
+        /// <param name="url">The url to validate</param>
+        /// <param name="callerUrl">The url of the current local domain (to ensure we can validate if the requested url is local without dependency on the request)</param>
+        /// <returns>True if it's an allowed url</returns>
+        public static bool ValidateProxyUrl(this UrlHelper urlHelper, string url, string callerUrl)
         {
             if (Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute) == false)
             {
@@ -82,10 +82,10 @@ namespace Umbraco.Web.Mvc
         /// <param name="url"></param>
         /// <returns></returns>
         public static string GetSaveFileServicePath(this UrlHelper url)
-		{
-			var result = url.Action("SavePartialView", "SaveFile", new {area = GlobalSettings.UmbracoMvcArea});
+        {
+            var result = url.Action("SavePartialView", "SaveFile", new {area = GlobalSettings.UmbracoMvcArea});
             return result.TrimEnd("SavePartialView").EnsureEndsWith('/');
-		}
+        }
 
         /// <summary>
         /// Returns the base path (not including the 'action') of the MVC controller "BulkPublishController"
@@ -108,5 +108,5 @@ namespace Umbraco.Web.Mvc
             var result = url.Action("ToSafeAlias", "CoreStrings", new { area = GlobalSettings.UmbracoMvcArea });
             return result.TrimEnd("ToSafeAlias");
         }
-	}
+    }
 }

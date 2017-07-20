@@ -18,7 +18,7 @@ namespace Umbraco.Core.Models
 
         internal Script(string path, Func<File, string> getFileContent)
             : base(path, getFileContent)
-        { }      
+        { }
 
         /// <summary>
         /// Indicates whether the current entity has an identity, which in this case is a path/name.

@@ -11,7 +11,7 @@ using ICSharpCode.SharpZipLib.Zip;
 
 namespace Umbraco.Core.IO
 {
-	public static class IOHelper
+    public static class IOHelper
     {
         private static string _rootDir = "";
 
@@ -21,14 +21,14 @@ namespace Umbraco.Core.IO
         public static char DirSepChar => Path.DirectorySeparatorChar;
 
         internal static void UnZip(string zipFilePath, string unPackDirectory, bool deleteZipFile)
-	    {
-	        // Unzip
-	        string tempDir = unPackDirectory;
-	        Directory.CreateDirectory(tempDir);
+        {
+            // Unzip
+            string tempDir = unPackDirectory;
+            Directory.CreateDirectory(tempDir);
 
             //TODO: Get rid of SharpZipLib library
-	        using (ZipInputStream s = new ZipInputStream(File.OpenRead(zipFilePath)))
-	        {
+            using (ZipInputStream s = new ZipInputStream(File.OpenRead(zipFilePath)))
+            {
                 ZipEntry theEntry;
                 while ((theEntry = s.GetNextEntry()) != null)
                 {
@@ -64,9 +64,9 @@ namespace Umbraco.Core.IO
                 if (deleteZipFile)
                     File.Delete(zipFilePath);
             }
-	    }
+        }
 
-	    //helper to try and match the old path to a new virtual one
+        //helper to try and match the old path to a new virtual one
         public static string FindFile(string virtualPath)
         {
             string retval = virtualPath;
@@ -115,8 +115,8 @@ namespace Umbraco.Core.IO
             {
                 return path;
             }
-			// Check that we even have an HttpContext! otherwise things will fail anyways
-			// http://umbraco.codeplex.com/workitem/30946
+            // Check that we even have an HttpContext! otherwise things will fail anyways
+            // http://umbraco.codeplex.com/workitem/30946
 
             if (useHttpContext && HttpContext.Current != null)
             {
@@ -127,11 +127,11 @@ namespace Umbraco.Core.IO
                     return HostingEnvironment.MapPath("~/" + path.TrimStart('/'));
             }
 
-        	var root = GetRootDirectorySafe();
-        	var newPath = path.TrimStart('~', '/').Replace('/', IOHelper.DirSepChar);
-        	var retval = root + IOHelper.DirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
+            var root = GetRootDirectorySafe();
+            var newPath = path.TrimStart('~', '/').Replace('/', IOHelper.DirSepChar);
+            var retval = root + IOHelper.DirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
 
-        	return retval;
+            return retval;
         }
 
         public static string MapPath(string path)
@@ -140,7 +140,7 @@ namespace Umbraco.Core.IO
         }
 
         //use a tilde character instead of the complete path
-		internal static string ReturnPath(string settingsKey, string standardPath, bool useTilde)
+        internal static string ReturnPath(string settingsKey, string standardPath, bool useTilde)
         {
             string retval = ConfigurationManager.AppSettings[settingsKey];
 
@@ -270,10 +270,10 @@ namespace Umbraco.Core.IO
                 return _rootDir;
             }
 
-			var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-			var uri = new Uri(codeBase);
-			var path = uri.LocalPath;
-        	var baseDirectory = Path.GetDirectoryName(path);
+            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            var uri = new Uri(codeBase);
+            var path = uri.LocalPath;
+            var baseDirectory = Path.GetDirectoryName(path);
             if (String.IsNullOrEmpty(baseDirectory))
                 throw new Exception("No root directory could be resolved. Please ensure that your Umbraco solution is correctly configured.");
 
@@ -317,9 +317,9 @@ namespace Umbraco.Core.IO
         /// <remarks>The supplied path should be the absolute path to the root of the umbraco site.</remarks>
         /// <param name="rootPath"></param>
         internal static void SetRootDirectory(string rootPath)
-	    {
+        {
             _rootDir = rootPath;
-	    }
+        }
 
         /// <summary>
         /// Check to see if filename passed has any special chars in it and strips them to create a safe filename.  Used to overcome an issue when Umbraco is used in IE in an intranet environment.
@@ -332,23 +332,23 @@ namespace Umbraco.Core.IO
             return filePath.ToSafeFileName();
         }
 
-	    public static void EnsurePathExists(string path)
-	    {
-	        var absolutePath = MapPath(path);
-	        if (Directory.Exists(absolutePath) == false)
-	            Directory.CreateDirectory(absolutePath);
-	    }
+        public static void EnsurePathExists(string path)
+        {
+            var absolutePath = MapPath(path);
+            if (Directory.Exists(absolutePath) == false)
+                Directory.CreateDirectory(absolutePath);
+        }
 
-	    public static void EnsureFileExists(string path, string contents)
-	    {
-	        var absolutePath = IOHelper.MapPath(path);
-	        if (File.Exists(absolutePath)) return;
+        public static void EnsureFileExists(string path, string contents)
+        {
+            var absolutePath = IOHelper.MapPath(path);
+            if (File.Exists(absolutePath)) return;
 
-	        using (var writer = File.CreateText(absolutePath))
-	        {
-	            writer.Write(contents);
-	        }
-	    }
+            using (var writer = File.CreateText(absolutePath))
+            {
+                writer.Write(contents);
+            }
+        }
 
         /// <summary>
         /// Checks if a given path is a full path including drive letter

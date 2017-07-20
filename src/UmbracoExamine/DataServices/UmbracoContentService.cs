@@ -31,7 +31,7 @@ namespace UmbracoExamine.DataServices
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-		public string StripHtml(string value)
+        public string StripHtml(string value)
         {
             return value.StripHtml();
         }
@@ -41,7 +41,7 @@ namespace UmbracoExamine.DataServices
         /// </summary>
         /// <param name="xpath"></param>
         /// <returns></returns>
-		public XDocument GetPublishedContentByXPath(string xpath)
+        public XDocument GetPublishedContentByXPath(string xpath)
         {
             //TODO: Remove the need for this, the best way would be to remove all requirements of examine based on Xml but that
             // would take some time. Another way in the in-term would be to add a static delegate to this class which can be set

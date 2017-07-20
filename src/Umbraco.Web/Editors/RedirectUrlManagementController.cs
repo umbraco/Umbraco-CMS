@@ -45,7 +45,7 @@ namespace Umbraco.Web.Editors
             var redirectUrlService = Services.RedirectUrlService;
             long resultCount;
 
-            var redirects = string.IsNullOrWhiteSpace(searchTerm) 
+            var redirects = string.IsNullOrWhiteSpace(searchTerm)
                 ? redirectUrlService.GetAllRedirectUrls(page, pageSize, out resultCount)
                 : redirectUrlService.SearchRedirectUrls(searchTerm, page, pageSize, out resultCount);
 
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Editors
             searchResult.TotalCount = resultCount;
             searchResult.CurrentPage = page;
             searchResult.PageCount = ((int)resultCount + pageSize - 1) / pageSize;
-            
+
             return searchResult;
 
         }

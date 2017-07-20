@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Umbraco.Core.Composing;
@@ -32,7 +32,7 @@ namespace Umbraco.Core.Services
         /// <param name="property">The content's Property</param>
         /// <param name="propertyData">The data that has been submitted to be saved for a content property</param>
         /// <param name="convertedPropertyValue">
-        /// If the <see cref="TagValueType"/> is <see cref="TagValueType.FromDelimitedValue"/> then this is expected to be a delimited string, 
+        /// If the <see cref="TagValueType"/> is <see cref="TagValueType.FromDelimitedValue"/> then this is expected to be a delimited string,
         /// otherwise if it is <see cref="TagValueType.CustomTagList"/> then this is expected to be IEnumerable{string}
         /// </param>
         /// <param name="attribute"></param>
@@ -65,7 +65,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="property">The content's Property</param>
         /// <param name="convertedPropertyValue">
-        /// If the <see cref="TagValueType"/> is <see cref="TagValueType.FromDelimitedValue"/> then this is expected to be a delimited string, 
+        /// If the <see cref="TagValueType"/> is <see cref="TagValueType.FromDelimitedValue"/> then this is expected to be a delimited string,
         /// otherwise if it is <see cref="TagValueType.CustomTagList"/> then this is expected to be IEnumerable{string}
         /// </param>
         /// <param name="delimiter">The delimiter for the value if convertedPropertyValue is a string delimited value</param>
@@ -110,8 +110,8 @@ namespace Umbraco.Core.Services
                                     if (parsedJson != null)
                                     {
                                         //recurse with new value
-                                        SetPropertyTags(property, parsedJson, delimiter, replaceTags, tagGroup, valueType, storageType);   
-                                    }                                    
+                                        SetPropertyTags(property, parsedJson, delimiter, replaceTags, tagGroup, valueType, storageType);
+                                    }
                                 }
                                 catch (Exception ex)
                                 {

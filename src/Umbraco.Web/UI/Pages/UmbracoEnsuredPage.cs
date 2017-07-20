@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Security;
 using System.Web;
 using Umbraco.Core.IO;
@@ -36,7 +36,7 @@ namespace Umbraco.Web.UI.Pages
         /// </summary>
         /// <param name="e"></param>
         /// <remarks>
-        /// Checks if the page exists outside of the /umbraco route, in which case the request will not have been authenticated for the back office 
+        /// Checks if the page exists outside of the /umbraco route, in which case the request will not have been authenticated for the back office
         /// so we'll force authentication.
         /// </remarks>
         protected override void OnPreInit(EventArgs e)
@@ -88,7 +88,7 @@ namespace Umbraco.Web.UI.Pages
         /// If true then umbraco will force any window/frame to reload umbraco in the main window
         /// </summary>
         protected bool RedirectToUmbraco { get; set; }
-      
+
         /// <summary>
         /// Used to assign a webforms page's security to a specific tree which will in turn check to see
         /// if the current user has access to the specified tree's registered section

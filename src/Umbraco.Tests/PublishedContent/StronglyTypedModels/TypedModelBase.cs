@@ -14,16 +14,16 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
     /// Represents the abstract base class for a 'TypedModel', which basically wraps IPublishedContent
     /// underneath a strongly typed model like "Textpage" and "Subpage".
     /// Because IPublishedContent is used under the hood there is no need for additional mapping, so the
-    /// only added cost should be the creation of the objects, which the IPublishedContent instance is 
+    /// only added cost should be the creation of the objects, which the IPublishedContent instance is
     /// passed into.
-    /// 
+    ///
     /// This base class exposes a simple way to write property getters by convention without
     /// using the string alias of a PropertyType (this is resolved by the use of the Property delegate).
-    /// 
+    ///
     /// This base class also exposes query options like Parent, Children, Ancestors and Descendants,
     /// which can be used for collections of strongly typed child models/objects. These types of collections
     /// typically corresponds to 'allowed child content types' on a Doc Type (at different levels).
-    /// 
+    ///
     /// The IPublishedContent properties are also exposed through this base class, but only
     /// by casting the typed model to IPublishedContent, so the properties doesn't show up by default:
     /// ie. ((IPublishedContent)textpage).Url

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
@@ -54,7 +54,7 @@ namespace Umbraco.Web.PropertyEditors
                     return string.Empty;
                 }
                 //Dates will be formatted as yyyy-MM-dd
-                return date.Result.Value.ToString("yyyy-MM-dd");                
+                return date.Result.Value.ToString("yyyy-MM-dd");
             }
 
         }

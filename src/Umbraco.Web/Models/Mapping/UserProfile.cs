@@ -55,9 +55,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(_textService)))
                 .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));
-            
-        } 
-     
+
+        }
+
         private static int GetIntId(object id)
         {
             var result = id.TryConvertTo<int>();
@@ -67,7 +67,7 @@ namespace Umbraco.Web.Models.Mapping
                     "Cannot convert the profile to a " + typeof(UserDetail).Name + " object since the id is not an integer");
             }
             return result.Result;
-        } 
- 
+        }
+
     }
 }

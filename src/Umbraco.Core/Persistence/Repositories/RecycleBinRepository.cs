@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
@@ -7,7 +7,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal abstract class RecycleBinRepository<TId, TEntity, TRepository> : VersionableRepositoryBase<TId, TEntity, TRepository>, IRecycleBinRepository<TEntity> 
+    internal abstract class RecycleBinRepository<TId, TEntity, TRepository> : VersionableRepositoryBase<TId, TEntity, TRepository>, IRecycleBinRepository<TEntity>
         where TEntity : class, IUmbracoEntity
         where TRepository :  class, IRepository
     {

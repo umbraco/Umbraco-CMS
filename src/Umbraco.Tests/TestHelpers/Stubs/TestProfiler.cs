@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using StackExchange.Profiling;
 using StackExchange.Profiling.SqlFormatters;
 using Umbraco.Core.Logging;

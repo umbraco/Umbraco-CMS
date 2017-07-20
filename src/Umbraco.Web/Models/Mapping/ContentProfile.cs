@@ -174,8 +174,8 @@ namespace Umbraco.Web.Models.Mapping
                 genericProperties =>
                 {
                     //TODO: This would be much nicer with the IUmbracoContextAccessor so we don't use singletons
-                    //If this is a web request and there's a user signed in and the 
-                    // user has access to the settings section, we will 
+                    //If this is a web request and there's a user signed in and the
+                    // user has access to the settings section, we will
                     if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
                         && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
                     {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class ContentTypeTests : UmbracoTestBase
     {
-       
+
 
         [Test]
         public void Can_Deep_Clone_Content_Type_Sort()
@@ -149,7 +149,7 @@ namespace Umbraco.Tests.Models
                     using (proflog.DebugDuration<ContentTypeTests>("Cloning content type"))
                     {
                         var clone = (ContentType)contentType.DeepClone();
-                    }                    
+                    }
                 }
             }
         }
@@ -160,7 +160,7 @@ namespace Umbraco.Tests.Models
             // Arrange
             var contentType = MockedContentTypes.CreateTextpageContentType();
             contentType.Id = 99;
-            
+
             var i = 200;
             foreach (var propertyType in contentType.PropertyTypes)
             {
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Models
             contentType.SetDefaultTemplate(new Template((string) "Test Template", (string) "testTemplate")
             {
                 Id = 88
-            });            
+            });
             contentType.Description = "test";
             contentType.Icon = "icon";
             contentType.IsContainer = true;
@@ -186,7 +186,7 @@ namespace Umbraco.Tests.Models
             contentType.Key = Guid.NewGuid();
             contentType.Level = 3;
             contentType.Path = "-1,4,10";
-            contentType.SortOrder = 5;            
+            contentType.SortOrder = 5;
             contentType.Trashed = false;
             contentType.UpdateDate = DateTime.Now;
 
@@ -237,7 +237,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.Thumbnail, contentType.Thumbnail);
             Assert.AreEqual(clone.Icon, contentType.Icon);
             Assert.AreEqual(clone.IsContainer, contentType.IsContainer);
-            
+
             //This double verifies by reflection
             var allProps = clone.GetType().GetProperties();
             foreach (var propertyInfo in allProps)
@@ -313,7 +313,7 @@ namespace Umbraco.Tests.Models
             }
             contentType.Id = 10;
             contentType.CreateDate = DateTime.Now;
-            contentType.CreatorId = 22;            
+            contentType.CreatorId = 22;
             contentType.Description = "test";
             contentType.Icon = "icon";
             contentType.IsContainer = true;

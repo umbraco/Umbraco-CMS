@@ -31,7 +31,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 
             Response.Cache.SetExpires(DateTime.Now.AddSeconds(5));
             Response.Cache.SetCacheability(HttpCacheability.Public);
-            
+
             //we need to clean this string:
             //http://issues.umbraco.org/issue/U4-2027
             var target = Request.QueryString.Get("target");
@@ -42,7 +42,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
                 throw new InvalidOperationException("The target query string must be set to a valid html element id");
 
             Target = matched[0].Value;
-            
+
             try
             {
 

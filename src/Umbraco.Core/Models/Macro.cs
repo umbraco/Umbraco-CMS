@@ -173,7 +173,7 @@ namespace Umbraco.Core.Models
         {
             OnPropertyChanged(Ps.Value.PropertiesSelector);
         }
-        
+
         public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
         {
             _addedProperties.Clear();
@@ -320,7 +320,7 @@ namespace Umbraco.Core.Models
         [DataMember]
         public MacroPropertyCollection Properties
         {
-            get { return _properties; }            
+            get { return _properties; }
         }
 
         public override object DeepClone()

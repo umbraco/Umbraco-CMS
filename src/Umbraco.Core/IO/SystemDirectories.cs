@@ -10,9 +10,9 @@ using System.IO;
 namespace Umbraco.Core.IO
 {
     //all paths has a starting but no trailing /
-	public class SystemDirectories
+    public class SystemDirectories
     {
-		//TODO: Why on earth is this even configurable? You cannot change the /Bin folder in ASP.Net
+        //TODO: Why on earth is this even configurable? You cannot change the /Bin folder in ASP.Net
         public static string Bin
         {
             get
@@ -36,7 +36,7 @@ namespace Umbraco.Core.IO
                 return IOHelper.ReturnPath("umbracoConfigDirectory", "~/config");
             }
         }
-                
+
         public static string Css
         {
             get
@@ -79,22 +79,22 @@ namespace Umbraco.Core.IO
         }
 
         public static string AppPlugins
-		{
-			get
-			{
-				//NOTE: this is not configurable and shouldn't need to be
-				return "~/App_Plugins";
-			}
-		}
+        {
+            get
+            {
+                //NOTE: this is not configurable and shouldn't need to be
+                return "~/App_Plugins";
+            }
+        }
 
-		public static string MvcViews
-		{
-			get
-			{
-				//NOTE: this is not configurable and shouldn't need to be
-				return "~/Views";
-			}
-		}
+        public static string MvcViews
+        {
+            get
+            {
+                //NOTE: this is not configurable and shouldn't need to be
+                return "~/Views";
+            }
+        }
 
         public static string PartialViews
         {
@@ -108,8 +108,8 @@ namespace Umbraco.Core.IO
         {
             get
             {
-                return MvcViews + "/MacroPartials/"; 
-                
+                return MvcViews + "/MacroPartials/";
+
             }
         }
 
@@ -120,7 +120,7 @@ namespace Umbraco.Core.IO
                 return IOHelper.ReturnPath("umbracoMediaPath", "~/media");
             }
         }
-        
+
         public static string Scripts
         {
             get
@@ -186,7 +186,7 @@ namespace Umbraco.Core.IO
             }
         }
 
-	    private static string _root;
+        private static string _root;
         /// <summary>
         /// Gets the root path of the application
         /// </summary>
@@ -200,7 +200,7 @@ namespace Umbraco.Core.IO
                     if (appPath == "/")
                         appPath = string.Empty;
 
-                    _root = appPath;    
+                    _root = appPath;
                 }
                 return _root;
             }
@@ -210,5 +210,5 @@ namespace Umbraco.Core.IO
     }
 
 
-    
+
 }

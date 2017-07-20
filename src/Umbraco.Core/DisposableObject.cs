@@ -1,39 +1,39 @@
-using System;
+﻿using System;
 
 namespace Umbraco.Core
 {
-	/// <summary>
-	/// Abstract implementation of IDisposable.
-	/// </summary>
-	/// <remarks>
-	/// Can also be used as a pattern for when inheriting is not possible.
-	///
+    /// <summary>
+    /// Abstract implementation of IDisposable.
+    /// </summary>
+    /// <remarks>
+    /// Can also be used as a pattern for when inheriting is not possible.
+    ///
     /// See also: https://msdn.microsoft.com/en-us/library/b1yfkh5e%28v=vs.110%29.aspx
     /// See also: https://lostechies.com/chrispatterson/2012/11/29/idisposable-done-right/
     ///
     /// Note: if an object's ctor throws, it will never be disposed, and so if that ctor
     /// has allocated disposable objects, it should take care of disposing them.
-	/// </remarks>
-	public abstract class DisposableObject : IDisposable
-	{
-	    private readonly object _locko = new object();
+    /// </remarks>
+    public abstract class DisposableObject : IDisposable
+    {
+        private readonly object _locko = new object();
 
-		// gets a value indicating whether this instance is disposed.
+        // gets a value indicating whether this instance is disposed.
         // for internal tests only (not thread safe)
-		public bool Disposed { get; private set; }
+        public bool Disposed { get; private set; }
 
-	    // implements IDisposable
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+        // implements IDisposable
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         // finalizer
-		~DisposableObject()
-		{
-			Dispose(false);
-		}
+        ~DisposableObject()
+        {
+            Dispose(false);
+        }
 
         private void Dispose(bool disposing)
         {
@@ -41,21 +41,21 @@ namespace Umbraco.Core
             if (_locko == null)
                 return;
 
-		    lock (_locko)
-		    {
-		        if (Disposed) return;
-		        Disposed = true;
-		    }
+            lock (_locko)
+            {
+                if (Disposed) return;
+                Disposed = true;
+            }
 
             DisposeUnmanagedResources();
 
             if (disposing)
                 DisposeResources();
-		}
+        }
 
-		protected abstract void DisposeResources();
+        protected abstract void DisposeResources();
 
-		protected virtual void DisposeUnmanagedResources()
-		{ }
-	}
+        protected virtual void DisposeUnmanagedResources()
+        { }
+    }
 }

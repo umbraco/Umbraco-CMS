@@ -1,17 +1,17 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace Umbraco.Core
 {
     /// <summary>
     /// A custom collection similar to HashSet{T} which only contains unique items, however this collection keeps items in order
-    /// and is customizable to keep the newest or oldest equatable item 
+    /// and is customizable to keep the newest or oldest equatable item
     /// </summary>
     /// <typeparam name="T"></typeparam>
     internal class OrderedHashSet<T> : KeyedCollection<T, T>
     {
         private readonly bool _keepOldest;
 
-        public OrderedHashSet(bool keepOldest = true) 
+        public OrderedHashSet(bool keepOldest = true)
         {
             _keepOldest = keepOldest;
         }
@@ -39,7 +39,7 @@ namespace Umbraco.Core
                     }
                     base.InsertItem(index, item);
                 }
-            }            
+            }
         }
 
         protected override T GetKeyForItem(T item)

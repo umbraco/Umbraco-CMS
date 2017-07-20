@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace Umbraco.Core.Cache
 {
@@ -34,8 +34,8 @@ namespace Umbraco.Core.Cache
 
         /// <summary>
         /// True/false as to validate the total item count when all items are returned from cache, the default is true but this
-        /// means that a db lookup will occur - though that lookup will probably be significantly less expensive than the normal 
-        /// GetAll method. 
+        /// means that a db lookup will occur - though that lookup will probably be significantly less expensive than the normal
+        /// GetAll method.
         /// </summary>
         /// <remarks>
         /// setting this to return false will improve performance of GetAll cache with no params but should only be used

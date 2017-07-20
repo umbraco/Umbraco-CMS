@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
     [Migration("7.2.0", 1, Constants.System.UmbracoMigrationName)]
     public class AddMissingForeignKeyForContentType : MigrationBase
     {
-        public AddMissingForeignKeyForContentType(IMigrationContext context) 
+        public AddMissingForeignKeyForContentType(IMigrationContext context)
             : base(context)
         { }
 
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
                     Delete.FromTable("umbracoNode").Row(new { id = orphanedId });
                 }
 
-                //Some very old schemas don't have an index on the cmsContentType.nodeId column, I'm not actually sure when it was added but 
+                //Some very old schemas don't have an index on the cmsContentType.nodeId column, I'm not actually sure when it was added but
                 // it is absolutely required to exist in order to add other foreign keys and much better for perf, so we'll need to check it's existence
                 // this came to light from this issue: http://issues.umbraco.org/issue/U4-4133
                 var dbIndexes = SqlSyntax.GetDefinedIndexes(Context.Database)

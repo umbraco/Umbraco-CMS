@@ -21,7 +21,7 @@ namespace Umbraco.Web.Strategies
             foreach (var grp in e.SavedEntities)
             {
                 //check if the name has changed
-                if (grp.AdditionalData.ContainsKey("previousName") 
+                if (grp.AdditionalData.ContainsKey("previousName")
                     && grp.AdditionalData["previousName"] != null
                     && grp.AdditionalData["previousName"].ToString().IsNullOrWhiteSpace() == false
                     && grp.AdditionalData["previousName"].ToString() != grp.Name)

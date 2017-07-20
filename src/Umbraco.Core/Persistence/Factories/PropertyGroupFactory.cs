@@ -6,7 +6,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class PropertyGroupFactory 
+    internal class PropertyGroupFactory
     {
         private readonly int _contentTypeId;
         private readonly DateTime _createDate;

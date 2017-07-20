@@ -36,7 +36,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         /// <summary>
         /// This allows for custom configuration to be injected into the pre-value editor
-        /// </summary>        
+        /// </summary>
         [DataMember(Name = "config")]
         public IDictionary<string, object> Config { get; set; }
 

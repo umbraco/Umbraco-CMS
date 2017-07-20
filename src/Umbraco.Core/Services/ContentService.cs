@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -2505,7 +2505,7 @@ namespace Umbraco.Core.Services
             var moves = new List<Tuple<IContent, string>>();
             var contentTypeIdsA = contentTypeIds.ToArray();
 
-            // using an immediate uow here because we keep making changes with 
+            // using an immediate uow here because we keep making changes with
             // PerformMoveLocked and DeleteLocked that must be applied immediately,
             // no point queuing operations
             //

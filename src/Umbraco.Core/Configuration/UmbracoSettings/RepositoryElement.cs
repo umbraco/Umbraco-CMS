@@ -38,7 +38,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get
             {
                 var prop = Properties["webserviceurl"];
-                return (string) prop.DefaultValue != (string) this[prop];                
+                return (string) prop.DefaultValue != (string) this[prop];
             }
         }
 
@@ -48,6 +48,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (string)base["restapiurl"]; }
             set { base["restapiurl"] = value; }
         }
-        
+
     }
 }

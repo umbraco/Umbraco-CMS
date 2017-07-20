@@ -42,7 +42,7 @@ namespace Umbraco.Core.Scoping
         private const IsolationLevel DefaultIsolationLevel = IsolationLevel.RepeatableRead;
 
         // initializes a new scope
-        private Scope(ScopeProvider scopeProvider, 
+        private Scope(ScopeProvider scopeProvider,
             ILogger logger, FileSystems fileSystems, Scope parent, ScopeContext scopeContext, bool detachable,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
@@ -113,7 +113,7 @@ namespace Umbraco.Core.Scoping
         }
 
         // initializes a new scope
-        public Scope(ScopeProvider scopeProvider, 
+        public Scope(ScopeProvider scopeProvider,
             ILogger logger, FileSystems fileSystems, bool detachable, ScopeContext scopeContext,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
@@ -369,7 +369,7 @@ namespace Umbraco.Core.Scoping
         {
             // figure out completed
             var completed = _completed.HasValue && _completed.Value;
-            
+
             // deal with database
             var databaseException = false;
             if (_database != null)

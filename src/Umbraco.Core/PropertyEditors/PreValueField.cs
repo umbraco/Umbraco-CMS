@@ -68,8 +68,8 @@ namespace Umbraco.Core.PropertyEditors
 
         /// <summary>
         /// Defines the view to use for the editor, this can be one of 3 things:
-        /// * the full virtual path or 
-        /// * the relative path to the current Umbraco folder 
+        /// * the full virtual path or
+        /// * the relative path to the current Umbraco folder
         /// * a simple view name which will map to the views/prevalueeditors/{view}.html
         /// </summary>
         [JsonProperty("view", Required = Required.Always)]
@@ -83,7 +83,7 @@ namespace Umbraco.Core.PropertyEditors
 
         /// <summary>
         /// This allows for custom configuration to be injected into the pre-value editor
-        /// </summary>        
+        /// </summary>
         [JsonProperty("config")]
         public IDictionary<string, object> Config { get; set; }
     }

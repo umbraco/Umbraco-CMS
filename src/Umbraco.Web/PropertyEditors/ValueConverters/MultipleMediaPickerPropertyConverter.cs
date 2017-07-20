@@ -45,8 +45,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
         {
-            return IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias) 
-                ? typeof(IEnumerable<IPublishedContent>) 
+            return IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias)
+                ? typeof(IEnumerable<IPublishedContent>)
                 : typeof(IPublishedContent);
         }
 
@@ -112,7 +112,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             // single value picker
             var nodeId = (int)source;
-            
+
             return umbHelper.Media(nodeId);
         }
 
@@ -144,8 +144,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
                     return preValue != null && preValue.Value.TryConvertTo<bool>().Result;
                 }
-                
-                //in some odd cases, the pre-values in the db won't exist but their default pre-values contain this key so check there 
+
+                //in some odd cases, the pre-values in the db won't exist but their default pre-values contain this key so check there
                 if (_propertyEditors.TryGet(propertyEditorAlias, out PropertyEditor propertyEditor))
                 {
                     var preValue = propertyEditor.DefaultPreValues

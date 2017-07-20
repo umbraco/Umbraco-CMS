@@ -8,7 +8,7 @@ namespace Umbraco.Web.Cache
 {
     public sealed class UserTypeCacheRefresher : CacheRefresherBase<UserTypeCacheRefresher>
     {
-        public UserTypeCacheRefresher(CacheHelper cacheHelper) 
+        public UserTypeCacheRefresher(CacheHelper cacheHelper)
             : base(cacheHelper)
         { }
 

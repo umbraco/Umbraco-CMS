@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
 using Umbraco.Core;
@@ -34,7 +34,7 @@ namespace umbraco
 
         public override bool PerformDelete()
         {
-			Current.Logger.Debug<dictionaryTasks>(TypeID + " " + ParentID + " deleting " + Alias);
+            Current.Logger.Debug<dictionaryTasks>(TypeID + " " + ParentID + " deleting " + Alias);
             var di = Current.Services.LocalizationService.GetDictionaryItemById(ParentID);
             if (di == null) return true;
 

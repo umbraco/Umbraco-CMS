@@ -1,34 +1,34 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
 {
-	/// <summary>
-	/// Starts the timer and invokes a  callback upon disposal. Provides a simple way of timing an operation by wrapping it in a <code>using</code> (C#) statement.
-	/// </summary>
-	public class DisposableTimer : DisposableObject
-	{
-	    private readonly ILogger _logger;
-	    private readonly LogType? _logType;
-	    private readonly Type _loggerType;
-	    private readonly int _thresholdMilliseconds;
-	    private readonly IDisposable _profilerStep;
+    /// <summary>
+    /// Starts the timer and invokes a  callback upon disposal. Provides a simple way of timing an operation by wrapping it in a <code>using</code> (C#) statement.
+    /// </summary>
+    public class DisposableTimer : DisposableObject
+    {
+        private readonly ILogger _logger;
+        private readonly LogType? _logType;
+        private readonly Type _loggerType;
+        private readonly int _thresholdMilliseconds;
+        private readonly IDisposable _profilerStep;
         private readonly string _endMessage;
         private string _failMessage;
-	    private Exception _failException;
-	    private bool _failed;
+        private Exception _failException;
+        private bool _failed;
 
         internal enum LogType
-	    {
-	        Debug, Info
-	    }
+        {
+            Debug, Info
+        }
 
         // internal - created by profiling logger
-	    internal DisposableTimer(ILogger logger, LogType logType, IProfiler profiler, Type loggerType,
+        internal DisposableTimer(ILogger logger, LogType logType, IProfiler profiler, Type loggerType,
             string startMessage, string endMessage, string failMessage = null,
             int thresholdMilliseconds = 0)
-	    {
+        {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (loggerType == null) throw new ArgumentNullException(nameof(loggerType));
 
@@ -36,8 +36,8 @@ namespace Umbraco.Core
             _logType = logType;
             _loggerType = loggerType;
             _endMessage = endMessage;
-	        _failMessage = failMessage;
-	        _thresholdMilliseconds = thresholdMilliseconds < 0 ? 0 : thresholdMilliseconds;
+            _failMessage = failMessage;
+            _thresholdMilliseconds = thresholdMilliseconds < 0 ? 0 : thresholdMilliseconds;
 
             if (thresholdMilliseconds == 0)
             {
@@ -73,26 +73,26 @@ namespace Umbraco.Core
             _failException = exception;
         }
 
-	    public Stopwatch Stopwatch { get; } = Stopwatch.StartNew();
+        public Stopwatch Stopwatch { get; } = Stopwatch.StartNew();
 
         /// <summary>
         ///Disposes resources.
         /// </summary>
         /// <remarks>Overrides abstract class <see cref="DisposableObject"/> which handles required locking.</remarks>
         protected override void DisposeResources()
-		{
+        {
             Stopwatch.Stop();
 
-		    _profilerStep?.Dispose();
+            _profilerStep?.Dispose();
 
-		    if ((Stopwatch.ElapsedMilliseconds >= _thresholdMilliseconds || _failed)
+            if ((Stopwatch.ElapsedMilliseconds >= _thresholdMilliseconds || _failed)
                 && _logType.HasValue && _loggerType != null && _logger != null
                 && (_endMessage.IsNullOrWhiteSpace() == false || _failed))
-		    {
-		        if (_failed)
-		        {
-		            _logger.Error(_loggerType, $"{_failMessage} ({Stopwatch.ElapsedMilliseconds}ms)", _failException);
-		        }
+            {
+                if (_failed)
+                {
+                    _logger.Error(_loggerType, $"{_failMessage} ({Stopwatch.ElapsedMilliseconds}ms)", _failException);
+                }
                 else switch (_logType)
                 {
                     case LogType.Debug:
@@ -102,10 +102,10 @@ namespace Umbraco.Core
                         _logger.Info(_loggerType, () => $"{_endMessage} ({Stopwatch.ElapsedMilliseconds}ms)");
                         break;
                     // filtered in the ctor
-                    //default: 
+                    //default:
                     //    throw new Exception();
                 }
             }
-		}
-	}
+        }
+    }
 }

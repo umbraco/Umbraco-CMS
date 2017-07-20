@@ -27,7 +27,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 });
             }
 
-            
+
 
         }
 

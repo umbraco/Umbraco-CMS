@@ -7,7 +7,7 @@ using Umbraco.Core.Composing;
 namespace Umbraco.Core.Macros
 {
     // that one is special since it's not initialized with XsltExtension types, but with Xslt extension object types,
-    // which are then wrapped in an XsltExtension object when the collection is created. so, cannot really inherit 
+    // which are then wrapped in an XsltExtension object when the collection is created. so, cannot really inherit
     // from (Lazy)CollectionBuilderBase and have to re-implement it. but almost everything is copied from CollectionBuilderBase.
 
     internal class XsltExtensionCollectionBuilder : ICollectionBuilder<XsltExtensionCollection, XsltExtension>

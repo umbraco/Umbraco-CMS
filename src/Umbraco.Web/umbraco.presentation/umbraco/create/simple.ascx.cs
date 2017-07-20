@@ -11,7 +11,7 @@ using UmbracoUserControl = Umbraco.Web.UI.Controls.UmbracoUserControl;
 namespace umbraco.cms.presentation.create.controls
 {
     /// <summary>
-    ///		Summary description for simple.
+    ///        Summary description for simple.
     /// </summary>
     public partial class simple : UmbracoUserControl
     {

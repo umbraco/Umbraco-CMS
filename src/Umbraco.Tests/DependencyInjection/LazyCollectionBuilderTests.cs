@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using LightInject;
@@ -8,20 +8,20 @@ using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.DI
 {
-	[TestFixture]
-	public class LazyCollectionBuilderTests
-	{
-		[SetUp]
-		public void Initialize()
-		{
+    [TestFixture]
+    public class LazyCollectionBuilderTests
+    {
+        [SetUp]
+        public void Initialize()
+        {
             Current.Reset();
         }
 
         [TearDown]
-		public void TearDown()
-		{
-		    Current.Reset();
-		}
+        public void TearDown()
+        {
+            Current.Reset();
+        }
 
         // note
         // lazy collection builder does not throw on duplicate, just uses distinct types
@@ -98,9 +98,9 @@ namespace Umbraco.Tests.DI
             Assert.IsFalse(values.Contains(o1)); // transient
         }
 
-	    [Test]
-	    public void LazyCollectionBuilderThrows()
-	    {
+        [Test]
+        public void LazyCollectionBuilderThrows()
+        {
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
 
@@ -113,12 +113,12 @@ namespace Umbraco.Tests.DI
                 // legal so far...
                 .Add(() => new[] { typeof(TransientObject4)  });
 
-	        Assert.Throws<InvalidOperationException>(() =>
-	        {
+            Assert.Throws<InvalidOperationException>(() =>
+            {
                 // but throws here when trying to register the types
-	            var values = container.GetInstance<TestCollection>();
-	        });
-	    }
+                var values = container.GetInstance<TestCollection>();
+            });
+        }
 
         [Test]
         public void LazyCollectionBuilderExclude()
@@ -145,19 +145,19 @@ namespace Umbraco.Tests.DI
             Assert.IsFalse(values.Contains(o1)); // transient
         }
 
-		#region Test classes
+        #region Test classes
 
-		private interface ITestInterface
-		{ }
+        private interface ITestInterface
+        { }
 
-		private class TransientObject1 : ITestInterface
-		{ }
+        private class TransientObject1 : ITestInterface
+        { }
 
-		private class TransientObject2 : ITestInterface
-		{ }
+        private class TransientObject2 : ITestInterface
+        { }
 
-		private class TransientObject3 : ITestInterface
-		{ }
+        private class TransientObject3 : ITestInterface
+        { }
 
         private class TransientObject4
         { }
@@ -180,6 +180,6 @@ namespace Umbraco.Tests.DI
             { }
         }
 
-		#endregion
-	}
+        #endregion
+    }
 }

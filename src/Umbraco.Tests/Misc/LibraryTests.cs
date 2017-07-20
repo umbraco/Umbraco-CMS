@@ -14,12 +14,12 @@ using Umbraco.Web.PublishedCache.XmlPublishedCache;
 namespace Umbraco.Tests.Misc
 {
 
-	/// <summary>
-	/// Tests for the legacy library class
-	/// </summary>
-	[TestFixture]
-	public class LibraryTests : BaseWebTest
-	{
+    /// <summary>
+    /// Tests for the legacy library class
+    /// </summary>
+    [TestFixture]
+    public class LibraryTests : BaseWebTest
+    {
         public override void SetUp()
         {
             base.SetUp();
@@ -42,24 +42,24 @@ namespace Umbraco.Tests.Misc
 
             var umbracoContext = GetUmbracoContext("/test");
             Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
-		}
+        }
 
-	    /// <summary>
-	    /// sets up resolvers before resolution is frozen
-	    /// </summary>
-	    protected override void Compose()
-	    {
-	        base.Compose();
+        /// <summary>
+        /// sets up resolvers before resolution is frozen
+        /// </summary>
+        protected override void Compose()
+        {
+            base.Compose();
 
             // required so we can access property.Value
-	        Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
-	    }
+            Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
+        }
 
-	    [Test]
-	    public void Json_To_Xml_Object()
-	    {
-	        var json = "{ id: 1, name: 'hello', children: [{id: 2, name: 'child1'}, {id:3, name: 'child2'}]}";
-	        var result = library.JsonToXml(json);
+        [Test]
+        public void Json_To_Xml_Object()
+        {
+            var json = "{ id: 1, name: 'hello', children: [{id: 2, name: 'child1'}, {id:3, name: 'child2'}]}";
+            var result = library.JsonToXml(json);
             Assert.AreEqual(@"<json>
   <id>1</id>
   <name>hello</name>
@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Misc
     <name>child2</name>
   </children>
 </json>".CrLf(), result.Current.OuterXml.CrLf());
-	    }
+        }
 
         [Test]
         public void Json_To_Xml_Array()
@@ -99,71 +99,71 @@ namespace Umbraco.Tests.Misc
             Assert.IsTrue(result.Current.OuterXml.StartsWith("<error>"));
         }
 
-	    [Test]
-		public void Get_Item_User_Property()
-		{
-			var val = library.GetItem(1173, "content");
-			var legacyVal = LegacyGetItem(1173, "content");
-			Assert.AreEqual(legacyVal, val);
-			Assert.AreEqual("<div>This is some content</div>", val);
-		}
+        [Test]
+        public void Get_Item_User_Property()
+        {
+            var val = library.GetItem(1173, "content");
+            var legacyVal = LegacyGetItem(1173, "content");
+            Assert.AreEqual(legacyVal, val);
+            Assert.AreEqual("<div>This is some content</div>", val);
+        }
 
-		[Test]
-		public void Get_Item_Document_Property()
-		{
-			//first test a single static val
-			var val = library.GetItem(1173, "template");
-			var legacyVal = LegacyGetItem(1173, "template");
-			Assert.AreEqual(legacyVal, val);
-			Assert.AreEqual("1234", val);
+        [Test]
+        public void Get_Item_Document_Property()
+        {
+            //first test a single static val
+            var val = library.GetItem(1173, "template");
+            var legacyVal = LegacyGetItem(1173, "template");
+            Assert.AreEqual(legacyVal, val);
+            Assert.AreEqual("1234", val);
 
-			//now test them all to see if they all match legacy
-			foreach(var s in new[]{"id","parentID","level","writerID","template","sortOrder","createDate","updateDate","nodeName","writerName","path"})
-			{
-				val = library.GetItem(1173, s);
-				legacyVal = LegacyGetItem(1173, s);
-				Assert.AreEqual(legacyVal, val);
-			}
-		}
+            //now test them all to see if they all match legacy
+            foreach(var s in new[]{"id","parentID","level","writerID","template","sortOrder","createDate","updateDate","nodeName","writerName","path"})
+            {
+                val = library.GetItem(1173, s);
+                legacyVal = LegacyGetItem(1173, s);
+                Assert.AreEqual(legacyVal, val);
+            }
+        }
 
-		[Test]
-		public void Get_Item_Invalid_Property()
-		{
-			var val = library.GetItem(1173, "dontfindme");
-			var legacyVal = LegacyGetItem(1173, "dontfindme");
-			Assert.AreEqual(legacyVal, val);
-			Assert.AreEqual("", val);
-		}
+        [Test]
+        public void Get_Item_Invalid_Property()
+        {
+            var val = library.GetItem(1173, "dontfindme");
+            var legacyVal = LegacyGetItem(1173, "dontfindme");
+            Assert.AreEqual(legacyVal, val);
+            Assert.AreEqual("", val);
+        }
 
-		/// <summary>
-		/// The old method, just using this to make sure we're returning the correct exact data as before.
-		/// </summary>
-		/// <param name="nodeId"></param>
-		/// <param name="alias"></param>
-		/// <returns></returns>
-		private string LegacyGetItem(int nodeId, string alias)
-		{
+        /// <summary>
+        /// The old method, just using this to make sure we're returning the correct exact data as before.
+        /// </summary>
+        /// <param name="nodeId"></param>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        private string LegacyGetItem(int nodeId, string alias)
+        {
             var cache = UmbracoContext.Current.ContentCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
             var umbracoXML = cache.GetXml(UmbracoContext.Current.InPreviewMode);
 
             string xpath = "./{0}";
-			if (umbracoXML.GetElementById(nodeId.ToString()) != null)
-				if (
-					",id,parentID,level,writerID,template,sortOrder,createDate,updateDate,nodeName,writerName,path,"
-						.
-						IndexOf("," + alias + ",") > -1)
-					return umbracoXML.GetElementById(nodeId.ToString()).Attributes.GetNamedItem(alias).Value;
-				else if (
-					umbracoXML.GetElementById(nodeId.ToString()).SelectSingleNode(string.Format(xpath, alias)) !=
-					null)
-					return
-						umbracoXML.GetElementById(nodeId.ToString()).SelectSingleNode(string.Format(xpath, alias)).ChildNodes[0].
-							Value; //.Value + "*";
-				else
-					return string.Empty;
-			else
-				return string.Empty;
-		}
-	}
+            if (umbracoXML.GetElementById(nodeId.ToString()) != null)
+                if (
+                    ",id,parentID,level,writerID,template,sortOrder,createDate,updateDate,nodeName,writerName,path,"
+                        .
+                        IndexOf("," + alias + ",") > -1)
+                    return umbracoXML.GetElementById(nodeId.ToString()).Attributes.GetNamedItem(alias).Value;
+                else if (
+                    umbracoXML.GetElementById(nodeId.ToString()).SelectSingleNode(string.Format(xpath, alias)) !=
+                    null)
+                    return
+                        umbracoXML.GetElementById(nodeId.ToString()).SelectSingleNode(string.Format(xpath, alias)).ChildNodes[0].
+                            Value; //.Value + "*";
+                else
+                    return string.Empty;
+            else
+                return string.Empty;
+        }
+    }
 }

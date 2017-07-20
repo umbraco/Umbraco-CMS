@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Linq;
 using NPoco;
@@ -33,8 +33,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
 
                 var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
 
-                if (columns.Any(x => x.ColumnName.InvariantEquals("id") 
-                    && x.TableName.InvariantEquals("umbracoLanguage") 
+                if (columns.Any(x => x.ColumnName.InvariantEquals("id")
+                    && x.TableName.InvariantEquals("umbracoLanguage")
                     && x.DataType.InvariantEquals("smallint")))
                 {
                     //Ensure that the umbracoLanguage PK is INT and not SmallInt (which it  might be in older db versions)
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                         .WithColumn("id").AsInt32().NotNullable().Identity()
                         .WithColumn("languageISOCode").AsString(10).Nullable()
                         .WithColumn("languageCultureName").AsString(50).Nullable();
-                
+
                     var currentData = Context.Database.Fetch<LanguageDto>(Sql().SelectAll().From<LanguageDto>());
                     foreach (var languageDto in currentData)
                     {
@@ -51,7 +51,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                             .EnableIdentityInsert()
                             .Row(new {id = languageDto.Id, languageISOCode = languageDto.IsoCode, languageCultureName = languageDto.CultureName});
                     }
-                    
+
                     //ok, all data has been copied over, drop the old table, rename the temp table and re-add constraints.
                     Delete.Table("umbracoLanguage");
                     Rename.Table("umbracoLanguage_TEMP").To("umbracoLanguage");
@@ -95,7 +95,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             }
 
 
-            
+
         }
 
         public override void Down()

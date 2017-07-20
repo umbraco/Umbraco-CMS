@@ -8,7 +8,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-			return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.ColorPickerAlias);
+            return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.ColorPickerAlias);
         }
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)

@@ -5,7 +5,7 @@ namespace Umbraco.Core.PropertyEditors
 {
     public class PropertyValueConverterCollectionBuilder : OrderedCollectionBuilderBase<PropertyValueConverterCollectionBuilder, PropertyValueConverterCollection, IPropertyValueConverter>
     {
-        public PropertyValueConverterCollectionBuilder(IServiceContainer container) 
+        public PropertyValueConverterCollectionBuilder(IServiceContainer container)
             : base(container)
         { }
 

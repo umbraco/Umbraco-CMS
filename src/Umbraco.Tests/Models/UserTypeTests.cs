@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
@@ -21,14 +21,14 @@ namespace Umbraco.Tests.Models
                 CreateDate = DateTime.Now,
                 Name = "Test",
                 Alias = "test",
-                Permissions = new[] {"a", "b", "c"}                
+                Permissions = new[] {"a", "b", "c"}
             };
 
             var clone = (UserType)item.DeepClone();
 
             Assert.AreNotSame(clone, item);
             Assert.AreEqual(clone, item);
-            
+
             //Verify normal properties with reflection
             var allProps = clone.GetType().GetProperties();
             foreach (var propertyInfo in allProps)

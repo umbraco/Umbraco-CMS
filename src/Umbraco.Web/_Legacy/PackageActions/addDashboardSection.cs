@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.IO;
@@ -7,102 +7,102 @@ using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Web._Legacy.PackageActions
 {
-	/// <summary>
-	/// 
-	/// </summary>
-	public class addDashboardSection : IPackageAction
-	{
-		#region IPackageAction Members
+    /// <summary>
+    ///
+    /// </summary>
+    public class addDashboardSection : IPackageAction
+    {
+        #region IPackageAction Members
 
-		/// <summary>
-		/// Installs a dashboard section. This action reuses the action XML, so it has to be valid dashboard markup.
-		/// </summary>
-		/// <param name="packageName">Name of the package.</param>
-		/// <param name="xmlData">The XML data.</param>
-		/// <returns>true if successfull</returns>
-		/// <example>
-		/// <code>
-		/// <Action runat="install" [undo="false"] alias="addDashboardSection" dashboardAlias="MyDashboardSection">
-		///     <section>
-		///         <areas>
-		///         <area>default</area>
-		///         <area>content</area>
-		///         </areas>
-		///	        <tab caption="Last Edits">
-		///             <control>/usercontrols/dashboard/latestEdits.ascx</control>
-		///             <control>/usercontrols/umbracoBlog/dashboardBlogPostCreate.ascx</control>
-		///         </tab>
-		///         <tab caption="Create blog post">
-		///             <control>/usercontrols/umbracoBlog/dashboardBlogPostCreate.ascx</control>
-		///         </tab>
-		///     </section>
-		/// </Action>
-		/// </code>
-		/// </example>
-		public bool Execute(string packageName, XmlNode xmlData)
-		{
-			//this will need a complete section node to work... 
+        /// <summary>
+        /// Installs a dashboard section. This action reuses the action XML, so it has to be valid dashboard markup.
+        /// </summary>
+        /// <param name="packageName">Name of the package.</param>
+        /// <param name="xmlData">The XML data.</param>
+        /// <returns>true if successfull</returns>
+        /// <example>
+        /// <code>
+        /// <Action runat="install" [undo="false"] alias="addDashboardSection" dashboardAlias="MyDashboardSection">
+        ///     <section>
+        ///         <areas>
+        ///         <area>default</area>
+        ///         <area>content</area>
+        ///         </areas>
+        ///            <tab caption="Last Edits">
+        ///             <control>/usercontrols/dashboard/latestEdits.ascx</control>
+        ///             <control>/usercontrols/umbracoBlog/dashboardBlogPostCreate.ascx</control>
+        ///         </tab>
+        ///         <tab caption="Create blog post">
+        ///             <control>/usercontrols/umbracoBlog/dashboardBlogPostCreate.ascx</control>
+        ///         </tab>
+        ///     </section>
+        /// </Action>
+        /// </code>
+        /// </example>
+        public bool Execute(string packageName, XmlNode xmlData)
+        {
+            //this will need a complete section node to work...
 
-			if (xmlData.HasChildNodes)
-			{
-				string sectionAlias = xmlData.Attributes["dashboardAlias"].Value;
-				string dbConfig = SystemFiles.DashboardConfig;
+            if (xmlData.HasChildNodes)
+            {
+                string sectionAlias = xmlData.Attributes["dashboardAlias"].Value;
+                string dbConfig = SystemFiles.DashboardConfig;
 
-				XmlNode section = xmlData.SelectSingleNode("./section");
-				XmlDocument dashboardFile = XmlHelper.OpenAsXmlDocument(dbConfig);
+                XmlNode section = xmlData.SelectSingleNode("./section");
+                XmlDocument dashboardFile = XmlHelper.OpenAsXmlDocument(dbConfig);
 
-			    //don't continue if it already exists
-			    var found = dashboardFile.SelectNodes("//section[@alias='" + sectionAlias + "']");
-			    if (found == null || found.Count <= 0)
-			    {
+                //don't continue if it already exists
+                var found = dashboardFile.SelectNodes("//section[@alias='" + sectionAlias + "']");
+                if (found == null || found.Count <= 0)
+                {
 
-			        XmlNode importedSection = dashboardFile.ImportNode(section, true);
+                    XmlNode importedSection = dashboardFile.ImportNode(section, true);
 
-			        XmlAttribute alias = XmlHelper.AddAttribute(dashboardFile, "alias", sectionAlias);
-			        importedSection.Attributes.Append(alias);
+                    XmlAttribute alias = XmlHelper.AddAttribute(dashboardFile, "alias", sectionAlias);
+                    importedSection.Attributes.Append(alias);
 
-			        dashboardFile.DocumentElement.AppendChild(importedSection);
+                    dashboardFile.DocumentElement.AppendChild(importedSection);
 
-			        dashboardFile.Save(IOHelper.MapPath(dbConfig));
-			    }
+                    dashboardFile.Save(IOHelper.MapPath(dbConfig));
+                }
 
-			    return true;
-			}
+                return true;
+            }
 
-			return false;
-		}
+            return false;
+        }
 
 
-		public string Alias()
-		{
-			return "addDashboardSection";
-		}
+        public string Alias()
+        {
+            return "addDashboardSection";
+        }
 
-		public bool Undo(string packageName, XmlNode xmlData)
-		{
+        public bool Undo(string packageName, XmlNode xmlData)
+        {
 
-			string sectionAlias = xmlData.Attributes["dashboardAlias"].Value;
-			string dbConfig = SystemFiles.DashboardConfig;
+            string sectionAlias = xmlData.Attributes["dashboardAlias"].Value;
+            string dbConfig = SystemFiles.DashboardConfig;
             XmlDocument dashboardFile = XmlHelper.OpenAsXmlDocument(dbConfig);
 
-			XmlNode section = dashboardFile.SelectSingleNode("//section [@alias = '" + sectionAlias + "']");
+            XmlNode section = dashboardFile.SelectSingleNode("//section [@alias = '" + sectionAlias + "']");
 
-			if (section != null)
-			{
+            if (section != null)
+            {
 
-				dashboardFile.SelectSingleNode("/dashBoard").RemoveChild(section);
-				dashboardFile.Save(IOHelper.MapPath(dbConfig));
-			}
+                dashboardFile.SelectSingleNode("/dashBoard").RemoveChild(section);
+                dashboardFile.Save(IOHelper.MapPath(dbConfig));
+            }
 
-			return true;
-		}
+            return true;
+        }
 
-		#endregion
+        #endregion
 
-		public XmlNode SampleXml()
-		{
-			throw new NotImplementedException();
-		}
+        public XmlNode SampleXml()
+        {
+            throw new NotImplementedException();
+        }
 
-	}
+    }
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -36,7 +36,7 @@ namespace Umbraco.Core.Configuration
         private static Version _version;
         private static readonly object Locker = new object();
         //make this volatile so that we can ensure thread safety with a double check lock
-    	private static volatile string _reservedUrlsCache;
+        private static volatile string _reservedUrlsCache;
         private static string _reservedPathsCache;
         private static HashSet<string> _reservedList = new HashSet<string>();
         private static string _reservedPaths;
@@ -66,7 +66,7 @@ namespace Umbraco.Core.Configuration
             ResetInternal();
         }
 
-    	/// <summary>
+        /// <summary>
         /// Gets the reserved urls from web.config.
         /// </summary>
         /// <value>The reserved urls.</value>
@@ -172,7 +172,7 @@ namespace Umbraco.Core.Configuration
         /// This will return the MVC area that we will route all custom routes through like surface controllers, etc...
         /// We will use the 'Path' (default ~/umbraco) to create it but since it cannot contain '/' and people may specify a path of ~/asdf/asdf/admin
         /// we will convert the '/' to '-' and use that as the path. its a bit lame but will work.
-		///
+        ///
         /// We also make sure that the virtual directory (SystemDirectories.Root) is stripped off first, otherwise we'd end up with something
         /// like "MyVirtualDirectory-Umbraco" instead of just "Umbraco".
         /// </remarks>
@@ -187,7 +187,7 @@ namespace Umbraco.Core.Configuration
                 var path = Path;
                 if (path.StartsWith(SystemDirectories.Root)) // beware of TrimStart, see U4-2518
                     path = path.Substring(SystemDirectories.Root.Length);
-			    return path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
+                return path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
             }
         }
 
@@ -514,7 +514,7 @@ namespace Umbraco.Core.Configuration
         /// Gets a value indicating whether umbraco should hide top level nodes from generated urls.
         /// </summary>
         /// <value>
-        /// 	<c>true</c> if umbraco hides top level nodes from urls; otherwise, <c>false</c>.
+        ///     <c>true</c> if umbraco hides top level nodes from urls; otherwise, <c>false</c>.
         /// </value>
         public static bool HideTopLevelNodeFromPath
         {
@@ -696,7 +696,7 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         /// <param name="url">The URL to check.</param>
         /// <returns>
-        /// 	<c>true</c> if the specified URL is reserved; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified URL is reserved; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsReservedPathOrUrl(string url)
         {

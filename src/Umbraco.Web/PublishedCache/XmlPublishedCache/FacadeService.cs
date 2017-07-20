@@ -36,8 +36,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // used in WebBootManager + tests
         public FacadeService(ServiceContext serviceContext,
             IScopeProvider scopeProvider,
-            IScopeUnitOfWorkProvider uowProvider, 
-            ICacheProvider requestCache, 
+            IScopeUnitOfWorkProvider uowProvider,
+            ICacheProvider requestCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders,
             IFacadeAccessor facadeAccessor,
             ILogger logger,
@@ -49,11 +49,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // used in some tests
         internal FacadeService(ServiceContext serviceContext,
             IScopeProvider scopeProvider,
-            IScopeUnitOfWorkProvider uowProvider, 
+            IScopeUnitOfWorkProvider uowProvider,
             ICacheProvider requestCache,
             IFacadeAccessor facadeAccessor,
             ILogger logger,
-            PublishedContentTypeCache contentTypeCache, 
+            PublishedContentTypeCache contentTypeCache,
             MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
             : this(serviceContext, scopeProvider, uowProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(), facadeAccessor, logger, contentTypeCache, mainDom, testing, enableRepositoryEvents)
@@ -61,12 +61,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         private FacadeService(ServiceContext serviceContext,
             IScopeProvider scopeProvider,
-            IScopeUnitOfWorkProvider uowProvider, 
+            IScopeUnitOfWorkProvider uowProvider,
             ICacheProvider requestCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders,
             IFacadeAccessor facadeAccessor,
             ILogger logger,
-            PublishedContentTypeCache contentTypeCache, 
+            PublishedContentTypeCache contentTypeCache,
             MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
             : base(facadeAccessor)

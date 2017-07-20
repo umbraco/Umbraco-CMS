@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web.Http;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;

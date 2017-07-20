@@ -1,4 +1,4 @@
-using Umbraco.Core.Models;
+﻿using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories

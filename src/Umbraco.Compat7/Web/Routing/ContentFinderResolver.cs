@@ -9,7 +9,7 @@ namespace Umbraco.Web.Routing
 {
     public class ContentFinderResolver : ManyObjectsResolverBase<ContentFinderCollectionBuilder, ContentFinderCollection, IContentFinder>
     {
-        private ContentFinderResolver(ContentFinderCollectionBuilder builder) 
+        private ContentFinderResolver(ContentFinderCollectionBuilder builder)
             : base(builder)
         { }
 

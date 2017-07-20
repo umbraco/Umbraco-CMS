@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -50,7 +50,7 @@ namespace Umbraco.Web.Security.Identity
             if (request.Uri.IsClientSideRequest() == false)
             {
                 var claimsPrincipal = context.Request.User as ClaimsPrincipal;
-                var isPreview = request.HasPreviewCookie()                    
+                var isPreview = request.HasPreviewCookie()
                     && claimsPrincipal != null
                     && request.Uri != null
                     && request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath) == false;
@@ -62,13 +62,13 @@ namespace Umbraco.Web.Security.Identity
 
                     var cookie = request.Cookies[_cookieOptions.CookieName];
                     if (cookie.IsNullOrWhiteSpace() == false)
-                    {                        
+                    {
                         var unprotected = _cookieOptions.TicketDataFormat.Unprotect(cookie);
                         if (unprotected != null)
                         {
-                            //Ok, we've got a real ticket, now we can add this ticket's identity to the current 
-                            // Principal, this means we'll have 2 identities assigned to the principal which we can 
-                            // use to authorize the preview and allow for a back office User.                            
+                            //Ok, we've got a real ticket, now we can add this ticket's identity to the current
+                            // Principal, this means we'll have 2 identities assigned to the principal which we can
+                            // use to authorize the preview and allow for a back office User.
                             claimsPrincipal.AddIdentity(UmbracoBackOfficeIdentity.FromClaimsIdentity(unprotected.Identity));
                         }
                     }

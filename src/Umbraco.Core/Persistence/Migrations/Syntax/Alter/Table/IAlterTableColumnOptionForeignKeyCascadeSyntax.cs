@@ -4,6 +4,6 @@
         IAlterTableColumnOptionSyntax,
         IForeignKeyCascadeSyntax<IAlterTableColumnOptionSyntax, IAlterTableColumnOptionForeignKeyCascadeSyntax>
     {
-         
+
     }
 }

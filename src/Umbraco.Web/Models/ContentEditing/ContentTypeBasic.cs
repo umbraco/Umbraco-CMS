@@ -14,13 +14,13 @@ namespace Umbraco.Web.Models.ContentEditing
     /// </summary>
     /// <remarks>
     /// Generally used to return the minimal amount of data about a content type
-    /// </remarks> 
+    /// </remarks>
     [DataContract(Name = "contentType", Namespace = "")]
     public class ContentTypeBasic : EntityBasic
     {
         /// <summary>
         /// Overridden to apply our own validation attributes since this is not always required for other classes
-        /// </summary>        
+        /// </summary>
         [Required]
         [RegularExpression(@"^([a-zA-Z]\w.*)$", ErrorMessage = "Invalid alias")]
         [DataMember(Name = "alias")]

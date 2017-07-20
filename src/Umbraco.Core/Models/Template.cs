@@ -78,7 +78,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Returns true if the template is used as a layout for other templates (i.e. it has 'children')
         /// </summary>
-        public bool IsMasterTemplate { get; internal set; }        
+        public bool IsMasterTemplate { get; internal set; }
 
         public void SetMasterTemplate(ITemplate masterTemplate)
         {
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Models
                 MasterTemplateId = new Lazy<int>(() => masterTemplate.Id);
                 MasterTemplateAlias = masterTemplate.Alias;
             }
-           
+
         }
 
         protected override void DeepCloneNameAndAlias(File clone)

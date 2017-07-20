@@ -16,7 +16,7 @@ namespace Umbraco.Web._Legacy.Controls
             get { return _text; }
             set { _text = value; }
         }
-            
+
         protected override void OnLoad(EventArgs eventArguments)
         {
         }
@@ -30,7 +30,7 @@ namespace Umbraco.Web._Legacy.Controls
             if (string.IsNullOrEmpty(_text))
                 CssClass += " hidelabel";
 
-          
+
             writer.WriteLine("<div class=\"umb-el-wrap " + CssClass + "\">");
 
 

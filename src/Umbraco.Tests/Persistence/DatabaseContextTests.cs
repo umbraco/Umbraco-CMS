@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Persistence
     [TestFixture, RequiresSTA]
     public class DatabaseContextTests
     {
-	    private IUmbracoDatabaseFactory _databaseFactory;
+        private IUmbracoDatabaseFactory _databaseFactory;
         private ILogger _logger;
         private SqlCeSyntaxProvider _sqlCeSyntaxProvider;
         private ISqlSyntaxProvider[] _sqlSyntaxProviders;
@@ -26,8 +26,8 @@ namespace Umbraco.Tests.Persistence
         private IMigrationEntryService _migrationEntryService;
 
         [SetUp]
-		public void Setup()
-		{
+        public void Setup()
+        {
             // create the database factory and database context
             _sqlCeSyntaxProvider = new SqlCeSyntaxProvider();
             _sqlSyntaxProviders = new[] { (ISqlSyntaxProvider) _sqlCeSyntaxProvider };
@@ -35,13 +35,13 @@ namespace Umbraco.Tests.Persistence
             _databaseFactory = new UmbracoDatabaseFactory(_sqlSyntaxProviders, _logger, Mock.Of<IMapperCollection>());
             _runtime = Mock.Of<IRuntimeState>();
             _migrationEntryService = Mock.Of<IMigrationEntryService>();
-		}
+        }
 
-		[TearDown]
-		public void TearDown()
-		{
-			_databaseFactory = null;
-		}
+        [TearDown]
+        public void TearDown()
+        {
+            _databaseFactory = null;
+        }
 
         [Test]
         public void GetDatabaseType()

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
@@ -22,7 +22,7 @@ namespace Umbraco.Web.Models.Mapping
     {
         public static IMappingExpression<TSource, PropertyGroup> MapPropertyGroupBasicToPropertyGroupPersistence<TSource, TPropertyTypeBasic>(
             this IMappingExpression<TSource, PropertyGroup> mapping)
-            where TSource : PropertyGroupBasic<TPropertyTypeBasic> 
+            where TSource : PropertyGroupBasic<TPropertyTypeBasic>
             where TPropertyTypeBasic : PropertyTypeBasic
         {
             return mapping
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Models.Mapping
         public static IMappingExpression<TSource, PropertyGroupDisplay<TPropertyTypeDisplay>> MapPropertyGroupBasicToPropertyGroupDisplay<TSource, TPropertyTypeBasic, TPropertyTypeDisplay>(
             this IMappingExpression<TSource, PropertyGroupDisplay<TPropertyTypeDisplay>> mapping)
             where TSource : PropertyGroupBasic<TPropertyTypeBasic>
-            where TPropertyTypeBasic : PropertyTypeBasic 
+            where TPropertyTypeBasic : PropertyTypeBasic
             where TPropertyTypeDisplay : PropertyTypeDisplay
         {
             return mapping
@@ -102,8 +102,8 @@ namespace Umbraco.Web.Models.Mapping
         public static IMappingExpression<TSource, TDestination> MapBaseContentTypeSaveToDisplay<TSource, TPropertyTypeSource, TDestination, TPropertyTypeDestination>(
             this IMappingExpression<TSource, TDestination> mapping)
             where TSource : ContentTypeSave<TPropertyTypeSource>
-            where TDestination : ContentTypeCompositionDisplay<TPropertyTypeDestination> 
-            where TPropertyTypeDestination : PropertyTypeDisplay 
+            where TDestination : ContentTypeCompositionDisplay<TPropertyTypeDestination>
+            where TPropertyTypeDestination : PropertyTypeDisplay
             where TPropertyTypeSource : PropertyTypeBasic
         {
             var propertyGroupDisplayResolver = new PropertyGroupDisplayResolver<TSource, TPropertyTypeSource, TPropertyTypeDestination>();
@@ -138,7 +138,7 @@ namespace Umbraco.Web.Models.Mapping
                 //Ignore because this is not actually used for content types
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
 
-                .ForMember(dest => dest.AllowedContentTypes, opt => opt.MapFrom(src => src.AllowedContentTypes.Select(x => x.Id.Value)))                 
+                .ForMember(dest => dest.AllowedContentTypes, opt => opt.MapFrom(src => src.AllowedContentTypes.Select(x => x.Id.Value)))
                 .ForMember(dest => dest.CompositeContentTypes, opt => opt.MapFrom(src => src.ContentTypeComposition))
                 .ForMember(dest => dest.LockedCompositeContentTypes, opt => opt.ResolveUsing(src => lockedCompositionsResolver.Resolve(src)))
                 .ForMember(dest => dest.Groups, opt => opt.ResolveUsing(src => propertyTypeGroupResolver.Resolve(src)));
@@ -151,12 +151,12 @@ namespace Umbraco.Web.Models.Mapping
         /// <typeparam name="TDestination"></typeparam>
         /// <typeparam name="TSourcePropertyType"></typeparam>
         /// <param name="mapping"></param>
-        /// <returns></returns>        
+        /// <returns></returns>
         public static IMappingExpression<TSource, TDestination> MapBaseContentTypeSaveToEntity<TSource, TSourcePropertyType, TDestination>(
             this IMappingExpression<TSource, TDestination> mapping)
             //where TSource : ContentTypeCompositionDisplay
             where TSource : ContentTypeSave<TSourcePropertyType>
-            where TDestination : IContentTypeComposition 
+            where TDestination : IContentTypeComposition
             where TSourcePropertyType : PropertyTypeBasic
         {
             return mapping
@@ -178,7 +178,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.NoGroupPropertyTypes, opt => opt.Ignore())
                 // ignore, composition is managed in AfterMapContentTypeSaveToEntity
                 .ForMember(dest => dest.ContentTypeComposition, opt => opt.Ignore())
-                
+
                 .ForMember(
                     dest => dest.AllowedContentTypes,
                     opt => opt.MapFrom(src => src.AllowedContentTypes.Select((t, i) => new ContentTypeSort(t, i))))
@@ -299,7 +299,7 @@ namespace Umbraco.Web.Models.Mapping
                 sourceProperty.Id = 0;
             }
 
-            // insert a new property, or update an existing property that has 
+            // insert a new property, or update an existing property that has
             // been deletedin the meantime and we need to re-create
             // map/create
             destProperty = Mapper.Map<PropertyType>(sourceProperty);

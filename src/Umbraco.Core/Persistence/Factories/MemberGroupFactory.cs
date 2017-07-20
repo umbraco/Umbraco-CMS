@@ -4,9 +4,9 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class MemberGroupFactory 
+    internal class MemberGroupFactory
     {
-        
+
         private readonly Guid _nodeObjectTypeId;
 
         public MemberGroupFactory()
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Factories
         public IMemberGroup BuildEntity(NodeDto dto)
         {
             var group = new MemberGroup();
-            
+
             try
             {
                 group.DisableChangeTracking();

@@ -12,6 +12,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         int MaxLogAge { get; }
 
-        IEnumerable<ILogType> DisabledLogTypes { get; }        
+        IEnumerable<ILogType> DisabledLogTypes { get; }
     }
 }

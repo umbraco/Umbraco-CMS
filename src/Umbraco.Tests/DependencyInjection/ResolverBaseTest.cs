@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using Moq;
 using NUnit.Framework;
@@ -32,8 +32,8 @@ namespace Umbraco.Tests.DI
             Current.Reset();
         }
 
-        protected virtual IEnumerable<Assembly> AssembliesToScan 
-            => new[] 
+        protected virtual IEnumerable<Assembly> AssembliesToScan
+            => new[]
             {
                 GetType().Assembly // this assembly only
             };

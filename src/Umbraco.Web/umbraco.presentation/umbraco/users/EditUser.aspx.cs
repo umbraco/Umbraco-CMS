@@ -145,7 +145,7 @@ namespace umbraco.cms.presentation.user
                 contentPicker.Value = "-1";
 
             content.Controls.Add(contentPicker);
-            
+
             // Add password changer
             var passwordChanger = (passwordChanger)LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx");
             passwordChanger.MembershipProviderName = UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider;
@@ -458,8 +458,8 @@ namespace umbraco.cms.presentation.user
             }
             else
             {
-                ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, 
-                    Services.TextService.Localize("speechBubbles/validationFailedHeader"), 
+                ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error,
+                    Services.TextService.Localize("speechBubbles/validationFailedHeader"),
                     Services.TextService.Localize("speechBubbles/validationFailedMessage"));
             }
         }

@@ -9,7 +9,7 @@ namespace Umbraco.Tests.Persistence.Mappers
     {
         [Test]
         public void Can_Map_Id_Property()
-        {            
+        {
             // Act
             string column = new RelationTypeMapper().Map(new SqlCeSyntaxProvider(), "Id");
 

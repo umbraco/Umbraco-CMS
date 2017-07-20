@@ -1,4 +1,4 @@
-//TODO: This needs a full rewrite in angular! kept here for reference for now
+﻿//TODO: This needs a full rewrite in angular! kept here for reference for now
 
 //using System;
 //using System.Collections;
@@ -62,7 +62,7 @@
 //        }
 
 //        /// <summary>
-//        /// This property controls whether the content property values are persisted even if validation 
+//        /// This property controls whether the content property values are persisted even if validation
 //        /// fails. If set to false, then the values will not be persisted.
 //        /// </summary>
 //        /// <remarks>
@@ -281,7 +281,7 @@
 //                string[] errorVars = { Services.TextService.Localize("name") };
 //                NameTxtValidator.ErrorMessage = " " + ui.Text("errorHandling", "errorMandatoryWithoutTab", errorVars) + "<br/>";
 //                NameTxtValidator.EnableClientScript = false;
-//                NameTxtValidator.Display = ValidatorDisplay.Dynamic;                
+//                NameTxtValidator.Display = ValidatorDisplay.Dynamic;
 //                _nameTxtCustomValidator.EnableClientScript = false;
 //                _nameTxtCustomValidator.Display = ValidatorDisplay.Dynamic;
 //                _nameTxtCustomValidator.ServerValidate += NameTxtCustomValidatorServerValidate;
@@ -322,7 +322,7 @@
 //        /// <remarks>
 //        /// We need to ensure people are not entering XSS attacks on this field
 //        /// http://issues.umbraco.org/issue/U4-485
-//        /// 
+//        ///
 //        /// This doesn't actually 'validate' but changes the text field value and strips html
 //        /// </remarks>
 //        void NameTxtCustomValidatorServerValidate(object source, ServerValidateEventArgs args)
@@ -344,7 +344,7 @@
 //        /// </summary>
 //        private void SetNameAndDataTypeValues()
 //        {
-//            //we only continue saving anything if: 
+//            //we only continue saving anything if:
 //            // SavePropertyDataWhenInvalid == true
 //            // OR if the page is actually valid.
 //            if (SavePropertyDataWhenInvalid || Page.IsValid)
@@ -391,7 +391,7 @@
 
 //            if (SaveAndPublish != null)
 //            {
-//                SaveAndPublish(this, new EventArgs());    
+//                SaveAndPublish(this, new EventArgs());
 //            }
 //        }
 

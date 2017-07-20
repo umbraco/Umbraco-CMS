@@ -21,7 +21,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             return Current.PropertyEditors
                 .Where(x =>
-                {                    
+                {
                     // fixme should we support deprecating?
                     //if (_contentSection.ShowDeprecatedPropertyEditors)
                     //    return true;

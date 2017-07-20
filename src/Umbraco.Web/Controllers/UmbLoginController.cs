@@ -29,8 +29,8 @@ namespace Umbraco.Web.Controllers
             {
                 // validate the redirect url
                 // if it's not a local url we'll redirect to the root of the current site
-                return Redirect(Url.IsLocalUrl(model.RedirectUrl) 
-                    ? model.RedirectUrl 
+                return Redirect(Url.IsLocalUrl(model.RedirectUrl)
+                    ? model.RedirectUrl
                     : CurrentPage.AncestorOrSelf(1).Url);
             }
 

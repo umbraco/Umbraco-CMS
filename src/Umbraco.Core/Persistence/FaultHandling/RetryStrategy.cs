@@ -80,7 +80,7 @@ namespace Umbraco.Core.Persistence.FaultHandling
         public static readonly RetryStrategy DefaultExponential = new ExponentialBackoff(DefaultClientRetryCount, DefaultMinBackoff, DefaultMaxBackoff, DefaultClientBackoff);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RetryStrategy"/> class. 
+        /// Initializes a new instance of the <see cref="RetryStrategy"/> class.
         /// </summary>
         /// <param name="name">The name of the retry strategy.</param>
         /// <param name="firstFastRetry">a value indicating whether or not the very first retry attempt will be made immediately

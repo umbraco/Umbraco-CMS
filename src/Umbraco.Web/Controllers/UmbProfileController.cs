@@ -40,7 +40,7 @@ namespace Umbraco.Web.Controllers
                 return Redirect(model.RedirectUrl);
             }
 
-            //redirect to current page by default                  
+            //redirect to current page by default
             return RedirectToCurrentUmbracoPage();
         }
     }

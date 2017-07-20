@@ -3,18 +3,18 @@
     internal enum PropertyResultType
     {
         /// <summary>
-		/// The property resolved was a normal document property
-		/// </summary>
-		UserProperty,
+        /// The property resolved was a normal document property
+        /// </summary>
+        UserProperty,
 
-		/// <summary>
-		/// The property resolved was a property defined as a member on the document object (IPublishedContent) itself
-		/// </summary>
-		ReflectedProperty,
+        /// <summary>
+        /// The property resolved was a property defined as a member on the document object (IPublishedContent) itself
+        /// </summary>
+        ReflectedProperty,
 
-		/// <summary>
-		/// The property was created manually for a custom purpose
-		/// </summary>
-		CustomProperty
+        /// <summary>
+        /// The property was created manually for a custom purpose
+        /// </summary>
+        CustomProperty
     }
 }

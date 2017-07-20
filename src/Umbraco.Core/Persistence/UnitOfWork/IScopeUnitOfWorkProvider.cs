@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.UnitOfWork

@@ -6,19 +6,19 @@ using System.Web.Caching;
 
 namespace Umbraco.Core.Cache
 {
-	/// <summary>
-	/// Class that is exposed by the ApplicationContext for application wide caching purposes
-	/// </summary>
+    /// <summary>
+    /// Class that is exposed by the ApplicationContext for application wide caching purposes
+    /// </summary>
     public class CacheHelper
-	{
+    {
         private static readonly ICacheProvider NullRequestCache = new NullCacheProvider();
         private static readonly ICacheProvider NullStaticCache = new NullCacheProvider();
         private static readonly IRuntimeCacheProvider NullRuntimeCache = new NullCacheProvider();
         private static readonly IsolatedRuntimeCache NullIsolatedCache = new IsolatedRuntimeCache(_ => NullRuntimeCache);
 
-	    public static CacheHelper NoCache { get; } = new CacheHelper(NullRuntimeCache, NullStaticCache, NullRequestCache, NullIsolatedCache);
+        public static CacheHelper NoCache { get; } = new CacheHelper(NullRuntimeCache, NullStaticCache, NullRequestCache, NullIsolatedCache);
 
-	    /// <summary>
+        /// <summary>
         /// Creates a cache helper with disabled caches
         /// </summary>
         /// <returns></returns>
@@ -33,59 +33,59 @@ namespace Umbraco.Core.Cache
             return new CacheHelper(NullRuntimeCache, NullStaticCache, NullRequestCache, NullIsolatedCache);
         }
 
-	    /// <summary>
-	    /// Initializes a new instance for use in the web
-	    /// </summary>
-	    public CacheHelper()
-	        : this(
-	            new HttpRuntimeCacheProvider(HttpRuntime.Cache),
-	            new StaticCacheProvider(),
+        /// <summary>
+        /// Initializes a new instance for use in the web
+        /// </summary>
+        public CacheHelper()
+            : this(
+                new HttpRuntimeCacheProvider(HttpRuntime.Cache),
+                new StaticCacheProvider(),
                 new HttpRequestCacheProvider(),
                 new IsolatedRuntimeCache(t => new ObjectCacheRuntimeCacheProvider()))
-	    {
-	    }
-
-	    /// <summary>
-	    /// Initializes a new instance for use in the web
-	    /// </summary>
-	    /// <param name="cache"></param>
-	    public CacheHelper(System.Web.Caching.Cache cache)
-	        : this(
-	            new HttpRuntimeCacheProvider(cache),
-	            new StaticCacheProvider(),
-                new HttpRequestCacheProvider(),
-                new IsolatedRuntimeCache(t => new ObjectCacheRuntimeCacheProvider()))
-	    {
-	    }
-
-	    [Obsolete("Use the constructor the specifies all dependencies")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public CacheHelper(
-            IRuntimeCacheProvider httpCacheProvider, 
-            ICacheProvider staticCacheProvider, 
-            ICacheProvider requestCacheProvider)
-            : this(httpCacheProvider, staticCacheProvider, requestCacheProvider, new IsolatedRuntimeCache(t => new ObjectCacheRuntimeCacheProvider()))
-        {            
+        {
         }
 
-	    /// <summary>
-	    /// Initializes a new instance based on the provided providers
-	    /// </summary>
-	    /// <param name="httpCacheProvider"></param>
-	    /// <param name="staticCacheProvider"></param>
-	    /// <param name="requestCacheProvider"></param>
-	    /// <param name="isolatedCacheManager"></param>
-	    public CacheHelper(
+        /// <summary>
+        /// Initializes a new instance for use in the web
+        /// </summary>
+        /// <param name="cache"></param>
+        public CacheHelper(System.Web.Caching.Cache cache)
+            : this(
+                new HttpRuntimeCacheProvider(cache),
+                new StaticCacheProvider(),
+                new HttpRequestCacheProvider(),
+                new IsolatedRuntimeCache(t => new ObjectCacheRuntimeCacheProvider()))
+        {
+        }
+
+        [Obsolete("Use the constructor the specifies all dependencies")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public CacheHelper(
+            IRuntimeCacheProvider httpCacheProvider,
+            ICacheProvider staticCacheProvider,
+            ICacheProvider requestCacheProvider)
+            : this(httpCacheProvider, staticCacheProvider, requestCacheProvider, new IsolatedRuntimeCache(t => new ObjectCacheRuntimeCacheProvider()))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance based on the provided providers
+        /// </summary>
+        /// <param name="httpCacheProvider"></param>
+        /// <param name="staticCacheProvider"></param>
+        /// <param name="requestCacheProvider"></param>
+        /// <param name="isolatedCacheManager"></param>
+        public CacheHelper(
             IRuntimeCacheProvider httpCacheProvider,
             ICacheProvider staticCacheProvider,
             ICacheProvider requestCacheProvider,
-            IsolatedRuntimeCache isolatedCacheManager)            
+            IsolatedRuntimeCache isolatedCacheManager)
         {
-	        if (httpCacheProvider == null) throw new ArgumentNullException("httpCacheProvider");
-	        if (staticCacheProvider == null) throw new ArgumentNullException("staticCacheProvider");
-	        if (requestCacheProvider == null) throw new ArgumentNullException("requestCacheProvider");
-	        if (isolatedCacheManager == null) throw new ArgumentNullException("isolatedCacheManager");
-	        RuntimeCache = httpCacheProvider;
+            if (httpCacheProvider == null) throw new ArgumentNullException("httpCacheProvider");
+            if (staticCacheProvider == null) throw new ArgumentNullException("staticCacheProvider");
+            if (requestCacheProvider == null) throw new ArgumentNullException("requestCacheProvider");
+            if (isolatedCacheManager == null) throw new ArgumentNullException("isolatedCacheManager");
+            RuntimeCache = httpCacheProvider;
             StaticCache = staticCacheProvider;
             RequestCache = requestCacheProvider;
             IsolatedRuntimeCache = isolatedCacheManager;
@@ -95,7 +95,7 @@ namespace Umbraco.Core.Cache
         /// Returns the current Request cache
         /// </summary>
         public ICacheProvider RequestCache { get; internal set; }
-        
+
         /// <summary>
         /// Returns the current Runtime cache
         /// </summary>
@@ -104,7 +104,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Returns the current Runtime cache
         /// </summary>
-	    public IRuntimeCacheProvider RuntimeCache { get; internal set; }
+        public IRuntimeCacheProvider RuntimeCache { get; internal set; }
 
         /// <summary>
         /// Returns the current Isolated Runtime cache manager
@@ -125,7 +125,7 @@ namespace Umbraco.Core.Cache
         }
 
         /// <summary>
-        /// Clears the item in umbraco's runtime cache with the given key 
+        /// Clears the item in umbraco's runtime cache with the given key
         /// </summary>
         /// <param name="key">Key</param>
         [Obsolete("Do not use this method, access the runtime cache from the RuntimeCache property")]
@@ -405,23 +405,23 @@ namespace Umbraco.Core.Cache
                 cache.InsertCacheItem(cacheKey, () => getCacheItem(), timeout, false, priority, refreshAction, cacheDependency);
             }
             throw new InvalidOperationException("Cannot use this obsoleted overload when the current provider is not of type " + typeof(HttpRuntimeCacheProvider));
-        } 
+        }
         #endregion
 
-	    private HttpRuntimeCacheProvider GetHttpRuntimeCacheProvider(IRuntimeCacheProvider runtimeCache)
-	    {
-	        HttpRuntimeCacheProvider cache;
+        private HttpRuntimeCacheProvider GetHttpRuntimeCacheProvider(IRuntimeCacheProvider runtimeCache)
+        {
+            HttpRuntimeCacheProvider cache;
             var wrapper = RuntimeCache as IRuntimeCacheProviderWrapper;
-	        if (wrapper != null)
-	        {
-	            cache = wrapper.InnerProvider as HttpRuntimeCacheProvider;
-	        }
-	        else
-	        {
+            if (wrapper != null)
+            {
+                cache = wrapper.InnerProvider as HttpRuntimeCacheProvider;
+            }
+            else
+            {
                 cache = RuntimeCache as HttpRuntimeCacheProvider;
             }
-	        return cache;
-	    }
+            return cache;
+        }
     }
 
 }

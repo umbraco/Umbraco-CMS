@@ -1,4 +1,4 @@
-// fixme - remove this file
+﻿// fixme - remove this file
 //using log4net.Core;
 //using log4net.Util;
 //using System;

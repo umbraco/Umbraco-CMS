@@ -67,15 +67,15 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// This will validate the entity's path and if it's invalid it will fix it, if fixing is required it will recursively 
+        /// This will validate the entity's path and if it's invalid it will fix it, if fixing is required it will recursively
         /// check and fix all ancestors if required.
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="logger"></param>
         /// <param name="getParent">A callback specified to retrieve the parent entity of the entity</param>
         /// <param name="update">A callback specified to update a fixed entity</param>
-        public static void EnsureValidPath<T>(this T entity, 
-            ILogger logger, 
+        public static void EnsureValidPath<T>(this T entity,
+            ILogger logger,
             Func<T, T> getParent,
             Action<T> update)
             where T: IUmbracoEntity
@@ -125,7 +125,7 @@ namespace Umbraco.Core.Models
             }
             return false;
         }
-    
+
         public static object GetAdditionalDataValueIgnoreCase(this IUmbracoEntity entity, string key, object defaultVal)
         {
             if (entity.AdditionalData.ContainsKeyIgnoreCase(key) == false) return defaultVal;

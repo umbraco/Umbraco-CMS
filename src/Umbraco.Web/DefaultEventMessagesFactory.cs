@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Core.Events;
 
 namespace Umbraco.Web

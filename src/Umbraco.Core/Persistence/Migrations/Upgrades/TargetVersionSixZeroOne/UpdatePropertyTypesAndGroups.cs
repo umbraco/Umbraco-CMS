@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
     [Migration("6.0.2", 0, Constants.System.UmbracoMigrationName)]
     public class UpdatePropertyTypesAndGroups : MigrationBase
     {
-        public UpdatePropertyTypesAndGroups(IMigrationContext context) 
+        public UpdatePropertyTypesAndGroups(IMigrationContext context)
             : base(context)
         { }
 
@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
         {
             if (database != null)
             {
-                //Fetch all PropertyTypes that belongs to a PropertyTypeGroup                
+                //Fetch all PropertyTypes that belongs to a PropertyTypeGroup
                 //NOTE: We are writing the full query because we've added a column to the PropertyTypeDto in later versions so one of the columns
                 // won't exist yet
                 var propertyTypes = database.Fetch<dynamic>("SELECT * FROM cmsPropertyType WHERE propertyTypeGroupId > 0");

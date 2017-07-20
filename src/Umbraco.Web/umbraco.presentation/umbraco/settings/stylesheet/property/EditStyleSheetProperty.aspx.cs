@@ -30,7 +30,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            
+
             _sheet = Services.FileService.GetStylesheetByName(Request.QueryString["id"]);
             if (_sheet == null) throw new InvalidOperationException("No stylesheet found with name: " + Request.QueryString["id"]);
 
@@ -83,7 +83,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
                 //to change the name we actually have to remove the property and re-add it as a different one
                 _sheet.AddProperty(new Umbraco.Core.Models.StylesheetProperty(NameTxt.Text, _stylesheetproperty.Alias, _stylesheetproperty.Value));
                 _sheet.RemoveProperty(_stylesheetproperty.Name);
-                //reset our variable 
+                //reset our variable
                 _stylesheetproperty = _sheet.Properties.Single(x => x.Name == NameTxt.Text);
             }
 

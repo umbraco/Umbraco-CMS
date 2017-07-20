@@ -10,7 +10,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         public virtual void Enabled()
         {
             Assert.IsTrue(SettingsSection.DistributedCall.Enabled == true);
-           
+
         }
         [Test]
         public void UserId()

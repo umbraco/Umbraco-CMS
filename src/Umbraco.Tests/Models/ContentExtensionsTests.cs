@@ -636,7 +636,7 @@ namespace Umbraco.Tests.Models
             //Assert.IsFalse(content.WasDirty()); // not impacted by user properties
             Assert.IsTrue(content.WasDirty()); // now it is!
         }
-        
+
         #endregion
     }
 }

@@ -7,7 +7,7 @@ using Umbraco.Web.Models.ContentEditing;
 namespace Umbraco.Web.Models.Mapping
 {
     /// <summary>
-    /// A mapper which declares how to map content properties. These mappings are shared among media (and probably members) which is 
+    /// A mapper which declares how to map content properties. These mappings are shared among media (and probably members) which is
     /// why they are in their own mapper
     /// </summary>
     internal class ContentPropertyProfile : Profile

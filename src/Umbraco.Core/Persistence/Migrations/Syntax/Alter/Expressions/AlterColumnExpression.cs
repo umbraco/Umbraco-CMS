@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
         }
 
 
-        
+
 
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }

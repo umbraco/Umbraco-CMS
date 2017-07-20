@@ -10,7 +10,7 @@ namespace Umbraco.Web._Legacy.Controls
         public string Hotkey { get; set; }
 
         public string Icon { get; set; }
-        
+
         public MenuButton()
         {
             Data = new DataAttributes();
@@ -29,7 +29,7 @@ namespace Umbraco.Web._Legacy.Controls
             Data.AppendTo(this);
 
             string cssClass = "btn";
-            
+
             if (Icon != null)
             {
                 cssClass = "btn editorIcon";

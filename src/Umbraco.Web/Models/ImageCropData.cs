@@ -8,7 +8,7 @@ namespace Umbraco.Web.Models
     {
         [DataMember(Name = "alias")]
         public string Alias { get; set; }
-        
+
         [DataMember(Name = "width")]
         public int Width { get; set; }
 
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Models
         }
 
         /// <summary>
-        /// Serves as the default hash function. 
+        /// Serves as the default hash function.
         /// </summary>
         /// <returns>
         /// A hash code for the current object.

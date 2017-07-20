@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Services
             //re-get
             entry = publicAccessService.GetEntryForContent(c);
 
-            // Assert           
+            // Assert
             Assert.IsTrue(updated.Success);
             Assert.AreEqual(OperationStatusType.Success, updated.Result.StatusType);
             Assert.AreEqual(2, entry.Rules.Count());
@@ -107,7 +107,7 @@ namespace Umbraco.Tests.Services
             //re-get
             entry = publicAccessService.GetEntryForContent(c);
 
-            // Assert           
+            // Assert
             Assert.IsTrue(updated1.Success);
             Assert.IsTrue(updated2.Success);
             Assert.AreEqual(OperationStatusType.Success, updated1.Result.StatusType);
@@ -139,14 +139,14 @@ namespace Umbraco.Tests.Services
                     RuleValue = "TestValue2"
                 },
             });
-            publicAccessService.Save(entry);            
+            publicAccessService.Save(entry);
 
             // Act
             var removed = publicAccessService.RemoveRule(c, "TestType", "TestValue1");
             //re-get
             entry = publicAccessService.GetEntryForContent(c);
 
-            // Assert           
+            // Assert
             Assert.IsTrue(removed.Success);
             Assert.AreEqual(OperationStatusType.Success, removed.Result.StatusType);
             Assert.AreEqual(1, entry.Rules.Count());

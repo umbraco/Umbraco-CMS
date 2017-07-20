@@ -1,4 +1,4 @@
-using LightInject;
+﻿using LightInject;
 using Umbraco.Web.Models.Mapping;
 
 namespace Umbraco.Web.DI

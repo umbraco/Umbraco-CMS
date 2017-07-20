@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Lucene.Net.Index;
 using NUnit.Framework;
 using Umbraco.Core;

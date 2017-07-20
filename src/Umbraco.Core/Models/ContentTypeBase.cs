@@ -50,9 +50,9 @@ namespace Umbraco.Core.Models
             _additionalData = new Dictionary<string, object>();
         }
 
-		protected ContentTypeBase(IContentTypeBase parent) : this(parent, null)
-		{
-		}
+        protected ContentTypeBase(IContentTypeBase parent) : this(parent, null)
+        {
+        }
 
         protected ContentTypeBase(IContentTypeBase parent, string alias)
         {
@@ -110,12 +110,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
-				var val = _parentId.Value;
-				if (val == 0)
-				{
-					throw new InvalidOperationException("The ParentId cannot be a value of 0. Perhaps the parent object used to instantiate this object has not been persisted to the data store.");
-				}
-				return val;				
+                var val = _parentId.Value;
+                if (val == 0)
+                {
+                    throw new InvalidOperationException("The ParentId cannot be a value of 0. Perhaps the parent object used to instantiate this object has not been persisted to the data store.");
+                }
+                return val;
             }
             set
             {
@@ -164,8 +164,8 @@ namespace Umbraco.Core.Models
             set
             {
                 SetPropertyValueAndDetectChanges(
-                    value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase), 
-                    ref _alias, 
+                    value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase),
+                    ref _alias,
                     Ps.Value.AliasSelector);
             }
         }
@@ -277,7 +277,7 @@ namespace Umbraco.Core.Models
                     //Custom comparer for enumerable
                     new DelegateEqualityComparer<IEnumerable<ContentTypeSort>>(
                         (sorts, enumerable) => sorts.UnsortedSequenceEqual(enumerable),
-                        sorts => sorts.GetHashCode()));                
+                        sorts => sorts.GetHashCode()));
             }
         }
 
@@ -330,7 +330,7 @@ namespace Umbraco.Core.Models
         /// A boolean flag indicating if a property type has been removed from this instance.
         /// </summary>
         /// <remarks>
-        /// This is currently (specifically) used in order to know that we need to refresh the content cache which 
+        /// This is currently (specifically) used in order to know that we need to refresh the content cache which
         /// needs to occur when a property has been removed from a content type
         /// </remarks>
         [IgnoreDataMember]
@@ -376,7 +376,7 @@ namespace Umbraco.Core.Models
         {
             if (PropertyTypeExists(propertyType.Alias) == false)
             {
-                _propertyTypes.Add(propertyType);                
+                _propertyTypes.Add(propertyType);
                 return true;
             }
 
@@ -389,7 +389,7 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">Alias of the PropertyType to move</param>
         /// <param name="propertyGroupName">Name of the PropertyGroup to move the PropertyType to</param>
         /// <returns></returns>
-        /// <remarks>If <paramref name="propertyGroupName"/> is null then the property is moved back to 
+        /// <remarks>If <paramref name="propertyGroupName"/> is null then the property is moved back to
         /// "generic properties" ie does not have a tab anymore.</remarks>
         public bool MovePropertyType(string propertyTypeAlias, string propertyGroupName)
         {
@@ -406,7 +406,7 @@ namespace Umbraco.Core.Models
             if (propertyGroupName != null && newPropertyGroup == null) return false;
 
             // get old group
-            var oldPropertyGroup = PropertyGroups.FirstOrDefault(x => 
+            var oldPropertyGroup = PropertyGroups.FirstOrDefault(x =>
                 x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias));
 
             // set new group
@@ -442,7 +442,7 @@ namespace Umbraco.Core.Models
 
             if (_propertyTypes.Any(x => x.Alias == propertyTypeAlias))
             {
-                _propertyTypes.RemoveItem(propertyTypeAlias);               
+                _propertyTypes.RemoveItem(propertyTypeAlias);
             }
         }
 
@@ -552,7 +552,7 @@ namespace Umbraco.Core.Models
             //turn off change tracking
             clone.DisableChangeTracking();
             //need to manually wire up the event handlers for the property type collections - we've ensured
-            // its ignored from the auto-clone process because its return values are unions, not raw and 
+            // its ignored from the auto-clone process because its return values are unions, not raw and
             // we end up with duplicates, see: http://issues.umbraco.org/issue/U4-4842
 
             clone._propertyTypes = (PropertyTypeCollection)_propertyTypes.DeepClone();

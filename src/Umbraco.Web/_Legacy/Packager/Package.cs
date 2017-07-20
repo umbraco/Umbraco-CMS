@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -16,8 +16,8 @@ namespace umbraco.cms.businesslogic.packager
         }
 
         /// <summary>
-        /// Initialize package install status object by specifying the internal id of the installation. 
-        /// The id is specific to the local umbraco installation and cannot be used to identify the package in general. 
+        /// Initialize package install status object by specifying the internal id of the installation.
+        /// The id is specific to the local umbraco installation and cannot be used to identify the package in general.
         /// Use the Package(Guid) constructor to check whether a package has been installed
         /// </summary>
         /// <param name="Id">The internal id.</param>
@@ -75,7 +75,7 @@ namespace umbraco.cms.businesslogic.packager
                 if (Id == 0)
                 {
                     // The method is synchronized
-                    scope.Database.Execute("INSERT INTO umbracoInstalledPackages (uninstalled, upgradeId, installDate, userId, versionMajor, versionMinor, versionPatch) VALUES (@uninstalled, @upgradeId, @installDate, @userId, @versionMajor, @versionMinor, @versionPatch)", 
+                    scope.Database.Execute("INSERT INTO umbracoInstalledPackages (uninstalled, upgradeId, installDate, userId, versionMajor, versionMinor, versionPatch) VALUES (@uninstalled, @upgradeId, @installDate, @userId, @versionMajor, @versionMinor, @versionPatch)",
                         new
                         {
                             uninstalled = Uninstalled,

@@ -1,4 +1,4 @@
-using System.Web;
+﻿using System.Web;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Lucene.Net.Store;
@@ -158,12 +158,12 @@ namespace Umbraco.Tests.PublishedContent
 
                 //move item to recycle bin
                 var newXml = XElement.Parse(@"<node id='3113' version='5b3e46ab-3e37-4cfa-ab70-014234b5bd33' parentID='-21' level='1' writerID='0' nodeType='1032' template='0' sortOrder='2' createDate='2010-05-19T17:32:46' updateDate='2010-05-19T17:32:46' nodeName='Another Umbraco Image' urlName='acnestressscrub' writerName='Administrator' nodeTypeAlias='Image' path='-1,-21,3113'>
-					<data alias='umbracoFile'><![CDATA[/media/1234/blah.pdf]]></data>
-					<data alias='umbracoWidth'>115</data>
-					<data alias='umbracoHeight'>268</data>
-					<data alias='umbracoBytes'>10726</data>
-					<data alias='umbracoExtension'>jpg</data>
-				</node>");
+                    <data alias='umbracoFile'><![CDATA[/media/1234/blah.pdf]]></data>
+                    <data alias='umbracoWidth'>115</data>
+                    <data alias='umbracoHeight'>268</data>
+                    <data alias='umbracoBytes'>10726</data>
+                    <data alias='umbracoExtension'>jpg</data>
+                </node>");
                 indexer.ReIndexNode(newXml, "media");
                 session.WaitForChanges();
 
@@ -449,19 +449,19 @@ namespace Umbraco.Tests.PublishedContent
             var nodeId = 2112;
 
             var xml = XElement.Parse(@"<Image id=""2112"" version=""5b3e46ab-3e37-4cfa-ab70-014234b5bd39"" parentID=""2222"" level=""3"" writerID=""0"" nodeType=""1032"" template=""0"" sortOrder=""1"" createDate=""2010-05-19T17:32:46"" updateDate=""2010-05-19T17:32:46"" nodeName=""Sam's Umbraco Image"" urlName=""acnestressscrub"" writerName=""Administrator"" nodeTypeAlias=""Image"" path=""-1,1111,2222,2112"" isDoc="""">
-				<umbracoFile><![CDATA[/media/1234/blah.pdf]]></umbracoFile>
-				<umbracoWidth>115</umbracoWidth>
-				<umbracoHeight>268</umbracoHeight>
-				<umbracoBytes>10726</umbracoBytes>
-				<umbracoExtension>jpg</umbracoExtension>
-				<Image id=""3113"" version=""5b3e46ab-3e37-4cfa-ab70-014234b5bd33"" parentID=""2112"" level=""4"" writerID=""0"" nodeType=""1032"" template=""0"" sortOrder=""2"" createDate=""2010-05-19T17:32:46"" updateDate=""2010-05-19T17:32:46"" nodeName=""Another Umbraco Image"" urlName=""acnestressscrub"" writerName=""Administrator"" nodeTypeAlias=""Image"" path=""-1,1111,2222,2112,3113"" isDoc="""">
-					<umbracoFile><![CDATA[/media/1234/blah.pdf]]></umbracoFile>
-					<umbracoWidth>115</umbracoWidth>
-					<umbracoHeight>268</umbracoHeight>
-					<umbracoBytes>10726</umbracoBytes>
-					<umbracoExtension>jpg</umbracoExtension>
-				</Image>
-			</Image>");
+                <umbracoFile><![CDATA[/media/1234/blah.pdf]]></umbracoFile>
+                <umbracoWidth>115</umbracoWidth>
+                <umbracoHeight>268</umbracoHeight>
+                <umbracoBytes>10726</umbracoBytes>
+                <umbracoExtension>jpg</umbracoExtension>
+                <Image id=""3113"" version=""5b3e46ab-3e37-4cfa-ab70-014234b5bd33"" parentID=""2112"" level=""4"" writerID=""0"" nodeType=""1032"" template=""0"" sortOrder=""2"" createDate=""2010-05-19T17:32:46"" updateDate=""2010-05-19T17:32:46"" nodeName=""Another Umbraco Image"" urlName=""acnestressscrub"" writerName=""Administrator"" nodeTypeAlias=""Image"" path=""-1,1111,2222,2112,3113"" isDoc="""">
+                    <umbracoFile><![CDATA[/media/1234/blah.pdf]]></umbracoFile>
+                    <umbracoWidth>115</umbracoWidth>
+                    <umbracoHeight>268</umbracoHeight>
+                    <umbracoBytes>10726</umbracoBytes>
+                    <umbracoExtension>jpg</umbracoExtension>
+                </Image>
+            </Image>");
             var node = xml.DescendantsAndSelf("Image").Single(x => (int)x.Attribute("id") == nodeId);
 
             var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null), ServiceContext.MediaService, ServiceContext.UserService, new StaticCacheProvider(), ContentTypesCache);

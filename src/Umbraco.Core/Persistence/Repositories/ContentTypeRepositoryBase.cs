@@ -754,7 +754,7 @@ AND umbracoNode.id <> @id",
                                 AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,
                                 ParentTypes.parentContentTypeId as chtParentId, ParentTypes.parentContentTypeKey as chtParentKey,
                                 umbracoNode.createDate as nCreateDate, umbracoNode." + sqlSyntax.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
-		                        umbracoNode.parentID as nParentId, umbracoNode." + sqlSyntax.GetQuotedColumnName("path") + @" as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode." + sqlSyntax.GetQuotedColumnName("text") + @" as nName, umbracoNode.trashed as nTrashed,
+                                umbracoNode.parentID as nParentId, umbracoNode." + sqlSyntax.GetQuotedColumnName("path") + @" as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode." + sqlSyntax.GetQuotedColumnName("text") + @" as nName, umbracoNode.trashed as nTrashed,
                                 umbracoNode.uniqueID as nUniqueId
                         FROM cmsContentType
                         INNER JOIN umbracoNode
@@ -894,7 +894,7 @@ AND umbracoNode.id <> @id",
                                 AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,
                                 ParentTypes.parentContentTypeId as chtParentId,ParentTypes.parentContentTypeKey as chtParentKey,
                                 umbracoNode.createDate as nCreateDate, umbracoNode." + sqlSyntax.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
-		                        umbracoNode.parentID as nParentId, umbracoNode." + sqlSyntax.GetQuotedColumnName("path") + @" as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode." + sqlSyntax.GetQuotedColumnName("text") + @" as nName, umbracoNode.trashed as nTrashed,
+                                umbracoNode.parentID as nParentId, umbracoNode." + sqlSyntax.GetQuotedColumnName("path") + @" as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode." + sqlSyntax.GetQuotedColumnName("text") + @" as nName, umbracoNode.trashed as nTrashed,
                                 umbracoNode.uniqueID as nUniqueId,
                                 Template.alias as tAlias, Template.nodeId as tId,Template.text as tText
                         FROM cmsContentType
@@ -1080,19 +1080,19 @@ AND umbracoNode.id <> @id",
                 if (contentTypeIds.Length == 0) return;
 
                 var sqlGroups = @"SELECT
-    pg.contenttypeNodeId AS contentTypeId, 
+    pg.contenttypeNodeId AS contentTypeId,
     pg.id AS id, pg.uniqueID AS " + sqlSyntax.GetQuotedColumnName("key") + @",
     pg.sortOrder AS sortOrder, pg." + sqlSyntax.GetQuotedColumnName("text") + @" AS text
 FROM cmsPropertyTypeGroup pg
 WHERE pg.contenttypeNodeId IN (@ids)
 ORDER BY contentTypeId, id";
 
-                var sqlProps = @"SELECT 
-	pt.contentTypeId AS contentTypeId, 
-    pt.id AS id, pt.uniqueID AS " + sqlSyntax.GetQuotedColumnName("key") + @", 
+                var sqlProps = @"SELECT
+    pt.contentTypeId AS contentTypeId,
+    pt.id AS id, pt.uniqueID AS " + sqlSyntax.GetQuotedColumnName("key") + @",
     pt.propertyTypeGroupId AS groupId,
-	pt.Alias AS alias, pt." + sqlSyntax.GetQuotedColumnName("Description") + @" AS " + sqlSyntax.GetQuotedColumnName("desc") + @", pt.mandatory AS mandatory,
-	pt.Name AS name, pt.sortOrder AS sortOrder, pt.validationRegExp AS regexp,
+    pt.Alias AS alias, pt." + sqlSyntax.GetQuotedColumnName("Description") + @" AS " + sqlSyntax.GetQuotedColumnName("desc") + @", pt.mandatory AS mandatory,
+    pt.Name AS name, pt.sortOrder AS sortOrder, pt.validationRegExp AS regexp,
     dt.nodeId as dataTypeId, dt.dbType as dbType, dt.propertyEditorAlias as editorAlias
 FROM cmsPropertyType pt
 INNER JOIN cmsDataType as dt ON pt.dataTypeId = dt.nodeId
@@ -1238,7 +1238,7 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         {
             var ids = contentPath.Split(',').Select(int.Parse);
             var sql = new Sql(@"SELECT COUNT(*) FROM cmsContentType
-INNER JOIN cmsContent ON cmsContentType.nodeId=cmsContent.contentType 
+INNER JOIN cmsContent ON cmsContentType.nodeId=cmsContent.contentType
 WHERE cmsContent.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", new { ids, isContainer = true });
             return Database.ExecuteScalar<int>(sql) > 0;
         }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Web;
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Cache
             Assert.IsTrue(original.IsDirty());
 
             var val = _provider.GetCacheItem<TestClass>("test", () => original);
-            
+
             Assert.AreNotEqual(original.CloneId, val.CloneId);
             Assert.IsFalse(val.IsDirty());
         }

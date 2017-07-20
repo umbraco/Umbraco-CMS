@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 
@@ -7,7 +7,7 @@ namespace Umbraco.Web._Legacy.Controls
     public class UmbracoPanel : Panel
     {
         private ScrollingMenu _menu = new ScrollingMenu();
-        
+
         private bool _hasMenu = false;
         private string _StatusBarText = "";
         private string _text;
@@ -54,7 +54,7 @@ namespace Umbraco.Web._Legacy.Controls
             EnsureChildControls();
         }
 
-   
+
         internal HtmlGenericControl header = new HtmlGenericControl();
         internal HtmlGenericControl row = new HtmlGenericControl();
         internal HtmlGenericControl leftcol = new HtmlGenericControl();
@@ -72,7 +72,7 @@ namespace Umbraco.Web._Legacy.Controls
             header.TagName = "div";
             header.ID = base.ClientID + "_header";
             header.Attributes.Add("class","umb-panel-header");
-            
+
             row.TagName = "div";
             row.Attributes.Add("class", "row-fluid");
             header.Controls.Add(row);
@@ -83,7 +83,7 @@ namespace Umbraco.Web._Legacy.Controls
             title.TagName = "h1";
             title.Attributes.Add("class", "headline");
             leftcol.Controls.Add(title);
-            
+
             row.Controls.Add(leftcol);
 
             rightcol.TagName = "span";
@@ -98,17 +98,17 @@ namespace Umbraco.Web._Legacy.Controls
             Height = Unit.Empty;
 
             Controls.AddAt(0,header);
-            
+
 
             base.CreateChildControls();
         }
-        
+
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
             title.InnerHtml = Text;
         }
-        
+
     }
 }

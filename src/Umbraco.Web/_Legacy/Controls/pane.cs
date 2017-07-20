@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data;
@@ -88,7 +88,7 @@ namespace Umbraco.Web._Legacy.Controls
                 styleString += key + ":" + this.Style[key] + ";";
             }
 
-            
+
             writer.WriteLine("<div class=\"umb-pane " + this.CssClass +  "\" style='" + styleString + "'>");
             if (!string.IsNullOrEmpty(m_title))
                 writer.WriteLine("<h5 class='umb-pane-title'>" + m_title + "</h5>");

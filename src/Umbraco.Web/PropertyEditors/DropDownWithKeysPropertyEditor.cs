@@ -1,4 +1,4 @@
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;

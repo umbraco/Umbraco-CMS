@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Events;

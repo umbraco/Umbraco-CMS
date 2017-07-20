@@ -7,7 +7,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class UserFactory 
+    internal class UserFactory
     {
         private readonly IUserType _userType;
 

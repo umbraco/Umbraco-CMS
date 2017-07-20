@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -120,7 +120,7 @@ namespace Umbraco.Web._Legacy.Controls
         private HtmlGenericControl group;
 
         protected override void CreateChildControls()
-        {   
+        {
             toolbar = new HtmlGenericControl { TagName = "div" };
             toolbar.Attributes.Add("class", "btn-toolbar umb-btn-toolbar");
             this.Controls.Add(toolbar);
@@ -140,12 +140,12 @@ namespace Umbraco.Web._Legacy.Controls
             }
             base.OnLoad(e);
         }
-        
-       
+
+
 
         protected override void OnInit(EventArgs e)
         {
-            
+
             EnsureChildControls();
             base.OnInit(e);
         }

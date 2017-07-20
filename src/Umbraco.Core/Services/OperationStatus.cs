@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Core.Events;
 
 namespace Umbraco.Core.Services
@@ -80,7 +80,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="statusType">The status of the operation.</param>
         /// <param name="eventMessages">Event messages produced by the operation.</param>
-        public OperationStatus(OperationStatusType statusType, EventMessages eventMessages) 
+        public OperationStatus(OperationStatusType statusType, EventMessages eventMessages)
             : base(statusType, eventMessages)
         { }
 

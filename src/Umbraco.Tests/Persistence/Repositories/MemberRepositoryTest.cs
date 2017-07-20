@@ -250,7 +250,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Create_Correct_Subquery()
         {
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            
+
             var query = provider.DatabaseContext.Query<IMember>().Where(x =>
                         ((Member) x).LongStringPropertyValue.Contains("1095") &&
                         ((Member) x).PropertyTypeAlias == "headshot");

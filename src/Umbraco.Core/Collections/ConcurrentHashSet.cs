@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading;
 namespace Umbraco.Core.Collections
 {
     /// <summary>
-    /// A thread-safe representation of a <see cref="HashSet{T}"/>. 
+    /// A thread-safe representation of a <see cref="HashSet{T}"/>.
     /// Enumerating this collection is thread-safe and will only operate on a clone that is generated before returning the enumerator.
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -91,7 +91,7 @@ namespace Umbraco.Core.Collections
                 _innerSet.Add(item);
             }
         }
-        
+
         /// <summary>
         /// Attempts to add an item to the collection
         /// </summary>

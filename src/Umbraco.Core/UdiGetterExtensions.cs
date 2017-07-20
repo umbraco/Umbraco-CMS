@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 
@@ -200,8 +200,8 @@ namespace Umbraco.Core
             if (entity == null) throw new ArgumentNullException("entity");
 
             // we should throw on Unknown but for the time being, assume it means PartialView
-            var entityType = entity.ViewType == PartialViewType.PartialViewMacro 
-                ? Constants.UdiEntityType.PartialViewMacro 
+            var entityType = entity.ViewType == PartialViewType.PartialViewMacro
+                ? Constants.UdiEntityType.PartialViewMacro
                 : Constants.UdiEntityType.PartialView;
 
             return new StringUdi(entityType, entity.Path.TrimStart('/')).EnsureClosed();

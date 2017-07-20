@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;

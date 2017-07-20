@@ -3,8 +3,8 @@
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
     public class DeleteTableExpression : MigrationExpressionBase
-    {        
-        public DeleteTableExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes) 
+    {
+        public DeleteTableExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
             : base(context, supportedDatabaseTypes)
         { }
 

@@ -9,7 +9,7 @@ namespace Umbraco.Web.Routing
 {
     public class UrlProviderResolver : ManyObjectsResolverBase<UrlProviderCollectionBuilder, UrlProviderCollection, IUrlProvider>
     {
-        private UrlProviderResolver(UrlProviderCollectionBuilder builder) 
+        private UrlProviderResolver(UrlProviderCollectionBuilder builder)
             : base(builder)
         { }
 

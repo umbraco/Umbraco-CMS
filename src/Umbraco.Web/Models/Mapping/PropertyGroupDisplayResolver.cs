@@ -7,7 +7,7 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class PropertyGroupDisplayResolver<TSource, TPropertyTypeSource, TPropertyTypeDestination>
         where TSource : ContentTypeSave<TPropertyTypeSource>
-        where TPropertyTypeDestination : PropertyTypeDisplay 
+        where TPropertyTypeDestination : PropertyTypeDisplay
         where TPropertyTypeSource : PropertyTypeBasic
     {
         public IEnumerable<PropertyGroupDisplay<TPropertyTypeDestination>> Resolve(TSource source)

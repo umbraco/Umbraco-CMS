@@ -23,12 +23,12 @@ namespace Umbraco.Tests.Security
         {
             var sessionId = Guid.NewGuid().ToString();
             var claimsIdentity = new ClaimsIdentity(new[]
-            {             
+            {
                 //This is the id that 'identity' uses to check for the user id
-                new Claim(ClaimTypes.NameIdentifier, "1234", ClaimValueTypes.Integer32, TestIssuer, TestIssuer), 
+                new Claim(ClaimTypes.NameIdentifier, "1234", ClaimValueTypes.Integer32, TestIssuer, TestIssuer),
                 //This is the id that 'identity' uses to check for the username
-                new Claim(ClaimTypes.Name, "testing", ClaimValueTypes.String, TestIssuer, TestIssuer), 
-                new Claim(ClaimTypes.GivenName, "hello world", ClaimValueTypes.String, TestIssuer, TestIssuer), 
+                new Claim(ClaimTypes.Name, "testing", ClaimValueTypes.String, TestIssuer, TestIssuer),
+                new Claim(ClaimTypes.GivenName, "hello world", ClaimValueTypes.String, TestIssuer, TestIssuer),
                 new Claim(Constants.Security.StartContentNodeIdClaimType, "-1", ClaimValueTypes.Integer32, TestIssuer, TestIssuer),
                 new Claim(Constants.Security.StartMediaNodeIdClaimType, "5543", ClaimValueTypes.Integer32, TestIssuer, TestIssuer),
                 new Claim(Constants.Security.AllowedApplicationsClaimType, "content", ClaimValueTypes.String, TestIssuer, TestIssuer),
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Security
                 new Claim(Constants.Security.SessionIdClaimType, sessionId, Constants.Security.SessionIdClaimType, TestIssuer, TestIssuer),
                 new Claim(ClaimsIdentity.DefaultRoleClaimType, "admin", ClaimValueTypes.String, TestIssuer, TestIssuer),
             });
-            
+
             var backofficeIdentity = UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
 
             Assert.AreEqual("1234", backofficeIdentity.Id);
@@ -57,9 +57,9 @@ namespace Umbraco.Tests.Security
         public void Create_From_Claims_Identity_Missing_Required_Claim()
         {
             var claimsIdentity = new ClaimsIdentity(new[]
-            {             
-                new Claim(ClaimTypes.NameIdentifier, "1234", ClaimValueTypes.Integer32, TestIssuer, TestIssuer), 
-                new Claim(ClaimTypes.Name, "testing", ClaimValueTypes.String, TestIssuer, TestIssuer),                 
+            {
+                new Claim(ClaimTypes.NameIdentifier, "1234", ClaimValueTypes.Integer32, TestIssuer, TestIssuer),
+                new Claim(ClaimTypes.Name, "testing", ClaimValueTypes.String, TestIssuer, TestIssuer),
             });
 
             Assert.Throws<InvalidOperationException>(() => UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity));
@@ -70,11 +70,11 @@ namespace Umbraco.Tests.Security
         {
             var sessionId = Guid.NewGuid().ToString();
             var claimsIdentity = new ClaimsIdentity(new[]
-            {             
+            {
                 //null or empty
-                new Claim(ClaimTypes.NameIdentifier, "", ClaimValueTypes.Integer32, TestIssuer, TestIssuer), 
-                new Claim(ClaimTypes.Name, "testing", ClaimValueTypes.String, TestIssuer, TestIssuer), 
-                new Claim(ClaimTypes.GivenName, "hello world", ClaimValueTypes.String, TestIssuer, TestIssuer), 
+                new Claim(ClaimTypes.NameIdentifier, "", ClaimValueTypes.Integer32, TestIssuer, TestIssuer),
+                new Claim(ClaimTypes.Name, "testing", ClaimValueTypes.String, TestIssuer, TestIssuer),
+                new Claim(ClaimTypes.GivenName, "hello world", ClaimValueTypes.String, TestIssuer, TestIssuer),
                 new Claim(Constants.Security.StartContentNodeIdClaimType, "-1", ClaimValueTypes.Integer32, TestIssuer, TestIssuer),
                 new Claim(Constants.Security.StartMediaNodeIdClaimType, "5543", ClaimValueTypes.Integer32, TestIssuer, TestIssuer),
                 new Claim(Constants.Security.AllowedApplicationsClaimType, "content", ClaimValueTypes.String, TestIssuer, TestIssuer),
@@ -125,8 +125,8 @@ namespace Umbraco.Tests.Security
             };
 
             var claimsIdentity = new ClaimsIdentity(new[]
-            {                             
-                new Claim("TestClaim1", "test", ClaimValueTypes.Integer32, TestIssuer, TestIssuer), 
+            {
+                new Claim("TestClaim1", "test", ClaimValueTypes.Integer32, TestIssuer, TestIssuer),
                 new Claim("TestClaim1", "test", ClaimValueTypes.Integer32, TestIssuer, TestIssuer)
             });
 

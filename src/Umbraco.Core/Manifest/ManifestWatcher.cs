@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Manifest
                 var fsw = new FileSystemWatcher(packageFolder, "*package.*")
                 {
                     IncludeSubdirectories = false,
-                    NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite 
+                    NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
                 };
 
                 _fws.Add(fsw);

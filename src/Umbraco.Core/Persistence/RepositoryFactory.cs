@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using LightInject;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;

@@ -9,17 +9,17 @@ using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
-	[Weight(1000)]
+    [Weight(1000)]
     public class ImageThumbnailProvider : AbstractThumbnailProvider
     {
-	    private readonly MediaFileSystem _mediaFileSystem;
+        private readonly MediaFileSystem _mediaFileSystem;
 
-	    public ImageThumbnailProvider(MediaFileSystem mediaFileSystem)
-	    {
-	        _mediaFileSystem = mediaFileSystem;
-	    }
+        public ImageThumbnailProvider(MediaFileSystem mediaFileSystem)
+        {
+            _mediaFileSystem = mediaFileSystem;
+        }
 
-	    protected override IEnumerable<string> SupportedExtensions
+        protected override IEnumerable<string> SupportedExtensions
         {
             get { return new List<string> { ".jpeg", ".jpg", ".gif", ".bmp", ".png", ".tiff", ".tif" }; }
         }

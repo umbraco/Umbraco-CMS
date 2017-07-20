@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Security;
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Services
                     publicAccessService.Save(entry);
                 }
             }
-          
+
             return hasChange;
         }
 

@@ -242,9 +242,9 @@ namespace Umbraco.Tests.Services
             Assert.Greater(allLangs.Count(), 0);
             foreach (var language in allLangs)
             {
-                Assert.AreEqual("Hellooooo", item.Translations.Single(x => x.Language.CultureName == language.CultureName).Value);    
+                Assert.AreEqual("Hellooooo", item.Translations.Single(x => x.Language.CultureName == language.CultureName).Value);
             }
-            
+
         }
 
         [Test]
@@ -325,11 +325,11 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var localizationService = ServiceContext.LocalizationService;
-            
+
             // Act
             var languages = localizationService.GetAllLanguages();
 
-            // Assert 
+            // Assert
             Assert.That(3, Is.EqualTo(languages.Count()));
         }
 

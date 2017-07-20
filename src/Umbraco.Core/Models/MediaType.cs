@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models
@@ -24,9 +24,9 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Use this to ensure inheritance from parent.</remarks>
         /// <param name="parent"></param>
-		public MediaType(IMediaType parent) : this(parent, null)
-		{
-		}
+        public MediaType(IMediaType parent) : this(parent, null)
+        {
+        }
 
         /// <summary>
         /// Constuctor for creating a MediaType with the parent as an inherited type.

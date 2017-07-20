@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.2.0", 4, Constants.System.UmbracoMigrationName)]
     public class UpdateToNewMemberPropertyAliases : MigrationBase
     {
-        public UpdateToNewMemberPropertyAliases(IMigrationContext context) 
+        public UpdateToNewMemberPropertyAliases(IMigrationContext context)
             : base(context)
         { }
 
@@ -50,7 +50,7 @@ INNER JOIN cmsContentType ON cmsPropertyType.contentTypeId = cmsContentType.node
 INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
 WHERE umbracoNode.nodeObjectType = @objectType) x)";
 
-                const string xmlSelectSql = @"SELECT cmsContentXml.* FROM cmsContentXml 
+                const string xmlSelectSql = @"SELECT cmsContentXml.* FROM cmsContentXml
 INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
 WHERE umbracoNode.nodeObjectType = @objectType";
 

@@ -31,7 +31,7 @@ namespace Umbraco.Web.UI.JavaScript
 
         public JArray GetStylesheetInitializationArray(HttpContextBase httpContext)
         {
-            var merged = new JArray();    
+            var merged = new JArray();
             foreach (var m in _parser.GetManifests())
             {
                 ManifestParser.MergeJArrays(merged, m.StylesheetInitialize);
@@ -46,7 +46,7 @@ namespace Umbraco.Web.UI.JavaScript
             return merged;
         }
 
-       
+
         /// <summary>
         /// Parses the CssResources.Main and returns a yepnop.injectCss format
         /// </summary>

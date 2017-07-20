@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Factories
     //{
     //    public override void ConfigureMappings(IConfiguration config)
     //    {
-            
+
     //        UserSectionFactory.ConfigureMappings(config);
     //    }
     //}

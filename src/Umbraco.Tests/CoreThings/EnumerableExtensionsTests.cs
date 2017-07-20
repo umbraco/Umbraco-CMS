@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -68,53 +68,53 @@ namespace Umbraco.Tests.CoreThings
             {
                 Children = new List<TestItem>
                 {
-	                new TestItem("1.1")
-	                {
-	                    Children = new List<TestItem>
-	                    {
-	                        new TestItem("1.1.1")
-	                        {
-	                            Children = new List<TestItem>
-	                            {
-	                                new TestItem("1.1.1.1")
-	                                {
-	                                    Children = new List<TestItem>
-	                                    {
-	                                        new TestItem("1.1.1.1.1"),
+                    new TestItem("1.1")
+                    {
+                        Children = new List<TestItem>
+                        {
+                            new TestItem("1.1.1")
+                            {
+                                Children = new List<TestItem>
+                                {
+                                    new TestItem("1.1.1.1")
+                                    {
+                                        Children = new List<TestItem>
+                                        {
+                                            new TestItem("1.1.1.1.1"),
                                             new TestItem("1.1.1.1.2")
-	                                    }
-	                                }
-	                            }
-	                        }
-	                    }
-	                },
-	                new TestItem("1.2")
-	                {
-	                    Children = new List<TestItem>
-	                    {
-	                        new TestItem("1.2.1")
-	                        {
-	                            Children = new List<TestItem>
-	                            {
-	                                new TestItem("1.2.1.1")
-	                                {
-	                                    Children = new List<TestItem>()
-	                                }
-	                            }
-	                        },
-	                        new TestItem("1.2.2")
-	                        {
-	                            Children = new List<TestItem>
-	                            {
-	                                new TestItem("1.2.2.1")
-	                                {
-	                                    Children = new List<TestItem>()
-	                                }
-	                            }
-	                        }
-	                    }
-	                }
-	            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    new TestItem("1.2")
+                    {
+                        Children = new List<TestItem>
+                        {
+                            new TestItem("1.2.1")
+                            {
+                                Children = new List<TestItem>
+                                {
+                                    new TestItem("1.2.1.1")
+                                    {
+                                        Children = new List<TestItem>()
+                                    }
+                                }
+                            },
+                            new TestItem("1.2.2")
+                            {
+                                Children = new List<TestItem>
+                                {
+                                    new TestItem("1.2.2.1")
+                                    {
+                                        Children = new List<TestItem>()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             };
 
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -141,7 +141,7 @@ namespace Umbraco.Tests.CoreThings
             public IEnumerable<TestItem> Children { get; set; }
         }
 
-	    [Test]
+        [Test]
         public void InGroupsOf_ReturnsAllElements()
         {
             var integers = new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };

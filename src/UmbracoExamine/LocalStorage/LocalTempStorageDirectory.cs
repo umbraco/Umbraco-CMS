@@ -8,7 +8,7 @@ namespace UmbracoExamine.LocalStorage
 {
     /// <summary>
     /// Used to read data from local temp storage and write to both local storage and main storage
-    /// </summary>    
+    /// </summary>
     public class LocalTempStorageDirectory : Directory
     {
         private readonly FSDirectory _tempStorageDir;
@@ -25,16 +25,16 @@ namespace UmbracoExamine.LocalStorage
             _tempStorageDir = new SimpleFSDirectory(tempStorageDir);
             _realDirectory = realDirectory;
             _lockFactory = new MultiIndexLockFactory(_realDirectory, _tempStorageDir);
-            
+
             Enabled = true;
 
         }
-        
+
         /// <summary>
         /// If initialization fails, it will be disabled and then this will just wrap the 'real directory'
         /// </summary>
         internal bool Enabled { get; set; }
-        
+
         public override string[] ListAll()
         {
             //always from the real dir
@@ -70,7 +70,7 @@ namespace UmbracoExamine.LocalStorage
 
         /// <summary>Removes an existing file in the directory. </summary>
         public override void DeleteFile(string name)
-        {   
+        {
             _realDirectory.DeleteFile(name);
 
             //perform on both dirs
@@ -79,7 +79,7 @@ namespace UmbracoExamine.LocalStorage
                 _tempStorageDir.DeleteFile(name);
             }
         }
-          
+
 
         /// <summary>Returns the length of a file in the directory. </summary>
         public override long FileLength(string name)
@@ -90,7 +90,7 @@ namespace UmbracoExamine.LocalStorage
 
         /// <summary>
         /// Creates a new, empty file in the directory with the given name.
-        /// Returns a stream writing this file. 
+        /// Returns a stream writing this file.
         /// </summary>
         public override IndexOutput CreateOutput(string name)
         {
@@ -99,7 +99,7 @@ namespace UmbracoExamine.LocalStorage
             {
                 return new MultiIndexOutput(
                     _tempStorageDir.CreateOutput(name),
-                    _realDirectory.CreateOutput(name));    
+                    _realDirectory.CreateOutput(name));
             }
 
             return _realDirectory.CreateOutput(name);
@@ -113,14 +113,14 @@ namespace UmbracoExamine.LocalStorage
             if (Enabled)
             {
                 //return the reader from the cache, not the real dir
-                return _tempStorageDir.OpenInput(name);    
+                return _tempStorageDir.OpenInput(name);
             }
 
             return _realDirectory.OpenInput(name);
         }
 
         /// <summary>
-        /// Creates an IndexInput for the file with the given name. 
+        /// Creates an IndexInput for the file with the given name.
         /// </summary>
         public override IndexInput OpenInput(string name, int bufferSize)
         {
@@ -131,19 +131,19 @@ namespace UmbracoExamine.LocalStorage
             }
             return _realDirectory.OpenInput(name, bufferSize);
         }
-        
+
         /// <summary>
         /// Ensure that any writes to this file are moved to
         ///             stable storage.  Lucene uses this to properly commit
         ///             changes to the index, to prevent a machine/OS crash
-        ///             from corrupting the index. 
+        ///             from corrupting the index.
         /// </summary>
         public override void Sync(string name)
         {
             _realDirectory.Sync(name);
             _tempStorageDir.Sync(name);
             base.Sync(name);
-        }        
+        }
 
         public override Lock MakeLock(string name)
         {
@@ -157,19 +157,19 @@ namespace UmbracoExamine.LocalStorage
         ///             (even in different JVMs and/or on different machines)
         ///             are considered "the same index".  This is how locking
         ///             "scopes" to the right index.
-        /// 
+        ///
         /// </summary>
         public override string GetLockId()
         {
             return string.Concat(_realDirectory.GetLockId(), _tempStorageDir.GetLockId());
         }
-        
+
         public override LockFactory LockFactory
         {
             get
             {
                 return _lockFactory;
-                //return _realDirectory.GetLockFactory();    
+                //return _realDirectory.GetLockFactory();
             }
 
         }
@@ -200,7 +200,7 @@ namespace UmbracoExamine.LocalStorage
             _lockFactory = lf;
             //_realDirectory.SetLockFactory(lf);
         }
-        
+
 
 
     }

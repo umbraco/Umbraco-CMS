@@ -3,6 +3,6 @@
     public interface ICreateColumnOptionForeignKeyCascadeSyntax : ICreateColumnOptionSyntax,
                                                                 IForeignKeyCascadeSyntax<ICreateColumnOptionSyntax, ICreateColumnOptionForeignKeyCascadeSyntax>
     {
-         
+
     }
 }

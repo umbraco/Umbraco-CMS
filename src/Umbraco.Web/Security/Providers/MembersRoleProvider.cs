@@ -1,4 +1,4 @@
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Linq;
 using System.Web.Security;
@@ -21,11 +21,11 @@ namespace Umbraco.Web.Security.Providers
 
         public MembersRoleProvider()
             : this(Current.Services.MemberService)
-        {            
+        {
         }
 
         private string _applicationName;
-        
+
         public override bool IsUserInRole(string username, string roleName)
         {
             return GetRolesForUser(username).Any(x => x == roleName);

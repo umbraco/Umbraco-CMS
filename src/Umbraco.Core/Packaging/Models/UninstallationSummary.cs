@@ -22,7 +22,7 @@ namespace Umbraco.Core.Packaging.Models
         public IEnumerable<IContent> ContentUninstalled { get; set; }
         public bool PackageUninstalled { get; set; }
     }
-    
+
     internal static class UninstallationSummaryExtentions
     {
         public static UninstallationSummary InitEmpty(this UninstallationSummary summary)

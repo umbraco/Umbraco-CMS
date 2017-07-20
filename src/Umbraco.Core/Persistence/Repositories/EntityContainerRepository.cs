@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using NPoco;
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly Guid _containerObjectType;
 
-        public EntityContainerRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, Guid containerObjectType) 
+        public EntityContainerRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, Guid containerObjectType)
             : base(work, cache, logger)
         {
             var allowedContainers = new[] {Constants.ObjectTypes.DocumentTypeContainerGuid, Constants.ObjectTypes.MediaTypeContainerGuid, Constants.ObjectTypes.DataTypeContainerGuid};
@@ -269,7 +269,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // update
             Database.Update(nodeDto);
-            
+
             // refresh the entity
             entity.Path = nodeDto.Path;
             entity.Level = nodeDto.Level;

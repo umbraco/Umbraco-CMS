@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Events;
@@ -535,7 +535,7 @@ namespace Umbraco.Core.Services
                 Audit(uow, AuditType.Delete, "Delete DataTypeDefinition performed by user", userId, dataTypeDefinition.Id);
 
                 uow.Complete();
-	        }
+            }
         }
 
         private void Audit(IUnitOfWork uow, AuditType type, string message, int userId, int objectId)
@@ -554,22 +554,22 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Delete
         /// </summary>
-		public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataTypeDefinition>> Deleting;
+        public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataTypeDefinition>> Deleting;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
-		public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataTypeDefinition>> Deleted;
+        public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataTypeDefinition>> Deleted;
 
         /// <summary>
         /// Occurs before Save
         /// </summary>
-		public static event TypedEventHandler<IDataTypeService, SaveEventArgs<IDataTypeDefinition>> Saving;
+        public static event TypedEventHandler<IDataTypeService, SaveEventArgs<IDataTypeDefinition>> Saving;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-		public static event TypedEventHandler<IDataTypeService, SaveEventArgs<IDataTypeDefinition>> Saved;
+        public static event TypedEventHandler<IDataTypeService, SaveEventArgs<IDataTypeDefinition>> Saved;
 
         /// <summary>
         /// Occurs before Move

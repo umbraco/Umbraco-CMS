@@ -7,10 +7,10 @@ using Umbraco.Web.Composing;
 namespace Umbraco.Web.Mvc
 {
     /// <summary>
-	/// Ensures authorization is successful for a back office user.
-	/// </summary>
-	public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
-	{
+    /// Ensures authorization is successful for a back office user.
+    /// </summary>
+    public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
+    {
         // see note in HttpInstallAuthorizeAttribute
         private readonly UmbracoContext _umbracoContext;
         private readonly IRuntimeState _runtimeState;
@@ -19,12 +19,12 @@ namespace Umbraco.Web.Mvc
 
         private UmbracoContext UmbracoContext => _umbracoContext ?? Current.UmbracoContext;
 
-	    /// <summary>
-	    /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
-	    /// </summary>
-	    /// <param name="umbracoContext"></param>
-	    /// <param name="runtimeState"></param>
-	    public UmbracoAuthorizeAttribute(UmbracoContext umbracoContext, IRuntimeState runtimeState)
+        /// <summary>
+        /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        /// <param name="runtimeState"></param>
+        public UmbracoAuthorizeAttribute(UmbracoContext umbracoContext, IRuntimeState runtimeState)
         {
             if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
@@ -35,17 +35,17 @@ namespace Umbraco.Web.Mvc
         public UmbracoAuthorizeAttribute()
         { }
 
-		/// <summary>
-		/// Ensures that the user must be in the Administrator or the Install role
-		/// </summary>
-		/// <param name="httpContext"></param>
-		/// <returns></returns>
-		protected override bool AuthorizeCore(HttpContextBase httpContext)
-		{
-		    if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
+        /// <summary>
+        /// Ensures that the user must be in the Administrator or the Install role
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <returns></returns>
+        protected override bool AuthorizeCore(HttpContextBase httpContext)
+        {
+            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
 
-		    try
-			{
+            try
+            {
                 // if not configured (install or upgrade) then we can continue
                 // otherwise we need to ensure that a user is logged in
                 return RuntimeState.Level == RuntimeLevel.Install
@@ -53,10 +53,10 @@ namespace Umbraco.Web.Mvc
                     || UmbracoContext.Security.ValidateCurrentUser();
             }
             catch (Exception)
-			{
-				return false;
-			}
-		}
+            {
+                return false;
+            }
+        }
 
         /// <summary>
         /// Override to to ensure no redirect occurs
@@ -70,5 +70,5 @@ namespace Umbraco.Web.Mvc
             filterContext.RequestContext.HttpContext.Response.SuppressFormsAuthenticationRedirect = true;
         }
 
-	}
+    }
 }

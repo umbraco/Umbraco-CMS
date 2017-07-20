@@ -45,7 +45,7 @@ namespace Umbraco.Web.Security.Identity
                     services.MemberTypeService,
                     services.ExternalLoginService,
                     userMembershipProvider));
-            
+
             app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
 
             //Create a sign in manager per request
@@ -201,21 +201,21 @@ namespace Umbraco.Web.Security.Identity
         /// <remarks>
         /// This is required because a developer can specify a custom user manager and due to generic types the key name will registered
         /// differently in the owin context
-        /// </remarks> 
+        /// </remarks>
         private static void SetBackOfficeUserManagerType<TManager, TUser>(this IAppBuilder app)
             where TManager : BackOfficeUserManager<TUser>
             where TUser : BackOfficeIdentityUser
         {
             if (_markerSet) throw new InvalidOperationException("The back office user manager marker has already been set, only one back office user manager can be configured");
 
-            //on each request set the user manager getter - 
+            //on each request set the user manager getter -
             // this is required purely because Microsoft.Owin.IOwinContext is super inflexible with it's Get since it can only be
             // a generic strongly typed instance
             app.Use((context, func) =>
             {
                 context.Set(BackOfficeUserManager.OwinMarkerKey, new BackOfficeUserManagerMarker<TManager, TUser>());
                 return func();
-            });            
+            });
         }
 
         private static void UseUmbracoBackOfficeCookieAuthenticationInternal(this IAppBuilder app, CookieAuthenticationOptions options, IRuntimeState runtimeState, PipelineStage stage)

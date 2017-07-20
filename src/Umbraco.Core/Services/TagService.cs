@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
@@ -9,14 +9,14 @@ using Umbraco.Core.Persistence.UnitOfWork;
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// Tag service to query for tags in the tags db table. The tags returned are only relevant for published content & saved media or members 
+    /// Tag service to query for tags in the tags db table. The tags returned are only relevant for published content & saved media or members
     /// </summary>
     /// <remarks>
     /// If there is unpublished content with tags, those tags will not be contained
     /// </remarks>
     public class TagService : ScopeRepositoryService, ITagService
     {
-      
+
         public TagService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, logger, eventMessagesFactory)
         {
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<ITagRepository>();
                 return repository.GetTaggedEntityById(id);
-            } 
+            }
         }
 
         public TaggedEntity GetTaggedEntityByKey(Guid key)
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<ITagRepository>();
                 return repository.GetTaggedEntityByKey(key);
-            } 
+            }
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<ITagRepository>();
                 return repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, tagGroup);
-            }         
+            }
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<ITagRepository>();
                 return repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, tag, tagGroup);
-            }         
+            }
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<ITagRepository>();
                 return repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, tagGroup);
-            }    
+            }
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<ITagRepository>();
                 return repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Media, tag, tagGroup);
-            }    
+            }
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<ITagRepository>();
                 return repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Member, tagGroup);
-            }    
+            }
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<ITagRepository>();
                 return repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Member, tag, tagGroup);
-            }    
+            }
         }
 
         /// <summary>
@@ -144,13 +144,13 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<ITagRepository>();
                 return repository.GetTagsForEntityType(TaggableObjectTypes.All, tagGroup);
-            }  
+            }
         }
 
         /// <summary>
         /// Gets all tags for content items
         /// </summary>
-        /// <remarks>Use the optional tagGroup parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the
         /// result to a specific 'Tag Group'.</remarks>
         /// <param name="tagGroup">Optional name of the 'Tag Group'</param>
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
@@ -166,7 +166,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets all tags for media items
         /// </summary>
-        /// <remarks>Use the optional tagGroup parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the
         /// result to a specific 'Tag Group'.</remarks>
         /// <param name="tagGroup">Optional name of the 'Tag Group'</param>
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
@@ -182,7 +182,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets all tags for member items
         /// </summary>
-        /// <remarks>Use the optional tagGroup parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the
         /// result to a specific 'Tag Group'.</remarks>
         /// <param name="tagGroup">Optional name of the 'Tag Group'</param>
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
@@ -198,7 +198,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets all tags attached to a property by entity id
         /// </summary>
-        /// <remarks>Use the optional tagGroup parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the
         /// result to a specific 'Tag Group'.</remarks>
         /// <param name="contentId">The content item id to get tags for</param>
         /// <param name="propertyTypeAlias">Property type alias</param>
@@ -216,7 +216,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets all tags attached to an entity (content, media or member) by entity id
         /// </summary>
-        /// <remarks>Use the optional tagGroup parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the
         /// result to a specific 'Tag Group'.</remarks>
         /// <param name="contentId">The content item id to get tags for</param>
         /// <param name="tagGroup">Optional name of the 'Tag Group'</param>
@@ -233,7 +233,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets all tags attached to a property by entity id
         /// </summary>
-        /// <remarks>Use the optional tagGroup parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the
         /// result to a specific 'Tag Group'.</remarks>
         /// <param name="contentId">The content item id to get tags for</param>
         /// <param name="propertyTypeAlias">Property type alias</param>
@@ -251,7 +251,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets all tags attached to an entity (content, media or member) by entity id
         /// </summary>
-        /// <remarks>Use the optional tagGroup parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the
         /// result to a specific 'Tag Group'.</remarks>
         /// <param name="contentId">The content item id to get tags for</param>
         /// <param name="tagGroup">Optional name of the 'Tag Group'</param>

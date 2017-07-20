@@ -39,8 +39,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="orderBy"></param>
         /// <returns></returns>
         IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, Expression<Func<IUser, string>> orderBy);
-        
-        
+
+
         /// <summary>
         /// Gets the user permissions for the specified entities
         /// </summary>

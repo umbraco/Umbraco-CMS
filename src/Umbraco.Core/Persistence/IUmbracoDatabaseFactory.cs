@@ -1,17 +1,17 @@
-using System;
+﻿using System;
 
 namespace Umbraco.Core.Persistence
 {
-	/// <summary>
-	/// Creates and manages the "ambient" database.
-	/// </summary>
-	public interface IUmbracoDatabaseFactory : IDatabaseContext, IDisposable
-	{
+    /// <summary>
+    /// Creates and manages the "ambient" database.
+    /// </summary>
+    public interface IUmbracoDatabaseFactory : IDatabaseContext, IDisposable
+    {
         /// <summary>
         /// Creates a new database.
         /// </summary>
         /// <remarks>The new database must be disposed after being used.</remarks>
-	    IUmbracoDatabase CreateDatabase();
+        IUmbracoDatabase CreateDatabase();
 
         /// <summary>
         /// Gets a value indicating whether the database factory is configured.

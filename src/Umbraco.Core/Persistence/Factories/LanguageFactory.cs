@@ -4,7 +4,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class LanguageFactory 
+    internal class LanguageFactory
     {
         public ILanguage BuildEntity(LanguageDto dto)
         {

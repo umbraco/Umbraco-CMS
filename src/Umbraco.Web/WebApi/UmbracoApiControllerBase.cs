@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web;
 using System.Web.Http;
 using LightInject;
@@ -107,6 +107,6 @@ namespace Umbraco.Web.WebApi
         protected Attempt<IOwinContext> TryGetOwinContext()
         {
             return Request.TryGetOwinContext();
-        }        
+        }
     }
 }

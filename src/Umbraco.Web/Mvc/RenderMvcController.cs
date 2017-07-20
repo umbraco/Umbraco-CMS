@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -13,7 +13,7 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// Represents the default front-end rendering controller.
     /// </summary>
-    [PreRenderViewActionFilter]    
+    [PreRenderViewActionFilter]
     public class RenderMvcController : UmbracoController, IRenderMvcController
     {
         private PublishedContentRequest _publishedContentRequest;

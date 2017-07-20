@@ -1,4 +1,4 @@
-using Lucene.Net.Store;
+﻿using Lucene.Net.Store;
 
 namespace UmbracoExamine.LocalStorage
 {
@@ -34,7 +34,7 @@ namespace UmbracoExamine.LocalStorage
         }
 
         /// <summary>
-        /// Releases exclusive access. 
+        /// Releases exclusive access.
         /// </summary>
         public override void Release()
         {
@@ -44,7 +44,7 @@ namespace UmbracoExamine.LocalStorage
 
         /// <summary>
         /// Returns true if the resource is currently locked.  Note that one must
-        ///             still call <see cref="M:Lucene.Net.Store.Lock.Obtain"/> before using the resource. 
+        ///             still call <see cref="M:Lucene.Net.Store.Lock.Obtain"/> before using the resource.
         /// </summary>
         public override bool IsLocked()
         {

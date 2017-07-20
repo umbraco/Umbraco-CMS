@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -99,80 +99,80 @@ namespace Umbraco.Web._Legacy.Actions
         /// <summary>
         /// A path to a supporting JavaScript file for the IAction. A script tag will be rendered out with the reference to the JavaScript file.
         /// </summary>
-		string JsSource { get; }
+        string JsSource { get; }
     }
 
     /// <summary>
     /// This action is invoked when a domain is being assigned to a document
     /// </summary>
     public class ActionAssignDomain : IAction
-	{
-		/// <summary>
-		/// A public constructor exists ONLY for backwards compatibility in regards to 3rd party add-ons.
-		/// All Umbraco assemblies should use the singleton instantiation (this.Instance)
-		/// When this applicatio is refactored, this constuctor should be made private.
-		/// </summary>
-		[Obsolete("Use the singleton instantiation instead of a constructor")]
-		public ActionAssignDomain() { }
+    {
+        /// <summary>
+        /// A public constructor exists ONLY for backwards compatibility in regards to 3rd party add-ons.
+        /// All Umbraco assemblies should use the singleton instantiation (this.Instance)
+        /// When this applicatio is refactored, this constuctor should be made private.
+        /// </summary>
+        [Obsolete("Use the singleton instantiation instead of a constructor")]
+        public ActionAssignDomain() { }
 
         public static ActionAssignDomain Instance { get; } = new ActionAssignDomain();
 
         #region IAction Members
 
-		public char Letter
-		{
-			get
-			{
-				return 'I';
-			}
-		}
+        public char Letter
+        {
+            get
+            {
+                return 'I';
+            }
+        }
 
-		public string JsFunctionName
-		{
-			get
-			{
-				return string.Format("{0}.actionAssignDomain()", ClientTools.Scripts.GetAppActions);
-			}
-		}
+        public string JsFunctionName
+        {
+            get
+            {
+                return string.Format("{0}.actionAssignDomain()", ClientTools.Scripts.GetAppActions);
+            }
+        }
 
-		public string JsSource
-		{
-			get
-			{
-				return null;
-			}
-		}
+        public string JsSource
+        {
+            get
+            {
+                return null;
+            }
+        }
 
-		public string Alias
-		{
-			get
-			{
-				return "assignDomain";
-			}
-		}
+        public string Alias
+        {
+            get
+            {
+                return "assignDomain";
+            }
+        }
 
-		public string Icon
-		{
-			get
-			{
+        public string Icon
+        {
+            get
+            {
                 return "home";
-			}
-		}
+            }
+        }
 
-		public bool ShowInNotifier
-		{
-			get
-			{
-				return false;
-			}
-		}
-		public bool CanBePermissionAssigned
-		{
-			get
-			{
-				return true;
-			}
-		}
-		#endregion
-	}
+        public bool ShowInNotifier
+        {
+            get
+            {
+                return false;
+            }
+        }
+        public bool CanBePermissionAssigned
+        {
+            get
+            {
+                return true;
+            }
+        }
+        #endregion
+    }
 }

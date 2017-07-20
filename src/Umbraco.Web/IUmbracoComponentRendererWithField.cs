@@ -1,4 +1,4 @@
-using System.Web;
+﻿using System.Web;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web
@@ -27,11 +27,11 @@ namespace Umbraco.Web
         /// <param name="formatAsDateWithTimeSeparator"></param>
         //// <param name="formatString"></param>
         /// <returns></returns>
-        IHtmlString Field(IPublishedContent currentPage, string fieldAlias, 
+        IHtmlString Field(IPublishedContent currentPage, string fieldAlias,
             string altFieldAlias = "", string altText = "", string insertBefore = "", string insertAfter = "",
             bool recursive = false, bool convertLineBreaks = false, bool removeParagraphTags = false,
             RenderFieldCaseType casing = RenderFieldCaseType.Unchanged,
-            RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged, 
+            RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged,
             bool formatAsDate =  false,
             bool formatAsDateWithTime = false,
             string formatAsDateWithTimeSeparator = "");

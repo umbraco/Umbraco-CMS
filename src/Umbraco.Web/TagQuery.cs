@@ -59,7 +59,7 @@ namespace Umbraco.Web
             _tagService = tagService;
             _contentQuery = contentQuery;
         }
-        
+
         /// <summary>
         /// Returns all content that is tagged with the specified tag value and optional tag group
         /// </summary>

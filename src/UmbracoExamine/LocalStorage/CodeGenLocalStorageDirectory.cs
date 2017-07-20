@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
@@ -20,7 +20,7 @@ namespace UmbracoExamine.LocalStorage
         public DirectoryInfo GetLocalStorageDirectory(NameValueCollection config, string configuredPath)
         {
             var codegenPath = HttpRuntime.CodegenDir;
-            var path = Path.Combine(codegenPath, 
+            var path = Path.Combine(codegenPath,
                 //ensure the temp path is consistent with the configured path location
                 configuredPath.TrimStart('~', '/').Replace("/", "\\"));
             return new DirectoryInfo(path);

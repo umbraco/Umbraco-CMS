@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -11,7 +11,7 @@ namespace umbraco.cms.presentation.user
 {
     /// <summary>
     /// Provides umbraco user permission functionality on various nodes. Only nodes that are published are queried via the cache.
-    /// </summary>    
+    /// </summary>
     public class UserPermissions
     {
         readonly IUser _user;
@@ -37,7 +37,7 @@ namespace umbraco.cms.presentation.user
             foreach (var nodeId in nodeIDs)
             {
                 var nodeActions = Current.Services.UserService.GetPermissions(UmbracoContext.Current.Security.CurrentUser, GetNodePath(nodeId));
-                
+
                 var lstActions = Action.FromEntityPermission(nodeActions);
                 if (lstActions == null || !lstActions.Contains(ActionRights.Instance))
                     lstNoPermissions.Add(nodeId);
@@ -76,7 +76,7 @@ namespace umbraco.cms.presentation.user
                 //the node will inherit from it's parent.
                 Current.Services.UserService.ReplaceUserPermissions(
                     _user.Id, new[] { ActionNull.Instance.Letter }, allNodes.ToArray());
-            }            
+            }
 
         }
 

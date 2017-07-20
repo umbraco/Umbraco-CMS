@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -15,8 +15,8 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     /// <remarks>
     /// A pre-value editor is made up of multiple pre-value fields, each field defines a key that the value is stored against.
-    /// Each field can have any editor and the value from each field can store any data such as a simple string or a json structure. 
-    /// 
+    /// Each field can have any editor and the value from each field can store any data such as a simple string or a json structure.
+    ///
     /// The Json serialization attributes are required for manifest property editors to work.
     /// </remarks>
     public class PreValueEditor
@@ -24,7 +24,7 @@ namespace Umbraco.Core.PropertyEditors
         public PreValueEditor()
         {
             var fields = new List<PreValueField>();
-               
+
             //the ctor checks if we have PreValueFieldAttributes applied and if so we construct our fields from them
             var props = TypeHelper.CachedDiscoverableProperties(GetType())
                 .Where(x => x.Name != "Fields");
@@ -49,7 +49,7 @@ namespace Umbraco.Core.PropertyEditors
                             {
                                 instance.Key = p.Name;
                             }
-                                
+
                             if (!att.Name.IsNullOrWhiteSpace())
                                 instance.Name = att.Name;
                             if (!att.View.IsNullOrWhiteSpace())
@@ -104,13 +104,13 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="editorValue"></param>
         /// <param name="currentValue">
-        /// The current value that has been persisted to the database for this pre-value editor. This value may be usesful for 
+        /// The current value that has been persisted to the database for this pre-value editor. This value may be usesful for
         /// how the value then get's deserialized again to be re-persisted. In most cases it will probably not be used.
         /// </param>
         /// <returns></returns>
         /// <remarks>
         /// By default this will just return the Posted editorValue.
-        /// 
+        ///
         /// This can be overridden if perhaps you have a comma delimited string posted value but want to convert those to individual rows, or to convert
         /// a json structure to multiple rows.
         /// </remarks>
@@ -134,8 +134,8 @@ namespace Umbraco.Core.PropertyEditors
         /// <remarks>
         /// This is generally not going to be used by anything unless a property editor wants to change the merging
         /// functionality or needs to convert some legacy persisted data, or convert the string values to strongly typed values in json (i.e. booleans)
-        /// 
-        /// IMPORTANT! When using this method the default pre values dictionary should not be modified which would change the property editor's global 
+        ///
+        /// IMPORTANT! When using this method the default pre values dictionary should not be modified which would change the property editor's global
         /// singleton pre-values!
         /// </remarks>
         public virtual IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
@@ -163,7 +163,7 @@ namespace Umbraco.Core.PropertyEditors
                 return defaultPreValCopy;
             }
 
-            //it's an array so need to format it 
+            //it's an array so need to format it
             var result = new Dictionary<string, object>();
             var asArray = persistedPreVals.PreValuesAsArray.ToArray();
             for (var i = 0; i < asArray.Length; i++)

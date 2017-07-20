@@ -22,12 +22,12 @@ namespace Umbraco.Web.Install.Controllers
         private readonly ILogger _logger;
 
         public InstallController(UmbracoContext umbracoContext, DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger)
-		{
-			_umbracoContext = umbracoContext;
+        {
+            _umbracoContext = umbracoContext;
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
-		    _logger = logger;
-		}
+            _logger = logger;
+        }
 
         [HttpGet]
         public ActionResult Index()

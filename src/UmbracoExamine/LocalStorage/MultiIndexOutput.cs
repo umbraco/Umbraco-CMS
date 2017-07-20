@@ -56,7 +56,7 @@ namespace UmbracoExamine.LocalStorage
                 //return the first
                 return _outputs[0].FilePointer;
             }
-            
+
         }
 
         public override void Seek(long pos)
@@ -74,7 +74,7 @@ namespace UmbracoExamine.LocalStorage
                 //return the first
                 return _outputs[0].FilePointer;
             }
-            
+
         }
     }
 }

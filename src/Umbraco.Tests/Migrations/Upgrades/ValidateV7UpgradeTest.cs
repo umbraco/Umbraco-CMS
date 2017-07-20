@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         public void Validate_AddIndexToCmsMacroTable()
         {
             var migrationContext = new MigrationContext(_database, _logger);
-            var migration = new AddIndexToCmsMacroTable(true, migrationContext);            
+            var migration = new AddIndexToCmsMacroTable(true, migrationContext);
             migration.Up();
 
             Assert.AreEqual(1, migrationContext.Expressions.Count);

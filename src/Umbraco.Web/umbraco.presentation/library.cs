@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -37,14 +37,14 @@ namespace umbraco
     [Obsolete("v8.kill.kill")]
     public class library
     {
-		/// <summary>
-		/// Returns a new UmbracoHelper so that we can start moving the logic from some of these methods to it
-		/// </summary>
-		/// <returns></returns>
-		private static UmbracoHelper GetUmbracoHelper()
-		{
-			return new UmbracoHelper(Current.UmbracoContext, Current.Services, Current.ApplicationCache);
-		}
+        /// <summary>
+        /// Returns a new UmbracoHelper so that we can start moving the logic from some of these methods to it
+        /// </summary>
+        /// <returns></returns>
+        private static UmbracoHelper GetUmbracoHelper()
+        {
+            return new UmbracoHelper(Current.UmbracoContext, Current.Services, Current.ApplicationCache);
+        }
 
         #region Declarations
 
@@ -126,7 +126,7 @@ namespace umbraco
         /// <returns>String with a friendly url from a node</returns>
         public static string NiceUrl(int nodeID)
         {
-        	return GetUmbracoHelper().NiceUrl(nodeID);
+            return GetUmbracoHelper().NiceUrl(nodeID);
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace umbraco
         /// <returns>String with a friendly url with full domain from a node</returns>
         public static string NiceUrlWithDomain(int nodeId)
         {
-        	return GetUmbracoHelper().NiceUrlWithDomain(nodeId);
+            return GetUmbracoHelper().NiceUrlWithDomain(nodeId);
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace umbraco
 
         public static string ResolveVirtualPath(string path)
         {
-			return IOHelper.ResolveUrl(path);
+            return IOHelper.ResolveUrl(path);
         }
 
 
@@ -170,40 +170,40 @@ namespace umbraco
         /// <returns>Returns a string with the data from the given element of a node</returns>
         public static string GetItem(int nodeId, string alias)
         {
-	        var doc = UmbracoContext.Current.ContentCache.GetById(nodeId);
+            var doc = UmbracoContext.Current.ContentCache.GetById(nodeId);
 
-			if (doc == null)
-				return string.Empty;
+            if (doc == null)
+                return string.Empty;
 
-	        switch (alias)
-	        {
-				case "id":
-			        return doc.Id.ToString();
-				case "version":
-			        return doc.Version.ToString();
-				case "parentID":
-			        return doc.Parent.Id.ToString();
-				case "level":
-			        return doc.Level.ToString();
-				case "writerID":
-			        return doc.WriterId.ToString();
-				case "template":
-			        return doc.TemplateId.ToString();
-				case "sortOrder":
-			        return doc.SortOrder.ToString();
-				case "createDate":
-					return doc.CreateDate.ToString("yyyy-MM-dd'T'HH:mm:ss");
-				case "updateDate":
-					return doc.UpdateDate.ToString("yyyy-MM-dd'T'HH:mm:ss");
-				case "nodeName":
-			        return doc.Name;
-				case "writerName":
-			        return doc.WriterName;
-				case "path":
-			        return doc.Path;
-				case "creatorName":
-			        return doc.CreatorName;
-	        }
+            switch (alias)
+            {
+                case "id":
+                    return doc.Id.ToString();
+                case "version":
+                    return doc.Version.ToString();
+                case "parentID":
+                    return doc.Parent.Id.ToString();
+                case "level":
+                    return doc.Level.ToString();
+                case "writerID":
+                    return doc.WriterId.ToString();
+                case "template":
+                    return doc.TemplateId.ToString();
+                case "sortOrder":
+                    return doc.SortOrder.ToString();
+                case "createDate":
+                    return doc.CreateDate.ToString("yyyy-MM-dd'T'HH:mm:ss");
+                case "updateDate":
+                    return doc.UpdateDate.ToString("yyyy-MM-dd'T'HH:mm:ss");
+                case "nodeName":
+                    return doc.Name;
+                case "writerName":
+                    return doc.WriterName;
+                case "path":
+                    return doc.Path;
+                case "creatorName":
+                    return doc.CreatorName;
+            }
 
             // in 4.9.0 the method returned the raw XML from the cache, unparsed
             // starting with 5c20f4f (4.10?) the method returns prop.Value.ToString()
@@ -213,8 +213,8 @@ namespace umbraco
             // if we return Value.ToString() we'll have macros parsed and that's nice
             //
             // so, use Value.ToString() here.
-	        var prop = doc.GetProperty(alias);
-	        return prop == null ? string.Empty : prop.Value.ToString();
+            var prop = doc.GetProperty(alias);
+            return prop == null ? string.Empty : prop.Value.ToString();
         }
 
         /// <summary>
@@ -354,7 +354,7 @@ namespace umbraco
         /// <returns>True is the current user is logged in</returns>
         public static bool IsLoggedOn()
         {
-        	return GetUmbracoHelper().MemberIsLoggedOn();
+            return GetUmbracoHelper().MemberIsLoggedOn();
         }
 
         public static XPathNodeIterator AllowedGroups(int documentId, string path)
@@ -384,7 +384,7 @@ namespace umbraco
         /// <returns>True if the document object is protected</returns>
         public static bool IsProtected(int DocumentId, string Path)
         {
-        	return GetUmbracoHelper().IsProtected(DocumentId, Path);
+            return GetUmbracoHelper().IsProtected(DocumentId, Path);
         }
 
         /// <summary>
@@ -395,7 +395,7 @@ namespace umbraco
         /// <returns>True if the current user has access or if the current document isn't protected</returns>
         public static bool HasAccess(int NodeId, string Path)
         {
-        	return GetUmbracoHelper().MemberHasAccess(NodeId, Path);
+            return GetUmbracoHelper().MemberHasAccess(NodeId, Path);
         }
 
 
@@ -406,7 +406,7 @@ namespace umbraco
         /// <returns>Md5 has of the string</returns>
         public static string md5(string text)
         {
-			return text.ToMd5();
+            return text.ToMd5();
         }
 
         /// <summary>
@@ -739,7 +739,7 @@ namespace umbraco
         /// <returns>The text with text line breaks replaced with html linebreaks (<br/>)</returns>
         public static string ReplaceLineBreaks(string text)
         {
-        	return GetUmbracoHelper().ReplaceLineBreaksForHtml(text);
+            return GetUmbracoHelper().ReplaceLineBreaksForHtml(text);
         }
 
         /// <summary>
@@ -802,11 +802,11 @@ namespace umbraco
                 p.RenderPage(TemplateId);
                 var c = p.PageContentControl;
 
-				using (var sw = new StringWriter())
+                using (var sw = new StringWriter())
                 using(var hw = new HtmlTextWriter(sw))
                 {
-					c.RenderControl(hw);
-					return sw.ToString();
+                    c.RenderControl(hw);
+                    return sw.ToString();
                 }
 
             }
@@ -819,7 +819,7 @@ namespace umbraco
         /// <returns>The rendered template as a string.</returns>
         public static string RenderTemplate(int PageId)
         {
-	        return RenderTemplate(PageId, -1);
+            return RenderTemplate(PageId, -1);
         }
 
         /// <summary>
@@ -1068,7 +1068,7 @@ namespace umbraco
         /// <returns>A dictionary items value as a string.</returns>
         public static string GetDictionaryItem(string Key)
         {
-	        return GetUmbracoHelper().GetDictionaryValue(Key);
+            return GetUmbracoHelper().GetDictionaryValue(Key);
         }
 
         /// <summary>

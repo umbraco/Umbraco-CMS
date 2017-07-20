@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Web.Script.Serialization;
 using Umbraco.Core.Logging;
@@ -10,21 +10,21 @@ using Action = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.controls.Tree
 {
-	internal class JTreeContextMenu
-	{
-		public string RenderJSONMenu()
-		{
+    internal class JTreeContextMenu
+    {
+        public string RenderJSONMenu()
+        {
 
-			JavaScriptSerializer jSSerializer = new JavaScriptSerializer();
+            JavaScriptSerializer jSSerializer = new JavaScriptSerializer();
 
-			jSSerializer.RegisterConverters(new List<JavaScriptConverter>() 
-					{ 	
-						new JTreeContextMenuItem()
-					});
-            
-			List<IAction> allActions = new List<IAction>();
-			foreach (var a in Current.Actions)
-			{
+            jSSerializer.RegisterConverters(new List<JavaScriptConverter>()
+                    {
+                        new JTreeContextMenuItem()
+                    });
+
+            List<IAction> allActions = new List<IAction>();
+            foreach (var a in Current.Actions)
+            {
                 // NH: Added a try/catch block to this as an error in a 3rd party action can crash the whole menu initialization
                 try
                 {
@@ -47,13 +47,13 @@ namespace umbraco.controls.Tree
                 }
                 catch (Exception ee)
                 {
-	                Current.Logger.Error<JTreeContextMenu>("Error initializing tree action", ee);
+                    Current.Logger.Error<JTreeContextMenu>("Error initializing tree action", ee);
                 }
 
-			}
+            }
 
 
-			return jSSerializer.Serialize(allActions);
-		}
-	}
+            return jSSerializer.Serialize(allActions);
+        }
+    }
 }

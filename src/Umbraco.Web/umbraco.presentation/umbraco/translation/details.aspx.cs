@@ -32,7 +32,7 @@ namespace umbraco.presentation.umbraco.translation {
             //Document page = new Document(t.Node.Id);
             var page = Current.Services.ContentService.GetById(t.TaskEntity.EntityId);
 
-            //Bind meta data and language... 
+            //Bind meta data and language...
             Literal lt = new Literal();
             lt.Text = t.Date.ToLongDateString() + " " + t.Date.ToLongTimeString();
             pp_date.Controls.Add(lt);
@@ -81,7 +81,7 @@ namespace umbraco.presentation.umbraco.translation {
             DataTable pageTable = new DataTable();
             pageTable.Columns.Add(Services.TextService.Localize("name"));
             pageTable.Columns.Add(Services.TextService.Localize("value"));
-            
+
             DataRow pageRow = pageTable.NewRow();
             pageRow[Services.TextService.Localize("name")] = Services.TextService.Localize("nodeName");
             pageRow[Services.TextService.Localize("value")] = page.Name;
@@ -94,7 +94,7 @@ namespace umbraco.presentation.umbraco.translation {
             //    pageRow[Services.TextService.Localize("value")] = page.getProperty(pt.Alias).Value;
             //    pageTable.Rows.Add(pageRow);
             //}
-            
+
             dg_fields.DataSource = pageTable;
             dg_fields.DataBind();
         }

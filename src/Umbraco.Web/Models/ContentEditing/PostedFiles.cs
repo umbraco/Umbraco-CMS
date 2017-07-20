@@ -1,10 +1,10 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
     /// <summary>
-    /// This is used for the response of PostAddFile so that we can analyze the response in a filter and remove the 
+    /// This is used for the response of PostAddFile so that we can analyze the response in a filter and remove the
     /// temporary files that were created.
     /// </summary>
     [DataContract]

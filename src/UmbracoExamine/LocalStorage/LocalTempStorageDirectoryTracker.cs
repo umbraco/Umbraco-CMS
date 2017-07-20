@@ -22,7 +22,7 @@ namespace UmbracoExamine.LocalStorage
             {
                 resolved.Enabled = false;
             }
-            
+
             return resolved;
         }
     }

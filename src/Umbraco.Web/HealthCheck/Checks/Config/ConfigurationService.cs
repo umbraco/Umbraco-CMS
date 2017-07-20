@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Xml;
 using Umbraco.Core.Logging;
@@ -26,7 +26,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         }
 
         /// <summary>
-        /// Gets a value from a given configuration file with the given XPath  
+        /// Gets a value from a given configuration file with the given XPath
         /// </summary>
         public ConfigurationServiceResult GetConfigurationValue()
         {
@@ -68,7 +68,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         }
 
         /// <summary>
-        /// Updates a value in a given configuration file with the given XPath  
+        /// Updates a value in a given configuration file with the given XPath
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>

@@ -50,8 +50,8 @@ namespace Umbraco.Core.Persistence.FaultHandling
         None = 0,
 
         /// <summary>
-        /// Corresponds to a Soft throttling type. Soft throttling is applied when machine resources such as, CPU, IO, storage, and worker threads exceed 
-        /// predefined safety thresholds despite the load balancer’s best efforts. 
+        /// Corresponds to a Soft throttling type. Soft throttling is applied when machine resources such as, CPU, IO, storage, and worker threads exceed
+        /// predefined safety thresholds despite the load balancer’s best efforts.
         /// </summary>
         Soft = 1,
 

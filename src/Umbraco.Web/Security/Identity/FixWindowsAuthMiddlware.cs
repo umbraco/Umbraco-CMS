@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -14,7 +14,7 @@ namespace Umbraco.Web.Security.Identity
     /// handler and now two identities have been assigned. Unfortunately, at some stage in the pipeline - I'm pretty sure
     /// it's the Role Provider Module - it again changes the user's Principal to a RolePrincipal and discards the second
     /// Identity which is the Back office identity thus preventing a user from accessing the back office... it's very annoying.
-    /// 
+    ///
     /// To fix this, we re-set the user Principal to only have a single identity: the back office one, since we know this is
     /// for a back office request.
     /// </summary>

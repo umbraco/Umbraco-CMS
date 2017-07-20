@@ -86,7 +86,7 @@ namespace Umbraco.Web
         // otherwise it's used by EnsureContext above
         // warn: does *not* manage setting any IUmbracoContextAccessor
         internal UmbracoContext(
-			HttpContextBase httpContext,
+            HttpContextBase httpContext,
             IFacadeService facadeService,
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
@@ -137,32 +137,32 @@ namespace Umbraco.Web
         public static UmbracoContext Current => Composing.Current.UmbracoContext;
 
         /// <summary>
-		/// This is used internally for performance calculations, the ObjectCreated DateTime is set as soon as this
-		/// object is instantiated which in the web site is created during the BeginRequest phase.
-		/// We can then determine complete rendering time from that.
-		/// </summary>
-		internal DateTime ObjectCreated { get; private set; }
+        /// This is used internally for performance calculations, the ObjectCreated DateTime is set as soon as this
+        /// object is instantiated which in the web site is created during the BeginRequest phase.
+        /// We can then determine complete rendering time from that.
+        /// </summary>
+        internal DateTime ObjectCreated { get; private set; }
 
-		/// <summary>
-		/// This is used internally for debugging and also used to define anything required to distinguish this request from another.
-		/// </summary>
-		internal Guid UmbracoRequestId { get; private set; }
+        /// <summary>
+        /// This is used internally for debugging and also used to define anything required to distinguish this request from another.
+        /// </summary>
+        internal Guid UmbracoRequestId { get; private set; }
 
         /// <summary>
         /// Gets the WebSecurity class
         /// </summary>
         public WebSecurity Security { get; }
 
-	    /// <summary>
-	    /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.
-	    /// </summary>
-		internal Uri OriginalRequestUrl { get; }
+        /// <summary>
+        /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.
+        /// </summary>
+        internal Uri OriginalRequestUrl { get; }
 
-		/// <summary>
-		/// Gets the cleaned up url that is handled by Umbraco.
-		/// </summary>
-		/// <remarks>That is, lowercase, no trailing slash after path, no .aspx...</remarks>
-		internal Uri CleanedUmbracoUrl { get; private set; }
+        /// <summary>
+        /// Gets the cleaned up url that is handled by Umbraco.
+        /// </summary>
+        /// <remarks>That is, lowercase, no trailing slash after path, no .aspx...</remarks>
+        internal Uri CleanedUmbracoUrl { get; private set; }
 
         /// <summary>
         /// Gets the facade.
@@ -188,14 +188,14 @@ namespace Umbraco.Web
         public bool IsFrontEndUmbracoRequest => PublishedContentRequest != null;
 
         /// <summary>
-		/// Gets the url provider.
-		/// </summary>
-    	public UrlProvider UrlProvider { get; }
+        /// Gets the url provider.
+        /// </summary>
+        public UrlProvider UrlProvider { get; }
 
-		/// <summary>
-		/// Gets/sets the PublishedContentRequest object
-		/// </summary>
-		public PublishedContentRequest PublishedContentRequest { get; set; }
+        /// <summary>
+        /// Gets/sets the PublishedContentRequest object
+        /// </summary>
+        public PublishedContentRequest PublishedContentRequest { get; set; }
 
         /// <summary>
         /// Exposes the HttpContext for the current request

@@ -79,7 +79,7 @@ namespace Umbraco.Core.Models
                 {
                     propertyType.PropertyGroupId = new Lazy<int>(() => this.Id);
                 }
-                
+
                 _propertyTypes.CollectionChanged += PropertyTypesChanged;
             }
         }
@@ -88,19 +88,19 @@ namespace Umbraco.Core.Models
         {
             if (base.Equals(other)) return true;
 
-            //Check whether the PropertyGroup's properties are equal. 
+            //Check whether the PropertyGroup's properties are equal.
             return Name.InvariantEquals(other.Name);
         }
 
         public override int GetHashCode()
         {
-            //Get hash code for the Name field if it is not null. 
+            //Get hash code for the Name field if it is not null.
             int baseHash = base.GetHashCode();
 
-            //Get hash code for the Alias field. 
+            //Get hash code for the Alias field.
             int nameHash = Name.ToLowerInvariant().GetHashCode();
 
-            //Calculate the hash code for the product. 
+            //Calculate the hash code for the product.
             return baseHash ^ nameHash;
         }
 

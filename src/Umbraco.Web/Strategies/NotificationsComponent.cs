@@ -48,7 +48,7 @@ namespace Umbraco.Web.Strategies
             //Send notifications for the delete action
             ContentService.Deleted += (sender, args) =>
                 args.DeletedEntities.ForEach(content => notificationService.SendNotification(content, ActionDelete.Instance));
-           
+
             //Send notifications for the unpublish action
             ContentService.UnPublished += (sender, args) =>
                 args.PublishedEntities.ForEach(content => notificationService.SendNotification(content, ActionUnPublish.Instance));

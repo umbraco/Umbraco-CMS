@@ -29,7 +29,7 @@ namespace Umbraco.Core.Logging
 
         #endregion
 
-        #region Warn		
+        #region Warn
 
         public static void Warn(Type callingType, string message, params Func<object>[] formatItems)
         {

@@ -43,7 +43,7 @@ namespace Umbraco.Web.Editors
         {
             get { return _security ?? UmbracoContext.Current.Security; }
         }
-        
+
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             var mediaItem = (MediaItemSave)actionContext.ActionArguments["contentItem"];
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Editors
                 case ContentSaveAction.Save:
                     contentToCheck = mediaItem.PersistedContent;
                     contentIdToCheck = contentToCheck.Id;
-                    break;                
+                    break;
                 case ContentSaveAction.SaveNew:
                     contentToCheck = MediaService.GetById(mediaItem.ParentId);
 

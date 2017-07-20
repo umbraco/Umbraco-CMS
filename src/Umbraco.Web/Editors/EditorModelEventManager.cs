@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web.Http.Filters;
 using Umbraco.Core.Events;
 using Umbraco.Web.Models.ContentEditing;
@@ -86,6 +86,6 @@ namespace Umbraco.Web.Editors
                 OnSendingMemberModel(sender, new EditorModelEventArgs<MemberDisplay>(e));
             }
         }
-        
+
     }
 }

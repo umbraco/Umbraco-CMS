@@ -286,7 +286,7 @@ namespace Umbraco.Tests.Persistence
                 scope.Complete();
             }
         }
-        
+
         [Test]
         public void Can_Create_cmsMember_Table()
         {

@@ -6,13 +6,13 @@ using Umbraco.Core.Models.PublishedContent;
 namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 {
     /// <summary>
-    /// Represents a Textpage which acts as the strongly typed model for a Doc Type 
+    /// Represents a Textpage which acts as the strongly typed model for a Doc Type
     /// with alias "Textpage" and "Subpage" as the allowed child type.
-    /// 
+    ///
     /// The basic properties are resolved by convention using the Resolve-Type-PropertyTypeAlias
     /// convention available through the base class' protected Resolve-method and Property-delegate.
-    /// 
-    /// The Textpage allows the use of Subpage and Textpage as child doc types, which are exposed as a 
+    ///
+    /// The Textpage allows the use of Subpage and Textpage as child doc types, which are exposed as a
     /// collection using the Children-Type-ContentTypeAlias convention available through the
     /// base class' protected Children-method and ContentTypeAlias-delegate.
     /// </summary>

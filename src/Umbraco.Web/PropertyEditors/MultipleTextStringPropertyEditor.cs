@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
@@ -121,7 +121,7 @@ namespace Umbraco.Web.PropertyEditors
             public MultipleTextStringPropertyValueEditor(PropertyValueEditor wrapped) : base(wrapped)
             {
             }
-            
+
             /// <summary>
             /// The value passed in from the editor will be an array of simple objects so we'll need to parse them to get the string
             /// </summary>
@@ -152,20 +152,20 @@ namespace Umbraco.Web.PropertyEditors
                     {
                         //swallow
                         max = -1;
-                    }                    
+                    }
                 }
 
                 //The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
                 var array = asArray.OfType<JObject>()
                                    .Where(x => x["value"] != null)
                                    .Select(x => x["value"].Value<string>());
-                
+
                 //only allow the max if over 0
                 if (max > 0)
                 {
-                    return string.Join(Environment.NewLine, array.Take(max));    
+                    return string.Join(Environment.NewLine, array.Take(max));
                 }
-                
+
                 return string.Join(Environment.NewLine, array);
             }
 

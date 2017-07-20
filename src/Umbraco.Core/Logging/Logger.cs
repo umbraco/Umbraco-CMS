@@ -14,8 +14,8 @@ using log4net.Util;
 namespace Umbraco.Core.Logging
 {
     ///<summary>
-	/// Implements <see cref="ILogger"/> on top of log4net.
-	///</summary>
+    /// Implements <see cref="ILogger"/> on top of log4net.
+    ///</summary>
     public class Logger : ILogger
     {
         /// <summary>
@@ -44,28 +44,28 @@ namespace Umbraco.Core.Logging
         {
             return new Logger();
         }
-        
+
         /// <inheritdoc/>
-		public void Error(Type reporting, string message, Exception exception = null)
-		{
-			var logger = LogManager.GetLogger(reporting);
-		    if (logger == null) return;
+        public void Error(Type reporting, string message, Exception exception = null)
+        {
+            var logger = LogManager.GetLogger(reporting);
+            if (logger == null) return;
 
-		    var dump = false;
+            var dump = false;
 
-		    if (IsTimeoutThreadAbortException(exception))
-		    {
-		        message += "\r\nThe thread has been aborted, because the request has timed out.";
+            if (IsTimeoutThreadAbortException(exception))
+            {
+                message += "\r\nThe thread has been aborted, because the request has timed out.";
 
                 // dump if configured, or if stacktrace contains Monitor.ReliableEnter
-		        dump = UmbracoConfig.For.CoreDebug().DumpOnTimeoutThreadAbort || IsMonitorEnterThreadAbortException(exception);
+                dump = UmbracoConfig.For.CoreDebug().DumpOnTimeoutThreadAbort || IsMonitorEnterThreadAbortException(exception);
 
                 // dump if it is ok to dump (might have a cap on number of dump...)
-		        dump &= MiniDump.OkToDump();
-		    }
+                dump &= MiniDump.OkToDump();
+            }
 
             if (dump)
-		    {
+            {
                 try
                 {
                     var dumped = MiniDump.Dump(withException: true);
@@ -80,7 +80,7 @@ namespace Umbraco.Core.Logging
             }
 
             logger.Error(message, exception);
-		}
+        }
 
         private static bool IsMonitorEnterThreadAbortException(Exception exception)
         {
@@ -133,11 +133,11 @@ namespace Umbraco.Core.Logging
 
         /// <inheritdoc/>
         public void Warn(Type reporting, string format, params Func<object>[] args)
-		{
-			var logger = LogManager.GetLogger(reporting);
-			if (logger == null || logger.IsWarnEnabled == false) return;
-			logger.WarnFormat(format, args.Select(x => x.Invoke()).ToArray());
-		}
+        {
+            var logger = LogManager.GetLogger(reporting);
+            if (logger == null || logger.IsWarnEnabled == false) return;
+            logger.WarnFormat(format, args.Select(x => x.Invoke()).ToArray());
+        }
 
         /// <inheritdoc/>
         public void Warn(Type reporting, Exception exception, string message)
@@ -187,11 +187,11 @@ namespace Umbraco.Core.Logging
 
         /// <inheritdoc/>
         public void Info(Type reporting, Func<string> generateMessage)
-		{
-			var logger = LogManager.GetLogger(reporting);
-			if (logger == null || logger.IsInfoEnabled == false) return;
-			logger.Info(generateMessage());
-		}
+        {
+            var logger = LogManager.GetLogger(reporting);
+            if (logger == null || logger.IsInfoEnabled == false) return;
+            logger.Info(generateMessage());
+        }
 
         /// <inheritdoc/>
         public void Info(Type reporting, string format, params object[] args)
@@ -203,14 +203,14 @@ namespace Umbraco.Core.Logging
 
         /// <inheritdoc/>
         public void Info(Type reporting, string format, params Func<object>[] args)
-		{
-			var logger = LogManager.GetLogger(reporting);
-			if (logger == null || logger.IsInfoEnabled == false) return;
-			logger.InfoFormat(format, args.Select(x => x.Invoke()).ToArray());
-		}
+        {
+            var logger = LogManager.GetLogger(reporting);
+            if (logger == null || logger.IsInfoEnabled == false) return;
+            logger.InfoFormat(format, args.Select(x => x.Invoke()).ToArray());
+        }
 
         /// <inheritdoc/>
-		public void Debug(Type reporting, string message)
+        public void Debug(Type reporting, string message)
         {
             var logger = LogManager.GetLogger(reporting);
             if (logger == null || logger.IsDebugEnabled == false) return;
@@ -218,15 +218,15 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-		public void Debug(Type reporting, Func<string> messageBuilder)
-		{
-			var logger = LogManager.GetLogger(reporting);
-			if (logger == null || logger.IsDebugEnabled == false) return;
-			logger.Debug(messageBuilder());
-		}
+        public void Debug(Type reporting, Func<string> messageBuilder)
+        {
+            var logger = LogManager.GetLogger(reporting);
+            if (logger == null || logger.IsDebugEnabled == false) return;
+            logger.Debug(messageBuilder());
+        }
 
         /// <inheritdoc/>
-		public void Debug(Type reporting, string format, params object[] args)
+        public void Debug(Type reporting, string format, params object[] args)
         {
             var logger = LogManager.GetLogger(reporting);
             if (logger == null || logger.IsDebugEnabled == false) return;
@@ -234,11 +234,11 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-		public void Debug(Type reporting, string format, params Func<object>[] args)
-		{
-			var logger = LogManager.GetLogger(reporting);
-			if (logger == null || logger.IsDebugEnabled == false) return;
-			logger.DebugFormat(format, args.Select(x => x.Invoke()).ToArray());
-		}
-	}
+        public void Debug(Type reporting, string format, params Func<object>[] args)
+        {
+            var logger = LogManager.GetLogger(reporting);
+            if (logger == null || logger.IsDebugEnabled == false) return;
+            logger.DebugFormat(format, args.Select(x => x.Invoke()).ToArray());
+        }
+    }
 }

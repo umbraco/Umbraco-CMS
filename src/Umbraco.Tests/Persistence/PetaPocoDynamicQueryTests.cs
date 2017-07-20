@@ -1,4 +1,4 @@
-//using System;
+﻿//using System;
 //using System.Linq;
 //using NUnit.Framework;
 //using Umbraco.Core.Models;
@@ -32,7 +32,7 @@
 //            //for (int i = 0; i < 2; i++)
 //            //{
 //            //    i1 = DatabaseContext.Database.Fetch<dynamic>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES");
-//            //    r1 = i1.Select(x => x.TABLE_NAME).Cast<string>().ToList();    
+//            //    r1 = i1.Select(x => x.TABLE_NAME).Cast<string>().ToList();
 //            //}
 
 //            //var oc21 = Database.PocoData.GetCachedPocoData().Count();
@@ -57,7 +57,7 @@
 //            //    foreach (var content in roots)
 //            //    {
 //            //        var d = ServiceContext.ContentService.GetDescendants(content);
-//            //    }    
+//            //    }
 //            //}
 
 //            //var oc41 = Database.PocoData.GetCachedPocoData().Count();

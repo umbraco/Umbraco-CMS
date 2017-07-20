@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Models
                 SortOrder = 9,
                 UpdateDate = DateTime.Now,
                 ValidationRegExp = "xxxx",
-                DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar                                
+                DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
             };
 
             var clone = (PropertyType)pt.DeepClone();

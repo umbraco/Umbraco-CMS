@@ -13,8 +13,8 @@ namespace Umbraco.Web.WebApi.Filters
     /// </summary>
     /// <remarks>
     /// This will only redirect Head/Get requests, otherwise will respond with text
-    /// 
-    /// References: 
+    ///
+    /// References:
     /// http://issues.umbraco.org/issue/U4-8542
     /// https://blogs.msdn.microsoft.com/carlosfigueira/2012/03/09/implementing-requirehttps-with-asp-net-web-api/
     /// </remarks>

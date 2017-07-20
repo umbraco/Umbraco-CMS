@@ -10,12 +10,12 @@ using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class UmbracoEntityFactory 
+    internal class UmbracoEntityFactory
     {
         internal void AddAdditionalData(UmbracoEntity entity, IDictionary<string, object> originalEntityProperties)
         {
             var entityProps = typeof(IUmbracoEntity).GetPublicProperties().Select(x => x.Name).ToArray();
-            
+
             //figure out what extra properties we have that are not on the IUmbracoEntity and add them to additional data
             foreach (var k in originalEntityProperties.Keys
                 .Select(x => new { orig = x, title = x.ToCleanString(CleanStringType.PascalCase | CleanStringType.Ascii | CleanStringType.ConvertCase) })
@@ -66,7 +66,7 @@ namespace Umbraco.Core.Persistence.Factories
                 entity.IsDraft = newestVersion != default(Guid) && (publishedVersion == default(Guid) || publishedVersion != newestVersion);
                 entity.HasPendingChanges = (publishedVersion != default(Guid) && newestVersion != default(Guid)) && publishedVersion != newestVersion;
 
-                //Now we can assign the additional data!                        
+                //Now we can assign the additional data!
                 AddAdditionalData(entity, asDictionary);
 
                 return entity;
@@ -76,6 +76,6 @@ namespace Umbraco.Core.Persistence.Factories
                 entity.EnableChangeTracking();
             }
         }
-        
+
     }
 }

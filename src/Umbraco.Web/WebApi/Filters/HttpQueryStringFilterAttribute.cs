@@ -34,9 +34,9 @@ namespace Umbraco.Web.WebApi.Filters
 
                 var formData = new FormDataCollection(queryStrings);
 
-                actionContext.ActionArguments[ParameterName] = formData;    
+                actionContext.ActionArguments[ParameterName] = formData;
             }
-            
+
             base.OnActionExecuting(actionContext);
         }
     }

@@ -12,8 +12,8 @@ namespace Umbraco.Web.Models
 {
     /// <summary>
     /// Provide an abstract base class for <c>IPublishedContent</c> implementations.
-	/// </summary>
-	/// <remarks>This base class does which (a) consitently resolves and caches the Url, (b) provides an implementation
+    /// </summary>
+    /// <remarks>This base class does which (a) consitently resolves and caches the Url, (b) provides an implementation
     /// for this[alias], and (c) provides basic content set management.</remarks>
     [DebuggerDisplay("Content Id: {Id}, Name: {Name}")]
     public abstract class PublishedContentBase : IPublishedContent
@@ -22,96 +22,96 @@ namespace Umbraco.Web.Models
 
         private string _url;
 
-	    /// <summary>
-		/// Gets the url of the content.
-		/// </summary>
-		/// <remarks>
-		/// If this content is Content, the url that is returned is the one computed by the NiceUrlProvider, otherwise if
-		/// this content is Media, the url returned is the value found in the 'umbracoFile' property.
-		/// </remarks>
-		public virtual string Url
-		{
-	        get
-	        {
-	            // should be thread-safe although it won't prevent url from being resolved more than once
-	            if (_url != null)
-	                return _url;
+        /// <summary>
+        /// Gets the url of the content.
+        /// </summary>
+        /// <remarks>
+        /// If this content is Content, the url that is returned is the one computed by the NiceUrlProvider, otherwise if
+        /// this content is Media, the url returned is the value found in the 'umbracoFile' property.
+        /// </remarks>
+        public virtual string Url
+        {
+            get
+            {
+                // should be thread-safe although it won't prevent url from being resolved more than once
+                if (_url != null)
+                    return _url;
 
-	            switch (ItemType)
-	            {
-	                case PublishedItemType.Content:
-	                    if (UmbracoContext.Current == null)
-	                        throw new InvalidOperationException(
-	                            "Cannot resolve a Url for a content item when UmbracoContext.Current is null.");
-	                    if (UmbracoContext.Current.UrlProvider == null)
-	                        throw new InvalidOperationException(
-	                            "Cannot resolve a Url for a content item when UmbracoContext.Current.UrlProvider is null.");
-	                    _url = UmbracoContext.Current.UrlProvider.GetUrl(Id);
-	                    break;
-	                case PublishedItemType.Media:
-	                    var prop = GetProperty(Constants.Conventions.Media.File);
-	                    if (prop == null || prop.Value == null)
-	                    {
-	                        _url = string.Empty;
-	                        return _url;
-	                    }
+                switch (ItemType)
+                {
+                    case PublishedItemType.Content:
+                        if (UmbracoContext.Current == null)
+                            throw new InvalidOperationException(
+                                "Cannot resolve a Url for a content item when UmbracoContext.Current is null.");
+                        if (UmbracoContext.Current.UrlProvider == null)
+                            throw new InvalidOperationException(
+                                "Cannot resolve a Url for a content item when UmbracoContext.Current.UrlProvider is null.");
+                        _url = UmbracoContext.Current.UrlProvider.GetUrl(Id);
+                        break;
+                    case PublishedItemType.Media:
+                        var prop = GetProperty(Constants.Conventions.Media.File);
+                        if (prop == null || prop.Value == null)
+                        {
+                            _url = string.Empty;
+                            return _url;
+                        }
 
-	                    var propType = ContentType.GetPropertyType(Constants.Conventions.Media.File);
+                        var propType = ContentType.GetPropertyType(Constants.Conventions.Media.File);
 
-	                    //This is a hack - since we now have 2 properties that support a URL: upload and cropper, we need to detect this since we always
-	                    // want to return the normal URL and the cropper stores data as json
-	                    switch (propType.PropertyEditorAlias)
-	                    {
-	                        case Constants.PropertyEditors.UploadFieldAlias:
-	                            _url = prop.Value.ToString();
-	                            break;
-	                        case Constants.PropertyEditors.ImageCropperAlias:
-	                            //get the url from the json format
+                        //This is a hack - since we now have 2 properties that support a URL: upload and cropper, we need to detect this since we always
+                        // want to return the normal URL and the cropper stores data as json
+                        switch (propType.PropertyEditorAlias)
+                        {
+                            case Constants.PropertyEditors.UploadFieldAlias:
+                                _url = prop.Value.ToString();
+                                break;
+                            case Constants.PropertyEditors.ImageCropperAlias:
+                                //get the url from the json format
 
-	                            var stronglyTyped = prop.Value as ImageCropDataSet;
-	                            if (stronglyTyped != null)
-	                            {
+                                var stronglyTyped = prop.Value as ImageCropDataSet;
+                                if (stronglyTyped != null)
+                                {
                                     _url = stronglyTyped.Src;
                                     break;
                                 }
 
                                 var json = prop.Value as JObject;
-	                            if (json != null)
-	                            {
+                                if (json != null)
+                                {
                                     _url = json.ToObject<ImageCropDataSet>(new JsonSerializer { Culture = CultureInfo.InvariantCulture, FloatParseHandling = FloatParseHandling.Decimal }).Src;
-	                                break;
-	                            }
+                                    break;
+                                }
 
-	                            _url = prop.Value.ToString();
-	                            break;
-	                    }
-	                    break;
-	                default:
-	                    throw new NotSupportedException();
-	            }
+                                _url = prop.Value.ToString();
+                                break;
+                        }
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
 
-	            return _url;
-	        }
-		}
+                return _url;
+            }
+        }
 
-		public abstract PublishedItemType ItemType { get; }
-		public abstract int Id { get; }
+        public abstract PublishedItemType ItemType { get; }
+        public abstract int Id { get; }
         public abstract Guid Key { get; }
         public abstract int TemplateId { get; }
-		public abstract int SortOrder { get; }
-		public abstract string Name { get; }
-		public abstract string UrlName { get; }
-		public abstract string DocumentTypeAlias { get; }
-		public abstract int DocumentTypeId { get; }
-		public abstract string WriterName { get; }
-		public abstract string CreatorName { get; }
-		public abstract int WriterId { get; }
-		public abstract int CreatorId { get; }
-		public abstract string Path { get; }
-		public abstract DateTime CreateDate { get; }
-		public abstract DateTime UpdateDate { get; }
-		public abstract Guid Version { get; }
-		public abstract int Level { get; }
+        public abstract int SortOrder { get; }
+        public abstract string Name { get; }
+        public abstract string UrlName { get; }
+        public abstract string DocumentTypeAlias { get; }
+        public abstract int DocumentTypeId { get; }
+        public abstract string WriterName { get; }
+        public abstract string CreatorName { get; }
+        public abstract int WriterId { get; }
+        public abstract int CreatorId { get; }
+        public abstract string Path { get; }
+        public abstract DateTime CreateDate { get; }
+        public abstract DateTime UpdateDate { get; }
+        public abstract Guid Version { get; }
+        public abstract int Level { get; }
 
         public abstract bool IsDraft { get; }
 

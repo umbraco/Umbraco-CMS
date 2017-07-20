@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Services
                 ct.PropertyGroups.Add(pg);
             };
 
-            var ct1 = MockedContentTypes.CreateBasicContentType("ct1", "CT1", null);            
+            var ct1 = MockedContentTypes.CreateBasicContentType("ct1", "CT1", null);
             var ct2 = MockedContentTypes.CreateBasicContentType("ct2", "CT2", null);
             addPropType(ct2);
             var ct3 = MockedContentTypes.CreateBasicContentType("ct3", "CT3", null);
@@ -130,7 +130,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void GetAvailableCompositeContentTypes_Not_Itself()
         {
-            var ct1 = MockedContentTypes.CreateBasicContentType("ct1", "CT1", null);            
+            var ct1 = MockedContentTypes.CreateBasicContentType("ct1", "CT1", null);
             var ct2 = MockedContentTypes.CreateBasicContentType("ct2", "CT2", null);
             var ct3 = MockedContentTypes.CreateBasicContentType("ct3", "CT3", null);
             ct1.Id = 1;

@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using NUnit.Framework;
 using Umbraco.Web;
 using Umbraco.Web.UI.Pages;
@@ -15,13 +15,13 @@ namespace Umbraco.Tests.DI
         // which should be ensured by PlugingManagerTests anyway, so this is useless?
         // maybe not as it seems to handle the "instance" thing... so we test that we respect the singleton?
         [Test]
-		public void FindAllActions()
+        public void FindAllActions()
         {
             var collectionBuilder = new ActionCollectionBuilder();
             collectionBuilder.SetProducer(() => TypeLoader.ResolveActions());
 
             var actions = collectionBuilder.CreateCollection();
-			Assert.AreEqual(2, actions.Count());
+            Assert.AreEqual(2, actions.Count());
 
             // order is unspecified, but both must be there
             var hasAction1 = actions.ElementAt(0) is SingletonAction || actions.ElementAt(1) is SingletonAction;
@@ -35,138 +35,138 @@ namespace Umbraco.Tests.DI
             Assert.AreSame(SingletonAction.Instance, action);
         }
 
-		#region Classes for tests
+        #region Classes for tests
 
-		public class SingletonAction : IAction
-		{
-			//create singleton
-			private static readonly SingletonAction instance = new SingletonAction();
+        public class SingletonAction : IAction
+        {
+            //create singleton
+            private static readonly SingletonAction instance = new SingletonAction();
 
-			public static SingletonAction Instance
-			{
-				get { return instance; }
-			}
+            public static SingletonAction Instance
+            {
+                get { return instance; }
+            }
 
-			#region IAction Members
+            #region IAction Members
 
-			public char Letter
-			{
-				get
-				{
-					return 'I';
-				}
-			}
+            public char Letter
+            {
+                get
+                {
+                    return 'I';
+                }
+            }
 
-			public string JsFunctionName
-			{
-				get
-				{
-					return string.Format("{0}.actionAssignDomain()", ClientTools.Scripts.GetAppActions);
-				}
-			}
+            public string JsFunctionName
+            {
+                get
+                {
+                    return string.Format("{0}.actionAssignDomain()", ClientTools.Scripts.GetAppActions);
+                }
+            }
 
-			public string JsSource
-			{
-				get
-				{
-					return null;
-				}
-			}
+            public string JsSource
+            {
+                get
+                {
+                    return null;
+                }
+            }
 
-			public string Alias
-			{
-				get
-				{
-					return "assignDomain";
-				}
-			}
+            public string Alias
+            {
+                get
+                {
+                    return "assignDomain";
+                }
+            }
 
-			public string Icon
-			{
-				get
-				{
-					return ".sprDomain";
-				}
-			}
+            public string Icon
+            {
+                get
+                {
+                    return ".sprDomain";
+                }
+            }
 
-			public bool ShowInNotifier
-			{
-				get
-				{
-					return false;
-				}
-			}
-			public bool CanBePermissionAssigned
-			{
-				get
-				{
-					return true;
-				}
-			}
-			#endregion
-		}
+            public bool ShowInNotifier
+            {
+                get
+                {
+                    return false;
+                }
+            }
+            public bool CanBePermissionAssigned
+            {
+                get
+                {
+                    return true;
+                }
+            }
+            #endregion
+        }
 
-		public class NonSingletonAction : IAction
-		{
-			#region IAction Members
+        public class NonSingletonAction : IAction
+        {
+            #region IAction Members
 
-			public char Letter
-			{
-				get
-				{
-					return 'Q';
-				}
-			}
+            public char Letter
+            {
+                get
+                {
+                    return 'Q';
+                }
+            }
 
-			public string JsFunctionName
-			{
-				get
-				{
-					return string.Format("{0}.actionAssignDomain()", ClientTools.Scripts.GetAppActions);
-				}
-			}
+            public string JsFunctionName
+            {
+                get
+                {
+                    return string.Format("{0}.actionAssignDomain()", ClientTools.Scripts.GetAppActions);
+                }
+            }
 
-			public string JsSource
-			{
-				get
-				{
-					return null;
-				}
-			}
+            public string JsSource
+            {
+                get
+                {
+                    return null;
+                }
+            }
 
-			public string Alias
-			{
-				get
-				{
-					return "asfasdf";
-				}
-			}
+            public string Alias
+            {
+                get
+                {
+                    return "asfasdf";
+                }
+            }
 
-			public string Icon
-			{
-				get
-				{
-					return ".sprDomain";
-				}
-			}
+            public string Icon
+            {
+                get
+                {
+                    return ".sprDomain";
+                }
+            }
 
-			public bool ShowInNotifier
-			{
-				get
-				{
-					return false;
-				}
-			}
-			public bool CanBePermissionAssigned
-			{
-				get
-				{
-					return true;
-				}
-			}
-			#endregion
-		}
+            public bool ShowInNotifier
+            {
+                get
+                {
+                    return false;
+                }
+            }
+            public bool CanBePermissionAssigned
+            {
+                get
+                {
+                    return true;
+                }
+            }
+            #endregion
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

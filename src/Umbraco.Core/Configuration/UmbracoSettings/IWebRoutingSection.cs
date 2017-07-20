@@ -9,7 +9,7 @@
         bool DisableAlternativeTemplates { get; }
 
         bool DisableFindContentByIdPath { get; }
-		
+
         bool DisableRedirectUrlTracking { get; }
 
         string UrlProviderMode { get; }

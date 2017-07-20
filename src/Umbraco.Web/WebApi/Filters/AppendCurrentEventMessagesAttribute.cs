@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Web.Http.Filters;
 using Umbraco.Core.Events;
@@ -9,7 +9,7 @@ using Umbraco.Web.UI;
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// Automatically checks if any request is a non-GET and if the 
+    /// Automatically checks if any request is a non-GET and if the
     /// resulting message is INotificationModel in which case it will append any Event Messages
     /// currently in the request.
     /// </summary>

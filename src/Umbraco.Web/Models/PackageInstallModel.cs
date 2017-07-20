@@ -24,6 +24,6 @@ namespace Umbraco.Web.Models
         [DataMember(Name = "zipFilePath")]
         public string ZipFilePath { get; set; }
 
-        
+
     }
 }

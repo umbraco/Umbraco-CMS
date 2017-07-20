@@ -53,11 +53,11 @@ namespace Umbraco.Web.WebServices
                     if (HttpContext.Request.UserHostAddress != null)
                         errorMessage = string.Format("{0} | Coming from {1}", errorMessage, HttpContext.Request.UserHostAddress);
                     if (HttpContext.Request.UrlReferrer != null)
-                        errorMessage = string.Format("{0} | Referrer {1}", errorMessage, HttpContext.Request.UrlReferrer);    
+                        errorMessage = string.Format("{0} | Referrer {1}", errorMessage, HttpContext.Request.UrlReferrer);
                 }
                 Logger.Error<ScheduledPublishController>(errorMessage, ee);
 
-                Response.StatusCode = 400; 
+                Response.StatusCode = 400;
 
                 return Json(new
                 {

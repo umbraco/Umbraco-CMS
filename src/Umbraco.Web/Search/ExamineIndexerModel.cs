@@ -10,7 +10,7 @@ namespace Umbraco.Web.Search
     {
         [DataMember(Name = "fieldDefinitions")]
         public IEnumerable<FieldDefinition> FieldDefinitions { get; set; }
-        
+
         /// <summary>
         /// The number of docs in the index
         /// </summary>

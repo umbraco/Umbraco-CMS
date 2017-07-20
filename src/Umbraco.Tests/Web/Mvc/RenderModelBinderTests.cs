@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Web;
 using System.Web.Mvc;
@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Web.Mvc
         {
             var binder = new ContentModelBinder();
             var found = binder.GetBinder(typeof (IPublishedContent));
-            Assert.IsNotNull(found);            
+            Assert.IsNotNull(found);
             found = binder.GetBinder(typeof(ContentModel));
             Assert.IsNotNull(found);
             found = binder.GetBinder(typeof(MyContent));
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Web.Mvc
             found = binder.GetBinder(typeof(MyOtherContent));
             Assert.IsNull(found);
             found = binder.GetBinder(typeof(MyCustomContentModel));
-            Assert.IsNull(found);            
+            Assert.IsNull(found);
             found = binder.GetBinder(typeof(IContentModel));
             Assert.IsNull(found);
         }
@@ -138,15 +138,15 @@ namespace Umbraco.Tests.Web.Mvc
             routeData.DataTokens[Core.Constants.Web.UmbracoDataToken] = content;
 
             //the value provider is the default implementation
-            var valueProvider = new Mock<IValueProvider>();            
+            var valueProvider = new Mock<IValueProvider>();
             //also IUnvalidatedValueProvider
             var invalidatedValueProvider = valueProvider.As<IUnvalidatedValueProvider>();
             invalidatedValueProvider.Setup(x => x.GetValue(It.IsAny<string>(), It.IsAny<bool>())).Returns(() =>
                 new ValueProviderResult(content, "content", CultureInfo.CurrentCulture));
 
             var controllerCtx = new ControllerContext(
-                Mock.Of<HttpContextBase>(http => http.Items == new Dictionary<object, object>()), 
-                routeData, 
+                Mock.Of<HttpContextBase>(http => http.Items == new Dictionary<object, object>()),
+                routeData,
                 Mock.Of<ControllerBase>());
             var result = binder.BindModel(controllerCtx,
                 new ModelBindingContext
@@ -159,15 +159,15 @@ namespace Umbraco.Tests.Web.Mvc
         }
 
         public class MyCustomContentModel : ContentModel
-        {           
-            public MyCustomContentModel(IPublishedContent content) 
+        {
+            public MyCustomContentModel(IPublishedContent content)
                 : base(content)
             { }
         }
-        
+
         public class MyOtherContent
         {
-            
+
         }
 
         public class MyContent : PublishedContentWrapped

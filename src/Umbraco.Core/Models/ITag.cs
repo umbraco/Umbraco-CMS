@@ -1,4 +1,4 @@
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models

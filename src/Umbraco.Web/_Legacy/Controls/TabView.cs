@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,13 +15,13 @@ using System.Web.UI.HtmlControls;
 namespace Umbraco.Web._Legacy.Controls
 {
 
-	public class TabView : Umbraco.Web._Legacy.Controls.UmbracoPanel
-	{
-	    public readonly ArrayList Tabs = new ArrayList();
-		protected ArrayList Panels = new ArrayList();
+    public class TabView : Umbraco.Web._Legacy.Controls.UmbracoPanel
+    {
+        public readonly ArrayList Tabs = new ArrayList();
+        protected ArrayList Panels = new ArrayList();
         protected Dictionary<string, TabPage> TabPages = new Dictionary<string, TabPage>();
 
-		private string _status = "";
+        private string _status = "";
 
         private HtmlGenericControl _tabList = new HtmlGenericControl();
         private HtmlGenericControl _body = new HtmlGenericControl();
@@ -45,7 +45,7 @@ namespace Umbraco.Web._Legacy.Controls
             _tabsHolder.Attributes.Add("class", "tab-content form-horizontal");
             _tabsHolder.ID = this.ID + "_content";
             _body.Controls.Add(_tabsHolder);
-            
+
             for (int i = 0; i < Tabs.Count; i++)
             {
                 var tabPage = TabPages.ElementAt(i).Value;
@@ -60,7 +60,7 @@ namespace Umbraco.Web._Legacy.Controls
         }
 
         protected override void OnInit(EventArgs e)
-        {   
+        {
             base.OnInit(e);
             base.CssClass = "umb-panel tabbable";
         }
@@ -72,13 +72,13 @@ namespace Umbraco.Web._Legacy.Controls
             if (string.IsNullOrEmpty(Text))
                 Text = " ";
 
-            
+
             for (int i = 0; i < Tabs.Count; i++)
             {
                 var tabPage = TabPages.ElementAt(i).Value;
                 string tabPageCaption = tabPage.Text;
                 string tabId = tabPage.ID;
-                
+
                 HtmlGenericControl li = new HtmlGenericControl();
                 li.TagName = "li";
                 if (tabId == ActiveTabId)
@@ -95,10 +95,10 @@ namespace Umbraco.Web._Legacy.Controls
             }
         }
 
-	    public ArrayList GetPanels()
-	    {
-	        return Panels;
-	    }
+        public ArrayList GetPanels()
+        {
+            return Panels;
+        }
 
         public TabPage NewTabPage(string text)
         {
@@ -117,13 +117,13 @@ namespace Umbraco.Web._Legacy.Controls
         }
 
 
-	    public string Status
-	    {
-	        get { return _status; }
-	        set { _status = value; }
-	    }
+        public string Status
+        {
+            get { return _status; }
+            set { _status = value; }
+        }
 
-	   
+
 
         public string ActiveTabId
         {
@@ -136,7 +136,7 @@ namespace Umbraco.Web._Legacy.Controls
                 if (TabPages.Count > 0)
                     return TabPages.ElementAt(0).Value.ID;
 
-                
+
 
                 return "tab01";
             }

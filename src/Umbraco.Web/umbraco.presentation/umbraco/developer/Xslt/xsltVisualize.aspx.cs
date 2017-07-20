@@ -25,8 +25,8 @@ namespace umbraco.presentation.umbraco.developer.Xslt
             if (!IsPostBack)
             {
                 // Check if cookie exists in the current request.
-				// zb-00004 #29956 : refactor cookies names & handling
-				if (Request.HasCookieValue(XsltVisualizeCookieName))
+                // zb-00004 #29956 : refactor cookies names & handling
+                if (Request.HasCookieValue(XsltVisualizeCookieName))
                     contentPicker.Value = Request.GetCookieValue(XsltVisualizeCookieName);
             }
 
@@ -73,10 +73,10 @@ namespace umbraco.presentation.umbraco.developer.Xslt
 
 
             // add cookie with current page
-			// zb-00004 #29956 : refactor cookies names & handling
-			Response.Cookies.Set(new HttpCookie(XsltVisualizeCookieName, contentPicker.Value)
-			{
-			    Expires = DateTime.Now + TimeSpan.FromMinutes(20)
+            // zb-00004 #29956 : refactor cookies names & handling
+            Response.Cookies.Set(new HttpCookie(XsltVisualizeCookieName, contentPicker.Value)
+            {
+                Expires = DateTime.Now + TimeSpan.FromMinutes(20)
             });
         }
 

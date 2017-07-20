@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 8, Constants.System.UmbracoMigrationName)]
     public class AlterTagRelationsTable : MigrationBase
     {
-        public AlterTagRelationsTable(IMigrationContext context) 
+        public AlterTagRelationsTable(IMigrationContext context)
             : base(context)
         { }
 
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
             //get all node id -> property type id references for nodes that are in a tag relations and for properties that are of those nodes that are of the tag data type
             var propertyTypeIdRef = Context.Database.Fetch<PropertyTypeReferenceDto>(@"SELECT DISTINCT cmsTagRelationship.nodeId as NodeId, cmsPropertyType.id as PropertyTypeId
-                FROM cmsTags 
+                FROM cmsTags
                 INNER JOIN cmsTagRelationship ON cmsTagRelationship.tagId = cmsTags.id
                 INNER JOIN umbracoNode ON umbracoNode.id = cmsTagRelationship.nodeId
                 INNER JOIN cmsContent ON cmsContent.nodeId = umbracoNode.id
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
             foreach (var tr in tagRelations)
             {
-                //for each tag relation we need to assign it a property type id which must exist in our references, if it doesn't it means that 
+                //for each tag relation we need to assign it a property type id which must exist in our references, if it doesn't it means that
                 // someone has tag data that relates to node that is not in the cmsContent table - we'll have to delete it and log it if that is the case.
 
                 var propertyTypes = propertyTypeIdRef.Where(x => x.NodeId == tr.NodeId).ToArray();

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Linq;
@@ -112,7 +112,7 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the Parent to retrieve Children from</param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         IEnumerable<IMedia> GetChildren(int id);
-        
+
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
         /// </summary>

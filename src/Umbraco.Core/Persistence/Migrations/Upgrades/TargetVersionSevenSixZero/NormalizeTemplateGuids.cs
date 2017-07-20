@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
             var version = database.FirstOrDefault<string>("SELECT version FROM umbracoMigration WHERE name=@name ORDER BY version DESC", new { name = Constants.System.UmbracoMigrationName });
             if (version != null && version.StartsWith("7.6.0")) return string.Empty;
 
-            var updates = database.Query<dynamic>(@"SELECT umbracoNode.id, cmsTemplate.alias FROM umbracoNode 
+            var updates = database.Query<dynamic>(@"SELECT umbracoNode.id, cmsTemplate.alias FROM umbracoNode
 JOIN cmsTemplate ON umbracoNode.id=cmsTemplate.nodeId
 WHERE nodeObjectType = @guid", new { guid = Constants.ObjectTypes.TemplateTypeGuid})
                 .Select(template => Tuple.Create((int) template.id, ("template____" + (string) template.alias).ToGuid()))

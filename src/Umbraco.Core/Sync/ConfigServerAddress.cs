@@ -27,6 +27,6 @@ namespace Umbraco.Core.Sync
         public override string ToString()
         {
             return ServerAddress;
-        }      
+        }
     }
 }

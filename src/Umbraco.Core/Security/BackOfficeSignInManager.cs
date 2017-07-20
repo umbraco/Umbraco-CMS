@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -49,7 +49,7 @@ namespace Umbraco.Core.Security
         public override async Task<SignInStatus> PasswordSignInAsync(string userName, string password, bool isPersistent, bool shouldLockout)
         {
             var result = await PasswordSignInAsyncImpl(userName, password, isPersistent, shouldLockout);
-            
+
             switch (result)
             {
                 case SignInStatus.Success:
@@ -176,7 +176,7 @@ namespace Umbraco.Core.Security
                     AllowRefresh = true,
                     IssuedUtc = nowUtc,
                     ExpiresUtc = nowUtc.AddMinutes(GlobalSettings.TimeOutInMinutes)
-                }, userIdentity, rememberBrowserIdentity);                
+                }, userIdentity, rememberBrowserIdentity);
             }
             else
             {

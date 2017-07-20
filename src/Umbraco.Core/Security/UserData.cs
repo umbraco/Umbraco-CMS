@@ -31,13 +31,13 @@ namespace Umbraco.Core.Security
 
         /// <summary>
         /// This is the 'security stamp' for validation
-        /// </summary>        
+        /// </summary>
         [DataMember(Name = "sessionId")]
-        public string SessionId { get; set; } 
+        public string SessionId { get; set; }
 
         [DataMember(Name = "id")]
         public object Id { get; set; }
-        
+
         [DataMember(Name = "roles")]
         public string[] Roles { get; set; }
 

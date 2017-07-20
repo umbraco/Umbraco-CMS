@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private UserTypeRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
-            return new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());            
+            return new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
         }
 
         [Test]
@@ -142,7 +142,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var resolved = repository2.Get(id);
 
                 // Assert
-                Assert.That(resolved, Is.Null);    
+                Assert.That(resolved, Is.Null);
             }
         }
 

@@ -24,7 +24,7 @@ namespace Umbraco.Core.Models
 
         internal PropertyTypeCollection()
         {
-            
+
         }
 
         public PropertyTypeCollection(IEnumerable<PropertyType> properties)
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Models
                     }
                 }
 
-                //check if the item's sort order is already in use				
+                //check if the item's sort order is already in use
                 if (this.Any(x => x.SortOrder == item.SortOrder))
                 {
                     //make it the next iteration

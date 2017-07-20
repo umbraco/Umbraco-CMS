@@ -1,4 +1,4 @@
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.Mapping

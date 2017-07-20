@@ -10,7 +10,7 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.ContentPickerAlias, "(Obsolete) Content Picker", PropertyEditorValueTypes.Integer, "contentpicker", IsParameterEditor = true, Group = "Pickers", IsDeprecated = true)]
     public class ContentPickerPropertyEditor : ContentPicker2PropertyEditor
     {
-        public ContentPickerPropertyEditor(ILogger logger) 
+        public ContentPickerPropertyEditor(ILogger logger)
             : base(logger)
         {
             InternalPreValues["idType"] = "int";

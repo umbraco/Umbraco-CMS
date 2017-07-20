@@ -24,6 +24,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
         {
             return source?.ToString() ?? string.Empty;
-        }        
+        }
     }
 }

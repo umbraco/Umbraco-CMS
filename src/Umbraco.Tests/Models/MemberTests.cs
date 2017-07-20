@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Models
             member.SortOrder = 5;
             member.Trashed = false;
             member.UpdateDate = DateTime.Now;
-            member.Version = Guid.NewGuid();            
+            member.Version = Guid.NewGuid();
             ((IUmbracoEntity)member).AdditionalData.Add("test1", 123);
             ((IUmbracoEntity)member).AdditionalData.Add("test2", "hello");
 

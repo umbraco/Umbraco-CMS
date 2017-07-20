@@ -27,7 +27,7 @@ namespace Umbraco.Web.Models.Mapping
             _fileService = fileService;
             _contentTypeService = contentTypeService;
             _mediaTypeService = mediaTypeService;
-            
+
             // v7 creates this map twice which makes no sense, and AutoMapper 6 detects it
             // assuming the second map took over, and removing the first one for now
             /*
@@ -182,7 +182,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
                 .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
                 .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
-                //only map if it is actually set, if it's  not set, it needs to be handled differently and will be taken care of in the 
+                //only map if it is actually set, if it's  not set, it needs to be handled differently and will be taken care of in the
                 // IContentType.AddPropertyType
                 .ForMember(dest => dest.PropertyGroupId, expression => expression.Condition(source => source.GroupId > 0))
                 .ForMember(type => type.PropertyGroupId, expression => expression.MapFrom(display => new Lazy<int>(() => display.GroupId, false)))
@@ -205,7 +205,7 @@ namespace Umbraco.Web.Models.Mapping
 
             CreateMap<MediaTypeSave, MediaTypeDisplay>()
                 .MapBaseContentTypeSaveToDisplay<MediaTypeSave, PropertyTypeBasic, MediaTypeDisplay, PropertyTypeDisplay>();
-            
+
             CreateMap<DocumentTypeSave, DocumentTypeDisplay>()
                 .MapBaseContentTypeSaveToDisplay<DocumentTypeSave, PropertyTypeBasic, DocumentTypeDisplay, PropertyTypeDisplay>()
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())

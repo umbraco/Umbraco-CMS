@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -164,20 +164,20 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetUrlWithCacheBust(this UrlHelper url, string actionName, string controllerName, RouteValueDictionary routeVals = null)
         {
-            var applicationJs = url.Action(actionName, controllerName, routeVals);          
+            var applicationJs = url.Action(actionName, controllerName, routeVals);
             applicationJs = applicationJs + "?umb__rnd=" + GetCacheBustHash();
             return applicationJs;
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public static string GetCacheBustHash()
         {
             //make a hash of umbraco and client dependency version
             //in case the user bypasses the installer and just bumps the web.config or clientdep config
-            
+
             var versionHash = new HashCodeCombiner();
 
             //if in debug mode, always burst the cache
@@ -188,9 +188,9 @@ namespace Umbraco.Web
             else
             {
                 //create a unique hash code of the current umb version and the current cdf version
-                
+
                 versionHash.AddCaseInsensitiveString(UmbracoVersion.Current.ToString());
-                versionHash.AddCaseInsensitiveString(ClientDependencySettings.Instance.Version.ToString(CultureInfo.InvariantCulture));                
+                versionHash.AddCaseInsensitiveString(ClientDependencySettings.Instance.Version.ToString(CultureInfo.InvariantCulture));
             }
 
             return versionHash.GetCombinedHashCode();

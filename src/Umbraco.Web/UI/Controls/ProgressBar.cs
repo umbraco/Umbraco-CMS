@@ -3,7 +3,7 @@
 namespace Umbraco.Web.UI.Controls
 {
     public class ProgressBar : System.Web.UI.WebControls.Image
-    {        
+    {
         public string Title { get; set; }
 
         protected override void Render(System.Web.UI.HtmlTextWriter writer)

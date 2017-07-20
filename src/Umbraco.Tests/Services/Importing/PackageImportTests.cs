@@ -282,14 +282,14 @@ namespace Umbraco.Tests.Services.Importing
             Assert.That(contents.Any(), Is.True);
             Assert.That(contents.Count(), Is.EqualTo(numberOfDocs));
         }
-        
+
         [Test]
         public void PackagingService_Can_Import_CheckboxList_Content_Package_Xml_With_Property_Editor_Aliases()
         {
             AssertCheckBoxListTests(ImportResources.CheckboxList_Content_Package);
         }
 
-    
+
 
         private void AssertCheckBoxListTests(string strXml)
         {
@@ -426,7 +426,7 @@ namespace Umbraco.Tests.Services.Importing
             var templates = packagingService.ImportTemplates(templateElement);
             var templatesAfterUpdate = packagingService.ImportTemplates(templateElementUpdated);
             var allTemplates = fileService.GetTemplates();
-            
+
             // Assert
             Assert.That(templates.Any(), Is.True);
             Assert.That(templates.Count(), Is.EqualTo(numberOfTemplates));
@@ -480,7 +480,7 @@ namespace Umbraco.Tests.Services.Importing
 
             var parentDictionaryItem = ServiceContext.LocalizationService.GetDictionaryItemByKey(parentKey);
             var childDictionaryItem = ServiceContext.LocalizationService.GetDictionaryItemByKey(childKey);
-            
+
             Assert.That(parentDictionaryItem.ParentId, Is.Not.EqualTo(childDictionaryItem.ParentId));
             Assert.That(childDictionaryItem.ParentId, Is.EqualTo(parentDictionaryItem.Key));
         }

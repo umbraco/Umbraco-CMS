@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -56,11 +56,11 @@ namespace Umbraco.Web
                         ""cdf"": """ + ClientDependencySettings.Instance.Version + @"""
                     },
                     ""isDebuggingEnabled"" : " + html.ViewContext.HttpContext.IsDebuggingEnabled.ToString().ToLowerInvariant() + @"
-                };       
+                };
             </script>";
 
             return html.Raw(str);
-        }      
+        }
 
         /// <summary>
         /// Used to render the script that will pass in the angular "externalLoginInfo" service/value on page load
@@ -126,7 +126,7 @@ namespace Umbraco.Web
 
 
             sb.AppendLine(@"app.value(""resetPasswordCodeInfo"", {");
-            sb.AppendLine(@"errors: errors,");            
+            sb.AppendLine(@"errors: errors,");
             sb.Append(@"resetCodeModel: ");
             sb.AppendLine(JsonConvert.SerializeObject(resetCodeModel));
             sb.AppendLine(@"});");

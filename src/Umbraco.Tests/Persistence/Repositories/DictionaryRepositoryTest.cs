@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //re-get
                 dictionaryItem = repository.Get(dictionaryItem.Id);
-               
+
 
                 // Assert
                 Assert.That(dictionaryItem, Is.Not.Null);
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
-                var dictionaryItem = (IDictionaryItem) new DictionaryItem("Testing1235");                
+                var dictionaryItem = (IDictionaryItem) new DictionaryItem("Testing1235");
 
                 repository.AddOrUpdate(dictionaryItem);
                 unitOfWork.Flush();

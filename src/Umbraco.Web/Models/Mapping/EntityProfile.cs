@@ -21,7 +21,7 @@ namespace Umbraco.Web.Models.Mapping
             var contentTypeUdiResolver = new ContentTypeUdiResolver();
 
             CreateMap<UmbracoEntity, EntityBasic>()
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(src.NodeObjectTypeId), src.Key))) 
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(src.NodeObjectTypeId), src.Key)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentTypeIcon))
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
@@ -105,10 +105,10 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                   .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                   .AfterMap((src, dest) =>
-                      {   
+                      {
                           //get the icon if there is one
-                          dest.Icon = src.Fields.ContainsKey(BaseUmbracoIndexer.IconFieldName) 
-                              ? src.Fields[BaseUmbracoIndexer.IconFieldName] 
+                          dest.Icon = src.Fields.ContainsKey(BaseUmbracoIndexer.IconFieldName)
+                              ? src.Fields[BaseUmbracoIndexer.IconFieldName]
                               : "icon-document";
 
                           dest.Name = src.Fields.ContainsKey("nodeName") ? src.Fields["nodeName"] : "[no name]";
@@ -151,7 +151,7 @@ namespace Umbraco.Web.Models.Mapping
                               }
                           }
                           dest.Path = src.Fields.ContainsKey(UmbracoContentIndexer.IndexPathFieldName) ? src.Fields[UmbracoContentIndexer.IndexPathFieldName] : "";
-                          
+
                           if (src.Fields.ContainsKey(LuceneIndexer.NodeTypeAliasFieldName))
                           {
                               dest.AdditionalData.Add("contentType", src.Fields[LuceneIndexer.NodeTypeAliasFieldName]);

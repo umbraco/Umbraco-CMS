@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Umbraco.Web.UI.Umbraco.Settings
 {
-	public partial class EditTemplate : global::umbraco.cms.presentation.settings.editTemplate
-	{
-	}
+    public partial class EditTemplate : global::umbraco.cms.presentation.settings.editTemplate
+    {
+    }
 }

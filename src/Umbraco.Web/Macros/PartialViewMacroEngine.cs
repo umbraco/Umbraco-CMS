@@ -65,7 +65,7 @@ namespace Umbraco.Web.Macros
         {
             if (macro == null) throw new ArgumentNullException(nameof(macro));
             if (content == null) throw new ArgumentNullException(nameof(content));
-			if (macro.ScriptName.IsNullOrWhiteSpace()) throw new ArgumentException("The ScriptName property of the macro object cannot be null or empty");
+            if (macro.ScriptName.IsNullOrWhiteSpace()) throw new ArgumentException("The ScriptName property of the macro object cannot be null or empty");
 
             var http = _getHttpContext();
             var umbCtx = _getUmbracoContext();
@@ -74,8 +74,8 @@ namespace Umbraco.Web.Macros
             routeVals.Values.Add("action", "Index");
             routeVals.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx); //required for UmbracoViewPage
 
-			//lets render this controller as a child action
-			var viewContext = new ViewContext { ViewData = new ViewDataDictionary() };
+            //lets render this controller as a child action
+            var viewContext = new ViewContext { ViewData = new ViewDataDictionary() };
             //try and extract the current view context from the route values, this would be set in the UmbracoViewPage or in
             // the UmbracoPageResult if POSTing to an MVC controller but rendering in Webforms
             if (http.Request.RequestContext.RouteData.DataTokens.ContainsKey(Mvc.Constants.DataTokenCurrentViewContext))
@@ -90,11 +90,11 @@ namespace Umbraco.Web.Macros
             {
                 controller.ViewData = viewContext.ViewData;
 
-				controller.ControllerContext = new ControllerContext(request, controller);
+                controller.ControllerContext = new ControllerContext(request, controller);
 
                 //call the action to render
                 var result = controller.Index();
-				output = controller.RenderViewResultAsString(result);
+                output = controller.RenderViewResultAsString(result);
             }
 
             return new MacroContent { Text = output };

@@ -31,7 +31,7 @@ namespace Umbraco.Web
                     {"allowManuallyChangingPassword", baseProvider != null && baseProvider.AllowManuallyChangingPassword}
                     //TODO: Inject the other parameters in here to change the behavior of this control - based on the membership provider settings.
                 };
-        } 
+        }
 
     }
 }

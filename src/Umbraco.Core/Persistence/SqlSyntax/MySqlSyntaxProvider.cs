@@ -332,7 +332,7 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             {
                 case SystemMethods.NewGuid:
                     return null; // NOT SUPPORTED!
-                                 //return "NEWID()";                
+                                 //return "NEWID()";
                 case SystemMethods.CurrentDateTime:
                     return "CURRENT_TIMESTAMP";
                     //case SystemMethods.NewSequentialId:
@@ -392,7 +392,7 @@ ORDER BY TABLE_NAME, INDEX_NAME",
                 db.CloseSharedConnection();
             }
 
-            // Could return null, which means testing failed, 
+            // Could return null, which means testing failed,
             // add message to check with their hosting provider
             return supportsCaseInsensitiveQueries;
         }

@@ -70,7 +70,7 @@ namespace Umbraco.Core.Services
 
         // lazy-constructed because when the ctor runs, the query factory may not be ready
 
-        private IQuery<IUmbracoEntity> QueryRootEntity => _queryRootEntity 
+        private IQuery<IUmbracoEntity> QueryRootEntity => _queryRootEntity
             ?? (_queryRootEntity = UowProvider.DatabaseContext.Query<IUmbracoEntity>().Where(x => x.ParentId == -1));
 
         #endregion
@@ -415,7 +415,7 @@ namespace Umbraco.Core.Services
         /// <param name="totalRecords"></param>
         /// <param name="orderBy"></param>
         /// <param name="orderDirection"></param>
-        /// <param name="filter"></param>        
+        /// <param name="filter"></param>
         /// <returns></returns>
         public IEnumerable<IUmbracoEntity> GetPagedDescendants(int id, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
             string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "")
@@ -615,8 +615,8 @@ namespace Umbraco.Core.Services
         public virtual UmbracoObjectTypes GetObjectType(IUmbracoEntity entity)
         {
             var entityImpl = entity as UmbracoEntity;
-            return entityImpl == null 
-                ? GetObjectType(entity.Id) 
+            return entityImpl == null
+                ? GetObjectType(entity.Id)
                 : UmbracoObjectTypesExtensions.GetUmbracoObjectType(entityImpl.NodeObjectTypeId);
         }
 

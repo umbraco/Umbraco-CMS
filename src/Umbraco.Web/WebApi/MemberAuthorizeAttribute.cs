@@ -10,7 +10,7 @@ namespace Umbraco.Web.WebApi
     /// to just authenticated members, and optionally of a particular type and/or group
     /// </summary>
     public sealed class MemberAuthorizeAttribute : AuthorizeAttribute
-    {        
+    {
         private readonly UmbracoContext _umbracoContext;
 
         private UmbracoContext GetUmbracoContext()

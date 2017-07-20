@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IDataTypeDefinitionRepository : IQueryRepository<int, IDataTypeDefinition>
     {
-        
+
         PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId);
         string GetPreValueAsString(int preValueId);
 

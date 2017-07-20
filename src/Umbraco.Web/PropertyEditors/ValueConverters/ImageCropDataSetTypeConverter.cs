@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -27,8 +27,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (cropDataSet == null)
                 return null;
 
-            return TypeHelper.IsTypeAssignableFrom<JObject>(destinationType) 
-                ? JObject.FromObject(cropDataSet) 
+            return TypeHelper.IsTypeAssignableFrom<JObject>(destinationType)
+                ? JObject.FromObject(cropDataSet)
                 : base.ConvertTo(context, culture, value, destinationType);
         }
     }

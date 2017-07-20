@@ -233,7 +233,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets a list of ContentType aliases from the current composition 
+        /// Gets a list of ContentType aliases from the current composition
         /// </summary>
         /// <returns>An enumerable list of string aliases</returns>
         /// <remarks>Does not contain the alias of the Current ContentType</remarks>
@@ -245,7 +245,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets a list of ContentType Ids from the current composition 
+        /// Gets a list of ContentType Ids from the current composition
         /// </summary>
         /// <returns>An enumerable list of integer ids</returns>
         /// <remarks>Does not contain the Id of the Current ContentType</remarks>

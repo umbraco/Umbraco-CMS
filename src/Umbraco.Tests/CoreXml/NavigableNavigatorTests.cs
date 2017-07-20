@@ -495,7 +495,7 @@ namespace Umbraco.Tests.CoreXml
         {
             var source = new TestSource5();
             var nav = new NavigableNavigator(source);
-            
+
             var iter = nav.Select("//* [@id=$id]", new XPathVariable("id", id.ToString(CultureInfo.InvariantCulture)));
             Assert.IsTrue(iter.MoveNext());
             var current = iter.Current as NavigableNavigator;
@@ -721,27 +721,27 @@ namespace Umbraco.Tests.CoreXml
   version=""1.0""
   xmlns:xsl=""http://www.w3.org/1999/XSL/Transform""
   xmlns:msxml=""urn:schemas-microsoft-com:xslt""
-	xmlns:umbraco.library=""urn:umbraco.library"" xmlns:Exslt.ExsltCommon=""urn:Exslt.ExsltCommon"" xmlns:Exslt.ExsltDatesAndTimes=""urn:Exslt.ExsltDatesAndTimes"" xmlns:Exslt.ExsltMath=""urn:Exslt.ExsltMath"" xmlns:Exslt.ExsltRegularExpressions=""urn:Exslt.ExsltRegularExpressions"" xmlns:Exslt.ExsltStrings=""urn:Exslt.ExsltStrings"" xmlns:Exslt.ExsltSets=""urn:Exslt.ExsltSets"" xmlns:Examine=""urn:Examine"" 
-	exclude-result-prefixes=""msxml umbraco.library Exslt.ExsltCommon Exslt.ExsltDatesAndTimes Exslt.ExsltMath Exslt.ExsltRegularExpressions Exslt.ExsltStrings Exslt.ExsltSets Examine "">
+    xmlns:umbraco.library=""urn:umbraco.library"" xmlns:Exslt.ExsltCommon=""urn:Exslt.ExsltCommon"" xmlns:Exslt.ExsltDatesAndTimes=""urn:Exslt.ExsltDatesAndTimes"" xmlns:Exslt.ExsltMath=""urn:Exslt.ExsltMath"" xmlns:Exslt.ExsltRegularExpressions=""urn:Exslt.ExsltRegularExpressions"" xmlns:Exslt.ExsltStrings=""urn:Exslt.ExsltStrings"" xmlns:Exslt.ExsltSets=""urn:Exslt.ExsltSets"" xmlns:Examine=""urn:Examine""
+    exclude-result-prefixes=""msxml umbraco.library Exslt.ExsltCommon Exslt.ExsltDatesAndTimes Exslt.ExsltMath Exslt.ExsltRegularExpressions Exslt.ExsltStrings Exslt.ExsltSets Examine "">
 
     <xsl:output method=""xml"" omit-xml-declaration=""yes"" />
     <xsl:param name=""currentPage""/>
 
     <xsl:template match=""/"">
-		<!-- <xsl:for-each select=""/root/* [@isDoc]""> -->
+        <!-- <xsl:for-each select=""/root/* [@isDoc]""> -->
         <!-- <xsl:for-each select=""$currentPage/root/* [@isDoc]""> -->
         <xsl:for-each select=""/macro/nav/root/* [@isDoc]"">
 <xsl:text>! </xsl:text><xsl:value-of select=""title"" /><xsl:text>
 </xsl:text>
-			<xsl:for-each select=""./* [@isDoc]"">
+            <xsl:for-each select=""./* [@isDoc]"">
 <xsl:text>!! </xsl:text><xsl:value-of select=""title"" /><xsl:text>
 </xsl:text>
-    			<xsl:for-each select=""./* [@isDoc]"">
+                <xsl:for-each select=""./* [@isDoc]"">
 <xsl:text>!!! </xsl:text><xsl:value-of select=""title"" /><xsl:text>
 </xsl:text>
-	    		</xsl:for-each>
-			</xsl:for-each>
-		</xsl:for-each>
+                </xsl:for-each>
+            </xsl:for-each>
+        </xsl:for-each>
     </xsl:template>
 
 </xsl:stylesheet>
@@ -782,7 +782,7 @@ namespace Umbraco.Tests.CoreXml
 
                 var x = new XmlDocument();
                 x.LoadXml(xml);
-                
+
                 macro = new MacroNavigator(new[]
                 {
                     // it even fails like that => macro nav. issue?
@@ -829,10 +829,10 @@ namespace Umbraco.Tests.CoreXml
                         <item><prop/></item>
                         <item><prop></prop></item>
                         <item><prop> </prop></item>
-                        <item><prop> 
+                        <item><prop>
                             </prop></item>
                         <item><prop> ooo </prop></item>
-                        <item><prop> ooo 
+                        <item><prop> ooo
                             </prop></item>
                         <item x=""""/>
                         <item x="" ""/>
@@ -857,7 +857,7 @@ namespace Umbraco.Tests.CoreXml
     <prop> ooo </prop>
   </item>
   <item>
-    <prop> ooo 
+    <prop> ooo
                             </prop>
   </item>
   <item x="""" />
@@ -975,11 +975,11 @@ namespace Umbraco.Tests.CoreXml
             // null => return null
             if (value == null) return null;
 
-			// attribute => return string value
+            // attribute => return string value
             if (isAttr) return value.ToString();
-            
-			// has a converter => use the converter
-            if (fieldType.XmlStringConverter != null) 
+
+            // has a converter => use the converter
+            if (fieldType.XmlStringConverter != null)
                 return fieldType.XmlStringConverter(value);
 
             // not a string => return value as a string
@@ -1103,7 +1103,7 @@ namespace Umbraco.Tests.CoreXml
             Content[2] = new TestContent(type1, 2, 1).WithValues("2:p1", "2:p2", "2:p3");
 
             Root = new TestRootContent(type).WithChildren(1);
-        }    
+        }
     }
 
     class TestSource4 : TestSourceBase
@@ -1166,13 +1166,13 @@ namespace Umbraco.Tests.CoreXml
         //        </item5>
         //    </wrap>
         //</root>
-        
+
         public TestSource6()
         {
             LastAttributeIndex = -1;
 
             var type = new TestRootContentType(this);
-            var type1 = type.CreateType("wrap", 
+            var type1 = type.CreateType("wrap",
                 new TestPropertyType("item1"),
                 new TestPropertyType("item2"),
                 new TestPropertyType("item2a"),
@@ -1187,11 +1187,11 @@ namespace Umbraco.Tests.CoreXml
             Content[1] = new TestContent(type1, 1, -1)
                 .WithValues(
                     null,
-                    null, 
-                    null, 
-                    null, 
-                    "\n        ", 
-                    "blah", 
+                    null,
+                    null,
+                    null,
+                    "\n        ",
+                    "blah",
                     "\n            blah\n        ",
                     "<subitem x=\"1\">bam</subitem>",
                     "\n        "

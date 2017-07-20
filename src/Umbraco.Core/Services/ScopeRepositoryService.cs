@@ -1,4 +1,4 @@
-using Umbraco.Core.Events;
+﻿using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.UnitOfWork;
 

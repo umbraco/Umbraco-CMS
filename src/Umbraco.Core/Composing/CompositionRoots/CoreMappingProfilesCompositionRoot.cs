@@ -1,4 +1,4 @@
-using LightInject;
+﻿using LightInject;
 using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.Composing.CompositionRoots

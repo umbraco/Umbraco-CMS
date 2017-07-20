@@ -1,4 +1,4 @@
-using Umbraco.Web.WebApi;
+﻿using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors

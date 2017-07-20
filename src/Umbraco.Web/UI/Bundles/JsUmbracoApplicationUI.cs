@@ -4,7 +4,7 @@ using ClientDependency.Core;
 namespace Umbraco.Web.UI.Bundles
 {
     /// <summary>
-    /// The UI Umbraco libs 
+    /// The UI Umbraco libs
     /// </summary>
     [ClientDependency(ClientDependencyType.Javascript, "ui/default.js", "UmbracoClient", Priority = 0, Group = 5)]
     [ClientDependency(ClientDependencyType.Javascript, "js/guiFunctions.js", "UmbracoRoot", Priority = 1, Group = 5)]

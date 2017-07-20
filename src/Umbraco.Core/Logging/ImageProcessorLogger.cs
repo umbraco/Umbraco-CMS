@@ -4,13 +4,13 @@ using ImageProcessor.Common.Exceptions;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Logging
-{   
+{
 
     /// <summary>
     /// A logger for explicitly logging ImageProcessor exceptions.
     /// <remarks>
     /// Creating this logger is enough for ImageProcessor to find and replace its in-built debug logger
-    /// without any additional configuration required. This class currently has to be public in order 
+    /// without any additional configuration required. This class currently has to be public in order
     /// to do so.
     /// </remarks>
     /// </summary>

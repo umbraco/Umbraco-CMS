@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private MediaTypeRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
-            return new MediaTypeRepository(unitOfWork, DisabledCache, Logger);            
+            return new MediaTypeRepository(unitOfWork, DisabledCache, Logger);
         }
 
         private EntityContainerRepository CreateContainerRepository(IScopeUnitOfWork unitOfWork)
@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
 
-                //create a 
+                //create a
                 var contentType2 = (IMediaType)new MediaType(contentType, "hello")
                 {
                     Name = "Blahasdfsadf"
@@ -71,7 +71,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType.Id).OriginalPath, contentType.Path);
                 Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType2.Id).OriginalPath, contentType2.Path);
             }
-            
+
         }
 
         [Test]
@@ -192,7 +192,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 TestHelper.AssertAllPropertyValuesAreEquals(contentType, fetched, "yyyy-MM-dd HH:mm:ss", ignoreProperties: new[] { "UpdateDate" });
             }
 
-            
+
         }
 
         [Test]
@@ -289,7 +289,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var mediaType = repository.Get(1033); //File
 
                 // Act
-                mediaType = repository.Get(mediaType.Key); 
+                mediaType = repository.Get(mediaType.Key);
 
                 // Assert
                 Assert.That(mediaType, Is.Not.Null);

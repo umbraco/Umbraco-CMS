@@ -22,40 +22,40 @@ using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Routing
 {
-	[TestFixture]
+    [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class RenderRouteHandlerTests : BaseWebTest
     {
-		public override void SetUp()
-		{
-			base.SetUp();
+        public override void SetUp()
+        {
+            base.SetUp();
 
-		    SettingsForTests.UmbracoPath = "~/umbraco";
+            SettingsForTests.UmbracoPath = "~/umbraco";
 
             WebRuntimeComponent.CreateRoutes(
                 new TestUmbracoContextAccessor(),
                 new SurfaceControllerTypeCollection(Enumerable.Empty<Type>()),
                 new UmbracoApiControllerTypeCollection(Enumerable.Empty<Type>()));
-		}
+        }
 
-	    public class TestRuntime : WebRuntime
-	    {
-	        public TestRuntime(UmbracoApplicationBase umbracoApplication)
+        public class TestRuntime : WebRuntime
+        {
+            public TestRuntime(UmbracoApplicationBase umbracoApplication)
                 : base(umbracoApplication)
-	        { }
+            { }
 
-	        public override void Boot(ServiceContainer container)
-	        {
+            public override void Boot(ServiceContainer container)
+            {
                 // do it before anything else - this is the only place where it's possible
-	            var logger = Mock.Of<ILogger>();
+                var logger = Mock.Of<ILogger>();
                 container.RegisterInstance<ILogger>(logger);
-	            var profiler = Mock.Of<IProfiler>();
+                var profiler = Mock.Of<IProfiler>();
                 container.RegisterInstance<IProfiler>(profiler);
                 container.RegisterInstance<ProfilingLogger>(new ProfilingLogger(logger, profiler));
 
                 base.Boot(container);
-	        }
-	    }
+            }
+        }
 
         protected override void Compose()
         {
@@ -73,11 +73,11 @@ namespace Umbraco.Tests.Routing
             Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefault()));
         }
 
-		public override void TearDown()
-		{
-			base.TearDown();
+        public override void TearDown()
+        {
+            base.TearDown();
             RouteTable.Routes.Clear();
-		}
+        }
 
         Template CreateTemplate(string alias)
         {
@@ -89,100 +89,100 @@ namespace Umbraco.Tests.Routing
             return template;
         }
 
-		/// <summary>
-		/// Will route to the default controller and action since no custom controller is defined for this node route
-		/// </summary>
-		[Test]
-		public void Umbraco_Route_Umbraco_Defined_Controller_Action()
-		{
+        /// <summary>
+        /// Will route to the default controller and action since no custom controller is defined for this node route
+        /// </summary>
+        [Test]
+        public void Umbraco_Route_Umbraco_Defined_Controller_Action()
+        {
             var template = CreateTemplate("homePage");
-			var route = RouteTable.Routes["Umbraco_default"];
-			var routeData = new RouteData { Route = route };
-			var umbracoContext = GetUmbracoContext("~/dummy-page", template.Id, routeData);
-		    var facadeRouter = CreateFacadeRouter();
-		    var frequest = facadeRouter.CreateRequest(umbracoContext);
-		    frequest.PublishedContent = umbracoContext.ContentCache.GetById(1174);
-			frequest.TemplateModel = template;
-			frequest.RenderingEngine = RenderingEngine.Mvc;
+            var route = RouteTable.Routes["Umbraco_default"];
+            var routeData = new RouteData { Route = route };
+            var umbracoContext = GetUmbracoContext("~/dummy-page", template.Id, routeData);
+            var facadeRouter = CreateFacadeRouter();
+            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            frequest.PublishedContent = umbracoContext.ContentCache.GetById(1174);
+            frequest.TemplateModel = template;
+            frequest.RenderingEngine = RenderingEngine.Mvc;
 
-			var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContext, Mock.Of<ILogger>()));
+            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContext, Mock.Of<ILogger>()));
 
-			handler.GetHandlerForRoute(umbracoContext.HttpContext.Request.RequestContext, frequest);
-			Assert.AreEqual("RenderMvc", routeData.Values["controller"].ToString());
+            handler.GetHandlerForRoute(umbracoContext.HttpContext.Request.RequestContext, frequest);
+            Assert.AreEqual("RenderMvc", routeData.Values["controller"].ToString());
             //the route action will still be the one we've asked for because our RenderActionInvoker is the thing that decides
             // if the action matches.
             Assert.AreEqual("homePage", routeData.Values["action"].ToString());
-		}
+        }
 
-		//test all template name styles to match the ActionName
+        //test all template name styles to match the ActionName
 
         //[TestCase("home-\\234^^*32page")]        //TODO: This fails!
         [TestCase("home-page")]
         [TestCase("home-page")]
         [TestCase("home-page")]
-		[TestCase("Home-Page")]
-		[TestCase("HomePage")]
-		[TestCase("homePage")]
+        [TestCase("Home-Page")]
+        [TestCase("HomePage")]
+        [TestCase("homePage")]
         [TestCase("site1/template2")]
         [TestCase("site1\\template2")]
         public void Umbraco_Route_User_Defined_Controller_Action(string templateName)
-		{
+        {
             // NOTE - here we create templates with crazy aliases... assuming that these
             // could exist in the database... yet creating templates should sanitize
             // aliases one way or another...
 
             var template = CreateTemplate(templateName);
             var route = RouteTable.Routes["Umbraco_default"];
-			var routeData = new RouteData() {Route = route};
-			var umbracoContext = GetUmbracoContext("~/dummy-page", template.Id, routeData, true);
-		    var facadeRouter = CreateFacadeRouter();
-		    var frequest = facadeRouter.CreateRequest(umbracoContext);
-		    frequest.PublishedContent = umbracoContext.ContentCache.GetById(1172);
-		    frequest.TemplateModel = template;
+            var routeData = new RouteData() {Route = route};
+            var umbracoContext = GetUmbracoContext("~/dummy-page", template.Id, routeData, true);
+            var facadeRouter = CreateFacadeRouter();
+            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            frequest.PublishedContent = umbracoContext.ContentCache.GetById(1172);
+            frequest.TemplateModel = template;
 
-			var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContext, Mock.Of<ILogger>()));
+            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContext, Mock.Of<ILogger>()));
 
-			handler.GetHandlerForRoute(umbracoContext.HttpContext.Request.RequestContext, frequest);
-			Assert.AreEqual("CustomDocument", routeData.Values["controller"].ToString());
-		    Assert.AreEqual(
+            handler.GetHandlerForRoute(umbracoContext.HttpContext.Request.RequestContext, frequest);
+            Assert.AreEqual("CustomDocument", routeData.Values["controller"].ToString());
+            Assert.AreEqual(
                 //global::umbraco.cms.helpers.Casing.SafeAlias(template.Alias),
                 template.Alias.ToSafeAlias(),
-		        routeData.Values["action"].ToString());
-		}
+                routeData.Values["action"].ToString());
+        }
 
 
-		#region Internal classes
+        #region Internal classes
 
-		///// <summary>
-		///// Used to test a user route (non-umbraco)
-		///// </summary>
-		//private class CustomUserController : Controller
-		//{
+        ///// <summary>
+        ///// Used to test a user route (non-umbraco)
+        ///// </summary>
+        //private class CustomUserController : Controller
+        //{
 
-		//    public ActionResult Index()
-		//    {
-		//        return View();
-		//    }
+        //    public ActionResult Index()
+        //    {
+        //        return View();
+        //    }
 
-		//    public ActionResult Test(int id)
-		//    {
-		//        return View();
-		//    }
+        //    public ActionResult Test(int id)
+        //    {
+        //        return View();
+        //    }
 
-		//}
+        //}
 
-		/// <summary>
-		/// Used to test a user route umbraco route
-		/// </summary>
-		public class CustomDocumentController : RenderMvcController
-		{
+        /// <summary>
+        /// Used to test a user route umbraco route
+        /// </summary>
+        public class CustomDocumentController : RenderMvcController
+        {
             public ActionResult HomePage(ContentModel model)
-			{
-				return View();
-			}
+            {
+                return View();
+            }
 
-		}
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

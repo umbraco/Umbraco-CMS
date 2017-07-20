@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Umbraco.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -9,7 +9,7 @@ namespace umbraco
 {
     public class languageTasks : LegacyDialogTask
     {
-       
+
         public override bool PerformSave()
         {
             //cms.businesslogic.language.Language.MakeNew(Alias);

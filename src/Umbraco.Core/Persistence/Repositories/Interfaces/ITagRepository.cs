@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -64,7 +64,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="propertyTypeId"></param>
         /// <param name="tags">The tags to assign</param>
         /// <param name="replaceTags">
-        /// If set to true, this will replace all tags with the given tags, 
+        /// If set to true, this will replace all tags with the given tags,
         /// if false this will append the tags that already exist for the content item
         /// </param>
         /// <returns></returns>

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Umbraco.Core.Models;
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Services
         /// <param name="content"></param>
         /// <returns>Returns null if no entry is found</returns>
         PublicAccessEntry GetEntryForContent(IContent content);
-        
+
         /// <summary>
         /// Gets the entry defined for the content item based on a content path
         /// </summary>

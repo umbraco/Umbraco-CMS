@@ -61,7 +61,7 @@ namespace umbraco.controls.Tree
 
         /// <summary>
         /// Returns a key/value object with: json, app, js as the keys
-        /// </summary>	
+        /// </summary>
         /// <returns></returns>
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -85,14 +85,14 @@ namespace umbraco.controls.Tree
 
             if (string.IsNullOrEmpty(treeType))
             {
-                //if there's not tree type specified, then render out the tree as per normal with the normal 
+                //if there's not tree type specified, then render out the tree as per normal with the normal
                 //way of doing things
                 returnVal.Add("json", treeCtl.GetJSONInitNode());
             }
             else
             {
                 //since 4.5.1 has a bug in it, it ignores if the treeType is specified and will always only render
-                //the whole APP not just a specific tree. 
+                //the whole APP not just a specific tree.
                 //this is a work around for this bug until it is fixed (which should be fixed in 4.5.2
 
                 //get the tree that we need to render
@@ -137,7 +137,7 @@ namespace umbraco.controls.Tree
             var identity = Context.GetCurrentIdentity(
                 //DO NOT AUTO-AUTH UNLESS THE CURRENT HANDLER IS WEBFORMS!
                 // Without this check, anything that is using this legacy API, like ui.Text will
-                // automatically log the back office user in even if it is a front-end request (if there is 
+                // automatically log the back office user in even if it is a front-end request (if there is
                 // a back office user logged in. This can cause problems becaues the identity is changing mid
                 // request. For example: http://issues.umbraco.org/issue/U4-4010
                 HttpContext.Current.CurrentHandler is Page);

@@ -7,15 +7,15 @@ using System.Text;
 namespace Umbraco.Web.Security
 {
     /// <summary>
-    /// This is used specifically to assign a default 'app' to a particular section in order to validate the 
+    /// This is used specifically to assign a default 'app' to a particular section in order to validate the
     /// currently logged in user's allowed applications
     /// </summary>
     /// <remarks>
     /// This relates to these issues:
     /// http://issues.umbraco.org/issue/U4-2021
     /// http://issues.umbraco.org/issue/U4-529
-    /// 
-    /// In order to fix these issues we need to pass in an 'app' parameter but since we don't want to break compatibility 
+    ///
+    /// In order to fix these issues we need to pass in an 'app' parameter but since we don't want to break compatibility
     /// we will create this mapping to map a 'default application' to a section action (like creating or deleting)
     /// </remarks>
     public static class LegacyDefaultAppMapping
@@ -24,7 +24,7 @@ namespace Umbraco.Web.Security
         /// Constructor that assigns all initial known mappings
         /// </summary>
         static LegacyDefaultAppMapping()
-        {            
+        {
         }
 
         private static readonly ConcurrentDictionary<string, string> NodeTypeAliasMapping = new ConcurrentDictionary<string, string>();

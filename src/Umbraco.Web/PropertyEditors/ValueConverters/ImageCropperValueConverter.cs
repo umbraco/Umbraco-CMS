@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
             {
                 Delete.ForeignKey("FK_cmsPropertyTypeGroup_cmsPropertyTypeGroup").OnTable("cmsPropertyTypeGroup");
             }
-            
+
             Delete.Column("parentGroupId").FromTable("cmsPropertyTypeGroup");
         }
 

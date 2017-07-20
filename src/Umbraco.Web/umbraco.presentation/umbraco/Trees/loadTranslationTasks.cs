@@ -26,12 +26,12 @@ namespace umbraco {
         public override void RenderJS(ref StringBuilder Javascript) {
            Javascript.Append(@"
                     function openTranslationTask(id) {
-	                    UmbClientMgr.contentFrame('translation/details.aspx?id=' + id);
+                        UmbClientMgr.contentFrame('translation/details.aspx?id=' + id);
                     }
                     function openTranslationOverview(id, mode) {
-	                    UmbClientMgr.contentFrame('translation/default.aspx?id=' + id + '&mode=' + mode);
+                        UmbClientMgr.contentFrame('translation/default.aspx?id=' + id + '&mode=' + mode);
                     }
-                    ");     
+                    ");
         }
 
         private IUser CurrentUser()
@@ -41,7 +41,7 @@ namespace umbraco {
 
         public override void Render(ref XmlTree tree) {
             foreach (Task t in Task.GetTasks(CurrentUser(), false)) {
-                
+
                 if (t.Type.Alias == "toTranslate") {
                     XmlTreeNode xNode = XmlTreeNode.Create(this);
                     xNode.Menu.Clear();
@@ -58,11 +58,11 @@ namespace umbraco {
                         tree.Add(xNode);
                         OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
                     }
-                    
+
                 }
 
             }
-        }        
+        }
     }
 
     public class loadYourTasks : BaseTree {
@@ -82,7 +82,7 @@ namespace umbraco {
         public override void RenderJS(ref StringBuilder Javascript) {
             Javascript.Append(@"
                     function openTranslationTask(id) {
-	                    UmbClientMgr.contentFrame('translation/details.aspx?id=' + id);
+                        UmbClientMgr.contentFrame('translation/details.aspx?id=' + id);
                     }");
         }
 
@@ -109,12 +109,12 @@ namespace umbraco {
                         tree.Add(xNode);
                         OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
                     }
-                    
+
                 }
 
             }
         }
     }
-    
+
 
 }

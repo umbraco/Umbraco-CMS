@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace Umbraco.Core.Services
 {
@@ -7,11 +7,11 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ServiceContext
     {
-        private readonly Lazy<IMigrationEntryService> _migrationEntryService; 
-        private readonly Lazy<IPublicAccessService> _publicAccessService; 
-        private readonly Lazy<ITaskService> _taskService; 
-        private readonly Lazy<IDomainService> _domainService; 
-        private readonly Lazy<IAuditService> _auditService; 
+        private readonly Lazy<IMigrationEntryService> _migrationEntryService;
+        private readonly Lazy<IPublicAccessService> _publicAccessService;
+        private readonly Lazy<ITaskService> _taskService;
+        private readonly Lazy<IDomainService> _domainService;
+        private readonly Lazy<IAuditService> _auditService;
         private readonly Lazy<ILocalizedTextService> _localizedTextService;
         private readonly Lazy<ITagService> _tagService;
         private readonly Lazy<IContentService> _contentService;

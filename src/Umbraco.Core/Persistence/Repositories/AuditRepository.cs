@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using LightInject;
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             throw new NotImplementedException();
         }
-        
+
         protected override void PersistUpdatedItem(AuditItem entity)
         {
             Database.Insert(new LogDto
@@ -46,7 +46,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var dto = Database.First<LogDto>(sql);
             if (dto == null)
                 return null;
-            
+
             return new AuditItem(dto.NodeId, dto.Comment, Enum<AuditType>.Parse(dto.Header), dto.UserId);
         }
 

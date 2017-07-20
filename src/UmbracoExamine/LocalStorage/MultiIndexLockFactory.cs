@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Lucene.Net.Store;
 
 namespace UmbracoExamine.LocalStorage
@@ -23,7 +23,7 @@ namespace UmbracoExamine.LocalStorage
         {
             return new MultiIndexLock(_master.LockFactory.MakeLock(lockName), _child.LockFactory.MakeLock(lockName));
         }
-        
+
         public override void ClearLock(string lockName)
         {
             _master.LockFactory.ClearLock(lockName);

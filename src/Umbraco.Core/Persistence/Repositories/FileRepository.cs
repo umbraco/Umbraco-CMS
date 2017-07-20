@@ -9,7 +9,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal abstract class FileRepository<TId, TEntity> : DisposableObject, IUnitOfWorkRepository, IRepository<TId, TEntity> 
+    internal abstract class FileRepository<TId, TEntity> : DisposableObject, IUnitOfWorkRepository, IRepository<TId, TEntity>
         where TEntity : IFile
     {
         protected FileRepository(IUnitOfWork work, IFileSystem fileSystem)
@@ -116,7 +116,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #region Abstract IUnitOfWorkRepository Methods
-        
+
         protected virtual void PersistNewItem(TEntity entity)
         {
             using (var stream = GetContentStream(entity.Content))
@@ -181,7 +181,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="filter"></param>
         /// <returns>
         /// Returns a list of all files with their paths. For example:
-        /// 
+        ///
         /// \hello.txt
         /// \folder1\test.txt
         /// \folder1\blah.csv
@@ -242,9 +242,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Dispose the unit of work
         /// </remarks>
         protected override void DisposeResources()
-		{
+        {
             // fixme - wtf in v8?
-			UnitOfWork.DisposeIfDisposable();
-		}
+            UnitOfWork.DisposeIfDisposable();
+        }
     }
 }

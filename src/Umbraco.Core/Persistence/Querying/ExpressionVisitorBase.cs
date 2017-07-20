@@ -541,12 +541,12 @@ namespace Umbraco.Core.Persistence.Querying
                 case "InvariantContains":
                 case "InvariantEquals":
 
-                    //special case, if it is 'Contains' and the argumet that Contains is being called on is 
+                    //special case, if it is 'Contains' and the argumet that Contains is being called on is
                     //Enumerable and the methodArgs is the actual member access, then it's an SQL IN claus
-                    if (m.Object == null 
+                    if (m.Object == null
                         && m.Arguments[0].Type != typeof(string)
                         && m.Arguments.Count == 2
-                        && methodArgs.Length == 1 
+                        && methodArgs.Length == 1
                         && methodArgs[0].NodeType == ExpressionType.MemberAccess
                         && TypeHelper.IsTypeAssignableFrom<IEnumerable>(m.Arguments[0].Type))
                     {
@@ -675,7 +675,7 @@ namespace Umbraco.Core.Persistence.Querying
                     if (m.Object == null && methodArgs.Length == 1 && methodArgs[0].NodeType == ExpressionType.MemberAccess)
                     {
                         var memberAccess = VisitMemberAccess((MemberExpression) methodArgs[0]);
-                        
+
                         var member = Expression.Convert(m.Arguments[0], typeof(object));
                         var lambda = Expression.Lambda<Func<object>>(member);
                         var getter = lambda.Compile();

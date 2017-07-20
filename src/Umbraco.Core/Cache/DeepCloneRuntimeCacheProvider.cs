@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Caching;
@@ -16,7 +16,7 @@ namespace Umbraco.Core.Cache
     }
 
     /// <summary>
-    /// A wrapper for any IRuntimeCacheProvider that ensures that all inserts and returns 
+    /// A wrapper for any IRuntimeCacheProvider that ensures that all inserts and returns
     /// are a deep cloned copy of the item when the item is IDeepCloneable and that tracks changes are
     /// reset if the object is TracksChangesEntityBase
     /// </summary>
@@ -84,7 +84,7 @@ namespace Umbraco.Core.Cache
             return InnerProvider.GetCacheItemsByKeyExpression(regexString)
                 .Select(CheckCloneableAndTracksChanges);
         }
-        
+
         public object GetCacheItem(string cacheKey)
         {
             var item = InnerProvider.GetCacheItem(cacheKey);
@@ -130,7 +130,7 @@ namespace Umbraco.Core.Cache
 
                 // clone / reset to go into the cache
                 return CheckCloneableAndTracksChanges(value);
-            }, timeout, isSliding, priority, removedCallback, dependentFiles);   
+            }, timeout, isSliding, priority, removedCallback, dependentFiles);
         }
 
         private static object CheckCloneableAndTracksChanges(object input)
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Cache
             var cloneable = input as IDeepCloneable;
             if (cloneable != null)
             {
-                input = cloneable.DeepClone();    
+                input = cloneable.DeepClone();
             }
 
             //on initial construction we don't want to have dirty properties tracked

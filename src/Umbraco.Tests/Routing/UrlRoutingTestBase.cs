@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Routing
     public abstract class UrlRoutingTestBase : BaseWebTest
     {
         /// <summary>
-        /// Sets up the mock domain service 
+        /// Sets up the mock domain service
         /// </summary>
         /// <param name="allDomains"></param>
         protected IDomainService SetupDomainServiceMock(IEnumerable<IDomain> allDomains)
@@ -46,10 +46,10 @@ namespace Umbraco.Tests.Routing
             domainService.Setup(service => service.GetAll(It.IsAny<bool>()))
                 .Returns((bool incWildcards) => new[]
                 {
-                    new UmbracoDomain("domain1.com/"){Id = 1, LanguageId = LangDeId, RootContentId = 1001, LanguageIsoCode = "de-DE"}, 
-                    new UmbracoDomain("domain1.com/en"){Id = 1, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"}, 
+                    new UmbracoDomain("domain1.com/"){Id = 1, LanguageId = LangDeId, RootContentId = 1001, LanguageIsoCode = "de-DE"},
+                    new UmbracoDomain("domain1.com/en"){Id = 1, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"},
                     new UmbracoDomain("domain1.com/fr"){Id = 1, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"}
-                });            
+                });
 
             return serviceContext;
         }

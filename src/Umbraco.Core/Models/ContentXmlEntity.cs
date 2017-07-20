@@ -16,7 +16,7 @@ namespace Umbraco.Core.Models
         public ContentXmlEntity(TContent content, Func<TContent, XElement> xml)
         {
             if (content == null) throw new ArgumentNullException("content");
-            _xml = xml;            
+            _xml = xml;
             Content = content;
         }
 
@@ -45,13 +45,13 @@ namespace Umbraco.Core.Models
         public DateTime? DeletedDate { get; set; }
 
         /// <summary>
-        /// Special case, always return false, this will cause the repositories managing 
-        /// this object to always do an 'insert' but these are special repositories that 
+        /// Special case, always return false, this will cause the repositories managing
+        /// this object to always do an 'insert' but these are special repositories that
         /// do an InsertOrUpdate on insert since the data for this needs to be managed this way
-        /// </summary>        
+        /// </summary>
         public bool HasIdentity
         {
-            get { return false; }         
+            get { return false; }
         }
 
         public object DeepClone()

@@ -80,7 +80,7 @@ namespace Umbraco.Core
 
         protected virtual void ConfigureUnhandledException(ILogger logger)
         {
-            //take care of unhandled exceptions - there is nothing we can do to 
+            //take care of unhandled exceptions - there is nothing we can do to
             // prevent the entire w3wp process to go down but at least we can try
             // and log the exception
             AppDomain.CurrentDomain.UnhandledException += (_, args) =>
@@ -139,7 +139,7 @@ namespace Umbraco.Core
             OnApplicationInit(this, new EventArgs());
         }
 
-                
+
         #endregion
 
         #region End
@@ -156,7 +156,7 @@ namespace Umbraco.Core
             {
                 _runtime.Terminate();
                 _runtime.DisposeIfDisposable();
-            
+
                 _runtime = null;
             }
 
@@ -229,7 +229,7 @@ namespace Umbraco.Core
         }
 
         #endregion
-        
+
         #region Utilities
 
         private static void TryInvoke(EventHandler handler, string name, object sender, EventArgs evargs)

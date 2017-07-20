@@ -64,7 +64,7 @@ namespace Umbraco.Tests.TreesAndSections
         {
             var name = Guid.NewGuid().ToString("N");
             ServiceContext.SectionService.MakeNew(name, name, "icon.jpg");
-            
+
             //check if it exists
             var app = ServiceContext.SectionService.GetByAlias(name);
             Assert.IsNotNull(app);
@@ -75,24 +75,24 @@ namespace Umbraco.Tests.TreesAndSections
         }
 
         /// <summary>
-        /// Creates a new user, assigns the user to existing application, 
+        /// Creates a new user, assigns the user to existing application,
         /// then deletes the user
         /// </summary>
         [Test()]
         public void Application_Create_New_User_Assign_Application()
         {
             var name = Guid.NewGuid().ToString("N");
-         
+
             //new user
             var ut = ServiceContext.UserService.GetAllUserTypes().First();
             var user = ServiceContext.UserService.CreateUserWithIdentity(name, name + "@example.com", ut);
-            
+
             //assign the app
             user.AddAllowedSection(Constants.Applications.Content);
             ServiceContext.UserService.Save(user);
 
             //ensure it's added
-            Assert.AreEqual(1, user.AllowedSections.Count(x => x == Constants.Applications.Content));            
+            Assert.AreEqual(1, user.AllowedSections.Count(x => x == Constants.Applications.Content));
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace Umbraco.Tests.TreesAndSections
             ServiceContext.UserService.Save(user);
             //ensure it's added
             Assert.AreEqual(1, user.AllowedSections.Count(x => x == app.Alias));
-            
+
         }
 
         #region Tests to write
@@ -158,7 +158,7 @@ namespace Umbraco.Tests.TreesAndSections
         //    Assert.Inconclusive("A method that does not return a value cannot be verified.");
         //}
 
-       
+
 
         ///// <summary>
         /////A test for MakeNew
@@ -264,11 +264,11 @@ namespace Umbraco.Tests.TreesAndSections
         //    actual = target.name;
         //    Assert.AreEqual(expected, actual);
         //    Assert.Inconclusive("Verify the correctness of this test method.");
-        //} 
+        //}
         #endregion
 
         #region Additional test attributes
-        // 
+        //
         //You can use the following additional attributes as you write your tests:
         //
         //Use ClassInitialize to run code before running the first test in the class

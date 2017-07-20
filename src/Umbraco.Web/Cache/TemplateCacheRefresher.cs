@@ -6,7 +6,7 @@ namespace Umbraco.Web.Cache
 {
     public sealed class TemplateCacheRefresher : CacheRefresherBase<TemplateCacheRefresher>
     {
-        public TemplateCacheRefresher(CacheHelper cacheHelper) 
+        public TemplateCacheRefresher(CacheHelper cacheHelper)
             : base(cacheHelper)
         { }
 

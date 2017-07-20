@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
     [Migration("6.0.0", 7, Constants.System.UmbracoMigrationName)]
     public class RenameTabIdColumn : MigrationBase
     {
-        public RenameTabIdColumn(IMigrationContext context) 
+        public RenameTabIdColumn(IMigrationContext context)
             : base(context)
         { }
 

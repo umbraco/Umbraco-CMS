@@ -14,7 +14,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Manifest
-{    
+{
     [TestFixture]
     public class ManifestParserTests
     {
@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Manifest
         {
             _parser = new ManifestParser(Mock.Of<ILogger>(), new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), new NullCacheProvider());
         }
-        
+
         [Test]
         public void Parse_Property_Editors_With_Pre_Vals()
         {
@@ -34,32 +34,32 @@ namespace Umbraco.Tests.Manifest
             var a = JsonConvert.DeserializeObject<JArray>(@"[
     {
         alias: 'Test.Test1',
-        name: 'Test 1',        
+        name: 'Test 1',
         editor: {
             view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
             valueType: 'int',
             validation: {
-                'required': true,               
+                'required': true,
                 'Regex': '\\d*'
             }
         },
         prevalues: {
-				fields: [
-					{
+                fields: [
+                    {
                         label: 'Some config 1',
-						key: 'key1',
-						view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html',
-						validation: {
+                        key: 'key1',
+                        view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html',
+                        validation: {
                             required: true
                         }
-					},
+                    },
                     {
                         label: 'Some config 2',
-						key: 'key2',
-						view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val2.html'
-					}
-				]
-			}
+                        key: 'key2',
+                        view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val2.html'
+                    }
+                ]
+            }
     }
 ]");
             var parser = _parser.GetPropertyEditors(a);
@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Manifest
             Assert.AreEqual("Some config 1", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).Name);
             Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).View);
             Assert.AreEqual(1, parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).Validators.Count);
-            
+
             Assert.AreEqual("key2", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).Key);
             Assert.AreEqual("Some config 2", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).Name);
             Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/Views/pre-val2.html", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).View);
@@ -83,20 +83,20 @@ namespace Umbraco.Tests.Manifest
             var a = JsonConvert.DeserializeObject<JArray>(@"[
     {
         alias: 'Test.Test1',
-        name: 'Test 1',        
-        view: 'blah',    
+        name: 'Test 1',
+        view: 'blah',
         icon: 'hello'
     },
     {
         alias: 'Test.Test2',
-        name: 'Test 2',        
+        name: 'Test 2',
         config: { key1: 'some default val' },
         view: '~/hello/world.cshtml',
         icon: 'helloworld'
     },
     {
         alias: 'Test.Test3',
-        name: 'Test 3',        
+        name: 'Test 3',
         config: { key1: 'some default val' },
         view: '/hello/world.html',
         render: '~/hello/world.cshtml',
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Manifest
             Assert.AreEqual("/hello/world.cshtml", parser.ElementAt(2).Render);
             Assert.AreEqual(1, parser.ElementAt(2).Config.Count);
             Assert.AreEqual("some default val", parser.ElementAt(2).Config["key1"]);
-            
+
         }
 
         [Test]
@@ -140,7 +140,7 @@ namespace Umbraco.Tests.Manifest
     {
         alias: 'Test.Test1',
         name: 'Test 1',
-        icon: 'icon-war',        
+        icon: 'icon-war',
         editor: {
             view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
             valueType: 'int',
@@ -153,7 +153,7 @@ namespace Umbraco.Tests.Manifest
     {
         alias: 'Test.Test2',
         name: 'Test 2',
-        group: 'customgroup',        
+        group: 'customgroup',
         defaultConfig: { key1: 'some default pre val' },
         editor: {
             view: '~/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html',
@@ -200,8 +200,8 @@ namespace Umbraco.Tests.Manifest
             var a = JsonConvert.DeserializeObject<JArray>(@"[
     {
         alias: 'Test.Test1',
-        name: 'Test 1',   
-        isParameterEditor: true,     
+        name: 'Test 1',
+        isParameterEditor: true,
         defaultConfig: { key1: 'some default val' },
         editor: {
             view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
@@ -238,7 +238,7 @@ namespace Umbraco.Tests.Manifest
             var a = JsonConvert.DeserializeObject<JArray>(@"[
     {
         alias: 'parameter1',
-        name: 'My Parameter',        
+        name: 'My Parameter',
         view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html'
     },
     {
@@ -266,7 +266,7 @@ namespace Umbraco.Tests.Manifest
         {
             var obj1 = JArray.FromObject(new[] { "test1", "test2", "test3" });
             var obj2 = JArray.FromObject(new[] { "test1", "test2", "test3", "test4" });
-            
+
             ManifestParser.MergeJArrays(obj1, obj2);
 
             Assert.AreEqual(4, obj1.Count());
@@ -317,7 +317,7 @@ namespace Umbraco.Tests.Manifest
             Assert.AreEqual(5, obj1.Properties().Count());
             Assert.AreEqual("Value3", obj1.Properties().ElementAt(2).Value.Value<string>());
         }
-        
+
 
         [TestCase("C:\\Test", "C:\\Test\\MyFolder\\AnotherFolder", 2)]
         [TestCase("C:\\Test", "C:\\Test\\MyFolder\\AnotherFolder\\YetAnother", 3)]
@@ -326,11 +326,11 @@ namespace Umbraco.Tests.Manifest
         {
             Assert.AreEqual(expected,
                 _parser.FolderDepth(
-                new DirectoryInfo(baseFolder), 
+                new DirectoryInfo(baseFolder),
                 new DirectoryInfo(currFolder)));
         }
 
-       
+
 
         //[Test]
         //public void Parse_Property_Editor()
@@ -342,9 +342,9 @@ namespace Umbraco.Tests.Manifest
         public void Create_Manifests_Editors()
         {
             var package1 = @"{
-propertyEditors: [], 
+propertyEditors: [],
 javascript: ['~/test.js', '~/test2.js']}";
-            
+
             var package2 = "{css: ['~/style.css', '~/folder-name/sdsdsd/stylesheet.css']}";
 
             var package3 = @"{
@@ -382,39 +382,39 @@ javascript: ['~/test.js', '~/test2.js']}";
             var package4 = @"{'propertyEditors': [
     {
         alias: 'Test.Test1',
-        name: 'Test 1',        
+        name: 'Test 1',
         editor: {
             view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
             valueType: 'int',
             validation: {
-                'required': true,               
+                'required': true,
                 'Regex': '\\d*'
             }
         },
         prevalues: {
-				fields: [
-					{
+                fields: [
+                    {
                         label: 'Some config 1',
-						key: 'key1',
-						view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html',
-						validation: {
+                        key: 'key1',
+                        view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html',
+                        validation: {
                             required: true
                         }
-					},
+                    },
                     {
                         label: 'Some config 2',
-						key: 'key2',
-						view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val2.html'
-					}
-				]
-			}
+                        key: 'key2',
+                        view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val2.html'
+                    }
+                ]
+            }
     }
 ]}";
 
             var package5 = @"{'parameterEditors': [
     {
         alias: 'parameter1',
-        name: 'My Parameter',        
+        name: 'My Parameter',
         view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html'
     },
     {
@@ -430,10 +430,10 @@ javascript: ['~/test.js', '~/test2.js']}";
             var paramEditors = result.SelectMany(x => _parser.GetParameterEditors(x.ParameterEditors)).ToArray();
             var propEditors = result.SelectMany(x => _parser.GetPropertyEditors(x.PropertyEditors)).ToArray();
             var gridEditors = result.SelectMany(x => _parser.GetGridEditors(x.GridEditors)).ToArray();
-            
+
             Assert.AreEqual(2, gridEditors.Count());
             Assert.AreEqual(2, paramEditors.Count());
-            Assert.AreEqual(1, propEditors.Count()); 
+            Assert.AreEqual(1, propEditors.Count());
 
         }
 
@@ -442,20 +442,20 @@ javascript: ['~/test.js', '~/test2.js']}";
         {
             var content4 = @"{
 //here's the property editors
-propertyEditors: [], 
+propertyEditors: [],
 //and here's the javascript
 javascript: ['~/test.js', '~/test2.js']}";
 
             var result = _parser.CreateManifests(null, content4);
 
-            Assert.AreEqual(1, result.Count()); 
+            Assert.AreEqual(1, result.Count());
         }
 
         [Test]
         public void Create_Manifest_With_Surround_Comments()
         {
             var content4 = @"{
-propertyEditors: []/*we have empty property editors**/, 
+propertyEditors: []/*we have empty property editors**/,
 javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2.js']}";
 
             var result = _parser.CreateManifests(null, content4);
@@ -468,7 +468,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
         {
             //NOTE: This is missing the final closing ]
             var content4 = @"{
-propertyEditors: []/*we have empty property editors**/, 
+propertyEditors: []/*we have empty property editors**/,
 javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2.js' }";
 
             var result = _parser.CreateManifests(null, content4);
@@ -510,7 +510,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.AreEqual(2, result.ElementAt(2).StylesheetInitialize.Count);
             Assert.AreEqual(2, result.ElementAt(3).StylesheetInitialize.Count);
         }
-        
+
 
     }
 }

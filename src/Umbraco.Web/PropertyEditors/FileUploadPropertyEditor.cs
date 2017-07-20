@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -34,7 +34,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns>The corresponding property value editor.</returns>
         protected override PropertyValueEditor CreateValueEditor()
         {
-            var baseEditor = base.CreateValueEditor();            
+            var baseEditor = base.CreateValueEditor();
             baseEditor.Validators.Add(new UploadFileTypeValidator());
             return new FileUploadPropertyValueEditor(baseEditor, _mediaFileSystem);
         }
@@ -163,11 +163,11 @@ namespace Umbraco.Web.PropertyEditors
                     _mediaFileSystem.UploadAutoFillProperties.Reset(model, autoFillConfig);
                 else
                     _mediaFileSystem.UploadAutoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(svalue));
-            }            
+            }
         }
 
         /// <summary>
-        /// A custom pre-val editor to ensure that the data is stored how the legacy data was stored in 
+        /// A custom pre-val editor to ensure that the data is stored how the legacy data was stored in
         /// </summary>
         internal class FileUploadPreValueEditor : ValueListPreValueEditor
         {
@@ -219,7 +219,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 var result = base.ConvertEditorToDb(editorValue, currentValue);
 
-                //this should just be a dictionary of values, we want to re-format this so that it is just one value in the dictionary that is 
+                //this should just be a dictionary of values, we want to re-format this so that it is just one value in the dictionary that is
                 // semi-colon delimited
                 var values = result.Select(item => item.Value.Value).ToList();
 
@@ -253,7 +253,7 @@ namespace Umbraco.Web.PropertyEditors
                             {
                                 //we'll make the server field the index number of the value so it can be wired up to the view
                                 "item_" + index.ToInvariantString()
-                            });   
+                            });
                         }
                     }
                 }

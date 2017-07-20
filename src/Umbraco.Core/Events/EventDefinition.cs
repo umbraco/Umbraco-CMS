@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace Umbraco.Core.Events
 {
@@ -54,7 +54,7 @@ namespace Umbraco.Core.Events
         private readonly TSender _sender;
         private readonly TEventArgs _args;
 
-        public EventDefinition(TypedEventHandler<TSender, TEventArgs> trackedEvent, TSender sender, TEventArgs args, string eventName = null) 
+        public EventDefinition(TypedEventHandler<TSender, TEventArgs> trackedEvent, TSender sender, TEventArgs args, string eventName = null)
             : base(sender, args, eventName)
         {
             _trackedEvent = trackedEvent;

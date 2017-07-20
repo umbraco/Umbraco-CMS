@@ -164,7 +164,7 @@ namespace umbraco.presentation.umbraco.dialogs
             if (entry.Success == false && entry.Result.Value == null)
             {
                 throw new Exception("Document is not protected!");
-            }            
+            }
         }
 
         private void AddMembershipUserToDocument(int documentId, string membershipUserName)
@@ -198,7 +198,7 @@ namespace umbraco.presentation.umbraco.dialogs
             if (entry != null)
             {
                 Services.PublicAccessService.Delete(entry);
-            }            
+            }
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -223,7 +223,7 @@ namespace umbraco.presentation.umbraco.dialogs
 
             if (IsPostBack == false)
             {
-                if (Services.PublicAccessService.IsProtected(documentId.ToString()) 
+                if (Services.PublicAccessService.IsProtected(documentId.ToString())
                     && GetProtectionType(documentId) != ProtectionType.NotProtected)
                 {
                     bt_buttonRemoveProtection.Visible = true;

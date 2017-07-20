@@ -5,6 +5,6 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IUserTypeRepository : IUnitOfWorkRepository, IQueryRepository<int, IUserType>
     {
-         
+
     }
 }

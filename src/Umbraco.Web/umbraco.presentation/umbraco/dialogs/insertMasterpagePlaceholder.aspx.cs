@@ -12,7 +12,7 @@ namespace umbraco.presentation.umbraco.dialogs {
         protected void Page_Load(object sender, EventArgs e) {
             //labels
             pp_placeholder.Text = Services.TextService.Localize("placeHolderID");
-           
+
         }
     }
 }

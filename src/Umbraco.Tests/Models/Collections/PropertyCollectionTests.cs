@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Models.Collections
             var collection = new PropertyCollection();
 
             collection.Add(new Property(new PropertyType("propEditor", DataTypeDatabaseType.Nvarchar, "test")));
-            
+
             Assert.IsTrue(collection.Contains("Test"));
         }
 
@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Models.Collections
 
             var first = collection.FirstOrDefault();
             var second = collection.FirstOrDefault(x => x.Alias.InvariantEquals("Test"));
-            
+
             Assert.That(first, Is.Null);
             Assert.That(first == null, Is.True);
             Assert.That(second == null, Is.True);

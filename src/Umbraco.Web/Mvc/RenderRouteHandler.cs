@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Web;
 using System.Web.Compilation;
@@ -173,10 +173,10 @@ namespace Umbraco.Web.Mvc
             if (decodedParts.All(x => x.Key != ReservedAdditionalKeys.Area))
                 return null;
 
-            foreach (var item in decodedParts.Where(x => new[] { 
-			    ReservedAdditionalKeys.Controller, 
-			    ReservedAdditionalKeys.Action, 
-			    ReservedAdditionalKeys.Area }.Contains(x.Key) == false))
+            foreach (var item in decodedParts.Where(x => new[] {
+                ReservedAdditionalKeys.Controller,
+                ReservedAdditionalKeys.Action,
+                ReservedAdditionalKeys.Area }.Contains(x.Key) == false))
             {
                 // Populate route with additional values which aren't reserved values so they eventually to action parameters
                 requestContext.RouteData.Values[item.Key] = item.Value;
@@ -356,9 +356,9 @@ namespace Umbraco.Web.Mvc
                 return new PublishedContentNotFoundHandler("In addition, no template exists to render the custom 404.");
 
             // so we have a template, so we should have a rendering engine
-            if (request.RenderingEngine == RenderingEngine.WebForms) // back to webforms ?                
+            if (request.RenderingEngine == RenderingEngine.WebForms) // back to webforms ?
                 return GetWebFormsHandler();
-            
+
             if (request.RenderingEngine != RenderingEngine.Mvc) // else ?
                 return new PublishedContentNotFoundHandler("In addition, no rendering engine exists to render the custom 404.");
 
@@ -385,8 +385,8 @@ namespace Umbraco.Web.Mvc
             }
 
             //Now we can check if we are supposed to render WebForms when the route has not been hijacked
-            if (request.RenderingEngine == RenderingEngine.WebForms 
-                && request.HasTemplate 
+            if (request.RenderingEngine == RenderingEngine.WebForms
+                && request.HasTemplate
                 && routeDef.HasHijackedRoute == false)
             {
                 return GetWebFormsHandler();
@@ -408,7 +408,7 @@ namespace Umbraco.Web.Mvc
                 var handler = GetHandlerOnMissingTemplate(request);
 
                 // if it's not null it can be either the PublishedContentNotFoundHandler (no document was
-                // found to handle 404, or document with no template was found) or the WebForms handler 
+                // found to handle 404, or document with no template was found) or the WebForms handler
                 // (a document was found and its template is WebForms)
 
                 // if it's null it means that a document was found and its template is Mvc
@@ -456,6 +456,6 @@ namespace Umbraco.Web.Mvc
             return _controllerFactory.GetControllerSessionBehavior(requestContext, controllerName);
         }
 
-        
+
     }
 }

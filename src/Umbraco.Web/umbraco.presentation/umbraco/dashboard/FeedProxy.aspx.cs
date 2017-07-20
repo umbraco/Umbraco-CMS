@@ -12,7 +12,7 @@ using Umbraco.Web.Composing;
 
 namespace dashboardUtilities
 {
-    
+
 
     public partial class FeedProxy : UmbracoEnsuredPage
     {
@@ -29,7 +29,7 @@ namespace dashboardUtilities
                         if (Uri.TryCreate(url, UriKind.Absolute, out requestUri))
                         {
                             var feedProxyXml = XmlHelper.OpenAsXmlDocument(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
-                            if (feedProxyXml != null 
+                            if (feedProxyXml != null
                                 && feedProxyXml.SelectSingleNode(string.Concat("//allow[@host = '", requestUri.Host, "']")) != null
                                 && requestUri.Port == 80)
                             {

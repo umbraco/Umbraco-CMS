@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 10, Constants.System.UmbracoMigrationName)]
     public class UpdateRelatedLinksData : MigrationBase
     {
-        public UpdateRelatedLinksData(IMigrationContext context) 
+        public UpdateRelatedLinksData(IMigrationContext context)
             : base(context)
         { }
 

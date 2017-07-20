@@ -12,7 +12,7 @@ namespace Umbraco.Core.Strings
             : base(builder)
         { }
 
-        public static UrlSegmentProviderResolver Current { get; } 
+        public static UrlSegmentProviderResolver Current { get; }
             = new UrlSegmentProviderResolver(CoreCurrent.Container.GetInstance<UrlSegmentProviderCollectionBuilder>());
 
         public IEnumerable<IUrlSegmentProvider> Providers => CoreCurrent.UrlSegmentProviders;

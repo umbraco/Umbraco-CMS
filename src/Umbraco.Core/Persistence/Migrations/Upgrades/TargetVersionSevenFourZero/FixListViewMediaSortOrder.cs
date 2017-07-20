@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Rdbms;

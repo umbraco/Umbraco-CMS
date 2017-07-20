@@ -51,7 +51,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Column
 
             return this;
         }
-        
+
 
         public IAlterColumnOptionSyntax WithDefaultValue(object value)
         {

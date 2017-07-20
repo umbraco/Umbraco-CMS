@@ -13,8 +13,8 @@ namespace Umbraco.Web.WebApi
         public virtual void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
         {
             //replace the normal validator with our custom one for this controller
-            controllerSettings.Services.Replace(typeof(IBodyModelValidator), 
-                new PrefixlessBodyModelValidator(controllerSettings.Services.GetBodyModelValidator()));            
+            controllerSettings.Services.Replace(typeof(IBodyModelValidator),
+                new PrefixlessBodyModelValidator(controllerSettings.Services.GetBodyModelValidator()));
         }
     }
 }

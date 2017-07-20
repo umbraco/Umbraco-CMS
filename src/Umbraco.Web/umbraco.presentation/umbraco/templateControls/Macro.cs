@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Web.UI;
@@ -68,36 +68,36 @@ namespace umbraco.presentation.templateControls
                 ViewState["FileLocation"] = value.ToLower();
             }
         }
-		[Bindable(true)]
-		[Category("Umbraco")]
-		[DefaultValue(RenderEvents.Init)]
-		[Localizable(true)]
-		public RenderEvents RenderEvent
-		{
-			get
-			{
-				var renderEvent = RenderEvents.Init;
-				if (ViewState["RenderEvent"] != null)
-					renderEvent = (RenderEvents)ViewState["RenderEvent"];
-				return renderEvent;
-			}
-			set
-			{
-				ViewState["RenderEvent"] = value;
-			}
-		}
+        [Bindable(true)]
+        [Category("Umbraco")]
+        [DefaultValue(RenderEvents.Init)]
+        [Localizable(true)]
+        public RenderEvents RenderEvent
+        {
+            get
+            {
+                var renderEvent = RenderEvents.Init;
+                if (ViewState["RenderEvent"] != null)
+                    renderEvent = (RenderEvents)ViewState["RenderEvent"];
+                return renderEvent;
+            }
+            set
+            {
+                ViewState["RenderEvent"] = value;
+            }
+        }
 
-		// Indicates where to run EnsureChildControls and effectively render the macro
-		public enum RenderEvents
-		{
-			Init,
-			PreRender,
-			Render
-		}
+        // Indicates where to run EnsureChildControls and effectively render the macro
+        public enum RenderEvents
+        {
+            Init,
+            PreRender,
+            Render
+        }
 
         public IList<Exception> Exceptions = new List<Exception>();
 
-		/// <summary>
+        /// <summary>
         /// Raises the <see cref="E:System.Web.UI.Control.Init"/> event.
         /// </summary>
         /// <param name="e">An <see cref="T:System.EventArgs"/> object that contains the event data.</param>
@@ -105,18 +105,18 @@ namespace umbraco.presentation.templateControls
             base.OnInit(e);
 
             // Create child controls when told to - this is the default
-			if (RenderEvent == RenderEvents.Init)
-	            EnsureChildControls();
+            if (RenderEvent == RenderEvents.Init)
+                EnsureChildControls();
         }
 
-		// Create child controls when told to - new option to render at PreRender
-		protected override void OnPreRender(EventArgs e)
-		{
-			base.OnPreRender(e);
+        // Create child controls when told to - new option to render at PreRender
+        protected override void OnPreRender(EventArgs e)
+        {
+            base.OnPreRender(e);
 
-			if (RenderEvent == RenderEvents.PreRender)
-				EnsureChildControls();
-		}
+            if (RenderEvent == RenderEvents.PreRender)
+                EnsureChildControls();
+        }
 
         /// <summary>
         /// Called by the ASP.NET page framework to notify server controls that use composition-based implementation to create any child controls they contain in preparation for posting back or rendering.
@@ -203,7 +203,7 @@ namespace umbraco.presentation.templateControls
         /// <param name="writer">The <see cref="T:System.Web.UI.HtmlTextWriter"/> object that receives the control content.</param>
         protected override void Render(HtmlTextWriter writer)
         {
-			// Create child controls when told to - do it here anyway as it has to be done
+            // Create child controls when told to - do it here anyway as it has to be done
             EnsureChildControls();
 
             var isDebug = GlobalSettings.DebugMode && (Context.Request.GetItemAsString("umbdebugshowtrace") != "" || Context.Request.GetItemAsString("umbdebug") != "");

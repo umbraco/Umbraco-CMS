@@ -8,24 +8,24 @@ using System.Xml.XPath;
 namespace Umbraco.Tests.UmbracoExamine
 {
     //TODO: This is ultra hack and still left over from legacy but still works for testing atm
-	internal class ExamineDemoDataMediaService
-	{
-		public ExamineDemoDataMediaService()
-		{
-			_doc = XDocument.Parse(TestFiles.media);
-		}
+    internal class ExamineDemoDataMediaService
+    {
+        public ExamineDemoDataMediaService()
+        {
+            _doc = XDocument.Parse(TestFiles.media);
+        }
 
-		#region IMediaService Members
+        #region IMediaService Members
 
-		public XDocument GetLatestMediaByXpath(string xpath)
-		{
-			var xdoc = XDocument.Parse("<media></media>");
-			xdoc.Root.Add(_doc.XPathSelectElements(xpath));
-			return xdoc;
-		}
+        public XDocument GetLatestMediaByXpath(string xpath)
+        {
+            var xdoc = XDocument.Parse("<media></media>");
+            xdoc.Root.Add(_doc.XPathSelectElements(xpath));
+            return xdoc;
+        }
 
-		#endregion
+        #endregion
 
-		private readonly XDocument _doc;
-	}
+        private readonly XDocument _doc;
+    }
 }

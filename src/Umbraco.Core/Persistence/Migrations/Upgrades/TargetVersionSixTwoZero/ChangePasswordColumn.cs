@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.2.0", 2, Constants.System.UmbracoMigrationName)]
     public class ChangePasswordColumn : MigrationBase
     {
-        public ChangePasswordColumn(IMigrationContext context) 
+        public ChangePasswordColumn(IMigrationContext context)
             : base(context)
         { }
 

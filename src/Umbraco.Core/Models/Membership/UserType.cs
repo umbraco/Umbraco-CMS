@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models.Membership
 {
     /// <summary>
     /// Represents the Type for a Backoffice User
-    /// </summary>    
+    /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
     internal class UserType : Entity, IUserType
@@ -46,9 +46,9 @@ namespace Umbraco.Core.Models.Membership
             set
             {
                 SetPropertyValueAndDetectChanges(
-                    value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase), 
-                    ref _alias, 
-                    Ps.Value.AliasSelector);                
+                    value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase),
+                    ref _alias,
+                    Ps.Value.AliasSelector);
             }
         }
 

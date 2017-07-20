@@ -249,7 +249,7 @@ namespace Umbraco.Web.Editors
                 codeFileDisplay.Path = Url.GetTreePathFromFilePath(id);
             }
 
-            codeFileDisplay.VirtualPath = codeFileDisplay.VirtualPath.TrimStart("~");            
+            codeFileDisplay.VirtualPath = codeFileDisplay.VirtualPath.TrimStart("~");
             codeFileDisplay.FileType = type;
             return codeFileDisplay;
         }
@@ -266,7 +266,7 @@ namespace Umbraco.Web.Editors
         {
             if (string.IsNullOrWhiteSpace(type)) throw new ArgumentException("Value cannot be null or whitespace.", "type");
             if (string.IsNullOrWhiteSpace(virtualPath)) throw new ArgumentException("Value cannot be null or whitespace.", "virtualPath");
-            
+
             virtualPath = System.Web.HttpUtility.UrlDecode(virtualPath);
 
             switch (type)
@@ -376,7 +376,7 @@ namespace Umbraco.Web.Editors
                     break;
 
 
-                    
+
 
                 default:
                     throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -409,7 +409,7 @@ namespace Umbraco.Web.Editors
                 relPath = relPath.IsNullOrWhiteSpace()
                     ? relPath + display.Name
                     : relPath.EnsureEndsWith('/') + display.Name;
-            }            
+            }
 
             var script = Services.FileService.GetScriptByName(relPath);
             if (script != null)
@@ -435,13 +435,13 @@ namespace Umbraco.Web.Editors
         private Attempt<IPartialView> CreateOrUpdatePartialView(CodeFileDisplay display)
         {
             return CreateOrUpdatePartialView(display, SystemDirectories.PartialViews,
-                Services.FileService.GetPartialView, Services.FileService.SavePartialView, Services.FileService.CreatePartialView);            
+                Services.FileService.GetPartialView, Services.FileService.SavePartialView, Services.FileService.CreatePartialView);
         }
-        
+
         private Attempt<IPartialView> CreateOrUpdatePartialViewMacro(CodeFileDisplay display)
         {
             return CreateOrUpdatePartialView(display, SystemDirectories.MacroPartials,
-                Services.FileService.GetPartialViewMacro, Services.FileService.SavePartialViewMacro, Services.FileService.CreatePartialViewMacro);           
+                Services.FileService.GetPartialViewMacro, Services.FileService.SavePartialViewMacro, Services.FileService.CreatePartialViewMacro);
         }
 
         /// <summary>

@@ -13,7 +13,7 @@ namespace UmbracoExamine
     {
 
         /// <summary>
-        /// The content index type        
+        /// The content index type
         /// </summary>
         /// <remarks>
         /// Is lower case because the Standard Analyzer requires lower case
@@ -21,7 +21,7 @@ namespace UmbracoExamine
         public const string Content = "content";
 
         /// <summary>
-        /// The media index type        
+        /// The media index type
         /// </summary>
         /// <remarks>
         /// Is lower case because the Standard Analyzer requires lower case
@@ -29,7 +29,7 @@ namespace UmbracoExamine
         public const string Media = "media";
 
         /// <summary>
-        /// The member index type        
+        /// The member index type
         /// </summary>
         /// <remarks>
         /// Is lower case because the Standard Analyzer requires lower case

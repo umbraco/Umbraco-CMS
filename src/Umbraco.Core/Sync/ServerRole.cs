@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Sync
+﻿namespace Umbraco.Core.Sync
 {
     /// <summary>
     /// The role of a server in an application environment.

@@ -8,7 +8,7 @@ namespace Umbraco.Web.Editors
 {
     internal class EditorValidatorCollection : BuilderCollectionBase<IEditorValidator>
     {
-        public EditorValidatorCollection(IEnumerable<IEditorValidator> items) 
+        public EditorValidatorCollection(IEnumerable<IEditorValidator> items)
             : base(items)
         { }
 

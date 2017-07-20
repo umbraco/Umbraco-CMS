@@ -52,7 +52,7 @@ namespace Umbraco.Web.Trees
             }
             else
             {
-                //get the tree that we need to render                    
+                //get the tree that we need to render
                 var treeDef = TreeDefinitionCollection.Instance.FindTree(appTree.Alias);
                 if (treeDef == null)
                 {
@@ -152,7 +152,7 @@ namespace Umbraco.Web.Trees
                                 menuItem.ExecuteLegacyJs(menuItem.Action.JsFunctionName);
                         }
                     }
-                    
+
                     numAdded++;
                 }
             }
@@ -168,7 +168,7 @@ namespace Umbraco.Web.Trees
             return collection;
         }
 
-        
+
 
         /// <summary>
         /// This will look at the legacy IAction's JsFunctionName and convert it to a confirmation dialog view if possible
@@ -269,7 +269,7 @@ namespace Umbraco.Web.Trees
                     return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/assignDomain2.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
-                            Current.Services.TextService.Localize("actions/assignDomain")));                
+                            Current.Services.TextService.Localize("actions/assignDomain")));
                 case "UmbClientMgr.appActions().actionSendToTranslate()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
@@ -337,7 +337,7 @@ namespace Umbraco.Web.Trees
             childNodesSource = childNodesSource.AppendQueryStringToUrl(childQuery);
 
             //for the menu source we need to detect if this is a root node since we'll need to set the parentId and id to -1
-            // for which we'll handle correctly on the server side.            
+            // for which we'll handle correctly on the server side.
             //if there are no menu items, then this will be empty
             var menuSource = "";
             if (xmlTreeNode.Menu != null && xmlTreeNode.Menu.Any())
@@ -356,10 +356,10 @@ namespace Umbraco.Web.Trees
                 {
                     menuQueryStrings.Add(i.Key, i.Value);
                 }
-                
-                menuSource = menuSource.AppendQueryStringToUrl(menuQueryStrings.ToQueryString());    
+
+                menuSource = menuSource.AppendQueryStringToUrl(menuQueryStrings.ToQueryString());
             }
-            
+
 
             //TODO: Might need to add stuff to additional attributes
 
@@ -393,7 +393,7 @@ namespace Umbraco.Web.Trees
 
         internal static TreeNodeCollection ConvertFromLegacy(string parentId, XmlTree xmlTree, UrlHelper urlHelper, string currentSection, FormDataCollection currentQueryStrings)
         {
-            //TODO: Once we get the editor URL stuff working we'll need to figure out how to convert 
+            //TODO: Once we get the editor URL stuff working we'll need to figure out how to convert
             // that over to use the old school ui.xml stuff for these old trees and however the old menu items worked.
 
             var collection = new TreeNodeCollection();

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.UnitOfWork;
 

@@ -68,7 +68,7 @@ namespace Umbraco.Core.Manifest
                         {
                             if (manifest.PropertyEditors != null)
                             {
-                                    editors.AddRange(_parser.GetPropertyEditors(manifest.PropertyEditors));    
+                                    editors.AddRange(_parser.GetPropertyEditors(manifest.PropertyEditors));
                             }
 
                         }
@@ -93,13 +93,13 @@ namespace Umbraco.Core.Manifest
                         {
                             if (manifest.ParameterEditors != null)
                             {
-                                editors.AddRange(_parser.GetParameterEditors(manifest.ParameterEditors));    
+                                editors.AddRange(_parser.GetParameterEditors(manifest.ParameterEditors));
                             }
                         }
                         return editors;
                     }, new TimeSpan(0, 10, 0));
             }
-        } 
-        
+        }
+
     }
 }

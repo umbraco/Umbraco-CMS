@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             var mediaMock = new Mock<IMedia>();
             mediaMock.Setup(m => m.Path).Returns("-1,1234,5678");
             var media = mediaMock.Object;
-            var mediaServiceMock = new Mock<IMediaService>();            
+            var mediaServiceMock = new Mock<IMediaService>();
             mediaServiceMock.Setup(x => x.GetById(1234)).Returns(media);
             var mediaService = mediaServiceMock.Object;
 
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             var mediaServiceMock = new Mock<IMediaService>();
             mediaServiceMock.Setup(x => x.GetById(0)).Returns(media);
             var mediaService = mediaServiceMock.Object;
-            
+
             //act/assert
             Assert.Throws<HttpResponseException>(() => MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, 1234));
         }
@@ -67,7 +67,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             var mediaServiceMock = new Mock<IMediaService>();
             mediaServiceMock.Setup(x => x.GetById(1234)).Returns(media);
             var mediaService = mediaServiceMock.Object;
-            
+
             //act
             var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, 1234);
 
@@ -83,7 +83,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             userMock.Setup(u => u.Id).Returns(0);
             userMock.Setup(u => u.StartMediaId).Returns(-1);
             var user = userMock.Object;
-            
+
             //act
             var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, null, -1);
 

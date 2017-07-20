@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using NUnit.Framework;
@@ -78,6 +78,6 @@ namespace Umbraco.Tests.Models
             var json = result.ResultStream.ToJsonString();
             Debug.Print(json);
         }
-    
+
     }
 }

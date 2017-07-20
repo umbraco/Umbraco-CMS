@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Web;
 using System.Xml;
@@ -15,7 +15,7 @@ using Umbraco.Web.Composing;
 namespace umbraco
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class item
     {

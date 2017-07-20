@@ -1,4 +1,4 @@
-using Umbraco.Core.Events;
+﻿using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services

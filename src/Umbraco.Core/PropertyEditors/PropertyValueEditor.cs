@@ -76,8 +76,8 @@ namespace Umbraco.Core.PropertyEditors
 
         /// <summary>
         /// Defines the view to use for the editor, this can be one of 3 things:
-        /// * the full virtual path or 
-        /// * the relative path to the current Umbraco folder 
+        /// * the full virtual path or
+        /// * the relative path to the current Umbraco folder
         /// * a simple view name which will map to the views/propertyeditors/{view}/{view}.html
         /// </summary>
         [JsonProperty("view", Required = Required.Always)]
@@ -100,7 +100,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <remarks>
         /// This will become legacy as soon as we implement overridable pre-values.
-        /// 
+        ///
         /// The default validator used is the RequiredValueValidator but this can be overridden by property editors
         /// if they need to do some custom validation, or if the value being validated is a json object.
         /// </remarks>
@@ -114,7 +114,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <remarks>
         /// This will become legacy as soon as we implement overridable pre-values.
-        /// 
+        ///
         /// The default validator used is the RegexValueValidator but this can be overridden by property editors
         /// if they need to do some custom validation, or if the value being validated is a json object.
         /// </remarks>
@@ -199,7 +199,7 @@ namespace Umbraco.Core.PropertyEditors
                     //ensure these are nullable so we can return a null if required
                     //NOTE: This is allowing type of 'long' because I think json.net will deserialize a numerical value as long
                     // instead of int. Even though our db will not support this (will get truncated), we'll at least parse to this.
-                    
+
                     valueType = typeof(long?);
 
                     //if parsing is successful, we need to return as an Int, we're only dealing with long's here because of json.net, we actually
@@ -207,7 +207,7 @@ namespace Umbraco.Core.PropertyEditors
                     //when we compare the values for dirty tracking we'll be comparing an int -> long and they will not match.
                     var result = value.TryConvertTo(valueType);
                     return result.Success && result.Result != null
-                        ? Attempt<object>.Succeed((int)(long)result.Result) 
+                        ? Attempt<object>.Succeed((int)(long)result.Result)
                         : result;
 
                 case DataTypeDatabaseType.Decimal:
@@ -231,14 +231,14 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="editorValue"></param>
         /// <param name="currentValue">
-        /// The current value that has been persisted to the database for this editor. This value may be usesful for 
+        /// The current value that has been persisted to the database for this editor. This value may be usesful for
         /// how the value then get's deserialized again to be re-persisted. In most cases it will probably not be used.
         /// </param>
         /// <returns></returns>
         /// <remarks>
         /// By default this will attempt to automatically convert the string value to the value type supplied by ValueType.
-        /// 
-        /// If overridden then the object returned must match the type supplied in the ValueType, otherwise persisting the 
+        ///
+        /// If overridden then the object returned must match the type supplied in the ValueType, otherwise persisting the
         /// value to the DB will fail when it tries to validate the value type.
         /// </remarks>
         public virtual object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
@@ -277,7 +277,7 @@ namespace Umbraco.Core.PropertyEditors
 
             switch (GetDatabaseType())
             {
-                case DataTypeDatabaseType.Ntext:                    
+                case DataTypeDatabaseType.Ntext:
                 case DataTypeDatabaseType.Nvarchar:
                     //if it is a string type, we will attempt to see if it is json stored data, if it is we'll try to convert
                     //to a real json object so we can pass the true json object directly to angular!
@@ -300,8 +300,8 @@ namespace Umbraco.Core.PropertyEditors
                     //Decimals need to be formatted with invariant culture (dots, not commas)
                     //Anything else falls back to ToString()
                     var decim = property.Value.TryConvertTo<decimal>();
-                    return decim.Success 
-                        ? decim.Result.ToString(NumberFormatInfo.InvariantInfo) 
+                    return decim.Success
+                        ? decim.Result.ToString(NumberFormatInfo.InvariantInfo)
                         : property.Value.ToString();
                 case DataTypeDatabaseType.Date:
                     var date = property.Value.TryConvertTo<DateTime?>();
@@ -313,7 +313,7 @@ namespace Umbraco.Core.PropertyEditors
                     return date.Result.Value.ToIsoString();
                 default:
                     throw new ArgumentOutOfRangeException();
-            }            
+            }
         }
 
         /// <summary>
@@ -326,9 +326,9 @@ namespace Umbraco.Core.PropertyEditors
         /// <remarks>
         /// By default this will just return the value of ConvertDbToString but ensure that if the db value type is nvarchar or text
         /// it is a CDATA fragment, otherwise it is just a text fragment.
-        /// 
+        ///
         /// This method by default will only return XText or XCData which must be wrapped in an element!
-        /// 
+        ///
         /// If the value is empty we will not return as CDATA since that will just take up more space in the file.
         /// </remarks>
         public virtual XNode ConvertDbToXml(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
@@ -344,7 +344,7 @@ namespace Umbraco.Core.PropertyEditors
                 case DataTypeDatabaseType.Date:
                 case DataTypeDatabaseType.Integer:
                 case DataTypeDatabaseType.Decimal:
-                    return new XText(ConvertDbToString(property, propertyType, dataTypeService));                    
+                    return new XText(ConvertDbToString(property, propertyType, dataTypeService));
                 case DataTypeDatabaseType.Nvarchar:
                 case DataTypeDatabaseType.Ntext:
                     //put text in cdata
@@ -374,7 +374,7 @@ namespace Umbraco.Core.PropertyEditors
                     return property.Value.ToXmlString<string>();
                 case DataTypeDatabaseType.Integer:
                 case DataTypeDatabaseType.Decimal:
-                    return property.Value.ToXmlString(property.Value.GetType());                
+                    return property.Value.ToXmlString(property.Value.GetType());
                 case DataTypeDatabaseType.Date:
                     //treat dates differently, output the format as xml format
                     if (property.Value == null)

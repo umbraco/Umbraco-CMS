@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models.Membership;
 
@@ -39,21 +39,21 @@ namespace Umbraco.Core.Services
         /// <param name="username">Username</param>
         /// <returns><see cref="IProfile"/></returns>
         IProfile GetProfileByUserName(string username);
-        
+
         /// <summary>
         /// Gets a user by Id
         /// </summary>
         /// <param name="id">Id of the user to retrieve</param>
         /// <returns><see cref="IUser"/></returns>
         IUser GetUserById(int id);
-        
+
         /// <summary>
         /// Removes a specific section from all users
         /// </summary>
         /// <remarks>This is useful when an entire section is removed from config</remarks>
         /// <param name="sectionAlias">Alias of the section to remove</param>
         void DeleteSectionFromAllUsers(string sectionAlias);
-        
+
         /// <summary>
         /// Add a specific section to all users or those specified as parameters
         /// </summary>
@@ -61,7 +61,7 @@ namespace Umbraco.Core.Services
         /// <param name="sectionAlias">Alias of the section to add</param>
         /// <param name="userIds">Specifiying nothing will add the section to all user</param>
         void AddSectionToAllUsers(string sectionAlias, params int[] userIds);
-        
+
         /// <summary>
         /// Get permissions set for a user and optional node ids
         /// </summary>
@@ -73,10 +73,10 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Replaces the same permission set for a single user to any number of entities
-        /// </summary>        
+        /// </summary>
         /// <param name="userId">Id of the user</param>
         /// <param name="permissions">
-        /// Permissions as enumerable list of <see cref="char"/>, 
+        /// Permissions as enumerable list of <see cref="char"/>,
         /// if no permissions are specified then all permissions for this node are removed for this user
         /// </param>
         /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Services
         /// <param name="ids">Optional Ids of UserTypes to retrieve</param>
         /// <returns>An enumerable list of <see cref="IUserType"/></returns>
         IEnumerable<IUserType> GetAllUserTypes(params int[] ids);
-        
+
         /// <summary>
         /// Gets a UserType by its Alias
         /// </summary>
@@ -125,7 +125,7 @@ namespace Umbraco.Core.Services
         /// Saves a UserType
         /// </summary>
         /// <param name="userType">UserType to save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events. 
+        /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         void SaveUserType(IUserType userType, bool raiseEvents = true);
 

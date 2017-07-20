@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
@@ -49,11 +49,11 @@ namespace Umbraco.Web.Models.ContentEditing
             Properties = new List<TPropertyType>();
         }
 
-        
+
 
         [DataMember(Name = "properties")]
         public IEnumerable<TPropertyType> Properties { get; set; }
 
-       
+
     }
 }

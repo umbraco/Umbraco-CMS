@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -181,7 +181,7 @@ namespace Umbraco.Tests.Models
         {
             public string Name { get; set; }
             public object[] MyTest1 { get; set; }
-            
+
         }
 
         public class Test4 : BaseCloneable

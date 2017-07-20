@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using Moq;
@@ -84,7 +84,7 @@ namespace Umbraco.Tests.Migrations
         [Migration("5.0.0", 1, "Test")]
         private class MultiMigration : MigrationBase
         {
-            public MultiMigration(IMigrationContext context) 
+            public MultiMigration(IMigrationContext context)
                 : base(context)
             { }
 

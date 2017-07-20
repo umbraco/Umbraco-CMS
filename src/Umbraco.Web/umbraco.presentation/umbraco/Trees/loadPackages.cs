@@ -21,12 +21,12 @@ namespace umbraco
         public const string PACKAGE_TREE_PREFIX = "package_";
 
         public loadPackages(string application) : base(application) { }
-        
+
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
         {
-            
+
         }
-        
+
         private int _id;
         private string _app;
         private string _packageType = "";
@@ -36,10 +36,10 @@ namespace umbraco
         {
             Javascript.Append(@"
             function openCreatedPackage(id) {
-	            UmbClientMgr.contentFrame('developer/packages/editPackage.aspx?id=' + id);
+                UmbClientMgr.contentFrame('developer/packages/editPackage.aspx?id=' + id);
             }
             function openInstalledPackage(id) {
-	            UmbClientMgr.contentFrame('developer/packages/installedPackage.aspx?id=' + id);
+                UmbClientMgr.contentFrame('developer/packages/installedPackage.aspx?id=' + id);
             }
             ");
         }
@@ -53,7 +53,7 @@ namespace umbraco
         {
 
             _packageType = HttpContext.Current.Request.QueryString["packageType"];
-           
+
             switch (_packageType)
             {
                 case "installed":
@@ -107,7 +107,7 @@ namespace umbraco
                         xNode.Menu.Add( ActionRefresh.Instance );
                         xNode.Source = "tree.aspx?app=" + this._app + "&id=" + this._id + "&treeType=packagerPackages&packageType=repository&repoGuid=" + repo.Guid + "&rnd=" + Guid.NewGuid();
                         tree.Add(xNode);
-                        
+
                     }
 
                     break;
@@ -115,7 +115,7 @@ namespace umbraco
 
                     _repoGuid = HttpContext.Current.Request.QueryString["repoGuid"];
                     Umbraco.Web.org.umbraco.our.Repository r = new Umbraco.Web.org.umbraco.our.Repository();
-                    
+
                     foreach (var cat in r.Categories(_repoGuid))
                     {
                         XmlTreeNode xNode = XmlTreeNode.Create(this);
@@ -124,17 +124,17 @@ namespace umbraco
                         xNode.Action = "javascript:openPackageCategory('BrowseRepository.aspx?category=" + cat.Id + "&repoGuid=" + _repoGuid + "');";
                         xNode.Icon = "icon-folder";
                         xNode.OpenIcon = "icon-folder";
-                        xNode.NodeType = "packagesCategory" + cat.Id;                        
+                        xNode.NodeType = "packagesCategory" + cat.Id;
                         tree.Add(xNode);
-                    
+
                     }
-                    
+
                     break;
             }
 
         }
 
-        
+
     }
 
 }

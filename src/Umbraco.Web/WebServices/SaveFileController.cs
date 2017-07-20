@@ -14,7 +14,7 @@ namespace Umbraco.Web.WebServices
     /// <summary>
     /// Represents REST controller used to save files such as templates, partial views, macro files, etc.
     /// </summary>
-    /// <remarks>This isn't fully implemented yet but we should migrate all of the logic 
+    /// <remarks>This isn't fully implemented yet but we should migrate all of the logic
     /// in the umbraco.presentation.webservices.codeEditorSave over to this controller.</remarks>
     [ValidateMvcAngularAntiForgeryToken]
     public class SaveFileController : UmbracoAuthorizedController
@@ -88,7 +88,7 @@ namespace Umbraco.Web.WebServices
                     oldname = oldname.TrimStart(pathPrefix);
             }
 
-            var currentView = oldname.IsNullOrWhiteSpace() 
+            var currentView = oldname.IsNullOrWhiteSpace()
                 ? get(svce, filename)
                 : get(svce, oldname);
 
@@ -98,7 +98,7 @@ namespace Umbraco.Web.WebServices
                 currentView.Path = filename;
             currentView.Content = contents;
 
-            
+
 
 
             Attempt<IPartialView> attempt;
@@ -157,7 +157,7 @@ namespace Umbraco.Web.WebServices
         //        if (Math.Max(t.MasterTemplate, 0) != Math.Max(masterTemplateId, 0))
         //        {
         //            t.MasterTemplate = Math.Max(masterTemplateId, 0);
-        //            pathChanged = true;                  
+        //            pathChanged = true;
         //        }
         //    }
         //    catch (ArgumentException ex)
@@ -171,7 +171,7 @@ namespace Umbraco.Web.WebServices
         //        t.Save();
 
         //        //ensure the correct path is synced as the parent might have been changed
-        //        // http://issues.umbraco.org/issue/U4-2300                
+        //        // http://issues.umbraco.org/issue/U4-2300
         //        if (pathChanged)
         //        {
         //            //need to re-look it up
@@ -220,7 +220,7 @@ namespace Umbraco.Web.WebServices
                 if (svce.ValidateScript(script) == false)
                     return Failed(Services.TextService.Localize("speechBubbles/scriptErrorText"), Services.TextService.Localize("speechBubbles/scriptErrorHeader"),
                                     new FileSecurityException("File '" + filename + "' is not a valid script file."));
-                
+
                 svce.SaveScript(script);
             }
             catch (Exception e)

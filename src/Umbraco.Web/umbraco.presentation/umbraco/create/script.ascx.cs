@@ -12,20 +12,20 @@ using Umbraco.Web._Legacy.UI;
 
 namespace umbraco.presentation.umbraco.create
 {
-	public partial class script : UmbracoUserControl
-	{
+    public partial class script : UmbracoUserControl
+    {
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-			sbmt.Text = Services.TextService.Localize("create");
+            sbmt.Text = Services.TextService.Localize("create");
 
             // Enable new item in folders to place items in that folder.
             if (Request["nodeType"] == "scriptsFolder")
                 rename.Text = Request["nodeId"].EnsureEndsWith('/');
-		}
+        }
 
-		protected void SubmitClick(object sender, System.EventArgs e)
-		{
+        protected void SubmitClick(object sender, System.EventArgs e)
+        {
             int createFolder = 0;
             if (scriptType.SelectedValue == "")
             {
@@ -34,28 +34,28 @@ namespace umbraco.presentation.umbraco.create
                 Page.Validate();
             }
 
-			if (Page.IsValid)
-			{
+            if (Page.IsValid)
+            {
                 string returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),
                     Security.CurrentUser,
                     Request.GetItemAsString("nodeType"),
-					createFolder,
+                    createFolder,
                     rename.Text + '\u00A4' + scriptType.SelectedValue);
 
-				ClientTools
+                ClientTools
                     .ChangeContentFrameUrl(returnUrl)
                     .ReloadActionNode(false, true)
-					.CloseModalWindow();
+                    .CloseModalWindow();
 
-			}
-		}
+            }
+        }
 
-		override protected void OnInit(EventArgs e)
-		{
-			base.OnInit(e);
+        override protected void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
 
-		    ContainsValidator.Enabled = false;
+            ContainsValidator.Enabled = false;
 
             string[] fileTypes = UmbracoConfig.For.UmbracoSettings().Content.ScriptFileTypes.ToArray();
 
@@ -66,7 +66,7 @@ namespace umbraco.presentation.umbraco.create
             {
                 scriptType.Items.Add(new ListItem("." + str + " file", str));
             }
-		}
+        }
 
         /// <summary>
         /// rename control.
@@ -86,7 +86,7 @@ namespace umbraco.presentation.umbraco.create
         /// </remarks>
         protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
         protected global::System.Web.UI.WebControls.RegularExpressionValidator EndsWithValidator;
-	    protected global::System.Web.UI.WebControls.RegularExpressionValidator ContainsValidator;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator ContainsValidator;
 
         /// <summary>
         /// scriptType control.
@@ -115,5 +115,5 @@ namespace umbraco.presentation.umbraco.create
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button sbmt;
 
-	}
+    }
 }

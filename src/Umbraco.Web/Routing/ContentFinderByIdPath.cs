@@ -1,4 +1,4 @@
-using Umbraco.Core.Logging;
+﻿using Umbraco.Core.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -6,34 +6,34 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
 {
-	/// <summary>
-	/// Provides an implementation of <see cref="IContentFinder"/> that handles page identifiers.
-	/// </summary>
-	/// <remarks>
-	/// <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
-	/// </remarks>
-	public class ContentFinderByIdPath : IContentFinder
+    /// <summary>
+    /// Provides an implementation of <see cref="IContentFinder"/> that handles page identifiers.
+    /// </summary>
+    /// <remarks>
+    /// <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
+    /// </remarks>
+    public class ContentFinderByIdPath : IContentFinder
     {
-	    private readonly ILogger _logger;
-	    private readonly IWebRoutingSection _webRoutingSection;
+        private readonly ILogger _logger;
+        private readonly IWebRoutingSection _webRoutingSection;
 
-	    public ContentFinderByIdPath(ILogger logger)
+        public ContentFinderByIdPath(ILogger logger)
             : this(UmbracoConfig.For.UmbracoSettings().WebRouting)
-	    {
-	        _logger = logger;
-	    }
+        {
+            _logger = logger;
+        }
 
-	    public ContentFinderByIdPath(IWebRoutingSection webRoutingSection)
-	    {
-	        _webRoutingSection = webRoutingSection;
-	    }
+        public ContentFinderByIdPath(IWebRoutingSection webRoutingSection)
+        {
+            _webRoutingSection = webRoutingSection;
+        }
 
-	    /// <summary>
-		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
-		/// </summary>
-		/// <param name="frequest">The <c>PublishedContentRequest</c>.</param>		
-		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-		public bool TryFindContent(PublishedContentRequest frequest)
+        /// <summary>
+        /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
+        /// </summary>
+        /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
+        /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
+        public bool TryFindContent(PublishedContentRequest frequest)
         {
 
             if (frequest.UmbracoContext != null && frequest.UmbracoContext.InPreviewMode == false
@@ -41,25 +41,25 @@ namespace Umbraco.Web.Routing
                 return false;
 
             IPublishedContent node = null;
-			var path = frequest.Uri.GetAbsolutePathDecoded();
+            var path = frequest.Uri.GetAbsolutePathDecoded();
 
             var nodeId = -1;
-			if (path != "/") // no id if "/"
+            if (path != "/") // no id if "/"
             {
-				var noSlashPath = path.Substring(1);
+                var noSlashPath = path.Substring(1);
 
                 if (int.TryParse(noSlashPath, out nodeId) == false)
                     nodeId = -1;
 
                 if (nodeId > 0)
                 {
-					_logger.Debug<ContentFinderByIdPath>("Id={0}", () => nodeId);
+                    _logger.Debug<ContentFinderByIdPath>("Id={0}", () => nodeId);
                     node = frequest.UmbracoContext.ContentCache.GetById(nodeId);
 
                     if (node != null)
                     {
-						frequest.PublishedContent = node;
-						_logger.Debug<ContentFinderByIdPath>("Found node with id={0}", () => frequest.PublishedContent.Id);
+                        frequest.PublishedContent = node;
+                        _logger.Debug<ContentFinderByIdPath>("Found node with id={0}", () => frequest.PublishedContent.Id);
                     }
                     else
                     {
@@ -69,7 +69,7 @@ namespace Umbraco.Web.Routing
             }
 
             if (nodeId == -1)
-				_logger.Debug<ContentFinderByIdPath>("Not a node id");
+                _logger.Debug<ContentFinderByIdPath>("Not a node id");
 
             return node != null;
         }

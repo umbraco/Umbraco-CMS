@@ -274,7 +274,7 @@ namespace Umbraco.Web.WebServices
                 FieldDefinitions = indexer.Value.FieldDefinitions,
                 Name = indexer.Key
             };
-            
+
             var props = TypeHelper.CachedDiscoverableProperties(indexer.GetType(), mustWrite: false)
                 //ignore these properties
                                   .Where(x => new[] {"IndexerData", "Description", "WorkingFolder"}.InvariantContains(x.Name) == false)

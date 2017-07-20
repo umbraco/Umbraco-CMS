@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -29,9 +29,9 @@ namespace Umbraco.Web.Search
     /// </summary>
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class ExamineComponent : UmbracoComponentBase, IUmbracoCoreComponent
-	{
-		public void Initialize(IRuntimeState runtime, PropertyEditorCollection propertyEditors, IExamineIndexCollectionAccessor indexCollection, ILogger logger)
-		{
+    {
+        public void Initialize(IRuntimeState runtime, PropertyEditorCollection propertyEditors, IExamineIndexCollectionAccessor indexCollection, ILogger logger)
+        {
             logger.Info<ExamineComponent>("Starting initialize async background thread.");
 
             // make it async in order not to slow down the boot
@@ -60,7 +60,7 @@ namespace Umbraco.Web.Search
                     logger.Error<ExamineComponent>("Failed to bind grid property editor.", e);
                 }
             });
-		    bg.Start();
+            bg.Start();
 
             // the rest is the original Examine event handler
 
@@ -68,20 +68,20 @@ namespace Umbraco.Web.Search
 
             //TODO: For now we'll make this true, it means that indexes will be near real time
             // we'll see about what implications this may have - should be great in most scenarios
-		    DefaultExamineSession.RequireImmediateConsistency = true;
+            DefaultExamineSession.RequireImmediateConsistency = true;
 
-			var registeredProviders = ExamineManager.Instance.IndexProviderCollection
-				.OfType<BaseUmbracoIndexer>().Count(x => x.EnableDefaultEventHandler);
+            var registeredProviders = ExamineManager.Instance.IndexProviderCollection
+                .OfType<BaseUmbracoIndexer>().Count(x => x.EnableDefaultEventHandler);
 
             logger.Info<ExamineComponent>($"Adding examine event handlers for {registeredProviders} index providers.");
 
-			// don't bind event handlers if we're not suppose to listen
-			if (registeredProviders == 0)
-				return;
+            // don't bind event handlers if we're not suppose to listen
+            if (registeredProviders == 0)
+                return;
 
             // bind to distributed cache events - this ensures that this logic occurs on ALL servers
             // that are taking part in a load balanced environment.
-		    ContentCacheRefresher.CacheUpdated += ContentCacheRefresherUpdated;
+            ContentCacheRefresher.CacheUpdated += ContentCacheRefresherUpdated;
             MediaCacheRefresher.CacheUpdated += MediaCacheRefresherUpdated;
             MemberCacheRefresher.CacheUpdated += MemberCacheRefresherUpdated;
 
@@ -90,16 +90,16 @@ namespace Umbraco.Web.Search
             // because, could not make sense of it?
 
             var contentIndexer = ExamineManager.Instance.IndexProviderCollection[Constants.Examine.InternalIndexer] as UmbracoContentIndexer;
-			if (contentIndexer != null)
-			{
-				contentIndexer.DocumentWriting += IndexerDocumentWriting;
-			}
-			var memberIndexer = ExamineManager.Instance.IndexProviderCollection[Constants.Examine.InternalMemberIndexer] as UmbracoMemberIndexer;
-			if (memberIndexer != null)
-			{
-				memberIndexer.DocumentWriting += IndexerDocumentWriting;
-			}
-		}
+            if (contentIndexer != null)
+            {
+                contentIndexer.DocumentWriting += IndexerDocumentWriting;
+            }
+            var memberIndexer = ExamineManager.Instance.IndexProviderCollection[Constants.Examine.InternalMemberIndexer] as UmbracoMemberIndexer;
+            if (memberIndexer != null)
+            {
+                memberIndexer.DocumentWriting += IndexerDocumentWriting;
+            }
+        }
 
         private static void RebuildIndexes(bool onlyEmptyIndexes)
         {
@@ -119,7 +119,7 @@ namespace Umbraco.Web.Search
         }
 
         static void MemberCacheRefresherUpdated(MemberCacheRefresher sender, CacheRefresherEventArgs args)
-	    {
+        {
             switch (args.MessageType)
             {
                 case MessageType.RefreshById:
@@ -158,22 +158,22 @@ namespace Umbraco.Web.Search
                     //We don't support these, these message types will not fire for unpublished content
                     break;
             }
-	    }
+        }
 
-	    static void MediaCacheRefresherUpdated(MediaCacheRefresher sender, CacheRefresherEventArgs args)
+        static void MediaCacheRefresherUpdated(MediaCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (args.MessageType != MessageType.RefreshByPayload)
                 throw new NotSupportedException();
 
             var mediaService = Current.Services.MediaService;
 
-	        foreach (var payload in (MediaCacheRefresher.JsonPayload[]) args.MessageObject)
-	        {
+            foreach (var payload in (MediaCacheRefresher.JsonPayload[]) args.MessageObject)
+            {
                 if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
-	            {
+                {
                     // remove from *all* indexes
-	                DeleteIndexForEntity(payload.Id, false);
-	            }
+                    DeleteIndexForEntity(payload.Id, false);
+                }
                 else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
                 {
                     // ExamineEvents does not support RefreshAll
@@ -182,7 +182,7 @@ namespace Umbraco.Web.Search
                 }
                 else // RefreshNode or RefreshBranch (maybe trashed)
                 {
-	                var media = mediaService.GetById(payload.Id);
+                    var media = mediaService.GetById(payload.Id);
                     if (media == null || media.Trashed)
                     {
                         // gone fishing, remove entirely
@@ -203,24 +203,24 @@ namespace Umbraco.Web.Search
                         }
                     }
                 }
-	        }
+            }
         }
 
-	    static void ContentCacheRefresherUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
-	    {
+        static void ContentCacheRefresherUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
+        {
             if (args.MessageType != MessageType.RefreshByPayload)
                 throw new NotSupportedException();
 
-	        var contentService = Current.Services.ContentService;
+            var contentService = Current.Services.ContentService;
 
-	        foreach (var payload in (ContentCacheRefresher.JsonPayload[]) args.MessageObject)
-	        {
+            foreach (var payload in (ContentCacheRefresher.JsonPayload[]) args.MessageObject)
+            {
                 if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
-	            {
+                {
                     // delete content entirely (with descendants)
                     //  false: remove entirely from all indexes
                     DeleteIndexForEntity(payload.Id, false);
-	            }
+                }
                 else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
                 {
                     // ExamineEvents does not support RefreshAll
@@ -229,10 +229,10 @@ namespace Umbraco.Web.Search
                 }
                 else // RefreshNode or RefreshBranch (maybe trashed)
                 {
-    	            // don't try to be too clever - refresh entirely
+                    // don't try to be too clever - refresh entirely
                     // there has to be race conds in there ;-(
 
-	                var content = contentService.GetById(payload.Id);
+                    var content = contentService.GetById(payload.Id);
                     if (content == null || content.Trashed)
                     {
                         // gone fishing, remove entirely from all indexes (with descendants)
@@ -286,8 +286,8 @@ namespace Umbraco.Web.Search
                 // ReIndexForContent is NOT taking care of descendants so we have to reload everything
                 //  again in order to process the branch - we COULD improve that by just reloading the
                 //  XML from database instead of reloading content & re-serializing!
-	        }
-	    }
+            }
+        }
 
         private static void ReIndexForContent(IContent content, IContent published)
         {
@@ -326,13 +326,13 @@ namespace Umbraco.Web.Search
         }
 
         private static void ReIndexForMember(IMember member)
-		{
-		    ExamineManager.Instance.ReIndexNode(
-		        member.ToXml(), IndexTypes.Member,
-		        ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
+        {
+            ExamineManager.Instance.ReIndexNode(
+                member.ToXml(), IndexTypes.Member,
+                ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
                     //ensure that only the providers are flagged to listen execute
-		            .Where(x => x.EnableDefaultEventHandler));
-		}
+                    .Where(x => x.EnableDefaultEventHandler));
+        }
 
         private static void ReIndexForMedia(IMedia sender, bool isMediaPublished)
         {
@@ -376,19 +376,19 @@ namespace Umbraco.Web.Search
         /// <param name="e"></param>
 
         private static void IndexerDocumentWriting(object sender, DocumentWritingEventArgs e)
-		{
-			if (e.Fields.Keys.Contains("nodeName"))
-			{
+        {
+            if (e.Fields.Keys.Contains("nodeName"))
+            {
                 //TODO: This logic should really be put into the content indexer instead of hidden here!!
 
-				//add the lower cased version
-				e.Document.Add(new Field("__nodeName",
-										e.Fields["nodeName"].ToLower(),
-										Field.Store.YES,
-										Field.Index.ANALYZED,
-										Field.TermVector.NO
-										));
-			}
-		}
-	}
+                //add the lower cased version
+                e.Document.Add(new Field("__nodeName",
+                                        e.Fields["nodeName"].ToLower(),
+                                        Field.Store.YES,
+                                        Field.Index.ANALYZED,
+                                        Field.TermVector.NO
+                                        ));
+            }
+        }
+    }
 }

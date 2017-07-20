@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Umbraco.Core.Models;
 using Relation = Umbraco.Web.Models.ContentEditing.Relation;
 using RelationType = Umbraco.Web.Models.ContentEditing.RelationType;

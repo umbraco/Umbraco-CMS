@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Web._Legacy.Controls;
 using Umbraco.Core;
 using Umbraco.Core.Services;
@@ -9,7 +9,7 @@ namespace umbraco.controls
 {
 
     public class ContentPicker : BaseTreePicker
-	{
+    {
 
         public ContentPicker()
         {
@@ -17,18 +17,18 @@ namespace umbraco.controls
             TreeAlias = "content";
         }
 
-		[Obsolete("Use Value property instead, this simply wraps it.")]
-		public string Text
-		{
-			get
-			{
+        [Obsolete("Use Value property instead, this simply wraps it.")]
+        public string Text
+        {
+            get
+            {
                 return this.Value;
-			}
+            }
             set
             {
                 this.Value = value;
             }
-		}
+        }
 
         public string AppAlias { get; set; }
         public string TreeAlias { get; set; }
@@ -68,5 +68,5 @@ namespace umbraco.controls
             catch { }
             return tempTitle;
         }
-	}
+    }
 }

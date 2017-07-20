@@ -10,8 +10,8 @@ namespace Umbraco.Web.Routing
     /// <summary>
     /// Provides utilities to handle domains.
     /// </summary>
-	public class DomainHelper
-	{
+    public class DomainHelper
+    {
         private readonly IDomainCache _domainCache;
 
         public DomainHelper(IDomainCache domainCache)
@@ -112,7 +112,7 @@ namespace Umbraco.Web.Routing
         {
             // sanitize the list to have proper uris for comparison (scheme, path end with /)
             // we need to end with / because example.com/foo cannot match example.com/foobar
-            // we need to order so example.com/foo matches before example.com/            
+            // we need to order so example.com/foo matches before example.com/
             var domainsAndUris = domains
                 .Where(d => d.IsWildcard == false)
                 //.Select(SanitizeForBackwardCompatibility)

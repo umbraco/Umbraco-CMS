@@ -22,7 +22,7 @@ namespace Umbraco.Core.Cache
         /// </summary>
         /// <param name="json">The json payload.</param>
         public virtual void Refresh(string json)
-        {            
+        {
             OnCacheUpdated(This, new CacheRefresherEventArgs(json, MessageType.RefreshByJson));
         }
     }

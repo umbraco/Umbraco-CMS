@@ -94,13 +94,13 @@ namespace Umbraco.Core.Services
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
         /// <param name="membershipUser"><see cref="IMember"/> or <see cref="IUser"/> to Delete</param>
         void Delete(T membershipUser);
-        
+
         /// <summary>
         /// Saves an <see cref="IMembershipUser"/>
         /// </summary>
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
         /// <param name="entity"><see cref="IMember"/> or <see cref="IUser"/> to Save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events. 
+        /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         void Save(T entity, bool raiseEvents = true);
 
@@ -109,7 +109,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
         /// <param name="entities"><see cref="IEnumerable{T}"/> to save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events. 
+        /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         void Save(IEnumerable<T> entities, bool raiseEvents = true);
 

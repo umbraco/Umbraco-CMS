@@ -1,4 +1,4 @@
-using Umbraco.Core.Models.EntityBase;
+﻿using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Cache
 {

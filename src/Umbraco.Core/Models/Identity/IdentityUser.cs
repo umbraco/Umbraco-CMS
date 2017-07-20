@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models.Identity
 
         /// <summary>
         /// Constructor
-        /// 
+        ///
         /// </summary>
         public IdentityUser()
         {

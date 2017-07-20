@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Factories
     // IMediaType (media types)
     // IMemberType (member types)
     //
-    internal class ContentTypeFactory 
+    internal class ContentTypeFactory
     {
         #region IContentType
 

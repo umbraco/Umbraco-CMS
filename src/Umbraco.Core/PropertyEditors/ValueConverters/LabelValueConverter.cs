@@ -9,7 +9,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     /// <remarks>
     /// Without a property converter defined for the label type, the value will be converted with
     /// the `ConvertUsingDarkMagic` method which will try to parse the value into it's correct type, but this
-    /// can cause issues if the string is detected as a number and then strips leading zeros. 
+    /// can cause issues if the string is detected as a number and then strips leading zeros.
     /// Example: http://issues.umbraco.org/issue/U4-7929
     /// </remarks>
     [DefaultPropertyValueConverter]

@@ -10,7 +10,7 @@ namespace Umbraco.Web.Mvc
 
     internal class SurfaceControllerTypeCollection : BuilderCollectionBase<Type>
     {
-        public SurfaceControllerTypeCollection(IEnumerable<Type> items) 
+        public SurfaceControllerTypeCollection(IEnumerable<Type> items)
             : base(items)
         { }
     }

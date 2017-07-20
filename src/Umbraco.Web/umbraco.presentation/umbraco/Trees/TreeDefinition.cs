@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Configuration;
 using System.Web;
@@ -13,8 +13,8 @@ namespace umbraco.cms.presentation.Trees
 {
 
     /// <summary>
-    /// Defines the entire structure of an application tree including it's Type, a reference to it's ApplicationTree object, and a reference 
-    /// to it's Application object. Tree Definitions are based on defining a database in the umbracoAppTree database. Any tree defined in this table 
+    /// Defines the entire structure of an application tree including it's Type, a reference to it's ApplicationTree object, and a reference
+    /// to it's Application object. Tree Definitions are based on defining a database in the umbracoAppTree database. Any tree defined in this table
     /// that is of an ITree type, it will be found and can be instantiated by this class. Any ITree that is not defined in the database will
     /// need to be instantiated with it's own tree constructor.
     /// </summary>
@@ -41,7 +41,7 @@ namespace umbraco.cms.presentation.Trees
         /// Returns a new instance of a BaseTree based on this Tree Definition
         /// </summary>
         public BaseTree CreateInstance()
-        {       
+        {
             //create the tree instance
             var typeInstance = CreateTreeInstance(m_treeType, m_app.Alias);
 

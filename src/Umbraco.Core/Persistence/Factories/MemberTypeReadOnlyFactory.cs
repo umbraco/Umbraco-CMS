@@ -7,7 +7,7 @@ using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class MemberTypeReadOnlyFactory 
+    internal class MemberTypeReadOnlyFactory
     {
         public IMemberType BuildEntity(MemberTypeReadOnlyDto dto, out bool needsSaving)
         {
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                 var propertyTypes = GetPropertyTypes(dto, memberType, standardPropertyTypes);
 
-                //By Convention we add 9 stnd PropertyTypes - This is only here to support loading of types that didn't have these conventions before.            
+                //By Convention we add 9 stnd PropertyTypes - This is only here to support loading of types that didn't have these conventions before.
                 foreach (var standardPropertyType in standardPropertyTypes)
                 {
                     if (dto.PropertyTypes.Any(x => x.Alias.Equals(standardPropertyType.Key))) continue;
@@ -112,7 +112,7 @@ namespace Umbraco.Core.Persistence.Factories
                         typeDto.Alias,
                         typeDto.DbType.EnumParse<DataTypeDatabaseType>(true),
                         standardProps);
-                    
+
                     var propertyType = new PropertyType(
                         typeDto.PropertyEditorAlias,
                         propDbType.Result,
@@ -186,7 +186,7 @@ namespace Umbraco.Core.Persistence.Factories
                     UpdateDate = dto.CreateDate,
                     Key = typeDto.UniqueId
                 };
-                
+
                 propertyTypes.Add(propertyType);
             }
             return propertyTypes;
@@ -196,6 +196,6 @@ namespace Umbraco.Core.Persistence.Factories
         {
             throw new System.NotImplementedException();
         }
-        
+
     }
 }

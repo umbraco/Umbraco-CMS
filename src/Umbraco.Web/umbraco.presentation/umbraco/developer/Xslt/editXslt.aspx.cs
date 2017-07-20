@@ -12,35 +12,35 @@ using Umbraco.Web.UI.Pages;
 
 namespace umbraco.cms.presentation.developer
 {
-	/// <summary>
-	/// Summary description for editXslt.
-	/// </summary>
+    /// <summary>
+    /// Summary description for editXslt.
+    /// </summary>
     [WebformsPageTreeAuthorize(Constants.Trees.Xslt)]
-	public partial class editXslt : UmbracoEnsuredPage
-	{
+    public partial class editXslt : UmbracoEnsuredPage
+    {
 
-		protected PlaceHolder buttons;
+        protected PlaceHolder buttons;
 
         protected MenuButton SaveButton;
 
-		protected void Page_Load(object sender, EventArgs e)
-		{
-			if (!IsPostBack)
-			{
-				string file = Request.QueryString["file"];
-				string path = BaseTree.GetTreePathFromFilePath(file);
-				ClientTools
-					.SetActiveTreeType(Constants.Trees.Xslt)
-					.SyncTree(path, false);
-			}
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                string file = Request.QueryString["file"];
+                string path = BaseTree.GetTreePathFromFilePath(file);
+                ClientTools
+                    .SetActiveTreeType(Constants.Trees.Xslt)
+                    .SyncTree(path, false);
+            }
 
 
 
-		}
+        }
 
-		protected override void OnInit(EventArgs e)
-		{			
-			base.OnInit(e);
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
 
             SaveButton = UmbracoPanel1.Menu.NewButton();
             SaveButton.ToolTip = "Save Xslt File";
@@ -56,147 +56,147 @@ namespace umbraco.cms.presentation.developer
             props.Controls.Add(pane2);
 
             var tmp = editorSource.Menu.NewIcon();
-			tmp.ImageURL = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/images/editor/insField.GIF";
-			tmp.OnClickCommand = ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/developer/xslt/xsltinsertvalueof.aspx?objectId=" + editorSource.ClientID, "Insert value", 750, 250);
-			//"umbracoInsertField(document.getElementById('editorSource'), 'xsltInsertValueOf', '','felt', 750, 230, '');";
-			tmp.AltText = "Insert xslt:value-of";
+            tmp.ImageURL = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/images/editor/insField.GIF";
+            tmp.OnClickCommand = ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/developer/xslt/xsltinsertvalueof.aspx?objectId=" + editorSource.ClientID, "Insert value", 750, 250);
+            //"umbracoInsertField(document.getElementById('editorSource'), 'xsltInsertValueOf', '','felt', 750, 230, '');";
+            tmp.AltText = "Insert xslt:value-of";
 
             editorSource.Menu.InsertSplitter();
 
             tmp = editorSource.Menu.NewIcon();
-			tmp.ImageURL = SystemDirectories.Umbraco + "/images/editor/insMemberItem.GIF";
-			tmp.OnClickCommand = "UmbEditor.Insert('<xsl:variable name=\"\" select=\"', '\"/>\\n', '" + editorSource.ClientID + "'); return false;";
-			tmp.AltText = "Insert xsl:variable";
+            tmp.ImageURL = SystemDirectories.Umbraco + "/images/editor/insMemberItem.GIF";
+            tmp.OnClickCommand = "UmbEditor.Insert('<xsl:variable name=\"\" select=\"', '\"/>\\n', '" + editorSource.ClientID + "'); return false;";
+            tmp.AltText = "Insert xsl:variable";
 
             editorSource.Menu.InsertSplitter();
 
             tmp = editorSource.Menu.NewIcon();
-			tmp.ImageURL = SystemDirectories.Umbraco + "/images/editor/insChildTemplateNew.GIF";
-			tmp.OnClickCommand = "UmbEditor.Insert('<xsl:if test=\"CONDITION\">\\n', '\\n</xsl:if>\\n', '" + editorSource.ClientID + "'); return false;";
-			tmp.AltText = "Insert xsl:if";
+            tmp.ImageURL = SystemDirectories.Umbraco + "/images/editor/insChildTemplateNew.GIF";
+            tmp.OnClickCommand = "UmbEditor.Insert('<xsl:if test=\"CONDITION\">\\n', '\\n</xsl:if>\\n', '" + editorSource.ClientID + "'); return false;";
+            tmp.AltText = "Insert xsl:if";
 
             tmp = editorSource.Menu.NewIcon();
-			tmp.ImageURL = SystemDirectories.Umbraco + "/images/editor/insChildTemplateNew.GIF";
-			tmp.OnClickCommand = "UmbEditor.Insert('<xsl:for-each select=\"QUERY\">\\n', '\\n</xsl:for-each>\\n', '" + editorSource.ClientID + "'); return false;";
-			tmp.AltText = "Insert xsl:for-each";
+            tmp.ImageURL = SystemDirectories.Umbraco + "/images/editor/insChildTemplateNew.GIF";
+            tmp.OnClickCommand = "UmbEditor.Insert('<xsl:for-each select=\"QUERY\">\\n', '\\n</xsl:for-each>\\n', '" + editorSource.ClientID + "'); return false;";
+            tmp.AltText = "Insert xsl:for-each";
 
             editorSource.Menu.InsertSplitter();
 
             tmp = editorSource.Menu.NewIcon();
-			tmp.ImageURL = SystemDirectories.Umbraco + "/images/editor/insFieldByLevel.GIF";
-			tmp.OnClickCommand = "UmbEditor.Insert('<xsl:choose>\\n<xsl:when test=\"CONDITION\">\\n', '\\n</xsl:when>\\n<xsl:otherwise>\\n</xsl:otherwise>\\n</xsl:choose>\\n', '" + editorSource.ClientID + "'); return false;";
-			tmp.AltText = "Insert xsl:choose";
+            tmp.ImageURL = SystemDirectories.Umbraco + "/images/editor/insFieldByLevel.GIF";
+            tmp.OnClickCommand = "UmbEditor.Insert('<xsl:choose>\\n<xsl:when test=\"CONDITION\">\\n', '\\n</xsl:when>\\n<xsl:otherwise>\\n</xsl:otherwise>\\n</xsl:choose>\\n', '" + editorSource.ClientID + "'); return false;";
+            tmp.AltText = "Insert xsl:choose";
 
             editorSource.Menu.InsertSplitter();
 
             tmp = editorSource.Menu.NewIcon();
-			tmp.ImageURL = SystemDirectories.Umbraco + "/images/editor/xslVisualize.GIF";
-			tmp.OnClickCommand = "xsltVisualize();";
-			tmp.AltText = "Visualize XSLT";
+            tmp.ImageURL = SystemDirectories.Umbraco + "/images/editor/xslVisualize.GIF";
+            tmp.OnClickCommand = "xsltVisualize();";
+            tmp.AltText = "Visualize XSLT";
 
 
-			// Add source and filename
-			var file = IOHelper.MapPath(SystemDirectories.Xslt + "/" + Request.QueryString["file"]);
+            // Add source and filename
+            var file = IOHelper.MapPath(SystemDirectories.Xslt + "/" + Request.QueryString["file"]);
 
-			// validate file
-			IOHelper.ValidateEditPath(file, SystemDirectories.Xslt);
-			// validate extension
-			IOHelper.ValidateFileExtension(file, new List<string>() { "xslt", "xsl" });
-
-
-			xsltFileName.Text = file.Replace(IOHelper.MapPath(SystemDirectories.Xslt), "").Substring(1).Replace(@"\", "/");
-
-			StreamReader SR;
-			string S;
-			SR = File.OpenText(file);
-
-			S = SR.ReadToEnd();
-			SR.Close();
-
-			editorSource.Text = S;
-		}
+            // validate file
+            IOHelper.ValidateEditPath(file, SystemDirectories.Xslt);
+            // validate extension
+            IOHelper.ValidateFileExtension(file, new List<string>() { "xslt", "xsl" });
 
 
-		protected override void OnPreRender(EventArgs e)
-		{
-			base.OnPreRender(e);
+            xsltFileName.Text = file.Replace(IOHelper.MapPath(SystemDirectories.Xslt), "").Substring(1).Replace(@"\", "/");
 
-			ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices) + "/codeEditorSave.asmx"));
-			ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices) + "/legacyAjaxCalls.asmx"));
-		}
+            StreamReader SR;
+            string S;
+            SR = File.OpenText(file);
+
+            S = SR.ReadToEnd();
+            SR.Close();
+
+            editorSource.Text = S;
+        }
 
 
-		/// <summary>
-		/// JsInclude1 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::ClientDependency.Core.Controls.JsInclude JsInclude1;
+        protected override void OnPreRender(EventArgs e)
+        {
+            base.OnPreRender(e);
 
-		/// <summary>
-		/// UmbracoPanel1 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::Umbraco.Web._Legacy.Controls.TabView UmbracoPanel1;
+            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices) + "/codeEditorSave.asmx"));
+            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices) + "/legacyAjaxCalls.asmx"));
+        }
 
-		/// <summary>
-		/// Pane1 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::Umbraco.Web._Legacy.Controls.Pane pane1;
+
+        /// <summary>
+        /// JsInclude1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude1;
+
+        /// <summary>
+        /// UmbracoPanel1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Umbraco.Web._Legacy.Controls.TabView UmbracoPanel1;
+
+        /// <summary>
+        /// Pane1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane1;
         protected global::Umbraco.Web._Legacy.Controls.Pane pane2;
 
-		/// <summary>
-		/// pp_filename control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_filename;
+        /// <summary>
+        /// pp_filename control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_filename;
 
-		/// <summary>
-		/// xsltFileName control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.WebControls.TextBox xsltFileName;
+        /// <summary>
+        /// xsltFileName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox xsltFileName;
 
-		/// <summary>
-		/// pp_errorMsg control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_errorMsg;
+        /// <summary>
+        /// pp_errorMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_errorMsg;
 
-		/// <summary>
-		/// editorSource control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::Umbraco.Web._Legacy.Controls.CodeArea editorSource;
+        /// <summary>
+        /// editorSource control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Umbraco.Web._Legacy.Controls.CodeArea editorSource;
 
-		/// <summary>
-		/// editorJs control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.WebControls.Literal editorJs;
-	}
+        /// <summary>
+        /// editorJs control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal editorJs;
+    }
 }

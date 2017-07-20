@@ -98,8 +98,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var dto = _modelFactory.BuildDto(group);
             var o = Database.IsNew(dto) ? Convert.ToInt32(Database.Insert(dto)) : Database.Update(dto);
             group.Id = dto.NodeId; //Set Id on entity to ensure an Id is set
-            
-            //Update with new correct path and id            
+
+            //Update with new correct path and id
             dto.Path = string.Concat("-1,", dto.NodeId);
             Database.Update(dto);
             //assign to entity
@@ -112,7 +112,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var dto = _modelFactory.BuildDto(entity);
 
             Database.Update(dto);
-            
+
             entity.ResetDirtyProperties();
         }
 
@@ -127,7 +127,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     return result.FirstOrDefault();
                 },
                 //cache for 5 mins since that is the default in the RuntimeCacheProvider
-                TimeSpan.FromMinutes(5), 
+                TimeSpan.FromMinutes(5),
                 //sliding is true
                 true);
         }
@@ -280,7 +280,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             foreach (var memberId in memberIds)
             {
-                //find any roles for the current member that are currently assigned that 
+                //find any roles for the current member that are currently assigned that
                 //exist in the roleNames list, then determine which ones are not currently assigned.
                 var mId = memberId;
                 var found = currentlyAssigned.Where(x => x.MemberId == mId).ToArray();

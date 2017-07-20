@@ -29,7 +29,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
             return m.Name.Replace("get_", "");
         }
 
-        // that would be the correct way of doing it, works in RELEASE mode 
+        // that would be the correct way of doing it, works in RELEASE mode
         // as well as DEBUG and is optimized, etc
         public string Resolve2([CallerMemberName] string memberName = null)
         {

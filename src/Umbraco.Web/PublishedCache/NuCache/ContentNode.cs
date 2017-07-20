@@ -146,7 +146,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 Node = this,
                 ContentTypeId = ContentType.Id,
-                
+
                 DraftData = ((PublishedContent) Draft)?._contentData,
                 PublishedData = ((PublishedContent) Published)?._contentData
             };

@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Benchmarks
         {
             public Config()
             {
-                Add(new MemoryDiagnoser());                
+                Add(new MemoryDiagnoser());
             }
         }
 
@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Benchmarks
             mapperCollection.Setup(x => x[It.IsAny<Type>()]).Returns(contentMapper);
             _mapperCollection = mapperCollection.Object;
         }
-        
+
         private readonly ISqlSyntaxProvider _syntaxProvider = new SqlCeSyntaxProvider();
         private readonly CachedExpression _cachedExpression;
         private readonly IMapperCollection _mapperCollection;
@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Benchmarks
 
                 var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(_syntaxProvider, _mapperCollection);
                 var result = modelToSqlExpressionHelper.Visit(predicate);
-            }            
+            }
         }
 
         [Benchmark]
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Benchmarks
                 var b = i * 10;
                 Expression<Func<IContent, bool>> predicate = content =>
                 content.Path.StartsWith("-1") && content.Published && (content.ContentTypeId == a || content.ContentTypeId == b);
-                
+
                 var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(_syntaxProvider, _mapperCollection);
 
                 //wrap it!

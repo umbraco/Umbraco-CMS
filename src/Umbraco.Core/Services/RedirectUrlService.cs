@@ -10,7 +10,7 @@ namespace Umbraco.Core.Services
 {
     internal class RedirectUrlService : ScopeRepositoryService, IRedirectUrlService
     {
-        public RedirectUrlService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory) 
+        public RedirectUrlService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, logger, eventMessagesFactory)
         { }
 
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Services
                 uow.Complete();
             }
         }
-        
+
         public void Delete(IRedirectUrl redirectUrl)
         {
             using (var uow = UowProvider.CreateUnitOfWork())

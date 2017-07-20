@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using NPoco;
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Install.InstallSteps
             var result = _databaseBuilder.ValidateDatabaseSchema();
             var determinedVersion = result.DetermineInstalledVersion();
 
-            return new InstallSetupResult("version7upgradereport", 
+            return new InstallSetupResult("version7upgradereport",
                 new
                 {
                     currentVersion = determinedVersion.ToString(),

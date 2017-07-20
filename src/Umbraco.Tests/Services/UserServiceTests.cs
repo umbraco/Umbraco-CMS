@@ -81,14 +81,14 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(2, permissions.ElementAt(1).AssignedPermissions.Count());
             Assert.AreEqual(1, permissions.ElementAt(2).AssignedPermissions.Count());
         }
-        
+
         [Test]
         public void Can_Delete_User()
         {
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
             var user = ServiceContext.UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io", userType);
-            
+
             ServiceContext.UserService.Delete(user, true);
             var deleted = ServiceContext.UserService.GetUserById(user.Id);
 
@@ -418,12 +418,12 @@ namespace Umbraco.Tests.Services
 
         [Test]
         public void Can_Remove_Section_From_All_Assigned_Users()
-        {            
+        {
             var userType = ServiceContext.UserService.GetUserTypeByAlias("admin");
 
             var user1 = ServiceContext.UserService.CreateUserWithIdentity("test1", "test1@test.com", userType);
             var user2 = ServiceContext.UserService.CreateUserWithIdentity("test2", "test2@test.com", userType);
-            
+
             //adds some allowed sections
             user1.AddAllowedSection("test");
             user2.AddAllowedSection("test");

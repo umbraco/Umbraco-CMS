@@ -19,7 +19,7 @@ namespace umbraco
     /// The codebehind class for the main default.aspx page that does the webforms rendering in Umbraco
     /// </summary>
     /// <remarks>
-    /// We would move this to the UI project but there is a public API property and some protected properties which people may be using so 
+    /// We would move this to the UI project but there is a public API property and some protected properties which people may be using so
     /// we cannot move it.
     /// </remarks>
     public class UmbracoDefault : Page
@@ -69,7 +69,7 @@ namespace umbraco
 
                     this.MasterPageFile = template.GetMasterPageName(_upage.Template);
 
-                    // reset the friendly path so it's used by forms, etc.			
+                    // reset the friendly path so it's used by forms, etc.
                     Context.RewritePath(UmbracoContext.Current.OriginalRequestUrl.PathAndQuery);
 
                     //fire the init finished event
@@ -95,7 +95,7 @@ namespace umbraco
                 var ctx = new ControllerContext(new HttpContextWrapper(Context), new RouteData(), new TempDataController());
                 provider.LoadTempData(ctx);
 
-                //This is only here for legacy if people arent' using master pages... 
+                //This is only here for legacy if people arent' using master pages...
                 //TODO: We need to test that this still works!! Or do we ??
                 if (!UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
                 {
@@ -130,7 +130,7 @@ namespace umbraco
             using (Current.ProfilingLogger.DebugDuration<UmbracoDefault>("Load"))
             {
                 base.OnLoad(e);
-                
+
                 if (ValidateRequest)
                     Request.ValidateInput();
             }

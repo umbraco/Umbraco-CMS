@@ -79,7 +79,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                             new RepositoryElement() {Name = "Umbraco package Repository", Id = new Guid("65194810-1f85-11dd-bd0b-0800200c9a66")}
                         };
 
-                    
+
                     _defaultRepositories = new RepositoriesElement()
                         {
                             Repositories = collection
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 var reposElement = (RepositoriesElement)base["repositories"];
                 if (reposElement.Repositories.All(x => x.Id != new Guid("65194810-1f85-11dd-bd0b-0800200c9a66")))
                 {
-                    reposElement.Repositories.Add(new RepositoryElement() { Name = "Umbraco package Repository", Id = new Guid("65194810-1f85-11dd-bd0b-0800200c9a66") });                    
+                    reposElement.Repositories.Add(new RepositoryElement() { Name = "Umbraco package Repository", Id = new Guid("65194810-1f85-11dd-bd0b-0800200c9a66") });
                 }
 
                 return reposElement;

@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// Defines the DataType Service, which is an easy access to operations involving <see cref="IDataTypeDefinition"/> 
+    /// Defines the DataType Service, which is an easy access to operations involving <see cref="IDataTypeDefinition"/>
     /// </summary>
     public interface IDataTypeService : IService
     {
@@ -138,6 +138,6 @@ namespace Umbraco.Core.Services
         string GetPreValueAsString(int id);
 
         Attempt<OperationStatus<MoveOperationStatusType>> Move(IDataTypeDefinition toMove, int parentId);
-        
+
     }
 }

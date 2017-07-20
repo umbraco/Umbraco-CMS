@@ -67,7 +67,7 @@ namespace Umbraco.Web.Editors
             var indention = Environment.NewLine + "\t\t\t\t\t\t";
 
             sb.Append("Model.Content.Site()");
-            
+
             var timer = new Stopwatch();
 
             timer.Start();
@@ -159,7 +159,7 @@ namespace Umbraco.Web.Editors
                     timer.Start();
 
                     //trial-run the tokenized clause to time the execution
-                    //for review - this uses a tonized query rather then the normal linq query. 
+                    //for review - this uses a tonized query rather then the normal linq query.
                     // fixme - that cannot work anymore now that we have killed dynamic support
                     //contents = contents.AsQueryable().Where(clause, model.Filters.Select(this.GetConstraintValue).ToArray());
                     throw new NotImplementedException();

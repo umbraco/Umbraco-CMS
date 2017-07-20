@@ -1,4 +1,4 @@
-using Umbraco.Core.Services;
+ï»¿using Umbraco.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -45,10 +45,10 @@ namespace umbraco.presentation.developer.packages
 
                 cp = new ContentPicker();
                 content.Controls.Add(cp);
-                
+
                 if (string.IsNullOrEmpty(pack.PackagePath) == false)
                 {
-                    packageUmbFile.Text = " &nbsp; <a href='" + Page.ResolveClientUrl(pack.PackagePath) + "'>Download</a>";                    
+                    packageUmbFile.Text = " &nbsp; <a href='" + Page.ResolveClientUrl(pack.PackagePath) + "'>Download</a>";
                 }
                 else
                 {
@@ -203,7 +203,7 @@ namespace umbraco.presentation.developer.packages
 
                 try
                 {
-                    //we try to load an xml document with the potential malformed xml to ensure that this is actual action xml... 
+                    //we try to load an xml document with the potential malformed xml to ensure that this is actual action xml...
                     XmlDocument xd = new XmlDocument();
                     xd.LoadXml(actions);
                     e.IsValid = true;
@@ -383,13 +383,13 @@ namespace umbraco.presentation.developer.packages
             {
                 string tmpFFFF = ((TextBox)rItem.FindControl("packageFilePath")).Text;
                 if (tmpFFFF.Trim() != "")
-                    tmpFilePathString += tmpFFFF + "¤";
+                    tmpFilePathString += tmpFFFF + "ï¿½";
             }
 
             cms.businesslogic.packager.CreatedPackage createdPackage = cms.businesslogic.packager.CreatedPackage.GetById(int.Parse(Request.QueryString["id"]));
             cms.businesslogic.packager.PackageInstance pack = createdPackage.Data;
 
-            pack.Files = new List<string>(tmpFilePathString.Trim('¤').Split('¤'));
+            pack.Files = new List<string>(tmpFilePathString.Trim('ï¿½').Split('ï¿½'));
             pack.Files.TrimExcess();
 
             createdPackage.Save();

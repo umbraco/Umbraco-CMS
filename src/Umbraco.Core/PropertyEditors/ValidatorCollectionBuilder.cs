@@ -10,7 +10,7 @@ namespace Umbraco.Core.PropertyEditors
 {
     internal class ValidatorCollectionBuilder : LazyCollectionBuilderBase<ValidatorCollectionBuilder, ValidatorCollection, ManifestValueValidator>
     {
-        public ValidatorCollectionBuilder(IServiceContainer container) 
+        public ValidatorCollectionBuilder(IServiceContainer container)
             : base(container)
         { }
 

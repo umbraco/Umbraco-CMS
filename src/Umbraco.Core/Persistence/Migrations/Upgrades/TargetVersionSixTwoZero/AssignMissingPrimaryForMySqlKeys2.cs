@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.0.0", "6.2.0", 0, Constants.System.UmbracoMigrationName)]
     public class AssignMissingPrimaryForMySqlKeys2 : MigrationBase
     {
-        public AssignMissingPrimaryForMySqlKeys2(IMigrationContext context) 
+        public AssignMissingPrimaryForMySqlKeys2(IMigrationContext context)
             : base(context)
         { }
 

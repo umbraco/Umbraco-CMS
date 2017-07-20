@@ -21,7 +21,7 @@ namespace UmbracoExamine
     /// XSLT extensions will ONLY work for provider that have a base class of BaseUmbracoIndexer
     /// </remarks>
     [XsltExtension("Examine")]
-    
+
     public class XsltExtensions
     {
         ///<summary>
@@ -37,7 +37,7 @@ namespace UmbracoExamine
             if (provider == null) throw new ArgumentNullException("provider");
 
             var results = provider.Search(searchText, useWildcards, indexType);
-            return GetResultsAsXml(results);            
+            return GetResultsAsXml(results);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace UmbracoExamine
         /// <returns></returns>
         public static XPathNodeIterator Search(string searchText, bool useWildcards, string providerName)
         {
-            return Search(searchText, useWildcards, providerName, string.Empty);         
+            return Search(searchText, useWildcards, providerName, string.Empty);
         }
 
         /// <summary>

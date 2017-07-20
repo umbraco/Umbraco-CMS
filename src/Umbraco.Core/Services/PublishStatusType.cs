@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Services
+﻿namespace Umbraco.Core.Services
 {
     /// <summary>
     /// A value indicating the result of publishing a content item.
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Services
         FailedHasExpired = 12,
 
         /// <summary>
-        /// The content item is scheduled to be released in the future and therefore we cannot force it to 
+        /// The content item is scheduled to be released in the future and therefore we cannot force it to
         /// be published during a bulk publish operation.
         /// </summary>
         FailedAwaitingRelease = 13,

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,52 +15,52 @@ using Umbraco.Core.Models.EntityBase;
 namespace Umbraco.Tests.TestHelpers
 {
     /// <summary>
-	/// Common helper properties and methods useful to testing
-	/// </summary>
-	public static class TestHelper
-	{
+    /// Common helper properties and methods useful to testing
+    /// </summary>
+    public static class TestHelper
+    {
 
-		
 
-		/// <summary>
-		/// Gets the current assembly directory.
-		/// </summary>
-		/// <value>The assembly directory.</value>
-		static public string CurrentAssemblyDirectory
-		{
-			get
-			{
-				var codeBase = typeof(TestHelper).Assembly.CodeBase;
-				var uri = new Uri(codeBase);
-				var path = uri.LocalPath;
-				return Path.GetDirectoryName(path);
-			}
-		}
 
-		/// <summary>
-		/// Maps the given <paramref name="relativePath"/> making it rooted on <see cref="CurrentAssemblyDirectory"/>. <paramref name="relativePath"/> must start with <code>~/</code>
-		/// </summary>
-		/// <param name="relativePath">The relative path.</param>
-		/// <returns></returns>
-		public static string MapPathForTest(string relativePath)
-		{
-			if (!relativePath.StartsWith("~/"))
-				throw new ArgumentException("relativePath must start with '~/'", "relativePath");
+        /// <summary>
+        /// Gets the current assembly directory.
+        /// </summary>
+        /// <value>The assembly directory.</value>
+        static public string CurrentAssemblyDirectory
+        {
+            get
+            {
+                var codeBase = typeof(TestHelper).Assembly.CodeBase;
+                var uri = new Uri(codeBase);
+                var path = uri.LocalPath;
+                return Path.GetDirectoryName(path);
+            }
+        }
 
-			return relativePath.Replace("~/", CurrentAssemblyDirectory + "/");
-		}
+        /// <summary>
+        /// Maps the given <paramref name="relativePath"/> making it rooted on <see cref="CurrentAssemblyDirectory"/>. <paramref name="relativePath"/> must start with <code>~/</code>
+        /// </summary>
+        /// <param name="relativePath">The relative path.</param>
+        /// <returns></returns>
+        public static string MapPathForTest(string relativePath)
+        {
+            if (!relativePath.StartsWith("~/"))
+                throw new ArgumentException("relativePath must start with '~/'", "relativePath");
 
-	    public static void InitializeContentDirectories()
+            return relativePath.Replace("~/", CurrentAssemblyDirectory + "/");
+        }
+
+        public static void InitializeContentDirectories()
         {
             CreateDirectories(new[] { SystemDirectories.Masterpages, SystemDirectories.MvcViews, SystemDirectories.Media, SystemDirectories.AppPlugins });
         }
 
-	    public static void CleanContentDirectories()
-	    {
-	        CleanDirectories(new[] { SystemDirectories.Masterpages, SystemDirectories.MvcViews, SystemDirectories.Media });
-	    }
+        public static void CleanContentDirectories()
+        {
+            CleanDirectories(new[] { SystemDirectories.Masterpages, SystemDirectories.MvcViews, SystemDirectories.Media });
+        }
 
-	    public static void CreateDirectories(string[] directories)
+        public static void CreateDirectories(string[] directories)
         {
             foreach (var directory in directories)
             {
@@ -70,13 +70,13 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-	    public static void CleanDirectories(string[] directories)
-	    {
-	        var preserves = new Dictionary<string, string[]>
-	        {
-	            { SystemDirectories.Masterpages, new[] {"dummy.txt"} },
-	            { SystemDirectories.MvcViews, new[] {"dummy.txt"} }
-	        };
+        public static void CleanDirectories(string[] directories)
+        {
+            var preserves = new Dictionary<string, string[]>
+            {
+                { SystemDirectories.Masterpages, new[] {"dummy.txt"} },
+                { SystemDirectories.MvcViews, new[] {"dummy.txt"} }
+            };
             foreach (var directory in directories)
             {
                 var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
@@ -86,7 +86,7 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-	    public static void CleanUmbracoSettingsConfig()
+        public static void CleanUmbracoSettingsConfig()
         {
             var currDir = new DirectoryInfo(CurrentAssemblyDirectory);
 
@@ -150,7 +150,7 @@ namespace Umbraco.Tests.TestHelpers
                         return enumerable;
                     }
                 };
-            }          
+            }
 
             var actualListEx = sorter(actualList).Cast<object>().ToList();
             var expectedListEx = sorter(expectedList).Cast<object>().ToList();

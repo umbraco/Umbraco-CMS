@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 1, Constants.System.UmbracoMigrationName)]
     public class UpdateControlIdToPropertyEditorAlias : MigrationBase
     {
-        public UpdateControlIdToPropertyEditorAlias(IMigrationContext context) 
+        public UpdateControlIdToPropertyEditorAlias(IMigrationContext context)
             : base(context)
         { }
 

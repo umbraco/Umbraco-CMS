@@ -9,10 +9,10 @@
 //------------------------------------------------------------------------------
 
 namespace umbraco.presentation.dialogs {
-    
-    
+
+
     public partial class Preview {
-        
+
         /// <summary>
         /// feedback1 control.
         /// </summary>
@@ -21,7 +21,7 @@ namespace umbraco.presentation.dialogs {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Umbraco.Web._Legacy.Controls.Feedback feedback1;
-        
+
         /// <summary>
         /// pane_form control.
         /// </summary>
@@ -30,7 +30,7 @@ namespace umbraco.presentation.dialogs {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Umbraco.Web._Legacy.Controls.Pane pane_form;
-        
+
         /// <summary>
         /// PropertyPanel1 control.
         /// </summary>
@@ -39,7 +39,7 @@ namespace umbraco.presentation.dialogs {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel1;
-        
+
         /// <summary>
         /// docLit control.
         /// </summary>
@@ -48,7 +48,7 @@ namespace umbraco.presentation.dialogs {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal docLit;
-        
+
         /// <summary>
         /// PropertyPanel2 control.
         /// </summary>
@@ -57,7 +57,7 @@ namespace umbraco.presentation.dialogs {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel2;
-        
+
         /// <summary>
         /// changeSetUrl control.
         /// </summary>

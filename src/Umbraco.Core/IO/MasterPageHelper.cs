@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -58,8 +58,8 @@ namespace Umbraco.Core.IO
 
                 using (var ms = new MemoryStream(withBom))
                 {
-                    _masterPageFileSystem.AddFile(filePath, ms, true);    
-                }                
+                    _masterPageFileSystem.AddFile(filePath, ms, true);
+                }
             }
             else
             {
@@ -67,7 +67,7 @@ namespace Umbraco.Core.IO
                 using (var tr = new StreamReader(s, Encoding.UTF8))
                 {
                     masterpageContent = tr.ReadToEnd();
-                    tr.Close();    
+                    tr.Close();
                 }
             }
 
@@ -83,7 +83,7 @@ namespace Umbraco.Core.IO
         //        using (var tr = new StreamReader(s))
         //        {
         //            masterpageContent = tr.ReadToEnd();
-        //            tr.Close();    
+        //            tr.Close();
         //        }
         //    }
 
@@ -197,7 +197,7 @@ namespace Umbraco.Core.IO
         private void UpdateChildTemplates(ITemplate template, string currentAlias, ITemplateRepository templateRepo)
         {
             //if we have a Old Alias if the alias and therefor the masterpage file name has changed...
-            //so before we save the new masterfile, we'll clear the old one, so we don't up with 
+            //so before we save the new masterfile, we'll clear the old one, so we don't up with
             //Unused masterpage files
             if (string.IsNullOrEmpty(currentAlias) == false && currentAlias != template.Alias)
             {
@@ -281,7 +281,7 @@ namespace Umbraco.Core.IO
         //    }
 
         //    //we have a Old Alias if the alias and therefor the masterpage file name has changed...
-        //    //so before we save the new masterfile, we'll clear the old one, so we don't up with 
+        //    //so before we save the new masterfile, we'll clear the old one, so we don't up with
         //    //Unused masterpage files
         //    if (string.IsNullOrEmpty(currentAlias) == false && currentAlias != template.Alias)
         //    {
@@ -295,7 +295,7 @@ namespace Umbraco.Core.IO
         //                UpdateMasterPageFile(t, null, templateRepo);
         //        }
 
-        //        //then kill the old file.. 
+        //        //then kill the old file..
         //        var oldFile = GetFilePath(currentAlias);
         //        if (_masterPageFileSystem.FileExists(oldFile))
         //            _masterPageFileSystem.DeleteFile(oldFile);

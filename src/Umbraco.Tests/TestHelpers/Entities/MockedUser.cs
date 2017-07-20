@@ -39,7 +39,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             else
             {
                 user.AddAllowedSection("content");
-                user.AddAllowedSection("media");    
+                user.AddAllowedSection("media");
             }
 
             return user;
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             {
                 var name = "Member No-" + i;
                 var user = new User(name, "test" + i + "@test.com", "test" + i, "test" + i, userType);
-                
+
                 if (onCreating != null)
                 {
                     onCreating(i, user);

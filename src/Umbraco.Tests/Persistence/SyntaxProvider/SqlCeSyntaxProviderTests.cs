@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
                             .InnerJoin<NodeDto>()
                             .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                             .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
-            
+
             var sqlOutput = SqlContext.SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
 
             Assert.AreEqual(@"DELETE FROM [cmsContentXml] WHERE [nodeId] IN (SELECT [nodeId] FROM (SELECT DISTINCT cmsContentXml.nodeId
@@ -74,7 +74,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         public void Format_SqlServer_NonClusteredIndexDefinition_AddsNonClusteredDirective()
         {
             var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null));
-            
+
             var indexDefinition = CreateIndexDefinition();
             indexDefinition.IndexType = IndexTypes.NonClustered;
 
@@ -167,6 +167,6 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
                 TableName = "TheTable",
                 SchemaName = "dbo"
             };
-        }        
+        }
     }
 }

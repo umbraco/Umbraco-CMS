@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Linq;
 using System.Net.Http;
@@ -20,7 +20,7 @@ namespace Umbraco.Web.Editors
     /// <remarks>
     /// As an example, lets say we have 2 methods: GetChildren(int id) and GetChildren(Guid id), by default Web Api won't allow this since
     /// it won't know what to select, but if this Tuple is passed in new Tuple{string, string}("GetChildren", "id")
-    /// 
+    ///
     /// This supports POST values too however only for JSON values
     /// </remarks>
     internal class ParameterSwapControllerActionSelector : ApiControllerActionSelector
@@ -110,7 +110,7 @@ namespace Umbraco.Web.Editors
             }
 
             if (requestParam != null)
-            {   
+            {
                 foreach (var paramType in paramTypes)
                 {
                     //check if this is IEnumerable and if so this will get it's type

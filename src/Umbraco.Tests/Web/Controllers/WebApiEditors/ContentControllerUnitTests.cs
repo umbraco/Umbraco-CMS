@@ -48,11 +48,11 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             var contentServiceMock = new Mock<IContentService>();
             contentServiceMock.Setup(x => x.GetById(0)).Returns(content);
             var contentService = contentServiceMock.Object;
-            var userServiceMock = new Mock<IUserService>();    
+            var userServiceMock = new Mock<IUserService>();
             var permissions = new List<EntityPermission>();
             userServiceMock.Setup(x => x.GetPermissions(user, 1234)).Returns(permissions);
             var userService = userServiceMock.Object;
-            
+
             //act/assert
             Assert.Throws<HttpResponseException>(() => ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, new[] { 'F' }));
         }
@@ -71,7 +71,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             var contentServiceMock = new Mock<IContentService>();
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
-            var userServiceMock = new Mock<IUserService>();    
+            var userServiceMock = new Mock<IUserService>();
             var permissions = new List<EntityPermission>();
             userServiceMock.Setup(x => x.GetPermissions(user, 1234)).Returns(permissions);
             var userService = userServiceMock.Object;
@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             var contentServiceMock = new Mock<IContentService>();
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
-            var userServiceMock = new Mock<IUserService>();    
+            var userServiceMock = new Mock<IUserService>();
             var permissions = new List<EntityPermission>
                 {
                     new EntityPermission(9, 1234, new string[]{ "A", "B", "C" })
@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             var contentServiceMock = new Mock<IContentService>();
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
-            var userServiceMock = new Mock<IUserService>();    
+            var userServiceMock = new Mock<IUserService>();
             var permissions = new List<EntityPermission>
                 {
                     new EntityPermission(9, 1234, new string[]{ "A", "F", "C" })
@@ -149,7 +149,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             userMock.Setup(u => u.Id).Returns(0);
             userMock.Setup(u => u.StartContentId).Returns(-1);
             var user = userMock.Object;
-            
+
             //act
             var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, null, null, -1);
 
@@ -165,7 +165,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
             userMock.Setup(u => u.Id).Returns(0);
             userMock.Setup(u => u.StartContentId).Returns(-1);
             var user = userMock.Object;
-            
+
             //act
             var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, null, null, -20);
 
@@ -359,7 +359,7 @@ namespace Umbraco.Tests.Web.Controllers.WebApiEditors
 
     //            var result = await client.SendAsync(request);
     //        }
-             
+
     //    }
 
     //}

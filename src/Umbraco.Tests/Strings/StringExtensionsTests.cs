@@ -13,13 +13,13 @@ namespace Umbraco.Tests.Strings
     [TestFixture]
     public class StringExtensionsTests : UmbracoTestBase
     {
-	    public override void SetUp()
-	    {
+        public override void SetUp()
+        {
             base.SetUp();
 
             // fixme - in "compose"?
             Container.RegisterSingleton<IShortStringHelper>(_ => new MockShortStringHelper());
-	    }
+        }
 
         [Test]
         public void CurrentHelper()
@@ -63,36 +63,36 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual(stripped, result);
         }
 
-	    [TestCase("This is a string to encrypt")]
-		[TestCase("This is a string to encrypt\nThis is a second line")]
-		[TestCase("    White space is preserved    ")]
-		[TestCase("\nWhite space is preserved\n")]
-		public void Encrypt_And_Decrypt(string input)
-		{
-			var encrypted = input.EncryptWithMachineKey();
-			var decrypted = encrypted.DecryptWithMachineKey();
-			Assert.AreNotEqual(input, encrypted);
-			Assert.AreEqual(input, decrypted);
-		}
+        [TestCase("This is a string to encrypt")]
+        [TestCase("This is a string to encrypt\nThis is a second line")]
+        [TestCase("    White space is preserved    ")]
+        [TestCase("\nWhite space is preserved\n")]
+        public void Encrypt_And_Decrypt(string input)
+        {
+            var encrypted = input.EncryptWithMachineKey();
+            var decrypted = encrypted.DecryptWithMachineKey();
+            Assert.AreNotEqual(input, encrypted);
+            Assert.AreEqual(input, decrypted);
+        }
 
-		[Test()]
-		public void Encrypt_And_Decrypt_Long_Value()
-		{
-			// Generate a really long string
-			char[] chars = { 'a', 'b', 'c', '1', '2', '3', '\n' };
+        [Test()]
+        public void Encrypt_And_Decrypt_Long_Value()
+        {
+            // Generate a really long string
+            char[] chars = { 'a', 'b', 'c', '1', '2', '3', '\n' };
 
-			string valueToTest = string.Empty;
+            string valueToTest = string.Empty;
 
-			// Create a string 7035 chars long
-			for (int i = 0; i < 1005; i++)
-				for (int j = 0; j < chars.Length; j++)
-					valueToTest += chars[j].ToString();
+            // Create a string 7035 chars long
+            for (int i = 0; i < 1005; i++)
+                for (int j = 0; j < chars.Length; j++)
+                    valueToTest += chars[j].ToString();
 
-			var encrypted = valueToTest.EncryptWithMachineKey();
-			var decrypted = encrypted.DecryptWithMachineKey();
-			Assert.AreNotEqual(valueToTest, encrypted);
-			Assert.AreEqual(valueToTest, decrypted);
-		}
+            var encrypted = valueToTest.EncryptWithMachineKey();
+            var decrypted = encrypted.DecryptWithMachineKey();
+            Assert.AreNotEqual(valueToTest, encrypted);
+            Assert.AreEqual(valueToTest, decrypted);
+        }
 
         [TestCase("Hello this is my string", " string", "Hello this is my")]
         [TestCase("Hello this is my string strung", " string", "Hello this is my string strung")]

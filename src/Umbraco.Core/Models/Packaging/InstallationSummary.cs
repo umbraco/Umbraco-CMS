@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models.Packaging
         public IEnumerable<PackageAction> Actions { get; set; }
         public bool PackageInstalled { get; set; }
     }
-    
+
     internal static class InstallationSummaryExtentions
     {
         public static InstallationSummary InitEmpty(this InstallationSummary summary)

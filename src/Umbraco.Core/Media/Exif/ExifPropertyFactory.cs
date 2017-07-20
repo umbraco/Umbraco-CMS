@@ -204,7 +204,7 @@ namespace Umbraco.Core.Media.Exif
                 else
                     return new ExifByteArray(etag, value);
             }
-            else if (type == 2) // 2 = ASCII An 8-bit byte containing one 7-bit ASCII code. 
+            else if (type == 2) // 2 = ASCII An 8-bit byte containing one 7-bit ASCII code.
             {
                 return new ExifAscii(etag, ExifBitConverter.ToAscii(value, encoding), encoding);
             }

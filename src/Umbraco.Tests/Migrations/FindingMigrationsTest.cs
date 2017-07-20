@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Migrations
             }
 
             Assert.That(list.Count, Is.EqualTo(3));
-            
+
             foreach (var migration1 in list)
             {
                 var migration = (MigrationBase) migration1;

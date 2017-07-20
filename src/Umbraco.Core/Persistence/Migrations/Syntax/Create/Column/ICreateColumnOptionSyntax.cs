@@ -2,6 +2,6 @@
 {
     public interface ICreateColumnOptionSyntax : IColumnOptionSyntax<ICreateColumnOptionSyntax, ICreateColumnOptionForeignKeyCascadeSyntax>
     {
-         
+
     }
 }

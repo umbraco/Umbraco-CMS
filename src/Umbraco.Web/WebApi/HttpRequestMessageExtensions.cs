@@ -16,7 +16,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.WebApi
 {
-    
+
     public static class HttpRequestMessageExtensions
     {
 
@@ -28,8 +28,8 @@ namespace Umbraco.Web.WebApi
         internal static Attempt<IOwinContext> TryGetOwinContext(this HttpRequestMessage request)
         {
             var httpContext = request.TryGetHttpContext();
-            return httpContext 
-                ? Attempt.Succeed(httpContext.Result.GetOwinContext()) 
+            return httpContext
+                ? Attempt.Succeed(httpContext.Result.GetOwinContext())
                 : Attempt<IOwinContext>.Fail();
         }
 

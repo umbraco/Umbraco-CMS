@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json.Linq;
@@ -51,7 +51,7 @@ namespace Umbraco.Core.Configuration.Grid
                         }
                     }
 
-                    
+
                     var builder = new ManifestBuilder(_runtimeCache, parser);
                     foreach (var gridEditor in builder.GridEditors)
                     {
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Configuration.Grid
 
                 return result;
             }
-            
+
         }
     }
 }

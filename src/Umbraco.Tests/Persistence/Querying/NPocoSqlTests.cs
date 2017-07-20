@@ -12,7 +12,7 @@ namespace Umbraco.Tests.Persistence.Querying
     [TestFixture]
     public class NPocoSqlTests : BaseUsingSqlCeSyntax
     {
-        //x => 
+        //x =>
 
         [Test]
         public void Where_Clause_With_Starts_With_Additional_Parameters()
@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (upper([umbracoNode].[path]) LIKE upper(@0))", sql.SQL.Replace("\n", " "));
             Assert.AreEqual(1, sql.Arguments.Length);
-            Assert.AreEqual(content.Path + "%", sql.Arguments[0]);        
+            Assert.AreEqual(content.Path + "%", sql.Arguments[0]);
         }
 
         [Test]

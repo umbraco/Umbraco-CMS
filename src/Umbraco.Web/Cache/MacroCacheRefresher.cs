@@ -11,7 +11,7 @@ namespace Umbraco.Web.Cache
 {
     public sealed class MacroCacheRefresher : JsonCacheRefresherBase<MacroCacheRefresher>
     {
-        public MacroCacheRefresher(CacheHelper cacheHelper) 
+        public MacroCacheRefresher(CacheHelper cacheHelper)
             : base(cacheHelper)
         { }
 
@@ -61,7 +61,7 @@ namespace Umbraco.Web.Cache
 
             base.Refresh(json);
         }
-        
+
         #endregion
 
         #region Json

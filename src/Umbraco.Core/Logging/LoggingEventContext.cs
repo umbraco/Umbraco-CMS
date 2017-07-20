@@ -1,4 +1,4 @@
-using log4net.Core;
+﻿using log4net.Core;
 
 namespace Umbraco.Core.Logging
 {

@@ -29,7 +29,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Length(100)]
         public string Group { get; set; }//NOTE Is set to [varchar] (100) in Sql Server script
 
-        [ResultColumn("NodeCount")]        
+        [ResultColumn("NodeCount")]
         public int NodeCount { get; set; }
     }
 }

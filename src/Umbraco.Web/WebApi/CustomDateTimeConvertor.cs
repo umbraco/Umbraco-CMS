@@ -12,7 +12,7 @@ namespace Umbraco.Web.WebApi
     internal class CustomDateTimeConvertor : IsoDateTimeConverter
     {
         private readonly string _dateTimeFormat;
-        
+
         public CustomDateTimeConvertor(string dateTimeFormat)
         {
             if (string.IsNullOrEmpty(dateTimeFormat)) throw new ArgumentNullOrEmptyException(nameof(dateTimeFormat));

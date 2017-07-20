@@ -122,7 +122,7 @@ namespace Umbraco.Web.Search
         /// If the index does not exist we'll consider it locked
         /// </remarks>
         public static bool IsIndexLocked(this LuceneIndexer indexer)
-        {   
+        {
             return indexer.IndexExists() == false
                    || IndexWriter.IsLocked(indexer.GetLuceneDirectory());
         }

@@ -16,7 +16,7 @@ using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web
 {
-    
+
     public static class GridTemplateExtensions
     {
         public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedProperty property, string framework = "bootstrap3")
@@ -110,7 +110,7 @@ namespace Umbraco.Web
         {
             if (string.IsNullOrWhiteSpace(propertyAlias)) throw new ArgumentNullOrEmptyException(nameof(propertyAlias));
 
-            return GetGridHtml(contentItem, propertyAlias, "bootstrap3");    
+            return GetGridHtml(contentItem, propertyAlias, "bootstrap3");
         }
 
         [Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
@@ -144,7 +144,7 @@ namespace Umbraco.Web
         private class FakeView : IView
         {
             public void Render(ViewContext viewContext, TextWriter writer)
-            {                
+            {
             }
         }
     }

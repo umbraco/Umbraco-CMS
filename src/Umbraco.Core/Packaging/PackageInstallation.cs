@@ -31,12 +31,12 @@ namespace Umbraco.Core.Packaging
         public PackageInstallation(IPackagingService packagingService, IMacroService macroService,
             IFileService fileService, IPackageExtraction packageExtraction, string fullPathToRoot)
         {
-            if (packageExtraction != null) _packageExtraction = packageExtraction; 
+            if (packageExtraction != null) _packageExtraction = packageExtraction;
             else throw new ArgumentNullException("packageExtraction");
-            
+
             if (macroService != null) _macroService = macroService;
             else throw new ArgumentNullException("macroService");
-            
+
             if (fileService != null) _fileService = fileService;
             else throw new ArgumentNullException("fileService");
 
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Packaging
 
             _fullPathToRoot = fullPathToRoot;
         }
-        
+
         public IConflictingPackageData ConflictingPackageData
         {
             private get
@@ -77,7 +77,7 @@ namespace Umbraco.Core.Packaging
                 _fullPathToRoot = value;
             }
         }
-        
+
         public MetaData GetMetaData(string packageFilePath)
         {
             try
@@ -119,7 +119,7 @@ namespace Umbraco.Core.Packaging
             XElement actions;
             MetaData metaData;
             InstallationSummary installationSummary;
-            
+
             try
             {
                 XElement rootElement = GetConfigXmlElement(packageFile);
@@ -171,8 +171,8 @@ namespace Umbraco.Core.Packaging
                 var stylesheetsInstalled = EmptyEnumerableIfNull<IFile>(styleSheets) ?? InstallStylesheets(styleSheets);
                 installationSummary.StylesheetsInstalled = stylesheetsInstalled;
 
-                var documentsInstalled = documents != null ? InstallDocuments(documents, userId) 
-                    : EmptyEnumerableIfNull<IContent>(documentSet) 
+                var documentsInstalled = documents != null ? InstallDocuments(documents, userId)
+                    : EmptyEnumerableIfNull<IContent>(documentSet)
                     ?? InstallDocuments(documentSet, userId);
                 installationSummary.ContentInstalled = documentsInstalled;
 
@@ -288,7 +288,7 @@ namespace Umbraco.Core.Packaging
 
                     var packageAction = new PackageAction
                     {
-                        XmlData = elemet, 
+                        XmlData = elemet,
                         Alias = aliasAttr.Value,
                         PackageName = packageName,
                     };
@@ -371,7 +371,7 @@ namespace Umbraco.Core.Packaging
             sourceDestination = AppendRootToDestination(FullPathToRoot, sourceDestination);
 
             _packageExtraction.CopyFilesFromArchive(packageFilePath, sourceDestination);
-            
+
             return sourceDestination.Select(sd => sd.Value).ToArray();
         }
 
@@ -430,7 +430,7 @@ namespace Umbraco.Core.Packaging
             XElement styleSheets = rootElement.Element(Constants.Packaging.StylesheetsNodeName);
             XElement templates = rootElement.Element(Constants.Packaging.TemplatesNodeName);
             XElement alias = rootElement.Element(Constants.Packaging.MacrosNodeName);
-            
+
             var sourceDestination = EmptyArrayIfNull<KeyValuePair<string, string>>(files) ?? ExtractSourceDestinationFileInformation(files);
 
             var installWarnings = new PreInstallWarnings();
@@ -443,10 +443,10 @@ namespace Umbraco.Core.Packaging
 
             var stylesheetNames = EmptyEnumerableIfNull<IFile>(styleSheets) ?? ConflictingPackageData.FindConflictingStylesheets(styleSheets);
             installWarnings.ConflictingStylesheetNames = stylesheetNames;
-            
+
             installWarnings.UnsecureFiles = FindUnsecureFiles(sourceDestination);
             installWarnings.FilesReplaced = FindFilesToBeReplaced(sourceDestination);
-            
+
             return installWarnings;
         }
 
@@ -454,7 +454,7 @@ namespace Umbraco.Core.Packaging
         {
             return sourceDestination.Where(sd => File.Exists(Path.Combine(FullPathToRoot, sd.Value))).ToArray();
         }
-        
+
         private KeyValuePair<string, string>[] FindUnsecureFiles(IEnumerable<KeyValuePair<string, string>> sourceDestinationPair)
         {
             return sourceDestinationPair.Where(sd => IsFileDestinationUnsecure(sd.Value)).ToArray();
@@ -469,7 +469,7 @@ namespace Umbraco.Core.Packaging
             string extension = Path.GetExtension(destination);
             return extension != null && extension.Equals(".dll", StringComparison.InvariantCultureIgnoreCase);
         }
-        
+
         private KeyValuePair<string, string>[] ExtractSourceDestinationFileInformation(XElement filesElement)
         {
             if (string.Equals(Constants.Packaging.FilesNodeName, filesElement.Name.LocalName) == false)
@@ -505,7 +505,7 @@ namespace Umbraco.Core.Packaging
                     var relativeDir = UpdatePathPlaceholders(PrepareAsFilePathElement(orgPathElement.Value));
 
                     var relativePath = Path.Combine(relativeDir, fileName);
-                    
+
 
                     return new KeyValuePair<string, string>(guidElement.Value, relativePath);
                 }).ToArray();
@@ -573,7 +573,7 @@ namespace Umbraco.Core.Packaging
             int val;
             return xElement == null ? defaultValue : int.TryParse(xElement.Value, out val) ? val : defaultValue;
         }
-        
+
         private static string UpdatePathPlaceholders(string path)
         {
             if (path.Contains("[$"))

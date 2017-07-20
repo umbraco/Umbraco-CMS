@@ -78,9 +78,9 @@ namespace Umbraco.Web.WebServices
                 case PublishStatusType.SuccessAlreadyPublished:
                     return Services.TextService.Localize("publish/nodePublish", new[] { status.ContentItem.Name});
                 case PublishStatusType.FailedPathNotPublished:
-                    return Services.TextService.Localize("publish/contentPublishedFailedByParent", 
+                    return Services.TextService.Localize("publish/contentPublishedFailedByParent",
                                    new [] { string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id) });
-                case PublishStatusType.FailedHasExpired:                    
+                case PublishStatusType.FailedHasExpired:
                 case PublishStatusType.FailedAwaitingRelease:
                 case PublishStatusType.FailedIsTrashed:
                     return "Cannot publish document with a status of " + status.StatusType;
@@ -90,9 +90,9 @@ namespace Umbraco.Web.WebServices
                 case PublishStatusType.FailedContentInvalid:
                     return Services.TextService.Localize("publish/contentPublishedFailedInvalid",
                                    new []{
-                                       string.Format("'{0}' ({1})", status.ContentItem.Name, status.ContentItem.Id), 
+                                       string.Format("'{0}' ({1})", status.ContentItem.Name, status.ContentItem.Id),
                                        string.Format("'{0}'", string.Join(", ", status.InvalidProperties.Select(x => x.Alias)))
-                                   });  
+                                   });
                 default:
                     return status.StatusType.ToString();
             }

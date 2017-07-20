@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -255,7 +255,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 
                 // Sync the tree
                 ClientTools.SyncTree(_content.Path, true);
-                
+
                 // Reload the page if the content was already being viewed
                 ClientTools.ReloadLocation();
 

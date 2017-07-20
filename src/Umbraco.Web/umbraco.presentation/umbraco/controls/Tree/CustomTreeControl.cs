@@ -83,7 +83,7 @@ namespace umbraco.controls.Tree
             writer.Write(@"
 <script type=""text/javascript"">
 jQuery(document).ready(function() {
-    var ctxMenu = " + GetJSONContextMenu() + @";	
+    var ctxMenu = " + GetJSONContextMenu() + @";
     var app = """ + App + @""";
     var showContext = " + ShowContextMenu.ToString().ToLower() + @";
     var isDialog = " + IsDialog.ToString().ToLower() + @";
@@ -91,7 +91,7 @@ jQuery(document).ready(function() {
     var treeType = """ + TreeType + @""";
     var functionToCall = """ + FunctionToCall + @""";
     var nodeKey = """ + NodeKey + @""";
-	
+
     //create the javascript tree
     jQuery(""#" + ClientID + @""").UmbracoTree({
         doNotInit: " + ManualInitialization.ToString().ToLower() + @",
@@ -108,17 +108,17 @@ jQuery(document).ready(function() {
         treeMode: """ + Mode.ToString().ToLower() + @""",
         dataUrl: """ + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + @"/webservices/TreeDataService.ashx"",
         serviceUrl: """ + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + @"/controls/Tree/CustomTreeService.asmx/GetInitAppTreeData""});
-        
+
      //add event handler for ajax errors, this will refresh the whole application
     var mainTree = UmbClientMgr.mainTree();
     if (mainTree != null) {
         mainTree.addEventHandler(""ajaxError"", function(e) {
             if (e.msg == ""rebuildTree"") {
-	            UmbClientMgr.mainWindow(""umbraco.aspx"");
+                UmbClientMgr.mainWindow(""umbraco.aspx"");
             }
         });
     }
-});	
+});
 
 </script>");
 

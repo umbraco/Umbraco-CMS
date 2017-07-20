@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Web.Http;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;

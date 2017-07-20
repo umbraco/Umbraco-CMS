@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
     [Migration("7.2.0", 2, Constants.System.UmbracoMigrationName)]
     public class RemoveCmsDocumentAliasColumn : MigrationBase
     {
-        public RemoveCmsDocumentAliasColumn(IMigrationContext context) 
+        public RemoveCmsDocumentAliasColumn(IMigrationContext context)
             : base(context)
         { }
 

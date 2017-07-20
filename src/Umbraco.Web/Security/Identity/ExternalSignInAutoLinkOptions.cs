@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core;
@@ -15,8 +15,8 @@ namespace Umbraco.Web.Security.Identity
     {
         public ExternalSignInAutoLinkOptions(
             bool autoLinkExternalAccount = false,
-            string defaultUserType = "editor", 
-            string[] defaultAllowedSections = null, 
+            string defaultUserType = "editor",
+            string[] defaultAllowedSections = null,
             string defaultCulture = null)
         {
             if (string.IsNullOrEmpty(defaultUserType)) throw new ArgumentNullOrEmptyException(nameof(defaultUserType));
@@ -57,16 +57,16 @@ namespace Umbraco.Web.Security.Identity
         /// <summary>
         /// For private external auth providers such as Active Directory, which when set to true will automatically
         /// create a local user if the external provider login was successful.
-        /// 
+        ///
         /// For public auth providers this should always be false!!!
         /// </summary>
         public bool ShouldAutoLinkExternalAccount(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
             return _autoLinkExternalAccount;
         }
-        
+
         private readonly string _defaultCulture;
-       
+
         /// <summary>
         /// The default Culture to use for auto-linking users
         /// </summary>

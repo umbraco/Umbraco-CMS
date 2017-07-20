@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core
 {
-	public static partial class Constants
+    public static partial class Constants
     {
         // fixme - kill the Whatever2!
 
@@ -449,5 +449,5 @@ namespace Umbraco.Core
                 public const string DataValueType = "umbracoDataValueType";
             }
         }
-	}
+    }
 }

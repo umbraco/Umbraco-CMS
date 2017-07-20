@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public TemplateFactory()
         {
-            
+
         }
 
         public TemplateFactory(Guid nodeObjectTypeId)

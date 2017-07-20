@@ -120,7 +120,7 @@ namespace Umbraco.Web.Editors
                 Content = new StringContent(result, Encoding.UTF8, "text/css")
             };
         }
-        
+
         [ValidateAngularAntiForgeryToken]
         public IEnumerable<Tab<DashboardControl>> GetDashboard(string section)
         {

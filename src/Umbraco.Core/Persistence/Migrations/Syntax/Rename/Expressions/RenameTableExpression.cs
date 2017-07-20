@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Rename.Expressions
         {
             if (IsExpressionSupported() == false)
                 return string.Empty;
-            
+
             return SqlSyntax.FormatTableRename(OldName, NewName);
         }
     }

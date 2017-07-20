@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Routing
         }
 
         internal static int? GetCurrentNotFoundPageId(
-            IContentErrorPage[] error404Collection, 
+            IContentErrorPage[] error404Collection,
             IEntityService entityService,
             IPublishedContentQuery publishedContentQuery,
             CultureInfo errorCulture)
@@ -74,8 +74,8 @@ namespace Umbraco.Web.Routing
             if (errorPage.HasContentKey)
             {
                 //need to get the Id for the GUID
-                //TODO: When we start storing GUIDs into the IPublishedContent, then we won't have to look this up 
-                // but until then we need to look it up in the db. For now we've implemented a cached service for 
+                //TODO: When we start storing GUIDs into the IPublishedContent, then we won't have to look this up
+                // but until then we need to look it up in the db. For now we've implemented a cached service for
                 // converting Int -> Guid and vice versa.
                 var found = entityService.GetIdForKey(errorPage.ContentKey, UmbracoObjectTypes.Document);
                 if (found)

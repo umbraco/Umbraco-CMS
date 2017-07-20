@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -15,13 +15,13 @@ using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.PublishedContent
 {
-	/// <summary>
-	/// Tests the methods on IPublishedContent using the DefaultPublishedContentStore
-	/// </summary>
-	[TestFixture]
+    /// <summary>
+    /// Tests the methods on IPublishedContent using the DefaultPublishedContentStore
+    /// </summary>
+    [TestFixture]
     [UmbracoTest(PluginManager = UmbracoTestOptions.PluginManager.PerFixture)]
     public class PublishedContentTests : PublishedContentTestBase
-	{
+    {
         private TypeLoader _typeLoader;
 
         public override void SetUp()
@@ -50,30 +50,30 @@ namespace Umbraco.Tests.PublishedContent
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
         }
 
-	    protected override void Compose()
-	    {
-	        base.Compose();
+        protected override void Compose()
+        {
+            base.Compose();
 
             Container.RegisterSingleton<IPublishedContentModelFactory>(f => new PublishedContentModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
-	    }
+        }
 
-	    protected override TypeLoader CreatePluginManager(IServiceFactory f)
-	    {
-	        var pluginManager = base.CreatePluginManager(f);
+        protected override TypeLoader CreatePluginManager(IServiceFactory f)
+        {
+            var pluginManager = base.CreatePluginManager(f);
 
-	        // this is so the model factory looks into the test assembly
-	        pluginManager.AssembliesToScan = pluginManager.AssembliesToScan
-	            .Union(new[] { typeof(PublishedContentTests).Assembly })
-	            .ToList();
+            // this is so the model factory looks into the test assembly
+            pluginManager.AssembliesToScan = pluginManager.AssembliesToScan
+                .Union(new[] { typeof(PublishedContentTests).Assembly })
+                .ToList();
 
-	        return pluginManager;
-	    }
+            return pluginManager;
+        }
 
         private readonly Guid _node1173Guid = Guid.NewGuid();
 
-	    protected override string GetXmlContent(int templateId)
-		{
-			return @"<?xml version=""1.0"" encoding=""utf-8""?>
+        protected override string GetXmlContent(int templateId)
+        {
+            return @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE root[
 <!ELEMENT Home ANY>
 <!ATTLIST Home id ID #REQUIRED>
@@ -81,49 +81,49 @@ namespace Umbraco.Tests.PublishedContent
 <!ATTLIST CustomDocument id ID #REQUIRED>
 ]>
 <root id=""-1"">
-	<Home id=""1046"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" nodeName=""Home"" urlName=""home"" writerName=""admin"" creatorName=""admin"" path=""-1,1046"" isDoc="""">
-		<content><![CDATA[]]></content>
-		<umbracoUrlAlias><![CDATA[this/is/my/alias, anotheralias]]></umbracoUrlAlias>
-		<umbracoNaviHide>1</umbracoNaviHide>
-		<testRecursive><![CDATA[This is the recursive val]]></testRecursive>
-		<Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc="""" key=""" + _node1173Guid + @""">
-			<content><![CDATA[<div>This is some content</div>]]></content>
-			<umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>
-			<testRecursive><![CDATA[]]></testRecursive>
-			<Home id=""1174"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-07-20T18:07:54"" updateDate=""2012-07-20T19:10:27"" nodeName=""Sub2"" urlName=""sub2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1174"" isDoc="""">
-				<content><![CDATA[]]></content>
-				<umbracoUrlAlias><![CDATA[only/one/alias]]></umbracoUrlAlias>
-				<creatorName><![CDATA[Custom data with same property name as the member name]]></creatorName>
-				<testRecursive><![CDATA[]]></testRecursive>
-			</Home>
-			<CustomDocument id=""1177"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""custom sub 1"" urlName=""custom-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1177"" isDoc="""" />
-			<CustomDocument id=""1178"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-16T14:23:35"" nodeName=""custom sub 2"" urlName=""custom-sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178"" isDoc="""" />
+    <Home id=""1046"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" nodeName=""Home"" urlName=""home"" writerName=""admin"" creatorName=""admin"" path=""-1,1046"" isDoc="""">
+        <content><![CDATA[]]></content>
+        <umbracoUrlAlias><![CDATA[this/is/my/alias, anotheralias]]></umbracoUrlAlias>
+        <umbracoNaviHide>1</umbracoNaviHide>
+        <testRecursive><![CDATA[This is the recursive val]]></testRecursive>
+        <Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc="""" key=""" + _node1173Guid + @""">
+            <content><![CDATA[<div>This is some content</div>]]></content>
+            <umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>
+            <testRecursive><![CDATA[]]></testRecursive>
+            <Home id=""1174"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-07-20T18:07:54"" updateDate=""2012-07-20T19:10:27"" nodeName=""Sub2"" urlName=""sub2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1174"" isDoc="""">
+                <content><![CDATA[]]></content>
+                <umbracoUrlAlias><![CDATA[only/one/alias]]></umbracoUrlAlias>
+                <creatorName><![CDATA[Custom data with same property name as the member name]]></creatorName>
+                <testRecursive><![CDATA[]]></testRecursive>
+            </Home>
+            <CustomDocument id=""1177"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""custom sub 1"" urlName=""custom-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1177"" isDoc="""" />
+            <CustomDocument id=""1178"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-16T14:23:35"" nodeName=""custom sub 2"" urlName=""custom-sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178"" isDoc="""" />
             <Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc="""">
-				<content><![CDATA[]]></content>
+                <content><![CDATA[]]></content>
                 <umbracoNaviHide>1</umbracoNaviHide>
-			</Home>
-		</Home>
-		<Home id=""1175"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-20T18:08:01"" updateDate=""2012-07-20T18:49:32"" nodeName=""Sub 2"" urlName=""sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1175"" isDoc=""""><content><![CDATA[]]></content>
-		</Home>
-		<CustomDocument id=""4444"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,4444"" isDoc="""">
-			<selectedNodes><![CDATA[1172,1176,1173]]></selectedNodes>
-		</CustomDocument>
-	</Home>
-	<CustomDocument id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
+            </Home>
+        </Home>
+        <Home id=""1175"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-20T18:08:01"" updateDate=""2012-07-20T18:49:32"" nodeName=""Sub 2"" urlName=""sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1175"" isDoc=""""><content><![CDATA[]]></content>
+        </Home>
+        <CustomDocument id=""4444"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,4444"" isDoc="""">
+            <selectedNodes><![CDATA[1172,1176,1173]]></selectedNodes>
+        </CustomDocument>
+    </Home>
+    <CustomDocument id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
 </root>";
-		}
+        }
 
-		internal IPublishedContent GetNode(int id)
-		{
-			var ctx = GetUmbracoContext("/test");
-			var doc = ctx.ContentCache.GetById(id);
-			Assert.IsNotNull(doc);
-			return doc;
-		}
+        internal IPublishedContent GetNode(int id)
+        {
+            var ctx = GetUmbracoContext("/test");
+            var doc = ctx.ContentCache.GetById(id);
+            Assert.IsNotNull(doc);
+            return doc;
+        }
 
-	    [Test]
-	    public void GetNodeByIds()
-	    {
+        [Test]
+        public void GetNodeByIds()
+        {
             var ctx = GetUmbracoContext("/test");
             var contentById = ctx.ContentCache.GetById(1173);
             Assert.IsNotNull(contentById);
@@ -294,18 +294,18 @@ namespace Umbraco.Tests.PublishedContent
             }
         }
 
-	    [Test]
-	    public void Descendants_Ordered_Properly()
-	    {
+        [Test]
+        public void Descendants_Ordered_Properly()
+        {
             var doc = GetNode(1046);
 
-	        var expected = new[] {1046, 1173, 1174, 1177, 1178, 1176, 1175, 4444, 1172};
-	        var exindex = 0;
+            var expected = new[] {1046, 1173, 1174, 1177, 1178, 1176, 1175, 4444, 1172};
+            var exindex = 0;
 
             // must respect the XPath descendants-or-self axis!
             foreach (var d in doc.DescendantsOrSelf())
                 Assert.AreEqual(expected[exindex++], d.Id);
-	    }
+        }
 
         [Test]
         public void GetPropertyValueRecursiveTest()
@@ -318,88 +318,88 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-		public void Get_Property_Value_Uses_Converter()
-		{
-			var doc = GetNode(1173);
+        public void Get_Property_Value_Uses_Converter()
+        {
+            var doc = GetNode(1173);
 
-			var propVal = doc.Value("content");
+            var propVal = doc.Value("content");
             Assert.IsInstanceOf(typeof(IHtmlString), propVal);
-			Assert.AreEqual("<div>This is some content</div>", propVal.ToString());
+            Assert.AreEqual("<div>This is some content</div>", propVal.ToString());
 
-			var propVal2 = doc.Value<IHtmlString>("content");
+            var propVal2 = doc.Value<IHtmlString>("content");
             Assert.IsInstanceOf(typeof(IHtmlString), propVal2);
             Assert.AreEqual("<div>This is some content</div>", propVal2.ToString());
 
             var propVal3 = doc.Value("Content");
             Assert.IsInstanceOf(typeof(IHtmlString), propVal3);
             Assert.AreEqual("<div>This is some content</div>", propVal3.ToString());
-		}
+        }
 
-		[Test]
-		public void Complex_Linq()
-		{
-			var doc = GetNode(1173);
+        [Test]
+        public void Complex_Linq()
+        {
+            var doc = GetNode(1173);
 
-			var result = doc.Ancestors().OrderBy(x => x.Level)
-				.Single()
-				.Descendants()
-				.FirstOrDefault(x => x.Value<string>("selectedNodes", "").Split(',').Contains("1173"));
+            var result = doc.Ancestors().OrderBy(x => x.Level)
+                .Single()
+                .Descendants()
+                .FirstOrDefault(x => x.Value<string>("selectedNodes", "").Split(',').Contains("1173"));
 
-			Assert.IsNotNull(result);
-		}
+            Assert.IsNotNull(result);
+        }
 
-		[Test]
-		public void Children_GroupBy_DocumentTypeAlias()
-		{
-			var doc = GetNode(1046);
+        [Test]
+        public void Children_GroupBy_DocumentTypeAlias()
+        {
+            var doc = GetNode(1046);
 
-			var found1 = doc.Children.GroupBy(x => x.DocumentTypeAlias).ToArray();
+            var found1 = doc.Children.GroupBy(x => x.DocumentTypeAlias).ToArray();
 
-			Assert.AreEqual(2, found1.Length);
-			Assert.AreEqual(2, found1.Single(x => x.Key.ToString() == "Home").Count());
-			Assert.AreEqual(1, found1.Single(x => x.Key.ToString() == "CustomDocument").Count());
-		}
+            Assert.AreEqual(2, found1.Length);
+            Assert.AreEqual(2, found1.Single(x => x.Key.ToString() == "Home").Count());
+            Assert.AreEqual(1, found1.Single(x => x.Key.ToString() == "CustomDocument").Count());
+        }
 
-		[Test]
-		public void Children_Where_DocumentTypeAlias()
-		{
-			var doc = GetNode(1046);
+        [Test]
+        public void Children_Where_DocumentTypeAlias()
+        {
+            var doc = GetNode(1046);
 
-			var found1 = doc.Children.Where(x => x.DocumentTypeAlias == "CustomDocument");
-			var found2 = doc.Children.Where(x => x.DocumentTypeAlias == "Home");
+            var found1 = doc.Children.Where(x => x.DocumentTypeAlias == "CustomDocument");
+            var found2 = doc.Children.Where(x => x.DocumentTypeAlias == "Home");
 
-			Assert.AreEqual(1, found1.Count());
-			Assert.AreEqual(2, found2.Count());
-		}
+            Assert.AreEqual(1, found1.Count());
+            Assert.AreEqual(2, found2.Count());
+        }
 
-		[Test]
-		public void Children_Order_By_Update_Date()
-		{
-			var doc = GetNode(1173);
+        [Test]
+        public void Children_Order_By_Update_Date()
+        {
+            var doc = GetNode(1173);
 
-			var ordered = doc.Children.OrderBy(x => x.UpdateDate);
+            var ordered = doc.Children.OrderBy(x => x.UpdateDate);
 
-			var correctOrder = new[] { 1178, 1177, 1174, 1176 };
-			for (var i = 0; i < correctOrder.Length; i++)
-			{
-				Assert.AreEqual(correctOrder[i], ordered.ElementAt(i).Id);
-			}
+            var correctOrder = new[] { 1178, 1177, 1174, 1176 };
+            for (var i = 0; i < correctOrder.Length; i++)
+            {
+                Assert.AreEqual(correctOrder[i], ordered.ElementAt(i).Id);
+            }
 
-		}
+        }
 
-		[Test]
-		public void FirstChild()
-		{
-			var doc = GetNode(1173); // has child nodes
-			Assert.IsNotNull(doc.FirstChild());
-			Assert.IsNotNull(doc.FirstChild(x => true));
-			Assert.IsNotNull(doc.FirstChild<IPublishedContent>());
+        [Test]
+        public void FirstChild()
+        {
+            var doc = GetNode(1173); // has child nodes
+            Assert.IsNotNull(doc.FirstChild());
+            Assert.IsNotNull(doc.FirstChild(x => true));
+            Assert.IsNotNull(doc.FirstChild<IPublishedContent>());
 
-			doc = GetNode(1175); // does not have child nodes
-			Assert.IsNull(doc.FirstChild());
-			Assert.IsNull(doc.FirstChild(x => true));
-			Assert.IsNull(doc.FirstChild<IPublishedContent>());
-		}
+            doc = GetNode(1175); // does not have child nodes
+            Assert.IsNull(doc.FirstChild());
+            Assert.IsNull(doc.FirstChild(x => true));
+            Assert.IsNull(doc.FirstChild<IPublishedContent>());
+        }
 
         [Test]
         public void IsComposedOf()
@@ -411,145 +411,145 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsTrue(isComposedOf);
         }
 
-		[Test]
-		public void HasProperty()
-		{
-			var doc = GetNode(1173);
+        [Test]
+        public void HasProperty()
+        {
+            var doc = GetNode(1173);
 
-			var hasProp = doc.HasProperty(Constants.Conventions.Content.UrlAlias);
+            var hasProp = doc.HasProperty(Constants.Conventions.Content.UrlAlias);
 
             Assert.IsTrue(hasProp);
-		}
+        }
 
-		[Test]
-		public void HasValue()
-		{
-			var doc = GetNode(1173);
+        [Test]
+        public void HasValue()
+        {
+            var doc = GetNode(1173);
 
-			var hasValue = doc.HasValue(Constants.Conventions.Content.UrlAlias);
-			var noValue = doc.HasValue("blahblahblah");
+            var hasValue = doc.HasValue(Constants.Conventions.Content.UrlAlias);
+            var noValue = doc.HasValue("blahblahblah");
 
-			Assert.IsTrue(hasValue);
-			Assert.IsFalse(noValue);
-		}
+            Assert.IsTrue(hasValue);
+            Assert.IsFalse(noValue);
+        }
 
-		[Test]
-		public void Ancestors_Where_Visible()
-		{
-			var doc = GetNode(1174);
+        [Test]
+        public void Ancestors_Where_Visible()
+        {
+            var doc = GetNode(1174);
 
-			var whereVisible = doc.Ancestors().Where(x => x.IsVisible());
-			Assert.AreEqual(1, whereVisible.Count());
+            var whereVisible = doc.Ancestors().Where(x => x.IsVisible());
+            Assert.AreEqual(1, whereVisible.Count());
 
-		}
+        }
 
-		[Test]
-		public void Visible()
-		{
-			var hidden = GetNode(1046);
-			var visible = GetNode(1173);
+        [Test]
+        public void Visible()
+        {
+            var hidden = GetNode(1046);
+            var visible = GetNode(1173);
 
-			Assert.IsFalse(hidden.IsVisible());
-			Assert.IsTrue(visible.IsVisible());
-		}
+            Assert.IsFalse(hidden.IsVisible());
+            Assert.IsTrue(visible.IsVisible());
+        }
 
-		[Test]
-		public void Ancestor_Or_Self()
-		{
-			var doc = GetNode(1173);
+        [Test]
+        public void Ancestor_Or_Self()
+        {
+            var doc = GetNode(1173);
 
-			var result = doc.AncestorOrSelf();
+            var result = doc.AncestorOrSelf();
 
-			Assert.IsNotNull(result);
+            Assert.IsNotNull(result);
 
             // ancestor-or-self has to be self!
             Assert.AreEqual(1173, result.Id);
-		}
+        }
 
-	    [Test]
-	    public void U4_4559()
-	    {
-	        var doc = GetNode(1174);
-	        var result = doc.AncestorOrSelf(1);
+        [Test]
+        public void U4_4559()
+        {
+            var doc = GetNode(1174);
+            var result = doc.AncestorOrSelf(1);
             Assert.IsNotNull(result);
             Assert.AreEqual(1046, result.Id);
-	    }
+        }
 
-		[Test]
-		public void Ancestors_Or_Self()
-		{
-			var doc = GetNode(1174);
+        [Test]
+        public void Ancestors_Or_Self()
+        {
+            var doc = GetNode(1174);
 
-			var result = doc.AncestorsOrSelf().ToArray();
+            var result = doc.AncestorsOrSelf().ToArray();
 
-			Assert.IsNotNull(result);
+            Assert.IsNotNull(result);
 
-			Assert.AreEqual(3, result.Length);
-			Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1174, 1173, 1046 }));
-		}
+            Assert.AreEqual(3, result.Length);
+            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1174, 1173, 1046 }));
+        }
 
-		[Test]
-		public void Ancestors()
-		{
-			var doc = GetNode(1174);
+        [Test]
+        public void Ancestors()
+        {
+            var doc = GetNode(1174);
 
-			var result = doc.Ancestors().ToArray();
+            var result = doc.Ancestors().ToArray();
 
-			Assert.IsNotNull(result);
+            Assert.IsNotNull(result);
 
-			Assert.AreEqual(2, result.Length);
-			Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1046 }));
-		}
+            Assert.AreEqual(2, result.Length);
+            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1046 }));
+        }
 
-		[Test]
-		public void Descendants_Or_Self()
-		{
-			var doc = GetNode(1046);
+        [Test]
+        public void Descendants_Or_Self()
+        {
+            var doc = GetNode(1046);
 
-			var result = doc.DescendantsOrSelf().ToArray();
+            var result = doc.DescendantsOrSelf().ToArray();
 
-			Assert.IsNotNull(result);
+            Assert.IsNotNull(result);
 
-			Assert.AreEqual(8, result.Length);
-			Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1046, 1173, 1174, 1176, 1175 }));
-		}
+            Assert.AreEqual(8, result.Length);
+            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1046, 1173, 1174, 1176, 1175 }));
+        }
 
-		[Test]
-		public void Descendants()
-		{
-			var doc = GetNode(1046);
+        [Test]
+        public void Descendants()
+        {
+            var doc = GetNode(1046);
 
-			var result = doc.Descendants().ToArray();
+            var result = doc.Descendants().ToArray();
 
-			Assert.IsNotNull(result);
+            Assert.IsNotNull(result);
 
-			Assert.AreEqual(7, result.Length);
-			Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1174, 1176, 1175, 4444 }));
-		}
+            Assert.AreEqual(7, result.Length);
+            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1174, 1176, 1175, 4444 }));
+        }
 
-		[Test]
-		public void Up()
-		{
-			var doc = GetNode(1173);
+        [Test]
+        public void Up()
+        {
+            var doc = GetNode(1173);
 
-			var result = doc.Up();
+            var result = doc.Up();
 
-			Assert.IsNotNull(result);
+            Assert.IsNotNull(result);
 
-			Assert.AreEqual(1046, result.Id);
-		}
+            Assert.AreEqual(1046, result.Id);
+        }
 
-		[Test]
-		public void Down()
-		{
-			var doc = GetNode(1173);
+        [Test]
+        public void Down()
+        {
+            var doc = GetNode(1173);
 
-			var result = doc.Down();
+            var result = doc.Down();
 
-			Assert.IsNotNull(result);
+            Assert.IsNotNull(result);
 
-			Assert.AreEqual(1174, result.Id);
-		}
+            Assert.AreEqual(1174, result.Id);
+        }
 
         [Test]
         public void FragmentProperty()
@@ -561,24 +561,24 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(5548, prop.Value);
         }
 
-	    public void Fragment1()
-	    {
+        public void Fragment1()
+        {
             var type = ContentTypesCache.Get(PublishedItemType.Content, "detachedSomething");
             var values = new Dictionary<string, object>();
             var f = new PublishedFragment(type, Guid.NewGuid(), values, false);
         }
 
         [Test]
-	    public void Fragment2()
-	    {
-	        var pt1 = new PublishedPropertyType("legend", 0, Constants.PropertyEditors.TextboxAlias);
-	        var pt2 = new PublishedPropertyType("image", 0, Constants.PropertyEditors.MediaPickerAlias);
+        public void Fragment2()
+        {
+            var pt1 = new PublishedPropertyType("legend", 0, Constants.PropertyEditors.TextboxAlias);
+            var pt2 = new PublishedPropertyType("image", 0, Constants.PropertyEditors.MediaPickerAlias);
             var pt3 = new PublishedPropertyType("size", 0, Constants.PropertyEditors.IntegerAlias);
-	        const string val1 = "boom bam";
-	        const int val2 = 0;
+            const string val1 = "boom bam";
+            const int val2 = 0;
             const int val3 = 666;
 
-	        var guid = Guid.NewGuid();
+            var guid = Guid.NewGuid();
 
             var ct = new PublishedContentType(0, "alias", new[] { pt1, pt2, pt3 });
 
@@ -593,18 +593,18 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(val3, c.Size);
         }
 
-	    class ImageWithLegendModel : PublishedFragment
-	    {
+        class ImageWithLegendModel : PublishedFragment
+        {
             public ImageWithLegendModel(PublishedContentType contentType, Guid fragmentKey, Dictionary<string, object> values, bool previewing)
                 : base(contentType, fragmentKey, values, previewing)
-	        { }
+            { }
 
 
             public string Legend => this.Value<string>("legend");
 
-	        public IPublishedContent Image => this.Value<IPublishedContent>("image");
+            public IPublishedContent Image => this.Value<IPublishedContent>("image");
 
-	        public int Size => this.Value<int>("size");
-	    }
+            public int Size => this.Value<int>("size");
+        }
     }
 }

@@ -35,6 +35,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 sourceString.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim());
 
             return values;
-        }        
+        }
     }
 }

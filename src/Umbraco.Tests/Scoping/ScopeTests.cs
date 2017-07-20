@@ -468,7 +468,7 @@ namespace Umbraco.Tests.Scoping
                         Assert.IsNull(scopeProvider.AmbientContext);
 
                         // back to original thread
-                        ScopeProviderStatic.HttpContextItemsGetter = () => httpContextItems; 
+                        ScopeProviderStatic.HttpContextItemsGetter = () => httpContextItems;
                     }
                     Assert.IsNotNull(scopeProvider.AmbientScope);
                     Assert.AreSame(scope, scopeProvider.AmbientScope);

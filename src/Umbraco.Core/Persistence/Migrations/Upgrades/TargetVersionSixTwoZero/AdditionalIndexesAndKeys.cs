@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.2.0", 1, Constants.System.UmbracoMigrationName)]
     public class AdditionalIndexesAndKeys : MigrationBase
     {
-        public AdditionalIndexesAndKeys(IMigrationContext context) 
+        public AdditionalIndexesAndKeys(IMigrationContext context)
             : base(context)
         { }
 
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
                 && sqlServerSyntax.ServerVersion.ProductVersion.StartsWith("11.")) // version 11.x
             {
                 // SQL Azure v2 does not support dropping clustered indexes on a table
-                // see http://issues.umbraco.org/issue/U4-5673            
+                // see http://issues.umbraco.org/issue/U4-5673
                 // and so we have to use a special method to do some manual work
                 if (dbIndexes.Any(x => x.IndexName.InvariantEquals("umbracoUserLogins_Index")))
                 {
@@ -91,18 +91,18 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
         {
             Context.Database.Execute(@"CREATE TABLE ""umbracoUserLogins_temp""
 (
-	contextID uniqueidentifier NOT NULL,
-	userID int NOT NULL,
-	[timeout] bigint NOT NULL
+    contextID uniqueidentifier NOT NULL,
+    userID int NOT NULL,
+    [timeout] bigint NOT NULL
 );
 CREATE CLUSTERED INDEX ""IX_umbracoUserLogins_Index"" ON ""umbracoUserLogins_temp"" (""contextID"");
 INSERT INTO ""umbracoUserLogins_temp"" SELECT * FROM ""umbracoUserLogins""
 DROP TABLE ""umbracoUserLogins""
 CREATE TABLE ""umbracoUserLogins""
 (
-	contextID uniqueidentifier NOT NULL,
-	userID int NOT NULL,
-	[timeout] bigint NOT NULL
+    contextID uniqueidentifier NOT NULL,
+    userID int NOT NULL,
+    [timeout] bigint NOT NULL
 );
 CREATE CLUSTERED INDEX ""IX_umbracoUserLogins_Index"" ON ""umbracoUserLogins"" (""contextID"");
 INSERT INTO ""umbracoUserLogins"" SELECT * FROM ""umbracoUserLogins_temp""

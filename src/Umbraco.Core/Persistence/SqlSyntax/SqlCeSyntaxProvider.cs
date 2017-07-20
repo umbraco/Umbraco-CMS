@@ -61,7 +61,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                     return string.Format("{0} LIKE '{1}'", column, value);
                 default:
                     throw new ArgumentOutOfRangeException("columnType");
-            }   
+            }
         }
 
         public override string GetConcat(params string[] args)
@@ -154,7 +154,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         {
             var items =
                 db.Fetch<dynamic>(
-                    @"SELECT TABLE_NAME, INDEX_NAME, COLUMN_NAME, [UNIQUE] FROM INFORMATION_SCHEMA.INDEXES 
+                    @"SELECT TABLE_NAME, INDEX_NAME, COLUMN_NAME, [UNIQUE] FROM INFORMATION_SCHEMA.INDEXES
 WHERE INDEX_NAME NOT LIKE 'PK_%'
 ORDER BY TABLE_NAME, INDEX_NAME");
             return
@@ -189,7 +189,7 @@ ORDER BY TABLE_NAME, INDEX_NAME");
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
-                    return "NEWID()";                
+                    return "NEWID()";
                 case SystemMethods.CurrentDateTime:
                     return "GETDATE()";
                 //case SystemMethods.NewSequentialId:
@@ -209,9 +209,9 @@ ORDER BY TABLE_NAME, INDEX_NAME");
             }
         }
 
-        
+
 
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
-        
+
     }
 }

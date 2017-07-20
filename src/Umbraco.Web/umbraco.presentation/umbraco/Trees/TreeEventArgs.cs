@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 
 
 namespace umbraco.cms.presentation.Trees
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class TreeEventArgs : EventArgs
     {

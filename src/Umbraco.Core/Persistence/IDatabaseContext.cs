@@ -1,4 +1,4 @@
-using NPoco;
+﻿using NPoco;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 

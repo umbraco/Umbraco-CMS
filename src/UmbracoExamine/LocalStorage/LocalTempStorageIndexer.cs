@@ -330,7 +330,7 @@ namespace UmbracoExamine.LocalStorage
                         var allSnapshotFiles = commit.FileNames
                             .Concat(new[]
                             {
-                                commit.SegmentsFileName, 
+                                commit.SegmentsFileName,
                                 //we need to manually include the segments.gen file
                                 "segments.gen"
                             })

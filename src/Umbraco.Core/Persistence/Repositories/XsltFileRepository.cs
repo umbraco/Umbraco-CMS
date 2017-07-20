@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories
             : base(work, fileSystem)
         {
         }
-        
+
         public override XsltFile Get(string id)
         {
             var path = FileSystem.GetRelativePath(id);
@@ -79,7 +79,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// Gets a list of all <see cref="XsltFile"/> that exist at the relative path specified. 
+        /// Gets a list of all <see cref="XsltFile"/> that exist at the relative path specified.
         /// </summary>
         /// <param name="rootPath">
         /// If null or not specified, will return the XSLT files at the root path relative to the IFileSystem

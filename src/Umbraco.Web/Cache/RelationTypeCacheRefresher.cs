@@ -7,7 +7,7 @@ namespace Umbraco.Web.Cache
 {
     public sealed class RelationTypeCacheRefresher : CacheRefresherBase<RelationTypeCacheRefresher>
     {
-        public RelationTypeCacheRefresher(CacheHelper cacheHelper) 
+        public RelationTypeCacheRefresher(CacheHelper cacheHelper)
             : base(cacheHelper)
         { }
 

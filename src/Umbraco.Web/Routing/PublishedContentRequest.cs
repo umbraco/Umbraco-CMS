@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Web;
@@ -18,7 +18,7 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class PublishedContentRequest
     {
-	    private readonly FacadeRouter _facadeRouter;
+        private readonly FacadeRouter _facadeRouter;
 
         private bool _readonly; // after prepared
         private bool _readonlyUri; // after preparing
@@ -75,10 +75,10 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Prepares the request.
         /// </summary>
-	    public void Prepare()
-	    {
-	        _facadeRouter.PrepareRequest(this);
-	    }
+        public void Prepare()
+        {
+            _facadeRouter.PrepareRequest(this);
+        }
 
         #region Events
 
@@ -101,7 +101,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Triggers the Preparing event.
         /// </summary>
-	    internal void OnPreparing()
+        internal void OnPreparing()
         {
             Preparing?.Invoke(this, EventArgs.Empty);
             _readonlyUri = true;
@@ -148,7 +148,7 @@ namespace Umbraco.Web.Routing
         /// preserve or reset the template, if any.</remarks>
         public void SetInternalRedirectPublishedContent(IPublishedContent content)
         {
-		    if (content == null) throw new ArgumentNullException(nameof(content));
+            if (content == null) throw new ArgumentNullException(nameof(content));
             EnsureWriteable();
 
             // unless a template has been set already by the finder,
@@ -185,18 +185,18 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-		/// Gets the initial requested content.
-		/// </summary>
-		/// <remarks>The initial requested content is the content that was found by the finders,
-		/// before anything such as 404, redirect... took place.</remarks>
-		public IPublishedContent InitialPublishedContent => _initialPublishedContent;
+        /// Gets the initial requested content.
+        /// </summary>
+        /// <remarks>The initial requested content is the content that was found by the finders,
+        /// before anything such as 404, redirect... took place.</remarks>
+        public IPublishedContent InitialPublishedContent => _initialPublishedContent;
 
         /// <summary>
         /// Gets value indicating whether the current published content is the initial one.
         /// </summary>
-		public bool IsInitialPublishedContent => _initialPublishedContent != null && _initialPublishedContent == _publishedContent;
+        public bool IsInitialPublishedContent => _initialPublishedContent != null && _initialPublishedContent == _publishedContent;
 
-	    /// <summary>
+        /// <summary>
         /// Indicates that the current PublishedContent is the initial one.
         /// </summary>
         public void SetIsInitialPublishedContent()
@@ -249,7 +249,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public string TemplateAlias => _template?.Alias;
 
-	    /// <summary>
+        /// <summary>
         /// Tries to set the template to use to display the requested content.
         /// </summary>
         /// <param name="alias">The alias of the template.</param>
@@ -294,7 +294,7 @@ namespace Umbraco.Web.Routing
         /// Resets the template.
         /// </summary>
         /// <remarks>The <c>RenderingEngine</c> becomes unknown.</remarks>
-	    public void ResetTemplate()
+        public void ResetTemplate()
         {
             EnsureWriteable();
             TemplateModel = null;
@@ -323,25 +323,25 @@ namespace Umbraco.Web.Routing
         /// <remarks>Is a DomainAndUri object ie a standard Domain plus the fully qualified uri. For example,
         /// the <c>Domain</c> may contain "example.com" whereas the <c>Uri</c> will be fully qualified eg "http://example.com/".</remarks>
         public DomainAndUri Domain
-	    {
-	        get { return _domain; }
-	        set
-	        {
-	            EnsureWriteable();
-	            _domain = value;
-	        }
-	    }
+        {
+            get { return _domain; }
+            set
+            {
+                EnsureWriteable();
+                _domain = value;
+            }
+        }
 
-		/// <summary>
-		/// Gets a value indicating whether the content request has a domain.
-		/// </summary>
-		public bool HasDomain => Domain != null;
+        /// <summary>
+        /// Gets a value indicating whether the content request has a domain.
+        /// </summary>
+        public bool HasDomain => Domain != null;
 
-	    /// <summary>
-	    /// Gets or sets the content request's culture.
-	    /// </summary>
-	    public CultureInfo Culture
-	    {
+        /// <summary>
+        /// Gets or sets the content request's culture.
+        /// </summary>
+        public CultureInfo Culture
+        {
             get { return _culture; }
             set
             {
@@ -353,41 +353,41 @@ namespace Umbraco.Web.Routing
         // note: do we want to have an ordered list of alternate cultures,
         // to allow for fallbacks when doing dictionnary lookup and such?
 
-		#endregion
+        #endregion
 
-		#region Rendering
+        #region Rendering
 
-		/// <summary>
-		/// Gets or sets whether the rendering engine is MVC or WebForms.
-		/// </summary>
-		public RenderingEngine RenderingEngine { get; internal set; }
+        /// <summary>
+        /// Gets or sets whether the rendering engine is MVC or WebForms.
+        /// </summary>
+        public RenderingEngine RenderingEngine { get; internal set; }
 
-		#endregion
+        #endregion
 
         #region Status
 
         /// <summary>
         /// Gets or sets a value indicating whether the requested content could not be found.
         /// </summary>
-        /// <remarks>This is set in the <c>PublishedContentRequestBuilder</c> and can also be used in 
+        /// <remarks>This is set in the <c>PublishedContentRequestBuilder</c> and can also be used in
         /// custom content finders or <c>Prepared</c> event handlers, where we want to allow developers
         /// to indicate a request is 404 but not to cancel it.</remarks>
         public bool Is404
-	    {
-	        get { return _is404; }
-	        set
-	        {
-	            EnsureWriteable();
-	            _is404 = value;
-	        }
-	    }
+        {
+            get { return _is404; }
+            set
+            {
+                EnsureWriteable();
+                _is404 = value;
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether the content request triggers a redirect (permanent or not).
         /// </summary>
         public bool IsRedirect => string.IsNullOrWhiteSpace(RedirectUrl) == false;
 
-	    /// <summary>
+        /// <summary>
         /// Gets or sets a value indicating whether the redirect is permanent.
         /// </summary>
         public bool IsRedirectPermanent { get; private set; }

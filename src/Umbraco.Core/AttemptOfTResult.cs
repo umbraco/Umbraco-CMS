@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace Umbraco.Core
 {
@@ -7,8 +7,8 @@ namespace Umbraco.Core
     /// </summary>
     /// <typeparam name="TResult">The type of the attempted operation result.</typeparam>
     [Serializable]
-	public struct Attempt<TResult>
-	{
+    public struct Attempt<TResult>
+    {
         /// <summary>
         /// Gets a value indicating whether this <see cref="Attempt{TResult}"/> was successful.
         /// </summary>
@@ -25,7 +25,7 @@ namespace Umbraco.Core
         public TResult Result { get; }
 
         // optimize, use a singleton failed attempt
-		private static readonly Attempt<TResult> Failed = new Attempt<TResult>(false, default(TResult), null);
+        private static readonly Attempt<TResult> Failed = new Attempt<TResult>(false, default(TResult), null);
 
         // private - use Succeed() or Fail() methods to create attempts
         private Attempt(bool success, TResult result, Exception exception)

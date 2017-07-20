@@ -28,7 +28,7 @@ namespace Umbraco.Web.Cache
         {
             var userPermissionCache = CacheHelper.IsolatedRuntimeCache.GetCache<EntityPermission>();
             if (userPermissionCache)
-                userPermissionCache.Result.ClearCacheByKeySearch(CacheKeys.UserPermissionsCacheKey);    
+                userPermissionCache.Result.ClearCacheByKeySearch(CacheKeys.UserPermissionsCacheKey);
             base.RefreshAll();
         }
 

@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 2, Constants.System.UmbracoMigrationName)]
     public class DropControlIdColumn : MigrationBase
     {
-        public DropControlIdColumn(IMigrationContext context) 
+        public DropControlIdColumn(IMigrationContext context)
             : base(context)
         { }
 

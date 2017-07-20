@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -13,8 +13,8 @@ namespace Umbraco.Web.PropertyEditors
 {
     internal class ColorListPreValueEditor : ValueListPreValueEditor
     {
-      
-        public ColorListPreValueEditor(ILocalizedTextService textService, ILogger logger) 
+
+        public ColorListPreValueEditor(ILocalizedTextService textService, ILogger logger)
             : base(textService, logger)
         {
             var field = Fields.First();
@@ -26,7 +26,7 @@ namespace Umbraco.Web.PropertyEditors
             //change the label
             field.Name = "Add color";
             //need to have some custom validation happening here
-            field.Validators.Add(new ColorListValidator()); 
+            field.Validators.Add(new ColorListValidator());
         }
 
         public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
@@ -42,7 +42,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 var json = value as JArray;
                 if (json == null) yield break;
-                
+
                 //validate each item which is a json object
                 for (var index = 0; index < json.Count; index++)
                 {

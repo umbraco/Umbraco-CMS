@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web;
 
 namespace Umbraco.Web.Routing
@@ -8,16 +8,16 @@ namespace Umbraco.Web.Routing
     /// </summary>
     internal class LegacyRequestInitializer
     {
-    	private readonly Uri _requestUrl;
-    	private readonly HttpContextBase _httpContext;
+        private readonly Uri _requestUrl;
+        private readonly HttpContextBase _httpContext;
 
         public LegacyRequestInitializer(Uri requestUrl, HttpContextBase httpContext)
         {
-        	_requestUrl = requestUrl;
-        	_httpContext = httpContext;
+            _requestUrl = requestUrl;
+            _httpContext = httpContext;
         }
 
-    	public void InitializeRequest()
+        public void InitializeRequest()
         {
             var uri = _requestUrl;
 

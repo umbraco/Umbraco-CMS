@@ -1,4 +1,4 @@
-namespace Umbraco.Web
+﻿namespace Umbraco.Web
 {
     /// <summary>
     /// Provides access to UmbracoContext.

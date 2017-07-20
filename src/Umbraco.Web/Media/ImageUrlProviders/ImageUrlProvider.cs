@@ -66,7 +66,7 @@ namespace Umbraco.Web.Media.ImageUrlProviders
             {
                 var lastIndexOf = filename.LastIndexOf('.');
                 var name = filename.Substring(0, lastIndexOf);
-                
+
                 //var extension = filename.Substring(lastIndexOf, filename.Length - lastIndexOf);
                 //Built in cropper currently always uses jpg as an extension
 

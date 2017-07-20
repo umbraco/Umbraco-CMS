@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;

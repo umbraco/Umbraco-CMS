@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -63,7 +63,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     .LeftJoin<LanguageDto>()
                     .On<DomainDto, LanguageDto>(dto => dto.DefaultLanguage, dto => dto.Id);
             }
-            
+
             return sql;
         }
 
@@ -124,7 +124,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((UmbracoDomain)entity).UpdatingEntity();
 
-            var exists = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDomains WHERE domainName = @domainName AND umbracoDomains.id <> @id", 
+            var exists = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDomains WHERE domainName = @domainName AND umbracoDomains.id <> @id",
                 new { domainName = entity.DomainName, id = entity.Id });
             //ensure there is no other domain with the same name on another entity
             if (exists > 0) throw new DuplicateNameException(string.Format("The domain name {0} is already assigned", entity.DomainName));
@@ -182,11 +182,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new DomainModelFactory();
             var entity = factory.BuildEntity(dto);
             return entity;
-        }      
+        }
 
         internal class DomainModelFactory
         {
-           
+
             public IDomain BuildEntity(DomainDto dto)
             {
                 var domain = new UmbracoDomain(dto.DomainName, dto.IsoCode)

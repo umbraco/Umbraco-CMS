@@ -282,7 +282,7 @@ namespace Umbraco.Core.Media.Exif
         /// </summary>
         JFXXPalette = IFD.JFXX + 201,
         /// <summary>
-        /// JFIF thumbnail. The thumbnail will be either a JPEG, 
+        /// JFIF thumbnail. The thumbnail will be either a JPEG,
         /// a 256 color palette bitmap, or a 24-bit RGB bitmap.
         /// </summary>
         JFXXThumbnail = IFD.JFXX + 202,

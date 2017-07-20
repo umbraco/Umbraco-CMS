@@ -28,14 +28,14 @@ using Version = Lucene.Net.Util.Version;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
-	/// <summary>
-	/// Used internally by test classes to initialize a new index from the template
-	/// </summary>
-	internal static class IndexInitializer
-	{
-		public static UmbracoContentIndexer GetUmbracoIndexer(
+    /// <summary>
+    /// Used internally by test classes to initialize a new index from the template
+    /// </summary>
+    internal static class IndexInitializer
+    {
+        public static UmbracoContentIndexer GetUmbracoIndexer(
             ProfilingLogger profilingLogger,
-            Directory luceneDir, 
+            Directory luceneDir,
             Analyzer analyzer = null,
             IContentService contentService = null,
             IMediaService mediaService = null,
@@ -44,11 +44,11 @@ namespace Umbraco.Tests.UmbracoExamine
             IContentTypeService contentTypeService = null,
             IMediaTypeService mediaTypeService = null,
             UmbracoContentIndexerOptions options = null)
-		{            
-		    if (contentService == null)
-		    {
+        {
+            if (contentService == null)
+            {
                 long longTotalRecs;
-		        var demoData = new ExamineDemoDataContentService();
+                var demoData = new ExamineDemoDataContentService();
 
                 var allRecs = demoData.GetLatestContentByXPath("//*[@isDoc]")
                     .Root
@@ -82,10 +82,10 @@ namespace Umbraco.Tests.UmbracoExamine
                         ==
                         allRecs);
             }
-		    if (userService == null)
-		    {
-		        userService = Mock.Of<IUserService>(x => x.GetProfileById(It.IsAny<int>()) == Mock.Of<IProfile>(p => p.Id == (object)0 && p.Name == "admin"));
-		    }
+            if (userService == null)
+            {
+                userService = Mock.Of<IUserService>(x => x.GetProfileById(It.IsAny<int>()) == Mock.Of<IProfile>(p => p.Id == (object)0 && p.Name == "admin"));
+            }
             if (mediaService == null)
             {
                 long totalRecs;
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.UmbracoExamine
                                 mt.Alias == (string) x.Attribute("nodeTypeAlias") &&
                                 mt.Id == (int) x.Attribute("nodeType"))))
                     .ToArray();
-                    
+
                 // MOCK!
                 var mediaServiceMock = new Mock<IMediaService>();
 
@@ -131,30 +131,30 @@ namespace Umbraco.Tests.UmbracoExamine
                 mediaService = mediaServiceMock.Object;
 
             }
-            
+
             if (analyzer == null)
             {
                 analyzer = new StandardAnalyzer(Version.LUCENE_30);
             }
 
-		    //var indexSet = new IndexSet();
+            //var indexSet = new IndexSet();
       //      var indexCriteria = indexSet.ToIndexCriteria(dataService, UmbracoContentIndexer.IndexFieldPolicies);
-            
-		    //var i = new UmbracoContentIndexer(indexCriteria,
-		    //                                  luceneDir, //custom lucene directory
+
+            //var i = new UmbracoContentIndexer(indexCriteria,
+            //                                  luceneDir, //custom lucene directory
       //                                        dataService,
       //                                        contentService,
       //                                        mediaService,
       //                                        dataTypeService,
       //                                        userService,
       //                                        new[] { new DefaultUrlSegmentProvider() },
-		    //                                  analyzer,
-		    //                                  false);
+            //                                  analyzer,
+            //                                  false);
 
-			//i.IndexSecondsInterval = 1;
+            //i.IndexSecondsInterval = 1;
 
-		    if (options == null)
-		    {
+            if (options == null)
+            {
                 options = new UmbracoContentIndexerOptions(false, false, null);
             }
 
@@ -176,45 +176,45 @@ namespace Umbraco.Tests.UmbracoExamine
             //    .Setup(x => x.GetWhereClauses())
             //    .Returns(new List<Tuple<string, object[]>> { new Tuple<string, object[]>("cmsDocument.published", new object[] { 1 }) });
             var scopeProvider = new Mock<IScopeProvider>();
-		    //scopeProvider
-		    //    .Setup(x => x.Query<IContent>())
-		    //    .Returns(query.Object);
+            //scopeProvider
+            //    .Setup(x => x.Query<IContent>())
+            //    .Returns(query.Object);
 
-		    var i = new UmbracoContentIndexer(
-		        new[] { new FieldDefinition("", FieldDefinitionTypes.FullText) },
-		        luceneDir,
-		        analyzer,
-		        profilingLogger,
-		        contentService,
-		        mediaService,
-		        userService,
-		        new[] {new DefaultUrlSegmentProvider()},
-		        new UmbracoContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),
-		        options,
+            var i = new UmbracoContentIndexer(
+                new[] { new FieldDefinition("", FieldDefinitionTypes.FullText) },
+                luceneDir,
+                analyzer,
+                profilingLogger,
+                contentService,
+                mediaService,
+                userService,
+                new[] {new DefaultUrlSegmentProvider()},
+                new UmbracoContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),
+                options,
                 scopeProvider.Object);
 
-			i.IndexingError += IndexingError;
+            i.IndexingError += IndexingError;
 
-			return i;
-		}
-        
-		public static LuceneSearcher GetLuceneSearcher(Directory luceneDir)
-		{
-			return new LuceneSearcher(luceneDir, new StandardAnalyzer(Version.LUCENE_29));
-		}
-		
-		public static MultiIndexSearcher GetMultiSearcher(Directory pdfDir, Directory simpleDir, Directory conventionDir, Directory cwsDir)
-		{
-			var i = new MultiIndexSearcher(new[] { pdfDir, simpleDir, conventionDir, cwsDir }, new StandardAnalyzer(Version.LUCENE_29));
-			return i;
-		}
+            return i;
+        }
 
+        public static LuceneSearcher GetLuceneSearcher(Directory luceneDir)
+        {
+            return new LuceneSearcher(luceneDir, new StandardAnalyzer(Version.LUCENE_29));
+        }
 
-		internal static void IndexingError(object sender, IndexingErrorEventArgs e)
-		{
-			throw new ApplicationException(e.Message, e.Exception);
-		}
+        public static MultiIndexSearcher GetMultiSearcher(Directory pdfDir, Directory simpleDir, Directory conventionDir, Directory cwsDir)
+        {
+            var i = new MultiIndexSearcher(new[] { pdfDir, simpleDir, conventionDir, cwsDir }, new StandardAnalyzer(Version.LUCENE_29));
+            return i;
+        }
 
 
-	}
+        internal static void IndexingError(object sender, IndexingErrorEventArgs e)
+        {
+            throw new ApplicationException(e.Message, e.Exception);
+        }
+
+
+    }
 }

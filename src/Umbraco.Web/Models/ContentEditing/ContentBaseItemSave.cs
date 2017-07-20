@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models;
@@ -9,8 +9,8 @@ namespace Umbraco.Web.Models.ContentEditing
     /// A model representing a content base item to be saved
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
-    public abstract class ContentBaseItemSave<TPersisted> : ContentItemBasic<ContentPropertyBasic, TPersisted>, IHaveUploadedFiles 
-        where TPersisted : IContentBase   
+    public abstract class ContentBaseItemSave<TPersisted> : ContentItemBasic<ContentPropertyBasic, TPersisted>, IHaveUploadedFiles
+        where TPersisted : IContentBase
     {
         protected ContentBaseItemSave()
         {

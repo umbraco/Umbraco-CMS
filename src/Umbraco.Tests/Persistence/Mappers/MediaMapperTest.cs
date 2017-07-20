@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Version_Property()
         {
-            
+
             // Act
             string column = new MediaMapper().Map(new SqlCeSyntaxProvider(), "Version");
 

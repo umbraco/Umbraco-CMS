@@ -34,6 +34,6 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "notifications")]
         public List<Notification> Notifications { get; private set; }
-       
+
     }
 }

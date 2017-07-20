@@ -101,9 +101,9 @@ namespace Umbraco.Tests.IO
 
         [Test]
         public void Exception_Thrown_On_Invalid_Typed_File_System()
-		{
+        {
             Assert.Throws<InvalidOperationException>(() => FileSystems.GetFileSystemProvider<InvalidTypedFileSystem>());
-		}
+        }
 
         [Test]
         public void Exception_Thrown_On_NonConfigured_Typed_File_System()
@@ -125,11 +125,11 @@ namespace Umbraco.Tests.IO
         /// that only accepts a base IFileSystem object
         /// </summary>
         internal class InvalidTypedFileSystem : FileSystemWrapper
-	    {
-		    public InvalidTypedFileSystem(IFileSystem wrapped, string invalidParam) 
+        {
+            public InvalidTypedFileSystem(IFileSystem wrapped, string invalidParam)
                 : base(wrapped)
-		    { }
-	    }
+            { }
+        }
 
         [FileSystemProvider("noconfig")]
         internal class NonConfiguredTypeFileSystem : FileSystemWrapper

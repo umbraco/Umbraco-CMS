@@ -35,7 +35,7 @@ namespace Umbraco.Web.Editors
             var media = Services.MediaService.GetById(mediaId);
             if (media == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
-            
+
             var imageProp = media.Properties[Constants.Conventions.Media.File];
             if (imageProp == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -54,8 +54,8 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         public HttpResponseMessage GetBigThumbnail(string originalImagePath)
         {
-            return string.IsNullOrWhiteSpace(originalImagePath) 
-                ? Request.CreateResponse(HttpStatusCode.OK) 
+            return string.IsNullOrWhiteSpace(originalImagePath)
+                ? Request.CreateResponse(HttpStatusCode.OK)
                 : GetResized(originalImagePath, 500, "big-thumb");
         }
 
@@ -73,7 +73,7 @@ namespace Umbraco.Web.Editors
             var media = Services.MediaService.GetById(mediaId);
             if (media == null)
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
-            
+
             var imageProp = media.Properties[Constants.Conventions.Media.File];
             if (imageProp == null)
                 return new HttpResponseMessage(HttpStatusCode.NotFound);

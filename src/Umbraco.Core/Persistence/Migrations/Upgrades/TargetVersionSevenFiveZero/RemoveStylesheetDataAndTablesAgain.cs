@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
         private string MigrationCode(IUmbracoDatabase database)
         {
             var local = Context.GetLocalMigration();
-            
+
             //Clear all stylesheet data if the tables exist
             var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
             if (tables.InvariantContains("cmsStylesheetProperty"))

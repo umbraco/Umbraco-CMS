@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Migrations
 
         protected override void Initialize()
         {
-            // nothing - do not register the collection            
+            // nothing - do not register the collection
         }
 
         protected override MigrationCollectionBuilder This => this;

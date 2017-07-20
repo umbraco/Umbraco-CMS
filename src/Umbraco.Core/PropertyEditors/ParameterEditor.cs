@@ -16,7 +16,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public ParameterEditor()             
+        public ParameterEditor()
         {
             Configuration = new Dictionary<string, object>();
             //assign properties based on the attribute if it is found
@@ -60,7 +60,7 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         [JsonIgnore]
-        IValueEditor IParameterEditor.ValueEditor 
+        IValueEditor IParameterEditor.ValueEditor
         {
             get { return ValueEditor; }
         }

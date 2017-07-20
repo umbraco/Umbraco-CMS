@@ -19,10 +19,10 @@ namespace Umbraco.Core.Media.Exif
         {
             ;
         }
-    }   
+    }
 
     /// <summary>
-    /// The exception that is thrown when an invalid enum type is given to an 
+    /// The exception that is thrown when an invalid enum type is given to an
     /// ExifEnumProperty.
     /// </summary>
     internal class UnknownEnumTypeException : Exception

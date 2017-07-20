@@ -7,7 +7,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// Represents the type's of Umbraco entities that can be resolved from the EntityController
     /// </summary>
     public enum UmbracoEntityTypes
-    {   
+    {
         /// <summary>
         /// Domain
         /// </summary>
@@ -69,10 +69,10 @@ namespace Umbraco.Web.Models.ContentEditing
         /// Document Type
         /// </summary>
         DocumentType,
-        
+
         /// <summary>
         /// Stylesheet
-        /// </summary>        
+        /// </summary>
         Stylesheet,
 
         /// <summary>

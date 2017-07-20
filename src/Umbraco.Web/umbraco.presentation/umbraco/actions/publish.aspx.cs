@@ -1,4 +1,4 @@
-//TODO: REbuild this in angular and new apis then remove this
+﻿//TODO: REbuild this in angular and new apis then remove this
 
 //using System;
 //using System.Data;
@@ -30,7 +30,7 @@
 
 //            if (!base.ValidateUserNodeTreePermissions(d.Path, "U"))
 //                throw new ArgumentException("The current user doesn't have permissions to publish this document. Please contact the system administrator.");
-            
+
 //            pane_publish.Text = Services.TextService.Localize("publish") + " '" + d.Text + "'";
 //            Panel2.Text = Services.TextService.Localize("publish");
 //            warning.Text = Services.TextService.Localize("publish") + " '" + d.Text + "'. " + Services.TextService.Localize("areyousure");
@@ -53,7 +53,7 @@
 //            {
 //                deleted.Text = "<div class='error' style='padding:10px'>" + GetMessageForStatus(result.Result) +  "</div>";
 //            }
-            
+
 //        }
 
 //        private string GetMessageForStatus(PublishStatus status)

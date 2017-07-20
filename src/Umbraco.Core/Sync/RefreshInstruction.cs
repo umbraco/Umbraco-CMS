@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
@@ -72,7 +72,7 @@ namespace Umbraco.Core.Sync
 
                 case MessageType.RefreshByJson:
                     return new[] { new RefreshInstruction(refresher, RefreshMethodType.RefreshByJson, json) };
-                
+
                 case MessageType.RefreshById:
                     if (idType == null)
                         throw new InvalidOperationException("Cannot refresh by id if idType is null.");
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Sync
                     // must be ints, bulk-remove is not supported, iterate
                     return ids.Select(x => new RefreshInstruction(refresher, RefreshMethodType.RemoveById, (int) x));
                     //return new[] { new RefreshInstruction(refresher, RefreshMethodType.RemoveByIds, JsonConvert.SerializeObject(ids.Cast<int>().ToArray())) };
-                
+
                 default:
                     //case MessageType.RefreshByInstance:
                     //case MessageType.RemoveByInstance:
@@ -124,14 +124,14 @@ namespace Umbraco.Core.Sync
         /// Gets or sets the payload data value.
         /// </summary>
         public string JsonPayload { get; set; }
-        
+
         protected bool Equals(RefreshInstruction other)
         {
-            return RefreshType == other.RefreshType 
-                && RefresherId.Equals(other.RefresherId) 
-                && GuidId.Equals(other.GuidId) 
-                && IntId == other.IntId 
-                && string.Equals(JsonIds, other.JsonIds) 
+            return RefreshType == other.RefreshType
+                && RefresherId.Equals(other.RefresherId)
+                && GuidId.Equals(other.GuidId)
+                && IntId == other.IntId
+                && string.Equals(JsonIds, other.JsonIds)
                 && string.Equals(JsonPayload, other.JsonPayload);
         }
 

@@ -32,7 +32,7 @@ namespace Umbraco.Core.Models.Packaging
             get { return _undo ?? true; }
             set { _undo = value; }
         }
-        
+
         public XElement XmlData { get; set; }
     }
 }

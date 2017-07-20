@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
@@ -32,10 +32,10 @@ namespace Umbraco.Web.PropertyEditors
                     yield return new ValidationResult(Current.Services.TextService.Localize("errors/dissallowedMediaType"),
                                                       new[]
                                                           {
-                                                              //we only store a single value for this editor so the 'member' or 'field' 
+                                                              //we only store a single value for this editor so the 'member' or 'field'
                                                               // we'll associate this error with will simply be called 'value'
                                                               "value"
-                                                          });   
+                                                          });
                 }
             }
 

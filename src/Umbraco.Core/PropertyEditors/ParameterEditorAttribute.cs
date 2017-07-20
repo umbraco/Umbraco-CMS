@@ -32,6 +32,6 @@ namespace Umbraco.Core.PropertyEditors
 
         public string Alias { get; }
         public string Name { get; }
-        public string EditorView { get; }        
+        public string EditorView { get; }
     }
 }

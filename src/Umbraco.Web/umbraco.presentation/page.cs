@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,194 +19,194 @@ using Umbraco.Web.Composing;
 
 namespace umbraco
 {
-	/// <summary>
-	/// Summary description for page.
-	/// </summary>
-	public class page
-	{
+    /// <summary>
+    /// Summary description for page.
+    /// </summary>
+    public class page
+    {
 
-		#region Private members and properties
+        #region Private members and properties
 
-		string _pageName;
-		int _parentId;
-		string _writerName;
-		string _creatorName;
-		string _path;
-		int _nodeType;
-		string _nodeTypeAlias;
-		string[] _splitpath;
-		DateTime _createDate;
-		DateTime _updateDate;
-		int _pageId;
-		Guid _pageVersion;
-		readonly int _template;
+        string _pageName;
+        int _parentId;
+        string _writerName;
+        string _creatorName;
+        string _path;
+        int _nodeType;
+        string _nodeTypeAlias;
+        string[] _splitpath;
+        DateTime _createDate;
+        DateTime _updateDate;
+        int _pageId;
+        Guid _pageVersion;
+        readonly int _template;
 
-		readonly Hashtable _elements = new Hashtable();
-		readonly StringBuilder _pageContent = new StringBuilder();
-		Control _pageContentControl = new Control();	
+        readonly Hashtable _elements = new Hashtable();
+        readonly StringBuilder _pageContent = new StringBuilder();
+        Control _pageContentControl = new Control();
 
-		#endregion
+        #endregion
 
-		#region Constructors
+        #region Constructors
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="page"/> class for a published document request.
-		/// </summary>
-		/// <param name="frequest">The <see cref="PublishedContentRequest"/> pointing to the document.</param>
-		/// <remarks>
-		/// The difference between creating the page with PublishedContentRequest vs an IPublishedContent item is 
-		/// that the PublishedContentRequest takes into account how a template is assigned during the routing process whereas
-		/// with an IPublishedContent item, the template id is asssigned purely based on the default.
-		/// </remarks>
-		internal page(PublishedContentRequest frequest)
-		{
+        /// <summary>
+        /// Initializes a new instance of the <see cref="page"/> class for a published document request.
+        /// </summary>
+        /// <param name="frequest">The <see cref="PublishedContentRequest"/> pointing to the document.</param>
+        /// <remarks>
+        /// The difference between creating the page with PublishedContentRequest vs an IPublishedContent item is
+        /// that the PublishedContentRequest takes into account how a template is assigned during the routing process whereas
+        /// with an IPublishedContent item, the template id is asssigned purely based on the default.
+        /// </remarks>
+        internal page(PublishedContentRequest frequest)
+        {
 
-			if (!frequest.HasPublishedContent)
-				throw new ArgumentException("Document request has no node.", "frequest");
-			
-			populatePageData(frequest.PublishedContent.Id,
-				frequest.PublishedContent.Name, frequest.PublishedContent.DocumentTypeId, frequest.PublishedContent.DocumentTypeAlias,
-				frequest.PublishedContent.WriterName, frequest.PublishedContent.CreatorName, frequest.PublishedContent.CreateDate, frequest.PublishedContent.UpdateDate,
-				frequest.PublishedContent.Path, frequest.PublishedContent.Version, frequest.PublishedContent.Parent == null ? -1 : frequest.PublishedContent.Parent.Id);
+            if (!frequest.HasPublishedContent)
+                throw new ArgumentException("Document request has no node.", "frequest");
 
-			if (frequest.HasTemplate)
-			{
+            populatePageData(frequest.PublishedContent.Id,
+                frequest.PublishedContent.Name, frequest.PublishedContent.DocumentTypeId, frequest.PublishedContent.DocumentTypeAlias,
+                frequest.PublishedContent.WriterName, frequest.PublishedContent.CreatorName, frequest.PublishedContent.CreateDate, frequest.PublishedContent.UpdateDate,
+                frequest.PublishedContent.Path, frequest.PublishedContent.Version, frequest.PublishedContent.Parent == null ? -1 : frequest.PublishedContent.Parent.Id);
 
-				this._template = frequest.TemplateModel.Id;
-				_elements["template"] = _template.ToString();				
-			}
+            if (frequest.HasTemplate)
+            {
 
-			PopulateElementData(frequest.PublishedContent);
+                this._template = frequest.TemplateModel.Id;
+                _elements["template"] = _template.ToString();
+            }
 
-		}
+            PopulateElementData(frequest.PublishedContent);
 
-		/// <summary>
-		/// Initializes a new instance of the page for a published document
-		/// </summary>
-		/// <param name="doc"></param>
-		internal page(IPublishedContent doc)
-		{
-			if (doc == null) throw new ArgumentNullException("doc");
-			
-			populatePageData(doc.Id,
-				doc.Name, doc.DocumentTypeId, doc.DocumentTypeAlias,
-				doc.WriterName, doc.CreatorName, doc.CreateDate, doc.UpdateDate,
-				doc.Path, doc.Version, doc.Parent == null ? -1 : doc.Parent.Id);
+        }
 
-			if (doc.TemplateId > 0)
-			{
-				//set the template to whatever is assigned to the doc
-				_template = doc.TemplateId;
-				_elements["template"] = _template.ToString();	
-			}			
-			
-			PopulateElementData(doc);
-		}
+        /// <summary>
+        /// Initializes a new instance of the page for a published document
+        /// </summary>
+        /// <param name="doc"></param>
+        internal page(IPublishedContent doc)
+        {
+            if (doc == null) throw new ArgumentNullException("doc");
+
+            populatePageData(doc.Id,
+                doc.Name, doc.DocumentTypeId, doc.DocumentTypeAlias,
+                doc.WriterName, doc.CreatorName, doc.CreateDate, doc.UpdateDate,
+                doc.Path, doc.Version, doc.Parent == null ? -1 : doc.Parent.Id);
+
+            if (doc.TemplateId > 0)
+            {
+                //set the template to whatever is assigned to the doc
+                _template = doc.TemplateId;
+                _elements["template"] = _template.ToString();
+            }
+
+            PopulateElementData(doc);
+        }
 
         /// <summary>
         /// Initializes a new instance of the page for a content.
         /// </summary>
         /// <param name="content">The content.</param>
         /// <remarks>This is for <see cref="MacroController"/> usage only.</remarks>
-	    internal page(IContent content)
+        internal page(IContent content)
             : this(new PagePublishedContent(content))
-	    { }
+        { }
 
-		#endregion
+        #endregion
 
-		#region Initialize
+        #region Initialize
 
-		void populatePageData(int pageID,
-			string pageName, int nodeType, string nodeTypeAlias,
-			string writerName, string creatorName, DateTime createDate, DateTime updateDate,
-			string path, Guid pageVersion, int parentId)
-		{
-			this._pageId = pageID;
-			this._pageName = pageName;
-			this._nodeType = nodeType;
-			this._nodeTypeAlias = nodeTypeAlias;
-			this._writerName = writerName;
-			this._creatorName = creatorName;
-			this._createDate = createDate;
-			this._updateDate = updateDate;
-			this._parentId = parentId;
-			this._path = path;
-			this._splitpath = path.Split(',');
-			this._pageVersion = pageVersion;
+        void populatePageData(int pageID,
+            string pageName, int nodeType, string nodeTypeAlias,
+            string writerName, string creatorName, DateTime createDate, DateTime updateDate,
+            string path, Guid pageVersion, int parentId)
+        {
+            this._pageId = pageID;
+            this._pageName = pageName;
+            this._nodeType = nodeType;
+            this._nodeTypeAlias = nodeTypeAlias;
+            this._writerName = writerName;
+            this._creatorName = creatorName;
+            this._createDate = createDate;
+            this._updateDate = updateDate;
+            this._parentId = parentId;
+            this._path = path;
+            this._splitpath = path.Split(',');
+            this._pageVersion = pageVersion;
 
-			// Update the elements hashtable
-			_elements.Add("pageID", pageID);
-			_elements.Add("parentID", parentId);
-			_elements.Add("pageName", pageName);
-			_elements.Add("nodeType", nodeType);
-			_elements.Add("nodeTypeAlias", nodeTypeAlias);
-			_elements.Add("writerName", writerName);
-			_elements.Add("creatorName", creatorName);
-			_elements.Add("createDate", createDate);
-			_elements.Add("updateDate", updateDate);
-			_elements.Add("path", path);
-			_elements.Add("splitpath", _splitpath);
-			_elements.Add("pageVersion", pageVersion);
-		}
+            // Update the elements hashtable
+            _elements.Add("pageID", pageID);
+            _elements.Add("parentID", parentId);
+            _elements.Add("pageName", pageName);
+            _elements.Add("nodeType", nodeType);
+            _elements.Add("nodeTypeAlias", nodeTypeAlias);
+            _elements.Add("writerName", writerName);
+            _elements.Add("creatorName", creatorName);
+            _elements.Add("createDate", createDate);
+            _elements.Add("updateDate", updateDate);
+            _elements.Add("path", path);
+            _elements.Add("splitpath", _splitpath);
+            _elements.Add("pageVersion", pageVersion);
+        }
 
-		void populatePageData(XmlNode node)
-		{
-			String s;
-			DateTime dt;
-			Guid guid;
-			int i;
+        void populatePageData(XmlNode node)
+        {
+            String s;
+            DateTime dt;
+            Guid guid;
+            int i;
 
-			if (int.TryParse(attrValue(node, "id"), out i))
-				_elements["pageID"] = this._pageId = i;
+            if (int.TryParse(attrValue(node, "id"), out i))
+                _elements["pageID"] = this._pageId = i;
 
-			if ((s = attrValue(node, "nodeName")) != null)
-				_elements["pageName"] = this._pageName = s;
+            if ((s = attrValue(node, "nodeName")) != null)
+                _elements["pageName"] = this._pageName = s;
 
-			if (int.TryParse(attrValue(node, "parentId"), out i))
-				_elements["parentId"] = this._parentId = i;
+            if (int.TryParse(attrValue(node, "parentId"), out i))
+                _elements["parentId"] = this._parentId = i;
 
-			if (int.TryParse(attrValue(node, "nodeType"), out i))
-				_elements["nodeType"] = this._nodeType = i;
-			if ((s = attrValue(node, "nodeTypeAlias")) != null)
-				_elements["nodeTypeAlias"] = this._nodeTypeAlias = s;
+            if (int.TryParse(attrValue(node, "nodeType"), out i))
+                _elements["nodeType"] = this._nodeType = i;
+            if ((s = attrValue(node, "nodeTypeAlias")) != null)
+                _elements["nodeTypeAlias"] = this._nodeTypeAlias = s;
 
-			if ((s = attrValue(node, "writerName")) != null)
-				_elements["writerName"] = this._writerName = s;
-			if ((s = attrValue(node, "creatorName")) != null)
-				_elements["creatorName"] = this._creatorName = s;
+            if ((s = attrValue(node, "writerName")) != null)
+                _elements["writerName"] = this._writerName = s;
+            if ((s = attrValue(node, "creatorName")) != null)
+                _elements["creatorName"] = this._creatorName = s;
 
-			if (DateTime.TryParse(attrValue(node, "createDate"), out dt))
-				_elements["createDate"] = this._createDate = dt;
-			if (DateTime.TryParse(attrValue(node, "updateDate"), out dt))
-				_elements["updateDate"] = this._updateDate = dt;
+            if (DateTime.TryParse(attrValue(node, "createDate"), out dt))
+                _elements["createDate"] = this._createDate = dt;
+            if (DateTime.TryParse(attrValue(node, "updateDate"), out dt))
+                _elements["updateDate"] = this._updateDate = dt;
 
-			if (Guid.TryParse(attrValue(node, "pageVersion"), out guid))
-				_elements["pageVersion"] = this._pageVersion = guid;
+            if (Guid.TryParse(attrValue(node, "pageVersion"), out guid))
+                _elements["pageVersion"] = this._pageVersion = guid;
 
-			if ((s = attrValue(node, "path")) != null)
-			{
-				_elements["path"] = this._path = s;
-				_elements["splitpath"] = this._splitpath = _path.Split(',');
-			}
-		}
+            if ((s = attrValue(node, "path")) != null)
+            {
+                _elements["path"] = this._path = s;
+                _elements["splitpath"] = this._splitpath = _path.Split(',');
+            }
+        }
 
-		string attrValue(XmlNode node, string attributeName)
-		{
-			var attr = node.Attributes.GetNamedItem(attributeName);
-			var value = attr != null ? attr.Value : null;
-			return value;
-		}
+        string attrValue(XmlNode node, string attributeName)
+        {
+            var attr = node.Attributes.GetNamedItem(attributeName);
+            var value = attr != null ? attr.Value : null;
+            return value;
+        }
 
-		/// <summary>
-		/// Puts the properties of the node into the elements table
-		/// </summary>
-		/// <param name="node"></param>
-		void PopulateElementData(IPublishedContent node)
-		{
-			foreach(var p in node.Properties)
-			{
-				if (_elements.ContainsKey(p.PropertyTypeAlias) == false)				
-				{
+        /// <summary>
+        /// Puts the properties of the node into the elements table
+        /// </summary>
+        /// <param name="node"></param>
+        void PopulateElementData(IPublishedContent node)
+        {
+            foreach(var p in node.Properties)
+            {
+                if (_elements.ContainsKey(p.PropertyTypeAlias) == false)
+                {
                     // note: legacy used the raw value (see populating from an Xml node below)
                     // so we're doing the same here, using DataValue. If we use Value then every
                     // value will be converted NOW - including RTEs that may contain macros that
@@ -215,145 +215,145 @@ namespace umbraco
                     // to properly fix this, we'd need to turn the elements collection into some
                     // sort of collection of lazy values.
 
-					_elements[p.PropertyTypeAlias] = p.SourceValue;
-				}
-			}			
-		}
+                    _elements[p.PropertyTypeAlias] = p.SourceValue;
+                }
+            }
+        }
 
-		void populateElementData(XmlNode node)
-		{
-			string xpath = "./* [not(@isDoc)]";
+        void populateElementData(XmlNode node)
+        {
+            string xpath = "./* [not(@isDoc)]";
 
-			foreach (XmlNode data in node.SelectNodes(xpath))
-			{
-				// ignore empty elements
-				if (data.ChildNodes.Count == 0)
-					continue;
+            foreach (XmlNode data in node.SelectNodes(xpath))
+            {
+                // ignore empty elements
+                if (data.ChildNodes.Count == 0)
+                    continue;
 
-				string alias = data.Name;
-				string value = data.FirstChild.Value;
+                string alias = data.Name;
+                string value = data.FirstChild.Value;
 
-				// moved to PublishedContentRequest + UmbracoModule
-				//if (alias == "umbracoRedirect")
-				//{
-				//    int i;
-				//    if (int.TryParse(value, out i))
-				//        HttpContext.Current.Response.Redirect(library.NiceUrl(int.Parse(data.FirstChild.Value)), true);
-				//}
+                // moved to PublishedContentRequest + UmbracoModule
+                //if (alias == "umbracoRedirect")
+                //{
+                //    int i;
+                //    if (int.TryParse(value, out i))
+                //        HttpContext.Current.Response.Redirect(library.NiceUrl(int.Parse(data.FirstChild.Value)), true);
+                //}
 
-				if (_elements.ContainsKey(alias))
-				{
-					Current.Logger.Debug<page>(
-						string.Format("Aliases must be unique, an element with alias \"{0}\" has already been loaded!", alias));					
-				}
-				else
-				{
-					_elements[alias] = value;
+                if (_elements.ContainsKey(alias))
+                {
                     Current.Logger.Debug<page>(
-						string.Format("Load element \"{0}\"", alias));					
-				}
-			}
-		}
+                        string.Format("Aliases must be unique, an element with alias \"{0}\" has already been loaded!", alias));
+                }
+                else
+                {
+                    _elements[alias] = value;
+                    Current.Logger.Debug<page>(
+                        string.Format("Load element \"{0}\"", alias));
+                }
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region Wtf?
+        #region Wtf?
 
-		public void RenderPage(int templateId)
-		{
-			if (templateId != 0)
-			{				
-				template templateDesign = new template(templateId);
-			
-				_pageContentControl = templateDesign.ParseWithControls(this);
-				_pageContent.Append(templateDesign.TemplateContent);
-			}
-		}
+        public void RenderPage(int templateId)
+        {
+            if (templateId != 0)
+            {
+                template templateDesign = new template(templateId);
 
-		#endregion
+                _pageContentControl = templateDesign.ParseWithControls(this);
+                _pageContent.Append(templateDesign.TemplateContent);
+            }
+        }
 
-		#region Public properties
+        #endregion
 
-		public Control PageContentControl
-		{
-			get { return _pageContentControl; }
-		}
+        #region Public properties
 
-		public string PageName
-		{
-			get { return _pageName; }
-		}
+        public Control PageContentControl
+        {
+            get { return _pageContentControl; }
+        }
 
-		public int ParentId
-		{
-			get { return _parentId; }
-		}
+        public string PageName
+        {
+            get { return _pageName; }
+        }
 
-		public string NodeTypeAlias
-		{
-			get { return _nodeTypeAlias; }
-		}
+        public int ParentId
+        {
+            get { return _parentId; }
+        }
 
-		public int NodeType
-		{
-			get { return _nodeType; }
-		}
+        public string NodeTypeAlias
+        {
+            get { return _nodeTypeAlias; }
+        }
 
-		public string WriterName
-		{
-			get { return _writerName; }
-		}
+        public int NodeType
+        {
+            get { return _nodeType; }
+        }
 
-		public string CreatorName
-		{
-			get { return _creatorName; }
-		}
+        public string WriterName
+        {
+            get { return _writerName; }
+        }
 
-		public DateTime CreateDate
-		{
-			get { return _createDate; }
-		}
+        public string CreatorName
+        {
+            get { return _creatorName; }
+        }
 
-		public DateTime UpdateDate
-		{
-			get { return _updateDate; }
-		}
+        public DateTime CreateDate
+        {
+            get { return _createDate; }
+        }
 
-		public int PageID
-		{
-			get { return _pageId; }
-		}
+        public DateTime UpdateDate
+        {
+            get { return _updateDate; }
+        }
 
-		public int Template
-		{
-			get { return _template; }
-		}
+        public int PageID
+        {
+            get { return _pageId; }
+        }
 
-		public Hashtable Elements
-		{
-			get { return _elements; }
-		}
+        public int Template
+        {
+            get { return _template; }
+        }
 
-		public string PageContent
-		{
-			get { return _pageContent.ToString(); }
-		}
+        public Hashtable Elements
+        {
+            get { return _elements; }
+        }
 
-		public string[] SplitPath
-		{
-			get { return this._splitpath; }
-		}
+        public string PageContent
+        {
+            get { return _pageContent.ToString(); }
+        }
 
-		#endregion
+        public string[] SplitPath
+        {
+            get { return this._splitpath; }
+        }
 
-		#region ToString
+        #endregion
 
-		public override string ToString()
-		{
-			return _pageName;
-		}
+        #region ToString
 
-		#endregion
+        public override string ToString()
+        {
+            return _pageName;
+        }
+
+        #endregion
 
         #region PublishedContent
 

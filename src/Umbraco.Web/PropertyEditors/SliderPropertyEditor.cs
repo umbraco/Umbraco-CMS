@@ -21,13 +21,13 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class SliderPreValueEditor : PreValueEditor
         {
-            
+
             [PreValueField("enableRange", "Enable range", "boolean")]
             public string Range { get; set; }
 
             [PreValueField("orientation", "Orientation", "views/propertyeditors/slider/orientation.prevalues.html")]
             public string Orientation { get; set; }
-            
+
             [PreValueField("initVal1", "Initial value", "number")]
             public int InitialValue { get; set; }
 
@@ -39,7 +39,7 @@ namespace Umbraco.Web.PropertyEditors
 
             [PreValueField("maxVal", "Maximum value", "number")]
             public int MaximumValue { get; set; }
-            
+
             [PreValueField("step", "Step increments", "number")]
             public int StepIncrements { get; set; }
 

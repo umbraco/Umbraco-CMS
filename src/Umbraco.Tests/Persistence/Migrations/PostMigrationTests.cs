@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Persistence.Migrations
             var runner1 = new MigrationRunner(Mock.Of<IMigrationCollectionBuilder>(), Mock.Of<IMigrationEntryService>(), logger, new SemVersion(1), new SemVersion(2), "Test1",
                 new IMigration[] { Mock.Of<IMigration>() });
             var result1 = runner1.Execute(migrationContext /*, false*/);
-            Assert.AreEqual(1, changed1.CountExecuted);            
+            Assert.AreEqual(1, changed1.CountExecuted);
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Persistence.Migrations
             Assert.AreEqual(0, changed2.CountExecuted);
 
             var runner2 = new MigrationRunner(Mock.Of<IMigrationCollectionBuilder>(), Mock.Of<IMigrationEntryService>(), logger, new SemVersion(1), new SemVersion(2), "Test2",
-                new IMigration[] { Mock.Of<IMigration>() });            
+                new IMigration[] { Mock.Of<IMigration>() });
             var result2 = runner2.Execute(migrationContext /*, false*/);
             Assert.AreEqual(1, changed1.CountExecuted);
             Assert.AreEqual(1, changed2.CountExecuted);

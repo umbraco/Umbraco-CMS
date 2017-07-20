@@ -8,10 +8,10 @@ using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
-	[Weight(3000)]
+    [Weight(3000)]
     public class MediaTypeIconThumbnailProvider : AbstractThumbnailProvider
     {
-        
+
         protected override IEnumerable<string> SupportedExtensions
         {
             get { return new List<string> { "*" }; }

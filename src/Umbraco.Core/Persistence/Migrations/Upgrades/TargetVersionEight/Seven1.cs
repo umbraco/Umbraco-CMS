@@ -27,14 +27,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
 
                 // 7.6.0
                 new AddIndexesToUmbracoRelationTables(Context),
-                new AddIndexToCmsMemberLoginName(Context), 
-                new AddIndexToUmbracoNodePath(Context), 
-                new AddMacroUniqueIdColumn(Context), 
+                new AddIndexToCmsMemberLoginName(Context),
+                new AddIndexToUmbracoNodePath(Context),
+                new AddMacroUniqueIdColumn(Context),
                 new AddRelationTypeUniqueIdColumn(Context),
-                new NormalizeTemplateGuids(Context), 
-                new ReduceLoginNameColumnsSize(Context), 
+                new NormalizeTemplateGuids(Context),
+                new ReduceLoginNameColumnsSize(Context),
                 new TargetVersionSevenSixZero.UpdateUniqueIndexOnCmsPropertyData(Context),
-                new RemoveUmbracoDeployTables(Context), 
+                new RemoveUmbracoDeployTables(Context),
             };
 
             foreach (var migration in migrations)

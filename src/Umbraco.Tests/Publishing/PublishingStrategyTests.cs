@@ -19,27 +19,27 @@ namespace Umbraco.Tests.Publishing
         {
             base.SetUp();
 
-            //LegacyUmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);              
+            //LegacyUmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
         }
 
         [TearDown]
         public override void TearDown()
         {
-			base.TearDown();
-            
+            base.TearDown();
+
             //ensure event handler is gone
-            ContentService.Publishing -= StrategyPublishing;            
+            ContentService.Publishing -= StrategyPublishing;
         }
 
         private IContent _homePage;
 
         /// <summary>
-        /// in these tests we have a heirarchy of 
+        /// in these tests we have a heirarchy of
         /// - home
         /// -- text page 1
         /// -- text page 2
         /// --- text page 3
-        /// 
+        ///
         /// For this test, none of them are published, then we bulk publish them all, however one of the nodes will fail publishing
         /// because it is not valid, then it's children won't be published either because it's never been published.
         /// </summary>
@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Publishing
             var subContent = MockedContent.CreateSimpleContent(
                 ServiceContext.ContentTypeService.Get("umbTextpage"), "Sub Sub Sub", mandatorContent.Id);
             ServiceContext.ContentService.Save(subContent, 0);
-            
+
             //publish root and nodes at it's children level
             var listToPublish = ServiceContext.ContentService.GetDescendants(_homePage.Id).Concat(new[] { _homePage });
             var evtMsgs = new EventMessages();
@@ -68,14 +68,14 @@ namespace Umbraco.Tests.Publishing
         }
 
         /// <summary>
-        /// in these tests we have a heirarchy of 
+        /// in these tests we have a heirarchy of
         /// - home
         /// -- text page 1
         /// -- text page 2
         /// --- text page 3
-        /// 
+        ///
         /// For this test, none of them are published, then we bulk publish them all, however we cancel the publishing for
-        /// "text page 2". This internally will ensure that text page 3 doesn't get published either because text page 2 has 
+        /// "text page 2". This internally will ensure that text page 3 doesn't get published either because text page 2 has
         /// never been published.
         /// </summary>
         [Test]
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Publishing
             var evtMsgs = new EventMessages();
             var uow = TestObjects.GetUnitOfWorkMock();
             var result = ((ContentService)ServiceContext.ContentService).StrategyPublishWithChildren(uow, listToPublish, null, 0, evtMsgs);
-            
+
             Assert.AreEqual(listToPublish.Count() - 2, result.Count(x => x.Success));
             Assert.IsTrue(result.Where(x => x.Success).Select(x => x.Result.ContentItem.Id)
                                 .ContainsAll(listToPublish.Where(x => x.Name != "Text Page 2" && x.Name != "Text Page 3").Select(x => x.Id)));
@@ -116,12 +116,12 @@ namespace Umbraco.Tests.Publishing
             Assert.IsTrue(_homePage.Published);
             foreach (var c in ServiceContext.ContentService.GetChildren(_homePage.Id))
             {
-                var r = ((ContentService)ServiceContext.ContentService).StrategyPublish(uow, c, false, 0, evtMsgs);    
+                var r = ((ContentService)ServiceContext.ContentService).StrategyPublish(uow, c, false, 0, evtMsgs);
                 Assert.IsTrue(r);
                 Assert.IsTrue(c.Published);
             }
 
-            //ok, all are published except the deepest descendant, we will pass in a flag to not include it to 
+            //ok, all are published except the deepest descendant, we will pass in a flag to not include it to
             //be published - beware that StrategyPublishWithChildren expects content to be ordered by level
             var content = new[] {_homePage}.Union(ServiceContext.ContentService.GetDescendants(_homePage));
             var result = ((ContentService)ServiceContext.ContentService).StrategyPublishWithChildren(uow, content, null, 0, evtMsgs, false);
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.Publishing
             var result1 = ((ContentService)ServiceContext.ContentService).StrategyPublish(uow, _homePage, false, 0, evtMsgs);
             Assert.IsTrue(result1);
             Assert.IsTrue(_homePage.Published);
-            
+
             //NOTE (MCH) This isn't persisted, so not really a good test as it will look like the result should be something else.
             foreach (var c in ServiceContext.ContentService.GetChildren(_homePage.Id))
             {
@@ -165,7 +165,7 @@ namespace Umbraco.Tests.Publishing
             var contents = new[] {_homePage} // top-level MUST be the first one here
                 .Concat(ServiceContext.ContentService.GetDescendants(_homePage));
             var result = ((ContentService)ServiceContext.ContentService).StrategyPublishWithChildren(uow, contents, null, 0, evtMsgs, true);
-            
+
             Assert.AreEqual(4, result.Count(x => x.Result.StatusType == PublishStatusType.Success));
             Assert.AreEqual(0, result.Count(x => x.Result.StatusType == PublishStatusType.SuccessAlreadyPublished));
             Assert.IsTrue(result.First(x => x.Result.StatusType == PublishStatusType.Success).Success);

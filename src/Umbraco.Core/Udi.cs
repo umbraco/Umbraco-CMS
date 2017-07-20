@@ -46,24 +46,24 @@ namespace Umbraco.Core
             UdiTypes = new Lazy<Dictionary<string, UdiType>>(() =>
             {
                 var result = new Dictionary<string, UdiType>();
-                
+
                 // known types:
                 foreach (var fi in typeof(Constants.UdiEntityType).GetFields(BindingFlags.Public | BindingFlags.Static))
                 {
-                    // IsLiteral determines if its value is written at 
+                    // IsLiteral determines if its value is written at
                     //   compile time and not changeable
-                    // IsInitOnly determine if the field can be set 
+                    // IsInitOnly determine if the field can be set
                     //   in the body of the constructor
-                    // for C# a field which is readonly keyword would have both true 
+                    // for C# a field which is readonly keyword would have both true
                     //   but a const field would have only IsLiteral equal to true
                     if (fi.IsLiteral && fi.IsInitOnly == false)
                     {
                         var udiType = fi.GetCustomAttribute<Constants.UdiTypeAttribute>();
 
-                        if (udiType == null) 
+                        if (udiType == null)
                             throw new InvalidOperationException("All Constants listed in UdiEntityType must be attributed with " + typeof(Constants.UdiTypeAttribute));
                         result[fi.GetValue(null).ToString()] = udiType.UdiType;
-                    }                        
+                    }
                 }
 
                 // Scan for unknown UDI types
@@ -87,7 +87,7 @@ namespace Umbraco.Core
                 }
 
                 return result;
-            });                       
+            });
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace Umbraco.Core
                 throw new ArgumentException("Value cannot be null or whitespace.", "id");
             if (udiType != UdiType.StringUdi)
                 throw new InvalidOperationException(string.Format("Entity type \"{0}\" does not have string udis.", entityType));
-            
+
             return new StringUdi(entityType, id);
         }
 

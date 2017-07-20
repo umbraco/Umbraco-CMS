@@ -7,7 +7,7 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.MacroContainerAlias, "(Obsolete) Macro Picker", "macrocontainer", ValueType = PropertyEditorValueTypes.Text, Group="rich content", Icon="icon-settings-alt", IsDeprecated = true)]
     public class MacroContainerPropertyEditor : PropertyEditor
     {
-        public MacroContainerPropertyEditor(ILogger logger) 
+        public MacroContainerPropertyEditor(ILogger logger)
             : base(logger)
         {
         }

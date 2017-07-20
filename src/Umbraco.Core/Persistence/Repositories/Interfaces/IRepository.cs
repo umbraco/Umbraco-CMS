@@ -3,10 +3,10 @@
 namespace Umbraco.Core.Persistence.Repositories
 {
     /// <summary>
-	/// Defines the base implementation of a repository.
-	/// </summary>
-	public interface IRepository
-	{ }
+    /// Defines the base implementation of a repository.
+    /// </summary>
+    public interface IRepository
+    { }
 
     public interface IReadRepository<in TId, out TEntity> : IRepository
     {

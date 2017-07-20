@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,43 +24,43 @@ namespace Umbraco.Tests.Plugins
 {
 
     /// <summary>
-	/// Tests for typefinder
-	/// </summary>
-	[TestFixture]
-	public class TypeFinderTests
-	{
-		/// <summary>
-		/// List of assemblies to scan
-		/// </summary>
-		private Assembly[] _assemblies;
+    /// Tests for typefinder
+    /// </summary>
+    [TestFixture]
+    public class TypeFinderTests
+    {
+        /// <summary>
+        /// List of assemblies to scan
+        /// </summary>
+        private Assembly[] _assemblies;
 
-		[SetUp]
-		public void Initialize()
-		{
-		    _assemblies = new[]
-			    {
-			        this.GetType().Assembly,
-			        typeof(System.Guid).Assembly,
-			        typeof(NUnit.Framework.Assert).Assembly,
-			        typeof(Microsoft.CSharp.CSharpCodeProvider).Assembly,
-			        typeof(System.Xml.NameTable).Assembly,
-			        typeof(System.Configuration.GenericEnumConverter).Assembly,
-			        typeof(System.Web.SiteMap).Assembly,
-			        //typeof(TabPage).Assembly,
-			        typeof(System.Web.Mvc.ActionResult).Assembly,
-			        typeof(TypeFinder).Assembly,
+        [SetUp]
+        public void Initialize()
+        {
+            _assemblies = new[]
+                {
+                    this.GetType().Assembly,
+                    typeof(System.Guid).Assembly,
+                    typeof(NUnit.Framework.Assert).Assembly,
+                    typeof(Microsoft.CSharp.CSharpCodeProvider).Assembly,
+                    typeof(System.Xml.NameTable).Assembly,
+                    typeof(System.Configuration.GenericEnumConverter).Assembly,
+                    typeof(System.Web.SiteMap).Assembly,
+                    //typeof(TabPage).Assembly,
+                    typeof(System.Web.Mvc.ActionResult).Assembly,
+                    typeof(TypeFinder).Assembly,
                     typeof(global::UmbracoExamine.BaseUmbracoIndexer).Assembly
-			    };
+                };
 
-		}
+        }
 
         [Test]
-		public void Find_Class_Of_Type_With_Attribute()
-		{
+        public void Find_Class_Of_Type_With_Attribute()
+        {
 
-			var typesFound = TypeFinder.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies);
-			Assert.AreEqual(2, typesFound.Count());
-		}
+            var typesFound = TypeFinder.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies);
+            Assert.AreEqual(2, typesFound.Count());
+        }
 
         //[Test]
         //public void Find_Classes_Of_Type()
@@ -93,10 +93,10 @@ namespace Umbraco.Tests.Plugins
             Assert.AreEqual(22, typesFound.Count()); // 22 classes in Umbraco.Web are marked with [Tree]
         }
 
-	    private static ProfilingLogger GetTestProfilingLogger()
-	    {
+        private static ProfilingLogger GetTestProfilingLogger()
+        {
             var logger = new DebugDiagnosticsLogger();
-	        var profiler = new TestProfiler();
+            var profiler = new TestProfiler();
             return new ProfilingLogger(logger, profiler);
         }
 
@@ -409,7 +409,7 @@ namespace Umbraco.Tests.Plugins
             internal static readonly string[] KnownAssemblyExclusionFilter = new[]
                 {
                     "mscorlib,",
-					"System.",
+                    "System.",
                     "Antlr3.",
                     "Autofac.",
                     "Autofac,",
@@ -430,8 +430,8 @@ namespace Umbraco.Tests.Plugins
                     "SqlCE4Umbraco,",
                     "umbraco.datalayer,",
                     "umbraco.interfaces,",
-					"umbraco.providers,",
-					"Umbraco.Web.UI,",
+                    "umbraco.providers,",
+                    "Umbraco.Web.UI,",
                     "umbraco.webservices",
                     "Lucene.",
                     "Examine,",
@@ -629,7 +629,7 @@ namespace Umbraco.Tests.Plugins
 
 
         }
-	}
+    }
 
 
 }

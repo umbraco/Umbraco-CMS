@@ -8,7 +8,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Tests.Configurations
 {
-  
+
     [TestFixture]
     public class FileSystemProviderTests
     {

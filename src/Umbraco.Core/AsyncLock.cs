@@ -69,11 +69,11 @@ namespace Umbraco.Core
 
         public Task<IDisposable> LockAsync()
         {
-            var wait = _semaphore != null 
+            var wait = _semaphore != null
                 ? _semaphore.WaitAsync()
                 : _semaphore2.WaitOneAsync();
 
-            return wait.IsCompleted 
+            return wait.IsCompleted
                 ? _releaserTask ?? Task.FromResult(CreateReleaser()) // anonymous vs named
                 : wait.ContinueWith((_, state) => (((AsyncLock) state).CreateReleaser()),
                     this, CancellationToken.None,
@@ -112,7 +112,7 @@ namespace Umbraco.Core
             return _releaser ?? CreateReleaser(); // anonymous vs named
         }
 
-        // note - before making those classes some structs, read 
+        // note - before making those classes some structs, read
         // about "impure methods" and mutating readonly structs...
 
         private class NamedSemaphoreReleaser : CriticalFinalizerObject, IDisposable
@@ -140,9 +140,9 @@ namespace Umbraco.Core
                 _semaphore.Dispose();
             }
 
-            // we WANT to release the semaphore because it's a system object, ie a critical 
+            // we WANT to release the semaphore because it's a system object, ie a critical
             // non-managed resource - and if it is not released then noone else can acquire
-            // the lock - so we inherit from CriticalFinalizerObject which means that the 
+            // the lock - so we inherit from CriticalFinalizerObject which means that the
             // finalizer "should" run in all situations - there is always a chance that it
             // does not run and the semaphore remains "acquired" but then chances are the
             // whole process (w3wp.exe...) is going down, at which point the semaphore will

@@ -7,7 +7,7 @@ using System.Linq;
 namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
-    /// Used to map the legacy parameter editor aliases to the new ones, this is really just used during 
+    /// Used to map the legacy parameter editor aliases to the new ones, this is really just used during
     /// installation but has been put in a separate class in case we need it for other purposes
     /// </summary>
     public static class LegacyParameterEditorAliasConverter
@@ -97,7 +97,7 @@ namespace Umbraco.Core.PropertyEditors
 
             CreateMap("mediaCurrent", Constants.PropertyEditors.MediaPickerAlias);
 
-            CreateMap("number", Constants.PropertyEditors.IntegerAlias);   
+            CreateMap("number", Constants.PropertyEditors.IntegerAlias);
         }
     }
 }

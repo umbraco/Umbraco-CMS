@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
@@ -56,7 +56,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public UmbracoContext UmbracoContext => _umbracoContext 
+        public UmbracoContext UmbracoContext => _umbracoContext
             ?? (_umbracoContext = ViewContext.GetUmbracoContext() ?? Current.UmbracoContext);
 
         /// <summary>

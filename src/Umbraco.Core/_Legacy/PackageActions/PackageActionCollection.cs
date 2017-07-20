@@ -5,7 +5,7 @@ namespace Umbraco.Core._Legacy.PackageActions
 {
     internal class PackageActionCollection : BuilderCollectionBase<IPackageAction>
     {
-        public PackageActionCollection(IEnumerable<IPackageAction> items) 
+        public PackageActionCollection(IEnumerable<IPackageAction> items)
             : base(items)
         { }
     }

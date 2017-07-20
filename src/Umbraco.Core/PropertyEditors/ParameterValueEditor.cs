@@ -11,7 +11,7 @@ namespace Umbraco.Core.PropertyEditors
         /// default ctor
         /// </summary>
         public ParameterValueEditor()
-        {           
+        {
         }
 
         /// <summary>

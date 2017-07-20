@@ -12,7 +12,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public MemberPickerPropertyEditor(ILogger logger) 
+        public MemberPickerPropertyEditor(ILogger logger)
             : base(logger)
         {
             InternalPreValues["idType"] = "int";

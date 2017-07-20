@@ -30,8 +30,8 @@ namespace Umbraco.Core.Models
         /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         public Content(string name, IContent parent, IContentType contentType)
-			: this(name, parent, contentType, new PropertyCollection())
-		{ }
+            : this(name, parent, contentType, new PropertyCollection())
+        { }
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -40,12 +40,12 @@ namespace Umbraco.Core.Models
         /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
-		public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties)
-			: base(name, parent, contentType, properties)
-		{
-		    _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
+        public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties)
+            : base(name, parent, contentType, properties)
+        {
+            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             PublishedState = PublishedState.Unpublished;
-		}
+        }
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -64,8 +64,8 @@ namespace Umbraco.Core.Models
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
-        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties) 
-			: base(name, parentId, contentType, properties)
+        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties)
+            : base(name, parentId, contentType, properties)
         {
             _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             PublishedState = PublishedState.Unpublished;
@@ -90,7 +90,7 @@ namespace Umbraco.Core.Models
         /// This is used to override the default one from the ContentType.
         /// </summary>
         /// <remarks>
-        /// If no template is explicitly set on the Content object, 
+        /// If no template is explicitly set on the Content object,
         /// the Default template from the ContentType will be returned.
         /// </remarks>
         [DataMember]

@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             var result = Mapper.Map<IContent, ContentItemDto<IContent>>(content);
 
-            AssertContentItem(result, content);    
+            AssertContentItem(result, content);
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace Umbraco.Tests.Models.Mapping
             foreach (var p in content.Properties)
             {
                 AssertDisplayProperty(result, p);
-            }            
+            }
             Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count() - 1);
             Assert.IsTrue(result.Tabs.Any(x => x.Label == Current.Services.TextService.Localize("general/properties")));
             Assert.IsTrue(result.Tabs.First().IsActive);
@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Models.Mapping
         public void To_Display_Model_With_Non_Grouped_Properties()
         {
             var idSeed = 1;
-            var contentType = MockedContentTypes.CreateSimpleContentType();            
+            var contentType = MockedContentTypes.CreateSimpleContentType();
             //add non-grouped properties
             contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, "nonGrouped1") { Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
             contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, "nonGrouped2") { Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
@@ -171,10 +171,10 @@ namespace Umbraco.Tests.Models.Mapping
             where TPersisted : IContentBase
         {
             AssertBasicProperty(result, p);
-            
+
             var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
             Assert.IsNotNull(pDto);
-            
+
             //pDto.Alias = p.Alias;
             //pDto.Description = p.PropertyType.Description;
             //pDto.Label = p.PropertyType.Name;

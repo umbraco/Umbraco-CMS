@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -18,14 +18,14 @@ namespace Umbraco.Tests.Models
             var item = new Template("Test", "test")
             {
                 Id = 3,
-                CreateDate = DateTime.Now,                
+                CreateDate = DateTime.Now,
                 Key = Guid.NewGuid(),
                 UpdateDate = DateTime.Now,
                 Content = "blah",
                 Path = "-1,3",
-                IsMasterTemplate = true,                
+                IsMasterTemplate = true,
                 MasterTemplateAlias = "master",
-                MasterTemplateId = new Lazy<int>(() => 88)                
+                MasterTemplateId = new Lazy<int>(() => 88)
             };
 
             var clone = (Template)item.DeepClone();

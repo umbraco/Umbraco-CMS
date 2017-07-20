@@ -62,7 +62,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.FailedPasswordAttempts, opt => opt.Ignore())
                 .ForMember(dest => dest.DeletedDate, opt => opt.Ignore())
                 //TODO: Support these eventually
-                .ForMember(dest => dest.PasswordQuestion, opt => opt.Ignore())                
+                .ForMember(dest => dest.PasswordQuestion, opt => opt.Ignore())
                 .ForMember(dest => dest.RawPasswordAnswerValue, opt => opt.Ignore());
 
             //FROM IMember TO MediaItemDisplay
@@ -103,7 +103,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.HasPublishedVersion, opt => opt.Ignore());
 
             //FROM MembershipUser TO MemberBasic
-            CreateMap<MembershipUser, MemberBasic>()                
+            CreateMap<MembershipUser, MemberBasic>()
                 //we're giving this entity an ID of 0 - we cannot really map it but it needs an id so the system knows it's not a new entity
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => int.MaxValue))
                 .ForMember(dest => dest.Udi, opt => opt.Ignore())

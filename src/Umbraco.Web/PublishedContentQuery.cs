@@ -63,7 +63,7 @@ namespace Umbraco.Web
                 ? ItemByXPath(xpath, vars, _contentCache)
                 : _query.ContentSingleAtXPath(xpath, vars);
         }
-        
+
         public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids)
         {
             return _query == null
@@ -102,7 +102,7 @@ namespace Umbraco.Web
         #endregion
 
         #region Media
-        
+
         public IPublishedContent Media(int id)
         {
             return _query == null
@@ -166,7 +166,7 @@ namespace Umbraco.Web
         //{
         //    var doc = cache.GetSingleByXPath(xpath, vars);
         //    return doc;
-        //}        
+        //}
 
         private static IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache cache, IEnumerable<int> ids)
         {

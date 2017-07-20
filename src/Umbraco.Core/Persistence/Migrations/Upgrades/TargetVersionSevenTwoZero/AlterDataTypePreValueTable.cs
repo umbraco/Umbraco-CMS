@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using AutoMapper;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
     [Migration("7.2.0", 0, Constants.System.UmbracoMigrationName)]
     public class AlterDataTypePreValueTable : MigrationBase
     {
-        public AlterDataTypePreValueTable(IMigrationContext context) 
+        public AlterDataTypePreValueTable(IMigrationContext context)
             : base(context)
         { }
 

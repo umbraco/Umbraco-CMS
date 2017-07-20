@@ -73,7 +73,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Creates and persists a Member
         /// </summary>
-        /// <remarks>Using this method will persist the Member object before its returned 
+        /// <remarks>Using this method will persist the Member object before its returned
         /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
         /// <param name="username">Username of the Member to create</param>
         /// <param name="email">Email of the Member to create</param>
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Creates and persists a Member
         /// </summary>
-        /// <remarks>Using this method will persist the Member object before its returned 
+        /// <remarks>Using this method will persist the Member object before its returned
         /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
         /// <param name="username">Username of the Member to create</param>
         /// <param name="email">Email of the Member to create</param>
@@ -97,7 +97,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
         /// </summary>
-        /// <remarks>This method exists so that Umbraco developers can use one entry point to create/update 
+        /// <remarks>This method exists so that Umbraco developers can use one entry point to create/update
         /// Members if they choose to. </remarks>
         /// <param name="member">The Member to save the password for</param>
         /// <param name="password">The password to encrypt and save</param>

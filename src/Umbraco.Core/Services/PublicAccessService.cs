@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Events;
@@ -63,7 +63,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
 
-                //This will retrieve from cache!                 
+                //This will retrieve from cache!
                 var entries = repo.GetAll().ToArray();
                 uow.Complete();
 
@@ -236,7 +236,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Occurs before Delete
-        /// </summary>		
+        /// </summary>
         public static event TypedEventHandler<IPublicAccessService, DeleteEventArgs<PublicAccessEntry>> Deleting;
 
         /// <summary>

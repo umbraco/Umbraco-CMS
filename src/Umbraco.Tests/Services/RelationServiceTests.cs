@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;

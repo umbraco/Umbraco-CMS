@@ -1,10 +1,10 @@
-using NPoco;
+﻿using NPoco;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 {
     public class AlterDefaultConstraintExpression : MigrationExpressionBase
     {
-        public AlterDefaultConstraintExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes) 
+        public AlterDefaultConstraintExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
             : base(context, supportedDatabaseTypes)
         { }
 

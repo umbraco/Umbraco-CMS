@@ -93,7 +93,7 @@ namespace Umbraco.Web.PropertyEditors
 
                 public bool AllowBulkMove { get; set; }
 
-                public bool AllowBulkDelete { get; set; }                
+                public bool AllowBulkDelete { get; set; }
             }
         }
     }

@@ -6,7 +6,7 @@ using System.Linq;
 namespace Umbraco.Core.Collections
 {
     /// <summary>
-    /// An ObservableDictionary 
+    /// An ObservableDictionary
     /// </summary>
     /// <remarks>
     /// Assumes that the key will not change and is unique for each element in the collection.
@@ -109,7 +109,7 @@ namespace Umbraco.Core.Collections
         /// </summary>
         /// <param name="key">Key of element to replace</param>
         /// <param name="value">New value</param>
-        /// 
+        ///
         /// <exception cref="InvalidOperationException"></exception>
         /// <returns>False if key not found</returns>
         public virtual bool Replace(TKey key, TValue value)

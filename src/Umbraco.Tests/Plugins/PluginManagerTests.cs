@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -33,19 +33,19 @@ namespace Umbraco.Tests.Plugins
             //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
             //TODO: Should probably update this so it only searches this assembly and add custom types to be found
             _manager.AssembliesToScan = new[]
-			    {
-			        this.GetType().Assembly,
-			        typeof(System.Guid).Assembly,
-			        typeof(NUnit.Framework.Assert).Assembly,
-			        typeof(Microsoft.CSharp.CSharpCodeProvider).Assembly,
-			        typeof(System.Xml.NameTable).Assembly,
-			        typeof(System.Configuration.GenericEnumConverter).Assembly,
-			        typeof(System.Web.SiteMap).Assembly,
-			        //typeof(TabPage).Assembly,
-			        typeof(System.Web.Mvc.ActionResult).Assembly,
-			        typeof(TypeFinder).Assembly,
-					typeof(UmbracoContext).Assembly
-			    };
+                {
+                    this.GetType().Assembly,
+                    typeof(System.Guid).Assembly,
+                    typeof(NUnit.Framework.Assert).Assembly,
+                    typeof(Microsoft.CSharp.CSharpCodeProvider).Assembly,
+                    typeof(System.Xml.NameTable).Assembly,
+                    typeof(System.Configuration.GenericEnumConverter).Assembly,
+                    typeof(System.Web.SiteMap).Assembly,
+                    //typeof(TabPage).Assembly,
+                    typeof(System.Web.Mvc.ActionResult).Assembly,
+                    typeof(TypeFinder).Assembly,
+                    typeof(UmbracoContext).Assembly
+                };
         }
 
         [TearDown]
@@ -68,79 +68,79 @@ namespace Umbraco.Tests.Plugins
         //[Test]
         //public void Scan_Vs_Load_Benchmark()
         //{
-        //	var typeLoader = new TypeLoader(false);
-        //	var watch = new Stopwatch();
-        //	watch.Start();
-        //	for (var i = 0; i < 1000; i++)
-        //	{
-        //		var type2 = Type.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
-        //		var type3 = Type.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
-        //		var type4 = Type.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
-        //		var type5 = Type.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
-        //	}
-        //	watch.Stop();
-        //	Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
-        //	watch.Start();
-        //	for (var i = 0; i < 1000; i++)
-        //	{
-        //		var type2 = BuildManager.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
-        //		var type3 = BuildManager.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
-        //		var type4 = BuildManager.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
-        //		var type5 = BuildManager.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
-        //	}
-        //	watch.Stop();
-        //	Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
-        //	watch.Reset();
-        //	watch.Start();
-        //	for (var i = 0; i < 1000; i++)
-        //	{
-        //		var refreshers = typeLoader.GetTypes<ICacheRefresher>(false);
-        //	}
-        //	watch.Stop();
-        //	Debug.WriteLine("TOTAL TIME (2nd round): " + watch.ElapsedMilliseconds);
+        //    var typeLoader = new TypeLoader(false);
+        //    var watch = new Stopwatch();
+        //    watch.Start();
+        //    for (var i = 0; i < 1000; i++)
+        //    {
+        //        var type2 = Type.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+        //        var type3 = Type.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+        //        var type4 = Type.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+        //        var type5 = Type.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+        //    }
+        //    watch.Stop();
+        //    Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
+        //    watch.Start();
+        //    for (var i = 0; i < 1000; i++)
+        //    {
+        //        var type2 = BuildManager.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+        //        var type3 = BuildManager.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+        //        var type4 = BuildManager.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+        //        var type5 = BuildManager.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+        //    }
+        //    watch.Stop();
+        //    Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
+        //    watch.Reset();
+        //    watch.Start();
+        //    for (var i = 0; i < 1000; i++)
+        //    {
+        //        var refreshers = typeLoader.GetTypes<ICacheRefresher>(false);
+        //    }
+        //    watch.Stop();
+        //    Debug.WriteLine("TOTAL TIME (2nd round): " + watch.ElapsedMilliseconds);
         //}
 
         ////NOTE: This test shows that Type.GetType is 100% faster than Assembly.Load(..).GetType(...) so we'll use that :)
         //[Test]
         //public void Load_Type_Benchmark()
         //{
-        //	var watch = new Stopwatch();
-        //	watch.Start();
-        //	for (var i = 0; i < 1000; i++)
-        //	{
-        //		var type2 = Type.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
-        //		var type3 = Type.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
-        //		var type4 = Type.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
-        //		var type5 = Type.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
-        //	}
-        //	watch.Stop();
-        //	Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
-        //	watch.Reset();
-        //	watch.Start();
-        //	for (var i = 0; i < 1000; i++)
-        //	{
-        //		var type2 = Assembly.Load("umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null")
-        //			.GetType("umbraco.macroCacheRefresh");
-        //		var type3 = Assembly.Load("umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null")
-        //			.GetType("umbraco.templateCacheRefresh");
-        //		var type4 = Assembly.Load("umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null")
-        //			.GetType("umbraco.presentation.cache.MediaLibraryRefreshers");
-        //		var type5 = Assembly.Load("umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null")
-        //			.GetType("umbraco.presentation.cache.pageRefresher");
-        //	}
-        //	watch.Stop();
-        //	Debug.WriteLine("TOTAL TIME (2nd round): " + watch.ElapsedMilliseconds);
-        //	watch.Reset();
-        //	watch.Start();
-        //	for (var i = 0; i < 1000; i++)
-        //	{
-        //		var type2 = BuildManager.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
-        //		var type3 = BuildManager.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
-        //		var type4 = BuildManager.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
-        //		var type5 = BuildManager.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
-        //	}
-        //	watch.Stop();
-        //	Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
+        //    var watch = new Stopwatch();
+        //    watch.Start();
+        //    for (var i = 0; i < 1000; i++)
+        //    {
+        //        var type2 = Type.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+        //        var type3 = Type.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+        //        var type4 = Type.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+        //        var type5 = Type.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+        //    }
+        //    watch.Stop();
+        //    Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
+        //    watch.Reset();
+        //    watch.Start();
+        //    for (var i = 0; i < 1000; i++)
+        //    {
+        //        var type2 = Assembly.Load("umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null")
+        //            .GetType("umbraco.macroCacheRefresh");
+        //        var type3 = Assembly.Load("umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null")
+        //            .GetType("umbraco.templateCacheRefresh");
+        //        var type4 = Assembly.Load("umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null")
+        //            .GetType("umbraco.presentation.cache.MediaLibraryRefreshers");
+        //        var type5 = Assembly.Load("umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null")
+        //            .GetType("umbraco.presentation.cache.pageRefresher");
+        //    }
+        //    watch.Stop();
+        //    Debug.WriteLine("TOTAL TIME (2nd round): " + watch.ElapsedMilliseconds);
+        //    watch.Reset();
+        //    watch.Start();
+        //    for (var i = 0; i < 1000; i++)
+        //    {
+        //        var type2 = BuildManager.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+        //        var type3 = BuildManager.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+        //        var type4 = BuildManager.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+        //        var type5 = BuildManager.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+        //    }
+        //    watch.Stop();
+        //    Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
         //}
 
         [Test]

@@ -1,4 +1,4 @@
-using Umbraco.Core.Models;
+﻿using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -47,7 +47,7 @@ namespace Umbraco.Core.Persistence.Factories
                 TaskTypeId = (byte)entity.TaskType.Id,
                 UserId = entity.AssigneeUserId
             };
-            
+
             return dto;
         }
     }

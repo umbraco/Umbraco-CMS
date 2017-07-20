@@ -19,7 +19,7 @@ namespace Umbraco.Core.Sync
     /// this messenger sends ALL instructions to ALL servers, including the local server.
     /// the CacheRefresher web service will run ALL instructions, so there may be duplicated,
     /// except for "bulk" refresh, where it excludes those coming from the local server
-    /// </remarks>        
+    /// </remarks>
     //
     // TODO see Message() method: stop sending to local server!
     // just need to figure out WebServerUtility permissions issues, if any
@@ -49,7 +49,7 @@ namespace Umbraco.Core.Sync
         /// <remarks>Distribution will be enabled based on the umbraco config setting.</remarks>
         internal WebServiceServerMessenger(string login, string password)
             : this(login, password, UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled)
-        {            
+        {
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace Umbraco.Core.Sync
                     {
                         Login = result.Item1;
                         Password = result.Item2;
-                        DistributedEnabled = UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled;    
+                        DistributedEnabled = UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled;
                     }
                 }
                 catch (Exception ex)
@@ -153,7 +153,7 @@ namespace Umbraco.Core.Sync
         protected virtual void Message(
             IEnumerable<IServerAddress> servers,
             ICacheRefresher refresher,
-            MessageType messageType, 
+            MessageType messageType,
             IEnumerable<object> ids = null,
             Type idArrayType = null,
             string jsonPayload = null)
@@ -213,7 +213,7 @@ namespace Umbraco.Core.Sync
                                 else // must be guids
                                 {
                                     // bulk of guids is not supported, iterate
-                                    asyncResults.AddRange(ids.Select(i => 
+                                    asyncResults.AddRange(ids.Select(i =>
                                         client.BeginRefreshByGuid(refresher.RefresherUniqueId, (Guid)i, Login, Password, null, null)));
                                 }
 
@@ -223,7 +223,7 @@ namespace Umbraco.Core.Sync
                                     throw new InvalidOperationException("Cannot remove by id if the idArrayType is null.");
 
                                 // must be ints
-                                asyncResults.AddRange(ids.Select(i => 
+                                asyncResults.AddRange(ids.Select(i =>
                                     client.BeginRemoveById(refresher.RefresherUniqueId, (int)i, Login, Password, null, null)));
                                 break;
                         }
@@ -375,7 +375,7 @@ namespace Umbraco.Core.Sync
             string url = (ex.Response != null) ? ex.Response.ResponseUri.ToString() : "invalid url (responseUri null)";
             Current.Logger.Error<WebServiceServerMessenger>("Error refreshing a node in the distributed list, URI attempted: " + url, ex);
         }
-        
+
         private static void LogStartDispatch()
         {
             Current.Logger.Info<WebServiceServerMessenger>("Submitting calls to distributed servers");

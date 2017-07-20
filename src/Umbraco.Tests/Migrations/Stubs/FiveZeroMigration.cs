@@ -1,4 +1,4 @@
-using Umbraco.Core.Logging;
+﻿using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -7,7 +7,7 @@ namespace Umbraco.Tests.Migrations.Stubs
     [Migration("5.0.0", 0, "Test")]
     public class FiveZeroMigration : MigrationBase
     {
-        public FiveZeroMigration(IMigrationContext context) 
+        public FiveZeroMigration(IMigrationContext context)
             : base(context)
         { }
 
@@ -19,6 +19,6 @@ namespace Umbraco.Tests.Migrations.Stubs
         public override void Down()
         {
         }
-        
+
     }
 }

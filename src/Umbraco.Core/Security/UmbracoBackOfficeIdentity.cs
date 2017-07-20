@@ -36,15 +36,15 @@ namespace Umbraco.Core.Security
 
             var username = identity.GetUserName();
             var session = identity.FindFirstValue(Constants.Security.SessionIdClaimType);
-            var startContentId = identity.FindFirstValue(Constants.Security.StartContentNodeIdClaimType);            
+            var startContentId = identity.FindFirstValue(Constants.Security.StartContentNodeIdClaimType);
             var startMediaId = identity.FindFirstValue(Constants.Security.StartMediaNodeIdClaimType);
 
             var culture = identity.FindFirstValue(ClaimTypes.Locality);
-            var id = identity.FindFirstValue(ClaimTypes.NameIdentifier);            
+            var id = identity.FindFirstValue(ClaimTypes.NameIdentifier);
             var realName = identity.FindFirstValue(ClaimTypes.GivenName);
 
-            if (username == null || startContentId == null || startMediaId == null 
-                || culture == null || id == null 
+            if (username == null || startContentId == null || startMediaId == null
+                || culture == null || id == null
                 || realName == null || session == null)
                 throw new InvalidOperationException("Cannot create a " + typeof(UmbracoBackOfficeIdentity) + " from " + typeof(ClaimsIdentity) + " since there are missing required claims");
 
@@ -155,7 +155,7 @@ namespace Umbraco.Core.Security
         {
             foreach (var claim in claimsIdentity.Claims)
             {
-                //In one special case we will replace a claim if it exists already and that is the 
+                //In one special case we will replace a claim if it exists already and that is the
                 // Forms auth claim for name which automatically gets added
                 TryRemoveClaim(FindFirst(x => x.Type == claim.Type && x.Issuer == "Forms"));
 
@@ -177,14 +177,14 @@ namespace Umbraco.Core.Security
                 {
                     ClaimTypes.NameIdentifier, //id
                     ClaimTypes.Name,  //username
-                    ClaimTypes.GivenName, 
+                    ClaimTypes.GivenName,
                     Constants.Security.StartContentNodeIdClaimType,
-                    Constants.Security.StartMediaNodeIdClaimType, 
-                    ClaimTypes.Locality, 
+                    Constants.Security.StartMediaNodeIdClaimType,
+                    ClaimTypes.Locality,
                     Constants.Security.SessionIdClaimType
                 };
             }
-        } 
+        }
 
         /// <summary>
         /// Adds claims based on the UserData data
@@ -214,7 +214,7 @@ namespace Umbraco.Core.Security
             {
                 AddClaim(new Claim(Constants.Security.SessionIdClaimType, SessionId, ClaimValueTypes.String, Issuer, Issuer, this));
 
-                //The security stamp claim is also required... this is because this claim type is hard coded 
+                //The security stamp claim is also required... this is because this claim type is hard coded
                 // by the SecurityStampValidator, see: https://katanaproject.codeplex.com/workitem/444
                 if (HasClaim(x => x.Type == Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType) == false)
                 {
@@ -227,7 +227,7 @@ namespace Umbraco.Core.Security
             {
                 foreach (var application in AllowedApplications)
                 {
-                    AddClaim(new Claim(Constants.Security.AllowedApplicationsClaimType, application, ClaimValueTypes.String, Issuer, Issuer, this));    
+                    AddClaim(new Claim(Constants.Security.AllowedApplicationsClaimType, application, ClaimValueTypes.String, Issuer, Issuer, this));
                 }
             }
 
@@ -242,8 +242,8 @@ namespace Umbraco.Core.Security
                 }
             }
 
-            
-            
+
+
         }
 
         protected internal UserData UserData { get; private set; }

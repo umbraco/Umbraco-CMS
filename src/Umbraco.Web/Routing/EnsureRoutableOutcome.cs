@@ -1,4 +1,4 @@
-namespace Umbraco.Web.Routing
+﻿namespace Umbraco.Web.Routing
 {
     /// <summary>
     /// Represents the outcome of trying to route an incoming request.

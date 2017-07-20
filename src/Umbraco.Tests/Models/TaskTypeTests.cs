@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -18,14 +18,14 @@ namespace Umbraco.Tests.Models
                 Alias = "test",
                 CreateDate = DateTime.Now,
                 Key = Guid.NewGuid(),
-                UpdateDate = DateTime.Now               
+                UpdateDate = DateTime.Now
             };
 
             var clone = (TaskType)item.DeepClone();
 
             Assert.AreNotSame(clone, item);
             Assert.AreEqual(clone, item);
-            Assert.AreEqual(clone.CreateDate, item.CreateDate);            
+            Assert.AreEqual(clone.CreateDate, item.CreateDate);
             Assert.AreEqual(clone.Id, item.Id);
             Assert.AreEqual(clone.Key, item.Key);
             Assert.AreEqual(clone.Alias, item.Alias);

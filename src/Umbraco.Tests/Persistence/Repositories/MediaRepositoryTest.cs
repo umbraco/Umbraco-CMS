@@ -240,7 +240,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_GetByQuery_On_MediaRepository_With_ContentType_Id_Filter()
         {
-            // Arrange            
+            // Arrange
             var folderMediaType = ServiceContext.MediaTypeService.Get(1031);
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
@@ -268,7 +268,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_GetByQuery_On_MediaRepository_With_ContentType_Alias_Filter()
         {
-            // Arrange            
+            // Arrange
             var folderMediaType = ServiceContext.MediaTypeService.Get(1031);
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())

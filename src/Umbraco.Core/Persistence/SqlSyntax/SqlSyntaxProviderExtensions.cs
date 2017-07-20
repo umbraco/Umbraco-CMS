@@ -42,7 +42,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public static Sql GetDeleteSubquery(this ISqlSyntaxProvider sqlProvider, string tableName, string columnName, Sql subQuery, WhereInType whereInType = WhereInType.In)
         {
 
-            return 
+            return
                 new Sql(string.Format(
                     whereInType == WhereInType.In
                         ? @"DELETE FROM {0} WHERE {1} IN (SELECT {1} FROM ({2}) x)"

@@ -218,7 +218,7 @@ namespace Umbraco.Core.Xml.XPath
             public bool WrapNavigatorInNodes { get; private set; }
             public KeyValuePair<string, string>[] Attributes { get; private set; }
         }
-        
+
         #endregion
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace Umbraco.Core.Xml.XPath
         /// </summary>
         public override bool IsEmptyElement
         {
-            get 
+            get
             {
                 DebugEnter("IsEmptyElement");
                 bool isEmpty;
@@ -1030,7 +1030,7 @@ namespace Umbraco.Core.Xml.XPath
             // gets a value indicating whether this state is at the same position as another one.
             public bool IsSamePosition(State other)
             {
-                return other.Position == Position 
+                return other.Position == Position
                     && (Position != StatePosition.ParameterNavigator || other.ParameterNavigator.IsSamePosition(ParameterNavigator))
                     && other.ParameterIndex == ParameterIndex
                     && other.ParameterAttributeIndex == ParameterAttributeIndex;

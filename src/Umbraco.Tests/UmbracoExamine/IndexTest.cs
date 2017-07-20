@@ -18,35 +18,35 @@ namespace Umbraco.Tests.UmbracoExamine
     [TestFixture, RequiresSTA]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class IndexTest : ExamineBaseTest
-	{
+    {
 
-	    [Test]
-	    public void Rebuild_Index()
-	    {
+        [Test]
+        public void Rebuild_Index()
+        {
 
-	        using (var luceneDir = new RAMDirectory())
-	        using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
-	        using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
-	        {
-	            var searcher = indexer.GetSearcher();
+            using (var luceneDir = new RAMDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
+            using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
+            {
+                var searcher = indexer.GetSearcher();
 
                 //create the whole thing
                 indexer.RebuildIndex();
-	            session.WaitForChanges();
+                session.WaitForChanges();
 
-	            var result = searcher.Find(searcher.CreateCriteria().All().Compile());
+                var result = searcher.Find(searcher.CreateCriteria().All().Compile());
 
                 Assert.AreEqual(29, result.TotalItemCount);
             }
-	    }
+        }
 
-	    ///// <summary>
+        ///// <summary>
         /// <summary>
         /// Check that the node signalled as protected in the content service is not present in the index.
         /// </summary>
         [Test]
-		public void Index_Protected_Content_Not_Indexed()
-		{
+        public void Index_Protected_Content_Not_Indexed()
+        {
 
             using (var luceneDir = new RAMDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
@@ -75,11 +75,11 @@ namespace Umbraco.Tests.UmbracoExamine
                 Assert.AreEqual(0, collector.TotalHits, "Protected node should not be indexed");
             }
 
-		}
+        }
 
-		[Test]
-		public void Index_Move_Media_From_Non_Indexable_To_Indexable_ParentID()
-		{
+        [Test]
+        public void Index_Move_Media_From_Non_Indexable_To_Indexable_ParentID()
+        {
             using (var luceneDir = new RAMDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
                 //make parent id 1116
@@ -121,11 +121,11 @@ namespace Umbraco.Tests.UmbracoExamine
                 results = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
                 Assert.AreEqual(1, results.Count());
             }
-		}
+        }
 
-		[Test]
-		public void Index_Move_Media_To_Non_Indexable_ParentID()
-		{
+        [Test]
+        public void Index_Move_Media_To_Non_Indexable_ParentID()
+        {
             using (var luceneDir = new RAMDirectory())
             using (var indexer1 = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
                 //make parent id 2222
@@ -166,16 +166,16 @@ namespace Umbraco.Tests.UmbracoExamine
                 results = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
                 Assert.AreEqual(0, results.Count());
             }
-		}
+        }
 
 
-		/// <summary>
-		/// This will ensure that all 'Content' (not media) is cleared from the index using the Lucene API directly.
-		/// We then call the Examine method to re-index Content and do some comparisons to ensure that it worked correctly.
-		/// </summary>
-		[Test]
-		public void Index_Reindex_Content()
-		{
+        /// <summary>
+        /// This will ensure that all 'Content' (not media) is cleared from the index using the Lucene API directly.
+        /// We then call the Examine method to re-index Content and do some comparisons to ensure that it worked correctly.
+        /// </summary>
+        [Test]
+        public void Index_Reindex_Content()
+        {
             using (var luceneDir = new RAMDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
             using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
@@ -213,12 +213,12 @@ namespace Umbraco.Tests.UmbracoExamine
 
         }
 
-		/// <summary>
-		/// This will delete an item from the index and ensure that all children of the node are deleted too!
-		/// </summary>
-		[Test]
-		public void Index_Delete_Index_Item_Ensure_Heirarchy_Removed()
-		{
+        /// <summary>
+        /// This will delete an item from the index and ensure that all children of the node are deleted too!
+        /// </summary>
+        [Test]
+        public void Index_Delete_Index_Item_Ensure_Heirarchy_Removed()
+        {
             using (var luceneDir = new RAMDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
             using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))

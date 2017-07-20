@@ -100,7 +100,7 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="upScale">
         /// If the image should be upscaled to requested dimensions
-        /// </param>        
+        /// </param>
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -115,7 +115,7 @@ namespace Umbraco.Web
              ImageCropAnchor? imageCropAnchor = null,
              bool preferFocalPoint = false,
              bool useCropDimensions = false,
-             bool cacheBuster = true, 
+             bool cacheBuster = true,
              string furtherOptions = null,
              ImageCropRatioMode? ratioMode = null,
              bool upScale = true)
@@ -126,7 +126,7 @@ namespace Umbraco.Web
 
             if (mediaItem.HasProperty(propertyAlias) == false || mediaItem.HasValue(propertyAlias) == false)
                 return string.Empty;
-            
+
             //get the default obj from the value converter
             var cropperValue = mediaItem.Value(propertyAlias);
 
@@ -208,7 +208,7 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="upScale">
         /// If the image should be upscaled to requested dimensions
-        /// </param>        
+        /// </param>
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -223,7 +223,7 @@ namespace Umbraco.Web
             ImageCropAnchor? imageCropAnchor = null,
             bool preferFocalPoint = false,
             bool useCropDimensions = false,
-            string cacheBusterValue = null, 
+            string cacheBusterValue = null,
             string furtherOptions = null,
             ImageCropRatioMode? ratioMode = null,
             bool upScale = true)
@@ -233,7 +233,7 @@ namespace Umbraco.Web
             ImageCropDataSet cropDataSet = null;
             if (string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson() && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
             {
-                cropDataSet = imageCropperValue.SerializeToCropDataSet();                    
+                cropDataSet = imageCropperValue.SerializeToCropDataSet();
             }
             return GetCropUrl(
                 imageUrl, cropDataSet, width, height, cropAlias, quality, imageCropMode,
@@ -287,7 +287,7 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="upScale">
         /// If the image should be upscaled to requested dimensions
-        /// </param>        
+        /// </param>
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -366,7 +366,7 @@ namespace Umbraco.Web
 
                 var hasFormat = furtherOptions != null && furtherOptions.InvariantContains("&format=");
 
-                //Only put quality here, if we don't have a format specified. 
+                //Only put quality here, if we don't have a format specified.
                 //Otherwise we need to put quality at the end to avoid it being overridden by the format.
                 if (quality != null && hasFormat == false)
                 {

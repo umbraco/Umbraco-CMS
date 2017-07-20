@@ -12,7 +12,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="controllerType"></param>
         /// <returns></returns>
-		internal static string GetControllerName(Type controllerType)
+        internal static string GetControllerName(Type controllerType)
         {
             if (!controllerType.Name.EndsWith("Controller"))
             {
@@ -26,90 +26,90 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="controllerInstance"></param>
         /// <returns></returns>
-	    internal static string GetControllerName(this IController controllerInstance)
-	    {
-	        return GetControllerName(controllerInstance.GetType());
-	    }
+        internal static string GetControllerName(this IController controllerInstance)
+        {
+            return GetControllerName(controllerInstance.GetType());
+        }
 
-	    /// <summary>
+        /// <summary>
         /// Return the controller name from the controller type
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <remarks></remarks>
-		internal static string GetControllerName<T>()
+        internal static string GetControllerName<T>()
         {
             return GetControllerName(typeof(T));
         }
 
-		/// <summary>
-		/// This is generally used for proxying to a ChildAction which requires a ViewContext to be setup
-		/// but since the View isn't actually rendered the IView object is null, however the rest of the 
-		/// properties are filled in.
-		/// </summary>
-		/// <param name="controller"></param>
-		/// <returns></returns>
-		internal static ViewContext CreateEmptyViewContext(this ControllerBase controller)
-		{
-			return new ViewContext
-			{
-				Controller = controller,
-				HttpContext = controller.ControllerContext.HttpContext,
-				RequestContext = controller.ControllerContext.RequestContext,
-				RouteData = controller.ControllerContext.RouteData,
-				TempData = controller.TempData,
-				ViewData = controller.ViewData
-			};
-		}
+        /// <summary>
+        /// This is generally used for proxying to a ChildAction which requires a ViewContext to be setup
+        /// but since the View isn't actually rendered the IView object is null, however the rest of the
+        /// properties are filled in.
+        /// </summary>
+        /// <param name="controller"></param>
+        /// <returns></returns>
+        internal static ViewContext CreateEmptyViewContext(this ControllerBase controller)
+        {
+            return new ViewContext
+            {
+                Controller = controller,
+                HttpContext = controller.ControllerContext.HttpContext,
+                RequestContext = controller.ControllerContext.RequestContext,
+                RouteData = controller.ControllerContext.RouteData,
+                TempData = controller.TempData,
+                ViewData = controller.ViewData
+            };
+        }
 
-		/// <summary>
-		/// Returns the string output from a ViewResultBase object
-		/// </summary>
-		/// <param name="controller"></param>
-		/// <param name="viewResult"></param>
-		/// <returns></returns>
-		internal static string RenderViewResultAsString(this ControllerBase controller, ViewResultBase viewResult)
-		{
-			using (var sw = new StringWriter())
-			{
-				controller.EnsureViewObjectDataOnResult(viewResult);
+        /// <summary>
+        /// Returns the string output from a ViewResultBase object
+        /// </summary>
+        /// <param name="controller"></param>
+        /// <param name="viewResult"></param>
+        /// <returns></returns>
+        internal static string RenderViewResultAsString(this ControllerBase controller, ViewResultBase viewResult)
+        {
+            using (var sw = new StringWriter())
+            {
+                controller.EnsureViewObjectDataOnResult(viewResult);
 
-				var viewContext = new ViewContext(controller.ControllerContext, viewResult.View, viewResult.ViewData, viewResult.TempData, sw);
-				viewResult.View.Render(viewContext, sw);
-				foreach (var v in viewResult.ViewEngineCollection)
-				{
-					v.ReleaseView(controller.ControllerContext, viewResult.View);
-				}
-				return sw.ToString().Trim();
-			}
-		}
-		
-		/// <summary>
-		/// Renders the partial view to string.
-		/// </summary>
-		/// <param name="controller">The controller context.</param>
-		/// <param name="viewName">Name of the view.</param>
-		/// <param name="model">The model.</param>
-		/// <param name="isPartial">true if it is a Partial view, otherwise false for a normal view </param>
-		/// <returns></returns>
-		internal static string RenderViewToString(this ControllerBase controller, string viewName, object model, bool isPartial = false)
-		{
-			if (controller.ControllerContext == null)
-				throw new ArgumentException("The controller must have an assigned ControllerContext to execute this method.");
+                var viewContext = new ViewContext(controller.ControllerContext, viewResult.View, viewResult.ViewData, viewResult.TempData, sw);
+                viewResult.View.Render(viewContext, sw);
+                foreach (var v in viewResult.ViewEngineCollection)
+                {
+                    v.ReleaseView(controller.ControllerContext, viewResult.View);
+                }
+                return sw.ToString().Trim();
+            }
+        }
 
-			controller.ViewData.Model = model;
+        /// <summary>
+        /// Renders the partial view to string.
+        /// </summary>
+        /// <param name="controller">The controller context.</param>
+        /// <param name="viewName">Name of the view.</param>
+        /// <param name="model">The model.</param>
+        /// <param name="isPartial">true if it is a Partial view, otherwise false for a normal view </param>
+        /// <returns></returns>
+        internal static string RenderViewToString(this ControllerBase controller, string viewName, object model, bool isPartial = false)
+        {
+            if (controller.ControllerContext == null)
+                throw new ArgumentException("The controller must have an assigned ControllerContext to execute this method.");
 
-			using (var sw = new StringWriter())
-			{
-				var viewResult = !isPartial 
-					? ViewEngines.Engines.FindView(controller.ControllerContext, viewName, null) 
-					: ViewEngines.Engines.FindPartialView(controller.ControllerContext, viewName);
-				var viewContext = new ViewContext(controller.ControllerContext, viewResult.View, controller.ViewData, controller.TempData, sw);
-				viewResult.View.Render(viewContext, sw);
-				viewResult.ViewEngine.ReleaseView(controller.ControllerContext, viewResult.View);				
-				return sw.GetStringBuilder().ToString();
-			}
-		}
+            controller.ViewData.Model = model;
+
+            using (var sw = new StringWriter())
+            {
+                var viewResult = !isPartial
+                    ? ViewEngines.Engines.FindView(controller.ControllerContext, viewName, null)
+                    : ViewEngines.Engines.FindPartialView(controller.ControllerContext, viewName);
+                var viewContext = new ViewContext(controller.ControllerContext, viewResult.View, controller.ViewData, controller.TempData, sw);
+                viewResult.View.Render(viewContext, sw);
+                viewResult.ViewEngine.ReleaseView(controller.ControllerContext, viewResult.View);
+                return sw.GetStringBuilder().ToString();
+            }
+        }
 
         /// <summary>
         /// Normally in MVC the way that the View object gets assigned to the result is to Execute the ViewResult, this however
@@ -120,7 +120,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="result"></param>
         /// <param name="controller"></param>
         private static void EnsureViewObjectDataOnResult(this ControllerBase controller, ViewResultBase result)
-        {            
+        {
             if (result.View != null) return;
 
             if (string.IsNullOrEmpty(result.ViewName))

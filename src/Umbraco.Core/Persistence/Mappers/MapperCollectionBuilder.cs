@@ -5,7 +5,7 @@ namespace Umbraco.Core.Persistence.Mappers
 {
     public class MapperCollectionBuilder : LazyCollectionBuilderBase<MapperCollectionBuilder, MapperCollection, BaseMapper>
     {
-        public MapperCollectionBuilder(IServiceContainer container) 
+        public MapperCollectionBuilder(IServiceContainer container)
             : base(container)
         { }
 

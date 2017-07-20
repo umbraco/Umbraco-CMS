@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -32,7 +32,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override InstallSetupResult Execute(object model)
         {
-            var installSteps = InstallStatusTracker.GetStatus().ToArray();            
+            var installSteps = InstallStatusTracker.GetStatus().ToArray();
             var previousStep = installSteps.Single(x => x.Name == "DatabaseInstall");
             var upgrade = previousStep.AdditionalData.ContainsKey("upgrade");
 
@@ -65,7 +65,7 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 return false;
             }
-            
+
             var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
 
             if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings))

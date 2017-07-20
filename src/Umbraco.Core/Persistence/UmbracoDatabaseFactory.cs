@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Common;
@@ -252,13 +252,13 @@ namespace Umbraco.Core.Persistence
 
         // during tests, the thread static var can leak between tests
         // this method provides a way to force-reset the variable
-	    internal void ResetForTests()
-	    {
+        internal void ResetForTests()
+        {
             // fixme - does not make any sense!
             //var db = _umbracoDatabaseAccessor.UmbracoDatabase;
             //_umbracoDatabaseAccessor.UmbracoDatabase = null;
             //db?.Dispose();
-	        //_databaseScopeAccessor.Scope = null;
-	    }
+            //_databaseScopeAccessor.Scope = null;
+        }
     }
 }

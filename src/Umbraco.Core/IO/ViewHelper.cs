@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -45,8 +45,8 @@ namespace Umbraco.Core.IO
 
             if (_viewFileSystem.FileExists(path) == false || overWrite)
             {
-                viewContent = SaveTemplateToFile(t);   
-            }                
+                viewContent = SaveTemplateToFile(t);
+            }
             else
             {
                 using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)))
@@ -135,7 +135,7 @@ namespace Umbraco.Core.IO
 
             if (string.IsNullOrEmpty(currentAlias) == false && currentAlias != t.Alias)
             {
-                //then kill the old file.. 
+                //then kill the old file..
                 var oldFile = ViewPath(currentAlias);
                 if (_viewFileSystem.FileExists(oldFile))
                     _viewFileSystem.DeleteFile(oldFile);

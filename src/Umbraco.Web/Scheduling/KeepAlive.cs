@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +13,7 @@ namespace Umbraco.Web.Scheduling
         private readonly ILogger _logger;
         private readonly ProfilingLogger _proflog;
 
-        public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds, 
+        public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
             IRuntimeState runtime, ILogger logger, ProfilingLogger proflog)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Configuration;
@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
         public EnsureContentTypeUniqueIdsAreConsistent(IMigrationContext context)
             : base(context)
         { }
-        
+
         public override void Up()
         {
             var objectTypes = new[]

@@ -1,10 +1,10 @@
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 
 namespace Umbraco.Core.Security
 {
     /// <summary>
     /// An interface for exposing the content type properties for storing membership data in when
-    /// a membership provider's data is backed by an Umbraco content type. 
+    /// a membership provider's data is backed by an Umbraco content type.
     /// </summary>
     public interface IUmbracoMemberTypeMembershipProvider
     {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
@@ -7,12 +7,12 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Install
 {
-	/// <summary>
-	/// Ensures authorization occurs for the installer if it has already completed.
-	/// If install has not yet occured then the authorization is successful.
-	/// </summary>
-	internal class HttpInstallAuthorizeAttribute : AuthorizeAttribute
-	{
+    /// <summary>
+    /// Ensures authorization occurs for the installer if it has already completed.
+    /// If install has not yet occured then the authorization is successful.
+    /// </summary>
+    internal class HttpInstallAuthorizeAttribute : AuthorizeAttribute
+    {
         // todo - cannot inject UmbracoContext nor RuntimeState in the attribute, read:
         // http://stackoverflow.com/questions/30096903/dependency-injection-inside-a-filterattribute-in-asp-net-mvc-6
         //  https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=98 - don't do it!
@@ -23,18 +23,18 @@ namespace Umbraco.Web.Install
         // the second solution is nicer BUT for the time being, let's use the first (simpler).
 
         private readonly UmbracoContext _umbracoContext;
-	    private readonly IRuntimeState _runtimeState;
+        private readonly IRuntimeState _runtimeState;
 
-	    private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
+        private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
 
-	    private UmbracoContext UmbracoContext => _umbracoContext ?? Current.UmbracoContext;
+        private UmbracoContext UmbracoContext => _umbracoContext ?? Current.UmbracoContext;
 
-	    /// <summary>
-	    /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
-	    /// </summary>
-	    /// <param name="umbracoContext"></param>
-	    /// <param name="runtimeState"></param>
-	    public HttpInstallAuthorizeAttribute(UmbracoContext umbracoContext, IRuntimeState runtimeState)
+        /// <summary>
+        /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        /// <param name="runtimeState"></param>
+        public HttpInstallAuthorizeAttribute(UmbracoContext umbracoContext, IRuntimeState runtimeState)
         {
             if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
@@ -43,10 +43,10 @@ namespace Umbraco.Web.Install
         }
 
         public HttpInstallAuthorizeAttribute()
-		{ }
+        { }
 
-	    protected override bool IsAuthorized(HttpActionContext actionContext)
-	    {
+        protected override bool IsAuthorized(HttpActionContext actionContext)
+        {
             try
             {
                 // if not configured (install or upgrade) then we can continue
@@ -60,6 +60,6 @@ namespace Umbraco.Web.Install
                 Current.Logger.Error<HttpInstallAuthorizeAttribute>("An error occurred determining authorization", ex);
                 return false;
             }
-	    }
-	}
+        }
+    }
 }

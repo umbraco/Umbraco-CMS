@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -69,7 +69,7 @@ namespace Umbraco.Web
             var user = umbracoContext.Security.CurrentUser;
             var userService = Current.Services.UserService; // fixme inject
 
-            //if there is no current user, then use the admin 
+            //if there is no current user, then use the admin
             if (user == null)
             {
                 Current.Logger.Debug(typeof(NotificationServiceExtensions), "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
@@ -94,7 +94,7 @@ namespace Umbraco.Web
             var user = umbracoContext.Security.CurrentUser;
             var userService = Current.Services.UserService; // fixme inject
 
-            //if there is no current user, then use the admin 
+            //if there is no current user, then use the admin
             if (user == null)
             {
                 Current.Logger.Debug(typeof(NotificationServiceExtensions), "There is no current Umbraco user logged in, the notifications will be sent from the administrator");

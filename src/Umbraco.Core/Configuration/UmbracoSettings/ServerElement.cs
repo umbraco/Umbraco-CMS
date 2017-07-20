@@ -20,7 +20,7 @@
                            ? null
                            : RawXml.Attribute("forceProtocol").Value;
             }
-        }  
+        }
 
         string IServer.ServerAddress
         {

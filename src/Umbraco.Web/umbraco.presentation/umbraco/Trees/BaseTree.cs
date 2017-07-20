@@ -240,8 +240,8 @@ namespace umbraco.cms.presentation.Trees
         protected void CreateRootNode()
         {
             m_initNode = XmlTreeNode.CreateRoot(this);
-			m_initNode.Icon = FolderIcon;
-			m_initNode.OpenIcon = FolderIconOpen;
+            m_initNode.Icon = FolderIcon;
+            m_initNode.OpenIcon = FolderIconOpen;
             CreateRootNode(ref m_initNode);
         }
 
@@ -280,16 +280,16 @@ namespace umbraco.cms.presentation.Trees
             CreateAllowedActions(ref m_allowedActions);
         }
 
-		/// <summary>
-		/// A helper method to re-generate the root node for the current tree.
-		/// </summary>
-		/// <returns></returns>
-		public XmlTreeNode GenerateRootNode()
-		{
-			XmlTreeNode node = XmlTreeNode.CreateRoot(this);
-			this.CreateRootNode(ref node);
-			return node;
-		}
+        /// <summary>
+        /// A helper method to re-generate the root node for the current tree.
+        /// </summary>
+        /// <returns></returns>
+        public XmlTreeNode GenerateRootNode()
+        {
+            XmlTreeNode node = XmlTreeNode.CreateRoot(this);
+            this.CreateRootNode(ref node);
+            return node;
+        }
 
         /// <summary>
         /// This method can initialize the ITreeService parameters for this class with another ITreeService object.
@@ -335,21 +335,21 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public string GetTreeServiceUrl(int id)
         {
-			// updated by NH to pass showcontextmenu, isdialog and dialogmode variables
-			TreeService treeSvc = new TreeService(id, TreeAlias, this.ShowContextMenu, this.IsDialog, this.DialogMode, "");
-			return treeSvc.GetServiceUrl();
+            // updated by NH to pass showcontextmenu, isdialog and dialogmode variables
+            TreeService treeSvc = new TreeService(id, TreeAlias, this.ShowContextMenu, this.IsDialog, this.DialogMode, "");
+            return treeSvc.GetServiceUrl();
         }
 
-		/// <summary>
-		/// Returns the tree service url to return the tree xml structure based on a string node key.
-		/// </summary>
-		/// <param name="nodeKey"></param>
-		/// <returns></returns>
-		public string GetTreeServiceUrl(string nodeKey)
-		{
-			TreeService treeSvc = new TreeService(-1, TreeAlias, this.ShowContextMenu, this.IsDialog, this.DialogMode, "", nodeKey);
-			return treeSvc.GetServiceUrl();
-		}
+        /// <summary>
+        /// Returns the tree service url to return the tree xml structure based on a string node key.
+        /// </summary>
+        /// <param name="nodeKey"></param>
+        /// <returns></returns>
+        public string GetTreeServiceUrl(string nodeKey)
+        {
+            TreeService treeSvc = new TreeService(-1, TreeAlias, this.ShowContextMenu, this.IsDialog, this.DialogMode, "", nodeKey);
+            return treeSvc.GetServiceUrl();
+        }
 
 
 
@@ -374,30 +374,30 @@ namespace umbraco.cms.presentation.Trees
             return treeSvc.GetServiceUrl();
         }
 
-		/// <summary>
-		/// Returns the serialized data for the nodeId passed in.
-		/// </summary>
-		/// <remarks>
-		/// This may not work with ITrees that don't support the BaseTree structure with TreeService.
-		/// If a tree implements other query string data to make it work, this may not function since
-		/// it only relies on the 3 parameters.
-		/// </remarks>
-		/// <param name="alias"></param>
-		/// <param name="nodeId"></param>
-		/// <returns></returns>
-		public string GetSerializedNodeData(string nodeId)
-		{
-			XmlTree xTree = new XmlTree();
-			int id;
-			if (int.TryParse(nodeId, out id))
-				this.id = id;
-			else
-				this.NodeKey = nodeId;
+        /// <summary>
+        /// Returns the serialized data for the nodeId passed in.
+        /// </summary>
+        /// <remarks>
+        /// This may not work with ITrees that don't support the BaseTree structure with TreeService.
+        /// If a tree implements other query string data to make it work, this may not function since
+        /// it only relies on the 3 parameters.
+        /// </remarks>
+        /// <param name="alias"></param>
+        /// <param name="nodeId"></param>
+        /// <returns></returns>
+        public string GetSerializedNodeData(string nodeId)
+        {
+            XmlTree xTree = new XmlTree();
+            int id;
+            if (int.TryParse(nodeId, out id))
+                this.id = id;
+            else
+                this.NodeKey = nodeId;
 
-			this.Render(ref xTree);
+            this.Render(ref xTree);
 
-			return xTree.ToString();
-		}
+            return xTree.ToString();
+        }
 
         /// <summary>
         /// Returns the default actions for a root node

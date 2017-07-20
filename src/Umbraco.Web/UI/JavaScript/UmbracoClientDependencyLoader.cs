@@ -1,4 +1,4 @@
-using System.Web.UI;
+﻿using System.Web.UI;
 using ClientDependency.Core.Controls;
 using ClientDependency.Core.FileRegistration.Providers;
 using Umbraco.Core.IO;

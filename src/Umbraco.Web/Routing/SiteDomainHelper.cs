@@ -4,38 +4,38 @@ using System.Linq;
 using System.Threading;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
- 
+
 namespace Umbraco.Web.Routing
 {
- 	/// <summary>
-	/// Provides utilities to handle site domains.
- 	/// </summary>
-	public class SiteDomainHelper : ISiteDomainHelper
- 	{
+     /// <summary>
+    /// Provides utilities to handle site domains.
+     /// </summary>
+    public class SiteDomainHelper : ISiteDomainHelper
+     {
         #region Configure
- 
+
         private static readonly ReaderWriterLockSlim ConfigLock = new ReaderWriterLockSlim();
-	    private static Dictionary<string, string[]> _sites;
+        private static Dictionary<string, string[]> _sites;
         private static Dictionary<string, List<string>> _bindings;
         private static Dictionary<string, Dictionary<string, string[]>> _qualifiedSites;
 
         // these are for unit tests *only*
         internal static Dictionary<string, string[]> Sites { get { return _sites; } }
-        internal static Dictionary<string, List<string>> Bindings { get { return _bindings;  } } 
+        internal static Dictionary<string, List<string>> Bindings { get { return _bindings;  } }
 
         // these are for validation
-	    //private const string DomainValidationSource = @"^(\*|((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/[-\w]*)?))$";
+        //private const string DomainValidationSource = @"^(\*|((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/[-\w]*)?))$";
         private const string DomainValidationSource = @"^(((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/)?))$";
-	    private static readonly Regex DomainValidation = new Regex(DomainValidationSource, RegexOptions.IgnoreCase | RegexOptions.Compiled);
- 
+        private static readonly Regex DomainValidation = new Regex(DomainValidationSource, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
          /// <summary>
         /// Returns a disposable object that represents safe write access to config.
          /// </summary>
         /// <remarks>Should be used in a <c>using(SiteDomainHelper.ConfigWriteLock) { ... }</c>  mode.</remarks>
         protected static IDisposable ConfigWriteLock
-	    {
+        {
             get { return new WriteLock(ConfigLock); }
-	    }
+        }
 
         /// <summary>
         /// Returns a disposable object that represents safe read access to config.
@@ -149,15 +149,15 @@ namespace Umbraco.Web.Routing
             {
                 foreach (var key in keys.Where(key => !_sites.ContainsKey(key)))
                     throw new ArgumentException(string.Format("Not an existing site key: {0}", key), "keys");
- 
+
                 _bindings = _bindings ?? new Dictionary<string, List<string>>();
- 
+
                 var allkeys = _bindings
                     .Where(kvp => keys.Contains(kvp.Key))
                     .SelectMany(kvp => kvp.Value)
                     .Union(keys)
                     .ToArray();
-                
+
                 foreach (var key in allkeys)
                 {
                     if (!_bindings.ContainsKey(key))
@@ -193,19 +193,19 @@ namespace Umbraco.Web.Routing
             return MapDomain(domainAndUris, qualifiedSites, currentAuthority);
         }
 
- 	    /// <summary>
- 	    /// Filters a list of <c>DomainAndUri</c> to pick those that best matches the current request.
- 	    /// </summary>
- 	    /// <param name="current">The Uri of the current request.</param>
- 	    /// <param name="domainAndUris">The list of <c>DomainAndUri</c> to filter.</param>
+         /// <summary>
+         /// Filters a list of <c>DomainAndUri</c> to pick those that best matches the current request.
+         /// </summary>
+         /// <param name="current">The Uri of the current request.</param>
+         /// <param name="domainAndUris">The list of <c>DomainAndUri</c> to filter.</param>
         /// <param name="excludeDefault">A value indicating whether to exclude the current/default domain.</param>
- 	    /// <returns>The selected <c>DomainAndUri</c> items.</returns>
- 	    /// <remarks>The filter must return something, even empty, else an exception will be thrown.</remarks>
- 	    public virtual IEnumerable<DomainAndUri> MapDomains(Uri current, DomainAndUri[] domainAndUris, bool excludeDefault)
+         /// <returns>The selected <c>DomainAndUri</c> items.</returns>
+         /// <remarks>The filter must return something, even empty, else an exception will be thrown.</remarks>
+         public virtual IEnumerable<DomainAndUri> MapDomains(Uri current, DomainAndUri[] domainAndUris, bool excludeDefault)
         {
             var currentAuthority = current.GetLeftPart(UriPartial.Authority);
             KeyValuePair<string, string[]>[] candidateSites = null;
- 	        IEnumerable<DomainAndUri> ret = domainAndUris;
+             IEnumerable<DomainAndUri> ret = domainAndUris;
 
             using (ConfigReadLock) // so nothing changes between GetQualifiedSites and access to bindings
             {
@@ -252,7 +252,7 @@ namespace Umbraco.Web.Routing
                     }
                 }
             }
- 
+
             // if we are able to filter, then filter, else return the whole lot
             return candidateSites == null ? ret : ret.Where(d =>
                 {
@@ -260,27 +260,27 @@ namespace Umbraco.Web.Routing
                     return candidateSites.Any(site => site.Value.Contains(authority));
                 });
          }
- 
-	    private static Dictionary<string, string[]> GetQualifiedSites(Uri current)
-	    {
-	        using (ConfigReadLock)
-	        {
-	            return GetQualifiedSitesInsideLock(current);
-	        }
-	    }
- 
-	    private static Dictionary<string, string[]> GetQualifiedSitesInsideLock(Uri current)
+
+        private static Dictionary<string, string[]> GetQualifiedSites(Uri current)
+        {
+            using (ConfigReadLock)
+            {
+                return GetQualifiedSitesInsideLock(current);
+            }
+        }
+
+        private static Dictionary<string, string[]> GetQualifiedSitesInsideLock(Uri current)
         {
             // we do our best, but can't do the impossible
             if (_sites == null)
                 return null;
- 
+
             // cached?
             if (_qualifiedSites != null && _qualifiedSites.ContainsKey(current.Scheme))
                 return _qualifiedSites[current.Scheme];
- 
+
             _qualifiedSites = _qualifiedSites ?? new Dictionary<string, Dictionary<string, string[]>>();
- 
+
             // convert sites into authority sites based upon current scheme
             // because some domains in the sites might not have a scheme -- and cache
             return _qualifiedSites[current.Scheme] = _sites
@@ -288,7 +288,7 @@ namespace Umbraco.Web.Routing
                     kvp => kvp.Key,
                     kvp => kvp.Value.Select(d => new Uri(UriUtility.StartWithScheme(d, current.Scheme)).GetLeftPart(UriPartial.Authority)).ToArray()
                 );
- 
+
             // .ToDictionary will evaluate and create the dictionary immediately
             // the new value is .ToArray so it will also be evaluated immediately
             // therefore it is safe to return and exit the configuration lock
@@ -308,7 +308,7 @@ namespace Umbraco.Web.Routing
             // find a site that contains the current authority
             var currentSite = qualifiedSites.FirstOrDefault(site => site.Value.Contains(currentAuthority));
 
-            // if current belongs to a site - try to pick the first element 
+            // if current belongs to a site - try to pick the first element
             // from domainAndUris that also belongs to that site
             var ret = currentSite.Equals(default(KeyValuePair<string, string[]>))
                 ? null

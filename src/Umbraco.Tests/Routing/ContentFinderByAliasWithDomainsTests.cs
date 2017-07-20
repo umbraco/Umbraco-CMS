@@ -1,9 +1,9 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
 {
-    
+
     [TestFixture]
     public class ContentFinderByAliasWithDomainsTests : ContentFinderByAliasTests
     {

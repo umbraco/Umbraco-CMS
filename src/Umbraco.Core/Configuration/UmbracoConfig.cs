@@ -21,13 +21,13 @@ namespace Umbraco.Core.Configuration
 
         public static UmbracoConfig For
         {
-            get { return Lazy.Value; }            
+            get { return Lazy.Value; }
         }
 
         #endregion
 
         /// <summary>
-        /// Default constructor 
+        /// Default constructor
         /// </summary>
         private UmbracoConfig()
         {
@@ -83,7 +83,7 @@ namespace Umbraco.Core.Configuration
             }
 
             return _dashboardSection;
-        }        
+        }
 
         /// <summary>
         /// Only for testing
@@ -117,7 +117,7 @@ namespace Umbraco.Core.Configuration
 
             return _umbracoSettings;
         }
-     
+
         /// <summary>
         /// Only for testing
         /// </summary>

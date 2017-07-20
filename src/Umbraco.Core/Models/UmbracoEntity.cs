@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models
         private bool _hasPendingChanges;
         private string _contentTypeAlias;
         private Guid _nodeObjectTypeId;
-        
+
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         private class PropertySelectors
@@ -152,7 +152,7 @@ namespace Umbraco.Core.Models
             get { return _hasPendingChanges; }
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _hasPendingChanges, Ps.Value.HasPendingChangesSelector);                
+                SetPropertyValueAndDetectChanges(value, ref _hasPendingChanges, Ps.Value.HasPendingChangesSelector);
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 AdditionalData["HasPendingChanges"] = value;
             }
@@ -163,7 +163,7 @@ namespace Umbraco.Core.Models
             get { return _contentTypeAlias; }
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _contentTypeAlias, Ps.Value.ContentTypeAliasSelector);                
+                SetPropertyValueAndDetectChanges(value, ref _contentTypeAlias, Ps.Value.ContentTypeAliasSelector);
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 AdditionalData["ContentTypeAlias"] = value;
             }
@@ -174,7 +174,7 @@ namespace Umbraco.Core.Models
             get { return _contentTypeIcon; }
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _contentTypeIcon, Ps.Value.ContentTypeIconSelector);                
+                SetPropertyValueAndDetectChanges(value, ref _contentTypeIcon, Ps.Value.ContentTypeIconSelector);
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 AdditionalData["ContentTypeIcon"] = value;
             }
@@ -185,7 +185,7 @@ namespace Umbraco.Core.Models
             get { return _contentTypeThumbnail; }
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _contentTypeThumbnail, Ps.Value.ContentTypeThumbnailSelector);                
+                SetPropertyValueAndDetectChanges(value, ref _contentTypeThumbnail, Ps.Value.ContentTypeThumbnailSelector);
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 AdditionalData["ContentTypeThumbnail"] = value;
             }
@@ -224,7 +224,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// A struction that can be contained in the additional data of an UmbracoEntity representing 
+        /// A struction that can be contained in the additional data of an UmbracoEntity representing
         /// a user defined property
         /// </summary>
         public class EntityProperty : IDeepCloneable

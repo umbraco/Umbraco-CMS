@@ -24,7 +24,7 @@ namespace Umbraco.Web
 
         public RelatedLinksTypeConverter()
         {
-            
+
         }
 
         private static readonly Type[] ConvertableTypes = new[]

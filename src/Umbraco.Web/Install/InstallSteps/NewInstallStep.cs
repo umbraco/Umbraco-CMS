@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
@@ -16,8 +16,8 @@ namespace Umbraco.Web.Install.InstallSteps
     /// This is the first UI step for a brand new install
     /// </summary>
     /// <remarks>
-    /// By default this will show the user view which is the most basic information to configure a new install, but if an install get's interupted because of an 
-    /// error, etc... and the end-user refreshes the installer then we cannot show the user screen because they've already entered that information so instead we'll    
+    /// By default this will show the user view which is the most basic information to configure a new install, but if an install get's interupted because of an
+    /// error, etc... and the end-user refreshes the installer then we cannot show the user screen because they've already entered that information so instead we'll
     /// display a simple continue installation view.
     /// </remarks>
     [InstallSetupStep(InstallationType.NewInstall,
@@ -113,24 +113,24 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             get { return RequiresExecution(null)
                 //the user UI
-                ? "user" 
+                ? "user"
                 //the continue install UI
                 : "continueinstall"; }
         }
-        
+
         public override bool RequiresExecution(UserModel model)
         {
             //now we have to check if this is really a new install, the db might be configured and might contain data
             var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
 
-            //if there's already a version then there should def be a user but in some cases someone may have 
+            //if there's already a version then there should def be a user but in some cases someone may have
             // left a version number in there but cleared out their db conn string, in that case, it's really a new install.
             if (GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace() == false && databaseSettings != null) return false;
 
             if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings) && _databaseBuilder.IsDatabaseConfigured)
                 return _databaseBuilder.HasSomeNonDefaultUser() == false;
 
-            // In this one case when it's a brand new install and nothing has been configured, make sure the 
+            // In this one case when it's a brand new install and nothing has been configured, make sure the
             // back office cookie is cleared so there's no old cookies lying around causing problems
             _http.ExpireCookie(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
 

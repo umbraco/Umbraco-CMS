@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
@@ -18,6 +18,6 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<AuditItem, LogDto>(src => src.AuditType, dto => dto.Header);
             CacheMap<AuditItem, LogDto>(src => src.UserId, dto => dto.UserId);
             CacheMap<AuditItem, LogDto>(src => src.CreateDate, dto => dto.Datestamp);
-        }        
+        }
     }
 }

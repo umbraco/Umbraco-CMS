@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Events
+﻿namespace Umbraco.Core.Events
 {
     /// <summary>
     /// A simple/default transient messages factory

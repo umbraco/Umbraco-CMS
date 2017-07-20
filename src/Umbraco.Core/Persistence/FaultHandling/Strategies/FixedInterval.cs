@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.FaultHandling.Strategies
         private readonly TimeSpan retryInterval;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FixedInterval"/> class. 
+        /// Initializes a new instance of the <see cref="FixedInterval"/> class.
         /// </summary>
         public FixedInterval()
             : this(DefaultClientRetryCount)
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.FaultHandling.Strategies
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FixedInterval"/> class. 
+        /// Initializes a new instance of the <see cref="FixedInterval"/> class.
         /// </summary>
         /// <param name="retryCount">The number of retry attempts.</param>
         public FixedInterval(int retryCount)
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.FaultHandling.Strategies
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FixedInterval"/> class. 
+        /// Initializes a new instance of the <see cref="FixedInterval"/> class.
         /// </summary>
         /// <param name="retryCount">The number of retry attempts.</param>
         /// <param name="retryInterval">The time interval between retries.</param>
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Persistence.FaultHandling.Strategies
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FixedInterval"/> class. 
+        /// Initializes a new instance of the <see cref="FixedInterval"/> class.
         /// </summary>
         /// <param name="name">The retry strategy name.</param>
         /// <param name="retryCount">The number of retry attempts.</param>
@@ -49,7 +49,7 @@ namespace Umbraco.Core.Persistence.FaultHandling.Strategies
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FixedInterval"/> class. 
+        /// Initializes a new instance of the <see cref="FixedInterval"/> class.
         /// </summary>
         /// <param name="name">The retry strategy name.</param>
         /// <param name="retryCount">The number of retry attempts.</param>

@@ -10,10 +10,10 @@ using Umbraco.Web.Composing;
 namespace Umbraco.Web.UI.Controls
 {
     /// <summary>
-	/// A control that exposes the helpful Umbraco context objects
-	/// </summary>
-	public abstract class UmbracoControl : Control
-	{
+    /// A control that exposes the helpful Umbraco context objects
+    /// </summary>
+    public abstract class UmbracoControl : Control
+    {
         private UrlHelper _url;
 
         protected UmbracoControl(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
@@ -44,7 +44,7 @@ namespace Umbraco.Web.UI.Controls
         /// </summary>
         public ILogger Logger { get; }
 
-	    /// <summary>
+        /// <summary>
         /// Gets the profiling logger.
         /// </summary>
         public ProfilingLogger ProfilingLogger { get; }
@@ -54,15 +54,15 @@ namespace Umbraco.Web.UI.Controls
         /// </summary>
         public UmbracoContext UmbracoContext { get; }
 
-	    /// <summary>
-	    /// Gets the services context.
-	    /// </summary>
-	    protected ServiceContext Services { get; }
+        /// <summary>
+        /// Gets the services context.
+        /// </summary>
+        protected ServiceContext Services { get; }
 
         /// <summary>
         /// Gets a Url helper.
         /// </summary>
         /// <remarks>This URL helper is created without any route data and an empty request context.</remarks>
         public UrlHelper Url => _url ?? (_url = new UrlHelper(Context.Request.RequestContext));
-	}
+    }
 }

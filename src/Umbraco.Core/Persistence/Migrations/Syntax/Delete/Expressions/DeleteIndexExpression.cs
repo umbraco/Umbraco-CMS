@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
             Index = new IndexDefinition();
         }
 
-        public DeleteIndexExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes, IndexDefinition index) 
+        public DeleteIndexExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes, IndexDefinition index)
             : base(context, supportedDatabaseTypes)
         {
             Index = index;

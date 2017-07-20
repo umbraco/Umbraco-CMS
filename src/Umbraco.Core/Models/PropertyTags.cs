@@ -15,9 +15,9 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// The behavior of how to save the tags assigned - 
-        ///    Merge (keep existing and append new), 
-        ///    Remove (remove any of the tags in the Tags property that are currently assigned, 
+        /// The behavior of how to save the tags assigned -
+        ///    Merge (keep existing and append new),
+        ///    Remove (remove any of the tags in the Tags property that are currently assigned,
         ///    Replace (replace the currently assigned tags with the ones specified)
         /// </summary>
         public PropertyTagBehavior Behavior { get; set; }

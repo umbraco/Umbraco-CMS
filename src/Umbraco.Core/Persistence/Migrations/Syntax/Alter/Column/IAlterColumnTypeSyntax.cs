@@ -2,6 +2,6 @@
 {
     public interface IAlterColumnTypeSyntax : IColumnTypeSyntax<IAlterColumnOptionSyntax>
     {
-         
+
     }
 }

@@ -6,7 +6,7 @@ namespace Umbraco.Core.PropertyEditors
 {
     internal class ValidatorCollection : BuilderCollectionBase<ManifestValueValidator>
     {
-        public ValidatorCollection(IEnumerable<ManifestValueValidator> items) 
+        public ValidatorCollection(IEnumerable<ManifestValueValidator> items)
             : base(items)
         { }
 

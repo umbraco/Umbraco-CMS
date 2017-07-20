@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web;
 using System.Web.Services;
 using System.ComponentModel;
@@ -22,7 +22,7 @@ namespace umbraco.presentation.webservices
     public class legacyAjaxCalls : UmbracoAuthorizedWebService
     {
         private IUser _currentUser;
-        
+
         /// <summary>
         /// method to accept a string value for the node id. Used for tree's such as python
         /// and xslt since the file names are the node IDs
@@ -36,8 +36,8 @@ namespace umbraco.presentation.webservices
         {
             if (!AuthorizeRequest())
                 return;
-            
-            //U4-2686 - alias is html encoded, make sure to decode 
+
+            //U4-2686 - alias is html encoded, make sure to decode
             alias = HttpUtility.HtmlDecode(alias);
 
             //check which parameters to pass depending on the types passed in
@@ -97,7 +97,7 @@ namespace umbraco.presentation.webservices
                         if (content != null)
                             Current.Services.ContentService.Delete(content);
                         break;
-                }                
+                }
             }
             else
             {

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -56,7 +56,7 @@ namespace Umbraco.Web.Models.ContentEditing
         {
             Groups = new List<PropertyGroupBasic<TPropertyType>>();
         }
-        
+
         //Tabs
         [DataMember(Name = "groups")]
         public IEnumerable<PropertyGroupBasic<TPropertyType>> Groups { get; set; }
@@ -89,7 +89,7 @@ namespace Umbraco.Web.Models.ContentEditing
             {
                 //we need to return the field name with an index so it's wired up correctly
                 var lastProperty = duplicateProperties.Last().Last();
-                var propertyGroup = Groups.Single(x => x.Properties.Contains(lastProperty));                
+                var propertyGroup = Groups.Single(x => x.Properties.Contains(lastProperty));
 
                 yield return new ValidationResult("Duplicate property aliases not allowed: " + lastProperty.Alias, new[]
                 {

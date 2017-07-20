@@ -5,7 +5,7 @@ namespace Umbraco.Core.Persistence.Migrations
 {
     public class MigrationCollection : BuilderCollectionBase<IMigration>
     {
-        public MigrationCollection(IEnumerable<IMigration> items) 
+        public MigrationCollection(IEnumerable<IMigration> items)
             : base(items)
         { }
     }

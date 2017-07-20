@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
@@ -154,7 +154,7 @@ namespace Umbraco.Core.Models
                 //try to get the new mapped parameter editor
                 var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(value, false);
                 var newVal = mapped.IsNullOrWhiteSpace() == false ? mapped : value;
-                SetPropertyValueAndDetectChanges(newVal, ref _editorAlias, Ps.Value.PropertyTypeSelector);                
+                SetPropertyValueAndDetectChanges(newVal, ref _editorAlias, Ps.Value.PropertyTypeSelector);
             }
         }
 

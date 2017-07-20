@@ -31,7 +31,7 @@ namespace Umbraco.Web.WebApi.Filters
         /// </summary>
         public const string AngularHeadername = "X-XSRF-TOKEN";
 
-        
+
 
         /// <summary>
         /// Returns 2 tokens - one for the cookie value and one that angular should set as the header value
@@ -39,7 +39,7 @@ namespace Umbraco.Web.WebApi.Filters
         /// <param name="cookieToken"></param>
         /// <param name="headerToken"></param>
         /// <remarks>
-        /// .Net provides us a way to validate one token with another for added security. With the way angular works, this 
+        /// .Net provides us a way to validate one token with another for added security. With the way angular works, this
         /// means that we need to set 2 cookies since angular uses one cookie value to create the header value, then we want to validate
         /// this header value against our original cookie value.
         /// </remarks>
@@ -69,8 +69,8 @@ namespace Umbraco.Web.WebApi.Filters
             return true;
         }
 
-        internal static bool ValidateHeaders(            
-            KeyValuePair<string, IEnumerable<string>>[] requestHeaders, 
+        internal static bool ValidateHeaders(
+            KeyValuePair<string, IEnumerable<string>>[] requestHeaders,
             string cookieToken,
             out string failedReason)
         {
@@ -87,7 +87,7 @@ namespace Umbraco.Web.WebApi.Filters
                 .Select(z => z.Value)
                 .SelectMany(z => z)
                 .FirstOrDefault();
-            
+
             // both header and cookie must be there
             if (cookieToken == null || headerToken == null)
             {

@@ -1,4 +1,4 @@
-using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {

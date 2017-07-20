@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
@@ -310,9 +310,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         #region Converters
 
         private IPublishedContent ConvertToDocument(XmlNode xmlNode, bool isPreviewing)
-		{
+        {
             return xmlNode == null ? null : XmlPublishedContent.Get(xmlNode, isPreviewing, _cacheProvider, _contentTypeCache);
-		}
+        }
 
         private IEnumerable<IPublishedContent> ConvertToDocuments(XmlNodeList xmlNodes, bool isPreviewing)
         {
@@ -325,9 +325,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         #region Getters
 
         public override IPublishedContent GetById(bool preview, int nodeId)
-    	{
-    		return ConvertToDocument(GetXml(preview).GetElementById(nodeId.ToString(CultureInfo.InvariantCulture)), preview);
-    	}
+        {
+            return ConvertToDocument(GetXml(preview).GetElementById(nodeId.ToString(CultureInfo.InvariantCulture)), preview);
+        }
 
         public override IPublishedContent GetById(bool preview, Guid nodeId)
         {
@@ -380,7 +380,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
         {
             return ConvertToDocuments(GetXml(preview).SelectNodes(XPathStrings.RootDocuments), preview);
-		}
+        }
 
         public override IPublishedContent GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars)
         {
@@ -430,9 +430,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public override bool HasContent(bool preview)
         {
-	        var xml = GetXml(preview);
+            var xml = GetXml(preview);
             var node = xml?.SelectSingleNode(XPathStrings.RootDocuments);
-			return node != null;
+            return node != null;
         }
 
         public override XPathNavigator CreateNavigator(bool preview)

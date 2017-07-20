@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Mappers
 {
     public class MapperCollection : BuilderCollectionBase<BaseMapper>, IMapperCollection
     {
-        public MapperCollection(IEnumerable<BaseMapper> items) 
+        public MapperCollection(IEnumerable<BaseMapper> items)
             : base(items)
         { }
 

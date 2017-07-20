@@ -91,7 +91,7 @@ namespace Umbraco.Web.WebApi.Filters
                 }
 
                 ObjectContent objectContent;
-                
+
                 try
                 {
                     objectContent = actionExecutedContext.Response.Content as ObjectContent;
@@ -137,14 +137,14 @@ namespace Umbraco.Web.WebApi.Filters
                                 }
                                 else
                                 {
-                                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The f.TempFilePath is null or whitespace!!??");   
+                                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The f.TempFilePath is null or whitespace!!??");
                                 }
                             }
                         }
                         else
                         {
-                            Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The uploadedFiles.UploadedFiles is null!!??");   
-                        }                        
+                            Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The uploadedFiles.UploadedFiles is null!!??");
+                        }
                     }
                     else
                     {
@@ -177,7 +177,7 @@ namespace Umbraco.Web.WebApi.Filters
                 }
 
             }
-            
+
         }
     }
 }

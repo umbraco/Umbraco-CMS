@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Core;
 using Umbraco.Core.Exceptions;
 
@@ -8,7 +8,7 @@ namespace Umbraco.Web._Legacy.Actions
     /// The attribute to assign to any IAction objects.
     /// </summary>
     /// <remarks>
-    /// This is purely used for compatibility reasons for old IActions used in v7 that haven't been upgraded to 
+    /// This is purely used for compatibility reasons for old IActions used in v7 that haven't been upgraded to
     /// the new format.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class)]

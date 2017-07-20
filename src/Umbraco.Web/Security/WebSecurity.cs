@@ -192,7 +192,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         /// <remarks>
         /// This will return an <see cref="IUser"/> instance no matter what membership provider is installed for the back office, it will automatically
-        /// create any missing <see cref="IUser"/> accounts if one is not found and a custom membership provider or <see cref="IBackOfficeUserPasswordChecker"/> is being used. 
+        /// create any missing <see cref="IUser"/> accounts if one is not found and a custom membership provider or <see cref="IBackOfficeUserPasswordChecker"/> is being used.
         /// </remarks>
         internal IUser GetBackOfficeUser(string username)
         {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(0, repo.GetAll().Count());
             }
 
-            
+
         }
     }
 }

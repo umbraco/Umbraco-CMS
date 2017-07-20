@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Configuration
+﻿namespace Umbraco.Core.Configuration
 {
     internal enum ContentXmlStorage
     {

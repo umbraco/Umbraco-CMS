@@ -3,7 +3,7 @@
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Rename.Expressions
 {
     public class RenameColumnExpression : MigrationExpressionBase
-    {        
+    {
         public RenameColumnExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
             : base(context, supportedDatabaseTypes)
         { }

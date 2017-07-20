@@ -31,7 +31,7 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Start()
         {
-            // the log will always be started   
+            // the log will always be started
         }
 
         /// <inheritdoc/>

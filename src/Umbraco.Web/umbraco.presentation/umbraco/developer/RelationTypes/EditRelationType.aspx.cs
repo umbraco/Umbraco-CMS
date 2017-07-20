@@ -32,7 +32,7 @@
 //        /// <summary>
 //        /// Umbraco ObjectType used to represent all parent items in this relation type
 //        /// </summary>
-//        /// 
+//        ///
 //        private UmbracoObjectTypes _parentObjectType;
 
 //        /// <summary>
@@ -41,7 +41,7 @@
 //        private UmbracoObjectTypes _childObjectType;
 
 //        /// <summary>
-//        /// Gets the name of the parent object type for all relations in this relation type 
+//        /// Gets the name of the parent object type for all relations in this relation type
 //        /// </summary>
 //        protected string ParentObjectType
 //        {
@@ -85,17 +85,17 @@
 //                    this._relations = new List<ReadOnlyRelation>();
 
 //                    using (var reader = uQuery.SqlHelper.ExecuteReader(@"
-//                        SELECT  A.id, 
+//                        SELECT  A.id,
 //                                A.parentId,
-//		                        B.[text] AS parentText,
-//		                        A.childId,
-//		                        C.[text] AS childText,
+//                                B.[text] AS parentText,
+//                                A.childId,
+//                                C.[text] AS childText,
 //                                A.relType,
-//		                        A.[datetime], 
-//		                        A.comment
-//                        FROM umbracoRelation A 
-//	                        LEFT OUTER JOIN umbracoNode B ON A.parentId = B.id
-//	                        LEFT OUTER JOIN umbracoNode C ON A.childId = C.id					
+//                                A.[datetime],
+//                                A.comment
+//                        FROM umbracoRelation A
+//                            LEFT OUTER JOIN umbracoNode B ON A.parentId = B.id
+//                            LEFT OUTER JOIN umbracoNode C ON A.childId = C.id
 //                        WHERE A.relType = " + this._relationType.Id.ToString()))
 //                    {
 //                        while (reader.Read())
@@ -275,7 +275,7 @@
 
 //                    var relationService = Services.RelationService;
 //                    relationService.Save(this._relationType);
-                    
+
 //                    ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, "Relation Type Updated", bubbleBody);
 //                }
 //            }

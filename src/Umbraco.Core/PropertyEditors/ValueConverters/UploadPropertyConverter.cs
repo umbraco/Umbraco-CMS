@@ -51,6 +51,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public override object ConvertInterToObject(PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
         {
             return source?.ToString() ?? "";
-        }        
+        }
     }
 }

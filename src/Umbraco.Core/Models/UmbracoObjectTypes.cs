@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Root
         /// </summary>
-        [UmbracoObjectType(Constants.ObjectTypes.SystemRoot)]        
+        [UmbracoObjectType(Constants.ObjectTypes.SystemRoot)]
         [FriendlyName("Root")]
         ROOT,
 
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Models
         /// Recycle Bin
         /// </summary>
         [UmbracoObjectType(Constants.ObjectTypes.ContentRecycleBin)]
-        [FriendlyName("Recycle Bin")]        
+        [FriendlyName("Recycle Bin")]
         RecycleBin,
 
         /// <summary>

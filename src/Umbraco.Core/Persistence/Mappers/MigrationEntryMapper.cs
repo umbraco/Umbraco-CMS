@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Mappers
 
         protected override void BuildMap()
         {
-            CacheMap<MigrationEntry, MigrationDto>(src => src.Id, dto => dto.Id);            
+            CacheMap<MigrationEntry, MigrationDto>(src => src.Id, dto => dto.Id);
             CacheMap<MigrationEntry, MigrationDto>(src => src.CreateDate, dto => dto.CreateDate);
             CacheMap<MigrationEntry, MigrationDto>(src => src.UpdateDate, dto => dto.CreateDate);
             CacheMap<MigrationEntry, MigrationDto>(src => src.Version, dto => dto.Version);

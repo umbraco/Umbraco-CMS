@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -106,7 +106,7 @@ namespace Umbraco.Core.Sync
             //  use ports from request
             // otherwise,
             //  if non-standard ports used,
-            //  user may need to set umbracoApplicationUrl manually per 
+            //  user may need to set umbracoApplicationUrl manually per
             //  http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks
             var port = (request.IsSecureConnection == false && GlobalSettings.UseSSL == false)
                         || (request.IsSecureConnection && GlobalSettings.UseSSL)

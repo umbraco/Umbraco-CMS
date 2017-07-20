@@ -3,7 +3,7 @@
 namespace Umbraco.Core.Models.Validation
 {
     /// <summary>
-    /// A custom validation attribute which adds additional metadata to the property to indicate that 
+    /// A custom validation attribute which adds additional metadata to the property to indicate that
     /// the value is required to be persisted.
     /// </summary>
     /// <remarks>

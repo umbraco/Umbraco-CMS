@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;

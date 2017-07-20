@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -344,7 +344,7 @@ namespace umbraco
                                     //{
                                     //    // NH adds Live Editing test stuff
                                     //    item umbItem = new item(umbPage.Elements, attributes);
-                                    //    //								item umbItem = new item(umbPage.PageElements[helper.FindAttribute(attributes, "field")].ToString(), attributes);
+                                    //    //                                item umbItem = new item(umbPage.PageElements[helper.FindAttribute(attributes, "field")].ToString(), attributes);
                                     //    tempElementContent = umbItem.FieldContent;
                                     //}
 

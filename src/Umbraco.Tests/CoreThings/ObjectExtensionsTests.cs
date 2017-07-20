@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -9,9 +9,9 @@ using Umbraco.Core;
 
 namespace Umbraco.Tests.CoreThings
 {
-	[TestFixture]
-	public class ObjectExtensionsTests
-	{
+    [TestFixture]
+    public class ObjectExtensionsTests
+    {
         private CultureInfo _savedCulture;
 
         [SetUp]
@@ -41,76 +41,76 @@ namespace Umbraco.Tests.CoreThings
             Assert.AreEqual(unit, result2.Result);
         }
 
-	    [Test]
-	    public void Can_Convert_List_To_Enumerable()
-	    {
-	        var list = new List<string> {"hello", "world", "awesome"};
-	        var result = list.TryConvertTo<IEnumerable<string>>();
-	        Assert.IsTrue(result.Success);
+        [Test]
+        public void Can_Convert_List_To_Enumerable()
+        {
+            var list = new List<string> {"hello", "world", "awesome"};
+            var result = list.TryConvertTo<IEnumerable<string>>();
+            Assert.IsTrue(result.Success);
             Assert.AreEqual(3, result.Result.Count());
-	    }
+        }
 
-	    [Test]
-		public void ObjectExtensions_Object_To_Dictionary()
-		{
-			//Arrange
+        [Test]
+        public void ObjectExtensions_Object_To_Dictionary()
+        {
+            //Arrange
 
-			var obj = new { Key1 = "value1", Key2 = "value2", Key3 = "value3" };
+            var obj = new { Key1 = "value1", Key2 = "value2", Key3 = "value3" };
 
-			//Act
+            //Act
 
-			var d = obj.ToDictionary<string>();
+            var d = obj.ToDictionary<string>();
 
-			//Assert
+            //Assert
 
-			Assert.IsTrue(d.Keys.Contains("Key1"));
-			Assert.IsTrue(d.Keys.Contains("Key2"));
-			Assert.IsTrue(d.Keys.Contains("Key3"));
-			Assert.AreEqual(d["Key1"], "value1");
-			Assert.AreEqual(d["Key2"], "value2");
-			Assert.AreEqual(d["Key3"], "value3");
-		}
+            Assert.IsTrue(d.Keys.Contains("Key1"));
+            Assert.IsTrue(d.Keys.Contains("Key2"));
+            Assert.IsTrue(d.Keys.Contains("Key3"));
+            Assert.AreEqual(d["Key1"], "value1");
+            Assert.AreEqual(d["Key2"], "value2");
+            Assert.AreEqual(d["Key3"], "value3");
+        }
 
-		[Test]
-		public void CanConvertIntToNullableInt()
-		{
-			var i = 1;
-			var result = i.TryConvertTo<int?>();
-			Assert.That(result.Success, Is.True);
-		}
+        [Test]
+        public void CanConvertIntToNullableInt()
+        {
+            var i = 1;
+            var result = i.TryConvertTo<int?>();
+            Assert.That(result.Success, Is.True);
+        }
 
-		[Test]
-		public void CanConvertNullableIntToInt()
-		{
-			int? i = 1;
-			var result = i.TryConvertTo<int>();
-			Assert.That(result.Success, Is.True);
-		}
+        [Test]
+        public void CanConvertNullableIntToInt()
+        {
+            int? i = 1;
+            var result = i.TryConvertTo<int>();
+            Assert.That(result.Success, Is.True);
+        }
 
-		[Test]
-		public virtual void CanConvertStringToBool()
-		{
-			var testCases = new Dictionary<string, bool>
-				{
-					{"TRUE", true},
-					{"True", true},
-					{"true", true},
-					{"1", true},
-					{"FALSE", false},
-					{"False", false},
-					{"false", false},
-					{"0", false},
-					{"", false}
-				};
+        [Test]
+        public virtual void CanConvertStringToBool()
+        {
+            var testCases = new Dictionary<string, bool>
+                {
+                    {"TRUE", true},
+                    {"True", true},
+                    {"true", true},
+                    {"1", true},
+                    {"FALSE", false},
+                    {"False", false},
+                    {"false", false},
+                    {"0", false},
+                    {"", false}
+                };
 
-			foreach (var testCase in testCases)
-			{
-				var result = testCase.Key.TryConvertTo<bool>();
+            foreach (var testCase in testCases)
+            {
+                var result = testCase.Key.TryConvertTo<bool>();
 
-				Assert.IsTrue(result.Success, testCase.Key);
-				Assert.AreEqual(testCase.Value, result.Result, testCase.Key);
-			}
-		}
+                Assert.IsTrue(result.Success, testCase.Key);
+                Assert.AreEqual(testCase.Value, result.Result, testCase.Key);
+            }
+        }
 
         [TestCase("2012-11-10", true)]
         [TestCase("2012/11/10", true)]
@@ -122,15 +122,15 @@ namespace Umbraco.Tests.CoreThings
         [TestCase("Saturday 10, November 2012", true)]
         [TestCase("2012-11-10 13:14:15", true)]
         [TestCase("2012-11-10T13:14:15Z", true)]
-		public virtual void CanConvertStringToDateTime(string date, bool outcome)
-		{
-			var dateTime = new DateTime(2012, 11, 10, 13, 14, 15);
+        public virtual void CanConvertStringToDateTime(string date, bool outcome)
+        {
+            var dateTime = new DateTime(2012, 11, 10, 13, 14, 15);
 
             var result = date.TryConvertTo<DateTime>();
 
             Assert.IsTrue(result.Success, date);
             Assert.AreEqual(DateTime.Equals(dateTime.Date, result.Result.Date), outcome, date);
-		}
+        }
 
         [Test]
         public virtual void CanConvertBlankStringToNullDateTime()
@@ -148,32 +148,32 @@ namespace Umbraco.Tests.CoreThings
             Assert.IsNull(result.Result);
         }
 
-		[Test]
-		public virtual void CanConvertBlankStringToDateTime()
-		{
-			var result = "".TryConvertTo<DateTime>();
-			Assert.IsTrue(result.Success);
-			Assert.AreEqual(DateTime.MinValue, result.Result);
-		}
+        [Test]
+        public virtual void CanConvertBlankStringToDateTime()
+        {
+            var result = "".TryConvertTo<DateTime>();
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(DateTime.MinValue, result.Result);
+        }
 
-		[Test]
-		public virtual void CanConvertObjectToString_Using_ToString_Overload()
-		{
-			var result = new MyTestObject().TryConvertTo<string>();
+        [Test]
+        public virtual void CanConvertObjectToString_Using_ToString_Overload()
+        {
+            var result = new MyTestObject().TryConvertTo<string>();
 
-			Assert.IsTrue(result.Success);
-			Assert.AreEqual("Hello world", result.Result);
-		}
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual("Hello world", result.Result);
+        }
 
-		        [Test]
+                [Test]
         public virtual void CanConvertObjectToSameObject()
         {
             var obj = new MyTestObject();
             var result = obj.TryConvertTo<object>();
 
-            Assert.AreEqual(obj, result.Result);            
+            Assert.AreEqual(obj, result.Result);
         }
-		
+
         private class MyTestObject
         {
             public override string ToString()
@@ -181,5 +181,5 @@ namespace Umbraco.Tests.CoreThings
                 return "Hello world";
             }
         }
-	}
+    }
 }

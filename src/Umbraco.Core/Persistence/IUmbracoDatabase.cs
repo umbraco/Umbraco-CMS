@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence
         /// <summary>
         /// Gets the database instance unique identifier as a string.
         /// </summary>
-        /// <remarks>UmbracoDatabase returns the first eight digits of its unique Guid and, in some 
+        /// <remarks>UmbracoDatabase returns the first eight digits of its unique Guid and, in some
         /// debug mode, the underlying database connection identifier (if any).</remarks>
         string InstanceId { get; }
 

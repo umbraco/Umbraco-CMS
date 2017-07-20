@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
@@ -61,7 +61,7 @@ namespace Umbraco.Web.PropertyEditors
             if (preValues != null)
             {
                 //get all pre-values matching our Ids
-                return string.Join(",", 
+                return string.Join(",",
                                    preValues.Where(x => selectedIds.Contains(x.Value.Id.ToInvariantString())).Select(x => x.Value.Value));
             }
 
@@ -82,7 +82,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <summary>
-        /// When multiple values are selected a json array will be posted back so we need to format for storage in 
+        /// When multiple values are selected a json array will be posted back so we need to format for storage in
         /// the database which is a comma separated ID value
         /// </summary>
         /// <param name="editorValue"></param>

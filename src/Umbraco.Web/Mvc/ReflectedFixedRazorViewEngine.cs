@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reflection;
 using System.Web.Mvc;
 
@@ -90,7 +90,7 @@ namespace Umbraco.Web.Mvc
         {
             return _wrappedEngine.FindView(controllerContext, viewName, masterName, useCache);
         }
-        
+
         public void ReleaseView(ControllerContext controllerContext, IView view)
         {
             _wrappedEngine.ReleaseView(controllerContext, view);

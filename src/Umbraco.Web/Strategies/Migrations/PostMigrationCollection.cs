@@ -5,7 +5,7 @@ namespace Umbraco.Web.Strategies.Migrations
 {
     public class PostMigrationCollection : BuilderCollectionBase<IPostMigration>
     {
-        public PostMigrationCollection(IEnumerable<IPostMigration> items) 
+        public PostMigrationCollection(IEnumerable<IPostMigration> items)
             : base(items)
         { }
     }

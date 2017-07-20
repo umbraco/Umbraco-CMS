@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Security.Permissions;
@@ -7,12 +7,12 @@ using Umbraco.Core.Models.PublishedContent;
 namespace Umbraco.Core.Events
 {
     /// <summary>
-	/// Event args for that can support cancellation
-	/// </summary>
-	[HostProtection(SecurityAction.LinkDemand, SharedState = true)]
-	public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
+    /// Event args for that can support cancellation
+    /// </summary>
+    [HostProtection(SecurityAction.LinkDemand, SharedState = true)]
+    public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
     {
-		private bool _cancel;
+        private bool _cancel;
 
         public CancellableEventArgs(bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
         {
@@ -30,8 +30,8 @@ namespace Umbraco.Core.Events
         }
 
         public CancellableEventArgs(bool canCancel)
-		{
-			CanCancel = canCancel;
+        {
+            CanCancel = canCancel;
             //create a standalone messages
             Messages = new EventMessages();
             AdditionalData = new ReadOnlyDictionary<string, object>(new Dictionary<string, object>());
@@ -43,37 +43,37 @@ namespace Umbraco.Core.Events
         }
 
         public CancellableEventArgs()
-			: this(true)
-		{
-		}
+            : this(true)
+        {
+        }
 
-		/// <summary>
-		/// Flag to determine if this instance will support being cancellable
-		/// </summary>
-		public bool CanCancel { get; set; }
+        /// <summary>
+        /// Flag to determine if this instance will support being cancellable
+        /// </summary>
+        public bool CanCancel { get; set; }
 
-		/// <summary>
-		/// If this instance supports cancellation, this gets/sets the cancel value
-		/// </summary>
-		public bool Cancel
-		{
-			get
-			{
-				if (CanCancel == false)
-				{
-					throw new InvalidOperationException("This event argument class does not support cancelling.");
-				}
-				return _cancel;
-			}
-			set
-			{
-				if (CanCancel == false)
-				{
-					throw new InvalidOperationException("This event argument class does not support cancelling.");
-				}
-				_cancel = value;
-			}
-		}
+        /// <summary>
+        /// If this instance supports cancellation, this gets/sets the cancel value
+        /// </summary>
+        public bool Cancel
+        {
+            get
+            {
+                if (CanCancel == false)
+                {
+                    throw new InvalidOperationException("This event argument class does not support cancelling.");
+                }
+                return _cancel;
+            }
+            set
+            {
+                if (CanCancel == false)
+                {
+                    throw new InvalidOperationException("This event argument class does not support cancelling.");
+                }
+                _cancel = value;
+            }
+        }
 
         /// <summary>
         /// if this instance supports cancellation, this will set Cancel to true with an affiliated cancellation message
@@ -95,39 +95,39 @@ namespace Umbraco.Core.Events
         /// In some cases raised evens might need to contain additional arbitrary readonly data which can be read by event subscribers
         /// </summary>
         /// <remarks>
-        /// This allows for a bit of flexibility in our event raising - it's not pretty but we need to maintain backwards compatibility 
+        /// This allows for a bit of flexibility in our event raising - it's not pretty but we need to maintain backwards compatibility
         /// so we cannot change the strongly typed nature for some events.
         /// </remarks>
         public ReadOnlyDictionary<string, object> AdditionalData { get; private set; }
 
-	    public bool Equals(CancellableEventArgs other)
-	    {
-	        if (ReferenceEquals(null, other)) return false;
-	        if (ReferenceEquals(this, other)) return true;
-	        return Equals(AdditionalData, other.AdditionalData);
-	    }
+        public bool Equals(CancellableEventArgs other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(AdditionalData, other.AdditionalData);
+        }
 
-	    public override bool Equals(object obj)
-	    {
-	        if (ReferenceEquals(null, obj)) return false;
-	        if (ReferenceEquals(this, obj)) return true;
-	        if (obj.GetType() != this.GetType()) return false;
-	        return Equals((CancellableEventArgs) obj);
-	    }
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((CancellableEventArgs) obj);
+        }
 
-	    public override int GetHashCode()
-	    {
-	        return (AdditionalData != null ? AdditionalData.GetHashCode() : 0);
-	    }
+        public override int GetHashCode()
+        {
+            return (AdditionalData != null ? AdditionalData.GetHashCode() : 0);
+        }
 
-	    public static bool operator ==(CancellableEventArgs left, CancellableEventArgs right)
-	    {
-	        return Equals(left, right);
-	    }
+        public static bool operator ==(CancellableEventArgs left, CancellableEventArgs right)
+        {
+            return Equals(left, right);
+        }
 
-	    public static bool operator !=(CancellableEventArgs left, CancellableEventArgs right)
-	    {
-	        return !Equals(left, right);
-	    }
-	}
+        public static bool operator !=(CancellableEventArgs left, CancellableEventArgs right)
+        {
+            return !Equals(left, right);
+        }
+    }
 }

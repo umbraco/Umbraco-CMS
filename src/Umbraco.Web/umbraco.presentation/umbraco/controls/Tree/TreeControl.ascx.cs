@@ -222,7 +222,7 @@ namespace umbraco.controls.Tree
             // Validate permissions
             if (ValidateCurrentUser() == false)
                 return;
-            
+
             if (!Security.ValidateUserApp(GetCurrentApp()))
                 throw new ArgumentException("The current user doesn't have access to this application. Please contact the system administrator.");
 
@@ -231,7 +231,7 @@ namespace umbraco.controls.Tree
             //m_ActiveTreeDefs = TreeDefinitionCollection.Instance.FindActiveTrees(GetCurrentApp());
 
             m_ActiveTreeDefs = Services.ApplicationTreeService.GetApplicationTrees(GetCurrentApp(), true).ToList();
-            
+
             if (!string.IsNullOrEmpty(this.TreeType))
             {
                 m_ActiveTreeDefs = m_ActiveTreeDefs
@@ -268,7 +268,7 @@ namespace umbraco.controls.Tree
             var identity = Context.GetCurrentIdentity(
                 //DO NOT AUTO-AUTH UNLESS THE CURRENT HANDLER IS WEBFORMS!
                 // Without this check, anything that is using this legacy API, like ui.Text will
-                // automatically log the back office user in even if it is a front-end request (if there is 
+                // automatically log the back office user in even if it is a front-end request (if there is
                 // a back office user logged in. This can cause problems becaues the identity is changing mid
                 // request. For example: http://issues.umbraco.org/issue/U4-4010
                 HttpContext.Current.CurrentHandler is Page);
@@ -403,7 +403,7 @@ namespace umbraco.controls.Tree
             else
             {
 
-                //If there is more than 1 tree for the application than render out a 
+                //If there is more than 1 tree for the application than render out a
                 //container node labelled with the current application.
                 XmlTree xTree = new XmlTree();
                 XmlTreeNode xNode = XmlTreeNode.CreateRoot(new NullTree(GetCurrentApp()));

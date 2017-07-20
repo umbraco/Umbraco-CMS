@@ -36,7 +36,7 @@ namespace Umbraco.Core.Security
         #region Static Create methods
 
         /// <summary>
-        /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager 
+        /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager
         /// </summary>
         /// <param name="options"></param>
         /// <param name="userService"></param>
@@ -109,7 +109,7 @@ namespace Umbraco.Core.Security
 
         #region What we support do not currently
 
-        //NOTE: Not sure if we really want/need to ever support this 
+        //NOTE: Not sure if we really want/need to ever support this
         public override bool SupportsUserClaim
         {
             get { return false; }
@@ -144,8 +144,8 @@ namespace Umbraco.Core.Security
         /// <param name="dataProtectionProvider"></param>
         /// <returns></returns>
         protected void InitUserManager(
-            BackOfficeUserManager<T> manager, 
-            MembershipProviderBase membershipProvider, 
+            BackOfficeUserManager<T> manager,
+            MembershipProviderBase membershipProvider,
             IDataProtectionProvider dataProtectionProvider)
         {
             // Configure validation logic for usernames
@@ -168,7 +168,7 @@ namespace Umbraco.Core.Security
 
             //use a custom hasher based on our membership provider
             manager.PasswordHasher = new MembershipPasswordHasher(membershipProvider);
-            
+
             if (dataProtectionProvider != null)
             {
                 manager.UserTokenProvider = new DataProtectorTokenProvider<T, int>(dataProtectionProvider.Create("ASP.NET Identity"));
@@ -200,7 +200,7 @@ namespace Umbraco.Core.Security
             //    BodyFormat = "Your security code is: {0}"
             //});
 
-            //manager.SmsService = new SmsService();            
+            //manager.SmsService = new SmsService();
         }
 
         /// <summary>
@@ -214,12 +214,12 @@ namespace Umbraco.Core.Security
         /// * Get password store
         /// * Call VerifyPasswordAsync with the password store + user + password
         /// * Uses the PasswordHasher.VerifyHashedPassword to compare the stored password
-        /// 
+        ///
         /// In some cases people want simple custom control over the username/password check, for simplicity
         /// sake, developers would like the users to simply validate against an LDAP directory but the user
-        /// data remains stored inside of Umbraco. 
+        /// data remains stored inside of Umbraco.
         /// See: http://issues.umbraco.org/issue/U4-7032 for the use cases.
-        /// 
+        ///
         /// We've allowed this check to be overridden with a simple callback so that developers don't actually
         /// have to implement/override this class.
         /// </remarks>

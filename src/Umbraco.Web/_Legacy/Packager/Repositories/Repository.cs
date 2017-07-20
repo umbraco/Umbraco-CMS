@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +16,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
 {
     [Obsolete("This should not be used and will be removed in future Umbraco versions")]
     public class Repository : DisposableObject
-    {        
+    {
         public string Guid { get; private set; }
 
         public string Name { get; private set; }
@@ -56,7 +56,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
                 fs1.Close();
                 fs1 = null;
 
-                byte[] thumb = new byte[0]; //todo upload thumbnail... 
+                byte[] thumb = new byte[0]; //todo upload thumbnail...
 
                 return Webservice.SubmitPackage(Guid, authorGuid, packageGuid, pack, doc, thumb, packageName, "", "", description);
             }
@@ -116,7 +116,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
             {
                 return null;
             }
-            
+
             var repository = new Repository
             {
                 Guid = found.Id.ToString(),
@@ -174,7 +174,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
             var fileByteArray = Webservice.GetPackageFile(packageGuid, currentUmbracoVersion.ToString(3));
 
-            //successfull 
+            //successfull
             if (fileByteArray.Length > 0)
             {
                 // Check for package directory
@@ -188,7 +188,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
                     return "packages\\" + packageGuid + ".umb";
                 }
             }
-            
+
             return "";
         }
 
@@ -259,7 +259,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
                 fileByteArray = Webservice.fetchProtectedPackage(packageGuid, key);
             }
 
-            //successfull 
+            //successfull
             if (fileByteArray.Length > 0)
             {
 

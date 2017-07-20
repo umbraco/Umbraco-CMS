@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Identity;
@@ -132,7 +132,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                 {
-                    "DELETE FROM umbracoExternalLogin WHERE id = @Id"                           
+                    "DELETE FROM umbracoExternalLogin WHERE id = @Id"
                 };
             return list;
         }
@@ -162,7 +162,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new ExternalLoginFactory();
             var dto = factory.BuildDto(entity);
 
-            Database.Update(dto);          
+            Database.Update(dto);
 
             entity.ResetDirtyProperties();
         }

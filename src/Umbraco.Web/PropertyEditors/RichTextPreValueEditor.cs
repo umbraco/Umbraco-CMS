@@ -49,7 +49,7 @@ namespace Umbraco.Web.PropertyEditors
         //
         // [PreValueField(typeof(EditorPreValueField))]
         // public string Editor { get; set; }
-           
+
         // [PreValueField("", "views/propertyeditors/rte/rte.prevalues.html", HideLabel = true)]
         // public class EditorPreValueField : PreValueField
         // {

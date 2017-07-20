@@ -98,7 +98,7 @@ namespace Umbraco.Tests.Persistence.Querying
             Expression<Func<IContent, bool>> predicate = content => content.Path.StartsWith("-1");
             var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(SqlContext.SqlSyntax, Mappers);
             var result = modelToSqlExpressionHelper.Visit(predicate);
-            
+
             Assert.AreEqual("upper([umbracoNode].[path]) LIKE upper(@0)", result);
             Assert.AreEqual("-1%", modelToSqlExpressionHelper.GetSqlParameters()[0]);
         }
@@ -158,7 +158,7 @@ namespace Umbraco.Tests.Persistence.Querying
             Debug.Print("Model to Sql ExpressionHelper: \n" + result);
 
             Assert.AreEqual("upper(`umbracoUser`.`userLogin`) = upper(@0)", result);
-            Assert.AreEqual("mydomain\\myuser", modelToSqlExpressionHelper.GetSqlParameters()[0]);            
+            Assert.AreEqual("mydomain\\myuser", modelToSqlExpressionHelper.GetSqlParameters()[0]);
         }
 
         [Test]

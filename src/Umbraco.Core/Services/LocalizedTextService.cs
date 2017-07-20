@@ -77,7 +77,7 @@ namespace Umbraco.Core.Services
             if (xmlSource != null)
             {
                 return GetFromXmlSource(xmlSource, culture, area, alias, tokens);
-            }          
+            }
             else
             {
                 return GetFromDictionarySource(culture, area, alias, tokens);
@@ -187,16 +187,16 @@ namespace Umbraco.Core.Services
         /// </param>
         /// <returns></returns>
         /// <remarks>
-        /// TODO: This is just a hack due to the way we store the language files, they should be stored with 4 letters since that 
+        /// TODO: This is just a hack due to the way we store the language files, they should be stored with 4 letters since that
         /// is what they reference but they are stored with 2, further more our user's languages are stored with 2. So this attempts
         /// to resolve the full culture if possible.
-        /// 
+        ///
         /// This only works when this service is constructed with the LocalizedTextServiceFileSources
         /// </remarks>
         public CultureInfo ConvertToSupportedCultureWithRegionCode(CultureInfo currentCulture)
         {
             if (currentCulture == null) throw new ArgumentNullException("currentCulture");
-            
+
             if (_fileSources == null) return currentCulture;
             if (currentCulture.Name.Length > 2) return currentCulture;
 
@@ -214,10 +214,10 @@ namespace Umbraco.Core.Services
             if (currentCulture == null) throw new ArgumentNullException("currentCulture");
 
             if (_fileSources == null) return currentCulture.Name;
-            
+
             var attempt = _fileSources.Value.TryConvert4LetterCultureTo2Letter(currentCulture);
-            return attempt 
-                ? attempt.Result 
+            return attempt
+                ? attempt.Result
                 : currentCulture.Name;
         }
 
@@ -226,11 +226,11 @@ namespace Umbraco.Core.Services
             if (_dictionarySource.ContainsKey(culture) == false)
             {
                 _logger.Warn<LocalizedTextService>("The culture specified {0} was not found in any configured sources for this service", () => culture);
-                return "[" + key + "]";  
+                return "[" + key + "]";
             }
 
             var cultureSource = _dictionarySource[culture];
-            
+
             string found;
             if (area.IsNullOrWhiteSpace())
             {
@@ -264,7 +264,7 @@ namespace Umbraco.Core.Services
             if (xmlSource.ContainsKey(culture) == false)
             {
                 _logger.Warn<LocalizedTextService>("The culture specified {0} was not found in any configured sources for this service", () => culture);
-                return "[" + key + "]";                
+                return "[" + key + "]";
             }
 
             var found = FindTranslation(xmlSource, culture, area, key);
@@ -273,7 +273,7 @@ namespace Umbraco.Core.Services
             {
                 return ParseTokens(found.Value, tokens);
             }
-            
+
             // Fall back to English by default if we can't find the key
             found = FindTranslation(xmlSource, new CultureInfo("en-US"), area, key);
             if (found != null)
@@ -303,11 +303,11 @@ namespace Umbraco.Core.Services
         /// <param name="tokens"></param>
         /// <returns></returns>
         /// <remarks>
-        /// This is based on how the legacy ui localized text worked, each token was just a sequential value delimited with a % symbol. 
+        /// This is based on how the legacy ui localized text worked, each token was just a sequential value delimited with a % symbol.
         /// For example: hello %0%, you are %1% !
-        /// 
+        ///
         /// Since we're going to continue using the same language files for now, the token system needs to remain the same. With our new service
-        /// we support a dictionary which means in the future we can really have any sort of token system. 
+        /// we support a dictionary which means in the future we can really have any sort of token system.
         /// Currently though, the token key's will need to be an integer and sequential - though we aren't going to throw exceptions if that is not the case.
         /// </remarks>
         internal static string ParseTokens(string value, IDictionary<string, string> tokens)

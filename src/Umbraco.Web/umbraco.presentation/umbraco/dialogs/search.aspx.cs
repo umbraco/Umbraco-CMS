@@ -44,7 +44,7 @@ namespace umbraco.presentation.dialogs
 
         protected void search_Click(object sender, EventArgs e)
         {
-            DoSearch();            
+            DoSearch();
         }
 
         private void DoSearch()
@@ -99,7 +99,7 @@ namespace umbraco.presentation.dialogs
         {
             var result = new XmlDocument();
             result.LoadXml("<results/>");
-            
+
             foreach (var r in results)
             {
                 var x = XmlHelper.AddTextNode(result, "result", "");

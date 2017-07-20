@@ -19,7 +19,7 @@ namespace Umbraco.Core.Logging
 
         public void Initialize(IProfiler profiler, ILogger logger, IRuntimeState runtime)
         {
-            // although registered in WebRuntime.Compose, ensure that we have not 
+            // although registered in WebRuntime.Compose, ensure that we have not
             // been replaced by another component, and we are still "the" profiler
             _profiler = profiler as WebProfiler;
             if (_profiler == null)

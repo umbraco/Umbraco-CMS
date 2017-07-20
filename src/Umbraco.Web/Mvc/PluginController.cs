@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Web.Mvc;
 using LightInject;
@@ -18,10 +18,10 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public abstract class PluginController : Controller, IDiscoverable
     {
-        private static readonly ConcurrentDictionary<Type, PluginControllerMetadata> MetadataStorage 
+        private static readonly ConcurrentDictionary<Type, PluginControllerMetadata> MetadataStorage
             = new ConcurrentDictionary<Type, PluginControllerMetadata>();
 
-        private UmbracoHelper _umbracoHelper;                
+        private UmbracoHelper _umbracoHelper;
 
         // for debugging purposes
         internal Guid InstanceId { get; } = Guid.NewGuid();

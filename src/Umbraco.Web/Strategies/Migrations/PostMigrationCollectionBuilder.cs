@@ -5,7 +5,7 @@ namespace Umbraco.Web.Strategies.Migrations
 {
     public class PostMigrationCollectionBuilder : LazyCollectionBuilderBase<PostMigrationCollectionBuilder, PostMigrationCollection, IPostMigration>
     {
-        public PostMigrationCollectionBuilder(IServiceContainer container) 
+        public PostMigrationCollectionBuilder(IServiceContainer container)
             : base(container)
         { }
 

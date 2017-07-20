@@ -1,4 +1,4 @@
-using Microsoft.Owin;
+﻿using Microsoft.Owin;
 
 namespace Umbraco.Web.Security.Identity
 {

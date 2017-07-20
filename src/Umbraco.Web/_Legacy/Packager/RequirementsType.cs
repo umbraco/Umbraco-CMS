@@ -1,4 +1,4 @@
-namespace umbraco.cms.businesslogic.packager
+﻿namespace umbraco.cms.businesslogic.packager
 {
     public enum RequirementsType
     {

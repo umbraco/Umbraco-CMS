@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Web.Http.Routing;
@@ -38,7 +38,7 @@ namespace Umbraco.Web
 
             if (methodParams.Any() == false)
             {
-                return url.GetUmbracoApiService<T>(method.Name);    
+                return url.GetUmbracoApiService<T>(method.Name);
             }
             return url.GetUmbracoApiService<T>(method.Name, methodParams.Values.First());
         }

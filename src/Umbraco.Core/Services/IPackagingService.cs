@@ -121,7 +121,7 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Language object</returns>
         XElement Export(ILanguage language, bool raiseEvents = true);
-        
+
         /// <summary>
         /// Exports a list of <see cref="IDictionaryItem"/> items to xml as an <see cref="XElement"/>
         /// </summary>

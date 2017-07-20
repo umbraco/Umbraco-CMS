@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -32,11 +32,11 @@ namespace Umbraco.Core.Services
         /// <param name="deep">Optional parameter indicating whether to include descendents</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
         public XElement Serialize(
-            IContentService contentService, 
-            IDataTypeService dataTypeService, 
+            IContentService contentService,
+            IDataTypeService dataTypeService,
             IUserService userService,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
-            IContent content, 
+            IContent content,
             bool deep = false)
         {
             if (contentService == null) throw new ArgumentNullException("contentService");
@@ -76,11 +76,11 @@ namespace Umbraco.Core.Services
         /// <param name="deep">Optional parameter indicating whether to include descendents</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Media object</returns>
         public XElement Serialize(
-            IMediaService mediaService, 
-            IDataTypeService dataTypeService, 
+            IMediaService mediaService,
+            IDataTypeService dataTypeService,
             IUserService userService,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders, 
-            IMedia media, 
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            IMedia media,
             bool deep = false)
         {
             if (mediaService == null) throw new ArgumentNullException("mediaService");
@@ -126,7 +126,7 @@ namespace Umbraco.Core.Services
 
             xml.Add(new XAttribute("loginName", member.Username));
             xml.Add(new XAttribute("email", member.Email));
-            
+
             xml.Add(new XAttribute("icon", member.ContentType.Icon));
 
             return xml;
@@ -194,7 +194,7 @@ namespace Umbraco.Core.Services
             }
 
             if (string.IsNullOrWhiteSpace(folderNames) == false)
-                xml.Add(new XAttribute("Folders", folderNames));            
+                xml.Add(new XAttribute("Folders", folderNames));
 
             return xml;
         }
@@ -422,7 +422,7 @@ namespace Umbraco.Core.Services
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
                                                    propertyType.ValidationRegExp != null ? new XElement("Validation", propertyType.ValidationRegExp) : null,
                                                    propertyType.Description != null ? new XElement("Description", new XCData(propertyType.Description)) : null);
-                
+
                 genericProperties.Add(genericProperty);
             }
 
@@ -479,7 +479,7 @@ namespace Umbraco.Core.Services
                 currentXml.Add(childXml);
                 //copy local (out of closure)
                 var c = child;
-                //get this item's children                
+                //get this item's children
                 var children = originalDescendants.Where(x => x.ParentId == c.Id);
                 //recurse and add it's children to the child xml element
                 AddChildXml(mediaService, dataTypeService, userService, urlSegmentProviders, originalDescendants, children, childXml);
@@ -537,7 +537,7 @@ namespace Umbraco.Core.Services
                 currentXml.Add(childXml);
                 //copy local (out of closure)
                 var c = child;
-                //get this item's children                
+                //get this item's children
                 var children = originalDescendants.Where(x => x.ParentId == c.Id);
                 //recurse and add it's children to the child xml element
                 AddChildXml(contentService, dataTypeService, userService, urlSegmentProviders, originalDescendants, children, childXml);

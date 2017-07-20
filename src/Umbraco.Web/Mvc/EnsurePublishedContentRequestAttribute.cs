@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web.Mvc;
 using Umbraco.Web.Routing;
 using Umbraco.Core;
@@ -15,7 +15,7 @@ namespace Umbraco.Web.Mvc
     /// <remarks>
     /// This is inspired from this discussion:
     /// http://our.umbraco.org/forum/developers/extending-umbraco/41367-Umbraco-6-MVC-Custom-MVC-Route?p=3
-    /// 
+    ///
     /// which is based on custom routing found here:
     /// http://shazwazza.com/post/Custom-MVC-routing-in-Umbraco
     /// </remarks>
@@ -79,7 +79,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Exposes an UmbracoHelper
         /// </summary>
-        protected UmbracoHelper Umbraco => _helper 
+        protected UmbracoHelper Umbraco => _helper
             ?? (_helper = new UmbracoHelper(Current.UmbracoContext, Current.Services, Current.ApplicationCache));
 
         public override void OnActionExecuted(ActionExecutedContext filterContext)
@@ -97,7 +97,7 @@ namespace Umbraco.Web.Mvc
         }
 
         /// <summary>
-        /// This assigns the published content to the request, developers can override this to specify 
+        /// This assigns the published content to the request, developers can override this to specify
         /// any other custom attributes required.
         /// </summary>
         /// <param name="request"></param>

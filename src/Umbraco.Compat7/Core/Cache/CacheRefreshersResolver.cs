@@ -9,7 +9,7 @@ namespace Umbraco.Core.Cache
 {
     public class CacheRefreshersResolver : LazyManyObjectsResolverBase<CacheRefresherCollectionBuilder, CacheRefresherCollection, ICacheRefresher>
     {
-        private CacheRefreshersResolver(CacheRefresherCollectionBuilder builder) 
+        private CacheRefreshersResolver(CacheRefresherCollectionBuilder builder)
             : base(builder)
         { }
 

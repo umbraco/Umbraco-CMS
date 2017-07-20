@@ -29,7 +29,7 @@ namespace Umbraco.Core.Manifest
             if (target.Render.IsNullOrWhiteSpace() == false && target.Render.StartsWith("~/"))
             {
                 target.Render = IOHelper.ResolveUrl(target.Render);
-            }             
+            }
         }
     }
 }

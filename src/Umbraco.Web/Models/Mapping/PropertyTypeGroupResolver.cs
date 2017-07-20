@@ -81,7 +81,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 group.Properties = MapProperties(tab.PropertyTypes, source, tab.Id, false);
                 groups.Add(group);
-            }         
+            }
 
             // add groups inherited through composition
             var localGroupIds = groups.Select(x => x.Id).ToArray();
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 // get the content type that defines this group
                 var definingContentType = GetContentTypeForPropertyGroup(source, tab.Id);
-                if (definingContentType == null) 
+                if (definingContentType == null)
                     throw new Exception("PropertyGroup with id=" + tab.Id + " was not found on any of the content type's compositions.");
 
                 var group = new PropertyGroupDisplay<TPropertyType>
@@ -135,11 +135,11 @@ namespace Umbraco.Web.Models.Mapping
             {
                 var genericTab = new PropertyGroupDisplay<TPropertyType>
                 {
-                    Id = PropertyGroupBasic.GenericPropertiesGroupId, 
+                    Id = PropertyGroupBasic.GenericPropertiesGroupId,
                     Name = "Generic properties",
-                    ContentTypeId = source.Id, 
+                    ContentTypeId = source.Id,
                     SortOrder = 999,
-                    Inherited = false, 
+                    Inherited = false,
                     Properties = genericProperties
                 };
                 groups.Add(genericTab);
@@ -201,7 +201,7 @@ namespace Umbraco.Web.Models.Mapping
                 var propertyEditor = _propertyEditors[p.PropertyEditorAlias];
                 var preValues = _dataTypeService.GetPreValuesCollectionByDataTypeId(p.DataTypeDefinitionId);
 
-                if (propertyEditor == null) 
+                if (propertyEditor == null)
                     throw new InvalidOperationException("No property editor could be resolved with the alias: " + p.PropertyEditorAlias + ", ensure all packages are installed correctly.");
 
                 mappedProperties.Add(new TPropertyType

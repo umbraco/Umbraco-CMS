@@ -86,10 +86,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                                                 a["link"] = helper.NiceUrl(content.Id);
                                             }
                                             break;
-                                    }                                    
+                                    }
                                 }
                             }
-                        }    
+                        }
                     }
                     return obj;
                 }
@@ -117,7 +117,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     var d = new XmlDocument();
                     var e = d.CreateElement("links");
                     d.AppendChild(e);
-                    
+
                     foreach (dynamic link in obj)
                     {
                         var ee = d.CreateElement("link");

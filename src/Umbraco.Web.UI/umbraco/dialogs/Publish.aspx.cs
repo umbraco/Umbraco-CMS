@@ -8,7 +8,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 {
     public partial class Publish : UmbracoEnsuredPage
     {
-     
+
         protected string PageName { get; private set; }
         protected int DocumentId { get; private set; }
         protected string DocumentPath { get; private set; }

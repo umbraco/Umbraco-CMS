@@ -460,7 +460,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // get PropertyDataDto distinct PropertyTypeDto
             var allPropertyTypeIds = allPropertyDataDtos.Select(x => x.PropertyTypeId).Distinct().ToList();
-            var allPropertyTypeDtos = Database.FetchByGroups<PropertyTypeDto, int>(allPropertyTypeIds, 2000, batch => 
+            var allPropertyTypeDtos = Database.FetchByGroups<PropertyTypeDto, int>(allPropertyTypeIds, 2000, batch =>
                 Sql()
                     .Select<PropertyTypeDto>()
                     .From<PropertyTypeDto>()
@@ -722,10 +722,10 @@ FROM cmsDataTypePreValues a
 WHERE EXISTS(
     SELECT DISTINCT b.id as preValIdInner
     FROM cmsDataTypePreValues b
-	INNER JOIN cmsPropertyType
-	ON b.datatypeNodeId = cmsPropertyType.dataTypeId
-    INNER JOIN 
-	    (" + string.Format(parsedOriginalSql, "cmsContent.contentType") + @") as docData
+    INNER JOIN cmsPropertyType
+    ON b.datatypeNodeId = cmsPropertyType.dataTypeId
+    INNER JOIN
+        (" + string.Format(parsedOriginalSql, "cmsContent.contentType") + @") as docData
     ON cmsPropertyType.contentTypeId = docData.contentType
     WHERE a.id = b.id)", docSql.Arguments);
 
@@ -744,8 +744,8 @@ WHERE EXISTS(
 FROM cmsPropertyData
 INNER JOIN cmsPropertyType
 ON cmsPropertyData.propertytypeid = cmsPropertyType.id
-INNER JOIN 
-	(" + string.Format(parsedOriginalSql, "cmsContent.nodeId, cmsContentVersion.VersionId") + @") as docData
+INNER JOIN
+    (" + string.Format(parsedOriginalSql, "cmsContent.nodeId, cmsContentVersion.VersionId") + @") as docData
 ON cmsPropertyData.versionId = docData.VersionId AND cmsPropertyData.contentNodeId = docData.nodeId
 ORDER BY contentNodeId, versionId, propertytypeid
 ", docSql.Arguments);

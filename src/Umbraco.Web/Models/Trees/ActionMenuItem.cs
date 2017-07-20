@@ -9,10 +9,10 @@ namespace Umbraco.Web.Models.Trees
     /// <remarks>
     /// These types of menu items are rare but they do exist. Things like refresh node simply execute
     /// JS and don't launch a dialog.
-    /// 
+    ///
     /// Each action menu item describes what angular service that it's method exists in and what the method name is.
-    /// 
-    /// An action menu item must describe the angular service name for which it's method exists. It may also define what the 
+    ///
+    /// An action menu item must describe the angular service name for which it's method exists. It may also define what the
     /// method name is that will be called in this service but if one is not specified then we will assume the method name is the
     /// same as the Type name of the current action menu class.
     /// </remarks>
@@ -35,7 +35,7 @@ namespace Umbraco.Web.Models.Trees
             }
             else
             {
-                AdditionalData.Add("jsAction", string.Format("{0}.{1}", attribute.ServiceName, attribute.MethodName));    
+                AdditionalData.Add("jsAction", string.Format("{0}.{1}", attribute.ServiceName, attribute.MethodName));
             }
         }
     }

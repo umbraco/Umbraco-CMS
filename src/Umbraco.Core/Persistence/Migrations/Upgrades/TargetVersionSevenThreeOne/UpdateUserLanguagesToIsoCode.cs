@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Rdbms;
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeOn
     [Migration("7.3.1", 0, Constants.System.UmbracoMigrationName)]
     public class UpdateUserLanguagesToIsoCode : MigrationBase
     {
-        public UpdateUserLanguagesToIsoCode(IMigrationContext context) 
+        public UpdateUserLanguagesToIsoCode(IMigrationContext context)
             : base(context)
         { }
 

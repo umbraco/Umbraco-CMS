@@ -1,4 +1,4 @@
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
@@ -24,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors
             editor.Validators.Add(new DecimalValidator());
             return editor;
         }
-        
+
         protected override PreValueEditor CreatePreValueEditor()
         {
             return new DecimalPreValueEditor();
@@ -62,6 +62,6 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
-        
+
     }
 }

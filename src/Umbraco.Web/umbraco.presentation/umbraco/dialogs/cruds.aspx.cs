@@ -28,11 +28,11 @@ namespace umbraco.dialogs
 
         private readonly Dictionary<string, HtmlTableRow> _permissions = new Dictionary<string, HtmlTableRow>();
         private IUmbracoEntity _node;
-        
+
         protected void Page_Load(object sender, EventArgs e)
         {
             Button1.Text = Services.TextService.Localize("update");
-            pane_form.Text = Services.TextService.Localize("actions/SetPermissionsForThePage",_node.Name); 
+            pane_form.Text = Services.TextService.Localize("actions/SetPermissionsForThePage",_node.Name);
         }
 
         override protected void OnInit(EventArgs e)
@@ -49,7 +49,7 @@ namespace umbraco.dialogs
             var corner = new HtmlTableCell("th");
             corner.Style.Add("border", "none");
             names.Cells.Add(corner);
-            
+
             foreach (var a in Current.Actions)
             {
                 if (a.CanBePermissionAssigned == false) continue;
@@ -84,7 +84,7 @@ namespace umbraco.dialogs
                         var chk = new CheckBox
                             {
                                 //Each checkbox is named with the user _ permission alias so we can parse
-                                ID = u.Id + "_" + a.Letter                                
+                                ID = u.Id + "_" + a.Letter
                             };
 
                         if (a.CanBePermissionAssigned == false) continue;
@@ -108,7 +108,7 @@ namespace umbraco.dialogs
             //add all collected rows
             foreach (var perm in _permissions.Values)
             {
-                ht.Rows.Add(perm);    
+                ht.Rows.Add(perm);
             }
 
             PlaceHolder1.Controls.Add(ht);
@@ -117,13 +117,13 @@ namespace umbraco.dialogs
 
         protected void Button1_Click(object sender, EventArgs e)
         {
-            //get non disabled, non admin users and project to a dictionary, 
+            //get non disabled, non admin users and project to a dictionary,
             // the string (value) portion will store the array of chars = their permissions
             long totalUsers;
             var usersPermissions = Services.UserService.GetAll(0, int.MaxValue, out totalUsers)
                 .Where(user => user.IsApproved && user.Id > 0)
                 .ToDictionary(user => user, user => "");
-            
+
             //iterate over each row which equals:
             // * a certain permission and the user's who will be allowed/denied that permission
             foreach (var row in _permissions)
@@ -144,11 +144,11 @@ namespace umbraco.dialogs
                         //get the char permission
                         var permAlias = split[1];
                         //now append that char permission to the user
-                        usersPermissions[user] += permAlias;    
+                        usersPermissions[user] += permAlias;
                     }
                 }
             }
-            
+
             // Loop through the users and update their permissions
             foreach (var user in usersPermissions)
             {

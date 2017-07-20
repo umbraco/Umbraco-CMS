@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Odbc;
@@ -222,7 +222,7 @@ namespace Umbraco.Tests.Plugins
             Assert.AreEqual("System.Collections.Generic.IDictionary`2[TKey,TValue]", t.ToString());
 
             t = typeof(IDictionary<,>);
-            t = t.MakeGenericType(t.GetGenericArguments()[0], t.GetGenericArguments()[1]); 
+            t = t.MakeGenericType(t.GetGenericArguments()[0], t.GetGenericArguments()[1]);
             Assert.AreEqual("IDictionary`2", t.Name);
             Assert.AreEqual("System.Collections.Generic.IDictionary`2", t.FullName);
             Assert.AreEqual("System.Collections.Generic.IDictionary`2[TKey,TValue]", t.ToString());

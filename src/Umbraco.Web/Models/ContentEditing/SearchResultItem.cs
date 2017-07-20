@@ -1,7 +1,7 @@
 ﻿namespace Umbraco.Web.Models.ContentEditing
 {
     public class SearchResultItem
-    {       
+    {
         /// <summary>
         /// The string representation of the ID, used for Web responses
         /// </summary>

@@ -92,7 +92,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     //order the result by name
                     .OrderBy(x => x.Name);
         }
-        
+
         /// <summary>
         /// Gets all entities of the specified <see cref="PropertyType"/> query
         /// </summary>
@@ -104,8 +104,8 @@ namespace Umbraco.Core.Persistence.Repositories
             return ints.Any()
                 ? GetAll(ints)
                 : Enumerable.Empty<IMediaType>();
-        }       
-        
+        }
+
         protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             var sql = Sql();

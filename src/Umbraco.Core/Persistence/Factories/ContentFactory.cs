@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// </summary>
         /// <param name="dto">
         /// This DTO can contain all of the information to build an IContent item, however in cases where multiple entities are being built,
-        /// a separate <see cref="DocumentPublishedReadOnlyDto"/> publishedDto entity will be supplied in place of the <see cref="DocumentDto"/>'s own 
+        /// a separate <see cref="DocumentPublishedReadOnlyDto"/> publishedDto entity will be supplied in place of the <see cref="DocumentDto"/>'s own
         /// ResultColumn DocumentPublishedReadOnlyDto
         /// </param>
         /// <param name="contentType"></param>
@@ -164,7 +164,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         private NodeDto BuildNodeDto(IContent entity)
         {
-            //TODO: Change this once the Language property is public on IContent            
+            //TODO: Change this once the Language property is public on IContent
             var nodeName = entity.Name;
 
             var nodeDto = new NodeDto

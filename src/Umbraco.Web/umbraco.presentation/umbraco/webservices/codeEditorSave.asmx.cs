@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -34,7 +34,7 @@ namespace umbraco.presentation.webservices
                 // validate extension
                 IOHelper.ValidateFileExtension(IOHelper.MapPath(SystemDirectories.Xslt + "/" + fileName),
                                                new List<string>() { "xsl", "xslt" });
-                
+
                 StreamWriter SW;
                 string tempFileName = IOHelper.MapPath(SystemDirectories.Xslt + "/" + DateTime.Now.Ticks + "_temp.xslt");
                 SW = File.CreateText(tempFileName);
@@ -151,7 +151,7 @@ namespace umbraco.presentation.webservices
 
                 if (errorMessage == "" && fileName.ToLower().EndsWith(".xslt"))
                 {
-                    //Hardcoded security-check... only allow saving files in xslt directory... 
+                    //Hardcoded security-check... only allow saving files in xslt directory...
                     var savePath = IOHelper.MapPath(SystemDirectories.Xslt + "/" + fileName);
 
                     if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Xslt + "/")))
@@ -170,7 +170,7 @@ namespace umbraco.presentation.webservices
                         SW.Close();
                         errorMessage = "true";
 
-                       
+
                     }
                     else
                     {

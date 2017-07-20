@@ -11,7 +11,7 @@ using Umbraco.Web._Legacy.UI;
 namespace umbraco.cms.presentation.create.controls
 {
     /// <summary>
-    ///		Summary description for language.
+    ///        Summary description for language.
     /// </summary>
     public partial class language : global::Umbraco.Web.UI.Controls.UmbracoUserControl
     {

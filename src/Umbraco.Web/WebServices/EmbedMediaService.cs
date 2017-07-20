@@ -20,7 +20,7 @@ namespace Umbraco.Web.WebServices
 
             if (currentUser == null)
                 throw new UnauthorizedAccessException("You must be logged in to use this service");
-            
+
             var url = HttpContext.Current.Request.Form["url"];
             var width = int.Parse(HttpContext.Current.Request.Form["width"]);
             var height = int.Parse(HttpContext.Current.Request.Form["height"]);

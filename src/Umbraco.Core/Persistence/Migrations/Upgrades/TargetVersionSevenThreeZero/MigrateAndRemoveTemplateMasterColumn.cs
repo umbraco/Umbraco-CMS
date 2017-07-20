@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Configuration;
@@ -30,15 +30,15 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             {
                 return;
             }
-            
+
             var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
 
             //update the parentId column for all templates to be correct so it matches the current 'master' template
 
             //In some old corrupted databases, the information will not be correct in the master column so we need to fix that
             //first by nulling out the master column where the id doesn't actually exist
-            Execute.Sql(@"UPDATE cmsTemplate SET master = NULL WHERE " + 
-                SqlSyntax.GetQuotedColumnName("master") + @" IS NOT NULL AND " + 
+            Execute.Sql(@"UPDATE cmsTemplate SET master = NULL WHERE " +
+                SqlSyntax.GetQuotedColumnName("master") + @" IS NOT NULL AND " +
                 SqlSyntax.GetQuotedColumnName("master") + @" NOT IN (" +
                 //Stupid MySQL... needs this stupid syntax because it can do an update with a sub query of itself,
                 // yet it can do one with a sub sub query
@@ -96,7 +96,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 return string.Empty;
             });
 
-            
+
 
             //now remove the master column and key
             if (DatabaseType.IsMySql())
@@ -113,7 +113,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             {
                 if (constraints.Any(x => x.Item1.InvariantEquals("cmsTemplate") && x.Item3.InvariantEquals("FK_cmsTemplate_cmsTemplate")))
                 {
-                    Delete.ForeignKey("FK_cmsTemplate_cmsTemplate").OnTable("cmsTemplate");                   
+                    Delete.ForeignKey("FK_cmsTemplate_cmsTemplate").OnTable("cmsTemplate");
                 }
 
                 //TODO: Hopefully it's not named something else silly in some crazy old versions
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
 
             if (cols.Any(x => x.ColumnName.InvariantEquals("master") && x.TableName.InvariantEquals("cmsTemplate")))
             {
-                Delete.Column("master").FromTable("cmsTemplate");    
+                Delete.Column("master").FromTable("cmsTemplate");
             }
         }
 

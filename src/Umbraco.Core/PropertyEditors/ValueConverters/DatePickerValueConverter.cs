@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Xml;
 using Umbraco.Core.Models.PublishedContent;
@@ -7,12 +7,12 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
     public class DatePickerValueConverter : PropertyValueConverterBase
-	{
-	    private static readonly string[] PropertyEditorAliases =
-	    {
-	        Constants.PropertyEditors.DateTimeAlias,
-	        Constants.PropertyEditors.DateAlias
-	    };
+    {
+        private static readonly string[] PropertyEditorAliases =
+        {
+            Constants.PropertyEditors.DateTimeAlias,
+            Constants.PropertyEditors.DateAlias
+        };
 
         public override bool IsConverter(PublishedPropertyType propertyType)
         {

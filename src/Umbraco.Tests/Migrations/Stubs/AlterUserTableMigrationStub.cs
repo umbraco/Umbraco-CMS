@@ -7,7 +7,7 @@ namespace Umbraco.Tests.Migrations.Stubs
     [MigrationAttribute("6.0.0", 0, "Test")]
     public class AlterUserTableMigrationStub : MigrationBase
     {
-        public AlterUserTableMigrationStub(IMigrationContext context) 
+        public AlterUserTableMigrationStub(IMigrationContext context)
             : base(context)
         { }
 

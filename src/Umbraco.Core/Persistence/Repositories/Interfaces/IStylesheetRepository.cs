@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories

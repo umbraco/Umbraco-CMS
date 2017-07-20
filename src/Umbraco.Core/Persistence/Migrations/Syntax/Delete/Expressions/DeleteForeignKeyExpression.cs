@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
     {
         public DeleteForeignKeyExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
             : base(context, supportedDatabaseTypes)
-        {   
+        {
             ForeignKey = new ForeignKeyDefinition();
         }
 
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 
             if (CurrentDatabaseType.IsMySql())
             {
-                //MySql naming "convention" for foreignkeys, which aren't explicitly named                
+                //MySql naming "convention" for foreignkeys, which aren't explicitly named
                 if (string.IsNullOrEmpty(ForeignKey.Name))
                     ForeignKey.Name = string.Format("{0}_ibfk_1", ForeignKey.ForeignTable.ToLower());
 

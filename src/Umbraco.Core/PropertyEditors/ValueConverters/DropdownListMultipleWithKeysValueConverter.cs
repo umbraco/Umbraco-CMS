@@ -35,6 +35,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                                     .ToArray();
 
             return prevalueIds;
-        }        
+        }
     }
 }

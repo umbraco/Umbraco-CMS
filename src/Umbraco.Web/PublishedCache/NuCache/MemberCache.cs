@@ -69,8 +69,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     EnsureProvider();
                     var member = _memberService.GetById(memberId);
-                    return member == null 
-                        ? null 
+                    return member == null
+                        ? null
                         : PublishedMember.Create(member, GetContentType(member.ContentTypeId), _previewDefault, _facadeAccessor);
                 });
         }

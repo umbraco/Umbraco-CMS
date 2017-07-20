@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
@@ -21,7 +21,7 @@ namespace umbraco.cms.presentation.Trees
         {
             get
             {
-				instance.EnsureTreesRegistered();
+                instance.EnsureTreesRegistered();
                 return instance;
             }
         }
@@ -33,11 +33,11 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public TreeDefinition FindTree(BaseTree tree)
         {
-			EnsureTreesRegistered();
+            EnsureTreesRegistered();
 
             var foundTree = this.Find(
-            	t => t.TreeType == tree.GetType()
-            	);
+                t => t.TreeType == tree.GetType()
+                );
             if (foundTree != null)
                 return foundTree;
 
@@ -51,7 +51,7 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public TreeDefinition FindTree<T>() where T : BaseTree
         {
-			EnsureTreesRegistered();
+            EnsureTreesRegistered();
 
             var foundTree = this.Find(
                delegate(TreeDefinition t)
@@ -74,11 +74,11 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public TreeDefinition FindTree(string alias)
         {
-			EnsureTreesRegistered();
+            EnsureTreesRegistered();
 
             var foundTree = this.Find(
-            	t => t.Tree.Alias.ToLower() == alias.ToLower()
-            	);
+                t => t.Tree.Alias.ToLower() == alias.ToLower()
+                );
             if (foundTree != null)
                 return foundTree;
 
@@ -92,11 +92,11 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public List<TreeDefinition> FindTrees(string appAlias)
         {
-			EnsureTreesRegistered();
+            EnsureTreesRegistered();
 
             return this.FindAll(
-            	tree => (tree.App != null && tree.App.Alias.ToLower() == appAlias.ToLower())
-            	);
+                tree => (tree.App != null && tree.App.Alias.ToLower() == appAlias.ToLower())
+                );
         }
 
         /// <summary>
@@ -106,11 +106,11 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public List<TreeDefinition> FindActiveTrees(string appAlias)
         {
-			EnsureTreesRegistered();
+            EnsureTreesRegistered();
 
             return this.FindAll(
-            	tree => (tree.App != null && tree.App.Alias.ToLower() == appAlias.ToLower() && tree.Tree.Initialize)
-            	);
+                tree => (tree.App != null && tree.App.Alias.ToLower() == appAlias.ToLower() && tree.Tree.Initialize)
+                );
         }
 
         public void ReRegisterTrees()

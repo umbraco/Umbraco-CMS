@@ -331,7 +331,7 @@ namespace Umbraco.Tests.Scoping
 
         public class LocalServerMessenger : ServerMessengerBase
         {
-            public LocalServerMessenger() 
+            public LocalServerMessenger()
                 : base(false)
             { }
 

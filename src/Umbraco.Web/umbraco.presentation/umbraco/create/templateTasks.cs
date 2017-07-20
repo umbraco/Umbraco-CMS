@@ -1,4 +1,4 @@
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Composing;
 using Umbraco.Web.UI;
@@ -7,11 +7,11 @@ using Umbraco.Web._Legacy.UI;
 namespace umbraco
 {
     public class templateTasks : LegacyDialogTask
-    {  
+    {
         public override bool PerformSave()
         {
             var masterId = ParentID;
-            
+
             var editor = "settings/editTemplate.aspx";
             if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
                 editor = "settings/views/editView.aspx";
@@ -42,7 +42,7 @@ namespace umbraco
         }
 
         private string _returnUrl = "";
-        
+
         public override string ReturnUrl
         {
             get { return _returnUrl; }
