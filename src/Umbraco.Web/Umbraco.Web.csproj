@@ -436,6 +436,7 @@
     <Compile Include="Security\Identity\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="SingletonHttpContextAccessor.cs" />
     <Compile Include="Trees\ContentTypeTreeController.cs" />
+    <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\PackagesTreeController.cs" />
     <Compile Include="Trees\MediaTypeTreeController.cs" />
     <Compile Include="Trees\MemberTypeTreeController.cs" />
