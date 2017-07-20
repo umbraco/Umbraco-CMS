@@ -35,13 +35,38 @@
             {
                 throw new InvalidOperationException("Id must be an integer");
             }
-           
+
             var nodes = new TreeNodeCollection();
 
             if (id == Constants.System.Root.ToInvariantString())
-            {              
-                nodes.AddRange(this.Services.LocalizationService.GetRootDictionaryItems().Select(
-                    x => this.CreateTreeNode(x.Id.ToInvariantString(), id, queryStrings, x.ItemKey, "icon-book-alt")));
+            {
+                nodes.AddRange(
+                    this.Services.LocalizationService.GetRootDictionaryItems().Select(
+                        x => this.CreateTreeNode(
+                            x.Id.ToInvariantString(),
+                            id,
+                            queryStrings,
+                            x.ItemKey,
+                            "icon-book-alt",
+                            true)));
+            }
+            else
+            {
+                // maybe we should use the guid as url param to avoid the extra call for getting dictionary item
+                var parentDictionary = this.Services.LocalizationService.GetDictionaryItemById(intId.Result);
+
+                if (parentDictionary == null)
+                {
+                    return nodes;
+                }
+
+                nodes.AddRange(this.Services.LocalizationService.GetDictionaryItemChildren(parentDictionary.Key).Select(
+                    x => this.CreateTreeNode(
+                        x.Id.ToInvariantString(),
+                        id,
+                        queryStrings,
+                        x.ItemKey,
+                        "icon-book-alt", true)));
             }
 
             return nodes;
