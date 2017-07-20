@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $scope, $q, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService) {
+    function ($rootScope, $scope, $q, $locale, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService) {
 
         $scope.isLoading = true;
 
@@ -100,9 +100,45 @@ angular.module("umbraco")
             //stores a reference to the editor
             var tinyMceEditor = null;
 
+            // these languages are available for localization
+            var availableLanguages = [
+                'da',
+                'de',
+                'en',
+                'en_us',
+                'fi',
+                'fr',
+                'he',
+                'it',
+                'ja',
+                'nl',
+                'no',
+                'pl',
+                'pt',
+                'ru',
+                'sv',
+                'zh'
+            ];
+
+            //define fallback language
+            var language = 'en_us';
+            //get locale from angular and match tinymce format. Angular localization is always in the format of ru-ru, de-de, en-gb, etc.
+            //wheras tinymce is in the format of ru, de, en, en_us, etc.
+            var localeId = $locale.id.replace('-', '_');
+            //try matching the language using full locale format
+            var languageMatch = _.find(availableLanguages, function(o) { return o === localeId; });
+            //if no matches, try matching using only the language
+            if (languageMatch === undefined) {
+                var localeParts = localeId.split('_');
+                languageMatch = _.find(availableLanguages, function(o) { return o === localeParts[0]; });
+            }
+            //if a match was found - set the language
+            if (languageMatch !== undefined) {
+                language = languageMatch;
+            }
+
             //wait for queue to end
             $q.all(await).then(function () {
-
                 //create a baseline Config to exten upon
                 var baseLineConfigObj = {
                     mode: "exact",
@@ -119,9 +155,9 @@ angular.module("umbraco")
                     toolbar: toolbar,
                     content_css: stylesheets,
                     relative_urls: false,
-                    style_formats: styleFormats
+                    style_formats: styleFormats,
+                    language: language
                 };
-
 
                 if (tinyMceConfig.customConfig) {
 
@@ -295,10 +331,7 @@ angular.module("umbraco")
 
                     });
                 };
-
-
-
-
+                
                 /** Loads in the editor */
                 function loadTinyMce() {
 

@@ -1,17 +1,17 @@
-﻿<form ng-controller="Umbraco.Dialogs.RteEmbedController" val-form-manager>
+<form ng-controller="Umbraco.Dialogs.RteEmbedController" val-form-manager>
     <div class="umb-panel">
          <div class="umb-panel-body no-header with-footer">
             <umb-pane>
-                <umb-control-group label="Url">
+                <umb-control-group label="@general_url">
                     <input id="url" class="umb-editor input-block-level" type="text" ng-model="form.url" ng-keyup="$event.keyCode == 13 ? showPreview() : null" required />
-                    <input type="button" ng-click="showPreview()" class="btn" value="Retrieve" />
+                    <input type="button" ng-click="showPreview()" class="btn" localize="value" value="@general_retrieve" />
                 </umb-control-group>
 
                 <div ng-show="form.supportsDimensions">    
-                    <umb-control-group label="Size">
+                    <umb-control-group label="@general_size">
                         <input type="text" ng-model="form.width" on-blur="changeSize('width')" style="width:50px"/> x <input type="text" ng-model="form.height" on-blur="changeSize('height')" style="width:50px"/>
 
-                        <label for="constrain" style="display:inline">Constrain:</label> 
+                        <label for="constrain" style="display:inline"><localize key="general_constrain">Constrain</localize>:</label> 
                         <input id="constrain" type="checkbox" ng-model="form.constrain" style="margin-bottom: 10px;"/>
                     </umb-control-group>
                 </div>

@@ -20,11 +20,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MemberPicker2Alias))
                 return true;
 
-            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters == false)
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
             {
                 return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MemberPickerAlias);
             }
-            return false;            
+            return false;
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)

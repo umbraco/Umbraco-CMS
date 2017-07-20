@@ -6,7 +6,7 @@ namespace Umbraco.Core.Configuration
 {
     public class UmbracoVersion
     {
-        private static readonly Version Version = new Version("7.6.2");
+        private static readonly Version Version = new Version("7.7.0");
 
         /// <summary>
         /// Gets the current version of Umbraco.
@@ -24,7 +24,7 @@ namespace Umbraco.Core.Configuration
         /// Gets the version comment (like beta or RC).
         /// </summary>
         /// <value>The version comment.</value>
-        public static string CurrentComment { get { return ""; } }
+        public static string CurrentComment { get { return "alpha001"; } }
 
         // Get the version of the umbraco.dll by looking at a class in that dll
         // Had to do it like this due to medium trust issues, see: http://haacked.com/archive/2010/11/04/assembly-location-and-medium-trust.aspx
@@ -33,9 +33,9 @@ namespace Umbraco.Core.Configuration
         public static SemVersion GetSemanticVersion()
         {
             return new SemVersion(
-                Current.Major, 
+                Current.Major,
                 Current.Minor,
-                Current.Build, 
+                Current.Build,
                 CurrentComment.IsNullOrWhiteSpace() ? null : CurrentComment,
                 Current.Revision > 0 ? Current.Revision.ToInvariantString() : null);
         }

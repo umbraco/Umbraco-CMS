@@ -823,9 +823,8 @@ namespace Umbraco.Web.Cache
             finally
             {
                 if (tempContext != null)
-                    tempContext.Dispose();
+                    tempContext.Dispose(); // nulls the ThreadStatic context
             }
-            
         }
 
         /// <summary>

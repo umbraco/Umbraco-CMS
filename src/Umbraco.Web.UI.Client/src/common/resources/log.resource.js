@@ -67,8 +67,8 @@ function logResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "logApiBaseUrl",
                        "GetCurrentUserLog",
-                       [{ logtype: type, sinceDate: since }])),
-               'Failed to retrieve user data for id ' + id);
+                       [{ logtype: type}, {sinceDate: since }])),
+               'Failed to retrieve log data for current user of type ' + type + ' since ' + since);
         },
 
         /**
@@ -98,8 +98,8 @@ function logResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "logApiBaseUrl",
                        "GetLog",
-                       [{ logtype: type, sinceDate: since }])),
-               'Failed to retrieve user data for id ' + id);
+                       [{ logtype: type}, {sinceDate: since }])),
+               'Failed to retrieve log data of type ' + type + ' since ' + since);
         }
     };
 }

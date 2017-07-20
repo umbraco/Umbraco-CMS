@@ -6,6 +6,7 @@ using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 
 
@@ -13,12 +14,12 @@ namespace Umbraco.Web.Cache
 {
     /// <summary>
     /// A cache refresher to ensure member cache is updated when members change
-    /// </summary>    
+    /// </summary>
     public sealed class DataTypeCacheRefresher : JsonCacheRefresherBase<DataTypeCacheRefresher>
     {
 
         #region Static helpers
-        
+
         /// <summary>
         /// Converts the json to a JsonPayload object
         /// </summary>
@@ -29,7 +30,7 @@ namespace Umbraco.Web.Cache
             var serializer = new JavaScriptSerializer();
             var jsonObject = serializer.Deserialize<JsonPayload[]>(json);
             return jsonObject;
-        }   
+        }
 
         /// <summary>
         /// Creates the custom Json payload used to refresh cache amongst the servers
@@ -43,7 +44,7 @@ namespace Umbraco.Web.Cache
             var json = serializer.Serialize(items);
             return json;
         }
-   
+
         /// <summary>
         /// Converts a macro to a jsonPayload object
         /// </summary>
@@ -58,7 +59,7 @@ namespace Umbraco.Web.Cache
             };
             return payload;
         }
-        
+
         #endregion
 
         #region Sub classes
@@ -93,28 +94,28 @@ namespace Umbraco.Web.Cache
             //we need to clear the ContentType runtime cache since that is what caches the
             // db data type to store the value against and anytime a datatype changes, this also might change
             // we basically need to clear all sorts of runtime caches here because so many things depend upon a data type
-            
+
             ClearAllIsolatedCacheByEntityType<IContent>();
             ClearAllIsolatedCacheByEntityType<IContentType>();
             ClearAllIsolatedCacheByEntityType<IMedia>();
             ClearAllIsolatedCacheByEntityType<IMediaType>();
             ClearAllIsolatedCacheByEntityType<IMember>();
             ClearAllIsolatedCacheByEntityType<IMemberType>();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
 
             var dataTypeCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
-            payloads.ForEach(payload =>
+            foreach (var payload in payloads)
             {
                 //clears the prevalue cache
                 if (dataTypeCache)
                     dataTypeCache.Result.ClearCacheByKeySearch(string.Format("{0}_{1}", CacheKeys.DataTypePreValuesCacheKey, payload.Id));
 
+                ApplicationContext.Current.Services.IdkMap.ClearCache(payload.Id);
                 PublishedContentType.ClearDataType(payload.Id);
-            });
+                NestedContentHelper.ClearCache(payload.Id);
+            }
 
             TagsValueConverter.ClearCaches();
-            MultipleMediaPickerPropertyConverter.ClearCaches();
+            LegacyMediaPickerPropertyConverter.ClearCaches();
             SliderValueConverter.ClearCaches();
             MediaPickerPropertyConverter.ClearCaches();
 

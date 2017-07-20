@@ -12,6 +12,6 @@ namespace Umbraco.Core.Models.PublishedContent
             : base(content)
         { }
 
-        public virtual Guid Key { get { return ((IPublishedContentWithKey) Content).Key; } }
+        public virtual Guid Key { get { return ((IPublishedContentWithKey) WrappedContentInternal).Key; } }
     }
 }

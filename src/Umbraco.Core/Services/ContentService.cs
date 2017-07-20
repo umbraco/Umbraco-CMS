@@ -32,6 +32,7 @@ namespace Umbraco.Core.Services
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
+        private readonly IdkMap _idkMap;
 
         //Support recursive locks because some of the methods that require locking call other methods that require locking.
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
@@ -43,7 +44,8 @@ namespace Umbraco.Core.Services
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
             IDataTypeService dataTypeService,
-            IUserService userService)
+            IUserService userService,
+            IdkMap idkMap)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
@@ -51,6 +53,7 @@ namespace Umbraco.Core.Services
             _publishingStrategy = new PublishingStrategy(UowProvider.ScopeProvider, eventMessagesFactory, logger);
             _dataTypeService = dataTypeService;
             _userService = userService;
+            _idkMap = idkMap;
         }
 
         #region Static Queries
@@ -174,8 +177,7 @@ namespace Umbraco.Core.Services
                 content.WriterId = userId;
 
                 uow.Events.Dispatch(Created, this, new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId));
-
-                Audit(uow, AuditType.New, string.Format("Content '{0}' was created", name), content.CreatorId, content.Id);
+                
                 uow.Commit();
             }
 
@@ -217,8 +219,7 @@ namespace Umbraco.Core.Services
                 content.WriterId = userId;
 
                 uow.Events.Dispatch(Created, this, new NewEventArgs<IContent>(content, false, contentTypeAlias, parent));
-
-                Audit(uow, AuditType.New, string.Format("Content '{0}' was created", name), content.CreatorId, content.Id);
+                
                 uow.Commit();
             }
 
@@ -382,13 +383,13 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         public IContent GetById(Guid key)
         {
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
-            {
-                var repository = RepositoryFactory.CreateContentRepository(uow);
-                var query = Query<IContent>.Builder.Where(x => x.Key == key);
-                var contents = repository.GetByQuery(query);
-                return contents.SingleOrDefault();
-            }
+            // the repository implements a cache policy on int identifiers, not guids,
+            // and we are not changing it now, but we still would like to rely on caching
+            // instead of running a full query against the database, so relying on the
+            // id-key map, which is fast.
+
+            var a = _idkMap.GetIdForKey(key, UmbracoObjectTypes.Document);
+            return a.Success ? GetById(a.Result) : null;
         }
 
         /// <summary>
@@ -1155,6 +1156,82 @@ namespace Umbraco.Core.Services
             return ((IContentServiceOperations)this).SaveAndPublish(content, userId, raiseEvents);
         }
 
+        public IContent GetBlueprintById(int id)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
+                return repository.Get(id);
+            }
+        }
+
+        public void SaveBlueprint(IContent content, int userId = 0)
+        {
+            //always ensure the blueprint is at the root
+            content.ParentId = -1;
+
+            using (new WriteLock(Locker))
+            {
+                using (var uow = UowProvider.GetUnitOfWork())
+                {
+                    if (string.IsNullOrWhiteSpace(content.Name))
+                    {
+                        throw new ArgumentException("Cannot save content blueprint with empty name.");
+                    }
+
+                    var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
+
+                    if (content.HasIdentity == false)
+                    {
+                        content.CreatorId = userId;
+                    }
+                    content.WriterId = userId;
+                    
+                    repository.AddOrUpdate(content);
+
+                    uow.Commit();
+                }
+            }
+        }
+
+        public void DeleteBlueprint(IContent content, int userId = 0)
+        {
+            using (new WriteLock(Locker))
+            {
+                using (var uow = UowProvider.GetUnitOfWork())
+                {              
+                    var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
+                    repository.Delete(content);                    
+                    uow.Commit();
+                }
+            }
+        }
+
+        public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = 0)
+        {
+            if (blueprint == null) throw new ArgumentNullException("blueprint");
+
+            var contentType = blueprint.ContentType;
+            var content = new Content(name, -1, contentType);
+            content.Path = string.Concat(content.ParentId.ToString(), ",", content.Id);
+
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                content.CreatorId = userId;
+                content.WriterId = userId;
+
+                //Now we need to map all of the properties over!
+                foreach (var property in blueprint.Properties)
+                {
+                    content.SetValue(property.Alias, property.Value);
+                }
+
+                uow.Commit();
+            }
+
+            return content;
+        }
+
         /// <summary>
         /// Saves a single <see cref="IContent"/> object
         /// </summary>
@@ -1785,6 +1862,21 @@ namespace Umbraco.Core.Services
             }
 
             return true;
+        }
+
+        public IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] documentTypeIds)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
+
+                var query = new Query<IContent>();
+                if (documentTypeIds.Length > 0)
+                {
+                    query.Where(x => documentTypeIds.Contains(x.ContentTypeId));
+                }
+                return repository.GetByQuery(query);
+            }
         }
 
         /// <summary>

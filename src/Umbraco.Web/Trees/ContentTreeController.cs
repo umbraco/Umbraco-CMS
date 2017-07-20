@@ -16,6 +16,7 @@ using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
+using umbraco.businesslogic.Actions;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using Umbraco.Web.Models.ContentEditing;
@@ -230,6 +231,8 @@ namespace Umbraco.Web.Trees
             var menu = new MenuItemCollection();
             menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
             menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+
+            menu.Items.Add<ActionCreateBlueprintFromContent>(ui.Text("actions", ActionCreateBlueprintFromContent.Instance.Alias));
 
             //need to ensure some of these are converted to the legacy system - until we upgrade them all to be angularized.
             menu.Items.Add<ActionMove>(ui.Text("actions", ActionMove.Instance.Alias), true);

@@ -1,21 +1,18 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Net.Http.Formatting;
 using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
-using System.Web;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
     public abstract class FileSystemTreeController : TreeController
     {
-        protected abstract IFileSystem2 FileSystem { get; }
-        protected abstract string[] Extensions { get; }
-        protected abstract string FileIcon { get; }
+        protected abstract string FilePath { get; }
+        protected abstract string FileSearchPattern { get; }
 
         /// <summary>
         /// Inheritors can override this method to modify the file node that is created.
@@ -31,43 +28,67 @@ namespace Umbraco.Web.Trees
 
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
-            var path = string.IsNullOrEmpty(id) == false && id != Constants.System.Root.ToInvariantString()
-                ? HttpUtility.UrlDecode(id).TrimStart("/")
-                : "";
+            var orgPath = "";
+            string path;
+            if (string.IsNullOrEmpty(id) == false && id != "-1")
+            {
+                orgPath = id;
+                path = IOHelper.MapPath(FilePath + "/" + orgPath);
+                orgPath += "/";
+            }
+            else
+            {
+                path = IOHelper.MapPath(FilePath);
+            }
 
-            var directories = FileSystem.GetDirectories(path);
+            var dirInfo = new DirectoryInfo(path);
+            var dirInfos = dirInfo.GetDirectories();
 
             var nodes = new TreeNodeCollection();
-            foreach (var directory in directories)
+            foreach (var dir in dirInfos)
             {
-                var hasChildren = FileSystem.GetFiles(directory).Any() || FileSystem.GetDirectories(directory).Any();
+                if ((dir.Attributes & FileAttributes.Hidden) != 0)
+                    continue;
 
-                var name = Path.GetFileName(directory);
-                var node = CreateTreeNode(HttpUtility.UrlEncode(directory), path, queryStrings, name, "icon-folder", hasChildren);
+                var hasChildren = dir.GetFiles().Length > 0 || dir.GetDirectories().Length > 0;
+                var node = CreateTreeNode(orgPath + dir.Name, orgPath, queryStrings, dir.Name, "icon-folder", hasChildren);
+
                 OnRenderFolderNode(ref node);
-                if(node != null)
+                if (node != null)
                     nodes.Add(node);
             }
 
             //this is a hack to enable file system tree to support multiple file extension look-up
             //so the pattern both support *.* *.xml and xml,js,vb for lookups
-            var files = FileSystem.GetFiles(path).Where(x =>
-            {
-                var extension = Path.GetExtension(x);
-                return extension != null && Extensions.Contains(extension.Trim('.'), StringComparer.InvariantCultureIgnoreCase);
-            });
+            var allowedExtensions = new string[0];
+            var filterByMultipleExtensions = FileSearchPattern.Contains(",");
+            FileInfo[] fileInfo;
 
-            foreach (var file in files)
-            {   
-                var withoutExt = Path.GetFileNameWithoutExtension(file);
-                if (withoutExt.IsNullOrWhiteSpace() == false)
-                {
-                    var name = Path.GetFileName(file);
-                    var node = CreateTreeNode(HttpUtility.UrlEncode(file), path, queryStrings, name, FileIcon, false);
-                    OnRenderFileNode(ref node);
-                    if (node != null)
-                        nodes.Add(node);
-                }
+            if (filterByMultipleExtensions)
+            {
+                fileInfo = dirInfo.GetFiles();
+                allowedExtensions = FileSearchPattern.ToLower().Split(',');
+            }
+            else
+                fileInfo = dirInfo.GetFiles(FileSearchPattern);
+
+            foreach (var file in fileInfo)
+            {
+                if ((file.Attributes & FileAttributes.Hidden) != 0)
+                    continue;
+
+                if (filterByMultipleExtensions && Array.IndexOf(allowedExtensions, file.Extension.ToLower().Trim('.')) < 0)
+                    continue;
+
+                var withoutExt = Path.GetFileNameWithoutExtension(file.Name);
+                if (withoutExt.IsNullOrWhiteSpace())
+                    continue;
+
+                var node = CreateTreeNode(orgPath + file.Name, orgPath, queryStrings, file.Name, "icon-file", false);
+
+                OnRenderFileNode(ref node);
+                if (node != null)
+                    nodes.Add(node);
             }
 
             return nodes;
@@ -90,22 +111,27 @@ namespace Umbraco.Web.Trees
                 return menu;
             }
 
-            var path = string.IsNullOrEmpty(id) == false && id != Constants.System.Root.ToInvariantString()
-                ? System.Web.HttpUtility.UrlDecode(id).TrimStart("/")
-                : "";
+            string path;
+            if (string.IsNullOrEmpty(id) == false)
+            {
+                var orgPath = System.Web.HttpUtility.UrlDecode(id);
+                path = IOHelper.MapPath(FilePath + "/" + orgPath);
+            }
+            else
+            {
+                path = IOHelper.MapPath(FilePath);
+            }
 
-            var isFile = FileSystem.FileExists(path);
-            var isDirectory = FileSystem.DirectoryExists(path);
-
-            if (isDirectory)
+            var dirInfo = new DirectoryInfo(path);
+            //check if it's a directory
+            if (dirInfo.Attributes == FileAttributes.Directory)
             {
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.Instance.Alias;
                 //create action
                 menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
-
-                var hasChildren = FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any();
-
+                
+                var hasChildren = dirInfo.GetFiles().Length > 0 || dirInfo.GetDirectories().Length > 0;
                 //We can only delete folders if it doesn't have any children (folders or files)
                 if (hasChildren == false)
                 {
@@ -116,9 +142,10 @@ namespace Umbraco.Web.Trees
                 //refresh action
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
             }
-            else if (isFile)
+            //if it's not a directory then we only allow to delete the item
+            else
             {
-                //if it's not a directory then we only allow to delete the item
+                //delete action
                 menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
             }
 

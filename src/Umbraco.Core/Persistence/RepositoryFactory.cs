@@ -145,6 +145,23 @@ namespace Umbraco.Core.Persistence
             };
         }
 
+        public virtual IContentRepository CreateContentBlueprintRepository(IScopeUnitOfWork uow)
+        {
+            return new ContentBlueprintRepository(
+                uow,
+                _cacheHelper,
+                _logger,
+                _sqlSyntax,
+                CreateContentTypeRepository(uow),
+                CreateTemplateRepository(uow),
+                CreateTagRepository(uow),
+                _settings.Content)
+            {
+                //duplicates are allowed
+                EnsureUniqueNaming = false
+            };
+        }
+
         public virtual IContentTypeRepository CreateContentTypeRepository(IScopeUnitOfWork uow)
         {
             return new ContentTypeRepository(
@@ -229,6 +246,18 @@ namespace Umbraco.Core.Persistence
         internal virtual IPartialViewRepository CreatePartialViewMacroRepository(IUnitOfWork uow)
         {
             return new PartialViewMacroRepository(uow, FileSystemProviderManager.Current.MacroPartialsFileSystem);
+        }
+
+        [Obsolete("MacroScripts are obsolete - this is for backwards compatibility with upgraded sites.")]
+        internal virtual IPartialViewRepository CreateMacroScriptRepository(IUnitOfWork uow)
+        {
+            return new MacroScriptRepository(uow, FileSystemProviderManager.Current.MacroScriptsFileSystem);
+        }
+
+        [Obsolete("UserControls are obsolete - this is for backwards compatibility with upgraded sites.")]
+        internal virtual IUserControlRepository CreateUserControlRepository(IUnitOfWork uow)
+        {
+            return new UserControlRepository(uow, FileSystemProviderManager.Current.UserControlsFileSystem);
         }
 
         public virtual IStylesheetRepository CreateStylesheetRepository(IUnitOfWork uow)

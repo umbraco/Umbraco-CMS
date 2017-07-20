@@ -437,6 +437,11 @@ namespace Umbraco.Core
             /// </summary>
             public const string EmailAddressAlias = "Umbraco.EmailAddress";
 
+            /// <summary>
+            /// Alias for the nested content property editor.
+            /// </summary>
+            public const string NestedContentAlias = "Umbraco.NestedContent";
+
             public static class PreValueKeys
             {
                 /// <summary>

@@ -111,7 +111,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         bool IRequestHandlerSection.ConvertUrlsToAscii
         {
-            get { return UrlReplacing.ConvertUrlsToAscii; }
+            get { return UrlReplacing.ConvertUrlsToAscii.InvariantEquals("true"); }
+        }
+
+        bool IRequestHandlerSection.TryConvertUrlsToAscii
+        {
+            get { return UrlReplacing.ConvertUrlsToAscii.InvariantEquals("try"); }
         }
 
         IEnumerable<IChar> IRequestHandlerSection.CharCollection

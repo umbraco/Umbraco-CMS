@@ -783,8 +783,6 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="postContent">Inserir após campo</key>
     <key alias="preContent">Inserir antes do campo</key>
     <key alias="recursive">Recursivo</key>
-    <key alias="removeParagraph">Remover etiquetas de parágrafo</key>
-    <key alias="removeParagraphHelp">Removerá quaisquer &amp;lt;P&amp;gt; do começo ao fim do texto</key>
     <key alias="uppercase">Maiúscula</key>
     <key alias="urlEncode">Codificar URL</key>
     <key alias="urlEncodeHelp">Vai formatar caracteres especiais em URLs</key>
