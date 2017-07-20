@@ -38,13 +38,7 @@ Umbraco.Application.Actions = function() {
             }
             else alert(msg);
         },
-
-        launchAbout: function() {
-            /// <summary>Launches the about Umbraco window</summary>
-            UmbClientMgr.openModalWindow("dialogs/about.aspx", UmbClientMgr.uiKeys()['general_about'], true, 450, 390);
-            return false;
-        },
-
+        
         launchCreateWizard: function() {
             /// <summary>Launches the create content wizard</summary>
 
@@ -194,15 +188,7 @@ Umbraco.Application.Actions = function() {
             }
 
         },
-
-        actionRights: function() {
-            /// <summary></summary>
-
-            if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.openModalWindow("dialogs/cruds.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_rights'], true, 800, 300);
-            }
-        },
-
+        
         actionProtect: function() {
             /// <summary></summary>
 
@@ -290,10 +276,7 @@ Umbraco.Application.Actions = function() {
                 }
                 else if (actionNode.nodeType == "users") {
                     UmbClientMgr.openModalWindow("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], true, 480, 380);
-                }
-                else if (actionNode.nodeType == "initpython" || actionNode.nodeType == "initdlrscripting") {
-                    UmbClientMgr.openModalWindow("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], true, 420, 380);
-                }
+                }               
                 else {
                     UmbClientMgr.openModalWindow("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], true, 420, 270);
                 }
@@ -315,14 +298,7 @@ Umbraco.Application.Actions = function() {
                 UmbClientMgr.openModalWindow("dialogs/sendToTranslation.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_sendToTranslate'], true, 500, 470);
             }
         },
-
-        actionEmptyTranscan: function() {
-            /// <summary></summary>
-
-            if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.openModalWindow("dialogs/emptyTrashcan.aspx?type=" + this._currApp, uiKeys['actions_emptyTrashcan'], true, 500, 220);
-            }
-        },
+        
 
         actionImport: function() {
             /// <summary></summary>
@@ -413,21 +389,6 @@ Umbraco.Application.Actions = function() {
             }
         },
 
-        actionMove: function() {
-            /// <summary></summary>
-
-            if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.openModalWindow("dialogs/moveOrCopy.aspx?app=" + this._currApp + "&mode=cut&id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_move'], true, 500, 460);
-            }
-        },
-
-        actionCopy: function() {
-            /// <summary></summary>
-
-            if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.openModalWindow("dialogs/moveOrCopy.aspx?app=" + this._currApp + "&mode=copy&id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_copy'], true, 500, 470);
-            }
-        },
         _debug: function(strMsg) {
             if (this._isDebug) {
                 Sys.Debug.trace("AppActions: " + strMsg);
