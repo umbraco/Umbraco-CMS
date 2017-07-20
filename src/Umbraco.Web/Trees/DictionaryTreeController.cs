@@ -1,5 +1,7 @@
 ﻿namespace Umbraco.Web.Trees
 {
+    using System;
+    using System.Linq;
     using System.Net.Http.Formatting;
 
     using global::umbraco;
@@ -28,7 +30,19 @@
         /// </remarks>
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
+            var intId = id.TryConvertTo<int>();
+            if (intId == false)
+            {
+                throw new InvalidOperationException("Id must be an integer");
+            }
+           
             var nodes = new TreeNodeCollection();
+
+            if (id == Constants.System.Root.ToInvariantString())
+            {              
+                nodes.AddRange(this.Services.LocalizationService.GetRootDictionaryItems().Select(
+                    x => this.CreateTreeNode(x.Id.ToInvariantString(), id, queryStrings, x.ItemKey, "icon-book-alt")));
+            }
 
             return nodes;
         }
