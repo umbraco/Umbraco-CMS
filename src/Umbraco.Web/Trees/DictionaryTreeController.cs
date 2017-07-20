@@ -87,6 +87,11 @@
         {
             var menu = new MenuItemCollection();
 
+            if (id != Constants.System.Root.ToInvariantString())
+            {
+                menu.Items.Add<ActionDelete>(this.Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
+            }
+
             menu.Items.Add<RefreshNode, ActionRefresh>(this.Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
 
             return menu;
