@@ -1463,13 +1463,6 @@
     <Compile Include="umbraco.presentation\umbraco\developer\Macros\assemblyBrowser.aspx.designer.cs">
       <DependentUpon>assemblyBrowser.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\autoDoc.aspx.cs">
-      <DependentUpon>autoDoc.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\autoDoc.aspx.designer.cs">
-      <DependentUpon>autoDoc.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx.cs">
       <DependentUpon>editPackage.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1510,13 +1503,6 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\notifications.aspx.designer.cs">
       <DependentUpon>notifications.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx.cs">
-      <DependentUpon>RegexWs.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx.designer.cs">
-      <DependentUpon>RegexWs.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx.cs">
       <DependentUpon>rollBack.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1537,13 +1523,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx.designer.cs">
       <DependentUpon>viewAuditTrail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\js\language.aspx.cs">
-      <DependentUpon>language.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\js\language.aspx.designer.cs">
-      <DependentUpon>language.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx.cs">
       <DependentUpon>EditMemberGroup.aspx</DependentUpon>
@@ -1887,7 +1866,6 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\notifications.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1920,13 +1898,9 @@
     <Content Include="umbraco.presentation\umbraco\translation\preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\xml.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Macros\assemblyBrowser.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\autoDoc.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\getXsltStatus.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx" />
-    <Content Include="umbraco.presentation\umbraco\js\language.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
     </Content>
@@ -1980,10 +1954,6 @@
     <EmbeddedResource Include="Mvc\Strings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco.presentation\umbraco\js\language.aspx.resx">
-      <DependentUpon>language.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="umbraco.presentation\umbraco\templateControls\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

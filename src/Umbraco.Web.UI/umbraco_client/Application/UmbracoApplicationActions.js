@@ -1,7 +1,6 @@
 ﻿/// <reference path="/umbraco_client/Application/NamespaceManager.js" />
 /// <reference path="UmbracoUtils.js" />
 /// <reference path="/umbraco_client/modal/modal.js" />
-/// <reference path="language.aspx" />
 /// <reference name="MicrosoftAjax.js"/>
 
 Umbraco.Sys.registerNamespace("Umbraco.Application");
