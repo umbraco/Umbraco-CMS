@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Web.Security;
+using Newtonsoft.Json;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
@@ -15,6 +17,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -223,9 +226,18 @@ ORDER BY colName";
             if (entity.SecurityStamp.IsNullOrWhiteSpace())
             {
                 entity.SecurityStamp = Guid.NewGuid().ToString();
-            }
+            }           
             
             var userDto = UserFactory.BuildDto(entity);
+
+            //Check if we have a known config, we only want to store config for hashing
+            //TODO: This logic will need to be updated when we do http://issues.umbraco.org/issue/U4-10089
+            var membershipProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
+            if (membershipProvider.PasswordFormat == MembershipPasswordFormat.Hashed)
+            {
+                var json = JsonConvert.SerializeObject(new { hashAlgorithm = Membership.HashAlgorithmType });
+                userDto.PasswordConfig = json;
+            }
 
             var id = Convert.ToInt32(Database.Insert(userDto));
             entity.Id = id;
@@ -318,6 +330,15 @@ ORDER BY colName";
                 {
                     userDto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
                     changedCols.Add("securityStampToken");
+                }
+
+                //Check if we have a known config, we only want to store config for hashing
+                //TODO: This logic will need to be updated when we do http://issues.umbraco.org/issue/U4-10089
+                var membershipProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
+                if (membershipProvider.PasswordFormat == MembershipPasswordFormat.Hashed)
+                {
+                    var json = JsonConvert.SerializeObject(new { hashAlgorithm = Membership.HashAlgorithmType });
+                    userDto.PasswordConfig = json;
                 }
             }
 
