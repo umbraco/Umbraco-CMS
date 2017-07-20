@@ -250,6 +250,16 @@ namespace Umbraco.Core.Services
         IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids);
 
         /// <summary>
+        /// Gets paths for entities.
+        /// </summary>
+        IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params int[] ids);
+
+        /// <summary>
+        /// Gets paths for entities.
+        /// </summary>
+        IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params Guid[] keys);
+
+        /// <summary>
         /// Gets the UmbracoObjectType from the integer id of an IUmbracoEntity.
         /// </summary>
         /// <param name="id">Id of the entity</param>

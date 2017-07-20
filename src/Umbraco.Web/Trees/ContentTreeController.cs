@@ -65,7 +65,7 @@ namespace Umbraco.Web.Trees
         private int[] _userStartNodes;
         protected override int[] UserStartNodes
         {
-            get { return _userStartNodes ?? (_userStartNodes = Security.CurrentUser.AllStartContentIds); }
+            get { return _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService)); }
         }
         
         /// <summary>
@@ -215,7 +215,7 @@ namespace Umbraco.Web.Trees
             {
                 return false;
             }
-            return Security.CurrentUser.HasPathAccess(content);
+            return Security.CurrentUser.HasPathAccess(content, Services.EntityService);
         }
 
         /// <summary>

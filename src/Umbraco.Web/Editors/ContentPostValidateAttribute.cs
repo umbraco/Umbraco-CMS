@@ -22,18 +22,21 @@ namespace Umbraco.Web.Editors
         private readonly IContentService _contentService;
         private readonly WebSecurity _security;
         private readonly IUserService _userService;
+        private readonly IEntityService _entityService;
 
         public ContentPostValidateAttribute()
         {            
         }
 
-        public ContentPostValidateAttribute(IContentService contentService, IUserService userService, WebSecurity security)
+        public ContentPostValidateAttribute(IContentService contentService, IUserService userService, IEntityService entityService, WebSecurity security)
         {
             if (contentService == null) throw new ArgumentNullException("contentService");
             if (userService == null) throw new ArgumentNullException("userService");
+            if (entityService == null) throw new ArgumentNullException("entityService");
             if (security == null) throw new ArgumentNullException("security");
             _contentService = contentService;
             _userService = userService;
+            _entityService = entityService;
             _security = security;
         }
 
@@ -50,6 +53,11 @@ namespace Umbraco.Web.Editors
         private IUserService UserService
         {
             get { return _userService ?? ApplicationContext.Current.Services.UserService; }
+        }
+
+        private IEntityService EntityService
+        {
+            get { return _entityService ?? ApplicationContext.Current.Services.EntityService; }
         }
 
         public override bool AllowMultiple
@@ -140,6 +148,7 @@ namespace Umbraco.Web.Editors
                 Security.CurrentUser,
                 UserService,
                 ContentService,
+                EntityService,
                 contentIdToCheck,
                 permissionToCheck.ToArray(),
                 contentToCheck) == false)

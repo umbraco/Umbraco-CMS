@@ -41,7 +41,7 @@ namespace Umbraco.Web.WebApi.Filters
 
         protected virtual int[] GetUserStartNodes(IUser user)
         {
-            return user.AllStartMediaIds;
+            return user.CalculateMediaStartNodeIds(ApplicationContext.Current.Services.EntityService);
         }
 
         protected virtual int RecycleBinId

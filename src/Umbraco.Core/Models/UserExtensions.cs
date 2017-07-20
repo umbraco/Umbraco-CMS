@@ -81,7 +81,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="user"></param>
         /// <param name="textService"></param>
-        /// <returns></returns>      
+        /// <returns></returns>
         public static CultureInfo GetUserCulture(this IUser user, ILocalizedTextService textService)
         {
             if (user == null) throw new ArgumentNullException("user");
@@ -94,7 +94,7 @@ namespace Umbraco.Core.Models
             try
             {
                 var culture = CultureInfo.GetCultureInfo(userLanguage.Replace("_", "-"));
-                //TODO: This is a hack because we store the user language as 2 chars instead of the full culture 
+                //TODO: This is a hack because we store the user language as 2 chars instead of the full culture
                 // which is actually stored in the language files (which are also named with 2 chars!) so we need to attempt
                 // to convert to a supported full culture
                 var result = textService.ConvertToSupportedCultureWithRegionCode(culture);
@@ -107,19 +107,36 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Checks if the user has access to the content item based on their start noe
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="content"></param>
-        /// <returns></returns>
-        internal static bool HasPathAccess(this IUser user, IContent content)
+        internal static bool HasContentRootAccess(this IUser user, IEntityService entityService)
         {
-            if (user == null) throw new ArgumentNullException("user");
-            if (content == null) throw new ArgumentNullException("content");
-            return HasPathAccess(content.Path, user.AllStartContentIds, Constants.System.RecycleBinContent);
+            return HasPathAccess(Constants.System.Root.ToInvariantString(), user.CalculateContentStartNodeIds(entityService), Constants.System.RecycleBinContent);
         }
-        
+
+        internal static bool HasContentBinAccess(this IUser user, IEntityService entityService)
+        {
+            return HasPathAccess(Constants.System.RecycleBinContent.ToInvariantString(), user.CalculateContentStartNodeIds(entityService), Constants.System.RecycleBinContent);
+        }
+
+        internal static bool HasMediaRootAccess(this IUser user, IEntityService entityService)
+        {
+            return HasPathAccess(Constants.System.Root.ToInvariantString(), user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
+        }
+
+        internal static bool HasMediaBinAccess(this IUser user, IEntityService entityService)
+        {
+            return HasPathAccess(Constants.System.RecycleBinMedia.ToInvariantString(), user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
+        }
+
+        internal static bool HasPathAccess(this IUser user, IContent content, IEntityService entityService)
+        {
+            return HasPathAccess(content.Path, user.CalculateContentStartNodeIds(entityService), Constants.System.RecycleBinContent);
+        }
+
+        internal static bool HasPathAccess(this IUser user, IMedia media, IEntityService entityService)
+        {
+            return HasPathAccess(media.Path, user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
+        }
+
         internal static bool HasPathAccess(string path, int[] startNodeIds, int recycleBinId)
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", "path");
@@ -136,11 +153,11 @@ namespace Umbraco.Core.Models
             if (formattedPath.Contains(formattedRecycleBinId))
             {
                 return false;
-            }            
+            }
 
             //check for normal paths
             foreach (var startNodeId in startNodeIds)
-            {                
+            {
                 var formattedStartNodeId = "," + startNodeId.ToInvariantString() + ",";
 
                 var hasAccess = formattedPath.Contains(formattedStartNodeId);
@@ -152,19 +169,6 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Checks if the user has access to the media item based on their start noe
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="media"></param>
-        /// <returns></returns>
-        internal static bool HasPathAccess(this IUser user, IMedia media)
-        {
-            if (user == null) throw new ArgumentNullException("user");
-            if (media == null) throw new ArgumentNullException("media");
-            return HasPathAccess(media.Path, user.AllStartMediaIds, Constants.System.RecycleBinMedia);
-        }
-        
-        /// <summary>
         /// Determines whether this user is an admin.
         /// </summary>
         /// <param name="user"></param>
@@ -175,6 +179,107 @@ namespace Umbraco.Core.Models
         {
             if (user == null) throw new ArgumentNullException("user");
             return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.AdminGroupAlias);
+        }
+
+        public static int[] CalculateContentStartNodeIds(this IUser user, IEntityService entityService)
+        {
+            const string cacheKey = "AllContentStartNodes";
+            //try to look them up from cache so we don't recalculate
+            var valuesInUserCache = FromUserCache(user, cacheKey);
+            if (valuesInUserCache != null) return valuesInUserCache;
+
+            var gsn = user.Groups.Where(x => x.StartContentId.HasValue).Select(x => x.StartContentId.Value).Distinct().ToArray();
+            var usn = user.StartContentIds;
+            var vals = CombineStartNodes(UmbracoObjectTypes.Document, gsn, usn, entityService);
+            ToUserCache(user, cacheKey, vals);
+            return vals;
+        }
+
+        public static int[] CalculateMediaStartNodeIds(this IUser user, IEntityService entityService)
+        {
+            const string cacheKey = "AllMediaStartNodes";
+            //try to look them up from cache so we don't recalculate
+            var valuesInUserCache = FromUserCache(user, cacheKey);
+            if (valuesInUserCache != null) return valuesInUserCache;
+
+            var gsn = user.Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId.Value).Distinct().ToArray();
+            var usn = user.StartMediaIds;
+            var vals = CombineStartNodes(UmbracoObjectTypes.Media, gsn, usn, entityService);
+            ToUserCache(user, cacheKey, vals);
+            return vals;
+        }
+
+        private static int[] FromUserCache(IUser user, string cacheKey)
+        {
+            var entityUser = user as User;
+            if (entityUser != null)
+            {
+                object allContentStartNodes;
+                if (entityUser.AdditionalData.TryGetValue(cacheKey, out allContentStartNodes))
+                {
+                    var asArray = allContentStartNodes as int[];
+                    if (asArray != null) return asArray;
+                }
+            }
+            return null;
+        }
+
+        private static void ToUserCache(IUser user, string cacheKey, int[] vals)
+        {
+            var entityUser = user as User;
+            if (entityUser != null)
+            {
+                entityUser.AdditionalData[cacheKey] = vals;
+            }
+        }
+
+        private static bool StartsWithPath(string test, string path)
+        {
+            return test.StartsWith(path) && test.Length > path.Length && test[path.Length] == ',';
+        }
+
+        //TODO: Unit test this
+        internal static int[] CombineStartNodes(UmbracoObjectTypes objectType, int[] groupSn, int[] userSn, IEntityService entityService)
+        {
+            // assume groupSn and userSn each don't contain duplicates
+
+            var asn = groupSn.Concat(userSn).Distinct().ToArray();
+            var paths = entityService.GetAllPaths(objectType, asn).ToDictionary(x => x.Id, x => x.Path);
+
+            paths[-1] = "-1"; // entityService does not get that one
+
+            var lsn = new List<int>();
+            foreach (var sn in groupSn)
+            {
+                string snp;
+                if (paths.TryGetValue(sn, out snp) == false) continue; // ignore
+
+                if (lsn.Any(x => StartsWithPath(snp, paths[x]))) continue; // skip if something above this sn
+                lsn.RemoveAll(x => StartsWithPath(paths[x], snp)); // remove anything below this sn
+                lsn.Add(sn);
+            }
+
+            var usn = new List<int>();
+            foreach (var sn in userSn)
+            {
+                if (groupSn.Contains(sn)) continue;
+
+                string snp;
+                if (paths.TryGetValue(sn, out snp) == false) continue; // ignore
+
+                if (usn.Any(x => StartsWithPath(paths[x], snp))) continue; // skip if something below this sn
+                usn.RemoveAll(x => StartsWithPath(snp, paths[x])); // remove anything above this sn
+                usn.Add(sn);
+            }
+
+            foreach (var sn in usn)
+            {
+                var snp = paths[sn]; // has to be here now
+                lsn.RemoveAll(x => StartsWithPath(snp, paths[x]) || StartsWithPath(paths[x], snp)); // remove anything above or below this sn
+                lsn.Add(sn);
+            }
+
+            return lsn.ToArray();
         }
     }
 }
