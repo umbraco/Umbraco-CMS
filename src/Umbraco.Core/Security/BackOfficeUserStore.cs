@@ -398,30 +398,16 @@ namespace Umbraco.Core.Security
         /// <param name="user"/><param name="roleName"/>
         /// <returns/>
         public Task AddToRoleAsync(BackOfficeIdentityUser user, string roleName)
-        {            
+        {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
+            if (string.IsNullOrWhiteSpace(roleName)) throw new ArgumentException("Value cannot be null or whitespace.", "roleName");
 
-            var currentRoles = user.Roles.Select(x => x.RoleId).ToArray();
+            var userRole = user.Roles.SingleOrDefault(r => r.RoleId == roleName);
 
-            if (currentRoles.InvariantContains(roleName)) return Task.FromResult(0);
-            
-            var asInt = user.Id.TryConvertTo<int>();
-            if (asInt == false)
+            if (userRole == null)
             {
-                throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
-            }
-
-            var foundUser = _userService.GetUserById(asInt.Result);            
-
-            if (foundUser != null)
-            {
-                var foundGroup = _userService.GetUserGroupByAlias(roleName);
-
-                if (foundGroup != null)
-                {
-                    foundUser.AddGroup(foundGroup.ToReadOnlyGroup());
-                }
+                user.AddRole(roleName);
             }
 
             return Task.FromResult(0);
@@ -433,30 +419,16 @@ namespace Umbraco.Core.Security
         /// <param name="user"/><param name="roleName"/>
         /// <returns/>
         public Task RemoveFromRoleAsync(BackOfficeIdentityUser user, string roleName)
-        {            
+        {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
+            if (string.IsNullOrWhiteSpace(roleName)) throw new ArgumentException("Value cannot be null or whitespace.", "roleName");
 
-            var currentRoles = user.Roles.Select(x => x.RoleId).ToArray();
+            var userRole = user.Roles.SingleOrDefault(r => r.RoleId == roleName);
 
-            if (currentRoles.InvariantContains(roleName) == false) return Task.FromResult(0);
-
-            var asInt = user.Id.TryConvertTo<int>();
-            if (asInt == false)
+            if (userRole != null)
             {
-                throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
-            }
-
-            var foundUser = _userService.GetUserById(asInt.Result);            
-
-            if (foundUser != null)
-            {
-                var foundGroup = _userService.GetUserGroupByAlias(roleName);
-
-                if (foundGroup != null)
-                {
-                    foundUser.RemoveGroup(foundGroup.Alias);
-                }
+                user.Roles.Remove(userRole);
             }
 
             return Task.FromResult(0);
