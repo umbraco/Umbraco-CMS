@@ -170,10 +170,14 @@ namespace Umbraco.Web.Security
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// This uses ASP.NET Identity to perform the validation
+        /// </remarks>
         public virtual bool ValidateBackOfficeCredentials(string username, string password)
         {
-            var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
-            return membershipProvider != null && membershipProvider.ValidateUser(username, password);
+            var backofficeuser = Mapper.Map<BackOfficeIdentityUser>(CurrentUser);
+            backofficeuser.UserName = username;
+            return UserManager.CheckPasswordAsync(backofficeuser, password).Result;
         }
         
         /// <summary>

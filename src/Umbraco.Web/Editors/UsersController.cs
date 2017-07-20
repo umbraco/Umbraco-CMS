@@ -404,7 +404,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="userSave"></param>
         /// <returns></returns>
-        public UserDisplay PostSaveUser(UserSave userSave)
+        public async Task<UserDisplay> PostSaveUser(UserSave userSave)
         {
             if (userSave == null) throw new ArgumentNullException("userSave");
 
@@ -460,7 +460,9 @@ namespace Umbraco.Web.Editors
             var resetPasswordValue = string.Empty;
             if (userSave.ChangePassword != null)
             {
-                var passwordChangeResult = PasswordChangeControllerHelper.ChangePassword(found, userSave.ChangePassword, ModelState, Members);
+                var passwordChanger = new PasswordChanger(Logger, Services.UserService);
+
+                var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(found, userSave.ChangePassword, ModelState, UserManager);
                 if (passwordChangeResult.Success)
                 {
                     //depending on how the provider is configured, the password may be reset so let's store that for later

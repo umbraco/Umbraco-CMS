@@ -663,7 +663,7 @@
     <Compile Include="Security\BackOfficeUserStore.cs" />
     <Compile Include="Security\IBackOfficeUserManagerMarker.cs" />
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
-    <Compile Include="Security\MembershipPasswordHasher.cs" />
+    <Compile Include="Security\MembershipProviderPasswordHasher.cs" />
     <Compile Include="Security\EmailService.cs" />
     <Compile Include="Security\MembershipProviderPasswordValidator.cs" />
     <Compile Include="Security\OwinExtensions.cs" />

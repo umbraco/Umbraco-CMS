@@ -86,9 +86,10 @@ namespace Umbraco.Web.Editors
         /// <returns>
         /// If the password is being reset it will return the newly reset password, otherwise will return an empty value
         /// </returns>
-        public ModelWithNotifications<string> PostChangePassword(ChangingPasswordModel data)
+        public async Task<ModelWithNotifications<string>> PostChangePassword(ChangingPasswordModel data)
         {
-            var passwordChangeResult = PasswordChangeControllerHelper.ChangePassword(Security.CurrentUser, data, ModelState, Members);
+            var passwordChanger = new PasswordChanger(Logger, Services.UserService);
+            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, data, ModelState, UserManager);
 
             if (passwordChangeResult.Success)
             {

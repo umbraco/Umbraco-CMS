@@ -137,7 +137,9 @@ namespace Umbraco.Core.Security
         /// Initializes the user manager with the correct options
         /// </summary>
         /// <param name="manager"></param>
-        /// <param name="membershipProvider"></param>
+        /// <param name="membershipProvider">
+        /// The <see cref="MembershipProviderBase"/> for the users called UsersMembershipProvider
+        /// </param>
         /// <param name="dataProtectionProvider"></param>
         /// <returns></returns>
         protected void InitUserManager(
@@ -153,11 +155,10 @@ namespace Umbraco.Core.Security
             };
 
             // Configure validation logic for passwords
-            var provider = MembershipProviderExtensions.GetUsersMembershipProvider();            
-            manager.PasswordValidator = new MembershipProviderPasswordValidator(provider);
+            manager.PasswordValidator = new MembershipProviderPasswordValidator(membershipProvider);
 
             //use a custom hasher based on our membership provider
-            manager.PasswordHasher = new MembershipPasswordHasher(membershipProvider);
+            manager.PasswordHasher = new MembershipProviderPasswordHasher(membershipProvider);
             
             if (dataProtectionProvider != null)
             {

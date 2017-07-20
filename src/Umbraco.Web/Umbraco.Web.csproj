@@ -333,7 +333,7 @@
     <Compile Include="Editors\EditorValidator.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
     <Compile Include="Editors\IsCurrentUserModelFilterAttribute.cs" />
-    <Compile Include="Editors\PasswordChangeControllerHelper.cs" />
+    <Compile Include="Editors\PasswordChanger.cs" />
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
