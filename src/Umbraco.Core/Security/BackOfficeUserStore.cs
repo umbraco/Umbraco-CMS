@@ -8,11 +8,13 @@ using System.Web.Security;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using IUser = Umbraco.Core.Models.Membership.IUser;
+using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Core.Security
 {
@@ -32,12 +34,14 @@ namespace Umbraco.Core.Security
         //IQueryableUserStore<BackOfficeIdentityUser, int>
     {
         private readonly IUserService _userService;
+        private readonly IEntityService _entityService;
         private readonly IExternalLoginService _externalLoginService;
         private bool _disposed = false;
 
-        public BackOfficeUserStore(IUserService userService, IExternalLoginService externalLoginService, MembershipProviderBase usersMembershipProvider)
+        public BackOfficeUserStore(IUserService userService, IEntityService entityService, IExternalLoginService externalLoginService, MembershipProviderBase usersMembershipProvider)
         {
             _userService = userService;
+            _entityService = entityService;
             _externalLoginService = externalLoginService;
             if (userService == null) throw new ArgumentNullException("userService");
             if (usersMembershipProvider == null) throw new ArgumentNullException("usersMembershipProvider");
@@ -123,7 +127,7 @@ namespace Umbraco.Core.Security
                     _userService.Save(found);
                 }
 
-                if (user.LoginsChanged)
+                if (user.IsPropertyDirty("Logins"))
                 {
                     var logins = await GetLoginsAsync(user);
                     _externalLoginService.SaveUserLogins(found.Id, logins);
@@ -191,30 +195,7 @@ namespace Umbraco.Core.Security
 
             return await Task.FromResult(result);
         }
-
-        /// <summary>
-        /// Looks up a <see cref="BackOfficeIdentityUser"/> by username
-        /// </summary>
-        /// <param name="userName"></param>
-        /// <param name="includeSecurityData">
-        /// Can be used for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes).
-        /// This is really only used for a shim in order to upgrade to 7.6.
-        /// </param>
-        /// <returns></returns>    
-        public virtual async Task<BackOfficeIdentityUser> FindByNameAsync(string userName, bool includeSecurityData)
-        {
-            ThrowIfDisposed();
-            var user = _userService.GetByUsername(userName, includeSecurityData);
-            if (user == null)
-            {
-                return null;
-            }
-
-            var result = AssignLoginsCallback(Mapper.Map<BackOfficeIdentityUser>(user));
-
-            return await Task.FromResult(result);
-        }        
-
+        
         /// <summary>
         /// Set the user password hash
         /// </summary>
@@ -421,7 +402,7 @@ namespace Umbraco.Core.Security
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
-            var currentRoles = user.Groups.Select(x => x.Alias).ToArray();
+            var currentRoles = user.Roles.Select(x => x.RoleId).ToArray();
 
             if (currentRoles.InvariantContains(roleName)) return Task.FromResult(0);
             
@@ -456,7 +437,7 @@ namespace Umbraco.Core.Security
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
-            var currentRoles = user.Groups.Select(x => x.Alias).ToArray();
+            var currentRoles = user.Roles.Select(x => x.RoleId).ToArray();
 
             if (currentRoles.InvariantContains(roleName) == false) return Task.FromResult(0);
 
@@ -490,7 +471,7 @@ namespace Umbraco.Core.Security
         {            
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
-            return Task.FromResult((IList<string>)user.Groups.Select(x => x.Alias).ToList());
+            return Task.FromResult((IList<string>)user.Roles.Select(x => x.RoleId).ToList());
         }
 
         /// <summary>
@@ -502,7 +483,7 @@ namespace Umbraco.Core.Security
         {            
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
-            return Task.FromResult(user.Groups.Select(x => x.Alias).InvariantContains(roleName));
+            return Task.FromResult(user.Roles.Select(x => x.RoleId).InvariantContains(roleName));
         }
 
         /// <summary>
@@ -744,26 +725,41 @@ namespace Umbraco.Core.Security
                 user.SecurityStamp = identityUser.SecurityStamp;
             }
 
-            if (identityUser.IsPropertyDirty("Groups"))
+            //TODO: Fix this for Groups too
+            if (identityUser.IsPropertyDirty("Roles") || identityUser.IsPropertyDirty("Groups"))
             {
                 var userGroupAliases = user.Groups.Select(x => x.Alias).ToArray();
-                var identityUserGroupAliases = identityUser.Groups.Select(x => x.Alias).ToArray();
 
-                if (userGroupAliases.ContainsAll(identityUserGroupAliases) == false
-                    || identityUserGroupAliases.ContainsAll(userGroupAliases) == false)
+                var identityUserRoles = identityUser.Roles.Select(x => x.RoleId).ToArray();
+                var identityUserGroups = identityUser.Groups.Select(x => x.Alias).ToArray();
+
+                var combinedAliases = identityUserRoles.Union(identityUserGroups).ToArray();
+
+                if (userGroupAliases.ContainsAll(combinedAliases) == false
+                    || combinedAliases.ContainsAll(userGroupAliases) == false)
                 {
                     anythingChanged = true;
 
                     //clear out the current groups (need to ToArray since we are modifying the iterator)
                     user.ClearGroups();
 
+                    //go lookup all these groups
+                    var groups = _userService.GetUserGroupsByAlias(combinedAliases).Select(x => x.ToReadOnlyGroup()).ToArray();
+
                     //use all of the ones assigned and add them
-                    foreach (var group in identityUser.Groups)
+                    foreach (var group in groups)
                     {
                         user.AddGroup(group);
                     }
+
+                    //re-assign
+                    identityUser.Groups = groups;
                 }
             }
+            
+            //we should re-set the calculated start nodes
+            identityUser.CalculatedMediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService);
+            identityUser.CalculatedContentStartNodeIds = user.CalculateContentStartNodeIds(_entityService);
 
             //reset all changes
             identityUser.ResetDirtyProperties(false);

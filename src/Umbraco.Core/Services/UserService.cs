@@ -224,26 +224,6 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Get an <see cref="IUser"/> by username
-        /// </summary>
-        /// <param name="username">Username to use for retrieval</param>
-        /// <param name="includeSecurityData">
-        /// Can be used for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes).
-        /// This is really only used for a shim in order to upgrade to 7.6.
-        /// </param>
-        /// <returns>
-        /// A non cached <see cref="IUser"/> instance
-        /// </returns>
-        public IUser GetByUsername(string username, bool includeSecurityData)
-        {
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
-            {
-                var repository = RepositoryFactory.CreateUserRepository(uow);
-                return repository.GetByUsername(username, includeSecurityData);
-            }
-        }
-
-        /// <summary>
         /// Deletes an <see cref="IUser"/>
         /// </summary>
         /// <param name="membershipUser"><see cref="IUser"/> to Delete</param>

@@ -60,8 +60,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="username"></param>
         /// <param name="includeSecurityData">
-        /// This is really only used for a shim in order to upgrade to 7.6 but could be used 
-        /// for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes)
+        /// This is only used for a shim in order to upgrade to 7.7
         /// </param>
         /// <returns>
         /// A non cached <see cref="IUser"/> instance
@@ -73,8 +72,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="id"></param>
         /// <param name="includeSecurityData">
-        /// This is really only used for a shim in order to upgrade to 7.6 but could be used 
-        /// for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes)
+        /// This is only used for a shim in order to upgrade to 7.7 
         /// </param>
         /// <returns>
         /// A non cached <see cref="IUser"/> instance

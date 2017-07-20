@@ -102,18 +102,11 @@ namespace Umbraco.Core.Security
                 return SignInStatus.Failure;
             }
 
-            var backOfficeUserMgr = UserManager as BackOfficeUserManager<BackOfficeIdentityUser>;
-
-            var user = backOfficeUserMgr != null
-                //this will be a slightly faster lookup since we don't need the security data here (and works for upgrading to 7.6)
-                //it's worth mentioning here that getting a user by login name is never cached so we don't need to worry about that here
-                ? await backOfficeUserMgr.FindByNameAsync(userName, includeSecurityData:false)
-                //load normally - this would only be the case if someone has totally replaced the user manager
-                : await UserManager.FindByNameAsync(userName);
+            var user = await UserManager.FindByNameAsync(userName);
             
             //if the user is null, create an empty one which can be used for auto-linking
             if (user == null)            
-                user = BackOfficeIdentityUser.CreateNew(userName, GlobalSettings.DefaultUILanguage);            
+                user = BackOfficeIdentityUser.CreateNew(userName, null, GlobalSettings.DefaultUILanguage);            
             
             //check the password for the user, this will allow a developer to auto-link 
             //an account if they have specified an IBackOfficeUserPasswordChecker

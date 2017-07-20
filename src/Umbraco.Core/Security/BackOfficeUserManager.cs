@@ -34,17 +34,20 @@ namespace Umbraco.Core.Security
         }
 
         #region Static Create methods
+
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager 
         /// </summary>
         /// <param name="options"></param>
         /// <param name="userService"></param>
+        /// <param name="entityService"></param>
         /// <param name="externalLoginService"></param>
         /// <param name="membershipProvider"></param>
         /// <returns></returns>
         public static BackOfficeUserManager Create(
             IdentityFactoryOptions<BackOfficeUserManager> options,
             IUserService userService,
+            IEntityService entityService,
             IExternalLoginService externalLoginService,
             MembershipProviderBase membershipProvider)
         {
@@ -52,7 +55,7 @@ namespace Umbraco.Core.Security
             if (userService == null) throw new ArgumentNullException("userService");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
-            var manager = new BackOfficeUserManager(new BackOfficeUserStore(userService, externalLoginService, membershipProvider));
+            var manager = new BackOfficeUserManager(new BackOfficeUserStore(userService, entityService, externalLoginService, membershipProvider));
             manager.InitUserManager(manager, membershipProvider, options);
             return manager;
         }
@@ -194,32 +197,6 @@ namespace Umbraco.Core.Security
             //manager.SmsService = new SmsService();            
         }
         
-        /// <summary>
-        /// Looks up a <see cref="BackOfficeIdentityUser"/> by username 
-        /// </summary>
-        /// <param name="userName"></param>
-        /// <param name="includeSecurityData">
-        /// Can be used for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes).
-        /// This is really only used for a shim in order to upgrade to 7.6.
-        /// </param>
-        /// <returns></returns>        
-        public async Task<T> FindByNameAsync(string userName, bool includeSecurityData)
-        {
-            T result;
-            if (includeSecurityData)
-            {
-                result = await Store.FindByNameAsync(userName);
-                return result;
-            }
-
-            var backOfficeUserStore = Store as BackOfficeUserStore;
-            if (backOfficeUserStore == null)
-                throw new InvalidOperationException("A custom IUserStore is in use which does not support querying users without security data");
-
-            result = (T)await backOfficeUserStore.FindByNameAsync(userName, false);
-            return result;
-        }
-
         /// <summary>
         /// Logic used to validate a username and password
         /// </summary>

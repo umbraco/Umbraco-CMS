@@ -443,14 +443,15 @@ namespace Umbraco.Web.Editors
 
                             var groups = Services.UserService.GetUserGroupsByAlias(autoLinkOptions.GetDefaultUserGroups(UmbracoContext, loginInfo));
 
-                            var autoLinkUser = new BackOfficeIdentityUser
+                            var autoLinkUser = BackOfficeIdentityUser.CreateNew(
+                                loginInfo.Email,
+                                loginInfo.Email,
+                                autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo));
+                            autoLinkUser.Name = loginInfo.ExternalIdentity.Name;
+                            foreach (var userGroup in groups)
                             {
-                                Email = loginInfo.Email,
-                                Name = loginInfo.ExternalIdentity.Name,
-                                Culture = autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo),
-                                UserName = loginInfo.Email,
-                                Groups = groups.Select(x => x.ToReadOnlyGroup()).ToArray()
-                            };
+                                autoLinkUser.AddRole(userGroup.Alias);
+                            }
                             
                             //call the callback if one is assigned
                             if (autoLinkOptions.OnAutoLinking != null)

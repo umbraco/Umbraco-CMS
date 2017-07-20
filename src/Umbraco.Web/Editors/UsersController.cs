@@ -232,12 +232,9 @@ namespace Umbraco.Web.Editors
 
             //we want to create the user with the UserManager, this ensures the 'empty' (special) password
             //format is applied without us having to duplicate that logic
-            var identityUser = new BackOfficeIdentityUser
-            {
-                Email = userSave.Email,
-                Name = userSave.Name,
-                UserName = userSave.Email
-            };
+            var identityUser = BackOfficeIdentityUser.CreateNew(userSave.Email, userSave.Email, GlobalSettings.DefaultUILanguage);
+            identityUser.Name = userSave.Name;
+
             var created = await UserManager.CreateAsync(identityUser);
             if (created.Succeeded == false)
             {
@@ -316,12 +313,10 @@ namespace Umbraco.Web.Editors
             {
                 //we want to create the user with the UserManager, this ensures the 'empty' (special) password
                 //format is applied without us having to duplicate that logic
-                var created = await UserManager.CreateAsync(new BackOfficeIdentityUser
-                {
-                    Email = userSave.Email,
-                    Name = userSave.Name,
-                    UserName = userSave.Email
-                });
+                var identityUser = BackOfficeIdentityUser.CreateNew(userSave.Email, userSave.Email, GlobalSettings.DefaultUILanguage);
+                identityUser.Name = userSave.Name;
+
+                var created = await UserManager.CreateAsync(identityUser);
                 if (created.Succeeded == false)
                 {
                     throw new HttpResponseException(

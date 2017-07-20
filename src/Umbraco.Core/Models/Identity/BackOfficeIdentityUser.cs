@@ -16,14 +16,21 @@ namespace Umbraco.Core.Models.Identity
     public class BackOfficeIdentityUser : IdentityUser<int, IIdentityUserLogin, IdentityUserRole<string>, IdentityUserClaim<int>>, IRememberBeingDirty
     {
         /// <summary>
-        /// Used to construct a new instance without an identity
+        ///  Used to construct a new instance without an identity
         /// </summary>
+        /// <param name="username"></param>
+        /// <param name="email">This is allowed to be null (but would need to be filled in if trying to persist this instance)</param>
+        /// <param name="culture"></param>
         /// <returns></returns>
-        internal static BackOfficeIdentityUser CreateNew(string username, string culture)
+        public static BackOfficeIdentityUser CreateNew(string username, string email, string culture)
         {
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
+            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", "culture");
+
             var user = new BackOfficeIdentityUser();
             user.DisableChangeTracking();
             user._userName = username;
+            user._email = email;
             //we are setting minvalue here because the default is "0" which is the id of the admin user
             //which we cannot allow because the admin user will always exist
             user._id = int.MinValue;
@@ -33,17 +40,30 @@ namespace Umbraco.Core.Models.Identity
             return user;
         }
 
-        public BackOfficeIdentityUser()
+        private BackOfficeIdentityUser()
+        {
+        }
+
+        /// <summary>
+        /// Creates an existing user with the specified groups
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="groups"></param>
+        public BackOfficeIdentityUser(int userId, IEnumerable<IReadOnlyUserGroup> groups)
         {
             _startMediaIds = new int[] { };
             _startContentIds = new int[] { };
             _groups = new IReadOnlyUserGroup[] { };
             _allowedSections = new string[] { };
             _culture = Configuration.GlobalSettings.DefaultUILanguage;
-        }
-
-        private int[] _allStartContentIds;
-        private int[] _allStartMediaIds;
+            _groups = groups.ToArray();
+            _roles = new ObservableCollection<IdentityUserRole<string>>(_groups.Select(x => new IdentityUserRole<string>
+            {
+                RoleId = x.Alias,
+                UserId = userId.ToString()
+            }));
+            _roles.CollectionChanged += _roles_CollectionChanged;
+        }        
 
         public virtual async Task<ClaimsIdentity> GenerateUserIdentityAsync(BackOfficeUserManager<BackOfficeIdentityUser> manager)
         {
@@ -60,6 +80,9 @@ namespace Umbraco.Core.Models.Identity
         {
             get { return _hasIdentity; }
         }
+
+        public int[] CalculatedMediaStartNodeIds { get; internal set; }
+        public int[] CalculatedContentStartNodeIds { get; internal set; }
 
         public override int Id
         {
@@ -166,7 +189,13 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>        
         public string[] AllowedSections
         {
-            get { return _allowedSections ?? (_allowedSections = _groups.Select(x => x.Alias).ToArray()); }
+            get { return _allowedSections ?? (_allowedSections = _groups.SelectMany(x => x.AllowedSections).Distinct().ToArray()); }
+        }
+
+        public string Culture
+        {
+            get { return _culture; }
+            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _culture, Ps.Value.CultureSelector); }
         }
 
         public IReadOnlyUserGroup[] Groups
@@ -174,15 +203,24 @@ namespace Umbraco.Core.Models.Identity
             get { return _groups; }
             set
             {
-                if (value == null) value = new IReadOnlyUserGroup[0];
+                //so they recalculate
+                _allowedSections = null;
+
+                //now clear all roles and re-add them
+                _roles.CollectionChanged -= _roles_CollectionChanged;
+                _roles.Clear();
+                foreach (var identityUserRole in _groups.Select(x => new IdentityUserRole<string>
+                {
+                    RoleId = x.Alias,
+                    UserId = Id.ToString()
+                }))
+                {
+                    _roles.Add(identityUserRole);
+                }
+                _roles.CollectionChanged += _roles_CollectionChanged;
+
                 _tracker.SetPropertyValueAndDetectChanges(value, ref _groups, Ps.Value.GroupsSelector, Ps.Value.GroupsComparer);
             }
-        }
-
-        public string Culture
-        {
-            get { return _culture; }
-            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _culture, Ps.Value.CultureSelector); }
         }
 
         /// <summary>
@@ -229,24 +267,43 @@ namespace Umbraco.Core.Models.Identity
                 return _logins;
             }
         }
-
-        public bool LoginsChanged { get; private set; }
-
+        
         void Logins_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            LoginsChanged = true;
+            _tracker.OnPropertyChanged(Ps.Value.LoginsSelector);
         }
 
-        private List<IdentityUserRole<string>> _roles;
+        private void _roles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            _tracker.OnPropertyChanged(Ps.Value.RolesSelector);
+        }
 
-        //TODO: We need to override this but need to wait until the rest of the PRs are merged in
-        ///// <summary>
-        ///// Override Roles because the value of these are the user's group aliases
-        ///// </summary>
-        //public override ICollection<IdentityUserRole<string>> Roles
-        //{
-        //    get { return _roles ?? (_roles = Groups.Select(x => x.Alias).ToArray()); }
-        //}
+        private readonly ObservableCollection<IdentityUserRole<string>> _roles;
+
+        /// <summary>
+        /// helper method to easily add a role without having to deal with IdentityUserRole{T}
+        /// </summary>
+        /// <param name="role"></param>
+        /// <remarks>
+        /// Adding a role this way will not reflect on the user's group's collection or it's allowed sections until the user is persisted
+        /// </remarks>
+        public void AddRole(string role)
+        {
+            Roles.Add(new IdentityUserRole<string>
+            {
+                UserId = this.Id.ToString(),
+                RoleId = role
+            });
+        }
+
+        /// <summary>
+        /// Override Roles because the value of these are the user's group aliases
+        /// </summary>
+        public override ICollection<IdentityUserRole<string>> Roles
+        {
+            get { return _roles; }
+        }
+
         /// <summary>
         /// Used to set a lazy call back to populate the user's Login list
         /// </summary>
@@ -255,23 +312,7 @@ namespace Umbraco.Core.Models.Identity
         {
             if (callback == null) throw new ArgumentNullException("callback");
             _getLogins = callback;
-        }
-
-        /// <summary>
-        /// Returns all start node Ids assigned to the user based on both the explicit start node ids assigned to the user and any start node Ids assigned to it's user groups
-        /// </summary>
-        public int[] AllStartContentIds
-        {
-            get { return _allStartContentIds ?? (_allStartContentIds = StartContentIds.Concat(Groups.Where(x => x.StartContentId.HasValue).Select(x => x.StartContentId.Value)).Distinct().ToArray()); }
-        }
-
-        /// <summary>
-        /// Returns all start node Ids assigned to the user based on both the explicit start node ids assigned to the user and any start node Ids assigned to it's user groups
-        /// </summary>
-        public int[] AllStartMediaIds
-        {
-            get { return _allStartMediaIds ?? (_allStartMediaIds = StartMediaIds.Concat(Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId.Value)).Distinct().ToArray()); }
-        }
+        }        
 
         #region Change tracking
 
@@ -346,6 +387,8 @@ namespace Umbraco.Core.Models.Identity
             public readonly PropertyInfo StartMediaIdsSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, int[]>(x => x.StartMediaIds);
             public readonly PropertyInfo StartContentIdsSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, int[]>(x => x.StartContentIds);
             public readonly PropertyInfo GroupsSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, IReadOnlyUserGroup[]>(x => x.Groups);
+            public readonly PropertyInfo LoginsSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, IEnumerable<IIdentityUserLogin>>(x => x.Logins);
+            public readonly PropertyInfo RolesSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, IEnumerable<IdentityUserRole<string>>>(x => x.Roles);
 
             //Custom comparer for enumerables
             public readonly DelegateEqualityComparer<IReadOnlyUserGroup[]> GroupsComparer = new DelegateEqualityComparer<IReadOnlyUserGroup[]>(
@@ -354,6 +397,7 @@ namespace Umbraco.Core.Models.Identity
             public readonly DelegateEqualityComparer<int[]> StartIdsComparer = new DelegateEqualityComparer<int[]>(
                 (groups, enumerable) => groups.UnsortedSequenceEqual(enumerable),
                 groups => groups.GetHashCode());
+
         }
 
         private readonly ChangeTracker _tracker = new ChangeTracker();
@@ -379,6 +423,14 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>        
         private class ChangeTracker : TracksChangesEntityBase
         {
+            /// <summary>
+            /// Make this public so that it's usable
+            /// </summary>
+            /// <param name="propertyInfo"></param>
+            public new void OnPropertyChanged(PropertyInfo propertyInfo)
+            {
+                base.OnPropertyChanged(propertyInfo);
+            }
         } 
         #endregion
 
