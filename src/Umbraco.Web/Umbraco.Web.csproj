@@ -1586,10 +1586,6 @@
     <Compile Include="umbraco.presentation\umbraco\settings\editLanguage.aspx.designer.cs">
       <DependentUpon>editLanguage.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\scripts\editScript.aspx.cs">
-      <DependentUpon>editScript.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\templateControls\Script.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseMediaTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadDLRScripts.cs" />
@@ -1717,10 +1713,6 @@
       <DependentUpon>codeEditorSave.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\Developer.asmx.cs">
-      <DependentUpon>Developer.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\legacyAjaxCalls.asmx.cs">
       <DependentUpon>legacyAjaxCalls.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -1738,20 +1730,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\RegexComWebservice.cs" />
-    <Compile Include="umbraco.presentation\umbraco\webservices\Settings.asmx.cs">
-      <DependentUpon>Settings.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\templates.asmx.cs">
       <DependentUpon>templates.asmx</DependentUpon>
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\trashcan.asmx.cs">
-      <DependentUpon>trashcan.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\UltimatePickerAutoCompleteHandler.ashx.cs">
-      <DependentUpon>UltimatePickerAutoCompleteHandler.ashx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\Web\UI\ContentPage.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -1891,9 +1872,6 @@
     <Content Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\settings\scripts\editScript.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\translation\default.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\xml.aspx" />
@@ -1917,18 +1895,13 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\webservices\CMSNode.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\codeEditorSave.asmx" />
-    <Content Include="umbraco.presentation\umbraco\webservices\Developer.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\legacyAjaxCalls.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\nodeSorter.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\progressStatus.asmx">
       <SubType>Form</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\webservices\publication.asmx" />
-    <Content Include="umbraco.presentation\umbraco\webservices\Settings.asmx">
-      <SubType>Form</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\webservices\templates.asmx" />
-    <Content Include="umbraco.presentation\umbraco\webservices\trashcan.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\TreeDataService.ashx" />
     <None Include="umbraco.presentation\umbraco\Trees\Trees.cd" />
     <None Include="umbraco.presentation\umbraco\Trees\XmlTree.xsd">
@@ -1939,7 +1912,6 @@
       <DependentUpon>XmlTree.xsd</DependentUpon>
     </None>
     <Content Include="umbraco.presentation\umbraco\webservices\TagsAutoCompleteHandler.ashx" />
-    <Content Include="umbraco.presentation\umbraco\webservices\UltimatePickerAutoCompleteHandler.ashx" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.wsdl" />
     <None Include="Web References\org.umbraco.update\Reference.map">
@@ -2004,7 +1976,9 @@
       <CachedSettingsPropName>umbraco_org_umbraco_update_CheckForUpgrade</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="umbraco.presentation\umbraco\settings\scripts\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0</VSToolsPath>

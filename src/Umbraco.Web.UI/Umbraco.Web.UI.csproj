@@ -882,7 +882,6 @@
     <Content Include="Umbraco\Xslt\Templates\RSSFeed.xslt" />
     <Content Include="Umbraco_Client\Images\progressbar.gif" />
     <Content Include="Umbraco\Settings\DictionaryItemList.aspx" />
-    <Content Include="Umbraco\Settings\Scripts\editScript.aspx" />
     <Content Include="Umbraco\Translation\default.aspx" />
     <Content Include="Umbraco\Translation\preview.aspx" />
     <Content Include="Umbraco\Translation\xml.aspx" />
@@ -932,18 +931,13 @@
     </Content>
     <Content Include="Umbraco\Webservices\CMSNode.asmx" />
     <Content Include="Umbraco\Webservices\codeEditorSave.asmx" />
-    <Content Include="Umbraco\Webservices\Developer.asmx" />
     <Content Include="Umbraco\Webservices\legacyAjaxCalls.asmx" />
     <Content Include="Umbraco\Webservices\nodeSorter.asmx" />
     <Content Include="Umbraco\Webservices\progressStatus.asmx">
       <SubType>Form</SubType>
     </Content>
     <Content Include="Umbraco\Webservices\publication.asmx" />
-    <Content Include="Umbraco\Webservices\Settings.asmx">
-      <SubType>Form</SubType>
-    </Content>
     <Content Include="Umbraco\Webservices\templates.asmx" />
-    <Content Include="Umbraco\Webservices\trashcan.asmx" />
     <Content Include="Umbraco\Webservices\wsdl.xslt" />
     <Content Include="Umbraco\Xslt\macroGetCurrent.xsl" />
     <Content Include="Umbraco\Xslt\macroGetSubs.xsl" />
@@ -1009,7 +1003,6 @@
     <Content Include="Umbraco\Masterpages\default.Master" />
     <Content Include="Umbraco\Webservices\TreeDataService.ashx" />
     <Content Include="Umbraco\Webservices\TagsAutoCompleteHandler.ashx" />
-    <Content Include="Umbraco\Webservices\UltimatePickerAutoCompleteHandler.ashx" />
     <Content Include="Umbraco\Webservices\MediaUploader.ashx" />
     <None Include="web.Template.config">
       <SubType>Designer</SubType>
