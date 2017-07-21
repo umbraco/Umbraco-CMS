@@ -88,16 +88,21 @@ function Compile-Belle
   $gitPath = [System.IO.Path]::GetDirectoryName($gitExe)
   $env:path = "$nodePath;$gitPath"
   
-  Write-Host "DEBUG"
-  Write-Host "NodePath: $($uenv.NodePath)"
-  ls $uenv.NodePath
-  
   push-location "$($uenv.SolutionRoot)\src\Umbraco.Web.UI.Client"
   write "" > $tmp\belle.log
-  &npm cache clean --quiet >> $tmp\belle.log 2>&1
-  &npm install --quiet >> $tmp\belle.log 2>&1
-  &npm install -g grunt-cli --quiet >> $tmp\belle.log 2>&1
-  &npm install -g bower --quiet >> $tmp\belle.log 2>&1
+  &npm cache clean #--quiet >> $tmp\belle.log 2>&1
+  &npm install #--quiet >> $tmp\belle.log 2>&1
+  &npm install -g grunt-cli #--quiet >> $tmp\belle.log 2>&1
+  &npm install -g bower #--quiet >> $tmp\belle.log 2>&1
+  
+  # FIXME TEMP - ON VSTS &grunt fails ?!
+  Write-Host "DEBUG"
+  Write-Host "ENV"
+  ls env:
+  Write-Host "NODEPATH"
+  ls $uenv.NodePath
+
+  
   &grunt build --buildversion=$version.Release >> $tmp\belle.log 2>&1
   pop-location
   
