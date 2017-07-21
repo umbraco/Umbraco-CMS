@@ -11,15 +11,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private string _valuesCacheKey;
 
         // initializes a published item property
-        public PropertySetProperty(IFacadeAccessor facadeAccessor, PublishedPropertyType propertyType, Guid fragmentKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
-            : base(propertyType, fragmentKey, previewing, referenceCacheLevel, sourceValue)
+        public PropertySetProperty(IFacadeAccessor facadeAccessor, PublishedPropertyType propertyType, IPropertySet set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
+            : base(propertyType, set, previewing, referenceCacheLevel, sourceValue)
         {
             _facadeAccessor = facadeAccessor;
         }
 
         // used to cache the CacheValues of this property
         internal string ValuesCacheKey => _valuesCacheKey
-            ?? (_valuesCacheKey = CacheKeys.PropertyCacheValues(FragmentKey, PropertyTypeAlias, IsPreviewing));
+            ?? (_valuesCacheKey = CacheKeys.PropertyCacheValues(Set.Key, PropertyTypeAlias, IsPreviewing));
 
         protected override CacheValues GetSnapshotCacheValues()
         {

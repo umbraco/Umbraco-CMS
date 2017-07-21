@@ -15,21 +15,15 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         };
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return PropertyEditorAliases.Contains(propertyType.PropertyEditorAlias);
-        }
+            => PropertyEditorAliases.Contains(propertyType.PropertyEditorAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof (DateTime);
-        }
+            => typeof (DateTime);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-        {
-            return PropertyCacheLevel.Content;
-        }
+            => PropertyCacheLevel.Content;
 
-        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return DateTime.MinValue;
 
@@ -37,8 +31,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // Actually, not always sometimes it is formatted in UTC style with 'Z' suffixed on the end but that is due to this bug:
             // http://issues.umbraco.org/issue/U4-4145, http://issues.umbraco.org/issue/U4-3894
             // We should just be using TryConvertTo instead.
-            var sourceString = source as string;
-            if (sourceString != null)
+
+            if (source is string sourceString)
             {
                 var attempt = sourceString.TryConvertTo<DateTime>();
                 return attempt.Success == false ? DateTime.MinValue : attempt.Result;
@@ -46,17 +40,15 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
             // in the database a DateTime is: DateTime
             // default value is: DateTime.MinValue
-            return (source is DateTime)
-                ? source
-                : DateTime.MinValue;
+            return source is DateTime ? source : DateTime.MinValue;
         }
 
         // default ConvertSourceToObject just returns source ie a DateTime value
 
-        public override object ConvertInterToXPath(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertInterToXPath(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             // source should come from ConvertSource and be a DateTime already
-            return XmlConvert.ToString((DateTime)inter, XmlDateTimeSerializationMode.Unspecified);
+            return XmlConvert.ToString((DateTime) inter, XmlDateTimeSerializationMode.Unspecified);
         }
     }
 }

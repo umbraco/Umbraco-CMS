@@ -169,12 +169,12 @@ namespace Umbraco.Web.PublishedCache
         /// Creates a set property.
         /// </summary>
         /// <param name="propertyType">The property type.</param>
-        /// <param name="setKey">The set key.</param>
+        /// <param name="set">The set.</param>
         /// <param name="previewing">A value indicating whether previewing.</param>
         /// <param name="referenceCacheLevel">The reference cache level.</param>
         /// <param name="sourceValue">The source value.</param>
         /// <returns>A set property.</returns>
-        IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, Guid setKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
+        IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, IPropertySet set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
 
         #endregion
     }

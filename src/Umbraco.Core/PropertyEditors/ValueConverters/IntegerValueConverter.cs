@@ -7,21 +7,15 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     public class IntegerValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return Constants.PropertyEditors.IntegerAlias.Equals(propertyType.PropertyEditorAlias);
-        }
+            => Constants.PropertyEditors.IntegerAlias.Equals(propertyType.PropertyEditorAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof (int);
-        }
+            => typeof (int);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-        {
-            return PropertyCacheLevel.Content;
-        }
+            => PropertyCacheLevel.Content;
 
-        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return 0;
 

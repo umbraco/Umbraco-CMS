@@ -21,6 +21,8 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="propertyType">The property type.</param>
         /// <returns>The CLR type of values returned by the converter.</returns>
+        /// <remarks>Some of the CLR types may be generated, therefore this method cannot directly return
+        /// a Type object (which may not exist yet). In which case it needs to return a ModelType instance.</remarks>
         Type GetPropertyValueType(PublishedPropertyType propertyType);
 
         /// <summary>
@@ -33,6 +35,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Converts a property source value to an intermediate value.
         /// </summary>
+        /// <param name="owner">The property set owning the property.</param>
         /// <param name="propertyType">The property type.</param>
         /// <param name="source">The source value.</param>
         /// <param name="preview">A value indicating whether conversion should take place in preview mode.</param>
@@ -48,11 +51,12 @@ namespace Umbraco.Core.PropertyEditors
         /// strings, and xml-whitespace strings appropriately, ie it should know whether to preserve
         /// whitespaces.</para>
         /// </remarks>
-        object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview);
+        object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview);
 
         /// <summary>
         /// Converts a property intermediate value to an Object value.
         /// </summary>
+        /// <param name="owner">The property set owning the property.</param>
         /// <param name="propertyType">The property type.</param>
         /// <param name="referenceCacheLevel">The reference cache level.</param>
         /// <param name="inter">The intermediate value.</param>
@@ -66,11 +70,12 @@ namespace Umbraco.Core.PropertyEditors
         /// passed to eg a PublishedFragment constructor. It is used by the fragment and the properties to manage
         /// the cache levels of property values. It is not meant to be used by the converter.</para>
         /// </remarks>
-        object ConvertInterToObject(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview);
+        object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview);
 
         /// <summary>
         /// Converts a property intermediate value to an XPath value.
         /// </summary>
+        /// <param name="owner">The property set owning the property.</param>
         /// <param name="propertyType">The property type.</param>
         /// <param name="referenceCacheLevel">The reference cache level.</param>
         /// <param name="inter">The intermediate value.</param>
@@ -89,6 +94,6 @@ namespace Umbraco.Core.PropertyEditors
         /// passed to eg a PublishedFragment constructor. It is used by the fragment and the properties to manage
         /// the cache levels of property values. It is not meant to be used by the converter.</para>
         /// </remarks>
-        object ConvertInterToXPath(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview);
+        object ConvertInterToXPath(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview);
     }
 }

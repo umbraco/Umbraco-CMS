@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -9,10 +10,16 @@ namespace Umbraco.Core.Models.PublishedContent
     /// </summary>
     public class PublishedContentModelFactory : IPublishedContentModelFactory
     {
-        //private readonly Dictionary<string, ConstructorInfo> _constructors
-        //    = new Dictionary<string, ConstructorInfo>();
+        private readonly Dictionary<string, ModelInfo> _modelInfos;
 
-        private readonly Dictionary<string, Func<IPublishedContent, IPublishedContent>> _constructors;
+        private class ModelInfo
+        {
+            public Type ParameterType { get; set; }
+            public Func<IPropertySet, IPropertySet> Ctor { get; set; }
+            public Type ModelType { get; set; }
+        }
+
+        public Dictionary<string, Type> ModelTypeMap { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedContentModelFactory"/> class with types.
@@ -30,61 +37,79 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </remarks>
         public PublishedContentModelFactory(IEnumerable<Type> types)
         {
-            var ctorArgTypes = new[] { typeof(IPublishedContent) };
-            var constructors = new Dictionary<string, Func<IPublishedContent, IPublishedContent>>(StringComparer.InvariantCultureIgnoreCase);
+            var ctorArgTypes = new[] { typeof(IPropertySet) };
+            var modelInfos = new Dictionary<string, ModelInfo>(StringComparer.InvariantCultureIgnoreCase);
+
+            ModelTypeMap = new Dictionary<string, Type>(StringComparer.InvariantCultureIgnoreCase);
 
             foreach (var type in types)
             {
-                var constructor = type.GetConstructor(ctorArgTypes);
+                ConstructorInfo constructor = null;
+                Type parameterType = null;
+
+                foreach (var ctor in type.GetConstructors())
+                {
+                    var parms = ctor.GetParameters();
+                    if (parms.Length == 1 && typeof (IPropertySet).IsAssignableFrom(parms[0].ParameterType))
+                    {
+                        if (constructor != null)
+                            throw new InvalidOperationException($"Type {type.FullName} has more than one public constructor with one argument of type, or implementing, IPropertySet.");
+                        constructor = ctor;
+                        parameterType = parms[0].ParameterType;
+                    }
+                }
+
                 if (constructor == null)
-                    throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type IPublishedContent.");
-                var attribute = type.GetCustomAttribute<PublishedContentModelAttribute>(false);
+                    throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type, or implementing, IPropertySet.");
+
+                var attribute = type.GetCustomAttribute<PublishedContentModelAttribute>(false); // fixme rename FacadeModelAttribute
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
 
-                if (constructors.ContainsKey(typeName))
-                    throw new InvalidOperationException($"More that one type want to be a model for content type {typeName}.");
+                if (modelInfos.TryGetValue(typeName, out ModelInfo modelInfo))
+                    throw new InvalidOperationException($"Both types {type.FullName} and {modelInfo.ModelType.FullName} want to be a model type for content type with alias \"{typeName}\".");
 
-                // should work everywhere, but slow
-                //_constructors[typeName] = constructor;
+                // see Umbraco.Tests.Benchmarks.CtorInvokeBenchmarks
+                // using ctor.Invoke is horrible, cannot even consider it,
+                // then expressions are 6-10x slower than direct ctor, and
+                // dynamic methods are 2-3x slower than direct ctor = best
 
-                // much faster with a dynamic method but potential MediumTrust issues
+                // much faster with a dynamic method but potential MediumTrust issues - which we don't support
                 // here http://stackoverflow.com/questions/16363838/how-do-you-call-a-constructor-via-an-expression-tree-on-an-existing-object
+                var meth = new DynamicMethod(string.Empty, typeof(IPropertySet), ctorArgTypes, type.Module, true);
+                var gen = meth.GetILGenerator();
+                gen.Emit(OpCodes.Ldarg_0);
+                gen.Emit(OpCodes.Newobj, constructor);
+                gen.Emit(OpCodes.Ret);
+                var func = (Func<IPropertySet, IPropertySet>) meth.CreateDelegate(typeof (Func<IPropertySet, IPropertySet>));
 
-                // fast enough and works in MediumTrust
+                // fast enough and works in MediumTrust - but we don't
                 // read http://boxbinary.com/2011/10/how-to-run-a-unit-test-in-medium-trust-with-nunitpart-three-umbraco-framework-testing/
-                var exprArg = Expression.Parameter(typeof(IPublishedContent), "content");
-                var exprNew = Expression.New(constructor, exprArg);
-                var expr = Expression.Lambda<Func<IPublishedContent, IPublishedContent>>(exprNew, exprArg);
-                var func = expr.Compile();
-                constructors[typeName] = func;
+                //var exprArg = Expression.Parameter(typeof(IPropertySet), "content");
+                //var exprNew = Expression.New(constructor, exprArg);
+                //var expr = Expression.Lambda<Func<IPropertySet, IPropertySet>>(exprNew, exprArg);
+                //var func = expr.Compile();
+
+                modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, Ctor = func, ModelType = type };
+                ModelTypeMap[typeName] = type;
             }
 
-            _constructors = constructors.Count > 0 ? constructors : null;
+            _modelInfos = modelInfos.Count > 0 ? modelInfos : null;
         }
 
-        public IPublishedContent CreateModel(IPublishedContent content)
+        public IPropertySet CreateModel(IPropertySet set)
         {
             // fail fast
-            if (_constructors == null)
-                return content;
+            if (_modelInfos == null)
+                return set;
 
-            // be case-insensitive
-            var contentTypeAlias = content.DocumentTypeAlias;
+            if (_modelInfos.TryGetValue(set.ContentType.Alias, out ModelInfo modelInfo) == false)
+                return set;
 
-            //ConstructorInfo constructor;
-            //return _constructors.TryGetValue(contentTypeAlias, out constructor)
-            //    ? (IPublishedContent) constructor.Invoke(new object[] { content })
-            //    : content;
+            // ReSharper disable once UseMethodIsInstanceOfType
+            if (modelInfo.ParameterType.IsAssignableFrom(set.GetType()) == false)
+                throw new InvalidOperationException($"Model {modelInfo.ModelType} expects argument of type {modelInfo.ParameterType.FullName}, but got {set.GetType().FullName}.");
 
-            Func<IPublishedContent, IPublishedContent> constructor;
-            return _constructors.TryGetValue(contentTypeAlias, out constructor)
-                ? constructor(content)
-                : content;
-        }
-
-        public T CreateModel<T>(IPropertySet content)
-        {
-            throw new NotImplementedException();
+            return modelInfo.Ctor(set);
         }
     }
 }

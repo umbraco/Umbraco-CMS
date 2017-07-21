@@ -301,7 +301,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         private void InitializeNode()
         {
-            InitializeNode(_xmlNode, _isPreviewing,
+            InitializeNode(this, _xmlNode, _isPreviewing,
                 out _id, out _key, out _template, out _sortOrder, out _name, out _writerName,
                 out _urlName, out _creatorName, out _creatorId, out _writerId, out _docTypeAlias, out _docTypeId, out _path,
                 out _version, out _createDate, out _updateDate, out _level, out _isDraft, out _contentType, out _properties,
@@ -311,7 +311,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _nodeInitialized = true;
         }
 
-        internal static void InitializeNode(XmlNode xmlNode, bool isPreviewing,
+        internal static void InitializeNode(XmlPublishedContent node, XmlNode xmlNode, bool isPreviewing,
             out int id, out Guid key, out int template, out int sortOrder, out string name, out string writerName, out string urlName,
             out string creatorName, out int creatorId, out int writerId, out string docTypeAlias, out int docTypeId, out string path,
             out Guid version, out DateTime createDate, out DateTime updateDate, out int level, out bool isDraft,
@@ -405,8 +405,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             foreach (var propertyType in contentType.PropertyTypes)
             {
                 var val = propertyNodes.TryGetValue(propertyType.PropertyTypeAlias.ToLowerInvariant(), out XmlNode n)
-                    ? new XmlPublishedProperty(propertyType, isPreviewing, n)
-                    : new XmlPublishedProperty(propertyType, isPreviewing);
+                    ? new XmlPublishedProperty(propertyType, node, isPreviewing, n)
+                    : new XmlPublishedProperty(propertyType, node, isPreviewing);
 
                 properties[propertyType.PropertyTypeAlias] = val;
             }

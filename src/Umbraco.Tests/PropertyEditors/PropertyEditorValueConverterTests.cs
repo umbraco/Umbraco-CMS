@@ -28,7 +28,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             var converter = new DatePickerValueConverter();
             var dateTime = new DateTime(2012, 11, 10, 13, 14, 15);
-            var result = converter.ConvertSourceToInter(null, date, false); // does not use type for conversion
+            var result = converter.ConvertSourceToInter(null, null, date, false); // does not use type for conversion
 
             if (expected)
                 Assert.AreEqual(dateTime.Date, ((DateTime) result).Date);
@@ -54,7 +54,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void CanConvertYesNoPropertyEditor(object value, bool expected)
         {
             var converter = new YesNoValueConverter();
-            var result = converter.ConvertSourceToInter(null, value, false); // does not use type for conversion
+            var result = converter.ConvertSourceToInter(null, null, value, false); // does not use type for conversion
 
             Assert.AreEqual(expected, result);
         }
@@ -67,7 +67,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void CanConvertCheckboxListPropertyEditor(object value, IEnumerable<string> expected)
         {
             var converter = new CheckboxListValueConverter();
-            var result = converter.ConvertInterToObject(null, PropertyCacheLevel.Unknown, value, false);
+            var result = converter.ConvertInterToObject(null, null, PropertyCacheLevel.Unknown, value, false);
 
             Assert.AreEqual(expected, result);
         }
@@ -80,8 +80,8 @@ namespace Umbraco.Tests.PropertyEditors
         public void CanConvertDropdownListMultiplePropertyEditor(object value, IEnumerable<string> expected)
         {
             var converter = new DropdownListMultipleValueConverter();
-            var inter = converter.ConvertSourceToInter(null, value, false);
-            var result = converter.ConvertInterToObject(null, PropertyCacheLevel.Unknown, inter, false);
+            var inter = converter.ConvertSourceToInter(null, null, value, false);
+            var result = converter.ConvertInterToObject(null, null, PropertyCacheLevel.Unknown, inter, false);
 
             Assert.AreEqual(expected, result);
         }
@@ -94,8 +94,8 @@ namespace Umbraco.Tests.PropertyEditors
         public void CanConvertDropdownListMultipleWithKeysPropertyEditor(object value, IEnumerable<int> expected)
         {
             var converter = new DropdownListMultipleWithKeysValueConverter();
-            var inter = converter.ConvertSourceToInter(null, value, false);
-            var result = converter.ConvertInterToObject(null, PropertyCacheLevel.Unknown, inter, false);
+            var inter = converter.ConvertSourceToInter(null, null, value, false);
+            var result = converter.ConvertInterToObject(null, null, PropertyCacheLevel.Unknown, inter, false);
 
             Assert.AreEqual(expected, result);
         }

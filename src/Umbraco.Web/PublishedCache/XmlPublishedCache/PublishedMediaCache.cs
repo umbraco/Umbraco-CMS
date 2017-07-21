@@ -683,8 +683,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     string value;
                     const bool isPreviewing = false; // false :: never preview a media
                     var property = valueDictionary.TryGetValue(alias, out value) == false || value == null
-                        ? new XmlPublishedProperty(propertyType, isPreviewing)
-                        : new XmlPublishedProperty(propertyType, isPreviewing, value);
+                        ? new XmlPublishedProperty(propertyType, this, isPreviewing)
+                        : new XmlPublishedProperty(propertyType, this, isPreviewing, value);
                     _properties.Add(property);
                 }
 

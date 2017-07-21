@@ -9,7 +9,7 @@ namespace Umbraco.Web.PublishedCache
         private readonly object _locko = new object();
         private readonly object _sourceValue;
 
-        protected readonly Guid FragmentKey;
+        protected readonly IPropertySet Set;
         protected readonly bool IsPreviewing;
         protected readonly bool IsMember;
 
@@ -18,11 +18,11 @@ namespace Umbraco.Web.PublishedCache
         private CacheValues _cacheValues;
 
         // initializes a published item property
-        protected PropertySetPropertyBase(PublishedPropertyType propertyType, Guid fragmentKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
+        protected PropertySetPropertyBase(PublishedPropertyType propertyType, IPropertySet set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
             : base(propertyType, referenceCacheLevel)
         {
             _sourceValue = sourceValue;
-            FragmentKey = fragmentKey;
+            Set = set;
             IsPreviewing = previewing;
             IsMember = propertyType.ContentType.ItemType == PublishedItemType.Member;
         }
@@ -117,7 +117,7 @@ namespace Umbraco.Web.PublishedCache
         {
             if (_interInitialized) return _interValue;
 
-            _interValue = PropertyType.ConvertSourceToInter(_sourceValue, IsPreviewing);
+            _interValue = PropertyType.ConvertSourceToInter(Set, _sourceValue, IsPreviewing);
             _interInitialized = true;
             return _interValue;
         }
@@ -136,7 +136,7 @@ namespace Umbraco.Web.PublishedCache
                     var cacheValues = GetCacheValues(cacheLevel);
                     if (cacheValues.ObjectInitialized) return cacheValues.ObjectValue;
 
-                    cacheValues.ObjectValue = PropertyType.ConvertInterToObject(referenceCacheLevel, GetInterValue(), IsPreviewing);
+                    cacheValues.ObjectValue = PropertyType.ConvertInterToObject(Set, referenceCacheLevel, GetInterValue(), IsPreviewing);
                     cacheValues.ObjectInitialized = true;
                     return cacheValues.ObjectValue;
                 }
@@ -155,7 +155,7 @@ namespace Umbraco.Web.PublishedCache
                     var cacheValues = GetCacheValues(cacheLevel);
                     if (cacheValues.XPathInitialized) return cacheValues.XPathValue;
 
-                    cacheValues.XPathValue = PropertyType.ConvertInterToXPath(referenceCacheLevel, GetInterValue(), IsPreviewing);
+                    cacheValues.XPathValue = PropertyType.ConvertInterToXPath(Set, referenceCacheLevel, GetInterValue(), IsPreviewing);
                     cacheValues.XPathInitialized = true;
                     return cacheValues.XPathValue;
                 }

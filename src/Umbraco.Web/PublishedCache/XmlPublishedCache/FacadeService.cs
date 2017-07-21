@@ -240,7 +240,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         #region Property Set
 
-        public override IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, Guid setKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
+        public override IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, IPropertySet set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
         {
             throw new NotImplementedException();
         }

@@ -7,42 +7,30 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     public class YesNoValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return propertyType.PropertyEditorAlias == Constants.PropertyEditors.TrueFalseAlias;
-        }
+            => propertyType.PropertyEditorAlias == Constants.PropertyEditors.TrueFalseAlias;
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof (bool);
-        }
+            => typeof (bool);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-        {
-            return PropertyCacheLevel.Content;
-        }
+            => PropertyCacheLevel.Content;
 
-        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             // in xml a boolean is: string
             // in the database a boolean is: string "1" or "0" or empty
             // typically the converter does not need to handle anything else ("true"...)
             // however there are cases where the value passed to the converter could be a non-string object, e.g. int, bool
 
-            if (source is string)
+            if (source is string s)
             {
-                var str = (string)source;
-
-                if (str == null || str.Length == 0 || str == "0")
+                if (s.Length == 0 || s == "0")
                     return false;
 
-                if (str == "1")
+                if (s == "1")
                     return true;
 
-                bool result;
-                if (bool.TryParse(str, out result))
-                    return result;
-
-                return false;
+                return bool.TryParse(s, out bool result) && result;
             }
 
             if (source is int)
@@ -57,7 +45,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         // default ConvertSourceToObject just returns source ie a boolean value
 
-        public override object ConvertInterToXPath(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertInterToXPath(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             // source should come from ConvertSource and be a boolean already
             return (bool)inter ? "1" : "0";

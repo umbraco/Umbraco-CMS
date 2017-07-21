@@ -63,7 +63,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             }
         }
 
-        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null)
             {

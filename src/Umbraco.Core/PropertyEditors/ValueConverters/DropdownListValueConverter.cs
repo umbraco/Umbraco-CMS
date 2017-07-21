@@ -7,24 +7,17 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     public class DropdownListValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.DropDownListAlias);
-        }
+            => propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.DropDownListAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof(string);
-        }
+            => typeof (string);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-        {
-            return PropertyCacheLevel.Content;
-        }
+            => PropertyCacheLevel.Content;
 
-        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             return source?.ToString() ?? string.Empty;
         }
-
     }
 }

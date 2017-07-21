@@ -92,7 +92,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IsPreviewing = true;
 
             // clone properties so _isPreviewing is true
-            PropertiesArray = origin.PropertiesArray.Select(x => (IPublishedProperty) new Property((Property) x)).ToArray();
+            PropertiesArray = origin.PropertiesArray.Select(x => (IPublishedProperty) new Property((Property) x, this)).ToArray();
         }
 
         #endregion

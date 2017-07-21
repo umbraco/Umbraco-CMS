@@ -15,6 +15,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly Guid _contentUid;
         private readonly bool _isPreviewing;
         private readonly bool _isMember;
+        private readonly IPublishedContent _content;
 
         private readonly object _locko = new object();
 
@@ -25,28 +26,29 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private string _recurseCacheKey;
 
         // initializes a published content property with no value
-        public Property(PublishedPropertyType propertyType, IPublishedContent content, IFacadeAccessor facadeAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Content)
+        public Property(PublishedPropertyType propertyType, PublishedContent content, IFacadeAccessor facadeAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Content)
             : this(propertyType, content, null, facadeAccessor, referenceCacheLevel)
         { }
 
         // initializes a published content property with a value
-        public Property(PublishedPropertyType propertyType, IPublishedContent content, object sourceValue, IFacadeAccessor facadeAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Content)
+        public Property(PublishedPropertyType propertyType, PublishedContent content, object sourceValue, IFacadeAccessor facadeAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Content)
             : base(propertyType, referenceCacheLevel)
         {
             _sourceValue = sourceValue;
             _contentUid = content.Key;
-            var inner = PublishedContent.UnwrapIPublishedContent(content);
-            _isPreviewing = inner.IsPreviewing;
+            _content = content;
+            _isPreviewing = content.IsPreviewing;
             _isMember = content.ContentType.ItemType == PublishedItemType.Member;
             _facadeAccessor = facadeAccessor;
         }
 
         // clone for previewing as draft a published content that is published and has no draft
-        public Property(Property origin)
+        public Property(Property origin, IPublishedContent content)
             : base(origin.PropertyType, origin.ReferenceCacheLevel)
         {
             _sourceValue = origin._sourceValue;
             _contentUid = origin._contentUid;
+            _content = content;
             _isPreviewing = true;
             _isMember = origin._isMember;
             _facadeAccessor = origin._facadeAccessor;
@@ -122,7 +124,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             if (_interInitialized) return _interValue;
 
-            _interValue = PropertyType.ConvertSourceToInter(_sourceValue, _isPreviewing);
+            _interValue = PropertyType.ConvertSourceToInter(_content, _sourceValue, _isPreviewing);
             _interInitialized = true;
             return _interValue;
         }
@@ -139,7 +141,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     if (cacheValues.ObjectInitialized) return cacheValues.ObjectValue;
 
                     // initial reference cache level always is .Content
-                    cacheValues.ObjectValue = PropertyType.ConvertInterToObject(PropertyCacheLevel.Content, GetInterValue(), _isPreviewing);
+                    cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Content, GetInterValue(), _isPreviewing);
                     cacheValues.ObjectInitialized = true;
                     return cacheValues.ObjectValue;
                 }
@@ -156,7 +158,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     if (cacheValues.XPathInitialized) return cacheValues.XPathValue;
 
                     // initial reference cache level always is .Content
-                    cacheValues.XPathValue = PropertyType.ConvertInterToXPath(PropertyCacheLevel.Content, GetInterValue(), _isPreviewing);
+                    cacheValues.XPathValue = PropertyType.ConvertInterToXPath(_content, PropertyCacheLevel.Content, GetInterValue(), _isPreviewing);
                     cacheValues.XPathInitialized = true;
                     return cacheValues.XPathValue;
                 }

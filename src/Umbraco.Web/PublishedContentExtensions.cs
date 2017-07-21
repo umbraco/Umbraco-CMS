@@ -6,7 +6,6 @@ using System.Linq;
 using System.Web;
 using Examine.LuceneEngine.SearchCriteria;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Models;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;

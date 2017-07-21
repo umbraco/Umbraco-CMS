@@ -392,8 +392,8 @@ namespace umbraco
                 {
                     // isPreviewing is true here since we want to preview anyway...
                     const bool isPreviewing = true;
-                    var source = PropertyType.ConvertSourceToInter(_sourceValue, isPreviewing);
-                    return PropertyType.ConvertInterToObject(PropertyCacheLevel.Unknown, source, isPreviewing);
+                    var source = PropertyType.ConvertSourceToInter(_content, _sourceValue, isPreviewing);
+                    return PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Unknown, source, isPreviewing);
                 }
             }
 

@@ -31,7 +31,7 @@ namespace Umbraco.Web.PublishedCache
                 .Select(propertyType =>
                 {
                     values.TryGetValue(propertyType.PropertyTypeAlias, out object value);
-                    return facadeService.CreateSetProperty(propertyType, Key, previewing, referenceCacheLevel, value);
+                    return facadeService.CreateSetProperty(propertyType, this, previewing, referenceCacheLevel, value);
                 })
                 .ToArray();
         }
@@ -55,7 +55,7 @@ namespace Umbraco.Web.PublishedCache
                 .Select(propertyType =>
                 {
                     values.TryGetValue(propertyType.PropertyTypeAlias, out object value);
-                    return (IPublishedProperty) new PropertySetProperty(propertyType, Key, previewing, cacheLevel, value);
+                    return (IPublishedProperty) new PropertySetProperty(propertyType, this, previewing, cacheLevel, value);
                 })
                 .ToArray();
         }

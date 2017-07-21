@@ -19,19 +19,13 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         private readonly IDataTypeService _dataTypeService;
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.ImageCropperAlias);
-        }
+            => propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.ImageCropperAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof (JToken);
-        }
+            => typeof (JToken);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-        {
-            return PropertyCacheLevel.Content;
-        }
+            => PropertyCacheLevel.Content;
 
         public ImageCropperValueConverter()
         {
@@ -40,8 +34,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         public ImageCropperValueConverter(IDataTypeService dataTypeService)
         {
-            if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
-            _dataTypeService = dataTypeService;
+            _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
         }
 
         internal static void MergePreValues(JObject currentValue, IDataTypeService dataTypeService, int dataTypeId)
@@ -100,7 +93,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             }
         }
 
-        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
             var sourceString = source.ToString();

@@ -609,6 +609,7 @@
     <Compile Include="Models\PublishedContent\IPublishedContentModelFactory.cs" />
     <Compile Include="Models\PublishedContent\IPropertySet.cs" />
     <Compile Include="Models\PublishedContent\IPublishedProperty.cs" />
+    <Compile Include="Models\PublishedContent\ModelType.cs" />
     <Compile Include="Models\PublishedContent\NoopPublishedContentModelFactory.cs" />
     <Compile Include="Models\PublishedContent\PropertyResult.cs" />
     <Compile Include="Models\PublishedContent\PropertyResultType.cs" />

@@ -1,15 +1,13 @@
-﻿namespace Umbraco.Core.Models.PublishedContent
+﻿using System;
+using System.Collections.Generic;
+
+namespace Umbraco.Core.Models.PublishedContent
 {
     public class NoopPublishedContentModelFactory : IPublishedContentModelFactory
     {
-        public IPublishedContent CreateModel(IPublishedContent content)
-        {
-            return content;
-        }
+        public IPropertySet CreateModel(IPropertySet set)
+            => set;
 
-        public T CreateModel<T>(IPropertySet content)
-        {
-            throw new System.NotImplementedException();
-        }
+        public Dictionary<string, Type> ModelTypeMap { get; } = new Dictionary<string, Type>();
     }
 }

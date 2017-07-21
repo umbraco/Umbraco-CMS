@@ -11,8 +11,7 @@ namespace Umbraco.Core.Models.PublishedContent
     {
         protected PublishedPropertyBase(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel)
         {
-            if (propertyType == null) throw new ArgumentNullException(nameof(propertyType));
-            PropertyType = propertyType;
+            PropertyType = propertyType ?? throw new ArgumentNullException(nameof(propertyType));
             ReferenceCacheLevel = referenceCacheLevel;
         }
 

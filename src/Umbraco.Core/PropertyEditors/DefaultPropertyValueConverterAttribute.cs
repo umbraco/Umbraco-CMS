@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -12,7 +10,7 @@ namespace Umbraco.Core.PropertyEditors
     {
         public DefaultPropertyValueConverterAttribute()
         {
-            DefaultConvertersToShadow = Enumerable.Empty<Type>();
+            DefaultConvertersToShadow = Array.Empty<Type>();
         }
 
         public DefaultPropertyValueConverterAttribute(params Type[] convertersToShadow)
@@ -30,7 +28,6 @@ namespace Umbraco.Core.PropertyEditors
         /// is a very generic converter and the RelatedLiksEditorValueConverter is more specific than it, so the RelatedLiksEditorValueConverter
         /// can specify that it 'shadows' the JsonValueConverter.
         /// </remarks>
-        public IEnumerable<Type> DefaultConvertersToShadow { get; private set; }
-
+        public Type[] DefaultConvertersToShadow { get; }
     }
 }

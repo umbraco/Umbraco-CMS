@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -18,28 +19,18 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.SliderAlias);
-        }
+            => propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.SliderAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return IsRangeDataType(propertyType.DataTypeId)
-                ? typeof(Range<decimal>)
-                : typeof(decimal);
-        }
+            => IsRangeDataType(propertyType.DataTypeId) ? typeof (Range<decimal>) : typeof (decimal);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-        {
-            return PropertyCacheLevel.Content;
-        }
+            => PropertyCacheLevel.Content;
 
-        public override object ConvertInterToObject(PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
+        public override object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
         {
             if (source == null)
-            {
                 return null;
-            }
 
             if (IsRangeDataType(propertyType.DataTypeId))
             {
@@ -55,9 +46,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
             var valueAttempt = source.ToString().TryConvertTo<decimal>();
             if (valueAttempt.Success)
-            {
                 return valueAttempt.Result;
-            }
 
             // Something failed in the conversion of the strings to decimals
             return null;

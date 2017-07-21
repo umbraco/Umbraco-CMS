@@ -6,8 +6,8 @@ namespace Umbraco.Web.PublishedCache
 {
     class PropertySetProperty : PropertySetPropertyBase
     {
-        public PropertySetProperty(PublishedPropertyType propertyType, Guid fragmentKey, bool previewing, PropertyCacheLevel cacheLevel, object sourceValue = null)
-            : base(propertyType, fragmentKey, previewing, cacheLevel, sourceValue)
+        public PropertySetProperty(PublishedPropertyType propertyType, IPropertySet set, bool previewing, PropertyCacheLevel cacheLevel, object sourceValue = null)
+            : base(propertyType, set, previewing, cacheLevel, sourceValue)
         { }
 
         protected override CacheValues GetSnapshotCacheValues()

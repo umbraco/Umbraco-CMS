@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -26,10 +27,14 @@ namespace Umbraco.Web.PublishedCache
 
         public virtual IPropertySet CreateSet(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing, PropertyCacheLevel referenceCacheLevel)
         {
-            return new PropertySet(contentType, key, values, previewing, this, referenceCacheLevel);
+            var set = new PropertySet(contentType, key, values, previewing, this, referenceCacheLevel);
+            var model = Current.PublishedContentModelFactory.CreateModel(set);
+            if (model == null)
+                throw new Exception("Factory returned null.");
+            return model;
         }
 
-        public abstract IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, Guid setKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
+        public abstract IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, IPropertySet set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
 
         public abstract string EnterPreview(IUser user, int contentId);
         public abstract void RefreshPreview(string previewToken, int contentId);

@@ -24,24 +24,17 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         };
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return Aliases.Contains(propertyType.PropertyEditorAlias);
-        }
+            => Aliases.Contains(propertyType.PropertyEditorAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof (string);
-        }
+            => typeof (string);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-        {
-            return PropertyCacheLevel.Content;
-        }
+            => PropertyCacheLevel.Content;
 
-        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
         {
-            if (source == null) return null;
-            return source.ToString();
+            return source?.ToString();
         }
     }
 }

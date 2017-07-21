@@ -29,16 +29,12 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         }
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof (JToken);
-        }
+            => typeof (JToken);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-        {
-            return PropertyCacheLevel.Content;
-        }
+            => PropertyCacheLevel.Content;
 
-        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
             var sourceString = source.ToString();

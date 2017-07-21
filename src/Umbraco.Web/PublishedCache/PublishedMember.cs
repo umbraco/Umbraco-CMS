@@ -21,15 +21,12 @@ namespace Umbraco.Web.PublishedCache
 
         public PublishedMember(IMember member, PublishedContentType publishedMemberType)
         {
-            if (member == null) throw new ArgumentNullException(nameof(member));
-            if (publishedMemberType == null) throw new ArgumentNullException(nameof(publishedMemberType));
-
-            _member = member;
+            _member = member ?? throw new ArgumentNullException(nameof(member));
             _membershipUser = member;
-            _publishedMemberType = publishedMemberType;
+            _publishedMemberType = publishedMemberType ?? throw new ArgumentNullException(nameof(publishedMemberType));
 
             _properties = PublishedProperty.MapProperties(_publishedMemberType.PropertyTypes, _member.Properties,
-                (t, v) => new RawValueProperty(t, v ?? string.Empty))
+                (t, v) => new RawValueProperty(t, this, v ?? string.Empty))
                 .ToArray();
         }
 

@@ -210,6 +210,7 @@
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
     <Compile Include="Models\Mapping\AutoMapper6Tests.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTests.cs" />
+    <Compile Include="PublishedContent\ModelsAndConvertersTests.cs" />
     <Compile Include="Routing\NiceUrlRoutesTests.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests2.cs" />
     <Compile Include="Scoping\EventNameExtractorTests.cs" />

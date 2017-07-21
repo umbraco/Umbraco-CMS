@@ -44,11 +44,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         }
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias)
-                ? typeof(IEnumerable<IPublishedContent>)
-                : typeof(IPublishedContent);
-        }
+            => IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias)
+                ? typeof (IEnumerable<IPublishedContent>)
+                : typeof (IPublishedContent);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
             => PropertyCacheLevel.Facade;
@@ -86,7 +84,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             });
         }
 
-        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             var nodeIds = source.ToString()
                 .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
@@ -95,7 +93,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return nodeIds;
         }
 
-        public override object ConvertInterToObject(PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
+        public override object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
         {
             if (source == null)
             {

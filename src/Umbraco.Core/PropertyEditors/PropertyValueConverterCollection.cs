@@ -12,24 +12,35 @@ namespace Umbraco.Core.PropertyEditors
         { }
 
         private readonly object _locker = new object();
-        private Tuple<IPropertyValueConverter, DefaultPropertyValueConverterAttribute>[] _defaults;
+        private Dictionary<IPropertyValueConverter, Type[]> _defaultConverters;
 
-        /// <summary>
-        /// Gets the default converters and associated metadata.
-        /// </summary>
-        internal Tuple<IPropertyValueConverter, DefaultPropertyValueConverterAttribute>[] DefaultConverters
+        private Dictionary<IPropertyValueConverter, Type[]> DefaultConverters
         {
             get
             {
                 lock (_locker)
                 {
-                    return _defaults ?? (_defaults = this.Select(x =>
-                        {
-                            var attrib = x.GetType().GetCustomAttribute<DefaultPropertyValueConverterAttribute>(false);
-                            return attrib == null ? null : Tuple.Create(x, attrib);
-                        }).WhereNotNull().ToArray());
+                    if (_defaultConverters != null)
+                        return _defaultConverters;
+
+                    _defaultConverters = new Dictionary<IPropertyValueConverter, Type[]>();
+
+                    foreach (var converter in this)
+                    {
+                        var attr = converter.GetType().GetCustomAttribute<DefaultPropertyValueConverterAttribute>(false);
+                        if (attr != null)
+                            _defaultConverters[converter] = attr.DefaultConvertersToShadow;
+                    }
+
+                    return _defaultConverters;
                 }
             }
         }
+
+        internal bool IsDefault(IPropertyValueConverter converter)
+            => DefaultConverters.ContainsKey(converter);
+
+        internal bool Shadows(IPropertyValueConverter shadowing, IPropertyValueConverter shadowed)
+            => DefaultConverters.TryGetValue(shadowing, out Type[] types) && types.Contains(shadowed.GetType());
     }
 }

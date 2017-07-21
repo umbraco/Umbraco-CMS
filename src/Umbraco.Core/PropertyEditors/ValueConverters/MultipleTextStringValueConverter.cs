@@ -10,21 +10,15 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     public class MultipleTextStringValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return Constants.PropertyEditors.MultipleTextstringAlias.Equals(propertyType.PropertyEditorAlias);
-        }
+            => Constants.PropertyEditors.MultipleTextstringAlias.Equals(propertyType.PropertyEditorAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof (IEnumerable<string>);
-        }
+            => typeof (IEnumerable<string>);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-        {
-            return PropertyCacheLevel.Content;
-        }
+            => PropertyCacheLevel.Content;
 
-        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             // data is (both in database and xml):
             // <keyFeatureList>
@@ -35,7 +29,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             //    </values>
             // </keyFeatureList>
 
-            var sourceString = source != null ? source.ToString() : null;
+            var sourceString = source?.ToString();
             if (string.IsNullOrWhiteSpace(sourceString)) return Enumerable.Empty<string>();
 
             //SD: I have no idea why this logic is here, I'm pretty sure we've never saved the multiple txt string
@@ -56,16 +50,13 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 pos = sourceString.IndexOf("<value>", pos, StringComparison.Ordinal);
             }
 
-            // Fall back on normal behaviour
-            if (values.Any() == false)
-            {
-                return sourceString.Split(Environment.NewLine.ToCharArray());
-            }
-
-            return values.ToArray();
+            // fall back on normal behaviour
+            return values.Any() == false 
+                ? sourceString.Split(Environment.NewLine.ToCharArray()) 
+                : values.ToArray();
         }
 
-        public override object ConvertInterToXPath(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertInterToXPath(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             var d = new XmlDocument();
             var e = d.CreateElement("values");

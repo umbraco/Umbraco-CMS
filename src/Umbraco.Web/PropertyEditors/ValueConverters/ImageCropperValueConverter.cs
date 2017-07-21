@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -19,17 +21,16 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         public ImageCropperValueConverter()
         { }
 
-        public ImageCropperValueConverter(IDataTypeService dataTypeService) : base(dataTypeService)
+        public ImageCropperValueConverter(IDataTypeService dataTypeService)
+            : base(dataTypeService)
         { }
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof (ImageCropDataSet);
-        }
+            => typeof (ImageCropDataSet);
 
-        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
         {
-            var baseVal = base.ConvertSourceToInter(propertyType, source, preview);
+            var baseVal = base.ConvertSourceToInter(owner, propertyType, source, preview);
             var json = baseVal as JObject;
             if (json == null) return baseVal;
 

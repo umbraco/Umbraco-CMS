@@ -44,22 +44,16 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// The <see cref="bool"/>.
         /// </returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinksAlias)
-                || propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinks2Alias);
-        }
+            => propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinksAlias)
+            || propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.RelatedLinks2Alias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof (JArray);
-        }
+            => typeof (JArray);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-        {
-            return PropertyCacheLevel.Content;
-        }
+            => PropertyCacheLevel.Content;
 
-        public override object ConvertSourceToInter(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
             var sourceString = source.ToString();
@@ -140,7 +134,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return link;
         }
 
-        public override object ConvertInterToXPath(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertInterToXPath(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             if (inter == null) return null;
             var sourceString = inter.ToString();

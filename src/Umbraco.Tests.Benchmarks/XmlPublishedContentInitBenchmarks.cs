@@ -155,7 +155,7 @@ namespace Umbraco.Tests.Benchmarks
         [Benchmark(OperationsPerInvoke = 10)]
         public void Enhanced_10_Children()
         {
-            XmlPublishedContent.InitializeNode(_xml10.DocumentElement, false,
+            XmlPublishedContent.InitializeNode(null, _xml10.DocumentElement, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
                 out version, out createDate, out updateDate, out level, out isDraft, out publishedContentType,
@@ -165,7 +165,7 @@ namespace Umbraco.Tests.Benchmarks
         [Benchmark(OperationsPerInvoke = 10)]
         public void Enhanced_100_Children()
         {
-            XmlPublishedContent.InitializeNode(_xml100.DocumentElement, false,
+            XmlPublishedContent.InitializeNode(null, _xml100.DocumentElement, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
                 out version, out createDate, out updateDate, out level, out isDraft, out publishedContentType,
@@ -175,7 +175,7 @@ namespace Umbraco.Tests.Benchmarks
         [Benchmark(OperationsPerInvoke = 10)]
         public void Enhanced_1000_Children()
         {
-            XmlPublishedContent.InitializeNode(_xml1000.DocumentElement, false,
+            XmlPublishedContent.InitializeNode(null, _xml1000.DocumentElement, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
                 out version, out createDate, out updateDate, out level, out isDraft, out publishedContentType,
@@ -185,7 +185,7 @@ namespace Umbraco.Tests.Benchmarks
         [Benchmark(OperationsPerInvoke = 10)]
         public void Enhanced_10000_Children()
         {
-            XmlPublishedContent.InitializeNode(_xml10000.DocumentElement, false,
+            XmlPublishedContent.InitializeNode(null, _xml10000.DocumentElement, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
                 out version, out createDate, out updateDate, out level, out isDraft, out publishedContentType,
@@ -295,8 +295,8 @@ namespace Umbraco.Tests.Benchmarks
             {
                 XmlNode n;
                 return propertyNodes.TryGetValue(p.PropertyTypeAlias.ToLowerInvariant(), out n)
-                    ? new XmlPublishedProperty(p, isPreviewing, n)
-                    : new XmlPublishedProperty(p, isPreviewing);
+                    ? new XmlPublishedProperty(p, null, isPreviewing, n)
+                    : new XmlPublishedProperty(p, null, isPreviewing);
             }).Cast<IPublishedProperty>().ToDictionary(
                 x => x.PropertyTypeAlias,
                 x => x,

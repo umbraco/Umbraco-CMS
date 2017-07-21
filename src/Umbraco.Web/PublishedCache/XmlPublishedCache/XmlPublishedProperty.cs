@@ -22,6 +22,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private object _objectValue;
         private bool _objectValueComputed;
         private readonly bool _isPreviewing;
+        private readonly IPublishedContent _content;
 
         /// <summary>
         /// Gets the raw value of the property.
@@ -42,9 +43,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 // are single threaded, so the following code should be safe & fast
 
                 if (_objectValueComputed) return _objectValue;
-                var inter = PropertyType.ConvertSourceToInter(_sourceValue, _isPreviewing);
+                var inter = PropertyType.ConvertSourceToInter(_content, _sourceValue, _isPreviewing);
                 // initial reference cache level always is .Content
-                _objectValue = PropertyType.ConvertInterToObject(PropertyCacheLevel.Content, inter, _isPreviewing);
+                _objectValue = PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Content, inter, _isPreviewing);
                 _objectValueComputed = true;
                 return _objectValue;
             }
@@ -52,26 +53,27 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public override object XPathValue { get { throw new NotImplementedException(); } }
 
-        public XmlPublishedProperty(PublishedPropertyType propertyType, bool isPreviewing, XmlNode propertyXmlData)
-            : this(propertyType, isPreviewing)
+        public XmlPublishedProperty(PublishedPropertyType propertyType, IPublishedContent content, bool isPreviewing, XmlNode propertyXmlData)
+            : this(propertyType, content, isPreviewing)
         {
             if (propertyXmlData == null)
                 throw new ArgumentNullException(nameof(propertyXmlData), "Property xml source is null");
             _sourceValue = XmlHelper.GetNodeValue(propertyXmlData);
         }
 
-        public XmlPublishedProperty(PublishedPropertyType propertyType, bool isPreviewing, string propertyData)
-            : this(propertyType, isPreviewing)
+        public XmlPublishedProperty(PublishedPropertyType propertyType, IPublishedContent content, bool isPreviewing, string propertyData)
+            : this(propertyType, content, isPreviewing)
         {
             if (propertyData == null)
                 throw new ArgumentNullException(nameof(propertyData));
             _sourceValue = propertyData;
         }
 
-        public XmlPublishedProperty(PublishedPropertyType propertyType, bool isPreviewing)
+        public XmlPublishedProperty(PublishedPropertyType propertyType, IPublishedContent content, bool isPreviewing)
             : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored
         {
             _sourceValue = string.Empty;
+            _content = content;
             _isPreviewing = isPreviewing;
         }
     }

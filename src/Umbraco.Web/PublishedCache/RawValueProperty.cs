@@ -12,10 +12,8 @@ namespace Umbraco.Web.PublishedCache
     internal class RawValueProperty : PublishedPropertyBase
     {
         private readonly object _dbVal; //the value in the db
-        private readonly Lazy<object> _sourceValue;
         private readonly Lazy<object> _objectValue;
         private readonly Lazy<object> _xpathValue;
-        private readonly bool _isPreviewing;
 
         public override object SourceValue => _dbVal;
 
@@ -26,24 +24,22 @@ namespace Umbraco.Web.PublishedCache
         public override object XPathValue => _xpathValue.Value;
 
         // note: propertyData cannot be null
-        public RawValueProperty(PublishedPropertyType propertyType, object propertyData, bool isPreviewing = false)
-            : this(propertyType, isPreviewing)
+        public RawValueProperty(PublishedPropertyType propertyType, IPublishedContent content, object propertyData, bool isPreviewing = false)
+            : this(propertyType, content, isPreviewing)
         {
-            if (propertyData == null)
-                throw new ArgumentNullException(nameof(propertyData));
-            _dbVal = propertyData;
+            _dbVal = propertyData ?? throw new ArgumentNullException(nameof(propertyData));
         }
 
         // note: maintaining two ctors to make sure we understand what we do when calling them
-        public RawValueProperty(PublishedPropertyType propertyType, bool isPreviewing = false)
+        public RawValueProperty(PublishedPropertyType propertyType, IPublishedContent content, bool isPreviewing = false)
             : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored
         {
             _dbVal = null;
-            _isPreviewing = isPreviewing;
+            var isPreviewing1 = isPreviewing;
 
-            _sourceValue = new Lazy<object>(() => PropertyType.ConvertSourceToInter(_dbVal, _isPreviewing));
-            _objectValue = new Lazy<object>(() => PropertyType.ConvertInterToObject(PropertyCacheLevel.Unknown, _sourceValue.Value, _isPreviewing));
-            _xpathValue = new Lazy<object>(() => PropertyType.ConvertInterToXPath(PropertyCacheLevel.Unknown, _sourceValue.Value, _isPreviewing));
+            var sourceValue = new Lazy<object>(() => PropertyType.ConvertSourceToInter(content, _dbVal, isPreviewing1));
+            _objectValue = new Lazy<object>(() => PropertyType.ConvertInterToObject(content, PropertyCacheLevel.Unknown, sourceValue.Value, isPreviewing1));
+            _xpathValue = new Lazy<object>(() => PropertyType.ConvertInterToXPath(content, PropertyCacheLevel.Unknown, sourceValue.Value, isPreviewing1));
         }
     }
 }
