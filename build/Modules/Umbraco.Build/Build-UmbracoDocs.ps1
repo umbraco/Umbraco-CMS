@@ -25,7 +25,7 @@ function Build-UmbracoDocs
   Write-Host "Build UI documentation"
 
   # get a temp clean node env (will restore)
-  Sandbox-Node
+  Sandbox-Node $uenv
  
   push-location "$src\Umbraco.Web.UI.Client"
   write "" > $tmp\belle-docs.log

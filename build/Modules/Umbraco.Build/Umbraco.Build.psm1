@@ -77,9 +77,11 @@ function Sandbox-Node
   $gitPath = [System.IO.Path]::GetDirectoryName($gitExe)
   $env:path = "$nodePath;$gitPath"
   
+  $global:node_nodepath = $env:NODEPATH
   $global:node_npmcache = $env:NPM_CONFIG_CACHE
   $global:node_npmprefix = $env:NPM_CONFIG_PREFIX
   
+  rm env:NODEPATH
   rm env:NPM_CONFIG_CACHE
   rm env:NPM_CONFIG_PREFIX
 }
@@ -87,6 +89,7 @@ function Sandbox-Node
 function Restore-Node
 {
   $env:path = $node_path
+  $env:NODEPATH = $node_nodepath
   $env:NPM_CONFIG_CACHE = $node_npmcache
   $env:NPM_CONFIG_PREFIX = $node_npmprefix
 }
@@ -108,7 +111,7 @@ function Compile-Belle
   Write-Host "Logging to $tmp\belle.log"
   
   # get a temp clean node env (will restore)
-  Sandbox-Node
+  Sandbox-Node $uenv
   
   push-location "$($uenv.SolutionRoot)\src\Umbraco.Web.UI.Client"
   write "" > $tmp\belle.log
