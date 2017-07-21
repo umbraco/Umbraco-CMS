@@ -24,12 +24,8 @@ function Build-UmbracoDocs
 
   Write-Host "Build UI documentation"
 
-    # get a temp clean path (will be restored)
-  $p = $env:path
-  $nodePath = $uenv.NodePath
-  $gitExe = (get-command git).Source  
-  $gitPath = [System.IO.Path]::GetDirectoryName($gitExe)
-  $env:path = "$nodePath;$gitPath"
+  # get a temp clean node env (will restore)
+  Sandbox-Node
  
   push-location "$src\Umbraco.Web.UI.Client"
   write "" > $tmp\belle-docs.log
@@ -50,7 +46,8 @@ function Build-UmbracoDocs
   (Get-Content $indexPath).Replace("location.href.replace(rUrl, indexFile)", "'$baseUrl'") `
     | Set-Content $indexPath
     
-  $env:path = $p
+  # restore
+  Restore-Node
   
   # zip
   &$uenv.Zip a -tzip -r "$out\ui-docs.zip" "$src\Umbraco.Web.UI.Client\docs\api\*.*" `

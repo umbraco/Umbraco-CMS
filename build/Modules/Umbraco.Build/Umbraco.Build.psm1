@@ -65,6 +65,32 @@ function Prepare-Build
   Copy-File "$webUi\web.Template.config" "$webUi\web.config"
 }
 
+function Sandbox-Node
+{
+  param (
+    $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
+  )
+  
+  $global:node_path = $env:path
+  $nodePath = $uenv.NodePath
+  $gitExe = (get-command git).Source  
+  $gitPath = [System.IO.Path]::GetDirectoryName($gitExe)
+  $env:path = "$nodePath;$gitPath"
+  
+  $global:node_npmcache = $env:NPM_CONFIG_CACHE
+  $global:node_npmprefix = $env:NPM_CONFIG_PREFIX
+  
+  rm env:NPM_CONFIG_CACHE
+  rm env:NPM_CONFIG_PREFIX
+}
+
+function Restore-Node
+{
+  $env:path = $node_path
+  $env:NPM_CONFIG_CACHE = $node_npmcache
+  $env:NPM_CONFIG_PREFIX = $node_npmprefix
+}
+
 #
 # Builds the Belle UI project
 #
@@ -81,12 +107,8 @@ function Compile-Belle
   Write-Host ">> Compile Belle"
   Write-Host "Logging to $tmp\belle.log"
   
-  # get a temp clean path (will be restored)
-  $p = $env:path
-  $nodePath = $uenv.NodePath
-  $gitExe = (get-command git).Source  
-  $gitPath = [System.IO.Path]::GetDirectoryName($gitExe)
-  $env:path = "$nodePath;$gitPath"
+  # get a temp clean node env (will restore)
+  Sandbox-Node
   
   push-location "$($uenv.SolutionRoot)\src\Umbraco.Web.UI.Client"
   write "" > $tmp\belle.log
@@ -109,8 +131,8 @@ function Compile-Belle
   # fixme - should we filter the log to find errors?
   #get-content .\build.tmp\belle.log | %{ if ($_ -match "build") { write $_}}
 
-  # restore path
-  $env:path = $p
+  # restore
+  Restore-Node
   
   # setting node_modules folder to hidden
   # used to prevent VS13 from crashing on it while loading the websites project
