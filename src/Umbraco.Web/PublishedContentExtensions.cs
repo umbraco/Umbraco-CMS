@@ -639,23 +639,9 @@ namespace Umbraco.Web
 	    /// <param name="recursive">When true, recurses up the content type tree to check inheritance; when false just calls IsDocumentType(this IPublishedContent content, string docTypeAlias).</param>
 	    /// <returns>True if the content is of the specified content type or a derived content type; otherwise false.</returns>
 	    public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias, bool recursive)
-		{
-			if (content.IsDocumentType(docTypeAlias))
-				return true;
-
-			if (recursive)
-				return IsDocumentTypeRecursive(content, docTypeAlias);
-			return false;
-		}
-
-		private static bool IsDocumentTypeRecursive(IPublishedContent content, string docTypeAlias)
-		{
-			var contentTypeService = UmbracoContext.Current.Application.Services.ContentTypeService;
-            var type = contentTypeService.GetContentType(content.DocumentTypeAlias);
-            if (type.Alias.InvariantEquals(docTypeAlias) || content.IsComposedOf(docTypeAlias))
-                return true;
-            return false;
-		}
+	    {
+	        return content.DocumentTypeAlias.InvariantEquals(docTypeAlias) || (recursive && content.IsComposedOf(docTypeAlias));
+	    }
 
 		public static bool IsNull(this IPublishedContent content, string alias, bool recurse)
 		{
