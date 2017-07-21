@@ -65,6 +65,25 @@ function Prepare-Build
   Copy-File "$webUi\web.Template.config" "$webUi\web.config"
 }
 
+function Clear-EnvVar($var)
+{
+  $value = [Environment]::GetEnvironmentVariable($var)
+  if (test-path "env:$var") { rm "env:$var" }
+  return $value
+}
+
+function Set-EnvVar($var, $value)
+{
+  if ($value)
+  {
+    [Environment]::SetEnvironmentVariable($var, $value)
+  }
+  else
+  {
+    if (test-path "env:$var") { rm "env:$var" }
+  }
+}
+
 function Sandbox-Node
 {
   param (
@@ -77,21 +96,18 @@ function Sandbox-Node
   $gitPath = [System.IO.Path]::GetDirectoryName($gitExe)
   $env:path = "$nodePath;$gitPath"
   
-  $global:node_nodepath = $env:NODEPATH
-  $global:node_npmcache = $env:NPM_CONFIG_CACHE
-  $global:node_npmprefix = $env:NPM_CONFIG_PREFIX
-  
-  rm env:NODEPATH
-  rm env:NPM_CONFIG_CACHE
-  rm env:NPM_CONFIG_PREFIX
+  $global:node_nodepath = Clear-EnvVar "NODEPATH"
+  $global:node_npmcache = Clear-EnvVar "NPM_CONFIG_CACHE"
+  $global:node_npmprefix = Clear-EnvVar "NPM_CONFIG_PREFIX"
 }
 
 function Restore-Node
 {
   $env:path = $node_path
-  $env:NODEPATH = $node_nodepath
-  $env:NPM_CONFIG_CACHE = $node_npmcache
-  $env:NPM_CONFIG_PREFIX = $node_npmprefix
+  
+  Set-EnvVar "NODEPATH" $node_nodepath
+  Set-EnvVar "NPM_CONFIG_CACHE" $node_npmcache
+  Set-EnvVar "NPM_CONFIG_PREFIX" $node_npmprefix
 }
 
 #
@@ -115,19 +131,10 @@ function Compile-Belle
   
   push-location "$($uenv.SolutionRoot)\src\Umbraco.Web.UI.Client"
   write "" > $tmp\belle.log
-  &npm cache clean #--quiet >> $tmp\belle.log 2>&1
-  &npm install #--quiet >> $tmp\belle.log 2>&1
-  &npm install -g grunt-cli #--quiet >> $tmp\belle.log 2>&1
-  &npm install -g bower #--quiet >> $tmp\belle.log 2>&1
-  
-  # FIXME TEMP - ON VSTS &grunt fails ?!
-  Write-Host "DEBUG"
-  Write-Host "ENV"
-  ls env:
-  Write-Host "NODEPATH"
-  ls $uenv.NodePath
-
-  
+  &npm cache clean --quiet >> $tmp\belle.log 2>&1
+  &npm install --quiet >> $tmp\belle.log 2>&1
+  &npm install -g grunt-cli --quiet >> $tmp\belle.log 2>&1
+  &npm install -g bower --quiet >> $tmp\belle.log 2>&1
   &grunt build --buildversion=$version.Release >> $tmp\belle.log 2>&1
   pop-location
   
