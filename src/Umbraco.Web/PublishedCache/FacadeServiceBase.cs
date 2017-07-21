@@ -24,7 +24,12 @@ namespace Umbraco.Web.PublishedCache
 
         public abstract bool EnsureEnvironment(out IEnumerable<string> errors);
 
-        public abstract IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
+        public virtual IPropertySet CreateSet(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing, PropertyCacheLevel referenceCacheLevel)
+        {
+            return new PropertySet(contentType, key, values, previewing, this, referenceCacheLevel);
+        }
+
+        public abstract IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, Guid setKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
 
         public abstract string EnterPreview(IUser user, int contentId);
         public abstract void RefreshPreview(string previewToken, int contentId);

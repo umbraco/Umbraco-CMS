@@ -206,7 +206,7 @@ namespace Umbraco.Web
         /// <param name="useWildCards"></param>
         /// <param name="searchProvider"></param>
         /// <returns></returns>
-        public IEnumerable<IPublishedContent> Search(string term, bool useWildCards = true, string searchProvider = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string searchProvider = null)
         {
             if (_query != null) return _query.Search(term, useWildCards, searchProvider);
 
@@ -215,7 +215,7 @@ namespace Umbraco.Web
                 searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
 
             var results = searcher.Search(term, useWildCards);
-            return results.ConvertSearchResultToPublishedContent(_contentCache);
+            return results.ToPublishedSearchResults(_contentCache);
         }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace Umbraco.Web
         /// <param name="criteria"></param>
         /// <param name="searchProvider"></param>
         /// <returns></returns>
-        public IEnumerable<IPublishedContent> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        public IEnumerable<PublishedSearchResult> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
         {
             if (_query != null) return _query.Search(criteria, searchProvider);
 
@@ -233,7 +233,7 @@ namespace Umbraco.Web
                 s = searchProvider;
 
             var results = s.Search(criteria);
-            return results.ConvertSearchResultToPublishedContent(_contentCache);
+            return results.ToPublishedSearchResults(_contentCache);
         }
 
         #endregion

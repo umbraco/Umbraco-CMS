@@ -152,18 +152,29 @@ namespace Umbraco.Web.PublishedCache
 
         #endregion
 
-        #region Fragment
+        #region Property Set
 
         /// <summary>
-        /// Creates a fragment property.
+        /// Creates a property set.
+        /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <param name="key">The set key.</param>
+        /// <param name="values">Raw values for properties.</param>
+        /// <param name="previewing">A value indicating whether previewing.</param>
+        /// <param name="referenceCacheLevel">The reference cache level.</param>
+        /// <returns>A property set.</returns>
+        IPropertySet CreateSet(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing, PropertyCacheLevel referenceCacheLevel);
+
+        /// <summary>
+        /// Creates a set property.
         /// </summary>
         /// <param name="propertyType">The property type.</param>
-        /// <param name="itemKey">The fragment key.</param>
+        /// <param name="setKey">The set key.</param>
         /// <param name="previewing">A value indicating whether previewing.</param>
         /// <param name="referenceCacheLevel">The reference cache level.</param>
         /// <param name="sourceValue">The source value.</param>
-        /// <returns>A fragment property.</returns>
-        IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
+        /// <returns>A set property.</returns>
+        IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, Guid setKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
 
         #endregion
     }

@@ -1534,11 +1534,11 @@ AND cmsContentNu.nodeId IS NULL
 
         #endregion
 
-        #region Fragments
+        #region Property Set
 
-        public override IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
+        public override IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, Guid setKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
         {
-            return new PublishedFragmentProperty(FacadeAccessor, propertyType, itemKey, previewing, referenceCacheLevel, sourceValue);
+            return new PropertySetProperty(FacadeAccessor, propertyType, setKey, previewing, referenceCacheLevel, sourceValue);
         }
 
         #endregion

@@ -219,7 +219,7 @@ namespace Umbraco.Web
 
         #region Search
 
-        public static IEnumerable<IPublishedContent> Search(this IPublishedContent content, string term, bool useWildCards = true, string searchProvider = null)
+        public static IEnumerable<PublishedSearchResult> Search(this IPublishedContent content, string term, bool useWildCards = true, string searchProvider = null)
         {
             var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
             if (string.IsNullOrEmpty(searchProvider) == false)
@@ -235,12 +235,12 @@ namespace Umbraco.Web
             return content.Search(crit, searcher);
         }
 
-        public static IEnumerable<IPublishedContent> SearchDescendants(this IPublishedContent content, string term, bool useWildCards = true, string searchProvider = null)
+        public static IEnumerable<PublishedSearchResult> SearchDescendants(this IPublishedContent content, string term, bool useWildCards = true, string searchProvider = null)
         {
             return content.Search(term, useWildCards, searchProvider);
         }
 
-        public static IEnumerable<IPublishedContent> SearchChildren(this IPublishedContent content, string term, bool useWildCards = true, string searchProvider = null)
+        public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, string term, bool useWildCards = true, string searchProvider = null)
         {
             var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
             if (string.IsNullOrEmpty(searchProvider) == false)
@@ -256,14 +256,14 @@ namespace Umbraco.Web
             return content.Search(crit, searcher);
         }
 
-        public static IEnumerable<IPublishedContent> Search(this IPublishedContent content, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        public static IEnumerable<PublishedSearchResult> Search(this IPublishedContent content, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
         {
             var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
             if (searchProvider != null)
                 s = searchProvider;
 
             var results = s.Search(criteria);
-            return results.ConvertSearchResultToPublishedContent(UmbracoContext.Current.ContentCache);
+            return results.ToPublishedSearchResults(UmbracoContext.Current.ContentCache);
         }
 
         #endregion

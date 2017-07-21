@@ -238,9 +238,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         #endregion
 
-        #region Fragments
+        #region Property Set
 
-        public override IPublishedProperty CreateFragmentProperty(PublishedPropertyType propertyType, Guid itemKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
+        public override IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, Guid setKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
         {
             throw new NotImplementedException();
         }

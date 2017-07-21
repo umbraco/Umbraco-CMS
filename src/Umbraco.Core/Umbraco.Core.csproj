@@ -607,13 +607,14 @@
     <Compile Include="Models\PublishedContent\IPublishedContent.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentExtended.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentModelFactory.cs" />
-    <Compile Include="Models\PublishedContent\IPublishedFragment.cs" />
+    <Compile Include="Models\PublishedContent\IPropertySet.cs" />
     <Compile Include="Models\PublishedContent\IPublishedProperty.cs" />
     <Compile Include="Models\PublishedContent\NoopPublishedContentModelFactory.cs" />
     <Compile Include="Models\PublishedContent\PropertyResult.cs" />
     <Compile Include="Models\PublishedContent\PropertyResultType.cs" />
+    <Compile Include="Models\PublishedContent\PropertySetModel.cs" />
+    <Compile Include="Models\PublishedContent\PropertySetWrapped.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentEnumerable.cs" />
-    <Compile Include="Models\PublishedContent\PublishedContentExtended.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentExtensionsForModels.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelAttribute.cs" />
@@ -624,6 +625,7 @@
     <Compile Include="Models\PublishedContent\PublishedItemType.cs" />
     <Compile Include="Models\PublishedContent\PublishedPropertyBase.cs" />
     <Compile Include="Models\PublishedContent\PublishedPropertyType.cs" />
+    <Compile Include="Models\PublishedContent\PublishedSearchResult.cs" />
     <Compile Include="Models\PublishedState.cs" />
     <Compile Include="Models\Range.cs" />
     <Compile Include="Models\Rdbms\AccessDto.cs" />

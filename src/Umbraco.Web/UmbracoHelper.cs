@@ -816,7 +816,7 @@ namespace Umbraco.Web
         /// <param name="useWildCards"></param>
         /// <param name="searchProvider"></param>
         /// <returns></returns>
-        public IEnumerable<IPublishedContent> Search(string term, bool useWildCards = true, string searchProvider = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string searchProvider = null)
         {
             return ContentQuery.Search(term, useWildCards, searchProvider);
         }
@@ -827,7 +827,7 @@ namespace Umbraco.Web
         /// <param name="criteria"></param>
         /// <param name="searchProvider"></param>
         /// <returns></returns>
-        public IEnumerable<IPublishedContent> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        public IEnumerable<PublishedSearchResult> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
         {
             return ContentQuery.Search(criteria, searchProvider);
         }

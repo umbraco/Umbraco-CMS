@@ -33,7 +33,7 @@ namespace Umbraco.Web
         /// <param name="useWildCards"></param>
         /// <param name="searchProvider"></param>
         /// <returns></returns>
-        IEnumerable<IPublishedContent> Search(string term, bool useWildCards = true, string searchProvider = null);
+        IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string searchProvider = null);
 
         /// <summary>
         /// Searhes content
@@ -41,6 +41,6 @@ namespace Umbraco.Web
         /// <param name="criteria"></param>
         /// <param name="searchProvider"></param>
         /// <returns></returns>
-        IEnumerable<IPublishedContent> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null);
+        IEnumerable<PublishedSearchResult> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null);
     }
 }

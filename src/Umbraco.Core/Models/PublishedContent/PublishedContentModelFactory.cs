@@ -82,7 +82,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 : content;
         }
 
-        public T CreateModel<T>(IPublishedFragment content)
+        public T CreateModel<T>(IPropertySet content)
         {
             throw new NotImplementedException();
         }

@@ -7,7 +7,7 @@
             return content;
         }
 
-        public T CreateModel<T>(IPublishedFragment content)
+        public T CreateModel<T>(IPropertySet content)
         {
             throw new System.NotImplementedException();
         }

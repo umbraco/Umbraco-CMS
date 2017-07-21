@@ -217,10 +217,10 @@
     <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultipleMediaPickerPropertyConverter.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheComponent.cs" />
-    <Compile Include="PublishedCache\NuCache\PublishedFragmentProperty.cs" />
-    <Compile Include="PublishedCache\PublishedFragment.cs" />
-    <Compile Include="PublishedCache\PublishedFragmentProperty.cs" />
-    <Compile Include="PublishedCache\PublishedFragmentPropertyBase.cs" />
+    <Compile Include="PublishedCache\NuCache\PropertySetProperty.cs" />
+    <Compile Include="PublishedCache\PropertySet.cs" />
+    <Compile Include="PublishedCache\PropertySetProperty.cs" />
+    <Compile Include="PublishedCache\PropertySetPropertyBase.cs" />
     <Compile Include="Models\Trees\DisableUser.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ContentPickerValueConverter.cs" />
     <Compile Include="PublishedCache\FacadeServiceBase.cs" />
@@ -265,7 +265,7 @@
     <Compile Include="PublishedCache\XmlPublishedCache\XmlCacheComponent.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStore.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStoreFilePersister.cs" />
-    <Compile Include="PublishedFragmentExtensions.cs" />
+    <Compile Include="PropertySetExtensions.cs" />
     <Compile Include="RelatedLinksTypeConverter.cs" />
     <Compile Include="Routing\ContentFinderCollection.cs" />
     <Compile Include="Routing\ContentFinderCollectionBuilder.cs" />

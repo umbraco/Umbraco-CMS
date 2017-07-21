@@ -5,13 +5,13 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    internal class PublishedFragmentProperty : PublishedFragmentPropertyBase
+    internal class PropertySetProperty : PropertySetPropertyBase
     {
         private readonly IFacadeAccessor _facadeAccessor;
         private string _valuesCacheKey;
 
         // initializes a published item property
-        public PublishedFragmentProperty(IFacadeAccessor facadeAccessor, PublishedPropertyType propertyType, Guid fragmentKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
+        public PropertySetProperty(IFacadeAccessor facadeAccessor, PublishedPropertyType propertyType, Guid fragmentKey, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
             : base(propertyType, fragmentKey, previewing, referenceCacheLevel, sourceValue)
         {
             _facadeAccessor = facadeAccessor;

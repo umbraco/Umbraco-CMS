@@ -9,7 +9,7 @@ namespace Umbraco.Web
     /// <summary>
     /// Provides extension methods for <c>IPublishedItem</c>.
     /// </summary>
-    public static class PublishedFragmentExtensions
+    public static class PropertySetExtensions
     {
         #region IsComposedOf
 
@@ -19,7 +19,7 @@ namespace Umbraco.Web
         /// <param name="content">The content.</param>
         /// <param name="alias">The content type alias.</param>
         /// <returns>A value indicating whether the content is of a content type composed of a content type identified by the alias.</returns>
-        public static bool IsComposedOf(this IPublishedFragment content, string alias)
+        public static bool IsComposedOf(this IPropertySet content, string alias)
         {
             return content.ContentType.CompositionAliases.Contains(alias);
         }
@@ -35,7 +35,7 @@ namespace Umbraco.Web
         /// <param name="alias">The property alias.</param>
         /// <returns>A value indicating whether the content has the property identified by the alias.</returns>
         /// <remarks>The content may have a property, and that property may not have a value.</remarks>
-        public static bool HasProperty(this IPublishedFragment content, string alias)
+        public static bool HasProperty(this IPropertySet content, string alias)
         {
             return content.ContentType.GetPropertyType(alias) != null;
         }
@@ -51,7 +51,7 @@ namespace Umbraco.Web
         /// <param name="alias">The property alias.</param>
         /// <returns>A value indicating whether the content has a value for the property identified by the alias.</returns>
         /// <remarks>Returns true if <c>GetProperty(alias)</c> is not <c>null</c> and <c>GetProperty(alias).HasValue</c> is <c>true</c>.</remarks>
-        public static bool HasValue(this IPublishedFragment content, string alias)
+        public static bool HasValue(this IPropertySet content, string alias)
         {
             var prop = content.GetProperty(alias);
             return prop != null && prop.HasValue;
@@ -66,7 +66,7 @@ namespace Umbraco.Web
         /// <param name="valueIfFalse">The value to return if the content has no value for the property.</param>
         /// <returns>Either <paramref name="valueIfTrue"/> or <paramref name="valueIfFalse"/> depending on whether the content
         /// has a value for the property identified by the alias.</returns>
-        public static IHtmlString HasValue(this IPublishedFragment content, string alias,
+        public static IHtmlString HasValue(this IPropertySet content, string alias,
             string valueIfTrue, string valueIfFalse = null)
         {
             return content.HasValue(alias)
@@ -90,7 +90,7 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object Value(this IPublishedFragment content, string alias)
+        public static object Value(this IPropertySet content, string alias)
         {
             var property = content.GetProperty(alias);
             return property?.Value;
@@ -109,7 +109,7 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object Value(this IPublishedFragment content, string alias, string defaultValue)
+        public static object Value(this IPropertySet content, string alias, string defaultValue) // fixme - kill
         {
             var property = content.GetProperty(alias);
             return property == null || property.HasValue == false ? defaultValue : property.Value;
@@ -128,7 +128,7 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object Value(this IPublishedFragment content, string alias, object defaultValue)
+        public static object Value(this IPropertySet content, string alias, object defaultValue)
         {
             var property = content.GetProperty(alias);
             return property == null || property.HasValue == false ? defaultValue : property.Value;
@@ -151,7 +151,7 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T Value<T>(this IPublishedFragment content, string alias)
+        public static T Value<T>(this IPropertySet content, string alias)
         {
             return content.Value(alias, false, default(T));
         }
@@ -170,12 +170,12 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T Value<T>(this IPublishedFragment content, string alias, T defaultValue)
+        public static T Value<T>(this IPropertySet content, string alias, T defaultValue)
         {
             return content.Value(alias, true, defaultValue);
         }
 
-        internal static T Value<T>(this IPublishedFragment content, string alias, bool withDefaultValue, T defaultValue)
+        internal static T Value<T>(this IPropertySet content, string alias, bool withDefaultValue, T defaultValue) // fixme uh?
         {
             var property = content.GetProperty(alias);
             if (property == null) return defaultValue;
@@ -205,7 +205,7 @@ namespace Umbraco.Web
         // TODO: strongly typed properties howto?
         // there is no strongly typed recurse, etc => needs to be in ModelsBuilder?
 
-        public static IHtmlString Value<T>(this IPublishedFragment content, string aliases, Func<T, string> format, string alt = "")
+        public static IHtmlString Value<T>(this IPropertySet content, string aliases, Func<T, string> format, string alt = "")
         {
             if (format == null) format = x => x.ToString();
 
@@ -239,7 +239,7 @@ namespace Umbraco.Web
         #region ToIndexedArray
 
         public static IndexedArrayItem<TContent>[] ToIndexedArray<TContent>(this IEnumerable<TContent> source)
-            where TContent : class, IPublishedFragment
+            where TContent : class, IPropertySet
         {
             var set = source.Select((content, index) => new IndexedArrayItem<TContent>(content, index)).ToArray();
             foreach (var setItem in set) setItem.TotalCount = set.Length;
@@ -253,7 +253,7 @@ namespace Umbraco.Web
         // the .OfType<T>() filter is nice when there's only one type
         // this is to support filtering with multiple types
         public static IEnumerable<T> OfTypes<T>(this IEnumerable<T> contents, params string[] types)
-            where T : IPublishedFragment
+            where T : IPropertySet
         {
             types = types.Select(x => x.ToLowerInvariant()).ToArray();
             return contents.Where(x => types.Contains(x.ContentType.Alias.ToLowerInvariant()));
