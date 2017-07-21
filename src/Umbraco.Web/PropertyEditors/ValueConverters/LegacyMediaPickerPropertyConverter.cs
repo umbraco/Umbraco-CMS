@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MultipleMediaPickerPropertyConverter.cs" company="Umbraco">
+// <copyright file="LegacyMediaPickerPropertyConverter.cs" company="Umbraco">
 //   Umbraco
 // </copyright>
 // <summary>
@@ -24,20 +24,20 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
     /// <summary>
-    /// The multiple media picker property value converter.
+    /// The multiple media picker and double legacy media picker property value converter, should be deleted for v8
     /// </summary>
     [DefaultPropertyValueConverter(typeof(MustBeStringValueConverter))]
-    public class MultipleMediaPickerPropertyConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+    public class LegacyMediaPickerPropertyConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
     {
         private readonly IDataTypeService _dataTypeService;
 
         //TODO: Remove this ctor in v8 since the other one will use IoC
-        public MultipleMediaPickerPropertyConverter()
+        public LegacyMediaPickerPropertyConverter()
             : this(ApplicationContext.Current.Services.DataTypeService)
         {
         }
 
-        public MultipleMediaPickerPropertyConverter(IDataTypeService dataTypeService)
+        public LegacyMediaPickerPropertyConverter(IDataTypeService dataTypeService)
         {
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
             _dataTypeService = dataTypeService;
@@ -54,10 +54,17 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters && propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultipleMediaPickerAlias))
             {
-                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultipleMediaPickerAlias);
+                return true;
             }
+
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters && propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPickerAlias))
+            {
+                // this is the double legacy media picker, it can pick only single media items
+                return true;
+            }
+
             return false;
         }
 
@@ -109,7 +116,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                             ApplicationContext.Current.Services.DataTypeService.GetDataTypeDefinitionById(
                                 propertyType.DataTypeId).Name);
 
-                    LogHelper.Warn<MultipleMediaPickerPropertyConverter>(error);
+                    LogHelper.Warn<LegacyMediaPickerPropertyConverter>(error);
                     throw new Exception(error);
                 }
             }

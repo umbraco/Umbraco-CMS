@@ -7,15 +7,15 @@ namespace Umbraco.Web.Trees
     /// <summary>
     /// Tree for displaying partial views in the settings app
     /// </summary>
-    [Tree(Constants.Applications.Settings, "partialViews", "Partial Views", sortOrder: 2)]
-	public class PartialViewsTreeController : FileSystemTreeController
+    [Tree(Constants.Applications.Settings, "partialViews", null, sortOrder: 2)]
+    public class PartialViewsTreeController : FileSystemTreeController2
     {
-		protected override IFileSystem2 FileSystem
-		{
-			get { return FileSystemProviderManager.Current.PartialViewsFileSystem; }
-		}
+        protected override IFileSystem2 FileSystem
+        {
+            get { return FileSystemProviderManager.Current.PartialViewsFileSystem; }
+        }
 
-        private static readonly string[] ExtensionsStatic = { "cshtml" };
+        private static readonly string[] ExtensionsStatic = {"cshtml"};
 
         protected override string[] Extensions
         {

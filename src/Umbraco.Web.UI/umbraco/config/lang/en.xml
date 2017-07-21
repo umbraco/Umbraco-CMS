@@ -514,6 +514,7 @@
     <key alias="rename">Rename</key>
     <key alias="renew">Renew</key>
     <key alias="required" version="7.0">Required</key>
+    <key alias="retrieve">Retrieve</key>
     <key alias="retry">Retry</key>
     <key alias="rights">Permissions</key>
     <key alias="search">Search</key>
@@ -1345,9 +1346,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="preContent">Insert before field</key>
     <key alias="recursive">Recursive</key>
     <key alias="recursiveDescr">Yes, make it recursive</key>
-    <key alias="removeParagraph">Remove paragraph tags</key>
-    <key alias="removeParagraphDescription">Yes, remove paragraph tags</key>
-    <key alias="removeParagraphHelp">Will remove any paragraph tag in the beginning and end of the text</key>
     <key alias="separator">Separator</key>
     <key alias="standardFields">Standard Fields</key>
     <key alias="uppercase">Uppercase</key>
@@ -1427,6 +1425,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="relationTypes">Relation Types</key>
     <key alias="packager">Packages</key>
     <key alias="packages">Packages</key>
+    <key alias="partialViews">Partial Views</key>
+    <key alias="partialViewMacros">Partial View Macro Files</key>
     <key alias="python">Python Files</key>
     <key alias="repositories">Install from repository</key>
     <key alias="runway">Install Runway</key>
@@ -1437,8 +1437,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="templates">Templates</key>
     <key alias="xslt">XSLT Files</key>
     <key alias="analytics">Analytics</key>
-	<key alias="partialViews">Partial Views</key>
-    <key alias="partialViewMacros">Partial View Macro Files</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">New update ready</key>
@@ -1549,8 +1547,10 @@ To manage your website, simply open the Umbraco back office and start adding con
 	  <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
 	  <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid: %2%</key>
 
-	  <key alias="httpsCheckValidCertificate">Your site certificate was marked as valid.</key>
+	  <key alias="httpsCheckValidCertificate">Your website's certificate is valid.</key>
 	  <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
+    <key alias="httpsCheckExpiredCertificate">Your website's SSL certificate has expired.</key>
+    <key alias="httpsCheckExpiringCertificate">Your website's SSL certificate is expiring in %0% days.</key>
 	  <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
 	  <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
 	  <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'umbracoUseSSL' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
@@ -1629,5 +1629,8 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="emptyStates">
     <key alias="emptyDictionaryTree">No Dictionary items to choose from</key>
+  </area>
+  <area alias="textbox">
+    <key alias="characters_left">characters left</key>
   </area>
 </language>

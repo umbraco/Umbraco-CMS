@@ -859,7 +859,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
   <area alias="grid">
     <key alias="insertControl">Element hinzufügen</key>
     <key alias="addRows">Zeilenlayout auswählen</key>
-    <key alias="addElement">Einfach auf &lt;i class="icon icon-add blue"&gt;&lt;/i&gt; klicken, um das erste Element anzulegen</key>
+    <key alias="addElement">Element mit &lt;i class="icon icon-add blue"&gt;&lt;/i&gt; hinzufügen</key>
     <key alias="dropElement">Drop content</key>
     <key alias="clickToEmbed">Klicken, um Inhalt einzubetten</key>
     <key alias="clickToInsertImage">Klicken, um Abbildung einzufügen</key>
@@ -903,8 +903,6 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="postContent">An den Feldinhalt anhängen</key>
     <key alias="preContent">Dem Feldinhalt voranstellen</key>
     <key alias="recursive">Rekursiv</key>
-    <key alias="removeParagraph">Textabsatz entfernen</key>
-    <key alias="removeParagraphHelp">Alle &lt;p&gt; am Anfang und am Ende des Feldinhalts werden entfernt</key>
     <key alias="standardFields">Standardfelder</key>
     <key alias="uppercase">Großbuchstaben</key>
     <key alias="urlEncode">URL kodieren</key>

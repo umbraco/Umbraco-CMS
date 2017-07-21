@@ -10,6 +10,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
 using ContentType = umbraco.cms.businesslogic.ContentType;
 
@@ -24,8 +25,24 @@ namespace Umbraco.Web
 
         public static Guid GetKey(this IPublishedContent content)
         {
+            // fast
             var contentWithKey = content as IPublishedContentWithKey;
-            return contentWithKey == null ? Guid.Empty : contentWithKey.Key;
+            if (contentWithKey != null) return contentWithKey.Key;
+
+            // try to unwrap (models...)
+            var contentWrapped = content as PublishedContentWrapped;
+            while (contentWrapped != null)
+            {
+                content = contentWrapped.Unwrap();
+                contentWrapped = content as PublishedContentWrapped;
+            }
+
+            // again
+            contentWithKey = content as IPublishedContentWithKey;
+            if (contentWithKey != null) return contentWithKey.Key;
+
+            LogHelper.Debug(typeof(PublishedContentExtensions), string.Format("Could not get key for IPublishedContent with id {0} of type {1}.", content.Id, content.GetType().FullName));
+            return Guid.Empty;
         }
 
         #endregion
@@ -634,14 +651,10 @@ namespace Umbraco.Web
 		private static bool IsDocumentTypeRecursive(IPublishedContent content, string docTypeAlias)
 		{
 			var contentTypeService = UmbracoContext.Current.Application.Services.ContentTypeService;
-			var type = contentTypeService.GetContentType(content.DocumentTypeAlias);
-			while (type != null && type.ParentId > 0)
-			{
-				type = contentTypeService.GetContentType(type.ParentId);
-				if (type.Alias.InvariantEquals(docTypeAlias))
-					return true;
-			}
-			return false;
+            var type = contentTypeService.GetContentType(content.DocumentTypeAlias);
+            if (type.Alias.InvariantEquals(docTypeAlias) || content.IsComposedOf(docTypeAlias))
+                return true;
+            return false;
 		}
 
 		public static bool IsNull(this IPublishedContent content, string alias, bool recurse)
@@ -912,14 +925,14 @@ namespace Umbraco.Web
 
         #region Axes: ancestors, ancestors-or-self
 
-        // as per XPath 1.0 specs ง2.2,
+        // as per XPath 1.0 specs ยง2.2,
         // - the ancestor axis contains the ancestors of the context node; the ancestors of the context node consist
         //   of the parent of context node and the parent's parent and so on; thus, the ancestor axis will always
         //   include the root node, unless the context node is the root node.
         // - the ancestor-or-self axis contains the context node and the ancestors of the context node; thus,
         //   the ancestor axis will always include the root node.
         //
-        // as per XPath 2.0 specs ง3.2.1.1,
+        // as per XPath 2.0 specs ยง3.2.1.1,
         // - the ancestor axis is defined as the transitive closure of the parent axis; it contains the ancestors
         //   of the context node (the parent, the parent of the parent, and so on) - The ancestor axis includes the
         //   root node of the tree in which the context node is found, unless the context node is the root node.
@@ -929,7 +942,7 @@ namespace Umbraco.Web
         // the ancestor and ancestor-or-self axis are reverse axes ie they contain the context node or nodes that
         // are before the context node in document order.
         //
-        // document order is defined by ง2.4.1 as:
+        // document order is defined by ยง2.4.1 as:
         // - the root node is the first node.
         // - every node occurs before all of its children and descendants.
         // - the relative order of siblings is the order in which they occur in the children property of their parent node.
@@ -1240,12 +1253,12 @@ namespace Umbraco.Web
         }
 
 
-        // as per XPath 1.0 specs ง2.2,
+        // as per XPath 1.0 specs ยง2.2,
         // - the descendant axis contains the descendants of the context node; a descendant is a child or a child of a child and so on; thus
         //   the descendant axis never contains attribute or namespace nodes.
         // - the descendant-or-self axis contains the context node and the descendants of the context node.
         //
-        // as per XPath 2.0 specs ง3.2.1.1,
+        // as per XPath 2.0 specs ยง3.2.1.1,
         // - the descendant axis is defined as the transitive closure of the child axis; it contains the descendants of the context node (the
         //   children, the children of the children, and so on).
         // - the descendant-or-self axis contains the context node and the descendants of the context node.
@@ -1253,7 +1266,7 @@ namespace Umbraco.Web
         // the descendant and descendant-or-self axis are forward axes ie they contain the context node or nodes that are after the context
         // node in document order.
         //
-        // document order is defined by ง2.4.1 as:
+        // document order is defined by ยง2.4.1 as:
         // - the root node is the first node.
         // - every node occurs before all of its children and descendants.
         // - the relative order of siblings is the order in which they occur in the children property of their parent node.
