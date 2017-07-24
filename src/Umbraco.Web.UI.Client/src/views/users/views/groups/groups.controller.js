@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserGroupsController($scope, $timeout, $location, userGroupsResource, formHelper) {
+    function UserGroupsController($scope, $timeout, $location, userGroupsResource, formHelper, localizationService) {
 
         var vm = this;
 
@@ -59,14 +59,26 @@
         }
 
         function deleteUserGroups() {
-            if (vm.selection.length > 0) {
-                userGroupsResource.deleteUserGroups(vm.selection).then(function (data) {
-                    clearSelection();
-                    onInit();
-                    formHelper.showNotifications(data);
-                }, function(error) {
-                    formHelper.showNotifications(error.data);
-                });
+
+            if(vm.selection.length > 0) {
+
+                localizationService.localize("defaultdialogs_confirmdelete")
+                    .then(function(value) {
+
+                        var confirmResponse = confirm(value);
+
+                        if (confirmResponse === true) {
+                            userGroupsResource.deleteUserGroups(vm.selection).then(function (data) {
+                                clearSelection();
+                                onInit();
+                                formHelper.showNotifications(data);
+                            }, function(error) {
+                                formHelper.showNotifications(error.data);
+                            });
+                        }
+
+                    });
+
             }
         }
 
