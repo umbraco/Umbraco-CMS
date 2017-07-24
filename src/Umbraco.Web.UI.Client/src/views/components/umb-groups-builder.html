@@ -98,7 +98,7 @@
                         <localize key="contentTypeEditor_inheritedFrom"></localize> {{ tab.inheritedFromName }}
 
                         <span ng-repeat="contentTypeName in tab.parentTabContentTypeNames">
-                            {{ contentTypeName }}
+                            <a href="#/settings/documentTypes/edit/{{tab.contentTypeId}}">{{ contentTypeName }}</a>
                             <span ng-if="!$last">, </span>
                         </span>
                     </div>
