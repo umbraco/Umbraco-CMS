@@ -51,8 +51,8 @@ namespace Umbraco.Web.Trees
             //if the request is for folders only then just return
             if (queryStrings["foldersonly"].IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
 
-            //Normal nodes
-            var sysIds = GetSystemIds();
+            //System ListView nodes
+            var systemListViewDataTypeIds = GetNonDeletableSystemListViewDataTypeIds();
 
             nodes.AddRange(
                 Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DataType)
@@ -61,7 +61,7 @@ namespace Umbraco.Web.Trees
                     {
                         var node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, "icon-autofill", false);
                         node.Path = dt.Path;
-                        if (sysIds.Contains(dt.Id))
+                        if (systemListViewDataTypeIds.Contains(dt.Id))
                         {
                             node.Icon = "icon-thumbnail-list";
                         }
@@ -71,16 +71,31 @@ namespace Umbraco.Web.Trees
             return nodes;
         }
 
-        private IEnumerable<int> GetSystemIds()
+        /// <summary>
+        /// Get all integer identifiers for the non-deletable system datatypes.
+        /// </summary>
+        private static IEnumerable<int> GetNonDeletableSystemDataTypeIds()
         {
             var systemIds = new[]
             {
-                Constants.System.DefaultContentListViewDataTypeId, 
-                Constants.System.DefaultMediaListViewDataTypeId, 
+                Constants.System.DefaultLabelDataTypeId
+            };
+
+            return systemIds.Concat(GetNonDeletableSystemListViewDataTypeIds());
+        }
+
+        /// <summary>
+        /// Get all integer identifiers for the non-deletable system listviews.
+        /// </summary>
+        private static IEnumerable<int> GetNonDeletableSystemListViewDataTypeIds()
+        {
+            return new[]
+            {
+                Constants.System.DefaultContentListViewDataTypeId,
+                Constants.System.DefaultMediaListViewDataTypeId,
                 Constants.System.DefaultMembersListViewDataTypeId
             };
-            return systemIds;
-        } 
+        }
         
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
@@ -120,7 +135,7 @@ namespace Umbraco.Web.Trees
             }
             else
             {
-                var sysIds = GetSystemIds();
+                var sysIds = GetNonDeletableSystemDataTypeIds();
 
                 if (sysIds.Contains(int.Parse(id)) == false)
                 {
