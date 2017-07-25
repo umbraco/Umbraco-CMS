@@ -26,7 +26,7 @@ namespace Umbraco.Core.PropertyEditors
 
         public PropertyEditorAttribute(string alias, string name)
         {
-            Mandate.ParameterNotNullOrEmpty(alias, "id");
+            Mandate.ParameterNotNullOrEmpty(alias, "alias");
             Mandate.ParameterNotNullOrEmpty(name, "name");
 
             Alias = alias;
