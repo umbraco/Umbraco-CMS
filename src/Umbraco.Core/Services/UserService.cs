@@ -295,6 +295,18 @@ namespace Umbraco.Core.Services
 
                 var repository = RepositoryFactory.CreateUserRepository(uow);
                 repository.AddOrUpdate(entity);
+
+                //Now we have to check for backwards compat hacks
+                var explicitUser = entity as User;                
+                if (explicitUser != null && explicitUser.GroupsToSave.Count > 0)
+                {
+                    var groupRepository = RepositoryFactory.CreateUserGroupRepository(uow);
+                    foreach (var userGroup in explicitUser.GroupsToSave)
+                    {
+                        groupRepository.AddOrUpdate(userGroup);
+                    }
+                }
+
                 try
                 {
                     // try to flush the unit of work
@@ -340,17 +352,28 @@ namespace Umbraco.Core.Services
                     }
                 }
                 var repository = RepositoryFactory.CreateUserRepository(uow);
-                foreach (var member in asArray)
+                var groupRepository = RepositoryFactory.CreateUserGroupRepository(uow);
+                foreach (var user in asArray)
                 {
-                    if (string.IsNullOrWhiteSpace(member.Username))
+                    if (string.IsNullOrWhiteSpace(user.Username))
                     {
                         throw new ArgumentException("Cannot save user with empty username.");
                     }
-                    if (string.IsNullOrWhiteSpace(member.Name))
+                    if (string.IsNullOrWhiteSpace(user.Name))
                     {
                         throw new ArgumentException("Cannot save user with empty name.");
                     }
-                    repository.AddOrUpdate(member);
+                    repository.AddOrUpdate(user);
+
+                    //Now we have to check for backwards compat hacks
+                    var explicitUser = user as User;
+                    if (explicitUser != null && explicitUser.GroupsToSave.Count > 0)
+                    {
+                        foreach (var userGroup in explicitUser.GroupsToSave)
+                        {
+                            groupRepository.AddOrUpdate(userGroup);
+                        }
+                    }
                 }
                 //commit the whole lot in one go
                 uow.Commit();
