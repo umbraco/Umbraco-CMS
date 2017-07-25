@@ -14,6 +14,7 @@ namespace Umbraco.Tests.Benchmarks
                 typeof(LinqCastBenchmarks),
                 //typeof(DeepCloneBenchmarks),
                 typeof(XmlPublishedContentInitBenchmarks),
+                typeof(CtorInvokeBenchmarks),
 
             });
             switcher.Run(args);
