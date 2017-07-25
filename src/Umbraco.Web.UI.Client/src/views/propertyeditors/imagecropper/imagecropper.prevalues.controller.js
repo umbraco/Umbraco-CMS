@@ -1,11 +1,26 @@
 angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesController",
-	function ($scope, $timeout) {
+	function ($scope, $timeout, localizationService) {
 
 	    if (!$scope.model.value) {
 	        $scope.model.value = [];
-	    }
-
-	    $scope.remove = function (item, evt) {
+		}
+		$scope.setDisplayName = function (crop) {
+		  if (crop.name.startsWith("@")) {
+		    localizationService.localize(crop.name.substring(1)).then(function (value) {
+		      if (value !== "") {
+		        crop.displayName = value;
+		      } else {
+		        crop.displayName = crop.name;
+		      }
+		    });
+		  } else {
+		    crop.displayName = crop.name;
+		  }
+	  };
+	    _.each($scope.model.value, function (crop) {
+	      $scope.setDisplayName(crop);
+	    });
+	  $scope.remove = function (item, evt) {
 	        evt.preventDefault();
 	        $scope.model.value = _.reject($scope.model.value, function (x) {
 	            return x.alias === item.alias;
@@ -25,10 +40,10 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
 	    $scope.add = function (evt) {
 	        evt.preventDefault();
 
-	        if ($scope.newItem && $scope.newItem.alias && 
-                angular.isNumber($scope.newItem.width) && angular.isNumber($scope.newItem.height) &&
-                $scope.newItem.width > 0 && $scope.newItem.height > 0) {
-
+	        if ($scope.newItem && $scope.newItem.name && $scope.newItem.alias && 
+             angular.isNumber($scope.newItem.width) && angular.isNumber($scope.newItem.height) &&
+	           $scope.newItem.width > 0 && $scope.newItem.height > 0) {
+	              $scope.setDisplayName($scope.newItem);
 	            var exists = _.find($scope.model.value, function (item) { return $scope.newItem.alias === item.alias; });
 	            if (!exists) {
 	                $scope.model.value.push($scope.newItem);

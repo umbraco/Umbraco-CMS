@@ -9,7 +9,7 @@
                 <a href=""><i class="icon icon-delete red hover-show pull-right" ng-click="remove(node, $event)"></i></a>
                 <i class="icon icon-picture handle hover-hide"></i>
 
-                <a href prevent-default ng-click="edit(node, $event)">{{node.alias}}</a>
+                <a href prevent-default ng-click="edit(node, $event)">{{node.displayName || node.alias}}</a>
                 <br /><small>{{node.width}}px &times; {{node.height}}px</small>
             </li>
         </ul>
@@ -18,10 +18,16 @@
     <div class="form" ng-show="newItem">
         <h4><localize key="imagecropper_defineCrop">Define crop</localize></h4>
         <p>
-            <localize key="imagecropper_defineCropDescription">Give the crop an alias and it's default width and height</localize>.
+            <localize key="imagecropper_defineCropDescription">Give the crop a name, an alias and its default width and height</localize>.
         </p>
 
         <div class="control-group">
+            <label><localize key="general_name">Name</localize></label>
+            <input name="newItem.name" type="text"
+                   ng-model="newItem.name" val-highlight="{{hasError}}" />
+        </div>
+
+      <div class="control-group">
             <label><localize key="general_alias">Alias</localize></label>
             <input name="newItem.alias" type="text"
                    ng-model="newItem.alias" val-highlight="{{hasError}}" />

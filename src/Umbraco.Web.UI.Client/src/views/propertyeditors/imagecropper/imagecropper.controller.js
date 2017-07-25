@@ -2,7 +2,7 @@
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco')
     .controller("Umbraco.PropertyEditors.ImageCropperController",
-    function ($rootScope, $routeParams, $scope, $log, mediaHelper, cropperHelper, $timeout, editorState, umbRequestHelper, fileManager, angularHelper) {
+	function ($rootScope, $routeParams, $scope, $log, mediaHelper, cropperHelper, $timeout, editorState, umbRequestHelper, fileManager, angularHelper, localizationService) {
 
         var config = angular.copy($scope.model.config);
         $scope.imageIsLoaded = false;
@@ -33,8 +33,27 @@ angular.module('umbraco')
             $scope.imageSrc = $scope.model.value.src;
         }
 
+        $scope.setDisplayName = function (crop) {
+          if (crop.name.startsWith("@")) {
+              localizationService.localize(crop.name.substring(1)).then(function (value) {
+                  if (value !== "") {
+                    crop.displayName = value;
+                  } else {
+                    crop.displayName = crop.name;
+                  }
+              });
+          } else {
+              crop.displayName = crop.name;
+          }
+        };
 
-        //crop a specific crop
+        if ($scope.model.value.crops) {
+            _.each($scope.model.value.crops, function(crop) {
+                  $scope.setDisplayName(crop);
+            });
+        }
+
+	      //crop a specific crop
         $scope.crop = function (crop) {
             $scope.currentCrop = crop;
             $scope.currentPoint = undefined;
