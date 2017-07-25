@@ -1,7 +1,5 @@
 <div ng-controller="Umbraco.Editors.Users.UsersController as vm" class="clearfix">
 
-
-
   <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
 
   <!-- Users Overview -->
@@ -102,51 +100,51 @@
       <div class="flex" style="margin-left: auto;">
 
         <!-- State filter -->
-        <div class="dropdown pull-right" ng-if="vm.userStatesFilter.length > 0">
-          <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.showStatusFilter = !vm.showStatusFilter">
+        <div style="position: relative;" ng-if="vm.userStatesFilter.length > 0">
+          <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.page.showStatusFilter = !vm.page.showStatusFilter">
             <span>Status:</span>
             <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getFilterName(vm.userStatesFilter) }}</span>
             <span class="caret"></span>
           </a>
-          <ul ng-if="vm.showStatusFilter" on-outside-click="vm.showStatusFilter = false;" class="dropdown-menu db" role="menu" aria-labelledby="dropdownMenu">
-            <li ng-repeat="userState in vm.userStatesFilter" style="padding: 5px 10px;">
+          <umb-dropdown class="pull-right" ng-if="vm.page.showStatusFilter" on-outside-click="vm.page.showStatusFilter = false;">
+            <umb-dropdown-item ng-repeat="userState in vm.userStatesFilter" style="padding: 8px 20px 8px 16px;">
               <div class="flex items-center">
-                <input style="margin-right: 7px; margin-top: 2px;" type="checkbox" ng-model="userState.selected" ng-change="vm.setUserStatesFilter(userState)" />
-                {{ userState.name }} ({{userState.count}})
+                <input id="state-{{$index}}" type="checkbox" ng-model="userState.selected" ng-change="vm.setUserStatesFilter(userState)" style="margin-right: 10px; margin-top: -3px;" />
+                <label for="state-{{$index}}">{{ userState.name }} ({{userState.count}})</label>
               </div>
-            </li>
-          </ul>
+            </umb-dropdown-item>
+          </umb-dropdown>
         </div>
 
         <!-- Groups filter -->
-        <div class="dropdown pull-right">
-          <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.showGroupFilter = !vm.showGroupFilter">
+        <div style="position: relative;">
+          <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.page.showGroupFilter = !vm.page.showGroupFilter">
             <span><localize key="general_groups"></localize>:</span>
             <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getFilterName(vm.userGroups) }}</span>
             <span class="caret"></span>
           </a>
-          <ul ng-if="vm.showGroupFilter" on-outside-click="vm.showGroupFilter = false;" class="dropdown-menu db" role="menu" aria-labelledby="dropdownMenu">
-            <li ng-repeat="userGroup in vm.userGroups" style="padding: 5px 10px;">
+          <umb-dropdown class="pull-right" ng-if="vm.page.showGroupFilter" on-outside-click="vm.page.showGroupFilter = false;">
+            <umb-dropdown-item ng-repeat="userGroup in vm.userGroups" style="padding: 8px 20px 8px 16px;">
               <div class="flex items-center">
-                <input style="margin-right: 7px; margin-top: 2px;" type="checkbox" ng-model="userGroup.selected" ng-change="vm.setUserGroupFilter(userGroup)"  />
-                {{ userGroup.name }}
+                <input id="group-{{$index}}" type="checkbox" ng-model="userGroup.selected" ng-change="vm.setUserGroupFilter(userGroup)" style="margin-right: 10px; margin-top: -3px;" />
+                <label for="group-{{$index}}">{{ userGroup.name }}</label>
               </div>
-            </li>
-          </ul>
+            </umb-dropdown-item>
+          </umb-dropdown>
         </div>
 
         <!-- Order By -->
-        <div class="dropdown pull-right">
-          <a class="btn btn-link dropdown-toggle flex" href="" data-toggle="dropdown">
+        <div style="position: relative;">
+          <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.page.showOrderByFilter = !vm.page.showOrderByFilter">
             <span>Order by:</span>
             <span class="bold" style="margin-left: 2px;">{{ vm.getSortLabel(vm.usersOptions.orderBy, vm.usersOptions.orderDirection) }} </span>
             <span class="caret"></span>
           </a>
-          <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-            <li ng-repeat="sortData in vm.userSortData">
-              <a tabindex="-1" href="#" ng-click="vm.setOrderByFilter(sortData.key, sortData.direction)" prevent-default>{{sortData.label}}</a>
-            </li>            
-          </ul>
+          <umb-dropdown class="pull-right" ng-if="vm.page.showOrderByFilter" on-outside-click="vm.page.showOrderByFilter = false;" umb-keyboard-list>
+            <umb-dropdown-item ng-repeat="sortData in vm.userSortData">
+              <a href="#" ng-click="vm.setOrderByFilter(sortData.key, sortData.direction)" prevent-default>{{sortData.label}}</a>
+            </umb-dropdown-item>
+          </umb-dropdown>
         </div>
 
       </div>
