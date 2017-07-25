@@ -72,6 +72,7 @@ namespace Umbraco.Web.Editors
             return userDisplay;
         }
 
+        [AppendUserModifiedHeader]
         [FileUploadCleanupFilter(false)]
         public async Task<HttpResponseMessage> PostSetAvatar()
         {
