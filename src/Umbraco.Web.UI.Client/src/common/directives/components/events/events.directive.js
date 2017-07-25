@@ -151,13 +151,8 @@ angular.module('umbraco.directives')
         function oneTimeClick(event) {
                 var el = event.target.nodeName;
 
-                //ignore link and button clicks
-                var els = ["INPUT","A","BUTTON"];
-                if(els.indexOf(el) >= 0){return;}
-
-                // ignore children of links and buttons
                 // ignore clicks on new overlay
-                var parents = $(event.target).parents("a,button,.umb-overlay");
+                var parents = $(event.target).parents(".umb-overlay");
                 if(parents.length > 0){
                     return;
                 }
