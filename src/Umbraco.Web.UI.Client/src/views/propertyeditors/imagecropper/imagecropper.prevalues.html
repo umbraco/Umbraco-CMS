@@ -21,11 +21,15 @@
             <localize key="imagecropper_defineCropDescription">Give the crop a name, an alias and its default width and height</localize>.
         </p>
 
-        <div class="control-group">
-            <label><localize key="general_name">Name</localize></label>
-            <input name="newItem.name" type="text"
-                   ng-model="newItem.name" val-highlight="{{hasError}}" />
-        </div>
+      <div class="control-group">
+        <label><localize key="general_name">Name</localize></label>
+        <input name="newItem.name" type="text" 
+               ng-model="newItem.name" val-highlight="{{hasError}}"/>
+        <br />
+        <small>
+          <localize key="imagecropper_nameDescription">Use @ as prefix to utilize localization keys</localize>.
+        </small>
+      </div>
 
       <div class="control-group">
             <label><localize key="general_alias">Alias</localize></label>

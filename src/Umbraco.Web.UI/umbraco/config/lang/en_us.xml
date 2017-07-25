@@ -958,6 +958,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="defineCropDescription">Give the crop a name, an alias and its default width and height</key>
     <key alias="saveCrop">Save crop</key>
     <key alias="addCrop">Add new crop</key>
+    <key alias="nameDescription">Use @ as prefix to utilize localization keys, if no area is given, the "general" area will be used.</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Current version</key>
