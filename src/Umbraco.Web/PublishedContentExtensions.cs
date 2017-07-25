@@ -10,6 +10,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
 using ContentType = umbraco.cms.businesslogic.ContentType;
 
@@ -24,14 +25,24 @@ namespace Umbraco.Web
 
         public static Guid GetKey(this IPublishedContent content)
         {
-            var wrapped = content as PublishedContentWrapped;
-            while (wrapped != null)
-            {
-                content = wrapped.Unwrap();
-                wrapped = content as PublishedContentWrapped;
-            }
+            // fast
             var contentWithKey = content as IPublishedContentWithKey;
-            return contentWithKey == null ? Guid.Empty : contentWithKey.Key;
+            if (contentWithKey != null) return contentWithKey.Key;
+
+            // try to unwrap (models...)
+            var contentWrapped = content as PublishedContentWrapped;
+            while (contentWrapped != null)
+            {
+                content = contentWrapped.Unwrap();
+                contentWrapped = content as PublishedContentWrapped;
+            }
+
+            // again
+            contentWithKey = content as IPublishedContentWithKey;
+            if (contentWithKey != null) return contentWithKey.Key;
+
+            LogHelper.Debug(typeof(PublishedContentExtensions), string.Format("Could not get key for IPublishedContent with id {0} of type {1}.", content.Id, content.GetType().FullName));
+            return Guid.Empty;
         }
 
         #endregion
@@ -628,23 +639,9 @@ namespace Umbraco.Web
 	    /// <param name="recursive">When true, recurses up the content type tree to check inheritance; when false just calls IsDocumentType(this IPublishedContent content, string docTypeAlias).</param>
 	    /// <returns>True if the content is of the specified content type or a derived content type; otherwise false.</returns>
 	    public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias, bool recursive)
-		{
-			if (content.IsDocumentType(docTypeAlias))
-				return true;
-
-			if (recursive)
-				return IsDocumentTypeRecursive(content, docTypeAlias);
-			return false;
-		}
-
-		private static bool IsDocumentTypeRecursive(IPublishedContent content, string docTypeAlias)
-		{
-			var contentTypeService = UmbracoContext.Current.Application.Services.ContentTypeService;
-            var type = contentTypeService.GetContentType(content.DocumentTypeAlias);
-            if (type.Alias.InvariantEquals(docTypeAlias) || content.IsComposedOf(docTypeAlias))
-                return true;
-            return false;
-		}
+	    {
+	        return content.DocumentTypeAlias.InvariantEquals(docTypeAlias) || (recursive && content.IsComposedOf(docTypeAlias));
+	    }
 
 		public static bool IsNull(this IPublishedContent content, string alias, bool recurse)
 		{

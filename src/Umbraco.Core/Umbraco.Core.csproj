@@ -351,10 +351,12 @@
     <Compile Include="Models\Membership\ContentPermissionSet.cs" />
     <Compile Include="Models\Membership\EntityPermissionCollection.cs" />
     <Compile Include="Models\Membership\IReadOnlyUserGroup.cs" />
+    <Compile Include="Models\Membership\IUserType.cs" />
     <Compile Include="Models\Membership\ReadOnlyUserGroup.cs" />
     <Compile Include="Models\Membership\UserGroupExtensions.cs" />
     <Compile Include="Models\Membership\UserProfile.cs" />
     <Compile Include="Models\Membership\UserState.cs" />
+    <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeConverter.cs" />
     <Compile Include="Models\Rdbms\UserStartNodeDto.cs" />
     <Compile Include="Models\UserControl.cs" />

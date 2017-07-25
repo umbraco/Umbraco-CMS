@@ -70,6 +70,7 @@ namespace Umbraco.Web.Routing
                 // test for collisions
                 var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
                 if (uri.IsAbsoluteUri == false) uri = uri.MakeAbsolute(UmbracoContext.Current.CleanedUmbracoUrl);
+                uri = UriUtility.UriToUmbraco(uri);
                 var pcr = new PublishedContentRequest(uri, UmbracoContext.Current.RoutingContext, UmbracoConfig.For.UmbracoSettings().WebRouting, s => Roles.Provider.GetRolesForUser(s));
                 pcr.Engine.TryRouteRequest();
 
