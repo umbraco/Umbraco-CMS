@@ -20,8 +20,19 @@ function DashboardController($scope, $routeParams, dashboardResource, localizati
     });
     
     dashboardResource.getDashboard($routeParams.section).then(function(tabs){
-   		$scope.dashboard.tabs = tabs;
-         $scope.page.loading = false;
+      $scope.dashboard.tabs = tabs;
+      if ($scope.dashboard.tabs) {
+        _.each($scope.dashboard.tabs, function (tab) {
+          if (tab.label.startsWith("@")) {
+            localizationService.localize(tab.label.substring(1)).then(function (value) {
+              if (value !== "") {
+                tab.label = value;
+              }
+            });
+          }
+        });
+      }
+      $scope.page.loading = false;
     });
 }
 
