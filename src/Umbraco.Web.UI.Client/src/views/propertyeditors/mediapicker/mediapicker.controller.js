@@ -10,7 +10,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         if (!$scope.model.config.startNodeId) {
             userService.getCurrentUser().then(function (userData) {
-                $scope.model.config.startNodeId = userData.startMediaIds.length === 0 ? -1 : userData.startMediaIds[0];
+                $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
             });
         }
 
@@ -45,7 +45,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                                 $scope.ids.push(media.udi);
                             }
                             else {
-                                $scope.ids.push(media.id);    
+                                $scope.ids.push(media.id);
                             }
                         }
                     });

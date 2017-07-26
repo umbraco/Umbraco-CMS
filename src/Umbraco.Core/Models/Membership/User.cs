@@ -118,7 +118,8 @@ namespace Umbraco.Core.Models.Membership
         private DateTime _lastLoginDate;
         private DateTime _lastLockoutDate;
         private bool _defaultToLiveEditing;
-        private IDictionary<string, object> _additionalData;        
+        private IDictionary<string, object> _additionalData;
+        private object _additionalDataLock = new object();
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
@@ -569,8 +570,18 @@ namespace Umbraco.Core.Models.Membership
         [DoNotClone]
         internal IDictionary<string, object> AdditionalData
         {
-            get { return _additionalData ?? (_additionalData = new Dictionary<string, object>()); }
+            get
+            {
+                lock (_additionalDataLock)
+                {
+                    return _additionalData ?? (_additionalData = new Dictionary<string, object>());
+                }
+            }
         }
+
+        [IgnoreDataMember]
+        [DoNotClone]
+        internal object AdditionalDataLock { get { return _additionalDataLock; } }
 
         public override object DeepClone()
         {
@@ -580,15 +591,29 @@ namespace Umbraco.Core.Models.Membership
             //manually clone the start node props
             clone._startContentIds = _startContentIds.ToArray();
             clone._startMediaIds = _startMediaIds.ToArray();
-            //This ensures that any value in the dictionary that is deep cloneable is cloned too
-            foreach (var key in clone.AdditionalData.Keys.ToArray())
+
+            // this value has been cloned and points to the same object
+            // which obviously is bad - needs to point to a new object
+            clone._additionalDataLock = new object();
+
+            if (_additionalData != null)
             {
-                var deepCloneable = clone.AdditionalData[key] as IDeepCloneable;
-                if (deepCloneable != null)
+                // clone._additionalData points to the same dictionary, which is bad, because
+                // changing one clone impacts all of them - so we need to reset it with a fresh
+                // dictionary that will contain the same values - and, if some values are deep
+                // cloneable, they should be deep-cloned too
+                var cloneAdditionalData = clone._additionalData = new Dictionary<string, object>();
+
+                lock (_additionalDataLock)
                 {
-                    clone.AdditionalData[key] = deepCloneable.DeepClone();
+                    foreach (var kvp in _additionalData)
+                    {
+                        var deepCloneable = kvp.Value as IDeepCloneable;
+                        cloneAdditionalData[kvp.Key] = deepCloneable == null ? kvp.Value : deepCloneable.DeepClone();
+                    } 
                 }
-            }            
+            }
+                   
             //need to create new collections otherwise they'll get copied by ref
             clone._userGroups = new HashSet<IReadOnlyUserGroup>(_userGroups);
             clone._allowedSections = _allowedSections != null ? new List<string>(_allowedSections) : null;
