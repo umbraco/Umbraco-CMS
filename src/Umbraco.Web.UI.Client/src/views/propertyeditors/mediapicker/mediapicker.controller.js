@@ -13,8 +13,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
                 $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
             });
-        } else {
-            $scope.model.config.startNodeIsVirtual = false;
         }
 
         function setupViewModel() {
