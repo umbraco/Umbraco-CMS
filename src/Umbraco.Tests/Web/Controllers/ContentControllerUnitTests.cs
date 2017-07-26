@@ -84,8 +84,8 @@ namespace Umbraco.Tests.Web.Controllers
             userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-1,1234")).Returns(permissionSet);
             var userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
-            entityServiceMock.Setup(x => x.GetAll(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns(new[] { Mock.Of<IUmbracoEntity>(entity => entity.Id == 9876 && entity.Path == "-1,9876") });
+            entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+                .Returns(new[] { Mock.Of<EntityPath>(entity => entity.Id == 9876 && entity.Path == "-1,9876") });
             var entityService = entityServiceMock.Object;
 
             //act
@@ -215,8 +215,8 @@ namespace Umbraco.Tests.Web.Controllers
             var userServiceMock = new Mock<IUserService>();
             var userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
-            entityServiceMock.Setup(x => x.GetAll(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns(new[] { Mock.Of<IUmbracoEntity>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
+            entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+                .Returns(new[] { Mock.Of<EntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
             var entityService = entityServiceMock.Object;
 
             //act
@@ -239,8 +239,8 @@ namespace Umbraco.Tests.Web.Controllers
             var userServiceMock = new Mock<IUserService>();
             var userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
-            entityServiceMock.Setup(x => x.GetAll(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns(new[] { Mock.Of<IUmbracoEntity>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
+            entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+                .Returns(new[] { Mock.Of<EntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
             var entityService = entityServiceMock.Object;
 
             //act
