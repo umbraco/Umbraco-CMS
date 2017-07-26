@@ -45,26 +45,57 @@ angular.module('umbraco.directives')
 
                 // Handle keydown events
                 function keydown(event) {
+                    $timeout(function(){
+                        checkFocus();
+                        // arrow down
+                        if (event.keyCode === 40) {
+                            arrowDown();
+                        }
+                        // arrow up
+                        if (event.keyCode === 38) {
+                            arrowUp();
+                        }
+                    });
+                }
 
-                    // arrow down
-                    if (event.keyCode === 40) {
-                        if(currentIndex < listItems.length - 1) {
-                            // we do this to focus the first element when 
-                            // using the arrow down key the first time
-                            if(focusSet) {
-                                currentIndex++;
-                            }
-                            listItems[currentIndex].focus();
+                function checkFocus() {
+                    var found = false;
+
+                    // check if any element has focus
+                    angular.forEach(listItems, function (item, index) {
+                        if ($(item).is(":focus")) {
+                            // if an element already has focus set the
+                            // currentIndex so we navigate from that element
+                            currentIndex = index;
                             focusSet = true;
+                            found = true;
                         }
-                    }
+                    });
 
-                    // arrow up
-                    if (event.keyCode === 38) {
-                        if(currentIndex > 0) {
-                            currentIndex--;
-                            listItems[currentIndex].focus();
+                    // If we don't find an element with focus we reset the currentIndex and the focusSet flag
+                    // we do this because you can have navigated away from the list with tab and we want to reset it if you navigate back
+                    if (!found) {
+                        currentIndex = 0;
+                        focusSet = false;
+                    }
+                }
+
+                function arrowDown() {
+                    if (currentIndex < listItems.length - 1) {
+                        // only bump the current index if the focus is already 
+                        // set else we just want to focus the first element
+                        if (focusSet) {
+                            currentIndex++;
                         }
+                        listItems[currentIndex].focus();
+                        focusSet = true;
+                    }
+                }
+
+                function arrowUp() {
+                    if (currentIndex > 0) {
+                        currentIndex--;
+                        listItems[currentIndex].focus();
                     }
                 }
 
