@@ -2,6 +2,7 @@
 @ngdoc directive
 @name umbraco.directives.directive:umbDropdown
 @restrict E
+@scope
 
 @description
 <b>Added in versions 7.7.0</b>: Use this component to render a dropdown menu.
@@ -18,10 +19,9 @@
                 action="vm.toggle()">
             </umb-button>
 
-            <umb-dropdown ng-if="vm.dropdownOpen" umb-keyboard-list>
+            <umb-dropdown ng-if="vm.dropdownOpen" on-close="vm.close()" umb-keyboard-list>
                 <umb-dropdown-item
-                    ng-repeat="item in vm.items"
-                    on-outside-click="vm.close()">
+                    ng-repeat="item in vm.items">
                     <a href="" ng-click="vm.select(item)">{{ item.name }}</a>
                 </umb-dropdown-item>
             </umb-dropdown>
@@ -75,18 +75,53 @@
     <li>{@link umbraco.directives.directive:umbKeyboardList umbKeyboardList}</li>
 </ul>
 
+@param {callback} onClose Callback when the dropdown menu closes. When you click outside or press esc.
+
 **/
 
 (function() {
     'use strict';
 
-    function umbDropdown() {
+    function umbDropdown($document) {
+
+        function link(scope, element, attr, ctrl) {
+
+            scope.close = function() {
+                if (scope.onClose) {
+                    scope.onClose();
+                }
+            };
+
+            // Handle keydown events
+            function keydown(event) {
+                // press escape
+                if(event.keyCode === 27) {
+                    scope.onClose();
+                }
+            }
+
+            // Stop to listen typing.
+            function stopListening() {
+                $document.off('keydown', keydown);
+            }
+
+            // Start listening to key typing.
+            $document.on('keydown', keydown);
+
+            // Stop listening when scope is destroyed.
+            scope.$on('$destroy', stopListening);
+            
+        }
 
         var directive = {
             restrict: 'E',
             replace: true,
             transclude: true,
-            templateUrl: 'views/components/umb-dropdown.html'
+            templateUrl: 'views/components/umb-dropdown.html',
+            scope: {
+                onClose: "&"
+            },
+            link: link
         };
 
         return directive;
