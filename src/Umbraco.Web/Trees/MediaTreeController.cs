@@ -34,8 +34,9 @@ namespace Umbraco.Web.Trees
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
             var node = base.CreateRootNode(queryStrings);
-            //if the user's start node is not default, then ensure the root doesn't have a menu
-            if (UserStartNodes.Length > 0 && UserStartNodes.Contains(Constants.System.Root) == false)
+
+            // if the user's start node is not default, then ensure the root doesn't have a menu
+            if (UserStartNodes.Contains(Constants.System.Root) == false)
             {
                 node.MenuUrl = "";
             }
@@ -101,7 +102,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //if the user's start node is not the root then ensure the root menu is empty/doesn't exist
-                if (UserStartNodes.Length > 0 && UserStartNodes.Contains(Constants.System.Root) == false)
+                if (UserStartNodes.Contains(Constants.System.Root) == false)
                 {
                     return menu;
                 }

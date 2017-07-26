@@ -14,12 +14,15 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class UserExtensionsTests
     {
-        [TestCase(2, "-1,1,2", "-1,1,2,3,4,5", true)]
-        [TestCase(6, "-1,1,2,3,4,5,6", "-1,1,2,3,4,5", false)]
-        [TestCase(-1, "-1", "-1,1,2,3,4,5", true)]
-        [TestCase(5, "-1,1,2,3,4,5", "-1,1,2,3,4,5", true)]
-        [TestCase(-1, "-1", "-1,-20,1,2,3,4,5", true)]
-        [TestCase(1, "-1,-20,1", "-1,-20,1,2,3,4,5", false)]
+        [TestCase(-1, "-1", "-1,1,2,3,4,5", true)] // below root start node
+        [TestCase(2, "-1,1,2", "-1,1,2,3,4,5", true)] // below start node
+        [TestCase(5, "-1,1,2,3,4,5", "-1,1,2,3,4,5", true)] // at start node
+
+        [TestCase(6, "-1,1,2,3,4,5,6", "-1,1,2,3,4,5", false)] // above start node
+
+        [TestCase(-1, "-1", "-1,-20,1,2,3,4,5", true)] // below root start node, bin
+        [TestCase(1, "-1,-20,1", "-1,-20,1,2,3,4,5", false)] // below bin start node
+
         public void Determines_Path_Based_Access_To_Content(int startNodeId, string startNodePath, string contentPath, bool outcome)
         {
             var userMock = new Mock<IUser>();
@@ -27,15 +30,12 @@ namespace Umbraco.Tests.Models
             var user = userMock.Object;
             var content = Mock.Of<IContent>(c => c.Path == contentPath && c.Id == 5);
 
-            var entityServiceMock = new Mock<IEntityService>();
-            entityServiceMock.Setup(x => x.GetAll(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns(new[]
-                {
-                    Mock.Of<IUmbracoEntity>(entity => entity.Id == startNodeId && entity.Path == startNodePath)
-                });
-            var entityService = entityServiceMock.Object;
+            var esmock = new Mock<IEntityService>();
+            esmock
+                .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+                .Returns<UmbracoObjectTypes, int[]>((type, ids) => new [] { new EntityPath { Id = startNodeId, Path = startNodePath } });
 
-            Assert.AreEqual(outcome, user.HasPathAccess(content, entityService));
+            Assert.AreEqual(outcome, user.HasPathAccess(content, esmock.Object));
         }
 
         [TestCase("", "1", "1")] // single user start, top level
@@ -52,6 +52,9 @@ namespace Umbraco.Tests.Models
         [TestCase("3", "2,5", "2,5")] // user and group start, restrict
         [TestCase("3", "2,1", "2,1")] // user and group start, expand
 
+        [TestCase("3,8", "2,6", "3,2")] // exclude bin
+        [TestCase("", "6", "")] // exclude bin
+
         public void CombineStartNodes(string groupSn, string userSn, string expected)
         {
             // 1
@@ -59,15 +62,23 @@ namespace Umbraco.Tests.Models
             //   5
             // 2
             //  4
+            // bin
+            //  6
+            //  7
+            //   8
 
             var paths = new Dictionary<int, string>
             {
-                { 1, "-1, 1" },
-                { 2, "-1, 2" },
-                { 3, "-1, 1, 3" },
-                { 4, "-1, 2, 4" },
-                { 5, "-1, 1, 3, 5" },
+                { 1, "-1,1" },
+                { 2, "-1,2" },
+                { 3, "-1,1,3" },
+                { 4, "-1,2,4" },
+                { 5, "-1,1,3,5" },
+                { 6, "-1,-20,6" },
+                { 7, "-1,-20,7" },
+                { 8, "-1,-20,7,8" },
             };
+
             var esmock = new Mock<IEntityService>();
             esmock
                 .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
