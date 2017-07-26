@@ -101,7 +101,7 @@
 
         <!-- State filter -->
         <div style="position: relative;" ng-if="vm.userStatesFilter.length > 0">
-          <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.page.showStatusFilter = !vm.page.showStatusFilter">
+          <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.toggleFilter('state')">
             <span>Status:</span>
             <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getFilterName(vm.userStatesFilter) }}</span>
             <span class="caret"></span>
@@ -118,7 +118,7 @@
 
         <!-- Groups filter -->
         <div style="position: relative;">
-          <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.page.showGroupFilter = !vm.page.showGroupFilter">
+          <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.toggleFilter('group')">
             <span><localize key="general_groups"></localize>:</span>
             <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getFilterName(vm.userGroups) }}</span>
             <span class="caret"></span>
@@ -135,7 +135,7 @@
 
         <!-- Order By -->
         <div style="position: relative;">
-          <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.page.showOrderByFilter = !vm.page.showOrderByFilter">
+          <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.toggleFilter('orderBy')">
             <span>Order by:</span>
             <span class="bold" style="margin-left: 2px;">{{ vm.getSortLabel(vm.usersOptions.orderBy, vm.usersOptions.orderDirection) }} </span>
             <span class="caret"></span>
