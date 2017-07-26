@@ -1,3 +1,32 @@
+/**
+@ngdoc directive
+@name umbraco.directives.directive:umbKeyboardList
+@restrict E
+
+@description
+<b>Added in versions 7.7.0</b>: Use this directive to add arrow up and down keyboard shortcuts to a list. Use this together with the {@link umbraco.directives.directive:umbDropdown umbDropdown} component to make easy accessible dropdown menus.
+
+<h3>Markup example</h3>
+<pre>
+    <div>
+        <ul umb-keyboard-list>
+            <li><a href="">Item 1</a></li>
+            <li><a href="">Item 2</a></li>
+            <li><a href="">Item 3</a></li>
+            <li><a href="">Item 4</a></li>
+            <li><a href="">Item 5</a></li>
+            <li><a href="">Item 6</a></li>
+        </ul>
+    </div>
+</pre>
+
+<h3>Use in combination with</h3>
+<ul>
+    <li>{@link umbraco.directives.directive:umbDropdown umbDropdown}</li>
+</ul>
+
+**/
+
 angular.module('umbraco.directives')
     .directive('umbKeyboardList', ['$document', '$timeout', function ($document, $timeout) {
 
