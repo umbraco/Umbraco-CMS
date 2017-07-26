@@ -12,7 +12,7 @@ namespace Umbraco.Web.Trees
     [LegacyBaseTree(typeof(loadScripts))]
     [PluginController("UmbracoTrees")]
     [CoreTree]
-    public class ScriptTreeController : FileSystemTreeController2
+    public class ScriptTreeController : FileSystemTreeController
     {
         protected override IFileSystem2 FileSystem
         {

@@ -44,6 +44,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Id, map => map.Condition(source => GetIntId(source.Id) > 0))
                 .ForMember(detail => detail.SessionTimeout, opt => opt.Ignore())
                 .ForMember(detail => detail.EmailConfirmedDate, opt => opt.Ignore())
+                .ForMember(detail => detail.UserType, opt => opt.Ignore())
                 .ForMember(detail => detail.InvitedDate, opt => opt.Ignore())
                 .ForMember(detail => detail.SecurityStamp, opt => opt.Ignore())
                 .ForMember(detail => detail.Avatar, opt => opt.Ignore())
@@ -74,6 +75,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Id, opt => opt.Ignore())
                 .ForMember(detail => detail.StartContentIds, opt => opt.Ignore())
                 .ForMember(detail => detail.StartMediaIds, opt => opt.Ignore())
+                .ForMember(detail => detail.UserType, opt => opt.Ignore())
                 .ForMember(detail => detail.Language, opt => opt.Ignore())
                 .ForMember(detail => detail.Username, opt => opt.Ignore())
                 .ForMember(detail => detail.PasswordQuestion, opt => opt.Ignore())
@@ -315,7 +317,34 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     detail => detail.EmailHash,
                     opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().GenerateHash()))
-                .ForMember(detail => detail.SecondsUntilTimeout, opt => opt.Ignore());            
+                .ForMember(detail => detail.SecondsUntilTimeout, opt => opt.Ignore())
+                .AfterMap((user, detail) =>
+                {
+                    //we need to map the legacy UserType
+                    //the best we can do here is to return the user's first user group as a IUserType object
+                    //but we should attempt to return any group that is the built in ones first
+                    var groups = user.Groups.ToArray();
+                    if (groups.Length == 0)
+                    {
+                        //In backwards compatibility land, a user type cannot be null! so we need to return a fake one. 
+                        detail.UserType = "temp";
+                    }
+                    else
+                    {
+                        var builtIns = new[] { Constants.Security.AdminGroupAlias, "writer", "editor", "translator" };
+                        var foundBuiltIn = groups.FirstOrDefault(x => builtIns.Contains(x.Alias));
+                        if (foundBuiltIn != null)
+                        {
+                            detail.UserType = foundBuiltIn.Alias;
+                        }
+                        else
+                        {
+                            //otherwise return the first
+                            detail.UserType = groups[0].Alias;
+                        }
+                    }
+                    
+                });
 
             config.CreateMap<IProfile, UserProfile>()
                   .ForMember(detail => detail.UserId, opt => opt.MapFrom(profile => GetIntId(profile.Id)));

@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models.Membership
@@ -116,7 +118,8 @@ namespace Umbraco.Core.Models.Membership
         private DateTime _lastLoginDate;
         private DateTime _lastLockoutDate;
         private bool _defaultToLiveEditing;
-        private IDictionary<string, object> _additionalData;        
+        private IDictionary<string, object> _additionalData;
+        private object _additionalDataLock = new object();
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
@@ -162,7 +165,7 @@ namespace Umbraco.Core.Models.Membership
             get { return Id; }
             set { throw new NotSupportedException("Cannot set the provider user key for a user"); }
         }
-
+        
         [DataMember]
         public DateTime? EmailConfirmedDate
         {
@@ -277,6 +280,165 @@ namespace Umbraco.Core.Models.Membership
         {
             get { return _allowedSections ?? (_allowedSections = new List<string>(_userGroups.SelectMany(x => x.AllowedSections).Distinct())); }
         }
+
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IUserType IUser.UserType
+        {
+            get
+            {
+                //the best we can do here is to return the user's first user group as a IUserType object
+                //but we should attempt to return any group that is the built in ones first
+                var groups = Groups.ToArray();
+                if (groups.Length == 0)
+                {
+                    //In backwards compatibility land, a user type cannot be null! so we need to return a fake one. 
+                    return new UserType
+                    {
+                        Alias = "temp",
+                        Id = int.MinValue,
+                        Key = Guid.Empty,
+                        CreateDate = default(DateTime),
+                        DeletedDate = null,
+                        Name = "Temp",
+                        Permissions = new List<string>(),
+                        UpdateDate = default(DateTime)
+                    };
+                }
+                var builtIns = new[] { Constants.Security.AdminGroupAlias, "writer", "editor", "translator" };
+                var foundBuiltIn = groups.FirstOrDefault(x => builtIns.Contains(x.Alias));
+                IUserGroup realGroup;
+                if (foundBuiltIn != null)
+                {
+                    //if the group isn't IUserGroup we'll need to look it up
+                    realGroup = foundBuiltIn as IUserGroup ?? ApplicationContext.Current.Services.UserService.GetUserGroupById(foundBuiltIn.Id);
+
+                    //return a mapped version of the group
+                    return new UserType
+                    {
+                        Alias = realGroup.Alias,
+                        Id = realGroup.Id,
+                        Key = realGroup.Key,
+                        CreateDate = realGroup.CreateDate,
+                        DeletedDate = realGroup.DeletedDate,
+                        Name = realGroup.Name,
+                        Permissions = realGroup.Permissions,
+                        UpdateDate = realGroup.UpdateDate
+                    };
+                }
+
+                //otherwise return the first
+                //if the group isn't IUserGroup we'll need to look it up
+                realGroup = groups[0] as IUserGroup ?? ApplicationContext.Current.Services.UserService.GetUserGroupById(groups[0].Id);
+                //return a mapped version of the group
+                return new UserType
+                {
+                    Alias = realGroup.Alias,
+                    Id = realGroup.Id,
+                    Key = realGroup.Key,
+                    CreateDate = realGroup.CreateDate,
+                    DeletedDate = realGroup.DeletedDate,
+                    Name = realGroup.Name,
+                    Permissions = realGroup.Permissions,
+                    UpdateDate = realGroup.UpdateDate
+                };
+            }
+            set
+            {
+                //if old APIs are still using this lets first check if  the user is part of the user group with the alias specified
+                if (Groups.Any(x => x.Alias == value.Alias))
+                    return;
+
+                //the only other option we have here is to lookup the group (and we'll need to use singletons here :( )
+                var found = ApplicationContext.Current.Services.UserService.GetUserGroupByAlias(value.Alias);
+                if (found == null)
+                    throw new InvalidOperationException("No user group was found with the alias " + value.Alias + ", this API (IUser.UserType) is obsolete, use user groups instead");
+
+                //if it's found, all we can do is add it, we can't really replace them
+                AddGroup(found.ToReadOnlyGroup());
+            }
+        }
+
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        void IUser.RemoveAllowedSection(string sectionAlias)
+        {
+            //don't do anything if they aren't allowed it already
+            if (AllowedSections.Contains(sectionAlias) == false)
+                return;
+
+            var groups = Groups.ToArray();
+            //our only option here is to check if a custom group is created for this user, if so we can remove it from that group, otherwise we'll throw
+            //now we'll check if the user has a special 1:1 user group created for itself. This will occur if this method is used and also during an upgrade.
+            //this comes in the alias form of userName + 'Group'
+            var customUserGroup = groups.FirstOrDefault(x => x.Alias == (Username + "Group"));
+            if (customUserGroup != null)
+            {
+                //if the group isn't IUserGroup we'll need to look it up
+                var realGroup = customUserGroup as IUserGroup ?? ApplicationContext.Current.Services.UserService.GetUserGroupById(customUserGroup.Id);
+                realGroup.RemoveAllowedSection(sectionAlias);
+                //now we need to flag this for saving (hack!) 
+                GroupsToSave.Add(realGroup);
+            }
+            else
+            {
+                throw new InvalidOperationException("Cannot remove the allowed section using this obsolete API. Modify the user's groups instead");
+            }
+            
+        }
+
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        void IUser.AddAllowedSection(string sectionAlias)
+        {
+            //don't do anything if they are allowed it already
+            if (AllowedSections.Contains(sectionAlias))
+                return;
+
+            //This is here for backwards compat only.
+            //First we'll check if the user is part of the 'admin' group. If so then we can ensure that the admin group has this section available to it.
+            //otherwise, the only thing we can do is create a custom user group for this user and add this section.
+            //We are checking for admin here because if the user is an admin and an allowed section is being added, then it's assumed it's to be added 
+            //for the whole admin group (i.e. Forms installer does this for admins)
+            var groups = Groups.ToArray();
+            var admin = groups.FirstOrDefault(x => x.Alias == Constants.Security.AdminGroupAlias);
+            if (admin != null)
+            {                
+                //if the group isn't IUserGroup we'll need to look it up
+                var realGroup = admin as IUserGroup ?? ApplicationContext.Current.Services.UserService.GetUserGroupById(admin.Id);
+                realGroup.AddAllowedSection(sectionAlias);
+                //now we need to flag this for saving (hack!) 
+                GroupsToSave.Add(realGroup);
+            }
+
+            //now we'll check if the user has a special 1:1 user group created for itself. This will occur if this method is used and also during an upgrade.
+            //this comes in the alias form of userName + 'Group'
+            var customUserGroup = groups.FirstOrDefault(x => x.Alias == (Username + "Group"));
+            if (customUserGroup != null)
+            {
+                //if the group isn't IUserGroup we'll need to look it up
+                var realGroup = customUserGroup as IUserGroup ?? ApplicationContext.Current.Services.UserService.GetUserGroupById(customUserGroup.Id);
+                realGroup.AddAllowedSection(sectionAlias);
+                //now we need to flag this for saving (hack!) 
+                GroupsToSave.Add(realGroup);
+            }
+
+            //ok, so the user doesn't have a 1:1 group, we'll need to flag it for creation
+            var newUserGroup = new UserGroup
+            {
+                Alias = Username + "Group",
+                Name = "Group for " + Username
+            };
+            newUserGroup.AddAllowedSection(sectionAlias);
+            GroupsToSave.Add(newUserGroup);
+        }
+
+        /// <summary>
+        /// This used purely for hacking backwards compatibility into this class for &lt; 7.7 compat
+        /// </summary>
+        [DoNotClone]
+        [IgnoreDataMember]
+        internal List<IUserGroup> GroupsToSave = new List<IUserGroup>();        
 
         public IProfile ProfileData
         {
@@ -408,8 +570,18 @@ namespace Umbraco.Core.Models.Membership
         [DoNotClone]
         internal IDictionary<string, object> AdditionalData
         {
-            get { return _additionalData ?? (_additionalData = new Dictionary<string, object>()); }
+            get
+            {
+                lock (_additionalDataLock)
+                {
+                    return _additionalData ?? (_additionalData = new Dictionary<string, object>());
+                }
+            }
         }
+
+        [IgnoreDataMember]
+        [DoNotClone]
+        internal object AdditionalDataLock { get { return _additionalDataLock; } }
 
         public override object DeepClone()
         {
@@ -419,15 +591,29 @@ namespace Umbraco.Core.Models.Membership
             //manually clone the start node props
             clone._startContentIds = _startContentIds.ToArray();
             clone._startMediaIds = _startMediaIds.ToArray();
-            //This ensures that any value in the dictionary that is deep cloneable is cloned too
-            foreach (var key in clone.AdditionalData.Keys.ToArray())
+
+            // this value has been cloned and points to the same object
+            // which obviously is bad - needs to point to a new object
+            clone._additionalDataLock = new object();
+
+            if (_additionalData != null)
             {
-                var deepCloneable = clone.AdditionalData[key] as IDeepCloneable;
-                if (deepCloneable != null)
+                // clone._additionalData points to the same dictionary, which is bad, because
+                // changing one clone impacts all of them - so we need to reset it with a fresh
+                // dictionary that will contain the same values - and, if some values are deep
+                // cloneable, they should be deep-cloned too
+                var cloneAdditionalData = clone._additionalData = new Dictionary<string, object>();
+
+                lock (_additionalDataLock)
                 {
-                    clone.AdditionalData[key] = deepCloneable.DeepClone();
+                    foreach (var kvp in _additionalData)
+                    {
+                        var deepCloneable = kvp.Value as IDeepCloneable;
+                        cloneAdditionalData[kvp.Key] = deepCloneable == null ? kvp.Value : deepCloneable.DeepClone();
+                    } 
                 }
-            }            
+            }
+                   
             //need to create new collections otherwise they'll get copied by ref
             clone._userGroups = new HashSet<IReadOnlyUserGroup>(_userGroups);
             clone._allowedSections = _allowedSections != null ? new List<string>(_allowedSections) : null;

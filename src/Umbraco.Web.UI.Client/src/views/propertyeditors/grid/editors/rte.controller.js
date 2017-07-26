@@ -28,7 +28,7 @@
                 currentTarget: currentTarget,
                 onlyImages: true,
                 showDetails: true,
-                startNodeId: userData.startMediaIds.length === 0 ? -1 : userData.startMediaIds[0],
+                startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
                 view: "mediapicker",
                 show: true,
                 submit: function(model) {

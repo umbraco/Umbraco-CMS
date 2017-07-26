@@ -91,7 +91,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 	        userService.getCurrentUser().then(function (userData) {
 	          $scope.mediaPickerOverlay = {
 	            view: "mediapicker",
-	            startNodeId: userData.startMediaIds.length == 0 ? -1 : userData.startMediaIds[0],
+	            startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
 	            show: true,
 	            submit: function(model) {
 	              var media = model.selectedImages[0];

@@ -13,7 +13,7 @@ namespace Umbraco.Web.Trees
     [UmbracoTreeAuthorize(Constants.Trees.PartialViewMacros)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
-    public class PartialViewMacrosTreeController : FileSystemTreeController2
+    public class PartialViewMacrosTreeController : FileSystemTreeController
     {
         protected override IFileSystem2 FileSystem
         {
