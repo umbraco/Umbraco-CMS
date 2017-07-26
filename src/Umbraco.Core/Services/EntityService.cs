@@ -370,13 +370,19 @@ namespace Umbraco.Core.Services
         public IEnumerable<IUmbracoEntity> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
             string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "")
         {
+            totalRecords = 0;
+
+            var idsA = ids.ToArray();
+            if (idsA.Length == 0)
+                return Enumerable.Empty<IUmbracoEntity>();
+
             var objectTypeId = umbracoObjectType.GetGuid();
+
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateEntityRepository(uow);
 
                 var query = Query<IUmbracoEntity>.Builder;
-                var idsA = ids.ToArray();
                 if (idsA.All(x => x != Constants.System.Root))
                 {
                     var clauses = new List<Expression<Func<IUmbracoEntity, bool>>>();
