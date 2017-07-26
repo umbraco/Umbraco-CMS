@@ -19,6 +19,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
             var mediaMock = new Mock<IMedia>();
             mediaMock.Setup(m => m.Path).Returns("-1,1234,5678");
@@ -88,6 +89,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
             var mediaServiceMock = new Mock<IMediaService>();
             var mediaService = mediaServiceMock.Object;
@@ -129,6 +131,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
             var mediaServiceMock = new Mock<IMediaService>();
             var mediaService = mediaServiceMock.Object;

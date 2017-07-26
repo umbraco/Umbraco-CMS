@@ -19,6 +19,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
@@ -131,6 +132,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
@@ -162,6 +164,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.Groups).Returns(new[] {new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>())});
             var user = userMock.Object;
             var contentServiceMock = new Mock<IContentService>();
             var contentService = contentServiceMock.Object;
@@ -183,6 +186,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
             var contentServiceMock = new Mock<IContentService>();
             var contentService = contentServiceMock.Object;
@@ -252,6 +256,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
@@ -309,6 +314,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
 
             var userServiceMock = new Mock<IUserService>();
