@@ -54,14 +54,15 @@
                                             on-remove="vm.clearStartNode('content')">
                                         </umb-node-preview>
 
-                                        <a href=""
-                                            ng-if="!vm.userGroup.contentStartNode.id"
+                                        <umb-node-preview
+                                            ng-if="!vm.userGroup.contentStartNode"
                                             style="max-width: 100%;"
-                                            class="umb-node-preview-add"
-                                            ng-click="vm.openContentPicker()"
-                                            prevent-default>
-                                            <localize key="general_add">Add</localize>
-                                        </a>
+                                            icon="vm.page.rootIcon"
+                                            name="vm.page.contentRootLabel"
+                                            allow-edit="true"
+                                            on-edit="vm.openContentPicker()">
+                                        </umb-node-preview>
+
                                     </umb-control-group>
 
                                     <umb-control-group label="Media start node" description="Donec quis lacinia ligula. Suspendisse ultrices risus ante">
@@ -74,14 +75,15 @@
                                             on-remove="vm.clearStartNode('media')">
                                         </umb-node-preview>
 
-                                        <a href=""
-                                            ng-if="!vm.userGroup.mediaStartNode.id"
+                                        <umb-node-preview
+                                            ng-if="!vm.userGroup.mediaStartNode"
                                             style="max-width: 100%;"
-                                            class="umb-node-preview-add"
-                                            ng-click="vm.openMediaPicker()"
-                                            prevent-default>
-                                            <localize key="general_add">Add</localize>
-                                        </a>
+                                            icon="vm.page.rootIcon"
+                                            name="vm.page.mediaRootLabel"
+                                            allow-edit="true"
+                                            on-edit="vm.openMediaPicker()">
+                                        </umb-node-preview>
+
                                     </umb-control-group>
 
                                 </div>

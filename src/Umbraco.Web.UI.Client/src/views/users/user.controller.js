@@ -7,11 +7,23 @@
         var localizeSaving = localizationService.localize("general_saving");
 
         vm.page = {};
+        vm.page.contentRootLabel = "Content Root";
+        vm.page.mediaRootLabel = "Media Root";
+        vm.page.rootIcon = "icon-folder";
         vm.user = {
           changePassword: null
         };
         vm.breadcrumbs = [];
         vm.avatarFile = {};
+        vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
+        vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
+        vm.toggleChangePassword = toggleChangePassword;
+        vm.emailIsUsername = true;
+        //create the initial model for change password
+        vm.changePasswordModel = {
+          config: {},
+          isChanging: false
+        };
 
         vm.goToPage = goToPage;
         vm.openUserGroupPicker = openUserGroupPicker;
@@ -22,16 +34,6 @@
         vm.enableUser = enableUser;
         vm.clearAvatar = clearAvatar;
         vm.save = save;
-        vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
-        vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
-        vm.toggleChangePassword = toggleChangePassword;
-        vm.emailIsUsername = true;
-
-        //create the initial model for change password
-        vm.changePasswordModel = {
-          config: {},
-          isChanging: false
-        };
 
         function init() {
 

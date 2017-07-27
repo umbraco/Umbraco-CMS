@@ -66,23 +66,25 @@
                 </div>
               </div>
 
-              <div class="test-group" ng-if="!vm.user.isCurrentUser">
+              <div class="test-group">
                 <div class="test-group-title">Permissions</div>
                 <div class="test-group-content block-form">
 
                   <umb-control-group style="margin-bottom: 25px;" label="Groups" description="Aliquam laoreet metus porta nisi pellentesque">
 
-                    <umb-user-group-preview ng-repeat="userGroup in vm.user.userGroups"
-                                            icon="userGroup.icon"
-                                            name="userGroup.name"
-                                            sections="userGroup.sections"
-                                            content-start-node="userGroup.contentStartNode"
-                                            media-start-node="userGroup.mediaStartNode"
-                                            allow-remove="true"
-                                            on-remove="vm.removeSelectedItem($index, vm.user.userGroups)">
+                    <umb-user-group-preview
+                      ng-repeat="userGroup in vm.user.userGroups"
+                      icon="userGroup.icon"
+                      name="userGroup.name"
+                      sections="userGroup.sections"
+                      content-start-node="userGroup.contentStartNode"
+                      media-start-node="userGroup.mediaStartNode"
+                      allow-remove="!vm.user.isCurrentUser"
+                      on-remove="vm.removeSelectedItem($index, vm.user.userGroups)">
                     </umb-user-group-preview>
 
                     <a href=""
+                       ng-if="!vm.user.isCurrentUser"
                        style="max-width: 100%;"
                        class="umb-node-preview-add"
                        ng-click="vm.openUserGroupPicker()"
@@ -94,15 +96,25 @@
 
                   <umb-control-group style="margin-bottom: 25px;" label="Content start nodes" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
 
-                    <umb-node-preview style="max-width: 100%;"
-                                      ng-repeat="node in vm.user.startContentIds"
-                                      icon="node.icon"
-                                      name="node.name"
-                                      allow-remove="true"
-                                      on-remove="vm.removeSelectedItem($index, vm.user.startContentIds)">
+                    <umb-node-preview
+                      style="max-width: 100%;"
+                      ng-repeat="node in vm.user.startContentIds"
+                      icon="node.icon"
+                      name="node.name"
+                      allow-remove="!vm.user.isCurrentUser"
+                      on-remove="vm.removeSelectedItem($index, vm.user.startContentIds)">
+                    </umb-node-preview>
+                    
+                    <umb-node-preview
+                      ng-if="vm.user.startContentIds.length === 0"
+                      style="max-width: 100%;"
+                      icon="vm.page.rootIcon"
+                      name="vm.page.contentRootLabel"
+                      allow-remove="false">
                     </umb-node-preview>
 
                     <a href=""
+                       ng-if="!vm.user.isCurrentUser"
                        style="max-width: 100%;"
                        class="umb-node-preview-add"
                        ng-click="vm.openContentPicker()"
@@ -114,15 +126,25 @@
 
                   <umb-control-group label="Media start nodes" description="Donec quis lacinia ligula. Suspendisse ultrices risus ante">
 
-                    <umb-node-preview style="max-width: 100%;"
-                                      ng-repeat="node in vm.user.startMediaIds"
-                                      icon="node.icon"
-                                      name="node.name"
-                                      allow-remove="true"
-                                      on-remove="vm.removeSelectedItem($index, vm.user.startMediaIds)">
+                    <umb-node-preview
+                      style="max-width: 100%;"
+                      ng-repeat="node in vm.user.startMediaIds"
+                      icon="node.icon"
+                      name="node.name"
+                      allow-remove="!vm.user.isCurrentUser"
+                      on-remove="vm.removeSelectedItem($index, vm.user.startMediaIds)">
+                    </umb-node-preview>
+
+                    <umb-node-preview
+                      ng-if="vm.user.startMediaIds.length === 0"
+                      style="max-width: 100%;"
+                      icon="vm.page.rootIcon"
+                      name="vm.page.mediaRootLabel"
+                      allow-remove="false">
                     </umb-node-preview>
 
                     <a href=""
+                       ng-if="!vm.user.isCurrentUser"
                        style="max-width: 100%;"
                        class="umb-node-preview-add"
                        ng-click="vm.openMediaPicker()"

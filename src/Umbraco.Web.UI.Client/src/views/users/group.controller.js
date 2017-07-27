@@ -7,6 +7,9 @@
         var localizeSaving = localizationService.localize("general_saving");
 
         vm.page = {};
+        vm.page.contentRootLabel = "Content Root";
+        vm.page.mediaRootLabel = "Media Root";
+        vm.page.rootIcon = "icon-folder";
         vm.userGroup = {};
         vm.labels = {};
 
