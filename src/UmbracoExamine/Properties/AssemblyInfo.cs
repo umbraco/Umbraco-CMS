@@ -1,9 +1,10 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 
-[assembly: AssemblyTitle("UmbracoExamine")]
-[assembly: AssemblyDescription("Umbraco index & search providers based on the Examine model using Lucene.NET 2.9.2")]
+[assembly: AssemblyTitle("Umbraco.Examine")]
+[assembly: AssemblyDescription("Umbraco Examine")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("UmbracoExamine")]
+[assembly: AssemblyProduct("Umbraco CMS")]
 
+// Umbraco Cms
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
