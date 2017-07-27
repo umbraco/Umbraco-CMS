@@ -153,7 +153,7 @@ namespace Umbraco.Core.Models.Identity
 
                 var gsn = Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId.Value).Distinct().ToArray();
                 var usn = StartMediaIds;
-                return _allStartMediaIds = UserExtensions.CombineStartNodes(UmbracoObjectTypes.Document, gsn, usn, ApplicationContext.Current.Services.EntityService);
+                return _allStartMediaIds = UserExtensions.CombineStartNodes(UmbracoObjectTypes.Media, gsn, usn, ApplicationContext.Current.Services.EntityService);
             }
         }
     }
