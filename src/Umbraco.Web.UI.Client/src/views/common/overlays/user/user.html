@@ -12,7 +12,7 @@
 
         <umb-button
             type="link"
-            href="#/users/framed/%252Fumbraco%252Fusers%252Fedituser.aspx%253Fid%253D{{user.id}}"
+            href="#/users/users/user/{{user.id}}"
             action="model.close()"
             button-style="primary"
             label="Edit"
@@ -97,7 +97,7 @@
           ng-submit="changePassword()"
           novalidate
           val-form-manager>
-         
+
          <change-password password-values="changePasswordModel.value"
                           config="changePasswordModel.config">
          </change-password>
