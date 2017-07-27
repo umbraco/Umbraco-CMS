@@ -66,7 +66,7 @@
                 </div>
               </div>
 
-              <div class="test-group" ng-if="!vm.user.isCurrentUser">
+              <div class="test-group">
                 <div class="test-group-title">Permissions</div>
                 <div class="test-group-content block-form">
 
@@ -140,34 +140,41 @@
 
               <div class="umb-package-details__section">
 
-                <div style="margin-bottom: 30px;">
+                <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #d8d7d9;">
                   <ng-form name="avatarForm" class="flex flex-column justify-center items-center">
 
-                    <umb-avatar style="margin-bottom: 10px;"
-                                color="secondary"
-                                size="xxl"
-                                name="{{vm.user.name}}"
-                                img-src="{{vm.user.avatars[3]}}"
-                                img-srcset="{{vm.user.avatars[4]}} 2x, {{vm.user.avatars[4]}} 3x">
-                    </umb-avatar>
+                      <umb-avatar style="margin-bottom: 15px;"
+                                  color="secondary"
+                                  size="xxl"
+                                  name="{{vm.user.name}}"
+                                  img-src="{{vm.user.avatars[3]}}"
+                                  img-srcset="{{vm.user.avatars[4]}} 2x, {{vm.user.avatars[4]}} 3x">
+                      </umb-avatar>
 
                     <umb-progress-bar style="max-width: 120px;"
                                       ng-if="vm.avatarFile.uploadStatus === 'uploading'"
                                       progress="{{ vm.avatarFile.uploadProgress }}"
                                       size="s">
                     </umb-progress-bar>
-
-                    <a href=""
-                       class="file-select bold"
-                       ng-if="vm.avatarFile.uploadStatus !== 'uploading'"
-                       ngf-select
-                       ng-model="filesHolder"
-                       ngf-change="changeAvatar($files, $event)"
-                       ngf-multiple="false"
-                       ngf-pattern="{{vm.acceptedFileTypes}}"
-                       ngf-max-size="{{ vm.maxFileSize }}">
-                      Change photo
-                    </a>
+                    
+                    <div class="flex items-center" ng-if="vm.avatarFile.uploadStatus !== 'uploading'">
+                   
+                      <a href=""
+                        class="umb-user-group-preview__action"
+                        ngf-select
+                        ng-model="filesHolder"
+                        ngf-change="changeAvatar($files, $event)"
+                        ngf-multiple="false"
+                        ngf-pattern="{{vm.acceptedFileTypes}}"
+                        ngf-max-size="{{ vm.maxFileSize }}">
+                        <localize key="user_changePhoto">Change photo</localize>
+                      </a>
+                    
+                      <a href="" class="umb-user-group-preview__action umb-user-group-preview__action--red" ng-click="vm.clearAvatar()" prevent-default>
+                        <localize key="user_removePhoto">Remove photo</localize>
+                      </a>
+                      
+                    </div>
 
                   </ng-form>
 
