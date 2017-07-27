@@ -44,11 +44,11 @@ namespace Umbraco.Tests.PublishedContent
             var propertyTypes = new[]
                 {
                     // AutoPublishedContentType will auto-generate other properties
-                    new PublishedPropertyType("umbracoNaviHide", 0, Constants.PropertyEditors.TrueFalseAlias), 
-                    new PublishedPropertyType("selectedNodes", 0, "?"), 
-                    new PublishedPropertyType("umbracoUrlAlias", 0, "?"), 
-                    new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias), 
-                    new PublishedPropertyType("testRecursive", 0, "?"), 
+                    new PublishedPropertyType("umbracoNaviHide", 0, Constants.PropertyEditors.TrueFalseAlias),
+                    new PublishedPropertyType("selectedNodes", 0, "?"),
+                    new PublishedPropertyType("umbracoUrlAlias", 0, "?"),
+                    new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias),
+                    new PublishedPropertyType("testRecursive", 0, "?"),
                 };
             var compositionAliases = new[] {"MyCompositionAlias"};
             var type = new AutoPublishedContentType(0, "anything", compositionAliases, propertyTypes);
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.PublishedContent
 	    protected override string GetXmlContent(int templateId)
 		{
 			return @"<?xml version=""1.0"" encoding=""utf-8""?>
-<!DOCTYPE root[ 
+<!DOCTYPE root[
 <!ELEMENT Home ANY>
 <!ATTLIST Home id ID #REQUIRED>
 <!ELEMENT CustomDocument ANY>
@@ -87,17 +87,17 @@ namespace Umbraco.Tests.PublishedContent
 		<testRecursive><![CDATA[This is the recursive val]]></testRecursive>
 		<Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc="""">
 			<content><![CDATA[<div>This is some content</div>]]></content>
-			<umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>			
+			<umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>
 			<testRecursive><![CDATA[]]></testRecursive>
 			<Home id=""1174"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-07-20T18:07:54"" updateDate=""2012-07-20T19:10:27"" nodeName=""Sub2"" urlName=""sub2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1174"" isDoc="""">
 				<content><![CDATA[]]></content>
 				<umbracoUrlAlias><![CDATA[only/one/alias]]></umbracoUrlAlias>
 				<creatorName><![CDATA[Custom data with same property name as the member name]]></creatorName>
 				<testRecursive><![CDATA[]]></testRecursive>
-			</Home>			
+			</Home>
 			<CustomDocument id=""1177"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""custom sub 1"" urlName=""custom-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1177"" isDoc="""" />
 			<CustomDocument id=""1178"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-16T14:23:35"" nodeName=""custom sub 2"" urlName=""custom-sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178"" isDoc="""" />
-            <Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc="""">
+            <Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc="""" key=""CDB83BBC-A83B-4BA6-93B8-AADEF67D3C09"">
 				<content><![CDATA[]]></content>
                 <umbracoNaviHide>1</umbracoNaviHide>
 			</Home>
@@ -211,8 +211,8 @@ namespace Umbraco.Tests.PublishedContent
         [PublishedContentModel("Home")]
         internal class Home : PublishedContentModel
         {
-            public Home(IPublishedContent content) 
-                : base(content) 
+            public Home(IPublishedContent content)
+                : base(content)
             {}
         }
 
@@ -658,6 +658,28 @@ namespace Umbraco.Tests.PublishedContent
 
 			Assert.AreEqual((int)1178, (int)result.Id);
 		}
+
+	    [Test]
+	    public void GetKey()
+	    {
+	        var key = Guid.Parse("CDB83BBC-A83B-4BA6-93B8-AADEF67D3C09");
+
+            // doc is Home (a model) and GetKey unwraps and works
+            var doc = GetNode(1176);
+            Assert.IsInstanceOf<Home>(doc);
+            Assert.AreEqual(key, doc.GetKey());
+
+            // wrapped is PublishedContentWrapped and WithKey unwraps
+            var wrapped = new TestWrapped(doc);
+	        Assert.AreEqual(key, wrapped.GetKey());
+	    }
+
+        class TestWrapped : PublishedContentWrapped
+        {
+            public TestWrapped(IPublishedContent content)
+                : base(content)
+            { }
+        }
 
         [Test]
         public void DetachedProperty1()

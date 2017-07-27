@@ -19,6 +19,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
             var mediaMock = new Mock<IMedia>();
             mediaMock.Setup(m => m.Path).Returns("-1,1234,5678");
@@ -71,8 +72,8 @@ namespace Umbraco.Tests.Web.Controllers
             mediaServiceMock.Setup(x => x.GetById(1234)).Returns(media);
             var mediaService = mediaServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
-            entityServiceMock.Setup(x => x.GetAll(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns(new[] {Mock.Of<IUmbracoEntity>(entity => entity.Id == 9876 && entity.Path == "-1,9876")});
+            entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+                .Returns(new[] {Mock.Of<EntityPath>(entity => entity.Id == 9876 && entity.Path == "-1,9876")});
             var entityService = entityServiceMock.Object;
 
             //act
@@ -88,6 +89,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
             var mediaServiceMock = new Mock<IMediaService>();
             var mediaService = mediaServiceMock.Object;
@@ -112,8 +114,8 @@ namespace Umbraco.Tests.Web.Controllers
             var mediaServiceMock = new Mock<IMediaService>();
             var mediaService = mediaServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
-            entityServiceMock.Setup(x => x.GetAll(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns(new[] { Mock.Of<IUmbracoEntity>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
+            entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+                .Returns(new[] { Mock.Of<EntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
             var entityService = entityServiceMock.Object;
 
             //act
@@ -129,6 +131,7 @@ namespace Umbraco.Tests.Web.Controllers
             //arrange
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
             var user = userMock.Object;
             var mediaServiceMock = new Mock<IMediaService>();
             var mediaService = mediaServiceMock.Object;
@@ -153,8 +156,8 @@ namespace Umbraco.Tests.Web.Controllers
             var mediaServiceMock = new Mock<IMediaService>();
             var mediaService = mediaServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
-            entityServiceMock.Setup(x => x.GetAll(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns(new[] { Mock.Of<IUmbracoEntity>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
+            entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+                .Returns(new[] { Mock.Of<EntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
             var entityService = entityServiceMock.Object;
 
             //act

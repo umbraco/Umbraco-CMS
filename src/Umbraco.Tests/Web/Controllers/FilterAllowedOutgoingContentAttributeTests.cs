@@ -92,8 +92,8 @@ namespace Umbraco.Tests.Web.Controllers
             var userServiceMock = new Mock<IUserService>();
             var userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
-            entityServiceMock.Setup(x => x.GetAll(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns(new[] { Mock.Of<IUmbracoEntity>(entity => entity.Id == 5 && entity.Path == "-1,5") });
+            entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+                .Returns(new[] { Mock.Of<EntityPath>(entity => entity.Id == 5 && entity.Path == "-1,5") });
             var entityService = entityServiceMock.Object;
 
             var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), userService, entityService);

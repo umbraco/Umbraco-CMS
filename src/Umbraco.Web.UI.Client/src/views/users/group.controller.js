@@ -19,6 +19,7 @@
         vm.clearStartNode = clearStartNode;
         vm.save = save;
         vm.openGranularPermissionsPicker = openGranularPermissionsPicker;
+        vm.setPermissionsForNode = setPermissionsForNode;
 
         function init() {
 
@@ -251,8 +252,10 @@
                     vm.nodePermissions.show = false;
                     vm.nodePermissions = null;
                     // close content picker overlay
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                    if(vm.contentPicker) {
+                        vm.contentPicker.show = false;
+                        vm.contentPicker = null;
+                    }
                 },
                 close: function (oldModel) {
                     vm.nodePermissions.show = false;

@@ -547,6 +547,8 @@ namespace Umbraco.Web.Editors
 
                 if (id == Constants.System.Root)
                 {
+                    // root is special: we reduce it to start nodes
+
                     int[] aids = null;
                     switch (type)
                     {
@@ -558,9 +560,9 @@ namespace Umbraco.Web.Editors
                             break;
                     }
 
-                    entities = aids != null && aids.Length > 0
-                        ? Services.EntityService.GetPagedDescendants(aids, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter)
-                        : Services.EntityService.GetPagedDescendantsFromRoot(objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter, includeTrashed: false);
+                    entities = aids == null || aids.Contains(Constants.System.Root)
+                        ? Services.EntityService.GetPagedDescendantsFromRoot(objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter, includeTrashed: false)
+                        : Services.EntityService.GetPagedDescendants(aids, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
                 }
                 else
                 {
@@ -676,6 +678,8 @@ namespace Umbraco.Web.Editors
             string type;
             var searcher = Constants.Examine.InternalSearcher;            
             var fields = new[] { "id", "__NodeId" };
+
+            totalFound = 0;
             
             //TODO: WE should really just allow passing in a lucene raw query
             switch (entityType)
@@ -694,15 +698,21 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Media:
                     type = "media";
 
+                    var mediaStartNodeIds = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
+                    if (mediaStartNodeIds.Length == 0) return Enumerable.Empty<EntityBasic>();
+
                     AddExamineSearchFrom(searchFrom, sb);
-                    AddExamineUserStartNode(Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService), sb);
+                    AddExamineUserStartNode(mediaStartNodeIds, sb);
 
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
 
+                    var contentStartNodeIds = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
+                    if (contentStartNodeIds.Length == 0) return Enumerable.Empty<EntityBasic>();
+
                     AddExamineSearchFrom(searchFrom, sb);
-                    AddExamineUserStartNode(Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService), sb);
+                    AddExamineUserStartNode(contentStartNodeIds, sb);
                     
                     break;
                 default:
@@ -957,7 +967,7 @@ namespace Umbraco.Web.Editors
                         break;
                 }
 
-                if (aids != null && aids.Length > 0)
+                if (aids != null)
                 {
                     var lids = new List<int>();
                     var ok = false;

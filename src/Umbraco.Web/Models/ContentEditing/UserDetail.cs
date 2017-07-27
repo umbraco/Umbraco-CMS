@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
@@ -23,6 +25,12 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "emailHash")]
         public string EmailHash { get; set; }
+
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [ReadOnly(true)]
+        [DataMember(Name = "userType")]        
+        public string UserType { get; set; }
 
         /// <summary>
         /// Gets/sets the number of seconds for the user's auth ticket to expire
