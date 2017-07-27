@@ -78,6 +78,7 @@ namespace Umbraco.Web.Editors
             return urls;
         }
 
+        [AppendUserModifiedHeader("id")]
         [FileUploadCleanupFilter(false)]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
@@ -141,6 +142,7 @@ namespace Umbraco.Web.Editors
             return request.CreateResponse(HttpStatusCode.OK, user.GetCurrentUserAvatarUrls(userService, staticCache));
         }
 
+        [AppendUserModifiedHeader("id")]
         public HttpResponseMessage PostClearAvatar(int id)
         {
             var found = Services.UserService.GetUserById(id);

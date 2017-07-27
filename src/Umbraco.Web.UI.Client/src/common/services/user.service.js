@@ -225,6 +225,26 @@ angular.module('umbraco.services')
           });
       },
 
+      /** Refreshes the current user data with the data stored for the user on the server and returns it */
+      refreshCurrentUser: function() {
+          var deferred = $q.defer();
+
+          authResource.getCurrentUser()
+              .then(function (data) {
+
+                  var result = { user: data, authenticated: true, lastUserId: lastUserId, loginType: "implicit" };
+                  
+                  setCurrentUser(data);
+
+                  deferred.resolve(currentUser);
+              }, function () {
+                  //it failed, so they are not logged in
+                  deferred.reject();
+              });
+
+          return deferred.promise;
+      },
+
       /** Returns the current user object in a promise  */
       getCurrentUser: function (args) {
         var deferred = $q.defer();

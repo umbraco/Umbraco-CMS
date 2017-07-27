@@ -132,7 +132,14 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public int[] AllStartContentIds
         {
-            get { return _allStartContentIds ?? (_allStartContentIds = StartContentIds.Concat(Groups.Where(x => x.StartContentId.HasValue).Select(x => x.StartContentId.Value)).Distinct().ToArray()); }
+            get
+            {
+                if (_allStartContentIds != null) return _allStartContentIds;
+
+                var gsn = Groups.Where(x => x.StartContentId.HasValue).Select(x => x.StartContentId.Value).Distinct().ToArray();
+                var usn = StartContentIds;
+                return _allStartContentIds = UserExtensions.CombineStartNodes(UmbracoObjectTypes.Document, gsn, usn, ApplicationContext.Current.Services.EntityService);
+            }
         }
 
         /// <summary>
@@ -140,7 +147,14 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public int[] AllStartMediaIds
         {
-            get { return _allStartMediaIds ?? (_allStartMediaIds = StartMediaIds.Concat(Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId.Value)).Distinct().ToArray()); }
+            get
+            {
+                if (_allStartMediaIds != null) return _allStartMediaIds;
+
+                var gsn = Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId.Value).Distinct().ToArray();
+                var usn = StartMediaIds;
+                return _allStartMediaIds = UserExtensions.CombineStartNodes(UmbracoObjectTypes.Media, gsn, usn, ApplicationContext.Current.Services.EntityService);
+            }
         }
     }
 }

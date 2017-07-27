@@ -7,6 +7,9 @@
     app.authenticated
     app.notAuthenticated
     app.closeDialogs
+    app.ysod
+    app.reInitialize
+    app.userRefresh
 */
 
 function eventsService($q, $rootScope) {
