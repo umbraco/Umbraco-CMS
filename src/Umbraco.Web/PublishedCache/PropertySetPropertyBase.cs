@@ -28,7 +28,7 @@ namespace Umbraco.Web.PublishedCache
         }
 
         public override bool HasValue => _sourceValue != null
-            && ((_sourceValue is string) == false || string.IsNullOrWhiteSpace((string)_sourceValue) == false);
+            && (!(_sourceValue is string) || string.IsNullOrWhiteSpace((string) _sourceValue) == false);
 
         protected class CacheValues
         {
@@ -38,29 +38,11 @@ namespace Umbraco.Web.PublishedCache
             public object XPathValue;
         }
 
-        private static void ValidateCacheLevel(PropertyCacheLevel cacheLevel)
-        {
-            switch (cacheLevel)
-            {
-                case PropertyCacheLevel.Content:
-                case PropertyCacheLevel.Snapshot:
-                case PropertyCacheLevel.Facade:
-                case PropertyCacheLevel.None:
-                    break;
-                default:
-                    throw new Exception("Invalid cache level.");
-            }
-        }
-
         private void GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
         {
             // based upon the current reference cache level (ReferenceCacheLevel) and this property
             // cache level (PropertyType.CacheLevel), determines both the actual cache level for the
             // property, and the new reference cache level.
-
-            // sanity checks
-            ValidateCacheLevel(ReferenceCacheLevel);
-            ValidateCacheLevel(PropertyType.CacheLevel);
 
             // if the property cache level is 'shorter-termed' that the reference
             // then use it and it becomes the new reference, else use Content and
@@ -71,7 +53,7 @@ namespace Umbraco.Web.PublishedCache
             // snapshot, ok to use content. OTOH, currently caching at snapshot,
             // property specifies facade, need to use facade.
             //
-            if (PropertyType.CacheLevel > ReferenceCacheLevel)
+            if (PropertyType.CacheLevel > ReferenceCacheLevel || PropertyType.CacheLevel == PropertyCacheLevel.None)
             {
                 cacheLevel = PropertyType.CacheLevel;
                 referenceCacheLevel = cacheLevel;
@@ -130,8 +112,7 @@ namespace Umbraco.Web.PublishedCache
             {
                 lock (_locko)
                 {
-                    PropertyCacheLevel cacheLevel, referenceCacheLevel;
-                    GetCacheLevels(out cacheLevel, out referenceCacheLevel);
+                    GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel);
 
                     var cacheValues = GetCacheValues(cacheLevel);
                     if (cacheValues.ObjectInitialized) return cacheValues.ObjectValue;
@@ -149,8 +130,7 @@ namespace Umbraco.Web.PublishedCache
             {
                 lock (_locko)
                 {
-                    PropertyCacheLevel cacheLevel, referenceCacheLevel;
-                    GetCacheLevels(out cacheLevel, out referenceCacheLevel);
+                    GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel);
 
                     var cacheValues = GetCacheValues(cacheLevel);
                     if (cacheValues.XPathInitialized) return cacheValues.XPathValue;

@@ -13,6 +13,23 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             PropertyType = propertyType ?? throw new ArgumentNullException(nameof(propertyType));
             ReferenceCacheLevel = referenceCacheLevel;
+
+            ValidateCacheLevel(ReferenceCacheLevel);
+            ValidateCacheLevel(PropertyType.CacheLevel);
+        }
+
+        private static void ValidateCacheLevel(PropertyCacheLevel cacheLevel)
+        {
+            switch (cacheLevel)
+            {
+                case PropertyCacheLevel.Content:
+                case PropertyCacheLevel.Snapshot:
+                case PropertyCacheLevel.Facade:
+                case PropertyCacheLevel.None:
+                    break;
+                default:
+                    throw new Exception("Invalid cache level.");
+            }
         }
 
         public PublishedPropertyType PropertyType { get; }

@@ -179,7 +179,7 @@ namespace Umbraco.Web.Models
             while (content != null && (property == null || property.HasValue == false))
             {
                 content = content.Parent;
-                property = content == null ? null : content.GetProperty(alias);
+                property = content?.GetProperty(alias);
                 if (firstNonNullProperty == null && property != null) firstNonNullProperty = property;
             }
 

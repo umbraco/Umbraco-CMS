@@ -20,7 +20,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     /// <summary>
     /// Implements a facade service.
     /// </summary>
-    class FacadeService : FacadeServiceBase
+    internal class FacadeService : FacadeServiceBase
     {
         private readonly XmlStore _xmlStore;
         private readonly RoutesCache _routesCache;
@@ -242,6 +242,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public override IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, IPropertySet set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
         {
+            // fixme - ouch?
             throw new NotImplementedException();
         }
 

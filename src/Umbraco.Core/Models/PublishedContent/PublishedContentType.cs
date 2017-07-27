@@ -14,11 +14,13 @@ namespace Umbraco.Core.Models.PublishedContent
         private readonly PublishedPropertyType[] _propertyTypes;
 
         // fast alias-to-index xref containing both the raw alias and its lowercase version
+        // fixme - benchmark this!
         private readonly Dictionary<string, int> _indexes = new Dictionary<string, int>();
 
         // internal so it can be used by PublishedNoCache which does _not_ want to cache anything and so will never
         // use the static cache getter PublishedContentType.GetPublishedContentType(alias) below - anything else
         // should use it.
+        // fixme - not true anymore internal and all?!
         internal PublishedContentType(IContentType contentType)
             : this(PublishedItemType.Content, contentType)
         { }
@@ -88,7 +90,7 @@ namespace Umbraco.Core.Models.PublishedContent
         // NOTE: code below defines and add custom, built-in, Umbraco properties for members
         //  unless they are already user-defined in the content type, then they are skipped
         // not sure it's needed really - this is here for safety purposes
-        static readonly Dictionary<string, Tuple<int, string>> BuiltinMemberProperties = new Dictionary<string, Tuple<int, string>>
+        private static readonly Dictionary<string, Tuple<int, string>> BuiltinMemberProperties = new Dictionary<string, Tuple<int, string>>
         {
             // see also PublishedMember class - exposing special properties as properties
             { "Email", Tuple.Create(Constants.DataTypes.Textbox, Constants.PropertyEditors.TextboxAlias) },
@@ -115,7 +117,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
             foreach (var propertyType in BuiltinMemberProperties
                 .Where(kvp => aliases.Contains(kvp.Key) == false)
-                .Select(kvp => new PublishedPropertyType(kvp.Key, kvp.Value.Item1, kvp.Value.Item2, true)))
+                .Select(kvp => new PublishedPropertyType(kvp.Key, kvp.Value.Item1, kvp.Value.Item2, umbraco: true)))
             {
                 if (contentType != null) propertyType.ContentType = contentType;
                 yield return propertyType;

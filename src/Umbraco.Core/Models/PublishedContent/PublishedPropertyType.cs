@@ -13,6 +13,15 @@ namespace Umbraco.Core.Models.PublishedContent
     /// if the property type changes, then a new class needs to be created.</remarks>
     public class PublishedPropertyType
     {
+        private readonly PropertyValueConverterCollection _converters;
+        private readonly object _locker = new object();
+        private volatile bool _initialized;
+        private IPropertyValueConverter _converter;
+        private PropertyCacheLevel _cacheLevel;
+
+        private Type _modelClrType;
+        private Type _clrType;
+
         #region Constructors
 
         /// <summary>
@@ -25,6 +34,8 @@ namespace Umbraco.Core.Models.PublishedContent
         public PublishedPropertyType(PublishedContentType contentType, PropertyType propertyType)
         {
             // PropertyEditor [1:n] DataTypeDefinition [1:n] PropertyType
+
+            _converters = Current.PropertyValueConverters; // fixme really?
 
             ContentType = contentType;
             PropertyTypeAlias = propertyType.Alias;
@@ -46,8 +57,8 @@ namespace Umbraco.Core.Models.PublishedContent
         /// to make decisions, fetch prevalues, etc.</para>
         /// <para>The value of <paramref name="propertyEditorAlias"/> is assumed to be valid.</para>
         /// </remarks>
-        internal PublishedPropertyType(string propertyTypeAlias, string propertyEditorAlias)
-            : this(propertyTypeAlias, 0, propertyEditorAlias)
+        internal PublishedPropertyType(string propertyTypeAlias, string propertyEditorAlias, PropertyValueConverterCollection converters = null)
+            : this(propertyTypeAlias, 0, propertyEditorAlias, converters)
         { }
 
         /// <summary>
@@ -63,10 +74,12 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <para>The values of <paramref name="dataTypeDefinitionId"/> and <paramref name="propertyEditorAlias"/> are
         /// assumed to be valid and consistent.</para>
         /// </remarks>
-        internal PublishedPropertyType(string propertyTypeAlias, int dataTypeDefinitionId, string propertyEditorAlias, bool umbraco = false)
+        internal PublishedPropertyType(string propertyTypeAlias, int dataTypeDefinitionId, string propertyEditorAlias, PropertyValueConverterCollection converters = null, bool umbraco = false)
         {
             // ContentType
             // - in unit tests, to be set by PublishedContentType when creating it
+
+            _converters = converters ?? Current.PropertyValueConverters; // fixme really?
 
             PropertyTypeAlias = propertyTypeAlias;
 
@@ -109,32 +122,23 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region Converters
 
-        private readonly object _locker = new object();
-        private volatile bool _initialized;
-        private IPropertyValueConverter _converter;
-        private PropertyCacheLevel _cacheLevel;
-
-        private Type _modelClrType;
-        private Type _clrType;
-
-        private void EnsureInitialized()
+        private void Initialize()
         {
             if (_initialized) return;
             lock (_locker)
             {
                 if (_initialized) return;
-                InitializeConverters();
+                InitializeLocked();
                 _initialized = true;
             }
         }
 
-        private void InitializeConverters()
+        private void InitializeLocked()
         {
             _converter = null;
             var isdefault = false;
 
-            var converterCollection = Current.PropertyValueConverters;
-            foreach (var converter in converterCollection)
+            foreach (var converter in _converters)
             {
                 if (converter.IsConverter(this) == false)
                     continue;
@@ -142,20 +146,20 @@ namespace Umbraco.Core.Models.PublishedContent
                 if (_converter == null)
                 {
                     _converter = converter;
-                    isdefault = converterCollection.IsDefault(converter);
+                    isdefault = _converters.IsDefault(converter);
                     continue;
                 }
 
                 if (isdefault)
                 {
-                    if (converterCollection.IsDefault(converter))
+                    if (_converters.IsDefault(converter))
                     {
                         // previous was default, and got another default
-                        if (converterCollection.Shadows(_converter, converter))
+                        if (_converters.Shadows(_converter, converter))
                         {
                             // previous shadows, ignore
                         }
-                        else if (converterCollection.Shadows(converter, _converter))
+                        else if (_converters.Shadows(converter, _converter))
                         {
                             // shadows previous, replace
                             _converter = converter;
@@ -179,7 +183,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 }
                 else
                 {
-                    if (converterCollection.IsDefault(converter))
+                    if (_converters.IsDefault(converter))
                     {
                         // previous was non-default, ignore default
                     }
@@ -204,7 +208,7 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             get
             {
-                EnsureInitialized();
+                if (!_initialized) Initialize();
                 return _cacheLevel;
             }
         }
@@ -215,7 +219,7 @@ namespace Umbraco.Core.Models.PublishedContent
         // preview: whether we are previewing or not
         public object ConvertSourceToInter(IPropertySet owner, object source, bool preview)
         {
-            EnsureInitialized();
+            if (!_initialized) Initialize();
 
             // use the converter if any, else just return the source value
             return _converter != null
@@ -229,7 +233,7 @@ namespace Umbraco.Core.Models.PublishedContent
         // preview: whether we are previewing or not
         public object ConvertInterToObject(IPropertySet owner, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
-            EnsureInitialized();
+            if (!_initialized) Initialize();
 
             // use the converter if any, else just return the inter value
             return _converter != null
@@ -244,7 +248,7 @@ namespace Umbraco.Core.Models.PublishedContent
         // preview: whether we are previewing or not
         public object ConvertInterToXPath(IPropertySet owner, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
-            EnsureInitialized();
+            if (!_initialized) Initialize();
 
             // use the converter if any
             if (_converter != null)
@@ -264,7 +268,7 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             get
             {
-                EnsureInitialized();
+                if (!_initialized) Initialize();
                 return _modelClrType;
             }
         }
@@ -276,7 +280,7 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             get
             {
-                EnsureInitialized();
+                if (!_initialized) Initialize();
                 return _clrType ?? (_clrType = ModelType.Map(_modelClrType, Current.PublishedContentModelFactory.ModelTypeMap));
             }
         }

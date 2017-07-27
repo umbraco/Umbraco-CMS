@@ -55,7 +55,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         public override bool HasValue => _sourceValue != null
-            && ((_sourceValue is string) == false || string.IsNullOrWhiteSpace((string)_sourceValue) == false);
+            && (!(_sourceValue is string) || string.IsNullOrWhiteSpace((string) _sourceValue) == false);
 
         private class CacheValues
         {

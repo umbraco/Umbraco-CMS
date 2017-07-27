@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LightInject;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -17,6 +16,17 @@ namespace Umbraco.Tests.PublishedContent
     [TestFixture]
     public class ModelsAndConvertersTests
     {
+        // fixme
+        // naming: IPublishedProperty is IPropertySetProperty or IFacadeProperty of some sort
+        // naming: general naming sucks at the moment
+        // caching: re-think how properties are cached
+        //  - for true NuCache content it probably is OK (but needs explanation)
+        //  - for true Xml cache content it probably is OK (but needs explanation)
+        //  - for pure sets, I have no idea - should at least cache at content level?
+        //    hold on - PropertySetPropertyBase probably handles it - need to check
+
+        #region ModelType
+
         [Test]
         public void ModelTypeEqualityTests()
         {
@@ -61,16 +71,132 @@ namespace Umbraco.Tests.PublishedContent
                 ModelType.Map(typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1").MakeArrayType()), map).ToString());
         }
 
+        #endregion
+
+        #region SimpleConverter1
+
         [Test]
-        public void ConverterTest1()
+        public void SimpleConverter1Test()
+        {
+            var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
+            {
+                new SimpleConverter1(),
+            });
+
+            var setType1 = new PublishedContentType(1000, "set1", new[]
+            {
+                new PublishedPropertyType("prop1", "editor1", converters),
+            });
+
+            var set1 = new PropertySet(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+
+            Assert.AreEqual(1234, set1.Value("prop1"));
+        }
+
+        private class SimpleConverter1 : IPropertyValueConverter
+        {
+            public bool IsConverter(PublishedPropertyType propertyType)
+                => propertyType.PropertyEditorAlias.InvariantEquals("editor1");
+
+            public Type GetPropertyValueType(PublishedPropertyType propertyType)
+                => typeof (int);
+
+            public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+                => PropertyCacheLevel.Content;
+
+            public object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
+                => int.TryParse(source as string, out int i) ? i : 0;
+
+            public object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+                => (int) inter;
+
+            public object ConvertInterToXPath(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+                => ((int) inter).ToString();
+        }
+
+        #endregion
+
+        #region SimpleConverter2
+
+        [Test]
+        public void SimpleConverter2Test()
+        {
+            var cacheMock = new Mock<IPublishedContentCache>();
+            var cacheContent = new Dictionary<int, IPublishedContent>();
+            cacheMock.Setup(x => x.GetById(It.IsAny<int>())).Returns<int>(id => cacheContent.TryGetValue(id, out IPublishedContent content) ? content : null);
+            var facadeMock = new Mock<IFacade>();
+            facadeMock.Setup(x => x.ContentCache).Returns(cacheMock.Object);
+            var facadeAccessorMock = new Mock<IFacadeAccessor>();
+            facadeAccessorMock.Setup(x => x.Facade).Returns(facadeMock.Object);
+            var facadeAccessor = facadeAccessorMock.Object;
+
+            var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
+            {
+                new SimpleConverter2(facadeAccessor),
+            });
+
+            var setType1 = new PublishedContentType(1000, "set1", new[]
+            {
+                new PublishedPropertyType("prop1", "editor2", converters),
+            });
+
+            var set1 = new PropertySet(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+
+            var cntType1 = new PublishedContentType(1001, "cnt1", Array.Empty<PublishedPropertyType>());
+            var cnt1 = new TestPublishedContent(cntType1, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
+            cacheContent[cnt1.Id] = cnt1;
+
+            Assert.AreSame(cnt1, set1.Value("prop1"));
+        }
+
+        private class SimpleConverter2 : IPropertyValueConverter
+        {
+            private readonly IFacadeAccessor _facadeAccessor;
+            private readonly PropertyCacheLevel _cacheLevel;
+
+            public SimpleConverter2(IFacadeAccessor facadeAccessor, PropertyCacheLevel cacheLevel = PropertyCacheLevel.None)
+            {
+                _facadeAccessor = facadeAccessor;
+                _cacheLevel = cacheLevel;
+            }
+
+            public bool IsConverter(PublishedPropertyType propertyType)
+                => propertyType.PropertyEditorAlias.InvariantEquals("editor2");
+
+            public Type GetPropertyValueType(PublishedPropertyType propertyType)
+                // the first version would be the "generic" version, but say we want to be more precise
+                // and return: whatever Clr type is generated for content type with alias "cnt1" -- which
+                // we cannot really typeof() at the moment because it has not been generated, hence ModelType.
+                // => typeof (IPublishedContent);
+                => ModelType.For("cnt1");
+
+            public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+                => _cacheLevel;
+
+            public object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
+                => int.TryParse(source as string, out int i) ? i : -1;
+
+            public object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+                => _facadeAccessor.Facade.ContentCache.GetById((int) inter);
+
+            public object ConvertInterToXPath(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+                => ((int) inter).ToString();
+        }
+
+        #endregion
+
+        #region SimpleConverter3
+
+        [Test]
+        public void SimpleConverter3Test()
         {
             Current.Reset();
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
 
             Current.Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>()
-                .Append<TestConverter1>()
-                .Append<TestConverter2>();
+                .Append<SimpleConverter3A>()
+                .Append<SimpleConverter3B>();
 
             IPublishedContentModelFactory factory = new PublishedContentModelFactory(new[]
             {
@@ -78,6 +204,15 @@ namespace Umbraco.Tests.PublishedContent
                 typeof(TestContentModel1), typeof(TestContentModel2),
             });
             Current.Container.Register(f => factory);
+
+            var cacheMock = new Mock<IPublishedContentCache>();
+            var cacheContent = new Dictionary<int, IPublishedContent>();
+            cacheMock.Setup(x => x.GetById(It.IsAny<int>())).Returns<int>(id => cacheContent.TryGetValue(id, out IPublishedContent content) ? content : null);
+            var facadeMock = new Mock<IFacade>();
+            facadeMock.Setup(x => x.ContentCache).Returns(cacheMock.Object);
+            var facadeAccessorMock = new Mock<IFacadeAccessor>();
+            facadeAccessorMock.Setup(x => x.Facade).Returns(facadeMock.Object);
+            Current.Container.Register(f => facadeAccessorMock.Object);
 
             var setType1 = new PublishedContentType(1000, "set1", new[]
             {
@@ -101,41 +236,31 @@ namespace Umbraco.Tests.PublishedContent
 
             var set1 = new PropertySet(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "val1" } }, false);
             var set2 = new PropertySet(setType2, Guid.NewGuid(), new Dictionary<string, object> { { "prop2", "1003" } }, false);
-            var cnt1 = new TestPublishedContent(contentType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "val1" } }, false);
-            var cnt2 = new TestPublishedContent(contentType2, Guid.NewGuid(), new Dictionary<string, object> { { "prop2", "1003" } }, false);
+            var cnt1 = new TestPublishedContent(contentType1, 1003, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "val1" } }, false);
+            var cnt2 = new TestPublishedContent(contentType2, 1004, Guid.NewGuid(), new Dictionary<string, object> { { "prop2", "1003" } }, false);
 
-            var cache = new Dictionary<int, IPublishedContent>
-            {
-                { 1003, cnt1.CreateModel() },
-                { 1004, cnt2.CreateModel() },
-            };
-
-            var facadeMock = new Mock<IFacade>();
-            var cacheMock = new Mock<IPublishedContentCache>();
-            cacheMock.Setup(x => x.GetById(It.IsAny<int>())).Returns<int>(id => cache.TryGetValue(id, out IPublishedContent content) ? content : null);
-            facadeMock.Setup(x => x.ContentCache).Returns(cacheMock.Object);
-            var facade = facadeMock.Object;
-            Current.Container.Register(f => facade);
+            cacheContent[cnt1.Id] = cnt1.CreateModel();
+            cacheContent[cnt2.Id] = cnt2.CreateModel();
 
             // can get the actual property Clr type
             // ie ModelType gets properly mapped by IPublishedContentModelFactory
             // must test ModelClrType with special equals 'cos they are not ref-equals
-            Assert.IsTrue(ModelType.Equals(typeof (IEnumerable<>).MakeGenericType(ModelType.For("content1")), contentType2.GetPropertyType("prop2").ModelClrType));
-            Assert.AreEqual(typeof (IEnumerable<TestContentModel1>), contentType2.GetPropertyType("prop2").ClrType);
+            Assert.IsTrue(ModelType.Equals(typeof(IEnumerable<>).MakeGenericType(ModelType.For("content1")), contentType2.GetPropertyType("prop2").ModelClrType));
+            Assert.AreEqual(typeof(IEnumerable<TestContentModel1>), contentType2.GetPropertyType("prop2").ClrType);
 
             // can create a model for a property set
             var model1 = factory.CreateModel(set1);
             Assert.IsInstanceOf<TestSetModel1>(model1);
-            Assert.AreEqual("val1", ((TestSetModel1) model1).Prop1);
+            Assert.AreEqual("val1", ((TestSetModel1)model1).Prop1);
 
             // can create a model for a published content
             var model2 = factory.CreateModel(set2);
             Assert.IsInstanceOf<TestSetModel2>(model2);
-            var mmodel2 = (TestSetModel2) model2;
+            var mmodel2 = (TestSetModel2)model2;
 
             // and get direct property
             Assert.IsInstanceOf<TestContentModel1[]>(model2.Value("prop2"));
-            Assert.AreEqual(1, ((TestContentModel1[]) model2.Value("prop2")).Length);
+            Assert.AreEqual(1, ((TestContentModel1[])model2.Value("prop2")).Length);
 
             // and get model property
             Assert.IsInstanceOf<IEnumerable<TestContentModel1>>(mmodel2.Prop2);
@@ -143,41 +268,298 @@ namespace Umbraco.Tests.PublishedContent
             var mmodel1 = mmodel2.Prop2.First();
 
             // and we get what we want
-            Assert.AreSame(cache[1003], mmodel1);
+            Assert.AreSame(cacheContent[mmodel1.Id], mmodel1);
         }
 
-        internal class TestPublishedContent : PropertySet, IPublishedContent
+        public class SimpleConverter3A : PropertyValueConverterBase
         {
-            public TestPublishedContent(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing)
-                : base(contentType, key, values, previewing)
-            { }
+            public override bool IsConverter(PublishedPropertyType propertyType)
+                => propertyType.PropertyEditorAlias == "editor1";
 
-            public int Id { get; }
-            public int TemplateId { get; }
-            public int SortOrder { get; }
-            public string Name { get; }
-            public string UrlName { get; }
-            public string DocumentTypeAlias { get; }
-            public int DocumentTypeId { get; }
-            public string WriterName { get; }
-            public string CreatorName { get; }
-            public int WriterId { get; }
-            public int CreatorId { get; }
-            public string Path { get; }
-            public DateTime CreateDate { get; }
-            public DateTime UpdateDate { get; }
-            public Guid Version { get; }
-            public int Level { get; }
-            public string Url { get; }
-            public PublishedItemType ItemType { get; }
-            public bool IsDraft { get; }
-            public IPublishedContent Parent { get; }
-            public IEnumerable<IPublishedContent> Children { get; }
-            public IPublishedProperty GetProperty(string alias, bool recurse)
+            public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+                => typeof (string);
+
+            public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+                => PropertyCacheLevel.Content;
+        }
+
+        public class SimpleConverter3B : PropertyValueConverterBase
+        {
+            private readonly IFacadeAccessor _facadeAccessor;
+
+            public SimpleConverter3B(IFacadeAccessor facadeAccessor)
             {
-                throw new NotImplementedException();
+                _facadeAccessor = facadeAccessor;
+            }
+
+            public override bool IsConverter(PublishedPropertyType propertyType)
+                => propertyType.PropertyEditorAlias == "editor2";
+
+            public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+                => typeof (IEnumerable<>).MakeGenericType(ModelType.For("content1"));
+
+            public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+                => PropertyCacheLevel.Snapshot;
+
+            public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
+            {
+                var s = source as string;
+                return s?.Split(',').Select(int.Parse).ToArray() ?? Array.Empty<int>();
+            }
+
+            public override object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            {
+                return ((int[]) inter).Select(x => (TestContentModel1) _facadeAccessor.Facade.ContentCache.GetById(x)).ToArray();
             }
         }
+
+        #endregion
+
+        #region ConversionCache
+
+        [TestCase(PropertyCacheLevel.None, 2)]
+        [TestCase(PropertyCacheLevel.Content, 1)]
+        [TestCase(PropertyCacheLevel.Snapshot, 1)]
+        [TestCase(PropertyCacheLevel.Facade, 1)]
+        public void CacheLevelTest(PropertyCacheLevel cacheLevel, int interConverts)
+        {
+            var converter = new CacheConverter1(cacheLevel);
+
+            var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
+            {
+                converter,
+            });
+
+            var setType1 = new PublishedContentType(1000, "set1", new[]
+            {
+                new PublishedPropertyType("prop1", "editor1", converters),
+            });
+
+            // PropertySetPropertyBase.GetCacheLevels:
+            //
+            //   if property level is > reference level, or both are None
+            //     use None for property & new reference
+            //   else
+            //     use Content for property, & keep reference
+            //
+            // PropertySet creates properties with reference being None
+            // if converter specifies None, keep using None
+            // anything else is not > None, use Content
+            //
+            // for standalone property sets, it's only None or Content
+
+            var set1 = new PropertySet(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+
+            Assert.AreEqual(1234, set1.Value("prop1"));
+            Assert.AreEqual(1, converter.SourceConverts);
+            Assert.AreEqual(1, converter.InterConverts);
+
+            // source is always converted once and cached per content
+            // inter conversion depends on the specified cache level
+
+            Assert.AreEqual(1234, set1.Value("prop1"));
+            Assert.AreEqual(1, converter.SourceConverts);
+            Assert.AreEqual(interConverts, converter.InterConverts);
+        }
+
+        // property is not cached, converted cached at Content, exept
+        //  /None = not cached at all
+        [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Content, 1, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Snapshot, 1, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Facade, 1, 0, 0, 0, 0)]
+
+        // property is cached at content level, converted cached at
+        //  /None = not at all
+        //  /Content = in content
+        //  /Facade = in facade
+        //  /Snapshot = in snapshot
+        [TestCase(PropertyCacheLevel.Content, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.Content, PropertyCacheLevel.Content, 1, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.Content, PropertyCacheLevel.Snapshot, 1, 1, 0, 1, 0)]
+        [TestCase(PropertyCacheLevel.Content, PropertyCacheLevel.Facade, 1, 0, 1, 0, 1)]
+
+        // property is cached at snapshot level, converted cached at Content, exept
+        //  /None = not cached at all
+        //  /Facade = cached in facade
+        [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.Content, 1, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.Snapshot, 1, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.Facade, 1, 0, 1, 0, 1)]
+
+        // property is cached at facade level, converted cached at Content, exept
+        //  /None = not cached at all
+        [TestCase(PropertyCacheLevel.Facade, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.Facade, PropertyCacheLevel.Content, 1, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.Facade, PropertyCacheLevel.Snapshot, 1, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.Facade, PropertyCacheLevel.Facade, 1, 0, 0, 0, 0)]
+
+        public void CacheFacadeTest(PropertyCacheLevel referenceCacheLevel, PropertyCacheLevel converterCacheLevel, int interConverts,
+            int snapshotCount1, int facadeCount1, int snapshotCount2, int facadeCount2)
+        {
+            var converter = new CacheConverter1(converterCacheLevel);
+
+            var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
+            {
+                converter,
+            });
+
+            var setType1 = new PublishedContentType(1000, "set1", new[]
+            {
+                new PublishedPropertyType("prop1", "editor1", converters),
+            });
+
+            var snapshotCache = new Dictionary<string, object>();
+            var facadeCache = new Dictionary<string, object>();
+
+            var facadeServiceMock = new Mock<IFacadeService>();
+            facadeServiceMock
+                .Setup(x => x.CreateSetProperty(It.IsAny<PublishedPropertyType>(), It.IsAny<IPropertySet>(), It.IsAny<bool>(), It.IsAny<PropertyCacheLevel>(), It.IsAny<object>()))
+                .Returns<PublishedPropertyType, IPropertySet, bool, PropertyCacheLevel, object>((propertyType, set, previewing, refCacheLevel, value) =>
+                {
+                    return new TestPropertySetProperty(propertyType, set, previewing, refCacheLevel, value, () => snapshotCache, () => facadeCache);
+                });
+            var facadeService = facadeServiceMock.Object;
+
+            // pretend we're creating this set as a value for a property
+            // referenceCacheLevel is the cache level for this fictious property
+            // converterCacheLevel is the cache level specified by the converter
+
+            var set1 = new PropertySet(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, facadeService, referenceCacheLevel);
+
+            Assert.AreEqual(1234, set1.Value("prop1"));
+            Assert.AreEqual(1, converter.SourceConverts);
+            Assert.AreEqual(1, converter.InterConverts);
+
+            Assert.AreEqual(snapshotCount1, snapshotCache.Count);
+            Assert.AreEqual(facadeCount1, facadeCache.Count);
+
+            Assert.AreEqual(1234, set1.Value("prop1"));
+            Assert.AreEqual(1, converter.SourceConverts);
+            Assert.AreEqual(interConverts, converter.InterConverts);
+
+            Assert.AreEqual(snapshotCount2, snapshotCache.Count);
+            Assert.AreEqual(facadeCount2, facadeCache.Count);
+
+            var oldFacadeCache = facadeCache;
+            facadeCache = new Dictionary<string, object>();
+
+            Assert.AreEqual(1234, set1.Value("prop1"));
+            Assert.AreEqual(1, converter.SourceConverts);
+
+            Assert.AreEqual(snapshotCount2, snapshotCache.Count);
+            Assert.AreEqual(facadeCount2, facadeCache.Count);
+
+            Assert.AreEqual((interConverts == 1 ? 1 : 3) + facadeCache.Count, converter.InterConverts);
+
+            var oldSnapshotCache = snapshotCache;
+            snapshotCache = new Dictionary<string, object>();
+
+            Assert.AreEqual(1234, set1.Value("prop1"));
+            Assert.AreEqual(1, converter.SourceConverts);
+
+            Assert.AreEqual(snapshotCount2, snapshotCache.Count);
+            Assert.AreEqual(facadeCount2, facadeCache.Count);
+
+            Assert.AreEqual((interConverts == 1 ? 1 : 4) + facadeCache.Count + snapshotCache.Count, converter.InterConverts);
+        }
+
+        [Test]
+        public void CacheUnknownTest()
+        {
+            var converter = new CacheConverter1(PropertyCacheLevel.Unknown);
+
+            var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
+            {
+                converter,
+            });
+
+            var setType1 = new PublishedContentType(1000, "set1", new[]
+            {
+                new PublishedPropertyType("prop1", "editor1", converters),
+            });
+
+            Assert.Throws<Exception>(() =>
+            {
+                var set1 = new PropertySet(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+            });
+        }
+
+        private class CacheConverter1 : IPropertyValueConverter
+        {
+            private readonly PropertyCacheLevel _cacheLevel;
+
+            public CacheConverter1(PropertyCacheLevel cacheLevel)
+            {
+                _cacheLevel = cacheLevel;
+            }
+
+            public int SourceConverts { get; private set; }
+            public int InterConverts { get; private set; }
+
+            public bool IsConverter(PublishedPropertyType propertyType)
+                => propertyType.PropertyEditorAlias.InvariantEquals("editor1");
+
+            public Type GetPropertyValueType(PublishedPropertyType propertyType)
+                => typeof(int);
+
+            public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+                => _cacheLevel;
+
+            public object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
+            {
+                SourceConverts++;
+                return int.TryParse(source as string, out int i) ? i : 0;
+            }
+
+            public object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            {
+                InterConverts++;
+                return (int) inter;
+            }
+
+            public object ConvertInterToXPath(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+                => ((int) inter).ToString();
+        }
+
+        private class TestPropertySetProperty : PropertySetPropertyBase
+        {
+            private readonly Func<Dictionary<string, object>> _getSnapshotCache;
+            private readonly Func<Dictionary<string, object>> _getFacadeCache;
+            private string _valuesCacheKey;
+
+            public TestPropertySetProperty(PublishedPropertyType propertyType, IPropertySet set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue,
+                Func<Dictionary<string, object>> getSnapshotCache, Func<Dictionary<string, object>> getFacadeCache)
+                : base(propertyType, set, previewing, referenceCacheLevel, sourceValue)
+            {
+                _getSnapshotCache = getSnapshotCache;
+                _getFacadeCache = getFacadeCache;
+            }
+
+            private string ValuesCacheKey => _valuesCacheKey ?? (_valuesCacheKey = $"CacheValues[{(IsPreviewing ? "D" : "P")}{Set.Key}:{PropertyType.PropertyTypeAlias}");
+
+            protected override CacheValues GetSnapshotCacheValues()
+            {
+                var snapshotCache = _getSnapshotCache();
+                if (snapshotCache.TryGetValue(ValuesCacheKey, out object cacheValues))
+                    return (CacheValues) cacheValues;
+                snapshotCache[ValuesCacheKey] = cacheValues = new CacheValues();
+                return (CacheValues) cacheValues;
+            }
+
+            protected override CacheValues GetFacadeCacheValues()
+            {
+                var facadeCache = _getFacadeCache();
+                if (facadeCache.TryGetValue(ValuesCacheKey, out object cacheValues))
+                    return (CacheValues)cacheValues;
+                facadeCache[ValuesCacheKey] = cacheValues = new CacheValues();
+                return (CacheValues)cacheValues;
+            }
+        }
+
+        #endregion
+
+        #region Model classes
 
         [PublishedContentModel("set1")]
         public class TestSetModel1 : PropertySetModel
@@ -219,47 +601,64 @@ namespace Umbraco.Tests.PublishedContent
             public IEnumerable<TestContentModel1> Prop2 => this.Value<IEnumerable<TestContentModel1>>("prop2");
         }
 
-        public class TestConverter1 : PropertyValueConverterBase
+        #endregion
+
+        #region Support classes
+
+        internal class TestPublishedContent : PropertySet, IPublishedContent
         {
-            public override bool IsConverter(PublishedPropertyType propertyType)
-                => propertyType.PropertyEditorAlias == "editor1";
+            public TestPublishedContent(PublishedContentType contentType, int id, Guid key, Dictionary<string, object> values, bool previewing)
+                : base(contentType, key, values, previewing)
+            {
+                Id = id;
+            }
 
-            public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-                => typeof (string);
+            public int Id { get; }
+            public int TemplateId { get; set; }
+            public int SortOrder { get; set; }
+            public string Name { get; set; }
+            public string UrlName { get; set; }
+            public string DocumentTypeAlias => ContentType.Alias;
+            public int DocumentTypeId { get; set; }
+            public string WriterName { get; set; }
+            public string CreatorName { get; set; }
+            public int WriterId { get; set; }
+            public int CreatorId { get; set; }
+            public string Path { get; set; }
+            public DateTime CreateDate { get; set; }
+            public DateTime UpdateDate { get; set; }
+            public Guid Version { get; set; }
+            public int Level { get; set; }
+            public string Url { get; set; }
+            public PublishedItemType ItemType => ContentType.ItemType;
+            public bool IsDraft { get; set; }
+            public IPublishedContent Parent { get; set; }
+            public IEnumerable<IPublishedContent> Children { get; set; }
 
-            public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-                => PropertyCacheLevel.Content;
+            // copied from PublishedContentBase
+            public IPublishedProperty GetProperty(string alias, bool recurse)
+            {
+                var property = GetProperty(alias);
+                if (recurse == false) return property;
+
+                IPublishedContent content = this;
+                var firstNonNullProperty = property;
+                while (content != null && (property == null || property.HasValue == false))
+                {
+                    content = content.Parent;
+                    property = content?.GetProperty(alias);
+                    if (firstNonNullProperty == null && property != null) firstNonNullProperty = property;
+                }
+
+                // if we find a content with the property with a value, return that property
+                // if we find no content with the property, return null
+                // if we find a content with the property without a value, return that property
+                //   have to save that first property while we look further up, hence firstNonNullProperty
+
+                return property != null && property.HasValue ? property : firstNonNullProperty;
+            }
         }
 
-        public class TestConverter2 : PropertyValueConverterBase
-        {
-            private readonly IFacade _facade;
-
-            public TestConverter2(IFacade facade)
-            {
-                _facade = facade;
-            }
-
-            public override bool IsConverter(PublishedPropertyType propertyType)
-                => propertyType.PropertyEditorAlias == "editor2";
-
-            // pretend ... when writing the converter, the model type for alias "set1" does not exist yet
-            public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-                => typeof (IEnumerable<>).MakeGenericType(ModelType.For("content1"));
-
-            public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-                => PropertyCacheLevel.Snapshot;
-
-            public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
-            {
-                var s = source as string;
-                return s?.Split(',').Select(int.Parse).ToArray() ?? Array.Empty<int>();
-            }
-
-            public override object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
-            {
-                return ((int[]) inter).Select(x => (TestContentModel1) _facade.ContentCache.GetById(x)).ToArray();
-            }
-        }
+        #endregion
     }
 }

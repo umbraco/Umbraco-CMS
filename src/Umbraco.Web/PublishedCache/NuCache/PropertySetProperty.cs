@@ -27,13 +27,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // snapshot cache (if we don't want to pollute the snapshot cache with short-lived
             // data) depending on settings
             // for members, always cache in the facade cache - never pollute snapshot cache
-            var facade = (Facade)_facadeAccessor.Facade;
+            var facade = (Facade) _facadeAccessor.Facade;
             var cache = facade == null
                 ? null
                 : ((IsPreviewing == false || FacadeService.FullCacheWhenPreviewing) && (IsMember == false)
                     ? facade.SnapshotCache
                     : facade.FacadeCache);
-            return  GetCacheValues(cache);
+            return GetCacheValues(cache);
         }
 
         protected override CacheValues GetFacadeCacheValues()
