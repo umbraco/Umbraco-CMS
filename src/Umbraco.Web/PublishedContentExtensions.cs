@@ -13,6 +13,8 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web
 {
+    using Examine = global::Examine;
+
     /// <summary>
     /// Provides extension methods for <c>IPublishedContent</c>.
     /// </summary>

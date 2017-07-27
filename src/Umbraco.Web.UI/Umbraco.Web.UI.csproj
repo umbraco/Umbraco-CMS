@@ -435,8 +435,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UmbracoExamine\UmbracoExamine.csproj">
-      <Name>UmbracoExamine</Name>
+    <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
+      <Name>Umbraco.Examine</Name>
+      <Project>{07FBC26B-2927-4A22-8D96-D644C667FECC}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Name>Umbraco.Core</Name>

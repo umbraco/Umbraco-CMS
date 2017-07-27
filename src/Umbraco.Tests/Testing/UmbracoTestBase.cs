@@ -29,7 +29,7 @@ using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.DI;
 using Umbraco.Web.Services;
-using UmbracoExamine;
+using Umbraco.Examine;
 using Current = Umbraco.Core.Composing.Current;
 
 namespace Umbraco.Tests.Testing

@@ -21,7 +21,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using UmbracoExamine;
+using Umbraco.Examine;
 using IContentService = Umbraco.Core.Services.IContentService;
 using IMediaService = Umbraco.Core.Services.IMediaService;
 using Version = Lucene.Net.Util.Version;

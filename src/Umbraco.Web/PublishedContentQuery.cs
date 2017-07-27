@@ -9,6 +9,8 @@ using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web
 {
+    using Examine = global::Examine;
+
     /// <summary>
     /// A class used to query for published content, media items
     /// </summary>

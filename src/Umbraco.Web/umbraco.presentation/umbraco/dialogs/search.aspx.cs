@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
-using UmbracoExamine;
+using Umbraco.Examine;
 using System.Xml;
 using Examine;
 using Examine.LuceneEngine.SearchCriteria;

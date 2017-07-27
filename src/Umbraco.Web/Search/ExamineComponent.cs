@@ -20,7 +20,7 @@ using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PropertyEditors;
-using UmbracoExamine;
+using Umbraco.Examine;
 
 namespace Umbraco.Web.Search
 {

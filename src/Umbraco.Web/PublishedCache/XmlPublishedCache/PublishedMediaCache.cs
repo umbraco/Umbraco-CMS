@@ -17,7 +17,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Models;
-using UmbracoExamine;
+using Umbraco.Examine;
 using umbraco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Services;

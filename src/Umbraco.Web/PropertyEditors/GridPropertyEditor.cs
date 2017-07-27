@@ -9,10 +9,12 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Xml;
-using UmbracoExamine;
+using Umbraco.Examine;
 
 namespace Umbraco.Web.PropertyEditors
 {
+    using Examine = global::Examine;
+
     [PropertyEditor(Constants.PropertyEditors.GridAlias, "Grid layout", "grid", HideLabel = true, IsParameterEditor = false, ValueType = PropertyEditorValueTypes.Json, Group="rich content", Icon="icon-layout")]
     public class GridPropertyEditor : PropertyEditor
     {

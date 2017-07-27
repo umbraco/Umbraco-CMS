@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 // Umbraco Cms
 [assembly: InternalsVisibleTo("Umbraco.Web")]
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]
-[assembly: InternalsVisibleTo("UmbracoExamine")]
+[assembly: InternalsVisibleTo("Umbraco.Examine")]
 
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
 [assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]

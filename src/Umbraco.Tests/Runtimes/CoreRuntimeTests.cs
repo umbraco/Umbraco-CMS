@@ -12,7 +12,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
-using UmbracoExamine;
+using Umbraco.Examine;
 
 namespace Umbraco.Tests.Runtimes
 {

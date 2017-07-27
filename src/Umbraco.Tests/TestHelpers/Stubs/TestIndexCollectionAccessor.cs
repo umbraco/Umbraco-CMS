@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Examine;
-using UmbracoExamine;
+using Umbraco.Examine;
 
 namespace Umbraco.Tests.TestHelpers.Stubs
 {

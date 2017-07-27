@@ -22,6 +22,8 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web
 {
+    using Examine = global::Examine;
+
     /// <summary>
     /// A helper class that provides many useful methods and functionality for using Umbraco in templates
     /// </summary>

@@ -5,7 +5,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
-using UmbracoExamine;
+using Umbraco.Examine;
 
 namespace Umbraco.Tests.UmbracoExamine
 {

@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Plugins
                     //typeof(TabPage).Assembly,
                     typeof(System.Web.Mvc.ActionResult).Assembly,
                     typeof(TypeFinder).Assembly,
-                    typeof(global::UmbracoExamine.BaseUmbracoIndexer).Assembly
+                    typeof(global::Umbraco.Examine.BaseUmbracoIndexer).Assembly
                 };
 
         }

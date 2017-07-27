@@ -9,7 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
-using UmbracoExamine;
+using Umbraco.Examine;
 
 namespace Umbraco.Web.Models.Mapping
 {

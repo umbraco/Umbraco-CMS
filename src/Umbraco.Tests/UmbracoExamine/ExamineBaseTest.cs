@@ -9,7 +9,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
-using UmbracoExamine;
+using Umbraco.Examine;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
