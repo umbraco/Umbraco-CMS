@@ -24,6 +24,12 @@ namespace Umbraco.Core.Models
         /// </returns>
         internal static string[] GetCurrentUserAvatarUrls(this IUser user, IUserService userService, ICacheProvider staticCache)
         {
+            //check if the user has explicitly removed all avatars including a gravatar, this will be possible and the value will be "none"
+            if (user.Avatar == "none")
+            {
+                return new string[0];
+            }
+
             if (user.Avatar.IsNullOrWhiteSpace())
             {
                 var gravatarHash = user.Email.ToMd5();
@@ -60,7 +66,7 @@ namespace Umbraco.Core.Models
                     };
                 }
 
-                return null;
+                return new string[0];
             }
 
             //use the custom avatar
