@@ -150,7 +150,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [WebApi.UmbracoAuthorize]
         [SetAngularAntiForgeryTokens]
-        [VerifyIfUserTicketDataIsStale]
+        [CheckIfUserTicketDataIsStale]
         public UserDetail GetCurrentUser()
         {
             var user = UmbracoContext.Security.CurrentUser;
