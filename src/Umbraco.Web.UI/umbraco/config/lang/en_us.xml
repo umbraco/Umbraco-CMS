@@ -363,6 +363,7 @@
     <key alias="filter">Type to filter...</key>
     <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
     <key alias="email">Enter your email...</key>
+    <key alias="enterMessage">Enter a message...</key>
   </area>
 
   <area alias="editcontenttype">
@@ -1492,8 +1493,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="language">Language</key>
     <key alias="lastLogin">Last login</key>
     <key alias="loginname">Login</key>
-    <key alias="mediastartnode">Start Node in Media Library</key>
-    <key alias="mediastartnodes">Start Nodes in Media Library</key>
+    <key alias="mediastartnode">Media start node</key>
+    <key alias="mediastartnodes">Media start nodes</key>
     <key alias="modules">Sections</key>
     <key alias="noConsole">Disable Umbraco Access</key>
     <key alias="noLogin">has not logged in yet</key>
@@ -1515,8 +1516,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="permissionsGranular">Granular permissions</key>
     <key alias="profile">Profile</key>
     <key alias="searchAllChildren">Search all children</key>
-    <key alias="startnode">Start Node in Content</key>
-    <key alias="startnodes">Start Nodes in Content</key>
+    <key alias="startnode">Content start node</key>
+    <key alias="startnodes">Content start nodes</key>
     <key alias="userCreated">has been created</key>
     <key alias="username">Name</key>
     <key alias="userPermissions">User permissions</key>

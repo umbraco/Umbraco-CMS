@@ -1507,7 +1507,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="excerptField">Excerpt field</key>
     <key alias="language">Language</key>
     <key alias="loginname">Username</key>
-    <key alias="mediastartnode">Start Node in Media Library</key>
+    <key alias="mediastartnode">Media start node</key>
     <key alias="modules">Sections</key>
     <key alias="noConsole">Disable Umbraco Access</key>
     <key alias="oldPassword">Old password</key>
@@ -1525,7 +1525,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="permissionSelectedPages">You are currently modifying permissions for the pages:</key>
     <key alias="permissionSelectPages">Select pages to modify their permissions</key>
     <key alias="searchAllChildren">Search all children</key>
-    <key alias="startnode">Start Node in Content</key>
+    <key alias="startnode">Content start node</key>
     <key alias="username">Name</key>
     <key alias="userPermissions">User permissions</key>
     <key alias="userGroupPermissions">User group permissions</key>

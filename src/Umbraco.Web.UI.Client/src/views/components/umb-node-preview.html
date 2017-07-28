@@ -7,7 +7,7 @@
 
         <div class="umb-user-group-preview__permission" ng-if="permissions">
             <span>
-                <span class="bold">Permissions:</span>
+                <span class="bold"><localize key="general_rights">Permissions</localize>:</span>
                 <span ng-repeat="permission in permissions">{{ permission.name }}<span ng-if="!$last">, </span></span>
             </span>
         </div>
