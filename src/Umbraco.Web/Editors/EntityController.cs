@@ -21,6 +21,8 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Xml;
+using Umbraco.Web.Search;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Editors
 {
@@ -52,6 +54,8 @@ namespace Umbraco.Web.Editors
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))));
             }
         }
+
+        private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
 
         /// <summary>
         /// Returns an Umbraco alias given a string
@@ -103,42 +107,40 @@ namespace Umbraco.Web.Editors
         /// 
         /// The reason a user is allowed to search individual entity types that they are not allowed to edit is because those search
         /// methods might be used in things like pickers in the content editor.
-        /// </remarks>
+        /// </remarks>        
         [HttpGet]
-        public IEnumerable<EntityTypeSearchResult> SearchAll(string query)
+        public IDictionary<string, TreeSearchResult> SearchAll(string query)
         {
+            var result = new Dictionary<string, TreeSearchResult>();
+
             if (string.IsNullOrEmpty(query))
-                return Enumerable.Empty<EntityTypeSearchResult>();
-
+                return result;
+            
             var allowedSections = Security.CurrentUser.AllowedSections.ToArray();
-
-            var result = new List<EntityTypeSearchResult>();
-
-            if (allowedSections.InvariantContains(Constants.Applications.Content))
+            var searchableTrees = SearchableTreeResolver.Current.SearchableTrees;
+            
+            foreach (var searchableTree in searchableTrees)
             {
-                result.Add(new EntityTypeSearchResult
+                if (allowedSections.Contains(searchableTree.Value.AppAlias))
+                {
+                    var tree = Services.ApplicationTreeService.GetByAlias(searchableTree.Key);
+                    if (tree == null) continue; //shouldn't occur
+                    
+                    var searchableTreeAttribute = searchableTree.Value.SearchableTree.GetType().GetCustomAttribute<SearchableTreeAttribute>(false);
+                    var treeAttribute = tree.GetTreeAttribute();
+
+                    long total;
+
+                    result[treeAttribute.GetRootNodeDisplayName(Services.TextService)] = new TreeSearchResult
                     {
-                        Results = ExamineSearch(query, UmbracoEntityTypes.Document),
-                        EntityType = UmbracoEntityTypes.Document.ToString()
-                    });
-            }
-            if (allowedSections.InvariantContains(Constants.Applications.Media))
-            {
-                result.Add(new EntityTypeSearchResult
-                {
-                    Results = ExamineSearch(query, UmbracoEntityTypes.Media),
-                    EntityType = UmbracoEntityTypes.Media.ToString()
-                });
-            }
-            if (allowedSections.InvariantContains(Constants.Applications.Members))
-            {
-                result.Add(new EntityTypeSearchResult
-                {
-                    Results = ExamineSearch(query, UmbracoEntityTypes.Member),
-                    EntityType = UmbracoEntityTypes.Member.ToString()
-                });
-
-            }
+                        Results = searchableTree.Value.SearchableTree.Search(query, 200, 0, out total),
+                        TreeAlias = searchableTree.Key,
+                        AppAlias = searchableTree.Value.AppAlias,
+                        JsFormatterService = searchableTreeAttribute == null ? "" : searchableTreeAttribute.ServiceName,
+                        JsFormatterMethod = searchableTreeAttribute == null ? "" : searchableTreeAttribute.MethodName
+                    };
+                }
+            }            
             return result;
         }
 
@@ -458,8 +460,8 @@ namespace Umbraco.Web.Editors
             //the EntityService cannot search members of a certain type, this is currently not supported and would require 
             //quite a bit of plumbing to do in the Services/Repository, we'll revert to a paged search
 
-            int total;
-            var searchResult = ExamineSearch(filter ?? "", type, pageSize, pageNumber - 1, out total, id);
+            long total;
+            var searchResult = _treeSearcher.ExamineSearch(Umbraco, filter ?? "", type, pageSize, pageNumber - 1, out total, id);
 
             return new PagedResult<EntityBasic>(total, pageNumber, pageSize)
             {
@@ -613,316 +615,12 @@ namespace Umbraco.Web.Editors
         /// <param name="entityType"></param>
         /// <param name="searchFrom"></param>
         /// <returns></returns>
-        private IEnumerable<EntityBasic> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
+        private IEnumerable<SearchResultItem> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
         {
-            int total;
-            return ExamineSearch(query, entityType, 200, 0, out total, searchFrom);
+            long total;
+            return _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, searchFrom);
         }
-
-        private void AddExamineSearchFrom(string searchFrom, StringBuilder sb)
-        {
-            //if searchFrom is specified and it is greater than 0
-            int mediaSearchFrom;
-            if (searchFrom != null && int.TryParse(searchFrom, out mediaSearchFrom) && mediaSearchFrom > 0)
-            {
-                sb.Append("+__Path: \\-1*\\,");
-                sb.Append(mediaSearchFrom.ToString(CultureInfo.InvariantCulture));
-                sb.Append("\\,* ");
-            }
-        }
-
-        private void AddExamineUserStartNode(int[] startNodes, StringBuilder sb)
-        {
-            //make sure only what the user is configured to view is found
-            if (startNodes.Length > 0)
-                sb.Append("+(");
-            foreach (var startNode in startNodes)
-            {
-                if (startNode > 0)
-                {
-                    // descendants
-                    // "__Path: -1*,1234,*" -- the first "*" stands for path-to-1234
-                    sb.Append("__Path: \\-1*\\,");
-                    sb.Append(startNode.ToString(CultureInfo.InvariantCulture));
-                    sb.Append("\\,* ");
-
-                    // self
-                    // "__Path: -1*,1234" -- the first "*" stands for path-to-1234
-                    sb.Append("__Path: \\-1*\\,");
-                    sb.Append(startNode.ToString(CultureInfo.InvariantCulture));
-                    sb.Append(" ");
-                }
-            }
-            if (startNodes.Length > 0)
-                sb.Append(")");
-        }
-
-        /// <summary>
-        /// Searches for results based on the entity type
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="entityType"></param>
-        /// <param name="totalFound"></param>
-        /// <param name="searchFrom">
-        /// A starting point for the search, generally a node id, but for members this is a member type alias
-        /// </param>
-        /// <param name="pageSize"></param>
-        /// <param name="pageIndex"></param>
-        /// <returns></returns>
-        private IEnumerable<EntityBasic> ExamineSearch(string query, UmbracoEntityTypes entityType, int pageSize, int pageIndex, out int totalFound, string searchFrom = null)
-        {
-            //TODO: We need to update this to support paging
-
-            var sb = new StringBuilder();
-
-            string type;
-            var searcher = Constants.Examine.InternalSearcher;            
-            var fields = new[] { "id", "__NodeId" };
-
-            totalFound = 0;
-            
-            //TODO: WE should really just allow passing in a lucene raw query
-            switch (entityType)
-            {
-                case UmbracoEntityTypes.Member:
-                    searcher = Constants.Examine.InternalMemberSearcher;
-                    type = "member";
-                    fields = new[] { "id", "__NodeId", "email", "loginName"};
-                    if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
-                    {
-                        sb.Append("+__NodeTypeAlias:");
-                        sb.Append(searchFrom);
-                        sb.Append(" ");
-                    }
-                    break;
-                case UmbracoEntityTypes.Media:
-                    type = "media";
-
-                    var mediaStartNodeIds = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
-                    if (mediaStartNodeIds.Length == 0) return Enumerable.Empty<EntityBasic>();
-
-                    AddExamineSearchFrom(searchFrom, sb);
-                    AddExamineUserStartNode(mediaStartNodeIds, sb);
-
-                    break;
-                case UmbracoEntityTypes.Document:
-                    type = "content";
-
-                    var contentStartNodeIds = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
-                    if (contentStartNodeIds.Length == 0) return Enumerable.Empty<EntityBasic>();
-
-                    AddExamineSearchFrom(searchFrom, sb);
-                    AddExamineUserStartNode(contentStartNodeIds, sb);
-                    
-                    break;
-                default:
-                    throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);                    
-            }
-
-            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
-
-            //build a lucene query:
-            // the __nodeName will be boosted 10x without wildcards
-            // then __nodeName will be matched normally with wildcards
-            // the rest will be normal without wildcards
-            
-            
-            //check if text is surrounded by single or double quotes, if so, then exact match
-            var surroundedByQuotes = Regex.IsMatch(query, "^\".*?\"$")
-                                     || Regex.IsMatch(query, "^\'.*?\'$");
-            
-            if (surroundedByQuotes)
-            {
-                //strip quotes, escape string, the replace again
-                query = query.Trim(new[] { '\"', '\'' });
-
-                query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
-
-                //nothing to search
-                if (searchFrom.IsNullOrWhiteSpace() && query.IsNullOrWhiteSpace())
-                {
-                    totalFound = 0;
-                    return new List<EntityBasic>();
-                }
-
-                //update the query with the query term
-                if (query.IsNullOrWhiteSpace() == false)
-                {
-                    //add back the surrounding quotes
-                    query = string.Format("{0}{1}{0}", "\"", query);
-
-                    //node name exactly boost x 10
-                    sb.Append("+(__nodeName: (");
-                    sb.Append(query.ToLower());
-                    sb.Append(")^10.0 ");
-
-                    foreach (var f in fields)
-                    {
-                        //additional fields normally
-                        sb.Append(f);
-                        sb.Append(": (");
-                        sb.Append(query);
-                        sb.Append(") ");
-                    }
-
-                    sb.Append(") ");
-                }
-            }
-            else
-            {
-                var trimmed = query.Trim(new[] {'\"', '\''});
-
-                //nothing to search
-                if (searchFrom.IsNullOrWhiteSpace() && trimmed.IsNullOrWhiteSpace())
-                {
-                    totalFound = 0;
-                    return new List<EntityBasic>();
-                }
-
-                //update the query with the query term
-                if (trimmed.IsNullOrWhiteSpace() == false)
-                {
-                    query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
-
-                    var querywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                    //node name exactly boost x 10
-                    sb.Append("+(__nodeName:");
-                    sb.Append("\"");
-                    sb.Append(query.ToLower());
-                    sb.Append("\"");
-                    sb.Append("^10.0 ");
-
-                    //node name normally with wildcards
-                    sb.Append(" __nodeName:");
-                    sb.Append("(");
-                    foreach (var w in querywords)
-                    {
-                        sb.Append(w.ToLower());
-                        sb.Append("* ");
-                    }
-                    sb.Append(") ");
-
-
-                    foreach (var f in fields)
-                    {
-                        //additional fields normally
-                        sb.Append(f);
-                        sb.Append(":");
-                        sb.Append("(");
-                        foreach (var w in querywords)
-                        {
-                            sb.Append(w.ToLower());
-                            sb.Append("* ");
-                        }
-                        sb.Append(")");
-                        sb.Append(" ");
-                    }
-
-                    sb.Append(") ");
-                }
-            }
-
-            //must match index type
-            sb.Append("+__IndexType:");
-            sb.Append(type);
-            
-            var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
-            
-            var result = internalSearcher
-                //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
-                .Search(raw, pageSize * (pageIndex + 1)); 
-
-            totalFound = result.TotalItemCount;
-
-            var pagedResult = result.Skip(pageIndex);
-            
-            switch (entityType)
-            {
-                case UmbracoEntityTypes.Member:
-                    return MemberFromSearchResults(pagedResult.ToArray());
-                case UmbracoEntityTypes.Media:
-                    return MediaFromSearchResults(pagedResult);                    
-                case UmbracoEntityTypes.Document:
-                    return ContentFromSearchResults(pagedResult);
-                default:
-                    throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);
-            }
-        }
-
-        /// <summary>
-        /// Returns a collection of entities for media based on search results
-        /// </summary>
-        /// <param name="results"></param>
-        /// <returns></returns>
-        private IEnumerable<EntityBasic> MemberFromSearchResults(SearchResult[] results)
-        {
-            var mapped = Mapper.Map<IEnumerable<EntityBasic>>(results).ToArray();
-            //add additional data
-            foreach (var m in mapped)
-            {
-                //if no icon could be mapped, it will be set to document, so change it to picture
-                if (m.Icon == "icon-document")
-                {
-                    m.Icon = "icon-user";
-                }
-
-                var searchResult = results.First(x => x.Id.ToInvariantString() == m.Id.ToString());
-                if (searchResult.Fields.ContainsKey("email") && searchResult.Fields["email"] != null)
-                {
-                    m.AdditionalData["Email"] = results.First(x => x.Id.ToInvariantString() == m.Id.ToString()).Fields["email"];    
-                }
-                if (searchResult.Fields.ContainsKey("__key") && searchResult.Fields["__key"] != null)
-                {
-                    Guid key;
-                    if (Guid.TryParse(searchResult.Fields["__key"], out key))
-                    {
-                        m.Key = key;
-                    }
-                }
-            }
-            return mapped;
-        } 
-
-        /// <summary>
-        /// Returns a collection of entities for media based on search results
-        /// </summary>
-        /// <param name="results"></param>
-        /// <returns></returns>
-        private IEnumerable<EntityBasic> MediaFromSearchResults(IEnumerable<SearchResult> results)
-        {
-            var mapped = Mapper.Map<IEnumerable<EntityBasic>>(results).ToArray();
-            //add additional data
-            foreach (var m in mapped)
-            {
-                //if no icon could be mapped, it will be set to document, so change it to picture
-                if (m.Icon == "icon-document")
-                {
-                    m.Icon = "icon-picture";                     
-                }
-            }
-            return mapped;
-        } 
-
-        /// <summary>
-        /// Returns a collection of entities for content based on search results
-        /// </summary>
-        /// <param name="results"></param>
-        /// <returns></returns>
-        private IEnumerable<EntityBasic> ContentFromSearchResults(IEnumerable<SearchResult> results)
-        {
-            var mapped = Mapper.Map<IEnumerable<EntityBasic>>(results).ToArray();
-            //add additional data
-            foreach (var m in mapped)
-            {
-                var intId = m.Id.TryConvertTo<int>();
-                if (intId.Success)
-                {
-                    m.AdditionalData["Url"] = Umbraco.NiceUrl(intId.Result);
-                }
-            }
-            return mapped;
-        } 
+        
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)
         {

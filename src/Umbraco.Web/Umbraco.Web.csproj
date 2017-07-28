@@ -458,6 +458,11 @@
     <Compile Include="RouteDataExtensions.cs" />
     <Compile Include="Routing\ContentFinderByRedirectUrl.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
+    <Compile Include="Search\SearchableApplicationTree.cs" />
+    <Compile Include="Search\SearchableTreeAttribute.cs" />
+    <Compile Include="Search\SearchableTreeCollection.cs" />
+    <Compile Include="Search\SearchableTreeResolver.cs" />
+    <Compile Include="Search\UmbracoTreeSearcher.cs" />
     <Compile Include="Security\Identity\ExternalSignInAutoLinkOptions.cs" />
     <Compile Include="Security\Identity\FixWindowsAuthMiddlware.cs" />
     <Compile Include="Security\Identity\ForceRenewalCookieAuthenticationHandler.cs" />
@@ -583,7 +588,7 @@
     <Compile Include="Install\Controllers\InstallApiController.cs" />
     <Compile Include="Install\Controllers\InstallController.cs" />
     <Compile Include="Install\InstallAuthorizeAttribute.cs" />
-    <Compile Include="Models\ContentEditing\EntityTypeSearchResult.cs" />
+    <Compile Include="Models\ContentEditing\TreeSearchResult.cs" />
     <Compile Include="Models\ContentEditing\ListViewAwareContentItemDisplayBase.cs" />
     <Compile Include="Models\ContentEditing\PropertyTypeValidation.cs" />
     <Compile Include="Models\ImageCropData.cs" />
@@ -852,7 +857,7 @@
     <Compile Include="Trees\ApplicationTreeRegistrar.cs" />
     <Compile Include="Trees\ContentTreeControllerBase.cs" />
     <Compile Include="Trees\LegacyTreeController.cs" />
-    <Compile Include="Trees\ISearchableTree.cs" />
+    <Compile Include="Search\ISearchableTree.cs" />
     <Compile Include="Trees\LegacyTreeDataConverter.cs" />
     <Compile Include="Trees\LegacyTreeJavascript.cs" />
     <Compile Include="Trees\LegacyTreeParams.cs" />
