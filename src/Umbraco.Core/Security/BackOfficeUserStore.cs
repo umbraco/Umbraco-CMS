@@ -93,6 +93,8 @@ namespace Umbraco.Core.Security
 
             UpdateMemberProperties(userEntity, user);
             
+            //TODO: We should deal with Roles --> User Groups here which we currently are not doing
+
             _userService.Save(userEntity);
 
             if (userEntity.Id == 0) throw new DataException("Could not create the user, check logs for details");

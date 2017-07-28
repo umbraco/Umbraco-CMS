@@ -35,8 +35,8 @@ namespace Umbraco.Core.Security
                     AllowedApplications = user.AllowedSections,
                     Culture = user.Culture,                 
                     Roles = user.Roles.Select(x => x.RoleId).ToArray(),
-                    StartContentNodes = user.StartContentIds,
-                    StartMediaNodes = user.StartMediaIds,
+                    StartContentNodes = user.CalculatedContentStartNodeIds,
+                    StartMediaNodes = user.CalculatedMediaStartNodeIds,
                     SessionId = user.SecurityStamp
                 });
 
