@@ -69,7 +69,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="id">Id of the user to retrieve</param>
         /// <returns><see cref="IUser"/></returns>
-        IUser GetUserById(int id);
+        IUser GetUserById(int id);        
 
         /// <summary>
         /// Gets a users by Id

@@ -352,7 +352,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IUser, UserData>()
                 .ConstructUsing((IUser user) => new UserData())
                 .ForMember(detail => detail.Id, opt => opt.MapFrom(user => user.Id))
-                .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections))
+                .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections.ToArray()))
                 .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
                 .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups.Select(x => x.Alias).ToArray()))
                 .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.CalculateContentStartNodeIds(applicationContext.Services.EntityService)))

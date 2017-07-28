@@ -176,98 +176,12 @@ namespace Umbraco.Web.Security
             return membershipProvider != null && membershipProvider.ValidateUser(username, password);
         }
         
-        /// <summary>
-        /// Returns the MembershipUser from the back office membership provider
-        /// </summary>
-        /// <param name="username"></param>
-        /// <param name="setOnline"></param>
-        /// <returns></returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Back office users shouldn't be resolved from the membership provider, they should be resolved usign the BackOfficeUserManager or the IUserService")]
         public virtual MembershipUser GetBackOfficeMembershipUser(string username, bool setOnline)
         {
             var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
             return membershipProvider != null ? membershipProvider.GetUser(username, setOnline) : null;
-        }
-
-        /// <summary>
-        /// Gets (and creates if not found) the back office <see cref="IUser"/> instance for the username specified
-        /// </summary>
-        /// <param name="username"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This will return an <see cref="IUser"/> instance no matter what membership provider is installed for the back office, it will automatically
-        /// create any missing <see cref="IUser"/> accounts if one is not found and a custom membership provider or <see cref="IBackOfficeUserPasswordChecker"/> is being used. 
-        /// </remarks>
-        internal IUser GetBackOfficeUser(string username)
-        {
-            //get the membership user (set user to be 'online' in the provider too)
-            var membershipUser = GetBackOfficeMembershipUser(username, true);
-            var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
-
-            if (membershipUser == null)
-            {
-                throw new InvalidOperationException(
-                    "The username & password validated but the membership provider '" +
-                    provider.Name +
-                    "' did not return a MembershipUser with the username supplied");
-            }
-
-            //regarldess of the membership provider used, see if this user object already exists in the umbraco data
-            var user = _applicationContext.Services.UserService.GetByUsername(membershipUser.UserName);
-
-            //we're using the built-in membership provider so the user will already be available
-            if (provider.IsUmbracoUsersProvider())
-            {
-                if (user == null)
-                {
-                    //this should never happen
-                    throw new InvalidOperationException("The user '" + username + "' could not be found in the Umbraco database");
-                }
-                return user;
-            }
-
-            //we are using a custom membership provider for the back office, in this case we need to create user accounts for the logged in member.
-            //if we already have a user object in Umbraco we don't need to do anything, otherwise we need to create a mapped Umbraco account.
-            if (user != null) return user;
-
-            var email = membershipUser.Email;
-            if (email.IsNullOrWhiteSpace())
-            {
-                //in some cases if there is no email we have to generate one since it is required!
-                email = Guid.NewGuid().ToString("N") + "@example.com";
-            }
-
-            user = new Core.Models.Membership.User
-            {
-                Email = email,
-                Language = GlobalSettings.DefaultUILanguage,
-                Name = membershipUser.UserName,
-                RawPasswordValue = Guid.NewGuid().ToString("N"), //Need to set this to something - will not be used though
-                Username = membershipUser.UserName,
-                IsLockedOut = false,
-                IsApproved = true
-            };
-
-            _applicationContext.Services.UserService.Save(user);
-
-            return user;
-        }
-
-        /// <summary>
-        /// Validates the user node tree permissions.
-        /// </summary>
-        /// <param name="umbracoUser"></param>
-        /// <param name="path">The path.</param>
-        /// <param name="action">The action.</param>
-        /// <returns></returns>
-        internal bool ValidateUserNodeTreePermissions(User umbracoUser, string path, string action)
-        {
-            var permissions = umbracoUser.GetPermissions(path);
-            if (permissions.IndexOf(action, StringComparison.Ordinal) > -1 && (path.Contains("-20") || ("," + path + ",").Contains("," + umbracoUser.StartNodeId + ",")))
-                return true;
-
-            var user = umbracoUser;
-            LogHelper.Info<WebSecurity>("User {0} has insufficient permissions in UmbracoEnsuredPage: '{1}', '{2}', '{3}'", () => user.Name, () => path, () => permissions, () => action);
-            return false;
         }
 
         /// <summary>

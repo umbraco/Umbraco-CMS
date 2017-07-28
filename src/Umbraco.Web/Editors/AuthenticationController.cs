@@ -150,7 +150,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [WebApi.UmbracoAuthorize]
         [SetAngularAntiForgeryTokens]
-        [VerifyIfUserTicketDataIsStale]
+        [CheckIfUserTicketDataIsStale]
         public UserDetail GetCurrentUser()
         {
             var user = UmbracoContext.Security.CurrentUser;
@@ -214,6 +214,8 @@ namespace Umbraco.Web.Editors
         {
             var http = EnsureHttpContext();
 
+            //Sign the user in with username/password, this also gives a chance for developers to 
+            //custom verify the credentials and auto-link user accounts with a custom IBackOfficePasswordChecker
             var result = await SignInManager.PasswordSignInAsync(
                 loginModel.Username, loginModel.Password, isPersistent: true, shouldLockout: true);
 
@@ -222,7 +224,7 @@ namespace Umbraco.Web.Editors
                 case SignInStatus.Success:
 
                     //get the user
-                    var user = Security.GetBackOfficeUser(loginModel.Username);
+                    var user = Services.UserService.GetByUsername(loginModel.Username);
                     return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.RequiresVerification:
 
@@ -248,7 +250,7 @@ namespace Umbraco.Web.Editors
                                 typeof(IUmbracoBackOfficeTwoFactorOptions) + ".GetTwoFactorView returned an empty string"));
                     }
 
-                    var attemptedUser = Security.GetBackOfficeUser(loginModel.Username);
+                    var attemptedUser = Services.UserService.GetByUsername(loginModel.Username);
                     
                     //create a with information to display a custom two factor send code view
                     var verifyResponse = Request.CreateResponse(HttpStatusCode.PaymentRequired, new
@@ -367,7 +369,7 @@ namespace Umbraco.Web.Editors
             {
                 case SignInStatus.Success:
                     //get the user
-                    var user = Security.GetBackOfficeUser(userName);
+                    var user = Services.UserService.GetByUsername(userName);
                     return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.LockedOut:
                     return Request.CreateValidationErrorResponse("User is locked out");                    
