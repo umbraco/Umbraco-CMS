@@ -3,7 +3,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.Security
@@ -40,8 +39,8 @@ namespace Umbraco.Core.Security
                     //For now, I'll fix this by using the user.Groups instead
                     //Roles = user.Roles.Select(x => x.RoleId).ToArray(),
                     Roles = user.Groups.Select(x => x.Alias).ToArray(),
-                    StartContentNodes = user.AllStartContentIds,
-                    StartMediaNodes = user.AllStartMediaIds,
+                    StartContentNodes = user.StartContentIds,
+                    StartMediaNodes = user.StartMediaIds,
                     SessionId = user.SecurityStamp
                 });
 
