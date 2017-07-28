@@ -15,6 +15,7 @@
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
     <key alias="emptyTrashcan">Empty recycle bin</key>
+    <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
     <key alias="importDocumentType">Import Document Type</key>
     <key alias="importPackage">Import Package</key>
@@ -35,6 +36,7 @@
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
     <key alias="sendToTranslate">Send To Translation</key>
+    <key alias="setGroup">Set group</key>
     <key alias="sort">Sort</key>
     <key alias="translate">Translate</key>
     <key alias="update">Update</key>
@@ -311,14 +313,17 @@
     <key alias="openInNewWindow">Opens the linked document in a new window or tab</key>
     <key alias="linkToMedia">Link to media</key>
     <key alias="linkToFile">Link to file</key>
+    <key alias="selectContentStartNode">Select content start node</key>
     <key alias="selectMedia">Select media</key>
     <key alias="selectIcon">Select icon</key>
     <key alias="selectItem">Select item</key>
     <key alias="selectLink">Select link</key>
     <key alias="selectMacro">Select macro</key>
     <key alias="selectContent">Select content</key>
+    <key alias="selectMediaStartNode">Select media start node</key>
     <key alias="selectMember">Select member</key>
     <key alias="selectMemberGroup">Select member group</key>
+    <key alias="selectNode">Select node</key>
     <key alias="selectSections">Select sections</key>
     <key alias="selectUsers">Select users</key>
     <key alias="noMacroParams">There are no parameters for this macro</key>
@@ -351,6 +356,7 @@
     <key alias="confirmPassword">Confirm your password</key>
     <key alias="nameentity">Name the %0%...</key>
     <key alias="entername">Enter a name...</key>
+    <key alias="enteremail">Enter an email...</key>
     <key alias="label">Label...</key>
     <key alias="enterDescription">Enter a description...</key>
     <key alias="search">Type to search...</key>
@@ -480,6 +486,7 @@
     <key alias="groups">Groups</key>
     <key alias="height">Height</key>
     <key alias="help">Help</key>
+    <key alias="hide">Hide</key>
     <key alias="icon">Icon</key>
     <key alias="import">Import</key>
     <key alias="innerMargin">Inner margin</key>
@@ -511,6 +518,7 @@
     <key alias="open">Open</key>
     <key alias="on">On</key>
     <key alias="or">or</key>
+    <key alias="orderBy">Order by</key>
     <key alias="password">Password</key>
     <key alias="path">Path</key>
     <key alias="placeHolderID">Placeholder ID</key>
@@ -535,6 +543,7 @@
     <key alias="showPageOnSend">Show page on Send</key>
     <key alias="size">Size</key>
     <key alias="sort">Sort</key>
+    <key alias="status">Status</key>
     <key alias="submit">Submit</key>
     <key alias="type">Type</key>
     <key alias="typeToSearch">Type to search...</key>
@@ -1465,6 +1474,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="updateNoServerError">Error checking for update. Please review trace-stack for further information</key>
   </area>
   <area alias="user">
+    <key alias="access">Access</key>
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Category field</key>
     <key alias="changePassword">Change Your Password</key>
@@ -1480,10 +1490,13 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="excerptField">Excerpt field</key>
     <key alias="goToProfile">Go to user profile</key>
     <key alias="language">Language</key>
+    <key alias="lastLogin">Last login</key>
     <key alias="loginname">Login</key>
     <key alias="mediastartnode">Start Node in Media Library</key>
+    <key alias="mediastartnodes">Start Nodes in Media Library</key>
     <key alias="modules">Sections</key>
     <key alias="noConsole">Disable Umbraco Access</key>
+    <key alias="noLogin">has not logged in yet</key>
     <key alias="oldPassword">Old password</key>
     <key alias="password">Password</key>
     <key alias="resetPassword">Reset password</key>
@@ -1498,8 +1511,13 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="permissionReplaceChildren">Replace child node permissions</key>
     <key alias="permissionSelectedPages">You are currently modifying permissions for the pages:</key>
     <key alias="permissionSelectPages">Select pages to modify their permissions</key>
+    <key alias="permissionsDefault">Default permissions</key>
+    <key alias="permissionsGranular">Granular permissions</key>
+    <key alias="profile">Profile</key>
     <key alias="searchAllChildren">Search all children</key>
     <key alias="startnode">Start Node in Content</key>
+    <key alias="startnodes">Start Nodes in Content</key>
+    <key alias="userCreated">has been created</key>
     <key alias="username">Name</key>
     <key alias="userPermissions">User permissions</key>
     <key alias="userGroupPermissions">User group permissions</key>

@@ -61,7 +61,7 @@
             <umb-button ng-if="vm.allowSetUserGroup"
                         type="button"
                         size="xs"
-                        label="Set group"
+                        label-key="actions_setGroup"
                         icon="icon-users"
                         action="vm.openBulkUserGroupPicker()">
           </umb-button>
@@ -71,7 +71,7 @@
                         type="button"
                         size="xs"
                         state="vm.enableUserButtonState"
-                        label="Enable"
+                        label-key="actions_enable"
                         icon="icon-check"
                         action="vm.enableUsers()">
           </umb-button>
@@ -81,7 +81,7 @@
                         type="button"
                         size="xs"
                         state="vm.disableUserButtonState"
-                        label="Disable"
+                        label-key="actions_disable"
                         icon="icon-block"
                         action="vm.disableUsers()">
           </umb-button>
@@ -94,7 +94,7 @@
     <div style="margin-bottom: 20px;" class="flex items-center">
 
       <div style="font-size: 16px;">
-        <span class="bold">Users</span> <span ng-if="vm.usersOptions.totalItems">({{vm.usersOptions.totalItems}})</span>
+        <span class="bold"><localize key="sections_users">Users</localize></span> <span ng-if="vm.usersOptions.totalItems">({{vm.usersOptions.totalItems}})</span>
       </div>
 
       <div class="flex" style="margin-left: auto;">
@@ -102,7 +102,7 @@
         <!-- State filter -->
         <div style="position: relative;" ng-if="vm.userStatesFilter.length > 0">
           <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.toggleFilter('state')">
-            <span>Status:</span>
+            <span><localize key="general_status">Status</localize>:</span> 
             <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getFilterName(vm.userStatesFilter) }}</span>
             <span class="caret"></span>
           </a>
@@ -136,7 +136,7 @@
         <!-- Order By -->
         <div style="position: relative;">
           <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.toggleFilter('orderBy')">
-            <span>Order by:</span>
+            <span><localize key="general_orderBy">Order by</localize>:</span> 
             <span class="bold" style="margin-left: 2px;">{{ vm.getSortLabel(vm.usersOptions.orderBy, vm.usersOptions.orderDirection) }} </span>
             <span class="caret"></span>
           </a>
@@ -156,7 +156,7 @@
                      position="center">
       <localize key="general_searchNoResult"></localize>
     </umb-empty-state>
-
+    
     <!-- Layout: Cards -->
     <div class="umb-user-cards" ng-if="vm.activeLayout.path === '1' && vm.loading === false">
       <a href="" class="umb-user-card" ng-repeat="user in vm.users" ng-click="vm.clickUser(user)">
@@ -184,14 +184,13 @@
           </div>
           <div class="umb-user-card__last-login">
             <div ng-if="user.formattedLastLogin">
-              <div>Last login on</div>
+              <div><localize key="user_lastLogin">Last login</localize></div>
               {{ user.formattedLastLogin }}
             </div>
             <div ng-if="!user.formattedLastLogin">
-              <div>{{ user.name | umbWordLimit:1 }} has</div>
-              not logged in yet
+              <div>{{ user.name | umbWordLimit:1 }} <localize key="user_noLogin">has not logged in yet</localize></div>
             </div>
-          </div>
+          </div> 
         </div>
       </a>
     </div>
@@ -206,10 +205,10 @@
               <a href="" style="text-decoration: none;" ng-click="vm.selectAll()"><umb-checkmark checked="vm.areAllSelected()" size="xs"></umb-checkmark></a>
             </th>
             <th style="width: 70px;"></th>
-            <th>Name</th>
-            <th>User group</th>
-            <th>Last Login</th>
-            <th>Status</th>
+            <th><localize key="general_name">Name</localize></th>
+            <th><localize key="user_usergroup">User group</localize></th>
+            <th><localize key="user_lastLogin">Last login</localize></th>
+            <th><localize key="general_status">Status</localize></th>
           </tr>
         </thead>
         <tbody>
@@ -272,11 +271,15 @@
         <div>
           <div ng-if="vm.usersViewState === 'inviteUser'">
             <h3 class="bold" style="margin-bottom: 0;"><localize key="user_inviteUser">Invite User</localize></h3>
-            <p style="line-height: 1.6em; margin-bottom: 15px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
+            <p style="line-height: 1.6em; margin-bottom: 15px;">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.
+            </p>
           </div>
           <div ng-if="vm.usersViewState === 'createUser'">
             <h3 class="bold" style="margin-bottom: 0;"><localize key="user_createUser">Create user</localize></h3>
-            <p style="line-height: 1.6em; margin-bottom: 15px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
+            <p style="line-height: 1.6em; margin-bottom: 15px;">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.
+            </p>
           </div>
         </div>
 
@@ -298,7 +301,7 @@
           <input type="email"
                  name="email"
                  localize="placeholder"
-                 placeholder="@placeholders_email"
+                 placeholder="@placeholders_enteremail"
                  class="input-block-level"
                  ng-model="vm.newUser.email"
                  required
@@ -383,12 +386,16 @@
             checked="vm.usersViewState === 'createUserSuccess'"
             size="m">
           </umb-checkmark>
-          <h3 class="bold" style="margin: 0 0 0 10px;">{{vm.newUser.name | umbWordLimit:1}} has been created</h3>
+          <h3 class="bold" style="margin: 0 0 0 10px;">
+            {{vm.newUser.name | umbWordLimit:1}}  <localize key="user_userCreated">has been created</localize>
+          </h3>
         </div>
         <p style="line-height: 1.6em; margin-bottom: 20px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
         <div>
 
-          <label class="bold">Password</label>
+          <label class="bold">
+            <localize key="placeholders_password">Password</localize>
+          </label>
 
           <div class="flex items-center justify-between" style="background-color: #f3f3f5; padding: 10px 20px; border-radius: 3px; margin-bottom: 30px;">
             
@@ -400,7 +407,7 @@
                 ng-if="!vm.newUser.showPassword"
                 type="button"
                 action="vm.toggleNewUserPassword()"
-                label="Show"
+                label-key="general_show"
                 size="xs">
               </umb-button>
 
@@ -408,7 +415,7 @@
                 ng-if="vm.newUser.showPassword"
                 type="button"
                 action="vm.toggleNewUserPassword()"
-                label="Hide"
+                label-key="general_hide"
                 size="xs">
               </umb-button>
 
@@ -420,7 +427,7 @@
                   umb-clipboard-text="vm.newUser.resetPasswordValue"
                   state="vm.page.copyPasswordButtonState"
                   type="button"
-                  label="Copy"
+                  label-key="general_copy"
                   size="xs">
               </umb-button>
 
