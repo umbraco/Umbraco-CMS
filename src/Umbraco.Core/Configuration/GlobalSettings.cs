@@ -300,19 +300,19 @@ namespace Umbraco.Core.Configuration
         /// <param name="value">Value of the setting to be saved.</param>
         internal static void SaveSetting(string key, string value)
         {
-            var fileName = IOHelper.MapPath(string.Format("{0}/web.config", SystemDirectories.Root));
-            var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
+            var configFile = WebConfigurationManager.OpenWebConfiguration("~");
+            var settings = configFile.AppSettings.Settings;
 
-            var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
-
-            // Update appSetting if it exists, or else create a new appSetting for the given key and value
-            var setting = appSettings.Descendants("add").FirstOrDefault(s => s.Attribute("key").Value == key);
-            if (setting == null)
-                appSettings.Add(new XElement("add", new XAttribute("key", key), new XAttribute("value", value)));
+            if (settings[key] == null)
+            {
+                settings.Add(key, value);
+            }
             else
-                setting.Attribute("value").Value = value;
+            {
+                settings[key].Value = value;
+            }
 
-            xml.Save(fileName, SaveOptions.DisableFormatting);
+            configFile.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
         }
 
@@ -322,18 +322,15 @@ namespace Umbraco.Core.Configuration
         /// <param name="key">Key of the setting to be removed.</param>
         internal static void RemoveSetting(string key)
         {
-            var fileName = IOHelper.MapPath(string.Format("{0}/web.config", SystemDirectories.Root));
-            var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
+            var configFile = WebConfigurationManager.OpenWebConfiguration("~");
+            var settings = configFile.AppSettings.Settings;
 
-            var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
-            var setting = appSettings.Descendants("add").FirstOrDefault(s => s.Attribute("key").Value == key);
-
-            if (setting != null)
+            if (settings[key] != null)
             {
-                setting.Remove();
-                xml.Save(fileName, SaveOptions.DisableFormatting);
+                settings.Remove(key);
+                configFile.Save(ConfigurationSaveMode.Modified);
                 ConfigurationManager.RefreshSection("appSettings");
-            }        
+            }
         }
 
         private static void SetMembershipProvidersLegacyEncoding(string providerName, bool useLegacyEncoding)
