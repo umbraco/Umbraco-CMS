@@ -19,7 +19,7 @@ namespace Umbraco.Core.Security
         public override async Task<IdentityResult> ValidateAsync(T item)
         {
             //Don't validate if the user's email or username hasn't changed otherwise it's just wasting SQL queries.
-            if (((ICanBeDirty)item).IsDirty())
+            if (item.IsPropertyDirty("Email") || item.IsPropertyDirty("UserName"))
             {
                 return await base.ValidateAsync(item);
             }
