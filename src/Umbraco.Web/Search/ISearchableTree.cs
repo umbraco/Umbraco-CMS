@@ -14,6 +14,7 @@ namespace Umbraco.Web.Search
         /// <summary>
         /// Searches for results based on the entity type
         /// </summary>
+        /// <param name="umbracoHelper"></param>
         /// <param name="query"></param>
         /// <param name="totalFound"></param>
         /// <param name="searchFrom">
@@ -22,6 +23,6 @@ namespace Umbraco.Web.Search
         /// <param name="pageSize"></param>
         /// <param name="pageIndex"></param>
         /// <returns></returns>
-        IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null);
+        IEnumerable<SearchResultItem> Search(UmbracoHelper umbracoHelper, string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null);
     }
 }

@@ -133,7 +133,7 @@ namespace Umbraco.Web.Editors
 
                     result[treeAttribute.GetRootNodeDisplayName(Services.TextService)] = new TreeSearchResult
                     {
-                        Results = searchableTree.Value.SearchableTree.Search(query, 200, 0, out total),
+                        Results = searchableTree.Value.SearchableTree.Search(Umbraco, query, 200, 0, out total),
                         TreeAlias = searchableTree.Key,
                         AppAlias = searchableTree.Value.AppAlias,
                         JsFormatterService = searchableTreeAttribute == null ? "" : searchableTreeAttribute.ServiceName,

@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using AutoMapper;
 using Examine;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Search
@@ -28,9 +29,9 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public IEnumerable<SearchResultItem> ExamineSearch(
             UmbracoHelper umbracoHelper,
-            string query, 
-            UmbracoEntityTypes entityType, 
-            int pageSize, 
+            string query,
+            UmbracoEntityTypes entityType,
+            int pageSize,
             long pageIndex, out long totalFound, string searchFrom = null)
         {
             var sb = new StringBuilder();
@@ -55,35 +56,13 @@ namespace Umbraco.Web.Search
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
-
-                    var mediaSearchFrom = int.MinValue;
-
-                    if (umbracoHelper.UmbracoContext.Security.CurrentUser.StartMediaId > 0 ||
-                        //if searchFrom is specified and it is greater than 0
-                        (searchFrom != null && int.TryParse(searchFrom, out mediaSearchFrom) && mediaSearchFrom > 0))
-                    {
-                        sb.Append("+__Path: \\-1*\\,");
-                        sb.Append(mediaSearchFrom > 0
-                            ? mediaSearchFrom.ToString(CultureInfo.InvariantCulture)
-                            : umbracoHelper.UmbracoContext.Security.CurrentUser.StartMediaId.ToString(CultureInfo.InvariantCulture));
-                        sb.Append("\\,* ");
-                    }
+                    var allMediaStartNodes = umbracoHelper.UmbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(ApplicationContext.Current.Services.EntityService);
+                    AppendPath(sb, UmbracoObjectTypes.Media,  allMediaStartNodes, searchFrom);
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
-
-                    var contentSearchFrom = int.MinValue;
-
-                    if (umbracoHelper.UmbracoContext.Security.CurrentUser.StartContentId > 0 ||
-                        //if searchFrom is specified and it is greater than 0
-                        (searchFrom != null && int.TryParse(searchFrom, out contentSearchFrom) && contentSearchFrom > 0))
-                    {
-                        sb.Append("+__Path: \\-1*\\,");
-                        sb.Append(contentSearchFrom > 0
-                            ? contentSearchFrom.ToString(CultureInfo.InvariantCulture)
-                            : umbracoHelper.UmbracoContext.Security.CurrentUser.StartContentId.ToString(CultureInfo.InvariantCulture));
-                        sb.Append("\\,* ");
-                    }
+                    var allContentStartNodes = umbracoHelper.UmbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(ApplicationContext.Current.Services.EntityService);
+                    AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom);
                     break;
                 default:
                     throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);
@@ -218,6 +197,58 @@ namespace Umbraco.Web.Search
                 default:
                     throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);
             }
+        }
+
+        private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[] startNodeIds, string searchFrom)
+        {
+            var entityService = ApplicationContext.Current.Services.EntityService;
+
+            int searchFromId;
+            var entityPath = int.TryParse(searchFrom, out searchFromId) && searchFromId > 0
+                ? entityService.GetAllPaths(objectType, searchFromId).FirstOrDefault()
+                : null;
+            if (entityPath != null)
+            {
+                // find... only what's underneath
+                sb.Append("+__Path:");
+                AppendPath(sb, entityPath.Path, false);
+                sb.Append(" ");
+            }
+            else if (startNodeIds.Length == 0)
+            {
+                // make sure we don't find anything
+                sb.Append("+__Path:none ");
+            }
+            else if (startNodeIds.Contains(-1) == false) // -1 = no restriction
+            {
+                var entityPaths = entityService.GetAllPaths(objectType, startNodeIds);
+
+                // for each start node, find the start node, and what's underneath
+                // +__Path:(-1*,1234 -1*,1234,* -1*,5678 -1*,5678,* ...)
+                sb.Append("+__Path:(");
+                var first = true;
+                foreach (var ep in entityPaths)
+                {
+                    if (first)
+                        first = false;
+                    else
+                        sb.Append(" ");
+                    AppendPath(sb, ep.Path, true);
+                }
+                sb.Append(") ");
+            }
+        }
+
+        private void AppendPath(StringBuilder sb, string path, bool includeThisNode)
+        {
+            path = path.Replace("-", "\\-").Replace(",", "\\,");
+            if (includeThisNode)
+            {
+                sb.Append(path);
+                sb.Append(" ");
+            }
+            sb.Append(path);
+            sb.Append("\\,*");
         }
 
         /// <summary>
