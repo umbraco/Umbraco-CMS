@@ -53,22 +53,21 @@
 	border-color: @turquoise-d1;
 }
 
-.umb-tree li.root > div {
-	padding: 0;
+.umb-tree li.root > div:first-child {
+  padding: 0;
 }
 
-.umb-tree li.root > div h5 {
-	margin: 0;
-	width: 100%;
-
-	display: flex;
-	align-items: center;
+.umb-tree li.root > div h5, .umb-tree li.root > div h6 {
+  margin: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
-.umb-tree li.root > div h5 > a, .umb-tree-header {
-	display: flex;
-	padding: 20px 0 20px 20px;
-	box-sizing: border-box;
+.umb-tree li.root > div:first-child h5 > a, .umb-tree-header {
+  display: flex;
+  padding: 20px 0 20px 20px;
+  box-sizing: border-box;
 }
 
 .umb-tree * {
@@ -96,14 +95,22 @@
 	text-decoration: none
 }
 
-.umb-tree div {
+/*.umb-tree div.tree-node {
 	padding: 5px 0 5px 0;
 	position: relative;
 	overflow: hidden;
 	display: flex;
 	flex-wrap: nowrap;
 	align-items: center;
+}*/
 
+.umb-tree div {
+  padding: 5px 0 5px 0;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
 }
 
 .umb-tree a.noSpr {
@@ -190,6 +197,21 @@
 .umb-tree .umb-tree-node-search {
     cursor:pointer;
     /*color:@turquoise;*/
+}
+
+.umb-tree div.umb-search-group {
+  position: inherit;
+  display: inherit;  
+}
+
+.umb-tree div.umb-search-group:hover {
+  background: inherit;
+}
+.umb-tree div.umb-search-group h6 {
+  /*color: @gray-5;*/
+  padding: 10px 0 10px 20px;
+  font-weight: inherit;
+  background:@gray-10;
 }
 
 .umb-tree .umb-search-group-item {

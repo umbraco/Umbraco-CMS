@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http.Formatting;
@@ -13,6 +14,8 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -29,8 +32,11 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Media, Constants.Trees.Media)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
-    public class MediaTreeController : ContentTreeControllerBase
+    [SearchableTree("searchResultFormatter", "configureMediaResult")]
+    public class MediaTreeController : ContentTreeControllerBase, ISearchableTree
     {
+        private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
+
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
             var node = base.CreateRootNode(queryStrings);
@@ -163,6 +169,11 @@ namespace Umbraco.Web.Trees
                 return false;
             }
             return Security.CurrentUser.HasPathAccess(media);
+        }
+
+        public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        {
+            return _treeSearcher.ExamineSearch(Umbraco, query, UmbracoEntityTypes.Media, pageSize, pageIndex, out totalFound, searchFrom);
         }
     }
 }
