@@ -141,31 +141,23 @@ namespace Umbraco.Core.Models
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", "path");
 
-            var formattedPath = "," + path + ",";
-            var formattedRecycleBinId = "," + recycleBinId.ToInvariantString() + ",";
+            // check for no access
+            if (startNodeIds.Length == 0)
+                return false;
 
-            //check for root path access
-            //TODO: This logic may change
-            if (startNodeIds.Length == 0 || startNodeIds.Contains(Constants.System.Root))
+            // check for root access
+            if (startNodeIds.Contains(Constants.System.Root))
                 return true;
 
-            //only users with root access have access to the recycle bin so if the above check didn't pass than access is denied
-            if (formattedPath.Contains(formattedRecycleBinId))
-            {
+            var formattedPath = "," + path + ",";
+
+            // only users with root access have access to the recycle bin,
+            // if the above check didn't pass then access is denied
+            if (formattedPath.Contains("," + recycleBinId + ","))
                 return false;
-            }
 
-            //check for normal paths
-            foreach (var startNodeId in startNodeIds)
-            {
-                var formattedStartNodeId = "," + startNodeId.ToInvariantString() + ",";
-
-                var hasAccess = formattedPath.Contains(formattedStartNodeId);
-                if (hasAccess)
-                    return true;
-            }
-
-            return false;
+            // check for a start node in the path
+            return startNodeIds.Any(x => formattedPath.Contains("," + x + ","));
         }
 
         /// <summary>
@@ -181,6 +173,7 @@ namespace Umbraco.Core.Models
             return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.AdminGroupAlias);
         }
 
+        // calc. start nodes, combining groups' and user's, and excluding what's in the bin
         public static int[] CalculateContentStartNodeIds(this IUser user, IEntityService entityService)
         {
             const string cacheKey = "AllContentStartNodes";
@@ -195,6 +188,7 @@ namespace Umbraco.Core.Models
             return vals;
         }
 
+        // calc. start nodes, combining groups' and user's, and excluding what's in the bin
         public static int[] CalculateMediaStartNodeIds(this IUser user, IEntityService entityService)
         {
             const string cacheKey = "AllMediaStartNodes";
@@ -212,22 +206,23 @@ namespace Umbraco.Core.Models
         private static int[] FromUserCache(IUser user, string cacheKey)
         {
             var entityUser = user as User;
-            if (entityUser != null)
+            if (entityUser == null) return null;
+
+            lock (entityUser.AdditionalDataLock)
             {
                 object allContentStartNodes;
-                if (entityUser.AdditionalData.TryGetValue(cacheKey, out allContentStartNodes))
-                {
-                    var asArray = allContentStartNodes as int[];
-                    if (asArray != null) return asArray;
-                }
+                return entityUser.AdditionalData.TryGetValue(cacheKey, out allContentStartNodes)
+                    ? allContentStartNodes as int[]
+                    : null;
             }
-            return null;
         }
 
         private static void ToUserCache(IUser user, string cacheKey, int[] vals)
         {
             var entityUser = user as User;
-            if (entityUser != null)
+            if (entityUser == null) return;
+
+            lock (entityUser.AdditionalDataLock)
             {
                 entityUser.AdditionalData[cacheKey] = vals;
             }
@@ -238,23 +233,41 @@ namespace Umbraco.Core.Models
             return test.StartsWith(path) && test.Length > path.Length && test[path.Length] == ',';
         }
 
-        //TODO: Unit test this
+        private static string GetBinPath(UmbracoObjectTypes objectType)
+        {
+            var binPath = Constants.System.Root + ",";
+            switch (objectType)
+            {
+                case UmbracoObjectTypes.Document:
+                    binPath += Constants.System.RecycleBinContent;
+                    break;
+                case UmbracoObjectTypes.Media:
+                    binPath += Constants.System.RecycleBinMedia;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("objectType");
+            }
+            return binPath;
+        }
+
         internal static int[] CombineStartNodes(UmbracoObjectTypes objectType, int[] groupSn, int[] userSn, IEntityService entityService)
         {
             // assume groupSn and userSn each don't contain duplicates
 
             var asn = groupSn.Concat(userSn).Distinct().ToArray();
+            var paths = entityService.GetAllPaths(objectType, asn).ToDictionary(x => x.Id, x => x.Path);
 
-            //TODO: Change this to a more optimal lookup just to retrieve paths
-            var paths = entityService.GetAll(objectType, asn).ToDictionary(x => x.Id, x => x.Path);
+            paths[Constants.System.Root] = Constants.System.Root.ToString(); // entityService does not get that one
 
-            paths[-1] = "-1"; // entityService does not get that one
+            var binPath = GetBinPath(objectType);
 
             var lsn = new List<int>();
             foreach (var sn in groupSn)
             {
                 string snp;
-                if (paths.TryGetValue(sn, out snp) == false) continue; // ignore
+                if (paths.TryGetValue(sn, out snp) == false) continue; // ignore rogue node (no path)
+
+                if (StartsWithPath(snp, binPath)) continue; // ignore bin
 
                 if (lsn.Any(x => StartsWithPath(snp, paths[x]))) continue; // skip if something above this sn
                 lsn.RemoveAll(x => StartsWithPath(paths[x], snp)); // remove anything below this sn
@@ -264,10 +277,12 @@ namespace Umbraco.Core.Models
             var usn = new List<int>();
             foreach (var sn in userSn)
             {
-                if (groupSn.Contains(sn)) continue;
+                if (groupSn.Contains(sn)) continue; // ignore, already there
 
                 string snp;
-                if (paths.TryGetValue(sn, out snp) == false) continue; // ignore
+                if (paths.TryGetValue(sn, out snp) == false) continue; // ignore rogue node (no path)
+
+                if (StartsWithPath(snp, binPath)) continue; // ignore bin
 
                 if (usn.Any(x => StartsWithPath(paths[x], snp))) continue; // skip if something below this sn
                 usn.RemoveAll(x => StartsWithPath(snp, paths[x])); // remove anything above this sn

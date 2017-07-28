@@ -94,8 +94,18 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
 				WHERE u.id = 0");
 
             // Rename some groups for consistency (plural form)
-            Execute.Sql("UPDATE umbracoUserGroup SET userGroupName = 'Writers' WHERE userGroupName = 'Writer'");
-            Execute.Sql("UPDATE umbracoUserGroup SET userGroupName = 'Translators' WHERE userGroupName = 'Translator'");
+            Execute.Sql("UPDATE umbracoUserGroup SET userGroupName = 'Writers' WHERE userGroupAlias = 'writer'");
+            Execute.Sql("UPDATE umbracoUserGroup SET userGroupName = 'Translators' WHERE userGroupAlias = 'translator'");
+
+            //Ensure all built in groups have a start node of -1
+            Execute.Sql("UPDATE umbracoUserGroup SET startContentId = -1 WHERE userGroupAlias = 'editor'");
+            Execute.Sql("UPDATE umbracoUserGroup SET startMediaId = -1 WHERE userGroupAlias = 'editor'");
+            Execute.Sql("UPDATE umbracoUserGroup SET startContentId = -1 WHERE userGroupAlias = 'writer'");
+            Execute.Sql("UPDATE umbracoUserGroup SET startMediaId = -1 WHERE userGroupAlias = 'writer'");
+            Execute.Sql("UPDATE umbracoUserGroup SET startContentId = -1 WHERE userGroupAlias = 'translator'");
+            Execute.Sql("UPDATE umbracoUserGroup SET startMediaId = -1 WHERE userGroupAlias = 'translator'");
+            Execute.Sql("UPDATE umbracoUserGroup SET startContentId = -1 WHERE userGroupAlias = 'admin'");
+            Execute.Sql("UPDATE umbracoUserGroup SET startMediaId = -1 WHERE userGroupAlias = 'admin'");
         }
 
         private void MigrateUserPermissions()

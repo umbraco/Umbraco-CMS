@@ -115,7 +115,9 @@
                                             name="node.name"
                                             permissions="node.allowedPermissions"
                                             allow-remove="true"
-                                            on-remove="vm.removeSelectedItem($index, vm.userGroup.assignedPermissions)">
+                                            on-remove="vm.removeSelectedItem($index, vm.userGroup.assignedPermissions)"
+                                            allow-edit="true"
+                                            on-edit="vm.setPermissionsForNode(node)">
                                         </umb-node-preview>
 
                                         <a href=""

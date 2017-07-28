@@ -167,25 +167,20 @@
       <HintPath>..\packages\Microsoft.IO.RecyclableMemoryStream.1.2.1\lib\net45\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Owin">
-      <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.0.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.1.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.Owin.Security.3.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Security, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.3.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security.Cookies, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.3.0.1\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Security.Cookies, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.3.1.0\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security.OAuth, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.3.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Security.OAuth, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.3.1.0\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -364,20 +359,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Controls\Images\ImageViewer.ascx.cs">
-      <DependentUpon>ImageViewer.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Controls\Images\ImageViewer.ascx.designer.cs">
-      <DependentUpon>ImageViewer.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Controls\PasswordChanger.ascx.cs">
-      <DependentUpon>passwordChanger.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Controls\PasswordChanger.ascx.designer.cs">
-      <DependentUpon>passwordChanger.ascx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Create.aspx.cs">
       <DependentUpon>create.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -385,47 +366,12 @@
     <Compile Include="Umbraco\Create.aspx.designer.cs">
       <DependentUpon>create.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Create\DlrScripting.ascx.cs">
-      <DependentUpon>DlrScripting.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Create\DlrScripting.ascx.designer.cs">
-      <DependentUpon>DlrScripting.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Create\PartialView.ascx.cs">
-      <DependentUpon>PartialView.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Create\PartialView.ascx.designer.cs">
-      <DependentUpon>PartialView.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Create\PartialViewMacro.ascx.cs">
-      <DependentUpon>PartialViewMacro.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Create\PartialViewMacro.ascx.designer.cs">
-      <DependentUpon>PartialViewMacro.ascx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Create\xslt.ascx.cs">
       <DependentUpon>xslt.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Umbraco\Create\User.ascx.cs">
-      <DependentUpon>User.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="Umbraco\Create\xslt.ascx.designer.cs">
       <DependentUpon>xslt.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Create\User.ascx.designer.cs">
-      <DependentUpon>User.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Dashboard\ExamineManagement.ascx.cs">
-      <DependentUpon>ExamineManagement.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Dashboard\ExamineManagement.ascx.designer.cs">
-      <DependentUpon>ExamineManagement.ascx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Dashboard\UserControlProxy.aspx.cs">
       <DependentUpon>UserControlProxy.aspx</DependentUpon>
@@ -448,13 +394,6 @@
     <Compile Include="Umbraco\Developer\Packages\DirectoryBrowser.aspx.designer.cs">
       <DependentUpon>directoryBrowser.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Developer\Python\EditPython.aspx.cs">
-      <DependentUpon>editPython.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Developer\Python\EditPython.aspx.designer.cs">
-      <DependentUpon>editPython.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.cs">
       <DependentUpon>ChangeDocType.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -465,13 +404,6 @@
     <Compile Include="Umbraco\Dialogs\EditMacro.aspx.cs">
       <DependentUpon>EditMacro.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Dialogs\MoveOrCopy.aspx.cs">
-      <DependentUpon>moveOrCopy.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Dialogs\MoveOrCopy.aspx.designer.cs">
-      <DependentUpon>moveOrCopy.aspx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\dialogs\Sort.aspx.cs">
       <DependentUpon>sort.aspx</DependentUpon>
@@ -575,7 +507,6 @@
     <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco\umbraco.aspx" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.unobtrusive-ajax.min.js" />
-    <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
     <Compile Include="Umbraco\umbraco.aspx.cs">
       <DependentUpon>umbraco.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -586,8 +517,6 @@
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Umbraco\Dashboard\UserControlProxy.aspx" />
-    <Content Include="Umbraco\Create\PartialView.ascx" />
-    <Content Include="Umbraco\Create\User.ascx" />
     <Content Include="Umbraco\Xslt\Web.config">
       <SubType>
       </SubType>
@@ -673,8 +602,6 @@
     <Content Include="Umbraco\Config\Lang\ru.xml" />
     <Content Include="Umbraco\Config\Lang\zh.xml" />
     <Content Include="Umbraco\Controls\Tree\CustomTreeService.asmx" />
-    <Content Include="Umbraco\Create\PartialViewMacro.ascx" />
-    <Content Include="Umbraco\Dashboard\ExamineManagement.ascx" />
     <Content Include="Umbraco\Developer\RelationTypes\EditRelationType.aspx" />
     <Content Include="Umbraco\Developer\RelationTypes\Images\Bidirectional.png" />
     <Content Include="Umbraco\Developer\RelationTypes\Images\ParentToChild.png" />
@@ -703,10 +630,8 @@
     <Content Include="Umbraco_Client\Dialogs\PublishDialog.css" />
     <Content Include="Umbraco_Client\Dialogs\PublishDialog.js" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
-    <Content Include="Umbraco_Client\Editors\EditMacroScripts.js" />
     <Content Include="Umbraco_Client\Editors\EditXslt.css" />
     <Content Include="Umbraco_Client\Editors\EditXslt.js" />
-    <Content Include="Umbraco_Client\Editors\EditScript.js" />
     <Content Include="Umbraco_Client\Editors\DirectoryBrowser.css" />
     <Content Include="Umbraco_Client\Editors\EditMacro.css" />
     <Content Include="Umbraco_Client\Editors\EditStyleSheet.js" />
@@ -721,18 +646,12 @@
     <Content Include="Umbraco_Client\Tablesorting\img\desc.gif" />
     <Content Include="Umbraco_Client\Tablesorting\jquery.tablesorter.min.js" />
     <Content Include="Umbraco_Client\Splitbutton\jquery.splitbutton.js" />
-    <Content Include="Umbraco_Client\Tags\Css\jquery.tagsinput.css" />
-    <Content Include="Umbraco_Client\Tags\Js\jquery.tagsinput.js" />
-    <Content Include="Umbraco_Client\Tags\Js\jquery.tagsinput.min.js">
-      <DependentUpon>jquery.tagsinput.js</DependentUpon>
-    </Content>
     <Content Include="Umbraco_Client\Application\JQuery\jquery.hotkeys.js" />
     <Content Include="Umbraco_Client\MaskedInput\jquery.maskedinput-1.3.min.js" />
     <Content Include="Umbraco_Client\Splitbutton\Images\splitbutton_hover.png" />
     <Content Include="Umbraco_Client\Splitbutton\Images\splitbutton_downarrow.png" />
     <Content Include="Umbraco_Client\Splitbutton\splitbutton.css" />
     <Content Include="Umbraco_Client\Modal\jquery.simplemodal.1.4.1.custom.js" />
-    <Content Include="Umbraco_Client\Jeditable\jquery.jeditable.js" />
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
     <Content Include="Umbraco\Members\MemberSearch.ascx" />
@@ -744,20 +663,6 @@
     <Content Include="Umbraco_Client\Ui\json2.js" />
     <Content Include="Umbraco_Client\Ui\knockout.js" />
     <Content Include="Umbraco_Client\Ui\knockout.mapping.js" />
-    <Content Include="Umbraco_Client\ui\ui-lightness\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
-    <Content Include="Umbraco_Client\ui\ui-lightness\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
-    <Content Include="Umbraco_Client\ui\ui-lightness\images\ui-bg_flat_10_000000_40x100.png" />
-    <Content Include="Umbraco_Client\ui\ui-lightness\images\ui-bg_glass_100_f6f6f6_1x400.png" />
-    <Content Include="Umbraco_Client\ui\ui-lightness\images\ui-bg_glass_100_fdf5ce_1x400.png" />
-    <Content Include="Umbraco_Client\ui\ui-lightness\images\ui-bg_glass_65_ffffff_1x400.png" />
-    <Content Include="Umbraco_Client\ui\ui-lightness\images\ui-bg_gloss-wave_35_f6a828_500x100.png" />
-    <Content Include="Umbraco_Client\ui\ui-lightness\images\ui-bg_highlight-soft_100_eeeeee_1x100.png" />
-    <Content Include="Umbraco_Client\ui\ui-lightness\images\ui-bg_highlight-soft_75_ffe45c_1x100.png" />
-    <Content Include="Umbraco_Client\ui\ui-lightness\images\ui-icons_222222_256x240.png" />
-    <Content Include="Umbraco_Client\ui\ui-lightness\images\ui-icons_228ef1_256x240.png" />
-    <Content Include="Umbraco_Client\ui\ui-lightness\images\ui-icons_ef8c08_256x240.png" />
-    <Content Include="Umbraco_Client\ui\ui-lightness\images\ui-icons_ffd27a_256x240.png" />
-    <Content Include="Umbraco_Client\ui\ui-lightness\images\ui-icons_ffffff_256x240.png" />
     <Content Include="Umbraco\endPreview.aspx" />
     <Content Include="Umbraco_Client\Application\HistoryManager.js" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.ba-bbq.min.js" />
@@ -787,17 +692,10 @@
     <Content Include="Umbraco_Client\DateTimePicker\Images\ui-icons_666666_256x240.png" />
     <Content Include="Umbraco_Client\DateTimePicker\Images\ui-icons_999999_256x240.png" />
     <Content Include="Umbraco_Client\DateTimePicker\umbDateTimePicker.js" />
-    <Content Include="Umbraco\Controls\passwordChanger.ascx" />
     <Content Include="Umbraco\Controls\ProgressBar.ascx" />
     <Content Include="Umbraco_Client\DateTimePicker\datetimepicker.css" />
     <Content Include="Umbraco_Client\DateTimePicker\timepicker.js" />
-    <Content Include="Umbraco\Create\DlrScripting.ascx" />
     <Content Include="Umbraco_Client\Tree\sprites.png" />
-    <Content Include="Umbraco\Controls\Images\ImageViewer.ascx" />
-    <Content Include="Umbraco\Controls\Images\ImageViewer.js" />
-    <Content Include="Umbraco\Controls\Images\ImageViewerUpdater.asmx" />
-    <Content Include="Umbraco\Controls\Images\UploadMediaImage.ascx" />
-    <Content Include="Umbraco\Controls\Images\UploadMediaImage.js" />
     <Content Include="Umbraco\Controls\Tree\TreeControl.ascx" />
     <Content Include="Umbraco\Js\UmbracoSpeechBubbleInit.js" />
     <Content Include="Umbraco\Search\QuickSearch.ascx" />
@@ -818,8 +716,6 @@
     <Content Include="Umbraco\Actions\editContent.aspx" />
     <Content Include="Umbraco\Actions\preview.aspx" />
     <Content Include="Umbraco\Actions\publish.aspx" />
-    <Content Include="Umbraco\Channels\rsd.aspx" />
-    <Content Include="Umbraco\Channels\wlwmanifest.aspx" />
     <Content Include="Umbraco\Config\Lang\da.xml" />
     <Content Include="Umbraco\Config\Lang\de.xml" />
     <Content Include="Umbraco\Config\Lang\es.xml" />
@@ -828,11 +724,8 @@
     <Content Include="Umbraco\Config\Lang\nl.xml" />
     <Content Include="Umbraco\Config\Lang\nb.xml" />
     <Content Include="Umbraco\Config\Lang\sv.xml" />
-    <Content Include="Umbraco\Css\permissionsEditor.css" />
-    <Content Include="Umbraco\Dialogs\mediaPicker.aspx" />
     <Content Include="Umbraco\Webservices\MacroContainerService.asmx" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.cookie.js" />
-    <Content Include="Umbraco_Client\Imagecropper\Jcrop.gif" />
     <Content Include="Umbraco_Client\Tablesorting\Img\bg.gif" />
     <Content Include="Umbraco_Client\Tree\menuIcons.css" />
     <Content Include="Umbraco_Client\Tree\Themes\Default\style.css" />
@@ -844,12 +737,9 @@
     <Content Include="Umbraco_Client\Tree\Themes\Umbraco\throbber.gif" />
     <Content Include="Umbraco\Developer\Xslt\xsltVisualize.aspx" />
     <Content Include="Umbraco\Dialogs\empty.htm" />
-    <Content Include="Umbraco\Dialogs\insertMasterpageContent.aspx" />
-    <Content Include="Umbraco\Dialogs\insertMasterpagePlaceholder.aspx" />
     <Content Include="Umbraco\Dialogs\republish.aspx" />
     <Content Include="Umbraco\Dialogs\search.aspx" />
     <Content Include="Umbraco\Dialogs\SendPublish.aspx" />
-    <Content Include="Umbraco\Create\script.ascx" />
     <Content Include="Umbraco_Client\Tree\treeIcons.css" />
     <Content Include="Umbraco_Client\Tree\Themes\Umbraco\contextMenuBg.gif" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery-fieldselection.js" />
@@ -859,8 +749,6 @@
     <Content Include="Umbraco_Client\Tree\NodeDefinition.js" />
     <Content Include="Umbraco_Client\Tree\UmbracoTree.js" />
     <Content Include="Umbraco_Client\Application\UmbracoClientManager.js" />
-    <Content Include="Umbraco\Plugins\Tinymce3\InsertAnchor.aspx" />
-    <Content Include="Umbraco\Plugins\Tinymce3\insertChar.aspx" />
     <Content Include="Umbraco\Webservices\TreeClientService.asmx" />
     <Content Include="Umbraco_Client\Application\NamespaceManager.js" />
     <Content Include="Umbraco_Client\Ui\jQueryWresize.js" />
@@ -872,39 +760,25 @@
     <Content Include="Umbraco_Client\Application\JQuery\jquery.autocomplete.js" />
     <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
-    <Content Include="Umbraco\Dialogs\about.aspx" />
-    <Content Include="Umbraco\Dialogs\AssignDomain.aspx" />
     <Content Include="Umbraco\Dialogs\create.aspx" />
-    <Content Include="Umbraco\Dialogs\cruds.aspx" />
-    <Content Include="Umbraco\Dialogs\emptyTrashcan.aspx" />
     <Content Include="Umbraco\Dialogs\exportDocumenttype.aspx" />
-    <Content Include="Umbraco\Dialogs\imageViewer.aspx" />
     <Content Include="Umbraco\Dialogs\importDocumenttype.aspx" />
-    <Content Include="Umbraco\Dialogs\insertMacro.aspx" />
-    <Content Include="Umbraco\Dialogs\insertTable.aspx" />
-    <Content Include="Umbraco\Dialogs\moveOrCopy.aspx" />
     <Content Include="Umbraco\Dialogs\notifications.aspx" />
     <Content Include="Umbraco\Dialogs\protectPage.aspx" />
     <Content Include="Umbraco\Dialogs\publish.aspx" />
-    <Content Include="Umbraco\Dialogs\RegexWs.aspx" />
     <Content Include="Umbraco\Dialogs\rollBack.aspx" />
     <Content Include="Umbraco\Dialogs\sendToTranslation.aspx" />
     <Content Include="Umbraco\Dialogs\treePicker.aspx" />
     <Content Include="Umbraco\Dialogs\umbracoField.aspx" />
-    <Content Include="Umbraco\Dialogs\uploadImage.aspx" />
     <Content Include="Umbraco\Dialogs\viewAuditTrail.aspx" />
     <Content Include="Umbraco\Config\Create\UI.xml" />
     <Content Include="Umbraco\Config\Lang\en.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Umbraco\Developer\Python\editPython.aspx" />
     <Content Include="Umbraco\Js\UmbracoSpeechBubble.js" />
     <Content Include="Umbraco\Js\UmbracoSpeechBubbleBackEnd.js" />
     <Content Include="Umbraco\Js\umbracoUpgradeChecker.js" />
     <Content Include="Umbraco\Members\ViewMembers.aspx" />
-    <Content Include="Umbraco\Plugins\Tinymce3\insertImage.aspx" />
-    <Content Include="Umbraco\Plugins\Tinymce3\insertLink.aspx" />
-    <Content Include="Umbraco\Plugins\Tinymce3\insertMacro.aspx" />
     <Content Include="Umbraco\Plugins\Tinymce3\tinymce3tinymceCompress.aspx" />
     <Content Include="Config\ClientDependency.config">
       <SubType>Designer</SubType>
@@ -915,7 +789,6 @@
     </Content>
     <Content Include="Config\scripting.config" />
     <Content Include="Config\feedProxy.config" />
-    <Content Include="Umbraco_Client\ui\ui-lightness\jquery-ui.custom.css" />
     <Content Include="Config\applications.config" />
     <Content Include="Config\trees.config">
       <SubType>Designer</SubType>
@@ -998,19 +871,12 @@
     <Content Include="Umbraco\Scripting\Templates\Cshtml\Breadcrumb.cshtml" />
     <Content Include="Umbraco\Scripting\Templates\Cshtml\Navigation.cshtml" />
     <Content Include="Umbraco\Scripting\Templates\Cshtml\SiteMap.cshtml" />
-    <None Include="Umbraco\Scripting\Templates\Py\SubpagesAsThumnbnails.py" />
-    <None Include="Umbraco\Scripting\Templates\Py\SubpagesFromAChangeableSource.py" />
-    <None Include="Umbraco\Scripting\Templates\Py\SubpagesFromCurrentPage.py" />
-    <None Include="Umbraco\Scripting\Templates\Rb\SubpagesAsThumnbnails.rb" />
-    <None Include="Umbraco\Scripting\Templates\Rb\SubpagesFromAChangeableSource.rb" />
-    <None Include="Umbraco\Scripting\Templates\Rb\SubpagesFromCurrentPage.rb" />
     <Content Include="Umbraco\Webservices\CheckForUpgrade.asmx" />
     <Content Include="Umbraco\Xslt\searchResult.xslt" />
     <Content Include="Umbraco\Xslt\Templates\RelatedLinks.xslt" />
     <Content Include="Umbraco\Xslt\Templates\RSSFeed.xslt" />
     <Content Include="Umbraco_Client\Images\progressbar.gif" />
     <Content Include="Umbraco\Settings\DictionaryItemList.aspx" />
-    <Content Include="Umbraco\Settings\Scripts\editScript.aspx" />
     <Content Include="Umbraco\Translation\default.aspx" />
     <Content Include="Umbraco\Translation\preview.aspx" />
     <Content Include="Umbraco\Translation\xml.aspx" />
@@ -1021,10 +887,7 @@
     <Content Include="Umbraco\Create\xslt.ascx">
       <SubType>UserControl</SubType>
     </Content>
-    <Content Include="Umbraco\Css\umbracoGui.css" />
-    <Content Include="Umbraco\Dashboard\LatestEdits.ascx" />
     <Content Include="Umbraco\Developer\Macros\assemblyBrowser.aspx" />
-    <Content Include="Umbraco\Developer\autoDoc.aspx" />
     <Content Include="Umbraco\Developer\Macros\editMacro.aspx" />
     <Content Include="Umbraco\Developer\Xslt\editXslt.aspx" />
     <Content Include="Umbraco\Developer\Xslt\getXsltStatus.asmx" />
@@ -1034,7 +897,6 @@
     <Content Include="Umbraco_Client\Tree\Themes\Umbraco\protect_overlay.gif" />
     <Content Include="Umbraco\Js\dualSelectBox.js" />
     <Content Include="Umbraco\Js\guiFunctions.js" />
-    <Content Include="Umbraco\Js\language.aspx" />
     <Content Include="Umbraco\Js\umbracoCheckKeys.js" />
     <Content Include="Umbraco\Js\xmlextras.js" />
     <Content Include="Umbraco\Js\xmlRequest.js" />
@@ -1064,18 +926,13 @@
     </Content>
     <Content Include="Umbraco\Webservices\CMSNode.asmx" />
     <Content Include="Umbraco\Webservices\codeEditorSave.asmx" />
-    <Content Include="Umbraco\Webservices\Developer.asmx" />
     <Content Include="Umbraco\Webservices\legacyAjaxCalls.asmx" />
     <Content Include="Umbraco\Webservices\nodeSorter.asmx" />
     <Content Include="Umbraco\Webservices\progressStatus.asmx">
       <SubType>Form</SubType>
     </Content>
     <Content Include="Umbraco\Webservices\publication.asmx" />
-    <Content Include="Umbraco\Webservices\Settings.asmx">
-      <SubType>Form</SubType>
-    </Content>
     <Content Include="Umbraco\Webservices\templates.asmx" />
-    <Content Include="Umbraco\Webservices\trashcan.asmx" />
     <Content Include="Umbraco\Webservices\wsdl.xslt" />
     <Content Include="Umbraco\Xslt\macroGetCurrent.xsl" />
     <Content Include="Umbraco\Xslt\macroGetSubs.xsl" />
@@ -1119,9 +976,6 @@
     <Content Include="Umbraco_Client\Propertypane\style.css" />
     <Content Include="Umbraco_Client\Scrollingmenu\javascript.js" />
     <Content Include="Umbraco_Client\Scrollingmenu\style.css" />
-    <Content Include="Umbraco_Client\SimpleEditor\Images\bold.gif" />
-    <Content Include="Umbraco_Client\SimpleEditor\Images\italic.gif" />
-    <Content Include="Umbraco_Client\SimpleEditor\Images\link.gif" />
     <Content Include="Umbraco_Client\Tablesorting\tableDragAndDrop.js" />
     <Content Include="Umbraco_Client\Tablesorting\tableFilterUtill.js" />
     <Content Include="Umbraco_Client\Tablesorting\tableFilter.js" />
@@ -1144,7 +998,6 @@
     <Content Include="Umbraco\Masterpages\default.Master" />
     <Content Include="Umbraco\Webservices\TreeDataService.ashx" />
     <Content Include="Umbraco\Webservices\TagsAutoCompleteHandler.ashx" />
-    <Content Include="Umbraco\Webservices\UltimatePickerAutoCompleteHandler.ashx" />
     <Content Include="Umbraco\Webservices\MediaUploader.ashx" />
     <None Include="web.Template.config">
       <SubType>Designer</SubType>

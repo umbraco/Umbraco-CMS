@@ -33,14 +33,10 @@ namespace Umbraco.Core.Security
                     Username = user.UserName,
                     RealName = user.Name,
                     AllowedApplications = user.AllowedSections,
-                    Culture = user.Culture,
-                    //TODO: In order for this to work, the user.Roles would need to be filled in! 
-                    //Currently that is not the case because the BackOfficeIdentityUser deals with Groups (which we need to update)
-                    //For now, I'll fix this by using the user.Groups instead
-                    //Roles = user.Roles.Select(x => x.RoleId).ToArray(),
-                    Roles = user.Groups.Select(x => x.Alias).ToArray(),
-                    StartContentNodes = user.StartContentIds,
-                    StartMediaNodes = user.StartMediaIds,
+                    Culture = user.Culture,                 
+                    Roles = user.Roles.Select(x => x.RoleId).ToArray(),
+                    StartContentNodes = user.CalculatedContentStartNodeIds,
+                    StartMediaNodes = user.CalculatedMediaStartNodeIds,
                     SessionId = user.SecurityStamp
                 });
 

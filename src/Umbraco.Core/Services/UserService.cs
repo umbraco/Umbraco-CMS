@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -153,7 +154,8 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
-                return repository.Get(id);
+                var result =  repository.Get(id);
+                return result;
             }
         }
 
@@ -198,8 +200,26 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
-                var query = Query<IUser>.Builder.Where(x => x.Username.Equals(username));
-                return repository.GetByQuery(query).FirstOrDefault();
+                
+                try
+                {
+                    return repository.GetByUsername(username, includeSecurityData: true);
+                }
+                catch (SqlException ex)
+                {
+                    //we need to handle this one specific case which is when we are upgrading to 7.6 since the user group
+                    //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
+                    //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
+                    //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
+                    //that method would not be cached.
+                    if (ApplicationContext.Current.IsUpgrading)
+                    {
+                        //NOTE: this will not be cached
+                        return repository.GetByUsername(username, includeSecurityData: false);
+                    }
+                    throw;
+                }
+
             }
         }
 
@@ -295,6 +315,18 @@ namespace Umbraco.Core.Services
 
                 var repository = RepositoryFactory.CreateUserRepository(uow);
                 repository.AddOrUpdate(entity);
+
+                //Now we have to check for backwards compat hacks
+                var explicitUser = entity as User;                
+                if (explicitUser != null && explicitUser.GroupsToSave.Count > 0)
+                {
+                    var groupRepository = RepositoryFactory.CreateUserGroupRepository(uow);
+                    foreach (var userGroup in explicitUser.GroupsToSave)
+                    {
+                        groupRepository.AddOrUpdate(userGroup);
+                    }
+                }
+
                 try
                 {
                     // try to flush the unit of work
@@ -340,17 +372,28 @@ namespace Umbraco.Core.Services
                     }
                 }
                 var repository = RepositoryFactory.CreateUserRepository(uow);
-                foreach (var member in asArray)
+                var groupRepository = RepositoryFactory.CreateUserGroupRepository(uow);
+                foreach (var user in asArray)
                 {
-                    if (string.IsNullOrWhiteSpace(member.Username))
+                    if (string.IsNullOrWhiteSpace(user.Username))
                     {
                         throw new ArgumentException("Cannot save user with empty username.");
                     }
-                    if (string.IsNullOrWhiteSpace(member.Name))
+                    if (string.IsNullOrWhiteSpace(user.Name))
                     {
                         throw new ArgumentException("Cannot save user with empty name.");
                     }
-                    repository.AddOrUpdate(member);
+                    repository.AddOrUpdate(user);
+
+                    //Now we have to check for backwards compat hacks
+                    var explicitUser = user as User;
+                    if (explicitUser != null && explicitUser.GroupsToSave.Count > 0)
+                    {
+                        foreach (var userGroup in explicitUser.GroupsToSave)
+                        {
+                            groupRepository.AddOrUpdate(userGroup);
+                        }
+                    }
                 }
                 //commit the whole lot in one go
                 uow.Commit();
@@ -656,7 +699,25 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
-                return repository.Get(id);
+                try
+                {
+                    var result = repository.Get(id);
+                    return result;
+                }
+                catch (SqlException ex)
+                {
+                    //we need to handle this one specific case which is when we are upgrading to 7.6 since the user group
+                    //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
+                    //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
+                    //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
+                    //that method would not be cached.
+                    if (ApplicationContext.Current.IsUpgrading)
+                    {
+                        //NOTE: this will not be cached
+                        return repository.Get(id, includeSecurityData: false);
+                    }
+                    throw;
+                }
             }
         }
 

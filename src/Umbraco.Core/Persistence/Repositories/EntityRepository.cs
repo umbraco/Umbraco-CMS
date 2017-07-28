@@ -256,32 +256,22 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids)
         {
-            if (ids.Any())
-            {
-                return PerformGetAll(objectTypeId, sql1 => sql1.Where(" umbracoNode.id in (@ids)", new {ids = ids}));
-            }
-            else
-            {
-                return PerformGetAll(objectTypeId);
-            }
+            return ids.Any() 
+                ? PerformGetAll(objectTypeId, sql => sql.Where(" umbracoNode.id in (@ids)", new { ids })) 
+                : PerformGetAll(objectTypeId);
         }
 
         public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params Guid[] keys)
         {
-            if (keys.Any())
-            {
-                return PerformGetAll(objectTypeId, sql1 => sql1.Where(" umbracoNode.uniqueID in (@keys)", new { keys = keys }));
-            }
-            else
-            {
-                return PerformGetAll(objectTypeId);
-            }
+            return keys.Any() 
+                ? PerformGetAll(objectTypeId, sql => sql.Where(" umbracoNode.uniqueID in (@keys)", new { keys })) 
+                : PerformGetAll(objectTypeId);
         }
 
         private IEnumerable<IUmbracoEntity> PerformGetAll(Guid objectTypeId, Action<Sql> filter = null)
         {
-            bool isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
-            bool isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
+            var isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
+            var isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
             var sql = GetFullSqlForEntityType(isContent, isMedia, objectTypeId, filter);
 
             var factory = new UmbracoEntityFactory();
@@ -306,6 +296,26 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
+        public virtual IEnumerable<EntityPath> GetAllPaths(Guid objectTypeId, params int[] ids)
+        {
+            return ids.Any()
+                ? PerformGetAllPaths(objectTypeId, sql => sql.Append(" AND umbracoNode.id in (@ids)", new { ids }))
+                : PerformGetAllPaths(objectTypeId);
+        }
+
+        public virtual IEnumerable<EntityPath> GetAllPaths(Guid objectTypeId, params Guid[] keys)
+        {
+            return keys.Any()
+                ? PerformGetAllPaths(objectTypeId, sql => sql.Append(" AND umbracoNode.uniqueID in (@keys)", new { keys }))
+                : PerformGetAllPaths(objectTypeId);
+        }
+
+        private IEnumerable<EntityPath> PerformGetAllPaths(Guid objectTypeId, Action<Sql> filter = null)
+        {
+            var sql = new Sql("SELECT id, path FROM umbracoNode WHERE umbracoNode.nodeObjectType=@type", new { type = objectTypeId });
+            if (filter != null) filter(sql);
+            return _work.Database.Fetch<EntityPath>(sql);
+        }
 
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query)
         {

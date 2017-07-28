@@ -78,6 +78,7 @@ namespace Umbraco.Web.Editors
             return urls;
         }
 
+        [AppendUserModifiedHeader("id")]
         [FileUploadCleanupFilter(false)]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
@@ -141,6 +142,7 @@ namespace Umbraco.Web.Editors
             return request.CreateResponse(HttpStatusCode.OK, user.GetCurrentUserAvatarUrls(userService, staticCache));
         }
 
+        [AppendUserModifiedHeader("id")]
         public HttpResponseMessage PostClearAvatar(int id)
         {
             var found = Services.UserService.GetUserById(id);
@@ -232,12 +234,9 @@ namespace Umbraco.Web.Editors
 
             //we want to create the user with the UserManager, this ensures the 'empty' (special) password
             //format is applied without us having to duplicate that logic
-            var identityUser = new BackOfficeIdentityUser
-            {
-                Email = userSave.Email,
-                Name = userSave.Name,
-                UserName = userSave.Email
-            };
+            var identityUser = BackOfficeIdentityUser.CreateNew(userSave.Email, userSave.Email, GlobalSettings.DefaultUILanguage);
+            identityUser.Name = userSave.Name;
+
             var created = await UserManager.CreateAsync(identityUser);
             if (created.Succeeded == false)
             {
@@ -316,12 +315,10 @@ namespace Umbraco.Web.Editors
             {
                 //we want to create the user with the UserManager, this ensures the 'empty' (special) password
                 //format is applied without us having to duplicate that logic
-                var created = await UserManager.CreateAsync(new BackOfficeIdentityUser
-                {
-                    Email = userSave.Email,
-                    Name = userSave.Name,
-                    UserName = userSave.Email
-                });
+                var identityUser = BackOfficeIdentityUser.CreateNew(userSave.Email, userSave.Email, GlobalSettings.DefaultUILanguage);
+                identityUser.Name = userSave.Name;
+
+                var created = await UserManager.CreateAsync(identityUser);
                 if (created.Succeeded == false)
                 {
                     throw new HttpResponseException(

@@ -34,17 +34,20 @@ namespace Umbraco.Core.Security
         }
 
         #region Static Create methods
+
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager 
         /// </summary>
         /// <param name="options"></param>
         /// <param name="userService"></param>
+        /// <param name="entityService"></param>
         /// <param name="externalLoginService"></param>
         /// <param name="membershipProvider"></param>
         /// <returns></returns>
         public static BackOfficeUserManager Create(
             IdentityFactoryOptions<BackOfficeUserManager> options,
             IUserService userService,
+            IEntityService entityService,
             IExternalLoginService externalLoginService,
             MembershipProviderBase membershipProvider)
         {
@@ -52,7 +55,7 @@ namespace Umbraco.Core.Security
             if (userService == null) throw new ArgumentNullException("userService");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
-            var manager = new BackOfficeUserManager(new BackOfficeUserStore(userService, externalLoginService, membershipProvider));
+            var manager = new BackOfficeUserManager(new BackOfficeUserStore(userService, entityService, externalLoginService, membershipProvider));
             manager.InitUserManager(manager, membershipProvider, options);
             return manager;
         }
@@ -104,6 +107,7 @@ namespace Umbraco.Core.Security
         {
         }
 
+
         #region What we support do not currently
 
         //NOTE: Not sure if we really want/need to ever support this 
@@ -148,7 +152,7 @@ namespace Umbraco.Core.Security
             IDataProtectionProvider dataProtectionProvider)
         {
             // Configure validation logic for usernames
-            manager.UserValidator = new UserValidator<T, int>(manager)
+            manager.UserValidator = new BackOfficeUserValidator<T>(manager)
             {
                 AllowOnlyAlphanumericUserNames = false,
                 RequireUniqueEmail = true
@@ -263,7 +267,7 @@ namespace Umbraco.Core.Security
 
 
         #region Overrides for password logic
-
+        
         /// <summary>
         /// Logic used to validate a username and password
         /// </summary>
@@ -289,12 +293,23 @@ namespace Umbraco.Core.Security
             if (BackOfficeUserPasswordChecker != null)
             {
                 var result = await BackOfficeUserPasswordChecker.CheckPasswordAsync(user, password);
+
+                if (user.HasIdentity == false)
+                {
+                    return false;
+                }
+
                 //if the result indicates to not fallback to the default, then return true if the credentials are valid
                 if (result != BackOfficeUserPasswordCheckerResult.FallbackToDefaultChecker)
                 {
                     return result == BackOfficeUserPasswordCheckerResult.ValidCredentials;
                 }
             }
+
+            //we cannot proceed if the user passed in does not have an identity
+            if (user.HasIdentity == false)
+                return false;
+
             //use the default behavior
             return await base.CheckPasswordAsync(user, password);
         }

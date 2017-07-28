@@ -370,13 +370,19 @@ namespace Umbraco.Core.Services
         public IEnumerable<IUmbracoEntity> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
             string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "")
         {
+            totalRecords = 0;
+
+            var idsA = ids.ToArray();
+            if (idsA.Length == 0)
+                return Enumerable.Empty<IUmbracoEntity>();
+
             var objectTypeId = umbracoObjectType.GetGuid();
+
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateEntityRepository(uow);
 
                 var query = Query<IUmbracoEntity>.Builder;
-                var idsA = ids.ToArray();
                 if (idsA.All(x => x != Constants.System.Root))
                 {
                     var clauses = new List<Expression<Func<IUmbracoEntity, bool>>>();
@@ -557,6 +563,42 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateEntityRepository(uow);
                 var ret = repository.GetAll(objectTypeId, keys);
                 return ret;
+            }
+        }
+
+        public virtual IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params int[] ids)
+        {
+            var entityType = GetEntityType(umbracoObjectType);
+            var typeFullName = entityType.FullName;
+            Mandate.That<NotSupportedException>(_supportedObjectTypes.ContainsKey(typeFullName), () =>
+            {
+                throw new NotSupportedException
+                    ("The passed in type is not supported");
+            });
+
+            var objectTypeId = umbracoObjectType.GetGuid();
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+                return repository.GetAllPaths(objectTypeId, ids);
+            }
+        }
+
+        public virtual IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params Guid[] keys)
+        {
+            var entityType = GetEntityType(umbracoObjectType);
+            var typeFullName = entityType.FullName;
+            Mandate.That<NotSupportedException>(_supportedObjectTypes.ContainsKey(typeFullName), () =>
+            {
+                throw new NotSupportedException
+                    ("The passed in type is not supported");
+            });
+
+            var objectTypeId = umbracoObjectType.GetGuid();
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+                return repository.GetAllPaths(objectTypeId, keys);
             }
         }
 

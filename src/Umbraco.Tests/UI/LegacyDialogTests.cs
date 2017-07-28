@@ -27,15 +27,12 @@ namespace Umbraco.Tests.UI
         }
 
         [TestCase(typeof(XsltTasks), DefaultApps.developer)]
-        [TestCase(typeof(templateTasks), DefaultApps.settings)]
         [TestCase(typeof(StylesheetTasks), DefaultApps.settings)]
         [TestCase(typeof(stylesheetPropertyTasks), DefaultApps.settings)]
-        [TestCase(typeof(ScriptTasks), DefaultApps.settings)]
         [TestCase(typeof(MemberGroupTasks), DefaultApps.member)]
         [TestCase(typeof(dictionaryTasks), DefaultApps.settings)]
         [TestCase(typeof(macroTasks), DefaultApps.developer)]
         [TestCase(typeof(languageTasks), DefaultApps.settings)]
-        [TestCase(typeof(DLRScriptingTasks), DefaultApps.developer)]
         [TestCase(typeof(CreatedPackageTasks), DefaultApps.developer)]
         public void Check_Assigned_Apps_For_Tasks(Type taskType, DefaultApps app)
         {
