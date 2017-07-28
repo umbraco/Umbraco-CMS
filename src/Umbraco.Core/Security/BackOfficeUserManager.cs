@@ -141,7 +141,9 @@ namespace Umbraco.Core.Security
         /// Initializes the user manager with the correct options
         /// </summary>
         /// <param name="manager"></param>
-        /// <param name="membershipProvider"></param>
+        /// <param name="membershipProvider">
+        /// The <see cref="MembershipProviderBase"/> for the users called UsersMembershipProvider
+        /// </param>
         /// <param name="dataProtectionProvider"></param>
         /// <returns></returns>
         protected void InitUserManager(
@@ -157,11 +159,10 @@ namespace Umbraco.Core.Security
             };
 
             // Configure validation logic for passwords
-            var provider = MembershipProviderExtensions.GetUsersMembershipProvider();            
-            manager.PasswordValidator = new MembershipProviderPasswordValidator(provider);
+            manager.PasswordValidator = new MembershipProviderPasswordValidator(membershipProvider);
 
             //use a custom hasher based on our membership provider
-            manager.PasswordHasher = new MembershipPasswordHasher(membershipProvider);
+            manager.PasswordHasher = GetDefaultPasswordHasher(membershipProvider);
             
             if (dataProtectionProvider != null)
             {
@@ -196,6 +197,76 @@ namespace Umbraco.Core.Security
 
             //manager.SmsService = new SmsService();            
         }
+
+        /// <summary>
+        /// This will determine which password hasher to use based on what is defined in config
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IPasswordHasher GetDefaultPasswordHasher(MembershipProviderBase provider)
+        {
+            //if the current user membership provider is unkown (this would be rare), then return the default password hasher
+            if (provider.IsUmbracoUsersProvider() == false)
+                return new PasswordHasher();
+
+            //if the configured provider has legacy features enabled, then return the membership provider password hasher
+            if (provider.AllowManuallyChangingPassword || provider.DefaultUseLegacyEncoding)
+                return new MembershipProviderPasswordHasher(provider);
+
+            //we can use the user aware password hasher (which will be the default and preferred way)
+            return new UserAwareMembershipProviderPasswordHasher(provider);
+        }
+
+        /// <summary>
+        /// Gets/sets the default back office user password checker
+        /// </summary>
+        public IBackOfficeUserPasswordChecker BackOfficeUserPasswordChecker { get; set; }
+
+        /// <summary>
+        /// Helper method to generate a password for a user based on the current password validator
+        /// </summary>
+        /// <returns></returns>
+        public string GeneratePassword()
+        {
+            var passwordValidator = PasswordValidator as PasswordValidator;
+
+            if (passwordValidator == null)
+            {
+                var membershipPasswordHasher = PasswordHasher as IMembershipProviderPasswordHasher;
+
+                //get the real password validator, this should not be null but in some very rare cases it could be, in which case
+                //we need to create a default password validator to use since we have no idea what it actually is or what it's rules are
+                //this is an Edge Case!
+                passwordValidator = PasswordValidator as PasswordValidator
+                                    ?? (membershipPasswordHasher != null
+                                        ? new MembershipProviderPasswordValidator(membershipPasswordHasher.MembershipProvider)
+                                        : new PasswordValidator());
+            }
+
+            var password = Membership.GeneratePassword(
+                passwordValidator.RequiredLength,
+                passwordValidator.RequireNonLetterOrDigit ? 2 : 0);
+
+            var random = new Random();
+
+            var passwordChars = password.ToCharArray();
+
+            if (passwordValidator.RequireDigit && passwordChars.ContainsAny(Enumerable.Range(48, 58).Select(x => (char)x)))
+                password += Convert.ToChar(random.Next(48, 58));  // 0-9
+
+            if (passwordValidator.RequireLowercase && passwordChars.ContainsAny(Enumerable.Range(97, 123).Select(x => (char)x)))
+                password += Convert.ToChar(random.Next(97, 123));  // a-z
+
+            if (passwordValidator.RequireUppercase && passwordChars.ContainsAny(Enumerable.Range(65, 91).Select(x => (char)x)))
+                password += Convert.ToChar(random.Next(65, 91));  // A-Z
+
+            if (passwordValidator.RequireNonLetterOrDigit && passwordChars.ContainsAny(Enumerable.Range(33, 48).Select(x => (char)x)))
+                password += Convert.ToChar(random.Next(33, 48));  // symbols !"#$%&'()*+,-./
+
+            return password;
+        }
+
+
+        #region Overrides for password logic
         
         /// <summary>
         /// Logic used to validate a username and password
@@ -243,44 +314,88 @@ namespace Umbraco.Core.Security
             return await base.CheckPasswordAsync(user, password);
         }
 
-        /// <summary>
-        /// Gets/sets the default back office user password checker
-        /// </summary>
-        public IBackOfficeUserPasswordChecker BackOfficeUserPasswordChecker { get; set; }
+        public override Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+        {
+            return base.ChangePasswordAsync(userId, currentPassword, newPassword);
+        }
 
         /// <summary>
-        /// Helper method to generate a password for a user based on the current password validator
+        /// Override to determine how to hash the password
+        /// </summary>
+        /// <param name="store"></param>
+        /// <param name="user"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        protected override async Task<bool> VerifyPasswordAsync(IUserPasswordStore<T, int> store, T user, string password)
+        {
+            var userAwarePasswordHasher = PasswordHasher as IUserAwarePasswordHasher<BackOfficeIdentityUser, int>;
+            if (userAwarePasswordHasher == null)
+                return await base.VerifyPasswordAsync(store, user, password);
+
+            var hash = await store.GetPasswordHashAsync(user);
+            return userAwarePasswordHasher.VerifyHashedPassword(user, hash, password) != PasswordVerificationResult.Failed;
+        }
+
+        /// <summary>
+        /// Override to determine how to hash the password
+        /// </summary>
+        /// <param name="passwordStore"></param>
+        /// <param name="user"></param>
+        /// <param name="newPassword"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This method is called anytime the password needs to be hashed for storage (i.e. including when reset password is used)
+        /// </remarks>
+        protected override async Task<IdentityResult> UpdatePassword(IUserPasswordStore<T, int> passwordStore, T user, string newPassword)
+        {
+            var userAwarePasswordHasher = PasswordHasher as IUserAwarePasswordHasher<BackOfficeIdentityUser, int>;
+            if (userAwarePasswordHasher == null)
+                return await base.UpdatePassword(passwordStore, user, newPassword);
+
+            var result = await PasswordValidator.ValidateAsync(newPassword);
+            if (result.Succeeded == false)
+                return result;
+
+            await passwordStore.SetPasswordHashAsync(user, userAwarePasswordHasher.HashPassword(user, newPassword));
+            await UpdateSecurityStampInternal(user);
+            return IdentityResult.Success;
+
+            
+        }
+
+        /// <summary>
+        /// This is copied from the underlying .NET base class since they decied to not expose it
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        private async Task UpdateSecurityStampInternal(BackOfficeIdentityUser user)
+        {
+            if (SupportsUserSecurityStamp == false)
+                return;
+            await GetSecurityStore().SetSecurityStampAsync(user, NewSecurityStamp());
+        }
+
+        /// <summary>
+        /// This is copied from the underlying .NET base class since they decied to not expose it
         /// </summary>
         /// <returns></returns>
-        public string GeneratePassword()
+        private IUserSecurityStampStore<BackOfficeIdentityUser, int> GetSecurityStore()
         {
-            var passwordValidator = PasswordValidator as PasswordValidator;
-            if (passwordValidator != null)
-            {
-                var password = Membership.GeneratePassword(
-                    passwordValidator.RequiredLength,
-                    passwordValidator.RequireNonLetterOrDigit ? 2 : 0);
-
-                var random = new Random();
-
-                var passwordChars = password.ToCharArray();
-
-                if (passwordValidator.RequireDigit && passwordChars.ContainsAny(Enumerable.Range(48, 58).Select(x => (char)x)))
-                    password += Convert.ToChar(random.Next(48, 58));  // 0-9
-
-                if (passwordValidator.RequireLowercase && passwordChars.ContainsAny(Enumerable.Range(97, 123).Select(x => (char)x)))
-                    password += Convert.ToChar(random.Next(97, 123));  // a-z
-
-                if (passwordValidator.RequireUppercase && passwordChars.ContainsAny(Enumerable.Range(65, 91).Select(x => (char)x)))
-                    password += Convert.ToChar(random.Next(65, 91));  // A-Z
-
-                if (passwordValidator.RequireNonLetterOrDigit && passwordChars.ContainsAny(Enumerable.Range(33, 48).Select(x => (char)x)))
-                    password += Convert.ToChar(random.Next(33, 48));  // symbols !"#$%&'()*+,-./
-
-                return password;
-            }
-            throw new NotSupportedException("Cannot generate a password since the type of the password validator (" + PasswordValidator.GetType() + ") is not known");
+            var store = Store as IUserSecurityStampStore<BackOfficeIdentityUser, int>;
+            if (store == null)
+                throw new NotSupportedException("The current user store does not implement " + typeof(IUserSecurityStampStore<>));
+            return store;
         }
-        
+
+        /// <summary>
+        /// This is copied from the underlying .NET base class since they decied to not expose it
+        /// </summary>
+        /// <returns></returns>
+        private static string NewSecurityStamp()
+        {
+            return Guid.NewGuid().ToString();
+        }
+
+        #endregion
     }
 }

@@ -57,6 +57,8 @@ namespace Umbraco.Web.Editors
         [WebApi.UmbracoAuthorize(requireApproval: false)]
         public IDictionary<string, object> GetMembershipProviderConfig()
         {
+            //TODO: Check if the current PasswordValidator is an IMembershipProviderPasswordValidator, if
+            //it's not than we should return some generic defaults
             var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
             return provider.GetConfiguration(Services.UserService);
         }
