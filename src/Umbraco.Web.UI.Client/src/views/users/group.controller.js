@@ -82,7 +82,6 @@
 
         function openSectionPicker() {
             vm.sectionPicker = {
-                title: "Select sections",
                 view: "sectionpicker",
                 selection: vm.userGroup.sections,
                 closeButtonLabel: vm.labels.cancel,
@@ -156,7 +155,6 @@
 
         function openUserPicker() {
             vm.userPicker = {
-                title: "Select users",
                 view: "userpicker",
                 selection: vm.userGroup.users,
                 show: true,

@@ -319,6 +319,8 @@
     <key alias="selectContent">Select content</key>
     <key alias="selectMember">Select member</key>
     <key alias="selectMemberGroup">Select member group</key>
+    <key alias="selectSections">Select sections</key>
+    <key alias="selectUsers">Select users</key>
     <key alias="noMacroParams">There are no parameters for this macro</key>
     <key alias="noMacros">There are no macros available to insert</key>
     <key alias="externalLoginProviders">External login providers</key>
