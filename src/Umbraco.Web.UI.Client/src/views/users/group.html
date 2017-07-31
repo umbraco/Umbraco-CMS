@@ -21,9 +21,11 @@
 
                         <div class="umb-package-details__main-content">
 
-                            <div class="test-group">
-                                <div class="test-group-title">Something</div>
-                                <div class="test-group-content block-form">
+                            <div class="umb-box">
+                                <div class="umb-box-header">
+                                    <div class="umb-box-header-title">Something</div>
+                                </div>
+                                <div class="umb-box-content block-form">
 
                                     <umb-control-group style="margin-bottom: 20px;" label="Sections" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
                                         <umb-node-preview
@@ -87,9 +89,11 @@
                                 </div>
                             </div>
 
-                            <div class="test-group">
-                                <div class="test-group-title">Default permissions</div>
-                                <div class="test-group-content block-form">
+                            <div class="umb-box">
+                                <div class="umb-box-header">
+                                    <div class="umb-box-header-title">Default permissions</div>
+                                </div>
+                                <div class="umb-box-content block-form">
                                     <umb-control-group
                                         ng-repeat="(category, permissions) in vm.userGroup.defaultPermissions"
                                         label="{{ category }}">
@@ -103,9 +107,11 @@
                                 </div>
                             </div>
 
-                            <div class="test-group">
-                                <div class="test-group-title">Granular permissions</div>
-                                <div class="test-group-content block-form">
+                            <div class="umb-box">
+                                <div class="umb-box-header">
+                                    <div class="umb-box-header-title">Granular permissions</div>
+                                </div>
+                                <div class="umb-box-content block-form">
                                     <umb-control-group label="Nodes" description="Donec quis lacinia ligula. Suspendisse ultrices risus ante">
                                         
                                         <umb-node-preview
