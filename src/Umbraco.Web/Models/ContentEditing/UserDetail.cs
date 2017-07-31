@@ -38,9 +38,15 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "remainingAuthSeconds")]
         public double SecondsUntilTimeout { get; set; }
 
+        /// <summary>
+        /// The user's calculated start nodes based on the start nodes they have assigned directly to them and via the groups they're assigned to
+        /// </summary>
         [DataMember(Name = "startContentIds")]
         public int[] StartContentIds { get; set; }
 
+        /// <summary>
+        /// The user's calculated start nodes based on the start nodes they have assigned directly to them and via the groups they're assigned to
+        /// </summary>
         [DataMember(Name = "startMediaIds")]
         public int[] StartMediaIds { get; set; }
 
