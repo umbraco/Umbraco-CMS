@@ -151,12 +151,26 @@ namespace Umbraco.Web.Editors
 
             var filePath = found.Avatar;
 
-            found.Avatar = null;
+            //if the filePath is already null it will mean that the user doesn't have a custom avatar and their gravatar is currently
+            //being used (if they have one). This means they want to remove their gravatar too which we can do by setting a special value 
+            //for the avatar.
+            if (filePath.IsNullOrWhiteSpace() == false)
+            {
+                found.Avatar = null;
+            }
+            else
+            {
+                //set a special value to indicate to not have any avatar
+                found.Avatar = "none";
+            }
 
             Services.UserService.Save(found);
 
-            if (FileSystemProviderManager.Current.MediaFileSystem.FileExists(filePath))
-                FileSystemProviderManager.Current.MediaFileSystem.DeleteFile(filePath);
+            if (filePath.IsNullOrWhiteSpace() == false)
+            {
+                if (FileSystemProviderManager.Current.MediaFileSystem.FileExists(filePath))
+                    FileSystemProviderManager.Current.MediaFileSystem.DeleteFile(filePath);
+            }
 
             return Request.CreateResponse(HttpStatusCode.OK, found.GetCurrentUserAvatarUrls(Services.UserService, ApplicationContext.ApplicationCache.StaticCache));
         }
