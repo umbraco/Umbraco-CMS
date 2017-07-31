@@ -374,10 +374,6 @@
     <Compile Include="PropertyEditors\PropertyEditorValueEditorTests.cs" />
     <Compile Include="PublishedContent\PublishedContentRequestEngineTests.cs" />
     <Compile Include="PublishedContent\RootNodeTests.cs" />
-    <Compile Include="PublishedContent\StronglyTypedModels\CallingMethodTests.cs" />
-    <Compile Include="PublishedContent\StronglyTypedModels\Subpage.cs" />
-    <Compile Include="PublishedContent\StronglyTypedModels\Textpage.cs" />
-    <Compile Include="PublishedContent\StronglyTypedModels\TypedModelBase.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests.cs" />
     <Compile Include="Misc\ApplicationUrlHelperTests.cs" />
     <Compile Include="Services\FileServiceTests.cs" />

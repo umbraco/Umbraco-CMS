@@ -16,15 +16,6 @@ namespace Umbraco.Tests.PublishedContent
     [TestFixture]
     public class ModelsAndConvertersTests
     {
-        // fixme
-        // naming: IPublishedProperty is IPropertySetProperty or IFacadeProperty of some sort
-        // naming: general naming sucks at the moment
-        // caching: re-think how properties are cached
-        //  - for true NuCache content it probably is OK (but needs explanation)
-        //  - for true Xml cache content it probably is OK (but needs explanation)
-        //  - for pure sets, I have no idea - should at least cache at content level?
-        //    hold on - PropertySetPropertyBase probably handles it - need to check
-
         #region ModelType
 
         [Test]
@@ -417,7 +408,9 @@ namespace Umbraco.Tests.PublishedContent
                 .Setup(x => x.CreateSetProperty(It.IsAny<PublishedPropertyType>(), It.IsAny<IPropertySet>(), It.IsAny<bool>(), It.IsAny<PropertyCacheLevel>(), It.IsAny<object>()))
                 .Returns<PublishedPropertyType, IPropertySet, bool, PropertyCacheLevel, object>((propertyType, set, previewing, refCacheLevel, value) =>
                 {
+                    // ReSharper disable AccessToModifiedClosure
                     return new TestPropertySetProperty(propertyType, set, previewing, refCacheLevel, value, () => snapshotCache, () => facadeCache);
+                    // ReSharper restore AccessToModifiedClosure
                 });
             var facadeService = facadeServiceMock.Object;
 
@@ -449,6 +442,7 @@ namespace Umbraco.Tests.PublishedContent
 
             Assert.AreEqual(snapshotCount2, snapshotCache.Count);
             Assert.AreEqual(facadeCount2, facadeCache.Count);
+            Assert.AreEqual(facadeCount2, oldFacadeCache.Count);
 
             Assert.AreEqual((interConverts == 1 ? 1 : 3) + facadeCache.Count, converter.InterConverts);
 
@@ -459,6 +453,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(1, converter.SourceConverts);
 
             Assert.AreEqual(snapshotCount2, snapshotCache.Count);
+            Assert.AreEqual(snapshotCount2, oldSnapshotCache.Count);
             Assert.AreEqual(facadeCount2, facadeCache.Count);
 
             Assert.AreEqual((interConverts == 1 ? 1 : 4) + facadeCache.Count + snapshotCache.Count, converter.InterConverts);
@@ -481,7 +476,7 @@ namespace Umbraco.Tests.PublishedContent
 
             Assert.Throws<Exception>(() =>
             {
-                var set1 = new PropertySet(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+                var unused = new PropertySet(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
             });
         }
 
