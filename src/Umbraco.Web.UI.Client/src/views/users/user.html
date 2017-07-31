@@ -170,7 +170,7 @@
                         <localize key="user_changePhoto">Change photo</localize>
                       </a>
                     
-                      <a href="" class="umb-user-group-preview__action umb-user-group-preview__action--red" ng-click="vm.clearAvatar()" prevent-default>
+                      <a href="" ng-if="vm.user.avatars" class="umb-user-group-preview__action umb-user-group-preview__action--red" ng-click="vm.clearAvatar()" prevent-default>
                         <localize key="user_removePhoto">Remove photo</localize>
                       </a>
 
