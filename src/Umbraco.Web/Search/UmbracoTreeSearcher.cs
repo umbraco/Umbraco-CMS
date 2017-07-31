@@ -8,6 +8,7 @@ using AutoMapper;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Search
@@ -40,6 +41,9 @@ namespace Umbraco.Web.Search
             var searcher = Constants.Examine.InternalSearcher;
             var fields = new[] { "id", "__NodeId" };
 
+            var umbracoContext = umbracoHelper.UmbracoContext;
+            var appContext = umbracoContext.Application;
+
             //TODO: WE should really just allow passing in a lucene raw query
             switch (entityType)
             {
@@ -56,13 +60,13 @@ namespace Umbraco.Web.Search
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
-                    var allMediaStartNodes = umbracoHelper.UmbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(ApplicationContext.Current.Services.EntityService);
-                    AppendPath(sb, UmbracoObjectTypes.Media,  allMediaStartNodes, searchFrom);
+                    var allMediaStartNodes = umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(appContext.Services.EntityService);
+                    AppendPath(sb, UmbracoObjectTypes.Media,  allMediaStartNodes, searchFrom, appContext.Services.EntityService);
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
-                    var allContentStartNodes = umbracoHelper.UmbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(ApplicationContext.Current.Services.EntityService);
-                    AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom);
+                    var allContentStartNodes = umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(appContext.Services.EntityService);
+                    AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, appContext.Services.EntityService);
                     break;
                 default:
                     throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);
@@ -199,9 +203,10 @@ namespace Umbraco.Web.Search
             }
         }
 
-        private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[] startNodeIds, string searchFrom)
+        private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[] startNodeIds, string searchFrom, IEntityService entityService)
         {
-            var entityService = ApplicationContext.Current.Services.EntityService;
+            if (sb == null) throw new ArgumentNullException("sb");
+            if (entityService == null) throw new ArgumentNullException("entityService");
 
             int searchFromId;
             var entityPath = int.TryParse(searchFrom, out searchFromId) && searchFromId > 0

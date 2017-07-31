@@ -259,9 +259,9 @@ namespace Umbraco.Web.Trees
             return menu;
         }
 
-        public IEnumerable<SearchResultItem> Search(UmbracoHelper umbracoHelper, string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
-            return _treeSearcher.ExamineSearch(umbracoHelper, query, UmbracoEntityTypes.Document, pageSize, pageIndex, out totalFound, searchFrom);
+            return _treeSearcher.ExamineSearch(Umbraco, query, UmbracoEntityTypes.Document, pageSize, pageIndex, out totalFound, searchFrom);
         }
     }
 }
