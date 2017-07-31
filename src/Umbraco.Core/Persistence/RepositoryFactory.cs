@@ -1,6 +1,7 @@
 using Umbraco.Core.Configuration;
 using System;
 using System.ComponentModel;
+using System.Web.Security;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -9,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Persistence
 {
@@ -314,11 +316,18 @@ namespace Umbraco.Core.Persistence
 
         public virtual IUserRepository CreateUserRepository(IScopeUnitOfWork uow)
         {
+            var userMembershipProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
+            var passwordConfig = userMembershipProvider == null || userMembershipProvider.PasswordFormat != MembershipPasswordFormat.Hashed
+                ? null
+                : new System.Collections.Generic.Dictionary<string, string> {{"hashAlgorithm", Membership.HashAlgorithmType}};
+
             return new UserRepository(
                 uow,
                 //Need to cache users - we look up user information more than anything in the back office!
                 _cacheHelper,
-                _logger, _sqlSyntax);
+                _logger, 
+                _sqlSyntax,
+                passwordConfig);
         }
 
         internal virtual IMacroRepository CreateMacroRepository(IScopeUnitOfWork uow)
