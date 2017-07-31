@@ -82,6 +82,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(basic => basic.Icon, expression => expression.MapFrom(entity => entity.ContentTypeIcon))
                 .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(x => x.Score, expression => expression.Ignore())
                 .AfterMap((entity, basic) =>
                 {
                     if (basic.Icon.IsNullOrWhiteSpace())
