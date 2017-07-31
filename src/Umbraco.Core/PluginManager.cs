@@ -491,7 +491,7 @@ namespace Umbraco.Core
                 {
                     if (--attempts == 0)
                         throw;
-                    Thread.Sleep(250);
+                    Thread.Sleep(pauseMilliseconds);
                 }
             }
         }
