@@ -272,13 +272,13 @@
           <div ng-if="vm.usersViewState === 'inviteUser'">
             <h3 class="bold" style="margin-bottom: 0;"><localize key="user_inviteUser">Invite User</localize></h3>
             <p style="line-height: 1.6em; margin-bottom: 15px;">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.
+              <localize key="user_inviteUserHelp"></localize>
             </p>
           </div>
           <div ng-if="vm.usersViewState === 'createUser'">
             <h3 class="bold" style="margin-bottom: 0;"><localize key="user_createUser">Create user</localize></h3>
             <p style="line-height: 1.6em; margin-bottom: 15px;">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.
+              <localize key="user_createUserHelp"></localize>
             </p>
           </div>
         </div>
@@ -311,7 +311,7 @@
           <span class="help-inline" val-msg-for="email" val-toggle-msg="valServerField"></span>
         </umb-control-group>
 
-        <umb-control-group label="@user_usergroup">
+        <umb-control-group label="@user_usergroup" description="@user_groupsHelp">
 
           <umb-user-group-preview ng-repeat="group in vm.newUser.userGroups"
                                   icon="group.icon"
@@ -338,7 +338,7 @@
                     type="text"
                     class="input-block-level"
                     localize="placeholder"
-                    placeholder="@placeholders_entermessage"
+                    placeholder="@placeholders_enterMessage"
                     ng-model="vm.newUser.message"
                     rows="4"
                     required
@@ -390,11 +390,11 @@
             {{vm.newUser.name | umbWordLimit:1}}  <localize key="user_userCreated">has been created</localize>
           </h3>
         </div>
-        <p style="line-height: 1.6em; margin-bottom: 20px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
+        <p style="line-height: 1.6em; margin-bottom: 20px;"><localize key="user_userCreatedSuccessHelp"></localize></p>
         <div>
 
           <label class="bold">
-            <localize key="placeholders_password">Password</localize>
+            <localize key="user_password">Password</localize>
           </label>
 
           <div class="flex items-center justify-between" style="background-color: #f3f3f5; padding: 10px 20px; border-radius: 3px; margin-bottom: 30px;">

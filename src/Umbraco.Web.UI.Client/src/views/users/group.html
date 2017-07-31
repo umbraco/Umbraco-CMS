@@ -25,7 +25,7 @@
                                 <div class="test-group-title"><localize key="user_access">Access</localize></div>
                                 <div class="test-group-content block-form">
 
-                                    <umb-control-group style="margin-bottom: 20px;" label="@main_sections" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
+                                    <umb-control-group style="margin-bottom: 20px;" label="@main_sections" description="@user_sectionsHelp">
                                         <umb-node-preview
                                             style="max-width: 100%;"
                                             ng-repeat="section in vm.userGroup.sections"
@@ -44,7 +44,7 @@
                                         </a>
                                     </umb-control-group>
 
-                                    <umb-control-group style="margin-bottom: 20px;" label="@user_startnode" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
+                                    <umb-control-group style="margin-bottom: 20px;" label="@user_startnode" description="@user_startnodehelp">
                                         <umb-node-preview
                                             ng-if="vm.userGroup.contentStartNode.id"
                                             style="max-width: 100%;"
@@ -64,7 +64,7 @@
                                         </a>
                                     </umb-control-group>
 
-                                    <umb-control-group label="@user_mediastartnode" description="Donec quis lacinia ligula. Suspendisse ultrices risus ante">
+                                    <umb-control-group label="@user_mediastartnode" description="@user_mediastartnodehelp">
                                         <umb-node-preview
                                             ng-if="vm.userGroup.mediaStartNode.id"
                                             style="max-width: 100%;"
@@ -106,7 +106,7 @@
                             <div class="test-group">
                                 <div class="test-group-title"><localize key="user_permissionsGranular">Granular permissions</localize></div>
                                 <div class="test-group-content block-form">
-                                    <umb-control-group label="Nodes" description="Donec quis lacinia ligula. Suspendisse ultrices risus ante">
+                                    <umb-control-group label="Nodes" description="@user_permissionsGranularHelp">
                                         
                                         <umb-node-preview
                                             ng-repeat="node in vm.userGroup.assignedPermissions"
