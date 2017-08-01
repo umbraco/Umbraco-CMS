@@ -449,12 +449,6 @@
     <Compile Include="Umbraco\Search\QuickSearch.ascx.designer.cs">
       <DependentUpon>QuickSearch.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Settings\EditTemplate.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Settings\EditTemplate.aspx.designer.cs">
-      <DependentUpon>editTemplate.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx.cs">
       <DependentUpon>editstylesheet.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -797,22 +791,6 @@
       <DependentUpon>applications.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Umbraco\Scripting\templates\cshtml\EmptyTemplate.cshtml">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="Umbraco\Scripting\templates\cshtml\Gallery.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListAncestorsFromCurrentPage.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesFromChangeableSource.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesFromCurrentPage.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesOrderedByDate.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesOrderedByName.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesOrderedByProperty.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesWithDoctype.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListDescendantsFromCurrentPage.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListImagesFromMediaFolder.cshtml">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="Umbraco\Scripting\templates\cshtml\MultinodeTree-picker.cshtml" />
     <Content Include="Umbraco\Views\Default.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Empty.cshtml" />
@@ -868,9 +846,6 @@
     <Content Include="Umbraco\Masterpages\umbracoPage.Master" />
     <Content Include="Umbraco\Masterpages\umbracoDialog.Master" />
     <Content Include="Umbraco\Search\QuickSearchHandler.ashx" />
-    <Content Include="Umbraco\Scripting\Templates\Cshtml\Breadcrumb.cshtml" />
-    <Content Include="Umbraco\Scripting\Templates\Cshtml\Navigation.cshtml" />
-    <Content Include="Umbraco\Scripting\Templates\Cshtml\SiteMap.cshtml" />
     <Content Include="Umbraco\Webservices\CheckForUpgrade.asmx" />
     <Content Include="Umbraco\Xslt\searchResult.xslt" />
     <Content Include="Umbraco\Xslt\Templates\RelatedLinks.xslt" />
@@ -912,7 +887,6 @@
     <Content Include="Umbraco\publishStatus.aspx" />
     <Content Include="Umbraco\Settings\EditDictionaryItem.aspx" />
     <Content Include="Umbraco\Settings\editLanguage.aspx" />
-    <Content Include="Umbraco\Settings\editTemplate.aspx" />
     <Content Include="Umbraco\Settings\Modals\ShowUmbracoTags.aspx" />
     <Content Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx" />
     <Content Include="Umbraco\Settings\Stylesheet\Property\EditStyleSheetProperty.aspx" />
@@ -932,7 +906,6 @@
       <SubType>Form</SubType>
     </Content>
     <Content Include="Umbraco\Webservices\publication.asmx" />
-    <Content Include="Umbraco\Webservices\templates.asmx" />
     <Content Include="Umbraco\Webservices\wsdl.xslt" />
     <Content Include="Umbraco\Xslt\macroGetCurrent.xsl" />
     <Content Include="Umbraco\Xslt\macroGetSubs.xsl" />
