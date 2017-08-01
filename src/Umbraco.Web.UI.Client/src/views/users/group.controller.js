@@ -6,6 +6,7 @@
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
 
+
         vm.page = {};
         vm.page.contentRootLabel = "Content Root";
         vm.page.mediaRootLabel = "Media Root";
@@ -30,6 +31,12 @@
 
             localizationService.localize("general_cancel").then(function (name) {
                 vm.labels.cancel = name;
+            });
+            localizationService.localize("general_add").then(function (name) {
+                vm.labels.add = name;
+            });
+            localizationService.localize("user_noStartNode").then(function (name) {
+                vm.labels.noStartNode = name;
             });
 
             if ($routeParams.create) {

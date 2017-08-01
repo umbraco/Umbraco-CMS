@@ -39,6 +39,10 @@
 
             vm.loading = true;
 
+            localizationService.localize("user_noStartNode").then(function (name) {
+                vm.page.noStartNodeLabel = name;
+            });
+
             // get user
             usersResource.getUser($routeParams.id).then(function (user) {
                 vm.user = user;

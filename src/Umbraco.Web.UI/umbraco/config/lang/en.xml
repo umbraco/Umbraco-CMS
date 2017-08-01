@@ -1604,6 +1604,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="permissionSelectPages">Select pages to modify their permissions</key>
     <key alias="searchAllChildren">Search all children</key>
     <key alias="startnode">Start Node in Content</key>
+    <key alias="noStartNode">No start node selected</key>
     <key alias="username">Name</key>
     <key alias="userPermissions">User permissions</key>
     <key alias="userGroupPermissions">User group permissions</key>
