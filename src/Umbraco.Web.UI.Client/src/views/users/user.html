@@ -20,9 +20,11 @@
 
             <div class="umb-package-details__main-content">
 
-              <div class="test-group">
-                <div class="test-group-title">Meta</div>
-                <div class="test-group-content block-form">
+              <div class="umb-box">
+                <div class="umb-box-header">
+                  <div class="umb-box-header-title">Meta</div>
+                </div>
+                <div class="umb-box-content block-form">
 
                   <umb-control-group label="Email" description="Orci varius natoque penatibus et magnis dis parturient montes">
                     <input type="text"
@@ -66,9 +68,11 @@
                 </div>
               </div>
 
-              <div class="test-group" ng-if="!vm.user.isCurrentUser">
-                <div class="test-group-title">Permissions</div>
-                <div class="test-group-content block-form">
+              <div class="umb-box" ng-if="!vm.user.isCurrentUser">
+                <div class="umb-box-header">
+                  <div class="umb-box-header-title">Permissions</div>
+                </div>
+                <div class="umb-box-content block-form">
 
                   <umb-control-group style="margin-bottom: 25px;" label="Groups" description="Aliquam laoreet metus porta nisi pellentesque">
 
