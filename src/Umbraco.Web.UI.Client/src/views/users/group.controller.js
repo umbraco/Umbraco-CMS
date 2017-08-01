@@ -25,8 +25,20 @@
 
             vm.loading = true;
 
-            localizationService.localize("general_cancel").then(function (name) {
-                vm.labels.cancel = name;
+            var labelKeys = [
+                "general_cancel",
+                "defaultdialogs_selectContentStartNode",
+                "defaultdialogs_selectMediaStartNode",
+                "defaultdialogs_selectNode",
+                "general_groups"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(function (values) {
+                vm.labels.cancel = values[0];
+                vm.labels.selectContentStartNode = values[1];
+                vm.labels.selectMediaStartNode = values[2];
+                vm.labels.selectNode = values[3];
+                vm.labels.groups = values[4];
             });
 
             if ($routeParams.create) {
@@ -82,7 +94,6 @@
 
         function openSectionPicker() {
             vm.sectionPicker = {
-                title: "Select sections",
                 view: "sectionpicker",
                 selection: vm.userGroup.sections,
                 closeButtonLabel: vm.labels.cancel,
@@ -103,7 +114,7 @@
 
         function openContentPicker() {
             vm.contentPicker = {
-                title: "Select content start node",
+                title: vm.labels.selectContentStartNode,
                 view: "contentpicker",
                 hideSubmitButton: true,
                 hideHeader: false,
@@ -128,7 +139,7 @@
 
         function openMediaPicker() {
             vm.contentPicker = {
-                title: "Select media start node",
+                title: vm.labels.selectMediaStartNode,
                 view: "treepicker",
                 section: "media",
                 treeAlias: "media",
@@ -156,7 +167,6 @@
 
         function openUserPicker() {
             vm.userPicker = {
-                title: "Select users",
                 view: "userpicker",
                 selection: vm.userGroup.users,
                 show: true,
@@ -195,7 +205,7 @@
 
         function openGranularPermissionsPicker() {
             vm.contentPicker = {
-                title: "Select node",
+                title: vm.labels.selectNode,
                 view: "contentpicker",
                 hideSubmitButton: true,
                 show: true,
@@ -225,7 +235,6 @@
             }
 
             vm.nodePermissions = {
-                title: "Set permissions for " + node.name,
                 view: "nodepermissions",
                 node: node,
                 show: true,
@@ -244,7 +253,7 @@
                             return i.id === node.id;
                         });
                         if (!found) {
-                            vm.userGroup.assignedPermissions.push(node);    
+                            vm.userGroup.assignedPermissions.push(node);
                         }
                     }
 
@@ -281,7 +290,7 @@
         function makeBreadcrumbs() {
             vm.breadcrumbs = [
                 {
-                    "name": "Groups",
+                    "name": vm.labels.groups,
                     "path": "/users/users/overview",
                     "subView": "groups"
                 },

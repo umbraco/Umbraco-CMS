@@ -16,6 +16,11 @@
 
             vm.loading = true;
 
+            // set default title
+            if(!$scope.model.title) {
+                $scope.model.title = localizationService.localize("defaultdialogs_selectUsers");
+            }
+
             // make sure we can push to something
             if(!$scope.model.selection) {
                 $scope.model.selection = [];
