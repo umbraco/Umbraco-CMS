@@ -115,8 +115,7 @@
                 allowEdit: "=?",
                 onOpen: "&?",
                 onRemove: "&?",
-                onEdit: "&?",
-                editLabelKey: "=?"
+                onEdit: "&?"
             },
             link: link
         };

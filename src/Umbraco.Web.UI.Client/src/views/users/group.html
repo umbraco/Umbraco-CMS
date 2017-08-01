@@ -52,39 +52,44 @@
                                             style="max-width: 100%;"
                                             icon="vm.userGroup.contentStartNode.icon"
                                             name="vm.userGroup.contentStartNode.name"
+                                            allow-edit="true"
                                             allow-remove="true"
+                                            on-edit="vm.openContentPicker()"
                                             on-remove="vm.clearStartNode('content')">
                                         </umb-node-preview>
 
-                                        <umb-node-preview
+                                        <a href=""
                                             ng-if="!vm.userGroup.contentStartNode"
                                             style="max-width: 100%;"
-                                            name="vm.labels.noStartNode"
-                                            allow-edit="true"
-                                            edit-label-key="'general_add'"
-                                            on-edit="vm.openContentPicker()">
-                                        </umb-node-preview>
+                                            class="umb-node-preview-add"
+                                            ng-click="vm.openContentPicker()"
+                                            prevent-default>
+                                            <localize key="general_add">Add</localize>
+                                        </a>
 
                                     </umb-control-group>
 
                                     <umb-control-group label="@user_mediastartnode" description="@user_mediastartnodehelp">
+                                        
                                         <umb-node-preview
                                             ng-if="vm.userGroup.mediaStartNode.id"
                                             style="max-width: 100%;"
                                             icon="vm.userGroup.mediaStartNode.icon"
                                             name="vm.userGroup.mediaStartNode.name"
+                                            allow-edit="true"
                                             allow-remove="true"
+                                            on-edit="vm.openMediaPicker()"
                                             on-remove="vm.clearStartNode('media')">
                                         </umb-node-preview>
 
-                                        <umb-node-preview
+                                        <a href=""
                                             ng-if="!vm.userGroup.mediaStartNode"
                                             style="max-width: 100%;"
-                                            name="vm.labels.noStartNode"
-                                            allow-edit="true"
-                                            edit-label-key="'general_add'"
-                                            on-edit="vm.openMediaPicker()">
-                                        </umb-node-preview>
+                                            class="umb-node-preview-add"
+                                            ng-click="vm.openMediaPicker()"
+                                            prevent-default>
+                                            <localize key="general_add">Add</localize>
+                                        </a>
 
                                     </umb-control-group>
 

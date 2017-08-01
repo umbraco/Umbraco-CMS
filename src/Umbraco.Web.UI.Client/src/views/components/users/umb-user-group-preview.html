@@ -17,8 +17,7 @@
             <span>
                 <span class="bold"><localize key="user_startnode">Content start node</localize>:</span>
                 <span ng-if="!contentStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
-                <span ng-if="contentStartNode && contentStartNode != -1">{{ contentStartNode.name }}</span>
-                <span ng-if="contentStartNode == -1">Content root</span>
+                <span ng-if="contentStartNode">{{ contentStartNode.name }}</span>
             </span>
         </div>
         
@@ -26,8 +25,7 @@
             <span>
                 <span class="bold"><localize key="user_mediastartnode">Media start node</localize>:</span>
                 <span ng-if="!mediaStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
-                <span ng-if="mediaStartNode && mediaStartNode != -1">{{ mediaStartNode.name }}</span>
-                <span ng-if="mediaStartNode == -1">Media root</span>
+                <span ng-if="mediaStartNode">{{ mediaStartNode.name }}</span>
             </span>
         </div>
 

@@ -38,10 +38,6 @@
 
             vm.loading = true;
 
-            localizationService.localize("user_noStartNode").then(function (name) {
-                vm.page.noStartNodeLabel = name;
-            });
-
             var labelKeys = [
                 "general_saving",
                 "general_cancel",
