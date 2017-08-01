@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function SectionPickerController($scope, sectionResource) {
+    function SectionPickerController($scope, sectionResource, localizationService) {
         
         var vm = this;
 
@@ -15,6 +15,11 @@
         function onInit() {
 
             vm.loading = true;
+
+            // set default title
+            if(!$scope.model.title) {
+                $scope.model.title = localizationService.localize("defaultdialogs_selectSections");
+            }
 
             // make sure we can push to something
             if(!$scope.model.selection) {

@@ -22,11 +22,11 @@
 
               <div class="umb-box">
                 <div class="umb-box-header">
-                  <div class="umb-box-header-title">Meta</div>
+                  <div class="umb-box-header-title"><localize key="user_profile">Profile</localize></div>
                 </div>
                 <div class="umb-box-content block-form">
 
-                  <umb-control-group label="Email" description="Orci varius natoque penatibus et magnis dis parturient montes">
+                  <umb-control-group label="@general_email">
                     <input type="text"
                            localize="placeholder"
                            placeholder="@placeholders_entername"
@@ -40,8 +40,7 @@
                     <span class="help-inline" val-msg-for="email" val-toggle-msg="valServerField"></span>
                   </umb-control-group>
 
-                  <umb-control-group label="Username" description="Orci varius natoque penatibus et magnis dis parturient montes"
-                                     ng-if="!vm.emailIsUsername">
+                  <umb-control-group label="@general_username" ng-if="!vm.emailIsUsername">
                     <input type="text"
                            localize="placeholder"
                            placeholder="@placeholders_entername"
@@ -55,12 +54,11 @@
                     <span class="help-inline" val-msg-for="username" val-toggle-msg="valServerField"></span>
                   </umb-control-group>
 
-                  <umb-control-group label="Language" description="Orci varius natoque penatibus et magnis dis parturient montes">
+                  <umb-control-group label="@user_language" description="@user_languageHelp">
                     <select class="input-block-level" ng-model="vm.user.culture" ng-options="key as value for (key, value) in vm.user.availableCultures" 
                             name="culture" 
                             required
                             val-server-field="Culture">
-                      <option value="">Select language</option>
                     </select>
                     <span class="help-inline" val-msg-for="culture" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
                     <span class="help-inline" val-msg-for="culture" val-toggle-msg="valServerField"></span>
@@ -70,11 +68,11 @@
 
               <div class="umb-box" ng-if="!vm.user.isCurrentUser">
                 <div class="umb-box-header">
-                  <div class="umb-box-header-title">Permissions</div>
+                  <div class="umb-box-header-title"><localize key="user_access">Access</localize></div>
                 </div>
                 <div class="umb-box-content block-form">
 
-                  <umb-control-group style="margin-bottom: 25px;" label="Groups" description="Aliquam laoreet metus porta nisi pellentesque">
+                  <umb-control-group style="margin-bottom: 25px;" label="@general_groups" description="@user_groupsHelp">
 
                     <umb-user-group-preview
                       ng-repeat="userGroup in vm.user.userGroups"
@@ -98,7 +96,7 @@
 
                   </umb-control-group>
 
-                  <umb-control-group style="margin-bottom: 25px;" label="Content start nodes" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
+                  <umb-control-group style="margin-bottom: 25px;" label="@user_startnodes" description="@user_startnodeshelp">
 
                     <umb-node-preview
                       style="max-width: 100%;"
@@ -128,7 +126,7 @@
 
                   </umb-control-group>
 
-                  <umb-control-group label="Media start nodes" description="Donec quis lacinia ligula. Suspendisse ultrices risus ante">
+                  <umb-control-group label="@user_mediastartnodes" description="@user_mediastartnodeshelp">
 
                     <umb-node-preview
                       style="max-width: 100%;"
@@ -206,7 +204,7 @@
                 </div>
 
                 <div class="umb-package-details__information-item">
-                  <div class="umb-package-details__information-item-label">Status</div>
+                  <div class="umb-package-details__information-item-label"><localize key="general_status">Status</localize>:</div>
                   <div class="umb-package-details__information-item-content">
                     <umb-badge style="margin-top: 4px;"
                                size="s"
@@ -217,21 +215,11 @@
                 </div>
 
                 <div class="umb-package-details__information-item">
-                  <div class="umb-package-details__information-item-label">Last login:</div>
+                  <div class="umb-package-details__information-item-label"><localize key="user_lastLogin">Last login</localize>:</div>
                   <div class="umb-package-details__information-item-content">
                     <span ng-if="vm.user.lastLoginDate">{{ vm.user.lastLoginDate }}</span>
-                    <span ng-if="!vm.user.lastLoginDate">The user has not logged in yet</span>
+                    <span ng-if="!vm.user.lastLoginDate">{{ vm.user.name }} <localize key="user_noLogin">has not logged in yet</localize></span>
                   </div>
-                </div>
-
-                <div class="umb-package-details__information-item" ng-if="vm.user.invitedBy">
-                  <div class="umb-package-details__information-item-label">Invited by:</div>
-                  <div class="umb-package-details__information-item-content">{{ vm.user.invitedBy }}</div>
-                </div>
-
-                <div class="umb-package-details__information-item" ng-if="vm.user.createdBy">
-                  <div class="umb-package-details__information-item-label">Created by:</div>
-                  <div class="umb-package-details__information-item-content">{{ vm.user.createdBy }}</div>
                 </div>
 
                 <div style="margin-top: 20px;">
@@ -241,7 +229,8 @@
                                 button-style="[danger,block]"
                                 action="vm.disableUser()"
                                 state="vm.disableUserButtonState"
-                                label="Disable user"
+                                label="Disable"
+                                label-key="actions_disable"
                                 size="m">
                     </umb-button>
                   </div>
@@ -252,7 +241,8 @@
                                 button-style="[success,block]"
                                 state="vm.enableUserButtonState"
                                 action="vm.enableUser()"
-                                label="Enable user"
+                                label="Enable"
+                                label-key="actions_enable"
                                 size="m">
                     </umb-button>
                   </div>

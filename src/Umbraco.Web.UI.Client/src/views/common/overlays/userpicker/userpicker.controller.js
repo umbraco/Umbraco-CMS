@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserPickerController($scope, usersResource) {
+    function UserPickerController($scope, usersResource, localizationService) {
         
         var vm = this;
 
@@ -18,6 +18,11 @@
         function onInit() {
 
             vm.loading = true;
+
+            // set default title
+            if(!$scope.model.title) {
+                $scope.model.title = localizationService.localize("defaultdialogs_selectUsers");
+            }
 
             // make sure we can push to something
             if(!$scope.model.selection) {

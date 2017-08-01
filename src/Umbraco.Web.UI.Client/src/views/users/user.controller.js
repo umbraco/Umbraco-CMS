@@ -4,7 +4,6 @@
     function UserEditController($scope, $timeout, $location, $routeParams, formHelper, usersResource, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource) {
 
         var vm = this;
-        var localizeSaving = localizationService.localize("general_saving");
 
         vm.page = {};
         vm.page.contentRootLabel = "Content Root";
@@ -15,15 +14,7 @@
         };
         vm.breadcrumbs = [];
         vm.avatarFile = {};
-        vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
-        vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
-        vm.toggleChangePassword = toggleChangePassword;
-        vm.emailIsUsername = true;
-        //create the initial model for change password
-        vm.changePasswordModel = {
-          config: {},
-          isChanging: false
-        };
+        vm.labels = {};
 
         vm.goToPage = goToPage;
         vm.openUserGroupPicker = openUserGroupPicker;
@@ -41,6 +32,22 @@
 
             localizationService.localize("user_noStartNode").then(function (name) {
                 vm.page.noStartNodeLabel = name;
+            });
+
+            var labelKeys = [
+                "general_saving",
+                "general_cancel",
+                "defaultdialogs_selectContentStartNode",
+                "defaultdialogs_selectMediaStartNode",
+                "sections_users"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(function (values) {
+                vm.labels.saving = values[0];
+                vm.labels.cancel = values[1];
+                vm.labels.selectContentStartNode = values[2];
+                vm.labels.selectMediaStartNode = values[3];
+                vm.labels.users = values[4];
             });
 
             // get user
@@ -77,7 +84,7 @@
             vm.user.resetPasswordValue = null;
 
             contentEditingHelper.contentEditorPerformSave({
-                statusMessage: localizeSaving,
+                statusMessage: vm.labels.saving,
                 saveMethod: usersResource.saveUser,
                 scope: $scope,
                 content: vm.user,
@@ -107,10 +114,9 @@
 
         function openUserGroupPicker() {
             vm.userGroupPicker = {
-                title: "Select user groups",
                 view: "usergrouppicker",
                 selection: vm.user.userGroups,
-                closeButtonLabel: "Cancel",
+                closeButtonLabel: vm.labels.cancel,
                 show: true,
                 submit: function (model) {
                     // apply changes
@@ -133,7 +139,7 @@
 
         function openContentPicker() {
             vm.contentPicker = {
-                title: "Select content start node",
+                title: vm.labels.selectContentStartNode,
                 view: "contentpicker",
                 multiPicker: true,
                 selection: vm.user.startContentIds,
@@ -164,7 +170,7 @@
 
         function openMediaPicker() {
             vm.mediaPicker = {
-                title: "Select media start node",
+                title: vm.labels.selectMediaStartNode,
                 view: "treepicker",
                 section: "media",
                 treeAlias: "media",
@@ -317,7 +323,7 @@
         function makeBreadcrumbs() {
             vm.breadcrumbs = [
                 {
-                    "name": "Users",
+                    "name": vm.labels.users,
                     "path": "/users/users/overview",
                     "subView": "users"
                 },

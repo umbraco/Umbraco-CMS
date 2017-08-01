@@ -7,7 +7,7 @@
 
         <div class="umb-user-group-preview__permission" ng-if="sections">
             <span>
-                <span class="bold">Sections:</span>
+                <span class="bold"><localize key="main_sections">Sections</localize>:</span>
                 <span ng-repeat="section in sections">{{ section.name }}<span ng-if="!$last">, </span></span>
                 <span ng-if="sections.length === 0">All sections</span>
             </span>
@@ -15,7 +15,7 @@
 
         <div class="umb-user-group-preview__permission">
             <span>
-                <span class="bold">Content start node:</span>
+                <span class="bold"><localize key="user_startnode">Content start node</localize>:</span>
                 <span ng-if="!contentStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
                 <span ng-if="contentStartNode && contentStartNode != -1">{{ contentStartNode.name }}</span>
                 <span ng-if="contentStartNode == -1">Content root</span>
@@ -24,7 +24,7 @@
         
         <div class="umb-user-group-preview__permission">
             <span>
-                <span class="bold">Media start node:</span>
+                <span class="bold"><localize key="user_mediastartnode">Media start node</localize>:</span>
                 <span ng-if="!mediaStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
                 <span ng-if="mediaStartNode && mediaStartNode != -1">{{ mediaStartNode.name }}</span>
                 <span ng-if="mediaStartNode == -1">Media root</span>
@@ -33,7 +33,7 @@
 
         <div class="umb-user-group-preview__permission" ng-if="permissions">
             <span>
-                <span class="bold">Permissions:</span>
+                <span class="bold"><localize key="general_rights">Permissions</localize>:</span>
                 <span ng-repeat="permission in permissions">{{ permission.name }}<span ng-if="!$last">, </span></span>
             </span>
         </div>
@@ -41,8 +41,8 @@
     </div>
 
     <div class="umb-user-group-preview__actions">
-        <a class="umb-user-group-preview__action" title="Edit" href="" ng-if="allowEdit" ng-click="onEdit()">Edit</a>
-        <a class="umb-user-group-preview__action umb-user-group-preview__action--red" title="Remove" href="" ng-if="allowRemove" ng-click="onRemove()">Remove</a>
+        <a class="umb-user-group-preview__action" title="Edit" href="" ng-if="allowEdit" ng-click="onEdit()"><localize key="general_edit">Edit</localize></a>
+        <a class="umb-user-group-preview__action umb-user-group-preview__action--red" title="Remove" href="" ng-if="allowRemove" ng-click="onRemove()"><localize key="general_remove">Remove</localize></a>
     </div>
 
 </div>
