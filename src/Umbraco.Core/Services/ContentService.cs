@@ -177,7 +177,7 @@ namespace Umbraco.Core.Services
                 content.WriterId = userId;
 
                 uow.Events.Dispatch(Created, this, new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId));
-                
+
                 uow.Commit();
             }
 
@@ -219,7 +219,7 @@ namespace Umbraco.Core.Services
                 content.WriterId = userId;
 
                 uow.Events.Dispatch(Created, this, new NewEventArgs<IContent>(content, false, contentTypeAlias, parent));
-                
+
                 uow.Commit();
             }
 
@@ -269,7 +269,7 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(content);
                 repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
 
-                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IContent>(content, false));
+                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IContent>(content, false), "Saved");
                 uow.Events.Dispatch(Created, this, new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId));
 
                 Audit(uow, AuditType.New, string.Format("Content '{0}' was created with Id {1}", name, content.Id), content.CreatorId, content.Id);
@@ -324,7 +324,7 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(content);
                 repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
 
-                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IContent>(content, false));
+                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IContent>(content, false), "Saved");
                 uow.Events.Dispatch(Created, this, new NewEventArgs<IContent>(content, false, contentTypeAlias, parent));
 
                 Audit(uow, AuditType.New, string.Format("Content '{0}' was created with Id {1}", name, content.Id), content.CreatorId, content.Id);
@@ -1161,14 +1161,28 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
-                return repository.Get(id);
+                var blueprint = repository.Get(id);
+                ((Content) blueprint).IsBlueprint = true;
+                return blueprint;
             }
+        }
+
+        public IContent GetBlueprintById(Guid id)
+        {
+            // the repository implements a cache policy on int identifiers, not guids,
+            // and we are not changing it now, but we still would like to rely on caching
+            // instead of running a full query against the database, so relying on the
+            // id-key map, which is fast.
+
+            var a = _idkMap.GetIdForKey(id, UmbracoObjectTypes.DocumentBlueprint);
+            return a.Success ? GetBlueprintById(a.Result) : null;
         }
 
         public void SaveBlueprint(IContent content, int userId = 0)
         {
             //always ensure the blueprint is at the root
             content.ParentId = -1;
+            ((Content) content).IsBlueprint = true;
 
             using (new WriteLock(Locker))
             {
@@ -1186,8 +1200,10 @@ namespace Umbraco.Core.Services
                         content.CreatorId = userId;
                     }
                     content.WriterId = userId;
-                    
+
                     repository.AddOrUpdate(content);
+
+                    uow.Events.Dispatch(SavedBlueprint, this, new SaveEventArgs<IContent>(content), "SavedBlueprint");
 
                     uow.Commit();
                 }
@@ -1199,9 +1215,10 @@ namespace Umbraco.Core.Services
             using (new WriteLock(Locker))
             {
                 using (var uow = UowProvider.GetUnitOfWork())
-                {              
+                {
                     var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
-                    repository.Delete(content);                    
+                    repository.Delete(content);
+                    uow.Events.Dispatch(DeletedBlueprint, this, new DeleteEventArgs<IContent>(content), "DeletedBlueprint");
                     uow.Commit();
                 }
             }
@@ -1215,19 +1232,11 @@ namespace Umbraco.Core.Services
             var content = new Content(name, -1, contentType);
             content.Path = string.Concat(content.ParentId.ToString(), ",", content.Id);
 
-            using (var uow = UowProvider.GetUnitOfWork())
-            {
-                content.CreatorId = userId;
-                content.WriterId = userId;
+            content.CreatorId = userId;
+            content.WriterId = userId;
 
-                //Now we need to map all of the properties over!
-                foreach (var property in blueprint.Properties)
-                {
-                    content.SetValue(property.Alias, property.Value);
-                }
-
-                uow.Commit();
-            }
+            foreach (var property in blueprint.Properties)
+                content.SetValue(property.Alias, property.Value);
 
             return content;
         }
@@ -1298,7 +1307,7 @@ namespace Umbraco.Core.Services
                 }
 
                 if (raiseEvents)
-                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IContent>(asArray, false, evtMsgs));
+                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IContent>(asArray, false, evtMsgs), "Saved");
 
                 Audit(uow, AuditType.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, Constants.System.Root);
                 uow.Commit();
@@ -1678,7 +1687,7 @@ namespace Umbraco.Core.Services
 
                     repository.AddOrUpdate(copy);
                     repository.AddOrUpdatePreviewXml(copy, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
-                    
+
                     //add permissions
                     if (currentPermissions.Count > 0)
                     {
@@ -1860,7 +1869,7 @@ namespace Umbraco.Core.Services
                     }
 
                     if (raiseEvents)
-                        uow.Events.Dispatch(Saved, this, new SaveEventArgs<IContent>(asArray, false));
+                        uow.Events.Dispatch(Saved, this, new SaveEventArgs<IContent>(asArray, false), "Saved");
 
                     if (shouldBePublished.Any())
                     {
@@ -1887,7 +1896,11 @@ namespace Umbraco.Core.Services
                 {
                     query.Where(x => documentTypeIds.Contains(x.ContentTypeId));
                 }
-                return repository.GetByQuery(query);
+                return repository.GetByQuery(query).Select(x =>
+                {
+                    ((Content) x).IsBlueprint = true;
+                    return x;
+                });
             }
         }
 
@@ -2294,7 +2307,7 @@ namespace Umbraco.Core.Services
                     }
 
                     if (raiseEvents)
-                        uow.Events.Dispatch(Saved, this, new SaveEventArgs<IContent>(content, false, evtMsgs));
+                        uow.Events.Dispatch(Saved, this, new SaveEventArgs<IContent>(content, false, evtMsgs), "Saved");
 
                     //Save xml to db and call following method to fire event through PublishingStrategy to update cache
                     if (published)
@@ -2362,7 +2375,7 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
 
                     if (raiseEvents)
-                        uow.Events.Dispatch(Saved, this, new SaveEventArgs<IContent>(content, false, evtMsgs));
+                        uow.Events.Dispatch(Saved, this, new SaveEventArgs<IContent>(content, false, evtMsgs), "Saved");
 
                     Audit(uow, AuditType.Save, "Save Content performed by user", userId, content.Id);
                     uow.Commit();
@@ -2625,6 +2638,17 @@ namespace Umbraco.Core.Services
         /// Occurs after the Recycle Bin has been Emptied
         /// </summary>
         public static event TypedEventHandler<IContentService, RecycleBinEventArgs> EmptiedRecycleBin;
+
+        /// <summary>
+        /// Occurs after a blueprint has been saved.
+        /// </summary>
+        public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> SavedBlueprint;
+
+        /// <summary>
+        /// Occurs after a blueprint has been deleted.
+        /// </summary>
+        public static event TypedEventHandler<IContentService, DeleteEventArgs<IContent>> DeletedBlueprint;
+
         #endregion
     }
 }

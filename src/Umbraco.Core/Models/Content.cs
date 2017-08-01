@@ -267,6 +267,9 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         internal DateTime PublishedDate { get; set; }
 
+        [DataMember]
+        public bool IsBlueprint { get; internal set; }
+
         /// <summary>
         /// Changes the Trashed state of the content object
         /// </summary>
