@@ -6,14 +6,17 @@ using System.IO;
 using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Services.Description;
+using AutoMapper;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.template;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Search;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
@@ -24,7 +27,7 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Settings, Constants.Trees.Templates, null, sortOrder:1)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
-    public class TemplatesTreeController : TreeController
+    public class TemplatesTreeController : TreeController, ISearchableTree
     {
         /// <summary>
         /// The method called to render the contents of the tree structure
@@ -128,6 +131,12 @@ namespace Umbraco.Web.Trees
                 ? "/" + queryStrings.GetValue<string>("application") + "/framed/" +
                   Uri.EscapeDataString("settings/editTemplate.aspx?templateID=" + template.Id)
                 : null;
+        }
+
+        public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        {
+            var results = Services.EntityService.GetPagedDescendantsFromRoot(UmbracoObjectTypes.Template, pageIndex, pageSize, out totalFound, filter: query);
+            return Mapper.Map<IEnumerable<SearchResultItem>>(results);
         }
     }
 }

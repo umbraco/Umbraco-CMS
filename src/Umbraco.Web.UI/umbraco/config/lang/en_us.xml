@@ -1456,7 +1456,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="uploadTranslationXml">Upload translation XML</key>
   </area>
   <area alias="treeHeaders">
+    <key alias="content">Content</key>
     <key alias="contentBlueprints">Content Blueprints</key>
+    <key alias="media">Media</key>
     <key alias="cacheBrowser">Cache Browser</key>
     <key alias="contentRecycleBin">Recycle Bin</key>
     <key alias="createdPackages">Created packages</key>
@@ -1500,6 +1502,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Category field</key>
     <key alias="changePassword">Change Your Password</key>
+    <key alias="changePhoto">Change photo</key>
     <key alias="newPassword">New password</key>
     <key alias="confirmNewPassword">Confirm new password</key>
     <key alias="changePasswordDescription">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
@@ -1539,6 +1542,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="permissionReplaceChildren">Replace child node permissions</key>
     <key alias="permissionSelectedPages">You are currently modifying permissions for the pages:</key>
     <key alias="permissionSelectPages">Select pages to modify their permissions</key>
+    <key alias="removePhoto">Remove photo</key>
     <key alias="permissionsDefault">Default permissions</key>
     <key alias="permissionsGranular">Granular permissions</key>
     <key alias="permissionsGranularHelp">Set permissions for specific nodes</key>

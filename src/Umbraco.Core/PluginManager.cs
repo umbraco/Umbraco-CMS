@@ -277,7 +277,7 @@ namespace Umbraco.Core
                         uniqInfos.Add(info.FullName);
                         hashCombiner.AddFileSystemItem(info);
                     }
-                } 
+                }
 
                 return ConvertHashToInt64(hashCombiner.GetCombinedHashCode());
             }
@@ -336,6 +336,9 @@ namespace Umbraco.Core
 
         #region Cache
 
+        private const int ListFileOpenReadTimeout = 4000; // milliseconds
+        private const int ListFileOpenWriteTimeout = 2000; // milliseconds
+
         /// <summary>
         /// Attemps to retrieve the list of types from the cache.
         /// </summary>
@@ -381,7 +384,7 @@ namespace Umbraco.Core
             if (File.Exists(filePath) == false)
                 return cache;
 
-            using (var stream = File.OpenRead(filePath))
+            using (var stream = GetFileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, ListFileOpenReadTimeout))
             using (var reader = new StreamReader(stream))
             {
                 while (true)
@@ -451,7 +454,7 @@ namespace Umbraco.Core
         {
             var filePath = GetPluginListFilePath();
 
-            using (var stream = File.Open(filePath, FileMode.Create, FileAccess.ReadWrite))
+            using (var stream = GetFileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, ListFileOpenWriteTimeout))
             using (var writer = new StreamWriter(stream))
             {
                 foreach (var typeList in _types.Values)
@@ -471,7 +474,26 @@ namespace Umbraco.Core
             // at the moment we write the cache to disk every time we update it. ideally we defer the writing
             // since all the updates are going to happen in a row when Umbraco starts. that being said, the
             // file is small enough, so it is not a priority.
-            WriteCache();            
+            WriteCache();
+        }
+
+        private static Stream GetFileStream(string path, FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int timeoutMilliseconds)
+        {
+            const int pauseMilliseconds = 250;
+            var attempts = timeoutMilliseconds / pauseMilliseconds;
+            while (true)
+            {
+                try
+                {
+                    return new FileStream(path, fileMode, fileAccess, fileShare);
+                }
+                catch
+                {
+                    if (--attempts == 0)
+                        throw;
+                    Thread.Sleep(pauseMilliseconds);
+                }
+            }
         }
 
         #endregion

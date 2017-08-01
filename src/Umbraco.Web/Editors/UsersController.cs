@@ -151,12 +151,26 @@ namespace Umbraco.Web.Editors
 
             var filePath = found.Avatar;
 
-            found.Avatar = null;
+            //if the filePath is already null it will mean that the user doesn't have a custom avatar and their gravatar is currently
+            //being used (if they have one). This means they want to remove their gravatar too which we can do by setting a special value 
+            //for the avatar.
+            if (filePath.IsNullOrWhiteSpace() == false)
+            {
+                found.Avatar = null;
+            }
+            else
+            {
+                //set a special value to indicate to not have any avatar
+                found.Avatar = "none";
+            }
 
             Services.UserService.Save(found);
 
-            if (FileSystemProviderManager.Current.MediaFileSystem.FileExists(filePath))
-                FileSystemProviderManager.Current.MediaFileSystem.DeleteFile(filePath);
+            if (filePath.IsNullOrWhiteSpace() == false)
+            {
+                if (FileSystemProviderManager.Current.MediaFileSystem.FileExists(filePath))
+                    FileSystemProviderManager.Current.MediaFileSystem.DeleteFile(filePath);
+            }
 
             return Request.CreateResponse(HttpStatusCode.OK, found.GetCurrentUserAvatarUrls(Services.UserService, ApplicationContext.ApplicationCache.StaticCache));
         }
@@ -401,7 +415,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="userSave"></param>
         /// <returns></returns>
-        public UserDisplay PostSaveUser(UserSave userSave)
+        public async Task<UserDisplay> PostSaveUser(UserSave userSave)
         {
             if (userSave == null) throw new ArgumentNullException("userSave");
 
@@ -457,7 +471,9 @@ namespace Umbraco.Web.Editors
             var resetPasswordValue = string.Empty;
             if (userSave.ChangePassword != null)
             {
-                var passwordChangeResult = PasswordChangeControllerHelper.ChangePassword(found, userSave.ChangePassword, ModelState, Members);
+                var passwordChanger = new PasswordChanger(Logger, Services.UserService);
+
+                var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(found, userSave.ChangePassword, ModelState, UserManager);
                 if (passwordChangeResult.Success)
                 {
                     //depending on how the provider is configured, the password may be reset so let's store that for later

@@ -13,6 +13,25 @@
             </umb-button>
         </umb-editor-sub-header-content-left>
 
+        <umb-editor-sub-header-content-right ng-if="vm.selection.length === 0">
+
+            <umb-editor-sub-header-section>
+            <div class="form-search -no-margin-bottom pull-right">
+                <div class="inner-addon left-addon">
+                    <i class="icon icon-search"></i>
+                    <input class="form-control search-input"
+                        type="text"
+                        localize="placeholder"
+                        placeholder="@placeholders_filter"
+                        ng-model="vm.filter"
+                        prevent-enter-submit
+                        no-dirty-check>
+                </div>
+            </div>
+            </umb-editor-sub-header-section>
+
+        </umb-editor-sub-header-content-right>
+
         <!-- With selection -->
         <umb-editor-sub-header-content-left ng-if="vm.selection.length > 0">
             <umb-editor-sub-header-section>
@@ -40,8 +59,14 @@
 
     </umb-editor-sub-header>
 
+    <div style="margin-bottom: 20px;" class="flex items-center">
+        <div style="font-size: 16px;">
+            <span class="bold"><localize key="general_groups">Groups</localize> </span> <span>({{vm.userGroups.length}})</span> 
+        </div>
+    </div>
+
     <div class="umb-list">
-        <a class="umb-list-item" ng-click="vm.clickUserGroup(group)" ng-class="{'umb-list-item--selected': group.selected}" href="" ng-repeat="group in vm.userGroups">
+        <a class="umb-list-item" ng-click="vm.clickUserGroup(group)" ng-class="{'umb-list-item--selected': group.selected}" href="" ng-repeat="group in vm.userGroups | filter:vm.filter">
             <div style="margin-right: 25px;">
                 <div class="umb-list-checkbox" ng-class="{'umb-list-checkbox--visible': vm.selection.length > 0}" ng-click="vm.selectUserGroup(group, vm.selection, $event)" >
                     <umb-checkmark checked="group.selected"></umb-checkmark>
