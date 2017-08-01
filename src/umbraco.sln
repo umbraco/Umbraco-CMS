@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.UI", "Umbraco.Web.UI\Umbraco.Web.UI.csproj", "{4C4C194C-B5E4-4991-8F87-4373E24CC19F}"
 EndProject
@@ -102,10 +102,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{E3F9F378
 		..\build\NuSpecs\tools\Readme.txt = ..\build\NuSpecs\tools\Readme.txt
 		..\build\NuSpecs\tools\ReadmeUpgrade.txt = ..\build\NuSpecs\tools\ReadmeUpgrade.txt
 		..\build\NuSpecs\tools\trees.config.install.xdt = ..\build\NuSpecs\tools\trees.config.install.xdt
-		..\build\NuSpecs\tools\uninstall.core.ps1 = ..\build\NuSpecs\tools\uninstall.core.ps1
-		..\build\NuSpecs\tools\uninstall.ps1 = ..\build\NuSpecs\tools\uninstall.ps1
 		..\build\NuSpecs\tools\Web.config.install.xdt = ..\build\NuSpecs\tools\Web.config.install.xdt
-		..\build\NuSpecs\tools\Web.config.uninstall.xdt = ..\build\NuSpecs\tools\Web.config.uninstall.xdt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{5B03EF4E-E0AC-4905-861B-8C3EC1A0D458}"
