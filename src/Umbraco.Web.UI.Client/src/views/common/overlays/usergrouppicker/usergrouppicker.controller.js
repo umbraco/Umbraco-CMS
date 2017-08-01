@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserGroupPickerController($scope, userGroupsResource) {
+    function UserGroupPickerController($scope, userGroupsResource, localizationService) {
         
         var vm = this;
 
