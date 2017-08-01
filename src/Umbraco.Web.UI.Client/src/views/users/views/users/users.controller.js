@@ -68,6 +68,7 @@
             }
         ];
 
+        vm.toggleFilter = toggleFilter;
         vm.setUsersViewState = setUsersViewState;
         vm.selectLayout = selectLayout;
         vm.selectUser = selectUser;
@@ -115,6 +116,28 @@
               return i.key === sortKey && i.direction === sortDirection;
             });
           return found ? found.label : sortKey;
+        }
+
+        function toggleFilter(type) {
+            // hack: on-outside-click prevents us from closing the dropdown when clicking on another link
+            // so I had to do this manually
+            switch (type) {
+                case "state":
+                    vm.page.showStatusFilter = !vm.page.showStatusFilter;
+                    vm.page.showGroupFilter = false;
+                    vm.page.showOrderByFilter = false;
+                    break;
+                case "group":
+                    vm.page.showGroupFilter = !vm.page.showGroupFilter;
+                    vm.page.showStatusFilter = false;
+                    vm.page.showOrderByFilter = false;
+                    break;
+                case "orderBy":
+                    vm.page.showOrderByFilter = !vm.page.showOrderByFilter;
+                    vm.page.showStatusFilter = false;
+                    vm.page.showGroupFilter = false;
+                    break;
+            }
         }
 
         function setUsersViewState(state) {

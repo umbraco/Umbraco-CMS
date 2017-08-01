@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Umbraco.Core.Models.Membership
 {
@@ -12,8 +13,8 @@ namespace Umbraco.Core.Models.Membership
             Icon = icon;
             Id = id;
             Alias = alias;
-            AllowedSections = allowedSections;
-            Permissions = permissions;
+            AllowedSections = allowedSections.ToArray();
+            Permissions = permissions.ToArray();
 
             //Zero is invalid and will be treated as Null
             StartContentId = startContentId == 0 ? null : startContentId;

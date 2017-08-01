@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Web.Security;
+using Newtonsoft.Json;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
@@ -15,6 +17,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -23,12 +26,23 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class UserRepository : PetaPocoRepositoryBase<int, IUser>, IUserRepository
     {
-        //private readonly CacheHelper _cacheHelper;
-
-        public UserRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        private readonly IDictionary<string, string> _passwordConfiguration;
+        
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="work"></param>
+        /// <param name="cacheHelper"></param>
+        /// <param name="logger"></param>
+        /// <param name="sqlSyntax"></param>
+        /// <param name="passwordConfiguration">
+        /// A dictionary specifying the configuration for user passwords. If this is null then no password configuration will be persisted or read.
+        /// </param>
+        public UserRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax,
+            IDictionary<string, string> passwordConfiguration = null)
             : base(work, cacheHelper, logger, sqlSyntax)
         {
-            //_cacheHelper = cacheHelper;
+            _passwordConfiguration = passwordConfiguration;
         }
 
         #region Overrides of RepositoryBase<int,IUser>
@@ -44,7 +58,89 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var dto = Database.Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(new UserGroupRelator().Map, sql)
                 .FirstOrDefault();
-            
+
+            if (dto == null)
+                return null;
+
+            var user = UserFactory.BuildEntity(dto);
+            return user;
+        }
+
+        /// <summary>
+        /// Returns a user by username
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="includeSecurityData">
+        /// Can be used for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes).
+        /// This is really only used for a shim in order to upgrade to 7.6.
+        /// </param>
+        /// <returns>
+        /// A non cached <see cref="IUser"/> instance
+        /// </returns>
+        public IUser GetByUsername(string username, bool includeSecurityData)
+        {
+            UserDto dto;
+            if (includeSecurityData)
+            {
+                var sql = GetQueryWithGroups();
+                sql.Where<UserDto>(userDto => userDto.Login == username, SqlSyntax);
+                sql //must be included for relator to work
+                    .OrderBy<UserDto>(d => d.Id, SqlSyntax)
+                    .OrderBy<UserGroupDto>(d => d.Id, SqlSyntax)
+                    .OrderBy<UserStartNodeDto>(d => d.Id, SqlSyntax);
+                dto = Database
+                    .Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(
+                        new UserGroupRelator().Map, sql)
+                    .FirstOrDefault();
+            }
+            else
+            {
+                var sql = GetBaseQuery("umbracoUser.*");
+                sql.Where<UserDto>(userDto => userDto.Login == username, SqlSyntax);
+                dto = Database.FirstOrDefault<UserDto>(sql);
+            }
+
+            if (dto == null)
+                return null;
+
+            var user = UserFactory.BuildEntity(dto);
+            return user;
+        }
+
+        /// <summary>
+        /// Returns a user by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="includeSecurityData">
+        /// This is really only used for a shim in order to upgrade to 7.6 but could be used 
+        /// for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes)
+        /// </param>
+        /// <returns>
+        /// A non cached <see cref="IUser"/> instance
+        /// </returns>
+        public IUser Get(int id, bool includeSecurityData)
+        {
+            UserDto dto;
+            if (includeSecurityData)
+            {
+                var sql = GetQueryWithGroups();
+                sql.Where(GetBaseWhereClause(), new { Id = id });
+                sql //must be included for relator to work
+                    .OrderBy<UserDto>(d => d.Id, SqlSyntax)
+                    .OrderBy<UserGroupDto>(d => d.Id, SqlSyntax)
+                    .OrderBy<UserStartNodeDto>(d => d.Id, SqlSyntax);
+                dto = Database
+                    .Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(
+                        new UserGroupRelator().Map, sql)
+                    .FirstOrDefault();
+            }
+            else
+            {
+                var sql = GetBaseQuery("umbracoUser.*");
+                sql.Where(GetBaseWhereClause(), new { Id = id });
+                dto = Database.FirstOrDefault<UserDto>(sql);
+            }
+
             if (dto == null)
                 return null;
 
@@ -55,13 +151,13 @@ namespace Umbraco.Core.Persistence.Repositories
         public IProfile GetProfile(string username)
         {
             var sql = GetBaseQuery(false).Where<UserDto>(userDto => userDto.UserName == username, SqlSyntax);
-            
+
             var dto = Database.Fetch<UserDto>(sql)
                 .FirstOrDefault();
 
             if (dto == null)
                 return null;
-            
+
             return new UserProfile(dto.Id, dto.UserName);
         }
 
@@ -92,7 +188,7 @@ SELECT '5CountOfInvited' AS colName, COUNT(id) AS num FROM umbracoUser WHERE las
 ORDER BY colName";
 
             var result = Database.Fetch<dynamic>(sql);
-            
+
             return new Dictionary<UserState, int>
             {
                 {UserState.All, result[0].num},
@@ -108,7 +204,7 @@ ORDER BY colName";
             var sql = GetQueryWithGroups();
             if (ids.Any())
             {
-                sql.Where("umbracoUser.id in (@ids)", new {ids = ids});
+                sql.Where("umbracoUser.id in (@ids)", new { ids = ids });
             }
             sql //must be included for relator to work
                 .OrderBy<UserDto>(d => d.Id, SqlSyntax)
@@ -117,10 +213,10 @@ ORDER BY colName";
 
             var users = ConvertFromDtos(Database.Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(new UserGroupRelator().Map, sql))
                 .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
-            
+
             return users;
         }
-        
+
         protected override IEnumerable<IUser> PerformGetByQuery(IQuery<IUser> query)
         {
             var sqlClause = GetQueryWithGroups();
@@ -136,14 +232,14 @@ ORDER BY colName";
 
             var users = ConvertFromDtos(dtos)
                 .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
-            
+
             return users;
         }
-        
+
         #endregion
 
         #region Overrides of PetaPocoRepositoryBase<int,IUser>
-        
+
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
@@ -214,18 +310,26 @@ ORDER BY colName";
         {
             get { throw new NotImplementedException(); }
         }
-        
+
         protected override void PersistNewItem(IUser entity)
         {
             ((User)entity).AddingEntity();
-            
+
             //ensure security stamp if non
             if (entity.SecurityStamp.IsNullOrWhiteSpace())
             {
                 entity.SecurityStamp = Guid.NewGuid().ToString();
             }
-            
+
             var userDto = UserFactory.BuildDto(entity);
+
+            //Check if we have a known config, we only want to store config for hashing
+            //TODO: This logic will need to be updated when we do http://issues.umbraco.org/issue/U4-10089            
+            if (_passwordConfiguration != null && _passwordConfiguration.Count > 0)
+            {
+                var json = JsonConvert.SerializeObject(_passwordConfiguration);
+                userDto.PasswordConfig = json;
+            }
 
             var id = Convert.ToInt32(Database.Insert(userDto));
             entity.Id = id;
@@ -248,7 +352,7 @@ ORDER BY colName";
                 var assigned = entity.Groups == null || entity.Groups.Any() == false
                     ? new List<UserGroupDto>()
                     : Database.Fetch<UserGroupDto>("SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)", new { aliases = entity.Groups.Select(x => x.Alias) });
-                
+
                 foreach (var groupDto in assigned)
                 {
                     var dto = new User2UserGroupDto
@@ -267,7 +371,7 @@ ORDER BY colName";
         {
             //Updates Modified date 
             ((User)entity).UpdatingEntity();
-            
+
             //ensure security stamp if non
             if (entity.SecurityStamp.IsNullOrWhiteSpace())
             {
@@ -275,7 +379,7 @@ ORDER BY colName";
             }
 
             var userDto = UserFactory.BuildDto(entity);
-            
+
             //build list of columns to check for saving - we don't want to save the password if it hasn't changed!
             //List the columns to save, NOTE: would be nice to not have hard coded strings here but no real good way around that
             var colsToSave = new Dictionary<string, string>()
@@ -285,8 +389,8 @@ ORDER BY colName";
                 {"startStructureID", "StartContentId"},
                 {"startMediaID", "StartMediaId"},
                 {"userName", "Name"},
-                {"userLogin", "Username"},                
-                {"userEmail", "Email"},                
+                {"userLogin", "Username"},
+                {"userEmail", "Email"},
                 {"userLanguage", "Language"},
                 {"securityStampToken", "SecurityStamp"},
                 {"lastLockoutDate", "LastLockoutDate"},
@@ -318,6 +422,16 @@ ORDER BY colName";
                 {
                     userDto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
                     changedCols.Add("securityStampToken");
+                }
+
+                //Check if we have a known config, we only want to store config for hashing
+                //TODO: This logic will need to be updated when we do http://issues.umbraco.org/issue/U4-10089
+                if (_passwordConfiguration != null && _passwordConfiguration.Count > 0)
+                {
+                    var json = JsonConvert.SerializeObject(_passwordConfiguration);
+                    userDto.PasswordConfig = json;
+
+                    changedCols.Add("passwordConfig");
                 }
             }
 
@@ -372,7 +486,7 @@ ORDER BY colName";
             //remove the ones not assigned to the entity
             var toDelete = assignedIds.Except(entityStartIds).ToArray();
             if (toDelete.Length > 0)
-                Database.Delete<UserStartNodeDto>("WHERE UserId = @UserId AND startNode IN (@startNodes)", new {UserId = entity.Id, startNodes = toDelete});
+                Database.Delete<UserStartNodeDto>("WHERE UserId = @UserId AND startNode IN (@startNodes)", new { UserId = entity.Id, startNodes = toDelete });
             //add the ones not currently in the db
             var toAdd = entityStartIds.Except(assignedIds).ToArray();
             foreach (var i in toAdd)
@@ -413,7 +527,7 @@ ORDER BY colName";
 
             return Database.ExecuteScalar<int>(sql) > 0;
         }
-        
+
         /// <summary>
         /// Gets a list of <see cref="IUser"/> objects associated with a given group
         /// </summary>
@@ -464,7 +578,7 @@ ORDER BY colName";
 
             if (mappedField.IsNullOrWhiteSpace())
                 throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
-            
+
             long tr;
             var results = GetPagedResultsByQuery(query, Convert.ToInt64(pageIndex), pageSize, out tr, mappedField, Direction.Ascending);
             totalRecords = Convert.ToInt32(tr);
@@ -502,11 +616,11 @@ ORDER BY colName";
             return GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, mappedField, orderDirection, userGroups, userState, filter);
         }
 
-        
 
-        private IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, 
-            string[] userGroups = null, 
-            UserState[] userState = null, 
+
+        private IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection,
+            string[] userGroups = null,
+            UserState[] userState = null,
             IQuery<IUser> filter = null)
         {
             if (string.IsNullOrWhiteSpace(orderBy)) throw new ArgumentException("Value cannot be null or whitespace.", "orderBy");
@@ -530,7 +644,7 @@ ORDER BY colName";
 		            INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
 		            INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
 		            WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
-                filterSql.Append(subQuery, new {userGroups=  userGroups});
+                filterSql.Append(subQuery, new { userGroups = userGroups });
             }
             if (userState != null && userState.Length > 0)
             {
@@ -568,12 +682,12 @@ ORDER BY colName";
             }
 
             // Get base query for returning IDs
-                var sqlBaseIds = GetBaseQuery("id");
-            
+            var sqlBaseIds = GetBaseQuery("id");
+
             if (query == null) query = new Query<IUser>();
             var translatorIds = new SqlTranslator<IUser>(sqlBaseIds, query);
             var sqlQueryIds = translatorIds.Translate();
-            
+
             //get sorted and filtered sql
             var sqlNodeIdsWithSort = GetSortedSqlForPagedResults(
                 GetFilteredSqlForPagedResults(sqlQueryIds, filterSql),
@@ -594,7 +708,7 @@ ORDER BY colName";
                 Database.BuildPageQueries<UserDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlStringCount, out sqlStringPage);
 
                 var sqlQueryFull = GetBaseQuery("umbracoUser.*, umbracoUserGroup.*, umbracoUserGroup2App.*, umbracoUserStartNode.*");
-                
+
                 var fullQueryWithPagedInnerJoin = sqlQueryFull
                     .Append("INNER JOIN (")
                     //join the paged query with the paged query arguments

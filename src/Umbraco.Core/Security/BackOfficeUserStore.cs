@@ -8,9 +8,13 @@ using System.Web.Security;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using IUser = Umbraco.Core.Models.Membership.IUser;
+using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Core.Security
 {
@@ -30,12 +34,14 @@ namespace Umbraco.Core.Security
         //IQueryableUserStore<BackOfficeIdentityUser, int>
     {
         private readonly IUserService _userService;
+        private readonly IEntityService _entityService;
         private readonly IExternalLoginService _externalLoginService;
         private bool _disposed = false;
 
-        public BackOfficeUserStore(IUserService userService, IExternalLoginService externalLoginService, MembershipProviderBase usersMembershipProvider)
+        public BackOfficeUserStore(IUserService userService, IEntityService entityService, IExternalLoginService externalLoginService, MembershipProviderBase usersMembershipProvider)
         {
             _userService = userService;
+            _entityService = entityService;
             _externalLoginService = externalLoginService;
             if (userService == null) throw new ArgumentNullException("userService");
             if (usersMembershipProvider == null) throw new ArgumentNullException("usersMembershipProvider");
@@ -76,7 +82,7 @@ namespace Umbraco.Core.Security
             var emptyPasswordValue = Constants.Security.EmptyPasswordPrefix +
                                       aspHasher.HashPassword(Guid.NewGuid().ToString("N"));
 
-            var member = new User(user.Name, user.Email, user.UserName, emptyPasswordValue)
+            var userEntity = new User(user.Name, user.Email, user.UserName, emptyPasswordValue)
             {
                 DefaultToLiveEditing = false,
                 Language = user.Culture ?? Configuration.GlobalSettings.DefaultUILanguage,
@@ -85,14 +91,16 @@ namespace Umbraco.Core.Security
                 IsLockedOut = user.IsLockedOut,
             };
 
-            UpdateMemberProperties(member, user);
+            UpdateMemberProperties(userEntity, user);
             
-            _userService.Save(member);
+            //TODO: We should deal with Roles --> User Groups here which we currently are not doing
 
-            if (member.Id == 0) throw new DataException("Could not create the user, check logs for details");
+            _userService.Save(userEntity);
+
+            if (userEntity.Id == 0) throw new DataException("Could not create the user, check logs for details");
 
             //re-assign id
-            user.Id = member.Id;
+            user.Id = userEntity.Id;
 
             return Task.FromResult(0);
         }
@@ -121,7 +129,7 @@ namespace Umbraco.Core.Security
                     _userService.Save(found);
                 }
 
-                if (user.LoginsChanged)
+                if (user.IsPropertyDirty("Logins"))
                 {
                     var logins = await GetLoginsAsync(user);
                     _externalLoginService.SaveUserLogins(found.Id, logins);
@@ -189,7 +197,7 @@ namespace Umbraco.Core.Security
 
             return await Task.FromResult(result);
         }
-
+        
         /// <summary>
         /// Set the user password hash
         /// </summary>
@@ -367,12 +375,17 @@ namespace Umbraco.Core.Security
             var result = _externalLoginService.Find(login).ToArray();
             if (result.Any())
             {
-                //return the first member that matches the result
-                var output = (from l in result
-                            select _userService.GetUserById(l.UserId)
-                                into user
-                                where user != null
-                                  select Mapper.Map<BackOfficeIdentityUser>(user)).FirstOrDefault();
+                //return the first user that matches the result
+                BackOfficeIdentityUser output = null;
+                foreach (var l in result)
+                {
+                    var user = _userService.GetUserById(l.UserId);
+                    if (user != null)
+                    {
+                        output = Mapper.Map<BackOfficeIdentityUser>(user);
+                        break;
+                    }
+                }
 
                 return Task.FromResult(AssignLoginsCallback(output));
             }
@@ -387,28 +400,16 @@ namespace Umbraco.Core.Security
         /// <param name="user"/><param name="roleName"/>
         /// <returns/>
         public Task AddToRoleAsync(BackOfficeIdentityUser user, string roleName)
-        {            
+        {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
+            if (string.IsNullOrWhiteSpace(roleName)) throw new ArgumentException("Value cannot be null or whitespace.", "roleName");
 
-            if (user.AllowedSections.InvariantContains(roleName)) return Task.FromResult(0);
-            
-            var asInt = user.Id.TryConvertTo<int>();
-            if (asInt == false)
+            var userRole = user.Roles.SingleOrDefault(r => r.RoleId == roleName);
+
+            if (userRole == null)
             {
-                throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
-            }
-
-            var foundUser = _userService.GetUserById(asInt.Result);            
-
-            if (foundUser != null)
-            {
-                var foundGroup = _userService.GetUserGroupByAlias(roleName);
-
-                if (foundGroup != null)
-                {
-                    foundUser.AddGroup(foundGroup.ToReadOnlyGroup());
-                }
+                user.AddRole(roleName);
             }
 
             return Task.FromResult(0);
@@ -420,28 +421,16 @@ namespace Umbraco.Core.Security
         /// <param name="user"/><param name="roleName"/>
         /// <returns/>
         public Task RemoveFromRoleAsync(BackOfficeIdentityUser user, string roleName)
-        {            
+        {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
+            if (string.IsNullOrWhiteSpace(roleName)) throw new ArgumentException("Value cannot be null or whitespace.", "roleName");
 
-            if (user.AllowedSections.InvariantContains(roleName) == false) return Task.FromResult(0);
+            var userRole = user.Roles.SingleOrDefault(r => r.RoleId == roleName);
 
-            var asInt = user.Id.TryConvertTo<int>();
-            if (asInt == false)
+            if (userRole != null)
             {
-                throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
-            }
-
-            var foundUser = _userService.GetUserById(asInt.Result);            
-
-            if (foundUser != null)
-            {
-                var foundGroup = _userService.GetUserGroupByAlias(roleName);
-
-                if (foundGroup != null)
-                {
-                    foundUser.RemoveGroup(foundGroup.Alias);
-                }
+                user.Roles.Remove(userRole);
             }
 
             return Task.FromResult(0);
@@ -456,7 +445,7 @@ namespace Umbraco.Core.Security
         {            
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
-            return Task.FromResult((IList<string>)user.Groups.Select(x => x.Alias).ToList());
+            return Task.FromResult((IList<string>)user.Roles.Select(x => x.RoleId).ToList());
         }
 
         /// <summary>
@@ -468,7 +457,7 @@ namespace Umbraco.Core.Security
         {            
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
-            return Task.FromResult(user.Groups.Select(x => x.Alias).InvariantContains(roleName));
+            return Task.FromResult(user.Roles.Select(x => x.RoleId).InvariantContains(roleName));
         }
 
         /// <summary>
@@ -623,34 +612,40 @@ namespace Umbraco.Core.Security
         }
         #endregion
 
-        private bool UpdateMemberProperties(Models.Membership.IUser user, BackOfficeIdentityUser identityUser)
+        private bool UpdateMemberProperties(IUser user, BackOfficeIdentityUser identityUser)
         {
             var anythingChanged = false;
-            //don't assign anything if nothing has changed as this will trigger
-            //the track changes of the model
-            if ((user.LastLoginDate != default(DateTime) && identityUser.LastLoginDateUtc.HasValue == false)
+            
+            //don't assign anything if nothing has changed as this will trigger the track changes of the model
+
+            if (identityUser.IsPropertyDirty("LastLoginDateUtc")
+                || (user.LastLoginDate != default(DateTime) && identityUser.LastLoginDateUtc.HasValue == false)
                 || identityUser.LastLoginDateUtc.HasValue && user.LastLoginDate.ToUniversalTime() != identityUser.LastLoginDateUtc.Value)
             {
                 anythingChanged = true;
                 user.LastLoginDate = identityUser.LastLoginDateUtc.Value.ToLocalTime();
             }
-            if ((user.EmailConfirmedDate.HasValue && user.EmailConfirmedDate.Value != default(DateTime) && identityUser.EmailConfirmed == false)
+            if (identityUser.IsPropertyDirty("EmailConfirmed")
+                || (user.EmailConfirmedDate.HasValue && user.EmailConfirmedDate.Value != default(DateTime) && identityUser.EmailConfirmed == false)
                 || ((user.EmailConfirmedDate.HasValue == false || user.EmailConfirmedDate.Value == default(DateTime)) && identityUser.EmailConfirmed))                
             {
                 anythingChanged = true;
                 user.EmailConfirmedDate = identityUser.EmailConfirmed ? (DateTime?)DateTime.Now : null;
             }
-            if (user.Name != identityUser.Name && identityUser.Name.IsNullOrWhiteSpace() == false)
+            if (identityUser.IsPropertyDirty("Name")
+                && user.Name != identityUser.Name && identityUser.Name.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 user.Name = identityUser.Name;
             }
-            if (user.Email != identityUser.Email && identityUser.Email.IsNullOrWhiteSpace() == false)
+            if (identityUser.IsPropertyDirty("Email")
+                && user.Email != identityUser.Email && identityUser.Email.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 user.Email = identityUser.Email;
             }
-            if (user.FailedPasswordAttempts != identityUser.AccessFailedCount)
+            if (identityUser.IsPropertyDirty("AccessFailedCount")
+                && user.FailedPasswordAttempts != identityUser.AccessFailedCount)
             {
                 anythingChanged = true;
                 user.FailedPasswordAttempts = identityUser.AccessFailedCount;
@@ -667,28 +662,33 @@ namespace Umbraco.Core.Security
                 }
 
             }
-            if (user.Username != identityUser.UserName && identityUser.UserName.IsNullOrWhiteSpace() == false)
+            if (identityUser.IsPropertyDirty("UserName")
+                && user.Username != identityUser.UserName && identityUser.UserName.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 user.Username = identityUser.UserName;
             }
-            if (user.RawPasswordValue != identityUser.PasswordHash && identityUser.PasswordHash.IsNullOrWhiteSpace() == false)
+            if (identityUser.IsPropertyDirty("PasswordHash")
+                && user.RawPasswordValue != identityUser.PasswordHash && identityUser.PasswordHash.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 user.RawPasswordValue = identityUser.PasswordHash;
             }
 
-            if (user.Language != identityUser.Culture && identityUser.Culture.IsNullOrWhiteSpace() == false)
+            if (identityUser.IsPropertyDirty("Culture")
+                && user.Language != identityUser.Culture && identityUser.Culture.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 user.Language = identityUser.Culture;
             }
-            if (user.StartMediaIds.UnsortedSequenceEqual(identityUser.StartMediaIds) == false)
+            if (identityUser.IsPropertyDirty("StartMediaIds")
+                && user.StartMediaIds.UnsortedSequenceEqual(identityUser.StartMediaIds) == false)
             {
                 anythingChanged = true;
                 user.StartMediaIds = identityUser.StartMediaIds;
             }
-            if (user.StartContentIds.UnsortedSequenceEqual(identityUser.StartContentIds) == false)
+            if (identityUser.IsPropertyDirty("StartContentIds")
+                && user.StartContentIds.UnsortedSequenceEqual(identityUser.StartContentIds) == false)
             {
                 anythingChanged = true;
                 user.StartContentIds = identityUser.StartContentIds;
@@ -699,23 +699,44 @@ namespace Umbraco.Core.Security
                 user.SecurityStamp = identityUser.SecurityStamp;
             }
 
-            var userGroupAliases = user.Groups.Select(x => x.Alias).ToArray();
-            var identityUserGroupAliases = identityUser.Groups.Select(x => x.Alias).ToArray();
-
-            if (userGroupAliases.ContainsAll(identityUserGroupAliases) == false
-                || identityUserGroupAliases.ContainsAll(userGroupAliases) == false)
+            //TODO: Fix this for Groups too
+            if (identityUser.IsPropertyDirty("Roles") || identityUser.IsPropertyDirty("Groups"))
             {
-                anythingChanged = true;
+                var userGroupAliases = user.Groups.Select(x => x.Alias).ToArray();
 
-                //clear out the current groups (need to ToArray since we are modifying the iterator)
-                user.ClearGroups();
-                
-                //use all of the ones assigned and add them
-                foreach (var group in identityUser.Groups)
+                var identityUserRoles = identityUser.Roles.Select(x => x.RoleId).ToArray();
+                var identityUserGroups = identityUser.Groups.Select(x => x.Alias).ToArray();
+
+                var combinedAliases = identityUserRoles.Union(identityUserGroups).ToArray();
+
+                if (userGroupAliases.ContainsAll(combinedAliases) == false
+                    || combinedAliases.ContainsAll(userGroupAliases) == false)
                 {
-                    user.AddGroup(group);
+                    anythingChanged = true;
+
+                    //clear out the current groups (need to ToArray since we are modifying the iterator)
+                    user.ClearGroups();
+
+                    //go lookup all these groups
+                    var groups = _userService.GetUserGroupsByAlias(combinedAliases).Select(x => x.ToReadOnlyGroup()).ToArray();
+
+                    //use all of the ones assigned and add them
+                    foreach (var group in groups)
+                    {
+                        user.AddGroup(group);
+                    }
+
+                    //re-assign
+                    identityUser.Groups = groups;
                 }
             }
+            
+            //we should re-set the calculated start nodes
+            identityUser.CalculatedMediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService);
+            identityUser.CalculatedContentStartNodeIds = user.CalculateContentStartNodeIds(_entityService);
+
+            //reset all changes
+            identityUser.ResetDirtyProperties(false);
 
             return anythingChanged;
         }
@@ -726,7 +747,6 @@ namespace Umbraco.Core.Security
             if (_disposed)
                 throw new ObjectDisposedException(GetType().Name);
         }
-
-      
+        
     }
 }

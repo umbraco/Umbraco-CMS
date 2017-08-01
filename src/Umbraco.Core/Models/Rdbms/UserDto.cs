@@ -41,6 +41,14 @@ namespace Umbraco.Core.Models.Rdbms
         [Length(500)]
         public string Password { get; set; }
 
+        /// <summary>
+        /// This will represent a JSON structure of how the password has been created (i.e hash algorithm, iterations)
+        /// </summary>
+        [Column("passwordConfig")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(500)]
+        public string PasswordConfig { get; set; }
+
         [Column("userEmail")]
         public string Email { get; set; }
         

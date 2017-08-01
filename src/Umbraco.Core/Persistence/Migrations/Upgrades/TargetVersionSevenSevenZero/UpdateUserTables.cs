@@ -1,7 +1,10 @@
 using System.Linq;
+using System.Web.Security;
+using Newtonsoft.Json;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZero
 {
@@ -28,6 +31,19 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
 
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("invitedDate")) == false)
                 Create.Column("invitedDate").OnTable("umbracoUser").AsDateTime().Nullable();
+
+            if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("passwordConfig")) == false)
+            {
+                Create.Column("passwordConfig").OnTable("umbracoUser").AsString(500).Nullable();
+                //Check if we have a known config, we only want to store config for hashing
+                var membershipProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
+                if (membershipProvider.PasswordFormat == MembershipPasswordFormat.Hashed)
+                {
+                    var json = JsonConvert.SerializeObject(new { hashAlgorithm = Membership.HashAlgorithmType });
+                    Execute.Sql("UPDATE umbracoUser SET passwordConfig = '" + json + "'");
+                }
+            }
+                
         }
 
         public override void Down()

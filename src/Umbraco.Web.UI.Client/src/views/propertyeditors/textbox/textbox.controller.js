@@ -1,6 +1,6 @@
 function textboxController($rootScope, $scope, $log) {
     $scope.model.maxlength = false;
-    if($scope.model.config.maxChars) {
+    if ($scope.model.config && $scope.model.config.maxChars) {
         $scope.model.maxlength = true;
         if($scope.model.value == undefined) {
             $scope.model.count = ($scope.model.config.maxChars * 1);
@@ -10,7 +10,7 @@ function textboxController($rootScope, $scope, $log) {
     }
 
     $scope.model.change = function() {
-        if($scope.model.config.maxChars) {
+        if ($scope.model.config && $scope.model.config.maxChars) {
             if($scope.model.value == undefined) {
                 $scope.model.count = ($scope.model.config.maxChars * 1);
             } else {

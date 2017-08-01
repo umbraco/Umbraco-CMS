@@ -54,7 +54,27 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         $scope.user = null;
     }));
 
-    //when the app is read/user is logged in, setup the data
+    evts.push(eventsService.on("app.userRefresh", function(evt) {
+        userService.refreshCurrentUser().then(function(data) {
+            $scope.user = data;
+
+            //Load locale file
+            if ($scope.user.locale) {
+                tmhDynamicLocale.set($scope.user.locale);
+            }
+
+            if ($scope.user.avatars) {
+                $scope.avatar = [];
+                if (angular.isArray($scope.user.avatars)) {
+                    for (var i = 0; i < $scope.user.avatars.length; i++) {
+                        $scope.avatar.push({ value: $scope.user.avatars[i] });
+                    }
+                }
+            }
+        });
+    }));
+
+    //when the app is ready/user is logged in, setup the data
     evts.push(eventsService.on("app.ready", function (evt, data) {
 
         $scope.authenticated = data.authenticated;
