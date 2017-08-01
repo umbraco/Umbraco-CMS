@@ -13,6 +13,15 @@
         vm.breadcrumbs = [];
         vm.avatarFile = {};
         vm.labels = {};
+        vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
+        vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
+        vm.emailIsUsername = true;
+
+        //create the initial model for change password
+        vm.changePasswordModel = {
+          config: {},
+          isChanging: false
+        };
 
         vm.goToPage = goToPage;
         vm.openUserGroupPicker = openUserGroupPicker;
@@ -23,6 +32,7 @@
         vm.enableUser = enableUser;
         vm.clearAvatar = clearAvatar;
         vm.save = save;
+        vm.toggleChangePassword = toggleChangePassword;
 
         function init() {
 
