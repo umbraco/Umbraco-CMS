@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 using System.Net.Http;
 using System.Web;
@@ -73,7 +74,9 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 var httpContext = Mock.Of<HttpContextBase>(
                     http => http.User == owinContext.Authentication.User
                             //ensure the request exists with a cookies collection    
-                            && http.Request == Mock.Of<HttpRequestBase>(r => r.Cookies == new HttpCookieCollection()));
+                            && http.Request == Mock.Of<HttpRequestBase>(r => r.Cookies == new HttpCookieCollection())
+                            //ensure the request exists with an items collection    
+                            && http.Items == Mock.Of<IDictionary>());
                 //chuck it into the props since this is what MS does when hosted and it's needed there
                 request.Properties["MS_HttpContext"] = httpContext;                
 
