@@ -261,7 +261,7 @@ namespace Umbraco.Web.Models.Mapping
                         var startNodes = new List<EntityBasic>();
                         if (startContentIds.Contains(-1))
                         {
-                            startNodes.Add(RootNode("Content Root"));
+                            startNodes.Add(RootNode(applicationContext.Services.TextService.Localize("content/contentRoot")));
                         }
                         var contentItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, startContentIds);
                         startNodes.AddRange(Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(contentItems));                        
@@ -275,7 +275,7 @@ namespace Umbraco.Web.Models.Mapping
                         var startNodes = new List<EntityBasic>();
                         if (startContentIds.Contains(-1))
                         {
-                            startNodes.Add(RootNode("Media Root"));
+                            startNodes.Add(RootNode(applicationContext.Services.TextService.Localize("media/mediaRoot")));
                         }
                         var mediaItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Media, startMediaIds);
                         startNodes.AddRange(Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(mediaItems));
@@ -376,7 +376,7 @@ namespace Umbraco.Web.Models.Mapping
             else if (group.StartMediaId == -1)
             {
                 //create the root node
-                display.MediaStartNode = RootNode("Media Root");
+                display.MediaStartNode = RootNode(services.TextService.Localize("media/mediaRoot"));
             }
 
             if (group.StartContentId > 0)
@@ -387,7 +387,7 @@ namespace Umbraco.Web.Models.Mapping
             else if (group.StartContentId == -1)
             {
                 //create the root node
-                display.ContentStartNode = RootNode("Content Root");
+                display.ContentStartNode = RootNode(services.TextService.Localize("content/contentRoot"));
             }
 
             if (display.Icon.IsNullOrWhiteSpace())

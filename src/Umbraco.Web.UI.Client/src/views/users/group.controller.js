@@ -7,9 +7,7 @@
         var localizeSaving = localizationService.localize("general_saving");
 
 
-        vm.page = {};
-        vm.page.contentRootLabel = "Content Root";
-        vm.page.mediaRootLabel = "Media Root";
+        vm.page = {};        
         vm.page.rootIcon = "icon-folder";
         vm.userGroup = {};
         vm.labels = {};
@@ -34,7 +32,9 @@
                 "defaultdialogs_selectContentStartNode",
                 "defaultdialogs_selectMediaStartNode",
                 "defaultdialogs_selectNode",
-                "general_groups"
+                "general_groups",
+                "content_contentRoot",
+                "media_mediaRoot"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (values) {
@@ -43,6 +43,8 @@
                 vm.labels.selectMediaStartNode = values[2];
                 vm.labels.selectNode = values[3];
                 vm.labels.groups = values[4];
+                vm.labels.contentRoot = values[5];
+                vm.labels.mediaRoot = values[6];
             });
             localizationService.localize("general_add").then(function (name) {
                 vm.labels.add = name;
@@ -133,7 +135,7 @@
                     if (model.selection) {
                         vm.userGroup.contentStartNode = model.selection[0];
                         if (vm.userGroup.contentStartNode.id === "-1") {
-                            vm.userGroup.contentStartNode.name = "Content Root";
+                            vm.userGroup.contentStartNode.name = vm.labels.contentRoot;
                             vm.userGroup.contentStartNode.icon = "icon-folder";
                         }
                     }
@@ -161,7 +163,7 @@
                     if (model.selection) {
                         vm.userGroup.mediaStartNode = model.selection[0];
                         if (vm.userGroup.mediaStartNode.id === "-1") {
-                            vm.userGroup.mediaStartNode.name = "Media Root";
+                            vm.userGroup.mediaStartNode.name = vm.labels.mediaRoot;
                             vm.userGroup.mediaStartNode.icon = "icon-folder";
                         }
                     }

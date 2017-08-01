@@ -6,8 +6,6 @@
         var vm = this;
 
         vm.page = {};
-        vm.page.contentRootLabel = "Content Root";
-        vm.page.mediaRootLabel = "Media Root";
         vm.page.rootIcon = "icon-folder";
         vm.user = {
           changePassword: null
@@ -39,7 +37,9 @@
                 "general_cancel",
                 "defaultdialogs_selectContentStartNode",
                 "defaultdialogs_selectMediaStartNode",
-                "sections_users"
+                "sections_users",
+                "content_contentRoot",
+                "media_mediaRoot"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (values) {
@@ -48,6 +48,8 @@
                 vm.labels.selectContentStartNode = values[2];
                 vm.labels.selectMediaStartNode = values[3];
                 vm.labels.users = values[4];
+                vm.labels.contentRoot = values[5];
+                vm.labels.mediaRoot = values[6];
             });
 
             // get user
@@ -150,7 +152,7 @@
                     if (model.selection) {
                         angular.forEach(model.selection, function (item) {
                             if (item.id === "-1") {
-                                item.name = "Content Root";
+                                item.name = vm.labels.contentRoot;
                                 item.icon = "icon-folder";
                             }
                             multiSelectItem(item, vm.user.startContentIds);
@@ -183,7 +185,7 @@
                     if (model.selection) {
                         angular.forEach(model.selection, function (item) {
                             if (item.id === "-1") {
-                                item.name = "Media Root";
+                                item.name = vm.labels.mediaRoot;
                                 item.icon = "icon-folder";
                             }
                             multiSelectItem(item, vm.user.startMediaIds);
