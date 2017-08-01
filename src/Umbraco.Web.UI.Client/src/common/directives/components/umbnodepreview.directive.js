@@ -94,7 +94,9 @@
     function NodePreviewDirective() {
 
         function link(scope, el, attr, ctrl) {
-
+            if (!scope.editLabelKey) {
+                scope.editLabelKey = "general_edit";
+            }
         }
 
         var directive = {
@@ -113,7 +115,8 @@
                 allowEdit: "=?",
                 onOpen: "&?",
                 onRemove: "&?",
-                onEdit: "&?"
+                onEdit: "&?",
+                editLabelKey: "=?"
             },
             link: link
         };

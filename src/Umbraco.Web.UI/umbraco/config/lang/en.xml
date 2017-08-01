@@ -216,6 +216,7 @@
     <key alias="createdBlueprintHeading">Blueprint created</key>
     <key alias="createdBlueprintMessage">Blueprint was created from %0%</key>
     <key alias="duplicateBlueprintMessage">Another Blueprint with the same name already exists.</key>
+    <key alias="contentRoot">Content root</key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
@@ -224,6 +225,7 @@
     <key alias="orClickHereToUpload">or click here to choose files</key>
     <key alias="onlyAllowedFiles">Only allowed file types are</key>
     <key alias="maxFileSize">Max file size is</key>
+    <key alias="mediaRoot">Media root</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -1620,6 +1622,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="profile">Profile</key>
     <key alias="searchAllChildren">Search all children</key>
     <key alias="sectionsHelp">Add sections to give users access</key>
+    <key alias="noStartNode">No start node selected</key>
     <key alias="startnode">Content start node</key>
     <key alias="startnodehelp">Limit the content tree to a specific start node</key>
     <key alias="startnodes">Content start nodes</key>

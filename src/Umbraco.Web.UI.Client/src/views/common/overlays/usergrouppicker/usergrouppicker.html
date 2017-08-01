@@ -28,11 +28,10 @@
                 <div>
                     <div class="umb-user-group-picker-list-item__name">{{ userGroup.name }}</div>
 
-                    <div class="umb-user-group-picker-list-item__permission">
+                    <div class="umb-user-group-picker-list-item__permission" ng-if="userGroup.sections">
                         <span>
                             <span class="bold"><localize key="main_sections">Sections</localize>:</span>
                             <span ng-repeat="section in userGroup.sections">{{ section.name }}<span ng-if="!$last">, </span></span>
-                            <span ng-if="userGroup.sections.length === 0">All sections</span>
                         </span>
                     </div>
 
