@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Data.SqlServerCe;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -205,9 +206,9 @@ namespace Umbraco.Core.Services
                 {
                     return repository.GetByUsername(username, includeSecurityData: true);
                 }
-                catch (SqlException ex)
+                catch (Exception ex) when (ex is SqlException || ex is SqlCeException)
                 {
-                    //we need to handle this one specific case which is when we are upgrading to 7.6 since the user group
+                    //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
                     //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
                     //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
                     //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
@@ -219,7 +220,6 @@ namespace Umbraco.Core.Services
                     }
                     throw;
                 }
-
             }
         }
 
@@ -704,9 +704,9 @@ namespace Umbraco.Core.Services
                     var result = repository.Get(id);
                     return result;
                 }
-                catch (SqlException ex)
+                catch (Exception ex) when (ex is SqlException || ex is SqlCeException)
                 {
-                    //we need to handle this one specific case which is when we are upgrading to 7.6 since the user group
+                    //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
                     //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
                     //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
                     //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
