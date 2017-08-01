@@ -60,7 +60,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
             if (tableName.Equals("umbracoUserGroup2App"))
             {
-                CreateUmbracooUserGroup2AppData();
+                CreateUmbracoUserGroup2AppData();
             }
 
             if (tableName.Equals("cmsPropertyTypeGroup"))
@@ -174,10 +174,10 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         
         private void CreateUmbracoUserGroupData()
         {
-            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 1, StartMediaId = null, StartContentId = null, Alias = Constants.Security.AdminGroupAlias, Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F7ï", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-medal" });
-            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 2, StartMediaId = null, StartContentId = null, Alias = "writer", Name = "Writers", DefaultPermissions = "CAH:F", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-edit" });
-            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 3, StartMediaId = null, StartContentId = null, Alias = "editor", Name = "Editors", DefaultPermissions = "CADMOSKTPUZ:5Fï", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-tools" });
-            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 4, StartMediaId = null, StartContentId = null, Alias = "translator", Name = "Translators", DefaultPermissions = "AF", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-globe" });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 1, StartMediaId = -1, StartContentId = -1, Alias = Constants.Security.AdminGroupAlias, Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F7ï", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-medal" });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 2, StartMediaId = -1, StartContentId = -1, Alias = "writer", Name = "Writers", DefaultPermissions = "CAH:F", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-edit" });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 3, StartMediaId = -1, StartContentId = -1, Alias = "editor", Name = "Editors", DefaultPermissions = "CADMOSKTPUZ:5Fï", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-tools" });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 4, StartMediaId = -1, StartContentId = -1, Alias = "translator", Name = "Translators", DefaultPermissions = "AF", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-globe" });
         }
 
         private void CreateUmbracoUser2UserGroupData()
@@ -185,7 +185,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert(new User2UserGroupDto { UserGroupId = 1, UserId = 0 });
         }
 
-        private void CreateUmbracooUserGroup2AppData()
+        private void CreateUmbracoUserGroup2AppData()
         {
             _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Content });
             _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Media });
@@ -198,7 +198,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Media });
             _database.Insert(new UserGroup2AppDto { UserGroupId = 4, AppAlias = Constants.Applications.Translation });
         }
-
+        
         private void CreateCmsPropertyTypeGroupData()
         {          
             _database.Insert("cmsPropertyTypeGroup", "id", false, new PropertyTypeGroupDto { Id = 3, ContentTypeNodeId = 1032, Text = "Image", SortOrder = 1, UniqueId = new Guid(Constants.PropertyTypeGroups.Image) });
