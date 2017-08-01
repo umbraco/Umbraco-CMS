@@ -1552,6 +1552,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="searchAllChildren">Search all children</key>
     <key alias="sectionsHelp">Add sections to give users access</key>
     <key alias="noStartNode">No start node selected</key>
+    <key alias="noStartNodes">No start nodes selected</key>
     <key alias="startnode">Content start node</key>
     <key alias="startnodehelp">Limit the content tree to a specific start node</key>
     <key alias="startnodes">Content start nodes</key>
