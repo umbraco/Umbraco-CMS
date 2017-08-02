@@ -11,7 +11,7 @@ namespace Umbraco.Web.HealthCheck
     public class HealthCheckResults
     {
         private readonly Dictionary<string, IEnumerable<HealthCheckStatus>> _results;
-        internal readonly bool AllChecksSuccessful;
+        public readonly bool AllChecksSuccessful;
 
         public HealthCheckResults(IEnumerable<HealthCheck> checks)
         {
