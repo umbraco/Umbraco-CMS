@@ -2,7 +2,7 @@
 
   <div class="umb-pane">
     <h5 ng-show="selectContentType"><localize key="create_createUnder">Create a page under</localize> {{currentNode.name}}</h5>
-    <h5 ng-show="selectBlueprint"><localize key="content_selectBlueprint">Select a blueprint</localize></h5>
+    <h5 ng-show="selectBlueprint"><localize key="blueprints_selectBlueprint">Select a blueprint</localize></h5>
 
     <p class="abstract" ng-if="allowedTypes && allowedTypes.length === 0">
       <localize key="create_noDocumentTypes" />
@@ -37,7 +37,7 @@
         <a ng-click="createBlank(docType)">
           <i class="large {{docType.icon}}"></i>
           <span class="menu-label">
-            <localize key="content_blankBlueprint">Blank</localize>
+            <localize key="blueprints_blankBlueprint">Blank</localize>
           </span>
         </a>
       </li>

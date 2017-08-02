@@ -1,32 +1,36 @@
 ﻿<div ng-controller="Umbraco.Editors.Content.CreateBlueprintController">
 
-  <form name="blueprintForm"
-        novalidate
-        ng-submit="create()"
-        val-form-manager>
+    <form name="blueprintForm"
+          novalidate
+          ng-submit="create()"
+          val-form-manager>
 
-    <div class="umbracoDialog umb-dialog-body with-footer"
-         ng-cloak>
-      <div class="umb-pane">
-        <umb-control-group label="{{label}}" hide-label="false">
-          <input type="text" name="name" ng-model="message.name" class="umb-textstring textstring input-block-level" 
-                 val-server-field="name"
-                 required />
-          <span class="help-inline" val-msg-for="name" val-toggle-msg="required"><localize key="required" /></span>
-          <span class="help-inline" val-msg-for="name" val-toggle-msg="valServerField"></span>
-        </umb-control-group>
+        <div class="umbracoDialog umb-dialog-body with-footer" ng-cloak>
+            <div class="umb-pane">
+                <umb-control-group label="{{label}}" hide-label="false">
+                    
+                    <p>
+                        <localize key="blueprints_blueprintDescription">A Content Template is pre-defined content that an editor can select to use as the basis for creating new content</localize>.
+                    </p>
 
-      </div>
+                    <input type="text" name="name" ng-model="message.name" class="umb-textstring textstring input-block-level"
+                           val-server-field="name"
+                           required />
+                    <span class="help-inline" val-msg-for="name" val-toggle-msg="required"><localize key="required" /></span>
+                    <span class="help-inline" val-msg-for="name" val-toggle-msg="valServerField"></span>
+                </umb-control-group>
 
-    </div>
-    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-    <button type="button" class="btn umb-button btn-info" ng-click="cancel()">
-      <localize key="general_cancel">Cancel</localize>
-    </button>
-    <button type="submit" class="btn umb-button btn-success">
-        <localize key="general_create">Create blueprint</localize>
-      </button>
-    </div>
+            </div>
 
-  </form>
+        </div>
+        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+            <button type="button" class="btn umb-button btn-info" ng-click="cancel()">
+                <localize key="general_cancel">Cancel</localize>
+            </button>
+            <button type="submit" class="btn umb-button btn-success">
+                <localize key="general_create">Create blueprint</localize>
+            </button>
+        </div>
+
+    </form>
 </div>
