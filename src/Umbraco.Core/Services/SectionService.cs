@@ -182,7 +182,6 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<Section> GetAllowedSections(int userId)
         {
-            
             var user = _userService.GetUserById(userId);
             if (user == null)
             {
@@ -210,7 +209,9 @@ namespace Umbraco.Core.Services
         /// <param name="icon">The application icon, which has to be located in umbraco/images/tray folder.</param>
         public void MakeNew(string name, string alias, string icon)
         {
-            MakeNew(name, alias, icon, GetSections().Max(x => x.SortOrder) + 1);
+            var sections = GetSections();
+            var nextSortOrder = sections.Any() ? sections.Max(x => x.SortOrder) + 1 : 1;
+            MakeNew(name, alias, icon, nextSortOrder);
         }
 
         /// <summary>
@@ -250,7 +251,7 @@ namespace Umbraco.Core.Services
                 using (var uow = _uowProvider.GetUnitOfWork())
                 {
                     uow.Database.Execute(
-                        "delete from umbracoUser2App where app = @appAlias",
+                        "delete from umbracoUserGroup2App where app = @appAlias",
                         new { appAlias = section.Alias });
                     uow.Commit();
                 }

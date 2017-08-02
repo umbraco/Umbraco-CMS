@@ -9,7 +9,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using umbraco.BasePages;
 using System.Linq;
-using umbraco.cms.presentation.user;
 using umbraco.interfaces;
 using Umbraco.Web;
 using Umbraco.Core;
@@ -137,10 +136,9 @@ namespace umbraco.dialogs
         /// </remarks>
         private bool CheckPermissions(IContentBase node, IAction currentAction)
         {
-            var currUserPermissions = new UserPermissions(CurrentUser);
-            var lstCurrUserActions = currUserPermissions.GetExistingNodePermission(node.Id);
-
-            return lstCurrUserActions.Contains(currentAction);
+            var userService = ApplicationContext.Current.Services.UserService;
+            var currUserPermissions = userService.GetPermissions(UmbracoContext.Current.Security.CurrentUser, node.Id).GetAllPermissions();
+            return currUserPermissions != null && currUserPermissions.Contains(currentAction.Letter.ToString(CultureInfo.InvariantCulture));
         }
 
         private void HandleDocumentTypeCopy()

@@ -37,6 +37,12 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, Guid?>(x => x.ParentId);
             public readonly PropertyInfo ItemKeySelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, string>(x => x.ItemKey);
             public readonly PropertyInfo TranslationsSelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, IEnumerable<IDictionaryTranslation>>(x => x.Translations);
+
+            //Custom comparer for enumerable
+            public readonly DelegateEqualityComparer<IEnumerable<IDictionaryTranslation>> DictionaryTranslationComparer =
+                new DelegateEqualityComparer<IEnumerable<IDictionaryTranslation>>(
+                    (enumerable, translations) => enumerable.UnsortedSequenceEqual(translations),
+                    enumerable => enumerable.GetHashCode());
         }
 
         /// <summary>
@@ -79,10 +85,7 @@ namespace Umbraco.Core.Models
                 }
 
                 SetPropertyValueAndDetectChanges(asArray, ref _translations, Ps.Value.TranslationsSelector,
-                    //Custom comparer for enumerable
-                    new DelegateEqualityComparer<IEnumerable<IDictionaryTranslation>>(
-                        (enumerable, translations) => enumerable.UnsortedSequenceEqual(translations),
-                        enumerable => enumerable.GetHashCode()));                
+                    Ps.Value.DictionaryTranslationComparer);                
             }
         }
     }

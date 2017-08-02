@@ -1,13 +1,16 @@
 using System;
 using umbraco.interfaces;
 using umbraco.BasePages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.BusinessLogic.Actions
 {
-	/// <summary>
-	/// This action is invoked when a document, media, member is deleted
-	/// </summary>
-	public class ActionDelete : IAction
+    /// <summary>
+    /// This action is invoked when a document, media, member is deleted
+    /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.ContentCategory)]
+    public class ActionDelete : IAction
 	{
 		//create singleton
 #pragma warning disable 612,618
@@ -83,6 +86,7 @@ namespace umbraco.BusinessLogic.Actions
 				return true;
 			}
 		}
-		#endregion
-	}
+        #endregion
+        
+    }
 }

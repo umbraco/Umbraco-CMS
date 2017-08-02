@@ -1,6 +1,7 @@
 using Umbraco.Core.Configuration;
 using System;
 using System.ComponentModel;
+using System.Web.Security;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -9,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Persistence
 {
@@ -248,6 +250,18 @@ namespace Umbraco.Core.Persistence
             return new PartialViewMacroRepository(uow, FileSystemProviderManager.Current.MacroPartialsFileSystem);
         }
 
+        [Obsolete("MacroScripts are obsolete - this is for backwards compatibility with upgraded sites.")]
+        internal virtual IPartialViewRepository CreateMacroScriptRepository(IUnitOfWork uow)
+        {
+            return new MacroScriptRepository(uow, FileSystemProviderManager.Current.MacroScriptsFileSystem);
+        }
+
+        [Obsolete("UserControls are obsolete - this is for backwards compatibility with upgraded sites.")]
+        internal virtual IUserControlRepository CreateUserControlRepository(IUnitOfWork uow)
+        {
+            return new UserControlRepository(uow, FileSystemProviderManager.Current.UserControlsFileSystem);
+        }
+
         public virtual IStylesheetRepository CreateStylesheetRepository(IUnitOfWork uow)
         {
             return new StylesheetRepository(uow, FileSystemProviderManager.Current.StylesheetsFileSystem);
@@ -292,23 +306,28 @@ namespace Umbraco.Core.Persistence
                 _logger, _sqlSyntax);
         }
 
-        public virtual IUserTypeRepository CreateUserTypeRepository(IScopeUnitOfWork uow)
+        public virtual IUserGroupRepository CreateUserGroupRepository(IScopeUnitOfWork uow)
         {
-            return new UserTypeRepository(
+            return new UserGroupRepository(
                 uow,
-                //There's not many user types but we query on users all the time so the result needs to be cached
                 _cacheHelper,
                 _logger, _sqlSyntax);
         }
 
         public virtual IUserRepository CreateUserRepository(IScopeUnitOfWork uow)
         {
+            var userMembershipProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
+            var passwordConfig = userMembershipProvider == null || userMembershipProvider.PasswordFormat != MembershipPasswordFormat.Hashed
+                ? null
+                : new System.Collections.Generic.Dictionary<string, string> {{"hashAlgorithm", Membership.HashAlgorithmType}};
+
             return new UserRepository(
                 uow,
                 //Need to cache users - we look up user information more than anything in the back office!
                 _cacheHelper,
-                _logger, _sqlSyntax,
-                CreateUserTypeRepository(uow));
+                _logger, 
+                _sqlSyntax,
+                passwordConfig);
         }
 
         internal virtual IMacroRepository CreateMacroRepository(IScopeUnitOfWork uow)

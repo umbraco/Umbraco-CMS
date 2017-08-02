@@ -114,27 +114,27 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Assigns a single permission to the current content item for the specified user ids
+        /// Assigns a single permission to the current content item for the specified group ids
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="permission"></param>
-        /// <param name="userIds"></param>
-        public void AssignContentPermission(IContent entity, char permission, IEnumerable<int> userIds)
+        /// <param name="groupIds"></param>
+        public void AssignContentPermission(IContent entity, char permission, IEnumerable<int> groupIds)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateContentRepository(uow);
-                repository.AssignEntityPermission(entity, permission, userIds);
+                repository.AssignEntityPermission(entity, permission, groupIds);
                 uow.Commit();
             }
         }
 
         /// <summary>
-        /// Gets the list of permissions for the content item
+        /// Returns implicit/inherited permissions assigned to the content item for all user groups
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public IEnumerable<EntityPermission> GetPermissionsForEntity(IContent content)
+        public EntityPermissionCollection GetPermissionsForEntity(IContent content)
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
@@ -1672,8 +1672,20 @@ namespace Umbraco.Core.Services
                     copy.CreatorId = userId;
                     copy.WriterId = userId;
 
+                    //get the current permissions, if there are any explicit ones they need to be copied
+                    var currentPermissions = GetPermissionsForEntity(content);
+                    currentPermissions.RemoveWhere(p => p.IsDefaultPermissions);
+
                     repository.AddOrUpdate(copy);
                     repository.AddOrUpdatePreviewXml(copy, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                    
+                    //add permissions
+                    if (currentPermissions.Count > 0)
+                    {
+                        var permissionSet = new ContentPermissionSet(copy, currentPermissions);
+                        repository.AddOrUpdatePermissions(permissionSet);
+                    }
+
                     uow.Commit(); // todo - this should flush, not commit
 
                     //Special case for the associated tags

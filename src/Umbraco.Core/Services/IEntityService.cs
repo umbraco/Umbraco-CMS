@@ -176,6 +176,12 @@ namespace Umbraco.Core.Services
             string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
+        /// Returns a paged collection of descendants
+        /// </summary>
+        IEnumerable<IUmbracoEntity> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
+
+        /// <summary>
         /// Returns a paged collection of descendants from the root
         /// </summary>
         /// <param name="umbracoObjectType"></param>
@@ -242,6 +248,16 @@ namespace Umbraco.Core.Services
         /// <param name="ids"></param>
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
         IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids);
+
+        /// <summary>
+        /// Gets paths for entities.
+        /// </summary>
+        IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params int[] ids);
+
+        /// <summary>
+        /// Gets paths for entities.
+        /// </summary>
+        IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params Guid[] keys);
 
         /// <summary>
         /// Gets the UmbracoObjectType from the integer id of an IUmbracoEntity.

@@ -123,6 +123,8 @@
 
             public const string Scripts = "scripts";
 
+            public const string Users = "users";
+
             //TODO: Fill in the rest!
         }
     }

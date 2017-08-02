@@ -67,15 +67,15 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               
                                                                               {28, typeof (TagDto)},
                                                                               {29, typeof (TagRelationshipDto)},
-                                                                              {31, typeof (UserTypeDto)},
+                                                                              // Removed in 7.6 {31, typeof (UserTypeDto)},
                                                                               {32, typeof (UserDto)},
                                                                               {33, typeof (TaskTypeDto)},
                                                                               {34, typeof (TaskDto)},
                                                                               {35, typeof (ContentType2ContentTypeDto)},
                                                                               {36, typeof (ContentTypeAllowedContentTypeDto)},
-                                                                              {37, typeof (User2AppDto)},
+                                                                              // Removed in 7.6 {37, typeof (User2AppDto)},
                                                                               {38, typeof (User2NodeNotifyDto)},
-                                                                              {39, typeof (User2NodePermissionDto)},
+                                                                              // Removed in 7.6 {39, typeof (User2NodePermissionDto)},
                                                                               {40, typeof (ServerRegistrationDto)},
                                                                               {41, typeof (AccessDto)},
                                                                               {42, typeof (AccessRuleDto)},
@@ -85,7 +85,12 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               //46, removed: UmbracoDeployChecksumDto
                                                                               //47, removed: UmbracoDeployDependencyDto
                                                                               {48, typeof (RedirectUrlDto) },
-                                                                              {49, typeof (LockDto) }
+                                                                              {49, typeof (LockDto) },
+                                                                              {50, typeof (UserGroupDto) },
+                                                                              {51, typeof (User2UserGroupDto) },
+                                                                              {52, typeof (UserGroup2NodePermissionDto) },
+                                                                              {53, typeof (UserGroup2AppDto) },
+                                                                              {54, typeof (UserStartNodeDto) },
                                                                           };
         #endregion
         

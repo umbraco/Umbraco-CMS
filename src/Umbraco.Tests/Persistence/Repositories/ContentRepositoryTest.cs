@@ -2,26 +2,19 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence;
-
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using umbraco.editorControls.tinyMCE3;
-using umbraco.interfaces;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Tests.Persistence.Repositories
@@ -69,6 +62,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, templateRepository);
             var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
+        }
+
+        private UserGroupRepository CreateUserGroupRepository(IScopeUnitOfWork unitOfWork)
+        {
+            return new UserGroupRepository(unitOfWork, CacheHelper, Logger, SqlSyntax);
         }
 
         [Test]
@@ -138,10 +136,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var hasPropertiesContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 content1 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
-                
+
                 contentTypeRepository.AddOrUpdate(hasPropertiesContentType);
-                repository.AddOrUpdate(content1);                
-                unitOfWork.Commit();                
+                repository.AddOrUpdate(content1);
+                unitOfWork.Commit();
             }
 
             var versionDtos = new List<ContentVersionDto>();
@@ -169,7 +167,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     VersionId = version,
                     WriterUserId = 0,
                     UpdateDate = versionDate,
-                    TemplateId = content1.Template == null || content1.Template.Id <= 0 ? null : (int?) content1.Template.Id
+                    TemplateId = content1.Template == null || content1.Template.Id <= 0 ? null : (int?)content1.Template.Id
                 });
             }
 
@@ -190,7 +188,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(contentItem.Version, versionDtos.Single(x => x.Id == versionDtos.Max(y => y.Id)).VersionId);
 
                 var allVersions = repository.GetAllVersions(content[0].Id);
-                var allKnownVersions = versionDtos.Select(x => x.VersionId).Union(new[]{ content1.Version }).ToArray();
+                var allKnownVersions = versionDtos.Select(x => x.VersionId).Union(new[] { content1.Version }).ToArray();
                 Assert.IsTrue(allKnownVersions.ContainsAll(allVersions.Select(x => x.Version)));
                 Assert.IsTrue(allVersions.Select(x => x.Version).ContainsAll(allKnownVersions));
             }
@@ -535,41 +533,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(dateValue, persistedTextpage.GetValue(dateTimePropertyAlias));
                 Assert.AreEqual(persistedTextpage.GetValue(dateTimePropertyAlias), textpage.GetValue(dateTimePropertyAlias));
             }
-        }
-
-        [Test]
-        public void Ensures_Permissions_Are_Set_If_Parent_Entity_Permissions_Exist()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            ContentTypeRepository contentTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
-            {
-                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
-                contentType.AllowedContentTypes = new List<ContentTypeSort>
-                {
-                    new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias)
-                };
-                var parentPage = MockedContent.CreateSimpleContent(contentType);
-                contentTypeRepository.AddOrUpdate(contentType);
-                repository.AddOrUpdate(parentPage);
-                unitOfWork.Commit();
-
-                // Act
-                repository.AssignEntityPermission(parentPage, 'A', new int[] { 0 });
-                var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
-                repository.AddOrUpdate(childPage);
-                unitOfWork.Commit();
-
-                // Assert
-                var permissions = repository.GetPermissionsForEntity(childPage.Id);
-                Assert.AreEqual(1, permissions.Count());
-                Assert.AreEqual("A", permissions.Single().AssignedPermissions.First());
-            }
-
-        }
+        }        
 
         [Test]
         public void Can_Perform_Add_On_ContentRepository()

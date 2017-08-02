@@ -33,10 +33,8 @@
     <key alias="sendtopublish">Send til publisering</key>
     <key alias="sendToTranslate">Send til oversetting</key>
     <key alias="sort">Sorter</key>
-    <key alias="toPublish">Send til publisering</key>
     <key alias="translate">Oversett</key>
     <key alias="update">Oppdater</key>
-    <key alias="defaultValue">Standard verdi</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Ingen tilgang.</key>
@@ -884,8 +882,6 @@ Vennlig hilsen Umbraco roboten
     <key alias="postContent">Sett inn etter felt</key>
     <key alias="preContent">Sett inn før felt</key>
     <key alias="recursive">Rekursivt</key>
-    <key alias="removeParagraph">Fjern paragraftagger</key>
-    <key alias="removeParagraphHelp">Fjerner eventuelle &lt;P&gt; rundt teksten</key>
     <key alias="standardFields">Standardfelter</key>
     <key alias="uppercase">Store bokstaver</key>
     <key alias="urlEncode">URL koding</key>
@@ -1005,8 +1001,6 @@ Vennlig hilsen Umbraco roboten
     <key alias="startnode">Startnode</key>
     <key alias="username">Navn</key>
     <key alias="userPermissions">Brukertillatelser</key>
-    <key alias="usertype">Brukertype</key>
-    <key alias="userTypes">Brukertyper</key>
     <key alias="writer">Forfatter</key>
     <key alias="translator">Oversetter</key>
     <key alias="change">Endre</key>

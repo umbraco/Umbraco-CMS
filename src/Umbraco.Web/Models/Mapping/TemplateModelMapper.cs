@@ -14,10 +14,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.Notifications, exp => exp.Ignore());
 
             config.CreateMap<TemplateDisplay, Template>()
-                .ForMember(x => x.DeletedDate, exp => exp.Ignore())
-                .ForMember(x => x.Path, exp => exp.Ignore())
-                .ForMember(x => x.CreateDate, exp => exp.Ignore())
-                .ForMember(x => x.UpdateDate, exp => exp.Ignore())
+                .IgnoreDeletableEntityCommonProperties()
+                .ForMember(x => x.Path, exp => exp.Ignore())                
                 .ForMember(x => x.VirtualPath, exp => exp.Ignore())
                 .ForMember(x => x.Path, exp => exp.Ignore())
                 .ForMember(x => x.MasterTemplateId, exp => exp.Ignore()) // ok, assigned when creating the template

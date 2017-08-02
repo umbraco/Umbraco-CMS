@@ -621,6 +621,34 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public Stream GetMacroScriptFileContentStream(string filepath)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateMacroScriptRepository(uow);
+                return repository.GetFileContentStream(filepath);
+            }
+        }
+
+        public void SetMacroScriptFileContent(string filepath, Stream content)
+        {
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var repository = RepositoryFactory.CreateMacroScriptRepository(uow);
+                repository.SetFileContent(filepath, content);
+                uow.Commit();
+            }
+        }
+
+        public long GetMacroScriptFileSize(string filepath)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateMacroScriptRepository(uow);
+                return repository.GetFileSize(filepath);
+            }
+        }
+
         #endregion
 
         public Stream GetStylesheetFileContentStream(string filepath)
@@ -675,6 +703,34 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateScriptRepository(uow);
+                return repository.GetFileSize(filepath);
+            }
+        }
+
+        public Stream GetUserControlFileContentStream(string filepath)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateUserControlRepository(uow);
+                return repository.GetFileContentStream(filepath);
+            }
+        }
+
+        public void SetUserControlFileContent(string filepath, Stream content)
+        {
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var repository = RepositoryFactory.CreateUserControlRepository(uow);
+                repository.SetFileContent(filepath, content);
+                uow.Commit();
+            }
+        }
+
+        public long GetUserControlFileSize(string filepath)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateUserControlRepository(uow);
                 return repository.GetFileSize(filepath);
             }
         }
@@ -779,6 +835,26 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreatePartialViewMacroRepository(uow);
+                return repository.Get(path);
+            }
+        }
+
+        [Obsolete("MacroScripts are obsolete - this is for backwards compatibility with upgraded sites.")]
+        public IPartialView GetMacroScript(string path)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateMacroScriptRepository(uow);
+                return repository.Get(path);
+            }
+        }
+
+        [Obsolete("UserControls are obsolete - this is for backwards compatibility with upgraded sites.")]
+        public IUserControl GetUserControl(string path)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateUserControlRepository(uow);
                 return repository.Get(path);
             }
         }

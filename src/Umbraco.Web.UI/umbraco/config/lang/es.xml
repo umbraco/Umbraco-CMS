@@ -32,10 +32,8 @@
     <key alias="sendtopublish">Enviar a Publicar</key>
     <key alias="sendToTranslate">Enviar a Traducir</key>
     <key alias="sort">Ordernar</key>
-    <key alias="toPublish">Enviar a publicación</key>
     <key alias="translate">Traducir</key>
     <key alias="update">Actualizar</key>
-    <key alias="defaultValue">Valor por defecto</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permiso denegado.</key>
@@ -809,8 +807,6 @@
     <key alias="postContent">Insertar después del campo</key>
     <key alias="preContent">Insertar antes del campo</key>
     <key alias="recursive">Recursivo</key>
-    <key alias="removeParagraph">Borrar los tags del párrafo</key>
-    <key alias="removeParagraphHelp">Borrará cualquier &amp;lt;P&amp;gt; al principio y al final del texto</key>
     <key alias="uppercase">Mayúscula</key>
     <key alias="urlEncode">Codificar URL</key>
     <key alias="urlEncodeHelp">Formateará los caracteres especiales de las URLs</key>
@@ -927,8 +923,6 @@
     <key alias="startnode">Nodo de comienzo en contenido</key>
     <key alias="username">Nombre de usuario</key>
     <key alias="userPermissions">Permisos de usuarios</key>
-    <key alias="usertype">Tipo de usuario</key>
-    <key alias="userTypes">Tipos de usuarios</key>
     <key alias="writer">Redactor</key>
     <key alias="yourProfile" version="7.0">Tu perfil</key>
     <key alias="yourHistory" version="7.0">Tu historial reciente</key>

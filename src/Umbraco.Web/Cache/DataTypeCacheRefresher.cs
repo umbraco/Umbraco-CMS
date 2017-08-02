@@ -3,6 +3,7 @@ using System.Web.Script.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using System.Linq;
+using Newtonsoft.Json;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -27,8 +28,7 @@ namespace Umbraco.Web.Cache
         /// <returns></returns>
         private static JsonPayload[] DeserializeFromJsonPayload(string json)
         {
-            var serializer = new JavaScriptSerializer();
-            var jsonObject = serializer.Deserialize<JsonPayload[]>(json);
+            var jsonObject = JsonConvert.DeserializeObject<JsonPayload[]>(json);
             return jsonObject;
         }
 
@@ -39,9 +39,8 @@ namespace Umbraco.Web.Cache
         /// <returns></returns>
         internal static string SerializeToJsonPayload(params IDataTypeDefinition[] dataTypes)
         {
-            var serializer = new JavaScriptSerializer();
             var items = dataTypes.Select(FromDataTypeDefinition).ToArray();
-            var json = serializer.Serialize(items);
+            var json = JsonConvert.SerializeObject(items);
             return json;
         }
 
@@ -115,7 +114,7 @@ namespace Umbraco.Web.Cache
             }
 
             TagsValueConverter.ClearCaches();
-            MultipleMediaPickerPropertyConverter.ClearCaches();
+            LegacyMediaPickerPropertyConverter.ClearCaches();
             SliderValueConverter.ClearCaches();
             MediaPickerPropertyConverter.ClearCaches();
 

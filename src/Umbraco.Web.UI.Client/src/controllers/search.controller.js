@@ -15,21 +15,21 @@ function SearchController($scope, searchService, $log, $location, navigationServ
     $scope.selectedResult = -1;
 
 
-    $scope.navigateResults = function(ev){
+    $scope.navigateResults = function (ev) {
         //38: up 40: down, 13: enter
 
-        switch(ev.keyCode){
+        switch (ev.keyCode) {
             case 38:
-                    iterateResults(true);
+                iterateResults(true);
                 break;
             case 40:
-                    iterateResults(false);
+                iterateResults(false);
                 break;
             case 13:
                 if ($scope.selectedItem) {
                     $location.path($scope.selectedItem.editorPath);
                     navigationService.hideSearch();
-                }                
+                }
                 break;
         }
     };
@@ -39,50 +39,50 @@ function SearchController($scope, searchService, $log, $location, navigationServ
     var groupIndex = -1;
     var itemIndex = -1;
     $scope.selectedItem = undefined;
-        
 
-    function iterateResults(up){
+
+    function iterateResults(up) {
         //default group
-        if(!group){
+        if (!group) {
             group = $scope.groups[0];
             groupIndex = 0;
         }
 
-        if(up){
-            if(itemIndex === 0){
-                if(groupIndex === 0){
-                    gotoGroup($scope.groups.length-1, true);
-                }else{
-                    gotoGroup(groupIndex-1, true);
+        if (up) {
+            if (itemIndex === 0) {
+                if (groupIndex === 0) {
+                    gotoGroup($scope.groups.length - 1, true);
+                } else {
+                    gotoGroup(groupIndex - 1, true);
                 }
-            }else{
-                gotoItem(itemIndex-1);
+            } else {
+                gotoItem(itemIndex - 1);
             }
-        }else{
-            if(itemIndex < group.results.length-1){
-                gotoItem(itemIndex+1);
-            }else{
-                if(groupIndex === $scope.groups.length-1){
+        } else {
+            if (itemIndex < group.results.length - 1) {
+                gotoItem(itemIndex + 1);
+            } else {
+                if (groupIndex === $scope.groups.length - 1) {
                     gotoGroup(0);
-                }else{
-                    gotoGroup(groupIndex+1);
+                } else {
+                    gotoGroup(groupIndex + 1);
                 }
             }
         }
     }
 
-    function gotoGroup(index, up){
+    function gotoGroup(index, up) {
         groupIndex = index;
         group = $scope.groups[groupIndex];
-        
-        if(up){
-            gotoItem(group.results.length-1);
-        }else{
-            gotoItem(0); 
+
+        if (up) {
+            gotoItem(group.results.length - 1);
+        } else {
+            gotoItem(0);
         }
     }
 
-    function gotoItem(index){
+    function gotoItem(index) {
         itemIndex = index;
         $scope.selectedItem = group.results[itemIndex];
     }
@@ -91,7 +91,7 @@ function SearchController($scope, searchService, $log, $location, navigationServ
     var canceler = null;
 
     $scope.$watch("searchTerm", _.debounce(function (newVal, oldVal) {
-        $scope.$apply(function() {
+        $scope.$apply(function () {
             if ($scope.searchTerm) {
                 if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
                     $scope.isSearching = true;
@@ -107,8 +107,16 @@ function SearchController($scope, searchService, $log, $location, navigationServ
                         canceler = $q.defer();
                     }
 
-                    searchService.searchAll({ term: $scope.searchTerm, canceler: canceler }).then(function(result) {
-                        $scope.groups = _.filter(result, function (group) { return group.results.length > 0; });
+                    searchService.searchAll({ term: $scope.searchTerm, canceler: canceler }).then(function (result) {
+
+                        //result is a dictionary of group Title and it's results
+                        var filtered = {};
+                        _.each(result, function (value, key) {
+                            if (value.results.length > 0) {
+                              filtered[key] = value;
+                            }
+                        });
+                        $scope.groups = filtered;
                         //set back to null so it can be re-created
                         canceler = null;
                     });

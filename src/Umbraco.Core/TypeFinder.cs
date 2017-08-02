@@ -7,6 +7,7 @@ using System.Security;
 using System.Text;
 using System.Web;
 using System.Web.Compilation;
+using System.Web.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -44,7 +45,7 @@ namespace Umbraco.Core
             HashSet<Assembly> assemblies = null;
             try
             {
-                var isHosted = HttpContext.Current != null;
+                var isHosted = HttpContext.Current != null || HostingEnvironment.IsHosted;
 
                 try
                 {

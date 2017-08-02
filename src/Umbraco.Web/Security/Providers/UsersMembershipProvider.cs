@@ -47,14 +47,23 @@ namespace Umbraco.Web.Security.Providers
             base.Initialize(name, config);
 
             // test for membertype (if not specified, choose the first member type available)
+            // We'll support both names for legacy reasons: defaultUserTypeAlias & defaultUserGroupAlias
+
             if (config["defaultUserTypeAlias"] != null)
             {
-                _defaultMemberTypeAlias = config["defaultUserTypeAlias"];
-                if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
+                if (config["defaultUserTypeAlias"].IsNullOrWhiteSpace() == false)
                 {
-                    throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
+                    _defaultMemberTypeAlias = config["defaultUserTypeAlias"];
+                    _hasDefaultMember = true;
                 }
-                _hasDefaultMember = true;
+            }
+            if (_hasDefaultMember == false && config["defaultUserGroupAlias"] != null)
+            {                
+                if (config["defaultUserGroupAlias"].IsNullOrWhiteSpace() == false)
+                {
+                    _defaultMemberTypeAlias = config["defaultUserGroupAlias"];
+                    _hasDefaultMember = true;
+                }
             }
         }
 
@@ -71,7 +80,7 @@ namespace Umbraco.Web.Security.Providers
                             _defaultMemberTypeAlias = MemberService.GetDefaultMemberType();
                             if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
                             {
-                                throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
+                                throw new ProviderException("No default user group alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
                             }
                             _hasDefaultMember = true;
                         }

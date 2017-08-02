@@ -197,7 +197,7 @@ module.exports = function (grunt) {
                 src: ['src/installer/**/*.js'],
                 dest: '<%= distdir %>/js/umbraco.installer.js',
                 options: {
-                    banner: "<%= banner %>\n(function() { \n\n angular.module('umbraco.install', []); \n",
+                    banner: "<%= banner %>\n(function() { \n\n",
                     footer: "\n\n})();"
                 }
             },
@@ -556,6 +556,10 @@ module.exports = function (grunt) {
                                 
                                 'src-min-noconflict/worker-javascript.js',
                             ]
+                        },
+                        'clipboard': {
+                            keepExpandedHierarchy: false,
+                            files: ['dist/clipboard.min.js']
                        }
                     }
                 }

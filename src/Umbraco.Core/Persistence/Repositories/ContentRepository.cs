@@ -21,28 +21,6 @@ using Umbraco.Core.Persistence.UnitOfWork;
 namespace Umbraco.Core.Persistence.Repositories
 {
     /// <summary>
-    /// Override the base content repository so we can change the node object type
-    /// </summary>
-    /// <remarks>
-    /// It would be nicer if we could separate most of this down into a smaller version of the ContentRepository class, however to do that 
-    /// requires quite a lot of work since we'd need to re-organize the interhitance quite a lot or create a helper class to perform a lot of the underlying logic.
-    /// 
-    /// TODO: Create a helper method to conain most of the underlying logic for the ContentRepository
-    /// </remarks>
-    internal class ContentBlueprintRepository : ContentRepository
-    {
-        public ContentBlueprintRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider syntaxProvider, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection contentSection) : base(work, cacheHelper, logger, syntaxProvider, contentTypeRepository, templateRepository, tagRepository, contentSection)
-        {
-        }
-
-        protected override Guid NodeObjectTypeId
-        {
-            get { return Constants.ObjectTypes.DocumentBlueprintGuid; }
-        }
-        
-    }
-
-    /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IContent"/>
     /// </summary>
     internal class ContentRepository : RecycleBinRepository<int, IContent>, IContentRepository
@@ -50,9 +28,9 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
         private readonly ITagRepository _tagRepository;
-        private readonly CacheHelper _cacheHelper;
         private readonly ContentPreviewRepository<IContent> _contentPreviewRepository;
         private readonly ContentXmlRepository<IContent> _contentXmlRepository;
+        private readonly PermissionRepository<IContent> _permissionRepository;
 
         public ContentRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider syntaxProvider, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection contentSection)
             : base(work, cacheHelper, logger, syntaxProvider, contentSection)
@@ -63,10 +41,10 @@ namespace Umbraco.Core.Persistence.Repositories
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
             _tagRepository = tagRepository;
-            _cacheHelper = cacheHelper;
             _contentPreviewRepository = new ContentPreviewRepository<IContent>(work, CacheHelper.NoCache, logger, syntaxProvider);
             _contentXmlRepository = new ContentXmlRepository<IContent>(work, CacheHelper.NoCache, logger, syntaxProvider);
-
+            _permissionRepository = new PermissionRepository<IContent>(UnitOfWork, cacheHelper, Logger, SqlSyntax);
+            
             EnsureUniqueNaming = true;
         }
 
@@ -204,7 +182,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM umbracoRedirectUrl WHERE contentKey IN (SELECT uniqueID FROM umbracoNode WHERE id = @Id)",
                                "DELETE FROM cmsTask WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
-                               "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @Id",
                                "DELETE FROM umbracoRelation WHERE parentId = @Id",
                                "DELETE FROM umbracoRelation WHERE childId = @Id",
                                "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
@@ -468,26 +446,7 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.Id = nodeDto.NodeId; //Set Id on entity to ensure an Id is set
             entity.Path = nodeDto.Path;
             entity.SortOrder = sortOrder;
-            entity.Level = level;
-
-            //Assign the same permissions to it as the parent node
-            // http://issues.umbraco.org/issue/U4-2161
-            var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            var parentPermissions = permissionsRepo.GetPermissionsForEntity(entity.ParentId).ToArray();
-            //if there are parent permissions then assign them, otherwise leave null and permissions will become the
-            // user's default permissions.
-            if (parentPermissions.Any())
-            {
-                var userPermissions = (
-                    from perm in parentPermissions
-                    from p in perm.AssignedPermissions
-                    select new EntityPermissionSet.UserPermission(perm.UserId, p)).ToList();
-
-                permissionsRepo.ReplaceEntityPermissions(new EntityPermissionSet(entity.Id, userPermissions));
-                //flag the entity's permissions changed flag so we can track those changes.
-                //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
-                ((Content)entity).PermissionsChanged = true;
-            }
+            entity.Level = level;            
 
             //Create the Content specific data - cmsContent
             var contentDto = dto.ContentVersionDto.ContentDto;
@@ -863,8 +822,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
         public void ReplaceContentPermissions(EntityPermissionSet permissionSet)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            repo.ReplaceEntityPermissions(permissionSet);
+            _permissionRepository.ReplaceEntityPermissions(permissionSet);
         }
 
         public void ClearPublished(IContent content)
@@ -874,22 +832,25 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
         }
 
         /// <summary>
-        /// Assigns a single permission to the current content item for the specified user ids
+        /// Assigns a single permission to the current content item for the specified user group ids
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="permission"></param>
-        /// <param name="userIds"></param>
-        public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> userIds)
-        {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            repo.AssignEntityPermission(entity, permission, userIds);
+        /// <param name="groupIds"></param>        
+        public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> groupIds)
+        {            
+            _permissionRepository.AssignEntityPermission(entity, permission, groupIds);
         }
 
-        public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
+        /// <summary>
+        /// Gets the explicit list of permissions for the content item
+        /// </summary>
+        /// <param name="entityId"></param>
+        /// <returns></returns>
+        public EntityPermissionCollection GetPermissionsForEntity(int entityId)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            return repo.GetPermissionsForEntity(entityId);
-        }
+            return _permissionRepository.GetPermissionsForEntity(entityId);
+        }        
 
         /// <summary>
         /// Adds/updates content/published xml
@@ -899,6 +860,15 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
         public void AddOrUpdateContentXml(IContent content, Func<IContent, XElement> xml)
         {
             _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IContent>(content, xml));
+        }
+
+        /// <summary>
+        /// Used to add/update a permission for a content item
+        /// </summary>
+        /// <param name="permission"></param>
+        public void AddOrUpdatePermissions(ContentPermissionSet permission)
+        {
+            _permissionRepository.AddOrUpdate(permission);
         }
 
         /// <summary>
@@ -942,9 +912,9 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             var filterSql = new Sql().Append("AND (cmsDocument.newest = 1)");
             if (filter != null)
             {
-                foreach (var filterClaus in filter.GetWhereClauses())
+                foreach (var filterClause in filter.GetWhereClauses())
                 {
-                    filterSql.Append(string.Format("AND ({0})", filterClaus.Item1), filterClaus.Item2);
+                    filterSql.Append(string.Format("AND ({0})", filterClause.Item1), filterClause.Item2);
                 }
             }
 

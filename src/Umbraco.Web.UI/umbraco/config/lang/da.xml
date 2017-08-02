@@ -31,17 +31,13 @@
     <key alias="republish">Genudgiv hele sitet</key>
     <key alias="restore" version="7.3.0">Gendan</key>
     <key alias="SetPermissionsForThePage">Sæt rettigheder for siden %0%</key>
-     <key alias="chooseWhereToMove">Hvor vil du flytte</key>
-    <key alias="toInTheTreeStructureBelow">hen til i træstrukturen?</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
     <key alias="sendtopublish">Send til udgivelse</key>
     <key alias="sendToTranslate">Send til oversættelse</key>
     <key alias="sort">Sortér</key>
-    <key alias="toPublish">Send til udgivelse</key>
     <key alias="translate">Oversæt</key>
     <key alias="update">Opdatér</key>
-    <key alias="defaultValue">Standard værdi</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Tilladelse nægtet.</key>
@@ -1145,8 +1141,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="postContent">Indsæt efter felt</key>
     <key alias="preContent">Indsæt før felt</key>
     <key alias="recursive">Rekursivt</key>
-    <key alias="removeParagraph">Fjern paragraf-tags</key>
-    <key alias="removeParagraphHelp">Fjerner eventuelle &amp;lt;P&amp;gt; omkring teksten</key>
     <key alias="standardFields">Standard felter</key>
     <key alias="uppercase">Uppercase</key>
     <key alias="urlEncode">URL encode</key>
@@ -1202,9 +1196,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="memberTypes">Medlemstype</key>
     <key alias="documentTypes">Dokumenttyper</key>
     <key alias="relationTypes">Relationstyper</key>
-
     <key alias="packager">Pakker</key>
     <key alias="packages">Pakker</key>
+    <key alias="partialViews">Partial Views</key>
+    <key alias="partialViewMacros">Partial View Makro Filer</key>
     <key alias="python">Python</key>
     <key alias="repositories">Installer fra "repository"</key>
     <key alias="runway">Installer Runway</key>
@@ -1258,8 +1253,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="startnode">Start node</key>
     <key alias="username">Navn</key>
     <key alias="userPermissions">Brugertilladelser</key>
-    <key alias="usertype">Brugertype</key>
-    <key alias="userTypes">Brugertyper</key>
     <key alias="writer">Forfatter</key>
     <key alias="translator">Oversætter</key>
     <key alias="change">Skift</key>
@@ -1291,5 +1284,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="disableError">Der opstod en fejl under forsøget på at slå URL trackeren fra, der findes mere information i logfilen.</key>
     <key alias="enabledConfirm">URL tracker er nu slået fra.</key>
     <key alias="enableError">Der opstod en fejl under forsøget på at slå URL trackeren til, der findes mere information i logfilen.</key>
+  </area>
+  <area alias="textbox">
+    <key alias="characters_left">Karakterer tilbage</key>
   </area>
 </language>

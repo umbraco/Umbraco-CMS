@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
 using Umbraco.Core.Cache;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Events;
@@ -361,6 +364,46 @@ namespace Umbraco.Core.Services
                 return contents;
             }
         }
+        /// <summary>
+        /// Returns a paged collection of descendants.
+        /// </summary>
+        public IEnumerable<IUmbracoEntity> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "")
+        {
+            totalRecords = 0;
+
+            var idsA = ids.ToArray();
+            if (idsA.Length == 0)
+                return Enumerable.Empty<IUmbracoEntity>();
+
+            var objectTypeId = umbracoObjectType.GetGuid();
+
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+
+                var query = Query<IUmbracoEntity>.Builder;
+                if (idsA.All(x => x != Constants.System.Root))
+                {
+                    var clauses = new List<Expression<Func<IUmbracoEntity, bool>>>();
+                    foreach (var id in idsA)
+                    {
+                        var qid = id;
+                        clauses.Add(x => x.Path.SqlContains(string.Format(",{0},", qid), TextColumnType.NVarchar) || x.Path.SqlEndsWith(string.Format(",{0}", qid), TextColumnType.NVarchar));
+                    }
+                    query.WhereAny(clauses);
+                }
+
+                IQuery<IUmbracoEntity> filterQuery = null;
+                if (filter.IsNullOrWhiteSpace() == false)
+                {
+                    filterQuery = Query<IUmbracoEntity>.Builder.Where(x => x.Name.Contains(filter));
+                }
+
+                var contents = repository.GetPagedResultsByQuery(query, objectTypeId, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filterQuery);
+                return contents;
+            }
+        }
 
         /// <summary>
         /// Returns a paged collection of descendants from the root
@@ -520,6 +563,42 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateEntityRepository(uow);
                 var ret = repository.GetAll(objectTypeId, keys);
                 return ret;
+            }
+        }
+
+        public virtual IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params int[] ids)
+        {
+            var entityType = GetEntityType(umbracoObjectType);
+            var typeFullName = entityType.FullName;
+            Mandate.That<NotSupportedException>(_supportedObjectTypes.ContainsKey(typeFullName), () =>
+            {
+                throw new NotSupportedException
+                    ("The passed in type is not supported");
+            });
+
+            var objectTypeId = umbracoObjectType.GetGuid();
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+                return repository.GetAllPaths(objectTypeId, ids);
+            }
+        }
+
+        public virtual IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params Guid[] keys)
+        {
+            var entityType = GetEntityType(umbracoObjectType);
+            var typeFullName = entityType.FullName;
+            Mandate.That<NotSupportedException>(_supportedObjectTypes.ContainsKey(typeFullName), () =>
+            {
+                throw new NotSupportedException
+                    ("The passed in type is not supported");
+            });
+
+            var objectTypeId = umbracoObjectType.GetGuid();
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+                return repository.GetAllPaths(objectTypeId, keys);
             }
         }
 

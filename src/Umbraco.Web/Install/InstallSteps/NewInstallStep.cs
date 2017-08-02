@@ -32,6 +32,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _applicationContext = applicationContext;
         }
 
+        //TODO: Change all logic in this step to use ASP.NET Identity NOT MembershipProviders
         private MembershipProvider CurrentProvider
         {
             get

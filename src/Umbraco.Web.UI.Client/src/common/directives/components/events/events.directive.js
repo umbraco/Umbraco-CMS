@@ -155,7 +155,6 @@ angular.module('umbraco.directives')
                 var els = ["INPUT","A","BUTTON"];
                 if(els.indexOf(el) >= 0){return;}
 
-                // ignore children of links and buttons
                 // ignore clicks on new overlay
                 var parents = $(event.target).parents("a,button,.umb-overlay");
                 if(parents.length > 0){

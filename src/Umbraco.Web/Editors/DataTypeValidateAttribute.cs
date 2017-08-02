@@ -24,7 +24,7 @@ namespace Umbraco.Web.Editors
         private readonly IDataTypeService _dataTypeService;
 
         public DataTypeValidateAttribute()
-        {            
+        {
         }
 
         public DataTypeValidateAttribute(IDataTypeService dataTypeService)
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Editors
             var dataType = (DataTypeSave)actionContext.ActionArguments["dataType"];
 
             dataType.Name = dataType.Name.CleanForXss('[', ']', '(', ')', ':');
-            dataType.Alias = dataType.Name.CleanForXss('[', ']', '(', ')', ':');
+            dataType.Alias = dataType.Alias == null ? dataType.Name : dataType.Alias.CleanForXss('[', ']', '(', ')', ':');
 
             //Validate that the property editor exists
             var propertyEditor = PropertyEditorResolver.Current.GetByAlias(dataType.SelectedEditor);
@@ -89,7 +89,7 @@ namespace Umbraco.Web.Editors
             foreach (var preVal in dataType.PreValues)
             {
                 var postedValue = preVal.Value;
-                
+
                 foreach (var v in propertyEditor.PreValueEditor.Fields.Where(x => x.Key == preVal.Key).SelectMany(x => x.Validators))
                 {
                     foreach (var result in v.Validate(postedValue, null, propertyEditor))

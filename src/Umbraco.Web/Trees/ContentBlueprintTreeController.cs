@@ -32,6 +32,16 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class ContentBlueprintTreeController : TreeController
     {
+
+        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        {
+            var root = base.CreateRootNode(queryStrings);
+
+            //this will load in a custom UI instead of the dashboard for the root node
+            root.RoutePath = string.Format("{0}/{1}/{2}", Constants.Applications.Settings, Constants.Trees.ContentBlueprints, "intro");
+
+            return root;
+        }
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
@@ -45,9 +55,12 @@ namespace Umbraco.Web.Trees
                 //get all blueprint content types
                 var contentTypeAliases = entities.Select(x => ((UmbracoEntity) x).ContentTypeAlias).Distinct();
                 //get the ids
-                var contentTypeIds = Services.ContentTypeService.GetAllContentTypeIds(contentTypeAliases.ToArray());
+                var contentTypeIds = Services.ContentTypeService.GetAllContentTypeIds(contentTypeAliases.ToArray()).ToArray();
+
                 //now get the entities ... it's a bit round about but still smaller queries than getting all document types
-                var docTypeEntities = Services.EntityService.GetAll(UmbracoObjectTypes.DocumentType, contentTypeIds.ToArray()).ToArray();
+                var docTypeEntities = contentTypeIds.Length == 0 
+                    ? new IUmbracoEntity[0]
+                    : Services.EntityService.GetAll(UmbracoObjectTypes.DocumentType, contentTypeIds).ToArray();
 
                 nodes.AddRange(docTypeEntities
                     .Select(entity =>

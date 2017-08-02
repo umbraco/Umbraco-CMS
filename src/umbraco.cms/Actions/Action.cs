@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Web;
 using System.Reflection;
 using Umbraco.Core;
@@ -150,7 +151,7 @@ namespace umbraco.BusinessLogic.Actions
         /// <returns></returns>
         public static string ToString(List<IAction> actions)
         {
-            string[] strMenu = Array.ConvertAll<IAction, string>(actions.ToArray(), delegate(IAction a) { return (a.Letter.ToString()); });
+            string[] strMenu = Array.ConvertAll<IAction, string>(actions.ToArray(), delegate(IAction a) { return (a.Letter.ToString(CultureInfo.InvariantCulture)); });
             return string.Join("", strMenu);
         }
 

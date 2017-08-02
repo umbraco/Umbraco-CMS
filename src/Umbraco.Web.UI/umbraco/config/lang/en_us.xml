@@ -12,9 +12,11 @@
     <key alias="copy">Copy</key>
     <key alias="create">Create</key>
     <key alias="createPackage">Create Package</key>
+    <key alias="createGroup">Create group</key>
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
     <key alias="emptyTrashcan">Empty recycle bin</key>
+    <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
     <key alias="importDocumentType">Import Document Type</key>
     <key alias="importPackage">Import Package</key>
@@ -29,17 +31,42 @@
     <key alias="republish">Republish entire site</key>
     <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
     <key alias="chooseWhereToMove">Choose where to move</key>
-    <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
+    <key alias="toInTheTreeStructureBelow">In the tree structure below</key>
     <key alias="restore" version="7.3.0">Restore</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
     <key alias="sendToTranslate">Send To Translation</key>
+    <key alias="setGroup">Set group</key>
     <key alias="sort">Sort</key>
-    <key alias="toPublish">Send to publication</key>
     <key alias="translate">Translate</key>
     <key alias="update">Update</key>
-    <key alias="defaultValue">Default value</key>
+  </area>
+  <area alias="actionCategories">
+    <key alias="content">Content</key>
+    <key alias="administration">Administration</key>
+    <key alias="structure">Structure</key>
+    <key alias="other">Other</key>
+  </area>
+  <area alias="actionDescriptions">
+    <key alias="assignDomain">Allow access to assign culture and hostnames</key>
+    <key alias="auditTrail">Allow access to view a node's history log</key>
+    <key alias="browse">Allow access to view a node</key>
+    <key alias="changeDocType">Allow access to change document type for a node</key>
+    <key alias="copy">Allow access to copy a node</key>
+    <key alias="create">Allow access to create nodes</key>
+    <key alias="delete">Allow access to delete nodes</key>
+    <key alias="move">Allow access to move a node</key>
+    <key alias="protect">Allow access to set and change public access for a node</key>
+    <key alias="publish">Allow access to publish a node</key>
+    <key alias="rights">Allow access to change permissions for a node</key>
+    <key alias="rollback">Allow access to roll back a node to a previous state</key>
+    <key alias="sendtopublish">Allow access to send a node for approval before publishing</key>
+    <key alias="sendToTranslate">Allow access to send a node for translation</key>
+    <key alias="sort">Allow access to change the sort order for nodes</key>
+    <key alias="translate">Allow access to translate a node</key>
+    <key alias="update">Allow access to save a node</key>
+    <key alias="createblueprint">Allow access to create a content template</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permission denied.</key>
@@ -178,6 +205,7 @@
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">What does this mean?</a>]]></key>
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
+    <key alias="contentRoot">Content root</key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
@@ -187,6 +215,7 @@
     <key alias="onlyAllowedFiles">Only allowed file types are</key>
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
     <key alias="maxFileSize">Max file size is</key>
+    <key alias="mediaRoot">Media root</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -307,14 +336,19 @@
     <key alias="openInNewWindow">Opens the linked document in a new window or tab</key>
     <key alias="linkToMedia">Link to media</key>
     <key alias="linkToFile">Link to file</key>
+    <key alias="selectContentStartNode">Select content start node</key>
     <key alias="selectMedia">Select media</key>
     <key alias="selectIcon">Select icon</key>
     <key alias="selectItem">Select item</key>
     <key alias="selectLink">Select link</key>
     <key alias="selectMacro">Select macro</key>
     <key alias="selectContent">Select content</key>
+    <key alias="selectMediaStartNode">Select media start node</key>
     <key alias="selectMember">Select member</key>
     <key alias="selectMemberGroup">Select member group</key>
+    <key alias="selectNode">Select node</key>
+    <key alias="selectSections">Select sections</key>
+    <key alias="selectUsers">Select users</key>
     <key alias="noMacroParams">There are no parameters for this macro</key>
     <key alias="noMacros">There are no macros available to insert</key>
     <key alias="externalLoginProviders">External login providers</key>
@@ -345,12 +379,14 @@
     <key alias="confirmPassword">Confirm your password</key>
     <key alias="nameentity">Name the %0%...</key>
     <key alias="entername">Enter a name...</key>
+    <key alias="enteremail">Enter an email...</key>
     <key alias="label">Label...</key>
     <key alias="enterDescription">Enter a description...</key>
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
     <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
-    <key alias="email">Enter your email</key>
+    <key alias="email">Enter your email...</key>
+    <key alias="enterMessage">Enter a message...</key>
   </area>
 
   <area alias="editcontenttype">
@@ -471,8 +507,10 @@
     <key alias="error">Error</key>
     <key alias="findDocument">Find</key>
     <key alias="first">First</key>
+    <key alias="groups">Groups</key>
     <key alias="height">Height</key>
     <key alias="help">Help</key>
+    <key alias="hide">Hide</key>
     <key alias="icon">Icon</key>
     <key alias="import">Import</key>
     <key alias="innerMargin">Inner margin</key>
@@ -491,6 +529,7 @@
     <key alias="logout">Logout</key>
     <key alias="macro">Macro</key>
     <key alias="mandatory">Mandatory</key>
+    <key alias="message">Message</key>
     <key alias="move">Move</key>
     <key alias="more">More</key>
     <key alias="name">Name</key>
@@ -498,9 +537,12 @@
     <key alias="next">Next</key>
     <key alias="no">No</key>
     <key alias="of">of</key>
+    <key alias="off">Off</key>
     <key alias="ok">OK</key>
     <key alias="open">Open</key>
+    <key alias="on">On</key>
     <key alias="or">or</key>
+    <key alias="orderBy">Order by</key>
     <key alias="password">Password</key>
     <key alias="path">Path</key>
     <key alias="placeHolderID">Placeholder ID</key>
@@ -515,6 +557,7 @@
     <key alias="rename">Rename</key>
     <key alias="renew">Renew</key>
     <key alias="required" version="7.0">Required</key>
+    <key alias="retrieve">Retrieve</key>
     <key alias="retry">Retry</key>
     <key alias="rights">Permissions</key>
     <key alias="search">Search</key>
@@ -524,6 +567,7 @@
     <key alias="showPageOnSend">Show page on Send</key>
     <key alias="size">Size</key>
     <key alias="sort">Sort</key>
+    <key alias="status">Status</key>
     <key alias="submit">Submit</key>
     <key alias="type">Type</key>
     <key alias="typeToSearch">Type to search...</key>
@@ -744,7 +788,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="resetCodeExpired">The link you have clicked on is invalid or has expired</key>
     <key alias="resetPasswordEmailCopySubject">Umbraco: Reset Password</key>
     <key alias="resetPasswordEmailCopyFormat">
-      <![CDATA[<p>Your username to login to the Umbraco back-office is: <strong>%0%</strong></p><p>Click <a href="%1%"><strong>here</strong></a> to reset your password or copy/paste this URL into your browser:</p><p><em>%1%</em></p>]]>
+      <![CDATA[<html><body><p>Your username to login to the Umbraco back-office is: <strong>%0%</strong></p><p>Click <a href="%1%"><strong>here</strong></a> to reset your password or copy/paste this URL into your browser:</p><p><em>%1%</em></p></body></html>]]>
     </key>
   </area>
   <area alias="main">
@@ -1058,6 +1102,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="editUserError">Error saving user (check log)</key>
     <key alias="editUserSaved">User Saved</key>
     <key alias="editUserTypeSaved">User type saved</key>
+    <key alias="editUserGroupSaved">User group saved</key>
     <key alias="fileErrorHeader">File not saved</key>
     <key alias="fileErrorText">file could not be saved. Please check file permissions</key>
     <key alias="fileSavedHeader">File saved</key>
@@ -1088,6 +1133,17 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="scriptErrorHeader">Script view not saved</key>
     <key alias="scriptErrorText">An error occurred saving the file.</key>
     <key alias="cssErrorText">An error occurred saving the file.</key>
+    <key alias="enableUsersSuccess">Enabled %0% users</key>
+    <key alias="enableUsersError">An error occurred while enabling the users</key>
+    <key alias="disableUsersSuccess">Disabled %0% users</key>
+    <key alias="disableUsersError">An error occurred while disabling the users</key>
+    <key alias="enableUserSuccess">%0% is now enabled</key>
+    <key alias="enableUserError">An error occurred while enabling the user</key>
+    <key alias="disableUserSuccess">%0% is now disabled</key>
+    <key alias="disableUserError">An error occurred while disabling the user</key>
+    <key alias="setUserGroupOnUsersSuccess">User groups have been set</key>
+    <key alias="deleteUserGroupsSuccess">Deleted %0% user groups</key>
+    <key alias="deleteUserGroupSuccess">%0% was deleted</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>
@@ -1343,9 +1399,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="preContent">Insert before field</key>
     <key alias="recursive">Recursive</key>
     <key alias="recursiveDescr">Yes, make it recursive</key>
-    <key alias="removeParagraph">Remove paragraph tags</key>
-    <key alias="removeParagraphDescription">Yes, remove paragraph tags</key>
-    <key alias="removeParagraphHelp">Will remove any paragraph tag in the beginning and end of the text</key>
     <key alias="separator">Separator</key>
     <key alias="standardFields">Standard Fields</key>
     <key alias="uppercase">Uppercase</key>
@@ -1405,7 +1458,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="uploadTranslationXml">Upload translation XML</key>
   </area>
   <area alias="treeHeaders">
+    <key alias="content">Content</key>
     <key alias="contentBlueprints">Content Blueprints</key>
+    <key alias="media">Media</key>
     <key alias="cacheBrowser">Cache Browser</key>
     <key alias="contentRecycleBin">Recycle Bin</key>
     <key alias="createdPackages">Created packages</key>
@@ -1436,6 +1491,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="templates">Templates</key>
     <key alias="xslt">XSLT Files</key>
     <key alias="analytics">Analytics</key>
+    <key alias="users">Users</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">New update ready</key>
@@ -1444,23 +1500,36 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="updateNoServerError">Error checking for update. Please review trace-stack for further information</key>
   </area>
   <area alias="user">
+    <key alias="access">Access</key>
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Category field</key>
     <key alias="changePassword">Change Your Password</key>
+    <key alias="changePhoto">Change photo</key>
     <key alias="newPassword">New password</key>
     <key alias="confirmNewPassword">Confirm new password</key>
     <key alias="changePasswordDescription">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
     <key alias="contentChannel">Content Channel</key>
+    <key alias="createAnotherUser">Create another user</key>
+    <key alias="createUserHelp">Create new users to give them access to Umbraco. When a new user is created a password will be generated that you can share with the user.</key>
     <key alias="descriptionField">Description field</key>
     <key alias="disabled">Disable User</key>
     <key alias="documentType">Document Type</key>
     <key alias="editors">Editor</key>
     <key alias="excerptField">Excerpt field</key>
+    <key alias="goToProfile">Go to user profile</key>
+    <key alias="groupsHelp">Add groups to assign access and permissions</key>
+    <key alias="inviteUserHelp">Invite new users to give them access to Umbraco. An invite email will be sent to the user with information on how to log in to Umbraco.</key>
     <key alias="language">Language</key>
+    <key alias="languageHelp">Set the language you will see in menus and dialogs</key>
+    <key alias="lastLogin">Last login</key>
     <key alias="loginname">Login</key>
-    <key alias="mediastartnode">Start Node in Media Library</key>
+    <key alias="mediastartnode">Media start node</key>
+    <key alias="mediastartnodehelp">Limit the media library to a specific start node</key>
+    <key alias="mediastartnodes">Media start nodes</key>
+    <key alias="mediastartnodeshelp">Limit the media library to specific start nodes</key>
     <key alias="modules">Sections</key>
     <key alias="noConsole">Disable Umbraco Access</key>
+    <key alias="noLogin">has not logged in yet</key>
     <key alias="oldPassword">Old password</key>
     <key alias="password">Password</key>
     <key alias="resetPassword">Reset password</key>
@@ -1475,18 +1544,40 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="permissionReplaceChildren">Replace child node permissions</key>
     <key alias="permissionSelectedPages">You are currently modifying permissions for the pages:</key>
     <key alias="permissionSelectPages">Select pages to modify their permissions</key>
+    <key alias="removePhoto">Remove photo</key>
+    <key alias="permissionsDefault">Default permissions</key>
+    <key alias="permissionsGranular">Granular permissions</key>
+    <key alias="permissionsGranularHelp">Set permissions for specific nodes</key>
+    <key alias="profile">Profile</key>
     <key alias="searchAllChildren">Search all children</key>
-    <key alias="startnode">Start Node in Content</key>
+    <key alias="sectionsHelp">Add sections to give users access</key>
+    <key alias="noStartNode">No start node selected</key>
+    <key alias="noStartNodes">No start nodes selected</key>
+    <key alias="startnode">Content start node</key>
+    <key alias="startnodehelp">Limit the content tree to a specific start node</key>
+    <key alias="startnodes">Content start nodes</key>
+    <key alias="startnodeshelp">Limit the content tree to specific start nodes</key>
+    <key alias="userCreated">has been created</key>
+    <key alias="userCreatedSuccessHelp">The new user has successfully been created. To log in to Umbraco use the password below.</key>
     <key alias="username">Name</key>
     <key alias="userPermissions">User permissions</key>
-    <key alias="usertype">User type</key>
-    <key alias="userTypes">User types</key>
+    <key alias="userGroupPermissions">User group permissions</key>
+    <key alias="usergroup">User group</key>
+    <key alias="userGroups">User groups</key>
     <key alias="writer">Writer</key>
     <key alias="translator">Translator</key>
     <key alias="change">Change</key>
     <key alias="yourProfile" version="7.0">Your profile</key>
     <key alias="yourHistory" version="7.0">Your recent history</key>
     <key alias="sessionExpires" version="7.0">Session expires in</key>
+    <key alias="inviteUser">Invite user</key>
+    <key alias="createUser">Create user</key>
+    <key alias="sendInvite">Send invite</key>
+    <key alias="backToUsers">Back to users</key>
+    <key alias="inviteEmailCopySubject">Umbraco: Invitation</key>
+    <key alias="inviteEmailCopyFormat">
+      <![CDATA[<html><body><p>Hi %0%, you have been invited by %1% to the Umbraco Back Office.</p><p>Message from %1%: <em>%2%</em></p><p>Click this <a href="%3%" target="_blank">link</a> to accept the invite</p><p><small>If you cannot click on the link, copy and paste this URL into your browser window<br/><br/>%3%</small></p></body></html>]]>
+    </key>
   </area>
   <area alias="validation">
     <key alias="validation">Validation</key>
@@ -1546,8 +1637,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
     <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid: %2%</key>
 
-    <key alias="httpsCheckValidCertificate">Your site certificate was marked as valid.</key>
+    <key alias="httpsCheckValidCertificate">Your website's certificate is valid.</key>
     <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
+    <key alias="httpsCheckExpiredCertificate">Your website's SSL certificate has expired.</key>
+    <key alias="httpsCheckExpiringCertificate">Your website's SSL certificate is expiring in %0% days.</key>   
     <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'umbracoUseSSL' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
@@ -1626,5 +1719,8 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="emptyStates">
     <key alias="emptyDictionaryTree">No Dictionary items to choose from</key>
+  </area>
+  <area alias="textbox">
+    <key alias="characters_left">characters left</key>
   </area>
 </language>

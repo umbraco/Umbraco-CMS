@@ -68,7 +68,7 @@ namespace Umbraco.Web.Trees
         /// <summary>
         /// Returns the user's start node for this tree
         /// </summary>
-        protected abstract int UserStartNode { get; }
+        protected abstract int[] UserStartNodes { get; }
 
         /// <summary>
         /// Gets the tree nodes for the given id
@@ -105,7 +105,7 @@ namespace Umbraco.Web.Trees
                 // Therefore, in the latter case, we want to change the id to -1 since we want to render the current user's root node
                 // and the GetChildEntities method will take care of rendering the correct root node.
                 // If it is in dialog mode, then we don't need to change anything and the children will just render as per normal.
-                if (IsDialog(queryStrings) == false && UserStartNode != Constants.System.Root)
+                if (IsDialog(queryStrings) == false && UserStartNodes.Contains(Constants.System.Root) == false)
                 {
                     id = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
                 }
@@ -128,7 +128,6 @@ namespace Umbraco.Web.Trees
             // look up from GUID if it's not an integer
             if (int.TryParse(id, out iid) == false)
             {
-
                 var idEntity = GetEntityFromId(id);
                 if (idEntity == null)
                 {
@@ -137,19 +136,13 @@ namespace Umbraco.Web.Trees
                 iid = idEntity.Id;
             }
 
-
-            //if a request is made for the root node data but the user's start node is not the default, then
-            // we need to return their start node data
-            if (iid == Constants.System.Root && UserStartNode != Constants.System.Root)
+            // if a request is made for the root node but user has no access to
+            // root node, return start nodes instead
+            if (iid == Constants.System.Root && UserStartNodes.Contains(Constants.System.Root) == false)
             {
-                //just return their single start node, it will show up under the 'Content' label
-                var startNode = Services.EntityService.Get(UserStartNode, UmbracoObjectType);
-                if (startNode != null)
-                    return new[] { startNode };
-                else
-                {
-                    throw new EntityNotFoundException(UserStartNode, "User's start content node could not be found");
-                }
+                return UserStartNodes.Length > 0
+                    ? Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes)
+                    : Enumerable.Empty<IUmbracoEntity>();
             }
 
             return Services.EntityService.GetChildren(iid, UmbracoObjectType).ToArray();
@@ -175,7 +168,7 @@ namespace Umbraco.Web.Trees
         protected sealed override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             //check if we're rendering the root
-            if (id == Constants.System.Root.ToInvariantString() && UserStartNode == Constants.System.Root)
+            if (id == Constants.System.Root.ToInvariantString() && UserStartNodes.Contains(Constants.System.Root))
             {
                 var altStartId = string.Empty;
 

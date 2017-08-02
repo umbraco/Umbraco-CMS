@@ -40,6 +40,25 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     return {
 
+
+      savePermissions: function (saveModel) {
+        if (!saveModel) {
+          throw "saveModel cannot be null";
+        }
+        if (!saveModel.contentId) {
+          throw "saveModel.contentId cannot be null";
+        }
+        if (!saveModel.permissions) {
+          throw "saveModel.permissions cannot be null";
+        }
+
+        return umbRequestHelper.resourcePromise(
+          $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostSaveUserGroupPermissions"),
+            saveModel),
+          'Failed to save permissions');
+      },
+
+
         getRecycleBin: function () {
             return umbRequestHelper.resourcePromise(
                   $http.get(
@@ -552,6 +571,15 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                                "HasPermission",
                                [{ permissionToCheck: permission }, { nodeId: id }])),
                    'Failed to check permission for item ' + id);
+        },
+
+        getDetailedPermissions: function (contentId) {
+          return umbRequestHelper.resourcePromise(
+            $http.get(
+              umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "GetDetailedPermissions", { contentId: contentId })),
+            'Failed to retrieve permissions for content item ' + contentId);
         },
 
         getPermissions: function (nodeIds) {

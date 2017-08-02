@@ -9,6 +9,7 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
+using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -83,6 +84,120 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Updates the permissions for a content item for a particular user group
+        /// </summary>
+        /// <param name="saveModel"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Permission check is done for letter 'R' which is for <see cref="ActionRights"/> which the user must have access to to update
+        /// </remarks>
+        [EnsureUserPermissionForContent("saveModel.ContentId", 'R')]
+        public IEnumerable<AssignedUserGroupPermissions> PostSaveUserGroupPermissions(UserGroupPermissionsSave saveModel)
+        {
+            if (saveModel.ContentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            var content = Services.ContentService.GetById(saveModel.ContentId);
+            if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            
+            //current permissions explicitly assigned to this content item
+            var contentPermissions = Services.ContentService.GetPermissionsForEntity(content)
+                .ToDictionary(x => x.UserGroupId, x => x);
+
+            var allUserGroups = Services.UserService.GetAllUserGroups().ToArray();
+
+            //loop through each user group
+            foreach (var userGroup in allUserGroups)
+            {
+                //check if there's a permission set posted up for this user group
+                IEnumerable<string> groupPermissions;
+                if (saveModel.AssignedPermissions.TryGetValue(userGroup.Id, out groupPermissions))
+                {
+                    //create a string collection of the assigned letters
+                    var groupPermissionCodes = groupPermissions.ToArray();
+
+                    //check if there are no permissions assigned for this group save model, if that is the case we want to reset the permissions
+                    //for this group/node which will go back to the defaults
+                    if (groupPermissionCodes.Length == 0)
+                    {
+                        Services.UserService.RemoveUserGroupPermissions(userGroup.Id, content.Id);
+                    }
+                    //check if they are the defaults, if so we should just remove them if they exist since it's more overhead having them stored
+                    else if (userGroup.Permissions.UnsortedSequenceEqual(groupPermissionCodes))
+                    {
+                        //only remove them if they are actually currently assigned
+                        if (contentPermissions.ContainsKey(userGroup.Id))
+                        {
+                            //remove these permissions from this node for this group since the ones being assigned are the same as the defaults
+                            Services.UserService.RemoveUserGroupPermissions(userGroup.Id, content.Id);
+                        }
+                    }
+                    //if they are different we need to update, otherwise there's nothing to update
+                    else if (contentPermissions.ContainsKey(userGroup.Id) == false || contentPermissions[userGroup.Id].AssignedPermissions.UnsortedSequenceEqual(groupPermissionCodes) == false)
+                    {
+                        
+                        Services.UserService.ReplaceUserGroupPermissions(userGroup.Id, groupPermissionCodes.Select(x => x[0]), content.Id);
+                    }                    
+                }                
+            }
+
+            return GetDetailedPermissions(content, allUserGroups);
+        }
+
+        /// <summary>
+        /// Returns the user group permissions for user groups assigned to this node
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Permission check is done for letter 'R' which is for <see cref="ActionRights"/> which the user must have access to to view
+        /// </remarks>
+        [EnsureUserPermissionForContent("contentId", 'R')]
+        public IEnumerable<AssignedUserGroupPermissions> GetDetailedPermissions(int contentId)
+        {
+            if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            var content = Services.ContentService.GetById(contentId);
+            if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));            
+            
+            var allUserGroups = Services.UserService.GetAllUserGroups();
+
+            return GetDetailedPermissions(content, allUserGroups);
+        }
+
+        private IEnumerable<AssignedUserGroupPermissions> GetDetailedPermissions(IContent content, IEnumerable<IUserGroup> allUserGroups)
+        {
+            //get all user groups and map their default permissions to the AssignedUserGroupPermissions model.
+            //we do this because not all groups will have true assigned permissions for this node so if they don't have assigned permissions, we need to show the defaults.
+
+            var defaultPermissionsByGroup = Mapper.Map<IEnumerable<AssignedUserGroupPermissions>>(allUserGroups).ToArray();
+
+            var defaultPermissionsAsDictionary = defaultPermissionsByGroup
+                .ToDictionary(x => Convert.ToInt32(x.Id), x => x);
+
+            //get the actual assigned permissions
+            var assignedPermissionsByGroup = Services.ContentService.GetPermissionsForEntity(content).ToArray();
+
+            //iterate over assigned and update the defaults with the real values
+            foreach (var assignedGroupPermission in assignedPermissionsByGroup)
+            {
+                var defaultUserGroupPermissions = defaultPermissionsAsDictionary[assignedGroupPermission.UserGroupId];
+
+                //clone the default permissions model to the assigned ones
+                defaultUserGroupPermissions.AssignedPermissions = AssignedUserGroupPermissions.ClonePermissions(defaultUserGroupPermissions.DefaultPermissions);
+
+                //since there is custom permissions assigned to this node for this group, we need to clear all of the default permissions
+                //and we'll re-check it if it's one of the explicitly assigned ones
+                foreach (var permission in defaultUserGroupPermissions.AssignedPermissions.SelectMany(x => x.Value))
+                {
+                    permission.Checked = false;
+                    permission.Checked = assignedGroupPermission.AssignedPermissions.Contains(permission.PermissionCode, StringComparer.InvariantCulture);
+                }
+                
+            }
+            
+            return defaultPermissionsByGroup;
+        }
+
+        /// <summary>
         /// Returns an item to be used to display the recycle bin for content
         /// </summary>
         /// <returns></returns>
@@ -127,7 +242,7 @@ namespace Umbraco.Web.Editors
             //set a custom path since the tree that renders this has the content type id as the parent
             content.Path = string.Format("-1,{0},{1}", persistedContent.ContentTypeId, content.Id);
 
-            content.AllowedActions = new[] {'A'};
+            content.AllowedActions = new[] {"A"};
 
             var excludeProps = new[] {"_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template"};
             var propsTab = content.Tabs.Last();
@@ -303,6 +418,7 @@ namespace Umbraco.Web.Editors
 
         /// <summary>
         /// Returns permissions for all nodes passed in for the current user
+        /// TODO: This should be moved to the CurrentUserController?
         /// </summary>
         /// <param name="nodeIds"></param>
         /// <returns></returns>
@@ -314,11 +430,18 @@ namespace Umbraco.Web.Editors
                     .ToDictionary(x => x.EntityId, x => x.AssignedPermissions);
         }
 
+        /// <summary>
+        /// Checks a nodes permission for the current user
+        /// TODO: This should be moved to the CurrentUserController?
+        /// </summary>
+        /// <param name="permissionToCheck"></param>
+        /// <param name="nodeId"></param>
+        /// <returns></returns>
         [HttpGet]
         public bool HasPermission(string permissionToCheck, int nodeId)
         {
-            var p = Services.UserService.GetPermissions(Security.CurrentUser, nodeId).FirstOrDefault();
-            if (p != null && p.AssignedPermissions.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
+            var p = Services.UserService.GetPermissions(Security.CurrentUser, nodeId).GetAllPermissions();
+            if (p.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
             {
                 return true;
             }
@@ -349,8 +472,8 @@ namespace Umbraco.Web.Editors
 
             var notificationModel = new SimpleNotificationModel();
             notificationModel.AddSuccessNotification(
-                Services.TextService.Localize("content/createdBlueprintHeading"),
-                Services.TextService.Localize("content/createdBlueprintMessage", new[]{ content.Name})
+                Services.TextService.Localize("blueprints/createdBlueprintHeading"),
+                Services.TextService.Localize("blueprints/createdBlueprintMessage", new[]{ content.Name})
             );
 
             return notificationModel;
@@ -361,7 +484,7 @@ namespace Umbraco.Web.Editors
             var existing = Services.ContentService.GetBlueprintsForContentTypes(content.ContentTypeId);
             if (existing.Any(x => x.Name == name && x.Id != content.Id))
             {
-                ModelState.AddModelError(modelName, Services.TextService.Localize("content/duplicateBlueprintMessage"));
+                ModelState.AddModelError(modelName, Services.TextService.Localize("blueprints/duplicateBlueprintMessage"));
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
         }
@@ -900,7 +1023,6 @@ namespace Umbraco.Web.Editors
         }
 
 
-
         /// <summary>
         /// Performs a permissions check for the user to check if it has access to the node based on 
         /// start node and/or permissions for the node
@@ -909,6 +1031,7 @@ namespace Umbraco.Web.Editors
         /// <param name="user"></param>
         /// <param name="userService"></param>
         /// <param name="contentService"></param>
+        /// <param name="entityService"></param>
         /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
         /// <param name="permissionsToCheck"></param>
         /// <param name="contentItem">Specifies the already resolved content item to check against</param>
@@ -918,10 +1041,16 @@ namespace Umbraco.Web.Editors
                 IUser user,
                 IUserService userService,
                 IContentService contentService,
+                IEntityService entityService,
                 int nodeId,
                 char[] permissionsToCheck = null,
                 IContent contentItem = null)
         {
+            if (storage == null) throw new ArgumentNullException("storage");
+            if (user == null) throw new ArgumentNullException("user");
+            if (userService == null) throw new ArgumentNullException("userService");
+            if (contentService == null) throw new ArgumentNullException("contentService");
+            if (entityService == null) throw new ArgumentNullException("entityService");
 
             if (contentItem == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinContent)
             {
@@ -935,35 +1064,33 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-
+            
             var hasPathAccess = (nodeId == Constants.System.Root)
-                                                            ? UserExtensions.HasPathAccess(
-                                                                    Constants.System.Root.ToInvariantString(),
-                                                                    user.StartContentId,
-                                                                    Constants.System.RecycleBinContent)
-                                                            : (nodeId == Constants.System.RecycleBinContent)
-                                                                        ? UserExtensions.HasPathAccess(
-                                                                                Constants.System.RecycleBinContent.ToInvariantString(),
-                                                                                user.StartContentId,
-                                                                                Constants.System.RecycleBinContent)
-                                                                        : user.HasPathAccess(contentItem);
+                ? user.HasContentRootAccess(entityService)
+                : (nodeId == Constants.System.RecycleBinContent)
+                    ? user.HasContentBinAccess(entityService)
+                    : user.HasPathAccess(contentItem, entityService);
 
             if (hasPathAccess == false)
             {
                 return false;
             }
 
-            if (permissionsToCheck == null || permissionsToCheck.Any() == false)
+            if (permissionsToCheck == null || permissionsToCheck.Length == 0)
             {
                 return true;
             }
 
-            var permission = userService.GetPermissions(user, nodeId).FirstOrDefault();
+            //get the implicit/inherited permissions for the user for this path,
+            //if there is no content item for this id, than just use the id as the path (i.e. -1 or -20)
+            var path = contentItem != null ? contentItem.Path : nodeId.ToString();
+            var permission = userService.GetPermissionsForPath(user, path);
 
             var allowed = true;
             foreach (var p in permissionsToCheck)
             {
-                if (permission == null || permission.AssignedPermissions.Contains(p.ToString(CultureInfo.InvariantCulture)) == false)
+                if (permission == null 
+                    || permission.GetAllPermissions().Contains(p.ToString(CultureInfo.InvariantCulture)) == false)
                 {
                     allowed = false;
                 }

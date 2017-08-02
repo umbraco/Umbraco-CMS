@@ -194,7 +194,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                             if (currentMenuNode) {
                                 if (confirm(txtConfirmDisable + ' "' + UmbClientMgr.mainTree().getActionNode().nodeName + '"?\n\n')) {
                                     angularHelper.safeApply($rootScope, function () {
-                                        userResource.disableUser(currentMenuNode.nodeId).then(function () {
+                                        usersResource.disableUser(currentMenuNode.nodeId).then(function () {
                                             UmbClientMgr.mainTree().syncTree("-1," + currentMenuNode.nodeId, true);
                                         });
                                     });

@@ -269,12 +269,12 @@
             var isSelected = false;
             for (var i = 0; selection.length > i; i++) {
                 var selectedItem = selection[i];
-                if (item.id === selectedItem.id) {
+                if (item.id === selectedItem.id || item.key === selectedItem.key) {
                     isSelected = true;
                 }
             }
             if (!isSelected) {
-                selection.push({ id: item.id });
+                selection.push({ id: item.id, key: item.key });
                 item.selected = true;
             }
         }

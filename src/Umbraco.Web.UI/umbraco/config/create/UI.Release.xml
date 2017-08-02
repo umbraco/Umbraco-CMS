@@ -1,20 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<createUI>  
-  <nodeType alias="templates">
-    <header>Template</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="templateTasks" />
-      <create assembly="umbraco" type="templateTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="inittemplates">
-    <header>Template</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="templateTasks" />
-    </tasks>
-  </nodeType>
+<createUI>
   <nodeType alias="initmacros">
     <header>Macro</header>
     <usercontrol>/create/simple.ascx</usercontrol>
@@ -43,27 +28,19 @@
       <delete assembly="umbraco" type="XsltTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="users">
-    <header>User</header>
-    <usercontrol>/create/user.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="userTasks" />
-      <delete assembly="umbraco" type="userTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="user">
-    <header>User</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="userTasks" />
-    </tasks>
-  </nodeType> 
   <nodeType alias="initmemberGroup">
     <header>membergroup</header>
     <usercontrol>/create/simple.ascx</usercontrol>
     <tasks>
       <create assembly="umbraco" type="MemberGroupTasks" />
     </tasks>
+  </nodeType>
+  <nodeType alias="memberGroups">
+    <header>membergroup</header>
+    <usercontrol>/create/simple.ascx</usercontrol>
+    <tasks>
+        <delete assembly="umbraco" type="MemberGroupTasks" />
+    </tasks> 
   </nodeType>
   <nodeType alias="initstylesheets">
     <header>Stylesheet</header>
@@ -78,28 +55,7 @@
     <tasks>
       <create assembly="umbraco" type="XsltTasks" />
     </tasks>
-  </nodeType>    
-  <nodeType alias="initmember">
-    <header>member</header>
-    <usercontrol>/create/member.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="memberTasks" />
-    </tasks>
   </nodeType>
-  <nodeType alias="initmember">
-    <header>member</header>
-    <usercontrol>/create/member.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="memberTasks" />
-    </tasks>
-  </nodeType>  
-  <nodeType alias="memberGroups">
-    <header>membergroup</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="MemberGroupTasks" />
-    </tasks>
-  </nodeType> 
   <nodeType alias="stylesheet">
     <header>Stylesheet editor egenskab</header>
     <usercontrol>/create/simple.ascx</usercontrol>
@@ -149,56 +105,6 @@
       <delete assembly="umbraco" type="cacheTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="initpython">
-    <header>Scripting file</header>
-    <usercontrol>/create/DLRScripting.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="PythonTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="python">
-    <header>Macro</header>
-    <usercontrol>/create/DLRScripting.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="PythonTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="initdlrscripting">
-    <header>Scripting file</header>
-    <usercontrol>/create/DLRScripting.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="DLRScriptingTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="dlrscripting">
-    <header>Macro</header>
-    <usercontrol>/create/DLRScripting.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="DLRScriptingTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="initscripts">
-    <header>Script file</header>
-    <usercontrol>/create/script.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="ScriptTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="scriptsFolder">
-    <header>Script file</header>
-    <usercontrol>/create/script.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="ScriptTasks" />
-      <delete assembly="umbraco" type="ScriptTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="scripts">
-    <header>Macro</header>
-    <usercontrol>/create/script.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="ScriptTasks" />
-    </tasks>
-  </nodeType>
   <nodeType alias="initpackager">
     <header>Package</header>
     <usercontrol>/create/simple.ascx</usercontrol>
@@ -227,44 +133,5 @@
       <delete assembly="umbraco" type="CreatedPackageTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="userTypes">
-    <header>User Types</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="cms.presentation.user.UserTypeTasks" />
-      <delete assembly="umbraco" type="cms.presentation.user.UserTypeTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="partialViews">
-    <header>Macro</header>
-		<usercontrol>/Create/PartialView.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="PartialViewTasks" />
-      <delete assembly="umbraco" type="PartialViewTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="partialViewMacros">
-    <header>Macro</header>
-    <usercontrol>/Create/PartialViewMacro.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="PartialViewMacroTasks" />
-      <delete assembly="umbraco" type="PartialViewMacroTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="partialViewsFolder">
-    <header>Macro</header>
-    <usercontrol>/Create/PartialView.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="PartialViewTasks" />
-      <delete assembly="umbraco" type="PartialViewTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="partialViewMacrosFolder">
-    <header>Macro</header>
-    <usercontrol>/Create/PartialViewMacro.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="PartialViewMacroTasks" />
-      <delete assembly="umbraco" type="PartialViewMacroTasks" />
-    </tasks>
-  </nodeType>
+  
 </createUI>

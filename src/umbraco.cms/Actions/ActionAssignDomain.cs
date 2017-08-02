@@ -1,14 +1,17 @@
 using System;
 using umbraco.interfaces;
 using umbraco.BasePages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.BusinessLogic.Actions
 {
 	/// <summary>
 	/// This action is invoked when a domain is being assigned to a document
 	/// </summary>
+	[ActionMetadata(Constants.Conventions.PermissionCategories.AdministrationCategory)]
 	public class ActionAssignDomain : IAction
-	{
+    {
 		//create singleton
 #pragma warning disable 612,618
 		private static readonly ActionAssignDomain m_instance = new ActionAssignDomain();
@@ -83,6 +86,7 @@ namespace umbraco.BusinessLogic.Actions
 				return true;
 			}
 		}
-		#endregion
-	}
+        #endregion
+        
+    }
 }

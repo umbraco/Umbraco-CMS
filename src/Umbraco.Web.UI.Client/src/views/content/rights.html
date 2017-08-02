@@ -1,0 +1,117 @@
+<div ng-controller="Umbraco.Editors.Content.RightsController as vm">
+
+    <!-- Manage groups -->
+    <div ng-show="vm.viewState === 'manageGroups'">
+        <div class="umb-dialog-body" ng-cloak>
+            <div class="umb-pane">
+
+                <div ng-show="vm.saveError">
+                    <div class="alert alert-error">
+                        <div><strong>{{vm.saveError.errorMsg}}</strong></div>
+                        <div>{{vm.saveError.data.message}}</div>
+                    </div>
+                </div>
+
+                <div ng-show="vm.saveSuccces">
+                    <div class="alert alert-success">
+                        Permissions saved for <strong>{{currentNode.name}}</strong>
+                    </div>
+                </div>
+
+                <h5>Ut tempor dui nec consectetur efficitur.</h5>
+                <p class="abstract" style="margin-bottom: 20px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tellus purus, malesuada sed purus ut, semper sollicitudin odio.</p>
+
+                <div style="position: relative; display: inline-block; margin-bottom: 20px;">
+                    <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" href="#">
+                        Add permissions for...
+                        <span class="caret" style="margin-left: 10px;"></span>
+                    </a>
+                    <ul class="dropdown-menu" style="width: 100%;">
+                        <li ng-repeat="group in vm.availableUserGroups | filter:{selected: '!true'}">
+                            <a href="" ng-click="vm.editPermissions(group)" prevent-default>
+                                <i class="{{group.icon}}"></i>
+                                {{group.name}}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <umb-user-group-preview
+                        ng-repeat="group in vm.selectedUserGroups"
+                        icon="group.icon"
+                        name="group.name"
+                        permissions="group.allowedPermissions"
+                        allow-remove="true"
+                        allow-edit="true"
+                        on-remove="vm.removePermissions($index, vm.selectedUserGroups)"
+                        on-edit="vm.editPermissions(group)">
+                    </umb-user-group-preview>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+            <umb-button
+                label-key="general_close"
+                disabled="vm.saveState === 'busy'"
+                action="nav.hideDialog()"
+                type="button"
+                button-style="link">
+            </umb-button>
+
+            <umb-button
+                label-key="buttons_save"
+                disabled="vm.saveState === 'busy'"
+                state="vm.saveState"
+                action="vm.save()"
+                type="button"
+                button-style="success">
+            </umb-button>
+        </div>
+
+    </div>
+
+    <!-- Manage permissions -->
+    <div ng-show="vm.viewState === 'managePermissions'">
+
+        <div class="umb-dialog-body" ng-cloak>
+            <div class="umb-pane block-form">
+                <h5>Set permissions for {{ vm.selectedUserGroup.name }}</h5>
+                <p class="abstract" style="margin-bottom: 20px;">Nam tellus purus, malesuada sed purus ut, semper sollicitudin odio.</p>
+                <umb-control-group
+                    ng-repeat="(category, permissions) in vm.selectedUserGroup.permissions"
+                    label="{{category}}">
+                    <umb-permission
+                        ng-repeat="permission in permissions"
+                        name="permission.name"
+                        description="permission.description"
+                        selected="permission.checked">
+                    </umb-permission>
+                </umb-control-group>
+            </div>
+        </div>
+
+        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+
+            <umb-button
+                label-key="general_cancel"
+                action="vm.cancelManagePermissions()"
+                type="button"
+                button-style="link">
+            </umb-button>
+
+            <umb-button
+                label="Set permissions"
+                action="vm.setPermissions(vm.selectedUserGroup)"
+                type="button"
+                button-style="success">
+            </umb-button>
+
+        </div>
+
+    </div>
+
+</div>
+

@@ -108,15 +108,15 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 
 	    $scope.switchToMediaPicker = function () {
 	        userService.getCurrentUser().then(function (userData) {
-	            dialogService.mediaPicker({
-	                startNodeId: userData.startMediaId,
-	                callback: function (media) {
-	                    $scope.target.id = media.id;
-	                    $scope.target.isMedia = true;
-	                    $scope.target.name = media.name;
-	                    $scope.target.url = mediaHelper.resolveFile(media);
-	                }
-	            });
+	          dialogService.mediaPicker({
+	            startNodeId: userData.startMediaIds.length == 0 ? -1 : userData.startMediaIds[0],
+	            callback: function(media) {
+	              $scope.target.id = media.id;
+	              $scope.target.isMedia = true;
+	              $scope.target.name = media.name;
+	              $scope.target.url = mediaHelper.resolveFile(media);
+	            }
+	          });
 	        });
 	    };
 

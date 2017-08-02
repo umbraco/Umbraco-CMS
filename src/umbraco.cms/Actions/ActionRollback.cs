@@ -1,13 +1,16 @@
 using System;
 using umbraco.interfaces;
 using umbraco.BasePages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.BusinessLogic.Actions
 {
-	/// <summary>
-	/// This action is invoked when copying a document is being rolled back
-	/// </summary>
-	public class ActionRollback : IAction
+    /// <summary>
+    /// This action is invoked when copying a document is being rolled back
+    /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.AdministrationCategory)]
+    public class ActionRollback : IAction
 	{
 		//create singleton
 #pragma warning disable 612,618

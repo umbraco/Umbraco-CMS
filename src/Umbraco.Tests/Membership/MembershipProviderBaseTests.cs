@@ -145,7 +145,7 @@ namespace Umbraco.Tests.Membership
             Assert.AreEqual("test", provider.Name);
             Assert.AreEqual(MembershipProviderBase.GetDefaultAppName(), provider.ApplicationName);
             Assert.AreEqual(false, provider.EnablePasswordRetrieval);
-            Assert.AreEqual(false, provider.EnablePasswordReset);
+            Assert.AreEqual(true, provider.EnablePasswordReset);
             Assert.AreEqual(false, provider.RequiresQuestionAndAnswer);
             Assert.AreEqual(true, provider.RequiresUniqueEmail);
             Assert.AreEqual(5, provider.MaxInvalidPasswordAttempts);
