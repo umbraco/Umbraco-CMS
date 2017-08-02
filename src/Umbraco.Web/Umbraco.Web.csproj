@@ -359,6 +359,7 @@
     <Compile Include="HealthCheck\StatusResultType.cs" />
     <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
+    <Compile Include="Install\InstallSteps\ConfigureMachineKey.cs" />
     <Compile Include="Models\ContentEditing\AssignedContentPermissions.cs" />
     <Compile Include="Models\ContentEditing\AssignedUserGroupPermissions.cs" />
     <Compile Include="Models\ContentEditing\ContentRedirectUrl.cs" />

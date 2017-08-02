@@ -666,6 +666,7 @@
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\IMembershipProviderPasswordHasher.cs" />
     <Compile Include="Security\IUserAwarePasswordHasher.cs" />
+    <Compile Include="Security\MachineKeyGenerator.cs" />
     <Compile Include="Security\MembershipProviderPasswordHasher.cs" />
     <Compile Include="Security\EmailService.cs" />
     <Compile Include="Security\MembershipProviderPasswordValidator.cs" />
