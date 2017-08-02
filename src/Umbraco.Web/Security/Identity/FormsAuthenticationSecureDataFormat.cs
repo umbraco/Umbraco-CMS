@@ -76,13 +76,13 @@ namespace Umbraco.Web.Security.Identity
                 return null;
             }
 
-                var ticket = new AuthenticationTicket(identity, new AuthenticationProperties
-                {
-                    ExpiresUtc = decrypt.Expiration.ToUniversalTime(),
-                    IssuedUtc = decrypt.IssueDate.ToUniversalTime(),
-                    IsPersistent = decrypt.IsPersistent,
-                    AllowRefresh = true
-                });
+            var ticket = new AuthenticationTicket(identity, new AuthenticationProperties
+            {
+                ExpiresUtc = decrypt.Expiration.ToUniversalTime(),
+                IssuedUtc = decrypt.IssueDate.ToUniversalTime(),
+                IsPersistent = decrypt.IsPersistent,
+                AllowRefresh = true
+            });
 
             return ticket;
         }
