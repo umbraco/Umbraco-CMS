@@ -4,54 +4,54 @@ namespace Umbraco.Core.Configuration.HealthChecks
 {
     public class HealthCheckNotificationSettingsElement : ConfigurationElement, IHealthCheckNotificationSettingsElement
     {
-        private const string ENABLED_KEY = "enabled";
-        private const string FIRST_RUN_TIME_KEY = "firstRunTime";
-        private const string PERIOD_KEY = "periodInHours";
-        private const string NOTIFICATION_METHODS_KEY = "notificationMethods";
-        private const string DISABLED_CHECKS_KEY = "disabledChecks";
+        private const string EnabledKey = "enabled";
+        private const string FirstRunTimeKey = "firstRunTime";
+        private const string PeriodKey = "periodInHours";
+        private const string NotificationMethodsKey = "notificationMethods";
+        private const string DisabledChecksKey = "disabledChecks";
 
-        [ConfigurationProperty(ENABLED_KEY, IsRequired = true)]
+        [ConfigurationProperty(EnabledKey, IsRequired = true)]
         public bool Enabled
         {
             get
             {
-                return (bool)base[ENABLED_KEY];
+                return (bool)base[EnabledKey];
             }
         }
 
-        [ConfigurationProperty(FIRST_RUN_TIME_KEY, IsRequired = false)]
+        [ConfigurationProperty(FirstRunTimeKey, IsRequired = false)]
         public string FirstRunTime
         {
             get
             {
-                return (string)base[FIRST_RUN_TIME_KEY];
+                return (string)base[FirstRunTimeKey];
             }
         }
 
-        [ConfigurationProperty(PERIOD_KEY, IsRequired = true)]
+        [ConfigurationProperty(PeriodKey, IsRequired = true)]
         public int PeriodInHours
         {
             get
             {
-                return (int)base[PERIOD_KEY];
+                return (int)base[PeriodKey];
             }
         }
 
-        [ConfigurationProperty(NOTIFICATION_METHODS_KEY, IsDefaultCollection = true, IsRequired = false)]
+        [ConfigurationProperty(NotificationMethodsKey, IsDefaultCollection = true, IsRequired = false)]
         public NotificationMethodsElementCollection NotificationMethods
         {
             get
             {
-                return (NotificationMethodsElementCollection)base[NOTIFICATION_METHODS_KEY];
+                return (NotificationMethodsElementCollection)base[NotificationMethodsKey];
             }
         }
 
-        [ConfigurationProperty(DISABLED_CHECKS_KEY, IsDefaultCollection = false, IsRequired = false)]
+        [ConfigurationProperty(DisabledChecksKey, IsDefaultCollection = false, IsRequired = false)]
         public DisabledHealthChecksElementCollection DisabledChecks
         {
             get
             {
-                return (DisabledHealthChecksElementCollection)base[DISABLED_CHECKS_KEY];
+                return (DisabledHealthChecksElementCollection)base[DisabledChecksKey];
             }
         }
     }

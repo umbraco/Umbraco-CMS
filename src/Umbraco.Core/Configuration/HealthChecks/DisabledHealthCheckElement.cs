@@ -8,34 +8,34 @@ namespace Umbraco.Core.Configuration.HealthChecks
 {
     public class DisabledHealthCheckElement : ConfigurationElement, IDisabledHealthCheckElement
     {
-        private const string ID_KEY = "id";
-        private const string DISABLED_ON_KEY = "disabledOn";
-        private const string DISABLED_BY_KEY = "disabledBy";
+        private const string IdKey = "id";
+        private const string DisabledOnKey = "disabledOn";
+        private const string DisabledByKey = "disabledBy";
 
-        [ConfigurationProperty(ID_KEY, IsKey = true, IsRequired = true)]
+        [ConfigurationProperty(IdKey, IsKey = true, IsRequired = true)]
         public Guid Id
         {
             get
             {
-                return ((Guid)(base[ID_KEY]));
+                return ((Guid)(base[IdKey]));
             }
         }
 
-        [ConfigurationProperty(DISABLED_ON_KEY, IsKey = false, IsRequired = false)]
+        [ConfigurationProperty(DisabledOnKey, IsKey = false, IsRequired = false)]
         public DateTime DisabledOn
         {
             get
             {
-                return ((DateTime)(base[DISABLED_ON_KEY]));
+                return ((DateTime)(base[DisabledOnKey]));
             }
         }
 
-        [ConfigurationProperty(DISABLED_BY_KEY, IsKey = false, IsRequired = false)]
+        [ConfigurationProperty(DisabledByKey, IsKey = false, IsRequired = false)]
         public int DisabledBy
         {
             get
             {
-                return ((int)(base[DISABLED_BY_KEY]));
+                return ((int)(base[DisabledByKey]));
             }
         }
     }

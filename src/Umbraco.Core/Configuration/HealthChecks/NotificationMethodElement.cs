@@ -4,54 +4,54 @@ namespace Umbraco.Core.Configuration.HealthChecks
 {
     public class NotificationMethodElement : ConfigurationElement, INotificationMethodElement
     {
-        private const string ALIAS_KEY = "alias";
-        private const string ENABLED_KEY = "enabled";
-        private const string VERBOSITY_KEY = "verbosity";
-        private const string FAILUREONLY_KEY = "failureOnly";
-        private const string SETTINGS_KEY = "settings";
+        private const string AliasKey = "alias";
+        private const string EnabledKey = "enabled";
+        private const string VerbosityKey = "verbosity";
+        private const string FailureonlyKey = "failureOnly";
+        private const string SettingsKey = "settings";
 
-        [ConfigurationProperty(ALIAS_KEY, IsKey = true, IsRequired = true)]
+        [ConfigurationProperty(AliasKey, IsKey = true, IsRequired = true)]
         public string Alias 
         {
             get
             {
-                return (string)base[ALIAS_KEY];
+                return (string)base[AliasKey];
             }
         }
 
-        [ConfigurationProperty(ENABLED_KEY, IsKey = true, IsRequired = true)]
+        [ConfigurationProperty(EnabledKey, IsKey = true, IsRequired = true)]
         public bool Enabled
         {
             get
             {
-                return (bool)base[ENABLED_KEY];
+                return (bool)base[EnabledKey];
             }
         }
 
-        [ConfigurationProperty(VERBOSITY_KEY, IsRequired = true)]
+        [ConfigurationProperty(VerbosityKey, IsRequired = true)]
         public HealthCheckNotificationVerbosity Verbosity
         {
             get
             {
-                return (HealthCheckNotificationVerbosity)base[VERBOSITY_KEY];
+                return (HealthCheckNotificationVerbosity)base[VerbosityKey];
             }
         }
 
-        [ConfigurationProperty(FAILUREONLY_KEY, IsRequired = false)]
+        [ConfigurationProperty(FailureonlyKey, IsRequired = false)]
         public bool FailureOnly
         {
             get
             {
-                return (bool)base[FAILUREONLY_KEY];
+                return (bool)base[FailureonlyKey];
             }
         }
 
-        [ConfigurationProperty(SETTINGS_KEY, IsDefaultCollection = true, IsRequired = false)]
+        [ConfigurationProperty(SettingsKey, IsDefaultCollection = true, IsRequired = false)]
         public NotificationMethodSettingsElementCollection Settings
         {
             get
             {
-                return (NotificationMethodSettingsElementCollection)base[SETTINGS_KEY];
+                return (NotificationMethodSettingsElementCollection)base[SettingsKey];
             }
         }
     }

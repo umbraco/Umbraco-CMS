@@ -4,19 +4,19 @@ namespace Umbraco.Core.Configuration.HealthChecks
 {
     public class HealthChecksSection : ConfigurationSection, IHealthChecksSection
     {
-        private const string DISABLED_CHECKS_KEY = "disabledChecks";
-        private const string NOTIFICATION_SETTINGS_KEY = "notificationSettings";
+        private const string DisabledChecksKey = "disabledChecks";
+        private const string NotificationSettingsKey = "notificationSettings";
 
-        [ConfigurationProperty(DISABLED_CHECKS_KEY)]
+        [ConfigurationProperty(DisabledChecksKey)]
         public DisabledHealthChecksElementCollection DisabledChecks
         {
-            get { return ((DisabledHealthChecksElementCollection)(base[DISABLED_CHECKS_KEY])); }
+            get { return ((DisabledHealthChecksElementCollection)(base[DisabledChecksKey])); }
         }
 
-        [ConfigurationProperty(NOTIFICATION_SETTINGS_KEY, IsRequired = true)]
+        [ConfigurationProperty(NotificationSettingsKey, IsRequired = true)]
         public HealthCheckNotificationSettingsElement NotificationSettings
         {
-            get { return ((HealthCheckNotificationSettingsElement)(base[NOTIFICATION_SETTINGS_KEY])); }
+            get { return ((HealthCheckNotificationSettingsElement)(base[NotificationSettingsKey])); }
         }
     }
 }
