@@ -29,8 +29,8 @@
     <key alias="republish">Republish entire site</key>
     <key alias="restore" version="7.3.0">Restore</key>
     <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
-      <key alias="chooseWhereToMove">Choose where to move</key>
-      <key alias="toInTheTreeStructureBelow">In the tree structure below</key>
+    <key alias="chooseWhereToMove">Choose where to move</key>
+    <key alias="toInTheTreeStructureBelow">In the tree structure below</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -213,11 +213,11 @@
     <key alias="contentRoot">Content root</key>
   </area>
   <area alias="blueprints">
-      <key alias="createBlueprintFrom">Create a Content Template from %0%</key>
+      <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
       <key alias="blankBlueprint">Blank</key>
       <key alias="selectBlueprint">Select a Content Template</key>
       <key alias="createdBlueprintHeading">Content Template created</key>
-      <key alias="createdBlueprintMessage">A Content Template was created from %0%</key>
+      <key alias="createdBlueprintMessage">A Content Template was created from '%0%'</key>
       <key alias="duplicateBlueprintMessage">Another Content Template with the same name already exists</key>
       <key alias="blueprintDescription">A Content Template is pre-defined content that an editor can select to use as the basis for creating new content</key>
   </area>

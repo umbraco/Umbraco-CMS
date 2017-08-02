@@ -14,8 +14,8 @@
     };
 
     var successText = {};
-    localizationService.localize("blueprints_createBlueprintFrom", [$scope.message.name]).then(function (localizedVal) {
-      $scope.label = localizedVal;
+    localizationService.localize("blueprints_createBlueprintFrom", ["<em>" + $scope.message.name + "</em>"]).then(function (localizedVal) {
+      $scope.title = localizedVal;
     });
 
    
