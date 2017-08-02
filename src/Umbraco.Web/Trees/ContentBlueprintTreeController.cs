@@ -58,7 +58,7 @@ namespace Umbraco.Web.Trees
                 var contentTypeIds = Services.ContentTypeService.GetAllContentTypeIds(contentTypeAliases.ToArray()).ToArray();
 
                 //now get the entities ... it's a bit round about but still smaller queries than getting all document types
-                var docTypeEntities = contentTypeIds.Length == 0 
+                var docTypeEntities = contentTypeIds.Length == 0
                     ? new IUmbracoEntity[0]
                     : Services.EntityService.GetAll(UmbracoObjectTypes.DocumentType, contentTypeIds).ToArray();
 
@@ -67,7 +67,7 @@ namespace Umbraco.Web.Trees
                     {
                         var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprintGuid, id, queryStrings, "icon-item-arrangement", true);
                         treeNode.Path = string.Format("-1,{0}", entity.Id);
-                        treeNode.NodeType = "contentType";
+                        treeNode.NodeType = "document-type-blueprints";
                         //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
                         treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
                         return treeNode;
@@ -101,7 +101,7 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.Root.ToInvariantString())
             {
-                // root actions                              
+                // root actions
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
                 return menu;
             }
@@ -122,6 +122,6 @@ namespace Umbraco.Web.Trees
 
             return menu;
         }
-        
+
     }
 }
