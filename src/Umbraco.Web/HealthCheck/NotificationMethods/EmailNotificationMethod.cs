@@ -17,9 +17,9 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             Verbosity = verbosity;
         }
 
-        public string RecipientEmail { get; set; }
+        public string RecipientEmail { get; private set; }
 
-        public string Subject { get; set; }
+        public string Subject { get; private set; }
 
         public async Task SendAsync(HealthCheckResults results)
         {
