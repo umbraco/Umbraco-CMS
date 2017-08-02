@@ -66,7 +66,7 @@
                 </div>
               </div>
 
-              <div class="umb-box" ng-if="!vm.user.isCurrentUser">
+              <div class="umb-box">
                 <div class="umb-box-header">
                   <div class="umb-box-header-title"><localize key="user_access">Access</localize></div>
                 </div>
@@ -106,12 +106,11 @@
                       allow-remove="!vm.user.isCurrentUser"
                       on-remove="vm.removeSelectedItem($index, vm.user.startContentIds)">
                     </umb-node-preview>
-                    
+
                     <umb-node-preview
-                      ng-if="vm.user.startContentIds.length === 0"
+                      ng-if="vm.user.startContentIds.length === 0 && vm.user.isCurrentUser"
                       style="max-width: 100%;"
-                      name="vm.page.noStartNodeLabel"
-                      allow-remove="false">
+                      name="vm.labels.noStartNodes">
                     </umb-node-preview>
 
                     <a href=""
@@ -137,10 +136,9 @@
                     </umb-node-preview>
 
                     <umb-node-preview
-                      ng-if="vm.user.startMediaIds.length === 0"
+                      ng-if="vm.user.startMediaIds.length === 0 && vm.user.isCurrentUser"
                       style="max-width: 100%;"
-                      name="vm.page.noStartNodeLabel"
-                      allow-remove="false">
+                      name="vm.labels.noStartNodes">
                     </umb-node-preview>
 
                     <a href=""
