@@ -175,9 +175,9 @@ namespace Umbraco.Web.Security
         /// </remarks>
         public virtual bool ValidateBackOfficeCredentials(string username, string password)
         {
-            var backofficeuser = Mapper.Map<BackOfficeIdentityUser>(CurrentUser);
-            backofficeuser.UserName = username;
-            return UserManager.CheckPasswordAsync(backofficeuser, password).Result;
+            //find the user by username
+            var user = UserManager.FindByNameAsync(username).Result;
+            return user != null && UserManager.CheckPasswordAsync(user, password).Result;
         }
         
         [EditorBrowsable(EditorBrowsableState.Never)]
