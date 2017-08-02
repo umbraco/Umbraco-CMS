@@ -1162,7 +1162,8 @@ namespace Umbraco.Core.Services
             {
                 var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
                 var blueprint = repository.Get(id);
-                ((Content) blueprint).IsBlueprint = true;
+                if (blueprint != null)
+                    ((Content) blueprint).IsBlueprint = true;
                 return blueprint;
             }
         }
