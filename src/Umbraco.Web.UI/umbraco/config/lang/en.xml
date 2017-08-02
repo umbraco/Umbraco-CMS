@@ -38,7 +38,7 @@
     <key alias="sort">Sort</key>
     <key alias="translate">Translate</key>
     <key alias="update">Update</key>
-    <key alias="createblueprint">Create blueprint</key>
+    <key alias="createblueprint">Create Content Template</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Content</key>
@@ -64,7 +64,7 @@
     <key alias="sort">Allow access to change the sort order for nodes</key>
     <key alias="translate">Allow access to translate a node</key>
     <key alias="update">Allow access to save a node</key>
-    <key alias="createblueprint">Allow access to create a content template</key>
+    <key alias="createblueprint">Allow access to create a Content Template</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permission denied.</key>
@@ -210,12 +210,12 @@
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
-    <key alias="createBlueprintFrom">Create a blueprint from %0%</key>
+    <key alias="createBlueprintFrom">Create a Content Template from %0%</key>
     <key alias="blankBlueprint">Blank</key>
-    <key alias="selectBlueprint">Select a blueprint</key>
-    <key alias="createdBlueprintHeading">Blueprint created</key>
-    <key alias="createdBlueprintMessage">Blueprint was created from %0%</key>
-    <key alias="duplicateBlueprintMessage">Another Blueprint with the same name already exists.</key>
+    <key alias="selectBlueprint">Select a Content Template</key>
+    <key alias="createdBlueprintHeading">Content Template created</key>
+    <key alias="createdBlueprintMessage">A Content Template was created from %0%</key>
+    <key alias="duplicateBlueprintMessage">Another Content Template with the same name already exists.</key>
     <key alias="contentRoot">Content root</key>
   </area>
   <area alias="media">
@@ -1530,7 +1530,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="treeHeaders">
     <key alias="content">Content</key>
-    <key alias="contentBlueprints">Content Blueprints</key>
+    <key alias="contentBlueprints">Content Templates</key>
     <key alias="media">Media</key>
     <key alias="cacheBrowser">Cache Browser</key>
     <key alias="contentRecycleBin">Recycle Bin</key>

@@ -32,6 +32,16 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class ContentBlueprintTreeController : TreeController
     {
+
+        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        {
+            var root = base.CreateRootNode(queryStrings);
+
+            //this will load in a custom UI instead of the dashboard for the root node
+            root.RoutePath = string.Format("{0}/{1}/{2}", Constants.Applications.Settings, Constants.Trees.ContentBlueprints, "intro");
+
+            return root;
+        }
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
