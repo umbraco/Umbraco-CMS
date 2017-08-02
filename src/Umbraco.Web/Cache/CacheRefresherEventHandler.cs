@@ -172,6 +172,11 @@ namespace Umbraco.Web.Cache
             Bind(() => ContentService.UnPublished += ContentService_UnPublished,
                  () => ContentService.UnPublished -= ContentService_UnPublished);
 
+            Bind(() => ContentService.SavedBlueprint += ContentService_SavedBlueprint,
+                 () => ContentService.SavedBlueprint -= ContentService_SavedBlueprint);
+            Bind(() => ContentService.DeletedBlueprint += ContentService_DeletedBlueprint,
+                 () => ContentService.DeletedBlueprint -= ContentService_DeletedBlueprint);
+
             // bind to public access events
             Bind(() => PublicAccessService.Saved += PublicAccessService_Saved,
                  () => PublicAccessService.Saved -= PublicAccessService_Saved);
@@ -364,6 +369,11 @@ namespace Umbraco.Web.Cache
             DistributedCache.Instance.RemoveUnpublishedPageCache(e.DeletedEntities.ToArray());
         }
 
+        static void ContentService_DeletedBlueprint(IContentService sender, DeleteEventArgs<IContent> e)
+        {
+            DistributedCache.Instance.RemoveUnpublishedPageCache(e.DeletedEntities.ToArray());
+        }
+
         /// <summary>
         /// Handles cache refreshing for when content is saved (not published)
         /// </summary>
@@ -382,6 +392,10 @@ namespace Umbraco.Web.Cache
             DistributedCache.Instance.RefreshUnpublishedPageCache(unpublished.ToArray());
         }
 
+        static void ContentService_SavedBlueprint(IContentService sender, SaveEventArgs<IContent> e)
+        {
+            DistributedCache.Instance.RefreshUnpublishedPageCache(e.SavedEntities.ToArray());
+        }
 
         #endregion
 

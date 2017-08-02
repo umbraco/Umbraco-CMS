@@ -1181,7 +1181,9 @@ namespace Umbraco.Core.Services
         public void SaveBlueprint(IContent content, int userId = 0)
         {
             //always ensure the blueprint is at the root
-            content.ParentId = -1;
+            if (content.ParentId != -1)
+                content.ParentId = -1;
+
             ((Content) content).IsBlueprint = true;
 
             using (new WriteLock(Locker))
