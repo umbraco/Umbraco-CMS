@@ -491,6 +491,8 @@ namespace Umbraco.Core
                 {
                     if (--attempts == 0)
                         throw;
+
+                    LogHelper.Debug<PluginManager>(string.Format("Attempted to get filestream for file {0} failed, {1} attempts left, pausing for {2} milliseconds", path, attempts, pauseMilliseconds));
                     Thread.Sleep(pauseMilliseconds);
                 }
             }

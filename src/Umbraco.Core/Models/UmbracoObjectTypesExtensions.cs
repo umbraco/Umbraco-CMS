@@ -68,15 +68,14 @@ namespace Umbraco.Core.Models
         {
             return UmbracoObjectTypeCache.GetOrAdd(umbracoObjectType, types =>
                 {
-                    var type = typeof(UmbracoObjectTypes);
-                    var memInfo = type.GetMember(umbracoObjectType.ToString());
-                    var attributes = memInfo[0].GetCustomAttributes(typeof(UmbracoObjectTypeAttribute),
-                        false);
+                    var type = typeof (UmbracoObjectTypes);
+                    var memberInfo = type.GetMember(umbracoObjectType.ToString());
+                    var attributes = memberInfo[0].GetCustomAttributes(typeof (UmbracoObjectTypeAttribute), false);
 
                     if (attributes.Length == 0)
                         return Guid.Empty;
 
-                    var attribute = ((UmbracoObjectTypeAttribute)attributes[0]);
+                    var attribute = (UmbracoObjectTypeAttribute) attributes[0];
                     if (attribute == null)
                         return Guid.Empty;
 

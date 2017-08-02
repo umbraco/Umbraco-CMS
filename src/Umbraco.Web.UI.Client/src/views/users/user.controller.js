@@ -38,10 +38,6 @@
 
             vm.loading = true;
 
-            localizationService.localize("user_noStartNode").then(function (name) {
-                vm.page.noStartNodeLabel = name;
-            });
-
             var labelKeys = [
                 "general_saving",
                 "general_cancel",
@@ -49,7 +45,8 @@
                 "defaultdialogs_selectMediaStartNode",
                 "sections_users",
                 "content_contentRoot",
-                "media_mediaRoot"
+                "media_mediaRoot",
+                "user_noStartNodes"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (values) {
@@ -60,6 +57,7 @@
                 vm.labels.users = values[4];
                 vm.labels.contentRoot = values[5];
                 vm.labels.mediaRoot = values[6];
+                vm.labels.noStartNodes = values[7];
             });
 
             // get user

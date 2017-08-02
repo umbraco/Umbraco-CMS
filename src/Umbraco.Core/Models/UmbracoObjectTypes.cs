@@ -39,14 +39,6 @@ namespace Umbraco.Core.Models
         Document,
 
         /// <summary>
-        /// Document
-        /// </summary>
-        [UmbracoObjectType(Constants.ObjectTypes.DocumentBlueprint, typeof(IContent))]
-        [FriendlyName("DocumentBlueprint")]
-        [UmbracoUdiType(Constants.UdiEntityType.DocumentBluePrint)]
-        DocumentBlueprint,
-
-        /// <summary>
         /// Media
         /// </summary>
         [UmbracoObjectType(Constants.ObjectTypes.Media, typeof(IMedia))]
@@ -193,6 +185,14 @@ namespace Umbraco.Core.Models
         /// </summary>
         [UmbracoObjectType(Constants.ObjectTypes.Language)]
         [FriendlyName("Language")]
-        Language
+        Language,
+
+        /// <summary>
+        /// Document
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.DocumentBlueprint, typeof(IContent))]
+        [FriendlyName("DocumentBlueprint")]
+        [UmbracoUdiType(Constants.UdiEntityType.DocumentBluePrint)]
+        DocumentBlueprint
     }
 }

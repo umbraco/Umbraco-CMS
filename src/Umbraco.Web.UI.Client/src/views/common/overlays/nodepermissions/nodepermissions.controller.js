@@ -9,7 +9,9 @@
 
             // set default title
             if(!$scope.model.title) {
-                $scope.model.title = localizationService.localize("actions_permissionsEdit") + $scope.model.node.name;
+                localizationService.localize("defaultdialogs_permissionsEdit").then(function(value){
+                    $scope.model.title = value + " " + $scope.model.node.name;
+                });
             }
             
         }
