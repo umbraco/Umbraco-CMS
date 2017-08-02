@@ -92,6 +92,7 @@ function SearchController($scope, searchService, $log, $location, navigationServ
 
     $scope.$watch("searchTerm", _.debounce(function (newVal, oldVal) {
         $scope.$apply(function () {
+            $scope.hasResults = false;
             if ($scope.searchTerm) {
                 if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
                     $scope.isSearching = true;
@@ -117,8 +118,11 @@ function SearchController($scope, searchService, $log, $location, navigationServ
                             }
                         });
                         $scope.groups = filtered;
+                        // check if search has results
+                        $scope.hasResults = Object.keys($scope.groups).length > 0;
                         //set back to null so it can be re-created
                         canceler = null;
+                        $scope.isSearching = false;
                     });
                 }
             }
