@@ -7,7 +7,6 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
 {
-
     public abstract class AbstractConfigCheck : HealthCheck
     {
         private readonly ConfigurationService _configurationService;
@@ -54,7 +53,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         protected AbstractConfigCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
             _textService = healthCheckContext.ApplicationContext.Services.TextService;
-            _configurationService = new ConfigurationService(AbsoluteFilePath, XPath);
+            _configurationService = new ConfigurationService(AbsoluteFilePath, XPath, _textService);
         }
 
         /// <summary>
