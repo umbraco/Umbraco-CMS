@@ -1,25 +1,51 @@
 ﻿using System;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.NotificationMethods
 {
     [HealthCheckNotificationMethod("email")]
     public class EmailNotificationMethod : NotificationMethodBase, IHealthCheckNotificatationMethod
     {
+        private readonly ILocalizedTextService _textService;
+
+        /// <summary>
+        /// Default constructor which is used in the provider model
+        /// </summary>
+        /// <param name="enabled"></param>
+        /// <param name="failureOnly"></param>
+        /// <param name="verbosity"></param>
+        /// <param name="recipientEmail"></param>
         public EmailNotificationMethod(bool enabled, bool failureOnly, HealthCheckNotificationVerbosity verbosity,
-                string recipientEmail, string subject)
+                string recipientEmail)
+            : this(enabled, failureOnly, verbosity, recipientEmail, ApplicationContext.Current.Services.TextService)
+        {            
+        }
+
+        /// <summary>
+        /// Constructor that could be used for testing
+        /// </summary>
+        /// <param name="enabled"></param>
+        /// <param name="failureOnly"></param>
+        /// <param name="verbosity"></param>
+        /// <param name="recipientEmail"></param>
+        /// <param name="textService"></param>
+        internal EmailNotificationMethod(bool enabled, bool failureOnly, HealthCheckNotificationVerbosity verbosity,
+            string recipientEmail, ILocalizedTextService textService)
             : base(enabled, failureOnly, verbosity)
         {
+            if (textService == null) throw new ArgumentNullException("textService");
+            if (string.IsNullOrWhiteSpace(recipientEmail)) throw new ArgumentException("Value cannot be null or whitespace.", "recipientEmail");
+            _textService = textService;
             RecipientEmail = recipientEmail;
-            Subject = subject;
             Verbosity = verbosity;
         }
 
-        public string RecipientEmail { get; private set; }
-
-        public string Subject { get; private set; }
+        public string RecipientEmail { get; private set; }        
 
         public async Task SendAsync(HealthCheckResults results)
         {
@@ -33,20 +59,33 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
                 return;
             }
 
-            using (var client = new SmtpClient())
-            using (var mailMessage = new MailMessage())
+            var message = _textService.Localize("healthcheck/scheduledHealthCheckEmailBody", new[]
             {
-                mailMessage.To.Add(RecipientEmail);
-                mailMessage.Body =
-                    string.Format(
-                        "<html><body><p>Results of the scheduled Umbraco Health Checks run on {0} at {1} are as follows:</p>{2}</body></html>",
-                        DateTime.Now.ToShortDateString(), 
-                        DateTime.Now.ToShortTimeString(),
-                        results.ResultsAsHtml(Verbosity));
-                mailMessage.Subject = string.IsNullOrEmpty(Subject) ? "Umbraco Health Check Status" : Subject;
-                mailMessage.IsBodyHtml = true;
+                DateTime.Now.ToShortDateString(),
+                DateTime.Now.ToShortTimeString(),
+                results.ResultsAsHtml(Verbosity)
+            });
 
-                await client.SendMailAsync(mailMessage);
+            var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject");
+
+            using (var client = new SmtpClient())
+            using (var mailMessage = new MailMessage(UmbracoConfig.For.UmbracoSettings().Content.NotificationEmailAddress,
+                RecipientEmail,
+                string.IsNullOrEmpty(subject) ? "Umbraco Health Check Status" : subject,
+                message)
+            {
+                IsBodyHtml = message.IsNullOrWhiteSpace() == false
+                             && message.Contains("<") && message.Contains("</")
+            })
+            {
+                if (client.DeliveryMethod == SmtpDeliveryMethod.Network)
+                {
+                    await client.SendMailAsync(mailMessage);
+                }
+                else
+                {
+                    client.Send(mailMessage);
+                }
             }
         }
     }
