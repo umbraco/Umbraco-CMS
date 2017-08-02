@@ -94,7 +94,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 else
                 {
                     result = StatusResultType.Error;
-                    message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, response.StatusDescription });
+                    message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { url, response.StatusDescription });
                 }
             }
             catch (Exception ex)
