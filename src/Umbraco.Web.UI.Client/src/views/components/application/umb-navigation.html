@@ -33,7 +33,15 @@
         <!-- Search results -->
         <div id="search-results" class="umb-modalcolumn-body" ng-show="showSearchResults">
 
-          <ul class="umb-tree">
+          <umb-load-indicator ng-if="isSearching"></umb-load-indicator>
+
+          <umb-empty-state
+            ng-if="!hasResults && !isSearching"
+            position="center">
+            <localize key="general_searchNoResult"></localize>
+          </umb-empty-state>
+
+          <ul class="umb-tree" ng-if="!isSearching && hasResults">
             <li class="root">
               <div>
                 <h5 class="umb-tree-header"><localize key="general_searchResults">Search results</localize></h5>
