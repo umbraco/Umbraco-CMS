@@ -17,20 +17,29 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
 
         public override void Up()
         {
-            var userGroups = Context.Database.Fetch<UserGroupDto>(
-                new Sql().Select("*")
-                    .From<UserGroupDto>(SqlSyntax)
-                    .Where<UserGroupDto>(x => x.Alias == "admin" || x.Alias == "editor", SqlSyntax));
-            foreach (var userGroup in userGroups)
+            Execute.Code(database =>
             {
-                if (userGroup.DefaultPermissions.Contains('ï') == false)
+                var userGroups = database.Fetch<UserGroupDto>(
+                    new Sql().Select("*")
+                        .From<UserGroupDto>(SqlSyntax)
+                        .Where<UserGroupDto>(x => x.Alias == "admin" || x.Alias == "editor", SqlSyntax));
+
+                var localContext = new LocalMigrationContext(Context.CurrentDatabaseProvider, database, SqlSyntax, Logger);
+
+                foreach (var userGroup in userGroups)
                 {
-                    userGroup.DefaultPermissions += "ï";
-                    Update.Table("umbracoUserGroup")
-                        .Set(new {userGroupDefaultPermissions = userGroup.DefaultPermissions})
-                        .Where(new {id = userGroup.Id});
+                    if (userGroup.DefaultPermissions.Contains('ï') == false)
+                    {
+                        userGroup.DefaultPermissions += "ï";
+                        localContext.Update.Table("umbracoUserGroup")
+                            .Set(new { userGroupDefaultPermissions = userGroup.DefaultPermissions })
+                            .Where(new { id = userGroup.Id });
+                    }
                 }
-            }
+
+                return localContext.GetSql();
+            });
+            
         }
 
         public override void Down()
