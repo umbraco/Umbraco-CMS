@@ -78,8 +78,10 @@ namespace Umbraco.Tests.Cache
                 new EventDefinition<IMediaService, MoveEventArgs<IMedia>>(null, ServiceContext.MediaService, new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(null, "", -1)), "Trashed"),
                 new EventDefinition<IMediaService, RecycleBinEventArgs>(null, ServiceContext.MediaService, new RecycleBinEventArgs(Guid.NewGuid(), new Dictionary<int, IEnumerable<Property>>(), true)),
 
-                new EventDefinition<IContentService, SaveEventArgs<IContent>>(null, ServiceContext.ContentService, new SaveEventArgs<IContent>(Enumerable.Empty<IContent>())),
-                new EventDefinition<IContentService, DeleteEventArgs<IContent>>(null, ServiceContext.ContentService, new DeleteEventArgs<IContent>(Enumerable.Empty<IContent>())),
+                new EventDefinition<IContentService, SaveEventArgs<IContent>>(null, ServiceContext.ContentService, new SaveEventArgs<IContent>(Enumerable.Empty<IContent>()), "Saved"),
+                new EventDefinition<IContentService, SaveEventArgs<IContent>>(null, ServiceContext.ContentService, new SaveEventArgs<IContent>(Enumerable.Empty<IContent>()), "SavedBlueprint"),
+                new EventDefinition<IContentService, DeleteEventArgs<IContent>>(null, ServiceContext.ContentService, new DeleteEventArgs<IContent>(Enumerable.Empty<IContent>()), "Deleted"),
+                new EventDefinition<IContentService, DeleteEventArgs<IContent>>(null, ServiceContext.ContentService, new DeleteEventArgs<IContent>(Enumerable.Empty<IContent>()), "DeletedBlueprint"),
                 new EventDefinition<IContentService, CopyEventArgs<IContent>>(null, ServiceContext.ContentService, new CopyEventArgs<IContent>(null, null, -1)),
                 new EventDefinition<IContentService, MoveEventArgs<IContent>>(null, ServiceContext.ContentService, new MoveEventArgs<IContent>(new MoveEventInfo<IContent>(null, "", -1)), "Trashed"),
                 new EventDefinition<IContentService, RecycleBinEventArgs>(null, ServiceContext.ContentService, new RecycleBinEventArgs(Guid.NewGuid(), new Dictionary<int, IEnumerable<Property>>(), true)),

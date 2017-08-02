@@ -255,7 +255,7 @@ namespace Umbraco.Core.Services
                     return content;
                 }
 
-                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IContent>(content)))
+                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IContent>(content), "Saving"))
                 {
                     uow.Commit();
                     content.WasCancelled = true;
@@ -310,7 +310,7 @@ namespace Umbraco.Core.Services
                     return content;
                 }
 
-                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IContent>(content)))
+                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IContent>(content), "Saving"))
                 {
                     uow.Commit();
                     content.WasCancelled = true;
@@ -1268,7 +1268,7 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IContent>(asArray, evtMsgs)))
+                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IContent>(asArray, evtMsgs), "Saving"))
                 {
                     uow.Commit();
                     return OperationStatus.Cancelled(evtMsgs);
@@ -1826,7 +1826,7 @@ namespace Umbraco.Core.Services
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
                     var asArray = items.ToArray();
-                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IContent>(asArray)))
+                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IContent>(asArray), "Saving"))
                     {
                         uow.Commit();
                         return false;
@@ -2254,7 +2254,7 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IContent>(content, evtMsgs)))
+                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IContent>(content, evtMsgs), "Saving"))
                     {
                         uow.Commit();
                         return Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent, evtMsgs));
@@ -2348,7 +2348,7 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IContent>(content, evtMsgs)))
+                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IContent>(content, evtMsgs), "Saving"))
                     {
                         uow.Commit();
                         return OperationStatus.Cancelled(evtMsgs);
