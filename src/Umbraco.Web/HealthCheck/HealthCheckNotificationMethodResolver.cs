@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Configuration;
 using System.Reflection;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Web.HealthCheck.NotificationMethods;
@@ -55,7 +56,7 @@ namespace Umbraco.Web.HealthCheck
                 }
 
                 // Using alias, get related configuration
-                var healthCheckConfig = (HealthChecksSection)ConfigurationManager.GetSection("umbracoConfiguration/HealthChecks");
+                var healthCheckConfig = UmbracoConfig.For.HealthCheck();
                 var notificationMethods = healthCheckConfig.NotificationSettings.NotificationMethods;
                 var notificationMethod = notificationMethods[attribute.Alias];
                 if (notificationMethod == null)

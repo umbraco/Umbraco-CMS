@@ -1,8 +1,10 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.HealthChecks
 {
-    public class NotificationMethodElement : ConfigurationElement, INotificationMethodElement
+    public class NotificationMethodElement : ConfigurationElement, INotificationMethod
     {
         private const string AliasKey = "alias";
         private const string EnabledKey = "enabled";
@@ -53,6 +55,31 @@ namespace Umbraco.Core.Configuration.HealthChecks
             {
                 return (NotificationMethodSettingsElementCollection)base[SettingsKey];
             }
+        }
+
+        string INotificationMethod.Alias
+        {
+            get { return Alias; }
+        }
+
+        bool INotificationMethod.Enabled
+        {
+            get { return Enabled; }
+        }
+
+        HealthCheckNotificationVerbosity INotificationMethod.Verbosity
+        {
+            get { return Verbosity; }
+        }
+
+        bool INotificationMethod.FailureOnly
+        {
+            get { return FailureOnly; }
+        }
+
+        IReadOnlyDictionary<string, INotificationMethodSettings> INotificationMethod.Settings
+        {
+            get { return Settings; }
         }
     }
 }

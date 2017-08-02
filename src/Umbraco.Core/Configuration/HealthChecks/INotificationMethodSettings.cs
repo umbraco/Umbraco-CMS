@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Configuration.HealthChecks
 {
-    public interface INotificationMethodSettingsElement
+    public interface INotificationMethodSettings
     {
         string Key { get; }
         string Value { get; }

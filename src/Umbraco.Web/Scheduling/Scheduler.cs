@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
+using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Scheduling
@@ -65,15 +66,15 @@ namespace Umbraco.Web.Scheduling
                 LogHelper.Debug<Scheduler>(() => "Initializing the scheduler");
                 var settings = UmbracoConfig.For.UmbracoSettings();
 
-                var healthCheckConfig = (HealthChecksSection)ConfigurationManager.GetSection("umbracoConfiguration/HealthChecks");
+                var healthCheckConfig = UmbracoConfig.For.HealthCheck();
 
-                const int DelayMilliseconds = 60000;
+                const int delayMilliseconds = 60000;
                 var tasks = new List<IBackgroundTask>
                 {
-                    new KeepAlive(_keepAliveRunner, DelayMilliseconds, 300000, e.UmbracoContext.Application),
-                    new ScheduledPublishing(_publishingRunner, DelayMilliseconds, 60000, e.UmbracoContext.Application, settings),
-                    new ScheduledTasks(_tasksRunner, DelayMilliseconds, 60000, e.UmbracoContext.Application, settings),
-                    new LogScrubber(_scrubberRunner, DelayMilliseconds, LogScrubber.GetLogScrubbingInterval(settings), e.UmbracoContext.Application, settings),
+                    new KeepAlive(_keepAliveRunner, delayMilliseconds, 300000, e.UmbracoContext.Application),
+                    new ScheduledPublishing(_publishingRunner, delayMilliseconds, 60000, e.UmbracoContext.Application, settings),
+                    new ScheduledTasks(_tasksRunner, delayMilliseconds, 60000, e.UmbracoContext.Application, settings),
+                    new LogScrubber(_scrubberRunner, delayMilliseconds, LogScrubber.GetLogScrubbingInterval(settings), e.UmbracoContext.Application, settings),
                 };
 
                 if (healthCheckConfig.NotificationSettings.Enabled)
@@ -82,15 +83,15 @@ namespace Umbraco.Web.Scheduling
                     int delayInMilliseconds;
                     if (string.IsNullOrEmpty(healthCheckConfig.NotificationSettings.FirstRunTime))
                     {
-                        delayInMilliseconds = DelayMilliseconds;
+                        delayInMilliseconds = delayMilliseconds;
                     }
                     else
                     {
                         // Otherwise start at scheduled time
                         delayInMilliseconds = DateTime.Now.PeriodicMinutesFrom(healthCheckConfig.NotificationSettings.FirstRunTime) * 60 * 1000;
-                        if (delayInMilliseconds < DelayMilliseconds)
+                        if (delayInMilliseconds < delayMilliseconds)
                         {
-                            delayInMilliseconds = DelayMilliseconds;
+                            delayInMilliseconds = delayMilliseconds;
                         }
                     }
 

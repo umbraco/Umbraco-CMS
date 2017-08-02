@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.HealthChecks
 {
-    public interface IDisabledHealthCheckElement
+    public interface IDisabledHealthCheck
     {
         Guid Id { get; }
         DateTime DisabledOn { get; }

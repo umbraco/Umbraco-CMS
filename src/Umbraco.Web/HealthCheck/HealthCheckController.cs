@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Web.Http;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Web.Editors;
 
@@ -20,7 +21,7 @@ namespace Umbraco.Web.HealthCheck
         {
             _healthCheckResolver = HealthCheckResolver.Current;
 
-            var healthCheckConfig = (HealthChecksSection)ConfigurationManager.GetSection("umbracoConfiguration/HealthChecks");
+            var healthCheckConfig = UmbracoConfig.For.HealthCheck();
             _disabledCheckIds = healthCheckConfig.DisabledChecks
                 .Select(x => x.Id)
                 .ToList();

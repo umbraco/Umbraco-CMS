@@ -1,8 +1,10 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.HealthChecks
 {
-    public class HealthCheckNotificationSettingsElement : ConfigurationElement, IHealthCheckNotificationSettingsElement
+    public class HealthCheckNotificationSettingsElement : ConfigurationElement, IHealthCheckNotificationSettings
     {
         private const string EnabledKey = "enabled";
         private const string FirstRunTimeKey = "firstRunTime";
@@ -53,6 +55,31 @@ namespace Umbraco.Core.Configuration.HealthChecks
             {
                 return (DisabledHealthChecksElementCollection)base[DisabledChecksKey];
             }
+        }
+
+        bool IHealthCheckNotificationSettings.Enabled
+        {
+            get { return Enabled; }
+        }
+
+        string IHealthCheckNotificationSettings.FirstRunTime
+        {
+            get { return FirstRunTime; }
+        }
+
+        int IHealthCheckNotificationSettings.PeriodInHours
+        {
+            get { return PeriodInHours; }
+        }
+
+        IReadOnlyDictionary<string, INotificationMethod> IHealthCheckNotificationSettings.NotificationMethods
+        {
+            get { return NotificationMethods; }
+        }
+
+        IEnumerable<IDisabledHealthCheck> IHealthCheckNotificationSettings.DisabledChecks
+        {
+            get { return DisabledChecks; }
         }
     }
 }

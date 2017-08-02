@@ -216,11 +216,11 @@
     <Compile Include="Configuration\Dashboard\SectionElement.cs" />
     <Compile Include="Configuration\Dashboard\TabCollection.cs" />
     <Compile Include="Configuration\Dashboard\TabElement.cs" />
-    <Compile Include="Configuration\HealthChecks\IDisabledHealthCheckElement.cs" />
-    <Compile Include="Configuration\HealthChecks\IHealthCheckNotificationSettingsElement.cs" />
-    <Compile Include="Configuration\HealthChecks\IHealthChecksSection.cs" />
-    <Compile Include="Configuration\HealthChecks\INotificationMethodElement.cs" />
-    <Compile Include="Configuration\HealthChecks\INotificationMethodSettingsElement.cs" />
+    <Compile Include="Configuration\HealthChecks\IDisabledHealthCheck.cs" />
+    <Compile Include="Configuration\HealthChecks\IHealthCheckNotificationSettings.cs" />
+    <Compile Include="Configuration\HealthChecks\IHealthChecks.cs" />
+    <Compile Include="Configuration\HealthChecks\INotificationMethod.cs" />
+    <Compile Include="Configuration\HealthChecks\INotificationMethodSettings.cs" />
     <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElement.cs" />
     <Compile Include="Configuration\HealthChecks\NotificationMethodElement.cs" />
     <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElementCollection.cs" />

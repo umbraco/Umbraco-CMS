@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 
 namespace Umbraco.Core.Configuration.HealthChecks
 {
     [ConfigurationCollection(typeof(NotificationMethodElement), AddItemName = "notificationMethod")]
-    public class NotificationMethodsElementCollection : ConfigurationElementCollection, IEnumerable<NotificationMethodElement> 
+    public class NotificationMethodsElementCollection : ConfigurationElementCollection, IEnumerable<INotificationMethod>, IReadOnlyDictionary<string, INotificationMethod>
     {
         protected override ConfigurationElement CreateNewElement()
         {
@@ -16,26 +17,64 @@ namespace Umbraco.Core.Configuration.HealthChecks
         {
             return ((NotificationMethodElement)(element)).Alias;
         }
-
-        new public NotificationMethodElement this[string key]
-        {
-            get
-            {
-                return (NotificationMethodElement)BaseGet(key);
-            }
-        }
-
-        IEnumerator<NotificationMethodElement> IEnumerable<NotificationMethodElement>.GetEnumerator()
+        
+        IEnumerator<KeyValuePair<string, INotificationMethod>> IEnumerable<KeyValuePair<string, INotificationMethod>>.GetEnumerator()
         {
             for (var i = 0; i < Count; i++)
             {
-                yield return BaseGet(i) as NotificationMethodElement;
+                var val = (NotificationMethodElement)BaseGet(i);
+                var key = (string)BaseGetKey(i);
+                yield return new KeyValuePair<string, INotificationMethod>(key, val);
             }
         }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        IEnumerator<INotificationMethod> IEnumerable<INotificationMethod>.GetEnumerator()
         {
-            return GetEnumerator();
+            for (var i = 0; i < Count; i++)
+            {
+                yield return (NotificationMethodElement)BaseGet(i);
+            }
+        }
+
+        bool IReadOnlyDictionary<string, INotificationMethod>.ContainsKey(string key)
+        {
+            return ((IReadOnlyDictionary<string, INotificationMethod>) this).Keys.Any(x => x == key);
+        }
+
+        bool IReadOnlyDictionary<string, INotificationMethod>.TryGetValue(string key, out INotificationMethod value)
+        {
+            try
+            {
+                var val = (NotificationMethodElement)BaseGet(key);
+                value = val;
+                return true;
+            }
+            catch (Exception)
+            {
+                value = null;
+                return false;
+            }
+        }
+
+        INotificationMethod IReadOnlyDictionary<string, INotificationMethod>.this[string key]
+        {
+            get { return (NotificationMethodElement)BaseGet(key); }
+        }
+
+        IEnumerable<string> IReadOnlyDictionary<string, INotificationMethod>.Keys
+        {
+            get { return BaseGetAllKeys().Cast<string>(); }
+        }
+
+        IEnumerable<INotificationMethod> IReadOnlyDictionary<string, INotificationMethod>.Values
+        {
+            get
+            {
+                for (var i = 0; i < Count; i++)
+                {
+                    yield return (NotificationMethodElement)BaseGet(i);
+                }
+            }
         }
     }
 }

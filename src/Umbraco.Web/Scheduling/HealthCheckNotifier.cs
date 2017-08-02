@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
@@ -44,9 +45,9 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
-            using (DisposableTimer.DebugDuration<KeepAlive>(() => "Health checks executing", () => "Health checks complete"))
+            using (_appContext.ProfilingLogger.DebugDuration<KeepAlive>("Health checks executing", "Health checks complete"))
             {
-                var healthCheckConfig = (HealthChecksSection)ConfigurationManager.GetSection("umbracoConfiguration/HealthChecks");
+                var healthCheckConfig = UmbracoConfig.For.HealthCheck();
 
                 // Don't notify for any checks that are disabled, nor for any disabled
                 // just for notifications
