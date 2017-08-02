@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
+﻿using System.Configuration;
 
 namespace Umbraco.Core.Configuration.HealthChecks
 {
-    public class HealthCheckNotificationSettingsElement : ConfigurationElement
+    public class HealthCheckNotificationSettingsElement : ConfigurationElement, IHealthCheckNotificationSettingsElement
     {
         private const string ENABLED_KEY = "enabled";
         private const string FIRST_RUN_TIME_KEY = "firstRunTime";

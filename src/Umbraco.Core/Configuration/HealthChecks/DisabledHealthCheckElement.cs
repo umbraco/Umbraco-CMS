@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Umbraco.Core.Configuration.HealthChecks
 {
-    public class DisabledHealthCheckElement : ConfigurationElement
+    public class DisabledHealthCheckElement : ConfigurationElement, IDisabledHealthCheckElement
     {
         private const string ID_KEY = "id";
         private const string DISABLED_ON_KEY = "disabledOn";

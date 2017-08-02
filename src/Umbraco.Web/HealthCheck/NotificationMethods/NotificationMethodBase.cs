@@ -11,7 +11,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             Verbosity = verbosity;
         }
 
-        public bool Enabled { get; set; }
+        public bool Enabled {  get; set; }
 
         public bool FailureOnly { get; set; }
 

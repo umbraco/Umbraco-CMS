@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.HealthChecks
 {
-    public class NotificationMethodSettingsElement : ConfigurationElement
+    public class NotificationMethodSettingsElement : ConfigurationElement, INotificationMethodSettingsElement
     {
         private const string KEY_KEY = "key";
         private const string VALUE_KEY = "value";

@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.HealthChecks
 {
-    public class HealthChecksSection : ConfigurationSection
+    public class HealthChecksSection : ConfigurationSection, IHealthChecksSection
     {
         private const string DISABLED_CHECKS_KEY = "disabledChecks";
         private const string NOTIFICATION_SETTINGS_KEY = "notificationSettings";

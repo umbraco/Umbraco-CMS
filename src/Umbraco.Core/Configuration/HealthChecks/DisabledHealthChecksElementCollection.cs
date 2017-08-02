@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
 
 namespace Umbraco.Core.Configuration.HealthChecks
@@ -17,7 +16,7 @@ namespace Umbraco.Core.Configuration.HealthChecks
             return ((DisabledHealthCheckElement)(element)).Id;
         }
 
-        new public DisabledHealthCheckElement this[string key]
+        public new DisabledHealthCheckElement this[string key]
         {
             get
             {

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
 
 namespace Umbraco.Core.Configuration.HealthChecks
@@ -17,7 +16,7 @@ namespace Umbraco.Core.Configuration.HealthChecks
             return ((NotificationMethodSettingsElement)(element)).Key;
         }
 
-        new public NotificationMethodSettingsElement this[string key]
+        public new NotificationMethodSettingsElement this[string key]
         {
             get
             {

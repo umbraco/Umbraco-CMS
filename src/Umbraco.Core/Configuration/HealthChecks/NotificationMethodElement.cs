@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
+﻿using System.Configuration;
 
 namespace Umbraco.Core.Configuration.HealthChecks
 {
-    public class NotificationMethodElement : ConfigurationElement
+    public class NotificationMethodElement : ConfigurationElement, INotificationMethodElement
     {
         private const string ALIAS_KEY = "alias";
         private const string ENABLED_KEY = "enabled";
