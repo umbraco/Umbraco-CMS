@@ -25,7 +25,7 @@
         </ul>
         <ul class="umb-actions umb-actions-child" ng-show="selectBlueprint">
 
-            <li ng-repeat="(key, value) in docType.blueprints | orderBy:'name':false" ng-class="{'umb-list-item' : $last}">
+            <li ng-repeat="(key, value) in docType.blueprints | orderBy:'name':false">
                 <a ng-click="createFromBlueprint(key)">
                     <i class="large {{docType.icon}}"></i>
                     <span class="menu-label">
@@ -34,7 +34,7 @@
                 </a>
             </li>
             
-            <li ng-show="allowBlank">
+            <li class="sep" ng-show="allowBlank">
                 <a ng-click="createBlank(docType)">
                     <i class="large {{docType.icon}}"></i>
                     <span class="menu-label">
