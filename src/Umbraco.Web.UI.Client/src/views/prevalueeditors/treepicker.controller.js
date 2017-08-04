@@ -3,7 +3,7 @@
 angular.module('umbraco')
 .controller("Umbraco.PrevalueEditors.TreePickerController",
 	
-	function($scope, dialogService, entityResource, $log, iconHelper){
+	function($scope, dialogService, entityResource, $log, iconHelper, miniEditorHelper){
 		$scope.renderModel = [];
 		$scope.ids = [];
 
@@ -45,6 +45,11 @@ angular.module('umbraco')
 					populate(model.selection[0]);
 				}
 
+				console.log(model);
+				/* entityResource.getUrl(updatedNode.id, entityType).then(function(data){
+						node.url = data;
+					}); */
+
 				$scope.treePickerOverlay.show = false;
 				$scope.treePickerOverlay = null;
 			};
@@ -55,7 +60,10 @@ angular.module('umbraco')
 			};
 
 		}
+		
 
+		
+	
 		$scope.remove =function(index){
 			$scope.renderModel.splice(index, 1);
 			$scope.ids.splice(index, 1);
@@ -74,10 +82,12 @@ angular.module('umbraco')
 
             if ($scope.ids.indexOf(itemId) < 0){
 				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-
-                $scope.ids.push(itemId);
-				$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon, udi: item.udi});
-				$scope.model.value = trim($scope.ids.join(), ",");
+				entityResource.getUrl(item.id, "Document").then(function(data){
+					item.path = data;		
+					$scope.ids.push(itemId);
+					$scope.renderModel.push({name: item.name, path: item.path, id: item.id, icon: item.icon, udi: item.udi});
+					$scope.model.value = trim($scope.ids.join(), ",");
+				});                 
 			}	
 		};
 

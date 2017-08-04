@@ -1,5 +1,5 @@
 <div ng-controller="Umbraco.PrevalueEditors.TreePickerController" class="umb-editor umb-contentpicker">
-
+	<!--
 	<ul class="unstyled list-icons" 
 		ng-model="renderModel">	
 		<li ng-repeat="node in renderModel">
@@ -10,7 +10,26 @@
 			<a href prevent-default ng-click="openContentPicker()" >{{node.name}}</a>
 		</li>
 	</ul>
+	-->
 
+	<div ui-sortable="sortableOptions" ng-model="renderModel">
+		<umb-node-preview
+			ng-repeat="node in renderModel"
+			icon="node.icon"
+			name="node.name"
+			published="node.published"
+			description="node.path"
+			sortable="!sortableOptions.disabled"
+			allow-remove="remove"
+			allow-open="model.config.showOpenButton && allowOpenButton && !dialogEditor"
+			allow-edit=""
+			on-remove="remove($index)"
+			on-open="openMiniEditor(node)"
+			on-edit="openContentPicker()">
+		</umb-node-preview>
+	</div>
+
+	<!--
 	<ul class="unstyled list-icons" ng-show="multipicker || renderModel.length === 0">	
 		<li>
 			<i class="icon icon-add turquoise"></i>
@@ -19,6 +38,15 @@
 			</a>
 		</li>
 	</ul>
+	-->
+
+	<a ng-show="model.config.multiPicker === true || renderModel.length === 0"
+		class="umb-node-preview-add"
+		href=""
+		ng-click="openContentPicker()"
+		prevent-default>
+		<localize key="general_add">Add</localize>
+	</a>
 
 	<umb-overlay
 		ng-if="treePickerOverlay.show"
