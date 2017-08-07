@@ -1518,6 +1518,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="excerptField">Excerpt field</key>
     <key alias="goToProfile">Go to user profile</key>
     <key alias="groupsHelp">Add groups to assign access and permissions</key>
+    <key alias="inviteAnotherUser">Invite another user</key>
     <key alias="inviteUserHelp">Invite new users to give them access to Umbraco. An invite email will be sent to the user with information on how to log in to Umbraco.</key>
     <key alias="language">Language</key>
     <key alias="languageHelp">Set the language you will see in menus and dialogs</key>
@@ -1564,6 +1565,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="userGroupPermissions">User group permissions</key>
     <key alias="usergroup">User group</key>
     <key alias="userGroups">User groups</key>
+    <key alias="userInvited">has been invited</key>
+    <key alias="userInvitedSuccessHelp">An invitation has been sent to the new user with details about how to log in to Umbraco.</key>
     <key alias="writer">Writer</key>
     <key alias="translator">Translator</key>
     <key alias="change">Change</key>

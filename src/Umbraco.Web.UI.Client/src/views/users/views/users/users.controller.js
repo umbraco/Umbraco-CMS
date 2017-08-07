@@ -472,6 +472,8 @@
                     .then(function (saved) {
                         //success
                         vm.page.createButtonState = "success";
+                        setUsersViewState('inviteUserSuccess');
+                        getUsers();
                     }, function (err) {
                         //error
                         formHelper.handleError(err);

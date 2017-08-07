@@ -1,9 +1,9 @@
 <div ng-controller="Umbraco.Editors.Users.UsersController as vm" class="clearfix">
 
-    <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
-
     <!-- Users Overview -->
     <div ng-if="vm.usersViewState === 'overview'">
+
+        <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
 
         <umb-editor-sub-header>
 
@@ -403,6 +403,7 @@
                         <localize key="user_userCreated">has been created</localize>
                     </h3>
                 </div>
+
                 <p style="line-height: 1.6em; margin-bottom: 20px;"><localize key="user_userCreatedSuccessHelp"></localize></p>
                 
                 <!-- New password -->
@@ -459,6 +460,53 @@
 
             </div>
         </div>
+    </div>
+
+    <!-- Invite user success -->
+    <div ng-if="vm.usersViewState === 'inviteUserSuccess'">
+        <umb-editor-sub-header>
+            <umb-editor-sub-header-content-left>
+                <a class="umb-package-details__back-link" href="" ng-click="vm.setUsersViewState('overview');">&larr; <localize key="user_backToUsers">Back to users</localize></a>
+            </umb-editor-sub-header-content-left>
+        </umb-editor-sub-header>
+
+        <div class="flex justify-center">
+            <div style="max-width: 500px;">
+
+                <!-- Success text -->
+                <div class="flex items-center" style="margin-bottom: 15px;">
+                    <umb-checkmark
+                        checked="vm.usersViewState === 'inviteUserSuccess'"
+                        size="m">
+                    </umb-checkmark>
+                    <h3 class="bold" style="margin: 0 0 0 10px;">
+                        {{vm.newUser.name | umbWordLimit:1}}
+                        <localize key="user_userInvited">has been created</localize>
+                    </h3>
+                </div>
+
+                <p style="line-height: 1.6em; margin-bottom: 20px;"><localize key="user_userInvitedSuccessHelp"></localize></p>
+
+                <!-- actions -->
+                <div>
+                    <umb-button
+                        type="button" button-style="info"
+                        label-key="user_inviteAnotherUser"
+                        action="vm.setUsersViewState('inviteUser');"
+                        size="m">
+                    </umb-button>
+                    <umb-button
+                        type="button"
+                        button-style="success"
+                        label-key="user_goToProfile"
+                        action="vm.goToUser(vm.newUser.id);"
+                        size="m">
+                    </umb-button>
+                </div>
+
+            </div>
+        </div>
+
     </div>
 
     <umb-overlay
