@@ -83,7 +83,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public bool HasContainerInPath(string contentPath)
         {
-            using (var uow = UowProvider.GetUnitOfWork())
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 // can use same repo for both content and media
                 var repository = RepositoryFactory.CreateContentTypeRepository(uow);

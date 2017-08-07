@@ -204,7 +204,7 @@ namespace Umbraco.Web.Editors
             if (identityUser != null)
             {
                 var user = Services.UserService.GetByEmail(model.Email);
-                if (user != null && user.IsLockedOut == false)
+                if (user != null)
                 {
                     var code = await UserManager.GeneratePasswordResetTokenAsync(identityUser.Id);
                     var callbackUrl = ConstructCallbackUrl(identityUser.Id, code);
@@ -303,9 +303,31 @@ namespace Umbraco.Web.Editors
             var result = await UserManager.ResetPasswordAsync(model.UserId, model.ResetCode, model.Password);
             if (result.Succeeded)
             {
+                var lockedOut = await UserManager.IsLockedOutAsync(model.UserId);
+                if (lockedOut)
+                {
+                    Logger.Info<AuthenticationController>(
+                        "User {0} is currently locked out, unlocking and resetting AccessFailedCount",
+                        () => model.UserId);
+
+                    //var user = await UserManager.FindByIdAsync(model.UserId);
+                    var unlockResult = await UserManager.SetLockoutEndDateAsync(model.UserId, DateTimeOffset.Now);
+                    if(unlockResult.Succeeded == false)
+                    {
+                        Logger.Warn<AuthenticationController>("Could not unlock for user {0} - error {1}",
+                                        () => model.UserId, () => unlockResult.Errors.First());
+                    }
+
+                    var resetAccessFailedCountResult = await UserManager.ResetAccessFailedCountAsync(model.UserId);
+                    if (resetAccessFailedCountResult.Succeeded == false)
+                    {
+                        Logger.Warn<AuthenticationController>("Could not reset access failed count {0} - error {1}",
+                            () => model.UserId, () => unlockResult.Errors.First());
+                    }
+                }
+
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
-
             return Request.CreateValidationErrorResponse(
                 result.Errors.Any() ? result.Errors.First() : "Set password failed");
         }

@@ -237,6 +237,7 @@
     <Compile Include="Configuration\UmbracoSettings\ContentError404Collection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentErrorPageElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentErrorsElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\ContentSectionExtensions.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillPropertiesCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillUploadFieldElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentImagingElement.cs" />
@@ -649,6 +650,7 @@
     <Compile Include="Services\ContentTypeServiceExtensions.cs" />
     <Compile Include="Models\RedirectUrl.cs" />
     <Compile Include="Services\IContentServiceBase.cs" />
+    <Compile Include="Services\IdkMap.cs" />
     <Compile Include="Services\RedirectUrlService.cs" />
     <Compile Include="Services\DomainService.cs" />
     <Compile Include="Services\ExternalLoginService.cs" />

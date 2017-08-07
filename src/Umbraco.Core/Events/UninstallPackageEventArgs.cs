@@ -3,7 +3,7 @@ using Umbraco.Core.Packaging.Models;
 
 namespace Umbraco.Core.Events
 {
-    internal class UninstallPackageEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>
+    public class UninstallPackageEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>
     {
         private readonly MetaData _packageMetaData;
 

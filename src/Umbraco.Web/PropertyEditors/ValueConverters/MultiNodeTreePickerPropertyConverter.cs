@@ -52,10 +52,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
+            if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePicker2Alias))
+                return true;
+
             if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
             {
-                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePickerAlias)
-                    || propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePicker2Alias);
+                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePickerAlias);
             }
             return false;
         }
@@ -119,68 +121,67 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             }
 
             //TODO: Inject an UmbracoHelper and create a GetUmbracoHelper method based on either injected or singleton
-            if (UmbracoContext.Current != null)
+            if (UmbracoContext.Current == null) return source;
+
+            var umbHelper = new UmbracoHelper(UmbracoContext.Current);
+
+            if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePickerAlias))
             {
-                if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePickerAlias))
+                var nodeIds = (int[])source;
+
+                if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.InvariantContains(propertyType.PropertyTypeAlias)) == false)
                 {
-                    var nodeIds = (int[])source;
+                    var multiNodeTreePicker = new List<IPublishedContent>();
 
-                    if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.InvariantContains(propertyType.PropertyTypeAlias)) == false)
+                    var objectType = UmbracoObjectTypes.Unknown;
+
+                    foreach (var nodeId in nodeIds)
                     {
-                        var multiNodeTreePicker = new List<IPublishedContent>();
+                        var multiNodeTreePickerItem =
+                            GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Document, umbHelper.TypedContent)
+                            ?? GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Media, umbHelper.TypedMedia)
+                            ?? GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Member, umbHelper.TypedMember);
 
-                        if (nodeIds.Length > 0)
+                        if (multiNodeTreePickerItem != null)
                         {
-                            var umbHelper = new UmbracoHelper(UmbracoContext.Current);
-                            var objectType = UmbracoObjectTypes.Unknown;
-
-                            foreach (var nodeId in nodeIds)
-                            {
-                                var multiNodeTreePickerItem =
-                                    GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Document, umbHelper.TypedContent)
-                                    ?? GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Media, umbHelper.TypedMedia)
-                                    ?? GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Member, umbHelper.TypedMember);
-
-                                if (multiNodeTreePickerItem != null)
-                                {
-                                    multiNodeTreePicker.Add(multiNodeTreePickerItem);
-                                }
-                            }
+                            multiNodeTreePicker.Add(multiNodeTreePickerItem);
                         }
-
-                        return multiNodeTreePicker;
                     }
 
-                    // return the first nodeId as this is one of the excluded properties that expects a single id
-                    return nodeIds.FirstOrDefault();
+                    return multiNodeTreePicker;
                 }
 
-                if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePicker2Alias))
+                // return the first nodeId as this is one of the excluded properties that expects a single id
+                return nodeIds.FirstOrDefault();
+            }
+
+            if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePicker2Alias))
+            {
+                var udis = (Udi[])source;
+
+                if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.InvariantContains(propertyType.PropertyTypeAlias)) == false)
                 {
-                    var udis = (Udi[])source;
+                    var multiNodeTreePicker = new List<IPublishedContent>();
 
-                    if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.InvariantContains(propertyType.PropertyTypeAlias)) == false)
+                    var objectType = UmbracoObjectTypes.Unknown;
+
+                    foreach (var udi in udis)
                     {
-                        var multiNodeTreePicker = new List<IPublishedContent>();
-
-                        if (udis.Length > 0)
+                        var multiNodeTreePickerItem =
+                            GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Document, umbHelper.TypedContent)
+                            ?? GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Media, umbHelper.TypedMedia)
+                            ?? GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Member, umbHelper.TypedMember);
+                        if (multiNodeTreePickerItem != null)
                         {
-                            foreach (var udi in udis)
-                            {
-                                var item = udi.ToPublishedContent();
-                                if (item != null)
-                                {
-                                    multiNodeTreePicker.Add(item);
-                                }
-                            }
+                            multiNodeTreePicker.Add(multiNodeTreePickerItem);
                         }
-
-                        return multiNodeTreePicker;
                     }
 
-                    // return the first nodeId as this is one of the excluded properties that expects a single id
-                    return udis.FirstOrDefault();
+                    return multiNodeTreePicker;
                 }
+
+                // return the first nodeId as this is one of the excluded properties that expects a single id
+                return udis.FirstOrDefault();
             }
             return source;
         }
@@ -193,7 +194,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// <param name="expectedType">The type of content expected/supported by <paramref name="contentFetcher"/></param>
         /// <param name="contentFetcher">A function to fetch content of type <paramref name="expectedType"/></param>
         /// <returns>The requested content, or null if either it does not exist or <paramref name="actualType"/> does not match <paramref name="expectedType"/></returns>
-        private IPublishedContent GetPublishedContent(int nodeId, ref UmbracoObjectTypes actualType, UmbracoObjectTypes expectedType, Func<int, IPublishedContent> contentFetcher)
+        private IPublishedContent GetPublishedContent<T>(T nodeId, ref UmbracoObjectTypes actualType, UmbracoObjectTypes expectedType, Func<T, IPublishedContent> contentFetcher)
         {
             // is the actual type supported by the content fetcher?
             if (actualType != UmbracoObjectTypes.Unknown && actualType != expectedType)

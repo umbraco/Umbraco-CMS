@@ -68,7 +68,7 @@ namespace Umbraco.Core.Strings
         /// <summary>
         /// Flag mask for encoding.
         /// </summary>
-        CodeMask = Unicode | Utf8 | Ascii,
+        CodeMask = Unicode | Utf8 | Ascii | TryAscii,
 
         /// <summary>
         /// Unicode encoding.
@@ -86,6 +86,10 @@ namespace Umbraco.Core.Strings
         /// </summary>
         Ascii = 0x0400,
 
+        /// <summary>
+        /// Ascii encoding, if possible.
+        /// </summary>
+        TryAscii = 0x0800,
 
         // role values
 

@@ -159,7 +159,7 @@ namespace Umbraco.Core.IO
 
             // ReSharper disable once AssignNullToNotNullAttribute
             var filepath = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
-                ? Path.Combine(folder, filename)
+                ? Path.Combine(folder, filename).Replace('\\', '/')
                 : folder + "-" + filename;
 
             return filepath;

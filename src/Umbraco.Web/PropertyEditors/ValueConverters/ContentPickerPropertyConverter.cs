@@ -50,10 +50,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
+            if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.ContentPicker2Alias))
+                return true;
+
             if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
             {
-                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.ContentPickerAlias)
-                    || propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.ContentPicker2Alias);
+                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.ContentPickerAlias);
             }
             return false;
         }
@@ -106,25 +108,26 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 return null;
             }
 
-            if (UmbracoContext.Current != null)
+            if (UmbracoContext.Current == null) return source;
+
+            if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.Contains(propertyType.PropertyTypeAlias.ToLower(CultureInfo.InvariantCulture))) == false)
             {
-                if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.Contains(propertyType.PropertyTypeAlias.ToLower(CultureInfo.InvariantCulture))) == false)
+                IPublishedContent content;
+                if (source is int)
                 {
-                    IPublishedContent content;
-                    if (source is int)
-                    {
-                        var sourceInt = (int)source;
-                        content = UmbracoContext.Current.ContentCache.GetById(sourceInt);
-                        if(content != null)
-                            return content;
-                    }
-                    else
-                    {
-                        var sourceUdi = source as Udi;
-                        content = sourceUdi.ToPublishedContent();
-                        if (content != null)
-                            return content;
-                    }
+                    var sourceInt = (int)source;
+                    content = UmbracoContext.Current.ContentCache.GetById(sourceInt);
+                    if(content != null)
+                        return content;
+                }
+                else
+                {
+                    var sourceUdi = source as Udi;
+                    if (sourceUdi == null) return null;
+                    var umbHelper = new UmbracoHelper(UmbracoContext.Current);
+                    content = umbHelper.TypedContent(sourceUdi);
+                    if (content != null)
+                        return content;
                 }
             }
             return source;

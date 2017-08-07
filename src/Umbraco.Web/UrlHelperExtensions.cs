@@ -176,22 +176,14 @@ namespace Umbraco.Web
             //make a hash of umbraco and client dependency version
             //in case the user bypasses the installer and just bumps the web.config or clientdep config
             
-            var versionHash = new HashCodeCombiner();
-
             //if in debug mode, always burst the cache
             if (GlobalSettings.DebugMode)
             {
-                versionHash.AddCaseInsensitiveString(DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture));
-            }
-            else
-            {
-                //create a unique hash code of the current umb version and the current cdf version
-                
-                versionHash.AddCaseInsensitiveString(UmbracoVersion.Current.ToString());
-                versionHash.AddCaseInsensitiveString(ClientDependencySettings.Instance.Version.ToString(CultureInfo.InvariantCulture));                
+                return DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture).GenerateHash();
             }
 
-            return versionHash.GetCombinedHashCode();
+            var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
+            return string.Format("{0}.{1}", version, ClientDependencySettings.Instance.Version).GenerateHash();
         }
     }
 }
