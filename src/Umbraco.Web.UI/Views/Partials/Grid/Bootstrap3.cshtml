@@ -2,10 +2,6 @@
 @using Umbraco.Web.Templates
 @using Newtonsoft.Json.Linq
 
-@* 
-    Razor helpers located at the bottom of this file
-*@
-
 @if (Model != null && Model.sections != null)
 {
     var oneColumn = ((System.Collections.ICollection)Model.sections).Count == 1;
@@ -64,29 +60,21 @@
         JObject cfg = contentItem.config;
 
         if(cfg != null)
-            foreach (JProperty property in cfg.Properties())
-            {
-                var propertyValue = HttpUtility.HtmlAttributeEncode(property.Value.ToString());
-                attrs.Add(property.Name + "=\"" + propertyValue + "\"");
+            foreach (JProperty property in cfg.Properties()) {
+                attrs.Add(property.Name + "='" + property.Value.ToString() + "'");
             }
-        
+                
         JObject style = contentItem.styles;
 
-        if (style != null) {
-            var cssVals = new List<string>();
-            foreach (JProperty property in style.Properties())
-            {
-                var propertyValue = property.Value.ToString();
-                if (string.IsNullOrWhiteSpace(propertyValue) == false)
-                {
-                    cssVals.Add(property.Name + ":" + propertyValue + ";");
-                }
-            }
+        if (style != null) { 
+        var cssVals = new List<string>();
+        foreach (JProperty property in style.Properties())
+            cssVals.Add(property.Name + ":" + property.Value.ToString() + ";");
 
-            if (cssVals.Any())
-                attrs.Add("style=\"" + HttpUtility.HtmlAttributeEncode(string.Join(" ", cssVals)) + "\"");
+        if (cssVals.Any())
+            attrs.Add("style='" + string.Join(" ", cssVals) + "'");
         }
-
+            
         return new MvcHtmlString(string.Join(" ", attrs));
     }
 }
