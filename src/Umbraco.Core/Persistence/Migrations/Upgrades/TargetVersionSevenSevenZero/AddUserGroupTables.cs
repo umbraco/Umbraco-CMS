@@ -112,7 +112,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
         {
             // Create user group records for all non-admin users that have specific permissions set
             Execute.Sql(@"INSERT INTO umbracoUserGroup(userGroupAlias, userGroupName)
-                SELECT userName + 'Group', 'Group for ' + userName
+                SELECT userLogin + 'Group', 'Group for ' + userLogin
                 FROM umbracoUser
                 WHERE (id IN (
 	                SELECT " + SqlSyntax.GetQuotedColumnName("user") + @"
@@ -127,7 +127,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
             Execute.Sql(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
                 SELECT u.id, ug.id
                 FROM umbracoUser u
-                INNER JOIN umbracoUserGroup ug ON ug.userGroupAlias = userName + 'Group'");
+                INNER JOIN umbracoUserGroup ug ON ug.userGroupAlias = userLogin + 'Group'");
 
             // Create node permissions on the groups
             Execute.Sql(@"INSERT INTO umbracoUserGroup2NodePermission (userGroupId,nodeId,permission)
