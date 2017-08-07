@@ -26,7 +26,7 @@
                         Add permissions for...
                         <span class="caret" style="margin-left: 10px;"></span>
                     </a>
-                    <ul class="dropdown-menu" style="width: 100%;">
+                    <ul class="dropdown-menu">
                         <li ng-repeat="group in vm.availableUserGroups | filter:{selected: '!true'}">
                             <a href="" ng-click="vm.editPermissions(group)" prevent-default>
                                 <i class="{{group.icon}}"></i>
