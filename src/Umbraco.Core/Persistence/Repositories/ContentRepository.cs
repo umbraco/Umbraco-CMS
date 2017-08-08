@@ -1126,31 +1126,10 @@ ORDER BY cmsContentVersion.id DESC
             if (EnsureUniqueNaming == false)
                 return nodeName;
 
-            var sql = new Sql();
-            sql.Select("*")
-               .From<NodeDto>()
-               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.ParentId == parentId && x.Text.StartsWith(nodeName));
+            var names = Database.Fetch<SimilarNodeName>("SELECT id, text AS name FROM umbracoNode WHERE nodeObjectType=@objectType AND parentId=@parentId",
+                new { objectType = NodeObjectTypeId, parentId });
 
-            int uniqueNumber = 1;
-            var currentName = nodeName;
-
-            var dtos = Database.Fetch<NodeDto>(sql);
-            if (dtos.Any())
-            {
-                var results = dtos.OrderBy(x => x.Text, new SimilarNodeNameComparer());
-                foreach (var dto in results)
-                {
-                    if (id != 0 && id == dto.NodeId) continue;
-
-                    if (dto.Text.ToLowerInvariant().Equals(currentName.ToLowerInvariant()))
-                    {
-                        currentName = nodeName + string.Format(" ({0})", uniqueNumber);
-                        uniqueNumber++;
-                    }
-                }
-            }
-
-            return currentName;
+            return SimilarNodeName.GetUniqueName(names, id, nodeName);
         }
 
         /// <summary>
