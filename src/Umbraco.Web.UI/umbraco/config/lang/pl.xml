@@ -383,7 +383,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="allPropTypes">Wszystkie typy właściwości &amp; dane właściwości</key>
     <key alias="willBeDeleted">używające tego typu danych zostaną usunięte na zawsze, potwierdź, że chcesz je także usunąć</key>
     <key alias="yesDelete">Tak, usuń</key>
-    <key alias="andAllRelated">i wszystkie typy właściwości &amp; dane właściwości używające tego typu danych/key>
+    <key alias="andAllRelated">i wszystkie typy właściwości &amp; dane właściwości używające tego typu danych</key>
     <key alias="selectFolder">Wybierz folder do przeniesienia</key>
     <key alias="inTheTree">do w strukturze drzewa poniżej</key>
     <key alias="wasMoved">został przeniesiony poniżej</key>
@@ -815,7 +815,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="notifications">Powiadomienie</key>
   </area>
   <area alias="packager">
-    <key alias="chooseLocalPackageText"><!CDATA[
+    <key alias="chooseLocalPackageText"><![CDATA[
       Wskaż pakiet z Twojego komputera, poprzez kliknięcie na przycisk "Przeglądaj"<br /> 
       i wskaż gdzie jest zapisany. Pakiety Umbraco przeważnie posiadają rozszerzenie ".umb" lub ".zip".
       ]]></key>
