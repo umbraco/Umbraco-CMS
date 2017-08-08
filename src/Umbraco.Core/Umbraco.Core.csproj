@@ -344,6 +344,8 @@
     <Compile Include="HashCodeHelper.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
+    <Compile Include="Models\GridAttributesBase.cs" />
+    <Compile Include="Models\IGridAttributes.cs" />
     <Compile Include="Models\IUserControl.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeConverter.cs" />
     <Compile Include="Models\UserControl.cs" />
