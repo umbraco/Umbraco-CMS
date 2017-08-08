@@ -357,6 +357,8 @@
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\EntityBase\EntityPath.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
+    <Compile Include="Models\GridAttributesBase.cs" />
+    <Compile Include="Models\IGridAttributes.cs" />
     <Compile Include="Models\IUserControl.cs" />
     <Compile Include="Models\Membership\ContentPermissionSet.cs" />
     <Compile Include="Models\Membership\EntityPermissionCollection.cs" />

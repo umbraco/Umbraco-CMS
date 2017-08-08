@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Web;
+using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using System.Web.Mvc;
-using Umbraco.Web.Templates;
-using System.IO;
-using System.Web.Routing;
-using Umbraco.Web.Mvc;
+using Umbraco.Web.GridFrameworks;
 
 namespace Umbraco.Web
 {
-    
+
     public static class GridTemplateExtensions
     {
         public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedProperty property, string framework = "bootstrap3")
@@ -24,6 +22,68 @@ namespace Umbraco.Web
 
             var view = "Grid/" + framework;
             return html.Partial(view, property.Value);
+        }
+
+        /// <summary>
+        /// Gets the grid HTML.
+        /// </summary>
+        /// <param name="html">The HTML.</param>
+        /// <param name="contentItem">The content item.</param>
+        /// <param name="propertyAlias">The property alias.</param>
+        /// <param name="recursive">if set to <c>true</c> [recursive].</param>
+        /// <returns></returns>
+        /// <exception cref="System.NullReferenceException">No property type found with alias " + propertyAlias</exception>
+        public static IHtmlString GetGridHtml<TGridFramework>(this HtmlHelper html, IPublishedContent contentItem, string propertyAlias, bool recursive = false)
+            where TGridFramework : IGridFramework, new()
+        {
+            Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
+            if (contentItem.HasProperty(propertyAlias) == false)
+            {
+                throw new NullReferenceException("No property found with alias " + propertyAlias);
+            }
+            var gridJson = contentItem.GetPropertyValue<string>(propertyAlias, recursive);
+            if (gridJson == null)
+            {
+                throw new NullReferenceException("The property with alias " + propertyAlias + ", was null");
+            }
+            return html.GetGridHtml<TGridFramework>(JsonConvert.DeserializeObject<GridValue>(gridJson));
+        }
+
+        /// <summary>
+        /// Gets the grid HTML.
+        /// </summary>
+        /// <param name="html">The HTML.</param>
+        /// <param name="gridToken">The grid as a JToken.</param>
+        /// <returns></returns>
+        public static IHtmlString GetGridHtml<TGridFramework>(this HtmlHelper html, JToken gridToken)
+            where TGridFramework : IGridFramework, new()
+        {
+            return html.GetGridHtml<TGridFramework>(gridToken.ToObject<GridValue>());
+        }
+
+        /// <summary>
+        /// Renders the grid.
+        /// </summary>
+        /// <param name="html">The HTML.</param>
+        /// <param name="grid">The grid.</param>
+        /// <returns></returns>
+        public static IHtmlString GetGridHtml<TGridFramework>(this HtmlHelper html, GridValue grid)
+            where TGridFramework : IGridFramework, new()
+        {
+            var framework = new TGridFramework { GridValue = grid };
+
+            var gridDiv = GridHelper.GetDivWrapper(framework.GridCssClass);
+
+            if (grid.Sections.Count() == 1)
+            {
+                gridDiv.AddChild(framework.GetSectionHtml(html, 0).ToHtmlString());
+            }
+            else if (grid.Sections.Count() > 1)
+            {
+                gridDiv.AddChild(framework.GetSectionsHtml(html).ToHtmlString());
+            }
+
+            return gridDiv.ToHtml();
         }
 
         public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedContent contentItem)
@@ -108,7 +168,7 @@ namespace Umbraco.Web
         {
             Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
 
-            return GetGridHtml(contentItem, propertyAlias, "bootstrap3");    
+            return GetGridHtml(contentItem, propertyAlias, "bootstrap3");
         }
 
         [Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
@@ -142,7 +202,7 @@ namespace Umbraco.Web
         private class FakeView : IView
         {
             public void Render(ViewContext viewContext, TextWriter writer)
-            {                
+            {
             }
         }
     }

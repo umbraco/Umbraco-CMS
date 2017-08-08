@@ -331,6 +331,12 @@
     <Compile Include="Editors\UserGroupsController.cs" />
     <Compile Include="Editors\UserGroupValidateAttribute.cs" />
     <Compile Include="Extensions\UdiExtensions.cs" />
+    <Compile Include="GridFrameworks\Bootstrap2FluidGrid.cs" />
+    <Compile Include="GridFrameworks\Bootstrap2Grid.cs" />
+    <Compile Include="GridFrameworks\Bootstrap3FluidGrid.cs" />
+    <Compile Include="GridFrameworks\Bootstrap3Grid.cs" />
+    <Compile Include="GridFrameworks\GridHelper.cs" />
+    <Compile Include="GridFrameworks\UmbracoGridFramework.cs" />
     <Compile Include="HealthCheck\Checks\Config\AbstractConfigCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\AcceptableConfiguration.cs" />
     <Compile Include="HealthCheck\Checks\Config\ConfigurationService.cs" />
@@ -365,6 +371,7 @@
     <Compile Include="HealthCheck\NotificationMethods\IHealthCheckNotificatationMethod.cs" />
     <Compile Include="HealthCheck\StatusResultType.cs" />
     <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
+    <Compile Include="IGridFramework.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Install\InstallSteps\ConfigureMachineKey.cs" />
     <Compile Include="Models\ContentEditing\AssignedContentPermissions.cs" />
