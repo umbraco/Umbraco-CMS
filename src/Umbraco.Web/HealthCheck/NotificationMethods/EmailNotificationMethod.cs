@@ -23,7 +23,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
         public EmailNotificationMethod(bool enabled, bool failureOnly, HealthCheckNotificationVerbosity verbosity,
                 string recipientEmail)
             : this(enabled, failureOnly, verbosity, recipientEmail, ApplicationContext.Current.Services.TextService)
-        {            
+        {
         }
 
         /// <summary>
@@ -39,13 +39,13 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             : base(enabled, failureOnly, verbosity)
         {
             if (textService == null) throw new ArgumentNullException("textService");
-            if (string.IsNullOrWhiteSpace(recipientEmail)) throw new ArgumentException("Value cannot be null or whitespace.", "recipientEmail");
+            if (enabled && string.IsNullOrWhiteSpace(recipientEmail)) throw new ArgumentException("Value cannot be null or whitespace.", "recipientEmail");
             _textService = textService;
             RecipientEmail = recipientEmail;
             Verbosity = verbosity;
         }
 
-        public string RecipientEmail { get; private set; }        
+        public string RecipientEmail { get; private set; }
 
         public async Task SendAsync(HealthCheckResults results)
         {
