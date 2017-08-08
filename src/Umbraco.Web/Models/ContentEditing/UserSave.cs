@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -47,11 +48,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            //TODO: Add other server side validation
-            //if (CultureInfo.GetCultureInfo(Culture))
-            //    yield return new ValidationResult("The culture is invalid", new[] { "Culture" });
-
-            yield break;
+            if (UserGroups.Any() == false)
+                yield return new ValidationResult("A user must be assigned to at least one group", new[] { "UserGroups" });
         }
     }
 }

@@ -14,11 +14,11 @@
         vm.newUser = {};
         vm.usersOptions = {};
         vm.userSortData = [
-          { label: "Name (A-Z)", key: "Name", direction: "Ascending" },
-          { label: "Name (Z-A)", key: "Name", direction: "Descending" },
-          { label: "Newest", key: "CreateDate", direction: "Descending" },
-          { label: "Oldest", key: "CreateDate", direction: "Ascending" },
-          { label: "Last login", key: "LastLoginDate", direction: "Descending" }
+            { label: "Name (A-Z)", key: "Name", direction: "Ascending" },
+            { label: "Name (Z-A)", key: "Name", direction: "Descending" },
+            { label: "Newest", key: "CreateDate", direction: "Descending" },
+            { label: "Oldest", key: "CreateDate", direction: "Ascending" },
+            { label: "Last login", key: "LastLoginDate", direction: "Descending" }
         ];
         vm.userStatesFilter = [];
         vm.newUser.userGroups = [];
@@ -111,11 +111,11 @@
         }
 
         function getSortLabel(sortKey, sortDirection) {
-          var found = _.find(vm.userSortData,
-            function (i) {
-              return i.key === sortKey && i.direction === sortDirection;
-            });
-          return found ? found.label : sortKey;
+            var found = _.find(vm.userSortData,
+                function (i) {
+                    return i.key === sortKey && i.direction === sortDirection;
+                });
+            return found ? found.label : sortKey;
         }
 
         function toggleFilter(type) {
@@ -160,7 +160,7 @@
         function selectUser(user, selection, event) {
 
             // prevent the current user to be selected
-            if(!user.isCurrentUser) {
+            if (!user.isCurrentUser) {
 
                 if (user.selected) {
                     var index = selection.indexOf(user.id);
@@ -170,10 +170,10 @@
                     user.selected = true;
                     vm.selection.push(user.id);
                 }
-                
+
                 setBulkActions(vm.users);
 
-                if(event){
+                if (event) {
                     event.preventDefault();
                     event.stopPropagation();
                 }
@@ -188,7 +188,7 @@
         }
 
         function clickUser(user) {
-            if(vm.selection.length > 0) {
+            if (vm.selection.length > 0) {
                 selectUser(user, vm.selection);
             } else {
                 goToUser(user.id);
@@ -198,22 +198,22 @@
         function disableUsers() {
             vm.disableUserButtonState = "busy";
             usersResource.disableUsers(vm.selection).then(function (data) {
-              // update userState
-              angular.forEach(vm.selection, function (userId) {
-                var user = getUserFromArrayById(userId, vm.users);
-                if (user) {
-                  user.userState = 1;
-                }
-              });
-              // show the correct badges
-              setUserDisplayState(vm.users);
+                // update userState
+                angular.forEach(vm.selection, function (userId) {
+                    var user = getUserFromArrayById(userId, vm.users);
+                    if (user) {
+                        user.userState = 1;
+                    }
+                });
+                // show the correct badges
+                setUserDisplayState(vm.users);
 
-              formHelper.showNotifications(data);
-              
-              vm.disableUserButtonState = "init";
-              clearSelection();
+                formHelper.showNotifications(data);
 
-            }, function(error){
+                vm.disableUserButtonState = "init";
+                clearSelection();
+
+            }, function (error) {
                 vm.disableUserButtonState = "error";
                 formHelper.showNotifications(error.data);
             });
@@ -222,27 +222,27 @@
         function enableUsers() {
             vm.enableUserButtonState = "busy";
             usersResource.enableUsers(vm.selection).then(function (data) {
-              // update userState
-              angular.forEach(vm.selection, function (userId) {
-                var user = getUserFromArrayById(userId, vm.users);
-                if (user) {
-                  user.userState = 0;
-                }
-              });
-              // show the correct badges
-              setUserDisplayState(vm.users);
-              // show notification
-              formHelper.showNotifications(data);
-              vm.enableUserButtonState = "init";
-              clearSelection();
+                // update userState
+                angular.forEach(vm.selection, function (userId) {
+                    var user = getUserFromArrayById(userId, vm.users);
+                    if (user) {
+                        user.userState = 0;
+                    }
+                });
+                // show the correct badges
+                setUserDisplayState(vm.users);
+                // show notification
+                formHelper.showNotifications(data);
+                vm.enableUserButtonState = "init";
+                clearSelection();
             }, function (error) {
                 vm.enableUserButtonState = "error";
-              formHelper.showNotifications(error.data);
+                formHelper.showNotifications(error.data);
             });
         }
 
         function getUserFromArrayById(userId, users) {
-            return _.find(users, function(u) { return u.id === userId });
+            return _.find(users, function (u) { return u.id === userId });
         }
 
         function openBulkUserGroupPicker(event) {
@@ -264,7 +264,7 @@
                         });
                         // apply changes to UI
                         _.each(vm.selection,
-                            function(userId) {
+                            function (userId) {
                                 var user = getUserFromArrayById(userId, vm.users);
                                 user.userGroups = vm.selectedBulkUserGroups;
                             });
@@ -327,7 +327,7 @@
                 // select all users
                 angular.forEach(vm.users, function (user) {
                     // prevent the current user to be selected
-                    if(!user.isCurrentUser) {
+                    if (!user.isCurrentUser) {
                         user.selected = true;
                         vm.selection.push(user.id);
                     }
@@ -339,11 +339,11 @@
             // we need to check if the current user is part of the selection and 
             // subtract the user from the total selection to find out if all users are selected
             var includesCurrentUser = vm.users.some(function (user) { return user.isCurrentUser === true; });
-            
-            if(includesCurrentUser) {
-                if (vm.selection.length === vm.users.length - 1) { return true;}
+
+            if (includesCurrentUser) {
+                if (vm.selection.length === vm.users.length - 1) { return true; }
             } else {
-                if (vm.selection.length === vm.users.length) { return true;}
+                if (vm.selection.length === vm.users.length) { return true; }
             }
         }
 
@@ -362,7 +362,7 @@
             var found = false;
             angular.forEach(array, function (item) {
                 if (item.selected) {
-                    if(!found) {
+                    if (!found) {
                         name = item.name
                         found = true;
                     } else {
@@ -374,14 +374,14 @@
         }
 
         function setUserStatesFilter(userState) {
-            
+
             if (!vm.usersOptions.userStates) {
                 vm.usersOptions.userStates = [];
             }
 
             //If the selection is "ALL" then we need to unselect everything else since this is an 'odd' filter
             if (userState.key === "All") {
-                angular.forEach(vm.userStatesFilter, function(i) {
+                angular.forEach(vm.userStatesFilter, function (i) {
                     i.selected = false;
                 });
                 //we can't unselect All
@@ -397,7 +397,7 @@
                 });
                 var indexOfAll = vm.usersOptions.userStates.indexOf("All");
                 if (indexOfAll >= 0) {
-                    vm.usersOptions.userStates.splice(indexOfAll, 1);    
+                    vm.usersOptions.userStates.splice(indexOfAll, 1);
                 }
             }
 
@@ -414,11 +414,11 @@
 
         function setUserGroupFilter(userGroup) {
 
-            if(!vm.usersOptions.userGroups) {
+            if (!vm.usersOptions.userGroups) {
                 vm.usersOptions.userGroups = [];
             }
 
-            if(userGroup.selected) {
+            if (userGroup.selected) {
                 vm.usersOptions.userGroups.push(userGroup.alias);
             } else {
                 var index = vm.usersOptions.userGroups.indexOf(userGroup.alias);
@@ -472,6 +472,9 @@
                     .then(function (saved) {
                         //success
                         vm.page.createButtonState = "success";
+                        vm.newUser = saved;
+                        setUsersViewState('inviteUserSuccess');
+                        getUsers();
                     }, function (err) {
                         //error
                         formHelper.handleError(err);
@@ -489,7 +492,7 @@
         function copySuccess() {
             vm.page.copyPasswordButtonState = "success";
         }
-        
+
         // copy to clip board error
         function copyError() {
             vm.page.copyPasswordButtonState = "error";
@@ -520,7 +523,7 @@
 
                 vm.loading = false;
 
-            }, function(error){
+            }, function (error) {
 
                 vm.loading = false;
 
@@ -528,7 +531,7 @@
         }
 
         function setUserDisplayState(users) {
-            angular.forEach(users, function(user){
+            angular.forEach(users, function (user) {
                 user.userDisplayState = usersHelper.getUserStateFromValue(user.userState);
             });
         }
@@ -557,22 +560,22 @@
                 }
 
                 // if the current user is selected prevent any bulk actions with the user included
-                if(user.isCurrentUser) {
+                if (user.isCurrentUser) {
                     vm.allowDisableUser = false;
                     vm.allowEnableUser = false;
                     vm.allowSetUserGroup = false;
                     return;
                 }
 
-                if(user.userDisplayState && user.userDisplayState.key === "Disabled") {
+                if (user.userDisplayState && user.userDisplayState.key === "Disabled") {
                     vm.allowDisableUser = false;
                 }
 
-                if(user.userDisplayState && user.userDisplayState.key === "Active") {
+                if (user.userDisplayState && user.userDisplayState.key === "Active") {
                     vm.allowEnableUser = false;
                 }
 
-                if(user.userDisplayState && user.userDisplayState.key === "Invited") {
+                if (user.userDisplayState && user.userDisplayState.key === "Invited") {
                     vm.allowEnableUser = false;
                 }
 
@@ -584,7 +587,7 @@
                     // for 2nd+ selected user, compare the user group aliases to determine if we should allow bulk editing.
                     // we don't allow bulk editing of users not currently having the same assigned user groups, as we can't
                     // really support that in the user group picker.
-                    var userGroups = user.userGroups.map(function(ug) { return ug.alias; });
+                    var userGroups = user.userGroups.map(function (ug) { return ug.alias; });
                     if (_.difference(firstSelectedUserGroups, userGroups).length > 0) {
                         vm.allowSetUserGroup = false;
                     }
