@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, usersResource, userGroupsResource, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService) {
+    function UsersController($scope, $timeout, $location, usersResource, userGroupsResource, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -539,7 +539,18 @@
         function formatDates(users) {
             angular.forEach(users, function (user) {
                 if (user.lastLoginDate) {
-                    user.formattedLastLogin = moment(user.lastLoginDate).format("MMMM Do YYYY, HH:mm");
+                    var dateVal;
+                    var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
+                    var localOffset = new Date().getTimezoneOffset();
+                    var serverTimeNeedsOffsetting = (-serverOffset !== localOffset);
+
+                    if(serverTimeNeedsOffsetting) {
+                        dateVal = dateHelper.convertToLocalMomentTime(user.lastLoginDate, serverOffset);
+                    } else {
+                        dateVal = moment(user.lastLoginDate, "YYYY-MM-DD HH:mm:ss");
+                    }
+
+                    user.formattedLastLogin = dateVal.format("MMMM Do YYYY, HH:mm");
                 }
             });
         }

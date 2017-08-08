@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, $timeout, $location, $routeParams, formHelper, usersResource, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource) {
+    function UserEditController($scope, $timeout, $location, $routeParams, formHelper, usersResource, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper) {
 
         var vm = this;
 
@@ -66,6 +66,11 @@
                 makeBreadcrumbs(vm.user);
                 setUserDisplayState();
 
+                // format dates to local
+                if(vm.user.lastLoginDate) {
+                    vm.user.formattedLastLogin = getLocalDate(vm.user.lastLoginDate, "MMMM Do YYYY, HH:mm");
+                }
+
                 vm.emailIsUsername = user.email === user.username;
 
                 //go get the config for the membership provider and add it to the model
@@ -80,6 +85,21 @@
                   vm.loading = false;
                 });
             });
+        }
+        
+        function getLocalDate(date, format) {
+            var dateVal;
+            var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
+            var localOffset = new Date().getTimezoneOffset();
+            var serverTimeNeedsOffsetting = (-serverOffset !== localOffset);
+
+            if(serverTimeNeedsOffsetting) {
+                dateVal = dateHelper.convertToLocalMomentTime(date, serverOffset);
+            } else {
+                dateVal = moment(date, "YYYY-MM-DD HH:mm:ss");
+            }
+
+            return dateVal.format(format);
         }
 
         function toggleChangePassword() {

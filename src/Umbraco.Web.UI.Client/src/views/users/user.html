@@ -225,9 +225,10 @@
 
                                 <div class="umb-package-details__information-item">
                                     <div class="umb-package-details__information-item-label">
-                                        <localize key="user_lastLogin">Last login</localize>:</div>
+                                        <localize key="user_lastLogin">Last login</localize>:
+                                    </div>
                                     <div class="umb-package-details__information-item-content">
-                                        <span ng-if="vm.user.lastLoginDate">{{ vm.user.lastLoginDate }}</span>
+                                        <span ng-if="vm.user.lastLoginDate">{{ vm.user.formattedLastLogin }}</span>
                                         <span ng-if="!vm.user.lastLoginDate">{{ vm.user.name }} <localize key="user_noLogin">has not logged in yet</localize></span>
                                     </div>
                                 </div>
