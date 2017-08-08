@@ -472,6 +472,7 @@
                     .then(function (saved) {
                         //success
                         vm.page.createButtonState = "success";
+                        vm.newUser = saved;
                         setUsersViewState('inviteUserSuccess');
                         getUsers();
                     }, function (err) {

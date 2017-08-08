@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -8,7 +9,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// Represents the data used to invite a user
     /// </summary>
     [DataContract(Name = "user", Namespace = "")]
-    public class UserInvite : EntityBasic
+    public class UserInvite : EntityBasic, IValidatableObject
     {
         [DataMember(Name = "userGroups")]
         [Required]
@@ -21,6 +22,11 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "message")]
         public string Message { get; set; }
-        
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (UserGroups.Any() == false)
+                yield return new ValidationResult("A user must be assigned to at least one group", new[] { "UserGroups" });            
+        }
     }
 }
