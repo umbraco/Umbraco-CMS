@@ -1836,9 +1836,9 @@ namespace Umbraco.Tests.Services
             Assert.That(sut.GetValue<DateTime>("date").ToString("G"), Is.EqualTo(content.GetValue<DateTime>("date").ToString("G")));
             Assert.That(sut.GetValue<string>("ddl"), Is.EqualTo("1234"));
             Assert.That(sut.GetValue<string>("chklist"), Is.EqualTo("randomc"));
-            Assert.That(sut.GetValue<int>("contentPicker"), Is.EqualTo(1090));
-            Assert.That(sut.GetValue<int>("mediaPicker"), Is.EqualTo(1091));
-            Assert.That(sut.GetValue<int>("memberPicker"), Is.EqualTo(1092));
+            Assert.That(sut.GetValue<Udi>("contentPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Document, new Guid("74ECA1D4-934E-436A-A7C7-36CC16D4095C"))));
+            Assert.That(sut.GetValue<Udi>("mediaPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Media, new Guid("44CB39C8-01E5-45EB-9CF8-E70AAF2D1691"))));
+            Assert.That(sut.GetValue<Udi>("memberPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Member, new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D"))));
             Assert.That(sut.GetValue<string>("relatedLinks"), Is.EqualTo("<links><link title=\"google\" link=\"http://google.com\" type=\"external\" newwindow=\"0\" /></links>"));
             Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));
         }
