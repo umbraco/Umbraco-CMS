@@ -264,7 +264,17 @@ namespace Umbraco.Core.Models
         /// <returns><see cref="Property"/> Value as an <see cref="object"/></returns>
         public virtual object GetValue(string propertyTypeAlias)
         {
-            return Properties[propertyTypeAlias].Value;
+            try
+            {
+                return Properties[propertyTypeAlias].Value;
+            }
+            catch (KeyNotFoundException ex)
+            {
+                var message = string.Format("Cannot find the property with alias '{0}' for the node named '{1}' with id '{2} that uses the document type alias '{3}'",
+                    propertyTypeAlias, this.Name, this.Id, this.ContentTypeBase.Alias);
+
+                throw new Exception(message, ex);
+            }
         }
 
         /// <summary>
@@ -275,8 +285,18 @@ namespace Umbraco.Core.Models
         /// <returns><see cref="Property"/> Value as a <see cref="TPassType"/></returns>
         public virtual TPassType GetValue<TPassType>(string propertyTypeAlias)
         {
-            var convertAttempt = Properties[propertyTypeAlias].Value.TryConvertTo<TPassType>();
-            return convertAttempt.Success ? convertAttempt.Result : default(TPassType);
+            try
+            {
+                var convertAttempt = Properties[propertyTypeAlias].Value.TryConvertTo<TPassType>();
+                return convertAttempt.Success ? convertAttempt.Result : default(TPassType);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                var message = string.Format("Cannot find the property with alias '{0}' for the node named '{1}' with id '{2} that uses the document type alias '{3}'",
+                    propertyTypeAlias, this.Name, this.Id, this.ContentTypeBase.Alias);
+
+                throw new Exception(message, ex);
+            }
         }
 
         /// <summary>
