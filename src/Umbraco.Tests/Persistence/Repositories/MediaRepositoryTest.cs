@@ -627,6 +627,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(medias, Is.Not.Null);
                 Assert.That(medias.Any(), Is.True);
                 Assert.That(medias.Count(), Is.GreaterThanOrEqualTo(3));
+
+                medias = repository.GetAll(medias.Select(x => x.Id).ToArray());
+                Assert.That(medias, Is.Not.Null);
+                Assert.That(medias.Any(), Is.True);
+                Assert.That(medias.Count(), Is.GreaterThanOrEqualTo(4));
+
+                medias = ((IReadRepository<Guid, IMedia>)repository).GetAll(medias.Select(x => x.Key).ToArray());
+                Assert.That(medias, Is.Not.Null);
+                Assert.That(medias.Any(), Is.True);
+                Assert.That(medias.Count(), Is.GreaterThanOrEqualTo(4));
             }
         }
 

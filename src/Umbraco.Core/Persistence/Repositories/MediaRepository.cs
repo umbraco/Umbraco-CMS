@@ -27,6 +27,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ITagRepository _tagRepository;
         private readonly ContentXmlRepository<IMedia> _contentXmlRepository;
         private readonly ContentPreviewRepository<IMedia> _contentPreviewRepository;
+        private readonly MediaByGuidReadRepository _mediaByGuidReadRepository;
 
         public MediaRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection)
             : base(work, cache, logger, sqlSyntax, contentSection)
@@ -37,6 +38,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _tagRepository = tagRepository;
             _contentXmlRepository = new ContentXmlRepository<IMedia>(work, CacheHelper.NoCache, logger, sqlSyntax);
             _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, CacheHelper.NoCache, logger, sqlSyntax);
+            _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, work, cache, logger, sqlSyntax);
             EnsureUniqueNaming = contentSection.EnsureUniqueNaming;
         }
 
@@ -520,6 +522,112 @@ namespace Umbraco.Core.Persistence.Repositories
             get { return Constants.System.RecycleBinMedia; }
         }
 
+        #endregion
+
+        #region Read Repository implementation for GUID keys
+        public IMedia Get(Guid id)
+        {
+            return _mediaByGuidReadRepository.Get(id);
+        }
+
+        IEnumerable<IMedia> IReadRepository<Guid, IMedia>.GetAll(params Guid[] ids)
+        {
+            return _mediaByGuidReadRepository.GetAll(ids);
+        }
+
+        public bool Exists(Guid id)
+        {
+            return _mediaByGuidReadRepository.Exists(id);
+        }
+
+        /// <summary>
+        /// A reading repository purely for looking up by GUID
+        /// </summary>
+        /// <remarks>
+        /// TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
+        /// Then we can do the same thing with repository instances and we wouldn't need to leave all these methods as not implemented because we wouldn't need to implement them
+        /// </remarks>
+        private class MediaByGuidReadRepository : PetaPocoRepositoryBase<Guid, IMedia>
+        {
+            private readonly MediaRepository _outerRepo;
+
+            public MediaByGuidReadRepository(MediaRepository outerRepo,
+                IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+                : base(work, cache, logger, sqlSyntax)
+            {
+                _outerRepo = outerRepo;
+            }
+
+            protected override IMedia PerformGet(Guid id)
+            {
+                var sql = GetBaseQuery(false);
+                sql.Where(GetBaseWhereClause(), new { Id = id });
+                sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
+
+                var dto = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+
+                if (dto == null)
+                    return null;
+
+                var content = _outerRepo.CreateMediaFromDto(dto, sql);
+
+                return content;
+            }
+
+            protected override IEnumerable<IMedia> PerformGetAll(params Guid[] ids)
+            {
+                Func<Sql, Sql> translate = s =>
+                {
+                    if (ids.Any())
+                    {
+                        s.Where("umbracoNode.uniqueID in (@ids)", new { ids });
+                    }
+                    //we only want the newest ones with this method
+                    s.Where<DocumentDto>(x => x.Newest, SqlSyntax);
+                    return s;
+                };
+
+                var sqlBaseFull = _outerRepo.GetBaseQuery(BaseQueryType.FullMultiple);
+                var sqlBaseIds = _outerRepo.GetBaseQuery(BaseQueryType.Ids);
+
+                return _outerRepo.ProcessQuery(translate(sqlBaseFull), new PagingSqlQuery(translate(sqlBaseIds)));
+            }
+
+            protected override Sql GetBaseQuery(bool isCount)
+            {
+                return _outerRepo.GetBaseQuery(isCount);
+            }
+
+            protected override string GetBaseWhereClause()
+            {
+                return "umbracoNode.uniqueID = @Id";
+            }
+
+            protected override Guid NodeObjectTypeId
+            {
+                get { return _outerRepo.NodeObjectTypeId; }
+            }
+
+            #region Not needed to implement
+
+            protected override IEnumerable<IMedia> PerformGetByQuery(IQuery<IMedia> query)
+            {
+                throw new NotImplementedException();
+            }
+            protected override IEnumerable<string> GetDeleteClauses()
+            {
+                throw new NotImplementedException();
+            }
+            protected override void PersistNewItem(IMedia entity)
+            {
+                throw new NotImplementedException();
+            }
+            protected override void PersistUpdatedItem(IMedia entity)
+            {
+                throw new NotImplementedException();
+            }
+            #endregion
+        }
         #endregion
 
         /// <summary>

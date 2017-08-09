@@ -369,7 +369,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets an <see cref="IContent"/> object by Id
+        /// Gets an <see cref="IContent"/> objects by Ids
         /// </summary>
         /// <param name="ids">Ids of the Content to retrieve</param>
         /// <returns><see cref="IContent"/></returns>
@@ -385,6 +385,34 @@ namespace Umbraco.Core.Services
                 // ensure that the result has the order based on the ids passed in
                 var result = repository.GetAll(idsArray);
                 var content = result.ToDictionary(x => x.Id, x => x);
+
+                var sortedResult = idsArray.Select(x =>
+                {
+                    IContent c;
+                    return content.TryGetValue(x, out c) ? c : null;
+                }).WhereNotNull();
+
+                return sortedResult;
+            }
+        }
+
+        /// <summary>
+        /// Gets an <see cref="IContent"/> objects by Ids
+        /// </summary>
+        /// <param name="ids">Ids of the Content to retrieve</param>
+        /// <returns><see cref="IContent"/></returns>
+        public IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids)
+        {
+            var idsArray = ids.ToArray();
+            if (idsArray.Length == 0) return Enumerable.Empty<IContent>();
+
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentRepository(uow);
+
+                // ensure that the result has the order based on the ids passed in
+                var result = repository.GetAll(idsArray);
+                var content = result.ToDictionary(x => x.Key, x => x);
 
                 var sortedResult = idsArray.Select(x =>
                 {

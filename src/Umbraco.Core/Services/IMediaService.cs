@@ -87,6 +87,7 @@ namespace Umbraco.Core.Services
         int CountDescendants(int parentId, string contentTypeAlias = null);
 
         IEnumerable<IMedia> GetByIds(IEnumerable<int> ids);
+        IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids);
 
         /// <summary>
         /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>

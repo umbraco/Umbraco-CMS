@@ -161,6 +161,7 @@ namespace Umbraco.Core.Services
         bool SendToPublication(IContent content, int userId = 0);
 
         IEnumerable<IContent> GetByIds(IEnumerable<int> ids);
+        IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids);
 
         /// <summary>
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
