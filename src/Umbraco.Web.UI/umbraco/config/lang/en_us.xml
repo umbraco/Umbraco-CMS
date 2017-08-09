@@ -351,8 +351,8 @@
     <key alias="filter">Type to filter...</key>
     <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
     <key alias="email">Enter your email</key>
+    <key alias="usernameHint">Your username is usually your email</key>
   </area>
-
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Allow at root</key>
     <key alias="allowAtRootDesc" version="7.2">Only Content Types with this checked can be created at the root level of Content and Media trees</key>
