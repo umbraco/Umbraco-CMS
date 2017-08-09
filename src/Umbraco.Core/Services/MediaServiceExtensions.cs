@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
@@ -12,6 +14,20 @@ namespace Umbraco.Core.Services
     /// </remarks>
     public static class MediaServiceExtensions
     {
+        public static IEnumerable<IMedia> GetByIds(this IMediaService mediaService, IEnumerable<Udi> ids)
+        {
+            var guids = new List<GuidUdi>();
+            foreach (var udi in ids)
+            {
+                var guidUdi = udi as GuidUdi;
+                if (guidUdi == null)
+                    throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) + " which is required by media");
+                guids.Add(guidUdi);
+            }
+
+            return mediaService.GetByIds(guids.Select(x => x.Guid));
+        }
+
         public static IMedia CreateMedia(this IMediaService mediaService, string name, Udi parentId, string mediaTypeAlias, int userId = 0)
         {
             var guidUdi = parentId as GuidUdi;

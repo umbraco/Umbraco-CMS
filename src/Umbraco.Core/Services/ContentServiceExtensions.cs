@@ -14,6 +14,20 @@ namespace Umbraco.Core.Services
     /// </summary>
     public static class ContentServiceExtensions
     {
+        public static IEnumerable<IContent> GetByIds(this IContentService contentService, IEnumerable<Udi> ids)
+        {
+            var guids = new List<GuidUdi>();
+            foreach (var udi in ids)
+            {
+                var guidUdi = udi as GuidUdi;
+                if (guidUdi == null)
+                    throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) + " which is required by content");
+                guids.Add(guidUdi);
+            }
+
+            return contentService.GetByIds(guids.Select(x => x.Guid));
+        }
+
         /// <summary>
         /// Method to create an IContent object based on the Udi of a parent
         /// </summary>
