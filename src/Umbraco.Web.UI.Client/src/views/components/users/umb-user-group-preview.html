@@ -13,7 +13,7 @@
             </span>
         </div>
 
-        <div class="umb-user-group-preview__permission">
+        <div class="umb-user-group-preview__permission" ng-if="!hideContentStartNode">
             <span>
                 <span class="bold"><localize key="user_startnode">Content start node</localize>:</span>
                 <span ng-if="!contentStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
@@ -21,7 +21,7 @@
             </span>
         </div>
         
-        <div class="umb-user-group-preview__permission">
+        <div class="umb-user-group-preview__permission" ng-if="!hideMediaStartNode">
             <span>
                 <span class="bold"><localize key="user_mediastartnode">Media start node</localize>:</span>
                 <span ng-if="!mediaStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
