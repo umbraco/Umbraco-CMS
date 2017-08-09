@@ -264,7 +264,7 @@ namespace Umbraco.Core.Models
         /// <returns><see cref="Property"/> Value as an <see cref="object"/></returns>
         public virtual object GetValue(string propertyTypeAlias)
         {
-            return Properties[propertyTypeAlias].Value;
+            return Properties.Contains(propertyTypeAlias) ? Properties[propertyTypeAlias].Value : null;
         }
 
         /// <summary>
@@ -275,6 +275,11 @@ namespace Umbraco.Core.Models
         /// <returns><see cref="Property"/> Value as a <see cref="TPassType"/></returns>
         public virtual TPassType GetValue<TPassType>(string propertyTypeAlias)
         {
+            if (Properties.Contains(propertyTypeAlias) == false)
+            {
+                return default(TPassType);
+            }
+
             var convertAttempt = Properties[propertyTypeAlias].Value.TryConvertTo<TPassType>();
             return convertAttempt.Success ? convertAttempt.Result : default(TPassType);
         }
