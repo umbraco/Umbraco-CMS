@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
@@ -8,8 +9,29 @@ using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Core.Services
 {
+    /// <summary>
+    /// Content service extension methods
+    /// </summary>
     public static class ContentServiceExtensions
     {
+        /// <summary>
+        /// Method to create an IContent object based on the Udi of a parent
+        /// </summary>
+        /// <param name="contentService"></param>
+        /// <param name="name"></param>
+        /// <param name="parentId"></param>
+        /// <param name="mediaTypeAlias"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public static IContent CreateContent(this IContentService contentService, string name, Udi parentId, string mediaTypeAlias, int userId = 0)
+        {
+            var guidUdi = parentId as GuidUdi;
+            if (guidUdi == null)
+                throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) + " which is required by content");
+            var parent = contentService.GetById(guidUdi.Guid);
+            return contentService.CreateContent(name, parent, mediaTypeAlias, userId);
+        }
+
         /// <summary>
         /// Remove all permissions for this user for all nodes
         /// </summary>

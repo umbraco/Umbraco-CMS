@@ -157,6 +157,26 @@ namespace Umbraco.Core.Services
         /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional id of the user creating the content</param>
         /// <returns><see cref="IContent"/></returns>
+        public IContent CreateContent(string name, Guid parentId, string contentTypeAlias, int userId = 0)
+        {
+            var parent = GetById(parentId);
+            return CreateContent(name, parent, contentTypeAlias, userId);
+        }
+
+        /// <summary>
+        /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content should based on.
+        /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IContent without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new content objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
+        /// <param name="name">Name of the Content object</param>
+        /// <param name="parentId">Id of Parent for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
         public IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = 0)
         {
             var contentType = FindContentTypeByAlias(contentTypeAlias);
