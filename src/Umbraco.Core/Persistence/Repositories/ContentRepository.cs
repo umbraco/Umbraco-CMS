@@ -992,13 +992,21 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
             protected override IEnumerable<IContent> PerformGetAll(params Guid[] ids)
             {
-                var sql = GetBaseQuery(false);
-                if (ids.Any())
+                Func<Sql, Sql> translate = s =>
                 {
-                    sql.Where("umbracoNode.uniqueID in (@ids)", new { ids = ids });
-                }
+                    if (ids.Any())
+                    {
+                        s.Where("umbracoNode.uniqueID in (@ids)", new { ids });
+                    }
+                    //we only want the newest ones with this method
+                    s.Where<DocumentDto>(x => x.Newest, SqlSyntax);
+                    return s;
+                };
 
-                return _outerRepo.ProcessQuery(sql, new PagingSqlQuery(sql));
+                var sqlBaseFull = _outerRepo.GetBaseQuery(BaseQueryType.FullMultiple);
+                var sqlBaseIds = _outerRepo.GetBaseQuery(BaseQueryType.Ids);
+
+                return _outerRepo.ProcessQuery(translate(sqlBaseFull), new PagingSqlQuery(translate(sqlBaseIds)));
             }
 
             protected override Sql GetBaseQuery(bool isCount)
