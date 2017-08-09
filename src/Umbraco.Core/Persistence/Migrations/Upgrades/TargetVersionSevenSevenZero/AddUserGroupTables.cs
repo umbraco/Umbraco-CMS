@@ -28,6 +28,45 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                 DeleteOldTables(tables, constraints);
                 SetDefaultIcons();
             }
+            else
+            {
+                //if we aren't adding the tables, make sure that the umbracoUserGroup table has the correct FKs - these
+                //were added after the beta release so we need to do some cleanup
+                //if the FK doesn't exist
+                if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUserGroup") 
+                    && x.Item2.InvariantEquals("startContentId") 
+                    && x.Item3.InvariantEquals("FK_startContentId_umbracoNode_id")) == false)
+                {
+                    //before we add any foreign key we need to make sure there's no stale data in there which would  have happened in the beta
+                    //release if a start node was assigned and then that start node was deleted.
+                    Execute.Sql(@"UPDATE umbracoUserGroup SET startContentId = NULL WHERE startContentId NOT IN (SELECT id FROM umbracoNode)");
+
+                    Create.ForeignKey("FK_startContentId_umbracoNode_id")
+                        .FromTable("umbracoUserGroup")
+                        .ForeignColumn("startContentId")
+                        .ToTable("umbracoNode")
+                        .PrimaryColumn("id")
+                        .OnDelete(Rule.None)
+                        .OnUpdate(Rule.None);
+                }
+
+                if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUserGroup") 
+                    && x.Item2.InvariantEquals("startMediaId") 
+                    && x.Item3.InvariantEquals("FK_startMediaId_umbracoNode_id")) == false)
+                {
+                    //before we add any foreign key we need to make sure there's no stale data in there which would  have happened in the beta
+                    //release if a start node was assigned and then that start node was deleted.
+                    Execute.Sql(@"UPDATE umbracoUserGroup SET startMediaId = NULL WHERE startMediaId NOT IN (SELECT id FROM umbracoNode)");
+
+                    Create.ForeignKey("FK_startMediaId_umbracoNode_id")
+                        .FromTable("umbracoUserGroup")
+                        .ForeignColumn("startMediaId")
+                        .ToTable("umbracoNode")
+                        .PrimaryColumn("id")
+                        .OnDelete(Rule.None)
+                        .OnUpdate(Rule.None);
+                }
+            }
         }
 
         private void SetDefaultIcons()

@@ -1583,6 +1583,14 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(content2, 0);
             Assert.IsTrue(ServiceContext.ContentService.PublishWithStatus(content2, 0).Success);
 
+            var editorGroup = ServiceContext.UserService.GetUserGroupByAlias("editor");
+            editorGroup.StartContentId = content1.Id;
+            ServiceContext.UserService.Save(editorGroup);
+
+            var admin = ServiceContext.UserService.GetUserById(0);
+            admin.StartContentIds = new[] {content1.Id};
+            ServiceContext.UserService.Save(admin);
+
             ServiceContext.RelationService.Save(new RelationType(Constants.ObjectTypes.DocumentGuid, Constants.ObjectTypes.DocumentGuid, "test"));
             Assert.IsNotNull(ServiceContext.RelationService.Relate(content1, content2, "test"));
 
@@ -1608,6 +1616,7 @@ namespace Umbraco.Tests.Services
             }).Success);
 
             // Act
+            ServiceContext.ContentService.MoveToRecycleBin(content1);
             ServiceContext.ContentService.EmptyRecycleBin();
             var contents = ServiceContext.ContentService.GetContentInRecycleBin();
 
