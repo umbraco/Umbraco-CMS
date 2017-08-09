@@ -263,7 +263,7 @@
     <key alias="recycleBinIsEmpty">Papirkurven er nu tom</key>
     <key alias="recycleBinWarning">Når elementer slettes fra papirkurven, slettes de for altid</key>
     <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webservice oplever i øjeblikket problemer, vi ikke har kontrol over. Beklager ulejligheden. ]]></key>
-    <key alias="regexSearchHelp">Søg efter et regulært udtryk for at tilføje validering til et formularfelt. Eksempel: 'e-mail', 'zip-code', 'url'</key>
+    <key alias="regexSearchHelp">Søg efter et regulært udtryk for at tilføje validering til et formularfelt. Eksempel: 'e-mail', 'postnr.', 'url'</key>
     <key alias="removeMacro">Fjern makro</key>
     <key alias="requiredField">Obligatorisk</key>
     <key alias="sitereindexed">Sitet er genindekseret</key>
