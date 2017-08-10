@@ -101,22 +101,28 @@ app.config(function ($routeProvider) {
             //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
             template: "<div ng-include='templateUrl'></div>",
             //This controller will execute for this route, then we can execute some code in order to set the template Url
-            controller: function ($scope, $route, $routeParams, $location) {
+            controller: function ($scope, $route, $routeParams, $location, sectionService) {
                 if ($routeParams.section.toLowerCase() === "default" || $routeParams.section.toLowerCase() === "umbraco" || $routeParams.section === "") {
                     $routeParams.section = "content";
                 }
 
-                //TODO: Here we could run some extra logic to check if the dashboard we are navigating
-                //to has any content to show and if not it could redirect to the first tree root path. 
-                //BUT! this would mean that we'd need a server side call to check this data....
-                //Instead we already have this data in the sections returned from the sectionResource but we
-                //don't want to cache data in a resource so we'd have to create a sectionService which would rely 
-                //on the userService, then we update the umbsections.directive to use the sectionService and when the 
-                //sectionService requests the sections, it caches the result against the current user. Then we can 
-                //use the sectionService here to do the redirection.
-
-                $routeParams.url = "dashboard.aspx?app=" + $routeParams.section;
-                $scope.templateUrl = 'views/common/dashboard.html';    
+                //We are going to check the currently loaded sections for the user and if the section we are navigating
+                //to has a custom route path we'll use that 
+                sectionService.getSectionsForUser().then(function(sections) {
+                    //find the one we're requesting
+                    var found = _.find(sections, function(s) {
+                        return s.alias === $routeParams.section;
+                    })
+                    if (found && found.routePath) {
+                        //there's a custom route path so redirect
+                        $location.path(found.routePath);
+                    }
+                    else {
+                        //there's no custom route path so continue as normal
+                        $routeParams.url = "dashboard.aspx?app=" + $routeParams.section;
+                        $scope.templateUrl = 'views/common/dashboard.html';            
+                    }
+                });
             },
             resolve: canRoute(true)
         })
