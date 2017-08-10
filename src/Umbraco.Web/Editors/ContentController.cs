@@ -9,7 +9,6 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -243,6 +242,7 @@ namespace Umbraco.Web.Editors
             content.Path = string.Format("-1,{0},{1}", persistedContent.ContentTypeId, content.Id);
 
             content.AllowedActions = new[] {"A"};
+            content.IsBlueprint = true;
 
             var excludeProps = new[] {"_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template"};
             var propsTab = content.Tabs.Last();
