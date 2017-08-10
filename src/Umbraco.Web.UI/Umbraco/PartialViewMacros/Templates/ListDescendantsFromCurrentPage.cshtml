@@ -1,6 +1,6 @@
+@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 @using Umbraco.Core.Models
 @using Umbraco.Web
-@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 
 @*
     This snippet creates links for every single page (no matter how deep) below
@@ -16,7 +16,7 @@
     var naviLevel = selection[0].Level;
 
     @* Add in level for a CSS hook *@
-    <ul class="level-@naviLevel">
+    <ul class="level-@(naviLevel)">
         @* Loop through the selection *@
         @foreach (var item in selection)
         {
@@ -24,10 +24,13 @@
                 <a href="@item.Url">@item.Name</a>
 
                 @* if this child page has any children, where the property umbracoNaviHide is not True *@
-                @if (item.Children.Any(x => x.IsVisible()))
-                {
-                    @* Call our helper to display the children *@
-                    @ChildPages(item.Children.ToArray())
+                @{
+                    var children = item.Children.Where(x => x.IsVisible()).ToArray();
+                    if (children.Length > 0)
+                    {
+                        @* Call our helper to display the children *@
+                        @ChildPages(children)
+                    }
                 }
             </li>
         }
@@ -40,21 +43,24 @@
     @* Ensure that we have a collection of pages *@
     if (selection.Length > 0)
     {
-        @* Get the first page in pages and get the level *@
+    @* Get the first page in pages and get the level *@
         var naviLevel = selection[0].Level;
 
-        @* Add in level for a CSS hook *@
+    @* Add in level for a CSS hook *@
         <ul class="level-@(naviLevel)">
-            @foreach (var item in selection.Where(x => x.IsVisible()))
+            @foreach (var item in selection)
             {
                 <li>
                     <a href="@item.Url">@item.Name</a>
 
-                    @* if the this page has any children, where the property umbracoNaviHide is not True *@
-                    @if (item.Children.Any(x => x.IsVisible()))
-                    {
+                    @* if the page has any children, where the property umbracoNaviHide is not True *@
+                    @{
+                        var children = item.Children.Where(x => x.IsVisible()).ToArray();
+                        if (children.Length > 0)
+                        {
                         @* Recurse and call our helper to display the children *@
-                        @ChildPages(item.Children.ToArray())
+                            @ChildPages(children)
+                        }
                     }
                 </li>
             }
