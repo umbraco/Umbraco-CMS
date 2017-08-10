@@ -59,20 +59,37 @@ namespace Umbraco.Web.HealthCheck
                 var healthCheckConfig = UmbracoConfig.For.HealthCheck();
                 var notificationMethods = healthCheckConfig.NotificationSettings.NotificationMethods;
                 var notificationMethod = notificationMethods[attribute.Alias];
-                if (notificationMethod == null)
-                {
-                    return null;
-                }
+
 
                 // Create array for constructor paramenters.  Will consists of common ones that all notification methods have as well
                 // as those specific to this particular notification method.
                 var baseType = typeof(NotificationMethodBase);
                 var baseTypeCtor = baseType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance).First();
                 var baseTypeCtorParamNames = baseTypeCtor.GetParameters().Select(x => x.Name);
-                var ctorParams = new List<object> { notificationMethod.Enabled, notificationMethod.FailureOnly, notificationMethod.Verbosity };
-                ctorParams.AddRange(ctor.GetParameters()
-                    .Where(x => baseTypeCtorParamNames.Contains(x.Name) == false)
-                    .Select(x => notificationMethod.Settings[x.Name].Value));
+
+                List<object> ctorParams;
+
+                if (notificationMethod != null)
+                {
+                    // configuration found so set ctorParams to config values
+                    ctorParams = new List<object>
+                    {
+                        notificationMethod.Enabled,
+                        notificationMethod.FailureOnly,
+                        notificationMethod.Verbosity
+                    };
+                    ctorParams.AddRange(ctor.GetParameters()
+                        .Where(x => baseTypeCtorParamNames.Contains(x.Name) == false)
+                        .Select(x => notificationMethod.Settings[x.Name].Value));
+                }
+                else
+                {
+                    // no configuration found so set to default values, enabled = false
+                    ctorParams = new List<object> { false, false, HealthCheckNotificationVerbosity.Detailed };
+                    ctorParams.AddRange(ctor.GetParameters()
+                        .Where(x => baseTypeCtorParamNames.Contains(x.Name) == false)
+                        .Select(x => string.Empty));
+                }
 
                 // Instantiate the type with the constructor parameters
                 return Activator.CreateInstance(serviceType, ctorParams.ToArray());
