@@ -154,8 +154,16 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			    }
 
 			    navigationService.hideSearch();
-			    navigationService.showTree(section.alias);
-			    $location.path("/" + section.alias);
+                navigationService.showTree(section.alias);
+
+                //in some cases the section will have a custom route path specified, if there is one we'll use it
+                if (section.routePath) {
+                    $location.path(section.routePath);
+                }
+                else {
+                    $location.path(section.alias);    
+                }
+			    
 			};
 
 			scope.sectionDblClick = function(section){
