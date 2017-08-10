@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentRightsController($scope, contentResource) {
+    function ContentRightsController($scope, contentResource, localizationService) {
 
         var vm = this;
 
@@ -9,6 +9,7 @@
         vm.selectedUserGroups = [];
         vm.removedUserGroups = [];
         vm.viewState = "manageGroups";
+        vm.labels = {};
 
         vm.setViewSate = setViewSate;
         vm.editPermissions = editPermissions;
@@ -51,6 +52,9 @@
             //if no permissions are explicitly set this means we need to show the defaults
             vm.selectedUserGroup.permissions = vm.selectedUserGroup.defaultPermissions;
           }
+          localizationService.localize("defaultdialogs_permissionsSetForGroup", [$scope.currentNode.name, vm.selectedUserGroup.name]).then(function (value) {
+            vm.labels.permissionsSetForGroup = value;
+          });
           setViewSate("managePermissions");
         }
 

@@ -39,7 +39,6 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             : base(enabled, failureOnly, verbosity)
         {
             if (textService == null) throw new ArgumentNullException("textService");
-            if (enabled && string.IsNullOrWhiteSpace(recipientEmail)) throw new ArgumentException("Value cannot be null or whitespace.", "recipientEmail");
             _textService = textService;
             RecipientEmail = recipientEmail;
             Verbosity = verbosity;

@@ -41,6 +41,7 @@
     <key alias="sort">Sort</key>
     <key alias="translate">Translate</key>
     <key alias="update">Update</key>
+    <key alias="setPermissions">Set permissions</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Content</key>
@@ -308,7 +309,10 @@
     <key alias="macroContainerSettings">Macro Settings</key>
     <key alias="macroDoesNotHaveProperties">This macro does not contain any properties you can edit</key>
     <key alias="paste">Paste</key>
-    <key alias="permissionsEdit">Edit Permissions for</key>
+    <key alias="permissionsEdit">Edit permissions for</key>
+    <key alias="permissionsSet">Set permissions for</key>
+    <key alias="permissionsSetForGroup">Set permissions for %0% for user group %1%</key>
+    <key alias="permissionsHelp">Select the users groups you want to set permissions for</key>
     <key alias="recycleBinDeleting">The items in the recycle bin are now being deleted. Please do not close this window while this operation takes place</key>
     <key alias="recycleBinIsEmpty">The recycle bin is now empty</key>
     <key alias="recycleBinWarning">When items are deleted from the recycle bin, they will be gone forever</key>
@@ -387,8 +391,8 @@
     <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
     <key alias="email">Enter your email...</key>
     <key alias="enterMessage">Enter a message...</key>
+    <key alias="usernameHint">Your username is usually your email</key>
   </area>
-
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Allow at root</key>
     <key alias="allowAtRootDesc" version="7.2">Only Content Types with this checked can be created at the root level of Content and Media trees</key>
@@ -1128,6 +1132,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="partialViewSavedText">Partial view saved without any errors!</key>
     <key alias="partialViewErrorHeader">Partial view not saved</key>
     <key alias="partialViewErrorText">An error occurred saving the file.</key>
+    <key alias="permissionsSavedFor">Permissions saved for</key>
     <key alias="scriptSavedHeader">Script view saved</key>
     <key alias="scriptSavedText">Script view saved without any errors!</key>
     <key alias="scriptErrorHeader">Script view not saved</key>
