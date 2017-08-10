@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Web;
 using System.Xml.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -41,32 +43,75 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
-        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out DataTypeDefinitionRepository dtdRepository)
+        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out DataTypeDefinitionRepository dtdRepository, CacheHelper cacheHelper = null)
         {
             TemplateRepository tr;
             var ctRepository = CreateRepository(unitOfWork, out contentTypeRepository, out tr);
-            dtdRepository = new DataTypeDefinitionRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, contentTypeRepository);
+            dtdRepository = new DataTypeDefinitionRepository(unitOfWork, cacheHelper, Logger, SqlSyntax, contentTypeRepository);
             return ctRepository;
         }
 
-        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
+        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, CacheHelper cacheHelper = null)
         {
             TemplateRepository tr;
-            return CreateRepository(unitOfWork, out contentTypeRepository, out tr);
+            return CreateRepository(unitOfWork, out contentTypeRepository, out tr, cacheHelper);
         }
 
-        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository)
+        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository, CacheHelper cacheHelper = null)
         {
-            templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
-            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, SqlSyntax);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, templateRepository);
-            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            cacheHelper = cacheHelper ?? CacheHelper;
+
+            templateRepository = new TemplateRepository(unitOfWork, cacheHelper, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+            var tagRepository = new TagRepository(unitOfWork, cacheHelper, Logger, SqlSyntax);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, cacheHelper, Logger, SqlSyntax, templateRepository);
+            var repository = new ContentRepository(unitOfWork, cacheHelper, Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
 
-        private UserGroupRepository CreateUserGroupRepository(IScopeUnitOfWork unitOfWork)
+        [Test]
+        public void Cache_Active_By_Int_And_Guid()
         {
-            return new UserGroupRepository(unitOfWork, CacheHelper, Logger, SqlSyntax);
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            
+            var realCache = new CacheHelper(
+                new ObjectCacheRuntimeCacheProvider(),
+                new StaticCacheProvider(),
+                new StaticCacheProvider(),
+                new IsolatedRuntimeCache(t => new ObjectCacheRuntimeCacheProvider()));
+
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository, cacheHelper: realCache))
+            {
+                DatabaseContext.Database.DisableSqlCount();
+
+                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
+                var content = MockedContent.CreateSimpleContent(contentType);
+                contentTypeRepository.AddOrUpdate(contentType);
+                repository.AddOrUpdate(content);
+                unitOfWork.Commit();
+
+                DatabaseContext.Database.EnableSqlCount();
+
+                //go get it, this should already be cached since the default repository key is the INT
+                var found = repository.Get(content.Id);
+                Assert.AreEqual(0, DatabaseContext.Database.SqlCount);
+                //retrieve again, this should use cache
+                found = repository.Get(content.Id);
+                Assert.AreEqual(0, DatabaseContext.Database.SqlCount);
+
+                //reset counter
+                DatabaseContext.Database.DisableSqlCount();
+                DatabaseContext.Database.EnableSqlCount();
+
+                //now get by GUID, this won't be cached yet because the default repo key is not a GUID 
+                found = repository.Get(content.Key);
+                var sqlCount = DatabaseContext.Database.SqlCount;
+                Assert.Greater(sqlCount, 0);
+                //retrieve again, this should use cache now
+                found = repository.Get(content.Key);
+                Assert.AreEqual(sqlCount, DatabaseContext.Database.SqlCount);
+            }
         }
 
         [Test]

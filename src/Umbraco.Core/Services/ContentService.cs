@@ -32,7 +32,6 @@ namespace Umbraco.Core.Services
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
-        private readonly IdkMap _idkMap;
 
         //Support recursive locks because some of the methods that require locking call other methods that require locking.
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
@@ -44,8 +43,7 @@ namespace Umbraco.Core.Services
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
             IDataTypeService dataTypeService,
-            IUserService userService,
-            IdkMap idkMap)
+            IUserService userService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
@@ -53,7 +51,6 @@ namespace Umbraco.Core.Services
             _publishingStrategy = new PublishingStrategy(UowProvider.ScopeProvider, eventMessagesFactory, logger);
             _dataTypeService = dataTypeService;
             _userService = userService;
-            _idkMap = idkMap;
         }
 
         #region Static Queries
@@ -431,13 +428,11 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         public IContent GetById(Guid key)
         {
-            // the repository implements a cache policy on int identifiers, not guids,
-            // and we are not changing it now, but we still would like to rely on caching
-            // instead of running a full query against the database, so relying on the
-            // id-key map, which is fast.
-
-            var a = _idkMap.GetIdForKey(key, UmbracoObjectTypes.Document);
-            return a.Success ? GetById(a.Result) : null;
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentRepository(uow);
+                return repository.Get(key);
+            }
         }
 
         /// <summary>
@@ -1218,13 +1213,14 @@ namespace Umbraco.Core.Services
 
         public IContent GetBlueprintById(Guid id)
         {
-            // the repository implements a cache policy on int identifiers, not guids,
-            // and we are not changing it now, but we still would like to rely on caching
-            // instead of running a full query against the database, so relying on the
-            // id-key map, which is fast.
-
-            var a = _idkMap.GetIdForKey(id, UmbracoObjectTypes.DocumentBlueprint);
-            return a.Success ? GetBlueprintById(a.Result) : null;
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
+                var blueprint = repository.Get(id);
+                if (blueprint != null)
+                    ((Content)blueprint).IsBlueprint = true;
+                return blueprint;
+            }
         }
 
         public void SaveBlueprint(IContent content, int userId = 0)
