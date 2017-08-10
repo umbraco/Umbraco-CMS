@@ -32,6 +32,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("invitedDate")) == false)
                 Create.Column("invitedDate").OnTable("umbracoUser").AsDateTime().Nullable();
 
+            if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("avatar")) == false)
+                Create.Column("avatar").OnTable("umbracoUser").AsString(500).Nullable();
+
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("passwordConfig")) == false)
             {
                 Create.Column("passwordConfig").OnTable("umbracoUser").AsString(500).Nullable();
@@ -43,7 +46,6 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                     Execute.Sql("UPDATE umbracoUser SET passwordConfig = '" + json + "'");
                 }
             }
-                
         }
 
         public override void Down()

@@ -11,7 +11,7 @@ using Umbraco.Core.Persistence.Querying;
 namespace Umbraco.Core.Persistence.Repositories
 {
 
-    public interface IContentRepository : IRepositoryVersionable<int, IContent>, IRecycleBinRepository<IContent>, IDeleteMediaFilesRepository
+    public interface IContentRepository : IRepositoryVersionable<int, IContent>, IRecycleBinRepository<IContent>, IReadRepository<Guid, IContent>, IDeleteMediaFilesRepository
     {
         /// <summary>
         /// This builds the Xml document used for the XML cache

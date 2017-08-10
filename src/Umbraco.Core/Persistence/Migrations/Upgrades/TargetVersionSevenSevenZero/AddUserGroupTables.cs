@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Umbraco.Core.Configuration;
@@ -85,6 +86,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                 INNER JOIN umbracoUserGroup ug ON ug.userGroupAlias = ut.userTypeAlias");
 
             // Add the built-in administrator account to all apps
+            // this will lookup all of the apps that the admin currently has access to in order to assign the sections
+            // instead of use statically assigning since there could be extra sections we don't know about.
             Execute.Sql(@"INSERT INTO umbracoUserGroup2app (userGroupId,app)
                 SELECT ug.id, app
                 FROM umbracoUserGroup ug
@@ -92,6 +95,89 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                 INNER JOIN umbracoUser u ON u.id = u2ug.userId
                 INNER JOIN umbracoUser2app u2a ON u2a." + SqlSyntax.GetQuotedColumnName("user") + @" = u.id
 				WHERE u.id = 0");
+
+            // Add the default section access to the other built-in accounts            
+            //  writer:
+            Execute.Sql(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
+                SELECT ug.id, 'content' as app
+                FROM umbracoUserGroup ug
+                WHERE ug.userGroupAlias = 'writer'");
+            //  editor
+            Execute.Sql(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
+                SELECT ug.id, 'content' as app
+                FROM umbracoUserGroup ug
+                WHERE ug.userGroupAlias = 'editor'");
+            Execute.Sql(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
+                SELECT ug.id, 'media' as app
+                FROM umbracoUserGroup ug
+                WHERE ug.userGroupAlias = 'editor'");
+            //  translator
+            Execute.Sql(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
+                SELECT ug.id, 'translation' as app
+                FROM umbracoUserGroup ug
+                WHERE ug.userGroupAlias = 'translator'");
+            
+            //We need to lookup all distinct combinations of section access and create a group for each distinct collection
+            //and assign groups accordingly. We'll perform the lookup 'now' to then create the queued SQL migrations.
+            var userAppsData = Context.Database.Query<dynamic>(@"SELECT u.id, u2a.app FROM umbracoUser u
+                                INNER JOIN umbracoUser2app u2a ON u2a." + SqlSyntax.GetQuotedColumnName("user") + @" = u.id
+                                ORDER BY u.id, u2a.app");
+            var usersWithApps = new Dictionary<int, List<string>>();
+            foreach (var userApps in userAppsData)
+            {
+                List<string> apps;
+                if (usersWithApps.TryGetValue(userApps.id, out apps) == false)
+                {
+                    apps = new List<string> {userApps.app};
+                    usersWithApps.Add(userApps.id, apps);
+                }
+                else
+                {
+                    apps.Add(userApps.app);
+                }
+            }
+            //At this stage we have a dictionary of users with a collection of their apps which are sorted
+            //and we need to determine the unique/distinct app collections for each user to create groups with.
+            //We can do this by creating a hash value of all of the app values and since they are already sorted we can get a distinct
+            //collection by this hash.
+            var distinctApps = usersWithApps
+                .Select(x => new {appCollection = x.Value, appsHash = string.Join("", x.Value).GenerateHash()})
+                .DistinctBy(x => x.appsHash)
+                .ToArray();
+            //Now we need to create user groups for each of these distinct app collections, and then assign the corresponding users to those groups
+            for (var i = 0; i < distinctApps.Length; i++)
+            {
+                //create the group
+                var alias = "MigratedSectionAccessGroup_" + (i + 1);
+                Insert.IntoTable("umbracoUserGroup").Row(new
+                {
+                    userGroupAlias = "MigratedSectionAccessGroup_" + (i + 1),
+                    userGroupName = "Migrated Section Access Group " + (i + 1)
+                });
+                //now assign the apps
+                var distinctApp = distinctApps[i];
+                foreach (var app in distinctApp.appCollection)
+                {
+                    Execute.Sql(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
+                        SELECT ug.id, '" + app + @"' as app
+                        FROM umbracoUserGroup ug
+                        WHERE ug.userGroupAlias = '" + alias + "'");
+                }
+                //now assign the corresponding users to this group
+                foreach (var userWithApps in usersWithApps)
+                {
+                    //check if this user's groups hash matches the current groups hash
+                    var hash = string.Join("", userWithApps.Value).GenerateHash();
+                    if (hash == distinctApp.appsHash)
+                    {
+                        //it matches so assign the user to this group
+                        Execute.Sql(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
+                            SELECT " + userWithApps.Key + @", ug.id
+                            FROM umbracoUserGroup ug
+                            WHERE ug.userGroupAlias = '" + alias + "'");
+                    }
+                }
+            }
 
             // Rename some groups for consistency (plural form)
             Execute.Sql("UPDATE umbracoUserGroup SET userGroupName = 'Writers' WHERE userGroupAlias = 'writer'");
@@ -112,12 +198,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
         {
             // Create user group records for all non-admin users that have specific permissions set
             Execute.Sql(@"INSERT INTO umbracoUserGroup(userGroupAlias, userGroupName)
-                SELECT userName + 'Group', 'Group for ' + userName
+                SELECT 'permissionGroupFor' + userLogin, 'Migrated Permission Group for ' + userLogin
                 FROM umbracoUser
                 WHERE (id IN (
-	                SELECT " + SqlSyntax.GetQuotedColumnName("user") + @"
-	                FROM umbracoUser2app
-                ) OR id IN (
 	                SELECT userid
 	                FROM umbracoUser2NodePermission
                 ))
@@ -127,7 +210,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
             Execute.Sql(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
                 SELECT u.id, ug.id
                 FROM umbracoUser u
-                INNER JOIN umbracoUserGroup ug ON ug.userGroupAlias = userName + 'Group'");
+                INNER JOIN umbracoUserGroup ug ON ug.userGroupAlias = 'permissionGroupFor' + userLogin");
 
             // Create node permissions on the groups
             Execute.Sql(@"INSERT INTO umbracoUserGroup2NodePermission (userGroupId,nodeId,permission)

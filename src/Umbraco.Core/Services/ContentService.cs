@@ -30,7 +30,6 @@ namespace Umbraco.Core.Services
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
-        private readonly IdkMap _idkMap;
 
         //Support recursive locks because some of the methods that require locking call other methods that require locking.
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
@@ -42,8 +41,7 @@ namespace Umbraco.Core.Services
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
             IDataTypeService dataTypeService,
-            IUserService userService,
-            IdkMap idkMap)
+            IUserService userService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
@@ -51,7 +49,6 @@ namespace Umbraco.Core.Services
             _publishingStrategy = new PublishingStrategy(UowProvider.ScopeProvider, eventMessagesFactory, logger);
             _dataTypeService = dataTypeService;
             _userService = userService;
-            _idkMap = idkMap;
         }
 
         #region Static Queries
@@ -139,6 +136,26 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateContentRepository(uow);
                 return repository.GetPermissionsForEntity(content.Id);
             }
+        }
+
+        /// <summary>
+        /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content should based on.
+        /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IContent without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new content objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
+        /// <param name="name">Name of the Content object</param>
+        /// <param name="parentId">Id of Parent for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
+        public IContent CreateContent(string name, Guid parentId, string contentTypeAlias, int userId = 0)
+        {
+            var parent = GetById(parentId);
+            return CreateContent(name, parent, contentTypeAlias, userId);
         }
 
         /// <summary>
@@ -347,7 +364,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets an <see cref="IContent"/> object by Id
+        /// Gets <see cref="IContent"/> objects by Ids
         /// </summary>
         /// <param name="ids">Ids of the Content to retrieve</param>
         /// <returns><see cref="IContent"/></returns>
@@ -375,19 +392,45 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets <see cref="IContent"/> objects by Ids
+        /// </summary>
+        /// <param name="ids">Ids of the Content to retrieve</param>
+        /// <returns><see cref="IContent"/></returns>
+        public IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids)
+        {
+            var idsArray = ids.ToArray();
+            if (idsArray.Length == 0) return Enumerable.Empty<IContent>();
+
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentRepository(uow);
+
+                // ensure that the result has the order based on the ids passed in
+                var result = repository.GetAll(idsArray);
+                var content = result.ToDictionary(x => x.Key, x => x);
+
+                var sortedResult = idsArray.Select(x =>
+                {
+                    IContent c;
+                    return content.TryGetValue(x, out c) ? c : null;
+                }).WhereNotNull();
+
+                return sortedResult;
+            }
+        }
+
+        /// <summary>
         /// Gets an <see cref="IContent"/> object by its 'UniqueId'
         /// </summary>
         /// <param name="key">Guid key of the Content to retrieve</param>
         /// <returns><see cref="IContent"/></returns>
         public IContent GetById(Guid key)
         {
-            // the repository implements a cache policy on int identifiers, not guids,
-            // and we are not changing it now, but we still would like to rely on caching
-            // instead of running a full query against the database, so relying on the
-            // id-key map, which is fast.
-
-            var a = _idkMap.GetIdForKey(key, UmbracoObjectTypes.Document);
-            return a.Success ? GetById(a.Result) : null;
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentRepository(uow);
+                return repository.Get(key);
+            }
         }
 
         /// <summary>
@@ -1168,13 +1211,14 @@ namespace Umbraco.Core.Services
 
         public IContent GetBlueprintById(Guid id)
         {
-            // the repository implements a cache policy on int identifiers, not guids,
-            // and we are not changing it now, but we still would like to rely on caching
-            // instead of running a full query against the database, so relying on the
-            // id-key map, which is fast.
-
-            var a = _idkMap.GetIdForKey(id, UmbracoObjectTypes.DocumentBlueprint);
-            return a.Success ? GetBlueprintById(a.Result) : null;
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
+                var blueprint = repository.Get(id);
+                if (blueprint != null)
+                    ((Content)blueprint).IsBlueprint = true;
+                return blueprint;
+            }
         }
 
         public void SaveBlueprint(IContent content, int userId = 0)
