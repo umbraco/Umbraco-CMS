@@ -55,6 +55,22 @@
                 'Failed to enable the users ' + userIds.join(","));
         }
 
+        function unlockUsers(userIds) {
+            if (!userIds) {
+                throw "userIds not specified";
+            }
+
+            //we need to create a custom query string for the usergroup array, so create it now and we can append the user groups if needed
+            var qry = "userIds=" + userIds.join("&userIds=");
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "userApiBaseUrl",
+                        "PostUnlockUsers", qry)),
+                'Failed to enable the users ' + userIds.join(","));
+        }
+
         function setUserGroupsOnUsers(userGroups, userIds) {
             var userGroupAliases = userGroups.map(function(o) { return o.alias; });
             var query = "userGroupAliases=" + userGroupAliases.join("&userGroupAliases=") + "&userIds=" + userIds.join("&userIds=");
@@ -185,6 +201,7 @@
         var resource = {
             disableUsers: disableUsers,
             enableUsers: enableUsers,
+            unlockUsers: unlockUsers,
             setUserGroupsOnUsers: setUserGroupsOnUsers,
             getPagedResults: getPagedResults,
             getUser: getUser,

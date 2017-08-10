@@ -81,6 +81,17 @@
                         action="vm.enableUsers()">
                     </umb-button>
                 </div>
+                <div style="margin-right: 5px;">
+                    <umb-button
+                        ng-if="vm.allowUnlockUser"
+                        type="button"
+                        size="xs"
+                        state="vm.unlockUserButtonState"
+                        label-key="actions_unlock"
+                        icon="icon-unlocked"
+                        action="vm.unlockUsers()">
+                    </umb-button>
+                </div>
                 <div>
                     <umb-button
                         ng-if="vm.allowDisableUser"

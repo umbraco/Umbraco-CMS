@@ -1,6 +1,8 @@
 <div ng-controller="Umbraco.Editors.Users.UserController as vm" class="clearfix">
 
-    <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
+    <umb-load-indicator
+        ng-if="vm.loading">
+    </umb-load-indicator>
 
     <form name="editUserForm" novalidate val-form-manager>
 
@@ -233,29 +235,43 @@
                                 </div>
 
                                 <div style="margin-top: 20px;">
-                                    <div style="margin-bottom: 10px;">
-                                        <umb-button
-                                            ng-if="vm.user.userDisplayState.key === 'Active' && !vm.user.isCurrentUser"
-                                            type="button"
-                                            button-style="[danger,block]"
-                                            action="vm.disableUser()"
-                                            state="vm.disableUserButtonState"
-                                            label="Disable"
-                                            label-key="actions_disable"
-                                            size="m">
-                                        </umb-button>
-                                    </div>
 
                                     <div style="margin-bottom: 10px;">
                                         <umb-button
-                                            ng-if="vm.user.userDisplayState.key === 'Disabled' && !vm.user.isCurrentUser || vm.user.userDisplayState.key === 'LockedOut' && !vm.user.isCurrentUser"
+                                            ng-if="vm.user.userDisplayState.key === 'Disabled' && !vm.user.isCurrentUser"
                                             type="button"
                                             button-style="[success,block]"
                                             state="vm.enableUserButtonState"
                                             action="vm.enableUser()"
                                             label="Enable"
                                             label-key="actions_enable"
-                                            size="m">
+                                            size="s">
+                                        </umb-button>
+                                    </div>
+
+                                    <div style="margin-bottom: 10px;">
+                                        <umb-button
+                                            ng-if="vm.user.userDisplayState.key === 'LockedOut' && !vm.user.isCurrentUser"
+                                            type="button"
+                                            button-style="[success,block]"
+                                            state="vm.unlockUserButtonState"
+                                            action="vm.unlockUser()"
+                                            label="Unlock"
+                                            label-key="actions_unlock"
+                                            size="s">
+                                        </umb-button>
+                                    </div>
+
+                                    <div style="margin-bottom: 10px;">
+                                        <umb-button
+                                            ng-if="vm.user.userDisplayState.key !== 'Disabled' && !vm.user.isCurrentUser"
+                                            type="button"
+                                            button-style="[info,block]"
+                                            action="vm.disableUser()"
+                                            state="vm.disableUserButtonState"
+                                            label="Disable"
+                                            label-key="actions_disable"
+                                            size="s">
                                         </umb-button>
                                     </div>
 
@@ -267,7 +283,7 @@
                                         label-key="general_changePassword"
                                         state="changePasswordButtonState"
                                         ng-if="vm.changePasswordModel.isChanging === false"
-                                        size="m">
+                                        size="s">
                                     </umb-button>
 
                                     <ng-form ng-if="vm.changePasswordModel.isChanging" name="passwordForm" class="block-form" val-form-manager>

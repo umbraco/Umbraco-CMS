@@ -28,6 +28,7 @@
 
         vm.allowDisableUser = true;
         vm.allowEnableUser = true;
+        vm.allowUnlockUser = true;
         vm.allowSetUserGroup = true;
 
         vm.layouts = [
@@ -76,6 +77,7 @@
         vm.clickUser = clickUser;
         vm.disableUsers = disableUsers;
         vm.enableUsers = enableUsers;
+        vm.unlockUsers = unlockUsers;
         vm.openBulkUserGroupPicker = openBulkUserGroupPicker;
         vm.openUserGroupPicker = openUserGroupPicker;
         vm.removeSelectedUserGroup = removeSelectedUserGroup;
@@ -237,6 +239,28 @@
                 clearSelection();
             }, function (error) {
                 vm.enableUserButtonState = "error";
+                formHelper.showNotifications(error.data);
+            });
+        }
+
+        function unlockUsers() {
+            vm.unlockUserButtonState = "busy";
+            usersResource.unlockUsers(vm.selection).then(function (data) {
+                // update userState
+                angular.forEach(vm.selection, function (userId) {
+                    var user = getUserFromArrayById(userId, vm.users);
+                    if (user) {
+                        user.userState = 0;
+                    }
+                });
+                // show the correct badges
+                setUserDisplayState(vm.users);
+                // show notification
+                formHelper.showNotifications(data);
+                vm.unlockUserButtonState = "init";
+                clearSelection();
+            }, function (error) {
+                vm.unlockUserButtonState = "error";
                 formHelper.showNotifications(error.data);
             });
         }
@@ -549,6 +573,7 @@
             // reset all states
             vm.allowDisableUser = true;
             vm.allowEnableUser = true;
+            vm.allowUnlockUser = true;
             vm.allowSetUserGroup = true;
 
             var firstSelectedUserGroups;
@@ -563,6 +588,7 @@
                 if (user.isCurrentUser) {
                     vm.allowDisableUser = false;
                     vm.allowEnableUser = false;
+                    vm.allowUnlockUser = false;
                     vm.allowSetUserGroup = false;
                     return;
                 }
@@ -577,6 +603,14 @@
 
                 if (user.userDisplayState && user.userDisplayState.key === "Invited") {
                     vm.allowEnableUser = false;
+                }
+
+                if (user.userDisplayState && user.userDisplayState.key === "LockedOut") {
+                    vm.allowEnableUser = false;
+                }
+
+                if (user.userDisplayState && user.userDisplayState.key !== "LockedOut") {
+                    vm.allowUnlockUser = false;
                 }
 
                 // store the user group aliases of the first selected user

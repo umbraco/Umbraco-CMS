@@ -559,6 +559,29 @@ namespace Umbraco.Web.Editors
                 Services.TextService.Localize("speechBubbles/enableUserSuccess", new[] { users[0].Name }));            
         }
 
+        /// <summary>
+        /// Unlocks the users with the given user ids
+        /// </summary>
+        /// <param name="userIds"></param>
+        public HttpResponseMessage PostUnlockUsers([FromUri]int[] userIds)
+        {
+            var users = Services.UserService.GetUsersById(userIds).ToArray();
+            foreach (var u in users)
+            {
+                u.IsLockedOut = false;
+            }
+            Services.UserService.Save(users);
+
+            if (users.Length > 1)
+            {
+                return Request.CreateNotificationSuccessResponse(
+                    Services.TextService.Localize("speechBubbles/unlockUsersSuccess", new[] { userIds.Length.ToString() }));
+            }
+
+            return Request.CreateNotificationSuccessResponse(
+                Services.TextService.Localize("speechBubbles/unlockUserSuccess", new[] { users[0].Name }));
+        }
+
         public HttpResponseMessage PostSetUserGroupsOnUsers([FromUri]string[] userGroupAliases, [FromUri]int[] userIds)
         {
             var users = Services.UserService.GetUsersById(userIds).ToArray();

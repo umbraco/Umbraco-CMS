@@ -42,6 +42,7 @@
     <key alias="translate">Translate</key>
     <key alias="update">Update</key>
     <key alias="setPermissions">Set permissions</key>
+    <key alias="unlock">Unlock</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Content</key>
@@ -1149,6 +1150,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="setUserGroupOnUsersSuccess">User groups have been set</key>
     <key alias="deleteUserGroupsSuccess">Deleted %0% user groups</key>
     <key alias="deleteUserGroupSuccess">%0% was deleted</key>
+    <key alias="unlockUsersSuccess">Unlocked %0% users</key>
+    <key alias="unlockUsersError">An error occurred while unlocking the users</key>
+    <key alias="unlockUserSuccess">%0% is now unlocked</key>
+    <key alias="unlockUserError">An error occurred while unlocking the user</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>

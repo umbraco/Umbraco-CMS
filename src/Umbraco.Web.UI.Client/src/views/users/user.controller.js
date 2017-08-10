@@ -30,6 +30,7 @@
         vm.removeSelectedItem = removeSelectedItem;
         vm.disableUser = disableUser;
         vm.enableUser = enableUser;
+        vm.unlockUser = unlockUser;
         vm.clearAvatar = clearAvatar;
         vm.save = save;
         vm.toggleChangePassword = toggleChangePassword;
@@ -234,11 +235,11 @@
         function disableUser() {
             vm.disableUserButtonState = "busy";
             usersResource.disableUsers([vm.user.id]).then(function (data) {
-              vm.user.userState = 1;
-              setUserDisplayState();
-              vm.disableUserButtonState = "success";
-              formHelper.showNotifications(data);
-            }, function(error){
+                vm.user.userState = 1;
+                setUserDisplayState();
+                vm.disableUserButtonState = "success";
+                formHelper.showNotifications(data);
+            }, function (error) {
                 vm.disableUserButtonState = "error";
                 formHelper.showNotifications(error.data);
             });
@@ -247,16 +248,28 @@
         function enableUser() {
             vm.enableUserButtonState = "busy";
             usersResource.enableUsers([vm.user.id]).then(function (data) {
-              vm.user.userState = 0;
-              setUserDisplayState();
-              vm.enableUserButtonState = "success";
-              formHelper.showNotifications(data);
-            }, function(error){
-                vm.disableUserButtonState = "error";
+                vm.user.userState = 0;
+                setUserDisplayState();
+                vm.enableUserButtonState = "success";
+                formHelper.showNotifications(data);
+            }, function (error) {
+                vm.enableUserButtonState = "error";
                 formHelper.showNotifications(error.data);
             });
         }
-      
+
+        function unlockUser() {
+            vm.unlockUserButtonState = "busy";
+            usersResource.unlockUsers([vm.user.id]).then(function (data) {
+                vm.user.userState = 0;
+                setUserDisplayState();
+                vm.unlockUserButtonState = "success";
+                formHelper.showNotifications(data);
+            }, function (error) {
+                vm.unlockUserButtonState = "error";
+                formHelper.showNotifications(error.data);
+            });
+        }
 
         function clearAvatar() {
             // get user
