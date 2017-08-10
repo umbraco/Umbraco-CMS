@@ -350,6 +350,8 @@ namespace Umbraco.Web.Editors
             //return the updated model
             var display = Mapper.Map<IContent, ContentItemDisplay>(contentItem.PersistedContent);
 
+            //Replaces values from display.Tabs with values from contentItem to prevent json objects from being re-formatted
+            ValueReplacer(display, contentItem);
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
 
@@ -399,6 +401,31 @@ namespace Umbraco.Web.Editors
             }
 
             return display;
+        }
+
+        /// <summary>
+        /// Replaces values in all textBoxes and textAreas in all tabs with original string values from contentItem to prevent json objects from being re-formatted
+        /// </summary>
+        /// <param name="display">Value out</param>
+        /// <param name="contentItem">Value in</param>
+        private void ValueReplacer(ContentItemDisplay display, ContentItemSave contentItem)
+        {
+            foreach (var tab in display.Tabs)
+            {
+                foreach (var tabProperty in tab.Properties)
+                {
+                    if (tabProperty.View.ToLower() == "textbox" || tabProperty.View.ToLower() == "textarea")
+                    {
+                        foreach (var contentItemProperty in contentItem.Properties)
+                        {
+                            if (tabProperty.Alias == contentItemProperty.Alias)
+                            {
+                                tabProperty.Value = contentItemProperty.Value;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
