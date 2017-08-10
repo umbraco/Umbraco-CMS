@@ -45,6 +45,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out DataTypeDefinitionRepository dtdRepository, CacheHelper cacheHelper = null)
         {
+            cacheHelper = cacheHelper ?? CacheHelper;
+
             TemplateRepository tr;
             var ctRepository = CreateRepository(unitOfWork, out contentTypeRepository, out tr);
             dtdRepository = new DataTypeDefinitionRepository(unitOfWork, cacheHelper, Logger, SqlSyntax, contentTypeRepository);
