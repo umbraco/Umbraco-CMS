@@ -3,6 +3,17 @@
 
 function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, miniEditorHelper) {
 
+    var unsubscribe;
+
+    function subscribe() {
+        unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+            var currIds = _.map($scope.renderModel, function (i) {
+                return $scope.model.config.idType === "udi" ? i.udi : i.id;
+            });
+            $scope.model.value = trim(currIds.join(), ",");
+        });
+    }
+
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
         return str.replace(rgxtrim, '');
@@ -231,19 +242,13 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             }
         });
     };
-        
-    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
-        var currIds = _.map($scope.renderModel, function (i) {
-            return $scope.model.config.idType === "udi" ? i.udi : i.id;
-        });
-        $scope.model.value = trim(currIds.join(), ",");
-    });
 
     //when the scope is destroyed we need to unsubscribe
     $scope.$on('$destroy', function () {
-        unsubscribe();
+        if(unsubscribe) {
+            unsubscribe();
+        }
     });
-
     
     var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
 
@@ -266,14 +271,14 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
             //everything is loaded, start the watch on the model
             startWatch();
-
+            subscribe();
         });
     }
     else {
         //everything is loaded, start the watch on the model
         startWatch();
+        subscribe();
     }
-    
 
     function setEntityUrl(entity) {
 
