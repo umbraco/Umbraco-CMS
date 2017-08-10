@@ -31,6 +31,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentPreviewRepository<IContent> _contentPreviewRepository;
         private readonly ContentXmlRepository<IContent> _contentXmlRepository;
         private readonly PermissionRepository<IContent> _permissionRepository;
+        private readonly ContentByGuidReadRepository _contentByGuidReadRepository;
 
         public ContentRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider syntaxProvider, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection contentSection)
             : base(work, cacheHelper, logger, syntaxProvider, contentSection)
@@ -44,7 +45,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _contentPreviewRepository = new ContentPreviewRepository<IContent>(work, CacheHelper.NoCache, logger, syntaxProvider);
             _contentXmlRepository = new ContentXmlRepository<IContent>(work, CacheHelper.NoCache, logger, syntaxProvider);
             _permissionRepository = new PermissionRepository<IContent>(UnitOfWork, cacheHelper, Logger, SqlSyntax);
-            
+            _contentByGuidReadRepository = new ContentByGuidReadRepository(this, work, cacheHelper, logger, syntaxProvider);
             EnsureUniqueNaming = true;
         }
 
@@ -936,6 +937,113 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             get { return Constants.System.RecycleBinContent; }
         }
 
+        #endregion
+
+        #region Read Repository implementation for GUID keys
+        public IContent Get(Guid id)
+        {
+            return _contentByGuidReadRepository.Get(id);
+        }
+
+        IEnumerable<IContent> IReadRepository<Guid, IContent>.GetAll(params Guid[] ids)
+        {
+            return _contentByGuidReadRepository.GetAll(ids);
+        }
+
+        public bool Exists(Guid id)
+        {
+            return _contentByGuidReadRepository.Exists(id);
+        }
+
+        /// <summary>
+        /// A reading repository purely for looking up by GUID
+        /// </summary>
+        /// <remarks>
+        /// TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
+        /// Then we can do the same thing with repository instances and we wouldn't need to leave all these methods as not implemented because we wouldn't need to implement them
+        /// </remarks>
+        private class ContentByGuidReadRepository : PetaPocoRepositoryBase<Guid, IContent>
+        {
+            private readonly ContentRepository _outerRepo;
+
+            public ContentByGuidReadRepository(ContentRepository outerRepo,
+                IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+                : base(work, cache, logger, sqlSyntax)
+            {
+                _outerRepo = outerRepo;
+            }
+
+            protected override IContent PerformGet(Guid id)
+            {
+                var sql = _outerRepo.GetBaseQuery(BaseQueryType.FullSingle)
+                    .Where(GetBaseWhereClause(), new { Id = id })
+                    .Where<DocumentDto>(x => x.Newest, SqlSyntax)
+                    .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
+
+                var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+
+                if (dto == null)
+                    return null;
+
+                var content = _outerRepo.CreateContentFromDto(dto, sql);
+
+                return content;
+            }
+
+            protected override IEnumerable<IContent> PerformGetAll(params Guid[] ids)
+            {
+                Func<Sql, Sql> translate = s =>
+                {
+                    if (ids.Any())
+                    {
+                        s.Where("umbracoNode.uniqueID in (@ids)", new { ids });
+                    }
+                    //we only want the newest ones with this method
+                    s.Where<DocumentDto>(x => x.Newest, SqlSyntax);
+                    return s;
+                };
+
+                var sqlBaseFull = _outerRepo.GetBaseQuery(BaseQueryType.FullMultiple);
+                var sqlBaseIds = _outerRepo.GetBaseQuery(BaseQueryType.Ids);
+
+                return _outerRepo.ProcessQuery(translate(sqlBaseFull), new PagingSqlQuery(translate(sqlBaseIds)));
+            }
+
+            protected override Sql GetBaseQuery(bool isCount)
+            {
+                return _outerRepo.GetBaseQuery(isCount);
+            }
+
+            protected override string GetBaseWhereClause()
+            {
+                return "umbracoNode.uniqueID = @Id";
+            }
+
+            protected override Guid NodeObjectTypeId
+            {
+                get { return _outerRepo.NodeObjectTypeId; }
+            }
+
+            #region Not needed to implement
+
+            protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)
+            {
+                throw new NotImplementedException();
+            }
+            protected override IEnumerable<string> GetDeleteClauses()
+            {
+                throw new NotImplementedException();
+            }
+            protected override void PersistNewItem(IContent entity)
+            {
+                throw new NotImplementedException();
+            }
+            protected override void PersistUpdatedItem(IContent entity)
+            {
+                throw new NotImplementedException();
+            }
+            #endregion
+        }
         #endregion
 
         protected override string GetDatabaseFieldNameForOrderBy(string orderBy)

@@ -35,16 +35,34 @@ namespace Umbraco.Core.Services
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
         private readonly MediaFileSystem _mediaFileSystem = FileSystemProviderManager.Current.MediaFileSystem;
-        private readonly IdkMap _idkMap;
 
-        public MediaService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IDataTypeService dataTypeService, IUserService userService, IdkMap idkMap)
+        public MediaService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IDataTypeService dataTypeService, IUserService userService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
             if (userService == null) throw new ArgumentNullException("userService");
             _dataTypeService = dataTypeService;
             _userService = userService;
-            _idkMap = idkMap;
+        }
+
+        /// <summary>
+        /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
+        /// that this Media should based on.
+        /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IMedia without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new media objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
+        /// <param name="name">Name of the Media object</param>
+        /// <param name="parentId">Id of Parent for the new Media item</param>
+        /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
+        /// <param name="userId">Optional id of the user creating the media item</param>
+        /// <returns><see cref="IMedia"/></returns>
+        public IMedia CreateMedia(string name, Guid parentId, string mediaTypeAlias, int userId = 0)
+        {
+            var parent = GetById(parentId);
+            return CreateMedia(name, parent, mediaTypeAlias, userId);
         }
 
         /// <summary>
@@ -307,11 +325,27 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets an <see cref="IMedia"/> object by Id
+        /// Gets an <see cref="IMedia"/> objects by Ids
         /// </summary>
         /// <param name="ids">Ids of the Media to retrieve</param>
         /// <returns><see cref="IMedia"/></returns>
         public IEnumerable<IMedia> GetByIds(IEnumerable<int> ids)
+        {
+            if (ids.Any() == false) return Enumerable.Empty<IMedia>();
+
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateMediaRepository(uow);
+                return repository.GetAll(ids.ToArray());
+            }
+        }
+
+        /// <summary>
+        /// Gets an <see cref="IMedia"/> objects by Ids
+        /// </summary>
+        /// <param name="ids">Ids of the Media to retrieve</param>
+        /// <returns><see cref="IMedia"/></returns>
+        public IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids)
         {
             if (ids.Any() == false) return Enumerable.Empty<IMedia>();
 
@@ -329,15 +363,11 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia GetById(Guid key)
         {
-            // the repository implements a cache policy on int identifiers, not guids,
-            // and we are not changing it now, but we still would like to rely on caching
-            // instead of running a full query against the database, so relying on the
-            // id-key map, which is fast.
-            //
-            // we should inject the id-key map but ... breaking changes ... yada
-
-            var a = _idkMap.GetIdForKey(key, UmbracoObjectTypes.Media);
-            return a.Success ? GetById(a.Result) : null;
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateMediaRepository(uow);
+                return repository.Get(key);
+            }
         }
 
         /// <summary>
