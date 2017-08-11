@@ -29,7 +29,7 @@
                                 </div>
                                 <div class="umb-box-content block-form">
 
-                                    <umb-control-group label="@general_email">
+                                    <umb-control-group label="@general_email" required="true">
                                         <input 
                                             type="email" 
                                             localize="placeholder" 
@@ -43,7 +43,7 @@
                                         <span class="help-inline" val-msg-for="email" val-toggle-msg="valServerField"></span>
                                     </umb-control-group>
 
-                                    <umb-control-group label="@general_username" ng-if="!vm.emailIsUsername">
+                                    <umb-control-group label="@general_username" ng-if="!vm.emailIsUsername" required="true">
                                         <input 
                                             type="text" 
                                             localize="placeholder" 
@@ -80,7 +80,7 @@
                                 </div>
                                 <div class="umb-box-content block-form">
 
-                                    <umb-control-group style="margin-bottom: 25px;" label="@general_groups" description="@user_groupsHelp">
+                                    <umb-control-group style="margin-bottom: 25px;" label="@general_groups" description="@user_groupsHelp" required="true">
 
                                         <umb-user-group-preview
                                             ng-repeat="userGroup in vm.user.userGroups"

@@ -307,22 +307,22 @@
                     </div>
                 </div>
 
-                <umb-control-group label="@general_name" label-for="name">
+                <umb-control-group label="@general_name" label-for="name" required="true">
                     <input type="text" name="name" localize="placeholder" placeholder="@placeholders_entername" class="input-block-level" ng-model="vm.newUser.name"
                         umb-auto-focus required val-server-field="Name" />
                     <span class="help-inline" val-msg-for="name" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
                     <span class="help-inline" val-msg-for="name" val-toggle-msg="valServerField"></span>
                 </umb-control-group>
 
-                <umb-control-group label="@general_email" label-for="email">
+                <umb-control-group label="@general_email" label-for="email" required="true">
                     <input type="email" name="email" localize="placeholder" placeholder="@placeholders_enteremail" class="input-block-level"
                         ng-model="vm.newUser.email" required val-email val-server-field="Email" />
                     <span class="help-inline" val-msg-for="email" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
                     <span class="help-inline" val-msg-for="email" val-toggle-msg="valServerField"></span>
                 </umb-control-group>
 
-                <umb-control-group label="@user_usergroup" description="@user_groupsHelp">
-
+                <umb-control-group label="@user_usergroup" description="@user_groupsHelp" required="true">
+                    
                     <umb-user-group-preview
                         ng-repeat="group in vm.newUser.userGroups"
                         icon="group.icon"
@@ -340,7 +340,7 @@
 
                 </umb-control-group>
 
-                <umb-control-group label="@general_message" ng-if="vm.usersViewState === 'inviteUser'" label-for="message">
+                <umb-control-group label="@general_message" ng-if="vm.usersViewState === 'inviteUser'" label-for="message" required="true">
                     <textarea
                         name="message"
                         type="text"
