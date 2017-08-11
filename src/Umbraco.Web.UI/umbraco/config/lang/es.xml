@@ -220,6 +220,8 @@
     <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Título del vínculo</key>
+    <key alias="urlLinkPicker">Vínculo</key>
     <key alias="anchorInsert">Nombre</key>
     <key alias="assignDomain">Administrar dominios</key>
     <key alias="closeThisWindow">Cerrar esta ventana</key>
