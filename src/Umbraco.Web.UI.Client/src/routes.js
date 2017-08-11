@@ -98,14 +98,31 @@ app.config(function ($routeProvider) {
             resolve: doLogout()
         })
         .when('/:section', {
-            templateUrl: function (rp) {
-                if (rp.section.toLowerCase() === "default" || rp.section.toLowerCase() === "umbraco" || rp.section === "")
-                {
-                    rp.section = "content";
+            //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
+            template: "<div ng-include='templateUrl'></div>",
+            //This controller will execute for this route, then we can execute some code in order to set the template Url
+            controller: function ($scope, $route, $routeParams, $location, sectionService) {
+                if ($routeParams.section.toLowerCase() === "default" || $routeParams.section.toLowerCase() === "umbraco" || $routeParams.section === "") {
+                    $routeParams.section = "content";
                 }
 
-                rp.url = "dashboard.aspx?app=" + rp.section;
-                return 'views/common/dashboard.html';
+                //We are going to check the currently loaded sections for the user and if the section we are navigating
+                //to has a custom route path we'll use that 
+                sectionService.getSectionsForUser().then(function(sections) {
+                    //find the one we're requesting
+                    var found = _.find(sections, function(s) {
+                        return s.alias === $routeParams.section;
+                    })
+                    if (found && found.routePath) {
+                        //there's a custom route path so redirect
+                        $location.path(found.routePath);
+                    }
+                    else {
+                        //there's no custom route path so continue as normal
+                        $routeParams.url = "dashboard.aspx?app=" + $routeParams.section;
+                        $scope.templateUrl = 'views/common/dashboard.html';            
+                    }
+                });
             },
             resolve: canRoute(true)
         })
@@ -121,15 +138,11 @@ app.config(function ($routeProvider) {
         })
         .when('/:section/:tree/:method', {
             templateUrl: function (rp) {
+
+                //if there is no method registered for this then show the dashboard
                 if (!rp.method)
                     return "views/common/dashboard.html";
-
-                //NOTE: This current isn't utilized by anything but does open up some cool opportunities for
-                // us since we'll be able to have specialized views for individual sections which is something
-                // we've never had before. So could utilize this for a new dashboard model when we get native
-                // angular dashboards working. Perhaps a normal section dashboard would list out the registered
-                // dashboards (as tabs if we wanted) and each tab could actually be a route link to one of these views?
-
+                
                 return ('views/' + rp.tree + '/' + rp.method + '.html');
             },
             resolve: canRoute(true)

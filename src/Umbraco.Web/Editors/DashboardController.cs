@@ -19,7 +19,6 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Editors
 {
-  
     //we need to fire up the controller like this to enable loading of remote css directly from this controller
     [PluginController("UmbracoApi")]
     [ValidationFilter]
@@ -124,54 +123,8 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public IEnumerable<Tab<DashboardControl>> GetDashboard(string section)
         {
-            var tabs = new List<Tab<DashboardControl>>();
-            var i = 1;
-
-            // The dashboard config can contain more than one area inserted by a package.
-            foreach( var dashboardSection in UmbracoConfig.For.DashboardSettings().Sections.Where(x => x.Areas.Contains(section)))
-            {
-                //we need to validate access to this section
-                if (DashboardSecurity.AuthorizeAccess(dashboardSection, Security.CurrentUser, Services.SectionService) == false)
-                    continue;
-
-                //User is authorized
-                foreach (var tab in dashboardSection.Tabs)
-                {
-                    //we need to validate access to this tab
-                    if (DashboardSecurity.AuthorizeAccess(tab, Security.CurrentUser, Services.SectionService) == false)
-                        continue;
-
-                    var dashboardControls = new List<DashboardControl>();
-
-                    foreach (var control in tab.Controls)
-                    {
-                        if (DashboardSecurity.AuthorizeAccess(control, Security.CurrentUser, Services.SectionService) == false)
-                            continue;
-
-                        var dashboardControl = new DashboardControl();
-                        var controlPath = control.ControlPath.Trim();
-                        dashboardControl.Path = IOHelper.FindFile(controlPath);
-                        if (controlPath.ToLowerInvariant().EndsWith(".ascx".ToLowerInvariant()))
-                            dashboardControl.ServerSide = true;
-
-                        dashboardControls.Add(dashboardControl);
-                    }
-
-                    tabs.Add(new Tab<DashboardControl>
-                    {
-                        Id = i,
-                        Alias = tab.Caption.ToSafeAlias(),
-                        IsActive = i == 1,
-                        Label = tab.Caption,
-                        Properties = dashboardControls
-                    });
-
-                    i++;
-                }
-            }
-
-            //In case there are no tabs or a user doesn't have access the empty tabs list is returned
-            return tabs;
+            var dashboardHelper = new DashboardHelper(Services.SectionService);
+            return dashboardHelper.GetDashboard(section, Security.CurrentUser);            
         }
     }
 }

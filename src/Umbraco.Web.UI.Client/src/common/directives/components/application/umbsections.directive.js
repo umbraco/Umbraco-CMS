@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbSections
 * @restrict E
 **/
-function sectionsDirective($timeout, $window, navigationService, treeService, sectionResource, appState, eventsService, $location) {
+function sectionsDirective($timeout, $window, navigationService, treeService, sectionService, appState, eventsService, $location) {
     return {
         restrict: "E",    // restrict to an element
         replace: true,   // replace the html element with the template
@@ -31,7 +31,7 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
             };
 
 			function loadSections(){
-				sectionResource.getSections()
+			    sectionService.getSectionsForUser()
 					.then(function (result) {
 						scope.sections = result;
 						calculateHeight();
@@ -154,8 +154,16 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			    }
 
 			    navigationService.hideSearch();
-			    navigationService.showTree(section.alias);
-			    $location.path("/" + section.alias);
+                navigationService.showTree(section.alias);
+
+                //in some cases the section will have a custom route path specified, if there is one we'll use it
+                if (section.routePath) {
+                    $location.path(section.routePath);
+                }
+                else {
+                    $location.path(section.alias);    
+                }
+			    
 			};
 
 			scope.sectionDblClick = function(section){

@@ -320,6 +320,7 @@
     <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="Editors\BackOfficeServerVariables.cs" />
+    <Compile Include="Editors\DashboardHelper.cs" />
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
