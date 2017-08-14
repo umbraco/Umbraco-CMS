@@ -181,12 +181,54 @@ namespace Umbraco.Core.Services
         {
             public int Id { get; set; }
             public UmbracoObjectTypes UmbracoObjectType { get; set; }
+
+            protected bool Equals(Id2KeyCompositeKey other)
+            {
+                return Id == other.Id && UmbracoObjectType == other.UmbracoObjectType;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((Id2KeyCompositeKey) obj);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return (Id * 397) ^ (int) UmbracoObjectType;
+                }
+            }
         }
 
         internal class Key2IdCompositeKey
         {
             public Guid Key { get; set; }
             public UmbracoObjectTypes UmbracoObjectType { get; set; }
+
+            protected bool Equals(Key2IdCompositeKey other)
+            {
+                return Key.Equals(other.Key) && UmbracoObjectType == other.UmbracoObjectType;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((Key2IdCompositeKey) obj);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return (Key.GetHashCode() * 397) ^ (int) UmbracoObjectType;
+                }
+            }
         }
     }
 }
