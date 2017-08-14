@@ -49,8 +49,7 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
       };
     }
 
-    $scope.remove =function(index, event){
-        event.preventDefault();
+    $scope.remove =function(index){
         $scope.renderModel.splice(index, 1);
     };
 
@@ -67,7 +66,10 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
         });
         if (currIds.indexOf(itemId) < 0) {
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon, udi: item.udi });
+            entityResource.getUrl(item.id, "Media").then(function(data){
+            item.path = data;
+            $scope.renderModel.push({ name: item.name, id: item.id, path: item.path,  icon: item.icon, udi: item.udi });
+            });
         }	
     };
 
@@ -89,7 +91,7 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
         entityResource.getByIds(modelIds, dialogOptions.entityType).then(function (data) {
             _.each(data, function (item, i) {
                 item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-                $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon, udi: item.udi });
+                $scope.renderModel.push({ name: item.name, id: item.id, path: item.path, icon: item.icon, udi: item.udi });
             });
         });
     }
