@@ -308,7 +308,10 @@
     <Compile Include="_Legacy\Actions\ActionAudit.cs" />
     <Compile Include="_Legacy\Actions\ActionBrowse.cs" />
     <Compile Include="_Legacy\Actions\ActionChangeDocType.cs" />
+    <Compile Include="_Legacy\Actions\ActionCollection.cs" />
+    <Compile Include="_Legacy\Actions\ActionCollectionBuilder.cs" />
     <Compile Include="_Legacy\Actions\ActionCopy.cs" />
+    <Compile Include="_Legacy\Actions\ActionCreateBlueprintFromContent.cs" />
     <Compile Include="_Legacy\Actions\ActionDelete.cs" />
     <Compile Include="_Legacy\Actions\ActionEmptyTranscan.cs" />
     <Compile Include="_Legacy\Actions\ActionExport.cs" />
@@ -335,6 +338,7 @@
     <Compile Include="_Legacy\Actions\ActionUnPublish.cs" />
     <Compile Include="_Legacy\Actions\ActionUpdate.cs" />
     <Compile Include="_Legacy\Actions\ContextMenuSeperator.cs" />
+    <Compile Include="_Legacy\Actions\IAction.cs" />
     <Compile Include="_Legacy\Actions\LegacyActionMenuItemAttribute.cs" />
     <Compile Include="Models\ContentEditing\EntityBasic.cs" />
     <Compile Include="Models\Trees\ApplicationAttribute.cs" />

@@ -29,6 +29,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
     return {
 
         /** Used by the content editor and mini content editor to perform saving operations */
+        //TODO: Make this a more helpful/reusable method for other form operations! we can simplify this form most forms
         contentEditorPerformSave: function (args) {
             if (!angular.isObject(args)) {
                 throw "args must be an object";

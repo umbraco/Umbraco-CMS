@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Logging;
@@ -143,7 +144,7 @@ namespace Umbraco.Web._Legacy.Actions
         /// <returns></returns>
         public static string ToString(List<IAction> actions)
         {
-            string[] strMenu = Array.ConvertAll<IAction, string>(actions.ToArray(), delegate(IAction a) { return (a.Letter.ToString()); });
+            string[] strMenu = Array.ConvertAll<IAction, string>(actions.ToArray(), delegate(IAction a) { return (a.Letter.ToString(CultureInfo.InvariantCulture)); });
             return string.Join("", strMenu);
         }
 

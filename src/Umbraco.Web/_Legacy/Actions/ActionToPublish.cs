@@ -1,11 +1,14 @@
 ﻿using System;
 using Umbraco.Web.UI.Pages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web._Legacy.Actions
 {
     /// <summary>
     /// This action is invoked when children to a document is being sent to published (by an editor without publishrights)
     /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.ContentCategory)]
     public class ActionToPublish : IAction
     {
         //create singleton

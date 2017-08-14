@@ -1,11 +1,14 @@
 ﻿using System;
 using Umbraco.Web.UI.Pages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web._Legacy.Actions
 {
     /// <summary>
     /// This action is invoked when children to a document, media, member is being sorted
     /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.StructureCategory)]
     public class ActionSort : IAction
     {
         //create singleton

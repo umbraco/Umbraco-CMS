@@ -28,10 +28,9 @@
          <div class="upload-button">
              <umb-button
                 type="button"
-                key="general_upload"
-                label="Upload"
+                label-key="general_upload"
                 action="upload()"
-                disabled="disabled">
+                disabled="lockedFolder">
              </umb-button>
          </div>
 
@@ -49,7 +48,7 @@
                <span class="umb-breadcrumbs__seperator">&#47;</span>
             </li>
 
-            <li class="umb-breadcrumbs__ancestor">
+            <li class="umb-breadcrumbs__ancestor" ng-if="!lockedFolder">
                <a href ng-hide="showFolderInput" ng-click="showFolderInput = true">
                   <i class="icon icon-add small"></i>
                </a>
@@ -68,7 +67,7 @@
       </div>
 
       <umb-file-dropzone
-         ng-if="acceptedMediatypes.length > 0 && !loading"
+         ng-if="acceptedMediatypes.length > 0 && !loading && !lockedFolder"
          accepted-mediatypes="acceptedMediatypes"
          parent-id="{{currentFolder.id}}"
          files-uploaded="onUploadComplete"

@@ -1,4 +1,6 @@
 ﻿using System;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Web.UI.Pages;
 
 namespace Umbraco.Web._Legacy.Actions
@@ -6,6 +8,7 @@ namespace Umbraco.Web._Legacy.Actions
     /// <summary>
     /// This action is invoked upon viewing audittrailing on a document
     /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.AdministrationCategory)]
     public class ActionAudit : IAction
     {
         /// <summary>

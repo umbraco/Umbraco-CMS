@@ -1,12 +1,14 @@
 .umb-node-preview {
-    padding: 5px 15px;
-    margin-bottom: 5px;
-    background: @gray-10;
-    border-radius: 3px;
+    padding: 7px 0;
     display: flex;
-    align-items: center;
     max-width: 66.6%;
     box-sizing: border-box;
+    border-bottom: 1px solid @gray-9;
+}
+
+.umb-node-preview:last-of-type {
+    border-bottom: none;
+    margin-bottom: 7px;
 }
 
 .umb-node-preview--sortable {
@@ -34,12 +36,12 @@
 
 .umb-node-preview__content {
     flex: 1 1 auto;
+    margin-right: 25px;
 }
 
 .umb-node-preview__name {
-    font-size: 13px;
-    font-weight: bold;
     color: @black;
+    margin-top: 3px;
 }
 
 .umb-node-preview__description {
@@ -76,7 +78,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px dashed @gray-8;
+    border: 1px dashed @gray-7;
     color: @turquoise-d1;
     font-weight: bold;
     padding: 5px 15px;

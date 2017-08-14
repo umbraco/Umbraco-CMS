@@ -144,8 +144,11 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
 
-    //if we have a query for the startnode, we will use that. 
-    if ($scope.model.config.startNode.query) {
+    if ($routeParams.section === "settings" && $routeParams.tree === "documentTypes") {
+        //if the content-picker is being rendered inside the document-type editor, we don't need to process the startnode query
+        dialogOptions.startNodeId = -1;
+    } else if ($scope.model.config.startNode.query) {
+        //if we have a query for the startnode, we will use that.
         var rootId = $routeParams.id;
         entityResource.getByQuery($scope.model.config.startNode.query, rootId, "Document").then(function (ent) {
             dialogOptions.startNodeId = $scope.model.config.idType === "udi" ? ent.udi : ent.id;

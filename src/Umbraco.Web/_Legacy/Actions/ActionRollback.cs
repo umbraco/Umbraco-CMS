@@ -1,11 +1,14 @@
 ﻿using System;
 using Umbraco.Web.UI.Pages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web._Legacy.Actions
 {
     /// <summary>
     /// This action is invoked when copying a document is being rolled back
     /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.AdministrationCategory)]
     public class ActionRollback : IAction
     {
         //create singleton

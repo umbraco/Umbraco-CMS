@@ -1,11 +1,14 @@
 ﻿using System;
 using Umbraco.Web.UI.Pages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web._Legacy.Actions
 {
     /// <summary>
     /// This action is invoked when copying a document, media, member
     /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.StructureCategory)]
     public class ActionCopy : IAction
     {
         //create singleton

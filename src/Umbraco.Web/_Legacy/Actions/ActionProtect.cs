@@ -1,11 +1,14 @@
 ﻿using System;
 using Umbraco.Web.UI.Pages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web._Legacy.Actions
 {
     /// <summary>
     /// This action is invoked when a document is protected or unprotected
     /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.AdministrationCategory)]
     public class ActionProtect : IAction
     {
         //create singleton

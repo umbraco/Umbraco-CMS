@@ -115,7 +115,7 @@ angular.module("umbraco")
         };
 
         //go get the config for the membership provider and add it to the model
-        currentUserResource.getMembershipProviderConfig().then(function(data) {
+        authResource.getMembershipProviderConfig().then(function(data) {
            $scope.changePasswordModel.config = data;
            //ensure the hasPassword config option is set to true (the user of course has a password already assigned)
            //this will ensure the oldPassword is shown so they can change it

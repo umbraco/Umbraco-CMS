@@ -1,4 +1,7 @@
-﻿namespace Umbraco.Web._Legacy.Actions
+﻿using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
+
+namespace Umbraco.Web._Legacy.Actions
 {
     /// <summary>
     /// This action is used as a security constraint that grants a user the ability to view nodes in a tree
@@ -9,6 +12,7 @@
     /// granting a user this permission, the user is able to see the node in the tree but not edit the document. This may be used by other trees
     /// that support permissions in the future.
     /// </remarks>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.ContentCategory)]
     public class ActionBrowse : IAction
     {
         //create singleton

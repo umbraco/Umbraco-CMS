@@ -12,6 +12,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         bool ConvertUrlsToAscii { get; }
 
+        bool TryConvertUrlsToAscii { get; }
+
         IEnumerable<IChar> CharCollection { get; }
     }
 }

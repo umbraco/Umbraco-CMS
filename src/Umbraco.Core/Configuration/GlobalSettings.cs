@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net.Configuration;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Hosting;
@@ -44,7 +45,6 @@ namespace Umbraco.Core.Configuration
         //ensure the built on (non-changeable) reserved paths are there at all times
         private const string StaticReservedPaths = "~/app_plugins/,~/install/,";
         private const string StaticReservedUrls = "~/config/splashes/booting.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd,";
-
         #endregion
 
         /// <summary>
@@ -55,6 +55,7 @@ namespace Umbraco.Core.Configuration
             _reservedUrlsCache = null;
             _reservedPaths = null;
             _reservedUrls = null;
+            HasSmtpServer = null;
         }
 
         /// <summary>
@@ -65,6 +66,25 @@ namespace Umbraco.Core.Configuration
         {
             ResetInternal();
         }
+
+        public static bool HasSmtpServerConfigured(string appPath)
+        {
+            if (HasSmtpServer.HasValue) return HasSmtpServer.Value;
+
+            var config = WebConfigurationManager.OpenWebConfiguration(appPath);
+            var settings = (MailSettingsSectionGroup)config.GetSectionGroup("system.net/mailSettings");
+            if (settings == null || settings.Smtp == null) return false;
+            if (settings.Smtp.SpecifiedPickupDirectory != null && string.IsNullOrEmpty(settings.Smtp.SpecifiedPickupDirectory.PickupDirectoryLocation) == false)
+                return true;
+            if (settings.Smtp.Network != null && string.IsNullOrEmpty(settings.Smtp.Network.Host) == false)
+                return true;
+            return false;
+        }
+
+        /// <summary>
+        /// For testing only
+        /// </summary>
+        internal static bool? HasSmtpServer { get; set; }
 
         /// <summary>
         /// Gets the reserved urls from web.config.

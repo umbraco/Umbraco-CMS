@@ -9,8 +9,9 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         var disableFolderSelect = $scope.model.config.disableFolderSelect && $scope.model.config.disableFolderSelect !== '0' ? true : false;
 
         if (!$scope.model.config.startNodeId) {
-            userService.getCurrentUser().then(function (userData) {
-                $scope.model.config.startNodeId = userData.startMediaId;
+            userService.getCurrentUser().then(function(userData) {
+                $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
             });
         }
 
@@ -45,7 +46,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                                 $scope.ids.push(media.udi);
                             }
                             else {
-                                $scope.ids.push(media.id);    
+                                $scope.ids.push(media.id);
                             }
                         }
                     });
@@ -73,6 +74,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                view: "mediapicker",
                title: "Select media",
                startNodeId: $scope.model.config.startNodeId,
+               startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
                multiPicker: multiPicker,
                onlyImages: onlyImages,
                disableFolderSelect: disableFolderSelect,

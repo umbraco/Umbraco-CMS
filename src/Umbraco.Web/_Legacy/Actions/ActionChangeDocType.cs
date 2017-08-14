@@ -1,11 +1,14 @@
 ﻿using System;
 using Umbraco.Web.UI.Pages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web._Legacy.Actions
 {
     /// <summary>
     /// This action is invoked when the document type of a piece of content is changed
     /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.AdministrationCategory)]
     public class ActionChangeDocType : IAction
     {
         //create singleton

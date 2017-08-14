@@ -1,10 +1,13 @@
 ﻿using System;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web._Legacy.Actions
 {
     /// <summary>
     /// This action is invoked when a translation occurs
     /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.AdministrationCategory)]
     public class ActionTranslate : IAction
     {
         //create singleton

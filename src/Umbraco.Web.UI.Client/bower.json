@@ -1,5 +1,5 @@
 {
-  "name": "Umbraco",
+  "name": "umbraco",
   "version": "7",
   "homepage": "https://github.com/umbraco/Umbraco-CMS",
   "authors": [
@@ -30,6 +30,7 @@
     "codemirror": "~5.3.0",
     "angular-local-storage": "~0.2.3",
     "moment": "~2.10.3",
-    "ace-builds": "^1.2.3"
+    "ace-builds": "^1.2.3",
+    "clipboard": "1.7.1"
   }
 }

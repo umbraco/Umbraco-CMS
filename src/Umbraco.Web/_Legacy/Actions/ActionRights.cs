@@ -1,11 +1,14 @@
 ﻿using System;
 using Umbraco.Web.UI.Pages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web._Legacy.Actions
 {
     /// <summary>
     /// This action is invoked when rights are changed on a document
     /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.ContentCategory)]
     public class ActionRights : IAction
     {
         //create singleton
