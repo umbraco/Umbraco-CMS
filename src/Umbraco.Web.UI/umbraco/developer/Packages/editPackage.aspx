@@ -190,6 +190,7 @@
                     <a href="#" onclick="UmbClientMgr.openModalWindow('developer/packages/directoryBrowser.aspx?target=<%= packageControlPath.ClientID %>','Choose a file or a folder', true, 500, 400); return false;"
                         style="border: none;">
                          <i class="icon icon-folder"></i>
+                      </a>
                 </td>
             </tr>
         </table>
