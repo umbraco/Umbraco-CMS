@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -10,8 +11,8 @@ namespace Umbraco.Core.Services
     {
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
-        private readonly Dictionary<int, Guid> _id2Key = new Dictionary<int, Guid>();
-        private readonly Dictionary<Guid, int> _key2Id = new Dictionary<Guid, int>();
+        private readonly Dictionary<Id2KeyCompositeKey, Guid> _id2Key = new Dictionary<Id2KeyCompositeKey, Guid>();
+        private readonly Dictionary<Key2IdCompositeKey, int> _key2Id = new Dictionary<Key2IdCompositeKey, int>();
 
         public IdkMap(IDatabaseUnitOfWorkProvider uowProvider)
         {
@@ -23,11 +24,12 @@ namespace Umbraco.Core.Services
 
         public Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
         {
+            var compositeKey = new Key2IdCompositeKey() { Key = key, UmbracoObjectType = umbracoObjectType };
             int id;
             try
             {
                 _locker.EnterReadLock();
-                if (_key2Id.TryGetValue(key, out id)) return Attempt.Succeed(id);
+                if (_key2Id.TryGetValue(compositeKey, out id)) return Attempt.Succeed(id);
             }
             finally
             {
@@ -48,9 +50,10 @@ namespace Umbraco.Core.Services
 
             try
             {
+                var reversedCompositeKey = new Id2KeyCompositeKey { Id = id, UmbracoObjectType = umbracoObjectType };
                 _locker.EnterWriteLock();
-                _id2Key[id] = key;
-                _key2Id[key] = id;
+                _id2Key[reversedCompositeKey] = key;
+                _key2Id[compositeKey] = id;
             }
             finally
             {
@@ -73,11 +76,12 @@ namespace Umbraco.Core.Services
 
         public Attempt<Guid> GetKeyForId(int id, UmbracoObjectTypes umbracoObjectType)
         {
+            var compositeKey = new Id2KeyCompositeKey() {Id = id, UmbracoObjectType = umbracoObjectType};
             Guid key;
             try
             {
                 _locker.EnterReadLock();
-                if (_id2Key.TryGetValue(id, out key)) return Attempt.Succeed(key);
+                if (_id2Key.TryGetValue(compositeKey, out key)) return Attempt.Succeed(key);
             }
             finally
             {
@@ -98,9 +102,10 @@ namespace Umbraco.Core.Services
 
             try
             {
+                var reversedCompositeKey = new Key2IdCompositeKey {Key = key, UmbracoObjectType = umbracoObjectType};
                 _locker.EnterWriteLock();
-                _id2Key[id] = key;
-                _key2Id[key] = id;
+                _id2Key[compositeKey] = key;
+                _key2Id[reversedCompositeKey] = id;
             }
             finally
             {
@@ -139,10 +144,12 @@ namespace Umbraco.Core.Services
             try
             {
                 _locker.EnterWriteLock();
-                Guid key;
-                if (_id2Key.TryGetValue(id, out key) == false) return;
-                _id2Key.Remove(id);
-                _key2Id.Remove(key);
+                var match = _id2Key.Keys.SingleOrDefault(x => x.Id == id);
+                if (match == null) return;
+                var key = _id2Key[match];
+                var reversedCompositeKey = new Key2IdCompositeKey { Key = key, UmbracoObjectType = match.UmbracoObjectType };
+                _id2Key.Remove(match);
+                _key2Id.Remove(reversedCompositeKey);
             }
             finally
             {
@@ -156,16 +163,30 @@ namespace Umbraco.Core.Services
             try
             {
                 _locker.EnterWriteLock();
-                int id;
-                if (_key2Id.TryGetValue(key, out id) == false) return;
-                _id2Key.Remove(id);
-                _key2Id.Remove(key);
+                var match = _key2Id.Keys.SingleOrDefault(x => x.Key == key);
+                if (match == null) return;
+                var id = _key2Id[match];
+                var reversedCompositeKey = new Id2KeyCompositeKey {Id = id, UmbracoObjectType = match.UmbracoObjectType};
+                _id2Key.Remove(reversedCompositeKey);
+                _key2Id.Remove(match);
             }
             finally
             {
                 if (_locker.IsWriteLockHeld)
                     _locker.ExitWriteLock();
             }
+        }
+
+        internal class Id2KeyCompositeKey
+        {
+            public int Id { get; set; }
+            public UmbracoObjectTypes UmbracoObjectType { get; set; }
+        }
+
+        internal class Key2IdCompositeKey
+        {
+            public Guid Key { get; set; }
+            public UmbracoObjectTypes UmbracoObjectType { get; set; }
         }
     }
 }
