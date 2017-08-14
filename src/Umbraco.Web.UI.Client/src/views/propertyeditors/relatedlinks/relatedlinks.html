@@ -50,7 +50,7 @@
                         <button type="button" class="btn btn-default" ng-click="delete($index)"><localize key="delete">Delete</localize></button>
                     </div>
                     <div class="btn-group" ng-show="link.edit" style="margin-left: 0;">
-                        <button type="button" class="btn btn-default" ng-click="saveEdit($index)"><localize key="buttons_save">Save</localize></button>
+                        <button type="button" class="btn btn-default" ng-disabled="!canSaveEdit($index)" ng-click="saveEdit($index)"><localize key="buttons_save">Save</localize></button>
                     </div>
                 </td>
             </tr>

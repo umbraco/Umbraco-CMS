@@ -76,9 +76,19 @@
                 $scope.model.value[idx].edit = true;
             };
 
+            $scope.canSaveEdit = function (idx) {
+                return $scope.model.value[idx].caption.trim() != "";
+            }
+
             $scope.saveEdit = function (idx) {
-                $scope.model.value[idx].title = $scope.model.value[idx].caption;
-                $scope.model.value[idx].edit = false;
+                if ($scope.model.value[idx].caption.trim() == "") {
+                    $scope.hasError = true;
+                    $event.preventDefault();
+                }
+                else {
+                    $scope.model.value[idx].title = $scope.model.value[idx].caption;
+                    $scope.model.value[idx].edit = false;
+                }
             };
 
             $scope.delete = function (idx) {               
