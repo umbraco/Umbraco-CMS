@@ -11,7 +11,8 @@ angular.module("umbraco.directives.html")
         description: "@",
         hideLabel: "@",
         alias: "@",
-        labelFor: "@"
+        labelFor: "@",
+        required: "@?"
       },
       require: '?^form',
       transclude: true,
