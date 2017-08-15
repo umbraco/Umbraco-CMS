@@ -563,23 +563,36 @@ namespace Umbraco.Web.Editors
         /// Unlocks the users with the given user ids
         /// </summary>
         /// <param name="userIds"></param>
-        public HttpResponseMessage PostUnlockUsers([FromUri]int[] userIds)
+        public async Task<HttpResponseMessage> PostUnlockUsers([FromUri]int[] userIds)
         {
-            var users = Services.UserService.GetUsersById(userIds).ToArray();
-            foreach (var u in users)
-            {
-                u.IsLockedOut = false;
-            }
-            Services.UserService.Save(users);
+            if (userIds.Length <= 0)
+                return Request.CreateResponse(HttpStatusCode.OK);
 
-            if (users.Length > 1)
+            if (userIds.Length == 1)
             {
+                var unlockResult = await UserManager.SetLockoutEndDateAsync(userIds[0], DateTimeOffset.Now);
+                if (unlockResult.Succeeded == false)
+                {
+                    return Request.CreateValidationErrorResponse(
+                        string.Format("Could not unlock for user {0} - error {1}", userIds[0], unlockResult.Errors.First()));
+                }
+                var user = await UserManager.FindByIdAsync(userIds[0]);
                 return Request.CreateNotificationSuccessResponse(
-                    Services.TextService.Localize("speechBubbles/unlockUsersSuccess", new[] { userIds.Length.ToString() }));
+                    Services.TextService.Localize("speechBubbles/unlockUserSuccess", new[] { user.Name }));                
+            }
+
+            foreach (var u in userIds)
+            {
+                var unlockResult = await UserManager.SetLockoutEndDateAsync(u, DateTimeOffset.Now);
+                if (unlockResult.Succeeded == false)
+                {
+                    return Request.CreateValidationErrorResponse(
+                        string.Format("Could not unlock for user {0} - error {1}", u, unlockResult.Errors.First()));
+                }
             }
 
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/unlockUserSuccess", new[] { users[0].Name }));
+                Services.TextService.Localize("speechBubbles/unlockUsersSuccess", new[] { userIds.Length.ToString() }));
         }
 
         public HttpResponseMessage PostSetUserGroupsOnUsers([FromUri]string[] userGroupAliases, [FromUri]int[] userIds)
