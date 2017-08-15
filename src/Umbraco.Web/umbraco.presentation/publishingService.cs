@@ -77,19 +77,28 @@ namespace umbraco.presentation
 
 		private static bool GetTaskByHttp(string url)
 		{
-			var myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+			var activeProtocol = ServicePointManager.SecurityProtocol;
+			try
+			{
+				ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+				var myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
 
-            try
-            {
-                using (var myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse())
-                {
-                    return myHttpWebResponse.StatusCode == HttpStatusCode.OK;
-                }
-            }
-            catch (Exception ex)
-            {
-                LogHelper.Error<publishingService>("Error sending url request for scheduled task", ex);
-            }
+				try
+				{
+					using (var myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse())
+					{
+						return myHttpWebResponse.StatusCode == HttpStatusCode.OK;
+					}
+				}
+				catch (Exception ex)
+				{
+					LogHelper.Error<publishingService>("Error sending url request for scheduled task", ex);
+				}
+			}
+			finally
+			{
+				ServicePointManager.SecurityProtocol = activeProtocol;
+			}
 
 		    return false;
 		}

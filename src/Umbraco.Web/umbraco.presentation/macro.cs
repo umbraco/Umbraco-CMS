@@ -1714,67 +1714,76 @@ namespace umbraco
                                            HttpContext.Current.Request.ServerVariables["SERVER_PORT"],
                                            IOHelper.ResolveUrl(SystemDirectories.Umbraco), querystring);
 
-                var myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+				var activeProtocol = ServicePointManager.SecurityProtocol;
+				try
+				{
+					ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+					var myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
 
-                // allows for validation of SSL conversations (to bypass SSL errors in debug mode!)
-                ServicePointManager.ServerCertificateValidationCallback += ValidateRemoteCertificate;
+					// allows for validation of SSL conversations (to bypass SSL errors in debug mode!)
+					ServicePointManager.ServerCertificateValidationCallback += ValidateRemoteCertificate;
 
-                // propagate the user's context
-                // zb-00004 #29956 : refactor cookies names & handling
+					// propagate the user's context
+					// zb-00004 #29956 : refactor cookies names & handling
 
-                //TODO: This is the worst thing ever. This will also not work if people decide to put their own
-                // custom auth system in place.
+					//TODO: This is the worst thing ever. This will also not work if people decide to put their own
+					// custom auth system in place.
 
-                HttpCookie inCookie = StateHelper.Cookies.UserContext.RequestCookie;
-                var cookie = new Cookie(inCookie.Name, inCookie.Value, inCookie.Path,
-                                        HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);
-                myHttpWebRequest.CookieContainer = new CookieContainer();
-                myHttpWebRequest.CookieContainer.Add(cookie);
+					HttpCookie inCookie = StateHelper.Cookies.UserContext.RequestCookie;
+					var cookie = new Cookie(inCookie.Name, inCookie.Value, inCookie.Path,
+											HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);
+					myHttpWebRequest.CookieContainer = new CookieContainer();
+					myHttpWebRequest.CookieContainer.Add(cookie);
 
-                // Assign the response object of 'HttpWebRequest' to a 'HttpWebResponse' variable.
-                HttpWebResponse myHttpWebResponse = null;
-                try
-                {
-                    myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
-                    if (myHttpWebResponse.StatusCode == HttpStatusCode.OK)
-                    {
-                        Stream streamResponse = myHttpWebResponse.GetResponseStream();
-                        var streamRead = new StreamReader(streamResponse);
-                        var readBuff = new Char[256];
-                        int count = streamRead.Read(readBuff, 0, 256);
-                        while (count > 0)
-                        {
-                            var outputData = new String(readBuff, 0, count);
-                            retVal += outputData;
-                            count = streamRead.Read(readBuff, 0, 256);
-                        }
-                        // Close the Stream object.
-                        streamResponse.Close();
-                        streamRead.Close();
+					// Assign the response object of 'HttpWebRequest' to a 'HttpWebResponse' variable.
+					HttpWebResponse myHttpWebResponse = null;
+					try
+					{
+						myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
+						if (myHttpWebResponse.StatusCode == HttpStatusCode.OK)
+						{
+							Stream streamResponse = myHttpWebResponse.GetResponseStream();
+							var streamRead = new StreamReader(streamResponse);
+							var readBuff = new Char[256];
+							int count = streamRead.Read(readBuff, 0, 256);
+							while (count > 0)
+							{
+								var outputData = new String(readBuff, 0, count);
+								retVal += outputData;
+								count = streamRead.Read(readBuff, 0, 256);
+							}
+							// Close the Stream object.
+							streamResponse.Close();
+							streamRead.Close();
 
-                        // Find the content of a form
-                        string grabStart = "<!-- grab start -->";
-                        string grabEnd = "<!-- grab end -->";
-                        int grabStartPos = retVal.IndexOf(grabStart) + grabStart.Length;
-                        int grabEndPos = retVal.IndexOf(grabEnd) - grabStartPos;
-                        retVal = retVal.Substring(grabStartPos, grabEndPos);
-                    }
-                    else
-                        retVal = ShowNoMacroContent(currentMacro);
+							// Find the content of a form
+							string grabStart = "<!-- grab start -->";
+							string grabEnd = "<!-- grab end -->";
+							int grabStartPos = retVal.IndexOf(grabStart) + grabStart.Length;
+							int grabEndPos = retVal.IndexOf(grabEnd) - grabStartPos;
+							retVal = retVal.Substring(grabStartPos, grabEndPos);
+						}
+						else
+							retVal = ShowNoMacroContent(currentMacro);
 
-                    // Release the HttpWebResponse Resource.
-                    myHttpWebResponse.Close();
-                }
-                catch (Exception)
-                {
-                    retVal = ShowNoMacroContent(currentMacro);
-                }
-                finally
-                {
-                    // Release the HttpWebResponse Resource.
-                    if (myHttpWebResponse != null)
-                        myHttpWebResponse.Close();
-                }
+						// Release the HttpWebResponse Resource.
+						myHttpWebResponse.Close();
+					}
+					catch (Exception)
+					{
+						retVal = ShowNoMacroContent(currentMacro);
+					}
+					finally
+					{
+						// Release the HttpWebResponse Resource.
+						if (myHttpWebResponse != null)
+							myHttpWebResponse.Close();
+					}
+				}
+				finally
+				{
+					ServicePointManager.SecurityProtocol = activeProtocol;
+				}
 
                 return retVal.Replace("\n", string.Empty).Replace("\r", string.Empty);
             }

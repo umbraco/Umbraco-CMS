@@ -67,29 +67,39 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var serverVariables = HealthCheckContext.HttpContext.Request.ServerVariables;
             var useSsl = GlobalSettings.UseSSL || serverVariables["SERVER_PORT"] == "443";
             var address = string.Format("http{0}://{1}:{2}", useSsl ? "s" : "", url.Host.ToLower(), url.Port);
-            var request = WebRequest.Create(address);
-            request.Method = "GET";
-            try
-            {
-                var response = request.GetResponse();
 
-                // Check first for header
-                success = DoHeadersContainFrameOptions(response);
+			var activeProtocol = ServicePointManager.SecurityProtocol;
+			try
+			{
+				ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+				var request = WebRequest.Create(address);
+				request.Method = "GET";
+				try
+				{
+					var response = request.GetResponse();
 
-                // If not found, check for meta-tag
-                if (success == false)
-                {
-                    success = DoMetaTagsContainFrameOptions(response);
-                }
+					// Check first for header
+					success = DoHeadersContainFrameOptions(response);
 
-                message = success
-                    ? _textService.Localize("healthcheck/clickJackingCheckHeaderFound")
-                    : _textService.Localize("healthcheck/clickJackingCheckHeaderNotFound");
-            }
-            catch (Exception ex)
-            {
-                message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, ex.Message });
-            }
+					// If not found, check for meta-tag
+					if (success == false)
+					{
+						success = DoMetaTagsContainFrameOptions(response);
+					}
+
+					message = success
+						? _textService.Localize("healthcheck/clickJackingCheckHeaderFound")
+						: _textService.Localize("healthcheck/clickJackingCheckHeaderNotFound");
+				}
+				catch (Exception ex)
+				{
+					message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, ex.Message });
+				}
+			}
+			finally
+			{
+				ServicePointManager.SecurityProtocol = activeProtocol;
+			}
 
             var actions = new List<HealthCheckAction>();
             if (success == false)

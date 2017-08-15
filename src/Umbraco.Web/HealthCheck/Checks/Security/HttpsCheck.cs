@@ -60,60 +60,70 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             // Attempt to access the site over HTTPS to see if it HTTPS is supported 
             // and a valid certificate has been configured
             var address = string.Format("https://{0}:{1}", url.Host.ToLower(), url.Port);
-            var request = (HttpWebRequest)WebRequest.Create(address);
-            request.Method = "HEAD";
 
-            try
-            {
-                var response = (HttpWebResponse)request.GetResponse();
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    // Got a valid response, check now for if certificate expiring within 14 days
-                    // Hat-tip: https://stackoverflow.com/a/15343898/489433
-                    const int NumberOfDaysForExpiryWarning = 14;
-                    var cert = request.ServicePoint.Certificate;
-                    var cert2 = new X509Certificate2(cert);
-                    var expirationDate = cert2.NotAfter;
+			var activeProtocol = ServicePointManager.SecurityProtocol;
+			try
+			{
+				ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+				var request = (HttpWebRequest)WebRequest.Create(address);
+				request.Method = "HEAD";
 
-                    var daysToExpiry = (int)Math.Floor((cert2.NotAfter - DateTime.Now).TotalDays);
-                    if (daysToExpiry <= 0)
-                    {
-                        result = StatusResultType.Error;
-                        message = _textService.Localize("healthcheck/httpsCheckExpiredCertificate");
-                    }
-                    else if (daysToExpiry < NumberOfDaysForExpiryWarning)
-                    {
-                        result = StatusResultType.Warning;
-                        message = _textService.Localize("healthcheck/httpsCheckExpiringCertificate", new[] { daysToExpiry.ToString() });
-                    }
-                    else
-                    {
-                        result = StatusResultType.Success;
-                        message = _textService.Localize("healthcheck/httpsCheckValidCertificate");
-                    }
-                }
-                else
-                {
-                    result = StatusResultType.Error;
-                    message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, response.StatusDescription });
-                }
-            }
-            catch (Exception ex)
-            {
-                var exception = ex as WebException;
-                if (exception != null)
-                {
-                    message = exception.Status == WebExceptionStatus.TrustFailure
-                        ? _textService.Localize("healthcheck/httpsCheckInvalidCertificate", new [] { exception.Message })
-                        : _textService.Localize("healthcheck/httpsCheckInvalidUrl", new [] { address, exception.Message });
-                }
-                else
-                {
-                    message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, ex.Message });
-                }
+				try
+				{
+					var response = (HttpWebResponse)request.GetResponse();
+					if (response.StatusCode == HttpStatusCode.OK)
+					{
+						// Got a valid response, check now for if certificate expiring within 14 days
+						// Hat-tip: https://stackoverflow.com/a/15343898/489433
+						const int NumberOfDaysForExpiryWarning = 14;
+						var cert = request.ServicePoint.Certificate;
+						var cert2 = new X509Certificate2(cert);
+						var expirationDate = cert2.NotAfter;
 
-                result = StatusResultType.Error;
-            }
+						var daysToExpiry = (int)Math.Floor((cert2.NotAfter - DateTime.Now).TotalDays);
+						if (daysToExpiry <= 0)
+						{
+							result = StatusResultType.Error;
+							message = _textService.Localize("healthcheck/httpsCheckExpiredCertificate");
+						}
+						else if (daysToExpiry < NumberOfDaysForExpiryWarning)
+						{
+							result = StatusResultType.Warning;
+							message = _textService.Localize("healthcheck/httpsCheckExpiringCertificate", new[] { daysToExpiry.ToString() });
+						}
+						else
+						{
+							result = StatusResultType.Success;
+							message = _textService.Localize("healthcheck/httpsCheckValidCertificate");
+						}
+					}
+					else
+					{
+						result = StatusResultType.Error;
+						message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, response.StatusDescription });
+					}
+				}
+				catch (Exception ex)
+				{
+					var exception = ex as WebException;
+					if (exception != null)
+					{
+						message = exception.Status == WebExceptionStatus.TrustFailure
+							? _textService.Localize("healthcheck/httpsCheckInvalidCertificate", new[] { exception.Message })
+							: _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, exception.Message });
+					}
+					else
+					{
+						message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, ex.Message });
+					}
+
+					result = StatusResultType.Error;
+				}
+			}
+			finally
+			{
+				ServicePointManager.SecurityProtocol = activeProtocol;
+			}
 
             var actions = new List<HealthCheckAction>();
 

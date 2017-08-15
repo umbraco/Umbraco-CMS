@@ -1500,35 +1500,44 @@ namespace umbraco
             return xp.Select("/");
         }
 
-        /// <summary>
-        /// Fetches a xml file from the specified url.
-        /// the Url can be a local url or even from a remote server.
-        /// </summary>
-        /// <param name="Url">The URL.</param>
-        /// <returns>The xml file as a XpathNodeIterator</returns>
-        public static XPathNodeIterator GetXmlDocumentByUrl(string Url)
-        {
-            XmlDocument xmlDoc = new XmlDocument();
-            WebRequest request = WebRequest.Create(Url);
-            try
-            {
-                WebResponse response = request.GetResponse();
-                Stream responseStream = response.GetResponseStream();
-                XmlTextReader reader = new XmlTextReader(responseStream);
+		/// <summary>
+		/// Fetches a xml file from the specified url.
+		/// the Url can be a local url or even from a remote server.
+		/// </summary>
+		/// <param name="Url">The URL.</param>
+		/// <returns>The xml file as a XpathNodeIterator</returns>
+		public static XPathNodeIterator GetXmlDocumentByUrl(string Url)
+		{
+			var activeProtocol = ServicePointManager.SecurityProtocol;
+			try
+			{
+				ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+				XmlDocument xmlDoc = new XmlDocument();
+				WebRequest request = WebRequest.Create(Url);
+				try
+				{
+					WebResponse response = request.GetResponse();
+					Stream responseStream = response.GetResponseStream();
+					XmlTextReader reader = new XmlTextReader(responseStream);
 
-                xmlDoc.Load(reader);
+					xmlDoc.Load(reader);
 
-                response.Close();
-                responseStream.Close();
-            }
-            catch (Exception err)
-            {
-                xmlDoc.LoadXml(string.Format("<error url=\"{0}\">{1}</error>",
-                                             HttpContext.Current.Server.HtmlEncode(Url), err));
-            }
-            XPathNavigator xp = xmlDoc.CreateNavigator();
-            return xp.Select("/");
-        }
+					response.Close();
+					responseStream.Close();
+				}
+				catch (Exception err)
+				{
+					xmlDoc.LoadXml(string.Format("<error url=\"{0}\">{1}</error>",
+												 HttpContext.Current.Server.HtmlEncode(Url), err));
+				}
+				XPathNavigator xp = xmlDoc.CreateNavigator();
+				return xp.Select("/");
+			}
+			finally
+			{
+				ServicePointManager.SecurityProtocol = activeProtocol;
+			}
+		}
 
         /// <summary>
         /// Gets the XML document by URL Cached.

@@ -195,44 +195,39 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
         public bool HasConnection()
         {
-
             string strServer = this.RepositoryUrl;
 
-            try
-            {
-
-                HttpWebRequest reqFP = (HttpWebRequest) HttpWebRequest.Create(strServer);
+			var activeProtocol = ServicePointManager.SecurityProtocol;
+			try
+			{
+				ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+				HttpWebRequest reqFP = (HttpWebRequest) HttpWebRequest.Create(strServer);
                 HttpWebResponse rspFP = (HttpWebResponse) reqFP.GetResponse();
 
                 if (HttpStatusCode.OK == rspFP.StatusCode)
                 {
-
                     // HTTP = 200 - Internet connection available, server online
                     rspFP.Close();
 
                     return true;
-
                 }
                 else
                 {
-
                     // Other status - Server or connection not available
-
                     rspFP.Close();
 
                     return false;
-
                 }
-
             }
             catch (WebException)
             {
-
                 // Exception - connection not available
-
                 return false;
-
             }
+			finally
+			{
+				ServicePointManager.SecurityProtocol = activeProtocol;
+			}
         }
         
 

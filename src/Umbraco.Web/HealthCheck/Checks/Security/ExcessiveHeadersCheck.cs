@@ -52,25 +52,35 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var serverVariables = HealthCheckContext.HttpContext.Request.ServerVariables;
             var useSsl = GlobalSettings.UseSSL || serverVariables["SERVER_PORT"] == "443";
             var address = string.Format("http{0}://{1}:{2}", useSsl ? "s" : "", url.Host.ToLower(), url.Port);
-            var request = WebRequest.Create(address);
-            request.Method = "HEAD";
-            try
-            {
-                var response = request.GetResponse();
-                var allHeaders = response.Headers.AllKeys;
-                var headersToCheckFor = new [] {"Server", "X-Powered-By", "X-AspNet-Version", "X-AspNetMvc-Version"};
-                var headersFound = allHeaders
-                    .Intersect(headersToCheckFor)
-                    .ToArray();
-                success = headersFound.Any() == false;
-                message = success
-                    ? _textService.Localize("healthcheck/excessiveHeadersNotFound")
-                    : _textService.Localize("healthcheck/excessiveHeadersFound", new [] { string.Join(", ", headersFound) });
-            }
-            catch (Exception ex)
-            {
-                message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, ex.Message });
-            }
+
+			var activeProtocol = ServicePointManager.SecurityProtocol;
+			try
+			{
+				ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+				var request = WebRequest.Create(address);
+				request.Method = "HEAD";
+				try
+				{
+					var response = request.GetResponse();
+					var allHeaders = response.Headers.AllKeys;
+					var headersToCheckFor = new[] { "Server", "X-Powered-By", "X-AspNet-Version", "X-AspNetMvc-Version" };
+					var headersFound = allHeaders
+						.Intersect(headersToCheckFor)
+						.ToArray();
+					success = headersFound.Any() == false;
+					message = success
+						? _textService.Localize("healthcheck/excessiveHeadersNotFound")
+						: _textService.Localize("healthcheck/excessiveHeadersFound", new[] { string.Join(", ", headersFound) });
+				}
+				catch (Exception ex)
+				{
+					message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, ex.Message });
+				}
+			}
+			finally
+			{
+				ServicePointManager.SecurityProtocol = activeProtocol;
+			}
 
             var actions = new List<HealthCheckAction>();
             return

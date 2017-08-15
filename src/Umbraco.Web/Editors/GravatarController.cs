@@ -26,20 +26,29 @@ namespace Umbraco.Web.Editors
             var user = userService.GetUserById(UmbracoContext.Security.CurrentUser.Id);
             var gravatarHash = user.Email.ToMd5();
             var gravatarUrl = "https://www.gravatar.com/avatar/" + gravatarHash;
-           
-            // Test if we can reach this URL, will fail when there's network or firewall errors
-            var request = (HttpWebRequest)WebRequest.Create(gravatarUrl);
-            // Require response within 10 seconds
-            request.Timeout = 10000;
-            try
-            {
-                using ((HttpWebResponse)request.GetResponse()) { }
-            }
-            catch (Exception)
-            {
-                // There was an HTTP or other error, return an null instead
-                return null;
-            }
+
+			var activeProtocol = ServicePointManager.SecurityProtocol;
+			try
+			{
+				ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+				// Test if we can reach this URL, will fail when there's network or firewall errors
+				var request = (HttpWebRequest)WebRequest.Create(gravatarUrl);
+				// Require response within 10 seconds
+				request.Timeout = 10000;
+				try
+				{
+					using ((HttpWebResponse)request.GetResponse()) { }
+				}
+				catch (Exception)
+				{
+					// There was an HTTP or other error, return an null instead
+					return null;
+				}
+			}
+			finally
+			{
+				ServicePointManager.SecurityProtocol = activeProtocol;
+			}
 
             return gravatarUrl;
         }
