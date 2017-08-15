@@ -7,6 +7,9 @@ angular.module('umbraco')
 		$scope.renderModel = [];
 		$scope.ids = [];
 
+		$scope.allowRemove = true;
+		$scope.allowEdit = true;
+		$scope.sortable = false;
 
 	    var config = {
 	        multiPicker: false,
@@ -25,8 +28,11 @@ angular.module('umbraco')
 			$scope.ids = $scope.model.value.split(',');
 			entityResource.getByIds($scope.ids, config.entityType).then(function (data) {
 			    _.each(data, function (item, i) {
-					item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-			        $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon, udi: item.udi });
+					entityResource.getUrl(item.id, "Document").then(function(data){
+						item.path = data;
+						item.icon = iconHelper.convertFromLegacyIcon(item.icon);		
+						$scope.renderModel.push({name: item.name, path: item.path, id: item.id, icon: item.icon, udi: item.udi});
+					}); 
 			    });
 			});
 		}
@@ -44,11 +50,6 @@ angular.module('umbraco')
 				} else {
 					populate(model.selection[0]);
 				}
-
-				console.log(model);
-				/* entityResource.getUrl(updatedNode.id, entityType).then(function(data){
-						node.url = data;
-					}); */
 
 				$scope.treePickerOverlay.show = false;
 				$scope.treePickerOverlay = null;

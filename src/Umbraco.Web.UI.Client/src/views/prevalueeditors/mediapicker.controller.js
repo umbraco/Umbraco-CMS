@@ -9,6 +9,10 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
 
     $scope.renderModel = [];   
 
+    $scope.allowRemove = true;
+    $scope.allowEdit = true;
+    $scope.sortable = false;
+
     var dialogOptions = {
         multiPicker: false,
         entityType: "Media",
@@ -90,13 +94,16 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
     if (modelIds.length > 0) {
         entityResource.getByIds(modelIds, dialogOptions.entityType).then(function (data) {
             _.each(data, function (item, i) {
-                item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-                $scope.renderModel.push({ name: item.name, id: item.id, path: item.path, icon: item.icon, udi: item.udi });
+
+                entityResource.getUrl(item.id, "Media").then(function(data){
+                    item.path = data;
+                    item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+                    $scope.renderModel.push({ name: item.name, id: item.id, path: item.path,  icon: item.icon, udi: item.udi });
+                });                
             });
         });
     }
-    
-    
+        
 }
 
 angular.module('umbraco').controller("Umbraco.PrevalueEditors.MediaPickerController",mediaPickerController);
