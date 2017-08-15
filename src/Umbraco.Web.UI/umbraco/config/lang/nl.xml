@@ -244,6 +244,8 @@
     <key alias="copiedItemOfItems">item %0% van de %1% gekopieerd</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Link Titel</key>
+    <key alias="urlLinkPicker">Link</key>
     <key alias="anchorInsert">Naam</key>
     <key alias="assignDomain">Beheer domeinnamen</key>
     <key alias="closeThisWindow">Sluit dit venster</key>
