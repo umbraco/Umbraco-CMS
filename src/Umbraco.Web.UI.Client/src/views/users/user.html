@@ -20,14 +20,12 @@
                     <div class="umb-package-details">
 
                         <div class="umb-package-details__main-content">
-
-                            <div class="umb-box">
-                                <div class="umb-box-header">
-                                    <div class="umb-box-header-title">
-                                        <localize key="user_profile">Profile</localize>
-                                    </div>
-                                </div>
-                                <div class="umb-box-content block-form">
+                          
+                              <umb-box>
+                                 
+                                <umb-box-header title-key="user_profile"></umb-box-header>
+                                
+                                <umb-box-content class="block-form">
 
                                     <umb-control-group label="@general_email">
                                         <input 
@@ -69,16 +67,12 @@
                                         <span class="help-inline" val-msg-for="culture" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
                                         <span class="help-inline" val-msg-for="culture" val-toggle-msg="valServerField"></span>
                                     </umb-control-group>
-                                </div>
-                            </div>
+                                </umb-box-content> 
+                            </umb-box>
 
-                            <div class="umb-box">
-                                <div class="umb-box-header">
-                                    <div class="umb-box-header-title">
-                                        <localize key="user_access">Access</localize>
-                                    </div>
-                                </div>
-                                <div class="umb-box-content block-form">
+                            <umb-box>
+                                <umb-box-header title-key="user_access"></umb-box-header>
+                                <umb-box-content class="block-form">
 
                                     <umb-control-group style="margin-bottom: 25px;" label="@general_groups" description="@user_groupsHelp">
 
@@ -160,8 +154,8 @@
 
                                     </umb-control-group>
 
-                                </div>
-                            </div>
+                                </umb-box-content>
+                            </umb-box>
                         </div>
 
                         <div class="umb-package-details__sidebar">
