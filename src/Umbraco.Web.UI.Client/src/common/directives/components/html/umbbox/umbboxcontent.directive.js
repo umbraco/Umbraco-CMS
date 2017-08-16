@@ -19,7 +19,7 @@ Use this directive to render an empty container. Recommended to use it inside an
 <h3>Use in combination with:</h3>
 <ul>
     <li>{@link umbraco.directives.directive:umbBox umbBox}</li>
-    <li>{@link umbraco.directives.directive:umbBoxContent umbBoxHeader}</li>
+    <li>{@link umbraco.directives.directive:umbBoxHeader umbBoxHeader}</li>
 </ul>
 **/
 
