@@ -3,7 +3,7 @@
 angular.module('umbraco')
 .controller("Umbraco.PrevalueEditors.TreePickerController",
 	
-	function($scope, dialogService, entityResource, $log, iconHelper, miniEditorHelper){
+	function($scope, dialogService, entityResource, $log, iconHelper){
 		$scope.renderModel = [];
 		$scope.ids = [];
 
@@ -28,11 +28,17 @@ angular.module('umbraco')
 			$scope.ids = $scope.model.value.split(',');
 			entityResource.getByIds($scope.ids, config.entityType).then(function (data) {
 			    _.each(data, function (item, i) {
-					entityResource.getUrl(item.id, "Document").then(function(data){
-						item.path = data;
-						item.icon = iconHelper.convertFromLegacyIcon(item.icon);		
-						$scope.renderModel.push({name: item.name, path: item.path, id: item.id, icon: item.icon, udi: item.udi});
-					}); 
+
+					item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+					$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon, udi: item.udi});
+					
+					// store the index of the new item in the renderModel collection so we can find it again
+					var itemRenderIndex = $scope.renderModel.length - 1;
+					// get and update the path for the picked node
+					entityResource.getUrl(item.id, config.entityType).then(function(data){
+						$scope.renderModel[itemRenderIndex].path = data;
+					});
+
 			    });
 			});
 		}
@@ -62,9 +68,6 @@ angular.module('umbraco')
 
 		}
 		
-
-		
-	
 		$scope.remove =function(index){
 			$scope.renderModel.splice(index, 1);
 			$scope.ids.splice(index, 1);
@@ -82,14 +85,20 @@ angular.module('umbraco')
             var itemId = config.idType === "udi" ? item.udi : item.id;
 
             if ($scope.ids.indexOf(itemId) < 0){
+				
 				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-				entityResource.getUrl(item.id, "Document").then(function(data){
-					item.path = data;		
-					$scope.ids.push(itemId);
-					$scope.renderModel.push({name: item.name, path: item.path, id: item.id, icon: item.icon, udi: item.udi});
-					$scope.model.value = trim($scope.ids.join(), ",");
-				});                 
-			}	
+				$scope.ids.push(itemId);
+				$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon, udi: item.udi});
+				$scope.model.value = trim($scope.ids.join(), ",");
+
+				// store the index of the new item in the renderModel collection so we can find it again
+				var itemRenderIndex = $scope.renderModel.length - 1;
+				// get and update the path for the picked node
+				entityResource.getUrl(item.id, config.entityType).then(function(data){
+					$scope.renderModel[itemRenderIndex].path = data;
+				});
+
+			}
 		};
 
 
