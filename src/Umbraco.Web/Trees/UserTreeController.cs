@@ -8,7 +8,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Users)]
-    [Tree(Constants.Applications.Users, Constants.Trees.Users, null, sortOrder: 0)]
+    [Tree(Constants.Applications.Users, Constants.Trees.Users, "Users", sortOrder: 0)]
     [PluginController("UmbracoTrees")]
     [LegacyBaseTree(typeof(loadUsers))]
     [CoreTree]
