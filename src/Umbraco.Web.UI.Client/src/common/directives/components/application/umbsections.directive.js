@@ -161,7 +161,7 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
                     $location.path(section.routePath);
                 }
                 else {
-                    $location.path(section.alias);    
+                    $location.path(section.alias).search('');
                 }
 			    
 			};
