@@ -27,7 +27,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// </summary>
     public abstract class PublishedContentWrapped : IPublishedContent
     {
-        protected readonly IPublishedContent WrappedContentInternal;
+        protected readonly IPublishedContent Content;
 
         /// <summary>
         /// Initialize a new instance of the <see cref="PublishedContentWrapped"/> class
@@ -36,7 +36,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <param name="content">The content to wrap and extend.</param>
         protected PublishedContentWrapped(IPublishedContent content)
         {
-            WrappedContentInternal = content;
+            Content = content;
         }
 
         /// <summary>
@@ -45,21 +45,21 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <returns>The wrapped content, that was passed as an argument to the constructor.</returns>
         public IPublishedContent Unwrap()
         {
-            return WrappedContentInternal;
+            return Content;
         }
 
         #region ContentSet
 
         public virtual IEnumerable<IPublishedContent> ContentSet
         {
-            get { return WrappedContentInternal.ContentSet; }
+            get { return Content.ContentSet; }
         }
 
         #endregion
 
         #region ContentType
 
-        public virtual PublishedContentType ContentType { get { return WrappedContentInternal.ContentType; } }
+        public virtual PublishedContentType ContentType { get { return Content.ContentType; } }
 
         #endregion
 
@@ -67,102 +67,102 @@ namespace Umbraco.Core.Models.PublishedContent
 
         public virtual int Id
         {
-            get { return WrappedContentInternal.Id; }
+            get { return Content.Id; }
         }
 
         public virtual int TemplateId
         {
-            get { return WrappedContentInternal.TemplateId; }
+            get { return Content.TemplateId; }
         }
 
         public virtual int SortOrder
         {
-            get { return WrappedContentInternal.SortOrder; }
+            get { return Content.SortOrder; }
         }
 
         public virtual string Name
         {
-            get { return WrappedContentInternal.Name; }
+            get { return Content.Name; }
         }
 
         public virtual string UrlName
         {
-            get { return WrappedContentInternal.UrlName; }
+            get { return Content.UrlName; }
         }
 
         public virtual string DocumentTypeAlias
         {
-            get { return WrappedContentInternal.DocumentTypeAlias; }
+            get { return Content.DocumentTypeAlias; }
         }
 
         public virtual int DocumentTypeId
         {
-            get { return WrappedContentInternal.DocumentTypeId; }
+            get { return Content.DocumentTypeId; }
         }
 
         public virtual string WriterName
         {
-            get { return WrappedContentInternal.WriterName; }
+            get { return Content.WriterName; }
         }
 
         public virtual string CreatorName
         {
-            get { return WrappedContentInternal.CreatorName; }
+            get { return Content.CreatorName; }
         }
 
         public virtual int WriterId
         {
-            get { return WrappedContentInternal.WriterId; }
+            get { return Content.WriterId; }
         }
 
         public virtual int CreatorId
         {
-            get { return WrappedContentInternal.CreatorId; }
+            get { return Content.CreatorId; }
         }
 
         public virtual string Path
         {
-            get { return WrappedContentInternal.Path; }
+            get { return Content.Path; }
         }
 
         public virtual DateTime CreateDate
         {
-            get { return WrappedContentInternal.CreateDate; }
+            get { return Content.CreateDate; }
         }
 
         public virtual DateTime UpdateDate
         {
-            get { return WrappedContentInternal.UpdateDate; }
+            get { return Content.UpdateDate; }
         }
 
         public virtual Guid Version
         {
-            get { return WrappedContentInternal.Version; }
+            get { return Content.Version; }
         }
 
         public virtual int Level
         {
-            get { return WrappedContentInternal.Level; }
+            get { return Content.Level; }
         }
 
         public virtual string Url
         {
-            get { return WrappedContentInternal.Url; }
+            get { return Content.Url; }
         }
 
         public virtual PublishedItemType ItemType
         {
-            get { return WrappedContentInternal.ItemType; }
+            get { return Content.ItemType; }
         }
 
         public virtual bool IsDraft
         {
-            get { return WrappedContentInternal.IsDraft; }
+            get { return Content.IsDraft; }
         }
 
         public virtual int GetIndex()
         {
-            return WrappedContentInternal.GetIndex();
+            return Content.GetIndex();
         }
 
         #endregion
@@ -171,12 +171,12 @@ namespace Umbraco.Core.Models.PublishedContent
 
         public virtual IPublishedContent Parent
         {
-            get { return WrappedContentInternal.Parent; }
+            get { return Content.Parent; }
         }
 
         public virtual IEnumerable<IPublishedContent> Children
         {
-            get { return WrappedContentInternal.Children; }
+            get { return Content.Children; }
         }
 
         #endregion
@@ -185,22 +185,22 @@ namespace Umbraco.Core.Models.PublishedContent
 
         public virtual ICollection<IPublishedProperty> Properties
         {
-            get { return WrappedContentInternal.Properties; }
+            get { return Content.Properties; }
         }
 
         public virtual object this[string alias]
         {
-            get { return WrappedContentInternal[alias]; }
+            get { return Content[alias]; }
         }
 
         public virtual IPublishedProperty GetProperty(string alias)
         {
-            return WrappedContentInternal.GetProperty(alias);
+            return Content.GetProperty(alias);
         }
 
         public virtual IPublishedProperty GetProperty(string alias, bool recurse)
         {
-            return WrappedContentInternal.GetProperty(alias, recurse);
+            return Content.GetProperty(alias, recurse);
         }
 
         #endregion

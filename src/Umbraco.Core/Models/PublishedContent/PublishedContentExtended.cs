@@ -28,7 +28,7 @@ namespace Umbraco.Core.Models.PublishedContent
             if (_index.HasValue) return _index.Value;
 
             // slow -- and don't cache, not in a set
-            if (_contentSet == null) return WrappedContentInternal.GetIndex();
+            if (_contentSet == null) return Content.GetIndex();
 
             // slow -- but cache for next time
             var index = _contentSet.FindIndex(x => x.Id == Id);
@@ -147,7 +147,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         public override IEnumerable<IPublishedContent> ContentSet
         {
-            get { return _contentSet ?? WrappedContentInternal.ContentSet; }
+            get { return _contentSet ?? Content.ContentSet; }
         }
 
         #endregion
@@ -161,8 +161,8 @@ namespace Umbraco.Core.Models.PublishedContent
             get
             {
                 return _properties == null
-                    ? WrappedContentInternal.Properties
-                    : WrappedContentInternal.Properties.Union(_properties).ToList();
+                    ? Content.Properties
+                    : Content.Properties.Union(_properties).ToList();
             }
         }
 
@@ -175,15 +175,15 @@ namespace Umbraco.Core.Models.PublishedContent
                     var property = _properties.FirstOrDefault(prop => prop.PropertyTypeAlias.InvariantEquals(alias));
                     if (property != null) return property.HasValue ? property.Value : null;
                 }
-                return WrappedContentInternal[alias];
+                return Content[alias];
             }
         }
 
         public override IPublishedProperty GetProperty(string alias)
         {
             return _properties == null
-                ? WrappedContentInternal.GetProperty(alias)
-                : _properties.FirstOrDefault(prop => prop.PropertyTypeAlias.InvariantEquals(alias)) ?? WrappedContentInternal.GetProperty(alias);
+                ? Content.GetProperty(alias)
+                : _properties.FirstOrDefault(prop => prop.PropertyTypeAlias.InvariantEquals(alias)) ?? Content.GetProperty(alias);
         }
 
         #endregion
