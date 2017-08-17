@@ -42,9 +42,8 @@
                 }
                 break;
             case 8:
-
                 var remainder = [];
-                if ($scope.model.value.length > 1) {
+                if ($scope.model.value.length > 1 && $scope.model.value.length >= $scope.model.config.max) {
                     if (txtBoxValue.value === "") {
                         for (var x = 0; x < $scope.model.value.length; x++) {
                             if (x !== index) {
