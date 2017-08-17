@@ -251,6 +251,8 @@
     <key alias="copiedItemOfItems">%0% éléments sur %1% copiés</key>
   </area>  
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Titre du lien</key>
+    <key alias="urlLinkPicker">Lien</key>
     <key alias="anchorInsert">Nom</key>
     <key alias="assignDomain">Gérer les noms d'hôtes</key>
     <key alias="closeThisWindow">Fermer cette fenêtre</key>

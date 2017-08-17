@@ -178,7 +178,7 @@
     <key alias="memberrole">Role</key>
     <key alias="membertype">Member Type</key>
     <key alias="noDate">No date chosen</key>
-    <key alias="nodeName">Link title</key>
+    <key alias="nodeName">Page title</key>
     <key alias="otherElements">Properties</key>
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
     <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
@@ -295,6 +295,8 @@
     <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Link title</key>
+    <key alias="urlLinkPicker">Link</key>
     <key alias="anchorInsert">Name</key>
     <key alias="assignDomain">Manage hostnames</key>
     <key alias="closeThisWindow">Close this window</key>
