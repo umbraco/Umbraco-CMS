@@ -759,7 +759,7 @@ namespace Umbraco.Core
                 foreach (var b in hashedByteArray)
                 {
                     //append it to our StringBuilder
-                    stringBuilder.Append(b.ToString("x2").ToLower());
+                    stringBuilder.Append(b.ToString("x2"));
                 }
 
                 //return the hashed value
