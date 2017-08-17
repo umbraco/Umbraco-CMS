@@ -475,6 +475,18 @@ namespace Umbraco.Core.Models.Membership
             set { SetPropertyValueAndDetectChanges(value, ref _sessionTimeout, Ps.Value.SessionTimeoutSelector); }
         }
 
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        int IUser.StartContentId
+        {
+            get
+            {
+                var calculatedStartNodes = this.CalculateContentStartNodeIds(ApplicationContext.Current.Services.EntityService);
+                return calculatedStartNodes.Length == 0 ? -1 : calculatedStartNodes[0];
+            }
+            set { StartContentIds = new[] { value }; }
+        }
+
         /// <summary>
         /// Gets or sets the start content id.
         /// </summary>
@@ -487,6 +499,18 @@ namespace Umbraco.Core.Models.Membership
         {
             get { return _startContentIds; }
             set { SetPropertyValueAndDetectChanges(value, ref _startContentIds, Ps.Value.StartContentIdSelector, Ps.Value.IntegerEnumerableComparer); }
+        }
+
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        int IUser.StartMediaId
+        {
+            get
+            {
+                var calculatedStartNodes = this.CalculateMediaStartNodeIds(ApplicationContext.Current.Services.EntityService);
+                return calculatedStartNodes.Length == 0 ? -1 : calculatedStartNodes[0];
+            }
+            set { StartMediaIds = new[] {value}; }
         }
 
         /// <summary>

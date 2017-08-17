@@ -15,8 +15,19 @@ namespace Umbraco.Core.Models.Membership
 
         string Name { get; set; }
         int SessionTimeout { get; set; }
+
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        int StartContentId { get; set; }
+
         int[] StartContentIds { get; set; }
+
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        int StartMediaId { get; set; }
+
         int[] StartMediaIds { get; set; }
+
         string Language { get; set; }
 
         [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
