@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Management.Instrumentation;
 using System.Net.Http;
 using System.Net.Http.Formatting;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
@@ -17,11 +13,9 @@ using Umbraco.Core;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core.Services;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
-using IAuthorizationFilter = System.Web.Http.Filters.IAuthorizationFilter;
 using UrlHelper = System.Web.Http.Routing.UrlHelper;
 
 namespace Umbraco.Web.Trees

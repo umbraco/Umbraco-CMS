@@ -1,11 +1,8 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
-using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
 using System.Linq;
-using System.Net.Http.Formatting;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Editors

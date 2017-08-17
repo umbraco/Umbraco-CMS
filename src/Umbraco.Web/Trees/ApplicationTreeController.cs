@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using System.Management.Instrumentation;
 using System.Net;
 using System.Net.Http.Formatting;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
