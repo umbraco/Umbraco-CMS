@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -11,8 +10,9 @@ namespace Umbraco.Core.Services
     {
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
-        private readonly Dictionary<Id2KeyCompositeKey, Guid> _id2Key = new Dictionary<Id2KeyCompositeKey, Guid>();
-        private readonly Dictionary<Key2IdCompositeKey, int> _key2Id = new Dictionary<Key2IdCompositeKey, int>();
+        
+        private readonly Dictionary<int, TypedId<Guid>> _id2Key = new Dictionary<int, TypedId<Guid>>();
+        private readonly Dictionary<Guid, TypedId<int>> _key2Id = new Dictionary<Guid, TypedId<int>>();
 
         public IdkMap(IDatabaseUnitOfWorkProvider uowProvider)
         {
@@ -24,12 +24,11 @@ namespace Umbraco.Core.Services
 
         public Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
         {
-            var compositeKey = new Key2IdCompositeKey(key, umbracoObjectType);
-            int id;
+            TypedId<int> id;
             try
             {
                 _locker.EnterReadLock();
-                if (_key2Id.TryGetValue(compositeKey, out id)) return Attempt.Succeed(id);
+                if (_key2Id.TryGetValue(key, out id) && id.UmbracoObjectType == umbracoObjectType) return Attempt.Succeed(id.Id);
             }
             finally
             {
@@ -46,14 +45,13 @@ namespace Umbraco.Core.Services
             }
 
             if (val == null) return Attempt<int>.Fail();
-            id = val.Value;
+            id = new TypedId<int>(val.Value, umbracoObjectType);
 
             try
             {
-                var reversedCompositeKey = new Id2KeyCompositeKey(id, umbracoObjectType);
                 _locker.EnterWriteLock();
-                _id2Key[reversedCompositeKey] = key;
-                _key2Id[compositeKey] = id;
+                _id2Key[id.Id] = new TypedId<Guid>(key, umbracoObjectType);
+                _key2Id[key] = id;
             }
             finally
             {
@@ -61,7 +59,7 @@ namespace Umbraco.Core.Services
                     _locker.ExitWriteLock();
             }
 
-            return Attempt.Succeed(id);
+            return Attempt.Succeed(id.Id);
         }
 
         public Attempt<int> GetIdForUdi(Udi udi)
@@ -76,12 +74,11 @@ namespace Umbraco.Core.Services
 
         public Attempt<Guid> GetKeyForId(int id, UmbracoObjectTypes umbracoObjectType)
         {
-            var compositeKey = new Id2KeyCompositeKey(id, umbracoObjectType);
-            Guid key;
+            TypedId<Guid> key;
             try
             {
                 _locker.EnterReadLock();
-                if (_id2Key.TryGetValue(compositeKey, out key)) return Attempt.Succeed(key);
+                if (_id2Key.TryGetValue(id, out key) && key.UmbracoObjectType == umbracoObjectType) return Attempt.Succeed(key.Id);
             }
             finally
             {
@@ -98,14 +95,13 @@ namespace Umbraco.Core.Services
             }
 
             if (val == null) return Attempt<Guid>.Fail();
-            key = val.Value;
+            key = new TypedId<Guid>(val.Value, umbracoObjectType);
 
             try
             {
-                var reversedCompositeKey = new Key2IdCompositeKey(key, umbracoObjectType);
                 _locker.EnterWriteLock();
-                _id2Key[compositeKey] = key;
-                _key2Id[reversedCompositeKey] = id;
+                _id2Key[id] = key;
+                _key2Id[key.Id] = new TypedId<int>();
             }
             finally
             {
@@ -113,7 +109,7 @@ namespace Umbraco.Core.Services
                     _locker.ExitWriteLock();
             }
 
-            return Attempt.Succeed(key);
+            return Attempt.Succeed(key.Id);
         }
 
         private static Guid GetNodeObjectTypeGuid(UmbracoObjectTypes umbracoObjectType)
@@ -144,17 +140,10 @@ namespace Umbraco.Core.Services
             try
             {
                 _locker.EnterWriteLock();
-                foreach (var compositeKey in _id2Key.Keys)
-                {
-                    if (compositeKey.Id == id)
-                    {
-                        var guid = _id2Key[compositeKey];
-                        var reversedCompositeKey = new Key2IdCompositeKey(guid, compositeKey.UmbracoObjectType);
-                        _id2Key.Remove(compositeKey);
-                        _key2Id.Remove(reversedCompositeKey);
-                        break;
-                    }
-                }
+                TypedId<Guid> key;
+                if (_id2Key.TryGetValue(id, out key) == false) return;
+                _id2Key.Remove(id);
+                _key2Id.Remove(key.Id);
             }
             finally
             {
@@ -168,17 +157,10 @@ namespace Umbraco.Core.Services
             try
             {
                 _locker.EnterWriteLock();
-                foreach (var compositeKey in _key2Id.Keys)
-                {
-                    if (compositeKey.Key == key)
-                    {
-                        var id = _key2Id[compositeKey];
-                        var reversedCompositeKey = new Id2KeyCompositeKey(id, compositeKey.UmbracoObjectType);
-                        _id2Key.Remove(reversedCompositeKey);
-                        _key2Id.Remove(compositeKey);
-                        break;
-                    }
-                }
+                TypedId<int> id;
+                if (_key2Id.TryGetValue(key, out id) == false) return;
+                _id2Key.Remove(id.Id);
+                _key2Id.Remove(key);
             }
             finally
             {
@@ -187,12 +169,12 @@ namespace Umbraco.Core.Services
             }
         }
 
-        private struct Id2KeyCompositeKey
+        private struct TypedId<T>
         {
-            private readonly int _id;
+            private readonly T _id;
             private readonly UmbracoObjectTypes _umbracoObjectType;
-
-            public int Id
+            
+            public T Id
             {
                 get { return _id; }
             }
@@ -202,70 +184,10 @@ namespace Umbraco.Core.Services
                 get { return _umbracoObjectType; }
             }
 
-            public Id2KeyCompositeKey(int id, UmbracoObjectTypes umbracoObjectType)
+            public TypedId(T id, UmbracoObjectTypes umbracoObjectType)
             {
+                _umbracoObjectType = umbracoObjectType;
                 _id = id;
-                _umbracoObjectType = umbracoObjectType;
-            }
-
-            private bool Equals(Id2KeyCompositeKey other)
-            {
-                return _id == other._id && _umbracoObjectType == other._umbracoObjectType;
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                return obj is Id2KeyCompositeKey && Equals((Id2KeyCompositeKey) obj);
-            }
-
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    return (_id * 397) ^ (int) _umbracoObjectType;
-                }
-            }
-        }
-
-        private struct Key2IdCompositeKey
-        {
-            private readonly Guid _key;
-            private readonly UmbracoObjectTypes _umbracoObjectType;
-
-            public Guid Key
-            {
-                get { return _key; }
-            }
-
-            public UmbracoObjectTypes UmbracoObjectType
-            {
-                get { return _umbracoObjectType; }
-            }
-
-            public Key2IdCompositeKey(Guid key, UmbracoObjectTypes umbracoObjectType)
-            {
-                _key = key;
-                _umbracoObjectType = umbracoObjectType;
-            }
-
-            private bool Equals(Key2IdCompositeKey other)
-            {
-                return _key.Equals(other._key) && _umbracoObjectType == other._umbracoObjectType;
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                return obj is Key2IdCompositeKey && Equals((Key2IdCompositeKey) obj);
-            }
-
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    return (_key.GetHashCode() * 397) ^ (int) _umbracoObjectType;
-                }
             }
         }
     }
