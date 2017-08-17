@@ -1,4 +1,4 @@
-﻿function MultipleTextBoxController($scope) {
+﻿function MultipleTextBoxController($scope, $timeout) {
 
     $scope.sortableOptions = {
         axis: 'y',
@@ -23,7 +23,10 @@
 
     //TODO add focus to newly created text box or the first in line after deletion
     $scope.addRemoveOnKeyDown = function (event, index) {
+
         var txtBoxValue = $scope.model.value[index];
+
+        var newItemIndex;
 
         event.preventDefault();
 
@@ -32,8 +35,10 @@
                 if ($scope.model.config.max <= 0 || $scope.model.value.length < $scope.model.config.max) {
                     $scope.model.value.push({ value: "" });
 
+                    newItemIndex = $scope.model.value.length - 1;
+
                     //Focus on the newly added value
-                    $scope.focusMe = false;
+                    $scope.model.value[newItemIndex].hasFocus = true;
                 }
                 break;
             case 8:
@@ -46,10 +51,18 @@
                                 remainder.push($scope.model.value[x]);
                             }
                         }
+
                         $scope.model.value = remainder;
 
-                        // The role of this statement is to trigger the observe event
-                        $scope.focusMe = ($scope.focusMe === true) ? false : true;
+                        newItemIndex = $scope.model.value.length - 1;
+
+                        //Set focus back on false as the directive only watches for true
+                        $scope.model.value[newItemIndex].hasFocus = false;
+
+                        $timeout(function () {
+                            //Focus on the previous value
+                            $scope.model.value[newItemIndex].hasFocus = true;
+                        });
                     }
                 }
                 break;
