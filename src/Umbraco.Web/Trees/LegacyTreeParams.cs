@@ -17,15 +17,14 @@ namespace Umbraco.Web.Trees
         {
             if (formCollection == null)
             {
-                return;
+                var p = TreeRequestParams.FromDictionary(formCollection.ToDictionary(x => x.Key, x => x.Value));
+                NodeKey = p.NodeKey;
+                StartNodeID = p.StartNodeID;
+                ShowContextMenu = p.ShowContextMenu;
+                IsDialog = p.IsDialog;
+                DialogMode = p.DialogMode;
+                FunctionToCall = p.FunctionToCall;
             }
-            var p = TreeRequestParams.FromDictionary(formCollection.ToDictionary(x => x.Key, x => x.Value));
-            NodeKey = p.NodeKey;
-            StartNodeID = p.StartNodeID;
-            ShowContextMenu = p.ShowContextMenu;
-            IsDialog = p.IsDialog;
-            DialogMode = p.DialogMode;
-            FunctionToCall = p.FunctionToCall;
         }
 
         public string NodeKey { get; set; }
