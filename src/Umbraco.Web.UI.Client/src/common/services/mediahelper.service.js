@@ -207,6 +207,8 @@ function mediaHelper(umbRequestHelper) {
                         }
                     }
                 }
+            }else if (mediaItem.image) {
+              result = mediaItem.image;
             }
             return result;            
         },
