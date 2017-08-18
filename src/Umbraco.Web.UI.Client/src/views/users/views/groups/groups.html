@@ -1,5 +1,7 @@
 <div ng-controller="Umbraco.Editors.Users.GroupsController as vm" class="clearfix">
 
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
     <umb-editor-sub-header>
             
         <!-- No selection -->
@@ -65,7 +67,7 @@
         </div>
     </div>
 
-    <div class="umb-list">
+    <div class="umb-list" ng-if="!vm.loading">
         <a class="umb-list-item" ng-click="vm.clickUserGroup(group)" ng-class="{'umb-list-item--selected': group.selected}" href="" ng-repeat="group in vm.userGroups | filter:vm.filter">
             <div style="margin-right: 25px;">
                 <div class="umb-list-checkbox" ng-class="{'umb-list-checkbox--visible': vm.selection.length > 0}" ng-click="vm.selectUserGroup(group, vm.selection, $event)" >
