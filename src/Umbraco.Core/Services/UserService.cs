@@ -315,11 +315,9 @@ namespace Umbraco.Core.Services
                 {
                     throw new ArgumentException("Cannot save user with empty name.");
                 }
-
-                var repository = RepositoryFactory.CreateUserRepository(uow);
-                repository.AddOrUpdate(entity);
-
-                //Now we have to check for backwards compat hacks
+                
+                //Now we have to check for backwards compat hacks, we'll need to process any groups
+                //to save first before we update the user since these groups might be new groups.
                 var explicitUser = entity as User;                
                 if (explicitUser != null && explicitUser.GroupsToSave.Count > 0)
                 {
@@ -329,6 +327,9 @@ namespace Umbraco.Core.Services
                         groupRepository.AddOrUpdate(userGroup);
                     }
                 }
+
+                var repository = RepositoryFactory.CreateUserRepository(uow);
+                repository.AddOrUpdate(entity);
 
                 try
                 {
