@@ -211,12 +211,20 @@
         // outwith the initial scoped request. This trick will fix that.
         //  
         var previewWindow = $window.open('preview/?id=' + content.id, 'umbpreview');
-        $scope.save().then(function (data) {
-          // Build the correct path so both /#/ and #/ work.
-          var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?id=' + data.id;
-          previewWindow.location.href = redirect;
-        });
 
+        // Build the correct path so both /#/ and #/ work.
+        var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?id=' + content.id;
+
+        //The user cannot save if they don't have access to do that, in which case we just want to preview
+        //and that's it otherwise they'll get an unauthorized access message
+        if (!_.contains(content.allowedActions, "A")) {
+            previewWindow.location.href = redirect;
+        }
+        else {
+            $scope.save().then(function (data) {
+                previewWindow.location.href = redirect;
+            });    
+        }
 
       }
 
