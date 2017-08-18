@@ -5,6 +5,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using umbraco.DataLayer;
 using Umbraco.Core.Persistence.Querying;
@@ -66,7 +67,7 @@ namespace umbraco.BusinessLogic
         {
             SetupUser(getUserId(Login));
         }
-
+        
         private void SetupUser(int ID)
         {
             UserEntity = ApplicationContext.Current.Services.UserService.GetUserById(ID);
@@ -762,6 +763,23 @@ namespace umbraco.BusinessLogic
             return new User(result);
         }
 
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups and the IUserService instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void AddApplication(string appAlias)
+        {
+            if (_lazyId.HasValue) SetupUser(_lazyId.Value);
+            UserEntity.AddAllowedSection(appAlias);
+        }
+
+        [Obsolete("This method will implicitly cause a multiple database saves and will reset the current user's dirty property, do not use this method, use the AddApplication method instead and then call Save() when you are done performing all user changes to persist the chagnes in one transaction")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void addApplication(string AppAlias)
+        {
+            if (_lazyId.HasValue) SetupUser(_lazyId.Value);
+            UserEntity.AddAllowedSection(AppAlias);
+            //For backwards compatibility this requires an implicit save
+            ApplicationContext.Current.Services.UserService.Save(UserEntity);
+        }
 
         //EVENTS
         /// <summary>
