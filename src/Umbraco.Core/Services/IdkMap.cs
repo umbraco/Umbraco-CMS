@@ -45,13 +45,12 @@ namespace Umbraco.Core.Services
             }
 
             if (val == null) return Attempt<int>.Fail();
-            id = new TypedId<int>(val.Value, umbracoObjectType);
 
             try
             {
                 _locker.EnterWriteLock();
-                _id2Key[id.Id] = new TypedId<Guid>(key, umbracoObjectType);
-                _key2Id[key] = id;
+                _id2Key[val.Value] = new TypedId<Guid>(key, umbracoObjectType);
+                _key2Id[key] = new TypedId<int>(val.Value, umbracoObjectType);
             }
             finally
             {
@@ -59,7 +58,7 @@ namespace Umbraco.Core.Services
                     _locker.ExitWriteLock();
             }
 
-            return Attempt.Succeed(id.Id);
+            return Attempt.Succeed(val.Value);
         }
 
         public Attempt<int> GetIdForUdi(Udi udi)
@@ -95,13 +94,12 @@ namespace Umbraco.Core.Services
             }
 
             if (val == null) return Attempt<Guid>.Fail();
-            key = new TypedId<Guid>(val.Value, umbracoObjectType);
 
             try
             {
                 _locker.EnterWriteLock();
-                _id2Key[id] = key;
-                _key2Id[key.Id] = new TypedId<int>();
+                _id2Key[id] = new TypedId<Guid>(val.Value, umbracoObjectType); ;
+                _key2Id[val.Value] = new TypedId<int>();
             }
             finally
             {
@@ -109,7 +107,7 @@ namespace Umbraco.Core.Services
                     _locker.ExitWriteLock();
             }
 
-            return Attempt.Succeed(key.Id);
+            return Attempt.Succeed(val.Value);
         }
 
         private static Guid GetNodeObjectTypeGuid(UmbracoObjectTypes umbracoObjectType)
