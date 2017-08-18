@@ -1,5 +1,7 @@
 ﻿function MultipleTextBoxController($scope, $timeout) {
 
+    var backspaceHits = 0;
+
     $scope.sortableOptions = {
         axis: 'y',
         containment: 'parent',
@@ -21,30 +23,34 @@
         }
     }
 
-    //TODO add focus to newly created text box or the first in line after deletion
     $scope.addRemoveOnKeyDown = function (event, index) {
 
         var txtBoxValue = $scope.model.value[index];
-
-        var newItemIndex;
 
         event.preventDefault();
 
         switch (event.keyCode) {
             case 13:
-                if ($scope.model.config.max <= 0 || $scope.model.value.length < $scope.model.config.max) {
-                    $scope.model.value.push({ value: "" });
-
-                    newItemIndex = $scope.model.value.length - 1;
-
+                if ($scope.model.config.max <= 0 && txtBoxValue.value || $scope.model.value.length < $scope.model.config.max && txtBoxValue.value) {
+                    var newItemIndex = index + 1;
+                    $scope.model.value.splice(newItemIndex, 0, { value: "" });
                     //Focus on the newly added value
                     $scope.model.value[newItemIndex].hasFocus = true;
                 }
                 break;
             case 8:
-                var remainder = [];
-                if ($scope.model.value.length > 1 && $scope.model.value.length >= $scope.model.config.max) {
-                    if (txtBoxValue.value === "") {
+
+                if ($scope.model.value.length > $scope.model.config.min) {
+                    var remainder = [];
+
+                    // Used to require an extra hit on backspace for the field to be removed
+                    if(txtBoxValue.value === "") {
+                        backspaceHits++;
+                    } else {
+                        backspaceHits = 0;
+                    }
+
+                    if (txtBoxValue.value === "" && backspaceHits === 2) {
                         for (var x = 0; x < $scope.model.value.length; x++) {
                             if (x !== index) {
                                 remainder.push($scope.model.value[x]);
@@ -53,28 +59,32 @@
 
                         $scope.model.value = remainder;
 
-                        newItemIndex = $scope.model.value.length - 1;
+                        var prevItemIndex = index - 1;
 
                         //Set focus back on false as the directive only watches for true
-                        $scope.model.value[newItemIndex].hasFocus = false;
+                        if(prevItemIndex >= 0) {
+                            $scope.model.value[prevItemIndex].hasFocus = false;
+                            $timeout(function () {
+                                //Focus on the previous value
+                                $scope.model.value[prevItemIndex].hasFocus = true;
+                            });
+                        }
 
-                        $timeout(function () {
-                            //Focus on the previous value
-                            $scope.model.value[newItemIndex].hasFocus = true;
-                        });
+                        backspaceHits = 0;
                     }
                 }
+
                 break;
             default:
         }
     }
 
-
-
     $scope.add = function () {
         if ($scope.model.config.max <= 0 || $scope.model.value.length < $scope.model.config.max) {
             $scope.model.value.push({ value: "" });
-            $scope.focusMe = false;
+            // focus new value
+            var newItemIndex = $scope.model.value.length - 1;
+            $scope.model.value[newItemIndex].hasFocus = true;
         }
     };
 
@@ -86,7 +96,6 @@
             }
         }
         $scope.model.value = remainder;
-        $scope.focusMe = true;
     };
 
 }
