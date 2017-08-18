@@ -663,16 +663,19 @@ ORDER BY colName";
                     {
                         if (appended) sb.Append(" OR ");
                         sb.Append("(userDisabled = 1)");
+                        appended = true;
                     }
                     if (userState.Contains(UserState.LockedOut))
                     {
                         if (appended) sb.Append(" OR ");
                         sb.Append("(userNoConsole = 1)");
+                        appended = true;
                     }
                     if (userState.Contains(UserState.Invited))
                     {
                         if (appended) sb.Append(" OR ");
                         sb.Append("(lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL)");
+                        appended = true;
                     }
 
                     sb.Append(")");
