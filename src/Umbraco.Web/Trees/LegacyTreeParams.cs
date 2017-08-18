@@ -15,7 +15,7 @@ namespace Umbraco.Web.Trees
 
         public LegacyTreeParams(IEnumerable<KeyValuePair<string, string>> formCollection)
         {
-            if (formCollection == null)
+            if (formCollection != null)
             {
                 var p = TreeRequestParams.FromDictionary(formCollection.ToDictionary(x => x.Key, x => x.Value));
                 NodeKey = p.NodeKey;
