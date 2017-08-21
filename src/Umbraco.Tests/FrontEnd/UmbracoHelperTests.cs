@@ -127,7 +127,7 @@ namespace Umbraco.Tests.FrontEnd
 
             var result = helper.TruncateByWords(text, 7).ToString();
 
-            Assert.AreEqual("Hello world, <b>this</b> is some text <a href='blah'>with&hellip;</a>", result);
+            Assert.AreEqual("Hello world, this is some text <a href='blah'>with&hellip;</a>", result);
         }
     }
 }

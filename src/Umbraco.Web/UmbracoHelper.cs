@@ -1466,7 +1466,7 @@ namespace Umbraco.Web
         /// </summary>
         public IHtmlString TruncateByWords(string html, int words)
         {
-            int length = _stringUtilities.WordsToLength(html, words);
+            int length = _stringUtilities.WordsToLength(html, words, false);
 
             return Truncate(html, length, true, false);
         }
@@ -1476,7 +1476,7 @@ namespace Umbraco.Web
         /// </summary>
         public IHtmlString TruncateByWords(string html, int words, bool addElipsis)
         {
-            int length = _stringUtilities.WordsToLength(html, words);
+            int length = _stringUtilities.WordsToLength(html, words, false);
 
             return Truncate(html, length, addElipsis, false);
         }
@@ -1486,7 +1486,7 @@ namespace Umbraco.Web
         /// </summary>
         public IHtmlString TruncateByWords(string html, int words, bool addElipsis, bool treatTagsAsContent)
         {
-            int length =_stringUtilities.WordsToLength(html, words);
+            int length =_stringUtilities.WordsToLength(html, words, treatTagsAsContent);
 
             return Truncate(html, length, addElipsis, treatTagsAsContent);
         }
@@ -1496,7 +1496,7 @@ namespace Umbraco.Web
         /// </summary>
         public IHtmlString TruncateByWords(IHtmlString html, int words)
         {
-            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words);
+            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words, false);
 
             return Truncate(html, length, true, false);
         }
@@ -1506,7 +1506,7 @@ namespace Umbraco.Web
         /// </summary>
         public IHtmlString TruncateByWords(IHtmlString html, int words, bool addElipsis)
         {
-            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words);
+            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words, false);
 
             return Truncate(html, length, addElipsis, false);
         }
@@ -1516,7 +1516,7 @@ namespace Umbraco.Web
         /// </summary>
         public IHtmlString TruncateByWords(IHtmlString html, int words, bool addElipsis, bool treatTagsAsContent)
         {
-            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words);
+            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words, treatTagsAsContent);
 
             return Truncate(html, length, addElipsis, treatTagsAsContent);
         }

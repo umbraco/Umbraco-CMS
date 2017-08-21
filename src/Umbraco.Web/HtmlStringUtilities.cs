@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using HtmlAgilityPack;
 
@@ -247,11 +248,18 @@ namespace Umbraco.Web
         /// <param name="html">Html text</param>
         /// <param name="words">Amount of words you would like to measure</param>
         /// <returns></returns>
-        public int WordsToLength(string html, int words)
+        public int WordsToLength(string html, int words, bool tagsAsContent)
         {
             int wordCount = 0;
             int length = 0;
             int maxWords = words;
+
+            string strippedOfTags = Regex.Replace(html, "<.*?>", string.Empty).Trim();
+
+            if (tagsAsContent == false)
+            {
+                html = strippedOfTags;
+            }
 
             while (length < html.Length)
             {
@@ -266,12 +274,11 @@ namespace Umbraco.Web
                 wordCount++;
 
                 // Skip whitespace until the next word
-                while (length < html.Length && char.IsWhiteSpace(html[length]))
+                while (length < html.Length && char.IsWhiteSpace(html[length]) && wordCount.Equals(maxWords) == false)
                 {
                     length++;
                 }
             }
-
             return length;
         }
     }
