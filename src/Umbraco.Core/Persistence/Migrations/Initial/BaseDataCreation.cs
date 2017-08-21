@@ -169,7 +169,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         private void CreateUmbracoUserData()
         {
-            _database.Insert("umbracoUser", "id", false, new UserDto { Id = 0, Disabled = false, NoConsole = false, UserName = "Administrator", Login = "admin", Password = "default", Email = "", UserLanguage = "en", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
+            _database.Insert("umbracoUser", "id", false, new UserDto { Id = 0, Disabled = false, NoConsole = false, UserName = "Administrator", Login = "admin", Password = "default", Email = "", UserLanguage = "en-US", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
         }
         
         private void CreateUmbracoUserGroupData()
