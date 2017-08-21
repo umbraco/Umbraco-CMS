@@ -9,6 +9,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
@@ -30,6 +31,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using ActionFilterAttribute = System.Web.Http.Filters.ActionFilterAttribute;
 using Constants = Umbraco.Core.Constants;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Task = System.Threading.Tasks.Task;
@@ -63,8 +65,7 @@ namespace Umbraco.Web.Editors
             : base(umbracoContext, umbracoHelper, backOfficeUserManager)
         {
         }
-
-
+        
         /// <summary>
         /// Returns a list of the sizes of gravatar urls for the user or null if the gravatar server cannot be reached
         /// </summary>
@@ -190,8 +191,6 @@ namespace Umbraco.Web.Editors
             return Mapper.Map<IUser, UserDisplay>(user);
         }
 
-        
-        
         /// <summary>
         /// Returns a paged users collection
         /// </summary>
@@ -212,6 +211,30 @@ namespace Umbraco.Web.Editors
             [FromUri]UserState[] userStates = null,
             string filter = "")
         {
+            //following the same principle we had in previous versions, we would only show admins to admins, see
+            // https://github.com/umbraco/Umbraco-CMS/blob/dev-v7/src/Umbraco.Web/umbraco.presentation/umbraco/Trees/loadUsers.cs#L91
+            // so to do that here, we'll need to check if this current user is an admin and if not we should exclude all user who are
+            // also admins
+
+            var isAdmin = Security.CurrentUser.IsAdmin();
+            if (isAdmin == false)
+            {
+                //this user is not an admin so in that case we need to either:
+                //A) remove the admin group from the userGroup filter if one is supplied
+                //B) if no filter is applied, create a filter based on all of the groups except for admin
+                if (userGroups != null && userGroups.Length > 0)
+                {
+                    userGroups = userGroups.Except(new[] { Constants.Security.AdminGroupAlias }).ToArray();
+                }
+                else
+                {
+                    userGroups = Services.UserService.GetAllUserGroups()
+                        .Where(x => x.Alias != Constants.Security.AdminGroupAlias)
+                        .Select(x => x.Alias)
+                        .ToArray();
+                }
+            }
+
             long pageIndex = pageNumber - 1;
             long total;
             var result = Services.UserService.GetAll(pageIndex, pageSize, out total, orderBy, orderDirection, userStates, userGroups, filter);
@@ -359,9 +382,7 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
-
         
-
         private HttpContextBase EnsureHttpContext()
         {
             var attempt = this.TryGetHttpContext();
@@ -431,6 +452,11 @@ namespace Umbraco.Web.Editors
             var found = Services.UserService.GetUserById(intId.Result);
             if (found == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            //TODO:
+            // a) A non-admin cannot save an admin
+            // b) A user cannot set a start node on another user that they don't have access to
+            // c) A user cannot set a section on another user that they don't have access to
 
             var hasErrors = false;
 
@@ -624,6 +650,49 @@ namespace Umbraco.Web.Editors
             /// </summary>
             [DataMember(Name = "userStates")]
             public IDictionary<UserState, int> UserStates { get; set; }
+        }
+
+        //internal class NonAdminAuthorizationFilterAttribute : ActionFilterAttribute
+        //{
+        //    public override void OnActionExecuting(HttpActionContext actionContext)
+        //    {
+        //        var contentItem = (ContentItemSave)actionContext.ActionArguments["userSave"];
+
+
+        //    }
+        //}
+    }
+
+    internal class UserEditorAuthorizationHelper
+    {
+        private readonly IContentService _contentService;
+        private readonly IMediaService _mediaService;
+        private readonly IEntityService _entityService;
+
+        public UserEditorAuthorizationHelper(IContentService contentService, IMediaService mediaService, IEntityService entityService)
+        {
+            _contentService = contentService;
+            _mediaService = mediaService;
+            _entityService = entityService;
+        }
+
+        public bool AuthorizeActions(IUser currentUser, IUser savingUser)
+        {
+            // a) A non-admin cannot save an admin
+            
+            var currentIsAdmin = currentUser.IsAdmin();
+            var savingIsAdmin = savingUser.IsAdmin();
+            if (currentIsAdmin == false && savingIsAdmin)
+                return false;
+
+            // b) A user cannot set a start node on another user that they don't have access to
+
+            //var startContent = _contentService.
+            //var currentHasContentAccess = currentUser.HasPathAccess()
+
+            // c) A user cannot set a section on another user that they don't have access to
+
+            return true;
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
+using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -95,6 +96,8 @@ namespace Umbraco.Web.Editors
         {
             if (saveModel.ContentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
+            //TODO: Should non-admins be alowed to set granular permissions?
+
             var content = Services.ContentService.GetById(saveModel.ContentId);
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             
@@ -156,7 +159,9 @@ namespace Umbraco.Web.Editors
             if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             var content = Services.ContentService.GetById(contentId);
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));            
-            
+
+            //TODO: Should non-admins be able to see detailed permissions?
+
             var allUserGroups = Services.UserService.GetAllUserGroups();
 
             return GetDetailedPermissions(content, allUserGroups);
