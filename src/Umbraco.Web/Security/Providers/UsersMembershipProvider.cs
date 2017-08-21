@@ -42,9 +42,35 @@ namespace Umbraco.Web.Security.Providers
             return entity.AsConcreteMembershipUser(Name, true);
         }
 
+        private bool _allowManuallyChangingPassword = false;
+        private bool _enablePasswordReset = false;
+
+        /// <summary>
+        /// Indicates whether the membership provider is configured to allow users to reset their passwords.
+        /// </summary>
+        /// <value></value>
+        /// <returns>true if the membership provider supports password reset; otherwise, false. The default is FALSE for users.</returns>
+        public override bool EnablePasswordReset
+        {
+            get { return _enablePasswordReset; }
+        }
+
+        /// <summary>
+        /// For backwards compatibility, this provider supports this option by default it is FALSE for users
+        /// </summary>
+        public override bool AllowManuallyChangingPassword
+        {
+            get { return _allowManuallyChangingPassword; }
+        }
+
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
             base.Initialize(name, config);
+
+            if (config == null) { throw new ArgumentNullException("config"); }
+            
+            _allowManuallyChangingPassword = config.GetValue("allowManuallyChangingPassword", false);
+            _enablePasswordReset = config.GetValue("enablePasswordReset", false);
 
             // test for membertype (if not specified, choose the first member type available)
             // We'll support both names for legacy reasons: defaultUserTypeAlias & defaultUserGroupAlias
