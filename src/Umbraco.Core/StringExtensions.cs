@@ -633,7 +633,7 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Ensures that the folder path endds with a DirectorySeperatorChar
+        /// Ensures that the folder path ends with a DirectorySeperatorChar
         /// </summary>
         /// <param name="currentFolder"></param>
         /// <returns></returns>
