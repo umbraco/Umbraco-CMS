@@ -10,8 +10,9 @@ namespace Umbraco.Core.Services
     {
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
-        private readonly Dictionary<int, Guid> _id2Key = new Dictionary<int, Guid>();
-        private readonly Dictionary<Guid, int> _key2Id = new Dictionary<Guid, int>();
+        
+        private readonly Dictionary<int, TypedId<Guid>> _id2Key = new Dictionary<int, TypedId<Guid>>();
+        private readonly Dictionary<Guid, TypedId<int>> _key2Id = new Dictionary<Guid, TypedId<int>>();
 
         public IdkMap(IDatabaseUnitOfWorkProvider uowProvider)
         {
@@ -23,11 +24,11 @@ namespace Umbraco.Core.Services
 
         public Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
         {
-            int id;
+            TypedId<int> id;
             try
             {
                 _locker.EnterReadLock();
-                if (_key2Id.TryGetValue(key, out id)) return Attempt.Succeed(id);
+                if (_key2Id.TryGetValue(key, out id) && id.UmbracoObjectType == umbracoObjectType) return Attempt.Succeed(id.Id);
             }
             finally
             {
@@ -44,13 +45,12 @@ namespace Umbraco.Core.Services
             }
 
             if (val == null) return Attempt<int>.Fail();
-            id = val.Value;
 
             try
             {
                 _locker.EnterWriteLock();
-                _id2Key[id] = key;
-                _key2Id[key] = id;
+                _id2Key[val.Value] = new TypedId<Guid>(key, umbracoObjectType);
+                _key2Id[key] = new TypedId<int>(val.Value, umbracoObjectType);
             }
             finally
             {
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Services
                     _locker.ExitWriteLock();
             }
 
-            return Attempt.Succeed(id);
+            return Attempt.Succeed(val.Value);
         }
 
         public Attempt<int> GetIdForUdi(Udi udi)
@@ -73,11 +73,11 @@ namespace Umbraco.Core.Services
 
         public Attempt<Guid> GetKeyForId(int id, UmbracoObjectTypes umbracoObjectType)
         {
-            Guid key;
+            TypedId<Guid> key;
             try
             {
                 _locker.EnterReadLock();
-                if (_id2Key.TryGetValue(id, out key)) return Attempt.Succeed(key);
+                if (_id2Key.TryGetValue(id, out key) && key.UmbracoObjectType == umbracoObjectType) return Attempt.Succeed(key.Id);
             }
             finally
             {
@@ -94,13 +94,12 @@ namespace Umbraco.Core.Services
             }
 
             if (val == null) return Attempt<Guid>.Fail();
-            key = val.Value;
 
             try
             {
                 _locker.EnterWriteLock();
-                _id2Key[id] = key;
-                _key2Id[key] = id;
+                _id2Key[id] = new TypedId<Guid>(val.Value, umbracoObjectType); ;
+                _key2Id[val.Value] = new TypedId<int>();
             }
             finally
             {
@@ -108,7 +107,7 @@ namespace Umbraco.Core.Services
                     _locker.ExitWriteLock();
             }
 
-            return Attempt.Succeed(key);
+            return Attempt.Succeed(val.Value);
         }
 
         private static Guid GetNodeObjectTypeGuid(UmbracoObjectTypes umbracoObjectType)
@@ -139,10 +138,10 @@ namespace Umbraco.Core.Services
             try
             {
                 _locker.EnterWriteLock();
-                Guid key;
+                TypedId<Guid> key;
                 if (_id2Key.TryGetValue(id, out key) == false) return;
                 _id2Key.Remove(id);
-                _key2Id.Remove(key);
+                _key2Id.Remove(key.Id);
             }
             finally
             {
@@ -156,15 +155,37 @@ namespace Umbraco.Core.Services
             try
             {
                 _locker.EnterWriteLock();
-                int id;
+                TypedId<int> id;
                 if (_key2Id.TryGetValue(key, out id) == false) return;
-                _id2Key.Remove(id);
+                _id2Key.Remove(id.Id);
                 _key2Id.Remove(key);
             }
             finally
             {
                 if (_locker.IsWriteLockHeld)
                     _locker.ExitWriteLock();
+            }
+        }
+
+        private struct TypedId<T>
+        {
+            private readonly T _id;
+            private readonly UmbracoObjectTypes _umbracoObjectType;
+            
+            public T Id
+            {
+                get { return _id; }
+            }
+
+            public UmbracoObjectTypes UmbracoObjectType
+            {
+                get { return _umbracoObjectType; }
+            }
+
+            public TypedId(T id, UmbracoObjectTypes umbracoObjectType)
+            {
+                _umbracoObjectType = umbracoObjectType;
+                _id = id;
             }
         }
     }
