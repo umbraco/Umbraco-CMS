@@ -62,7 +62,7 @@
                     return nodes;
                 }
 
-                nodes.AddRange(this.Services.LocalizationService.GetDictionaryItemChildren(parentDictionary.Key).ToList().OrderBy(item => item.Key).Select(
+                nodes.AddRange(this.Services.LocalizationService.GetDictionaryItemChildren(parentDictionary.Key).ToList().OrderByDescending(item => item.Key).Select(
                     x => this.CreateTreeNode(
                         x.Id.ToInvariantString(),
                         id,
