@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Filters;
 using AutoMapper;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -69,13 +70,17 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<UserGroupBasic> GetUserGroups()
         {
-            return Mapper.Map<IEnumerable<IUserGroup>, IEnumerable<UserGroupBasic>>(Services.UserService.GetAllUserGroups());
+            var allGroups = Mapper.Map<IEnumerable<IUserGroup>, IEnumerable<UserGroupBasic>>(Services.UserService.GetAllUserGroups());
+            //we cannot return user groups that this user does not have access to
+            var currentUserGroups = Security.CurrentUser.Groups.Select(x => x.Alias).ToArray();
+            return allGroups.Where(x => currentUserGroups.Contains(x.Alias)).ToArray();
         }
 
         /// <summary>
         /// Return a user group
         /// </summary>
         /// <returns></returns>
+        [UserGroupAuthorization("id")]
         public UserGroupDisplay GetUserGroup(int id)
         {
             var found = Services.UserService.GetUserGroupById(id);
@@ -89,6 +94,7 @@ namespace Umbraco.Web.Editors
 
         [HttpPost]
         [HttpDelete]
+        [UserGroupAuthorization("userGroupIds")]
         public HttpResponseMessage PostDeleteUserGroups([FromUri] int[] userGroupIds)
         {
             var userGroups = Services.UserService.GetAllUserGroups(userGroupIds).ToArray();
