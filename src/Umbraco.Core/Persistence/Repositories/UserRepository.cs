@@ -594,14 +594,24 @@ ORDER BY colName";
         /// <param name="totalRecords"></param>
         /// <param name="orderBy"></param>
         /// <param name="orderDirection"></param>
-        /// <param name="userGroups">Optional parameter to filter by specified user groups</param>
+        /// <param name="includeUserGroups">
+        /// A filter to only include user that belong to these user groups
+        /// </param>
+        /// <param name="excludeUserGroups">
+        /// A filter to only include users that do not belong to these user groups
+        /// </param>
         /// <param name="userState">Optional parameter to filter by specfied user state</param>
         /// <param name="filter"></param>
         /// <returns></returns>
         /// <remarks>
         /// The query supplied will ONLY work with data specifically on the umbracoUser table because we are using PetaPoco paging (SQL paging)
         /// </remarks>
-        public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, Expression<Func<IUser, object>> orderBy, Direction orderDirection, string[] userGroups = null, UserState[] userState = null, IQuery<IUser> filter = null)
+        public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords,
+            Expression<Func<IUser, object>> orderBy, Direction orderDirection,
+            string[] includeUserGroups = null,
+            string[] excludeUserGroups = null,
+            UserState[] userState = null,
+            IQuery<IUser> filter = null)
         {
             if (orderBy == null) throw new ArgumentNullException("orderBy");
 
@@ -613,13 +623,14 @@ ORDER BY colName";
             if (mappedField.IsNullOrWhiteSpace())
                 throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
 
-            return GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, mappedField, orderDirection, userGroups, userState, filter);
+            return GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, mappedField, orderDirection, includeUserGroups, excludeUserGroups, userState, filter);
         }
 
 
 
         private IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection,
-            string[] userGroups = null,
+            string[] includeUserGroups = null,
+            string[] excludeUserGroups = null,
             UserState[] userState = null,
             IQuery<IUser> filter = null)
         {
@@ -627,7 +638,9 @@ ORDER BY colName";
 
 
             Sql filterSql = null;
-            if (filter != null || (userGroups != null && userGroups.Length > 0) || (userState != null && userState.Length > 0 && userState.Contains(UserState.All) == false))
+            if (filter != null
+                || (includeUserGroups != null && includeUserGroups.Length > 0) || (excludeUserGroups != null && excludeUserGroups.Length > 0)
+                || (userState != null && userState.Length > 0 && userState.Contains(UserState.All) == false))
                 filterSql = new Sql();
 
             if (filter != null)
@@ -637,15 +650,27 @@ ORDER BY colName";
                     filterSql.Append(string.Format("AND ({0})", filterClause.Item1), filterClause.Item2);
                 }
             }
-            if (userGroups != null && userGroups.Length > 0)
+
+            if (includeUserGroups != null && includeUserGroups.Length > 0)
             {
                 var subQuery = @"AND (umbracoUser.id IN (SELECT DISTINCT umbracoUser.id
 		            FROM umbracoUser
 		            INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
 		            INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
 		            WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
-                filterSql.Append(subQuery, new { userGroups = userGroups });
+                filterSql.Append(subQuery, new { userGroups = includeUserGroups });
             }
+
+            if (excludeUserGroups != null && excludeUserGroups.Length > 0)
+            {
+                var subQuery = @"AND (umbracoUser.id NOT IN (SELECT DISTINCT umbracoUser.id
+		            FROM umbracoUser
+		            INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
+		            INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
+		            WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
+                filterSql.Append(subQuery, new { userGroups = excludeUserGroups });
+            }
+
             if (userState != null && userState.Length > 0)
             {
                 //the "ALL" state doesn't require any filtering so we ignore that, if it exists in the list we don't do any filtering

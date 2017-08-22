@@ -616,7 +616,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.UserService.Save(users);
 
             long totalRecs;
-            var found = ServiceContext.UserService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, userGroups: new[] {userGroup.Alias});
+            var found = ServiceContext.UserService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, includeUserGroups: new[] {userGroup.Alias});
 
             Assert.AreEqual(2, found.Count());
             Assert.AreEqual(5, totalRecs);
@@ -644,7 +644,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.UserService.Save(users);
 
             long totalRecs;
-            var found = ServiceContext.UserService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, userGroups: new[] { userGroup.Alias }, filter: "blah");
+            var found = ServiceContext.UserService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, includeUserGroups: new[] { userGroup.Alias }, filter: "blah");
 
             Assert.AreEqual(2, found.Count());
             Assert.AreEqual(2, totalRecs);

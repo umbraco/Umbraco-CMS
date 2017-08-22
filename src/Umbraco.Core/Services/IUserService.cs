@@ -24,13 +24,19 @@ namespace Umbraco.Core.Services
         /// <param name="orderBy"></param>
         /// <param name="orderDirection"></param>
         /// <param name="userState"></param>
-        /// <param name="userGroups"></param>
+        /// <param name="includeUserGroups">
+        /// A filter to only include user that belong to these user groups
+        /// </param>
+        /// <param name="excludeUserGroups">
+        /// A filter to only include users that do not belong to these user groups
+        /// </param>
         /// <param name="filter"></param>
         /// <returns></returns>
         IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, 
             UserState[] userState = null, 
-            string[] userGroups = null,
+            string[] includeUserGroups = null,
+            string[] excludeUserGroups = null,
             string filter = "");
 
         /// <summary>

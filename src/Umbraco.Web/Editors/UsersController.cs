@@ -216,28 +216,17 @@ namespace Umbraco.Web.Editors
             // so to do that here, we'll need to check if this current user is an admin and if not we should exclude all user who are
             // also admins
 
+            var excludeUserGroups = new string[0];
             var isAdmin = Security.CurrentUser.IsAdmin();
             if (isAdmin == false)
             {
-                //this user is not an admin so in that case we need to either:
-                //A) remove the admin group from the userGroup filter if one is supplied
-                //B) if no filter is applied, create a filter based on all of the groups except for admin
-                if (userGroups != null && userGroups.Length > 0)
-                {
-                    userGroups = userGroups.Except(new[] { Constants.Security.AdminGroupAlias }).ToArray();
-                }
-                else
-                {
-                    userGroups = Services.UserService.GetAllUserGroups()
-                        .Where(x => x.Alias != Constants.Security.AdminGroupAlias)
-                        .Select(x => x.Alias)
-                        .ToArray();
-                }
+                //this user is not an admin so in that case we need to exlude all admin users
+                excludeUserGroups = new[] {Constants.Security.AdminGroupAlias};
             }
 
             long pageIndex = pageNumber - 1;
             long total;
-            var result = Services.UserService.GetAll(pageIndex, pageSize, out total, orderBy, orderDirection, userStates, userGroups, filter);
+            var result = Services.UserService.GetAll(pageIndex, pageSize, out total, orderBy, orderDirection, userStates, userGroups, excludeUserGroups, filter);
             
             var paged = new PagedUserResult(total, pageNumber, pageSize)
             {

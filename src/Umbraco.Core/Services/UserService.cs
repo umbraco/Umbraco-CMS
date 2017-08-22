@@ -556,7 +556,29 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[] userState = null, string[] userGroups = null, string filter = "")
+        /// <summary>
+        /// Get paged users
+        /// </summary>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="userState"></param>
+        /// <param name="includeUserGroups">
+        /// A filter to only include user that belong to these user groups
+        /// </param>
+        /// <param name="excludeUserGroups">
+        /// A filter to only include users that do not belong to these user groups
+        /// </param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection,
+            UserState[] userState = null,
+            string[] includeUserGroups = null,
+            string[] excludeUserGroups = null,
+            string filter = "")
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
@@ -604,7 +626,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var repository = RepositoryFactory.CreateUserRepository(uow);
-                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, sort, orderDirection, userGroups, userState, filterQuery);
+                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, sort, orderDirection, includeUserGroups, excludeUserGroups, userState, filterQuery);
             }
         }
 
