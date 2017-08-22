@@ -330,6 +330,7 @@
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
     <Compile Include="Editors\UserGroupAuthorizationAttribute.cs" />
+    <Compile Include="Editors\UserGroupEditorAuthorizationHelper.cs" />
     <Compile Include="Editors\UserGroupsController.cs" />
     <Compile Include="Editors\UserGroupValidateAttribute.cs" />
     <Compile Include="Extensions\UdiExtensions.cs" />

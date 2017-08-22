@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Filters;
 using AutoMapper;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -26,9 +27,32 @@ namespace Umbraco.Web.Editors
         {
             if (userGroupSave == null) throw new ArgumentNullException("userGroupSave");
 
+            //authorize that the user has access to save this user group
+            var authHelper = new UserGroupEditorAuthorizationHelper(
+                Services.UserService, Services.ContentService, Services.MediaService, Services.EntityService);
+            var isAuthorized = authHelper.AuthorizeGroupAccess(Security.CurrentUser, userGroupSave.Alias);
+            if (isAuthorized == false)
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
+
+            //if sections were added we need to check that the current user has access to that section
+            isAuthorized = authHelper.AuthorizeSectionChanges(Security.CurrentUser,
+                userGroupSave.PersistedUserGroup.AllowedSections,
+                userGroupSave.Sections);
+            if (isAuthorized == false)
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
+
+            //if start nodes were changed we need to check that the current user has access to them
+            isAuthorized = authHelper.AuthorizeStartNodeChanges(Security.CurrentUser,
+                userGroupSave.PersistedUserGroup.StartContentId,
+                userGroupSave.StartContentId,
+                userGroupSave.PersistedUserGroup.StartMediaId,
+                userGroupSave.StartMediaId);
+            if (isAuthorized == false)
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
+
             //save the group
             Services.UserService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());
-
+            
             //deal with permissions
 
             //remove ones that have been removed
@@ -71,6 +95,11 @@ namespace Umbraco.Web.Editors
         public IEnumerable<UserGroupBasic> GetUserGroups()
         {
             var allGroups = Mapper.Map<IEnumerable<IUserGroup>, IEnumerable<UserGroupBasic>>(Services.UserService.GetAllUserGroups());
+
+            //if admin, return all groups
+            if (Security.CurrentUser.IsAdmin())
+                return allGroups;
+
             //we cannot return user groups that this user does not have access to
             var currentUserGroups = Security.CurrentUser.Groups.Select(x => x.Alias).ToArray();
             return allGroups.Where(x => currentUserGroups.Contains(x.Alias)).ToArray();

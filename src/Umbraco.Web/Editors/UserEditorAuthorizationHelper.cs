@@ -31,18 +31,12 @@ namespace Umbraco.Web.Editors
         /// <param name="startMediaIds">The start media ids of the user being saved (can be null or empty)</param>
         /// <param name="userGroupAliases">The user aliases of the user being saved (can be null or empty)</param>
         /// <returns></returns>
-        public Attempt<string> AuthorizeActions(IUser currentUser,
+        public Attempt<string> IsAuthorized(IUser currentUser,
             IUser savingUser,
             IEnumerable<int> startContentIds, IEnumerable<int> startMediaIds,
             IEnumerable<string> userGroupAliases)
         {
-            var currentIsAdmin = currentUser.IsAdmin();
-
-            // a1) An admin can edit anything
-            if (currentIsAdmin)
-                return Attempt<string>.Succeed();
-
-            // a2) A non-admin cannot save an admin
+            // a) A non-admin cannot save an admin
 
             if (savingUser != null)
             {                
@@ -50,17 +44,23 @@ namespace Umbraco.Web.Editors
                     return Attempt.Fail("The current user is not an administrator");
             }
 
-            // b0) A user cannot set a start node on another user that they don't have access to
+            // b) A user cannot set a start node on another user that they don't have access to, this even goes for admins
 
             var pathResult = AuthorizePath(currentUser, startContentIds, startMediaIds);
             if (pathResult == false)
                 return pathResult;
+            
+            // c) an admin can manage any group or section access
+
+            var currentIsAdmin = currentUser.IsAdmin();
+            if (currentIsAdmin)
+                return Attempt<string>.Succeed();
 
             if (userGroupAliases != null)
             {
                 var userGroups = _userService.GetUserGroupsByAlias(userGroupAliases.ToArray()).ToArray();
 
-                // b1) A user cannot assign a group to another user that grants them access to a start node they don't have access to
+                // d) A user cannot assign a group to another user that grants them access to a start node they don't have access to
                 foreach (var group in userGroups)
                 {
                     pathResult = AuthorizePath(currentUser,
@@ -70,7 +70,7 @@ namespace Umbraco.Web.Editors
                         return pathResult;
                 }
 
-                // c) A user cannot set a section on another user that they don't have access to
+                // e) A user cannot set a section on another user that they don't have access to
                 var allGroupSections = userGroups.SelectMany(x => x.AllowedSections).Distinct();
                 var missingSectionAccess = allGroupSections.Except(currentUser.AllowedSections).ToArray();
                 if (missingSectionAccess.Length > 0)

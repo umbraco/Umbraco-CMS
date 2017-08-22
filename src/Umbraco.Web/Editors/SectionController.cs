@@ -3,7 +3,9 @@ using AutoMapper;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using System.Linq;
+using Umbraco.Core.Models;
 using Umbraco.Web.Trees;
+using Section = Umbraco.Web.Models.ContentEditing.Section;
 
 namespace Umbraco.Web.Editors
 {
@@ -55,10 +57,18 @@ namespace Umbraco.Web.Editors
             return sectionModels;
         }
 
+        /// <summary>
+        /// Returns all the sections that the user has access to
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<Section> GetAllSections()
         {
             var sections = Services.SectionService.GetSections();
-            return sections.Select(Mapper.Map<Core.Models.Section, Section>);
+            var mapped = sections.Select(Mapper.Map<Core.Models.Section, Section>);
+            if (Security.CurrentUser.IsAdmin())
+                return mapped;
+
+            return mapped.Where(x => Security.CurrentUser.AllowedSections.Contains(x.Alias)).ToArray();
         }
 
     }

@@ -1,11 +1,10 @@
 using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.Editors
 {
@@ -41,29 +40,22 @@ namespace Umbraco.Web.Editors
 
         protected override bool IsAuthorized(HttpActionContext actionContext)
         {
-            var currentUser = GetUmbracoContext().Security.CurrentUser;
-
-            //admins can access any group
-            if (currentUser.IsAdmin())
-                return base.IsAuthorized(actionContext);
-
-            var queryString = actionContext.Request
-                .GetQueryNameValuePairs();
+            var umbCtx = GetUmbracoContext();
+            var currentUser = umbCtx.Security.CurrentUser;
+            
+            var queryString = actionContext.Request.GetQueryNameValuePairs();
 
             var ids = queryString.Where(x => x.Key == _paramName).ToArray();
             if (ids.Length == 0)
                 return base.IsAuthorized(actionContext);
 
             var intIds = ids.Select(x => x.Value.TryConvertTo<int>()).Where(x => x.Success).Select(x => x.Result).ToArray();
-            return AuthorizeGroupAccess(currentUser, intIds);            
-        }
-
-        private bool AuthorizeGroupAccess(IUser currentUser, params int[] groupIds)
-        {
-            var groups = GetUmbracoContext().Application.Services.UserService.GetAllUserGroups(groupIds);
-            var groupAliases = groups.Select(x => x.Alias).ToArray();
-            var userGroups = currentUser.Groups.Select(x => x.Alias).ToArray();
-            return userGroups.ContainsAll(groupAliases);
+            var authHelper = new UserGroupEditorAuthorizationHelper(
+                umbCtx.Application.Services.UserService,
+                umbCtx.Application.Services.ContentService,
+                umbCtx.Application.Services.MediaService,
+                umbCtx.Application.Services.EntityService);
+            return authHelper.AuthorizeGroupAccess(currentUser, intIds);         
         }
     }
 }
