@@ -269,6 +269,14 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
+            //Perform authorization here to see if the current user can actually save this user with the info being requested
+            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
+            var canSaveUser = authHelper.AuthorizeActions(Security.CurrentUser, null, null, null, userSave.UserGroups);
+            if (canSaveUser == false)
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, canSaveUser.Result));
+            }
+
             //we want to create the user with the UserManager, this ensures the 'empty' (special) password
             //format is applied without us having to duplicate that logic
             var identityUser = BackOfficeIdentityUser.CreateNew(userSave.Email, userSave.Email, GlobalSettings.DefaultUILanguage);
@@ -346,6 +354,14 @@ namespace Umbraco.Web.Editors
             {
                 ModelState.AddModelError("Email", "A user with the email already exists");
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+            }
+
+            //Perform authorization here to see if the current user can actually save this user with the info being requested
+            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
+            var canSaveUser = authHelper.AuthorizeActions(Security.CurrentUser, user, null, null, userSave.UserGroups);
+            if (canSaveUser == false)
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, canSaveUser.Result));
             }
 
             if (user == null)
@@ -455,7 +471,7 @@ namespace Umbraco.Web.Editors
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
-            var canSaveUser = authHelper.AuthorizeActions(Security.CurrentUser, found, userSave);
+            var canSaveUser = authHelper.AuthorizeActions(Security.CurrentUser, found, userSave.StartContentIds, userSave.StartMediaIds, userSave.UserGroups);
             if (canSaveUser == false)
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, canSaveUser.Result));
@@ -672,40 +688,58 @@ namespace Umbraco.Web.Editors
             _entityService = entityService;
         }
 
-        public Attempt<string> AuthorizeActions(IUser currentUser, IUser savingUser, UserSave savingData)
+        /// <summary>
+        /// Checks if the current user has access to save the user data 
+        /// </summary>
+        /// <param name="currentUser">The current user trying to save user data</param>
+        /// <param name="savingUser">The user instance being saved (can be null if it's a new user)</param>
+        /// <param name="startContentIds">The start content ids of the user being saved (can be null or empty)</param>
+        /// <param name="startMediaIds">The start media ids of the user being saved (can be null or empty)</param>
+        /// <param name="userGroupAliases">The user aliases of the user being saved (can be null or empty)</param>
+        /// <returns></returns>
+        public Attempt<string> AuthorizeActions(IUser currentUser,
+            IUser savingUser,
+            IEnumerable<int> startContentIds, IEnumerable<int> startMediaIds,
+            IEnumerable<string> userGroupAliases)
         {
             // a) A non-admin cannot save an admin
 
-            var currentIsAdmin = currentUser.IsAdmin();
-            var savingIsAdmin = savingUser.IsAdmin();
-            if (currentIsAdmin == false && savingIsAdmin)
-                return Attempt.Fail("The current user is not an administrator");
+            if (savingUser != null)
+            {
+                var currentIsAdmin = currentUser.IsAdmin();
+                var savingIsAdmin = savingUser.IsAdmin();
+                if (currentIsAdmin == false && savingIsAdmin)
+                    return Attempt.Fail("The current user is not an administrator");
+            }
 
             // b0) A user cannot set a start node on another user that they don't have access to
 
-            var pathResult = AuthorizePath(currentUser, savingData.StartContentIds, savingData.StartMediaIds);
+            var pathResult = AuthorizePath(currentUser, startContentIds, startMediaIds);
             if (pathResult == false)
                 return pathResult;
 
-            var userGroups = _userService.GetUserGroupsByAlias(savingData.UserGroups.ToArray()).ToArray();
-
-            // b1) A user cannot assign a group to another user that grants them access to a start node they don't have access to
-            foreach (var group in userGroups)
+            if (userGroupAliases != null)
             {
-                pathResult = AuthorizePath(currentUser,
-                    group.StartContentId.HasValue ? new []{ group.StartContentId.Value } : null,
-                    group.StartMediaId.HasValue ? new[] { group.StartMediaId.Value } : null);
-                if (pathResult == false)
-                    return pathResult;
-            }
+                var userGroups = _userService.GetUserGroupsByAlias(userGroupAliases.ToArray()).ToArray();
 
-            // c) A user cannot set a section on another user that they don't have access to
-            var allGroupSections = userGroups.SelectMany(x => x.AllowedSections).Distinct();
-            var missingSectionAccess = allGroupSections.Except(currentUser.AllowedSections).ToArray();
-            if (missingSectionAccess.Length > 0)
-            {
-                return Attempt.Fail("The current user does not have access to sections " + string.Join(",", missingSectionAccess));
-            }
+                // b1) A user cannot assign a group to another user that grants them access to a start node they don't have access to
+                foreach (var group in userGroups)
+                {
+                    pathResult = AuthorizePath(currentUser,
+                        group.StartContentId.HasValue ? new[] { group.StartContentId.Value } : null,
+                        group.StartMediaId.HasValue ? new[] { group.StartMediaId.Value } : null);
+                    if (pathResult == false)
+                        return pathResult;
+                }
+
+                // c) A user cannot set a section on another user that they don't have access to
+                var allGroupSections = userGroups.SelectMany(x => x.AllowedSections).Distinct();
+                var missingSectionAccess = allGroupSections.Except(currentUser.AllowedSections).ToArray();
+                if (missingSectionAccess.Length > 0)
+                {
+                    return Attempt.Fail("The current user does not have access to sections " + string.Join(",", missingSectionAccess));
+                }
+            }            
 
             return Attempt<string>.Succeed();
         }
