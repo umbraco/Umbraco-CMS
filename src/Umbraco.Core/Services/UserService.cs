@@ -817,7 +817,9 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateUserGroupRepository(uow);
                 var query = Query<IUserGroup>.Builder.Where(x => aliases.SqlIn(x.Alias));
                 var contents = repository.GetByQuery(query);
-                return contents.ToArray();
+                return contents
+                    .WhereNotNull()
+                    .ToArray();
             }
         }
 

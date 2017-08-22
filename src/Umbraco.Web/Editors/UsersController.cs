@@ -453,11 +453,14 @@ namespace Umbraco.Web.Editors
             if (found == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            //TODO:
-            // a) A non-admin cannot save an admin
-            // b) A user cannot set a start node on another user that they don't have access to
-            // c) A user cannot set a section on another user that they don't have access to
-
+            //Perform authorization here to see if the current user can actually save this user with the info being requested
+            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
+            var canSaveUser = authHelper.AuthorizeActions(Security.CurrentUser, found, userSave);
+            if (canSaveUser == false)
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, canSaveUser.Result));
+            }
+            
             var hasErrors = false;
 
             var existing = Services.UserService.GetByEmail(userSave.Email);
@@ -651,48 +654,89 @@ namespace Umbraco.Web.Editors
             [DataMember(Name = "userStates")]
             public IDictionary<UserState, int> UserStates { get; set; }
         }
-
-        //internal class NonAdminAuthorizationFilterAttribute : ActionFilterAttribute
-        //{
-        //    public override void OnActionExecuting(HttpActionContext actionContext)
-        //    {
-        //        var contentItem = (ContentItemSave)actionContext.ActionArguments["userSave"];
-
-
-        //    }
-        //}
+        
     }
 
     internal class UserEditorAuthorizationHelper
     {
         private readonly IContentService _contentService;
         private readonly IMediaService _mediaService;
+        private readonly IUserService _userService;
         private readonly IEntityService _entityService;
 
-        public UserEditorAuthorizationHelper(IContentService contentService, IMediaService mediaService, IEntityService entityService)
+        public UserEditorAuthorizationHelper(IContentService contentService, IMediaService mediaService, IUserService userService, IEntityService entityService)
         {
             _contentService = contentService;
             _mediaService = mediaService;
+            _userService = userService;
             _entityService = entityService;
         }
 
-        public bool AuthorizeActions(IUser currentUser, IUser savingUser)
+        public Attempt<string> AuthorizeActions(IUser currentUser, IUser savingUser, UserSave savingData)
         {
             // a) A non-admin cannot save an admin
-            
+
             var currentIsAdmin = currentUser.IsAdmin();
             var savingIsAdmin = savingUser.IsAdmin();
             if (currentIsAdmin == false && savingIsAdmin)
-                return false;
+                return Attempt.Fail("The current user is not an administrator");
 
-            // b) A user cannot set a start node on another user that they don't have access to
+            // b0) A user cannot set a start node on another user that they don't have access to
 
-            //var startContent = _contentService.
-            //var currentHasContentAccess = currentUser.HasPathAccess()
+            var pathResult = AuthorizePath(currentUser, savingData.StartContentIds, savingData.StartMediaIds);
+            if (pathResult == false)
+                return pathResult;
+
+            var userGroups = _userService.GetUserGroupsByAlias(savingData.UserGroups.ToArray()).ToArray();
+
+            // b1) A user cannot assign a group to another user that grants them access to a start node they don't have access to
+            foreach (var group in userGroups)
+            {
+                pathResult = AuthorizePath(currentUser,
+                    group.StartContentId.HasValue ? new []{ group.StartContentId.Value } : null,
+                    group.StartMediaId.HasValue ? new[] { group.StartMediaId.Value } : null);
+                if (pathResult == false)
+                    return pathResult;
+            }
 
             // c) A user cannot set a section on another user that they don't have access to
+            var allGroupSections = userGroups.SelectMany(x => x.AllowedSections).Distinct();
+            var missingSectionAccess = allGroupSections.Except(currentUser.AllowedSections).ToArray();
+            if (missingSectionAccess.Length > 0)
+            {
+                return Attempt.Fail("The current user does not have access to sections " + string.Join(",", missingSectionAccess));
+            }
 
-            return true;
+            return Attempt<string>.Succeed();
+        }
+
+        private Attempt<string> AuthorizePath(IUser currentUser, IEnumerable<int> startContentIds, IEnumerable<int> startMediaIds)
+        {
+            if (startContentIds != null)
+            {
+                foreach (var contentId in startContentIds)
+                {
+                    var content = _contentService.GetById(contentId);
+                    if (content == null) continue;
+                    var hasAccess = currentUser.HasPathAccess(content, _entityService);
+                    if (hasAccess == false)
+                        return Attempt.Fail("The current user does not have access to the content path " + content.Path);
+                }
+            }
+
+            if (startMediaIds != null)
+            {
+                foreach (var mediaId in startMediaIds)
+                {
+                    var media = _mediaService.GetById(mediaId);
+                    if (media == null) continue;
+                    var hasAccess = currentUser.HasPathAccess(media, _entityService);
+                    if (hasAccess == false)
+                        return Attempt.Fail("The current user does not have access to the media path " + media.Path);
+                }                
+            }
+
+            return Attempt<string>.Succeed();
         }
     }
 }
