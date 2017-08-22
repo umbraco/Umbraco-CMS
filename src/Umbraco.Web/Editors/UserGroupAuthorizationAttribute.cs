@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.Editors
@@ -41,6 +42,11 @@ namespace Umbraco.Web.Editors
         protected override bool IsAuthorized(HttpActionContext actionContext)
         {
             var currentUser = GetUmbracoContext().Security.CurrentUser;
+
+            //admins can access any group
+            if (currentUser.IsAdmin())
+                return base.IsAuthorized(actionContext);
+
             var queryString = actionContext.Request
                 .GetQueryNameValuePairs();
 
