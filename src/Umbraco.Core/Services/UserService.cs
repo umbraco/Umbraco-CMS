@@ -155,7 +155,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
-                var result =  repository.Get(id);
+                var result = repository.Get(id);
                 return result;
             }
         }
@@ -201,7 +201,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
-                
+
                 try
                 {
                     return repository.GetByUsername(username, includeSecurityData: true);
@@ -315,10 +315,10 @@ namespace Umbraco.Core.Services
                 {
                     throw new ArgumentException("Cannot save user with empty name.");
                 }
-                
+
                 //Now we have to check for backwards compat hacks, we'll need to process any groups
                 //to save first before we update the user since these groups might be new groups.
-                var explicitUser = entity as User;                
+                var explicitUser = entity as User;
                 if (explicitUser != null && explicitUser.GroupsToSave.Count > 0)
                 {
                     var groupRepository = RepositoryFactory.CreateUserGroupRepository(uow);
@@ -556,6 +556,20 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection,
+            UserState[] userState = null,
+            string[] userGroups = null,
+            string filter = null)
+        {
+            IQuery<IUser> filterQuery = null;
+            if (filter.IsNullOrWhiteSpace() == false)
+            {
+                filterQuery = Query<IUser>.Builder.Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
+            }
+            return GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, userState, userGroups, null, filterQuery);
+        }
+
         /// <summary>
         /// Get paged users
         /// </summary>
@@ -574,11 +588,11 @@ namespace Umbraco.Core.Services
         /// <param name="filter"></param>
         /// <returns></returns>
         public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection,
-            UserState[] userState = null,
-            string[] includeUserGroups = null,
-            string[] excludeUserGroups = null,
-            string filter = "")
+        string orderBy, Direction orderDirection,
+        UserState[] userState = null,
+        string[] includeUserGroups = null,
+        string[] excludeUserGroups = null,
+        IQuery<IUser> filter = null)
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
@@ -619,14 +633,8 @@ namespace Umbraco.Core.Services
                         throw new IndexOutOfRangeException("The orderBy parameter " + orderBy + " is not valid");
                 }
 
-                IQuery<IUser> filterQuery = null;
-                if (filter.IsNullOrWhiteSpace() == false)
-                {
-                    filterQuery = Query<IUser>.Builder.Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
-                }
-
                 var repository = RepositoryFactory.CreateUserRepository(uow);
-                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, sort, orderDirection, includeUserGroups, excludeUserGroups, userState, filterQuery);
+                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, sort, orderDirection, includeUserGroups, excludeUserGroups, userState, filter);
             }
         }
 
@@ -811,7 +819,7 @@ namespace Umbraco.Core.Services
                             x => new EntityPermission(
                                 groupId,
                                 x,
-                                new[] {permission.ToString(CultureInfo.InvariantCulture)}))
+                                new[] { permission.ToString(CultureInfo.InvariantCulture) }))
                         .ToArray(), false));
             }
         }

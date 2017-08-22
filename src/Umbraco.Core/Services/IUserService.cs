@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
 {
@@ -37,7 +39,27 @@ namespace Umbraco.Core.Services
             UserState[] userState = null, 
             string[] includeUserGroups = null,
             string[] excludeUserGroups = null,
-            string filter = "");
+            IQuery<IUser> filter = null);
+
+        /// <summary>
+        /// Get paged users
+        /// </summary>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="userState"></param>
+        /// <param name="userGroups">
+        /// A filter to only include user that belong to these user groups
+        /// </param>        
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection,
+            UserState[] userState = null,
+            string[] userGroups = null,
+            string filter = null);
 
         /// <summary>
         /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method

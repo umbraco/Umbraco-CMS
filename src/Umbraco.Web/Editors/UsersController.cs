@@ -25,6 +25,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -224,9 +225,23 @@ namespace Umbraco.Web.Editors
                 excludeUserGroups = new[] {Constants.Security.AdminGroupAlias};
             }
 
+            var filterQuery = Query<IUser>.Builder;
+
+            //if the current user is not the administrator, then don't include this in the results.
+            var isAdminUser = Security.CurrentUser.Id == 0;
+            if (isAdminUser == false)
+            {
+                filterQuery.Where(x => x.Id != 0);
+            }
+
+            if (filter.IsNullOrWhiteSpace() == false)
+            {
+                filterQuery.Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
+            }
+
             long pageIndex = pageNumber - 1;
             long total;
-            var result = Services.UserService.GetAll(pageIndex, pageSize, out total, orderBy, orderDirection, userStates, userGroups, excludeUserGroups, filter);
+            var result = Services.UserService.GetAll(pageIndex, pageSize, out total, orderBy, orderDirection, userStates, userGroups, excludeUserGroups, filterQuery);
             
             var paged = new PagedUserResult(total, pageNumber, pageSize)
             {
