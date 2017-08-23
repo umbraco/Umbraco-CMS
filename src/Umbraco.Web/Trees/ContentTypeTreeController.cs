@@ -100,7 +100,13 @@ namespace Umbraco.Web.Trees
                     //can delete doc type
                     menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
                 }
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);    
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+
+                var menuItem = new MenuItem(
+                    "rename",
+                    Services.TextService.Localize(String.Format("actions/{0}", "rename"))
+                );
+                menu.Items.Add(menuItem);
             }
             else
             {

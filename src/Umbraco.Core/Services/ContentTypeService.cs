@@ -76,6 +76,31 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public Attempt<OperationStatus<EntityContainer, OperationStatusType>> RenameContentTypeContainer(int id, string name, int userId = 0)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DocumentTypeContainerGuid))
+            {
+                try
+                {
+                    var container = repo.Get(id);
+
+                    container.Name = name;
+
+                    repo.AddOrUpdate(container);
+                    uow.Commit();
+                    //TODO: Audit trail ? (yep, I'm sure, but there's nothing to duplicate ;) )
+
+                    return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
+                }
+                catch (Exception ex)
+                {
+                    return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(null, OperationStatusType.FailedExceptionThrown, evtMsgs), ex);
+                }
+            }
+        }
+
         public Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateMediaTypeContainer(int parentId, string name, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();

@@ -29,6 +29,7 @@ namespace Umbraco.Core.Services
         Attempt<string[]> ValidateComposition(IContentTypeComposition compo);
 
         Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateContentTypeContainer(int parentId, string name, int userId = 0);
+        Attempt<OperationStatus<EntityContainer, OperationStatusType>> RenameContentTypeContainer(int id, string name, int userId = 0);
         Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateMediaTypeContainer(int parentId, string name, int userId = 0);
         Attempt<OperationStatus> SaveContentTypeContainer(EntityContainer container, int userId = 0);
         Attempt<OperationStatus> SaveMediaTypeContainer(EntityContainer container, int userId = 0);
