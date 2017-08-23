@@ -163,6 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\CacheRefresherEventHandlerTests.cs" />
+    <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
     <Compile Include="Dependencies\NuGet.cs" />
     <Compile Include="CallContextTests.cs" />
     <Compile Include="Issues\U9560.cs" />
