@@ -7,9 +7,9 @@
         "notificationsService",
         "localizationService",
         function (scope, contentTypeResource, navigationService, notificationsService, localizationService) {
-            scope.strings = {
-                
-            }
+            var notificationHeader;
+            localizationService.localize("general_renamed")
+                .then(function(s) { notificationHeader = s; });
 
             scope.model = {
                 folderName: scope.currentNode.name 
@@ -19,12 +19,23 @@
 
                 contentTypeResource.renameContainer(scope.currentNode.id, scope.model.folderName)
                     .then(function() {
-                        
-                        notificationsService.showNotification({
-                            type: 0,
-                            header: "Renamed",
-                            message: scope.currentNode.name + " was renamed to " + scope.model.folderName
-                        });
+
+                        localizationService.localize("renamecontainer_folderWasRenamed",
+                                scope.currentNode.name,
+                                scope.model.folderName)
+                            .then(function(msg) {
+                                notificationsService.showNotification({
+                                    type: 0,
+                                    header: notificationHeader,
+                                    message: msg
+                                });
+                            });
+
+                        //notificationsService.showNotification({
+                        //    type: 0,
+                        //    header: notificationHeader,
+                        //    message: scope.currentNode.name + " was renamed to " + scope.model.folderName
+                        //});
 
                         navigationService.hideMenu();
 
