@@ -1586,6 +1586,8 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="user">
     <key alias="access">Access</key>
+    <key alias="accessHelp">Based on the assigned groups and start nodes, the user has access to the following nodes</key>
+    <key alias="assignAccess">Assign access</key>
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Category field</key>
     <key alias="createDate">User is created</key>

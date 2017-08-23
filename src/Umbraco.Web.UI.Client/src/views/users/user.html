@@ -73,7 +73,7 @@
                             </umb-box>
 
                             <umb-box>
-                                <umb-box-header title-key="user_access"></umb-box-header>
+                                <umb-box-header title-key="user_assignAccess"></umb-box-header>
                                 <umb-box-content class="block-form">
 
                                     <umb-control-group style="margin-bottom: 25px;" label="@general_groups" description="@user_groupsHelp" required="true">
@@ -154,6 +154,41 @@
                                             <localize key="general_add">Add</localize>
                                         </a>
 
+                                    </umb-control-group>
+
+                                </umb-box-content>
+                            </umb-box>
+
+                            <umb-box>
+                                <umb-box-header title-key="user_access" description-key="user_accessHelp"></umb-box-header>
+                                <umb-box-content class="block-form" style="padding-bottom: 0;">
+
+                                    <umb-control-group label="@sections_content">
+                                        <umb-node-preview
+                                            style="max-width: 100%;"
+                                            ng-repeat="node in vm.user.calculatedStartContentIds"
+                                            icon="node.icon"
+                                            name="node.name">
+                                        </umb-node-preview>
+                                        <umb-node-preview
+                                            ng-if="vm.user.calculatedStartContentIds.length === 0"
+                                            style="max-width: 100%;"
+                                            name="vm.labels.noStartNodes">
+                                        </umb-node-preview>
+                                    </umb-control-group>
+
+                                    <umb-control-group label="@sections_media">
+                                        <umb-node-preview
+                                            style="max-width: 100%;"
+                                            ng-repeat="node in vm.user.calculatedStartMediaIds"
+                                            icon="node.icon"
+                                            name="node.name">
+                                        </umb-node-preview>
+                                        <umb-node-preview
+                                            ng-if="vm.user.calculatedStartMediaIds.length === 0"
+                                            style="max-width: 100%;"
+                                            name="vm.labels.noStartNodes">
+                                        </umb-node-preview>
                                     </umb-control-group>
 
                                 </umb-box-content>
@@ -366,6 +401,8 @@
                     </div>
 
                 </div>
+
+                <pre>{{ vm.user | json }}</pre>
 
             </umb-editor-container>
 
