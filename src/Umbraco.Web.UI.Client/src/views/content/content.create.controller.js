@@ -19,6 +19,9 @@ function contentCreateController($scope,
       $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
     });
 
+    blueprintConfig = blueprintConfig || {};
+    blueprintConfig.contentTypes = blueprintConfig.contentTypes || {};
+
     $scope.selectContentType = true;
     $scope.selectBlueprint = false;
     $scope.allowBlank = blueprintConfig.allowBlank;
@@ -37,7 +40,7 @@ function contentCreateController($scope,
 
   function createOrSelectBlueprintIfAny(docType) {
     var blueprintIds = _.keys(docType.blueprints || {}),
-      currentConfig = blueprintConfig.contentTypes[docType.alias] || blueprintConfig;
+      currentConfig = angular.extend({}, blueprintConfig, blueprintConfig.contentTypes[docType.alias]);
 
     $scope.docType = docType;
     $scope.allowBlank = currentConfig.allowBlank;

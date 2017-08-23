@@ -120,22 +120,38 @@
           expect(scope.allowBlank).toBe(false);
         });
 
-      it("uses overridden configuration for document types",
+      it("uses overridden configuration for allowing blank content",
         function () {
           initialize({
             allowBlank: false,
             skipSelect: false,
             contentTypes: {
               "y": {
-                  allowBlank: true,
-                  skipSelect: false
+                  allowBlank: true
+              }  
+            }
+          });
+
+          scope.createOrSelectBlueprintIfAny(allowedTypes[1]);
+          expect(scope.allowBlank).toBe(true);
+        });
+
+      it("uses overridden configuration for skipping selection",
+        function () {
+          initialize({
+            allowBlank: false,
+            skipSelect: false,
+            contentTypes: {
+              "y": {
+                  skipSelect: true
               }  
             }
           });
 
           scope.createOrSelectBlueprintIfAny(allowedTypes[1]);
 
-          expect(scope.allowBlank).toBe(true);
+          expect(location.path).toHaveBeenCalledWith("/content/content/edit/1234");
+          expect(searcher.search).toHaveBeenCalledWith("doctype=y&create=true&blueprintId=1");
         });
 
     });
