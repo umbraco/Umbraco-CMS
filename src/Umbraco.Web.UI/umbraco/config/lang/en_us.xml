@@ -1588,9 +1588,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="access">Access</key>
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Category field</key>
+    <key alias="createDate">User is created</key>
     <key alias="changePassword">Change Your Password</key>
     <key alias="changePhoto">Change photo</key>
     <key alias="newPassword">New password</key>
+    <key alias="noLockouts">hasn't been locked out</key>
+    <key alias="noPasswordChange">The password hasn't been changed</key>
     <key alias="confirmNewPassword">Confirm new password</key>
     <key alias="changePasswordDescription">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
     <key alias="contentChannel">Content Channel</key>
@@ -1601,13 +1604,16 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="documentType">Document Type</key>
     <key alias="editors">Editor</key>
     <key alias="excerptField">Excerpt field</key>
+    <key alias="failedPasswordAttempts">Failed login attempts</key>
     <key alias="goToProfile">Go to user profile</key>
     <key alias="groupsHelp">Add groups to assign access and permissions</key>
     <key alias="inviteAnotherUser">Invite another user</key>
     <key alias="inviteUserHelp">Invite new users to give them access to Umbraco. An invite email will be sent to the user with information on how to log in to Umbraco.</key>
     <key alias="language">Language</key>
     <key alias="languageHelp">Set the language you will see in menus and dialogs</key>
+    <key alias="lastLockoutDate">Last lockout date</key>
     <key alias="lastLogin">Last login</key>
+    <key alias="lastPasswordChangeDate">Password is last changed</key>
     <key alias="loginname">Login</key>
     <key alias="mediastartnode">Media start node</key>
     <key alias="mediastartnodehelp">Limit the media library to a specific start node</key>
@@ -1643,6 +1649,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="startnodehelp">Limit the content tree to a specific start node</key>
     <key alias="startnodes">Content start nodes</key>
     <key alias="startnodeshelp">Limit the content tree to specific start nodes</key>
+    <key alias="updateDate">User is last updated</key>
     <key alias="userCreated">has been created</key>
     <key alias="userCreatedSuccessHelp">The new user has successfully been created. To log in to Umbraco use the password below.</key>
     <key alias="username">Name</key>

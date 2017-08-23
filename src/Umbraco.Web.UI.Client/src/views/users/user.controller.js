@@ -66,11 +66,7 @@
                 vm.user = user;
                 makeBreadcrumbs(vm.user);
                 setUserDisplayState();
-
-                // format dates to local
-                if(vm.user.lastLoginDate) {
-                    vm.user.formattedLastLogin = getLocalDate(vm.user.lastLoginDate, "MMMM Do YYYY, HH:mm");
-                }
+                formatDatesToLocal(vm.user);
 
                 vm.emailIsUsername = user.email === user.username;
 
@@ -89,18 +85,20 @@
         }
         
         function getLocalDate(date, format) {
-            var dateVal;
-            var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
-            var localOffset = new Date().getTimezoneOffset();
-            var serverTimeNeedsOffsetting = (-serverOffset !== localOffset);
+            if(date) {
+                var dateVal;
+                var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
+                var localOffset = new Date().getTimezoneOffset();
+                var serverTimeNeedsOffsetting = (-serverOffset !== localOffset);
 
-            if(serverTimeNeedsOffsetting) {
-                dateVal = dateHelper.convertToLocalMomentTime(date, serverOffset);
-            } else {
-                dateVal = moment(date, "YYYY-MM-DD HH:mm:ss");
+                if(serverTimeNeedsOffsetting) {
+                    dateVal = dateHelper.convertToLocalMomentTime(date, serverOffset);
+                } else {
+                    dateVal = moment(date, "YYYY-MM-DD HH:mm:ss");
+                }
+
+                return dateVal.format(format);
             }
-
-            return dateVal.format(format);
         }
 
         function toggleChangePassword() {
@@ -128,6 +126,7 @@
 
                 vm.user = saved;
                 setUserDisplayState();
+                formatDatesToLocal(vm.user);
 
                 vm.changePasswordModel.isChanging = false;
                 vm.page.saveButtonState = "success";
@@ -378,6 +377,14 @@
 
         function setUserDisplayState() {
             vm.user.userDisplayState = usersHelper.getUserStateFromValue(vm.user.userState);
+        }
+
+        function formatDatesToLocal(user) {
+            user.formattedLastLogin = getLocalDate(user.lastLoginDate, "MMMM Do YYYY, HH:mm");
+            user.formattedLastLockoutDate = getLocalDate(user.lastLockoutDate, "MMMM Do YYYY, HH:mm");
+            user.formattedCreateDate = getLocalDate(user.createDate, "MMMM Do YYYY, HH:mm");
+            user.formattedUpdateDate = getLocalDate(user.updateDate, "MMMM Do YYYY, HH:mm");
+            user.formattedLastPasswordChangeDate = getLocalDate(user.lastPasswordChangeDate, "MMMM Do YYYY, HH:mm");
         }
 
         init();
