@@ -24,6 +24,7 @@
           contentTypeResource: contentTypeResource
         };
         if (blueprintConfig) {
+          blueprintConfig.contentTypes = blueprintConfig.contentTypes || {};
           dependencies.blueprintConfig = blueprintConfig;
         }
         controller("Umbraco.Editors.Content.CreateController",
@@ -117,6 +118,24 @@
           });
 
           expect(scope.allowBlank).toBe(false);
+        });
+
+      it("uses overridden configuration for document types",
+        function () {
+          initialize({
+            allowBlank: false,
+            skipSelect: false,
+            contentTypes: {
+              "y": {
+                  allowBlank: true,
+                  skipSelect: false
+              }  
+            }
+          });
+
+          scope.createOrSelectBlueprintIfAny(allowedTypes[1]);
+
+          expect(scope.allowBlank).toBe(true);
         });
 
     });

@@ -36,10 +36,14 @@ function contentCreateController($scope,
   }
 
   function createOrSelectBlueprintIfAny(docType) {
-    var blueprintIds = _.keys(docType.blueprints || {});
+    var blueprintIds = _.keys(docType.blueprints || {}),
+      currentConfig = blueprintConfig.contentTypes[docType.alias] || blueprintConfig;
+
     $scope.docType = docType;
+    $scope.allowBlank = currentConfig.allowBlank;
+
     if (blueprintIds.length) {
-      if (blueprintConfig.skipSelect) {
+      if (currentConfig.skipSelect) {
         createFromBlueprint(blueprintIds[0]);
       } else {
         $scope.selectContentType = false;
@@ -68,5 +72,6 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CreateController",
 
 angular.module("umbraco").value("blueprintConfig", {
     skipSelect: false,
-    allowBlank: true
+    allowBlank: true,
+    contentTypes: {}
 });
