@@ -43,6 +43,9 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 var owinContext = request.GetOwinContext();
                 
                 var mockedUserService = Mock.Of<IUserService>();
+                var mockedContentService = Mock.Of<IContentService>();
+                var mockedMediaService = Mock.Of<IMediaService>();
+                var mockedEntityService = Mock.Of<IEntityService>();
 
                 var mockedMigrationService = new Mock<IMigrationEntryService>();
                 //set it up to return anything so that the app ctx is 'Configured'
@@ -50,6 +53,9 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 
                 var serviceContext = new ServiceContext(
                     userService: mockedUserService,
+                    contentService: mockedContentService,
+                    mediaService: mockedMediaService,
+                    entityService: mockedEntityService,
                     migrationEntryService: mockedMigrationService.Object,
                     localizedTextService:Mock.Of<ILocalizedTextService>(),
                     sectionService:Mock.Of<ISectionService>());
