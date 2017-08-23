@@ -632,20 +632,22 @@ ORDER BY colName";
             string[] includeUserGroups = null,
             string[] excludeUserGroups = null,
             UserState[] userState = null,
-            IQuery<IUser> filter = null)
+            IQuery<IUser> customFilter = null)
         {
             if (string.IsNullOrWhiteSpace(orderBy)) throw new ArgumentException("Value cannot be null or whitespace.", "orderBy");
 
 
             Sql filterSql = null;
-            if (filter != null
+            var customFilterWheres = customFilter != null ? customFilter.GetWhereClauses().ToArray() : null;
+            var hasCustomFilter = customFilterWheres != null && customFilterWheres.Length > 0;
+            if (hasCustomFilter
                 || (includeUserGroups != null && includeUserGroups.Length > 0) || (excludeUserGroups != null && excludeUserGroups.Length > 0)
                 || (userState != null && userState.Length > 0 && userState.Contains(UserState.All) == false))
                 filterSql = new Sql();
 
-            if (filter != null)
+            if (hasCustomFilter)
             {
-                foreach (var filterClause in filter.GetWhereClauses())
+                foreach (var filterClause in customFilterWheres)
                 {
                     filterSql.Append(string.Format("AND ({0})", filterClause.Item1), filterClause.Item2);
                 }

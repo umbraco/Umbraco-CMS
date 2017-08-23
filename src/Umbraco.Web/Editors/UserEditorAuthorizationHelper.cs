@@ -36,12 +36,14 @@ namespace Umbraco.Web.Editors
             IEnumerable<int> startContentIds, IEnumerable<int> startMediaIds,
             IEnumerable<string> userGroupAliases)
         {
+            var currentIsAdmin = currentUser.IsAdmin();
+
             // a) A non-admin cannot save an admin
 
             if (savingUser != null)
             {                
-                if (savingUser.IsAdmin())
-                    return Attempt.Fail("The current user is not an administrator");
+                if (savingUser.IsAdmin() && currentIsAdmin == false)
+                    return Attempt.Fail("The current user is not an administrator so cannot save another administrator");
             }
 
             // b) A user cannot set a start node on another user that they don't have access to, this even goes for admins
@@ -51,8 +53,7 @@ namespace Umbraco.Web.Editors
                 return pathResult;
             
             // c) an admin can manage any group or section access
-
-            var currentIsAdmin = currentUser.IsAdmin();
+            
             if (currentIsAdmin)
                 return Attempt<string>.Succeed();
 

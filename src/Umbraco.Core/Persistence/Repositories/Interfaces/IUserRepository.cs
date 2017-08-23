@@ -48,7 +48,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="pageSize"></param>
         /// <param name="totalRecords"></param>
         /// <param name="orderBy"></param>
-        /// <param name="filter"></param>
+        /// <param name="customFilter"></param>
         /// <param name="orderDirection"></param>
         /// <param name="includeUserGroups">
         /// A filter to only include user that belong to these user groups
@@ -63,7 +63,7 @@ namespace Umbraco.Core.Persistence.Repositories
             string[] includeUserGroups = null,
             string[] excludeUserGroups = null,
             UserState[] userState = null,
-            IQuery<IUser> filter = null);
+            IQuery<IUser> customFilter = null);
 
         /// <summary>
         /// Returns a user by username
