@@ -181,6 +181,8 @@
     <key alias="lastPublished">Документ опубликован</key>
     <key alias="noItemsToShow">Здесь еще нет элементов.</key>
     <key alias="listViewNoItems" version="7.1.5">В этом списке пока нет элементов.</key>
+    <key alias="listViewNoContent">Содержимое пока еще не добавлено</key>
+    <key alias="listViewNoMembers">Участники пока еще не добавлены</key>
     <key alias="mediaLinks">Ссылка на медиа-элементы</key>
     <key alias="mediatype">Тип медиа-контента</key>
     <key alias="membergroup">Группа участников</key>
