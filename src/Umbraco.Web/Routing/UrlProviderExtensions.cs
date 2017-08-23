@@ -78,7 +78,7 @@ namespace Umbraco.Web.Routing
                 {
                     urls.Add(ui.Text("content", "routeError", "(error)", umbracoContext.Security.CurrentUser));
                 }
-                else if (pcr.PublishedContent.Id != content.Id)
+                else if (pcr.IgnorePublishedContentCollisions == false && pcr.PublishedContent.Id != content.Id)
                 {
                     var o = pcr.PublishedContent;
                     string s;
