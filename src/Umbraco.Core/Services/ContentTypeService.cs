@@ -95,7 +95,6 @@ namespace Umbraco.Core.Services
 
                     repo.AddOrUpdate(container);
                     uow.Commit();
-                    //TODO: Audit trail ? (yep, I'm sure, but there's nothing to duplicate ;) )
 
                     return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
                 }
