@@ -18,7 +18,8 @@ namespace Umbraco.Core.Events
         {
             CanCancel = canCancel;
             Messages = messages;
-            AdditionalData = additionalData;
+            AdditionalData = new ReadOnlyDictionary<string, object>(additionalData);
+            EventState = new Dictionary<string, object>();
         }
 
         public CancellableEventArgs(bool canCancel, EventMessages eventMessages)
@@ -26,7 +27,8 @@ namespace Umbraco.Core.Events
             if (eventMessages == null) throw new ArgumentNullException("eventMessages");
             CanCancel = canCancel;
             Messages = eventMessages;
-            AdditionalData = new Dictionary<string, object>();
+            AdditionalData = new ReadOnlyDictionary<string, object>(new Dictionary<string, object>());
+            EventState = new Dictionary<string, object>();
         }
 
         public CancellableEventArgs(bool canCancel)
@@ -34,7 +36,8 @@ namespace Umbraco.Core.Events
 			CanCancel = canCancel;
             //create a standalone messages
             Messages = new EventMessages();
-            AdditionalData = new Dictionary<string, object>();
+            AdditionalData = new ReadOnlyDictionary<string, object>(new Dictionary<string, object>());
+		    EventState = new Dictionary<string, object>();
         }
 
         public CancellableEventArgs(EventMessages eventMessages)
@@ -92,12 +95,19 @@ namespace Umbraco.Core.Events
         public EventMessages Messages { get; private set; }
 
         /// <summary>
-        /// In some cases raised evens might need to contain additional arbitrary data which can be read by event subscribers
+        /// In some cases raised evens might need to contain additional arbitrary readonly data which can be read by event subscribers
         /// </summary>
         /// <remarks>
-        /// This also allows for storing stateful data between a start ("ing") event and a end ("ed") event for event handlers
+        /// This allows for a bit of flexibility in our event raising - it's not pretty but we need to maintain backwards compatibility 
+        /// so we cannot change the strongly typed nature for some events.
         /// </remarks>
-        public IDictionary<string, object> AdditionalData { get; private set; }
+        public ReadOnlyDictionary<string, object> AdditionalData { get; private set; }
+
+        /// <summary>
+        /// This can be used by event subscribers to store state in the event args so they easily deal with custom state data between a starting ("ing") 
+        /// event and an ending ("ed") event
+        /// </summary>
+        public IDictionary<string, object> EventState { get; private set; }
 
 	    public bool Equals(CancellableEventArgs other)
 	    {
