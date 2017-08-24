@@ -85,5 +85,10 @@ namespace Umbraco.Core.Models
         /// Gets the unique identifier of the published version, if any.
         /// </summary>
         Guid PublishedVersionGuid { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the content item is a blueprint.
+        /// </summary>
+        bool IsBlueprint { get; }
     }
 }

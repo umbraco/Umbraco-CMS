@@ -135,6 +135,9 @@ namespace Umbraco.Core
         /// <returns></returns>
         public static bool ContainsAll<TSource>(this IEnumerable<TSource> source, IEnumerable<TSource> other)
         {
+            if (source == null) throw new ArgumentNullException("source");
+            if (other == null) throw new ArgumentNullException("other");
+
             return other.Except(source).Any() == false;
         }
 

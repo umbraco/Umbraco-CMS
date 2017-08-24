@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// </summary>
     public abstract class PropertySetWrapped : IPropertySet
     {
-        protected readonly IPropertySet Content;
+        private readonly IPropertySet _content;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertySetWrapped"/> class
@@ -18,25 +18,25 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <param name="content">The content to wrap.</param>
         protected PropertySetWrapped(IPropertySet content)
         {
-            Content = content;
+            _content = content;
         }
 
         /// <summary>
         /// Gets the wrapped content.
         /// </summary>
         /// <returns>The wrapped content, that was passed as an argument to the constructor.</returns>
-        public IPropertySet Unwrap() => Content;
+        public IPropertySet Unwrap() => _content;
 
         /// <inheritdoc />
-        public PublishedContentType ContentType => Content.ContentType;
+        public PublishedContentType ContentType => _content.ContentType;
 
         /// <inheritdoc />
-        public Guid Key => Content.Key;
+        public Guid Key => _content.Key;
 
         /// <inheritdoc />
-        public IEnumerable<IPublishedProperty> Properties => Content.Properties;
+        public IEnumerable<IPublishedProperty> Properties => _content.Properties;
 
         /// <inheritdoc />
-        public IPublishedProperty GetProperty(string alias) => Content.GetProperty(alias);
+        public IPublishedProperty GetProperty(string alias) => _content.GetProperty(alias);
     }
 }

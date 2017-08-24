@@ -23,7 +23,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // in XML a decimal is a string
             if (source is string sourceString)
             {
-                return decimal.TryParse(sourceString, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out decimal d) ? d : 0M;
+                return decimal.TryParse(sourceString, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal d) ? d : 0M;
             }
 
             // in the database an a decimal is an a decimal

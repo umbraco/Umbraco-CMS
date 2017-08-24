@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Web.Compilation;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
@@ -285,6 +286,9 @@ namespace Umbraco.Core.Composing
 
         #region Cache
 
+        private const int ListFileOpenReadTimeout = 4000; // milliseconds
+        private const int ListFileOpenWriteTimeout = 2000; // milliseconds
+
         // internal for tests
         internal Attempt<IEnumerable<string>> TryGetCached(Type baseType, Type attributeType)
         {
@@ -327,7 +331,7 @@ namespace Umbraco.Core.Composing
             if (File.Exists(filePath) == false)
                 return cache;
 
-            using (var stream = File.OpenRead(filePath))
+            using (var stream = GetFileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, ListFileOpenReadTimeout))
             using (var reader = new StreamReader(stream))
             {
                 while (true)
@@ -382,7 +386,7 @@ namespace Umbraco.Core.Composing
         {
             var filePath = GeTypesListFilePath();
 
-            using (var stream = File.Open(filePath, FileMode.Create, FileAccess.ReadWrite))
+            using (var stream = GetFileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, ListFileOpenWriteTimeout))
             using (var writer = new StreamWriter(stream))
             {
                 foreach (var typeList in _types.Values)
@@ -421,6 +425,27 @@ namespace Umbraco.Core.Composing
                 File.Delete(path);
 
             _runtimeCache.ClearCacheItem(CacheKey);
+        }
+
+        private Stream GetFileStream(string path, FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int timeoutMilliseconds)
+        {
+            const int pauseMilliseconds = 250;
+            var attempts = timeoutMilliseconds / pauseMilliseconds;
+            while (true)
+            {
+                try
+                {
+                    return new FileStream(path, fileMode, fileAccess, fileShare);
+                }
+                catch
+                {
+                    if (--attempts == 0)
+                        throw;
+
+                    _logger.Logger.Debug<TypeLoader>($"Attempted to get filestream for file {path} failed, {attempts} attempts left, pausing for {pauseMilliseconds} milliseconds");
+                    Thread.Sleep(pauseMilliseconds);
+                }
+            }
         }
 
         #endregion

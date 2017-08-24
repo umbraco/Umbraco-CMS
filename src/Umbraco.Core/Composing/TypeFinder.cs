@@ -7,6 +7,7 @@ using System.Security;
 using System.Text;
 using System.Web;
 using System.Web.Compilation;
+using System.Web.Hosting;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
@@ -44,7 +45,7 @@ namespace Umbraco.Core.Composing
             HashSet<Assembly> assemblies = null;
             try
             {
-                var isHosted = HttpContext.Current != null;
+                var isHosted = HttpContext.Current != null || HostingEnvironment.IsHosted;
 
                 try
                 {
@@ -55,7 +56,7 @@ namespace Umbraco.Core.Composing
                 }
                 catch (InvalidOperationException e)
                 {
-                    if ((e.InnerException is SecurityException) == false)
+                    if (e.InnerException is SecurityException == false)
                         throw;
                 }
 

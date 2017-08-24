@@ -68,11 +68,21 @@ namespace Umbraco.Core
             /// Guid for a Document object.
             /// </summary>
             public const string Document = "C66BA18E-EAF3-4CFF-8A22-41B16D66A972";
-
+            
             /// <summary>
             /// Guid for a Document object.
             /// </summary>
             public static readonly Guid DocumentGuid = new Guid(Document);
+
+            /// <summary>
+            /// Guid for a Document Blueprint object.
+            /// </summary>
+            public const string DocumentBlueprint = "6EBEF410-03AA-48CF-A792-E1C1CB087ACA";
+
+            /// <summary>
+            /// Guid for a Document object.
+            /// </summary>
+            public static readonly Guid DocumentBlueprintGuid = new Guid(DocumentBlueprint);
 
             /// <summary>
             /// Guid for a Document Type object.
@@ -212,6 +222,16 @@ namespace Umbraco.Core
             /// Guid for a Forms DataSource.
             /// </summary>
             public static readonly Guid FormsDataSourceGuid = new Guid(FormsDataSource);
+
+            /// <summary>
+            /// Guid for a Language.
+            /// </summary>
+            public const string Language = "6B05D05B-EC78-49BE-A4E4-79E274F07A77";
+
+            /// <summary>
+            /// Guid for a Forms DataSource.
+            /// </summary>
+            public static readonly Guid LanguageGuid = new Guid(Language);
         }
     }
 }

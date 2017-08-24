@@ -21,7 +21,6 @@ namespace Umbraco.Core.Models
         private DateTime? _expireDate;
         private int _writer;
         private string _nodeName;//NOTE Once localization is introduced this will be the non-localized Node Name.
-        private bool _permissionsChanged;
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -82,7 +81,6 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
             public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.WriterId);
             public readonly PropertyInfo NodeNameSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.NodeName);
-            public readonly PropertyInfo PermissionsChangedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.PermissionsChanged);
         }
 
         /// <summary>
@@ -204,16 +202,6 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Used internally to track if permissions have been changed during the saving process for this entity
-        /// </summary>
-        [IgnoreDataMember]
-        internal bool PermissionsChanged
-        {
-            get { return _permissionsChanged; }
-            set { SetPropertyValueAndDetectChanges(value, ref _permissionsChanged, Ps.Value.PermissionsChangedSelector); }
-        }
-
-        /// <summary>
         /// Gets the ContentType used by this content object
         /// </summary>
         [IgnoreDataMember]
@@ -284,6 +272,9 @@ namespace Umbraco.Core.Models
 
         [IgnoreDataMember]
         internal DateTime PublishedDate { get; set; }
+
+        [DataMember]
+        public bool IsBlueprint { get; internal set; }
 
         public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
         {

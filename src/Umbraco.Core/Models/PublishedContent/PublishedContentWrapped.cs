@@ -20,7 +20,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// </summary>
     public abstract class PublishedContentWrapped : IPublishedContent
     {
-        protected readonly IPublishedContent Content;
+        private readonly IPublishedContent _content;
 
         /// <summary>
         /// Initialize a new instance of the <see cref="PublishedContentWrapped"/> class
@@ -29,85 +29,85 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <param name="content">The content to wrap.</param>
         protected PublishedContentWrapped(IPublishedContent content)
         {
-            Content = content;
+            _content = content;
         }
 
         /// <summary>
         /// Gets the wrapped content.
         /// </summary>
         /// <returns>The wrapped content, that was passed as an argument to the constructor.</returns>
-        public IPublishedContent Unwrap() => Content;
+        public IPublishedContent Unwrap() => _content;
 
         #region ContentType
 
-        public virtual PublishedContentType ContentType => Content.ContentType;
+        public virtual PublishedContentType ContentType => _content.ContentType;
 
         #endregion
 
         #region Content
 
-        public virtual int Id => Content.Id;
+        public virtual int Id => _content.Id;
 
-        public Guid Key => Content.Key;
+        public Guid Key => _content.Key;
 
-        public virtual int TemplateId => Content.TemplateId;
+        public virtual int TemplateId => _content.TemplateId;
 
-        public virtual int SortOrder => Content.SortOrder;
+        public virtual int SortOrder => _content.SortOrder;
 
-        public virtual string Name => Content.Name;
+        public virtual string Name => _content.Name;
 
-        public virtual string UrlName => Content.UrlName;
+        public virtual string UrlName => _content.UrlName;
 
-        public virtual string DocumentTypeAlias => Content.DocumentTypeAlias;
+        public virtual string DocumentTypeAlias => _content.DocumentTypeAlias;
 
-        public virtual int DocumentTypeId => Content.DocumentTypeId;
+        public virtual int DocumentTypeId => _content.DocumentTypeId;
 
-        public virtual string WriterName => Content.WriterName;
+        public virtual string WriterName => _content.WriterName;
 
-        public virtual string CreatorName => Content.CreatorName;
+        public virtual string CreatorName => _content.CreatorName;
 
-        public virtual int WriterId => Content.WriterId;
+        public virtual int WriterId => _content.WriterId;
 
-        public virtual int CreatorId => Content.CreatorId;
+        public virtual int CreatorId => _content.CreatorId;
 
-        public virtual string Path => Content.Path;
+        public virtual string Path => _content.Path;
 
-        public virtual DateTime CreateDate => Content.CreateDate;
+        public virtual DateTime CreateDate => _content.CreateDate;
 
-        public virtual DateTime UpdateDate => Content.UpdateDate;
+        public virtual DateTime UpdateDate => _content.UpdateDate;
 
-        public virtual Guid Version => Content.Version;
+        public virtual Guid Version => _content.Version;
 
-        public virtual int Level => Content.Level;
+        public virtual int Level => _content.Level;
 
-        public virtual string Url => Content.Url;
+        public virtual string Url => _content.Url;
 
-        public virtual PublishedItemType ItemType => Content.ItemType;
+        public virtual PublishedItemType ItemType => _content.ItemType;
 
-        public virtual bool IsDraft => Content.IsDraft;
+        public virtual bool IsDraft => _content.IsDraft;
 
         #endregion
 
         #region Tree
 
-        public virtual IPublishedContent Parent => Content.Parent;
+        public virtual IPublishedContent Parent => _content.Parent;
 
-        public virtual IEnumerable<IPublishedContent> Children => Content.Children;
+        public virtual IEnumerable<IPublishedContent> Children => _content.Children;
 
         #endregion
 
         #region Properties
 
-        public virtual IEnumerable<IPublishedProperty> Properties => Content.Properties;
+        public virtual IEnumerable<IPublishedProperty> Properties => _content.Properties;
 
         public virtual IPublishedProperty GetProperty(string alias)
         {
-            return Content.GetProperty(alias);
+            return _content.GetProperty(alias);
         }
 
         public virtual IPublishedProperty GetProperty(string alias, bool recurse)
         {
-            return Content.GetProperty(alias, recurse);
+            return _content.GetProperty(alias, recurse);
         }
 
         #endregion

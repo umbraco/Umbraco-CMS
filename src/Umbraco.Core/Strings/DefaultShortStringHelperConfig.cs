@@ -12,10 +12,12 @@ namespace Umbraco.Core.Strings
 
         public DefaultShortStringHelperConfig Clone()
         {
-            var config = new DefaultShortStringHelperConfig();
-            config.DefaultCulture = DefaultCulture;
-            config.ForceSafeAliases = ForceSafeAliases;
-            config.UrlReplaceCharacters = UrlReplaceCharacters;
+            var config = new DefaultShortStringHelperConfig
+            {
+                DefaultCulture = DefaultCulture,
+                ForceSafeAliases = ForceSafeAliases,
+                UrlReplaceCharacters = UrlReplaceCharacters
+            };
 
             foreach (var kvp1 in _configs)
             {
@@ -63,14 +65,19 @@ namespace Umbraco.Core.Strings
             UrlReplaceCharacters = umbracoSettings.RequestHandler.CharCollection
                 .Where(x => string.IsNullOrEmpty(x.Char) == false)
                 .ToDictionary(x => x.Char, x => x.Replacement);
-            var convertUrlsToAscii = umbracoSettings.RequestHandler.ConvertUrlsToAscii;
+
+            var urlSegmentConvertTo = CleanStringType.Utf8;
+            if (umbracoSettings.RequestHandler.ConvertUrlsToAscii)
+                urlSegmentConvertTo = CleanStringType.Ascii;
+            if (umbracoSettings.RequestHandler.TryConvertUrlsToAscii)
+                urlSegmentConvertTo = CleanStringType.TryAscii;
 
             return WithConfig(CleanStringType.UrlSegment, new Config
             {
                 PreFilter = ApplyUrlReplaceCharacters,
                 PostFilter = x => CutMaxLength(x, 240),
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
-                StringType = (convertUrlsToAscii ? CleanStringType.Ascii : CleanStringType.Utf8) | CleanStringType.LowerCase,
+                StringType = urlSegmentConvertTo | CleanStringType.LowerCase,
                 BreakTermsOnUpper = false,
                 Separator = '-'
             }).WithConfig(CleanStringType.FileName, new Config

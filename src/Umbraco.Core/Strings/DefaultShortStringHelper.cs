@@ -314,9 +314,20 @@ function validateSafeAlias(input, value, immediate, callback) {{
 
             // recode
             var codeType = stringType & CleanStringType.CodeMask;
-            text = codeType == CleanStringType.Ascii
-                ? Utf8ToAsciiConverter.ToAsciiString(text)
-                : RemoveSurrogatePairs(text);
+            switch (codeType)
+            {
+                case CleanStringType.Ascii:
+                    text = Utf8ToAsciiConverter.ToAsciiString(text);
+                    break;
+                case CleanStringType.TryAscii:
+                    const char ESC = (char) 27;
+                    var ctext = Utf8ToAsciiConverter.ToAsciiString(text, ESC);
+                    if (ctext.Contains(ESC) == false) text = ctext;
+                    break;
+                default:
+                    text = RemoveSurrogatePairs(text);
+                    break;
+            }
 
             // clean
             text = CleanCodeString(text, stringType, separator.Value, culture, config);
