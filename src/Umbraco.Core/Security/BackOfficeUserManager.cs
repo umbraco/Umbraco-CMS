@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,6 +35,19 @@ namespace Umbraco.Core.Security
         }
 
         #region Static Create methods
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the overload specifying all dependencies instead")]
+        public static BackOfficeUserManager Create(
+            IdentityFactoryOptions<BackOfficeUserManager> options,
+            IUserService userService,         
+            IExternalLoginService externalLoginService,
+            MembershipProviderBase membershipProvider)
+        {
+            return Create(options, userService,
+                ApplicationContext.Current.Services.EntityService,
+                externalLoginService, membershipProvider);
+        }
 
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager 

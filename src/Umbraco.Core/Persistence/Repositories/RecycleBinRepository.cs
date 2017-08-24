@@ -54,6 +54,9 @@ namespace Umbraco.Core.Persistence.Repositories
                     SELECT TB1.id FROM umbracoRedirectUrl as TB1
                     INNER JOIN umbracoNode as TB2 ON TB1.contentKey = TB2.uniqueId
                     WHERE TB2.trashed = '1' AND TB2.nodeObjectType = @NodeObjectType)",
+                FormatDeleteStatement("umbracoUserStartNode", "startNode"),
+                FormatUpdateStatement("umbracoUserGroup", "startContentId"),
+                FormatUpdateStatement("umbracoUserGroup", "startMediaId"),
                 FormatDeleteStatement("umbracoRelation", "parentId"),
                 FormatDeleteStatement("umbracoRelation", "childId"),
                 FormatDeleteStatement("cmsTagRelationship", "nodeId"),
@@ -105,6 +108,21 @@ namespace Umbraco.Core.Persistence.Repositories
             return
                 string.Format(
                     "DELETE FROM {0} WHERE {0}.{1} IN (SELECT id FROM umbracoNode WHERE trashed = '1' AND nodeObjectType = @NodeObjectType)",
+                    tableName, keyName);
+        }
+
+        /// <summary>
+        /// An update statement that will update a value to NULL in the table specified where its PK (keyName) is found in the
+        /// list of umbracoNode.id that have trashed flag set
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="keyName"></param>
+        /// <returns></returns>
+        private string FormatUpdateStatement(string tableName, string keyName)
+        {
+            return
+                string.Format(
+                    "UPDATE {0} SET {0}.{1} = NULL WHERE {0}.{1} IN (SELECT id FROM umbracoNode WHERE trashed = '1' AND nodeObjectType = @NodeObjectType)",
                     tableName, keyName);
         }
 

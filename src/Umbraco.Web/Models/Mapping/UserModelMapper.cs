@@ -228,13 +228,45 @@ namespace Umbraco.Web.Models.Mapping
                     display.AssignedPermissions = allAssignedPermissions;
                 });
 
+            //Important! Currently we are never mapping to multiple UserDisplay objects but if we start doing that
+            // this will cause an N+1 and we'll need to change how this works.
             config.CreateMap<IUser, UserDisplay>()
                 .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(applicationContext.Services.UserService, applicationContext.ApplicationCache.RuntimeCache)))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(detail => detail.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?) user.LastLoginDate))
                 .ForMember(detail => detail.UserGroups, opt => opt.MapFrom(user => user.Groups))
-                .ForMember(detail => detail.StartContentIds, opt => opt.UseValue(Enumerable.Empty<EntityBasic>()))
-                .ForMember(detail => detail.StartMediaIds, opt => opt.UseValue(Enumerable.Empty<EntityBasic>()))
+                .ForMember(
+                    detail => detail.CalculatedStartContentIds,
+                    opt => opt.MapFrom(user => GetStartNodeValues(
+                        user.CalculateContentStartNodeIds(applicationContext.Services.EntityService),
+                        applicationContext.Services.TextService,
+                        applicationContext.Services.EntityService,
+                        UmbracoObjectTypes.Document,
+                        "content/contentRoot")))
+                .ForMember(
+                    detail => detail.CalculatedStartMediaIds,
+                    opt => opt.MapFrom(user => GetStartNodeValues(
+                        user.CalculateMediaStartNodeIds(applicationContext.Services.EntityService),
+                        applicationContext.Services.TextService,
+                        applicationContext.Services.EntityService,
+                        UmbracoObjectTypes.Document,
+                        "media/mediaRoot")))
+                .ForMember(
+                    detail => detail.StartContentIds,
+                    opt => opt.MapFrom(user => GetStartNodeValues(
+                        user.StartContentIds.ToArray(),
+                        applicationContext.Services.TextService,
+                        applicationContext.Services.EntityService,
+                        UmbracoObjectTypes.Document,
+                        "content/contentRoot")))
+                .ForMember(
+                    detail => detail.StartMediaIds,
+                    opt => opt.MapFrom(user => GetStartNodeValues(
+                        user.StartMediaIds.ToArray(),
+                        applicationContext.Services.TextService,
+                        applicationContext.Services.EntityService,
+                        UmbracoObjectTypes.Media,
+                        "media/mediaRoot")))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))                
                 .ForMember(
                     detail => detail.AvailableCultures,
@@ -252,40 +284,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.ResetPasswordValue, opt => opt.Ignore())
                 .ForMember(detail => detail.Alias, opt => opt.Ignore())
                 .ForMember(detail => detail.Trashed, opt => opt.Ignore())
-                .ForMember(detail => detail.AdditionalData, opt => opt.Ignore())
-                .AfterMap((user, display) =>
-                {
-                    //Important! Currently we are never mapping to multiple UserDisplay objects but if we start doing that
-                    // this will cause an N+1 and we'll need to change how this works.
-
-                    var startContentIds = user.StartContentIds.ToArray();
-                    if (startContentIds.Length > 0)
-                    {
-                        //TODO: Update GetAll to be able to pass in a parameter like on the normal Get to NOT load in the entire object!
-                        var startNodes = new List<EntityBasic>();
-                        if (startContentIds.Contains(-1))
-                        {
-                            startNodes.Add(RootNode(applicationContext.Services.TextService.Localize("content/contentRoot")));
-                        }
-                        var contentItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, startContentIds);
-                        startNodes.AddRange(Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(contentItems));                        
-                        display.StartContentIds = startNodes;
-
-
-                    }
-                    var startMediaIds = user.StartMediaIds.ToArray();
-                    if (startMediaIds.Length > 0)
-                    {
-                        var startNodes = new List<EntityBasic>();
-                        if (startContentIds.Contains(-1))
-                        {
-                            startNodes.Add(RootNode(applicationContext.Services.TextService.Localize("media/mediaRoot")));
-                        }
-                        var mediaItems = applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Media, startMediaIds);
-                        startNodes.AddRange(Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(mediaItems));
-                        display.StartMediaIds = startNodes;
-                    }
-                });
+                .ForMember(detail => detail.AdditionalData, opt => opt.Ignore());
 
             config.CreateMap<IUser, UserBasic>()
                 //Loading in the user avatar's requires an external request if they don't have a local file avatar, this means that initial load of paging may incur a cost
@@ -365,6 +364,24 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
                 .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));
             
+        }
+
+        private IEnumerable<EntityBasic> GetStartNodeValues(int[] startNodeIds,
+            ILocalizedTextService textService, IEntityService entityService, UmbracoObjectTypes objectType,
+            string localizedKey)
+        {
+            if (startNodeIds.Length > 0)
+            {
+                var startNodes = new List<EntityBasic>();
+                if (startNodeIds.Contains(-1))
+                {
+                    startNodes.Add(RootNode(textService.Localize(localizedKey)));
+                }
+                var mediaItems = entityService.GetAll(objectType, startNodeIds);
+                startNodes.AddRange(Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(mediaItems));
+                return startNodes;
+            }
+            return Enumerable.Empty<EntityBasic>();
         }
 
         private void MapUserGroupBasic(ServiceContext services, dynamic group, UserGroupBasic display)

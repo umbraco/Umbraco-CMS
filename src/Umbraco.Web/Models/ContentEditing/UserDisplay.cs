@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Serialization;
@@ -38,6 +39,40 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "resetPasswordValue")]
         [ReadOnly(true)]
         public string ResetPasswordValue { get; set; }
-        
+
+        /// <summary>
+        /// A readonly value showing the user's current calculated start content ids
+        /// </summary>
+        [DataMember(Name = "calculatedStartContentIds")]
+        [ReadOnly(true)]
+        public IEnumerable<EntityBasic> CalculatedStartContentIds { get; set; }
+
+        /// <summary>
+        /// A readonly value showing the user's current calculated start media ids
+        /// </summary>
+        [DataMember(Name = "calculatedStartMediaIds")]
+        [ReadOnly(true)]
+        public IEnumerable<EntityBasic> CalculatedStartMediaIds { get; set; }
+
+        [DataMember(Name = "failedPasswordAttempts")]
+        [ReadOnly(true)]
+        public int FailedPasswordAttempts { get; set; }
+
+        [DataMember(Name = "lastLockoutDate")]
+        [ReadOnly(true)]
+        public DateTime LastLockoutDate { get; set; }
+
+        [DataMember(Name = "lastPasswordChangeDate")]
+        [ReadOnly(true)]
+        public DateTime LastPasswordChangeDate { get; set; }
+
+        [DataMember(Name = "createDate")]
+        [ReadOnly(true)]
+        public DateTime CreateDate { get; set; }
+
+        [DataMember(Name = "updateDate")]
+        [ReadOnly(true)]
+        public DateTime UpdateDate { get; set; }
+
     }
 }
