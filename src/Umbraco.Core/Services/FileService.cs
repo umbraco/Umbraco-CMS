@@ -564,16 +564,19 @@ namespace Umbraco.Core.Services
             {
                 var repository = RepositoryFactory.CreateTemplateRepository(uow);
 
-                if (uow.Events.DispatchCancelable(DeletingTemplate, this, new DeleteEventArgs<ITemplate>(template)))
+                var args = new DeleteEventArgs<ITemplate>(template);
+                
+                if (uow.Events.DispatchCancelable(DeletingTemplate, this, args))
                 {
                     uow.Commit();
                     return;
                 }
-
+                
                 repository.Delete(template);
 
-                uow.Events.Dispatch(DeletedTemplate, this, new DeleteEventArgs<ITemplate>(template, false));
-
+                args.CanCancel = false;
+                uow.Events.Dispatch(DeletedTemplate, this, args);
+                
                 Audit(uow, AuditType.Delete, "Delete Template performed by user", userId, template.Id);
                 uow.Commit();
             }
