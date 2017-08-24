@@ -114,7 +114,7 @@ namespace Umbraco.Core.Events
             get { return _moveInfoCollection; }
             set
             {
-                var first = _moveInfoCollection.FirstOrDefault();
+                var first = value.FirstOrDefault();
                 if (first == null)
                 {
                     throw new InvalidOperationException("MoveInfoCollection must have at least one item");
