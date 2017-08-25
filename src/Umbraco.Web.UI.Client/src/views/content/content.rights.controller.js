@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentRightsController($scope, contentResource, localizationService, angularHelper) {
+    function ContentRightsController($scope, $timeout, contentResource, localizationService, angularHelper) {
 
         var vm = this;
         var currentForm;
@@ -146,9 +146,12 @@
                 initData(userGroups);
 
                 // clear dirty state on the form so we don't see the discard changes notification
-                if(currentForm) {
-                  currentForm.$dirty = false;
-                }
+                // we use a timeout here because in some cases the initData reformats the userGroups model and triggers a change after the form state was changed
+                $timeout(function() {
+                  if(currentForm) {
+                    currentForm.$dirty = false;
+                  }
+                });
 
                 vm.saveState = "success";
                 vm.saveSuccces = true;
