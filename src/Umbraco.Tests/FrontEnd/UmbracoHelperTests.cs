@@ -95,37 +95,72 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public void Truncate_By_Words()
+        public void Truncate_By_Words_TagsAsContentOff()
         {
             var text = "Hello world, this is some text <a href='blah'>with a link</a>";
 
             var helper = new UmbracoHelper();
 
-            var result = helper.TruncateByWords(text, 4).ToString();
+            var result = helper.TruncateByWords(text, 4, true, false).ToString();
 
             Assert.AreEqual("Hello world, this is&hellip;", result);
         }
 
         [Test]
-        public void Truncate_By_Words_With_Tag()
+        public void Truncate_By_Words_With_Tag_TagsAsContentOff()
         {
             var text = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
 
             var helper = new UmbracoHelper();
 
-            var result = helper.TruncateByWords(text, 4).ToString();
+            var result = helper.TruncateByWords(text, 4, true, false).ToString();
 
             Assert.AreEqual("Hello world, <b>this</b> is&hellip;", result);
         }
 
         [Test]
-        public void Truncate_By_Words_Mid_Tag()
+        public void Truncate_By_Words_Mid_Tag_TagsAsContentOff()
         {
             var text = "Hello world, this is some text <a href='blah'>with a link</a>";
 
             var helper = new UmbracoHelper();
 
-            var result = helper.TruncateByWords(text, 7).ToString();
+            var result = helper.TruncateByWords(text, 7, true, false).ToString();
+
+            Assert.AreEqual("Hello world, this is some text <a href='blah'>with&hellip;</a>", result);
+        }
+        [Test]
+        public void Truncate_By_Words_TagsAsContentOn()
+        {
+            var text = "Hello world, this is some text <a href='blah'>with a link</a>";
+
+            var helper = new UmbracoHelper();
+
+            var result = helper.TruncateByWords(text, 4, true, true).ToString();
+
+            Assert.AreEqual("Hello world, this is&hellip;", result);
+        }
+
+        [Test]
+        public void Truncate_By_Words_With_Tag_TagsAsContentOn()
+        {
+            var text = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
+
+            var helper = new UmbracoHelper();
+
+            var result = helper.TruncateByWords(text, 4, true, true).ToString();
+
+            Assert.AreEqual("Hello world, <b>this</b> is&hellip;", result);
+        }
+
+        [Test]
+        public void Truncate_By_Words_Mid_Tag_TagsAsContentOn()
+        {
+            var text = "Hello world, this is some text <a href='blah'>with a link</a>";
+
+            var helper = new UmbracoHelper();
+
+            var result = helper.TruncateByWords(text, 7, true, true).ToString();
 
             Assert.AreEqual("Hello world, this is some text <a href='blah'>with&hellip;</a>", result);
         }

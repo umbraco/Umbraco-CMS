@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using HtmlAgilityPack;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web
 {
@@ -142,6 +143,10 @@ namespace Umbraco.Web
                                             {
                                                 string thisTag = tagStack.Pop();
                                                 outputtw.Write("</" + thisTag + ">");
+                                                if (treatTagsAsContent)
+                                                {
+                                                    currentTextLength++;
+                                                }
                                             }
                                             if (!isTagClose && currentTag.Length > 0)
                                             {
@@ -149,6 +154,10 @@ namespace Umbraco.Web
                                                 {
                                                     tagStack.Push(currentTag);
                                                     outputtw.Write("<" + currentTag);
+                                                    if (treatTagsAsContent)
+                                                    {
+                                                        currentTextLength++;
+                                                    }
                                                     if (!string.IsNullOrEmpty(tagContents))
                                                     {
                                                         if (tagContents.EndsWith("/"))
@@ -236,7 +245,14 @@ namespace Umbraco.Web
                     outputms.Position = 0;
                     using (TextReader outputtr = new StreamReader(outputms))
                     {
-                        return new HtmlString(outputtr.ReadToEnd().Replace("  ", " ").Trim());
+                        string result = String.Empty;
+
+                        string firsTrim = outputtr.ReadToEnd().Replace("  ", " ").Trim();
+                        
+                        //Check to see if there is an empty char between the hellip and the output string
+                        //if there is, remove it
+                        result = firsTrim[firsTrim.Length -9] == ' ' ? firsTrim.Remove(firsTrim.Length - 9, 1) : firsTrim;
+                        return new HtmlString(result);
                     }
                 }
             }
