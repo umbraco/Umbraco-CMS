@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms

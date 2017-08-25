@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Persistence;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 

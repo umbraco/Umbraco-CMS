@@ -1,10 +1,10 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
+    // fixme - remove in v8
     [Obsolete("Table no longer exists as of 7.6 - retained only to support migrations from previous versions")]
     [TableName("umbracoUserType")]
     [PrimaryKey("id")]

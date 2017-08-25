@@ -23,14 +23,14 @@ namespace Umbraco.Core.Models.Packaging
 
         public ActionRunAt RunAt
         {
-            get { return _runAt == ActionRunAt.Undefined ? ActionRunAt.Install : _runAt; }
-            set { _runAt = value; }
+            get => _runAt == ActionRunAt.Undefined ? ActionRunAt.Install : _runAt;
+            set => _runAt = value;
         }
 
         public bool Undo //NOTE: Should thid default to "False"? but the documentation says default "True" (http://our.umbraco.org/wiki/reference/packaging/package-actions)
         {
-            get { return _undo ?? true; }
-            set { _undo = value; }
+            get => _undo ?? true;
+            set => _undo = value;
         }
 
         public XElement XmlData { get; set; }

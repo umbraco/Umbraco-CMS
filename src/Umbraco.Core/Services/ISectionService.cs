@@ -11,7 +11,7 @@ namespace Umbraco.Core.Services
         IEnumerable<Section> GetSections();
 
         /// <summary>
-        /// Get the user's allowed sections
+        /// Get the user group's allowed sections
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>

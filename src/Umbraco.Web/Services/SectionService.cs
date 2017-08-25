@@ -34,13 +34,10 @@ namespace Umbraco.Web.Services
             IScopeUnitOfWorkProvider uowProvider,
             CacheHelper cache)
         {
-            if (applicationTreeService == null) throw new ArgumentNullException("applicationTreeService");
-            if (cache == null) throw new ArgumentNullException("cache");
-
+            _applicationTreeService = applicationTreeService ?? throw new ArgumentNullException(nameof(applicationTreeService));
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _userService = userService;
-            _applicationTreeService = applicationTreeService;
             _uowProvider = uowProvider;
-            _cache = cache;
             _allAvailableSections = new Lazy<IEnumerable<Section>>(() => new LazyEnumerableSections());
         }
 
@@ -61,7 +58,7 @@ namespace Umbraco.Web.Services
                 }
                 return _appConfig;
             }
-            set { _appConfig = value; }
+            set => _appConfig = value;
         }
 
         /// <summary>
@@ -177,7 +174,9 @@ namespace Umbraco.Web.Services
         /// <param name="icon">The application icon, which has to be located in umbraco/images/tray folder.</param>
         public void MakeNew(string name, string alias, string icon)
         {
-            MakeNew(name, alias, icon, GetSections().Max(x => x.SortOrder) + 1);
+            var sections = GetSections();
+            var nextSortOrder = sections.Any() ? sections.Max(x => x.SortOrder) + 1 : 1;
+            MakeNew(name, alias, icon, nextSortOrder);
         }
 
         /// <summary>
@@ -216,7 +215,7 @@ namespace Umbraco.Web.Services
                 //delete the assigned applications
                 using (var uow = _uowProvider.CreateUnitOfWork())
                 {
-                    uow.Database.Execute("delete from umbracoUser2App where app = @appAlias",
+                    uow.Database.Execute("delete from umbracoUserGroup2App where app = @appAlias",
                         new { appAlias = section.Alias });
                     uow.Complete();
                 }

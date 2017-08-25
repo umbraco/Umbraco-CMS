@@ -201,7 +201,7 @@ namespace Umbraco.Core.Security
         public static bool RenewUmbracoAuthTicket(this HttpContextBase http)
         {
             if (http == null) throw new ArgumentNullException("http");
-            http.Items["umbraco-force-auth"] = true;
+            http.Items[Constants.Security.ForceReAuthFlag] = true;
             return true;
         }
 
@@ -213,7 +213,7 @@ namespace Umbraco.Core.Security
         internal static bool RenewUmbracoAuthTicket(this HttpContext http)
         {
             if (http == null) throw new ArgumentNullException("http");
-            http.Items["umbraco-force-auth"] = true;
+            http.Items[Constants.Security.ForceReAuthFlag] = true;
             return true;
         }
 

@@ -228,6 +228,7 @@ namespace Umbraco.Core.Services
             var path = element.Attribute("path").Value;
             //TODO: Shouldn't we be using this value???
             var template = element.Attribute("template").Value;
+            var key = Guid.Empty;
 
             var properties = from property in element.Elements()
                              where property.Attribute("isDoc") == null
@@ -244,6 +245,12 @@ namespace Umbraco.Core.Services
                                        Level = int.Parse(level),
                                        SortOrder = int.Parse(sortOrder)
                                    };
+
+            if (element.Attribute("key") != null && Guid.TryParse(element.Attribute("key").Value, out key))
+            {
+                // update the Guid (for UDI support)
+                content.Key = key;
+            }
 
             using (var uow = _uowProvider.CreateUnitOfWork(readOnly: true))
             {
@@ -1914,12 +1921,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after a package is imported
         /// </summary>
-        internal static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<InstallationSummary>> ImportedPackage;
+        public static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<InstallationSummary>> ImportedPackage;
 
         /// <summary>
         /// Occurs after a package is uninstalled
         /// </summary>
-        internal static event TypedEventHandler<IPackagingService, UninstallPackageEventArgs<UninstallationSummary>> UninstalledPackage;
+        public static event TypedEventHandler<IPackagingService, UninstallPackageEventArgs<UninstallationSummary>> UninstalledPackage;
 
         #endregion
     }

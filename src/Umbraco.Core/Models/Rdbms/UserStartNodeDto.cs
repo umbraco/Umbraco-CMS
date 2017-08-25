@@ -1,11 +1,11 @@
 ﻿using System;
-using Umbraco.Core.Persistence;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
     [TableName("umbracoUserStartNode")]
-    [PrimaryKey("id", autoIncrement = true)]
+    [PrimaryKey("id", AutoIncrement = true)]
     [ExplicitColumns]
     internal class UserStartNodeDto : IEquatable<UserStartNodeDto>
     {
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Models.Rdbms
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((UserStartNodeDto) obj);
         }
 

@@ -157,6 +157,22 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Creates and persists a new <see cref="IMember"/>
+        /// </summary>
+        /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
+        /// <param name="username">Username of the <see cref="IMembershipUser"/> to create</param>
+        /// <param name="email">Email of the <see cref="IMembershipUser"/> to create</param>
+        /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
+        /// <param name="memberTypeAlias">Alias of the Type</param>
+        /// <param name="isApproved">Is the member approved</param>
+        /// <returns><see cref="IMember"/></returns>
+        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved)
+        {
+            var memberType = FindMemberTypeByAlias(memberTypeAlias);
+            return CreateMemberWithIdentity(username, email, username, passwordValue, memberType, isApproved);
+        }
+
+        /// <summary>
         /// Creates and persists a Member
         /// </summary>
         /// <remarks>Using this method will persist the Member object before its returned
@@ -165,8 +181,9 @@ namespace Umbraco.Core.Services
         /// <param name="email">Email of the Member to create</param>
         /// <param name="name">Name of the Member to create</param>
         /// <param name="memberTypeAlias">Alias of the MemberType the Member should be based on</param>
+        /// <param name="isApproved">Optional IsApproved of the Member to create</param>
         /// <returns><see cref="IMember"/></returns>
-        public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias)
+        public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias, bool isApproved = true)
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
@@ -177,7 +194,7 @@ namespace Umbraco.Core.Services
                 if (memberType == null)
                     throw new ArgumentException("No member type with that alias.", nameof(memberTypeAlias)); // causes rollback
 
-                var member = new Member(name, email.ToLower().Trim(), username, memberType);
+                var member = new Member(name, email.ToLower().Trim(), username, memberType, isApproved);
                 CreateMember(uow, member, 0, true);
 
                 uow.Complete();

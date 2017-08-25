@@ -1,6 +1,7 @@
 ﻿using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Security
 {
@@ -8,18 +9,33 @@ namespace Umbraco.Core.Security
     {
         public async Task SendAsync(IdentityMessage message)
         {
-            using (var client = new SmtpClient())
-            using (var mailMessage = new MailMessage())
+            var mailMessage = new MailMessage(
+                UmbracoConfig.For.UmbracoSettings().Content.NotificationEmailAddress,
+                message.Destination,
+                message.Subject,
+                message.Body)
             {
-                mailMessage.Body = message.Body;
-                mailMessage.To.Add(message.Destination);
-                mailMessage.Subject = message.Subject;
+                IsBodyHtml = message.Body.IsNullOrWhiteSpace() == false
+                             && message.Body.Contains("<") && message.Body.Contains("</")
+            };
 
-                //TODO: This check could be nicer but that is the way it is currently
-                mailMessage.IsBodyHtml = message.Body.IsNullOrWhiteSpace() == false
-                    && message.Body.Contains("<") && message.Body.Contains("</");
-
-                await client.SendMailAsync(mailMessage);
+            try
+            {
+                using (var client = new SmtpClient())
+                {
+                    if (client.DeliveryMethod == SmtpDeliveryMethod.Network)
+                    {
+                        await client.SendMailAsync(mailMessage);
+                    }
+                    else
+                    {
+                        client.Send(mailMessage);
+                    }
+                }
+            }
+            finally
+            {
+                mailMessage.Dispose();
             }
         }
     }

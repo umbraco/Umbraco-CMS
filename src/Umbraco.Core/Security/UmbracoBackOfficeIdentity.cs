@@ -48,12 +48,20 @@ namespace Umbraco.Core.Security
                 || realName == null || session == null)
                 throw new InvalidOperationException("Cannot create a " + typeof(UmbracoBackOfficeIdentity) + " from " + typeof(ClaimsIdentity) + " since there are missing required claims");
 
-            int startContentIdAsInt;
-            int startMediaIdAsInt;
-            if (int.TryParse(startContentId, out startContentIdAsInt) == false || int.TryParse(startMediaId, out startMediaIdAsInt) == false)
+            int[] startContentIdsAsInt;
+            int[] startMediaIdsAsInt;
+            if (startContentId.DetectIsJson() == false || startMediaId.DetectIsJson() == false)
+                throw new InvalidOperationException("Cannot create a " + typeof(UmbracoBackOfficeIdentity) + " from " + typeof(ClaimsIdentity) + " since the data is not formatted correctly - either content or media start Ids are not JSON");
+
+            try
             {
-                throw new InvalidOperationException("Cannot create a " + typeof(UmbracoBackOfficeIdentity) + " from " + typeof(ClaimsIdentity) + " since the data is not formatted correctly");
+                startContentIdsAsInt = JsonConvert.DeserializeObject<int[]>(startContentId);
+                startMediaIdsAsInt = JsonConvert.DeserializeObject<int[]>(startMediaId);
             }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException("Cannot create a " + typeof(UmbracoBackOfficeIdentity) + " from " + typeof(ClaimsIdentity) + " since the data is not formatted correctly - either content or media start Ids could not be parsed as JSON", e);
+            }           
 
             var roles = identity.FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToList();
             var allowedApps = identity.FindAll(x => x.Type == Constants.Security.AllowedApplicationsClaimType).Select(app => app.Value).ToList();
@@ -67,8 +75,8 @@ namespace Umbraco.Core.Security
                 Roles = roles.ToArray(),
                 Username = username,
                 RealName = realName,
-                StartContentNode = startContentIdAsInt,
-                StartMediaNode = startMediaIdAsInt
+                StartContentNodes = startContentIdsAsInt,
+                StartMediaNodes = startMediaIdsAsInt
             };
 
             return new UmbracoBackOfficeIdentity(identity, userData);
@@ -202,10 +210,10 @@ namespace Umbraco.Core.Security
                 AddClaim(new Claim(ClaimTypes.GivenName, UserData.RealName, ClaimValueTypes.String, Issuer, Issuer, this));
 
             if (HasClaim(x => x.Type == Constants.Security.StartContentNodeIdClaimType) == false)
-                AddClaim(new Claim(Constants.Security.StartContentNodeIdClaimType, StartContentNode.ToInvariantString(), ClaimValueTypes.Integer32, Issuer, Issuer, this));
+                AddClaim(new Claim(Constants.Security.StartContentNodeIdClaimType, JsonConvert.SerializeObject(StartContentNodes), ClaimValueTypes.Integer32, Issuer, Issuer, this));
 
             if (HasClaim(x => x.Type == Constants.Security.StartMediaNodeIdClaimType) == false)
-                AddClaim(new Claim(Constants.Security.StartMediaNodeIdClaimType, StartMediaNode.ToInvariantString(), ClaimValueTypes.Integer32, Issuer, Issuer, this));
+                AddClaim(new Claim(Constants.Security.StartMediaNodeIdClaimType, JsonConvert.SerializeObject(StartMediaNodes), ClaimValueTypes.Integer32, Issuer, Issuer, this));
 
             if (HasClaim(x => x.Type == ClaimTypes.Locality) == false)
                 AddClaim(new Claim(ClaimTypes.Locality, Culture, ClaimValueTypes.String, Issuer, Issuer, this));
@@ -259,14 +267,14 @@ namespace Umbraco.Core.Security
             get { return _currentIssuer; }
         }
 
-        public int StartContentNode
+        public int[] StartContentNodes
         {
-            get { return UserData.StartContentNode; }
+            get { return UserData.StartContentNodes; }
         }
 
-        public int StartMediaNode
+        public int[] StartMediaNodes
         {
-            get { return UserData.StartMediaNode; }
+            get { return UserData.StartMediaNodes; }
         }
 
         public string[] AllowedApplications

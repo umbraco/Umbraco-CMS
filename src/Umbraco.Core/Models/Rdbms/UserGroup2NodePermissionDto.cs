@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Persistence;
+﻿using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms

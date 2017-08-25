@@ -29,7 +29,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("userNoConsole")]
         [Constraint(Default = "0")]
         public bool NoConsole { get; set; }
-        
+
         [Column("userName")]
         public string UserName { get; set; }
 
@@ -109,7 +109,7 @@ namespace Umbraco.Core.Models.Rdbms
         public List<UserGroupDto> UserGroupDtos { get; set; }
 
         [ResultColumn]
-        // fixme - reference?
+        [Reference(ReferenceType.Many, ReferenceMemberName = "UserId")]
         public HashSet<UserStartNodeDto> UserStartNodeDtos { get; set; }
     }
 }
