@@ -24,18 +24,7 @@ function DictionaryDeleteController($scope, dictionaryResource, treeService, nav
     dictionaryResource.deleteById($scope.currentNode.id).then(function () {
       $scope.currentNode.loading = false;
       
-      treeService.removeNode($scope.currentNode);
-
-      //if the current edited item is the same one as we're deleting, we need to navigate elsewhere
-      if (editorState.current && editorState.current.id === $scope.currentNode.id) {
-
-        //If the deleted item lived at the root then just redirect back to the root, otherwise redirect to the item's parent
-        var location = "/settings";
-        if ($scope.currentNode.parentId.toString() !== "-1")
-          location = "/settings/current/edit/" + $scope.currentNode.parentId;
-
-        $location.path(location);
-      }
+      treeService.removeNode($scope.currentNode);      
 
       navigationService.hideMenu();
     });
