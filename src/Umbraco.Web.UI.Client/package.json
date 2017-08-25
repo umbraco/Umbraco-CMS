@@ -26,7 +26,10 @@
     "cssnano": "^3.7.6",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
+    "gulp-connect": "^5.0.0",
     "gulp-less": "^3.1.0",
+    "gulp-ngdocs": "^0.3.0",
+    "gulp-open": "^2.0.0",
     "gulp-postcss": "^6.2.0",
     "gulp-rename": "^1.2.2",
     "gulp-sort": "^2.0.0",
@@ -40,6 +43,7 @@
     "karma-jasmine": "^1.1.0",
     "karma-phantomjs-launcher": "^1.0.4",
     "lodash": "^4.16.3",
-    "merge-stream": "^1.0.1"
+    "merge-stream": "^1.0.1",
+    "run-sequence": "^2.1.0"
   }
 }

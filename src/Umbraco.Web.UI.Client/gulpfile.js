@@ -6,10 +6,12 @@ var sourcemaps = require('gulp-sourcemaps');
 var wrap = require("gulp-wrap-js");
 var sort = require('gulp-sort');
 var uglify = require('gulp-uglify');
+var connect = require('gulp-connect');
+var open = require('gulp-open');
+var runSequence = require('run-sequence');
 
 var _ = require('lodash');
 var MergeStream = require('merge-stream');
-
 
 //Less + css
 var postcss = require('gulp-postcss');
@@ -17,6 +19,8 @@ var less = require('gulp-less');
 var autoprefixer = require('autoprefixer');
 var cssnano = require('cssnano');
 
+// Documentation
+var gulpDocs = require('gulp-ngdocs');
 
 /***************************************************************
 Helper functions
@@ -280,4 +284,55 @@ gulp.task('watch', defaultTasks, function () {
     );
 
     return stream;    
+});
+
+/**************************
+ * Build Backoffice UI API documentation
+ **************************/
+gulp.task('docs', [], function (cb) {
+
+    var options = {
+        html5Mode: false,
+        startPage: '/api',
+        title: "Umbraco Backoffice UI API Documentation",
+        dest: 'docs/api',
+        styles: ['docs/umb-docs.css'],
+        image: "https://our.umbraco.org/assets/images/logo.svg"
+    }
+
+    return gulpDocs.sections({
+        api: {
+            glob: ['src/common/**/*.js', 'docs/src/api/**/*.ngdoc'],
+            api: true,
+            title: 'API Documentation'
+        }
+    })
+    .pipe(gulpDocs.process(options))
+    .pipe(gulp.dest('docs/api'));
+    cb();
+});
+
+gulp.task('connect:docs', function (cb) {
+    connect.server({
+        root: 'docs/api',
+        livereload: true,
+        fallback: 'docs/api/index.html',
+        port: 8880
+    });
+    cb();
+});
+
+gulp.task('open:docs', function (cb) {
+    
+    var options = {
+        uri: 'http://localhost:8880/index.html'
+    };
+
+    gulp.src(__filename)
+    .pipe(open(options));
+    cb();
+});
+
+gulp.task('docserve', function(cb) {
+    runSequence('docs', 'connect:docs', 'open:docs', cb);
 });
