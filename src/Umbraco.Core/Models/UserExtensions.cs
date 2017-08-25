@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
@@ -109,7 +110,7 @@ namespace Umbraco.Core.Models
             catch (CultureNotFoundException)
             {
                 //return the default one
-                return CultureInfo.GetCultureInfo("en");
+                return CultureInfo.GetCultureInfo(GlobalSettings.DefaultUILanguage);
             }
         }
 

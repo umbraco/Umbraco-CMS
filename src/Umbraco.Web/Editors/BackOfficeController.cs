@@ -161,7 +161,7 @@ namespace Umbraco.Web.Editors
                 ? Security.IsAuthenticated()
                     //current culture is set at the very beginning of each request
                     ? Thread.CurrentThread.CurrentCulture
-                    : CultureInfo.GetCultureInfo("en")
+                    : CultureInfo.GetCultureInfo(GlobalSettings.DefaultUILanguage)
                 : CultureInfo.GetCultureInfo(culture);
 
             var textForCulture = Services.TextService.GetAllStoredValues(cultureInfo)
