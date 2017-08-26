@@ -15,7 +15,7 @@
         ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:'name' | filter:searchTerm"
         ng-click="selectItem(availableItem)"
         class="-three-in-row">
-        <a class="umb-card-grid-item" href="" title="{{ availableItem.name }}">
+        <a class="umb-card-grid-item" href="" title="{{ availableItem.alias }}">
             <i class="{{ availableItem.icon }}"></i>
             {{ availableItem.name }}
         </a>
