@@ -23,6 +23,8 @@ namespace Umbraco.Core.Persistence.Repositories
         UmbracoObjectTypes GetObjectType(int id);
         UmbracoObjectTypes GetObjectType(Guid key);
 
+        IEnumerable<EntityPath> GetAllPaths(Guid objectTypeId, params int[] ids);
+        IEnumerable<EntityPath> GetAllPaths(Guid objectTypeId, params Guid[] keys);
 
         /// <summary>
         /// Gets paged results

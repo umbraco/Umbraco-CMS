@@ -54,7 +54,7 @@ namespace Umbraco.Core.Services
         /// Gets all content type aliases accross content, media and member types.
         /// </summary>
         /// <param name="guids">Optional object types guid to restrict to content, and/or media, and/or member types.</param>
-        /// <returns>All property type aliases.</returns>
+        /// <returns>All content type aliases.</returns>
         /// <remarks>Beware! Works accross content, media and member types.</remarks>
         public IEnumerable<string> GetAllContentTypeAliases(params Guid[] guids)
         {
@@ -66,5 +66,23 @@ namespace Umbraco.Core.Services
                 return repo.GetAllContentTypeAliases(guids);
             }
         }
+
+        /// <summary>
+        /// Gets all content type id for aliases accross content, media and member types.
+        /// </summary>
+        /// <param name="aliases">Aliases to look for.</param>
+        /// <returns>All content type ids.</returns>
+        /// <remarks>Beware! Works accross content, media and member types.</remarks>
+        public IEnumerable<int> GetAllContentTypeIds(string[] aliases)
+        {
+            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            {
+                // that one is special because it works accross content, media and member types
+                uow.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
+                var repo = uow.CreateRepository<IContentTypeRepository>();
+                return repo.GetAllContentTypeIds(aliases);
+            }
+        }
+
     }
 }

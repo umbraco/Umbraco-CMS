@@ -582,17 +582,27 @@
     <Compile Include="Models\MediaType.cs" />
     <Compile Include="Models\Member.cs" />
     <Compile Include="Models\MemberGroup.cs" />
+    <Compile Include="Models\Membership\ContentPermissionSet.cs" />
     <Compile Include="Models\Membership\EntityPermission.cs" />
+    <Compile Include="Models\Membership\EntityPermissionCollection.cs" />
     <Compile Include="Models\Membership\EntityPermissionSet.cs" />
     <Compile Include="Models\Membership\IMembershipUser.cs" />
     <Compile Include="Models\Membership\IProfile.cs" />
+    <Compile Include="Models\Membership\IReadOnlyUserGroup.cs" />
     <Compile Include="Models\Membership\IUser.cs" />
+    <Compile Include="Models\Membership\IUserGroup.cs" />
     <Compile Include="Models\Membership\IUserType.cs" />
     <Compile Include="Models\Membership\MemberCountType.cs" />
     <Compile Include="Models\Membership\MembershipScenario.cs" />
     <Compile Include="Models\Membership\MembershipUserExtensions.cs" />
+    <Compile Include="Models\Membership\ReadOnlyUserGroup.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
+    <Compile Include="Models\Membership\UmbracoMembershipUser.cs" />
     <Compile Include="Models\Membership\User.cs" />
+    <Compile Include="Models\Membership\UserGroup.cs" />
+    <Compile Include="Models\Membership\UserGroupExtensions.cs" />
+    <Compile Include="Models\Membership\UserProfile.cs" />
+    <Compile Include="Models\Membership\UserState.cs" />
     <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\MemberType.cs" />
     <Compile Include="Models\MemberTypePropertyProfileAccess.cs" />
@@ -691,10 +701,13 @@
     <Compile Include="Models\Rdbms\TaskDto.cs" />
     <Compile Include="Models\Rdbms\TaskTypeDto.cs" />
     <Compile Include="Models\Rdbms\TemplateDto.cs" />
-    <Compile Include="Models\Rdbms\User2AppDto.cs" />
     <Compile Include="Models\Rdbms\User2NodeNotifyDto.cs" />
-    <Compile Include="Models\Rdbms\User2NodePermissionDto.cs" />
+    <Compile Include="Models\Rdbms\User2UserGroupDto.cs" />
     <Compile Include="Models\Rdbms\UserDto.cs" />
+    <Compile Include="Models\Rdbms\UserGroup2AppDto.cs" />
+    <Compile Include="Models\Rdbms\UserGroup2NodePermissionDto.cs" />
+    <Compile Include="Models\Rdbms\UserGroupDto.cs" />
+    <Compile Include="Models\Rdbms\UserStartNodeDto.cs" />
     <Compile Include="Models\Rdbms\UserTypeDto.cs" />
     <Compile Include="Models\RedirectUrl.cs" />
     <Compile Include="Models\Relation.cs" />
@@ -798,7 +811,7 @@
     <Compile Include="Persistence\Factories\TemplateFactory.cs" />
     <Compile Include="Persistence\Factories\UmbracoEntityFactory.cs" />
     <Compile Include="Persistence\Factories\UserFactory.cs" />
-    <Compile Include="Persistence\Factories\UserTypeFactory.cs" />
+    <Compile Include="Persistence\Factories\UserGroupFactory.cs" />
     <Compile Include="Persistence\FaultHandling\ITransientErrorDetectionStrategy.cs" />
     <Compile Include="Persistence\FaultHandling\RetryingEventArgs.cs" />
     <Compile Include="Persistence\FaultHandling\RetryLimitExceededException.cs" />
@@ -824,6 +837,7 @@
     <Compile Include="Persistence\Mappers\DictionaryTranslationMapper.cs" />
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
     <Compile Include="Persistence\Mappers\DtoMapModel.cs" />
+    <Compile Include="Persistence\Mappers\ExternalLoginMapper.cs" />
     <Compile Include="Persistence\Mappers\IMapperCollection.cs" />
     <Compile Include="Persistence\Mappers\LanguageMapper.cs" />
     <Compile Include="Persistence\Mappers\MacroMapper.cs" />
@@ -847,6 +861,7 @@
     <Compile Include="Persistence\Mappers\TaskTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\TemplateMapper.cs" />
     <Compile Include="Persistence\Mappers\UmbracoEntityMapper.cs" />
+    <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
     <Compile Include="Persistence\Mappers\UserMapper.cs" />
     <Compile Include="Persistence\Mappers\UserSectionMapper.cs" />
     <Compile Include="Persistence\Mappers\UserTypeMapper.cs" />
@@ -1079,6 +1094,7 @@
     <Compile Include="Persistence\Querying\ValuePropertyMatchType.cs" />
     <Compile Include="Persistence\RecordPersistenceType.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
+    <Compile Include="Persistence\Repositories\ContentBlueprintRepository.cs" />
     <Compile Include="Persistence\Repositories\ContentRepository.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeRepositoryBase.cs" />
@@ -1285,17 +1301,23 @@
     <Compile Include="Security\BackOfficeUserManagerMarker.cs" />
     <Compile Include="Security\BackOfficeUserPasswordCheckerResult.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />
+    <Compile Include="Security\BackOfficeUserValidator.cs" />
     <Compile Include="Security\EmailService.cs" />
     <Compile Include="Security\IBackOfficeUserManagerMarker.cs" />
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
+    <Compile Include="Security\IMembershipProviderPasswordHasher.cs" />
     <Compile Include="Security\IUmbracoMemberTypeMembershipProvider.cs" />
+    <Compile Include="Security\IUserAwarePasswordHasher.cs" />
     <Compile Include="Security\IUsersMembershipProvider.cs" />
-    <Compile Include="Security\MembershipPasswordHasher.cs" />
+    <Compile Include="Security\MachineKeyGenerator.cs" />
     <Compile Include="Security\MembershipProviderBase.cs" />
     <Compile Include="Security\MembershipProviderExtensions.cs" />
+    <Compile Include="Security\MembershipProviderPasswordHasher.cs" />
+    <Compile Include="Security\MembershipProviderPasswordValidator.cs" />
     <Compile Include="Security\OwinExtensions.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
+    <Compile Include="Security\UserAwareMembershipProviderPasswordHasher.cs" />
     <Compile Include="Security\UserData.cs" />
     <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="Serialization\AbstractSerializationService.cs" />
@@ -1344,6 +1366,7 @@
     <Compile Include="Services\IContentTypeService.cs" />
     <Compile Include="Services\IContentTypeServiceBase.cs" />
     <Compile Include="Services\IDataTypeService.cs" />
+    <Compile Include="Services\IdkMap.cs" />
     <Compile Include="Services\IDomainService.cs" />
     <Compile Include="Services\IEntityService.cs" />
     <Compile Include="Services\IExternalLoginService.cs" />
@@ -1494,6 +1517,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="FileResources\BlockingWeb.config" />
+    <None Include="Models\Rdbms\UserDto.cs.orig" />
+    <None Include="Models\Rdbms\UserTypeDto.cs.orig" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -22,13 +22,15 @@ namespace Umbraco.Core.Services
     public class MediaService : ScopeRepositoryService, IMediaService, IMediaServiceOperations
     {
         private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IdkMap _idkMap;
 
         #region Constructors
 
-        public MediaService(IScopeUnitOfWorkProvider provider, MediaFileSystem mediaFileSystem, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        public MediaService(IScopeUnitOfWorkProvider provider, MediaFileSystem mediaFileSystem, ILogger logger, IEventMessagesFactory eventMessagesFactory, IdkMap idkMap)
             : base(provider, logger, eventMessagesFactory)
         {
             _mediaFileSystem = mediaFileSystem;
+            _idkMap = idkMap;
         }
 
         #endregion
@@ -330,13 +332,13 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia GetById(Guid key)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
-            {
-                uow.ReadLock(Constants.Locks.MediaTree);
-                var repository = uow.CreateRepository<IMediaRepository>();
-                var query = uow.Query<IMedia>().Where(x => x.Key == key);
-                return repository.GetByQuery(query).SingleOrDefault();
-            }
+            // the repository implements a cache policy on int identifiers, not guids,
+            // and we are not changing it now, but we still would like to rely on caching
+            // instead of running a full query against the database, so relying on the
+            // id-key map, which is fast.
+
+            var a = _idkMap.GetIdForKey(key, UmbracoObjectTypes.Media);
+            return a.Success ? GetById(a.Result) : null;
         }
 
         /// <summary>

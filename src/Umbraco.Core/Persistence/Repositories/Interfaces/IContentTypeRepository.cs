@@ -29,5 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </param>
         /// <returns></returns>
         IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes);
+
+        IEnumerable<int> GetAllContentTypeIds(string[] aliases);
     }
 }

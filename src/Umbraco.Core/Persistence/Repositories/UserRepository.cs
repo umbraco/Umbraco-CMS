@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Web.Security;
 using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -17,6 +18,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -28,14 +30,24 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IUserTypeRepository _userTypeRepository;
         private readonly CacheHelper _cacheHelper;
         private readonly IMapperCollection _mapperCollection;
+        private readonly IDictionary<string, string> _passwordConfig;
         private PermissionRepository<IContent> _permissionRepository;
 
-        public UserRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IUserTypeRepository userTypeRepository, IMapperCollection mapperCollection)
+        public UserRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IUserTypeRepository userTypeRepository, IMapperCollection mapperCollection, IDictionary<string, string> passwordConfig = null)
             : base(work, cacheHelper, logger)
         {
             _userTypeRepository = userTypeRepository;
             _mapperCollection = mapperCollection;
             _cacheHelper = cacheHelper;
+
+            if (passwordConfig == null)
+            {
+                var userMembershipProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
+                passwordConfig = userMembershipProvider == null || userMembershipProvider.PasswordFormat != MembershipPasswordFormat.Hashed
+                    ? null
+                    : new Dictionary<string, string> { { "hashAlgorithm", Membership.HashAlgorithmType } };
+            }
+            _passwordConfig = passwordConfig;
         }
 
         // note: is ok to 'new' the repo here as it's a sub-repo really

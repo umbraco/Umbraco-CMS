@@ -1252,7 +1252,7 @@ WHERE cmsContent.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", 
             var list = new List<string>
             {
                 "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
-                "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @Id",
                 "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
                 "DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @Id",
                 "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @Id",

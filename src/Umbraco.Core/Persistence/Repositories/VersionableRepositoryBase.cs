@@ -50,22 +50,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="id">Id of the <see cref="TEntity"/> to retrieve versions from</param>
         /// <returns>An enumerable list of the same <see cref="TEntity"/> object with different versions</returns>
-        public virtual IEnumerable<TEntity> GetAllVersions(int id)
-        {
-            var sql = Sql()
-                .SelectAll()
-                .From<ContentVersionDto>()
-                .InnerJoin<ContentDto>()
-                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                .Where<NodeDto>(x => x.NodeId == id)
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
-
-            var dtos = Database.Fetch<ContentVersionDto>(sql);
-            return dtos.Select(x => GetByVersion(x.VersionId));
-        }
+        public abstract IEnumerable<TEntity> GetAllVersions(int id);
 
         /// <summary>
         /// Gets a list of all version Ids for the given content item ordered so latest is first

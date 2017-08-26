@@ -137,6 +137,20 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.Fetch<string>(sql);
         }
 
+        public IEnumerable<int> GetAllContentTypeIds(string[] aliases)
+        {
+            if (aliases.Length == 0) return Enumerable.Empty<int>();
+
+            var sql = Sql()
+                .Select("cmsContentType.nodeId")
+                .From<ContentTypeDto>()
+                .InnerJoin<NodeDto>()
+                .On<ContentTypeDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
+                .Where<ContentTypeDto>(dto => aliases.Contains(dto.Alias));
+
+            return Database.Fetch<int>(sql);
+        }
+
         protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             var sql = Sql();

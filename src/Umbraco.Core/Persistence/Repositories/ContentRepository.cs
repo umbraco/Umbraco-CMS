@@ -1,10 +1,10 @@
-﻿using System;
+﻿using NPoco;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Xml;
-using NPoco;
-using Umbraco.Core.IO;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -13,9 +13,6 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -32,17 +29,17 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly CacheHelper _cacheHelper;
         private PermissionRepository<IContent> _permissionRepository;
 
-        public ContentRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository /*, IContentSection contentSection*/)
-            : base(work, cacheHelper, logger /*, contentSection*/)
+        public ContentRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection settings)
+            : base(work, cacheHelper, logger)
         {
             _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
             _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _cacheHelper = cacheHelper;
 
-            _publishedQuery =  work.Query<IContent>().Where(x => x.Published);
+            _publishedQuery =  work.Query<IContent>().Where(x => x.Published); // fixme not used?
 
-            EnsureUniqueNaming = true;
+            EnsureUniqueNaming = settings.EnsureUniqueNaming;
         }
 
         protected override ContentRepository This => this;
@@ -51,7 +48,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         // note: is ok to 'new' the repo here as it's a sub-repo really
         private PermissionRepository<IContent> PermissionRepository => _permissionRepository
-            ?? (_permissionRepository = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper));
+            ?? (_permissionRepository = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, Logger));
 
         #region Overrides of RepositoryBase<IContent>
 
@@ -196,7 +193,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM umbracoRedirectUrl WHERE contentKey IN (SELECT uniqueID FROM umbracoNode WHERE id = @Id)",
                                "DELETE FROM cmsTask WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
-                               "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @Id",
                                "DELETE FROM umbracoRelation WHERE parentId = @Id",
                                "DELETE FROM umbracoRelation WHERE childId = @Id",
                                "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
@@ -213,11 +210,20 @@ namespace Umbraco.Core.Persistence.Repositories
             return list;
         }
 
-        protected override Guid NodeObjectTypeId => new Guid(Constants.ObjectTypes.Document);
+        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.DocumentGuid;
 
         #endregion
 
         #region Overrides of VersionableRepositoryBase<IContent>
+
+        public override IEnumerable<IContent> GetAllVersions(int id)
+        {
+            var sql = GetBaseQuery(false)
+                .Where(GetBaseWhereClause(), new { Id = id })
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+
+            return MapQueryDtos(Database.Fetch<DocumentDto>(sql), true);
+        }
 
         public override IContent GetByVersion(Guid versionId)
         {
@@ -344,24 +350,6 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.Path = nodeDto.Path;
             entity.SortOrder = sortOrder;
             entity.Level = level;
-
-            //Assign the same permissions to it as the parent node
-            // http://issues.umbraco.org/issue/U4-2161
-            var parentPermissions = PermissionRepository.GetPermissionsForEntity(entity.ParentId).ToArray();
-            //if there are parent permissions then assign them, otherwise leave null and permissions will become the
-            // user's default permissions.
-            if (parentPermissions.Any())
-            {
-                var userPermissions = (
-                    from perm in parentPermissions
-                    from p in perm.AssignedPermissions
-                    select new EntityPermissionSet.UserPermission(perm.UserId, p)).ToList();
-
-                PermissionRepository.ReplaceEntityPermissions(new EntityPermissionSet(entity.Id, userPermissions));
-                //flag the entity's permissions changed flag so we can track those changes.
-                //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
-                ((Content)entity).PermissionsChanged = true;
-            }
 
             //Create the Content specific data - cmsContent
             var contentDto = dto.ContentVersionDto.ContentDto;
@@ -506,9 +494,13 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 //In order to update the ContentVersion we need to retrieve its primary key id
                 var contentVerDto = Database.SingleOrDefault<ContentVersionDto>("WHERE VersionId = @Version", new { /*Version =*/ entity.Version });
-                contentVersionDto.Id = contentVerDto.Id;
 
-                Database.Update(contentVersionDto);
+                if (contentVerDto != null)
+                {
+                    contentVersionDto.Id = contentVerDto.Id;
+                    Database.Update(contentVersionDto);
+                }
+
                 Database.Update(dto);
             }
 
@@ -682,19 +674,28 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// Assigns a single permission to the current content item for the specified user ids
+        /// Assigns a single permission to the current content item for the specified group ids
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="permission"></param>
-        /// <param name="userIds"></param>
-        public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> userIds)
+        /// <param name="groupIds"></param>
+        public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> groupIds)
         {
-            PermissionRepository.AssignEntityPermission(entity, permission, userIds);
+            PermissionRepository.AssignEntityPermission(entity, permission, groupIds);
         }
 
-        public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
+        public EntityPermissionCollection GetPermissionsForEntity(int entityId)
         {
             return PermissionRepository.GetPermissionsForEntity(entityId);
+        }
+
+        /// <summary>
+        /// Used to add/update a permission for a content item
+        /// </summary>
+        /// <param name="permission"></param>
+        public void AddOrUpdatePermissions(ContentPermissionSet permission)
+        {
+            PermissionRepository.AddOrUpdate(permission);
         }
 
         /// <summary>

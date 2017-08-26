@@ -21,6 +21,9 @@ namespace Umbraco.Core.Composing.CompositionRoots
             // register the service context
             container.RegisterSingleton<ServiceContext>();
 
+            // register the special idk map
+            container.RegisterSingleton<IdkMap>();
+
             // register the services
             container.RegisterSingleton<IMigrationEntryService, MigrationEntryService>();
             container.RegisterSingleton<IPublicAccessService, PublicAccessService>();

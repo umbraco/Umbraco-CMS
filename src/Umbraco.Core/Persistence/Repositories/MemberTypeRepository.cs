@@ -185,7 +185,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
-            var l = (List<string>)base.GetDeleteClauses(); // we know it's a list
+            var l = (List<string>) base.GetDeleteClauses(); // we know it's a list
             l.Add("DELETE FROM cmsMemberType WHERE NodeId = @Id");
             l.Add("DELETE FROM cmsContentType WHERE nodeId = @Id");
             l.Add("DELETE FROM umbracoNode WHERE id = @Id");
