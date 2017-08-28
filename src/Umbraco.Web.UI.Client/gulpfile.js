@@ -22,6 +22,9 @@ var cssnano = require('cssnano');
 // Documentation
 var gulpDocs = require('gulp-ngdocs');
 
+// Testing
+var karmaServer = require('karma').Server;
+
 /***************************************************************
 Helper functions
 ***************************************************************/
@@ -335,4 +338,25 @@ gulp.task('open:docs', function (cb) {
 
 gulp.task('docserve', function(cb) {
     runSequence('docs', 'connect:docs', 'open:docs', cb);
+});
+
+/**************************
+ * Build tests
+ **************************/
+
+ // Karma test
+gulp.task('test:unit', function() {
+    new karmaServer({
+        configFile: __dirname + "/test/config/karma.conf.js",
+        keepalive: true 
+    })
+    .start();
+});
+
+gulp.task('test:e2e', function() {
+    new karmaServer({
+        configFile: __dirname + "/test/config/e2e.js",
+        keepalive: true 
+    })
+    .start();
 });
