@@ -342,6 +342,7 @@
     <Compile Include="Events\SupersedeEventAttribute.cs" />
     <Compile Include="Exceptions\ConnectionException.cs" />
     <Compile Include="HashCodeHelper.cs" />
+    <Compile Include="HashGenerator.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
     <Compile Include="Models\IUserControl.cs" />

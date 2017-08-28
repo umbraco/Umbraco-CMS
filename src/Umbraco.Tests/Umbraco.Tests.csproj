@@ -166,6 +166,7 @@
     <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
     <Compile Include="Dependencies\NuGet.cs" />
     <Compile Include="CallContextTests.cs" />
+    <Compile Include="HashGeneratorTests.cs" />
     <Compile Include="Issues\U9560.cs" />
     <Compile Include="Collections\OrderedHashSetTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
