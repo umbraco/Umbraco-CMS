@@ -9,6 +9,7 @@ var uglify = require('gulp-uglify');
 var connect = require('gulp-connect');
 var open = require('gulp-open');
 var runSequence = require('run-sequence');
+var gulpif = require('gulp-if');
 
 var _ = require('lodash');
 var MergeStream = require('merge-stream');
@@ -28,15 +29,15 @@ var karmaServer = require('karma').Server;
 /***************************************************************
 Helper functions
 ***************************************************************/
-function processJs(files, out) {
+function processJs(files, out, makeSourcemaps) {
     
     return gulp.src(files)
      .pipe(sort())
-     .pipe(sourcemaps.init())
+     .pipe(gulpif(makeSourcemaps, sourcemaps.init()))
      .pipe(concat(out))
      .pipe(wrap('(function(){\n%= body %\n})();'))
      .pipe(uglify({ mangle: false }))
-     .pipe(sourcemaps.write())
+     .pipe(gulpif(makeSourcemaps, sourcemaps.write()))
      .pipe(gulp.dest(root + targets.js));
 
      console.log(out + " compiled");
@@ -117,11 +118,23 @@ var targets = {
 
 
 /**************************
- * Runs the default tasks for the project to prepare backoffice files
+ * Main tasks for the project to prepare backoffice files
  **************************/
-var defaultTasks = ["dependencies","js", "less", "views"];
-gulp.task("default", defaultTasks);
 
+ // Build - build the files ready for production
+gulp.task('build', function(cb) {
+    runSequence(["dependencies", "js:production", "less", "views"], "test:unit", cb);
+});
+
+// Dev - build the files ready for development and start watchers
+gulp.task('dev', function(cb) {
+    runSequence(["dependencies", "js:development", "less", "views"], "watch", cb);
+});
+
+// Docserve - build and open the back office documentation
+gulp.task('docserve', function(cb) {
+    runSequence('docs', 'connect:docs', 'open:docs', cb);
+});
 
 /**************************
  * Task processes and copies all dependencies, either installed by bower, npm or stored locally in the project
@@ -195,7 +208,7 @@ gulp.task('dependencies', function () {
 /**************************
  * Copies all angular JS files into their seperate umbraco.*.js file
  **************************/
-gulp.task('js', function () { 
+gulp.task('js:production', function () { 
   
     //we run multiple streams, so merge them all together
     var stream = new MergeStream();
@@ -206,10 +219,27 @@ gulp.task('js', function () {
         );
 
      _.forEach(sources.js, function (group) {
-        stream.add (processJs(group.files, group.out) );
+        stream.add (processJs(group.files, group.out, false) );
      });
 
      return stream;
+});
+
+gulp.task('js:development', function () { 
+    
+    //we run multiple streams, so merge them all together
+    var stream = new MergeStream();
+
+    stream.add(
+        gulp.src(sources.globs.js)
+            .pipe(gulp.dest(root + targets.js))
+        );
+
+    _.forEach(sources.js, function (group) {
+        stream.add (processJs(group.files, group.out, true) );
+    });
+
+    return stream;
 });
 
 gulp.task('less', function () {
@@ -243,7 +273,7 @@ gulp.task('views', function () {
 });
 
 
-gulp.task('watch', defaultTasks, function () {
+gulp.task('watch', function () {
 
     var stream = new MergeStream();
 
@@ -286,7 +316,7 @@ gulp.task('watch', defaultTasks, function () {
         .pipe(gulp.dest(root + targets.js))
     );
 
-    return stream;    
+    return stream;
 });
 
 /**************************
@@ -336,10 +366,6 @@ gulp.task('open:docs', function (cb) {
     cb();
 });
 
-gulp.task('docserve', function(cb) {
-    runSequence('docs', 'connect:docs', 'open:docs', cb);
-});
-
 /**************************
  * Build tests
  **************************/
@@ -348,7 +374,7 @@ gulp.task('docserve', function(cb) {
 gulp.task('test:unit', function() {
     new karmaServer({
         configFile: __dirname + "/test/config/karma.conf.js",
-        keepalive: true 
+        keepalive: true
     })
     .start();
 });
@@ -356,7 +382,7 @@ gulp.task('test:unit', function() {
 gulp.task('test:e2e', function() {
     new karmaServer({
         configFile: __dirname + "/test/config/e2e.js",
-        keepalive: true 
+        keepalive: true
     })
     .start();
 });
