@@ -1,29 +1,35 @@
 (function () {
     "use strict";
 
-    function ContentRightsController($scope, contentResource, localizationService) {
+    function ContentRightsController($scope, $timeout, contentResource, localizationService, angularHelper) {
 
         var vm = this;
+        var currentForm;
 
         vm.availableUserGroups = [];
         vm.selectedUserGroups = [];
         vm.removedUserGroups = [];
         vm.viewState = "manageGroups";
         vm.labels = {};
-
+        vm.showNotification = false;
+        
         vm.setViewSate = setViewSate;
         vm.editPermissions = editPermissions;
         vm.setPermissions = setPermissions;
         vm.save = save;
         vm.removePermissions = removePermissions;
         vm.cancelManagePermissions = cancelManagePermissions;
+        vm.closeDialog = closeDialog;
+        vm.stay = stay;
 
         function onInit() {
             vm.loading = true;
             contentResource.getDetailedPermissions($scope.currentNode.id).then(function (userGroups) {
                 initData(userGroups);                
                 vm.loading = false;
+                currentForm = angularHelper.getCurrentForm($scope);
             });
+
         }
 
         /**
@@ -139,12 +145,35 @@
                 //re-assign model from server since it could have changed
                 initData(userGroups);
 
+                // clear dirty state on the form so we don't see the discard changes notification
+                // we use a timeout here because in some cases the initData reformats the userGroups model and triggers a change after the form state was changed
+                $timeout(function() {
+                  if(currentForm) {
+                    currentForm.$dirty = false;
+                  }
+                });
+
                 vm.saveState = "success";
                 vm.saveSuccces = true;
             }, function(error){
                 vm.saveState = "error";
                 vm.saveError = error;
             });
+        }
+
+        function stay() {
+          vm.showNotification = false;
+        }
+
+        function closeDialog() {
+
+          // check if form has been changed. If it has show discard changes notification
+          if (currentForm && currentForm.$dirty) {
+            vm.showNotification = true;
+          } else {
+            $scope.nav.hideDialog();
+          }
+          
         }
 
         onInit();
