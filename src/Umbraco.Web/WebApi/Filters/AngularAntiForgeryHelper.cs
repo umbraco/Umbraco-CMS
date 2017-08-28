@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Helpers;
 using Umbraco.Core;
@@ -29,8 +27,6 @@ namespace Umbraco.Web.WebApi.Filters
         /// The header name that angular uses to pass in the token to validate the cookie
         /// </summary>
         public const string AngularHeadername = "X-XSRF-TOKEN";
-
-        
 
         /// <summary>
         /// Returns 2 tokens - one for the cookie value and one that angular should set as the header value
@@ -68,8 +64,8 @@ namespace Umbraco.Web.WebApi.Filters
             return true;
         }
 
-        internal static bool ValidateHeaders(            
-            KeyValuePair<string, IEnumerable<string>>[] requestHeaders, 
+        internal static bool ValidateHeaders(
+            KeyValuePair<string, IEnumerable<string>>[] requestHeaders,
             string cookieToken,
             out string failedReason)
         {
@@ -86,7 +82,7 @@ namespace Umbraco.Web.WebApi.Filters
                 .Select(z => z.Value)
                 .SelectMany(z => z)
                 .FirstOrDefault();
-            
+
             // both header and cookie must be there
             if (cookieToken == null || headerToken == null)
             {
@@ -111,15 +107,41 @@ namespace Umbraco.Web.WebApi.Filters
         /// <returns></returns>
         public static bool ValidateHeaders(HttpRequestHeaders requestHeaders, out string failedReason)
         {
-            var cookieToken = requestHeaders
-                .GetCookies()
-                .Select(c => c[CsrfValidationCookieName])
-                .FirstOrDefault();
+            var cookieToken = GetCookie(requestHeaders, CsrfValidationCookieName);
 
             return ValidateHeaders(
                 requestHeaders.ToDictionary(x => x.Key, x => x.Value).ToArray(),
-                cookieToken == null ? null : cookieToken.Value,
+                cookieToken == null ? null : cookieToken,
                 out failedReason);
+        }
+
+        /// <summary>
+        /// Retrieves an individual cookie from the cookies collection
+        /// Adapted from: https://stackoverflow.com/a/29057304/5018
+        /// </summary>
+        /// <param name="requestHeaders"></param>
+        /// <param name="cookieName"></param>
+        /// <returns></returns>
+        private static string GetCookie(HttpRequestHeaders requestHeaders, string cookieName)
+        {
+            var cookieRequestHeader = requestHeaders.Where(h => h.Key.Equals("Cookie", StringComparison.InvariantCultureIgnoreCase)).ToArray();
+            if (cookieRequestHeader.Any() == false)
+                return null;
+
+            var cookiesHeader = cookieRequestHeader.FirstOrDefault();
+            if (cookiesHeader.Value == null)
+                return null;
+
+            var cookiesHeaderValue = cookiesHeader.Value.FirstOrDefault();
+            if (cookiesHeaderValue == null)
+                return null;
+
+            var cookieCollection = cookiesHeaderValue.Split(';');
+            var cookiePair = cookieCollection.FirstOrDefault(c => c.Trim().StartsWith(cookieName, StringComparison.InvariantCultureIgnoreCase));
+            if (cookiePair == null)
+                return null;
+
+            return cookiePair.Trim().Substring(cookieName.Length + 1);
         }
     }
 }
