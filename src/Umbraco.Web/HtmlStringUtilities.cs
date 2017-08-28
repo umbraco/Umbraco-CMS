@@ -266,15 +266,24 @@ namespace Umbraco.Web
         /// <returns></returns>
         public int WordsToLength(string html, int words, bool tagsAsContent)
         {
-            int wordCount = 0;
-            int length = 0;
-            int insideTagCounter = length;
-            int maxWords = words;
+            HtmlDocument doc = new HtmlDocument();
 
-            string strippedOfTags = Regex.Replace(html, "<.*?>", string.Empty).Trim();
+            int wordCount = 0,
+                length = 0,
+                insideTagCounter = length,
+                maxWords = words;
 
+            string strippedOfTags = string.Empty;
+
+            //If tagsAsContent is on, use the string stripped of html tags
             if (tagsAsContent == false)
             {
+                doc.LoadHtml(html);
+
+                foreach (var node in doc.DocumentNode.ChildNodes)
+                {
+                    strippedOfTags += node.InnerText;
+                }
                 html = strippedOfTags;
             }
 
