@@ -35,8 +35,40 @@ function dictionaryResource($q, $http, umbRequestHelper) {
       "Failed to delete item " + id);
   }
 
+  /**
+         * @ngdoc method
+         * @name umbraco.resources.dictionaryResource#create
+         * @methodOf umbraco.resources.dictionaryResource
+         *
+         * @description
+         * Creates a dictionary item with the gieven key and parent id
+         *
+         * ##usage
+         * <pre>
+         * dictionaryResource.create(1234,"Item key")
+         *    .then(function() {
+         *        alert('its created!');
+         *    });
+         * </pre>
+         *
+         * @param {Int} parentid the parentid of the new dictionary item
+         * @param {String} key the key of the new dictionary item
+         * @returns {Promise} resourcePromise object.
+         *
+  **/
+  function create(parentid, key) {
+    return umbRequestHelper.resourcePromise(
+      $http.post(
+        umbRequestHelper.getApiUrl(
+          "dictionaryApiBaseUrl",
+          "Create",
+          { parentId: parentid, key : key })),
+      "Failed to create item ");
+  }
+
   var resource = {
-    deleteById: deleteById
+    deleteById: deleteById,
+    create : create
   };
 
   return resource;
