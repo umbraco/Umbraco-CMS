@@ -59,24 +59,42 @@ namespace Umbraco.Web.Editors
 
             if (userGroupAliases != null)
             {
-                var userGroups = _userService.GetUserGroupsByAlias(userGroupAliases.ToArray()).ToArray();
+                var savingGroupAliases = userGroupAliases.ToArray();
 
-                // d) A user cannot assign a group to another user that grants them access to a start node they don't have access to
-                foreach (var group in userGroups)
-                {
-                    pathResult = AuthorizePath(currentUser,
-                        group.StartContentId.HasValue ? new[] { group.StartContentId.Value } : null,
-                        group.StartMediaId.HasValue ? new[] { group.StartMediaId.Value } : null);
-                    if (pathResult == false)
-                        return pathResult;
-                }
+                //only validate any groups that have changed.
+                //a non-admin user can remove groups and add groups that they have access to
+                //but they cannot add a group that they do not have access to or that grants them
+                //path or section access that they don't have access to.
 
-                // e) A user cannot set a section on another user that they don't have access to
-                var allGroupSections = userGroups.SelectMany(x => x.AllowedSections).Distinct();
-                var missingSectionAccess = allGroupSections.Except(currentUser.AllowedSections).ToArray();
-                if (missingSectionAccess.Length > 0)
+                var newGroups = savingUser == null
+                    ? savingGroupAliases
+                    : savingGroupAliases.Except(savingUser.Groups.Select(x => x.Alias)).ToArray();
+
+                var userGroupsChanged = savingUser != null && newGroups.Length > 0;
+
+                if (userGroupsChanged)
                 {
-                    return Attempt.Fail("The current user does not have access to sections " + string.Join(",", missingSectionAccess));
+                    var userGroups = _userService.GetUserGroupsByAlias(newGroups).ToArray();
+
+                    //TODO: pretty sure d + e can be done by just checking if the newGroups being added are groups that the current user is a member of
+
+                    // d) A user cannot assign a group to another user that grants them access to a start node they don't have access to
+                    foreach (var group in userGroups)
+                    {
+                        pathResult = AuthorizePath(currentUser,
+                            group.StartContentId.HasValue ? new[] { group.StartContentId.Value } : null,
+                            group.StartMediaId.HasValue ? new[] { group.StartMediaId.Value } : null);
+                        if (pathResult == false)
+                            return pathResult;
+                    }
+
+                    // e) A user cannot set a section on another user that they don't have access to
+                    var allGroupSections = userGroups.SelectMany(x => x.AllowedSections).Distinct();
+                    var missingSectionAccess = allGroupSections.Except(currentUser.AllowedSections).ToArray();
+                    if (missingSectionAccess.Length > 0)
+                    {
+                        return Attempt.Fail("The current user does not have access to sections " + string.Join(",", missingSectionAccess));
+                    }
                 }
             }            
 

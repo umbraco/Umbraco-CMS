@@ -32,6 +32,10 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "userType")]        
         public string UserType { get; set; }
 
+        [ReadOnly(true)]
+        [DataMember(Name = "userGroups")]
+        public string[] UserGroups { get; set; }
+
         /// <summary>
         /// Gets/sets the number of seconds for the user's auth ticket to expire
         /// </summary>

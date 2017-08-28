@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserGroupsController($scope, $timeout, $location, userGroupsResource, formHelper, localizationService) {
+    function UserGroupsController($scope, $timeout, $location, userService, userGroupsResource, formHelper, localizationService) {
 
         var vm = this;
 
@@ -14,14 +14,21 @@
         vm.selectUserGroup = selectUserGroup;
         vm.deleteUserGroups = deleteUserGroups;
 
+        var currentUser = null;
+
         function onInit() {
 
             vm.loading = true;
 
-            // Get usergroups
-            userGroupsResource.getUserGroups().then(function (userGroups) {
-                vm.userGroups = userGroups;
-                vm.loading = false;
+            userService.getCurrentUser().then(function(user) {
+                currentUser = user;
+                // Get usergroups
+                userGroupsResource.getUserGroups({ onlyCurrentUserGroups: false }).then(function (userGroups) {
+                    vm.userGroups = _.map(userGroups, function (ug) {
+                        return { group: ug, isMember: user.userGroups.indexOf(ug.alias) !== -1}  
+                    });
+                    vm.loading = false;
+                });
             });
 
         }
@@ -34,22 +41,31 @@
         }
 
         function clickUserGroup(userGroup) {
+
+            if (currentUser.userGroups.indexOf(userGroup.group.alias) === -1) {
+                return;
+            }
+
             if (vm.selection.length > 0) {
                 selectUserGroup(userGroup, vm.selection);
             } else {
-                goToUserGroup(userGroup.id);
+                goToUserGroup(userGroup.group.id);
             }
         }
 
         function selectUserGroup(userGroup, selection, event) {
 
+            if (currentUser.userGroups.indexOf(userGroup.group.alias) === -1) {
+                return;
+            }
+
             if (userGroup.selected) {
-                var index = selection.indexOf(userGroup.id);
+                var index = selection.indexOf(userGroup.group.id);
                 selection.splice(index, 1);
                 userGroup.selected = false;
             } else {
                 userGroup.selected = true;
-                vm.selection.push(userGroup.id);
+                vm.selection.push(userGroup.group.id);
             }
 
             if(event){

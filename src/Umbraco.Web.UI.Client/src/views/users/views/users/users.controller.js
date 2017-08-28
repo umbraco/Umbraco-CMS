@@ -106,7 +106,7 @@
             getUsers();
 
             // Get user groups
-            userGroupsResource.getUserGroups().then(function (userGroups) {
+            userGroupsResource.getUserGroups({ onlyCurrentUserGroups: false}).then(function (userGroups) {
                 vm.userGroups = userGroups;
             });
 
