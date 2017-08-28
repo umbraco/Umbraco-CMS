@@ -268,6 +268,7 @@ namespace Umbraco.Web
         {
             int wordCount = 0;
             int length = 0;
+            int insideTagCounter = length;
             int maxWords = words;
 
             string strippedOfTags = Regex.Replace(html, "<.*?>", string.Empty).Trim();
@@ -284,6 +285,18 @@ namespace Umbraco.Web
                 // Check if current char is part of a word
                 while (length < html.Length && char.IsWhiteSpace(html[length]) == false)
                 {
+                    //Check if we have a space inside a tag and increase the length if we do
+                    if (html[length].Equals('<') && html[length + 1].Equals('/') == false && tagsAsContent)
+                    {
+                        while (html[insideTagCounter].Equals('>') == false)
+                        {
+                            if (html[insideTagCounter].Equals(' '))
+                            {
+                                length++;
+                            }
+                            insideTagCounter++;
+                        }
+                    }
                     length++;
                 }
 
