@@ -107,11 +107,20 @@ namespace Umbraco.Web.Editors
             {
                 foreach (var contentId in startContentIds)
                 {
-                    var content = _contentService.GetById(contentId);
-                    if (content == null) continue;
-                    var hasAccess = currentUser.HasPathAccess(content, _entityService);
-                    if (hasAccess == false)
-                        return Attempt.Fail("The current user does not have access to the content path " + content.Path);
+                    if (contentId == Constants.System.Root)
+                    {
+                        var hasAccess = UserExtensions.HasPathAccess("-1", currentUser.CalculateContentStartNodeIds(_entityService), Constants.System.RecycleBinContent);
+                        if (hasAccess == false)
+                            return Attempt.Fail("The current user does not have access to the content root");
+                    }
+                    else
+                    {
+                        var content = _contentService.GetById(contentId);
+                        if (content == null) continue;
+                        var hasAccess = currentUser.HasPathAccess(content, _entityService);
+                        if (hasAccess == false)
+                            return Attempt.Fail("The current user does not have access to the content path " + content.Path);
+                    }
                 }
             }
 
@@ -119,11 +128,20 @@ namespace Umbraco.Web.Editors
             {
                 foreach (var mediaId in startMediaIds)
                 {
-                    var media = _mediaService.GetById(mediaId);
-                    if (media == null) continue;
-                    var hasAccess = currentUser.HasPathAccess(media, _entityService);
-                    if (hasAccess == false)
-                        return Attempt.Fail("The current user does not have access to the media path " + media.Path);
+                    if (mediaId == Constants.System.Root)
+                    {
+                        var hasAccess = UserExtensions.HasPathAccess("-1", currentUser.CalculateMediaStartNodeIds(_entityService), Constants.System.RecycleBinMedia);
+                        if (hasAccess == false)
+                            return Attempt.Fail("The current user does not have access to the media root");
+                    }
+                    else
+                    {
+                        var media = _mediaService.GetById(mediaId);
+                        if (media == null) continue;
+                        var hasAccess = currentUser.HasPathAccess(media, _entityService);
+                        if (hasAccess == false)
+                            return Attempt.Fail("The current user does not have access to the media path " + media.Path);
+                    }                    
                 }                
             }
 
