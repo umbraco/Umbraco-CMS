@@ -14,6 +14,8 @@ namespace Umbraco.Web.Editors
     using System.Net.Http;
     using System.Web.Http;
 
+    using Umbraco.Web.WebApi;
+
     /// <summary>
     /// The API controller used for editing dictionary items
     /// </summary>
@@ -44,6 +46,55 @@ namespace Umbraco.Web.Editors
             Services.LocalizationService.Delete(foundDictionary, Security.CurrentUser.Id);
 
             return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        /// <summary>
+        /// Creates a new dictoinairy item
+        /// </summary>
+        /// <param name="parentId">
+        /// The parent id.
+        /// </param>
+        /// <param name="key">
+        /// The key.
+        /// </param>
+        /// <returns>
+        /// The <see cref="HttpResponseMessage"/>.
+        /// </returns>
+        [HttpPost]
+        public HttpResponseMessage Create(int parentId, string key)
+        {
+            if (string.IsNullOrEmpty(key))
+            {
+                return this.Request.CreateNotificationValidationErrorResponse("Key can not be empty;"); // TODO translate
+            }
+
+            if (this.Services.LocalizationService.DictionaryItemExists(key))
+            {
+                return this.Request.CreateNotificationValidationErrorResponse("Key already exists"); // TODO translate
+            }
+
+            try
+            {
+                Guid? parentGuid = null;
+
+                if (parentId > 0)
+                {
+                    parentGuid = this.Services.LocalizationService.GetDictionaryItemById(parentId).Key;
+                }
+
+                var item = this.Services.LocalizationService.CreateDictionaryItemWithIdentity(
+                    key,
+                    parentGuid,
+                    string.Empty);
+
+
+                return this.Request.CreateResponse(HttpStatusCode.OK, item.Id);
+            }
+            catch (Exception exception)
+            {
+                this.Logger.Error(this.GetType(), "Error creating dictionary", exception);
+                return this.Request.CreateNotificationValidationErrorResponse("Error creating dictionary item");
+            }            
         }
     }
 }
