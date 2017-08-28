@@ -199,6 +199,7 @@
     <Compile Include="Web\Controllers\UsersControllerTests.cs" />
     <Compile Include="Dependencies\NuGet.cs" />
     <Compile Include="CallContextTests.cs" />
+    <Compile Include="HashGeneratorTests.cs" />
     <Compile Include="Issues\U9560.cs" />
     <Compile Include="Collections\OrderedHashSetTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
