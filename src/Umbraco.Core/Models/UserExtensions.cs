@@ -284,8 +284,6 @@ namespace Umbraco.Core.Models
             var usn = new List<int>();
             foreach (var sn in userSn)
             {
-                if (groupSn.Contains(sn)) continue; // ignore, already there
-
                 string snp;
                 if (paths.TryGetValue(sn, out snp) == false) continue; // ignore rogue node (no path)
 

@@ -14,30 +14,6 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class UserExtensionsTests
     {
-        [Test]
-        public void Determines_Path_Access_To_Content_Two_Groups()
-        {
-            var paths = new Dictionary<int, string>
-            {
-                { 1234, "-1,1234" }
-            };
-
-            var esmock = new Mock<IEntityService>();
-            esmock
-                .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns<UmbracoObjectTypes, int[]>(
-                    (type, ids) => paths.Where(x => ids.Contains(x.Key)).Select(x => new EntityPath { Id = x.Key, Path = x.Value }));
-
-            var combined = UserExtensions.CombineStartNodes(
-                UmbracoObjectTypes.Document,
-                new[] {1234, -1},
-                new[] {1234},
-                esmock.Object);
-
-            Assert.AreEqual(1, combined.Length);
-            Assert.AreEqual(1234, combined[0]);
-        }
-
         [TestCase(-1, "-1", "-1,1,2,3,4,5", true)] // below root start node
         [TestCase(2, "-1,1,2", "-1,1,2,3,4,5", true)] // below start node
         [TestCase(5, "-1,1,2,3,4,5", "-1,1,2,3,4,5", true)] // at start node
@@ -78,6 +54,9 @@ namespace Umbraco.Tests.Models
 
         [TestCase("3,8", "2,6", "3,2")] // exclude bin
         [TestCase("", "6", "")] // exclude bin
+
+        [TestCase("1,-1", "1", "1")] // was an issue
+        [TestCase("-1,1", "1", "1")] // was an issue
 
         public void CombineStartNodes(string groupSn, string userSn, string expected)
         {
