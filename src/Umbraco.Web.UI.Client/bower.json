@@ -40,7 +40,8 @@
     "ignore": [
       "font-awesome",
       "angular",
-      "bootstrap"
+      "bootstrap",
+      "codemirror"
     ],
     
     "sources": {

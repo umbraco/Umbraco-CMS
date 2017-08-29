@@ -149,31 +149,50 @@ gulp.task('dependencies', function () {
 
     //Tinymce
     stream.add(
-            gulp.src("./bower_components/tinymce/plugins/**")
-                .pipe(gulp.dest(root + targets.lib + "/tinymce/plugins/"))
-        );
+        gulp.src("./bower_components/tinymce/plugins/**")
+            .pipe(gulp.dest(root + targets.lib + "/tinymce/plugins/"))
+    );
 
     //font-awesome
     stream.add(
-            gulp.src("./bower_components/font-awesome/{fonts,css}/*")
-                .pipe(gulp.dest(root + targets.lib + "/font-awesome"))
-        );
+        gulp.src("./bower_components/font-awesome/{fonts,css}/*")
+            .pipe(gulp.dest(root + targets.lib + "/font-awesome"))
+    );
     
     // ace Editor
     stream.add(
-            gulp.src(["bower_components/ace-builds/src-min-noconflict/ace.js",
-        "bower_components/ace-builds/src-min-noconflict/ext-language_tools.js",
-        "bower_components/ace-builds/src-min-noconflict/ext-searchbox.js",
-        "bower_components/ace-builds/src-min-noconflict/ext-settings_menu.js",
-        "bower_components/ace-builds/src-min-noconflict/snippets/text.js",
-        "bower_components/ace-builds/src-min-noconflict/snippets/javascript.js",
-        "bower_components/ace-builds/src-min-noconflict/theme-chrome.js",
-        "bower_components/ace-builds/src-min-noconflict/mode-razor.js",
-        "bower_components/ace-builds/src-min-noconflict/mode-javascript.js",
-        "bower_components/ace-builds/src-min-noconflict/worker-javascript.js"],
-        {base: "./bower_components/ace-builds/"})
+        gulp.src(["bower_components/ace-builds/src-min-noconflict/ace.js",
+            "bower_components/ace-builds/src-min-noconflict/ext-language_tools.js",
+            "bower_components/ace-builds/src-min-noconflict/ext-searchbox.js",
+            "bower_components/ace-builds/src-min-noconflict/ext-settings_menu.js",
+            "bower_components/ace-builds/src-min-noconflict/snippets/text.js",
+            "bower_components/ace-builds/src-min-noconflict/snippets/javascript.js",
+            "bower_components/ace-builds/src-min-noconflict/theme-chrome.js",
+            "bower_components/ace-builds/src-min-noconflict/mode-razor.js",
+            "bower_components/ace-builds/src-min-noconflict/mode-javascript.js",
+            "bower_components/ace-builds/src-min-noconflict/worker-javascript.js"],
+            { base: "./bower_components/ace-builds/" })
             .pipe(gulp.dest(root + targets.lib + "/ace-builds"))
-        );
+    );
+
+    // code mirror
+    stream.add(
+        gulp.src([
+            "bower_components/codemirror/lib/codemirror.js",
+            "bower_components/codemirror/lib/codemirror.css",
+
+            "bower_components/codemirror/mode/css/*",
+            "bower_components/codemirror/mode/javascript/*",
+            "bower_components/codemirror/mode/xml/*",
+            "bower_components/codemirror/mode/htmlmixed/*",
+
+            "bower_components/codemirror/addon/search/*",
+            "bower_components/codemirror/addon/edit/*",
+            "bower_components/codemirror/addon/selection/*",
+            "bower_components/codemirror/addon/dialog/*"],
+            { base: "./bower_components/codemirror/" })
+            .pipe(gulp.dest(root + targets.lib + "/codemirror"))
+    );
 
     //copy over libs which are not on bower (/lib) and 
     //libraries that have been managed by bower-installer (/lib-bower)
