@@ -57,13 +57,13 @@ IF NOT [%npmPath%] == [] GOTO :build
     ECHO Change directory to %CD%\..\src\Umbraco.Web.UI.Client\
     CD %CD%\..\src\Umbraco.Web.UI.Client\
 
-    ECHO Do npm install and the grunt build of Belle
+    ECHO Do npm install and the gulp build of Belle
     call npm cache clean --quiet
 
     call npm install -g gulp-cli --quiet
     call npm install -g bower --quiet
     call npm install --quiet
-    call gulp --buildversion=%release%
+    call gulp build --buildversion=%release%
 
     ECHO Move back to the build folder
     CD "%buildFolder%"
