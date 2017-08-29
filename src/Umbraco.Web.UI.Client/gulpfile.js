@@ -276,6 +276,7 @@ gulp.task('views', function () {
 gulp.task('watch', function () {
 
     var stream = new MergeStream();
+    var watchInterval = 500;
 
     //Setup a watcher for all groups of javascript files
     _.forEach(sources.js, function (group) {
@@ -284,7 +285,7 @@ gulp.task('watch', function () {
 
             stream.add( 
 
-                watch(group.files, { ignoreInitial: true }, function (file) {
+                watch(group.files, { ignoreInitial: true, interval: watchInterval }, function (file) {
 
                     console.info(file.path + " has changed, added to:  " + group.out);
                     processJs(group.files, group.out);
@@ -299,20 +300,20 @@ gulp.task('watch', function () {
 
     stream.add( 
         //watch all less files and trigger the less task
-        watch(sources.globs.less, { ignoreInitial: true }, function () {
+        watch(sources.globs.less, { ignoreInitial: true, interval: watchInterval }, function () {
             gulp.run(['less']);
         })
     );
 
     //watch all views - copy single file changes
     stream.add( 
-        watch(sources.globs.views)
+        watch(sources.globs.views, { interval: watchInterval })
         .pipe(gulp.dest(root + targets.views))
     );
 
     //watch all app js files that will not be merged - copy single file changes
     stream.add( 
-        watch(sources.globs.js)
+        watch(sources.globs.js, { interval: watchInterval })
         .pipe(gulp.dest(root + targets.js))
     );
 
