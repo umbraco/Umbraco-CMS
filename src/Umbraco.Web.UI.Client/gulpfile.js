@@ -151,7 +151,9 @@ gulp.task('dependencies', function () {
 
     //font-awesome
     stream.add(
-        gulp.src("./bower_components/font-awesome/{fonts,css}/*")
+        gulp.src(["./bower_components/font-awesome/fonts/*",
+            "./bower_components/font-awesome/css/font-awesome.min.css"],
+            { base: "./bower_components/font-awesome/" })
             .pipe(gulp.dest(root + targets.lib + "/font-awesome"))
     );
     
