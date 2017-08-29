@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
@@ -12,7 +13,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="user"></param>
         /// <param name="textService"></param>
-        /// <returns></returns>      
+        /// <returns></returns>
         public static CultureInfo GetUserCulture(this IUser user, ILocalizedTextService textService)
         {
             if (user == null) throw new ArgumentNullException("user");
@@ -34,7 +35,7 @@ namespace Umbraco.Core.Models
             catch (CultureNotFoundException)
             {
                 //return the default one
-                return CultureInfo.GetCultureInfo("en");
+                return CultureInfo.GetCultureInfo(GlobalSettings.DefaultUILanguage);
             }
         }
 

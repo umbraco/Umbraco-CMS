@@ -248,6 +248,8 @@
     <key alias="copiedItemOfItems">item %0% van de %1% gekopieerd</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Link Titel</key>
+    <key alias="urlLinkPicker">Link</key>
     <key alias="anchorInsert">Naam</key>
     <key alias="assignDomain">Beheer domeinnamen</key>
     <key alias="closeThisWindow">Sluit dit venster</key>
@@ -1173,8 +1175,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="postContent">Invoegen na veld</key>
     <key alias="preContent">Invoegen voor veld</key>
     <key alias="recursive">Recursief</key>
-    <key alias="removeParagraph">Verwijder paragraaf tags</key>
-    <key alias="removeParagraphHelp"><![CDATA[Alle <P> tags aan het begin en einde van de tekst worden verwijderd]]></key>
     <key alias="standardFields">Standaard velden</key>
     <key alias="uppercase">Hoofdletters</key>
     <key alias="urlEncode">URL-encoderen</key>

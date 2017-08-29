@@ -218,15 +218,7 @@ AnotherContentFinder
             //ensure they are all found
             Assert.IsTrue(plugins.Result.ContainsAll(shouldContain));
         }
-
-        [Test]
-        public void PluginHash_From_String()
-        {
-            var s = "hello my name is someone".GetHashCode().ToString("x", CultureInfo.InvariantCulture);
-            var output = PluginManager.ConvertHashToInt64(s);
-            Assert.AreNotEqual(0, output);
-        }
-
+        
         [Test]
         public void Get_Plugins_Hash()
         {

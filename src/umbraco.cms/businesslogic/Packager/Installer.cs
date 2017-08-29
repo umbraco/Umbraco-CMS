@@ -381,14 +381,26 @@ namespace umbraco.cms.businesslogic.packager
 
                     //Perhaps it would have been a good idea to put the following into methods eh?!?
 
-                    #region DataTypes
-                    var dataTypeElement = rootElement.Descendants("DataTypes").FirstOrDefault();
-                    if (dataTypeElement != null)
+                    #region Stylesheets
+                    foreach (XmlNode n in Config.DocumentElement.SelectNodes("Stylesheets/Stylesheet"))
                     {
-                        var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement, currentUser.Id);
-                        foreach (var dataTypeDefinition in dataTypeDefinitions)
+                        StyleSheet s = StyleSheet.Import(n, currentUser);
+
+                        insPack.Data.Stylesheets.Add(s.Id.ToString(CultureInfo.InvariantCulture));
+                        //saveNeeded = true;
+                    }
+
+                    //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
+                    #endregion
+
+                    #region Templates
+                    var templateElement = rootElement.Descendants("Templates").FirstOrDefault();
+                    if (templateElement != null)
+                    {
+                        var templates = packagingService.ImportTemplates(templateElement, currentUser.Id);
+                        foreach (var template in templates)
                         {
-                            insPack.Data.DataTypes.Add(dataTypeDefinition.Id.ToString(CultureInfo.InvariantCulture));
+                            insPack.Data.Templates.Add(template.Id.ToString(CultureInfo.InvariantCulture));
                         }
                     }
                     #endregion
@@ -412,24 +424,24 @@ namespace umbraco.cms.businesslogic.packager
                     }
                     #endregion
 
+                    #region DataTypes
+                    var dataTypeElement = rootElement.Descendants("DataTypes").FirstOrDefault();
+                    if (dataTypeElement != null)
+                    {
+                        var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement, currentUser.Id);
+                        foreach (var dataTypeDefinition in dataTypeDefinitions)
+                        {
+                            insPack.Data.DataTypes.Add(dataTypeDefinition.Id.ToString(CultureInfo.InvariantCulture));
+                        }
+                    }
+                    #endregion
+
                     #region Macros
                     var macroItemsElement = rootElement.Descendants("Macros").FirstOrDefault();
                     if (macroItemsElement != null)
                     {
                         var insertedMacros = packagingService.ImportMacros(macroItemsElement);
                         insPack.Data.Macros.AddRange(insertedMacros.Select(m => m.Id.ToString(CultureInfo.InvariantCulture)));
-                    }
-                    #endregion
-
-                    #region Templates
-                    var templateElement = rootElement.Descendants("Templates").FirstOrDefault();
-                    if (templateElement != null)
-                    {
-                        var templates = packagingService.ImportTemplates(templateElement, currentUser.Id);
-                        foreach (var template in templates)
-                        {
-                            insPack.Data.Templates.Add(template.Id.ToString(CultureInfo.InvariantCulture));
-                        }
                     }
                     #endregion
 
@@ -449,18 +461,6 @@ namespace umbraco.cms.businesslogic.packager
                             //saveNeeded = true;
                         }
                     }
-                    #endregion
-
-                    #region Stylesheets
-                    foreach (XmlNode n in Config.DocumentElement.SelectNodes("Stylesheets/Stylesheet"))
-                    {
-                        StyleSheet s = StyleSheet.Import(n, currentUser);
-
-                        insPack.Data.Stylesheets.Add(s.Id.ToString(CultureInfo.InvariantCulture));
-                        //saveNeeded = true;
-                    }
-
-                    //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
                     #endregion
 
                     #region Documents

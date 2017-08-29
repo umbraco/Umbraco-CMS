@@ -162,6 +162,8 @@
     <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Titolo del Link</key>
+    <key alias="urlLinkPicker">Link</key>
     <key alias="anchorInsert">Nome</key>
     <key alias="assignDomain">Gestione alias Hostnames</key>
     <key alias="closeThisWindow">Chiudi questa finestra</key>
@@ -789,8 +791,6 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="postContent"><![CDATA[Inserisci dopo il campo]]></key>
     <key alias="preContent"><![CDATA[Inserisci prima il campo]]></key>
     <key alias="recursive">Ricorsivo</key>
-    <key alias="removeParagraph"><![CDATA[Rimuovi i tag paragrafo]]></key>
-    <key alias="removeParagraphHelp"><![CDATA[Rimuoverà &lt;P&gt; all'inizio e alla fine del testo]]></key>
     <key alias="standardFields">Campi Standard</key>
     <key alias="uppercase">Maiuscolo</key>
     <key alias="urlEncode"><![CDATA[Codifica URL]]></key>

@@ -231,6 +231,18 @@ namespace Umbraco.Core.Persistence
             return new PartialViewMacroRepository(uow, FileSystemProviderManager.Current.MacroPartialsFileSystem);
         }
 
+        [Obsolete("MacroScripts are obsolete - this is for backwards compatibility with upgraded sites.")]
+        internal virtual IPartialViewRepository CreateMacroScriptRepository(IUnitOfWork uow)
+        {
+            return new MacroScriptRepository(uow, FileSystemProviderManager.Current.MacroScriptsFileSystem);
+        }
+
+        [Obsolete("UserControls are obsolete - this is for backwards compatibility with upgraded sites.")]
+        internal virtual IUserControlRepository CreateUserControlRepository(IUnitOfWork uow)
+        {
+            return new UserControlRepository(uow, FileSystemProviderManager.Current.UserControlsFileSystem);
+        }
+
         public virtual IStylesheetRepository CreateStylesheetRepository(IUnitOfWork uow)
         {
             return new StylesheetRepository(uow, FileSystemProviderManager.Current.StylesheetsFileSystem);

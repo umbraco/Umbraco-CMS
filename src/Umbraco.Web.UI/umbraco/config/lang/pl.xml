@@ -45,7 +45,7 @@
     <key alias="permissionDenied">Brak odpowiednich uprawnień</key>
     <key alias="addNew">Dodaj nową domenę</key>
     <key alias="remove">Usuń domenę</key>
-    <key alias="invalidNode">Niepoprawny węzeł<./key>
+    <key alias="invalidNode">Niepoprawny węzeł.</key>
     <key alias="invalidDomain">Niepoprawny format domeny.</key>
     <key alias="duplicateDomain">Domena została już przydzielona.</key>
     <key alias="language">Język</key>
@@ -177,6 +177,8 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="target" version="7.0">Cel</key>
     <key alias="scheduledPublishServerTime">Oznacza to następującą godzinę na serwerze:</key>
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Co to oznacza?</a>]]></key>
+    <key alias="addTextBox">Dodaj kolejne pole tekstowe</key>
+    <key alias="removeTextBox">Usuń te pole tekstowe</key> 
   </area>
   <area alias="media">
     <key alias="clickToUpload">Kliknij, aby załadować plik</key>
@@ -304,6 +306,7 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="linkToPage">Link do strony</key>
     <key alias="openInNewWindow">Otwórz zlinkowany dokument w nowym oknie lub zakładce</key>
     <key alias="linkToMedia">Link do mediów</key>
+    <key alias="linkToFile">Link do plików</key>
     <key alias="selectMedia">Wybierz media</key>
     <key alias="selectIcon">Wybierz ikonę</key>
     <key alias="selectItem">Wybierz element</key>
@@ -323,6 +326,7 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="unLinkYour">Odlinkuj swój</key>
     <key alias="account">konto</key>
     <key alias="selectEditor">Wybierz edytora</key>
+    <key alias="selectSnippet">Wybierz snippet</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
@@ -380,6 +384,13 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="rteRelatedStylesheets">Powiązane arkusze stylów</key>
     <key alias="rteShowLabel">Pokaż etykietę</key>
     <key alias="rteWidthAndHeight">Szerokość i wysokość</key>
+    <key alias="allPropTypes">Wszystkie typy właściwości &amp; dane właściwości</key>
+    <key alias="willBeDeleted">używające tego typu danych zostaną usunięte na zawsze, potwierdź, że chcesz je także usunąć</key>
+    <key alias="yesDelete">Tak, usuń</key>
+    <key alias="andAllRelated">i wszystkie typy właściwości &amp; dane właściwości używające tego typu danych</key>
+    <key alias="selectFolder">Wybierz folder do przeniesienia</key>
+    <key alias="inTheTree">do w strukturze drzewa poniżej</key>
+    <key alias="wasMoved">został przeniesiony poniżej</key>
   </area>
   <area alias="errorHandling">
     <key alias="errorButDataWasSaved">Dane zostały zapisane, lecz wystąpiły błędy, które musisz poprawić przed publikacją strony:</key>
@@ -438,6 +449,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="closewindow">Zamknij okno</key>
     <key alias="comment">Komentarz</key>
     <key alias="confirm">Potwierdzenie</key>
+    <key alias="constrain">Zachowaj</key>
     <key alias="constrainProportions">Zachowaj proporcje</key>
     <key alias="continue">Kontynuuj</key>
     <key alias="copy">Kopiuj</key>
@@ -449,6 +461,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="deleted">Usunięto</key>
     <key alias="deleting">Usuwanie...</key>
     <key alias="design">Wygląd</key>
+    <key alias="dictionary">Słownik</key>
     <key alias="dimensions">Rozmiary</key>
     <key alias="down">Dół</key>
     <key alias="download">Pobierz</key>
@@ -458,6 +471,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="email">Email</key>
     <key alias="error">Błąd</key>
     <key alias="findDocument">Znajdź</key>
+    <key alias="first">Pierwszy</key>
     <key alias="height">Wysokość</key>
     <key alias="help">Pomoc</key>
     <key alias="icon">Ikona</key>
@@ -468,7 +482,8 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="invalid">Nieprawidłowe</key>
     <key alias="justify">Wyrównaj</key>
     <key alias="language">Język</key>
-    <key alias="layout">układ</key>
+    <key alias="last">Ostatni</key>
+    <key alias="layout">Układ</key>
     <key alias="loading">Ładowanie</key>
     <key alias="locked">Zablokowany</key>
     <key alias="login">Zaloguj</key>
@@ -495,9 +510,11 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="reciept">E-mail, aby otrzymywać dane z formularzy</key>
     <key alias="recycleBin">Kosz</key>
     <key alias="remaining">Pozostało</key>
+    <key alias="remove">Usuń</key>
     <key alias="rename">Zmień nazwę</key>
     <key alias="renew">Odnów</key>
     <key alias="required" version="7.0">Wymagany</key>
+    <key alias="retrieve">Odzyskaj</key>
     <key alias="retry">Ponów próbę</key>
     <key alias="rights">Uprawnienia</key>
     <key alias="search">Szukaj</key>
@@ -802,10 +819,43 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="notifications">Powiadomienie</key>
   </area>
   <area alias="packager">
-    <key alias="chooseLocalPackageText"><!CDATA[
+    <key alias="chooseLocalPackageText"><![CDATA[
       Wskaż pakiet z Twojego komputera, poprzez kliknięcie na przycisk "Przeglądaj"<br /> 
       i wskaż gdzie jest zapisany. Pakiety Umbraco przeważnie posiadają rozszerzenie ".umb" lub ".zip".
       ]]></key>
+    <key alias="dropHere">Upuść, aby załadować</key>
+    <key alias="orClickHereToUpload">lub kliknij tutaj, aby wybrać pliki</key>
+    <key alias="uploadPackage">Załaduj pakiet</key>
+    <key alias="localPackageDescription">Zainstaluj lokalny pakiet poprzez wybranie go ze swojego komputera. Instaluj jedynie te pakiety, z zaufanych i znanych Tobie źródeł</key>
+    <key alias="uploadAnother">Załaduj kolejny pakiet</key>
+    <key alias="cancelAndUploadAnother">Anuluj i załaduj kolejny pakiet</key>
+    <key alias="packageLicense">Licencja</key>
+    <key alias="accept">Zgadzam się</key>
+    <key alias="termsOfUse">zasady użytkowania</key>
+    <key alias="packageInstall">Zainstaluj pakiet</key>
+    <key alias="installFinish">Zakończ</key>
+    <key alias="installedPackages">Zainstalowane pakiety</key>
+    <key alias="noPackages">Nie masz żadnych zainstalowanych pakietów</key>
+    <key alias="noPackagesDescription"><![CDATA[Nie masz żadnych zainstalowanych pakietów. Zainstaluj lokalny pakiet poprzez wybranie go ze swojego komputera lub przeglądaj dostępne pakiety, używając ikony <strong>'Pakiety'</strong> w prawym górnym rogu ekranu]]></key>
+    <key alias="packageSearch">Szukaj pakietów</key>
+    <key alias="packageSearchResults">Wyniki dla</key>
+    <key alias="packageNoResults">Nie mogliśmy znaleźć niczego dla</key>
+    <key alias="packageNoResultsDescription">Spróbuj wyszukać kolejny pakiet lub przeszukaj kategorie pakietów</key>
+    <key alias="packagesPopular">Popularne</key>
+    <key alias="packagesNew">Nowe wydania</key>
+    <key alias="packageHas">ma</key>
+    <key alias="packageKarmaPoints">punktów karmy</key>
+    <key alias="packageInfo">Informacja</key>
+    <key alias="packageOwner">Właściciel</key>
+    <key alias="packageContrib">Kontrybutor</key>
+    <key alias="packageCreated">Utworzone</key>
+    <key alias="packageCurrentVersion">Obecna wersja</key>
+    <key alias="packageNetVersion">wersja .NET</key>
+    <key alias="packageDownloads">Pobrania</key>
+    <key alias="packageLikes">Polubienia</key>
+    <key alias="packageCompatibility">Zgodność</key>
+    <key alias="packageCompatibilityDescription">Według raportów członków społeczności, ten pakiet jest zgodny z następującymi wersjami Umbraco. Pełna zgodność nie może być zagwarantowana dla wersji zaraportowanych poniżej 100%</key>
+    <key alias="packageExternalSources">Zewnętrzne źródła</key>
     <key alias="packageAuthor">Autor</key>
     <key alias="packageDemonstration">Demonstracja</key>
     <key alias="packageDocumentation">Dokumentacja</key>
@@ -841,6 +891,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="installStateRestarting">Restartowanie, proszę czekać...</key>
     <key alias="installStateComplete">Wszystko skończone, Twoja przeglądarka się teraz odświeży, proszę czekać...</key>
     <key alias="installStateCompleted">Proszę kliknąć Zakończ, aby zakończyć instalację i przeładować stronę.</key>
+    <key alias="installStateUploading">Wgrywanie pakietu...</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Wklej z zachowaniem formatowania (Nie zalecane)</key>
@@ -908,6 +959,10 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   </area>
   <area alias="imagecropper">
     <key alias="reset">Resetuj</key>
+    <key alias="defineCrop">Zdefiniuj przycięcie</key>
+    <key alias="defineCropDescription">Ustaw alias dla przycięcia, a także jego domyślną szerokość i długość</key>
+    <key alias="saveCrop">Zapisz przycięcie</key>
+    <key alias="addCrop">Dodaj nowe przycięcie</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Aktualna wersja</key>
@@ -1116,6 +1171,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     
     
     <key alias="queryBuilder">Konstruktor zapytań</key>
+    <key alias="buildQuery">Zbuduj zapytanie</key>
     <key alias="itemsReturned">Element zwrócony, w</key>
 
     <key alias="iWant">Chcę</key>   
@@ -1261,27 +1317,36 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   </area>
       
   <area alias="templateEditor">
+    <key alias="addFallbackField">Dodaj pole zastępcze</key>
+    <key alias="fallbackField">Pole zastępcze</key>
+    <key alias="addDefaultValue">Dodaj domyślną wartość</key>
+    <key alias="defaultValue">Domyślna wartość</key>
     <key alias="alternativeField">Pole alternatywne</key>
     <key alias="alternativeText">Tekst alternatywny</key>
     <key alias="casing">Wielkość liter</key>
     <key alias="encoding">Kodowanie</key>
     <key alias="chooseField">Wybierz pole</key>
     <key alias="convertLineBreaks">Konwertuj złamania wiersza</key>
+    <key alias="convertLineBreaksDescription">Tak, konwertuj złamania wiersza</key>
     <key alias="convertLineBreaksHelp">Zamienia złamania wiersza na html-tag &amp;lt;br&amp;gt;</key>
     <key alias="customFields">Niestandardowe Pola</key>
     <key alias="dateOnly">Tak, tylko data</key>
+    <key alias="formatAndEncoding">Format i kodowanie</key>
     <key alias="formatAsDate">Formatuj jako datę</key>
+    <key alias="formatAsDateDescr">Formatuj wartość jako datę lub jako datę i czas, zgodnie z aktywną kulturą</key>
     <key alias="htmlEncode">Kodowanie HTML</key>
     <key alias="htmlEncodeHelp">Zamienia znaki specjalne na ich odpowiedniki HTML</key>
     <key alias="insertedAfter">Zostanie wstawione za wartością pola</key>
     <key alias="insertedBefore">Zostanie wstawione przed wartością pola</key>
     <key alias="lowercase">małe znaki</key>
+    <key alias="modifyOutput">Modyfikuj dane wyjściowe</key>
     <key alias="none">Nic</key>
+    <key alias="outputSample">Próbka danych wyjściowych</key>
     <key alias="postContent">Wstaw za polem</key>
     <key alias="preContent">Wstaw przed polem</key>
     <key alias="recursive">Rekurencyjne</key>
-    <key alias="removeParagraph">Usuń znaki paragrafu</key>
-    <key alias="removeParagraphHelp">Usuwa wszystkie &amp;lt;P&amp;gt; z początku i końca tekstu</key>
+    <key alias="recursiveDescr">Tak, spraw, aby było to rekurencyjne</key>
+    <key alias="separator">Separator</key>
     <key alias="standardFields">Standardowe Pola</key>
     <key alias="uppercase">Wielkie litery</key>
     <key alias="urlEncode">Kodowanie URL</key>
@@ -1431,6 +1496,14 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
       <key alias="validateAsUrl">Waliduj jako URL</key>
       <key alias="enterCustomValidation">...lub wpisz niestandardową walidację</key>
       <key alias="fieldIsMandatory">Pole jest wymagane</key>
+    <key alias="validationRegExp">Wprowadź wyrażenie regularne</key>
+    <key alias="minCount">Musisz dodać przynajmniej</key>
+    <key alias="maxCount">Możesz mieć jedynie</key>
+    <key alias="items">elementy</key>
+    <key alias="itemsSelected">wybrane elementy</key>
+    <key alias="invalidDate">Niepoprawna data</key>
+    <key alias="invalidNumber">To nie jest numer</key>
+    <key alias="invalidEmail">Niepoprawny e-mail</key>
   </area>
   <area alias="healthcheck">
 	  <!-- Następujące klucze spowodują, że tokeny zostaną przekazane:
@@ -1474,8 +1547,10 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
 	  <key alias="xmlDataIntegrityCheckMedia">Media - Suma XML: %0%, Suma: %1%, Suma niepoprawnych: %2%</key>
 	  <key alias="xmlDataIntegrityCheckContent">Zawartość - Suma XML: %0%, Suma opublikowanych: %1%, Suma niepoprawnych: %2%</key>
 
-	  <key alias="httpsCheckValidCertificate">Certifikat Twojej strony został oznaczony jako poprawny.</key>
+	  <key alias="httpsCheckValidCertificate">Certifikat Twojej strony jest poprawny.</key>
 	  <key alias="httpsCheckInvalidCertificate">Błąd walidacji certyfikatu: '%0%'</key>
+    <key alias="httpsCheckExpiredCertificate">Certyfikat SSL Twojej strony wygasł.</key>
+    <key alias="httpsCheckExpiringCertificate">Certyfikat SSL Twojej strony wygaśnie za %0% dni.</key>
 	  <key alias="httpsCheckInvalidUrl">Błąd pingowania adresu URL %0% - '%1%'</key>
 	  <key alias="httpsCheckIsCurrentSchemeHttps">Oglądasz %0% stronę używając HTTPS.</key>
 	  <key alias="httpsCheckConfigurationRectifyNotPossible">appSetting 'umbracoUseSSL' został ustawiony na 'false' w Twoim pliku web.config. Po uzyskaniu dostępu do strony, używając HTTPS, powinieneś go ustawić na 'true'.</key>
@@ -1554,5 +1629,8 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   </area>
   <area alias="emptyStates">
     <key alias="emptyDictionaryTree">Brak elementów słownika do wyboru</key>
-  </area>    
+  </area>
+    <area alias="textbox">
+    <key alias="characters_left">pozostało znaków</key>
+  </area>
 </language>

@@ -253,6 +253,8 @@
     <key alias="copiedItemOfItems">%0% éléments sur %1% copiés</key>
   </area>  
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Titre du lien</key>
+    <key alias="urlLinkPicker">Lien</key>
     <key alias="anchorInsert">Nom</key>
     <key alias="assignDomain">Gérer les noms d'hôtes</key>
     <key alias="closeThisWindow">Fermer cette fenêtre</key>
@@ -1345,9 +1347,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="preContent">Insérer avant le champ</key>
     <key alias="recursive">Récursif</key>
     <key alias="recursiveDescr">Oui, rendre récursif</key>
-    <key alias="removeParagraph">Supprimer les balises de paragraphe</key>
-    <key alias="removeParagraphDescription">Oui, supprimer les balises de paragraphe</key>
-    <key alias="removeParagraphHelp">Supprimera toute balise &amp;lt;P&amp;gt; au début et à la fin du texte</key>
     <key alias="separator">Séparateur</key>
     <key alias="standardFields">Champs standards</key>
     <key alias="uppercase">Majuscules</key>

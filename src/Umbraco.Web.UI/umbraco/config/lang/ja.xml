@@ -1108,8 +1108,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="postContent">フィールド値の後ろ追加</key>
     <key alias="preContent">フィールド値の前に追加</key>
     <key alias="recursive">再帰的</key>
-    <key alias="removeParagraph">段落タグの消去</key>
-    <key alias="removeParagraphHelp">段落タグ &amp;lt;P&amp;gt; を消去します</key>
     <key alias="standardFields">標準フィールド</key>
     <key alias="uppercase">大文字変換</key>
     <key alias="urlEncode">URLエンコード</key>

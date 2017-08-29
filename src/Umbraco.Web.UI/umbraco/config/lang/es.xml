@@ -220,6 +220,8 @@
     <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Título del vínculo</key>
+    <key alias="urlLinkPicker">Vínculo</key>
     <key alias="anchorInsert">Nombre</key>
     <key alias="assignDomain">Administrar dominios</key>
     <key alias="closeThisWindow">Cerrar esta ventana</key>
@@ -809,8 +811,6 @@
     <key alias="postContent">Insertar después del campo</key>
     <key alias="preContent">Insertar antes del campo</key>
     <key alias="recursive">Recursivo</key>
-    <key alias="removeParagraph">Borrar los tags del párrafo</key>
-    <key alias="removeParagraphHelp">Borrará cualquier &amp;lt;P&amp;gt; al principio y al final del texto</key>
     <key alias="uppercase">Mayúscula</key>
     <key alias="urlEncode">Codificar URL</key>
     <key alias="urlEncodeHelp">Formateará los caracteres especiales de las URLs</key>
