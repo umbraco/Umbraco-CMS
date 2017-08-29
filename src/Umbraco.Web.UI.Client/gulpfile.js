@@ -149,8 +149,10 @@ gulp.task('dependencies', function () {
 
     //Tinymce
     stream.add(
-        gulp.src("./bower_components/tinymce/plugins/**")
-            .pipe(gulp.dest(root + targets.lib + "/tinymce/plugins/"))
+        gulp.src(["./bower_components/tinymce/plugins/**",
+            "./bower_components/tinymce/themes/**"],
+            { base: "./bower_components/tinymce/" })
+            .pipe(gulp.dest(root + targets.lib + "/tinymce"))
     );
 
     //font-awesome
