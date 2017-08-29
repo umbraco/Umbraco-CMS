@@ -107,41 +107,13 @@ namespace Umbraco.Web.WebApi.Filters
         /// <returns></returns>
         public static bool ValidateHeaders(HttpRequestHeaders requestHeaders, out string failedReason)
         {
-            var cookieToken = GetCookie(requestHeaders, CsrfValidationCookieName);
+            var cookieToken = requestHeaders.GetCookieValue(CsrfValidationCookieName);
 
             return ValidateHeaders(
                 requestHeaders.ToDictionary(x => x.Key, x => x.Value).ToArray(),
                 cookieToken == null ? null : cookieToken,
                 out failedReason);
         }
-
-        /// <summary>
-        /// Retrieves an individual cookie from the cookies collection
-        /// Adapted from: https://stackoverflow.com/a/29057304/5018
-        /// </summary>
-        /// <param name="requestHeaders"></param>
-        /// <param name="cookieName"></param>
-        /// <returns></returns>
-        private static string GetCookie(HttpRequestHeaders requestHeaders, string cookieName)
-        {
-            var cookieRequestHeader = requestHeaders.Where(h => h.Key.Equals("Cookie", StringComparison.InvariantCultureIgnoreCase)).ToArray();
-            if (cookieRequestHeader.Any() == false)
-                return null;
-
-            var cookiesHeader = cookieRequestHeader.FirstOrDefault();
-            if (cookiesHeader.Value == null)
-                return null;
-
-            var cookiesHeaderValue = cookiesHeader.Value.FirstOrDefault();
-            if (cookiesHeaderValue == null)
-                return null;
-
-            var cookieCollection = cookiesHeaderValue.Split(';');
-            var cookiePair = cookieCollection.FirstOrDefault(c => c.Trim().StartsWith(cookieName, StringComparison.InvariantCultureIgnoreCase));
-            if (cookiePair == null)
-                return null;
-
-            return cookiePair.Trim().Substring(cookieName.Length + 1);
-        }
+        
     }
 }

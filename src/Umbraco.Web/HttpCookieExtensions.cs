@@ -17,6 +17,43 @@ namespace Umbraco.Web
     internal static class HttpCookieExtensions
     {
         /// <summary>
+        /// Retrieves an individual cookie from the cookies collection
+        /// </summary>
+        /// <param name="requestHeaders"></param>
+        /// <param name="cookieName"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Adapted from: https://stackoverflow.com/a/29057304/5018 because there's an issue with .NET WebApi cookie parsing logic 
+        /// when using requestHeaders.GetCookies() when an invalid cookie name is present.
+        /// </remarks>
+        public static string GetCookieValue(this HttpRequestHeaders requestHeaders, string cookieName)
+        {
+            var cookieRequestHeader = requestHeaders
+                .Where(h => h.Key.Equals("Cookie", StringComparison.InvariantCultureIgnoreCase))
+                .ToArray();
+
+            if (cookieRequestHeader.Length == 0)
+                return null;
+
+            var cookiesHeader = cookieRequestHeader[0];
+            
+            var cookiesHeaderValue = cookiesHeader.Value.FirstOrDefault();
+            if (cookiesHeaderValue == null)
+                return null;
+
+            var cookieCollection = cookiesHeaderValue.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var cookieNameValue in cookieCollection)
+            {
+                var parts = cookieNameValue.Split(new[] {'='}, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length != 2) continue;
+                if (parts[0].Trim().InvariantEquals(cookieName))
+                    return parts[1].Trim();
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Removes the cookie from the request and the response if it exists
         /// </summary>
         /// <param name="http"></param>
