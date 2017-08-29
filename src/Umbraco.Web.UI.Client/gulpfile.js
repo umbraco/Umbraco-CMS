@@ -2,14 +2,11 @@
 var watch = require('gulp-watch');
 var concat = require('gulp-concat');
 var rename = require('gulp-rename');
-var sourcemaps = require('gulp-sourcemaps');
 var wrap = require("gulp-wrap-js");
 var sort = require('gulp-sort');
-var uglify = require('gulp-uglify');
 var connect = require('gulp-connect');
 var open = require('gulp-open');
 var runSequence = require('run-sequence');
-var gulpif = require('gulp-if');
 
 var _ = require('lodash');
 var MergeStream = require('merge-stream');
@@ -29,15 +26,12 @@ var karmaServer = require('karma').Server;
 /***************************************************************
 Helper functions
 ***************************************************************/
-function processJs(files, out, makeSourcemaps) {
+function processJs(files, out) {
     
     return gulp.src(files)
      .pipe(sort())
-     .pipe(gulpif(makeSourcemaps, sourcemaps.init()))
      .pipe(concat(out))
      .pipe(wrap('(function(){\n%= body %\n})();'))
-     .pipe(uglify({ mangle: false }))
-     .pipe(gulpif(makeSourcemaps, sourcemaps.write()))
      .pipe(gulp.dest(root + targets.js));
 
      console.log(out + " compiled");
@@ -123,12 +117,12 @@ var targets = {
 
  // Build - build the files ready for production
 gulp.task('build', function(cb) {
-    runSequence(["dependencies", "js:production", "less", "views"], "test:unit", cb);
+    runSequence(["dependencies", "js", "less", "views"], "test:unit", cb);
 });
 
 // Dev - build the files ready for development and start watchers
 gulp.task('dev', function(cb) {
-    runSequence(["dependencies", "js:development", "less", "views"], "watch", cb);
+    runSequence(["dependencies", "js", "less", "views"], "watch", cb);
 });
 
 // Docserve - build and open the back office documentation
@@ -229,7 +223,7 @@ gulp.task('dependencies', function () {
 /**************************
  * Copies all angular JS files into their seperate umbraco.*.js file
  **************************/
-gulp.task('js:production', function () { 
+gulp.task('js', function () { 
   
     //we run multiple streams, so merge them all together
     var stream = new MergeStream();
@@ -240,27 +234,10 @@ gulp.task('js:production', function () {
         );
 
      _.forEach(sources.js, function (group) {
-        stream.add (processJs(group.files, group.out, false) );
+        stream.add (processJs(group.files, group.out) );
      });
 
      return stream;
-});
-
-gulp.task('js:development', function () { 
-    
-    //we run multiple streams, so merge them all together
-    var stream = new MergeStream();
-
-    stream.add(
-        gulp.src(sources.globs.js)
-            .pipe(gulp.dest(root + targets.js))
-        );
-
-    _.forEach(sources.js, function (group) {
-        stream.add (processJs(group.files, group.out, true) );
-    });
-
-    return stream;
 });
 
 gulp.task('less', function () {
