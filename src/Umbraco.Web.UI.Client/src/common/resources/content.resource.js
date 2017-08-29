@@ -418,14 +418,14 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                   'Failed to retrieve data for empty content item type ' + alias);
         },
 
-        getBlueprintScaffold: function (blueprintId) {
+        getBlueprintScaffold: function (parentId, blueprintId) {
 
           return umbRequestHelper.resourcePromise(
             $http.get(
               umbRequestHelper.getApiUrl(
                 "contentApiBaseUrl",
-                "GetEmpty",
-                [{ blueprintId: blueprintId }])),
+                      "GetEmpty",
+                      [{ blueprintId: blueprintId }, { parentId: parentId}])),
             'Failed to retrieve blueprint for id ' + blueprintId);
         },
 
