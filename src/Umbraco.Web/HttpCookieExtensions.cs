@@ -28,26 +28,23 @@ namespace Umbraco.Web
         /// </remarks>
         public static string GetCookieValue(this HttpRequestHeaders requestHeaders, string cookieName)
         {
-            var cookieRequestHeader = requestHeaders
-                .Where(h => h.Key.Equals("Cookie", StringComparison.InvariantCultureIgnoreCase))
-                .ToArray();
-
-            if (cookieRequestHeader.Length == 0)
-                return null;
-
-            var cookiesHeader = cookieRequestHeader[0];
-            
-            var cookiesHeaderValue = cookiesHeader.Value.FirstOrDefault();
-            if (cookiesHeaderValue == null)
-                return null;
-
-            var cookieCollection = cookiesHeaderValue.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var cookieNameValue in cookieCollection)
+            foreach (var header in requestHeaders)
             {
-                var parts = cookieNameValue.Split(new[] {'='}, StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length != 2) continue;
-                if (parts[0].Trim().InvariantEquals(cookieName))
-                    return parts[1].Trim();
+                if (header.Key.Equals("Cookie", StringComparison.InvariantCultureIgnoreCase) == false)
+                    continue;
+                
+                var cookiesHeaderValue = header.Value.FirstOrDefault();
+                if (cookiesHeaderValue == null)
+                    return null;
+
+                var cookieCollection = cookiesHeaderValue.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var cookieNameValue in cookieCollection)
+                {
+                    var parts = cookieNameValue.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length != 2) continue;
+                    if (parts[0].Trim().Equals(cookieName, StringComparison.InvariantCultureIgnoreCase))
+                        return parts[1].Trim();
+                }
             }
 
             return null;
