@@ -93,7 +93,7 @@ namespace Umbraco.Core.Security
             {
                 //this will hash the guid with a salt so should be nicely random
                 var aspHasher = new PasswordHasher();
-                member.RawPasswordValue = "___UIDEMPTYPWORD__" +
+                member.RawPasswordValue = Constants.Security.EmptyPasswordPrefix +
                     aspHasher.HashPassword(Guid.NewGuid().ToString("N"));
 
             }
