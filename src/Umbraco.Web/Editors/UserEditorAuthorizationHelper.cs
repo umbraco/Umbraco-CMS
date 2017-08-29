@@ -74,27 +74,17 @@ namespace Umbraco.Web.Editors
 
                 if (userGroupsChanged)
                 {
-                    var userGroups = _userService.GetUserGroupsByAlias(newGroups).ToArray();
+                    // d) A user cannot assign a group to another user that they do not belong to
 
-                    //TODO: pretty sure d + e can be done by just checking if the newGroups being added are groups that the current user is a member of
-
-                    // d) A user cannot assign a group to another user that grants them access to a start node they don't have access to
-                    foreach (var group in userGroups)
+                    var currentUserGroups = currentUser.Groups.Select(x => x.Alias).ToArray();
+                    
+                    foreach (var group in newGroups)
                     {
-                        pathResult = AuthorizePath(currentUser,
-                            group.StartContentId.HasValue ? new[] { group.StartContentId.Value } : null,
-                            group.StartMediaId.HasValue ? new[] { group.StartMediaId.Value } : null);
-                        if (pathResult == false)
-                            return pathResult;
-                    }
-
-                    // e) A user cannot set a section on another user that they don't have access to
-                    var allGroupSections = userGroups.SelectMany(x => x.AllowedSections).Distinct();
-                    var missingSectionAccess = allGroupSections.Except(currentUser.AllowedSections).ToArray();
-                    if (missingSectionAccess.Length > 0)
-                    {
-                        return Attempt.Fail("The current user does not have access to sections " + string.Join(",", missingSectionAccess));
-                    }
+                        if (currentUserGroups.Contains(group) == false)
+                        {
+                            return Attempt.Fail("Cannot assign the group " + group + ", the current user is not a member");
+                        }
+                    }                    
                 }
             }            
 

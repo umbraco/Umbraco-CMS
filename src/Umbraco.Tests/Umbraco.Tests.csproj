@@ -196,6 +196,7 @@
     <Compile Include="TestHelpers\ControllerTesting\TestRunner.cs" />
     <Compile Include="TestHelpers\ControllerTesting\TestStartup.cs" />
     <Compile Include="TestHelpers\ControllerTesting\TraceExceptionLogger.cs" />
+    <Compile Include="Web\Controllers\UserEditorAuthorizationHelperTests.cs" />
     <Compile Include="Web\Controllers\UsersControllerTests.cs" />
     <Compile Include="Dependencies\NuGet.cs" />
     <Compile Include="CallContextTests.cs" />
