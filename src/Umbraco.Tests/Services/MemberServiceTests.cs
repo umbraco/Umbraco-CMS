@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Web.Security;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Events;
@@ -12,9 +14,11 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Web.Security.Providers;
 
 namespace Umbraco.Tests.Services
 {
@@ -26,6 +30,14 @@ namespace Umbraco.Tests.Services
         public override void Initialize()
         {
             base.Initialize();
+
+            //hack! but we have no choice until we remove the SavePassword method from IMemberService
+            var providerMock = new Mock<MembersMembershipProvider>(ServiceContext.MemberService) { CallBase = true };
+            providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
+            providerMock.Setup(@base => @base.PasswordFormat).Returns(MembershipPasswordFormat.Hashed);
+            var provider = providerMock.Object;
+
+            ((MemberService)ServiceContext.MemberService).MembershipProvider = provider;
         }
 
         [TearDown]
@@ -33,7 +45,7 @@ namespace Umbraco.Tests.Services
         {
             base.TearDown();
         }
-
+        
         [Test]
         public void Can_Set_Password_On_New_Member()
         {
