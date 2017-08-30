@@ -21,58 +21,109 @@
 
       $scope.auditTrail = [
         {
-          "name": "Zsolt Laszlo",
           "date": "03 December 2016 17:58PM",
           "action": "publish",
-          "description": "Content was performed"
+          "description": "Content was performed",
+          "user": {
+            "name": "Zsolt Laszlo",
+            "avatars": []
+          }
         },
         {
-          "name": "Mads Rasmussen",
           "date": "24 December 2016 20:18PM",
-          "action": "publish",
-          "description": "Content was performed"
+          "action": "unpublish",
+          "description": "Content was performed",
+          "user": {
+            "name": "Mads Rasmussen",
+            "avatars": [
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=30",
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=60",
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=90",
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=150",
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=300"
+            ]
+          }
         },
         {
-          "name": "Zsolt Laszlo",
           "date": "19 November 2016 21:11AM",
-          "action": "publish",
-          "description": "Content was performed"
+          "action": "save",
+          "description": "Content was performed",
+          "user": {
+            "name": "Zsolt Laszlo",
+            "avatars": []
+          }
         },
         {
-          "name": "Mads Rasmussen",
           "date": "10 November 2016 10:41AM",
-          "action": "publish",
-          "description": "Content was performed"
+          "action": "save",
+          "description": "Content was performed",
+          "user": {
+            "name": "Mads Rasmussen",
+            "avatars": [
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=30",
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=60",
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=90",
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=150",
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=300"
+            ]
+          }
         },
         {
-          "name": "Zsolt Laszlo",
           "date": "02 November 2016 03:44PM",
-          "action": "publish",
-          "description": "Content was performed"
+          "action": "save",
+          "description": "Content was performed",
+          "user": {
+            "name": "Zsolt Laszlo",
+            "avatars": []
+          }
         },
         {
-          "name": "Mads Rasmussen",
           "date": "19 September 2016 18:21AM",
           "action": "publish",
-          "description": "Content was performed"
+          "description": "Content was performed",
+          "user": {
+            "name": "Mads Rasmussen",
+            "avatars": [
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=30",
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=60",
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=90",
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=150",
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=300"
+            ]
+          }
         },
         {
-          "name": "Mads Rasmussen",
           "date": "19 September 2016 08:51AM",
-          "action": "publish",
-          "description": "Content was performed"
+          "action": "save",
+          "description": "Content was performed",
+          "user": {
+            "name": "Mads Rasmussen",
+            "avatars": [
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=30",
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=60",
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=90",
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=150",
+              "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=300"
+            ]
+          }
         },
         {
-          "name": "Zsolt Laszlo",
           "date": "11 September 2016 13:28AM",
-          "action": "publish",
-          "description": "Content was performed"
+          "action": "save",
+          "description": "Content was performed",
+          "user": {
+            "name": "Zsolt Laszlo",
+            "avatars": []
+          }
         },
         {
-          "name": "Zsolt Laszlo",
           "date": "01 September 2016 23:19AM",
-          "action": "publish",
-          "description": "Content was performed"
+          "action": "save",
+          "description": "Content was performed",
+          "user": {
+            "name": "Zsolt Laszlo",
+            "avatars": []
+          }
         }
       ];
 
@@ -122,6 +173,10 @@
             });
         }
       }
+
+      // get the auditTrail
+      setAuditTrailActionColor($scope.auditTrail);
+
     }
 
     /** Syncs the content item to it's tree node - this occurs on first load and after saving */
@@ -331,6 +386,21 @@
       alert("you opened docType");
       console.log("this is not the template");
     };
+
+    function setAuditTrailActionColor(auditTrail) {
+      angular.forEach(auditTrail, function (item) {
+        switch (item.action) {
+          case "publish":
+            item.actionColor = "success";
+            break;
+          case "unpublish":
+            item.actionColor = "danger";
+            break;
+          default:
+            item.actionColor = "gray";
+        }
+      });
+    }
 
 
 
