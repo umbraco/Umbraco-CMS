@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web;
@@ -91,10 +92,17 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 var webSecurity = new Mock<WebSecurity>(null, null);
 
                 //mock CurrentUser
+                var groups = new List<ReadOnlyUserGroup>();
+                for (var index = 0; index < backofficeIdentity.Roles.Length; index++)
+                {
+                    var role = backofficeIdentity.Roles[index];
+                    groups.Add(new ReadOnlyUserGroup(index + 1, role, "icon-user", null, null, role, new string[0], new string[0]));
+                }
                 webSecurity.Setup(x => x.CurrentUser)
                     .Returns(Mock.Of<IUser>(u => u.IsApproved == true
                                                  && u.IsLockedOut == false
                                                  && u.AllowedSections == backofficeIdentity.AllowedApplications
+                                                 && u.Groups == groups
                                                  && u.Email == "admin@admin.com"
                                                  && u.Id == (int) backofficeIdentity.Id
                                                  && u.Language == "en"
