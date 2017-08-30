@@ -8,6 +8,8 @@
  */
 function ContentEditController($scope, $routeParams, contentResource) {
 
+
+
   function scaffoldEmpty() {
     return contentResource.getScaffold($routeParams.id, $routeParams.doctype);
   }

@@ -15,8 +15,88 @@
     $scope.page.listViewPath = null;
     $scope.page.isNew = $scope.isNew ? true : false;
     $scope.page.buttonGroupState = "init";
+    $scope.allowOpen = true;
 
     function init(content) {
+
+      $scope.auditTrail = [
+        {
+          "name": "Zsolt Laszlo",
+          "date": "03 December 2016 17:58PM",
+          "action": "publish",
+          "description": "Content was performed"
+        },
+        {
+          "name": "Mads Rasmussen",
+          "date": "24 December 2016 20:18PM",
+          "action": "publish",
+          "description": "Content was performed"
+        },
+        {
+          "name": "Zsolt Laszlo",
+          "date": "19 November 2016 21:11AM",
+          "action": "publish",
+          "description": "Content was performed"
+        },
+        {
+          "name": "Mads Rasmussen",
+          "date": "10 November 2016 10:41AM",
+          "action": "publish",
+          "description": "Content was performed"
+        },
+        {
+          "name": "Zsolt Laszlo",
+          "date": "02 November 2016 03:44PM",
+          "action": "publish",
+          "description": "Content was performed"
+        },
+        {
+          "name": "Mads Rasmussen",
+          "date": "19 September 2016 18:21AM",
+          "action": "publish",
+          "description": "Content was performed"
+        },
+        {
+          "name": "Mads Rasmussen",
+          "date": "19 September 2016 08:51AM",
+          "action": "publish",
+          "description": "Content was performed"
+        },
+        {
+          "name": "Zsolt Laszlo",
+          "date": "11 September 2016 13:28AM",
+          "action": "publish",
+          "description": "Content was performed"
+        },
+        {
+          "name": "Zsolt Laszlo",
+          "date": "01 September 2016 23:19AM",
+          "action": "publish",
+          "description": "Content was performed"
+        }
+      ];
+
+      $scope.pagination = {
+        "pageNumber": 1,
+        "totalPages": 5
+      };
+
+      $scope.docType = 
+        {
+          "icon": "icon-item-arrangement",
+          "name": "Project",
+          "description": "Description for the doctype section"
+        };
+
+      $scope.template = {
+        "description": "Description for the template section"
+      };
+
+      $scope.idSection = {
+        "name": "Id"
+      };
+
+
 
       var buttons = contentEditingHelper.configureContentEditorButtons({
         create: $scope.page.isNew,
@@ -229,6 +309,30 @@
       }
 
     };
+
+    $scope.nextPage = function(pageNumber) {
+      alert("next page" + pageNumber);
+    };
+
+    $scope.prevPage = function(pageNumber) {
+      alert("previous page" + pageNumber);
+    };
+
+    $scope.goToPage = function(pageNumber) {
+      alert("go to page" + pageNumber);
+    };
+
+    $scope.openTemplate = function(template) {
+      alert("you opened template");
+      console.log("this is not the doctype");
+    };
+
+    $scope.openDocType = function(docType) {
+      alert("you opened docType");
+      console.log("this is not the template");
+    };
+
+
 
   }
 

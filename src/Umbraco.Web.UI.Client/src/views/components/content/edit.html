@@ -18,16 +18,117 @@
             hide-alias="true">
          </umb-editor-header>
 
-
          <umb-editor-container>
-
             <umb-tabs-content class="form-horizontal" view="true">
                <umb-tab id="tab{{tab.id}}" ng-repeat="tab in content.tabs" rel="{{tab.id}}">
+                    <div ng-show="tab.id === 0">
+                        <div class="umb-package-details">
+                            <div class="umb-package-details__main-content">
+                                <umb-box>
+                                    <umb-box-header title="Links"></umb-box-header>
+                                    <umb-box-content class="block-form">
+                                        <div ng-repeat="url in content.urls">
+                                            {{ url }}
+                                        </div>
+                                    </umb-box-content>    
+                                </umb-box>
+                                <umb-box>
+                                    <umb-box-header title="History"></umb-box-header>
+                                    <umb-box-content class="block-form">
+                                        <!-- item 1 -->
+                                        <div class="history-item" ng-repeat="item in auditTrail">
+                                            <div class="history-row">
+                                                <umb-avatar
+                                                color="secondary"
+                                                size="xs"
+                                                name="zsolt">
+                                            </umb-avatar>
+                                                <div class="name-date-container">
+                                                    <h1>{{ item.name }}</h1>
+                                                    <h2>{{ item.date }}</h2>
+                                                </div>
+                                                    <umb-badge size="s" color="success">
+                                                        {{ item.action }}
+                                                    </umb-badge>
+                                                <h4>{{ item.description }}</h4>
+                                            </div>
+                                            <div class="history-line"></div>
+                                        </div>
+                                        <div class="flex justify-center">
+                                        <umb-pagination
+                                            page-number="pagination.pageNumber"
+                                            total-pages="pagination.totalPages"
+                                            on-next="nextPage"
+                                            on-prev="prevPage"
+                                            on-go-to-page="goToPage">
+                                        </umb-pagination>
+                                    </div>
+                                    </umb-box-content>    
+                                </umb-box>           
+                            </div>
 
-                  <umb-property ng-repeat="property in tab.properties" property="property">
-                     <umb-editor model="property"></umb-editor>
+                            <div class="umb-package-details__sidebar">
+                                <umb-box>
+                                    <umb-box-header title="Scheduled publish"></umb-box-header>
+                                    <umb-box-content class="block-form">
+                                        <div class="date-wrapper">
+                                            <div class="date-container">
+                                                <h2>Publish date</h2>
+                                                <h3>October 2016</h3>
+                                                <h1>17</h1>
+                                                <h3>Wednesday 10:43 PM</h3>
+                                            </div>
+                                            <div class="date-separate"></div>
+                                            <div class="date-container">
+                                                <h2>Unpublish date</h2>
+                                                <div class="place-holder"></div>
+                                                <h4>ADD DATE</h4>
+                                            </div>
+                                        </div>
+                                    </umb-box-content>    
+                                </umb-box>
+                                <umb-box>
+                                    <umb-box-header title="Meta data"></umb-box-header>
+                                    <umb-box-content class="block-form">
+                                        <umb-control-group label="Created by {{ content.owner.name }} at {{ content.createDate }}"></umb-control-group>
+                                        
+                                        <umb-control-group label="{{ idSection.name }}">
+                                            <div>{{ content.id }}</div>
+                                            <small class="muted">{{ content.key }}</small>
+                                        </umb-control-group>
+
+                                        <umb-control-group label="@template_template" description="{{template.description}}">
+                                            <umb-node-preview
+                                                name="content.template"
+                                                allow-open="allowOpen"
+                                                on-open="openTemplate(template)">
+                                            </umb-node-preview>
+                                        </umb-control-group>
+
+                                        <umb-control-group label="@content_documentType" description="{{docType.description}}">
+                                            <umb-node-preview
+                                                icon="docType.icon"
+                                                name="docType.name"
+                                                allow-open="allowOpen"
+                                                on-open="openDocType(docType)">
+                                            </umb-node-preview>
+                                        </umb-control-group>
+                                    </umb-box-content>    
+                                </umb-box>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div ng-hide="tab.id === 0">
+                        <umb-property ng-repeat="property in tab.properties" property="property">
+                        <umb-editor model="property"></umb-editor>
                   </umb-property>
+                </div>
 
+                
+                  <!-- <pre>{{ tab | json }}</pre> -->
+
+               
                </umb-tab>
             </umb-tabs-content>
 
