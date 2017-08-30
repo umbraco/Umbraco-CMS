@@ -203,6 +203,17 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                        "PostCreateContainer",
                        { parentId: parentId, name: name })),
                 'Failed to create a folder under parent id ' + parentId);
+        },
+
+        renameContainer: function (id, name) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("mediaTypeApiBaseUrl",
+                    "PostRenameContainer",
+                    { id: id, name: name })),
+                "Failed to rename the folder with id " + id
+            );
+
         }
 
     };

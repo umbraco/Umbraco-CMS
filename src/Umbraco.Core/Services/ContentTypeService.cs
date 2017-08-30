@@ -76,6 +76,35 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public Attempt<OperationStatus<EntityContainer, OperationStatusType>> RenameContentTypeContainer(int id, string name, int userId = 0)
+        {
+            return RenameTypeContainer(id, name, Constants.ObjectTypes.DocumentTypeContainerGuid);
+        }
+
+        private Attempt<OperationStatus<EntityContainer, OperationStatusType>> RenameTypeContainer(int id, string name, Guid typeCode)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, typeCode))
+            {
+                try
+                {
+                    var container = repo.Get(id);
+
+                    container.Name = name;
+
+                    repo.AddOrUpdate(container);
+                    uow.Commit();
+
+                    return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
+                }
+                catch (Exception ex)
+                {
+                    return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(null, OperationStatusType.FailedExceptionThrown, evtMsgs), ex);
+                }
+            }
+        }
+
         public Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateMediaTypeContainer(int parentId, string name, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
@@ -112,6 +141,11 @@ namespace Umbraco.Core.Services
                     return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(null, OperationStatusType.FailedExceptionThrown, evtMsgs), ex);
                 }
             }
+        }
+
+        public Attempt<OperationStatus<EntityContainer, OperationStatusType>> RenameMediaTypeContainer(int id, string name, int userId = 0)
+        {
+            return RenameTypeContainer(id, name, Constants.ObjectTypes.MediaTypeContainerGuid);
         }
 
         public Attempt<OperationStatus> SaveContentTypeContainer(EntityContainer container, int userId = 0)
