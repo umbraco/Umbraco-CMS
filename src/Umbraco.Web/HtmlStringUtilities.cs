@@ -87,6 +87,8 @@ namespace Umbraco.Web
 
         public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
         {
+            string hellip = "&hellip;";
+
             using (var outputms = new MemoryStream())
             {
                 using (var outputtw = new StreamWriter(outputms))
@@ -231,7 +233,7 @@ namespace Umbraco.Web
                                         // Reached truncate limit.
                                         if (addElipsis)
                                         {
-                                            outputtw.Write("&hellip;");
+                                            outputtw.Write(hellip);
                                         }
                                         lengthReached = true;
                                     }
@@ -247,11 +249,14 @@ namespace Umbraco.Web
                     {
                         string result = String.Empty;
 
-                        string firsTrim = outputtr.ReadToEnd().Replace("  ", " ").Trim();
-                        
+                        string firstTrim = outputtr.ReadToEnd().Replace("  ", " ").Trim();
+
                         //Check to see if there is an empty char between the hellip and the output string
                         //if there is, remove it
-                        result = firsTrim[firsTrim.Length -9] == ' ' ? firsTrim.Remove(firsTrim.Length - 9, 1) : firsTrim;
+                        if (String.IsNullOrEmpty(firstTrim) == false)
+                        {
+                            result = firstTrim[firstTrim.Length - hellip.Length -1] == ' ' ? firstTrim.Remove(firstTrim.Length - hellip.Length -1, 1) : firstTrim;
+                        }
                         return new HtmlString(result);
                     }
                 }
