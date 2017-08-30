@@ -7,7 +7,7 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
         // it cannot be static
         $.ajaxSetup({
             beforeSend: function (xhr) {
-              xhr.setRequestHeader("X-XSRF-TOKEN", $cookies["XSRF-TOKEN"]);
+                xhr.setRequestHeader("X-UMB-XSRF-TOKEN", $cookies["UMB-XSRF-TOKEN"]);
               if (queryStrings.getParams().umbDebug === "true" || queryStrings.getParams().umbdebug === "true") {
                 xhr.setRequestHeader("X-UMB-DEBUG", "true");
               }
