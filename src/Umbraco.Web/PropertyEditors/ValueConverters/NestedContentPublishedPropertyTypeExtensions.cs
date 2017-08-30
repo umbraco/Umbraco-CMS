@@ -108,7 +108,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                             i,
                             preview);
 
-                        if (PublishedContentModelFactoryResolver.HasCurrent)
+                        if (PublishedContentModelFactoryResolver.HasCurrent && PublishedContentModelFactoryResolver.Current.HasValue)
                         {
                             // Let the current model factory create a typed model to wrap our model
                             content = PublishedContentModelFactoryResolver.Current.Factory.CreateModel(content);
