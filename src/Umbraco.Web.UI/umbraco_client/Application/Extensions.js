@@ -369,7 +369,7 @@
                 if (parts.length === 2) return parts.pop().split(";").shift();
             }
 
-            xhr.setRequestHeader("X-XSRF-TOKEN", getCookie("XSRF-TOKEN"));
+            xhr.setRequestHeader("X-UMB-XSRF-TOKEN", getCookie("UMB-XSRF-TOKEN"));
         }
     });
 
