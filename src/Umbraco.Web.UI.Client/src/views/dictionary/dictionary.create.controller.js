@@ -17,7 +17,10 @@ function DictionaryCreateController($scope, dictionaryResource, treeService, nav
       console.log(data);
       navigationService.hideMenu();
     },function(err) {
-      console.log(err);
+      if (err.data && err.data.message) {
+        notificationsService.error(err.data.message);
+        navigationService.hideMenu();
+      }
     });
   }
 
