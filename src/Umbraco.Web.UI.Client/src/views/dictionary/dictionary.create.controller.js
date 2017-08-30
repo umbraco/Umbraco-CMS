@@ -6,17 +6,19 @@
  * @description
  * The controller for creating dictionary items
  */
-function DictionaryCreateController($scope, dictionaryResource, treeService, navigationService) {
+function DictionaryCreateController($scope, dictionaryResource, treeService, navigationService, notificationsService) {
   vm = this;
 
   vm.itemKey = '';
 
-  function createItem() {
-    console.log(vm.itemKey);
-    console.log($scope.dialogOptions.currentNode.id);
+  function createItem() {    
 
-    // do actual saving
-    navigationService.hideMenu();
+    dictionaryResource.create($scope.dialogOptions.currentNode.id, vm.itemKey).then(function(data) {
+      console.log(data);
+      navigationService.hideMenu();
+    },function(err) {
+      console.log(err);
+    });
   }
 
   vm.createItem = createItem;
