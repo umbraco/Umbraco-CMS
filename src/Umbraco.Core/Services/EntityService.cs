@@ -348,20 +348,21 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
             {
                 var repository = RepositoryFactory.CreateEntityRepository(uow);
-
-                //lookup the path so we can use it in the prefix query below
-                var itemPath = repository.GetAllPaths(objectTypeId, id).ToArray();
-                if (itemPath.Length == 0)
-                {
-                    totalRecords = 0;
-                    return Enumerable.Empty<IUmbracoEntity>();
-                }
-
+                
                 var query = Query<IUmbracoEntity>.Builder;
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
-                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", itemPath[0].Path), TextColumnType.NVarchar));
+                    //lookup the path so we can use it in the prefix query below
+                    var itemPaths = repository.GetAllPaths(objectTypeId, id).ToArray();
+                    if (itemPaths.Length == 0)
+                    {
+                        totalRecords = 0;
+                        return Enumerable.Empty<IUmbracoEntity>();
+                    }
+                    var itemPath = itemPaths[0].Path;
+
+                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", itemPath), TextColumnType.NVarchar));
                 }
 
                 IQuery<IUmbracoEntity> filterQuery = null;
@@ -406,10 +407,15 @@ namespace Umbraco.Core.Services
                     var clauses = new List<Expression<Func<IUmbracoEntity, bool>>>();
                     foreach (var id in idsA)
                     {
-                        var path = itemPaths.FirstOrDefault(x => x.Id == id);
-                        if (path == null) continue;
-                        var qid = id;
-                        clauses.Add(x => x.Path.SqlStartsWith(string.Format("{0},", path), TextColumnType.NVarchar) || x.Path.SqlEndsWith(string.Format(",{0}", qid), TextColumnType.NVarchar));
+                        //if the id is root then don't add any clauses
+                        if (id != Constants.System.Root)
+                        {
+                            var itemPath = itemPaths.FirstOrDefault(x => x.Id == id);
+                            if (itemPath == null) continue;
+                            var path = itemPath.Path;
+                            var qid = id;
+                            clauses.Add(x => x.Path.SqlStartsWith(string.Format("{0},", path), TextColumnType.NVarchar) || x.Path.SqlEndsWith(string.Format(",{0}", qid), TextColumnType.NVarchar));
+                        }                        
                     }
                     query.WhereAny(clauses);
                 }
@@ -462,22 +468,7 @@ namespace Umbraco.Core.Services
                 return contents;
             }
         }
-
-        /// <inheritdoc />
-        public virtual IEnumerable<IUmbracoEntity> GetAncestors(int id)
-        {
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
-            {
-                var repository = RepositoryFactory.CreateEntityRepository(uow);
-                var entity = repository.Get(id);
-                var pathMatch = entity.Path + ",";
-                var query = Query<IUmbracoEntity>.Builder.Where(x => x.Path.StartsWith(pathMatch) && x.Id != id);
-
-                var entities = repository.GetByQuery(query);
-                return entities;
-            }
-        }
-
+        
         /// <summary>
         /// Gets a collection of descendents by the parents Id
         /// </summary>
