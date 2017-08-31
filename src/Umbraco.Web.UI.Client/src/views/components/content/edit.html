@@ -27,9 +27,14 @@
                                 <umb-box>
                                     <umb-box-header title="Links"></umb-box-header>
                                     <umb-box-content class="block-form">
-                                        <div ng-repeat="url in content.urls">
-                                           <i class="icon icon-window-popin"></i> <a href="{{ url }}" >{{ url }}</a>
-                                        </div>
+                                        <ul class="nav nav-stacked" style="margin-bottom: 0;">
+                                            <li ng-repeat="url in content.urls">
+                                                <a href="{{url}}" target="_blank">
+                                                    <i class="icon icon-window-popin"></i>
+                                                    <span>{{url}}</span>
+                                                </a>
+                                            </li>
+                                        </ul>
                                     </umb-box-content>    
                                 </umb-box>
                                 <umb-box>
