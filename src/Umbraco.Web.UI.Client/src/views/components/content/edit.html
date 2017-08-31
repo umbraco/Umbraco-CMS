@@ -36,7 +36,7 @@
                                     <umb-box-header title="History"></umb-box-header>
                                     <umb-box-content class="block-form">
                                         <!-- item 1 -->
-                                        <div class="history-item" ng-repeat="item in auditTrail">
+                                        <div class="history-item" ng-repeat="item in auditTrail" ng-class="{'last-history-item': $last}">
                                             <div class="history-row">
                                                 <umb-avatar
                                                     color="secondary"
