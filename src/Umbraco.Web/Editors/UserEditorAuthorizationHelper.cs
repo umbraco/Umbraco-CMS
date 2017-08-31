@@ -52,8 +52,16 @@ namespace Umbraco.Web.Editors
             //a user can remove any start nodes and add start nodes that they have access to
             //but they cannot add a start node that they do not have access to
 
-            var changedStartContentIds = savingUser == null ? startContentIds : startContentIds.Except(savingUser.StartContentIds).ToArray();
-            var changedStartMediaIds = savingUser == null ? startMediaIds : startMediaIds.Except(savingUser.StartMediaIds).ToArray();
+            var changedStartContentIds = savingUser == null
+                ? startContentIds
+                : startContentIds == null
+                    ? null
+                    : startContentIds.Except(savingUser.StartContentIds).ToArray();
+            var changedStartMediaIds = savingUser == null
+                ? startMediaIds
+                : startMediaIds == null
+                    ? null
+                    : startMediaIds.Except(savingUser.StartMediaIds).ToArray();
             var pathResult = AuthorizePath(currentUser, changedStartContentIds, changedStartMediaIds);
             if (pathResult == false)
                 return pathResult;
