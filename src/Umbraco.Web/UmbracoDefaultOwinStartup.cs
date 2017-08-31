@@ -28,6 +28,7 @@ namespace Umbraco.Web
 
             ConfigureServices(app);
             ConfigureMiddleware(app);
+            ConfigureExternalLogins(app);
         }
 
         /// <summary>
@@ -66,6 +67,15 @@ namespace Umbraco.Web
             app.ConfigureUserManagerForUmbracoBackOffice(
                 ApplicationContext,
                 Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());
+        }
+
+        /// <summary>
+        /// Configure external oAuth login providers
+        /// </summary>
+        /// <param name="app"></param>
+        protected virtual void ConfigureExternalLogins(IAppBuilder app)
+        {
+            // Code for configuring external login/oAuth providers goes here.
         }
 
         /// <summary>
