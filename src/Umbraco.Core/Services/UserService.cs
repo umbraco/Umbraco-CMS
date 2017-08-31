@@ -178,7 +178,8 @@ namespace Umbraco.Core.Services
                 user.AddAllowedSection("content");
                 user.AddAllowedSection("media");
 
-                if (uow.Events.DispatchCancelable(SavingUser, this, new SaveEventArgs<IUser>(user)))
+                var saveEventArgs = new SaveEventArgs<IUser>(user);
+                if (uow.Events.DispatchCancelable(SavingUser, this, saveEventArgs))
                 {
                     uow.Commit();
                     return user;
@@ -186,8 +187,8 @@ namespace Umbraco.Core.Services
 
                 repository.AddOrUpdate(user);
                 uow.Commit();
-
-                uow.Events.Dispatch(SavedUser, this, new SaveEventArgs<IUser>(user, false));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(SavedUser, this, saveEventArgs);
 
                 return user;
             }
@@ -314,7 +315,8 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (uow.Events.DispatchCancelable(DeletingUser, this, new DeleteEventArgs<IUser>(user)))
+                    var deleteEventArgs = new DeleteEventArgs<IUser>(user);
+                    if (uow.Events.DispatchCancelable(DeletingUser, this, deleteEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -322,7 +324,8 @@ namespace Umbraco.Core.Services
                     var repository = RepositoryFactory.CreateUserRepository(uow);
                     repository.Delete(user);
                     uow.Commit();
-                    uow.Events.Dispatch(DeletedUser, this, new DeleteEventArgs<IUser>(user, false));
+                    deleteEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(DeletedUser, this, deleteEventArgs);
                 }
             }
         }
@@ -337,7 +340,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (raiseEvents && uow.Events.DispatchCancelable(SavingUser, this, new SaveEventArgs<IUser>(entity)))
+                var saveEventArgs = new SaveEventArgs<IUser>(entity);
+                if (raiseEvents && uow.Events.DispatchCancelable(SavingUser, this, saveEventArgs))
                 {
                     uow.Commit();
                     return;
@@ -363,7 +367,10 @@ namespace Umbraco.Core.Services
                     uow.Commit();
 
                     if (raiseEvents)
-                        uow.Events.Dispatch(SavedUser, this, new SaveEventArgs<IUser>(entity, false));
+                    {
+                        saveEventArgs.CanCancel = false;
+                        uow.Events.Dispatch(SavedUser, this, saveEventArgs);
+                    }
                 }
                 catch (DbException ex)
                 {
@@ -391,9 +398,10 @@ namespace Umbraco.Core.Services
             var asArray = entities.ToArray();
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                var saveEventArgs = new SaveEventArgs<IUser>(asArray);
                 if (raiseEvents)
                 {
-                    if (uow.Events.DispatchCancelable(SavingUser, this, new SaveEventArgs<IUser>(asArray)))
+                    if (uow.Events.DispatchCancelable(SavingUser, this, saveEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -416,7 +424,10 @@ namespace Umbraco.Core.Services
                 uow.Commit();
 
                 if (raiseEvents)
-                    uow.Events.Dispatch(SavedUser, this, new SaveEventArgs<IUser>(asArray, false));
+                {
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(SavedUser, this, saveEventArgs);
+                }
             }
 
 
@@ -719,7 +730,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (raiseEvents && uow.Events.DispatchCancelable(SavingUserType, this, new SaveEventArgs<IUserType>(userType)))
+                var saveEventArgs = new SaveEventArgs<IUserType>(userType);
+                if (raiseEvents && uow.Events.DispatchCancelable(SavingUserType, this, saveEventArgs))
                 {
                     uow.Commit();
                     return;
@@ -729,7 +741,10 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(userType);
                 uow.Commit();
                 if (raiseEvents)
-                    uow.Events.Dispatch(SavedUserType, this, new SaveEventArgs<IUserType>(userType, false));
+                {
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(SavedUserType, this, saveEventArgs);
+                }
             }
         }
 
@@ -741,7 +756,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(DeletingUserType, this, new DeleteEventArgs<IUserType>(userType)))
+                var deleteEventArgs = new DeleteEventArgs<IUserType>(userType);
+                if (uow.Events.DispatchCancelable(DeletingUserType, this, deleteEventArgs))
                 {
                     uow.Commit();
                     return;
@@ -749,7 +765,8 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateUserTypeRepository(uow);
                 repository.Delete(userType);
                 uow.Commit();
-                uow.Events.Dispatch(DeletedUserType, this, new DeleteEventArgs<IUserType>(userType, false));
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(DeletedUserType, this, deleteEventArgs);
             }
         }
 
