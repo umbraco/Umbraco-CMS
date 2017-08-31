@@ -27,18 +27,25 @@
                                 <umb-box>
                                     <umb-box-header title="Links"></umb-box-header>
                                     <umb-box-content class="block-form">
-                                        <div ng-repeat="url in content.urls">
-                                           <i class="icon icon-window-popin"></i> <a href="{{ url }}" >{{ url }}</a>
-                                        </div>
+                                        <ul class="nav nav-stacked" style="margin-bottom: 0;">
+                                            <li ng-repeat="url in content.urls">
+                                                <a href="{{url}}" target="_blank">
+                                                    <i class="icon icon-window-popin"></i>
+                                                    <span>{{url}}</span>
+                                                </a>
+                                            </li>
+                                        </ul>
                                     </umb-box-content>    
                                 </umb-box>
                                 <umb-box>
                                     <umb-box-header title="History"></umb-box-header>
-                                    <umb-box-content class="block-form">
-                                        <!-- item 1 -->
-                                        <div class="history-item" ng-repeat="item in auditTrail" ng-class="{'last-history-item': $last}">
-                                            <div class="history-row">
-                                                <div class="history-item__avatar">
+                                    <umb-box-content class="block-form" style="position: relative;">
+
+                                        <umb-load-indicator ng-if="loadingAuditTrail"></umb-load-indicator>
+
+                                        <div ng-if="!loadingAuditTrail">
+                                            <div class="history-item" ng-repeat="item in auditTrail" ng-class="{'last-history-item': $last}">
+                                                <div class="history-row">
                                                     <umb-avatar
                                                         color="secondary"
                                                         size="xs"
@@ -46,29 +53,32 @@
                                                         img-src="{{item.user.avatars[3]}}"
                                                         img-srcset="{{item.user.avatars[4]}} 2x, {{item.user.avatars[4]}} 3x">
                                                     </umb-avatar>
-                                                </div>
-                                                <div class="name-date-container">
-                                                    <div>{{ item.user.name }}</div>
-                                                    <div class="history-item__date">{{ item.date }}</div>
-                                                </div>
-                                                    <umb-badge
-                                                        size="s"
-                                                        color="{{item.actionColor}}">
-                                                        {{ item.action }}
-                                                    </umb-badge>
+                                                    <div class="name-date-container">
+                                                    <span>{{ item.user.name }}</span>
+                                                    <span class="date">{{ item.date }}</span>
+                                                    </div>
+                                                        <umb-badge
+                                                            size="s"
+                                                            color="{{item.actionColor}}">
+                                                            {{ item.action }}
+                                                        </umb-badge>
                                                 <span>{{ item.description }}</span>
+                                                </div>
+                                                <div class="history-line"></div>
                                             </div>
-                                            <div class="history-line"></div>
+
+                                            <div class="flex justify-center">
+                                                <umb-pagination
+                                                    page-number="pagination.pageNumber"
+                                                    total-pages="pagination.totalPages"
+                                                    on-next="nextPage"
+                                                    on-prev="prevPage"
+                                                    on-go-to-page="goToPage">
+                                                </umb-pagination>
+                                            </div>
+
                                         </div>
-                                        <div class="flex justify-center">
-                                        <umb-pagination
-                                            page-number="pagination.pageNumber"
-                                            total-pages="pagination.totalPages"
-                                            on-next="nextPage"
-                                            on-prev="prevPage"
-                                            on-go-to-page="goToPage">
-                                        </umb-pagination>
-                                    </div>
+
                                     </umb-box-content>    
                                 </umb-box>           
                             </div>

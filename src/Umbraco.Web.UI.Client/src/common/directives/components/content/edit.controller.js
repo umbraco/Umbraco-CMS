@@ -177,8 +177,12 @@
       // get available templates
       $scope.availableTemplates = getAvailableTemplates($scope.content);
 
-      // get the auditTrail
-      setAuditTrailActionColor($scope.auditTrail);
+      // get the auditTrail - fake loading
+      $scope.loadingAuditTrail = true;
+      $timeout(function(){
+        setAuditTrailActionColor($scope.auditTrail);        
+        $scope.loadingAuditTrail = false;
+      }, 2000);
 
     }
 
