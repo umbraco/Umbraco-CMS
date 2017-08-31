@@ -593,7 +593,14 @@ namespace Umbraco.Core.Services
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
-                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
+                    var entityRepository = RepositoryFactory.CreateEntityRepository(uow);
+                    var mediaPath = entityRepository.GetAllPaths(Constants.ObjectTypes.MediaGuid, id).ToArray();
+                    if (mediaPath.Length == 0)
+                    {
+                        totalChildren = 0;
+                        return Enumerable.Empty<IMedia>();
+                    }
+                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", mediaPath[0]), TextColumnType.NVarchar));
                 }
                 IQuery<IMedia> filterQuery = null;
                 if (filter.IsNullOrWhiteSpace() == false)
