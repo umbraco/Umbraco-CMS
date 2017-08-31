@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
+using Ganss.XSS;
 using HtmlAgilityPack;
 using Umbraco.Web.WebApi.Filters;
 
@@ -88,6 +89,18 @@ namespace Umbraco.Web
         public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
         {
             string hellip = "&hellip;";
+
+            HtmlDocument doc = new HtmlDocument();
+            HtmlSanitizer sanitizer = new HtmlSanitizer();
+
+            doc.LoadHtml(html);
+
+            //Check for invalid HTML
+            if (doc.ParseErrors.Any())
+            {
+                //Sanitize invalid HTML, it will not be pretty, but it will be valid
+                html = sanitizer.Sanitize(html);
+            }
 
             using (var outputms = new MemoryStream())
             {
@@ -255,7 +268,7 @@ namespace Umbraco.Web
                         //if there is, remove it
                         if (string.IsNullOrWhiteSpace(firstTrim) == false)
                         {
-                            result = firstTrim[firstTrim.Length - hellip.Length -1] == ' ' ? firstTrim.Remove(firstTrim.Length - hellip.Length -1, 1) : firstTrim;
+                            result = firstTrim[firstTrim.Length - hellip.Length - 1] == ' ' ? firstTrim.Remove(firstTrim.Length - hellip.Length - 1, 1) : firstTrim;
                         }
                         return new HtmlString(result);
                     }
@@ -272,10 +285,13 @@ namespace Umbraco.Web
         public int WordsToLength(string html, int words, bool tagsAsContent)
         {
             HtmlDocument doc = new HtmlDocument();
+            HtmlSanitizer sanitizer = new HtmlSanitizer();
+
+            doc.LoadHtml(html);
 
             int wordCount = 0,
                 length = 0,
-                insideTagCounter = length,
+                insideTagCounter = 0,
                 maxWords = words;
 
             string strippedOfTags = string.Empty;
@@ -283,13 +299,20 @@ namespace Umbraco.Web
             //If tagsAsContent is on, use the string stripped of html tags
             if (tagsAsContent == false)
             {
-                doc.LoadHtml(html);
-
                 foreach (var node in doc.DocumentNode.ChildNodes)
                 {
                     strippedOfTags += node.InnerText;
                 }
                 html = strippedOfTags;
+            }
+            else
+            {
+                //Check for invalid HTML
+                if (doc.ParseErrors.Any())
+                {
+                    //Sanitize invalid HTML, it will not be pretty, but it will be valid
+                    html = sanitizer.Sanitize(html);
+                }
             }
 
             while (length < html.Length)
@@ -300,14 +323,13 @@ namespace Umbraco.Web
                 while (length < html.Length && char.IsWhiteSpace(html[length]) == false)
                 {
                     //Check if we have a space inside a tag and increase the length if we do
+                    //We ignore the end tag as it is added by the Truncate method
                     if (html[length].Equals('<') && html[length + 1].Equals('/') == false && tagsAsContent)
                     {
+                        insideTagCounter = length;
                         while (html[insideTagCounter].Equals('>') == false)
                         {
-                            if (html[insideTagCounter].Equals(' '))
-                            {
-                                length++;
-                            }
+                            length++;
                             insideTagCounter++;
                         }
                     }
