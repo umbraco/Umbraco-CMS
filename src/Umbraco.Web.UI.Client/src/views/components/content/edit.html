@@ -38,16 +38,18 @@
                                         <!-- item 1 -->
                                         <div class="history-item" ng-repeat="item in auditTrail" ng-class="{'last-history-item': $last}">
                                             <div class="history-row">
-                                                <umb-avatar
-                                                    color="secondary"
-                                                    size="xs"
-                                                    name="{{item.user.name}}"
-                                                    img-src="{{item.user.avatars[3]}}"
-                                                    img-srcset="{{item.user.avatars[4]}} 2x, {{item.user.avatars[4]}} 3x">
-                                                </umb-avatar>
+                                                <div class="history-item__avatar">
+                                                    <umb-avatar
+                                                        color="secondary"
+                                                        size="xs"
+                                                        name="{{item.user.name}}"
+                                                        img-src="{{item.user.avatars[3]}}"
+                                                        img-srcset="{{item.user.avatars[4]}} 2x, {{item.user.avatars[4]}} 3x">
+                                                    </umb-avatar>
+                                                </div>
                                                 <div class="name-date-container">
-                                                    <span>{{ item.user.name }}</span>
-                                                    <span class="date">{{ item.date }}</span>
+                                                    <div>{{ item.user.name }}</div>
+                                                    <div class="history-item__date">{{ item.date }}</div>
                                                 </div>
                                                     <umb-badge
                                                         size="s"
@@ -77,14 +79,14 @@
                                     <umb-box-content class="block-form">
                                         <div class="date-wrapper">
                                             <div class="date-container">
-                                                <h2>Publish date</h2>
-                                                <h3>October 2016</h3>
-                                                <h1>17</h1>
-                                                <h3>Wednesday 10:43 PM</h3>
+                                                <div class="date-wrapper__title">Publish date</div>
+                                                <div class="date-wrapper__date">October 2016</div>
+                                                <div class="date-wrapper__number">17</div>
+                                                <div class="date-wrapper__date">Wednesday 10:43 PM</div>
                                             </div>
                                             <div class="date-separate"></div>
                                             <div class="date-container">
-                                                <h2>Unpublish date</h2>
+                                                <div class="date-wrapper__title">Unpublish date</div>
                                                 <div class="place-holder"></div>
                                                 <h4>ADD DATE</h4>
                                             </div>
