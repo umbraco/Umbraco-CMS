@@ -247,13 +247,13 @@ namespace Umbraco.Web
                     outputms.Position = 0;
                     using (TextReader outputtr = new StreamReader(outputms))
                     {
-                        string result = String.Empty;
+                        string result = string.Empty;
 
                         string firstTrim = outputtr.ReadToEnd().Replace("  ", " ").Trim();
 
                         //Check to see if there is an empty char between the hellip and the output string
                         //if there is, remove it
-                        if (String.IsNullOrEmpty(firstTrim) == false)
+                        if (string.IsNullOrWhiteSpace(firstTrim) == false)
                         {
                             result = firstTrim[firstTrim.Length - hellip.Length -1] == ' ' ? firstTrim.Remove(firstTrim.Length - hellip.Length -1, 1) : firstTrim;
                         }
