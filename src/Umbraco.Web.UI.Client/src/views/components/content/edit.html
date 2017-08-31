@@ -96,9 +96,13 @@
                                     <umb-box-content class="block-form">
                                         <umb-control-group label="Created by {{ content.owner.name }} at {{ content.createDate }}"></umb-control-group>
                                         
-                                        <umb-control-group label="{{ idSection.name }}">
-                                            <div>{{ content.id }}</div>
-                                            <small class="muted">{{ content.key }}</small>
+                                        <umb-control-group label="@content_documentType" description="{{docType.description}}">
+                                            <umb-node-preview
+                                                icon="docType.icon"
+                                                name="docType.name"
+                                                allow-open="allowOpen"
+                                                on-open="openDocType(docType)">
+                                            </umb-node-preview>
                                         </umb-control-group>
 
                                         <umb-control-group label="@template_template" description="{{template.description}}">
@@ -109,13 +113,9 @@
                                             </umb-node-preview>
                                         </umb-control-group>
 
-                                        <umb-control-group label="@content_documentType" description="{{docType.description}}">
-                                            <umb-node-preview
-                                                icon="docType.icon"
-                                                name="docType.name"
-                                                allow-open="allowOpen"
-                                                on-open="openDocType(docType)">
-                                            </umb-node-preview>
+                                        <umb-control-group label="{{ idSection.name }}">
+                                            <div>{{ content.id }}</div>
+                                            <small class="muted">{{ content.key }}</small>
                                         </umb-control-group>
                                     </umb-box-content>    
                                 </umb-box>
