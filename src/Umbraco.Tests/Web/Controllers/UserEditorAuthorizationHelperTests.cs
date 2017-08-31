@@ -112,18 +112,30 @@ namespace Umbraco.Tests.Web.Controllers
         }
 
         [Test]
-        public void Cannot_Grant_Content_Start_Node_On_User_Without_Access()
+        public void Can_Add_Another_Content_Start_Node_On_User_With_Access()
         {
-            var currentUser = Mock.Of<IUser>(user => user.StartContentIds == new[]{9876});
-            var savingUser = Mock.Of<IUser>();
+            var nodePaths = new Dictionary<int, string>
+            {
+                {1234, "-1,1234"},
+                {9876, "-1,9876"},
+                {5555, "-1,9876,5555"},
+                {4567, "-1,4567"},
+            };
+
+            var currentUser = Mock.Of<IUser>(user => user.StartContentIds == new[] { 9876 });
+            var savingUser = Mock.Of<IUser>(user => user.StartContentIds == new[] {1234});
 
             var contentService = new Mock<IContentService>();
-            contentService.Setup(x => x.GetById(It.IsAny<int>())).Returns(Mock.Of<IContent>(content => content.Path == "-1,1234"));
+            contentService.Setup(x => x.GetById(It.IsAny<int>()))
+                .Returns((int id) => Mock.Of<IContent>(content => content.Path == nodePaths[id]));            
             var mediaService = new Mock<IMediaService>();
             var userService = new Mock<IUserService>();
             var entityService = new Mock<IEntityService>();
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns(new[] { new EntityPath() { Path = "-1,9876", Id = 9876 } });
+                .Returns((UmbracoObjectTypes objType, int[] ids) =>
+                {
+                    return ids.Select(x => new EntityPath {Path = nodePaths[x], Id = x});
+                });
 
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
@@ -131,25 +143,113 @@ namespace Umbraco.Tests.Web.Controllers
                 userService.Object,
                 entityService.Object);
 
+            //adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234, 5555 }, new int[0], new string[0]);
+
+            Assert.IsTrue(result.Success);
+        }
+
+        [Test]
+        public void Can_Remove_Content_Start_Node_On_User_Without_Access()
+        {
+            var nodePaths = new Dictionary<int, string>
+            {
+                {1234, "-1,1234"},
+                {9876, "-1,9876"},
+                {5555, "-1,9876,5555"},
+                {4567, "-1,4567"},
+            };
+
+            var currentUser = Mock.Of<IUser>(user => user.StartContentIds == new[] { 9876 });
+            var savingUser = Mock.Of<IUser>(user => user.StartContentIds == new[] { 1234, 4567 });
+
+            var contentService = new Mock<IContentService>();
+            contentService.Setup(x => x.GetById(It.IsAny<int>()))
+                .Returns((int id) => Mock.Of<IContent>(content => content.Path == nodePaths[id]));
+            var mediaService = new Mock<IMediaService>();
+            var userService = new Mock<IUserService>();
+            var entityService = new Mock<IEntityService>();
+            entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+                .Returns((UmbracoObjectTypes objType, int[] ids) =>
+                {
+                    return ids.Select(x => new EntityPath { Path = nodePaths[x], Id = x });
+                });
+
+            var authHelper = new UserEditorAuthorizationHelper(
+                contentService.Object,
+                mediaService.Object,
+                userService.Object,
+                entityService.Object);
+
+            //removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234 }, new int[0], new string[0]);
+
+            Assert.IsTrue(result.Success);
+        }
+
+        [Test]
+        public void Cannot_Add_Content_Start_Node_On_User_Without_Access()
+        {
+            var nodePaths = new Dictionary<int, string>
+            {
+                {1234, "-1,1234"},
+                {9876, "-1,9876"},
+                {5555, "-1,9876,5555"},
+                {4567, "-1,4567"},
+            };
+
+            var currentUser = Mock.Of<IUser>(user => user.StartContentIds == new[]{9876});
+            var savingUser = Mock.Of<IUser>();
+
+            var contentService = new Mock<IContentService>();
+            contentService.Setup(x => x.GetById(It.IsAny<int>()))
+                .Returns((int id) => Mock.Of<IContent>(content => content.Path == nodePaths[id]));
+            var mediaService = new Mock<IMediaService>();
+            var userService = new Mock<IUserService>();
+            var entityService = new Mock<IEntityService>();
+            entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+                .Returns((UmbracoObjectTypes objType, int[] ids) =>
+                {
+                    return ids.Select(x => new EntityPath { Path = nodePaths[x], Id = x });
+                });
+
+            var authHelper = new UserEditorAuthorizationHelper(
+                contentService.Object,
+                mediaService.Object,
+                userService.Object,
+                entityService.Object);
+
+            //adding 1234 but currentUser doesn't have access to it ... nope
             var result = authHelper.IsAuthorized(currentUser, savingUser, new []{1234}, new int[0], new string[0]);
 
             Assert.IsFalse(result.Success);
         }
 
         [Test]
-        public void Can_Grant_Content_Start_Node_On_User_With_Access()
+        public void Can_Add_Content_Start_Node_On_User_With_Access()
         {
+            var nodePaths = new Dictionary<int, string>
+            {
+                {1234, "-1,1234"},
+                {9876, "-1,9876"},
+                {5555, "-1,9876,5555"},
+                {4567, "-1,4567"},
+            };
+
             var currentUser = Mock.Of<IUser>(user => user.StartContentIds == new[] { 9876 });
             var savingUser = Mock.Of<IUser>();
 
             var contentService = new Mock<IContentService>();
             contentService.Setup(x => x.GetById(It.IsAny<int>()))
-                .Returns(Mock.Of<IContent>(content => content.Path == "-1,9876,5555"));
+                .Returns((int id) => Mock.Of<IContent>(content => content.Path == nodePaths[id]));
             var mediaService = new Mock<IMediaService>();
             var userService = new Mock<IUserService>();
             var entityService = new Mock<IEntityService>();
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns(new[] { new EntityPath() { Path = "-1,9876", Id = 9876 } });
+                .Returns((UmbracoObjectTypes objType, int[] ids) =>
+                {
+                    return ids.Select(x => new EntityPath { Path = nodePaths[x], Id = x });
+                });
 
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
@@ -157,24 +257,37 @@ namespace Umbraco.Tests.Web.Controllers
                 userService.Object,
                 entityService.Object);
 
+            //adding 5555 which currentUser has access to since it's a child of 9876 ... ok
             var result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 5555 }, new int[0], new string[0]);
 
             Assert.IsTrue(result.Success);
         }
 
         [Test]
-        public void Cannot_Grant_Media_Start_Node_On_User_Without_Access()
+        public void Cannot_Add_Media_Start_Node_On_User_Without_Access()
         {
+            var nodePaths = new Dictionary<int, string>
+            {
+                {1234, "-1,1234"},
+                {9876, "-1,9876"},
+                {5555, "-1,9876,5555"},
+                {4567, "-1,4567"},
+            };
+
             var currentUser = Mock.Of<IUser>(user => user.StartMediaIds == new[] { 9876 });
             var savingUser = Mock.Of<IUser>();
 
             var contentService = new Mock<IContentService>();            
-            var mediaService = new Mock<IMediaService>();
-            mediaService.Setup(x => x.GetById(It.IsAny<int>())).Returns(Mock.Of<IMedia>(content => content.Path == "-1,1234"));
+            var mediaService = new Mock<IMediaService>();            
+            mediaService.Setup(x => x.GetById(It.IsAny<int>()))
+                .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
             var userService = new Mock<IUserService>();
             var entityService = new Mock<IEntityService>();
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns(new[] { new EntityPath() { Path = "-1,9876", Id = 9876 } });
+                .Returns((UmbracoObjectTypes objType, int[] ids) =>
+                {
+                    return ids.Select(x => new EntityPath { Path = nodePaths[x], Id = x });
+                });
 
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
@@ -182,25 +295,37 @@ namespace Umbraco.Tests.Web.Controllers
                 userService.Object,
                 entityService.Object);
 
+            //adding 1234 but currentUser doesn't have access to it ... nope
             var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] {1234}, new string[0]);
 
             Assert.IsFalse(result.Success);
         }
 
         [Test]
-        public void Can_Grant_Media_Start_Node_On_User_With_Access()
+        public void Can_Add_Media_Start_Node_On_User_With_Access()
         {
+            var nodePaths = new Dictionary<int, string>
+            {
+                {1234, "-1,1234"},
+                {9876, "-1,9876"},
+                {5555, "-1,9876,5555"},
+                {4567, "-1,4567"},
+            };
+
             var currentUser = Mock.Of<IUser>(user => user.StartMediaIds == new[] { 9876 });
             var savingUser = Mock.Of<IUser>();
 
             var contentService = new Mock<IContentService>();            
             var mediaService = new Mock<IMediaService>();
             mediaService.Setup(x => x.GetById(It.IsAny<int>()))
-                .Returns(Mock.Of<IMedia>(content => content.Path == "-1,9876,5555"));
+                .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
             var userService = new Mock<IUserService>();
             var entityService = new Mock<IEntityService>();
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns(new[] { new EntityPath() { Path = "-1,9876", Id = 9876 } });
+                .Returns((UmbracoObjectTypes objType, int[] ids) =>
+                {
+                    return ids.Select(x => new EntityPath { Path = nodePaths[x], Id = x });
+                });
 
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
@@ -208,7 +333,84 @@ namespace Umbraco.Tests.Web.Controllers
                 userService.Object,
                 entityService.Object);
 
+            //adding 5555 which currentUser has access to since it's a child of 9876 ... ok
             var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 5555 }, new string[0]);
+
+            Assert.IsTrue(result.Success);
+        }
+
+        [Test]
+        public void Can_Add_Another_Media_Start_Node_On_User_With_Access()
+        {
+            var nodePaths = new Dictionary<int, string>
+            {
+                {1234, "-1,1234"},
+                {9876, "-1,9876"},
+                {5555, "-1,9876,5555"},
+                {4567, "-1,4567"},
+            };
+
+            var currentUser = Mock.Of<IUser>(user => user.StartMediaIds == new[] { 9876 });
+            var savingUser = Mock.Of<IUser>(user => user.StartMediaIds == new[] { 1234 });
+
+            var contentService = new Mock<IContentService>();            
+            var mediaService = new Mock<IMediaService>();
+            mediaService.Setup(x => x.GetById(It.IsAny<int>()))
+                .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
+            var userService = new Mock<IUserService>();
+            var entityService = new Mock<IEntityService>();
+            entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+                .Returns((UmbracoObjectTypes objType, int[] ids) =>
+                {
+                    return ids.Select(x => new EntityPath { Path = nodePaths[x], Id = x });
+                });
+
+            var authHelper = new UserEditorAuthorizationHelper(
+                contentService.Object,
+                mediaService.Object,
+                userService.Object,
+                entityService.Object);
+
+            //adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234, 5555 }, new string[0]);
+
+            Assert.IsTrue(result.Success);
+        }
+
+        [Test]
+        public void Can_Remove_Media_Start_Node_On_User_Without_Access()
+        {
+            var nodePaths = new Dictionary<int, string>
+            {
+                {1234, "-1,1234"},
+                {9876, "-1,9876"},
+                {5555, "-1,9876,5555"},
+                {4567, "-1,4567"},
+            };
+
+            var currentUser = Mock.Of<IUser>(user => user.StartMediaIds == new[] { 9876 });
+            var savingUser = Mock.Of<IUser>(user => user.StartMediaIds == new[] { 1234, 4567 });
+
+            var contentService = new Mock<IContentService>();            
+            var mediaService = new Mock<IMediaService>();
+            mediaService.Setup(x => x.GetById(It.IsAny<int>()))
+                .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
+            var userService = new Mock<IUserService>();
+            var entityService = new Mock<IEntityService>();
+            entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+                .Returns((UmbracoObjectTypes objType, int[] ids) =>
+                {
+                    return ids.Select(x => new EntityPath { Path = nodePaths[x], Id = x });
+                });
+
+            var authHelper = new UserEditorAuthorizationHelper(
+                contentService.Object,
+                mediaService.Object,
+                userService.Object,
+                entityService.Object);
+
+            //removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234 }, new string[0]);
 
             Assert.IsTrue(result.Success);
         }

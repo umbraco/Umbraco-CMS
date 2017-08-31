@@ -46,9 +46,15 @@ namespace Umbraco.Web.Editors
                     return Attempt.Fail("The current user is not an administrator so cannot save another administrator");
             }
 
-            // b) A user cannot set a start node on another user that they don't have access to, this even goes for admins
+            // b) If a start node is changing, a user cannot set a start node on another user that they don't have access to, this even goes for admins
 
-            var pathResult = AuthorizePath(currentUser, startContentIds, startMediaIds);
+            //only validate any start nodes that have changed.
+            //a user can remove any start nodes and add start nodes that they have access to
+            //but they cannot add a start node that they do not have access to
+
+            var changedStartContentIds = savingUser == null ? startContentIds : startContentIds.Except(savingUser.StartContentIds).ToArray();
+            var changedStartMediaIds = savingUser == null ? startMediaIds : startMediaIds.Except(savingUser.StartMediaIds).ToArray();
+            var pathResult = AuthorizePath(currentUser, changedStartContentIds, changedStartMediaIds);
             if (pathResult == false)
                 return pathResult;
             
