@@ -70,12 +70,12 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Configure external oAuth login providers
+        /// Configure external/OAuth login providers
         /// </summary>
         /// <param name="app"></param>
         protected virtual void ConfigureExternalLogins(IAppBuilder app)
         {
-            // Code for configuring external login/oAuth providers goes here.
+            // Code for configuring external login/OAuth providers goes here.
         }
 
         /// <summary>
