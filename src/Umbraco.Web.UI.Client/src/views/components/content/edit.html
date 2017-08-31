@@ -39,15 +39,19 @@
                                         <div class="history-item" ng-repeat="item in auditTrail">
                                             <div class="history-row">
                                                 <umb-avatar
-                                                color="secondary"
-                                                size="xs"
-                                                name="zsolt">
-                                            </umb-avatar>
+                                                    color="secondary"
+                                                    size="xs"
+                                                    name="{{item.user.name}}"
+                                                    img-src="{{item.user.avatars[3]}}"
+                                                    img-srcset="{{item.user.avatars[4]}} 2x, {{item.user.avatars[4]}} 3x">
+                                                </umb-avatar>
                                                 <div class="name-date-container">
-                                                    <h1>{{ item.name }}</h1>
+                                                    <h1>{{ item.user.name }}</h1>
                                                     <h2>{{ item.date }}</h2>
                                                 </div>
-                                                    <umb-badge size="s" color="success">
+                                                    <umb-badge
+                                                        size="s"
+                                                        color="{{item.actionColor}}">
                                                         {{ item.action }}
                                                     </umb-badge>
                                                 <h4>{{ item.description }}</h4>
