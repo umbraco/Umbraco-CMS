@@ -210,17 +210,7 @@ namespace Umbraco.Web.Trees
         protected override bool HasPathAccess(string id, FormDataCollection queryStrings)
         {
             var entity = GetEntityFromId(id);
-            if (entity == null)
-            {
-                return false;
-            }
-
-            var content = Services.ContentService.GetById(entity.Id);
-            if (content == null)
-            {
-                return false;
-            }
-            return Security.CurrentUser.HasPathAccess(content, Services.EntityService);
+            return HasPathAccess(entity, queryStrings);
         }
 
         /// <summary>

@@ -6,6 +6,7 @@ using System.Net;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -142,6 +143,19 @@ namespace Umbraco.Core.Models
         internal static bool HasPathAccess(this IUser user, IMedia media, IEntityService entityService)
         {
             return HasPathAccess(media.Path, user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
+        }
+
+        internal static bool HasPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService, int recycleBinId)
+        {
+            switch (recycleBinId)
+            {
+                case Constants.System.RecycleBinMedia:
+                    return HasPathAccess(entity.Path, user.CalculateMediaStartNodeIds(entityService), recycleBinId);
+                case Constants.System.RecycleBinContent:
+                    return HasPathAccess(entity.Path, user.CalculateContentStartNodeIds(entityService), recycleBinId);
+                default:
+                    throw new NotSupportedException("Path access is only determined on content or media");
+            }
         }
 
         internal static bool HasPathAccess(string path, int[] startNodeIds, int recycleBinId)

@@ -89,7 +89,7 @@ angular.module("umbraco.directives")
 
                 element.find("a:first").text(node.name);
 
-                if (!node.menuUrl) {
+                if (!node.menuUrl || (node.metaData && node.metaData.noAccess === true)) {
                     element.find("a.umb-options").remove();
                 }
 
@@ -140,6 +140,9 @@ angular.module("umbraco.directives")
               about it.
             */
             scope.options = function (n, ev) {
+                if (n.metaData && n.metaData.noAccess === true) {
+                    return;
+                }
                 emitEvent("treeOptionsClick", { element: element, tree: scope.tree, node: n, event: ev });
             };
 
@@ -158,6 +161,11 @@ angular.module("umbraco.directives")
                     return;
                 }
 
+                if (n.metaData && n.metaData.noAccess === true) {
+                    ev.preventDefault();
+                    return;
+                }
+
                 emitEvent("treeNodeSelect", { element: element, tree: scope.tree, node: n, event: ev });
                 ev.preventDefault();
             };
@@ -169,6 +177,9 @@ angular.module("umbraco.directives")
               defined on the tree
             */
             scope.altSelect = function (n, ev) {
+                if (n.metaData && n.metaData.noAccess === true) {
+                    return;
+                }
                 emitEvent("treeNodeAltSelect", { element: element, tree: scope.tree, node: n, event: ev });
             };
 

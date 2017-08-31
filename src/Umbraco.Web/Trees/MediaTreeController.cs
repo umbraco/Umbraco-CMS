@@ -160,17 +160,7 @@ namespace Umbraco.Web.Trees
         protected override bool HasPathAccess(string id, FormDataCollection queryStrings)
         {
             var entity = GetEntityFromId(id);
-            if (entity == null)
-            {
-                return false;
-            }
-
-            var media = Services.MediaService.GetById(entity.Id);
-            if (media == null)
-            {
-                return false;
-            }
-            return Security.CurrentUser.HasPathAccess(media, Services.EntityService);
+            return HasPathAccess(entity, queryStrings);
         }
 
         public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
