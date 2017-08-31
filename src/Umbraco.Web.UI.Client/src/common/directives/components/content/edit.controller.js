@@ -174,6 +174,9 @@
         }
       }
 
+      // get available templates
+      $scope.availableTemplates = getAvailableTemplates($scope.content);
+
       // get the auditTrail
       setAuditTrailActionColor($scope.auditTrail);
 
@@ -387,6 +390,22 @@
       console.log("this is not the template");
     };
 
+    $scope.updateTemplate = function(templateAlias) {
+
+      // update template value
+      $scope.content.template = templateAlias;
+
+      // update template value on the correct tab
+      angular.forEach($scope.content.tabs, function(tab){
+        angular.forEach(tab.properties, function(property){
+          if(property.alias === "_umb_template") {
+            property.value = templateAlias;
+          }
+        });
+      });
+
+    };
+
     function setAuditTrailActionColor(auditTrail) {
       angular.forEach(auditTrail, function (item) {
         switch (item.action) {
@@ -400,6 +419,23 @@
             item.actionColor = "gray";
         }
       });
+    }
+
+    function getAvailableTemplates(content) {
+
+      var availableTemplates = {};
+
+      // find the templates in the properties array
+      angular.forEach(content.properties, function(property){
+        if(property.alias === "_umb_template") {
+          if(property.config && property.config.items) {
+            availableTemplates = property.config.items;
+          }
+        }
+      });
+
+      return availableTemplates;
+
     }
 
 

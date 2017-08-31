@@ -106,11 +106,12 @@
                                         </umb-control-group>
 
                                         <umb-control-group label="@template_template" description="{{template.description}}">
-                                            <umb-node-preview
-                                                name="content.template"
-                                                allow-open="allowOpen"
-                                                on-open="openTemplate(template)">
-                                            </umb-node-preview>
+                                            <select
+                                                class="input-block-level"
+                                                ng-model="content.template"
+                                                ng-options="key as value for (key, value) in availableTemplates"
+                                                ng-change="updateTemplate(content.template)">
+                                            </select>
                                         </umb-control-group>
 
                                         <umb-control-group label="{{ idSection.name }}">
