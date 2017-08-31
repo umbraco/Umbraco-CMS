@@ -102,8 +102,8 @@
                 <asp:RegularExpressionValidator ID="NewPasswordLengthValidator" runat="server"
                     Display="Dynamic"
                     ControlToValidate="umbPasswordChanger_passwordNew"
-                    ErrorMessage='<%# "Minimum " + Provider.MinRequiredPasswordLength + " characters" %>'
-                    ValidationExpression='<%# ".{" + Provider.MinRequiredPasswordLength + "}.*" %>' />
+                    ErrorMessage='<%# "Password must have one lower case and one upper case letter, one digit, a special character, length greater or equal to 8 characters with no spaces" %>'
+                    ValidationExpression='<%# Provider.PasswordStrengthRegularExpression %>' />
             </div>
         </div>
         
