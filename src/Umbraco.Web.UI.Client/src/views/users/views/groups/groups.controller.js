@@ -24,9 +24,12 @@
                 currentUser = user;
                 // Get usergroups
                 userGroupsResource.getUserGroups({ onlyCurrentUserGroups: false }).then(function (userGroups) {
+
+                    // only allow editing and selection if user is member of the group or admin
                     vm.userGroups = _.map(userGroups, function (ug) {
-                        return { group: ug, isMember: user.userGroups.indexOf(ug.alias) !== -1}  
+                        return { group: ug, hasAccess: user.userGroups.indexOf(ug.alias) !== -1 || user.userGroups.indexOf("admin") !== -1}
                     });
+
                     vm.loading = false;
                 });
             });
@@ -42,7 +45,8 @@
 
         function clickUserGroup(userGroup) {
 
-            if (currentUser.userGroups.indexOf(userGroup.group.alias) === -1) {
+            // only allow editing if user is member of the group or admin
+            if (currentUser.userGroups.indexOf(userGroup.group.alias) === -1 && currentUser.userGroups.indexOf("admin") === -1) {
                 return;
             }
 
@@ -55,7 +59,8 @@
 
         function selectUserGroup(userGroup, selection, event) {
 
-            if (currentUser.userGroups.indexOf(userGroup.group.alias) === -1) {
+            // only allow selection if user is member of the group or admin
+            if (currentUser.userGroups.indexOf(userGroup.group.alias) === -1 && currentUser.userGroups.indexOf("admin") === -1) {
                 return;
             }
 
