@@ -204,6 +204,13 @@ namespace Umbraco.Core.Services
         IEnumerable<IUmbracoEntity> GetDescendents(int id);
 
         /// <summary>
+        /// Gets a collection of ancestors by the parents Id
+        /// </summary>
+        /// <param name="id">Id of entity to retrieve ancestors for</param>
+        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
+        IEnumerable<IUmbracoEntity> GetAncestors(int id);
+
+        /// <summary>
         /// Gets a collection of descendents by the parents Id
         /// </summary>
         /// <param name="id">Id of entity to retrieve descendents for</param>
