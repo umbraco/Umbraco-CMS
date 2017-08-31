@@ -108,12 +108,12 @@
                                     <umb-box-content class="block-form">
                                         <umb-control-group label="Created by {{ content.owner.name }} at {{ content.createDate }}"></umb-control-group>
                                         
-                                        <umb-control-group label="@content_documentType" description="{{docType.description}}">
+                                        <umb-control-group label="@content_documentType" description="Description here">
                                             <umb-node-preview
-                                                icon="docType.icon"
-                                                name="docType.name"
+                                                icon="documentType.icon"
+                                                name="documentType.linkText"
                                                 allow-open="allowOpen"
-                                                on-open="openDocType(docType)">
+                                                on-open="openDocumentType(documentType)">
                                             </umb-node-preview>
                                         </umb-control-group>
 
