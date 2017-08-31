@@ -49,15 +49,15 @@
                                                         img-srcset="{{item.user.avatars[4]}} 2x, {{item.user.avatars[4]}} 3x">
                                                     </umb-avatar>
                                                     <div class="name-date-container">
-                                                        <h1>{{ item.user.name }}</h1>
-                                                        <h2>{{ item.date }}</h2>
+                                                    <span>{{ item.user.name }}</span>
+                                                    <span class="date">{{ item.date }}</span>
                                                     </div>
                                                         <umb-badge
                                                             size="s"
                                                             color="{{item.actionColor}}">
                                                             {{ item.action }}
                                                         </umb-badge>
-                                                    <h4>{{ item.description }}</h4>
+                                                <span>{{ item.description }}</span>
                                                 </div>
                                                 <div class="history-line"></div>
                                             </div>
