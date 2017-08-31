@@ -348,22 +348,11 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
             {
                 var repository = RepositoryFactory.CreateEntityRepository(uow);
-                
+
                 var query = Query<IUmbracoEntity>.Builder;
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
-                {
-                    //lookup the path so we can use it in the prefix query below
-                    var itemPaths = repository.GetAllPaths(objectTypeId, id).ToArray();
-                    if (itemPaths.Length == 0)
-                    {
-                        totalRecords = 0;
-                        return Enumerable.Empty<IUmbracoEntity>();
-                    }
-                    var itemPath = itemPaths[0].Path;
-
-                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", itemPath), TextColumnType.NVarchar));
-                }
+                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
 
                 IQuery<IUmbracoEntity> filterQuery = null;
                 if (filter.IsNullOrWhiteSpace() == false)
@@ -392,30 +381,15 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateEntityRepository(uow);
-                
+
                 var query = Query<IUmbracoEntity>.Builder;
                 if (idsA.All(x => x != Constants.System.Root))
                 {
-                    //lookup the paths so we can use it in the prefix query below
-                    var itemPaths = repository.GetAllPaths(objectTypeId, idsA).ToArray();
-                    if (itemPaths.Length == 0)
-                    {
-                        totalRecords = 0;
-                        return Enumerable.Empty<IUmbracoEntity>();
-                    }
-
                     var clauses = new List<Expression<Func<IUmbracoEntity, bool>>>();
                     foreach (var id in idsA)
                     {
-                        //if the id is root then don't add any clauses
-                        if (id != Constants.System.Root)
-                        {
-                            var itemPath = itemPaths.FirstOrDefault(x => x.Id == id);
-                            if (itemPath == null) continue;
-                            var path = itemPath.Path;
-                            var qid = id;
-                            clauses.Add(x => x.Path.SqlStartsWith(string.Format("{0},", path), TextColumnType.NVarchar) || x.Path.SqlEndsWith(string.Format(",{0}", qid), TextColumnType.NVarchar));
-                        }                        
+                        var qid = id;
+                        clauses.Add(x => x.Path.SqlContains(string.Format(",{0},", qid), TextColumnType.NVarchar) || x.Path.SqlEndsWith(string.Format(",{0}", qid), TextColumnType.NVarchar));
                     }
                     query.WhereAny(clauses);
                 }
@@ -468,7 +442,7 @@ namespace Umbraco.Core.Services
                 return contents;
             }
         }
-        
+
         /// <summary>
         /// Gets a collection of descendents by the parents Id
         /// </summary>
@@ -627,13 +601,13 @@ namespace Umbraco.Core.Services
                 return repository.GetAllPaths(objectTypeId, keys);
             }
         }
-        
+
         /// <summary>
-        /// Gets a collection of <see cref="T:Umbraco.Core.Models.EntityBase.IUmbracoEntity" />
+        /// Gets a collection of <see cref="IUmbracoEntity"/>
         /// </summary>
         /// <param name="objectTypeId">Guid id of the UmbracoObjectType</param>
         /// <param name="ids"></param>
-        /// <returns>An enumerable list of <see cref="T:Umbraco.Core.Models.EntityBase.IUmbracoEntity" /> objects</returns>
+        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
         public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids)
         {
             var umbracoObjectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
