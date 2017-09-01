@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -269,7 +270,7 @@ namespace Umbraco.Web.Routing
         /// <remarks>Eg the relative part of <c>/foo/bar/nil</c> to domain <c>example.com/foo</c> is <c>/bar/nil</c>.</remarks>
         public static string PathRelativeToDomain(Uri domainUri, string path)
         {
-            return path.Substring(domainUri.AbsolutePath.Length).EnsureStartsWith('/');
+            return Uri.EscapeUriString(path).Substring(domainUri.AbsolutePath.Length).EnsureStartsWith('/');
         }
 
         #endregion
