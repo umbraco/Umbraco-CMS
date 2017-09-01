@@ -17,6 +17,7 @@
     $scope.page.buttonGroupState = "init";
     $scope.allowOpen = true;
 
+
     function init(content) {
 
       $scope.auditTrail = [
@@ -384,14 +385,8 @@
       alert("go to page" + pageNumber);
     };
 
-    $scope.openTemplate = function(template) {
-      alert("you opened template");
-      console.log("this is not the doctype");
-    };
-
     $scope.openDocType = function(docType) {
-      alert("you opened docType");
-      console.log("this is not the template");
+      console.log("doctype has been clicked");
     };
 
     $scope.updateTemplate = function(templateAlias) {

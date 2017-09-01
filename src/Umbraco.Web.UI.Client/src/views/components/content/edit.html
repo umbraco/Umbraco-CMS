@@ -46,23 +46,33 @@
                                         <div ng-if="!loadingAuditTrail">
                                             <div class="history-item" ng-repeat="item in auditTrail" ng-class="{'last-history-item': $last}">
                                                 <div class="history-row">
-                                                    <umb-avatar
-                                                        color="secondary"
-                                                        size="xs"
-                                                        name="{{item.user.name}}"
-                                                        img-src="{{item.user.avatars[3]}}"
-                                                        img-srcset="{{item.user.avatars[4]}} 2x, {{item.user.avatars[4]}} 3x">
-                                                    </umb-avatar>
-                                                    <div class="name-date-container">
-                                                    <span>{{ item.user.name }}</span>
-                                                    <span class="date">{{ item.date }}</span>
+                                                
+
+                                                <div class="history-item__break">
+                                                    <div class="history-item__avatar">
+                                                        <umb-avatar
+                                                            color="secondary"
+                                                            size="xs"
+                                                            name="{{item.user.name}}"
+                                                            img-src="{{item.user.avatars[3]}}"
+                                                            img-srcset="{{item.user.avatars[4]}} 2x, {{item.user.avatars[4]}} 3x">
+                                                        </umb-avatar>
                                                     </div>
+
+                                                    <div class="name-date-container">
+                                                    <div>{{ item.user.name }}</div>
+                                                    <div class="history-item__date">{{ item.date }}</div>
+                                                    </div>
+                                                </div>
+                                                    
+                                                    <div class="history-item__break">
                                                         <umb-badge
                                                             size="s"
                                                             color="{{item.actionColor}}">
                                                             {{ item.action }}
                                                         </umb-badge>
-                                                <span>{{ item.description }}</span>
+                                                        <span>{{ item.description }}</span>
+                                                    </div>
                                                 </div>
                                                 <div class="history-line"></div>
                                             </div>
@@ -98,10 +108,10 @@
                                             <div class="date-container">
                                                 <div class="date-wrapper__title">Unpublish date</div>
                                                 <div class="place-holder"></div>
-                                                <h4>ADD DATE</h4>
+                                                <div class="data-wrapper__add">ADD</div>
                                             </div>
                                         </div>
-                                    </umb-box-content>    
+                                    </umb-box-content>
                                 </umb-box>
                                 <umb-box>
                                     <umb-box-header title="Meta data"></umb-box-header>
@@ -128,7 +138,7 @@
 
                                         <umb-control-group label="{{ idSection.name }}">
                                             <div>{{ content.id }}</div>
-                                            <small class="muted">{{ content.key }}</small>
+                                            <small>{{ content.key }}</small>
                                         </umb-control-group>
                                     </umb-box-content>    
                                 </umb-box>
@@ -165,7 +175,11 @@
             </umb-editor-footer-content-left>
 
 
-            <umb-editor-footer-content-right>
+            <umb-editor-footer-content-right>              
+                
+                <span ng-if="content.removeDate != null && content.releaseDate != null">Publish and unpublish date: <i class="icon-calendar"></i>{{ content.releaseDate }} and {{ content.removeDate }}</span>
+                <span ng-if="content.removeDate == null && content.releaseDate != null">Publish date only: <i class="icon-calendar"></i> {{ content.releaseDate }}</span>
+                <span ng-if="content.removeDate != null && content.releaseDate == null">Remove date only: <i class="icon-calendar"></i> {{ content.removeDate }}</span>
 
                <umb-button
                   ng-if="page.listViewPath"

@@ -1,11 +1,10 @@
 //----- SCHEDULED PUBLISH ------
 
-
 .place-holder {
     height: 60px;
     width: 60px;
     margin: 15px auto;
-    background-color: grey;
+    background-color: @gray-8;
 }
 
 .date-wrapper {
@@ -21,26 +20,27 @@
 .date-wrapper__number{
     font-size: 48px;
     line-height: 50px;
-    color: #2e2e32;
+    color: @gray-2;
     font-weight: 900;
 }
 
 .date-wrapper__title {
     font-size: 16px;
     font-weight: 700;
-    color: #514f53;
+    color: @gray-3;
     margin: 0 0 15px 0;
 }
 
 .date-wrapper__date{
     font-size: 13px;
-    color: #a2a0a5;
+    color: @gray-6;
     margin: 0;
 }
 
-.date-container h4{
+.data-wrapper__add{
     font-size: 18px;
-    color: #d7d6d8;
+    line-height: 10px;
+    color: @gray-8;
     font-weight: 900;
     margin: 0;
 }
@@ -49,7 +49,7 @@
     height: 120px;
     margin: 15px 0 0 0;
     width: 2px;
-    background-color: #d7d6d8;
+    background-color: @gray-8;
 }
 
 //--------- HISTORY ----------
@@ -59,7 +59,7 @@
     width: 2px;
     height: 24px;
     margin: 0 0 0 14px;
-    background-color: #d7d6d8;
+    background-color: @gray-8;
 }
 
 .history-row {
@@ -72,8 +72,8 @@
 }
 
 .history-item__date {
-    font-size: 13px;;
-    color: #817f85;
+    font-size: 13px;
+    color: @gray-5;
 }
 
 .name-date-container {
@@ -81,24 +81,10 @@
     height: 30px;
 }
 
-.history-indicator__publish {
-    padding: 7px;
-    height: 14px;
-    background-color: #eafff5;
-    border: 1px solid #35c685;
-}
-
 .last-history-item .history-line {
     display: none;
 }
 
-/* pagination */
-
-.umb-box-content .umb-pagination ul {
-    float: none;
-    display: inline;
-    margin: 0 auto;
-}
 //--------- META DATA --------
 .meta-data-section {
     display: flex;
@@ -107,20 +93,40 @@
 
 .meta-data-title {
     font-size: 15px;
-    color: #000;
+    color: @black;
     font-weight: bold;
     line-height: 20px;
 }
 
 .meta-data-description {
     font-size: 13px;
-    color: #817f85;
+    color: @gray-5;
 }
 
 .meta-data {
     font-size: 15px;
-    color: #303033;
+    color: @gray-2;
     line-height: 20px;
 }
 
-//----------- LINKS ----------
+/*  RESPONSIVE  */
+
+.history-item__break {
+    display: flex;
+    align-items: center;
+}
+@media (max-width: 979px) {
+    
+    .history-row {
+        display: block;
+        padding: 10px 0;
+    }
+
+    .history-item__break {
+        padding: 7px 0;
+    }
+
+    .history-line {
+        display: none;
+    }
+}
