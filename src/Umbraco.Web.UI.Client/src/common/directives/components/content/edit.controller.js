@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http) {
+  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http) {
 
     //setup scope vars
     $scope.defaultButton = null;
@@ -133,13 +133,6 @@
         "totalPages": 5
       };
 
-      $scope.docType = 
-        {
-          "icon": "icon-item-arrangement",
-          "name": "Project",
-          "description": "Description for the doctype section"
-        };
-
       $scope.template = {
         "description": "Description for the template section"
       };
@@ -177,6 +170,9 @@
 
       // get available templates
       $scope.availableTemplates = getAvailableTemplates($scope.content);
+
+      // get document type details
+      $scope.documentType = getDocumentType($scope.content);
 
       // get the auditTrail - fake loading
       $scope.loadingAuditTrail = true;
@@ -385,8 +381,10 @@
       alert("go to page" + pageNumber);
     };
 
-    $scope.openDocType = function(docType) {
-      console.log("doctype has been clicked");
+    $scope.openDocumentType = function(documentType) {
+      // remove first "#" from url if it is prefixed else the path won't work
+      var url = documentType.url.replace(/^#/,"");
+      $location.path(url);
     };
 
     $scope.updateTemplate = function(templateAlias) {
@@ -437,7 +435,22 @@
 
     }
 
+    function getDocumentType(content) {
 
+      var documentType = {};
+
+      // find the document type in the properties array
+      angular.forEach(content.properties, function (property) {
+        if (property.alias === "_umb_doctype") {
+          if (property.value && property.value.length > 0) {
+            documentType = property.value[0];
+          }
+        }
+      });
+
+      return documentType;
+
+    }
 
   }
 
