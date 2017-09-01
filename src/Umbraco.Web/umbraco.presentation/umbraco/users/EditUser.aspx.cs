@@ -615,7 +615,7 @@ namespace umbraco.cms.presentation.user
             // update when the AD provider is active.
             if ((BackOfficeProvider is ActiveDirectoryMembershipProvider) == false)
             {
-                var membershipHelper = new MembershipHelper(ApplicationContext, new HttpContextWrapper(Context));
+                var membershipHelper = new MembershipHelper(UmbracoContext.Current);
                 //set the writable properties that we are editing
                 membershipHelper.UpdateMember(membershipUser, BackOfficeProvider,
                                               email.Text.Trim(),
