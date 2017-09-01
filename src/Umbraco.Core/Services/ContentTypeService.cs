@@ -96,6 +96,8 @@ namespace Umbraco.Core.Services
                     repo.AddOrUpdate(container);
                     uow.Commit();
 
+                    uow.Events.Dispatch(SavedContentTypeContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs), "RenamedContainer");
+
                     return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
                 }
                 catch (Exception ex)
