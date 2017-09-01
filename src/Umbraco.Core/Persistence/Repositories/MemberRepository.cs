@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using Microsoft.AspNet.Identity;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
@@ -231,6 +232,18 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Create the first entry in cmsMember
             dto.NodeId = nodeDto.NodeId;
+
+            //if the password is empty, generate one with the special prefix
+            //this will hash the guid with a salt so should be nicely random
+            if (entity.RawPasswordValue.IsNullOrWhiteSpace())
+            {
+                var aspHasher = new PasswordHasher();
+                dto.Password = Constants.Security.EmptyPasswordPrefix +
+                               aspHasher.HashPassword(Guid.NewGuid().ToString("N"));
+                //re-assign
+                entity.RawPasswordValue = dto.Password;
+            }
+
             Database.Insert(dto);
 
             //Create the PropertyData for this version - cmsPropertyData
