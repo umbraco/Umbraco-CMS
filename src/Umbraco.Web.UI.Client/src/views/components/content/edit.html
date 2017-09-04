@@ -21,189 +21,21 @@
          <umb-editor-container>
             <umb-tabs-content class="form-horizontal" view="true">
                <umb-tab id="tab{{tab.id}}" ng-repeat="tab in content.tabs" rel="{{tab.id}}">
-                    <div ng-show="tab.id === 0">
-                        <div class="umb-package-details">
-                            <div class="umb-package-details__main-content">
-                                <umb-box>
-                                    <umb-box-header title="Links"></umb-box-header>
-                                    <umb-box-content class="block-form">
-                                        <ul class="nav nav-stacked" style="margin-bottom: 0;">
-                                            <li ng-repeat="url in content.urls">
-                                                <a href="{{url}}" target="_blank">
-                                                    <i class="icon icon-window-popin"></i>
-                                                    <span>{{url}}</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </umb-box-content>
-                                </umb-box>
-                                <umb-box>
-                                    <umb-box-header title="History"></umb-box-header>
-                                    <umb-box-content class="block-form" style="position: relative;">
-
-                                        <umb-load-indicator ng-if="loadingAuditTrail"></umb-load-indicator>
-
-                                        <div ng-if="!loadingAuditTrail">
-                                            <div class="history-item" ng-repeat="item in auditTrail" ng-class="{'last-history-item': $last}">
-                                                <div class="history-row">
-                                                
-
-                                                <div class="history-item__break">
-                                                    <div class="history-item__avatar">
-                                                        <umb-avatar
-                                                            color="secondary"
-                                                            size="xs"
-                                                            name="{{item.user.name}}"
-                                                            img-src="{{item.user.avatars[3]}}"
-                                                            img-srcset="{{item.user.avatars[4]}} 2x, {{item.user.avatars[4]}} 3x">
-                                                        </umb-avatar>
-                                                    </div>
-
-                                                    <div class="name-date-container">
-                                                    <div>{{ item.user.name }}</div>
-                                                    <div class="history-item__date">{{ item.date }}</div>
-                                                    </div>
-                                                </div>
-                                                    
-                                                    <div class="history-item__break">
-                                                        <umb-badge
-                                                            size="s"
-                                                            color="{{item.actionColor}}">
-                                                            {{ item.action }}
-                                                        </umb-badge>
-                                                        <span>{{ item.description }}</span>
-                                                    </div>
-                                                </div>
-                                                <div class="history-line"></div>
-                                            </div>
-
-                                            <div class="flex justify-center">
-                                                <umb-pagination
-                                                    page-number="pagination.pageNumber"
-                                                    total-pages="pagination.totalPages"
-                                                    on-next="nextPage"
-                                                    on-prev="prevPage"
-                                                    on-go-to-page="goToPage">
-                                                </umb-pagination>
-                                            </div>
-
-                                        </div>
-
-                                    </umb-box-content>    
-                                </umb-box>           
-                            </div>
-
-                            <div class="umb-package-details__sidebar">
-                                <umb-box>
-                                    <umb-box-header title="Scheduled publish"></umb-box-header>
-                                    <umb-box-content class="block-form">
-
-                                        <div class="date-wrapper">
-
-                                            <div class="flex items-center flex-column">
-                                                
-
-                                                <umb-date-time-picker
-                                                    options="datePickerConfig"
-                                                    on-change="datePickerChange(event, 'publish')">
-                                                    
-                                                    <div class="date-container">
-                                                        
-                                                        <div class="date-container__title">Publish date</div>
-
-                                                        <div class="date-container__date" ng-if="content.releaseDate">
-                                                            <div class="date-wrapper__date">{{content.releaseDate | amDateFormat:'MMMM'}} {{content.releaseDate | amDateFormat:'YYYY'}}</div>
-                                                            <div class="date-wrapper__number">{{content.releaseDate | amDateFormat:'DD'}}</div>
-                                                            <div class="date-wrapper__date">{{content.releaseDate | amDateFormat:'dddd'}} {{content.releaseDate | amDateFormat:'HH:mm'}}</div>
-                                                        </div>
-
-                                                        <a href="" ng-if="!content.releaseDate" class="bold" style="color: #00aea2; text-decoration: underline;">Set date</a>                                                    
-                                                        
-                                                    </div>
-
-                                                </umb-date-time-picker>
-                                                
-                                                <a ng-if="content.releaseDate" ng-click="clearPublishDate()" href="" style="text-decoration: underline;">
-                                                    <small>Clear date</small>
-                                                </a>
-
-                                            </div>
-
-                                            <div class="date-separate"></div>
-
-                                            <div class="flex items-center flex-column">
-                                                <umb-date-time-picker
-                                                    options="datePickerConfig"
-                                                    on-change="datePickerChange(event, 'unpublish')">
-
-                                                    <div class="date-container">
-
-                                                        <div class="date-container__title">Unpublish date</div>
-                                                        
-                                                        <div class="date-container__date" ng-if="content.removeDate">
-                                                            <div class="date-wrapper__date">{{content.removeDate | amDateFormat:'MMMM'}} {{content.removeDate | amDateFormat:'YYYY'}}</div>
-                                                            <div class="date-wrapper__number">{{content.removeDate | amDateFormat:'DD'}}</div>
-                                                            <div class="date-wrapper__date">{{content.removeDate | amDateFormat:'dddd'}} {{content.removeDate | amDateFormat:'HH:mm'}}</div>
-                                                        </div>
-
-                                                        <a href="" ng-if="!content.removeDate" class="bold" style="color: #00aea2; text-decoration: underline;">Set date</a>
-
-                                                    </div>
-
-                                                </umb-date-time-picker>
-
-                                                <a ng-if="content.removeDate" ng-click="clearUnpublishDate()" href="" style="text-decoration: underline;">
-                                                    <small>Clear date</small>
-                                                </a>
-                                            </div>
-
-                                        </div>
-                                        
-
-                                    </umb-box-content>
-                                </umb-box>
-                                <umb-box>
-                                    <umb-box-header title="Meta data"></umb-box-header>
-                                    <umb-box-content class="block-form">
-                                        
-                                        <umb-control-group label="Created" description="Date/time this document was created">
-                                            Created {{ content.createDate }} by {{ content.owner.name }}
-                                        </umb-control-group>
-                                        
-                                        <umb-control-group label="@content_documentType" description="Description here">
-                                            <umb-node-preview
-                                                icon="documentType.icon"
-                                                name="documentType.linkText"
-                                                allow-open="allowOpen"
-                                                on-open="openDocumentType(documentType)">
-                                            </umb-node-preview>
-                                        </umb-control-group>
-
-                                        <umb-control-group label="@template_template" description="{{template.description}}">
-                                            <select
-                                                class="input-block-level"
-                                                ng-model="content.template"
-                                                ng-options="key as value for (key, value) in availableTemplates"
-                                                ng-change="updateTemplate(content.template)">
-                                            </select>
-                                        </umb-control-group>
-
-                                        <umb-control-group label="{{ idSection.name }}">
-                                            <div>{{ content.id }}</div>
-                                            <small>{{ content.key }}</small>
-                                        </umb-control-group>
-                                    </umb-box-content>    
-                                </umb-box>
-                            </div>
-                        </div>
-                    </div>
-
+                    
+                    <!-- Other tabs than info -->
                     <div ng-if="tab.id !== 0">
                         <umb-property ng-repeat="property in tab.properties" property="property">
-                        <umb-editor model="property"></umb-editor>
-                    </umb-property>
-
-                </div>
+                            <umb-editor model="property"></umb-editor>
+                        </umb-property>
+                    </div>
+                
+                    <!-- Info tab -->
+                    <div ng-show="tab.id === 0">
+                        <umb-content-node-info
+                            ng-if="content"
+                            node="content">
+                        </umb-content-node-info>
+                    </div>
                
                </umb-tab>
             </umb-tabs-content>
