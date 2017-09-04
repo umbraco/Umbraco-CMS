@@ -5,8 +5,10 @@ SETLOCAL
 SET toolsFolder=%CD%\tools\
 ECHO Current folder: %CD%
 
-SET nodeFileName=node-v6.11.2-win-x86.7z
-SET nodeExtractFolder=%toolsFolder%node.js.6112
+SET nodeVersion=6.11.2
+
+SET nodeFileName=node-v%nodeVersion%-win-x86.7z
+SET nodeExtractFolder=%toolsFolder%node.js.%nodeVersion%
 
 SET nuGetExecutable=%CD%\tools\nuget.exe
 IF NOT EXIST "%nuGetExecutable%" (
@@ -25,44 +27,41 @@ FOR /f "delims=" %%A in ('dir "%toolsFolder%7-Zip.CommandLine.*" /b') DO SET "se
 MOVE "%sevenZipExePath%tools\7za.exe" "%toolsFolder%7za.exe"
 
 IF NOT EXIST "%nodeExtractFolder%" (
-	ECHO Downloading http://nodejs.org/dist/v6.11.2/%nodeFileName% to %toolsFolder%%nodeFileName%
-	powershell -Command "(New-Object Net.WebClient).DownloadFile('http://nodejs.org/dist/v6.11.2/%nodeFileName%', '%toolsFolder%%nodeFileName%')"
+	ECHO Downloading http://nodejs.org/dist/v%nodeVersion%/%nodeFileName% to %toolsFolder%%nodeFileName%
+	powershell -Command "(New-Object Net.WebClient).DownloadFile('http://nodejs.org/dist/v%nodeVersion%/%nodeFileName%', '%toolsFolder%%nodeFileName%')"
 	ECHO Extracting %nodeFileName% to %nodeExtractFolder%
 	"%toolsFolder%\7za.exe" x "%toolsFolder%\%nodeFileName%" -o"%nodeExtractFolder%" -aos > nul
 )
 FOR /f "delims=" %%A in ('dir "%nodeExtractFolder%\node*" /b') DO SET "nodePath=%nodeExtractFolder%\%%A"
-
-SET drive=%CD:~0,2%
-SET nuGetFolder=%drive%\packages\
-FOR /f "delims=" %%A in ('dir "%nuGetFolder%npm.*" /b') DO SET "npmPath=%nuGetFolder%%%A\"
-
-IF [%npmPath%] == [] GOTO :installnpm 
-IF NOT [%npmPath%] == [] GOTO :build
-
-:installnpm
-	ECHO Downloading npm
-	ECHO Configured packages folder: %nuGetFolder%	
-	ECHO Installing Npm NuGet Package
-	"%nuGetExecutable%" install Npm -OutputDirectory %nuGetFolder% -Verbosity detailed
-	REM Ensures that we look for the just downloaded NPM, not whatever the user has installed on their machine
-	FOR /f "delims=" %%A in ('dir %nuGetFolder%npm.* /b') DO SET "npmPath=%nuGetFolder%%%A\"
-	GOTO :build
-
+	
 :build
-    ECHO Adding Npm and Node to path 
+    ECHO Adding Node to path 
     REM SETLOCAL is on, so changes to the path not persist to the actual user's path
-    PATH="%npmPath%";"%nodePath%";%PATH%
+    PATH="%nodePath%";%PATH%
+
+    ECHO Node version is: 
+    call node -v
+	
+    ECHO npm version is:
+    call npm -v
+
     SET buildFolder=%CD%
 
     ECHO Change directory to %CD%\..\src\Umbraco.Web.UI.Client\
     CD %CD%\..\src\Umbraco.Web.UI.Client\
 
     ECHO Do npm install and the gulp build of Belle
+	
+    ECHO Clean npm cache 
     call npm cache clean --quiet
 
+    ECHO Installing gulp cli
     call npm install -g gulp-cli --quiet
+    ECHO Installing bower
     call npm install -g bower --quiet
+    ECHO Doing npm install
     call npm install --quiet
+    ECHO Executing gulp build
     call gulp build --buildversion=%release%
 
     ECHO Move back to the build folder
