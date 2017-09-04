@@ -54,7 +54,8 @@ namespace Umbraco.Core.Services
                         CreatorId = userId
                     };
 
-                    if (uow.Events.DispatchCancelable(SavingContentTypeContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs)))
+                    var saveEventArgs = new SaveEventArgs<EntityContainer>(container, evtMsgs);
+                    if (uow.Events.DispatchCancelable(SavingContentTypeContainer, this, saveEventArgs))
                     {
                         uow.Commit();
                         return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.FailedCancelledByEvent, evtMsgs));
@@ -62,8 +63,8 @@ namespace Umbraco.Core.Services
 
                     repo.AddOrUpdate(container);
                     uow.Commit();
-
-                    uow.Events.Dispatch(SavedContentTypeContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs), "SavedContentTypeContainer");
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(SavedContentTypeContainer, this, saveEventArgs, "SavedContentTypeContainer");
                     //TODO: Audit trail ?
 
                     return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
@@ -92,7 +93,8 @@ namespace Umbraco.Core.Services
                         CreatorId = userId
                     };
 
-                    if (uow.Events.DispatchCancelable(SavingMediaTypeContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs)))
+                    var saveEventArgs = new SaveEventArgs<EntityContainer>(container, evtMsgs);
+                    if (uow.Events.DispatchCancelable(SavingMediaTypeContainer, this, saveEventArgs))
                     {
                         uow.Commit();
                         return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.FailedCancelledByEvent, evtMsgs));
@@ -100,8 +102,8 @@ namespace Umbraco.Core.Services
 
                     repo.AddOrUpdate(container);
                     uow.Commit();
-
-                    uow.Events.Dispatch(SavedMediaTypeContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs), "SavedMediaTypeContainer");
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(SavedMediaTypeContainer, this, saveEventArgs, "SavedMediaTypeContainer");
                     //TODO: Audit trail ?
 
                     return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
@@ -289,7 +291,8 @@ namespace Umbraco.Core.Services
                     return OperationStatus.NoOperation(evtMsgs);
                 }
 
-                if (uow.Events.DispatchCancelable(DeletingContentTypeContainer, this, new DeleteEventArgs<EntityContainer>(container, evtMsgs)))
+                var deleteEventArgs = new DeleteEventArgs<EntityContainer>(container, evtMsgs);
+                if (uow.Events.DispatchCancelable(DeletingContentTypeContainer, this, deleteEventArgs))
                 {
                     uow.Commit();
                     return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs));
@@ -297,8 +300,8 @@ namespace Umbraco.Core.Services
 
                 repo.Delete(container);
                 uow.Commit();
-
-                uow.Events.Dispatch(DeletedContentTypeContainer, this, new DeleteEventArgs<EntityContainer>(container, evtMsgs), "DeletedContentTypeContainer");
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(DeletedContentTypeContainer, this, deleteEventArgs, "DeletedContentTypeContainer");
 
                 return OperationStatus.Success(evtMsgs);
                 //TODO: Audit trail ?
@@ -319,7 +322,8 @@ namespace Umbraco.Core.Services
                     return OperationStatus.NoOperation(evtMsgs);
                 }
 
-                if (uow.Events.DispatchCancelable(DeletingMediaTypeContainer, this, new DeleteEventArgs<EntityContainer>(container, evtMsgs)))
+                var deleteEventArgs = new DeleteEventArgs<EntityContainer>(container, evtMsgs);
+                if (uow.Events.DispatchCancelable(DeletingMediaTypeContainer, this, deleteEventArgs))
                 {
                     uow.Commit();
                     return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs));
@@ -327,8 +331,8 @@ namespace Umbraco.Core.Services
 
                 repo.Delete(container);
                 uow.Commit();
-
-                uow.Events.Dispatch(DeletedMediaTypeContainer, this, new DeleteEventArgs<EntityContainer>(container, evtMsgs));
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(DeletedMediaTypeContainer, this, deleteEventArgs);
 
                 return OperationStatus.Success(evtMsgs);
                 //TODO: Audit trail ?
@@ -765,7 +769,8 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (uow.Events.DispatchCancelable(SavingContentType, this, new SaveEventArgs<IContentType>(contentType)))
+                    var saveEventArgs = new SaveEventArgs<IContentType>(contentType);
+                    if (uow.Events.DispatchCancelable(SavingContentType, this, saveEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -788,7 +793,8 @@ namespace Umbraco.Core.Services
 
                     UpdateContentXmlStructure(contentType);
 
-                    uow.Events.Dispatch(SavedContentType, this, new SaveEventArgs<IContentType>(contentType, false));
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(SavedContentType, this, saveEventArgs);
 
                     Audit(uow, AuditType.Save, "Save ContentType performed by user", userId, contentType.Id);
                     uow.Commit();
@@ -809,7 +815,8 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (uow.Events.DispatchCancelable(SavingContentType, this, new SaveEventArgs<IContentType>(asArray)))
+                    var saveEventArgs = new SaveEventArgs<IContentType>(asArray);
+                    if (uow.Events.DispatchCancelable(SavingContentType, this, saveEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -834,7 +841,8 @@ namespace Umbraco.Core.Services
 
                     UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
 
-                    uow.Events.Dispatch(SavedContentType, this, new SaveEventArgs<IContentType>(asArray, false));
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(SavedContentType, this, saveEventArgs);
 
                     Audit(uow, AuditType.Save, "Save ContentTypes performed by user", userId, -1);
                     uow.Commit();
@@ -854,7 +862,8 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (uow.Events.DispatchCancelable(DeletingContentType, this, new DeleteEventArgs<IContentType>(contentType)))
+                    var deleteEventArgs = new DeleteEventArgs<IContentType>(contentType);                    
+                    if (uow.Events.DispatchCancelable(DeletingContentType, this, deleteEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -869,8 +878,9 @@ namespace Umbraco.Core.Services
                     _contentService.DeleteContentOfTypes(deletedContentTypes.Select(x => x.Id), userId);
 
                     repository.Delete(contentType);
-
-                    uow.Events.Dispatch(DeletedContentType, this, new DeleteEventArgs<IContentType>(deletedContentTypes.DistinctBy(x => x.Id), false));
+                    deleteEventArgs.DeletedEntities = deletedContentTypes.DistinctBy(x => x.Id);
+                    deleteEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(DeletedContentType, this, deleteEventArgs);
 
                     Audit(uow, AuditType.Delete, string.Format("Delete ContentType performed by user"), userId, contentType.Id);
                     uow.Commit();
@@ -894,7 +904,8 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (uow.Events.DispatchCancelable(DeletingContentType, this, new DeleteEventArgs<IContentType>(asArray)))
+                    var deleteEventArgs = new DeleteEventArgs<IContentType>(asArray);
+                    if (uow.Events.DispatchCancelable(DeletingContentType, this, deleteEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -915,8 +926,9 @@ namespace Umbraco.Core.Services
                     {
                         repository.Delete(contentType);
                     }
-
-                    uow.Events.Dispatch(DeletedContentType, this, new DeleteEventArgs<IContentType>(deletedContentTypes.DistinctBy(x => x.Id), false));
+                    deleteEventArgs.DeletedEntities = deletedContentTypes.DistinctBy(x => x.Id);
+                    deleteEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(DeletedContentType, this, deleteEventArgs);
 
                     Audit(uow, AuditType.Delete, string.Format("Delete ContentTypes performed by user"), userId, -1);
                     uow.Commit();
@@ -1065,7 +1077,9 @@ namespace Umbraco.Core.Services
             var moveInfo = new List<MoveEventInfo<IMediaType>>();
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(MovingMediaType, this, new MoveEventArgs<IMediaType>(evtMsgs, new MoveEventInfo<IMediaType>(toMove, toMove.Path, containerId))))
+                var moveEventInfo = new MoveEventInfo<IMediaType>(toMove, toMove.Path, containerId);
+                var moveEventArgs = new MoveEventArgs<IMediaType>(evtMsgs, moveEventInfo);
+                if (uow.Events.DispatchCancelable(MovingMediaType, this, moveEventArgs))
                 {
                     uow.Commit();
                     return Attempt.Fail(new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs));
@@ -1090,7 +1104,9 @@ namespace Umbraco.Core.Services
                     return Attempt.Fail(new OperationStatus<MoveOperationStatusType>(ex.Operation, evtMsgs));
                 }
                 uow.Commit();
-                uow.Events.Dispatch(MovedMediaType, this, new MoveEventArgs<IMediaType>(false, evtMsgs, moveInfo.ToArray()));
+                moveEventArgs.MoveInfoCollection = moveInfo;
+                moveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(MovedMediaType, this, moveEventArgs);
             }
 
             return Attempt.Succeed(
@@ -1104,7 +1120,9 @@ namespace Umbraco.Core.Services
             var moveInfo = new List<MoveEventInfo<IContentType>>();
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(MovingContentType, this, new MoveEventArgs<IContentType>(evtMsgs, new MoveEventInfo<IContentType>(toMove, toMove.Path, containerId))))
+                var moveEventInfo = new MoveEventInfo<IContentType>(toMove, toMove.Path, containerId);
+                var moveEventArgs = new MoveEventArgs<IContentType>(evtMsgs, moveEventInfo);
+                if (uow.Events.DispatchCancelable(MovingContentType, this, moveEventArgs))
                 {
                     uow.Commit();
                     return Attempt.Fail(new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs));
@@ -1128,8 +1146,10 @@ namespace Umbraco.Core.Services
                     uow.Commit();
                     return Attempt.Fail(new OperationStatus<MoveOperationStatusType>(ex.Operation, evtMsgs));
                 }
+                moveEventArgs.MoveInfoCollection = moveInfo;
+                moveEventArgs.CanCancel = false;
                 uow.Commit();
-                uow.Events.Dispatch(MovedContentType, this, new MoveEventArgs<IContentType>(false, evtMsgs, moveInfo.ToArray()));
+                uow.Events.Dispatch(MovedContentType, this, moveEventArgs);
             }
 
             return Attempt.Succeed(
@@ -1237,7 +1257,8 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (uow.Events.DispatchCancelable(SavingMediaType, this, new SaveEventArgs<IMediaType>(mediaType)))
+                    var saveEventArgs = new SaveEventArgs<IMediaType>(mediaType);
+                    if (uow.Events.DispatchCancelable(SavingMediaType, this, saveEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -1253,8 +1274,8 @@ namespace Umbraco.Core.Services
                     uow.Commit();
 
                     UpdateContentXmlStructure(mediaType);
-
-                    uow.Events.Dispatch(SavedMediaType, this, new SaveEventArgs<IMediaType>(mediaType, false));
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(SavedMediaType, this, saveEventArgs);
 
                     Audit(uow, AuditType.Save, "Save MediaType performed by user", userId, mediaType.Id);
                     uow.Commit();
@@ -1275,7 +1296,8 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (uow.Events.DispatchCancelable(SavingMediaType, this, new SaveEventArgs<IMediaType>(asArray)))
+                    var saveEventArgs = new SaveEventArgs<IMediaType>(asArray);
+                    if (uow.Events.DispatchCancelable(SavingMediaType, this, saveEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -1299,8 +1321,8 @@ namespace Umbraco.Core.Services
                     uow.Commit();
 
                     UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
-
-                    uow.Events.Dispatch(SavedMediaType, this, new SaveEventArgs<IMediaType>(asArray, false));
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(SavedMediaType, this, saveEventArgs);
 
                     Audit(uow, AuditType.Save, "Save MediaTypes performed by user", userId, -1);
                     uow.Commit();
@@ -1322,7 +1344,8 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (uow.Events.DispatchCancelable(DeletingMediaType, this, new DeleteEventArgs<IMediaType>(mediaType)))
+                    var deleteEventArgs = new DeleteEventArgs<IMediaType>(mediaType);
+                    if (uow.Events.DispatchCancelable(DeletingMediaType, this, deleteEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -1338,7 +1361,9 @@ namespace Umbraco.Core.Services
 
                     repository.Delete(mediaType);
 
-                    uow.Events.Dispatch(DeletedMediaType, this, new DeleteEventArgs<IMediaType>(deletedMediaTypes.DistinctBy(x => x.Id), false));
+                    deleteEventArgs.CanCancel = false;
+                    deleteEventArgs.DeletedEntities = deletedMediaTypes.DistinctBy(x => x.Id);
+                    uow.Events.Dispatch(DeletedMediaType, this, deleteEventArgs);
 
                     Audit(uow, AuditType.Delete, "Delete MediaType performed by user", userId, mediaType.Id);
                     uow.Commit();
@@ -1362,7 +1387,8 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (uow.Events.DispatchCancelable(DeletingMediaType, this, new DeleteEventArgs<IMediaType>(asArray)))
+                    var deleteEventArgs = new DeleteEventArgs<IMediaType>(asArray);
+                    if (uow.Events.DispatchCancelable(DeletingMediaType, this, deleteEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -1384,7 +1410,9 @@ namespace Umbraco.Core.Services
                         repository.Delete(mediaType);
                     }
 
-                    uow.Events.Dispatch(DeletedMediaType, this, new DeleteEventArgs<IMediaType>(deletedMediaTypes.DistinctBy(x => x.Id), false));
+                    deleteEventArgs.DeletedEntities = deletedMediaTypes.DistinctBy(x => x.Id);
+                    deleteEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(DeletedMediaType, this, deleteEventArgs);
 
                     Audit(uow, AuditType.Delete, "Delete MediaTypes performed by user", userId, -1);
                     uow.Commit();

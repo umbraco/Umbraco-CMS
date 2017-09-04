@@ -32,9 +32,9 @@ namespace Umbraco.Web.Models
         private ProfileModel(bool doLookup)
         {
             MemberProperties = new List<UmbracoProperty>();
-            if (doLookup)
+            if (doLookup && UmbracoContext.Current != null)
             {
-                var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
+                var helper = new MembershipHelper(UmbracoContext.Current);
                 var model = helper.GetCurrentMemberProfileModel();
                 MemberProperties = model.MemberProperties;
             }   

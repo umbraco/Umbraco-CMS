@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Web;
 using System.Web.Security;
 using Umbraco.Core;
@@ -63,7 +64,7 @@ namespace Umbraco.Web.Routing
 
             Uri = uri;
             RoutingContext = routingContext;
-            GetRolesForLogin = getRolesForLogin;
+            _getRolesForLoginCallback = getRolesForLogin;
 
             _engine = new PublishedContentRequestEngine(
                 routingConfig,
@@ -447,7 +448,27 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public RoutingContext RoutingContext { get; private set; }
 
-        internal Func<string, IEnumerable<string>> GetRolesForLogin { get; private set; }
+        /// <summary>
+        /// Returns the current members roles if a member is logged in
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This ensures that the callback is only executed once in case this method is accessed a few times
+        /// </remarks>
+        public IEnumerable<string> GetRolesForLogin(string username)
+        {
+            string[] roles;
+            if (_rolesForLogin.TryGetValue(username, out roles))
+                return roles;
+
+            roles = _getRolesForLoginCallback(username).ToArray();
+            _rolesForLogin[username] = roles;
+            return roles;
+        }
+
+        private readonly IDictionary<string, string[]> _rolesForLogin = new Dictionary<string, string[]>();
+        private readonly Func<string, IEnumerable<string>> _getRolesForLoginCallback;
 
         /// <summary>
         /// The "umbraco page" object.
