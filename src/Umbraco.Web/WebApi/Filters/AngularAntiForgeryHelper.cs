@@ -16,17 +16,17 @@ namespace Umbraco.Web.WebApi.Filters
         /// <summary>
         /// The cookie name that is used to store the validation value
         /// </summary>
-        public const string CsrfValidationCookieName = "XSRF-V";
+        public const string CsrfValidationCookieName = "UMB-XSRF-V";
 
         /// <summary>
-        /// The cookie name that is set for angular to use to pass in to the header value for "X-XSRF-TOKEN"
+        /// The cookie name that is set for angular to use to pass in to the header value for "X-UMB-XSRF-TOKEN"
         /// </summary>
-        public const string AngularCookieName = "XSRF-TOKEN";
+        public const string AngularCookieName = "UMB-XSRF-TOKEN";
 
         /// <summary>
         /// The header name that angular uses to pass in the token to validate the cookie
         /// </summary>
-        public const string AngularHeadername = "X-XSRF-TOKEN";
+        public const string AngularHeadername = "X-UMB-XSRF-TOKEN";
 
         /// <summary>
         /// Returns 2 tokens - one for the cookie value and one that angular should set as the header value
