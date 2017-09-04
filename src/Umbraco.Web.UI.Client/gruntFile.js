@@ -560,7 +560,11 @@ module.exports = function (grunt) {
                         'clipboard': {
                             keepExpandedHierarchy: false,
                             files: ['dist/clipboard.min.js']
-                       }
+                       },
+                       'angular-moment': {
+                            keepExpandedHierarchy: false,
+                            files: ['angular-moment.min.js']
+                        }
                     }
                 }
             },

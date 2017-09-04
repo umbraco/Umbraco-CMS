@@ -402,6 +402,35 @@
       });
 
     };
+    
+    $scope.datePickerConfig = {
+      pickDate: true,
+      pickTime: true,
+      useSeconds: false,
+      format: "YYYY-MM-DD HH:mm",
+      icons: {
+        time: "icon-time",
+        date: "icon-calendar",
+        up: "icon-chevron-up",
+        down: "icon-chevron-down"
+      }
+    };
+
+    $scope.datePickerChange = function(event, type) {
+      if(type === 'publish') {
+        setPublishDate(event.date.format("YYYY-MM-DD HH:mm"));
+      } else if( type === 'unpublish') {
+        setUnpublishDate(event.date.format("YYYY-MM-DD HH:mm"));
+      }
+    };
+
+    $scope.clearPublishDate = function() {
+      clearPublishDate();
+    };
+
+    $scope.clearUnpublishDate = function() {
+      clearUnpublishDate();
+    };
 
     function setAuditTrailActionColor(auditTrail) {
       angular.forEach(auditTrail, function (item) {
@@ -449,6 +478,70 @@
       });
 
       return documentType;
+
+    }
+
+    function setPublishDate(date) {
+
+      // update publish value
+      $scope.content.releaseDate = date;
+
+      // update template value on the correct tab
+      angular.forEach($scope.content.tabs, function(tab){
+        angular.forEach(tab.properties, function(property){
+          if(property.alias === "_umb_releasedate") {
+            property.value = date;
+          }
+        });
+      });
+
+    }
+
+    function clearPublishDate() {
+
+      // update publish value
+      $scope.content.releaseDate = null;
+
+      // update template value on the correct tab
+      angular.forEach($scope.content.tabs, function (tab) {
+        angular.forEach(tab.properties, function (property) {
+          if (property.alias === "_umb_releasedate") {
+            property.value = null;
+          }
+        });
+      });
+
+    }
+
+    function setUnpublishDate(date) {
+
+      // update publish value
+      $scope.content.removeDate = date;
+
+      // update template value on the correct tab
+      angular.forEach($scope.content.tabs, function (tab) {
+        angular.forEach(tab.properties, function (property) {
+          if (property.alias === "_umb_expiredate") {
+            property.value = date;
+          }
+        });
+      });
+
+    }
+
+    function clearUnpublishDate() {
+
+      // update publish value
+      $scope.content.removeDate = null;
+
+      // update template value on the correct tab
+      angular.forEach($scope.content.tabs, function (tab) {
+        angular.forEach(tab.properties, function (property) {
+          if (property.alias === "_umb_expiredate") {
+            property.value = null;
+          }
+        });
+      });
 
     }
 

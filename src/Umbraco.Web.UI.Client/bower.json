@@ -30,6 +30,7 @@
     "angular-local-storage": "~0.2.3",
     "moment": "~2.10.3",
     "ace-builds": "^1.2.3",
-    "clipboard": "1.7.1"
+    "clipboard": "1.7.1",
+    "angular-moment": "^1.0.1"
   }
 }

@@ -35,7 +35,7 @@
                                                 </a>
                                             </li>
                                         </ul>
-                                    </umb-box-content>    
+                                    </umb-box-content>
                                 </umb-box>
                                 <umb-box>
                                     <umb-box-header title="History"></umb-box-header>
@@ -97,26 +97,78 @@
                                 <umb-box>
                                     <umb-box-header title="Scheduled publish"></umb-box-header>
                                     <umb-box-content class="block-form">
+
                                         <div class="date-wrapper">
-                                            <div class="date-container">
-                                                <div class="date-wrapper__title">Publish date</div>
-                                                <div class="date-wrapper__date">October 2016</div>
-                                                <div class="date-wrapper__number">17</div>
-                                                <div class="date-wrapper__date">Wednesday 10:43 PM</div>
+
+                                            <div class="flex items-center flex-column">
+                                                
+
+                                                <umb-date-time-picker
+                                                    options="datePickerConfig"
+                                                    on-change="datePickerChange(event, 'publish')">
+                                                    
+                                                    <div class="date-container">
+                                                        
+                                                        <div class="date-container__title">Publish date</div>
+
+                                                        <div class="date-container__date" ng-if="content.releaseDate">
+                                                            <div class="date-wrapper__date">{{content.releaseDate | amDateFormat:'MMMM'}} {{content.releaseDate | amDateFormat:'YYYY'}}</div>
+                                                            <div class="date-wrapper__number">{{content.releaseDate | amDateFormat:'DD'}}</div>
+                                                            <div class="date-wrapper__date">{{content.releaseDate | amDateFormat:'dddd'}} {{content.releaseDate | amDateFormat:'HH:mm'}}</div>
+                                                        </div>
+
+                                                        <a href="" ng-if="!content.releaseDate" class="bold" style="color: #00aea2; text-decoration: underline;">Set date</a>                                                    
+                                                        
+                                                    </div>
+
+                                                </umb-date-time-picker>
+                                                
+                                                <a ng-if="content.releaseDate" ng-click="clearPublishDate()" href="" style="text-decoration: underline;">
+                                                    <small>Clear date</small>
+                                                </a>
+
                                             </div>
+
                                             <div class="date-separate"></div>
-                                            <div class="date-container">
-                                                <div class="date-wrapper__title">Unpublish date</div>
-                                                <div class="place-holder"></div>
-                                                <div class="data-wrapper__add">ADD</div>
+
+                                            <div class="flex items-center flex-column">
+                                                <umb-date-time-picker
+                                                    options="datePickerConfig"
+                                                    on-change="datePickerChange(event, 'unpublish')">
+
+                                                    <div class="date-container">
+
+                                                        <div class="date-container__title">Unpublish date</div>
+                                                        
+                                                        <div class="date-container__date" ng-if="content.removeDate">
+                                                            <div class="date-wrapper__date">{{content.removeDate | amDateFormat:'MMMM'}} {{content.removeDate | amDateFormat:'YYYY'}}</div>
+                                                            <div class="date-wrapper__number">{{content.removeDate | amDateFormat:'DD'}}</div>
+                                                            <div class="date-wrapper__date">{{content.removeDate | amDateFormat:'dddd'}} {{content.removeDate | amDateFormat:'HH:mm'}}</div>
+                                                        </div>
+
+                                                        <a href="" ng-if="!content.removeDate" class="bold" style="color: #00aea2; text-decoration: underline;">Set date</a>
+
+                                                    </div>
+
+                                                </umb-date-time-picker>
+
+                                                <a ng-if="content.removeDate" ng-click="clearUnpublishDate()" href="" style="text-decoration: underline;">
+                                                    <small>Clear date</small>
+                                                </a>
                                             </div>
+
                                         </div>
+                                        
+
                                     </umb-box-content>
                                 </umb-box>
                                 <umb-box>
                                     <umb-box-header title="Meta data"></umb-box-header>
                                     <umb-box-content class="block-form">
-                                        <umb-control-group label="Created by {{ content.owner.name }} at {{ content.createDate }}"></umb-control-group>
+                                        
+                                        <umb-control-group label="Created" description="Date/time this document was created">
+                                            Created {{ content.createDate }} by {{ content.owner.name }}
+                                        </umb-control-group>
                                         
                                         <umb-control-group label="@content_documentType" description="Description here">
                                             <umb-node-preview
@@ -146,15 +198,12 @@
                         </div>
                     </div>
 
-                    <div ng-hide="tab.id === 0">
+                    <div ng-if="tab.id !== 0">
                         <umb-property ng-repeat="property in tab.properties" property="property">
                         <umb-editor model="property"></umb-editor>
-                  </umb-property>
+                    </umb-property>
+
                 </div>
-
-                
-                  <!-- <pre>{{ tab | json }}</pre> -->
-
                
                </umb-tab>
             </umb-tabs-content>

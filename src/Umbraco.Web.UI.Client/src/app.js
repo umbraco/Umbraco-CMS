@@ -11,7 +11,8 @@ var app = angular.module('umbraco', [
     'ngMobile',
     'tmh.dynamicLocale',
     'ngFileUpload',
-	'LocalStorageModule'
+    'LocalStorageModule',
+    'angularMoment'
 ]);
 
 var packages = angular.module("umbraco.packages", []);
