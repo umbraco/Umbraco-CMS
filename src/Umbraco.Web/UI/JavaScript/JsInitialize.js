@@ -3,7 +3,7 @@
     'lib/angular/1.1.5/angular.min.js',
     'lib/underscore/underscore-min.js',
 
-    'lib/moment/moment.js',
+    'lib/moment/moment-with-locales.js',
     'lib/angular-moment/angular-moment.min.js',
 
     'lib/jquery-ui/jquery-ui.min.js',
