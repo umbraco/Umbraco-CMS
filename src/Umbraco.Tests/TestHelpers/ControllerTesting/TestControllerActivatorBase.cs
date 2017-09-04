@@ -114,7 +114,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 //mock Validate
                 webSecurity.Setup(x => x.ValidateCurrentUser())
                     .Returns(() => true);               
-                webSecurity.Setup(x => x.UserHasAppAccess(It.IsAny<string>(), It.IsAny<IUser>()))
+                webSecurity.Setup(x => x.UserHasSectionAccess(It.IsAny<string>(), It.IsAny<IUser>()))
                     .Returns(() => true);
 
                 var umbCtx = UmbracoContext.EnsureContext(

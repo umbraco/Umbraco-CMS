@@ -458,14 +458,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                     //indicates we've handled the server result
                     return true;
                 }
-                else {
-                    dialogService.ysodDialog(args.err);
-                }
             }
-            else {
-                dialogService.ysodDialog(args.err);
-            }
-
             return false;
         },
 

@@ -90,7 +90,7 @@ namespace Umbraco.Web.Editors
         public async Task<ModelWithNotifications<string>> PostChangePassword(ChangingPasswordModel data)
         {
             var passwordChanger = new PasswordChanger(Logger, Services.UserService);
-            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, Security.CurrentUser, data, ModelState, UserManager);
+            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, Security.CurrentUser, data, UserManager);
 
             if (passwordChangeResult.Success)
             {
@@ -98,6 +98,11 @@ namespace Umbraco.Web.Editors
                 var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);
                 result.AddSuccessNotification(Services.TextService.Localize("user/password"), Services.TextService.Localize("user/passwordChanged"));
                 return result;
+            }
+
+            foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
+            {
+                ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
             }
 
             throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));

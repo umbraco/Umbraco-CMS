@@ -8,6 +8,7 @@ using Microsoft.AspNet.Identity;
 using umbraco.cms.businesslogic.packager;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -34,14 +35,12 @@ namespace Umbraco.Web.Editors
         /// <param name="currentUser">The user performing the password save action</param>
         /// <param name="savingUser">The user who's password is being changed</param>
         /// <param name="passwordModel"></param>
-        /// <param name="modelState"></param>
         /// <param name="userMgr"></param>
         /// <returns></returns>
         public async Task<Attempt<PasswordChangedModel>> ChangePasswordWithIdentityAsync(
             IUser currentUser,
             IUser savingUser,
             ChangingPasswordModel passwordModel, 
-            ModelStateDictionary modelState, 
             BackOfficeUserManager<BackOfficeIdentityUser> userMgr)
         {
             if (passwordModel == null) throw new ArgumentNullException("passwordModel");
@@ -69,7 +68,8 @@ namespace Umbraco.Web.Editors
                 throw new InvalidOperationException("The membership provider cannot have a password format of " + membershipPasswordHasher.MembershipProvider.PasswordFormat + " and be configured with secured hashed passwords");
             }
 
-            //Are we resetting the password??
+            //Are we resetting the password?? In ASP.NET Identity APIs, this flag indicates that an admin user is changing another user's password
+            //without knowing the original password.
             if (passwordModel.Reset.HasValue && passwordModel.Reset.Value)
             {
                 //if it's the current user, the current user cannot reset their own password
@@ -78,15 +78,24 @@ namespace Umbraco.Web.Editors
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password reset is not allowed", new[] { "resetPassword" }) });
                 }
 
+                //if the current user has access to reset/manually change the password
+                if (currentUser.HasSectionAccess(Umbraco.Core.Constants.Applications.Users) == false)
+                {
+                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("The current user is not authorized", new[] { "resetPassword" }) });
+                }
+
                 //ok, we should be able to reset it
                 var resetToken = await userMgr.GeneratePasswordResetTokenAsync(savingUser.Id);
-                var newPass = userMgr.GeneratePassword();
+                var newPass = passwordModel.NewPassword.IsNullOrWhiteSpace()
+                    ? userMgr.GeneratePassword()
+                    : passwordModel.NewPassword;
+
                 var resetResult = await userMgr.ResetPasswordAsync(savingUser.Id, resetToken, newPass);
 
                 if (resetResult.Succeeded == false)
                 {
                     var errors = string.Join(". ", resetResult.Errors);
-                    _logger.Warn<PasswordChanger>(string.Format("Could not reset member password {0}", errors));
+                    _logger.Warn<PasswordChanger>(string.Format("Could not reset user password {0}", errors));
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not reset password, errors: " + errors, new[] { "resetPassword" }) });
                 }
 
@@ -115,8 +124,8 @@ namespace Umbraco.Web.Editors
                 if (changeResult.Succeeded == false)
                 {
                     var errors = string.Join(". ", changeResult.Errors);
-                    _logger.Warn<PasswordChanger>(string.Format("Could not change member password {0}", errors));
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, errors: " + errors, new[] { "value" }) });
+                    _logger.Warn<PasswordChanger>(string.Format("Could not change user password {0}", errors));
+                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, errors: " + errors, new[] { "oldPassword" }) });
                 }
                 return Attempt.Succeed(new PasswordChangedModel());                
             }

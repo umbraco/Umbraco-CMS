@@ -14,6 +14,12 @@ namespace Umbraco.Core.Models
 {
     public static class UserExtensions
     {
+        public static bool HasSectionAccess(this IUser user, string app)
+        {
+            var apps = user.AllowedSections;
+            return apps.Any(uApp => uApp.InvariantEquals(app));
+        }
+
         /// <summary>
         /// Tries to lookup the user's gravatar to see if the endpoint can be reached, if so it returns the valid URL
         /// </summary>
