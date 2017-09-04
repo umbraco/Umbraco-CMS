@@ -5,8 +5,8 @@ SETLOCAL
 SET toolsFolder=%CD%\tools\
 ECHO Current folder: %CD%
 
-SET nodeFileName=node-v6.9.1-win-x86.7z
-SET nodeExtractFolder=%toolsFolder%node.js.691
+SET nodeFileName=node-v6.11.2-win-x86.7z
+SET nodeExtractFolder=%toolsFolder%node.js.6112
 
 SET nuGetExecutable=%CD%\tools\nuget.exe
 IF NOT EXIST "%nuGetExecutable%" (
@@ -25,8 +25,8 @@ FOR /f "delims=" %%A in ('dir "%toolsFolder%7-Zip.CommandLine.*" /b') DO SET "se
 MOVE "%sevenZipExePath%tools\7za.exe" "%toolsFolder%7za.exe"
 
 IF NOT EXIST "%nodeExtractFolder%" (
-	ECHO Downloading http://nodejs.org/dist/v6.9.1/%nodeFileName% to %toolsFolder%%nodeFileName%
-	powershell -Command "(New-Object Net.WebClient).DownloadFile('http://nodejs.org/dist/v6.9.1/%nodeFileName%', '%toolsFolder%%nodeFileName%')"
+	ECHO Downloading http://nodejs.org/dist/v6.11.2/%nodeFileName% to %toolsFolder%%nodeFileName%
+	powershell -Command "(New-Object Net.WebClient).DownloadFile('http://nodejs.org/dist/v6.11.2/%nodeFileName%', '%toolsFolder%%nodeFileName%')"
 	ECHO Extracting %nodeFileName% to %nodeExtractFolder%
 	"%toolsFolder%\7za.exe" x "%toolsFolder%\%nodeFileName%" -o"%nodeExtractFolder%" -aos > nul
 )
