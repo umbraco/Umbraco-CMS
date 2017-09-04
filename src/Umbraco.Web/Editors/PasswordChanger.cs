@@ -27,9 +27,19 @@ namespace Umbraco.Web.Editors
             _logger = logger;
             _userService = userService;
         }
-        
+
+        /// <summary>
+        /// Changes the password for a user based on the many different rules and config options
+        /// </summary>
+        /// <param name="currentUser">The user performing the password save action</param>
+        /// <param name="savingUser">The user who's password is being changed</param>
+        /// <param name="passwordModel"></param>
+        /// <param name="modelState"></param>
+        /// <param name="userMgr"></param>
+        /// <returns></returns>
         public async Task<Attempt<PasswordChangedModel>> ChangePasswordWithIdentityAsync(
             IUser currentUser,
+            IUser savingUser,
             ChangingPasswordModel passwordModel, 
             ModelStateDictionary modelState, 
             BackOfficeUserManager<BackOfficeIdentityUser> userMgr)
@@ -48,7 +58,7 @@ namespace Umbraco.Web.Editors
                 //if this isn't using an IUserAwarePasswordHasher, then fallback to the old way
                 if (membershipPasswordHasher.MembershipProvider.RequiresQuestionAndAnswer)
                     throw new NotSupportedException("Currently the user editor does not support providers that have RequiresQuestionAndAnswer specified");
-                return ChangePasswordWithMembershipProvider(currentUser.Username, passwordModel, membershipPasswordHasher.MembershipProvider);
+                return ChangePasswordWithMembershipProvider(savingUser.Username, passwordModel, membershipPasswordHasher.MembershipProvider);
             }
 
             //if we are here, then a IUserAwarePasswordHasher is available, however we cannot proceed in that case if for some odd reason
@@ -62,10 +72,16 @@ namespace Umbraco.Web.Editors
             //Are we resetting the password??
             if (passwordModel.Reset.HasValue && passwordModel.Reset.Value)
             {
+                //if it's the current user, the current user cannot reset their own password
+                if (currentUser.Username == savingUser.Username)
+                {
+                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password reset is not allowed", new[] { "resetPassword" }) });
+                }
+
                 //ok, we should be able to reset it
-                var resetToken = await userMgr.GeneratePasswordResetTokenAsync(currentUser.Id);
+                var resetToken = await userMgr.GeneratePasswordResetTokenAsync(savingUser.Id);
                 var newPass = userMgr.GeneratePassword();
-                var resetResult = await userMgr.ResetPasswordAsync(currentUser.Id, resetToken, newPass);
+                var resetResult = await userMgr.ResetPasswordAsync(savingUser.Id, resetToken, newPass);
 
                 if (resetResult.Succeeded == false)
                 {
@@ -95,7 +111,7 @@ namespace Umbraco.Web.Editors
             if (passwordModel.OldPassword.IsNullOrWhiteSpace() == false)
             {
                 //if an old password is suplied try to change it
-                var changeResult = await userMgr.ChangePasswordAsync(currentUser.Id, passwordModel.OldPassword, passwordModel.NewPassword);
+                var changeResult = await userMgr.ChangePasswordAsync(savingUser.Id, passwordModel.OldPassword, passwordModel.NewPassword);
                 if (changeResult.Succeeded == false)
                 {
                     var errors = string.Join(". ", changeResult.Errors);
@@ -112,7 +128,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Changes password for a member/user given the membership provider and the password change model
         /// </summary>
-        /// <param name="username"></param>
+        /// <param name="username">The username of the user having their password changed</param>
         /// <param name="passwordModel"></param>
         /// <param name="membershipProvider"></param>
         /// <returns></returns>        

@@ -78,6 +78,9 @@
                   vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
 
                   vm.changePasswordModel.config.disableToggle = true;
+
+                  //if it's the current user then disable password reset since that doesn't make sense.
+                    vm.changePasswordModel.config.enableReset = !vm.user.isCurrentUser;
                   
                   vm.loading = false;
                 });

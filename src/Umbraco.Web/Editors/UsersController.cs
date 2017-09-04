@@ -522,7 +522,7 @@ namespace Umbraco.Web.Editors
             {
                 var passwordChanger = new PasswordChanger(Logger, Services.UserService);
 
-                var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(found, userSave.ChangePassword, ModelState, UserManager);
+                var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, userSave.ChangePassword, ModelState, UserManager);
                 if (passwordChangeResult.Success)
                 {
                     //depending on how the provider is configured, the password may be reset so let's store that for later

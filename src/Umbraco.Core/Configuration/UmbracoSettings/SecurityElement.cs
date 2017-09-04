@@ -16,6 +16,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return GetOptionalTextElement("hideDisabledUsersInBackoffice", false); }
         }
 
+        /// <summary>
+        /// Used to enable/disable the forgot password functionality on the back office login screen
+        /// </summary>
         [ConfigurationProperty("allowPasswordReset")]
         internal InnerTextConfigurationElement<bool> AllowPasswordReset
         {
@@ -44,6 +47,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return HideDisabledUsersInBackoffice; }
         }
 
+        /// <summary>
+        /// Used to enable/disable the forgot password functionality on the back office login screen
+        /// </summary>
         bool ISecuritySection.AllowPasswordReset
         {
             get { return AllowPasswordReset; }

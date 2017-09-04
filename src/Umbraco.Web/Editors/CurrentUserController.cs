@@ -90,7 +90,7 @@ namespace Umbraco.Web.Editors
         public async Task<ModelWithNotifications<string>> PostChangePassword(ChangingPasswordModel data)
         {
             var passwordChanger = new PasswordChanger(Logger, Services.UserService);
-            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, data, ModelState, UserManager);
+            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, Security.CurrentUser, data, ModelState, UserManager);
 
             if (passwordChangeResult.Success)
             {
