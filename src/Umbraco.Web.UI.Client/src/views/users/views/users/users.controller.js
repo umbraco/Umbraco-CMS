@@ -50,24 +50,31 @@
             "selected": true
         };
 
-        //don't set this if no email is configured
-        if (Umbraco.Sys.ServerVariables.umbracoSettings.emailServerConfigured) {
+        //don't show the invite button if no email is configured
+        if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
             vm.defaultButton = {
                 labelKey: "user_inviteUser",
-                handler: function () {
+                handler: function() {
                     vm.setUsersViewState('inviteUser');
                 }
             };
+            vm.subButtons = [
+                {
+                    labelKey: "user_createUser",
+                    handler: function () {
+                        vm.setUsersViewState('createUser');
+                    }
+                }
+            ];
         }
-
-        vm.subButtons = [
-            {
+        else {
+            vm.defaultButton = {
                 labelKey: "user_createUser",
                 handler: function () {
                     vm.setUsersViewState('createUser');
                 }
-            }
-        ];
+            };
+        }
 
         vm.toggleFilter = toggleFilter;
         vm.setUsersViewState = setUsersViewState;
