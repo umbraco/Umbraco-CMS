@@ -47,7 +47,7 @@ namespace Umbraco.Web.WebApi.Filters
                 .ToArray();
 
             return UmbracoContext.Current.Security.CurrentUser != null
-                   && apps.Any(app => UmbracoContext.Current.Security.UserHasAppAccess(
+                   && apps.Any(app => UmbracoContext.Current.Security.UserHasSectionAccess(
                        app, UmbracoContext.Current.Security.CurrentUser));
         }
     }

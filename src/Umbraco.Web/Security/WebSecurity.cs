@@ -12,6 +12,7 @@ using Umbraco.Core.Security;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using umbraco.businesslogic.Exceptions;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Web.Models.ContentEditing;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
@@ -48,11 +49,11 @@ namespace Umbraco.Web.Security
             IEnumerable<string> allowGroups = null,
             IEnumerable<int> allowMembers = null)
         {
-            if (HttpContext.Current == null || ApplicationContext.Current == null)
+            if (UmbracoContext.Current == null)
             {
                 return false;
             }
-            var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
+            var helper = new MembershipHelper(UmbracoContext.Current);
             return helper.IsMemberAuthorized(allowAll, allowTypes, allowGroups, allowMembers);
         }
 
@@ -308,35 +309,34 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Checks if the specified user as access to the app
         /// </summary>
-        /// <param name="app"></param>
+        /// <param name="section"></param>
         /// <param name="user"></param>
         /// <returns></returns>
-        internal virtual bool UserHasAppAccess(string app, IUser user)
+        internal virtual bool UserHasSectionAccess(string section, IUser user)
         {
-            var apps = user.AllowedSections;
-            return apps.Any(uApp => uApp.InvariantEquals(app));
+            return user.HasSectionAccess(section);
         }
 
         [Obsolete("Do not use this method if you don't have to, use the overload with IUser instead")]
-        internal bool UserHasAppAccess(string app, User user)
+        internal bool UserHasSectionAccess(string section, User user)
         {
-            return user.Applications.Any(uApp => uApp.alias == app);
+            return user.Applications.Any(uApp => uApp.alias == section);
         }
 
         /// <summary>
         /// Checks if the specified user by username as access to the app
         /// </summary>
-        /// <param name="app"></param>
+        /// <param name="section"></param>
         /// <param name="username"></param>
         /// <returns></returns>
-        internal bool UserHasAppAccess(string app, string username)
+        internal bool UserHasSectionAccess(string section, string username)
         {
             var user = _applicationContext.Services.UserService.GetByUsername(username);
             if (user == null)
             {
                 return false;
             }
-            return UserHasAppAccess(app, user);
+            return user.HasSectionAccess(section);
         }
 
         [Obsolete("Returns the current user's unique umbraco sesion id - this cannot be set and isn't intended to be used in your code")]
