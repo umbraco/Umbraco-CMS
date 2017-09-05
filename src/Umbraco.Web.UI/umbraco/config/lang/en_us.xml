@@ -527,10 +527,12 @@
     <key alias="error">Error</key>
     <key alias="findDocument">Find</key>
     <key alias="first">First</key>
+    <key alias="general">General</key>
     <key alias="groups">Groups</key>
     <key alias="height">Height</key>
     <key alias="help">Help</key>
     <key alias="hide">Hide</key>
+    <key alias="history">History</key>
     <key alias="icon">Icon</key>
     <key alias="import">Import</key>
     <key alias="innerMargin">Inner margin</key>
@@ -542,6 +544,7 @@
     <key alias="language">Language</key>
     <key alias="last">Last</key>
     <key alias="layout">Layout</key>
+    <key alias="links">Links</key>
     <key alias="loading">Loading</key>
     <key alias="locked">Locked</key>
     <key alias="login">Login</key>
@@ -580,6 +583,7 @@
     <key alias="retrieve">Retrieve</key>
     <key alias="retry">Retry</key>
     <key alias="rights">Permissions</key>
+    <key alias="scheduledPublishing">Scheduled Publishing</key>
     <key alias="search">Search</key>
     <key alias="searchNoResult">Sorry, we can not find what you are looking for</key>
     <key alias="server">Server</key>

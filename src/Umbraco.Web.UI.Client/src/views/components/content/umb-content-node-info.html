@@ -3,7 +3,7 @@
     <div class="umb-package-details__main-content">
         
         <umb-box>
-            <umb-box-header title="Links"></umb-box-header>
+            <umb-box-header title-key="general_links"></umb-box-header>
             <umb-box-content class="block-form">
                 <ul class="nav nav-stacked" style="margin-bottom: 0;">
                     <li ng-repeat="url in node.urls">
@@ -17,7 +17,7 @@
         </umb-box>
 
         <umb-box>
-            <umb-box-header title="History"></umb-box-header>
+            <umb-box-header title-key="general_history"></umb-box-header>
             <umb-box-content class="block-form" style="position: relative;">
 
                 <umb-load-indicator ng-if="loadingAuditTrail"></umb-load-indicator>
@@ -74,7 +74,7 @@
 
     <div class="umb-package-details__sidebar">
         <umb-box>
-            <umb-box-header title="Scheduled publish"></umb-box-header>
+            <umb-box-header title-key="general_scheduledPublishing"></umb-box-header>
             <umb-box-content class="block-form">
 
                 <div class="date-wrapper">
@@ -88,7 +88,9 @@
                             
                             <div class="date-container">
                                 
-                                <div class="date-container__title">Publish date</div>
+                                <div class="date-container__title">
+                                    <localize key="content_releaseDate"></localize>
+                                </div>
 
                                 <div class="date-container__date" ng-if="node.releaseDate">
                                     <div class="date-wrapper__date">{{node.releaseDate | amDateFormat:'MMMM'}} {{node.releaseDate | amDateFormat:'YYYY'}}</div>
@@ -117,7 +119,9 @@
 
                             <div class="date-container">
 
-                                <div class="date-container__title">Unpublish date</div>
+                                <div class="date-container__title">
+                                    <localize key="content_unpublishDate"></localize>
+                                </div>
                                 
                                 <div class="date-container__date" ng-if="node.removeDate">
                                     <div class="date-wrapper__date">{{node.removeDate | amDateFormat:'MMMM'}} {{node.removeDate | amDateFormat:'YYYY'}}</div>
@@ -142,13 +146,17 @@
             </umb-box-content>
         </umb-box>
         <umb-box>
-            <umb-box-header title="Meta data"></umb-box-header>
+            <umb-box-header title-key="general_general"></umb-box-header>
             <umb-box-content class="block-form">
                 
+                <umb-control-group label="Created">
+                    Created {{node.createDate | amDateFormat:'HH:mm'}} {{node.createDate | amDateFormat:'DD'}} {{ node.createDate | amDateFormat:'MMM'}} {{ node.createDate | amDateFormat:'YYYY'}} by {{ node.owner.name }}
+                </umb-control-group>
+            <!-- 
                 <umb-control-group label="Created" description="Date/time this document was created">
                     Created {{ node.createDate }} by {{ node.owner.name }}
                 </umb-control-group>
-                
+             -->
                 <umb-control-group label="@content_documentType" description="Description here">
                     <umb-node-preview
                         icon="documentType.icon"
