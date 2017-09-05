@@ -17,7 +17,7 @@ namespace Umbraco.Core.Models.Membership
     /// </summary>    
     [Serializable]
     [DataContract(IsReference = true)]
-    public class User : Entity, IUser
+    public class User : Entity, IUser, IProfile
     {
         /// <summary>
         /// Constructor for creating a new/empty user
