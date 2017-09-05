@@ -823,6 +823,8 @@ namespace Umbraco.Web.Cache
                     var handler = FindHandler(e);
                     if (handler == null) continue;
 
+                    ApplicationContext.Current.ProfilingLogger.Logger.Info<CacheRefresherEventHandler>("Handling " + e.Sender + " " + e.EventName);
+
                     handler.Invoke(null, new[] { e.Sender, e.Args });
                 }
             }
