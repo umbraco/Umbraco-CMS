@@ -1,11 +1,13 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout) {
+    function ContentNodeInfoDirective($timeout, $location) {
 
         function link(scope, element, attrs, ctrl) {
-
+            
             function onInit() {
+
+                scope.allowOpen = true;
 
                 scope.datePickerConfig = {
                     pickDate: true,

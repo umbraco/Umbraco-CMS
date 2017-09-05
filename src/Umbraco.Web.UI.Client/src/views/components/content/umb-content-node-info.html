@@ -150,14 +150,14 @@
             <umb-box-content class="block-form">
                 
                 <umb-control-group label="Created">
-                    Created {{node.createDate | amDateFormat:'HH:mm'}} {{node.createDate | amDateFormat:'DD'}} {{ node.createDate | amDateFormat:'MMM'}} {{ node.createDate | amDateFormat:'YYYY'}} by {{ node.owner.name }}
+                    {{node.createDate | amDateFormat:'DD'}} {{ node.createDate | amDateFormat:'MMM'}} {{ node.createDate | amDateFormat:'YYYY'}}, {{node.createDate | amDateFormat:'h:mmA'}} by {{ node.owner.name }}
                 </umb-control-group>
             <!-- 
                 <umb-control-group label="Created" description="Date/time this document was created">
                     Created {{ node.createDate }} by {{ node.owner.name }}
                 </umb-control-group>
              -->
-                <umb-control-group label="@content_documentType" description="Description here">
+                <umb-control-group label="@content_documentType">
                     <umb-node-preview
                         icon="documentType.icon"
                         name="documentType.linkText"
@@ -166,7 +166,18 @@
                     </umb-node-preview>
                 </umb-control-group>
 
-                <umb-control-group label="@template_template" description="{{template.description}}">
+            <!--                 
+                <umb-control-group label="@content_documentType" description="Description here">
+                    <umb-node-preview
+                        icon="documentType.icon"
+                        name="documentType.linkText"
+                        allow-open="allowOpen"
+                        on-open="openDocumentType(documentType)">
+                    </umb-node-preview>
+                </umb-control-group>
+            -->
+
+                <umb-control-group label="@template_template">
                     <select
                         class="input-block-level"
                         ng-model="node.template"
