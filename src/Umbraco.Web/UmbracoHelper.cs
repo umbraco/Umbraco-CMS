@@ -1294,9 +1294,9 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="text">The text.</param>
 		/// <returns>The text with text line breaks replaced with html linebreaks (<br/>)</returns>
-		public string ReplaceLineBreaksForHtml(string text)
+		public IHtmlString ReplaceLineBreaksForHtml(string text)
 		{
-            return _stringUtilities.ReplaceLineBreaksForHtml(text);
+            		return _stringUtilities.ReplaceLineBreaksForHtml(text);
 		}
 
         /// <summary>
