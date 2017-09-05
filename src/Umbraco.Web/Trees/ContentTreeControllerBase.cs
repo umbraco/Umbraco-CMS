@@ -67,9 +67,13 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         internal TreeNode GetSingleTreeNodeWithAccessCheck(IUmbracoEntity e, string parentId, FormDataCollection queryStrings)
         {
-            var treeNode = GetSingleTreeNode(e, parentId, queryStrings);
-            var hasAccess = Security.CurrentUser.HasPathAccess(e, Services.EntityService, RecycleBinId);
-            if (hasAccess == false)
+            bool hasPathAccess;
+            var entityIsAncestorOfStartNodes = Security.CurrentUser.IsInBranchOfStartNode(e, Services.EntityService, RecycleBinId, out hasPathAccess);
+            if (entityIsAncestorOfStartNodes == false)
+                return null;
+
+            var treeNode = GetSingleTreeNode(e, parentId, queryStrings);            
+            if (hasPathAccess == false)
             {
                 treeNode.AdditionalData["noAccess"] = true;
             }
