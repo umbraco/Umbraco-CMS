@@ -54,30 +54,32 @@
                </umb-breadcrumbs>
 
             </umb-editor-footer-content-left>
-
+            
+            
 
             <umb-editor-footer-content-right>              
                 
-                <span ng-if="content.removeDate != null && content.releaseDate != null">Publish and unpublish date: <i class="icon-calendar"></i>{{ content.releaseDate }} and {{ content.removeDate }}</span>
-                <span ng-if="content.removeDate == null && content.releaseDate != null">Publish date only: <i class="icon-calendar"></i> {{ content.releaseDate }}</span>
-                <span ng-if="content.removeDate != null && content.releaseDate == null">Remove date only: <i class="icon-calendar"></i> {{ content.removeDate }}</span>
+                <span class="umb-editor-footer__date-container">
+                    <div ng-if="content.releaseDate != null"><i class="icon-calendar"></i> Publish date: {{ content.releaseDate }}</div>
+                    <div ng-if="content.removeDate != null"><i class="icon-calendar"></i> Unpublish date: {{ content.removeDate }}</div>
+                </span>
 
-               <umb-button
-                  ng-if="page.listViewPath"
-                  type="link"
-                  href="#{{page.listViewPath}}"
-                  label="Return to list"
-                  label-key="buttons_returnToList">
-               </umb-button>
+                <umb-button
+                    ng-if="page.listViewPath"
+                    type="link"
+                    href="#{{page.listViewPath}}"
+                    label="Return to list"
+                    label-key="buttons_returnToList">
+                </umb-button>
 
-               <umb-button
-                  ng-if="!page.isNew && content.allowPreview"
-                  type="button"
-                  button-style="info"
-                  action="preview(content)"
-                  label="Preview page"
-                  label-key="buttons_showPage">
-               </umb-button>
+                <umb-button
+                    ng-if="!page.isNew && content.allowPreview"
+                    type="button"
+                    button-style="info"
+                    action="preview(content)"
+                    label="Preview page"
+                    label-key="buttons_showPage">
+                </umb-button>
 
                <umb-button-group
                   ng-if="defaultButton"

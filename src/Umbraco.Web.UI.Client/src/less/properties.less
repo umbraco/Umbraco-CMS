@@ -58,7 +58,23 @@
     background-color: @gray-8;
 }
 
-//--------- HISTORY ----------
+
+//--------- PUBLISH DATE IN THE FOOTER ---------
+
+.umb-editor-footer__date-container {
+    display: flex;
+    flex-direction: column;
+    float: left;
+    font-size: 13px;
+    line-height: 13px;
+    color: @gray-2;
+}
+
+.umb-editor-footer__date-container div {
+    margin-right: 20px;
+}
+
+//------------------- HISTORY ------------------
 
 
 .history-line {
@@ -85,6 +101,7 @@
 .name-date-container {
     margin: 0 30px 0 7px;
     height: 30px;
+    min-width: 170px;
 }
 
 .last-history-item .history-line {
@@ -120,8 +137,31 @@
 .history-item__break {
     display: flex;
     align-items: center;
+    min-width: 230px;
 }
 @media (max-width: 979px) {
+    
+    .history-row {
+        display: block;
+        padding: 10px 0;
+    }
+
+    .history-item__break {
+        padding: 7px 0;
+    }
+
+    .history-line {
+        display: none;
+    }
+}
+@media (max-width: 1535px) {
+    
+    .history-line {
+        visibility: hidden;
+    }
+}
+
+@media (min-width: 1101px) and (max-width: 1365px) {
     
     .history-row {
         display: block;
