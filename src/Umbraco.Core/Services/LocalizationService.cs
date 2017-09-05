@@ -405,6 +405,15 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public Dictionary<string, Guid> GetDictionaryItemKeyMap()
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateDictionaryRepository(uow);
+                return repository.GetDictionaryItemKeyMap();
+            }
+        }
+
         #region Event Handlers
         /// <summary>
         /// Occurs before Delete
