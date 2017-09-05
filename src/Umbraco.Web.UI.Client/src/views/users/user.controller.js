@@ -68,7 +68,7 @@
                 setUserDisplayState();
                 formatDatesToLocal(vm.user);
 
-                vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail || user.email === user.username;
+                vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail && user.email === user.username;
 
                 //go get the config for the membership provider and add it to the model
                 authResource.getMembershipProviderConfig().then(function (data) {
