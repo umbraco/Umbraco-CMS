@@ -155,5 +155,17 @@ namespace Umbraco.Tests.FrontEnd
 
             Assert.AreEqual("Hello world, this is some text <a href='blah'>with a link</a>", result);
         }
+
+        [Test]
+        public void Strip_Invalid_Html()
+        {
+            var text = "Hello world, <bthis</b> is some text <a href='blah'>with a link</a>";
+
+            var helper = new UmbracoHelper();
+
+            var result = helper.StripHtml(text).ToString();
+
+            Assert.AreEqual("Hello world, is some text with a link", result);
+        }
     }
 }

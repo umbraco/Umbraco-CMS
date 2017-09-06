@@ -58,7 +58,7 @@ namespace Umbraco.Web
             {
                 return new HtmlString(html);
             }
-            return new HtmlString(doc.DocumentNode.FirstChild.InnerHtml);
+            return new HtmlString(doc.DocumentNode.FirstChild.InnerHtml.Replace("  ", " "));
         }
 
         internal string Join<TIgnore>(string seperator, params object[] args)
