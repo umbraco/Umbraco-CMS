@@ -271,8 +271,9 @@ namespace Umbraco.Web.Trees
 
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
-            var actions = global::umbraco.BusinessLogic.Actions.Action.FromString(UmbracoUser.GetPermissions(dd.Path));
-
+            var actions = ActionsResolver.Current.FromActionSymbols(Security.CurrentUser.GetPermissions(dd.Path, Services.UserService))
+                .ToList();
+            
             // A user is allowed to delete their own stuff
             if (dd.CreatorId == UmbracoUser.Id && actions.Contains(ActionDelete.Instance) == false)
                 actions.Add(ActionDelete.Instance);
