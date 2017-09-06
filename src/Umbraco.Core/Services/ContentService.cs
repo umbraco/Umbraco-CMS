@@ -684,7 +684,17 @@ namespace Umbraco.Core.Services
                 // get query - if the id is System Root, then just get all
                 var query = Query<IContent>.Builder;
                 if (id != Constants.System.Root)
-                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
+                {
+                    var entityRepository = RepositoryFactory.CreateEntityRepository(uow);
+                    var contentPath = entityRepository.GetAllPaths(Constants.ObjectTypes.DocumentGuid, id).ToArray();
+                    if (contentPath.Length == 0)
+                    {
+                        totalChildren = 0;
+                        return Enumerable.Empty<IContent>();
+                    }
+                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", contentPath[0]), TextColumnType.NVarchar));
+                }
+                    
 
                 // get filter
                 IQuery<IContent> filterQuery = null;
@@ -719,7 +729,16 @@ namespace Umbraco.Core.Services
                 // get query - if the id is System Root, then just get all
                 var query = Query<IContent>.Builder;
                 if (id != Constants.System.Root)
-                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
+                {
+                    var entityRepository = RepositoryFactory.CreateEntityRepository(uow);
+                    var contentPath = entityRepository.GetAllPaths(Constants.ObjectTypes.DocumentGuid, id).ToArray();
+                    if (contentPath.Length == 0)
+                    {
+                        totalChildren = 0;
+                        return Enumerable.Empty<IContent>();
+                    }
+                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", contentPath[0]), TextColumnType.NVarchar));
+                }
 
                 return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
             }
@@ -1667,7 +1686,7 @@ namespace Umbraco.Core.Services
         {
             using (new WriteLock(Locker))
             {
-                var nodeObjectType = new Guid(Constants.ObjectTypes.Document);
+                var nodeObjectType = Constants.ObjectTypes.DocumentGuid;
 
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
