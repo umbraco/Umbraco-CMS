@@ -248,15 +248,15 @@ namespace Umbraco.Web
                     outputms.Position = 0;
                     using (TextReader outputtr = new StreamReader(outputms))
                     {
-                        string result = String.Empty;
+                        string result = string.Empty;
 
                         string firstTrim = outputtr.ReadToEnd().Replace("  ", " ").Trim();
 
                         //Check to see if there is an empty char between the hellip and the output string
                         //if there is, remove it
-                        if (string.IsNullOrEmpty(firstTrim) == false)
+                        if (string.IsNullOrWhiteSpace(firstTrim) == false)
                         {
-                            result = firstTrim[firstTrim.Length - hellip.Length -1] == ' ' ? firstTrim.Remove(firstTrim.Length - hellip.Length -1, 1) : firstTrim;
+                            result = firstTrim[firstTrim.Length - hellip.Length - 1] == ' ' ? firstTrim.Remove(firstTrim.Length - hellip.Length - 1, 1) : firstTrim;
                         }
                         return new HtmlString(result);
                     }
@@ -274,19 +274,17 @@ namespace Umbraco.Web
         public int WordsToLength(string html, int words, bool tagsAsContent)
         {
             HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(html);
 
             int wordCount = 0,
                 length = 0,
-                insideTagCounter = length,
                 maxWords = words;
-
             string strippedOfTags = string.Empty;
+            bool invalidHtml = doc.ParseErrors.Any();
 
             //If tagsAsContent is on, use the string stripped of html tags
             if (tagsAsContent == false)
             {
-                doc.LoadHtml(html);
-
                 foreach (var node in doc.DocumentNode.ChildNodes)
                 {
                     strippedOfTags += node.InnerText;
@@ -304,13 +302,9 @@ namespace Umbraco.Web
                     //Check if we have a space inside a tag and increase the length if we do
                     if (html[length].Equals('<') && html[length + 1].Equals('/') == false && tagsAsContent)
                     {
-                        while (html[insideTagCounter].Equals('>') == false)
+                        while (html[length].Equals('>') == false && invalidHtml == false)
                         {
-                            if (html[insideTagCounter].Equals(' '))
-                            {
-                                length++;
-                            }
-                            insideTagCounter++;
+                            length++;
                         }
                     }
                     length++;
