@@ -95,7 +95,7 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public void Truncate_By_Words_TagsAsContent()
+        public void Truncate_By_Words()
         {
             var text = "Hello world, this is some text <a href='blah'>with a link</a>";
 
@@ -107,7 +107,7 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public void Truncate_By_Words_With_Tag_TagsAsContent()
+        public void Truncate_By_Words_With_Tag()
         {
             var text = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
 
@@ -119,7 +119,7 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public void Truncate_By_Words_Mid_Tag_TagsAsContent()
+        public void Truncate_By_Words_Mid_Tag()
         {
             var text = "Hello world, this is some text <a href='blah'>with a link</a>";
 
