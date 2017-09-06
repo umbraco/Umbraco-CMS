@@ -239,6 +239,12 @@ angular.module("umbraco.directives")
 
             setupNodeDom(scope.node, scope.tree);
 
+            // load the children if the current user don't have access to the node
+            // it is used to auto expand the tree to the start nodes the user has access to
+            if(scope.node.hasChildren && scope.node.metaData.noAccess) {
+                scope.loadChildren(scope.node);
+            }
+
             var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" enablelistviewexpand="{{enablelistviewexpand}}" eventhandler="eventhandler" tree="tree" current-node="currentNode" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
             var newElement = angular.element(template);
             $compile(newElement)(scope);
