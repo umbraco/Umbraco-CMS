@@ -121,7 +121,9 @@
             vm.user.resetPasswordValue = null;
 
             //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
+            if(vm.user.changePassword) {
             vm.user.changePassword.reset = !vm.user.changePassword.oldPassword && !vm.user.isCurrentUser;
+            }
 
             contentEditingHelper.contentEditorPerformSave({
                 statusMessage: vm.labels.saving,
