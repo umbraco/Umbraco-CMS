@@ -271,7 +271,7 @@ namespace Umbraco.Web
         /// <param name="words">Amount of words you would like to measure</param>
         /// <param name="tagsAsContent"></param>
         /// <returns></returns>
-        public int WordsToLength(string html, int words, bool tagsAsContent)
+        public int WordsToLength(string html, int words)
         {
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(html);
@@ -279,18 +279,8 @@ namespace Umbraco.Web
             int wordCount = 0,
                 length = 0,
                 maxWords = words;
-            string strippedOfTags = string.Empty;
-            bool invalidHtml = doc.ParseErrors.Any();
 
-            //If tagsAsContent is on, use the string stripped of html tags
-            if (tagsAsContent == false)
-            {
-                foreach (var node in doc.DocumentNode.ChildNodes)
-                {
-                    strippedOfTags += node.InnerText;
-                }
-                html = strippedOfTags;
-            }
+            html = StripHtmlTags(html, null).ToString();
 
             while (length < html.Length)
             {
@@ -299,14 +289,6 @@ namespace Umbraco.Web
                 // Check if current char is part of a word
                 while (length < html.Length && char.IsWhiteSpace(html[length]) == false)
                 {
-                    //Check if we have a space inside a tag and increase the length if we do
-                    if (html[length].Equals('<') && html[length + 1].Equals('/') == false && tagsAsContent)
-                    {
-                        while (html[length].Equals('>') == false && invalidHtml == false)
-                        {
-                            length++;
-                        }
-                    }
                     length++;
                 }
 
