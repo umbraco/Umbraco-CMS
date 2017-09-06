@@ -1466,7 +1466,7 @@ namespace Umbraco.Web
         /// </summary>
         public IHtmlString TruncateByWords(string html, int words)
         {
-            int length = _stringUtilities.WordsToLength(html, words, false);
+            int length = _stringUtilities.WordsToLength(html, words);
 
             return Truncate(html, length, true, false);
         }
@@ -1476,7 +1476,7 @@ namespace Umbraco.Web
         /// </summary>
         public IHtmlString TruncateByWords(string html, int words, bool addElipsis)
         {
-            int length = _stringUtilities.WordsToLength(html, words, false);
+            int length = _stringUtilities.WordsToLength(html, words);
 
             return Truncate(html, length, addElipsis, false);
         }
@@ -1484,19 +1484,9 @@ namespace Umbraco.Web
         /// <summary>
         /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
         /// </summary>
-        public IHtmlString TruncateByWords(string html, int words, bool addElipsis, bool treatTagsAsContent)
-        {
-            int length =_stringUtilities.WordsToLength(html, words, treatTagsAsContent);
-
-            return Truncate(html, length, addElipsis, treatTagsAsContent);
-        }
-
-        /// <summary>
-        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
-        /// </summary>
         public IHtmlString TruncateByWords(IHtmlString html, int words)
         {
-            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words, false);
+            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words);
 
             return Truncate(html, length, true, false);
         }
@@ -1506,19 +1496,9 @@ namespace Umbraco.Web
         /// </summary>
         public IHtmlString TruncateByWords(IHtmlString html, int words, bool addElipsis)
         {
-            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words, false);
+            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words);
 
             return Truncate(html, length, addElipsis, false);
-        }
-
-        /// <summary>
-        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
-        /// </summary>
-        public IHtmlString TruncateByWords(IHtmlString html, int words, bool addElipsis, bool treatTagsAsContent)
-        {
-            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words, treatTagsAsContent);
-
-            return Truncate(html, length, addElipsis, treatTagsAsContent);
         }
         #endregion
         #endregion
