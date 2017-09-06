@@ -38,6 +38,7 @@
     "grunt-open": "~0.2.0",
     "grunt-postcss": "~0.6.0",
     "grunt-recess": "~0.3",
+    "grunt-umblocalize": "^0.3.1",
     "karma": "~0.9",
     "karma-chrome-launcher": "0.0.2",
     "karma-coffee-preprocessor": "0.0.1",

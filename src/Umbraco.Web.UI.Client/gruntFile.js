@@ -7,6 +7,7 @@ module.exports = function (grunt) {
     grunt.registerTask('dev', ['jshint:dev', 'build-dev', 'webserver', 'open:dev', 'watch']);
     grunt.registerTask('docserve', ['docs:api', 'connect:docserver', 'open:docs', 'watch:docs']);
     grunt.registerTask('vs', ['jshint:dev', 'build-dev', 'watch']);
+    grunt.registerTask('localize', ['umblocalize']);
 
     //TODO: Too much watching, this brings windows to it's knees when in dev mode
     //run by the watch task
@@ -325,6 +326,17 @@ module.exports = function (grunt) {
             }
         },
 
+        umblocalize: {
+          localize: {
+            options: {
+                baseFile: 'en_us.xml'
+            },
+            files: {
+                'config/lang': ['../Umbraco.Web.UI/Umbraco/config/lang/*.xml']
+            }
+          }
+        },
+
         postcss: {
            options: {
               processors: [
@@ -582,6 +594,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-recess');
+    grunt.loadNpmTasks('grunt-umblocalize');
     grunt.loadNpmTasks('grunt-postcss');
 
     grunt.loadNpmTasks('grunt-karma');
