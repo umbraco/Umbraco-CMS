@@ -308,6 +308,7 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add<ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
+
             return PerformGetMenuForNode(id, queryStrings);
         }
 

@@ -41,22 +41,8 @@ namespace Umbraco.Web.Trees
     [SearchableTree("searchResultFormatter", "configureContentResult")]
     public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
     {
-    
         private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
-
-        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
-        {
-            var node = base.CreateRootNode(queryStrings);
-
-            // if the user's start node is not default, then ensure the root doesn't have a menu
-            if (UserStartNodes.Contains(Constants.System.Root) == false)
-            {
-                node.MenuUrl = "";
-            }
-            node.Name = ui.Text("sections", Constants.Trees.Content);
-            return node;
-        }
-
+        
         protected override int RecycleBinId
         {
             get { return Constants.System.RecycleBinContent; }
@@ -128,9 +114,12 @@ namespace Umbraco.Web.Trees
             {
                 var menu = new MenuItemCollection();
                 
-                // if the user's start node is not the root then ensure the root menu is empty/doesn't exist
+                // if the user's start node is not the root then the only menu item to display is refresh
                 if (UserStartNodes.Contains(Constants.System.Root) == false)
                 {
+                    menu.Items.Add<RefreshNode, ActionRefresh>(
+                        Services.TextService.Localize(string.Concat("actions/", ActionRefresh.Instance.Alias)),
+                        true);
                     return menu;
                 }
 
@@ -173,6 +162,16 @@ namespace Umbraco.Web.Trees
             if (item == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            //if the user has no path access for this node, all they can do is refresh
+            if (Security.CurrentUser.HasPathAccess(item, Services.EntityService, RecycleBinId) == false)
+            {
+                var menu = new MenuItemCollection();
+                menu.Items.Add<RefreshNode, ActionRefresh>(
+                    Services.TextService.Localize(string.Concat("actions/", ActionRefresh.Instance.Alias)),
+                    true);
+                return menu;
             }
 
             var nodeMenu = GetAllNodeMenuItems(item);

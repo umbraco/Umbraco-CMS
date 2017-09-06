@@ -36,20 +36,7 @@ namespace Umbraco.Web.Trees
     public class MediaTreeController : ContentTreeControllerBase, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
-
-        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
-        {
-            var node = base.CreateRootNode(queryStrings);
-
-            // if the user's start node is not default, then ensure the root doesn't have a menu
-            if (UserStartNodes.Contains(Constants.System.Root) == false)
-            {
-                node.MenuUrl = "";
-            }
-            node.Name = ui.Text("sections", Constants.Trees.Media);
-            return node;
-        }
-
+        
         protected override int RecycleBinId
         {
             get { return Constants.System.RecycleBinMedia; }
@@ -107,9 +94,12 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.Root.ToInvariantString())
             {
-                //if the user's start node is not the root then ensure the root menu is empty/doesn't exist
+                // if the user's start node is not the root then the only menu item to display is refresh
                 if (UserStartNodes.Contains(Constants.System.Root) == false)
                 {
+                    menu.Items.Add<RefreshNode, ActionRefresh>(
+                        Services.TextService.Localize(string.Concat("actions/", ActionRefresh.Instance.Alias)),
+                        true);
                     return menu;
                 }
 
@@ -130,6 +120,16 @@ namespace Umbraco.Web.Trees
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
+
+            //if the user has no path access for this node, all they can do is refresh
+            if (Security.CurrentUser.HasPathAccess(item, Services.EntityService, RecycleBinId) == false)
+            {
+                menu.Items.Add<RefreshNode, ActionRefresh>(
+                    Services.TextService.Localize(string.Concat("actions/", ActionRefresh.Instance.Alias)),
+                    true);
+                return menu;
+            }
+
             //return a normal node menu:
             menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
             menu.Items.Add<ActionMove>(ui.Text("actions", ActionMove.Instance.Alias));
