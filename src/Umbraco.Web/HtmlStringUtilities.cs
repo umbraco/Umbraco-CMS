@@ -32,6 +32,7 @@ namespace Umbraco.Web
         {
             var doc = new HtmlDocument();
             doc.LoadHtml("<p>" + html + "</p>");
+            
             var targets = new List<HtmlNode>();
 
             var nodes = doc.DocumentNode.FirstChild.SelectNodes(".//*");
@@ -87,7 +88,7 @@ namespace Umbraco.Web
 
         public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
         {
-            string hellip = "&hellip;";
+            const string hellip = "&hellip;";
 
             using (var outputms = new MemoryStream())
             {
@@ -110,7 +111,7 @@ namespace Umbraco.Web
                                     isTagClose = false;
 
                                 int ic = 0,
-                                    currentLength = 0,
+                                    //currentLength = 0,
                                     currentTextLength = 0;
 
                                 string currentTag = string.Empty,
@@ -217,7 +218,7 @@ namespace Umbraco.Web
                                         {
                                             var charToWrite = (char)ic;
                                             outputtw.Write(charToWrite);
-                                            currentLength++;
+                                            //currentLength++;
                                         }
                                     }
 
@@ -253,7 +254,7 @@ namespace Umbraco.Web
 
                         //Check to see if there is an empty char between the hellip and the output string
                         //if there is, remove it
-                        if (String.IsNullOrEmpty(firstTrim) == false)
+                        if (string.IsNullOrEmpty(firstTrim) == false)
                         {
                             result = firstTrim[firstTrim.Length - hellip.Length -1] == ' ' ? firstTrim.Remove(firstTrim.Length - hellip.Length -1, 1) : firstTrim;
                         }
@@ -268,6 +269,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="html">Html text</param>
         /// <param name="words">Amount of words you would like to measure</param>
+        /// <param name="tagsAsContent"></param>
         /// <returns></returns>
         public int WordsToLength(string html, int words, bool tagsAsContent)
         {
