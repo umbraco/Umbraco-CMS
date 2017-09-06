@@ -26,6 +26,8 @@
 
         vm.selectedBulkUserGroups = [];
 
+        vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail;
+
         vm.allowDisableUser = true;
         vm.allowEnableUser = true;
         vm.allowUnlockUser = true;

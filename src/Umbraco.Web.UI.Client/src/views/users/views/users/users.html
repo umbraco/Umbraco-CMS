@@ -325,6 +325,13 @@
                     <span class="help-inline" val-msg-for="name" val-toggle-msg="valServerField"></span>
                 </umb-control-group>
 
+                <umb-control-group label="@general_username" label-for="username" required="true" ng-if="!vm.usernameIsEmail">
+                    <input type="text" name="username" localize="placeholder" placeholder="@placeholders_enterusername" class="input-block-level"
+                        ng-model="vm.newUser.username" val-server-field="Username" ng-required="vm.usernameIsEmail" />
+                    <span class="help-inline" val-msg-for="username" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
+                    <span class="help-inline" val-msg-for="username" val-toggle-msg="valServerField"></span>
+                </umb-control-group>
+
                 <umb-control-group label="@general_email" label-for="email" required="true">
                     <input type="email" name="email" localize="placeholder" placeholder="@placeholders_enteremail" class="input-block-level"
                         ng-model="vm.newUser.email" required val-email val-server-field="Email" />
