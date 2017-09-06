@@ -400,6 +400,7 @@
     <key alias="nameentity">Name the %0%...</key>
     <key alias="entername">Enter a name...</key>
     <key alias="enteremail">Enter an email...</key>
+    <key alias="enterusername">Enter a username...</key>
     <key alias="label">Label...</key>
     <key alias="enterDescription">Enter a description...</key>
     <key alias="search">Type to search...</key>

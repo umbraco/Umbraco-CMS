@@ -265,13 +265,18 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
-
-            var existing = Services.UserService.GetByEmail(userSave.Email);
-            if (existing != null)
+            
+            if (UmbracoConfig.For.UmbracoSettings().Security.UsernameIsEmail)
             {
-                ModelState.AddModelError("Email", "A user with the email already exists");
-                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+                //ensure they are the same if we're using it
+                userSave.Username = userSave.Email;
             }
+            else
+            {
+                //first validate the username if were showing it
+                CheckUniqueUsername(userSave.Username, null);
+            }
+            CheckUniqueEmail(userSave.Email, null);
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
@@ -283,7 +288,7 @@ namespace Umbraco.Web.Editors
 
             //we want to create the user with the UserManager, this ensures the 'empty' (special) password
             //format is applied without us having to duplicate that logic
-            var identityUser = BackOfficeIdentityUser.CreateNew(userSave.Email, userSave.Email, GlobalSettings.DefaultUILanguage);
+            var identityUser = BackOfficeIdentityUser.CreateNew(userSave.Username, userSave.Email, GlobalSettings.DefaultUILanguage);
             identityUser.Name = userSave.Name;
 
             var created = await UserManager.CreateAsync(identityUser);
@@ -352,13 +357,19 @@ namespace Umbraco.Web.Editors
                     Request.CreateNotificationValidationErrorResponse("No Email server is configured"));
             }
 
-            var user = Services.UserService.GetByEmail(userSave.Email);
-            if (user != null && (user.LastLoginDate != default(DateTime) || user.EmailConfirmedDate.HasValue))
+            IUser user;
+            if (UmbracoConfig.For.UmbracoSettings().Security.UsernameIsEmail)
             {
-                ModelState.AddModelError("Email", "A user with the email already exists");
-                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+                //ensure it's the same
+                userSave.Username = userSave.Email;
             }
-
+            else
+            {
+                //first validate the username if we're showing it
+                user = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default(DateTime) || u.EmailConfirmedDate.HasValue);
+            }
+            user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default(DateTime) || u.EmailConfirmedDate.HasValue);
+            
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
             var canSaveUser = authHelper.IsAuthorized(Security.CurrentUser, user, null, null, userSave.UserGroups);
@@ -371,7 +382,7 @@ namespace Umbraco.Web.Editors
             {
                 //we want to create the user with the UserManager, this ensures the 'empty' (special) password
                 //format is applied without us having to duplicate that logic
-                var identityUser = BackOfficeIdentityUser.CreateNew(userSave.Email, userSave.Email, GlobalSettings.DefaultUILanguage);
+                var identityUser = BackOfficeIdentityUser.CreateNew(userSave.Username, userSave.Email, GlobalSettings.DefaultUILanguage);
                 identityUser.Name = userSave.Name;
 
                 var created = await UserManager.CreateAsync(identityUser);
@@ -401,7 +412,31 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
-        
+
+        private IUser CheckUniqueEmail(string email, Func<IUser, bool> extraCheck)
+        {
+            var user = Services.UserService.GetByEmail(email);
+            if (user != null && (extraCheck == null || extraCheck(user)))
+            {
+                ModelState.AddModelError("Email", "A user with the email already exists");
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+            }
+            return user;
+        }
+
+        private IUser CheckUniqueUsername(string username, Func<IUser, bool> extraCheck)
+        {
+            var user = Services.UserService.GetByUsername(username);
+            if (user != null && (extraCheck == null || extraCheck(user)))
+            {
+                ModelState.AddModelError(
+                    UmbracoConfig.For.UmbracoSettings().Security.UsernameIsEmail ? "Email" : "Username",
+                    "A user with the username already exists");
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+            }
+            return user;
+        }
+
         private HttpContextBase EnsureHttpContext()
         {
             var attempt = this.TryGetHttpContext();

@@ -713,11 +713,10 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IProfile"/></returns>
         public IProfile GetProfileById(int id)
         {
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
-            {
-                var repository = RepositoryFactory.CreateUserRepository(uow);
-                return repository.GetProfile(id);
-            }
+            //This is called a TON. Go get the full user from cache which should already be IProfile
+            var fullUser = GetUserById(id);
+            var asProfile = fullUser as IProfile;
+            return asProfile ?? new UserProfile(fullUser.Id, fullUser.Name);
         }
 
         /// <summary>
