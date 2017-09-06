@@ -59,10 +59,14 @@
 
         function selectUserGroup(userGroup, selection, event) {
 
-            // only allow selection if user is member of the group or admin
+            // Only allow selection if user is member of the group or admin
             if (currentUser.userGroups.indexOf(userGroup.group.alias) === -1 && currentUser.userGroups.indexOf("admin") === -1) {
                 return;
             }
+            // Disallow selection of the admin group, the checkbox is not visible in the UI, but clicking(and thous selecting) is still possible.
+            // Currently selection can only be used for deleting, and the Controller will also disallow deleting the admin group.
+            if (userGroup.group.alias === "admin")
+                return;
 
             if (userGroup.selected) {
                 var index = selection.indexOf(userGroup.group.id);
