@@ -55,6 +55,23 @@ namespace Umbraco.Web.Trees
 
         #endregion
 
+        /// <summary>
+        /// Ensure the noAccess metadata is applied for the root node if in dialog mode and the user doesn't have path access to it
+        /// </summary>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        {
+            var node = base.CreateRootNode(queryStrings);
+
+            if (IsDialog(queryStrings) && UserStartNodes.Contains(Constants.System.Root) == false)
+            {
+                node.AdditionalData["noAccess"] = true;
+            }
+
+            return node;
+        }
+
         protected abstract TreeNode GetSingleTreeNode(IUmbracoEntity e, string parentId, FormDataCollection queryStrings);
 
         /// <summary>

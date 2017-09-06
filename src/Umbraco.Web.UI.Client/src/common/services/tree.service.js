@@ -44,6 +44,14 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             if (!parentNode.section) {
                 parentNode.section = section;
             }
+
+            if (parentNode.metaData && parentNode.metaData.noAccess === true) {
+                if (!parentNode.cssClasses) {
+                    parentNode.cssClasses = [];
+                }
+                parentNode.cssClasses.push("no-access");
+            }
+
             //create a method outside of the loop to return the parent - otherwise jshint blows up
             var funcParent = function() {
                 return parentNode;
