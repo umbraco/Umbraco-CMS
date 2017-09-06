@@ -18,7 +18,7 @@ namespace Umbraco.Core
 
             internal const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
             internal const string ForceReAuthFlag = "umbraco-force-auth";
-
+            
             /// <summary>
             /// The prefix used for external identity providers for their authentication type
             /// </summary>

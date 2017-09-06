@@ -35,7 +35,7 @@ namespace Umbraco.Web.WebApi.Filters
             }
 
             var authorized = UmbracoContext.Current.Security.CurrentUser != null
-                   && _appNames.Any(app => UmbracoContext.Current.Security.UserHasAppAccess(
+                   && _appNames.Any(app => UmbracoContext.Current.Security.UserHasSectionAccess(
                        app, UmbracoContext.Current.Security.CurrentUser));
 
             return authorized;

@@ -335,6 +335,7 @@
     <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="DecimalExtensions.cs" />
     <Compile Include="DelegateExtensions.cs" />
+    <Compile Include="Deploy\IUniqueIdentifyingServiceConnector.cs" />
     <Compile Include="Diagnostics\MiniDump.cs" />
     <Compile Include="Deploy\ArtifactBase.cs" />
     <Compile Include="Deploy\ArtifactDependency.cs" />
@@ -354,6 +355,7 @@
     <Compile Include="Events\SupersedeEventAttribute.cs" />
     <Compile Include="Exceptions\ConnectionException.cs" />
     <Compile Include="HashCodeHelper.cs" />
+    <Compile Include="HashGenerator.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\EntityBase\EntityPath.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
@@ -815,7 +817,6 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\AddMissingForeignKeyForContentType.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\AlterDataTypePreValueTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenOneZero\AssignMissingPrimaryForMySqlKeys.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\AddIndexToUmbracoNodeTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\RemoveCmsDocumentAliasColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AssignMissingKeysAndIndexes.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\AssignMissingPrimaryForMySqlKeys.cs" />

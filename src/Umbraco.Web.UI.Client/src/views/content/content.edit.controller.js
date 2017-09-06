@@ -14,7 +14,7 @@ function ContentEditController($scope, $routeParams, contentResource) {
     return contentResource.getScaffold($routeParams.id, $routeParams.doctype);
   }
   function scaffoldBlueprint() {
-    return contentResource.getBlueprintScaffold($routeParams.blueprintId);
+      return contentResource.getBlueprintScaffold($routeParams.id, $routeParams.blueprintId);
   }
 
   $scope.contentId = $routeParams.id;

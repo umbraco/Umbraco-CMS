@@ -72,10 +72,28 @@ namespace Umbraco.Core.Services
 
         public static bool HasAccess(this IPublicAccessService publicAccessService, string path, MembershipUser member, RoleProvider roleProvider)
         {
+            return publicAccessService.HasAccess(path, member.UserName, roleProvider.GetRolesForUser);
+        }
+
+        /// <summary>
+        /// Checks if the member with the specified username has access to the path which is also based on the passed in roles for the member
+        /// </summary>
+        /// <param name="publicAccessService"></param>
+        /// <param name="path"></param>
+        /// <param name="username"></param>
+        /// <param name="rolesCallback">A callback to retrieve the roles for this member</param>
+        /// <returns></returns>
+        public static bool HasAccess(this IPublicAccessService publicAccessService, string path, string username, Func<string, IEnumerable<string>> rolesCallback)
+        {
+            if (rolesCallback == null) throw new ArgumentNullException("roles");
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
+            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", "path");
+
             var entry = publicAccessService.GetEntryForContent(path.EnsureEndsWith(path));
             if (entry == null) return true;
 
-            var roles = roleProvider.GetRolesForUser(member.UserName);
+            var roles = rolesCallback(username);
+
             return entry.Rules.Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType
                                         && roles.Contains(x.RuleValue));
         }

@@ -92,13 +92,20 @@ namespace Umbraco.Web.Editors
         /// Returns all user groups
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<UserGroupBasic> GetUserGroups()
+        public IEnumerable<UserGroupBasic> GetUserGroups(bool onlyCurrentUserGroups = true)
         {
-            var allGroups = Mapper.Map<IEnumerable<IUserGroup>, IEnumerable<UserGroupBasic>>(Services.UserService.GetAllUserGroups());
+            var allGroups = Mapper.Map<IEnumerable<IUserGroup>, IEnumerable<UserGroupBasic>>(Services.UserService.GetAllUserGroups())
+                .ToList();
 
-            //if admin, return all groups
-            if (Security.CurrentUser.IsAdmin())
+            var isAdmin = Security.CurrentUser.IsAdmin();
+            if (isAdmin) return allGroups;
+
+            if (onlyCurrentUserGroups == false)
+            {
+                //this user is not an admin so in that case we need to exlude all admin users
+                allGroups.RemoveAt(allGroups.IndexOf(allGroups.Find(basic => basic.Alias == Constants.Security.AdminGroupAlias)));
                 return allGroups;
+            }
 
             //we cannot return user groups that this user does not have access to
             var currentUserGroups = Security.CurrentUser.Groups.Select(x => x.Alias).ToArray();

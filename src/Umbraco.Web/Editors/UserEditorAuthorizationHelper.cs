@@ -46,9 +46,23 @@ namespace Umbraco.Web.Editors
                     return Attempt.Fail("The current user is not an administrator so cannot save another administrator");
             }
 
-            // b) A user cannot set a start node on another user that they don't have access to, this even goes for admins
+            // b) If a start node is changing, a user cannot set a start node on another user that they don't have access to, this even goes for admins
 
-            var pathResult = AuthorizePath(currentUser, startContentIds, startMediaIds);
+            //only validate any start nodes that have changed.
+            //a user can remove any start nodes and add start nodes that they have access to
+            //but they cannot add a start node that they do not have access to
+
+            var changedStartContentIds = savingUser == null
+                ? startContentIds
+                : startContentIds == null
+                    ? null
+                    : startContentIds.Except(savingUser.StartContentIds).ToArray();
+            var changedStartMediaIds = savingUser == null
+                ? startMediaIds
+                : startMediaIds == null
+                    ? null
+                    : startMediaIds.Except(savingUser.StartMediaIds).ToArray();
+            var pathResult = AuthorizePath(currentUser, changedStartContentIds, changedStartMediaIds);
             if (pathResult == false)
                 return pathResult;
             
@@ -59,24 +73,32 @@ namespace Umbraco.Web.Editors
 
             if (userGroupAliases != null)
             {
-                var userGroups = _userService.GetUserGroupsByAlias(userGroupAliases.ToArray()).ToArray();
+                var savingGroupAliases = userGroupAliases.ToArray();
 
-                // d) A user cannot assign a group to another user that grants them access to a start node they don't have access to
-                foreach (var group in userGroups)
-                {
-                    pathResult = AuthorizePath(currentUser,
-                        group.StartContentId.HasValue ? new[] { group.StartContentId.Value } : null,
-                        group.StartMediaId.HasValue ? new[] { group.StartMediaId.Value } : null);
-                    if (pathResult == false)
-                        return pathResult;
-                }
+                //only validate any groups that have changed.
+                //a non-admin user can remove groups and add groups that they have access to
+                //but they cannot add a group that they do not have access to or that grants them
+                //path or section access that they don't have access to.
 
-                // e) A user cannot set a section on another user that they don't have access to
-                var allGroupSections = userGroups.SelectMany(x => x.AllowedSections).Distinct();
-                var missingSectionAccess = allGroupSections.Except(currentUser.AllowedSections).ToArray();
-                if (missingSectionAccess.Length > 0)
+                var newGroups = savingUser == null
+                    ? savingGroupAliases
+                    : savingGroupAliases.Except(savingUser.Groups.Select(x => x.Alias)).ToArray();
+
+                var userGroupsChanged = savingUser != null && newGroups.Length > 0;
+
+                if (userGroupsChanged)
                 {
-                    return Attempt.Fail("The current user does not have access to sections " + string.Join(",", missingSectionAccess));
+                    // d) A user cannot assign a group to another user that they do not belong to
+
+                    var currentUserGroups = currentUser.Groups.Select(x => x.Alias).ToArray();
+                    
+                    foreach (var group in newGroups)
+                    {
+                        if (currentUserGroups.Contains(group) == false)
+                        {
+                            return Attempt.Fail("Cannot assign the group " + group + ", the current user is not a member");
+                        }
+                    }                    
                 }
             }            
 
@@ -89,11 +111,20 @@ namespace Umbraco.Web.Editors
             {
                 foreach (var contentId in startContentIds)
                 {
-                    var content = _contentService.GetById(contentId);
-                    if (content == null) continue;
-                    var hasAccess = currentUser.HasPathAccess(content, _entityService);
-                    if (hasAccess == false)
-                        return Attempt.Fail("The current user does not have access to the content path " + content.Path);
+                    if (contentId == Constants.System.Root)
+                    {
+                        var hasAccess = UserExtensions.HasPathAccess("-1", currentUser.CalculateContentStartNodeIds(_entityService), Constants.System.RecycleBinContent);
+                        if (hasAccess == false)
+                            return Attempt.Fail("The current user does not have access to the content root");
+                    }
+                    else
+                    {
+                        var content = _contentService.GetById(contentId);
+                        if (content == null) continue;
+                        var hasAccess = currentUser.HasPathAccess(content, _entityService);
+                        if (hasAccess == false)
+                            return Attempt.Fail("The current user does not have access to the content path " + content.Path);
+                    }
                 }
             }
 
@@ -101,11 +132,20 @@ namespace Umbraco.Web.Editors
             {
                 foreach (var mediaId in startMediaIds)
                 {
-                    var media = _mediaService.GetById(mediaId);
-                    if (media == null) continue;
-                    var hasAccess = currentUser.HasPathAccess(media, _entityService);
-                    if (hasAccess == false)
-                        return Attempt.Fail("The current user does not have access to the media path " + media.Path);
+                    if (mediaId == Constants.System.Root)
+                    {
+                        var hasAccess = UserExtensions.HasPathAccess("-1", currentUser.CalculateMediaStartNodeIds(_entityService), Constants.System.RecycleBinMedia);
+                        if (hasAccess == false)
+                            return Attempt.Fail("The current user does not have access to the media root");
+                    }
+                    else
+                    {
+                        var media = _mediaService.GetById(mediaId);
+                        if (media == null) continue;
+                        var hasAccess = currentUser.HasPathAccess(media, _entityService);
+                        if (hasAccess == false)
+                            return Attempt.Fail("The current user does not have access to the media path " + media.Path);
+                    }                    
                 }                
             }
 

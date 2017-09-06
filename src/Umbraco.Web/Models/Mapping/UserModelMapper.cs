@@ -321,12 +321,15 @@ namespace Umbraco.Web.Models.Mapping
                     detail => detail.EmailHash,
                     opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().GenerateHash()))
                 .ForMember(detail => detail.SecondsUntilTimeout, opt => opt.Ignore())
+                .ForMember(detail => detail.UserGroups, opt => opt.Ignore())
                 .AfterMap((user, detail) =>
                 {
                     //we need to map the legacy UserType
                     //the best we can do here is to return the user's first user group as a IUserType object
                     //but we should attempt to return any group that is the built in ones first
                     var groups = user.Groups.ToArray();
+                    detail.UserGroups = user.Groups.Select(x => x.Alias).ToArray();
+
                     if (groups.Length == 0)
                     {
                         //In backwards compatibility land, a user type cannot be null! so we need to return a fake one. 

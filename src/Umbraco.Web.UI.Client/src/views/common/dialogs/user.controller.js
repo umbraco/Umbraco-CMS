@@ -119,7 +119,7 @@ angular.module("umbraco")
            $scope.changePasswordModel.config = data;
            //ensure the hasPassword config option is set to true (the user of course has a password already assigned)
            //this will ensure the oldPassword is shown so they can change it
-           // disable reset password functionality beacuse it does not make sense inside the backoffice
+           // disable reset password functionality beacuse it does not make sense for the current user.
            $scope.changePasswordModel.config.hasPassword = true;
            $scope.changePasswordModel.config.disableToggle = true;
            $scope.changePasswordModel.config.enableReset = false;

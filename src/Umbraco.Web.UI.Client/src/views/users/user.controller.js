@@ -78,6 +78,14 @@
                   vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
 
                   vm.changePasswordModel.config.disableToggle = true;
+
+                  //this is only relavent for membership providers now (it's basically obsolete)
+                  vm.changePasswordModel.config.enableReset = false;
+
+                  //in the ASP.NET Identity world, this config option will allow an admin user to change another user's password
+                  //if the user has access to the user section. So if this editor is being access, the user of course has access to this section.
+                  //the authorization check is also done on the server side when submitted.
+                  vm.changePasswordModel.config.allowManuallyChangingPassword = !vm.user.isCurrentUser;
                   
                   vm.loading = false;
                 });
@@ -111,6 +119,9 @@
 
             vm.page.saveButtonState = "busy";
             vm.user.resetPasswordValue = null;
+
+            //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
+            vm.user.changePassword.reset = !vm.user.changePassword.oldPassword && !vm.user.isCurrentUser;
 
             contentEditingHelper.contentEditorPerformSave({
                 statusMessage: vm.labels.saving,
