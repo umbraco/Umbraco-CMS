@@ -7,6 +7,8 @@ using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.DataProtection;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Services;
 
@@ -24,14 +26,25 @@ namespace Umbraco.Core.Security
         {
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the constructor specifying all dependencies instead")]
         public BackOfficeUserManager(
             IUserStore<BackOfficeIdentityUser, int> store,
             IdentityFactoryOptions<BackOfficeUserManager> options,
             MembershipProviderBase membershipProvider)
+            : this(store, options, membershipProvider, UmbracoConfig.For.UmbracoSettings().Content)
+        {
+        }
+
+        public BackOfficeUserManager(
+            IUserStore<BackOfficeIdentityUser, int> store,
+            IdentityFactoryOptions<BackOfficeUserManager> options,
+            MembershipProviderBase membershipProvider,
+            IContentSection contentSectionConfig)
             : base(store)
         {
-            if (options == null) throw new ArgumentNullException("options");;
-            InitUserManager(this, membershipProvider, options);
+            if (options == null) throw new ArgumentNullException("options"); ;
+            InitUserManager(this, membershipProvider, contentSectionConfig, options);
         }
 
         #region Static Create methods
@@ -46,7 +59,8 @@ namespace Umbraco.Core.Security
         {
             return Create(options, userService,
                 ApplicationContext.Current.Services.EntityService,
-                externalLoginService, membershipProvider);
+                externalLoginService, membershipProvider,
+                UmbracoConfig.For.UmbracoSettings().Content);
         }
 
         /// <summary>
@@ -57,20 +71,34 @@ namespace Umbraco.Core.Security
         /// <param name="entityService"></param>
         /// <param name="externalLoginService"></param>
         /// <param name="membershipProvider"></param>
+        /// <param name="contentSectionConfig"></param>
         /// <returns></returns>
         public static BackOfficeUserManager Create(
             IdentityFactoryOptions<BackOfficeUserManager> options,
             IUserService userService,
             IEntityService entityService,
             IExternalLoginService externalLoginService,
-            MembershipProviderBase membershipProvider)
+            MembershipProviderBase membershipProvider,
+            IContentSection contentSectionConfig)
         {
             if (options == null) throw new ArgumentNullException("options");
             if (userService == null) throw new ArgumentNullException("userService");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
-            var manager = new BackOfficeUserManager(new BackOfficeUserStore(userService, entityService, externalLoginService, membershipProvider));
-            manager.InitUserManager(manager, membershipProvider, options);
+            var manager = new BackOfficeUserManager(
+                new BackOfficeUserStore(userService, entityService, externalLoginService, membershipProvider));
+            manager.InitUserManager(manager, membershipProvider, contentSectionConfig, options);
+            return manager;
+        }
+        
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the overload specifying all dependencies instead")]
+        public static BackOfficeUserManager Create(
+           IdentityFactoryOptions<BackOfficeUserManager> options,
+           BackOfficeUserStore customUserStore,
+           MembershipProviderBase membershipProvider)
+        {
+            var manager = new BackOfficeUserManager(customUserStore, options, membershipProvider);
             return manager;
         }
 
@@ -80,33 +108,46 @@ namespace Umbraco.Core.Security
         /// <param name="options"></param>
         /// <param name="customUserStore"></param>
         /// <param name="membershipProvider"></param>
+        /// <param name="contentSectionConfig"></param>
         /// <returns></returns>
         public static BackOfficeUserManager Create(
-           IdentityFactoryOptions<BackOfficeUserManager> options,
-           BackOfficeUserStore customUserStore,
-           MembershipProviderBase membershipProvider)
+            IdentityFactoryOptions<BackOfficeUserManager> options,
+            BackOfficeUserStore customUserStore,
+            MembershipProviderBase membershipProvider,
+            IContentSection contentSectionConfig)
         {
-            var manager = new BackOfficeUserManager(customUserStore, options, membershipProvider);
+            var manager = new BackOfficeUserManager(customUserStore, options, membershipProvider, contentSectionConfig);
             return manager;
         }
         #endregion
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the overload specifying all dependencies instead")]
+        protected void InitUserManager(
+            BackOfficeUserManager manager,
+            MembershipProviderBase membershipProvider,         
+            IdentityFactoryOptions<BackOfficeUserManager> options)
+        {
+            InitUserManager(manager, membershipProvider, UmbracoConfig.For.UmbracoSettings().Content, options);
+        }
 
         /// <summary>
         /// Initializes the user manager with the correct options
         /// </summary>
         /// <param name="manager"></param>
         /// <param name="membershipProvider"></param>
+        /// <param name="contentSectionConfig"></param>
         /// <param name="options"></param>
         /// <returns></returns>
         protected void InitUserManager(
             BackOfficeUserManager manager,
             MembershipProviderBase membershipProvider,
+            IContentSection contentSectionConfig,
             IdentityFactoryOptions<BackOfficeUserManager> options)
         {
             //NOTE: This method is mostly here for backwards compat
-            base.InitUserManager(manager, membershipProvider, options.DataProtectionProvider);
+            base.InitUserManager(manager, membershipProvider, options.DataProtectionProvider, contentSectionConfig);
         }
-
        
     }
 
@@ -151,6 +192,16 @@ namespace Umbraco.Core.Security
         }
         #endregion
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the overload specifying all dependencies instead")]
+        protected void InitUserManager(
+            BackOfficeUserManager<T> manager,
+            MembershipProviderBase membershipProvider,
+            IDataProtectionProvider dataProtectionProvider)
+        {
+            InitUserManager(manager, membershipProvider, dataProtectionProvider, UmbracoConfig.For.UmbracoSettings().Content);
+        }
+
         /// <summary>
         /// Initializes the user manager with the correct options
         /// </summary>
@@ -159,11 +210,13 @@ namespace Umbraco.Core.Security
         /// The <see cref="MembershipProviderBase"/> for the users called UsersMembershipProvider
         /// </param>
         /// <param name="dataProtectionProvider"></param>
+        /// <param name="contentSectionConfig"></param>
         /// <returns></returns>
         protected void InitUserManager(
             BackOfficeUserManager<T> manager, 
             MembershipProviderBase membershipProvider, 
-            IDataProtectionProvider dataProtectionProvider)
+            IDataProtectionProvider dataProtectionProvider,
+            IContentSection contentSectionConfig)
         {
             // Configure validation logic for usernames
             manager.UserValidator = new BackOfficeUserValidator<T>(manager)
@@ -193,7 +246,9 @@ namespace Umbraco.Core.Security
             //custom identity factory for creating the identity object for which we auth against in the back office
             manager.ClaimsIdentityFactory = new BackOfficeClaimsIdentityFactory<T>();
 
-            manager.EmailService = new EmailService();
+            manager.EmailService = new EmailService(
+                contentSectionConfig.NotificationEmailAddress,
+                new EmailSender());
 
             //NOTE: Not implementing these, if people need custom 2 factor auth, they'll need to implement their own UserStore to suport it
 

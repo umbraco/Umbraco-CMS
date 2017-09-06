@@ -351,8 +351,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
             
-            var hasSmtp = GlobalSettings.HasSmtpServerConfigured(RequestContext.VirtualPathRoot);
-            if (hasSmtp == false)
+            if (EmailSender.CanSendRequiredEmail == false)
             {
                 throw new HttpResponseException(
                     Request.CreateNotificationValidationErrorResponse("No Email server is configured"));
@@ -477,12 +476,15 @@ namespace Umbraco.Web.Editors
                 UserExtensions.GetUserCulture(to.Language, Services.TextService),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString() });
 
-            await UserManager.EmailService.SendAsync(new IdentityMessage
-            {
-                Body = emailBody,
-                Destination = userDisplay.Email,
-                Subject = emailSubject
-            });
+            await UserManager.EmailService.SendAsync(
+                //send the special UmbracoEmailMessage which configures it's own sender
+                //to allow for events to handle sending the message if no smtp is configured
+                new UmbracoEmailMessage(new EmailSender(true))
+                {
+                    Body = emailBody,
+                    Destination = userDisplay.Email,
+                    Subject = emailSubject
+                });
 
         }
 

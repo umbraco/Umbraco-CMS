@@ -67,7 +67,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
             var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject");
 
-            using (var client = new SmtpClient())
+            var mailSender = new EmailSender();
             using (var mailMessage = new MailMessage(UmbracoConfig.For.UmbracoSettings().Content.NotificationEmailAddress,
                 RecipientEmail,
                 string.IsNullOrEmpty(subject) ? "Umbraco Health Check Status" : subject,
@@ -77,14 +77,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
                              && message.Contains("<") && message.Contains("</")
             })
             {
-                if (client.DeliveryMethod == SmtpDeliveryMethod.Network)
-                {
-                    await client.SendMailAsync(mailMessage);
-                }
-                else
-                {
-                    client.Send(mailMessage);
-                }
+                await mailSender.SendAsync(mailMessage);
             }
         }
     }
