@@ -15,6 +15,11 @@ namespace Umbraco.Core.Models
 {
     public static class UserExtensions
     {
+        public static IEnumerable<string> GetPermissions(this IUser user, string path, IUserService userService)
+        {
+            return userService.GetPermissionsForPath(user, path).GetAllPermissions();
+        }
+
         public static bool HasSectionAccess(this IUser user, string app)
         {
             var apps = user.AllowedSections;
