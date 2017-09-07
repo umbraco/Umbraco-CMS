@@ -27,6 +27,9 @@ namespace Umbraco.Web.Scheduling
         {
             if (_appContext == null) return true; // repeat...
 
+            if (Suspendable.ScheduledPublishing.CanRun == false)
+                return true; // repeat, later
+
             switch (_appContext.GetCurrentServerRole())
             {
                 case ServerRole.Slave:

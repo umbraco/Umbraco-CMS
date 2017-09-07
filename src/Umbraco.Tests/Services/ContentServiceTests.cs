@@ -999,6 +999,21 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void IsPublishable()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var parent = contentService.CreateContent("parent", -1, "umbTextpage");
+            contentService.SaveAndPublishWithStatus(parent);
+            var content = contentService.CreateContent("child", parent, "umbTextpage");
+            contentService.Save(content);
+
+            Assert.IsTrue(contentService.IsPublishable(content));
+            contentService.UnPublish(parent);
+            Assert.IsFalse(contentService.IsPublishable(content));
+        }
+
+        [Test]
         public void Can_Publish_Content_WithEvents()
         {
             ContentService.Publishing += ContentServiceOnPublishing;

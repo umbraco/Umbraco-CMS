@@ -822,7 +822,6 @@ namespace Umbraco.Web.Cache
                 {
                     var handler = FindHandler(e);
                     if (handler == null) continue;
-
                     handler.Invoke(null, new[] { e.Sender, e.Args });
                 }
             }
@@ -831,7 +830,7 @@ namespace Umbraco.Web.Cache
                 if (tempContext != null)
                     tempContext.Dispose();
             }
-            
+
         }
 
         /// <summary>
