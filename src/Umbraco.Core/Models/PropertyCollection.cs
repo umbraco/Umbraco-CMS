@@ -95,6 +95,7 @@ namespace Umbraco.Core.Models
                         var property = this[key];
                         if (item.Value == null && property.Value != null)
                         {
+                            item.Id = property.Id;
                             item.Value = property.Value;
                         }
 
