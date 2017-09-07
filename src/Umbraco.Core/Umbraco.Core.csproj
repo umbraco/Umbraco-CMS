@@ -371,7 +371,6 @@
     <Compile Include="Models\Membership\UserState.cs" />
     <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeConverter.cs" />
-    <Compile Include="Models\Rdbms\ReadOnlyLogDto.cs" />
     <Compile Include="Models\Rdbms\UserStartNodeDto.cs" />
     <Compile Include="Models\UserControl.cs" />
     <Compile Include="OrderedHashSet.cs" />

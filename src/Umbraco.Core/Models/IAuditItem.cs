@@ -8,7 +8,5 @@ namespace Umbraco.Core.Models
         string Comment { get; }
         AuditType AuditType { get; }
         int UserId { get; }
-        string UserName { get; }
-        string UserAvatar { get; }
     }
 }

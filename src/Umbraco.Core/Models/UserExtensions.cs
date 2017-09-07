@@ -24,12 +24,11 @@ namespace Umbraco.Core.Models
         /// Tries to lookup the user's gravatar to see if the endpoint can be reached, if so it returns the valid URL
         /// </summary>
         /// <param name="user"></param>
-        /// <param name="userService"></param>
         /// <param name="staticCache"></param>
         /// <returns>
         /// A list of 5 different sized avatar URLs
         /// </returns>
-        internal static string[] GetCurrentUserAvatarUrls(this IUser user, IUserService userService, ICacheProvider staticCache)
+        internal static string[] GetUserAvatarUrls(this IUser user, ICacheProvider staticCache)
         {
             //check if the user has explicitly removed all avatars including a gravatar, this will be possible and the value will be "none"
             if (user.Avatar == "none")

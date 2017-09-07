@@ -13,8 +13,8 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "userName")]
         public string UserName { get; set; }
 
-        [DataMember(Name = "userAvatar")]
-        public string UserAvatar { get; set; }
+        [DataMember(Name = "userAvatars")]
+        public string[] UserAvatars { get; set; }        
 
         [DataMember(Name = "nodeId")]
         public int NodeId { get; set; }

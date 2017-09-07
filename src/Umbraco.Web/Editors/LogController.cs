@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -31,9 +33,10 @@ namespace Umbraco.Web.Editors
             var dateQuery = sinceDate.HasValue ? Query<IAuditItem>.Builder.Where(x => x.CreateDate >= sinceDate) : null;
             var result = Services.AuditService.GetPagedItemsByEntity(id, pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter: dateQuery);
             var mapped = Mapper.Map<IEnumerable<AuditLog>>(result);
+            
             return new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)
             {
-                Items = mapped
+                Items = MapAvatars(mapped)
             };
         }
 
@@ -49,7 +52,7 @@ namespace Umbraco.Web.Editors
             var mapped = Mapper.Map<IEnumerable<AuditLog>>(result);
             return new PagedResult<AuditLog>(totalRecords, pageNumber + 1, pageSize)
             {
-                Items = mapped
+                Items = MapAvatars(mapped)
             };
         }
 
@@ -81,5 +84,16 @@ namespace Umbraco.Web.Editors
                 Log.Instance.GetLogItems(Enum<LogTypes>.Parse(logType.ToString()), sinceDate.Value));
         }
 
+        private IEnumerable<AuditLog> MapAvatars(IEnumerable<AuditLog> items)
+        {
+            var userIds = items.Select(x => x.UserId).ToArray();
+            var users = Services.UserService.GetUsersById(userIds)
+                .ToDictionary(x => x.Id, x => x.GetUserAvatarUrls(ApplicationContext.ApplicationCache.RuntimeCache));
+            foreach (var item in items)
+            {
+                item.UserAvatars = users[item.UserId];
+            }
+            return items;
+        }
     }
 }

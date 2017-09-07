@@ -92,11 +92,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 translatedQuery.OrderBy("Datestamp");            
 
             // Get page of results and total count
-            var pagedResult = Database.Page<ReadOnlyLogDto>(pageIndex + 1, pageSize, translatedQuery);
+            var pagedResult = Database.Page<LogDto>(pageIndex + 1, pageSize, translatedQuery);
             totalRecords = pagedResult.TotalItems;
 
             return pagedResult.Items.Select(
-                dto => new AuditItem(dto.Id, dto.Comment, Enum<AuditType>.Parse(dto.Header), dto.UserId, dto.UserName, dto.UserAvatar)).ToArray();
+                dto => new AuditItem(dto.Id, dto.Comment, Enum<AuditType>.Parse(dto.Header), dto.UserId)).ToArray();
         }
 
         protected override void PersistUpdatedItem(IAuditItem entity)
