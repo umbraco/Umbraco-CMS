@@ -93,9 +93,12 @@ namespace Umbraco.Core.Models
                         //NOTE: Consider checking type before value is set: item.PropertyType.DataTypeId == property.PropertyType.DataTypeId
                         //Transfer the existing value to the new property
                         var property = this[key];
-                        if (item.Value == null && property.Value != null)
+                        if (item.Id == 0 && property.Id != 0)
                         {
                             item.Id = property.Id;
+                        }
+                        if (item.Value == null && property.Value != null)
+                        {
                             item.Value = property.Value;
                         }
 
