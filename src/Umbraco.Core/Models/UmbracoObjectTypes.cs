@@ -193,7 +193,7 @@ namespace Umbraco.Core.Models
         [UmbracoObjectType(Constants.ObjectTypes.DocumentBlueprint, typeof(IContent))]
         [FriendlyName("DocumentBlueprint")]
         [UmbracoUdiType(Constants.UdiEntityType.DocumentBluePrint)]
-        DocumentBlueprint
+        DocumentBlueprint,
         
         /// <summary>
         /// Reserved Identifier
