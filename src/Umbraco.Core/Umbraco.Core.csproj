@@ -359,6 +359,7 @@
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\EntityBase\EntityPath.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
+    <Compile Include="Models\IAuditItem.cs" />
     <Compile Include="Models\IUserControl.cs" />
     <Compile Include="Models\Membership\ContentPermissionSet.cs" />
     <Compile Include="Models\Membership\EntityPermissionCollection.cs" />
@@ -370,6 +371,7 @@
     <Compile Include="Models\Membership\UserState.cs" />
     <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeConverter.cs" />
+    <Compile Include="Models\Rdbms\ReadOnlyLogDto.cs" />
     <Compile Include="Models\Rdbms\UserStartNodeDto.cs" />
     <Compile Include="Models\UserControl.cs" />
     <Compile Include="OrderedHashSet.cs" />
@@ -530,6 +532,7 @@
     <Compile Include="Persistence\LockedRepository.cs" />
     <Compile Include="Persistence\LockingRepository.cs" />
     <Compile Include="Persistence\Mappers\AccessMapper.cs" />
+    <Compile Include="Persistence\Mappers\AuditMapper.cs" />
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
     <Compile Include="Persistence\Mappers\ExternalLoginMapper.cs" />
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
