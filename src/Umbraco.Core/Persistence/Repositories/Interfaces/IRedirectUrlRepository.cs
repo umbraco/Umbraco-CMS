@@ -76,5 +76,16 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="total">The total count of redirect urls.</param>
         /// <returns>The redirect urls.</returns>
         IEnumerable<IRedirectUrl> SearchUrls(string searchTerm, long pageIndex, int pageSize, out long total);
+
+        /// <summary>
+        /// Searches for all redirect urls that contain a given search term in their URL property.
+        /// </summary>
+        /// <param name="rootContentId">The content unique identifier.</param>
+        /// <param name="searchTerm">The term to search for.</param>
+        /// <param name="pageIndex">The page index.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="total">The total count of redirect urls.</param>
+        /// <returns>The redirect urls.</returns>
+        IEnumerable<IRedirectUrl> SearchUrls(int rootContentId, string searchTerm, long pageIndex, int pageSize, out long total);
     }
 }

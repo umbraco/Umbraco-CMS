@@ -35,13 +35,27 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public RedirectUrlSearchResult SearchRedirectUrls(string searchTerm, int page = 0, int pageSize = 10)
         {
+            var user = Security.CurrentUser;
+            var userIsAdmin = user.IsAdmin();
+            var startContentId = user.StartContentId;
+
             var searchResult = new RedirectUrlSearchResult();
             var redirectUrlService = Services.RedirectUrlService;
             long resultCount;
+            IEnumerable<IRedirectUrl> redirects;
 
-            var redirects = string.IsNullOrWhiteSpace(searchTerm) 
-                ? redirectUrlService.GetAllRedirectUrls(page, pageSize, out resultCount)
-                : redirectUrlService.SearchRedirectUrls(searchTerm, page, pageSize, out resultCount);
+            if (userIsAdmin)
+            {
+                redirects = string.IsNullOrWhiteSpace(searchTerm)
+                    ? redirectUrlService.GetAllRedirectUrls(page, pageSize, out resultCount)
+                    : redirectUrlService.SearchRedirectUrls(searchTerm, page, pageSize, out resultCount);
+            }
+            else
+            {
+                redirects = string.IsNullOrWhiteSpace(searchTerm)
+                    ? redirectUrlService.GetAllRedirectUrls(startContentId, page, pageSize, out resultCount)
+                    : redirectUrlService.SearchRedirectUrls(startContentId, searchTerm, page, pageSize, out resultCount);
+            }
 
             searchResult.SearchResults = Mapper.Map<IEnumerable<ContentRedirectUrl>>(redirects).ToArray();
             //now map the Content/published url
