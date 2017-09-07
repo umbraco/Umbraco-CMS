@@ -751,5 +751,34 @@ namespace Umbraco.Core.Services
                 return exists;
             }
         }
+
+        /// <inheritdoc />
+        public int ReserveId(Guid key)
+        {
+            NodeDto node;
+            using (var scope = UowProvider.ScopeProvider.CreateScope())
+            {
+                var sql = new Sql("SELECT * FROM umbracoNode WHERE uniqueID=@0 AND nodeObjectType=@1", key, Constants.ObjectTypes.IdReservationGuid);
+                node = scope.Database.SingleOrDefault<NodeDto>(sql);
+                if (node != null) throw new InvalidOperationException("An identifier has already been reserved for this Udi.");
+                node = new NodeDto
+                {
+                    UniqueId = key,
+                    Text = "RESERVED.ID",
+                    NodeObjectType = Constants.ObjectTypes.IdReservationGuid,
+
+                    CreateDate = DateTime.Now,
+                    UserId = 0,
+                    ParentId = -1,
+                    Level = 1,
+                    Path = "-1",
+                    SortOrder = 0,
+                    Trashed = false
+                };
+                scope.Database.Insert(node);
+                scope.Complete();
+            }
+            return node.NodeId;
+        }
     }
 }
