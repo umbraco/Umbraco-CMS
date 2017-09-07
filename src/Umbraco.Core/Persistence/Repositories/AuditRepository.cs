@@ -19,30 +19,77 @@ namespace Umbraco.Core.Persistence.Repositories
         {
         }
 
-        public IEnumerable<IAuditItem> GetPagedResultsByQuery(IQuery<IAuditItem> query, long pageIndex, int pageSize, out long totalRecords, Direction orderDirection, IQuery<IAuditItem> customFilter)
+        /// <summary>
+        /// Return the audit items as paged result
+        /// </summary>
+        /// <param name="query">
+        /// The query coming from the service
+        /// </param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="auditTypeFilter">
+        /// Since we currently do not have enum support with our expression parser, we cannot query on AuditType in the query or the custom filter
+        /// so we need to do that here
+        /// </param>
+        /// <param name="customFilter">
+        /// A user supplied custom filter
+        /// </param>
+        /// <returns></returns>
+        public IEnumerable<IAuditItem> GetPagedResultsByQuery(IQuery<IAuditItem> query, long pageIndex, int pageSize,
+            out long totalRecords, Direction orderDirection,
+            AuditType[] auditTypeFilter,
+            IQuery<IAuditItem> customFilter)
         {
-            var customFilterWheres = customFilter != null ? customFilter.GetWhereClauses().ToArray() : null;
-            var hasCustomFilter = customFilterWheres != null && customFilterWheres.Length > 0;
+            if (auditTypeFilter == null) auditTypeFilter = new AuditType[0];
 
-            if (hasCustomFilter)
-            {
-                var filterSql = new Sql();
-                foreach (var filterClause in customFilterWheres)
-                {
-                    filterSql.Append(string.Format("AND ({0})", filterClause.Item1), filterClause.Item2);
-                }
-            }
-            
             var sql = GetBaseQuery(false);
-
-            if (orderDirection == Direction.Descending)
-                sql.OrderByDescending("Datestamp");
-            else
-                sql.OrderBy("Datestamp");
 
             if (query == null) query = new Query<IAuditItem>();
             var translatorIds = new SqlTranslator<IAuditItem>(sql, query);
             var translatedQuery = translatorIds.Translate();
+
+            var customFilterWheres = customFilter != null ? customFilter.GetWhereClauses().ToArray() : null;
+            var hasCustomFilter = customFilterWheres != null && customFilterWheres.Length > 0;
+            if (hasCustomFilter)
+            {
+                var filterSql = new Sql();
+                var first = true;
+                foreach (var filterClaus in customFilterWheres)
+                {
+                    if (first == false)
+                    {
+                        filterSql.Append(" AND ");
+                    }
+                    filterSql.Append(string.Format("({0})", filterClaus.Item1), filterClaus.Item2);
+                    first = false;
+                }
+
+                translatedQuery = GetFilteredSqlForPagedResults(translatedQuery, filterSql);
+            }
+
+            if (auditTypeFilter.Length > 0)
+            {
+                var filterSql = new Sql();
+                var first = true;
+                foreach (var filterClaus in auditTypeFilter)
+                {
+                    if (first == false || hasCustomFilter)
+                    {
+                        filterSql.Append(" AND ");
+                    }
+                    filterSql.Append("(logHeader = @logHeader)", new {logHeader = filterClaus.ToString() });
+                    first = false;
+                }
+
+                translatedQuery = GetFilteredSqlForPagedResults(translatedQuery, filterSql);
+            }
+
+            if (orderDirection == Direction.Descending)
+                translatedQuery.OrderByDescending("Datestamp");
+            else
+                translatedQuery.OrderBy("Datestamp");            
 
             // Get page of results and total count
             var pagedResult = Database.Page<ReadOnlyLogDto>(pageIndex + 1, pageSize, translatedQuery);
@@ -113,6 +160,34 @@ namespace Umbraco.Core.Persistence.Repositories
             get { throw new NotImplementedException(); }
         }
         #endregion
-        
+
+        private Sql GetFilteredSqlForPagedResults(Sql sql, Sql filterSql)
+        {
+            Sql filteredSql;
+
+            // Apply filter
+            if (filterSql != null)
+            {
+                var sqlFilter = " WHERE " + filterSql.SQL.TrimStart("AND ");
+
+                //NOTE: this is certainly strange - NPoco handles this much better but we need to re-create the sql
+                // instance a couple of times to get the parameter order correct, for some reason the first
+                // time the arguments don't show up correctly but the SQL argument parameter names are actually updated
+                // accordingly - so we re-create it again. In v8 we don't need to do this and it's already taken care of.
+
+                filteredSql = new Sql(sql.SQL, sql.Arguments);
+                var args = filteredSql.Arguments.Concat(filterSql.Arguments).ToArray();
+                filteredSql = new Sql(
+                    string.Format("{0} {1}", filteredSql.SQL, sqlFilter),
+                    args);
+                filteredSql = new Sql(filteredSql.SQL, args);
+            }
+            else
+            {
+                //copy to var so that the original isn't changed
+                filteredSql = new Sql(sql.SQL, sql.Arguments);
+            }
+            return filteredSql;
+        }
     }
 }

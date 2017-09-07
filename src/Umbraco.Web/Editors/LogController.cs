@@ -8,6 +8,9 @@ using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Editors
@@ -18,23 +21,58 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class LogController : UmbracoAuthorizedJsonController
     {
+        public PagedResult<AuditLog> GetPagedEntityLog(int id,
+            int pageNumber = 1,
+            int pageSize = 0,
+            Direction orderDirection = Direction.Descending,
+            DateTime? sinceDate = null)
+        {
+            long totalRecords;
+            var dateQuery = sinceDate.HasValue ? Query<IAuditItem>.Builder.Where(x => x.CreateDate >= sinceDate) : null;
+            var result = Services.AuditService.GetPagedItemsByEntity(id, pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter: dateQuery);
+            var mapped = Mapper.Map<IEnumerable<AuditLog>>(result);
+            return new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)
+            {
+                Items = mapped
+            };
+        }
+
+        public PagedResult<AuditLog> GetPagedCurrentUserLog(
+            int pageNumber = 1,
+            int pageSize = 0,
+            Direction orderDirection = Direction.Descending,
+            DateTime? sinceDate = null)
+        {
+            long totalRecords;
+            var dateQuery = sinceDate.HasValue ? Query<IAuditItem>.Builder.Where(x => x.CreateDate >= sinceDate) : null;
+            var result = Services.AuditService.GetPagedItemsByUser(Security.GetUserId(), pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter:dateQuery);
+            var mapped = Mapper.Map<IEnumerable<AuditLog>>(result);
+            return new PagedResult<AuditLog>(totalRecords, pageNumber + 1, pageSize)
+            {
+                Items = mapped
+            };
+        }
+
+        [Obsolete("Use GetPagedLog instead")]
         public IEnumerable<AuditLog> GetEntityLog(int id)
         {
-            return Mapper.Map<IEnumerable<AuditLog>>(
-                Log.Instance.GetLogItems(id));
+            long totalRecords;
+            var result = Services.AuditService.GetPagedItemsByEntity(id, 1, int.MaxValue, out totalRecords);
+            return Mapper.Map<IEnumerable<AuditLog>>(result);
         }
 
-        public IEnumerable<AuditLog> GetCurrentUserLog(AuditLogType logType, DateTime? sinceDate)
+        //TODO: Move to CurrentUserController?
+        [Obsolete("Use GetPagedCurrentUserLog instead")]
+        public IEnumerable<AuditLog> GetCurrentUserLog(AuditType logType, DateTime? sinceDate)
         {
-            if (sinceDate == null)
-                sinceDate = DateTime.Now.Subtract(new TimeSpan(7, 0, 0, 0, 0));
-
-            var u = new User(Security.CurrentUser);
-            return Mapper.Map<IEnumerable<AuditLog>>(
-                Log.Instance.GetLogItems(u, Enum<LogTypes>.Parse(logType.ToString()), sinceDate.Value));
+            long totalRecords;
+            var dateQuery = sinceDate.HasValue ? Query<IAuditItem>.Builder.Where(x => x.CreateDate >= sinceDate) : null;
+            var result = Services.AuditService.GetPagedItemsByUser(Security.GetUserId(), 1, int.MaxValue, out totalRecords, auditTypeFilter: new[] {logType},customFilter: dateQuery);
+            return Mapper.Map<IEnumerable<AuditLog>>(result);
         }
 
-        public IEnumerable<AuditLog> GetLog(AuditLogType logType, DateTime? sinceDate)
+        [Obsolete("Use GetPagedLog instead")]
+        public IEnumerable<AuditLog> GetLog(AuditType logType, DateTime? sinceDate)
         {
             if (sinceDate == null)
                 sinceDate = DateTime.Now.Subtract(new TimeSpan(7, 0, 0, 0, 0));

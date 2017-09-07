@@ -27,12 +27,33 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IEnumerable<IAuditItem> GetPagedItems(int id, long pageIndex, int pageSize, out long totalRecords, Direction orderDirection = Direction.Descending, IQuery<IAuditItem> filter = null)
+        /// <summary>
+        /// Returns paged items in the audit trail for a given entity
+        /// </summary>
+        /// <param name="entityId"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderDirection">
+        /// By default this will always be ordered descending (newest first)
+        /// </param>
+        /// <param name="auditTypeFilter">
+        /// Since we currently do not have enum support with our expression parser, we cannot query on AuditType in the query or the custom filter
+        /// so we need to do that here
+        /// </param>
+        /// <param name="customFilter">
+        /// Optional filter to be applied
+        /// </param>
+        /// <returns></returns>
+        public IEnumerable<IAuditItem> GetPagedItemsByEntity(int entityId, long pageIndex, int pageSize, out long totalRecords,
+            Direction orderDirection = Direction.Descending,
+            AuditType[] auditTypeFilter = null,
+            IQuery<IAuditItem> customFilter = null)
         {
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
 
-            if (id == Constants.System.Root || id <= 0)
+            if (entityId == Constants.System.Root || entityId <= 0)
             {
                 totalRecords = 0;
                 return Enumerable.Empty<IAuditItem>();
@@ -42,9 +63,48 @@ namespace Umbraco.Core.Services
             {
                 var repository = RepositoryFactory.CreateAuditRepository(uow);
 
-                var query = Query<IAuditItem>.Builder.Where(x => x.Id == id);
+                var query = Query<IAuditItem>.Builder.Where(x => x.Id == entityId);
 
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderDirection, filter);
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderDirection, auditTypeFilter, customFilter);
+            }
+        }
+
+        /// <summary>
+        /// Returns paged items in the audit trail for a given user
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderDirection">
+        /// By default this will always be ordered descending (newest first)
+        /// </param>
+        /// <param name="auditTypeFilter">
+        /// Since we currently do not have enum support with our expression parser, we cannot query on AuditType in the query or the custom filter
+        /// so we need to do that here
+        /// </param>
+        /// <param name="customFilter">
+        /// Optional filter to be applied
+        /// </param>
+        /// <returns></returns>
+        public IEnumerable<IAuditItem> GetPagedItemsByUser(int userId, long pageIndex, int pageSize, out long totalRecords, Direction orderDirection = Direction.Descending, AuditType[] auditTypeFilter = null, IQuery<IAuditItem> customFilter = null)
+        {
+            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
+            Mandate.ParameterCondition(pageSize > 0, "pageSize");
+
+            if (userId < 0)
+            {
+                totalRecords = 0;
+                return Enumerable.Empty<IAuditItem>();
+            }
+
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateAuditRepository(uow);
+
+                var query = Query<IAuditItem>.Builder.Where(x => x.UserId == userId);
+
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderDirection, auditTypeFilter, customFilter);
             }
         }
     }

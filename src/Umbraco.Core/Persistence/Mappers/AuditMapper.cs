@@ -38,6 +38,7 @@ namespace Umbraco.Core.Persistence.Mappers
                 CacheMap<AuditItem, LogDto>(src => src.CreateDate, dto => dto.Datestamp);
                 CacheMap<AuditItem, LogDto>(src => src.UserId, dto => dto.UserId);
                 CacheMap<AuditItem, LogDto>(src => src.AuditType, dto => dto.Header);                
+                CacheMap<AuditItem, LogDto>(src => src.Comment, dto => dto.Comment);
             }
         }
 
