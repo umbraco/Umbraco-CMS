@@ -249,7 +249,7 @@ namespace Umbraco.Web.Models.Mapping
                         user.CalculateMediaStartNodeIds(applicationContext.Services.EntityService),
                         applicationContext.Services.TextService,
                         applicationContext.Services.EntityService,
-                        UmbracoObjectTypes.Document,
+                        UmbracoObjectTypes.Media,
                         "media/mediaRoot")))
                 .ForMember(
                     detail => detail.StartContentIds,
