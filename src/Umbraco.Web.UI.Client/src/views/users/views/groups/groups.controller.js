@@ -63,9 +63,9 @@
             if (currentUser.userGroups.indexOf(userGroup.group.alias) === -1 && currentUser.userGroups.indexOf("admin") === -1) {
                 return;
             }
-            // Disallow selection of the admin group, the checkbox is not visible in the UI, but clicking(and thous selecting) is still possible.
+            // Disallow selection of the admin/translators group, the checkbox is not visible in the UI, but clicking(and thus selecting) is still possible.
             // Currently selection can only be used for deleting, and the Controller will also disallow deleting the admin group.
-            if (userGroup.group.alias === "admin")
+            if (userGroup.group.alias === "admin" || userGroup.group.alias === "translator")
                 return;
 
             if (userGroup.selected) {

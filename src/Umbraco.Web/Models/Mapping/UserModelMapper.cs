@@ -337,7 +337,7 @@ namespace Umbraco.Web.Models.Mapping
                     }
                     else
                     {
-                        var builtIns = new[] { Constants.Security.AdminGroupAlias, "writer", "editor", "translator" };
+                        var builtIns = new[] { Constants.Security.AdminGroupAlias, "writer", "editor", Constants.Security.TranslatorGroupAlias };
                         var foundBuiltIn = groups.FirstOrDefault(x => builtIns.Contains(x.Alias));
                         if (foundBuiltIn != null)
                         {
