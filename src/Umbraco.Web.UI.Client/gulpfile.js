@@ -87,7 +87,8 @@ var sources = {
     views:{
         umbraco: {files: ["src/views/**/*html"], folder: ""},
         preview: { files: ["src/canvasdesigner/**/*.html"], folder: "../preview"},
-        installer: {files: ["src/installer/steps/*.html"], folder: "install"}
+        installer: {files: ["src/installer/steps/*.html"], folder: "install"},
+        installerIndex: {files: ["src/installer/installer.html"], out: "installer.html"}
     },
 
     //globs for file-watching
