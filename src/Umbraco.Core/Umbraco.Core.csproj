@@ -238,6 +238,7 @@
     <Compile Include="Configuration\UmbracoSettings\ContentErrorPageElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentErrorsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentSectionExtensions.cs" />
+    <Compile Include="Configuration\UmbracoSettings\IInternalSearchFieldsToSearchSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillPropertiesCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillUploadFieldElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentImagingElement.cs" />
@@ -262,6 +263,7 @@
     <Compile Include="Configuration\UmbracoSettings\ILogType.cs" />
     <Compile Include="Configuration\InnerTextConfigurationElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\INotDynamicXmlDocument.cs" />
+    <Compile Include="Configuration\UmbracoSettings\InternalSearchElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\IProvidersSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IRazorStaticMapping.cs" />
     <Compile Include="Configuration\UmbracoSettings\IRepositoriesSection.cs" />

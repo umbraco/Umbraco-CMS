@@ -122,6 +122,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (WebRoutingElement)this["web.routing"]; }
         }
 
+        [ConfigurationProperty("internalSearch")]
+        internal InternalSearchElement InternalSearch
+        {
+            get { return (InternalSearchElement)this["internalSearch"]; }
+        }
+
         [ConfigurationProperty("scripting")]
         internal ScriptingElement Scripting
         {
@@ -196,6 +202,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IScriptingSection IUmbracoSettingsSection.Scripting
         {
             get { return Scripting; }
+        }
+
+        IInternalSearchFieldsToSearchSection IUmbracoSettingsSection.InternalSearch
+        {
+            get { return InternalSearch; }
         }
     }
 }
