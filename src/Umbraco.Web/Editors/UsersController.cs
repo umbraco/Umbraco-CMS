@@ -553,8 +553,7 @@ namespace Umbraco.Web.Editors
             {
                 userSave.Username = userSave.Email;
             }
-
-            var resetPasswordValue = string.Empty;
+            
             if (userSave.ChangePassword != null)
             {
                 var passwordChanger = new PasswordChanger(Logger, Services.UserService);
@@ -562,9 +561,6 @@ namespace Umbraco.Web.Editors
                 var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, userSave.ChangePassword, UserManager);
                 if (passwordChangeResult.Success)
                 {
-                    //depending on how the provider is configured, the password may be reset so let's store that for later
-                    resetPasswordValue = passwordChangeResult.Result.ResetPassword;
-
                     //need to re-get the user 
                     found = Services.UserService.GetUserById(intId.Result);
                 }
@@ -588,11 +584,7 @@ namespace Umbraco.Web.Editors
             Services.UserService.Save(user);
 
             var display = Mapper.Map<UserDisplay>(user);
-
-            //re-map the password reset value (if any)
-            if (resetPasswordValue.IsNullOrWhiteSpace() == false)
-                display.ResetPasswordValue = resetPasswordValue;
-
+            
             display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserSaved"));
             return display;
         }        
