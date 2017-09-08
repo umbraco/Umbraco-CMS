@@ -7,7 +7,7 @@ using Umbraco.Web.Cache;
 
 namespace Umbraco.Web
 {
-    public static class Suspendable
+    internal static class Suspendable
     {
         public static class PageCacheRefresher
         {

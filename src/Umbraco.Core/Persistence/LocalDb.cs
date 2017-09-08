@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence
     /// Studio which can be used to connect to LocalDB databases.</para>
     /// <para>See also https://github.com/ritterim/automation-sql which is a somewhat simpler version of this.</para>
     /// </remarks>
-    public class LocalDb
+    internal class LocalDb
     {
         private int _version;
         private bool _hasVersion;
