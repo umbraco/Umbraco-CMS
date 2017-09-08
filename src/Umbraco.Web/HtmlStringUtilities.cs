@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
-using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 
 namespace Umbraco.Web
@@ -24,7 +23,7 @@ namespace Umbraco.Web
         /// <returns>The text with text line breaks replaced with html linebreaks (<br/>)</returns>
         public string ReplaceLineBreaksForHtml(string text)
         {
-            return Regex.Replace(text, @"(\r\n?|\n)", "<br />$0");
+            return text.Replace("\r\n", @"<br />").Replace("\n", @"<br />").Replace("\r", @"<br />");
         }
 
         public HtmlString StripHtmlTags(string html, params string[] tags)
