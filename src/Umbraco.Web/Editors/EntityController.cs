@@ -19,6 +19,7 @@ using Umbraco.Web.Dynamics;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.Editors
@@ -651,6 +652,13 @@ namespace Umbraco.Web.Editors
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
+
+                    var searchFieldsSetByUser = UmbracoConfig.For.UmbracoSettings().InternalSearch.ContentSearchFields.Split(',');
+
+                    if (searchFieldsSetByUser.Any())
+                    {
+                        fields.ToList().AddRange(searchFieldsSetByUser);
+                    }
 
                     var contentSearchFrom = int.MinValue;
 
