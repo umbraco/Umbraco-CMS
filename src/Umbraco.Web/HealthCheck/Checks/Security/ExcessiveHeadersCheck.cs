@@ -54,10 +54,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var url = _runtime.ApplicationUrl;
 
             // Access the site home page and check for the headers
-            var serverVariables = _httpContextAccessor.HttpContext.Request.ServerVariables;
-            var useSsl = GlobalSettings.UseSSL || _httpContextAccessor.HttpContext.Request.ServerVariables["SERVER_PORT"] == "443";
-            var address = string.Format("http{0}://{1}:{2}", useSsl ? "s" : "", url.Host.ToLower(), url.Port);
-            var request = WebRequest.Create(address);
+            var request = WebRequest.Create(url);
             request.Method = "HEAD";
             try
             {
@@ -74,7 +71,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             }
             catch (Exception ex)
             {
-                message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { address, ex.Message });
+                message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { url, ex.Message });
             }
 
             var actions = new List<HealthCheckAction>();

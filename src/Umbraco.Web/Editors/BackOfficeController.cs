@@ -735,7 +735,7 @@ namespace Umbraco.Web.Editors
 
         private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()
         {
-            var treeTypes = Current.TypeLoader.ResolveAttributedTreeControllers(); // fixme inject
+            var treeTypes = Current.TypeLoader.GetAttributedTreeControllers(); // fixme inject
             //get all plugin trees with their attributes
             var treesWithAttributes = treeTypes.Select(x => new
             {

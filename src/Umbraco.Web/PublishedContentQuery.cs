@@ -59,6 +59,14 @@ namespace Umbraco.Web
                 : _query.Content(id);
         }
 
+        public IPublishedContent Content(Udi id)
+        {
+            if (!(id is GuidUdi udi)) return null;
+            return _query == null
+                ? ItemById(udi.Guid, _contentCache)
+                : _query.Content(udi.Guid);
+        }
+
         public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
             return _query == null
@@ -117,6 +125,14 @@ namespace Umbraco.Web
             return _query == null
                 ? ItemById(id, _mediaCache)
                 : _query.Media(id);
+        }
+
+        public IPublishedContent Media(Udi id)
+        {
+            if (!(id is GuidUdi udi)) return null;
+            return _query == null
+                ? ItemById(udi.Guid, _mediaCache)
+                : _query.Media(udi.Guid);
         }
 
         public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids)

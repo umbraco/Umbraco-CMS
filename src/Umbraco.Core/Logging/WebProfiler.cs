@@ -58,9 +58,9 @@ namespace Umbraco.Core.Logging
             if (request.Success == false) return false;
 
             if (request.Result.Url.IsClientSideRequest()) return false;
-            if (string.IsNullOrEmpty(request.Result.QueryString["umbDebug"])) return false;
-            if (request.Result.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)) return true;
-            return true;
+            if (bool.TryParse(request.Result.QueryString["umbDebug"], out var umbDebug)) return umbDebug;
+            if (bool.TryParse(request.Result.Headers["X-UMB-DEBUG"], out var xUmbDebug)) return xUmbDebug;
+            return false;
         }
 
         /// <inheritdoc/>

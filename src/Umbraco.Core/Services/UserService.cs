@@ -77,6 +77,7 @@ namespace Umbraco.Core.Services
         IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias)
         {
             return CreateUserWithIdentity(username, email, passwordValue);
+        }
 
         /// <summary>
         /// Creates and persists a new <see cref="IUser"/>

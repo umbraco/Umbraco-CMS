@@ -2,6 +2,7 @@
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Core.Services;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 
@@ -11,11 +12,13 @@ namespace Umbraco.Web.Cache
     public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeCacheRefresher, DataTypeCacheRefresher.JsonPayload>
     {
         private readonly IFacadeService _facadeService;
+        private readonly IdkMap _idkMap;
 
-        public DataTypeCacheRefresher(CacheHelper cacheHelper, IFacadeService facadeService)
+        public DataTypeCacheRefresher(CacheHelper cacheHelper, IFacadeService facadeService, IdkMap idkMap)
             : base(cacheHelper)
         {
             _facadeService = facadeService;
+            _idkMap = idkMap;
         }
 
         #region Define
@@ -45,15 +48,18 @@ namespace Umbraco.Web.Cache
             ClearAllIsolatedCacheByEntityType<IMember>();
             ClearAllIsolatedCacheByEntityType<IMemberType>();
 
-            CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
-
             var dataTypeCache = CacheHelper.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
 
             //clears the prevalue cache
             if (dataTypeCache)
                 foreach (var payload in payloads)
                     dataTypeCache.Result.ClearCacheByKeySearch(CacheKeys.DataTypePreValuesCacheKey + "_" + payload.Id);
+
+            foreach (var payload in payloads)
+            {
+                _idkMap.ClearCache(payload.Id);
+#error also nested content see 7.7
+            }
 
             // fixme - not sure I like these?
             TagsValueConverter.ClearCaches();

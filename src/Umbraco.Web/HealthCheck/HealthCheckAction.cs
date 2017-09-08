@@ -47,12 +47,11 @@ namespace Umbraco.Web.HealthCheck
         [DataMember(Name = "actionParameters")]
         public Dictionary<string, object> ActionParameters { get; set; }
 
-
         /// <summary>
         /// The name of the action - this is used to name the fix button
         /// </summary>
         [DataMember(Name = "name")]
-        private string _name = Current.Services.TextService.Localize("healthcheck/rectifyButton");
+        private string _name;
         public string Name
         {
             get { return _name; }

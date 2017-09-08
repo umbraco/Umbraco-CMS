@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml.XPath;
+using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 
@@ -15,6 +16,7 @@ namespace Umbraco.Web
     {
         IPublishedContent Content(int id);
         IPublishedContent Content(Guid id);
+        IPublishedContent Content(Udi id);
         IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars);
         IEnumerable<IPublishedContent> Content(IEnumerable<int> ids);
         IEnumerable<IPublishedContent> Content(IEnumerable<Guid> ids);
@@ -24,6 +26,7 @@ namespace Umbraco.Web
 
         IPublishedContent Media(int id);
         IPublishedContent Media(Guid id);
+        IPublishedContent Media(Udi id);
         IEnumerable<IPublishedContent> Media(IEnumerable<int> ids);
         IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids);
         IEnumerable<IPublishedContent> MediaAtRoot();

@@ -440,6 +440,17 @@ namespace Umbraco.Web
 
         #region Members
 
+        public IPublishedContent Member(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            return guidUdi == null ? null : Member(guidUdi.Guid);
+        }
+
+        public IPublishedContent Member(Guid id)
+        {
+            return MembershipHelper.GetByProviderKey(id);
+        }
+
         public IPublishedContent Member(object id)
         {
             var asInt = id.TryConvertTo<int>();
@@ -473,12 +484,12 @@ namespace Umbraco.Web
 
         private IPublishedContent ContentForObject(object id)
         {
-            int intId;
-            if (ConvertIdObjectToInt(id, out intId))
+            if (ConvertIdObjectToInt(id, out var intId))
                 return ContentQuery.Content(intId);
-            Guid guidId;
-            if (ConvertIdObjectToGuid(id, out guidId))
+            if (ConvertIdObjectToGuid(id, out var guidId))
                 return ContentQuery.Content(guidId);
+            if (ConvertIdObjectToUdi(id, out var udiId))
+                return ContentQuery.Content(udiId);
             return null;
         }
 
@@ -510,6 +521,11 @@ namespace Umbraco.Web
         public IPublishedContent Content(string id)
         {
             return ContentForObject(id);
+        }
+
+        public IPublishedContent Content(Udi id)
+        {
+            return ContentQuery.Content(id);
         }
 
         public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
@@ -658,8 +674,7 @@ namespace Umbraco.Web
             intIds = null;
             foreach (var id in ids)
             {
-                int intId;
-                if (ConvertIdObjectToInt(id, out intId))
+                if (ConvertIdObjectToInt(id, out var intId))
                     list.Add(intId);
                 else
                     return false; // if one of them is not an int, fail
@@ -684,9 +699,38 @@ namespace Umbraco.Web
             return true;
         }
 
+        private static bool ConvertIdObjectToUdi(object id, out Udi guidId)
+        {
+            if (id is string s)
+                return Udi.TryParse(s, out guidId);
+            if (id is Udi)
+            {
+                guidId = (Udi) id;
+                return true;
+            }
+            guidId = null;
+            return false;
+        }
+
         #endregion
 
         #region Media
+
+        public IPublishedContent TypedMedia(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            return guidUdi == null ? null : Media(guidUdi.Guid);
+        }
+
+        public IPublishedContent Media(Guid id)
+        {
+            //TODO: This is horrible but until the media cache properly supports GUIDs we have no choice here and
+            // currently there won't be any way to add this method correctly to `ITypedPublishedContentQuery` without breaking an interface and adding GUID support for media
+
+            var entityService = Current.Services.EntityService; // fixme inject
+            var mediaAttempt = entityService.GetIdForKey(id, UmbracoObjectTypes.Media);
+            return mediaAttempt.Success ? ContentQuery.Media(mediaAttempt.Result) : null;
+        }
 
         /// <summary>
         /// Overloaded method accepting an 'object' type
@@ -705,12 +749,12 @@ namespace Umbraco.Web
 
         private IPublishedContent MediaForObject(object id)
         {
-            int intId;
-            if (ConvertIdObjectToInt(id, out intId))
+            if (ConvertIdObjectToInt(id, out var intId))
                 return ContentQuery.Media(intId);
-            //Guid guidId;
-            //if (ConvertIdObjectToGuid(id, out guidId))
-            //    return ContentQuery.Media(guidId);
+            if (ConvertIdObjectToGuid(id, out var guidId))
+                return ContentQuery.Media(guidId);
+            if (ConvertIdObjectToUdi(id, out var udiId))
+                return ContentQuery.Media(udiId);
             return null;
         }
 
@@ -853,9 +897,22 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="text">The text to create a hash from</param>
         /// <returns>Md5 has of the string</returns>
+        [Obsolete("Please use the CreateHash method instead. This may be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public string CreateMd5Hash(string text)
         {
             return text.ToMd5();
+        }
+
+        /// <summary>
+        /// Generates a hash based on the text string passed in.  This method will detect the
+        /// security requirements (is FIPS enabled) and return an appropriate hash.
+        /// </summary>
+        /// <param name="text">The text to create a hash from</param>
+        /// <returns>Hash of the text string</returns>
+        public string CreateHash(string text)
+        {
+            return text.GenerateHash();
         }
 
         /// <summary>

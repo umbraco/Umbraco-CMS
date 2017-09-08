@@ -278,21 +278,21 @@ AnotherContentFinder
         [Test]
         public void Resolves_Actions()
         {
-            var actions = _manager.ResolveActions();
+            var actions = _manager.GetActions();
             Assert.AreEqual(36, actions.Count()); // 36 classes in the solution implement IAction
         }
 
         [Test]
         public void Resolves_Trees()
         {
-            var trees = _manager.ResolveTrees();
+            var trees = _manager.GetTrees();
             Assert.AreEqual(5, trees.Count()); // 5 classes in the solution implement BaseTree
         }
 
         [Test]
         public void Resolves_XsltExtensions()
         {
-            var types = _manager.ResolveXsltExtensions();
+            var types = _manager.GetXsltExtensions();
             Assert.AreEqual(3, types.Count());
         }
 

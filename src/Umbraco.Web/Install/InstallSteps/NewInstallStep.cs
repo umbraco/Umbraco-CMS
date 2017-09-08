@@ -35,6 +35,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _databaseBuilder = databaseBuilder;
         }
 
+        //TODO: Change all logic in this step to use ASP.NET Identity NOT MembershipProviders
         private MembershipProvider CurrentProvider
         {
             get

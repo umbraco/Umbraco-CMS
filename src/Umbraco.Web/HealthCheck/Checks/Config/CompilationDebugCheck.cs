@@ -18,6 +18,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 
+        public override bool ValidIfConfigMissing => true;
+
         public override IEnumerable<AcceptableConfiguration> Values => new List<AcceptableConfiguration>
         {
             new AcceptableConfiguration { IsRecommended = true, Value = bool.FalseString.ToLower() }

@@ -32,10 +32,8 @@
     <key alias="sendtopublish">Odeslat k publikování</key>
     <key alias="sendToTranslate">Odeslat k překladu</key>
     <key alias="sort">Seřadit</key>
-    <key alias="toPublish">Odeslat k publikování</key>
     <key alias="translate">Přeložit</key>
     <key alias="update">Aktualizovat</key>
-    <key alias="defaultValue">Výchozí hodnota</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Přístup zakázán.</key>
@@ -911,8 +909,6 @@
     <key alias="postContent">Vložit za polem</key>
     <key alias="preContent">Vložit před polem</key>
     <key alias="recursive">Rekurzivní</key>
-    <key alias="removeParagraph">Odstranit tagy odstavce</key>
-    <key alias="removeParagraphHelp">Odstraní jakékoliv &amp;lt;P&amp;gt; na začátku a na konci textu</key>
     <key alias="standardFields">Standardní pole</key>
     <key alias="uppercase">Velká písmena</key>
     <key alias="urlEncode">Kódování URL</key>
@@ -1042,8 +1038,6 @@
     <key alias="startnode">Úvodní uzel v obsahu</key>
     <key alias="username">Uživatelské jméno</key>
     <key alias="userPermissions">Oprávnění uživatele</key>
-    <key alias="usertype">Typ uživatele</key>
-    <key alias="userTypes">Typy uživatelů</key>
     <key alias="writer">Spisovatel</key>
     <key alias="yourProfile" version="7.0">Váš profil</key>
     <key alias="yourHistory" version="7.0">Vaše nedávná historie</key>

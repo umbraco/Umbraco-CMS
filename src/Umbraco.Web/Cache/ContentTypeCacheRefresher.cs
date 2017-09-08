@@ -2,6 +2,7 @@
 using System.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Web.PublishedCache;
 
@@ -10,11 +11,13 @@ namespace Umbraco.Web.Cache
     public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<ContentTypeCacheRefresher, ContentTypeCacheRefresher.JsonPayload>
     {
         private readonly IFacadeService _facadeService;
+        private readonly IdkMap _idkMap;
 
-        public ContentTypeCacheRefresher(CacheHelper cacheHelper, IFacadeService facadeService)
+        public ContentTypeCacheRefresher(CacheHelper cacheHelper, IFacadeService facadeService, IdkMap idkMap)
             : base(cacheHelper)
         {
             _facadeService = facadeService;
+            _idkMap = idkMap;
         }
 
         #region Define
@@ -55,11 +58,11 @@ namespace Umbraco.Web.Cache
                 ClearAllIsolatedCacheByEntityType<IMemberType>();
             }
 
-            CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
-
             foreach (var id in payloads.Select(x => x.Id))
+            {
+                _idkMap.ClearCache(id);
                 ClearLegacyCaches(id);
+            }
 
             if (payloads.Any(x => x.ItemType == typeof(IContentType).Name))
                 // don't try to be clever - refresh all

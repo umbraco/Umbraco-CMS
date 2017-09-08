@@ -15,11 +15,13 @@ namespace Umbraco.Web.Cache
     public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRefresher, MediaCacheRefresher.JsonPayload>
     {
         private readonly IFacadeService _facadeService;
+        private readonly IdkMap _idkMap;
 
-        public MediaCacheRefresher(CacheHelper cacheHelper, IFacadeService facadeService)
+        public MediaCacheRefresher(CacheHelper cacheHelper, IFacadeService facadeService, IdkMap idkMap)
             : base(cacheHelper)
         {
             _facadeService = facadeService;
+            _idkMap = idkMap;
         }
 
         #region Define
@@ -46,11 +48,11 @@ namespace Umbraco.Web.Cache
                 var mediaCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMedia>();
 
                 Current.ApplicationCache.ClearPartialViewCache();
-                Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-                Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
 
                 foreach (var payload in payloads)
                 {
+                    _idkMap.ClearCache(payload.Id);
+
                     // note: ClearCacheByKeySearch - does StartsWith(...)
 
                     // legacy alert!

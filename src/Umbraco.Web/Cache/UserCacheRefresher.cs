@@ -28,9 +28,6 @@ namespace Umbraco.Web.Cache
         public override void RefreshAll()
         {
             ClearAllIsolatedCacheByEntityType<IUser>();
-            var userPermissionsCache = CacheHelper.IsolatedRuntimeCache.GetCache<EntityPermission>();
-            if (userPermissionsCache)
-                userPermissionsCache.Result.ClearCacheByKeySearch(CacheKeys.UserPermissionsCacheKey);
             base.RefreshAll();
         }
 
@@ -45,14 +42,9 @@ namespace Umbraco.Web.Cache
             var userCache = CacheHelper.IsolatedRuntimeCache.GetCache<IUser>();
             if (userCache)
                 userCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUser>(id));
-
-            var userPermissionsCache = CacheHelper.IsolatedRuntimeCache.GetCache<EntityPermission>();
-            if (userPermissionsCache)
-                userPermissionsCache.Result.ClearCacheByKeySearch($"{CacheKeys.UserPermissionsCacheKey}{id}");
-
+           
             base.Remove(id);
         }
-
         #endregion
     }
 }

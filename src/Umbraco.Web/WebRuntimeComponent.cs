@@ -42,6 +42,8 @@ using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using Umbraco.Web._Legacy.Actions;
 using Umbraco.Examine;
+using Umbraco.Web.Search;
+using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web
@@ -55,7 +57,7 @@ namespace Umbraco.Web
 
             composition.Container.RegisterFrom<WebMappingProfilesCompositionRoot>();
 
-            var pluginManager = composition.Container.GetInstance<TypeLoader>();
+            var typeLoader = composition.Container.GetInstance<TypeLoader>();
             var logger = composition.Container.GetInstance<ILogger>();
             var proflog = composition.Container.GetInstance<ProfilingLogger>();
 
@@ -101,26 +103,29 @@ namespace Umbraco.Web
             composition.Container.EnableMvc(); // does container.EnablePerWebRequestScope()
             composition.Container.ScopeManagerProvider = smp; // reverts - we will do it last (in WebRuntime)
 
-            composition.Container.RegisterMvcControllers(pluginManager, GetType().Assembly);
+            composition.Container.RegisterMvcControllers(typeLoader, GetType().Assembly);
             composition.Container.EnableWebApi(GlobalConfiguration.Configuration);
-            composition.Container.RegisterApiControllers(pluginManager, GetType().Assembly);
+            composition.Container.RegisterApiControllers(typeLoader, GetType().Assembly);
 
             XsltExtensionCollectionBuilder.Register(composition.Container)
-                .AddExtensionObjectProducer(() => pluginManager.ResolveXsltExtensions());
+                .AddExtensionObjectProducer(() => typeLoader.GetXsltExtensions());
+
+            composition.Container.RegisterCollectionBuilder<SearchableTreeCollectionBuilder>()
+                .Add(() => typeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
 
             composition.Container.RegisterCollectionBuilder<EditorValidatorCollectionBuilder>()
-                .Add(() => pluginManager.GetTypes<IEditorValidator>());
+                .Add(() => typeLoader.GetTypes<IEditorValidator>());
 
             // set the default RenderMvcController
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
 
             ActionCollectionBuilder.Register(composition.Container)
-                .SetProducer(() => pluginManager.ResolveActions());
+                .SetProducer(() => typeLoader.GetActions());
 
-            var surfaceControllerTypes = new SurfaceControllerTypeCollection(pluginManager.ResolveSurfaceControllers());
+            var surfaceControllerTypes = new SurfaceControllerTypeCollection(typeLoader.GetSurfaceControllers());
             composition.Container.RegisterInstance(surfaceControllerTypes);
 
-            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(pluginManager.ResolveUmbracoApiControllers());
+            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(typeLoader.GetUmbracoApiControllers());
             composition.Container.RegisterInstance(umbracoApiControllerTypes);
 
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
@@ -160,16 +165,19 @@ namespace Umbraco.Web
             composition.Container.RegisterSingleton<ISiteDomainHelper, SiteDomainHelper>();
 
             composition.Container.RegisterCollectionBuilder<ThumbnailProviderCollectionBuilder>()
-                .Add(pluginManager.ResolveThumbnailProviders());
+                .Add(typeLoader.GetThumbnailProviders());
 
             composition.Container.RegisterCollectionBuilder<ImageUrlProviderCollectionBuilder>()
-                .Append(pluginManager.ResolveImageUrlProviders());
+                .Append(typeLoader.GetImageUrlProviders());
 
             composition.Container.RegisterSingleton<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             composition.Container.RegisterCollectionBuilder<HealthCheckCollectionBuilder>()
-                .Add(() => pluginManager.GetTypes<HealthCheck.HealthCheck>());
+                .Add(() => typeLoader.GetTypes<HealthCheck.HealthCheck>());
+
+            composition.Container.RegisterCollectionBuilder<HealthCheckNotificationMethodCollectionBuilder>()
+                .Add(() => typeLoader.GetTypes<HealthCheck.NotificationMethods.IHealthCheckNotificationMethod>());
 
             // auto-register views
             composition.Container.RegisterAuto(typeof(UmbracoViewPage<>));

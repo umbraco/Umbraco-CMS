@@ -311,20 +311,7 @@ namespace Umbraco.Web
             if (content.IsDocumentType(docTypeAlias))
                 return true;
 
-            return recursive && IsDocumentTypeRecursive(content, docTypeAlias);
-        }
-
-        private static bool IsDocumentTypeRecursive(IPublishedContent content, string docTypeAlias)
-        {
-            var contentTypeService = Current.Services.ContentTypeService; // fixme - inject
-            var type = contentTypeService.Get(content.DocumentTypeAlias);
-            while (type != null && type.ParentId > 0)
-            {
-                type = contentTypeService.Get(type.ParentId);
-                if (type.Alias.InvariantEquals(docTypeAlias))
-                    return true;
-            }
-            return false;
+            return recursive && content.IsComposedOf(docTypeAlias);
         }
 
         public static bool IsNull(this IPublishedContent content, string alias, bool recurse)

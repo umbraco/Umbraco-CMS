@@ -29,7 +29,7 @@ namespace Umbraco.Core.Services
            IContentService contentService, IContentTypeService contentTypeService,
            IMediaService mediaService, IMediaTypeService mediaTypeService,
            IDataTypeService dataTypeService,
-           IMemberService memberService, IMemberTypeService memberTypeService, IdkMap idkMap)
+           IMemberService memberService, IMemberTypeService memberTypeService, IdkMap idkMap,
            IRuntimeCacheProvider runtimeCache)
             : base(provider, logger, eventMessagesFactory)
         {
@@ -542,7 +542,7 @@ namespace Umbraco.Core.Services
             var entityType = GetEntityType(umbracoObjectType);
             var typeFullName = entityType.FullName;
             if (_supportedObjectTypes.ContainsKey(typeFullName) == false)
-                throw new NotSupportedException("The passed in type is not supported.);
+                throw new NotSupportedException("The passed in type is not supported.");
 
             var objectTypeId = umbracoObjectType.GetGuid();
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
@@ -557,7 +557,7 @@ namespace Umbraco.Core.Services
             var entityType = GetEntityType(umbracoObjectType);
             var typeFullName = entityType.FullName;
             if (_supportedObjectTypes.ContainsKey(typeFullName) == false)
-                throw new NotSupportedException("The passed in type is not supported.);
+                throw new NotSupportedException("The passed in type is not supported.");
 
             var objectTypeId = umbracoObjectType.GetGuid();
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))

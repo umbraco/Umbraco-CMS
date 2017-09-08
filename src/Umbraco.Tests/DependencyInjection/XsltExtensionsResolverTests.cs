@@ -19,7 +19,7 @@ namespace Umbraco.Tests.DI
         {
             var container = new ServiceContainer();
             var builder = new XsltExtensionCollectionBuilder(container);
-            builder.AddExtensionObjectProducer(() => TypeLoader.ResolveXsltExtensions());
+            builder.AddExtensionObjectProducer(() => TypeLoader.GetXsltExtensions());
             var extensions = builder.CreateCollection();
 
             Assert.AreEqual(3, extensions.Count());

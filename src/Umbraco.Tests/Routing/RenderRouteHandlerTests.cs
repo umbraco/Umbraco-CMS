@@ -64,10 +64,10 @@ namespace Umbraco.Tests.Routing
             // set the default RenderMvcController
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
 
-            var surfaceControllerTypes = new SurfaceControllerTypeCollection(Current.TypeLoader.ResolveSurfaceControllers());
+            var surfaceControllerTypes = new SurfaceControllerTypeCollection(Current.TypeLoader.GetSurfaceControllers());
             Container.RegisterInstance(surfaceControllerTypes);
 
-            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Current.TypeLoader.ResolveUmbracoApiControllers());
+            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Current.TypeLoader.GetUmbracoApiControllers());
             Container.RegisterInstance(umbracoApiControllerTypes);
 
             Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefault()));

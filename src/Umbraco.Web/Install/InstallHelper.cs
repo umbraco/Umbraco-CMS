@@ -48,6 +48,7 @@ namespace Umbraco.Web.Install
                 new FilePermissionsStep(),
                 new MajorVersion7UpgradeReport(_databaseBuilder, Current.RuntimeState, Current.DatabaseContext, Current.ScopeProvider),
                 new Version73FileCleanup(_httpContext, _logger),
+                new ConfigureMachineKey(),
                 new DatabaseConfigureStep(_databaseBuilder),
                 new DatabaseInstallStep(_databaseBuilder, Current.RuntimeState, Current.Logger),
                 new DatabaseUpgradeStep(_databaseBuilder, Current.Services.MigrationEntryService, Current.RuntimeState, Current.MigrationCollectionBuilder, Current.Logger),

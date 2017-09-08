@@ -12,18 +12,21 @@ using Umbraco.Web.Security;
 namespace Umbraco.Web.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.NewInstall,
-        "StarterKitDownload", "starterKit", 30, "Adding a simple website to Umbraco, will make it easier for you to get started")]
+        "StarterKitDownload", "starterKit", 30, "Adding a simple website to Umbraco, will make it easier for you to get started",
+        PerformsAppRestart = true)]
     internal class StarterKitDownloadStep : InstallSetupStep<Guid?>
     {
         private readonly InstallHelper _installHelper;
         private readonly IContentService _contentService;
         private readonly WebSecurity _security;
+        private readonly HttpContextBase _httpContext;
 
         public StarterKitDownloadStep(IContentService contentService, InstallHelper installHelper, WebSecurity security)
         {
             _installHelper = installHelper;
             _contentService = contentService;
             _security = security;
+            _httpContext = httpContext;
         }
 
         private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
@@ -47,6 +50,8 @@ namespace Umbraco.Web.Install.InstallSteps
             }
 
             var result = DownloadPackageFiles(starterKitId.Value);
+
+            _applicationContext.RestartApplicationPool(_httpContext);
 
             return new InstallSetupResult(new Dictionary<string, object>
             {

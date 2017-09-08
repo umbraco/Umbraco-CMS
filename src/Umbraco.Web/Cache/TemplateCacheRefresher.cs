@@ -1,14 +1,19 @@
 ﻿using System;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Cache
 {
     public sealed class TemplateCacheRefresher : CacheRefresherBase<TemplateCacheRefresher>
     {
-        public TemplateCacheRefresher(CacheHelper cacheHelper)
+        private readonly IdkMap _idkMap;
+
+        public TemplateCacheRefresher(CacheHelper cacheHelper, IdkMap idkMap)
             : base(cacheHelper)
-        { }
+        {
+            _idkMap = idkMap;
+        }
 
         #region Define
 
@@ -46,8 +51,7 @@ namespace Umbraco.Web.Cache
 
         private void RemoveFromCache(int id)
         {
-            CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            CacheHelper.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
+            _idkMap.ClearCache(id);
             CacheHelper.RuntimeCache.ClearCacheItem($"{CacheKeys.TemplateFrontEndCacheKey}{id}");
 
             //need to clear the runtime cache for templates

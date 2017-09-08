@@ -2,6 +2,7 @@
 using System.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -12,6 +13,7 @@ namespace Umbraco.Web.Install.InstallSteps
     internal class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
     {
         private readonly DatabaseBuilder _databaseBuilder;
+        private readonly ILogger _logger;
 
         public DatabaseConfigureStep(DatabaseBuilder databaseBuilder)
         {
@@ -80,8 +82,9 @@ namespace Umbraco.Web.Install.InstallSteps
                     result.DetermineInstalledVersion();
                     return false;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    _logger.Error<DatabaseConfigureStep>("An error occurred, reconfiguring...", ex);
                     //something went wrong, could not connect so probably need to reconfigure
                     return true;
                 }

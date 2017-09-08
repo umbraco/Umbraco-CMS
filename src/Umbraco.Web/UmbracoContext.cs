@@ -141,12 +141,12 @@ namespace Umbraco.Web
         /// object is instantiated which in the web site is created during the BeginRequest phase.
         /// We can then determine complete rendering time from that.
         /// </summary>
-        internal DateTime ObjectCreated { get; private set; }
+        internal DateTime ObjectCreated { get; }
 
         /// <summary>
         /// This is used internally for debugging and also used to define anything required to distinguish this request from another.
         /// </summary>
-        internal Guid UmbracoRequestId { get; private set; }
+        internal Guid UmbracoRequestId { get; }
 
         /// <summary>
         /// Gets the WebSecurity class
@@ -162,7 +162,7 @@ namespace Umbraco.Web
         /// Gets the cleaned up url that is handled by Umbraco.
         /// </summary>
         /// <remarks>That is, lowercase, no trailing slash after path, no .aspx...</remarks>
-        internal Uri CleanedUmbracoUrl { get; private set; }
+        internal Uri CleanedUmbracoUrl { get; }
 
         /// <summary>
         /// Gets the facade.
@@ -253,7 +253,7 @@ namespace Umbraco.Web
                 if (_previewing.HasValue == false) DetectPreviewMode();
                 return _previewing.Value;
             }
-            private set { _previewing = value; }
+            private set => _previewing = value;
         }
 
         private string PreviewToken

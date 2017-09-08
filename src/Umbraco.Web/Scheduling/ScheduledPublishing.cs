@@ -1,13 +1,19 @@
 ﻿using System;
-using System.Net.Http;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
+using System.Web.Hosting;
+using umbraco;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
-using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -49,64 +55,38 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
-            string umbracoAppUrl;
+            UmbracoContext tempContext = null;
             try
             {
-                umbracoAppUrl = _runtime.ApplicationUrl.ToString();
-                if (umbracoAppUrl.IsNullOrWhiteSpace())
+                // DO not run publishing if content is re-loading
+                if (content.Instance.isInitializing == false)
                 {
+                    //TODO: We should remove this in v8, this is a backwards compat hack
+                    // see notes in CacheRefresherEventHandler
+                    // because notifications will not be sent if there is no UmbracoContext
+                    // see NotificationServiceExtensions
+                    var httpContext = new HttpContextWrapper(new HttpContext(new SimpleWorkerRequest("temp.aspx", "", new StringWriter())));
+                    tempContext = UmbracoContext.EnsureContext(
+                        httpContext,
+                        _appContext,
+                        new WebSecurity(httpContext, _appContext),
+                        _settings,
+                        UrlProviderResolver.Current.Providers,
+                        true);
+
+                    var publisher = new ScheduledPublisher(_appContext.Services.ContentService);
+                    var count = publisher.CheckPendingAndProcess();
                     _logger.Warn<ScheduledPublishing>("No url for service (yet), skip.");
-                    return true; // repeat
                 }
             }
             catch (Exception e)
             {
                 _logger.Error<ScheduledPublishing>("Could not acquire application url", e);
-                return true; // repeat
             }
-
-            var url = umbracoAppUrl + "/RestServices/ScheduledPublish/Index";
-
-            using (_proflog.DebugDuration<ScheduledPublishing>($"Scheduled publishing executing at {url}",  "Scheduled publishing complete"))
+            finally
             {
-                try
-                {
-                    using (var wc = new HttpClient())
-                    {
-                        var request = new HttpRequestMessage(HttpMethod.Post, url)
-                        {
-                            Content = new StringContent(string.Empty)
-                        };
-
-                        // running on a background task, requires its own (safe) scope
-                        // (GetAuthenticationHeaderValue uses UserService to load the current user, hence requires a database)
-                        // (might not need a scope but we don't know really)
-                        using (var scope = _scopeProvider.CreateScope())
-                        {
-                            //pass custom the authorization header
-                            request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_userService);
-                            scope.Complete();
-                        }
-
-                        var result = await wc.SendAsync(request, token);
-                        var content = await result.Content.ReadAsStringAsync();
-
-                        if (result.IsSuccessStatusCode)
-                        {
-                            _logger.Debug<ScheduledPublishing>($"Request successfully sent to url = \"{url}\".");
-                        }
-                        else
-                        {
-                            var msg = $"Request failed with status code \"{result.StatusCode}\". Request content = \"{content}\".";
-                            var ex = new HttpRequestException(msg);
-                            _logger.Error<ScheduledPublishing>(msg, ex);
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    _logger.Error<ScheduledPublishing>($"Failed (at \"{umbracoAppUrl}\").", e);
-                }
+                if (tempContext != null)
+                    tempContext.Dispose(); // nulls the ThreadStatic context
             }
 
             return true; // repeat
