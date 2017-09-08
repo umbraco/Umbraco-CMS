@@ -5,7 +5,7 @@
     * 
     *
     **/
-function currentUserResource($q, $http, umbRequestHelper) {
+function currentUserResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
     //the factory object returned
     return {
@@ -38,8 +38,11 @@ function currentUserResource($q, $http, umbRequestHelper) {
          */
         changePassword: function (changePasswordArgs) {
 
-            changePasswordArgs = _.omit(changePasswordArgs, "confirm");
-
+            changePasswordArgs = umbDataFormatter.formatChangePasswordModel(changePasswordArgs);
+            if (!changePasswordArgs) {
+                throw 'No password data to change';
+            }
+            
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(

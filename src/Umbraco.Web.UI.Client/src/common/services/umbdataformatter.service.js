@@ -7,7 +7,29 @@
     * @description A helper object used to format/transform JSON Umbraco data, mostly used for persisting data to the server
     **/
     function umbDataFormatter() {
+        
         return {
+
+            formatChangePasswordModel: function(model) {
+                if (!model) {
+                    return null;
+                }
+                var trimmed = _.omit(model, ["confirm", "generatedPassword"])
+
+                //ensure that the pass value is null if all child properties are null
+                var allNull = true;
+                var vals = _.values(trimmed);
+                for (var k = 0; k < vals.length; k++) {
+                    if (vals[k] !== null && vals[k] !== undefined) {
+                        allNull = false;
+                    }
+                }
+                if (allNull) {
+                    return null;
+                }
+
+                return trimmed;
+            },
 
             formatContentTypePostData: function (displayModel, action) {
 
@@ -82,7 +104,7 @@
 
                 //create the save model from the display model
                 var saveModel = _.pick(displayModel, 'id', 'parentId', 'name', 'username', 'culture', 'email', 'startContentIds', 'startMediaIds', 'userGroups', 'message', 'changePassword');
-                saveModel.changePassword = _.omit(saveModel.changePassword, "confirm");
+                saveModel.changePassword = this.formatChangePasswordModel(saveModel.changePassword);
 
                 //make sure the userGroups are just a string array
                 var currGroups = saveModel.userGroups;
@@ -222,7 +244,8 @@
                 });
                 saveModel.email = propEmail.value;
                 saveModel.username = propLogin.value;
-                saveModel.password = _.omit(propPass.value, "confirm");
+                
+                saveModel.password = this.formatChangePasswordModel(propPass.value);
 
                 var selectedGroups = [];
                 for (var n in propGroups.value) {
