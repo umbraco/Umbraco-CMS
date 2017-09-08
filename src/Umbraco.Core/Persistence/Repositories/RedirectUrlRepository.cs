@@ -185,9 +185,15 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         public IEnumerable<IRedirectUrl> GetAllUrls(int rootContentId, long pageIndex, int pageSize, out long total)
         {
-            var sql = GetBaseQuery(false)
-                .Where(string.Format("{0}.{1} LIKE @path", SqlSyntax.GetQuotedTableName("umbracoNode"), SqlSyntax.GetQuotedColumnName("path")), new { path = "%," + rootContentId + ",%" })
-                .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc, SqlSyntax);
+            var sql = GetBaseQuery(false);
+            if (rootContentId != -1)
+            {
+                sql = sql.
+                    Where(string.Format("{0}.{1} LIKE @path", SqlSyntax.GetQuotedTableName("umbracoNode"), SqlSyntax.GetQuotedColumnName("path")), new { path = "%," + rootContentId + ",%" });
+            }
+
+            sql = sql.OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc, SqlSyntax);
+
             var result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
             total = Convert.ToInt32(result.TotalItems);
 
@@ -209,9 +215,27 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         public IEnumerable<IRedirectUrl> SearchUrls(int rootContentId, string searchTerm, long pageIndex, int pageSize, out long total)
         {
-            var sql = GetBaseQuery(false)
-                .Where(string.Format("{0}.{1} LIKE @url AND {2}.{3} LIKE @path", SqlSyntax.GetQuotedTableName("umbracoRedirectUrl"), SqlSyntax.GetQuotedColumnName("Url"), SqlSyntax.GetQuotedTableName("umbracoNode"),SqlSyntax.GetQuotedColumnName("path")), new { url = "%" + searchTerm.Trim().ToLowerInvariant() + "%", path = "%," + rootContentId + ",%" })
-                .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc, SqlSyntax);
+            var sql = GetBaseQuery(false);
+            if (rootContentId != -1)
+            {
+                sql = sql
+                    .Where(string.Format("{0}.{1} LIKE @url AND {2}.{3} LIKE @path", SqlSyntax.GetQuotedTableName("umbracoRedirectUrl"), SqlSyntax.GetQuotedColumnName("Url"), SqlSyntax.GetQuotedTableName("umbracoNode"), SqlSyntax.GetQuotedColumnName("path")), new
+                    {
+                        url = "%" + searchTerm.Trim().ToLowerInvariant() + "%",
+                        path = "%," + rootContentId + ",%"
+                    });
+            }
+            else
+            {
+                sql = sql
+                    .Where(
+                        string.Format("{0}.{1} LIKE @url", SqlSyntax.GetQuotedTableName("umbracoRedirectUrl"),
+                            SqlSyntax.GetQuotedColumnName("Url")),
+                        new { url = "%" + searchTerm.Trim().ToLowerInvariant() + "%" });
+            }
+
+            sql = sql.OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc, SqlSyntax);
+
             var result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
             total = Convert.ToInt32(result.TotalItems);
 
