@@ -170,10 +170,6 @@ ECHO.
 %MSBUILD% "Build.proj" /p:BUILD_RELEASE=%RELEASE% /p:BUILD_COMMENT=%COMMENT% /p:NugetPackagesDirectory="%nuGetFolder%" /p:VSWherePath=%VSWherePath% /consoleloggerparameters:Summary;ErrorsOnly /fileLogger
 IF ERRORLEVEL 1 GOTO error
 
-ECHO.
-ECHO Setting node_modules folder to hidden to prevent VS13 from crashing on it while loading the websites project
-attrib +h ..\src\Umbraco.Web.UI.Client\node_modules
-
 IF %SKIPNUGET% EQU 1 GOTO success
 
 ECHO.
