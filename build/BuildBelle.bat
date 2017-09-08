@@ -56,7 +56,7 @@ FOR /f "delims=" %%A in ('dir "%nodeExtractFolder%\node*" /b') DO SET "nodePath=
     ECHO Installing bower
     call npm install -g bower
 	
-    ECHO Installing gulp & gulp cli
+    ECHO Installing gulp and gulp cli
     call npm install -g gulp
     call npm install -g gulp-cli
 	
