@@ -5,6 +5,7 @@ using Umbraco.Core.Persistence.Migrations.Syntax.Alter;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create;
 using Umbraco.Core.Persistence.Migrations.Syntax.Delete;
 using Umbraco.Core.Persistence.Migrations.Syntax.Execute;
+using Umbraco.Core.Persistence.Migrations.Syntax.Update;
 
 namespace Umbraco.Core.Persistence.Migrations
 {
@@ -17,6 +18,8 @@ namespace Umbraco.Core.Persistence.Migrations
         public IExecuteBuilder Execute => new ExecuteBuilder(this);
 
         public IDeleteBuilder Delete => new DeleteBuilder(this);
+
+        public IUpdateBuilder Update => new UpdateBuilder(this);
 
         public IAlterSyntaxBuilder Alter => new AlterSyntaxBuilder(this);
 
