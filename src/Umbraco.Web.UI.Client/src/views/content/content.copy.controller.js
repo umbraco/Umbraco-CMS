@@ -22,7 +22,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 	        hideHeader: false
 	    }
 	    userService.getCurrentUser().then(function (userData) {
-	        $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;
+            $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;	     
 	    });
 
 	    var node = dialogOptions.currentNode;
