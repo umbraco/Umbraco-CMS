@@ -54,8 +54,10 @@ FOR /f "delims=" %%A in ('dir "%nodeExtractFolder%\node*" /b') DO SET "nodePath=
 	
     ECHO Clean npm cache 
     call npm cache clean --quiet
-
-    ECHO Installing gulp cli
+    
+	ECHO Installing gulp
+	call npm install -g gulp --quiet
+	ECHO Installing gulp cli
     call npm install -g gulp-cli --quiet
     ECHO Installing bower
     call npm install -g bower --quiet
