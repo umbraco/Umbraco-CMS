@@ -172,10 +172,15 @@ IF ERRORLEVEL 1 GOTO error
 
 IF %SKIPNUGET% EQU 1 GOTO success
 
+IF EXIST ..\src\Umbraco.Web.UI.Client\node_modules (
+	ECHO.
+	ECHO Setting node_modules folder to hidden to prevent Visual Studio from crashing on it while loading the websites project
+	attrib +h ..\src\Umbraco.Web.UI.Client\node_modules
+)
+
 ECHO.
 ECHO Adding Web.config transform files to the NuGet package
 REN .\_BuildOutput\WebApp\Views\Web.config Web.config.transform
-REN .\_BuildOutput\WebApp\Xslt\Web.config Web.config.transform
 
 ECHO.
 ECHO Packing the NuGet release files
