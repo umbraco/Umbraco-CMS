@@ -167,7 +167,6 @@
 	  <BelleLibFiles Include="..\src\Umbraco.Web.UI\Umbraco\lib\**\*.*" />
 	  <BelleViewsFiles Include="..\src\Umbraco.Web.UI\Umbraco\Views\**\*.*" />
 	  <BellePreviewFiles Include="..\src\Umbraco.Web.UI\Umbraco\Preview\**\*.*" />
-	  <BelleInstallerFile Include="..\src\Umbraco.Web.UI\Umbraco\installer.html" />	  
     </ItemGroup>
 
     <Copy SourceFiles="@(BelleAssetsFiles)"
@@ -190,8 +189,6 @@
           DestinationFiles="@(BellePreviewFiles->'$(WebAppFolder)umbraco\preview\%(RecursiveDir)%(Filename)%(Extension)')"
           OverwriteReadOnlyFiles="true"
           SkipUnchangedFiles="false" />
-    <Copy SourceFiles="@(BelleInstallerFile)"
-        DestinationFiles="@(BelleInstallerFile->'$(WebAppFolder)umbraco\%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
 
   <Target Name="CopyLibraries" DependsOnTargets="OffsetTimestamps" >
