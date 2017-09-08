@@ -146,3 +146,4 @@ build/msbuild.log
 src/packages/
 build/tools/
 src/PrecompiledWeb/*
+npm-debug.log
