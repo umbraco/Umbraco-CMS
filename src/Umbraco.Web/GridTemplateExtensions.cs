@@ -11,6 +11,7 @@ using Umbraco.Web.Templates;
 using System.IO;
 using System.Web.Routing;
 using Umbraco.Web.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Web
 {
@@ -85,7 +86,70 @@ namespace Umbraco.Web
 
             return html.Partial(view, model);
         }
+        
+        public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedContent contentItem, bool recurse)
+        {
+            return html.GetGridHtml(contentItem, "bodyText", recurse, "bootstrap3");
+        }
+        public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedContent contentItem, string propertyAlias, bool recurse)
+        {
+            Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
 
+            return html.GetGridHtml(contentItem, propertyAlias, recurse, "bootstrap3");
+        }
+        public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, HtmlHelper html, bool recurse)
+        {
+            return html.GetGridHtml(contentItem, "bodyText", recurse, "bootstrap3");
+        }
+        public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, HtmlHelper html, string propertyAlias, bool recurse)
+        {
+            Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
+
+            return html.GetGridHtml(contentItem, propertyAlias, recurse, "bootstrap3");
+        }
+        /// <summary>
+        /// Is this the best place to put this?
+        /// Essentially it's a work around for the fact that HasValue doesn't work consistently with the Grid
+        /// If a Grid property exists and hasn't been used HasValue functions as expected and returns false
+        /// However if controls have been added to the grid, and then deleted, along with any rows, then some 'Json' remains 
+        /// and HasValue returns true when to the editor it is completely empty
+        /// so here we use JObject SelectTokens to look for controls to determine if there is any content in the remaining Json
+        /// Is that the best approach?
+        ///  it may make more sense to investigate cleaning up a grid property when it has had all controls removed so it doesn't store anything and HasValue would work again
+        /// </summary>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        private static bool HasGridValue(IPublishedProperty property)
+        {
+            if (property == null) { return false; }
+            if (!property.HasValue) { return false; }
+            JObject grid = property.GetValue<JObject>();
+            if (grid == null) { return false; }
+            return grid.SelectTokens("sections[*].rows[*].areas[*].controls").Any();
+        }
+        public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedContent contentItem, string propertyAlias, bool recurse, string framework = "bootstrap3")
+        {
+            Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
+            if (recurse == false) return html.GetGridHtml(contentItem, propertyAlias, framework);
+            var property = contentItem.GetProperty(propertyAlias);
+            var firstNonNullProperty = property;
+            while (contentItem != null && (property == null || property.HasValue == false || (property.HasValue == true && HasGridValue(property) == false)))
+            {
+                contentItem = contentItem.Parent;
+                property = contentItem == null ? null : contentItem.GetProperty(propertyAlias);
+                if (firstNonNullProperty == null && property != null) firstNonNullProperty = property;
+            }
+
+            var view = "Grid/" + framework;
+
+            if (property == null) throw new NullReferenceException("No property type found with alias using recurse " + propertyAlias);
+            var model = property.Value;
+
+            var asString = model as string;
+            if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
+
+            return html.Partial(view, model);
+        }
 
         [Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
         public static MvcHtmlString GetGridHtml(this IPublishedProperty property, string framework = "bootstrap3")
