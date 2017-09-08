@@ -1662,6 +1662,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="userGroups">User groups</key>
     <key alias="userInvited">has been invited</key>
     <key alias="userInvitedSuccessHelp">An invitation has been sent to the new user with details about how to log in to Umbraco.</key>
+    <key alias="userinviteWelcomeMessage">Hello there and welcome to Umbraco! In just 1 minute you’ll be good to go, we just need you to setup a password and add a picture for your avatar.</key>
     <key alias="writer">Writer</key>
     <key alias="translator">Translator</key>
     <key alias="change">Change</key>

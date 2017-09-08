@@ -82,6 +82,7 @@
 
                 //create the save model from the display model
                 var saveModel = _.pick(displayModel, 'id', 'parentId', 'name', 'username', 'culture', 'email', 'startContentIds', 'startMediaIds', 'userGroups', 'message', 'changePassword');
+                saveModel.changePassword = _.omit(saveModel.changePassword, "confirm");
 
                 //make sure the userGroups are just a string array
                 var currGroups = saveModel.userGroups;
@@ -221,7 +222,7 @@
                 });
                 saveModel.email = propEmail.value;
                 saveModel.username = propLogin.value;
-                saveModel.password = propPass.value;
+                saveModel.password = _.omit(propPass.value, "confirm");
 
                 var selectedGroups = [];
                 for (var n in propGroups.value) {
