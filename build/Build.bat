@@ -91,14 +91,15 @@ SET PATH="%MSBUILDPATH%";%PATH%
 
 ReplaceIISExpressPortNumber.exe ..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj %RELEASE%
 
-ECHO.
-ECHO Removing the belle build folder and bower_components folder to make sure everything is clean as a whistle
-RD ..\src\Umbraco.Web.UI.Client\build /Q /S
-RD ..\src\Umbraco.Web.UI.Client\bower_components /Q /S
+IF EXIST ..\src\Umbraco.Web.UI.Client\bower_components (
+	ECHO.
+	ECHO Removing the bower_components folder to make sure everything is clean as a whistle
+	RD ..\src\Umbraco.Web.UI.Client\bower_components /Q /S
+)
 
 ECHO.
 ECHO Removing existing built files to make sure everything is clean as a whistle
-RMDIR /Q /S _BuildOutput
+RMDIR /Q /S _BuildOutput 2>NUL
 DEL /F /Q UmbracoCms.*.zip 2>NUL
 DEL /F /Q UmbracoExamine.*.zip 2>NUL
 DEL /F /Q UmbracoCms.*.nupkg 2>NUL
