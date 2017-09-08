@@ -49,19 +49,21 @@ FOR /f "delims=" %%A in ('dir "%nodeExtractFolder%\node*" /b') DO SET "nodePath=
 
     ECHO Change directory to %CD%\..\src\Umbraco.Web.UI.Client\
     CD %CD%\..\src\Umbraco.Web.UI.Client\
-
-    ECHO Do npm install and the gulp build of Belle
-	
+    
     ECHO Clean npm cache 
-    call npm cache clean --quiet
-
-    ECHO Installing gulp cli
-    call npm install -g gulp-cli --quiet
+    call npm cache clean
+	
     ECHO Installing bower
-    call npm install -g bower --quiet
-    ECHO Doing npm install
-    call npm install --quiet
-    ECHO Executing gulp build
+    call npm install -g bower
+	
+    ECHO Installing gulp & gulp cli
+    call npm install -g gulp
+    call npm install -g gulp-cli
+	
+    ECHO Executing npm install
+    call npm install
+	
+    ECHO Do gulp build of Belle
     call gulp build --buildversion=%release%
 
     ECHO Move back to the build folder

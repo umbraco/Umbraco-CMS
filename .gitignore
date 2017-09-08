@@ -147,3 +147,4 @@ src/packages/
 src/PrecompiledWeb/*
 build/tools/
 src/PrecompiledWeb/*
+npm-debug.log

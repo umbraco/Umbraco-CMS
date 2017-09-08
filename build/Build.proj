@@ -162,11 +162,31 @@
 
   <Target Name="CopyBelleBuild" DependsOnTargets="CopyLibraries" >
     <ItemGroup>
-      <BelleFiles Include="..\src\Umbraco.Web.UI.Client\build\belle\**\*.*" Exclude="..\src\Umbraco.Web.UI.Client\build\belle\index.html" />
+      <BelleAssetsFiles Include="..\src\Umbraco.Web.UI\Umbraco\assets\**\*.*" />
+	  <BelleJsFiles Include="..\src\Umbraco.Web.UI\Umbraco\Js\**\*.*" />
+	  <BelleLibFiles Include="..\src\Umbraco.Web.UI\Umbraco\lib\**\*.*" />
+	  <BelleViewsFiles Include="..\src\Umbraco.Web.UI\Umbraco\Views\**\*.*" />
+	  <BellePreviewFiles Include="..\src\Umbraco.Web.UI\Umbraco\Preview\**\*.*" />
     </ItemGroup>
 
-    <Copy SourceFiles="@(BelleFiles)"
-          DestinationFiles="@(BelleFiles->'$(WebAppFolder)umbraco\%(RecursiveDir)%(Filename)%(Extension)')"
+    <Copy SourceFiles="@(BelleAssetsFiles)"
+          DestinationFiles="@(BelleAssetsFiles->'$(WebAppFolder)umbraco\assets\%(RecursiveDir)%(Filename)%(Extension)')"
+          OverwriteReadOnlyFiles="true"
+          SkipUnchangedFiles="false" />
+    <Copy SourceFiles="@(BelleJsFiles)"
+          DestinationFiles="@(BelleJsFiles->'$(WebAppFolder)umbraco\Js\%(RecursiveDir)%(Filename)%(Extension)')"
+          OverwriteReadOnlyFiles="true"
+          SkipUnchangedFiles="false" />
+    <Copy SourceFiles="@(BelleLibFiles)"
+          DestinationFiles="@(BelleLibFiles->'$(WebAppFolder)umbraco\lib\%(RecursiveDir)%(Filename)%(Extension)')"
+          OverwriteReadOnlyFiles="true"
+          SkipUnchangedFiles="false" />
+    <Copy SourceFiles="@(BelleViewsFiles)"
+          DestinationFiles="@(BelleViewsFiles->'$(WebAppFolder)umbraco\Views\%(RecursiveDir)%(Filename)%(Extension)')"
+          OverwriteReadOnlyFiles="true"
+          SkipUnchangedFiles="false" />
+    <Copy SourceFiles="@(BellePreviewFiles)"
+          DestinationFiles="@(BellePreviewFiles->'$(WebAppFolder)umbraco\preview\%(RecursiveDir)%(Filename)%(Extension)')"
           OverwriteReadOnlyFiles="true"
           SkipUnchangedFiles="false" />
   </Target>

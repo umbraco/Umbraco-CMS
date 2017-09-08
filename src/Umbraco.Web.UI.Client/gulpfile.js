@@ -38,7 +38,7 @@ function processJs(files, out) {
 }
 
 function processLess(files, out) {
-   
+
     var processors = [
          autoprefixer,
          cssnano
@@ -64,7 +64,7 @@ var sources = {
     less: {
         installer: { files: ["src/less/installer.less"], out: "installer.css" },
         nonodes: { files: ["src/less/pages/nonodes.less"], out: "nonodes.style.min.css"},
-        preview: { files: ['src/less/canvas-designer.less', 'src/less/helveticons.less'], out: "canvasdesigner.css" },
+        preview: { files: ["src/less/canvas-designer.less"], out: "canvasdesigner.css" },
         umbraco: { files: ["src/less/belle.less"], out: "umbraco.css" }
     },
 
