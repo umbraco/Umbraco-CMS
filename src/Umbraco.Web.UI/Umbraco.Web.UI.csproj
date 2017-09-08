@@ -2433,7 +2433,7 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
     <Copy SourceFiles="$(ProjectDir)Web.$(Configuration).config.transformed" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="$(BuildingInsideVisualStudio) == true" />
   </Target>
   <Target Name="BelleBuild" BeforeTargets="Rebuild">
-	<Message Text="Building Belle (due to a rebuild or this being the first build)" Importance="high" />
+    <Message Text="Building Belle (due to a rebuild or this being the first build)" Importance="high" />
     <!-- Only runs when a Rebuild is requested -->
     <ReadLinesFromFile File="$(ProjectDir)\..\..\build\UmbracoVersion.txt">
       <Output TaskParameter="Lines" PropertyName="VersionNumber" />
