@@ -25,6 +25,19 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return GetOptionalTextElement("allowPasswordReset", true); }
         }
 
+        /// <summary>
+        /// A boolean indicating that by default the email address will be the username
+        /// </summary>
+        /// <remarks>
+        /// Even if this is true and the username is different from the email in the database, the username field will still be shown.
+        /// When this is false, the username and email fields will be shown in the user section.
+        /// </remarks>
+        [ConfigurationProperty("usernameIsEmail")]
+        internal InnerTextConfigurationElement<bool> UsernameIsEmail
+        {
+            get { return GetOptionalTextElement("usernameIsEmail", true); }
+        }
+
         [ConfigurationProperty("authCookieName")]
         internal InnerTextConfigurationElement<string> AuthCookieName
         {
@@ -53,6 +66,18 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool ISecuritySection.AllowPasswordReset
         {
             get { return AllowPasswordReset; }
+        }
+
+        /// <summary>
+        /// A boolean indicating that by default the email address will be the username
+        /// </summary>
+        /// <remarks>
+        /// Even if this is true and the username is different from the email in the database, the username field will still be shown.
+        /// When this is false, the username and email fields will be shown in the user section.
+        /// </remarks>
+        bool ISecuritySection.UsernameIsEmail
+        {
+            get { return UsernameIsEmail; }
         }
 
         string ISecuritySection.AuthCookieName

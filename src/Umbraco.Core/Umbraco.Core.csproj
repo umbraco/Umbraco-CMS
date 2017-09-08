@@ -348,14 +348,17 @@
     <Compile Include="Deploy\Direction.cs" />
     <Compile Include="Deploy\IFileType.cs" />
     <Compile Include="Deploy\IFileTypeCollection.cs" />
+    <Compile Include="EmailSender.cs" />
     <Compile Include="Events\EventDefinitionFilter.cs" />
     <Compile Include="Events\IDeletingMediaFilesEventArgs.cs" />
     <Compile Include="Events\ScopeEventDispatcherBase.cs" />
     <Compile Include="Events\ScopeLifespanMessagesFactory.cs" />
+    <Compile Include="Events\SendEmailEventArgs.cs" />
     <Compile Include="Events\SupersedeEventAttribute.cs" />
     <Compile Include="Exceptions\ConnectionException.cs" />
     <Compile Include="HashCodeHelper.cs" />
     <Compile Include="HashGenerator.cs" />
+    <Compile Include="IEmailSender.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\EntityBase\EntityPath.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
@@ -527,6 +530,7 @@
     <Compile Include="Persistence\Factories\TaskFactory.cs" />
     <Compile Include="Persistence\Factories\TaskTypeFactory.cs" />
     <Compile Include="Persistence\Factories\UserGroupFactory.cs" />
+    <Compile Include="Persistence\LocalDb.cs" />
     <Compile Include="Persistence\LockedRepository.cs" />
     <Compile Include="Persistence\LockingRepository.cs" />
     <Compile Include="Persistence\Mappers\AccessMapper.cs" />
@@ -688,6 +692,7 @@
     <Compile Include="Security\EmailService.cs" />
     <Compile Include="Security\MembershipProviderPasswordValidator.cs" />
     <Compile Include="Security\OwinExtensions.cs" />
+    <Compile Include="Security\UmbracoEmailMessage.cs" />
     <Compile Include="Security\UserAwareMembershipProviderPasswordHasher.cs" />
     <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="Serialization\NoTypeConverterJsonConverter.cs" />

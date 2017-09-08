@@ -98,8 +98,8 @@ namespace Umbraco.Web.Editors
                     _logger.Warn<PasswordChanger>(string.Format("Could not reset user password {0}", errors));
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not reset password, errors: " + errors, new[] { "resetPassword" }) });
                 }
-
-                return Attempt.Succeed(new PasswordChangedModel { ResetPassword = newPass });
+                
+                return Attempt.Succeed(new PasswordChangedModel());
             }
 
             //we're not resetting it so we need to try to change it.

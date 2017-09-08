@@ -438,7 +438,24 @@ namespace Umbraco.Core.Persistence.Repositories
             nodeDto.Path = parent.Path;
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
-            var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
+
+            // note:
+            // there used to be a check on Database.IsNew(nodeDto) here to either Insert or Update,
+            // but I cannot figure out what was the point, as the node should obviously be new if
+            // we reach that point - removed.
+
+            // see if there's a reserved identifier for this unique id
+            var sql = new Sql("SELECT id FROM umbracoNode WHERE uniqueID=@0 AND nodeObjectType=@1", nodeDto.UniqueId, Constants.ObjectTypes.IdReservationGuid);
+            var id = Database.ExecuteScalar<int>(sql);
+            if (id > 0)
+            {
+                nodeDto.NodeId = id;
+                Database.Update(nodeDto);
+            }
+            else
+            {
+                Database.Insert(nodeDto);
+            }
 
             //Update with new correct path
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);

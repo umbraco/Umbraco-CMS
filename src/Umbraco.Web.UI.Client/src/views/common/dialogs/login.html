@@ -13,7 +13,9 @@
       <form name="inviteUserPasswordForm" novalidate="" ng-submit="inviteSavePassword()" val-form-manager>
         <div class="form" ng-if="inviteStep === 1">
           <h1 style="margin-bottom: 10px; text-align: left;">Hi, {{invitedUser.name}}</h1>
-          <p style="line-height: 1.6; margin-bottom: 25px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non libero vel turpis ultrices pharetra.</p>
+          <p style="line-height: 1.6; margin-bottom: 25px;">
+              <localize key="user_inviteWelcomeMessage">Welcome to Umbraco! Just need to get your password and avatar setup and then you're good to go</localize>
+          </p>
 
           <div class="control-group" ng-class="{error: setPasswordForm.password.$invalid}">
             <label>

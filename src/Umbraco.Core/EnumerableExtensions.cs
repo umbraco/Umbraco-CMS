@@ -298,5 +298,16 @@ namespace Umbraco.Core
             return list1Groups.Count == list2Groups.Count
                && list1Groups.All(g => g.Count() == list2Groups[g.Key].Count());
         }
+
+        public static IEnumerable<T> SkipLast<T>(this IEnumerable<T> source)
+        {
+            using (var e = source.GetEnumerator())
+            {
+                if (e.MoveNext() == false) yield break;
+
+                for (var value = e.Current; e.MoveNext(); value = e.Current)
+                    yield return value;
+            }
+        }
     }
 }

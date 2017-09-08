@@ -684,7 +684,17 @@ namespace Umbraco.Core.Services
                 // get query - if the id is System Root, then just get all
                 var query = Query<IContent>.Builder;
                 if (id != Constants.System.Root)
-                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
+                {
+                    var entityRepository = RepositoryFactory.CreateEntityRepository(uow);
+                    var contentPath = entityRepository.GetAllPaths(Constants.ObjectTypes.DocumentGuid, id).ToArray();
+                    if (contentPath.Length == 0)
+                    {
+                        totalChildren = 0;
+                        return Enumerable.Empty<IContent>();
+                    }
+                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", contentPath[0]), TextColumnType.NVarchar));
+                }
+                    
 
                 // get filter
                 IQuery<IContent> filterQuery = null;
@@ -719,7 +729,16 @@ namespace Umbraco.Core.Services
                 // get query - if the id is System Root, then just get all
                 var query = Query<IContent>.Builder;
                 if (id != Constants.System.Root)
-                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
+                {
+                    var entityRepository = RepositoryFactory.CreateEntityRepository(uow);
+                    var contentPath = entityRepository.GetAllPaths(Constants.ObjectTypes.DocumentGuid, id).ToArray();
+                    if (contentPath.Length == 0)
+                    {
+                        totalChildren = 0;
+                        return Enumerable.Empty<IContent>();
+                    }
+                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", contentPath[0]), TextColumnType.NVarchar));
+                }
 
                 return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
             }
@@ -942,15 +961,30 @@ namespace Umbraco.Core.Services
         /// <returns>True if the Content can be published, otherwise False</returns>
         public bool IsPublishable(IContent content)
         {
-            //If the passed in content has yet to be saved we "fallback" to checking the Parent
-            //because if the Parent is publishable then the current content can be Saved and Published
-            if (content.HasIdentity == false)
-            {
-                var parent = GetById(content.ParentId);
-                return IsPublishable(parent, true);
-            }
+            // get ids from path
+            // skip the first one that has to be -1 - and we don't care
+            // skip the last one that has to be "this" - and it's ok to stop at the parent
+            var ids = content.Path.Split(',').Skip(1).SkipLast().Select(int.Parse).ToArray();
+            if (ids.Length == 0)
+                return false;
 
-            return IsPublishable(content, false);
+            // if the first one is recycle bin, fail fast
+            if (ids[0] == Constants.System.RecycleBinContent)
+                return false;
+
+            // fixme - move to repository?
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var sql = new Sql(@"
+                    SELECT id 
+                    FROM umbracoNode
+                    JOIN cmsDocument ON umbracoNode.id=cmsDocument.nodeId AND cmsDocument.published=@0
+                    WHERE umbracoNode.trashed=@1 AND umbracoNode.id IN (@2)",
+                    true, false, ids);
+                Console.WriteLine(sql.SQL);
+                var x = uow.Database.Fetch<int>(sql);
+                return ids.Length == x.Count;
+            }
         }
 
         /// <summary>
@@ -1101,7 +1135,7 @@ namespace Umbraco.Core.Services
                         descendant.WriterId = userId;
                         descendant.ChangeTrashedState(true, descendant.ParentId);
                         repository.AddOrUpdate(descendant);
-                        
+
                         moveInfo.Add(new MoveEventInfo<IContent>(descendant, descendant.Path, descendant.ParentId));
                     }
 
@@ -1667,7 +1701,7 @@ namespace Umbraco.Core.Services
         {
             using (new WriteLock(Locker))
             {
-                var nodeObjectType = new Guid(Constants.ObjectTypes.Document);
+                var nodeObjectType = Constants.ObjectTypes.DocumentGuid;
 
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
@@ -2468,40 +2502,6 @@ namespace Umbraco.Core.Services
 
                 return OperationStatus.Success(evtMsgs);
             }
-        }
-
-        /// <summary>
-        /// Checks if the passed in <see cref="IContent"/> can be published based on the anscestors publish state.
-        /// </summary>
-        /// <remarks>
-        /// Check current is only used when falling back to checking the Parent of non-saved content, as
-        /// non-saved content doesn't have a valid path yet.
-        /// </remarks>
-        /// <param name="content"><see cref="IContent"/> to check if anscestors are published</param>
-        /// <param name="checkCurrent">Boolean indicating whether the passed in content should also be checked for published versions</param>
-        /// <returns>True if the Content can be published, otherwise False</returns>
-        private bool IsPublishable(IContent content, bool checkCurrent)
-        {
-            var ids = content.Path.Split(',').Select(int.Parse).ToList();
-            foreach (var id in ids)
-            {
-                //If Id equals that of the recycle bin we return false because nothing in the bin can be published
-                if (id == Constants.System.RecycleBinContent)
-                    return false;
-
-                //We don't check the System Root, so just continue
-                if (id == Constants.System.Root) continue;
-
-                //If the current id equals that of the passed in content and if current shouldn't be checked we skip it.
-                if (checkCurrent == false && id == content.Id) continue;
-
-                //Check if the content for the current id is published - escape the loop if we encounter content that isn't published
-                var hasPublishedVersion = HasPublishedVersion(id);
-                if (hasPublishedVersion == false)
-                    return false;
-            }
-
-            return true;
         }
 
         private PublishStatusType CheckAndLogIsPublishable(IContent content)

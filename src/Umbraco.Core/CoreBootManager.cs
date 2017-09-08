@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using AutoMapper;
@@ -398,6 +399,28 @@ namespace Umbraco.Core
         {
             if (ApplicationContext.IsConfigured == false) return;
             if (ApplicationContext.DatabaseContext.IsDatabaseConfigured == false) return;
+
+            // deal with localdb
+            var databaseContext = ApplicationContext.DatabaseContext;
+            var localdbex = new Regex(@"\(localdb\)\\([a-zA-Z0-9-_]+)(;|$)");
+            var m = localdbex.Match(databaseContext.ConnectionString);
+            if (m.Success)
+            {
+                var instanceName = m.Groups[1].Value;
+                ProfilingLogger.Logger.Info<CoreBootManager>(string.Format("LocalDb instance \"{0}\"", instanceName));
+
+                var localDb = new LocalDb();
+                if (localDb.IsAvailable == false)
+                    throw new UmbracoStartupFailedException("Umbraco cannot start. LocalDb is not available.");
+
+                if (localDb.InstanceExists(m.Groups[1].Value) == false)
+                {
+                    if (localDb.CreateInstance(instanceName) == false)
+                        throw new UmbracoStartupFailedException(string.Format("Umbraco cannot start. LocalDb cannot create instance \"{0}\".", instanceName));
+                    if (localDb.StartInstance(instanceName) == false)
+                        throw new UmbracoStartupFailedException(string.Format("Umbraco cannot start. LocalDb cannot start instance \"{0}\".", instanceName));
+                }
+            }
 
             //try now
             if (ApplicationContext.DatabaseContext.CanConnect)
