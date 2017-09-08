@@ -162,11 +162,16 @@
 
   <Target Name="CopyBelleBuild" DependsOnTargets="CopyLibraries" >
     <ItemGroup>
-      <BelleFiles Include="..\src\Umbraco.Web.UI.Client\build\belle\**\*.*" Exclude="..\src\Umbraco.Web.UI.Client\build\belle\index.html" />
+      <BelleFiles Include="..\src\Umbraco.Web.UI\Umbraco\js\**\*.*" />
+	  <BelleLibFiles Include="..\src\Umbraco.Web.UI\Umbraco\lib\**\*.*" />
     </ItemGroup>
 
     <Copy SourceFiles="@(BelleFiles)"
-          DestinationFiles="@(BelleFiles->'$(WebAppFolder)umbraco\%(RecursiveDir)%(Filename)%(Extension)')"
+          DestinationFiles="@(BelleFiles->'$(WebAppFolder)umbraco\js\%(RecursiveDir)%(Filename)%(Extension)')"
+          OverwriteReadOnlyFiles="true"
+          SkipUnchangedFiles="false" />
+    <Copy SourceFiles="@(BelleLibFiles)"
+          DestinationFiles="@(BelleLibFiles->'$(WebAppFolder)umbraco\lib\%(RecursiveDir)%(Filename)%(Extension)')"
           OverwriteReadOnlyFiles="true"
           SkipUnchangedFiles="false" />
   </Target>
