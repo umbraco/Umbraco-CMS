@@ -403,6 +403,7 @@
     <Compile Include="PropertyEditors\MemberPicker2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultiNodeTreePicker2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\RelatedLinks2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\TextOnlyValueEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ContentPickerPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleContentPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropDataSetConverter.cs" />
@@ -434,8 +435,8 @@
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
     <Compile Include="Security\Identity\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="SingletonHttpContextAccessor.cs" />
+    <Compile Include="Suspendable.cs" />
     <Compile Include="Trees\ContentTypeTreeController.cs" />
-    <Compile Include="Trees\FileSystemTreeController.cs" />
     <Compile Include="Trees\PackagesTreeController.cs" />
     <Compile Include="Trees\MediaTypeTreeController.cs" />
     <Compile Include="Trees\MemberTypeTreeController.cs" />
@@ -713,7 +714,7 @@
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
-    <Compile Include="Trees\FileSystemTreeController2.cs" />
+    <Compile Include="Trees\FileSystemTreeController.cs" />
     <Compile Include="Trees\LanguageTreeController.cs" />
     <Compile Include="Trees\LegacyBaseTreeAttribute.cs" />
     <Compile Include="Trees\MemberTreeController.cs" />

@@ -28,13 +28,13 @@
     font-size: @fontSizeLarge;
     color: @black;
     font-weight: bold;
-
     margin: 7px 0;
 }
 
 .umb-overlay .umb-overlay__subtitle {
     font-size: @fontSizeSmall;
     color: @gray-3;
+    margin: 0;
 }
 
 .umb-overlay .umb-overlay-container {
@@ -155,7 +155,7 @@
 @media (max-width: 500px) {
     .umb-overlay.umb-overlay-left {
         margin-left: 41px;
-        width: ~"(calc(~'100%' - ~'41px'))";
+        width: calc(100% - 41px);
     }
 }
 

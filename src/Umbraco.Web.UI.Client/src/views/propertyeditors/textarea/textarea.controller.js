@@ -1,4 +1,15 @@
-function textAreaController($rootScope, $scope, $log) {
+function textAreaController($scope) {
+
+    // macro parameter editor doesn't contains a config object,
+    // so we create a new one to hold any properties 
+    if (!$scope.model.config) {
+        $scope.model.config = {};
+    }
+
+    if (!$scope.model.config.maxChars) {
+        $scope.model.config.maxChars = false;
+    }
+
     $scope.model.maxlength = false;
     if($scope.model.config.maxChars) {
         $scope.model.maxlength = true;

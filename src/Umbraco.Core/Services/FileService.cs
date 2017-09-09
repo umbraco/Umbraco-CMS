@@ -70,7 +70,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(SavingStylesheet, this, new SaveEventArgs<Stylesheet>(stylesheet)))
+                var saveEventArgs = new SaveEventArgs<Stylesheet>(stylesheet);
+                if (uow.Events.DispatchCancelable(SavingStylesheet, this, saveEventArgs))
                 {
                     uow.Commit();
                     return;
@@ -78,8 +79,8 @@ namespace Umbraco.Core.Services
 
                 var repository = RepositoryFactory.CreateStylesheetRepository(uow);
                 repository.AddOrUpdate(stylesheet);
-
-                uow.Events.Dispatch(SavedStylesheet, this, new SaveEventArgs<Stylesheet>(stylesheet, false));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(SavedStylesheet, this, saveEventArgs);
 
                 Audit(uow, AuditType.Save, "Save Stylesheet performed by user", userId, -1);
                 uow.Commit();
@@ -103,15 +104,16 @@ namespace Umbraco.Core.Services
                     return;
                 }
 
-                if (uow.Events.DispatchCancelable(DeletingStylesheet, this, new DeleteEventArgs<Stylesheet>(stylesheet)))
+                var deleteEventArgs = new DeleteEventArgs<Stylesheet>(stylesheet);
+                if (uow.Events.DispatchCancelable(DeletingStylesheet, this, deleteEventArgs))
                 {
                     uow.Commit();
                     return;
                 }
 
                 repository.Delete(stylesheet);
-
-                uow.Events.Dispatch(DeletedStylesheet, this, new DeleteEventArgs<Stylesheet>(stylesheet, false));
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(DeletedStylesheet, this, deleteEventArgs);
 
                 Audit(uow, AuditType.Delete, string.Format("Delete Stylesheet performed by user"), userId, -1);
                 uow.Commit();
@@ -171,7 +173,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(SavingScript, this, new SaveEventArgs<Script>(script)))
+                var saveEventArgs = new SaveEventArgs<Script>(script);
+                if (uow.Events.DispatchCancelable(SavingScript, this, saveEventArgs))
                 {
                     uow.Commit();
                     return;
@@ -179,8 +182,8 @@ namespace Umbraco.Core.Services
 
                 var repository = RepositoryFactory.CreateScriptRepository(uow);
                 repository.AddOrUpdate(script);
-
-                uow.Events.Dispatch(SavedScript, this, new SaveEventArgs<Script>(script, false));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(SavedScript, this, saveEventArgs);
 
                 Audit(uow, AuditType.Save, "Save Script performed by user", userId, -1);
                 uow.Commit();
@@ -204,15 +207,16 @@ namespace Umbraco.Core.Services
                     return;
                 }
 
-                if (uow.Events.DispatchCancelable(DeletingScript, this, new DeleteEventArgs<Script>(script)))
+                var deleteEventArgs = new DeleteEventArgs<Script>(script);
+                if (uow.Events.DispatchCancelable(DeletingScript, this, deleteEventArgs))
                 {
                     uow.Commit();
                     return;
                 }
 
                 repository.Delete(script);
-
-                uow.Events.Dispatch(DeletedScript, this, new DeleteEventArgs<Script>(script, false));
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(DeletedScript, this, deleteEventArgs);
 
                 Audit(uow, AuditType.Delete, string.Format("Delete Script performed by user"), userId, -1);
                 uow.Commit();
@@ -289,7 +293,8 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(SavingTemplate, this, new SaveEventArgs<ITemplate>(template, true, evtMsgs, additionalData)))
+                var saveEventArgs = new SaveEventArgs<ITemplate>(template, true, evtMsgs, additionalData);
+                if (uow.Events.DispatchCancelable(SavingTemplate, this, saveEventArgs))
                 {
                     uow.Commit();
                     return Attempt.Fail(new OperationStatus<ITemplate, OperationStatusType>(template, OperationStatusType.FailedCancelledByEvent, evtMsgs));
@@ -297,8 +302,8 @@ namespace Umbraco.Core.Services
 
                 var repository = RepositoryFactory.CreateTemplateRepository(uow);
                 repository.AddOrUpdate(template);
-
-                uow.Events.Dispatch(SavedTemplate, this, new SaveEventArgs<ITemplate>(template, false, evtMsgs));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(SavedTemplate, this, saveEventArgs);
 
                 Audit(uow, AuditType.Save, "Save Template performed by user", userId, template.Id);
                 uow.Commit();
@@ -564,16 +569,19 @@ namespace Umbraco.Core.Services
             {
                 var repository = RepositoryFactory.CreateTemplateRepository(uow);
 
-                if (uow.Events.DispatchCancelable(DeletingTemplate, this, new DeleteEventArgs<ITemplate>(template)))
+                var args = new DeleteEventArgs<ITemplate>(template);
+                
+                if (uow.Events.DispatchCancelable(DeletingTemplate, this, args))
                 {
                     uow.Commit();
                     return;
                 }
-
+                
                 repository.Delete(template);
 
-                uow.Events.Dispatch(DeletedTemplate, this, new DeleteEventArgs<ITemplate>(template, false));
-
+                args.CanCancel = false;
+                uow.Events.Dispatch(DeletedTemplate, this, args);
+                
                 Audit(uow, AuditType.Delete, "Delete Template performed by user", userId, template.Id);
                 uow.Commit();
             }
@@ -898,10 +906,11 @@ namespace Umbraco.Core.Services
 
         private Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, PartialViewType partialViewType, string snippetName = null, int userId = 0)
         {
+            var newEventArgs = new NewEventArgs<IPartialView>(partialView, true, partialView.Alias, -1);
             using (var scope = UowProvider.ScopeProvider.CreateScope())
             {
-                scope.Complete(); // always
-                if (scope.Events.DispatchCancelable(CreatingPartialView, this, new NewEventArgs<IPartialView>(partialView, true, partialView.Alias, -1)))
+                scope.Complete(); // always                
+                if (scope.Events.DispatchCancelable(CreatingPartialView, this, newEventArgs))
                     return Attempt<IPartialView>.Fail();
             }
 
@@ -915,8 +924,8 @@ namespace Umbraco.Core.Services
             {
                 var repository = GetPartialViewRepository(partialViewType, uow);
                 repository.AddOrUpdate(partialView);
-
-                uow.Events.Dispatch(CreatedPartialView, this, new NewEventArgs<IPartialView>(partialView, false, partialView.Alias, -1));
+                newEventArgs.CanCancel = false;
+                uow.Events.Dispatch(CreatedPartialView, this, newEventArgs);
 
                 Audit(uow, AuditType.Save, string.Format("Save {0} performed by user", partialViewType), userId, -1);
                 uow.Commit();
@@ -947,15 +956,16 @@ namespace Umbraco.Core.Services
                     return false;
                 }
 
-                if (uow.Events.DispatchCancelable(DeletingPartialView, this, new DeleteEventArgs<IPartialView>(partialView)))
+                var deleteEventArgs = new DeleteEventArgs<IPartialView>(partialView);
+                if (uow.Events.DispatchCancelable(DeletingPartialView, this, deleteEventArgs))
                 {
                     uow.Commit();
                     return false;
                 }
 
                 repository.Delete(partialView);
-
-                uow.Events.Dispatch(DeletedPartialView, this, new DeleteEventArgs<IPartialView>(partialView, false));
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(DeletedPartialView, this, deleteEventArgs);
 
                 Audit(uow, AuditType.Delete, string.Format("Delete {0} performed by user", partialViewType), userId, -1);
                 uow.Commit();
@@ -979,7 +989,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(SavingPartialView, this, new SaveEventArgs<IPartialView>(partialView)))
+                var saveEventArgs = new SaveEventArgs<IPartialView>(partialView);
+                if (uow.Events.DispatchCancelable(SavingPartialView, this, saveEventArgs))
                 {
                     uow.Commit();
                     return Attempt<IPartialView>.Fail();
@@ -987,8 +998,8 @@ namespace Umbraco.Core.Services
 
                 var repository = GetPartialViewRepository(partialViewType, uow);
                 repository.AddOrUpdate(partialView);
-
-                uow.Events.Dispatch(SavedPartialView, this, new SaveEventArgs<IPartialView>(partialView, false));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(SavedPartialView, this, saveEventArgs);
 
                 Audit(uow, AuditType.Save, string.Format("Save {0} performed by user", partialViewType), userId, -1);
                 uow.Commit();

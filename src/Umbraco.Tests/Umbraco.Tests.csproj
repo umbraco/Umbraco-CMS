@@ -164,8 +164,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\CacheRefresherEventHandlerTests.cs" />
+    <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
     <Compile Include="Dependencies\NuGet.cs" />
     <Compile Include="CallContextTests.cs" />
+    <Compile Include="HashGeneratorTests.cs" />
     <Compile Include="Issues\U9560.cs" />
     <Compile Include="Collections\OrderedHashSetTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
@@ -211,6 +213,8 @@
     <Compile Include="Collections\DeepCloneableListTests.cs" />
     <Compile Include="Web\Controllers\BackOfficeControllerUnitTests.cs" />
     <Compile Include="DelegateExtensionsTests.cs" />
+    <Compile Include="Web\HttpCookieExtensionsTests.cs" />
+    <Compile Include="Web\Mvc\HtmlStringUtilitiesTests.cs" />
     <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />

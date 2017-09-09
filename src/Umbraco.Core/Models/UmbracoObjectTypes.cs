@@ -185,6 +185,13 @@ namespace Umbraco.Core.Models
         /// </summary>
         [UmbracoObjectType(Constants.ObjectTypes.Language)]
         [FriendlyName("Language")]
-        Language
+        Language,
+
+        /// <summary>
+        /// Reserved Identifier
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.IdReservation)]
+        [FriendlyName("Identifier Reservation")]
+        IdReservation
     }
 }

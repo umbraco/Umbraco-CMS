@@ -342,6 +342,7 @@
     <Compile Include="Events\SupersedeEventAttribute.cs" />
     <Compile Include="Exceptions\ConnectionException.cs" />
     <Compile Include="HashCodeHelper.cs" />
+    <Compile Include="HashGenerator.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
     <Compile Include="Models\IUserControl.cs" />
@@ -495,6 +496,7 @@
     <Compile Include="Persistence\Factories\PublicAccessEntryFactory.cs" />
     <Compile Include="Persistence\Factories\TaskFactory.cs" />
     <Compile Include="Persistence\Factories\TaskTypeFactory.cs" />
+    <Compile Include="Persistence\LocalDb.cs" />
     <Compile Include="Persistence\LockedRepository.cs" />
     <Compile Include="Persistence\LockingRepository.cs" />
     <Compile Include="Persistence\Mappers\AccessMapper.cs" />
@@ -586,6 +588,7 @@
     <Compile Include="Persistence\Repositories\MigrationEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepository.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepository.cs" />
+    <Compile Include="Persistence\Repositories\SimilarNodeName.cs" />
     <Compile Include="Persistence\Repositories\UserControlRepository.cs" />
     <Compile Include="Persistence\Repositories\XsltFileRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
@@ -764,7 +767,6 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\AddMissingForeignKeyForContentType.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\AlterDataTypePreValueTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenOneZero\AssignMissingPrimaryForMySqlKeys.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\AddIndexToUmbracoNodeTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\RemoveCmsDocumentAliasColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AssignMissingKeysAndIndexes.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\AssignMissingPrimaryForMySqlKeys.cs" />
@@ -1188,7 +1190,6 @@
     <Compile Include="Persistence\Repositories\RepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\ScriptRepository.cs" />
     <Compile Include="Persistence\Repositories\ServerRegistrationRepository.cs" />
-    <Compile Include="Persistence\Repositories\SimilarNodeNameComparer.cs" />
     <Compile Include="Persistence\Repositories\StylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\TemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\UserRepository.cs" />

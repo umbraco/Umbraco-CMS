@@ -48,11 +48,11 @@ namespace Umbraco.Web.Security
             IEnumerable<string> allowGroups = null,
             IEnumerable<int> allowMembers = null)
         {
-            if (HttpContext.Current == null || ApplicationContext.Current == null)
+            if (UmbracoContext.Current == null)
             {
                 return false;
             }
-            var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
+            var helper = new MembershipHelper(UmbracoContext.Current);
             return helper.IsMemberAuthorized(allowAll, allowTypes, allowGroups, allowMembers);
         }
 

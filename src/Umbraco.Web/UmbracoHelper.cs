@@ -433,7 +433,7 @@ namespace Umbraco.Web
         /// <returns>True if the document object is protected</returns>
         public bool IsProtected(string path)
         {
-            return UmbracoContext.Application.Services.PublicAccessService.IsProtected(path);
+            return MembershipHelper.IsProtected(path);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -450,25 +450,7 @@ namespace Umbraco.Web
         /// <returns>True if the current user has access or if the current document isn't protected</returns>
         public bool MemberHasAccess(string path)
         {
-            if (IsProtected(path))
-            {
-                return MembershipHelper.IsLoggedIn()
-                       && UmbracoContext.Application.Services.PublicAccessService.HasAccess(path, GetCurrentMember(), Roles.Provider);
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Gets (or adds) the current member from the current request cache
-        /// </summary>
-        private MembershipUser GetCurrentMember()
-        {
-            return UmbracoContext.Application.ApplicationCache.RequestCache
-                .GetCacheItem<MembershipUser>("UmbracoHelper.GetCurrentMember", () =>
-                {
-                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-                    return provider.GetCurrentUser();
-                });
+            return MembershipHelper.MemberHasAccess(path);
         }
 
 		/// <summary>

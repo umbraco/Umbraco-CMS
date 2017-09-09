@@ -412,7 +412,8 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateRelationRepository(uow);
-                if (uow.Events.DispatchCancelable(SavingRelation, this, new SaveEventArgs<IRelation>(relation)))
+                var saveEventArgs = new SaveEventArgs<IRelation>(relation);
+                if (uow.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
                 {
                     uow.Commit();
                     return relation;
@@ -420,7 +421,8 @@ namespace Umbraco.Core.Services
 
                 repository.AddOrUpdate(relation);
                 uow.Commit();
-                uow.Events.Dispatch(SavedRelation, this, new SaveEventArgs<IRelation>(relation, false));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(SavedRelation, this, saveEventArgs);
                 return relation;
             }
         }
@@ -442,7 +444,8 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(SavingRelation, this, new SaveEventArgs<IRelation>(relation)))
+                var saveEventArgs = new SaveEventArgs<IRelation>(relation);
+                if (uow.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
                 {
                     uow.Commit();
                     return relation;
@@ -450,8 +453,8 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateRelationRepository(uow);
                 repository.AddOrUpdate(relation);
                 uow.Commit();
-
-                uow.Events.Dispatch(SavedRelation, this, new SaveEventArgs<IRelation>(relation, false));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(SavedRelation, this, saveEventArgs);
                 return relation;
             }
         }
@@ -568,7 +571,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(SavingRelation, this, new SaveEventArgs<IRelation>(relation)))
+                var saveEventArgs = new SaveEventArgs<IRelation>(relation);
+                if (uow.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
                 {
                     uow.Commit();
                     return;
@@ -576,7 +580,8 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateRelationRepository(uow);
                 repository.AddOrUpdate(relation);
                 uow.Commit();
-                uow.Events.Dispatch(SavedRelation, this, new SaveEventArgs<IRelation>(relation, false));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(SavedRelation, this, saveEventArgs);
             }
         }
 
@@ -588,7 +593,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(SavingRelationType, this, new SaveEventArgs<IRelationType>(relationType)))
+                var saveEventArgs = new SaveEventArgs<IRelationType>(relationType);
+                if (uow.Events.DispatchCancelable(SavingRelationType, this, saveEventArgs))
                 {
                     uow.Commit();
                     return;
@@ -596,7 +602,8 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateRelationTypeRepository(uow);
                 repository.AddOrUpdate(relationType);
                 uow.Commit();
-                uow.Events.Dispatch(SavedRelationType, this, new SaveEventArgs<IRelationType>(relationType, false));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(SavedRelationType, this, saveEventArgs);
             }
         }
 
@@ -608,7 +615,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(DeletingRelation, this, new DeleteEventArgs<IRelation>(relation)))
+                var deleteEventArgs = new DeleteEventArgs<IRelation>(relation);
+                if (uow.Events.DispatchCancelable(DeletingRelation, this, deleteEventArgs))
                 {
                     uow.Commit();
                     return;
@@ -616,7 +624,8 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateRelationRepository(uow);
                 repository.Delete(relation);
                 uow.Commit();
-                uow.Events.Dispatch(DeletedRelation, this, new DeleteEventArgs<IRelation>(relation, false));
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(DeletedRelation, this, deleteEventArgs);
             }
         }
 
@@ -628,7 +637,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(DeletingRelationType, this, new DeleteEventArgs<IRelationType>(relationType)))
+                var deleteEventArgs = new DeleteEventArgs<IRelationType>(relationType);
+                if (uow.Events.DispatchCancelable(DeletingRelationType, this, deleteEventArgs))
                 {
                     uow.Commit();
                     return;
@@ -636,7 +646,8 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateRelationTypeRepository(uow);
                 repository.Delete(relationType);
                 uow.Commit();
-                uow.Events.Dispatch(DeletedRelationType, this, new DeleteEventArgs<IRelationType>(relationType, false));
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(DeletedRelationType, this, deleteEventArgs);
             }
         }
 
