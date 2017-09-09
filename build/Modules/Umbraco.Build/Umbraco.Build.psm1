@@ -46,7 +46,6 @@ function Prepare-Build
   # clear
   Write-Host "Clear folders and files"
 
-  Remove-Directory "$src\Umbraco.Web.UI.Client\build"
   Remove-Directory "$src\Umbraco.Web.UI.Client\bower_components"
 
   if (-not $keep)
@@ -130,12 +129,22 @@ function Compile-Belle
   Sandbox-Node $uenv
   
   push-location "$($uenv.SolutionRoot)\src\Umbraco.Web.UI.Client"
-  write "" > $tmp\belle.log
-  &npm cache clean --quiet >> $tmp\belle.log 2>&1
-  &npm install --quiet >> $tmp\belle.log 2>&1
-  &npm install -g grunt-cli --quiet >> $tmp\belle.log 2>&1
-  &npm install -g bower --quiet >> $tmp\belle.log 2>&1
-  &grunt build --buildversion=$version.Release >> $tmp\belle.log 2>&1
+  write "node version is:" > $tmp\belle.log
+  &node -v >> $tmp\belle.log 2>&1
+  write "npm version is:" >> $tmp\belle.log 2>&1
+  &npm -v >> $tmp\belle.log 2>&1
+  write "cleaning npm cache" >> $tmp\belle.log 2>&1
+  &npm cache clean >> $tmp\belle.log 2>&1
+  write "installing bower" >> $tmp\belle.log 2>&1
+  &npm install -g bower >> $tmp\belle.log 2>&1
+  write "installing gulp" >> $tmp\belle.log 2>&1
+  &npm install -g gulp >> $tmp\belle.log 2>&1
+  write "installing gulp-cli" >> $tmp\belle.log 2>&1
+  &npm install -g gulp-cli --quiet >> $tmp\belle.log 2>&1
+  write "executing npm install" >> $tmp\belle.log 2>&1
+  &npm install >> $tmp\belle.log 2>&1
+  write "executing gulp but for version $version" >> $tmp\belle.log 2>&1
+  &gulp build --buildversion=$version.Release >> $tmp\belle.log 2>&1
   pop-location
   
   # fixme - should we filter the log to find errors?
@@ -349,8 +358,11 @@ function Prepare-Packages
           
   # copy Belle
   Write-Host "Copy Belle"
-  Copy-Files "$src\Umbraco.Web.UI.Client\build\belle" "*" "$tmp\WebApp\umbraco" `
-    { -not ($_.RelativeName -eq "index.html") }
+  Copy-Files "$src\Umbraco.Web.UI\umbraco\assets" "*" "$tmp\WebApp\umbraco\assets"
+  Copy-Files "$src\Umbraco.Web.UI\umbraco\js" "*" "$tmp\WebApp\umbraco\js"
+  Copy-Files "$src\Umbraco.Web.UI\umbraco\lib" "*" "$tmp\WebApp\umbraco\lib"
+  Copy-Files "$src\Umbraco.Web.UI\umbraco\views" "*" "$tmp\WebApp\umbraco\views"
+  Copy-Files "$src\Umbraco.Web.UI\umbraco\preview" "*" "$tmp\WebApp\umbraco\preview"
 
   # prepare WebPI
   Write-Host "Prepare WebPI"
