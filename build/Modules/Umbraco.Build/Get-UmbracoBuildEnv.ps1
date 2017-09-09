@@ -143,7 +143,7 @@ function Get-UmbracoBuildEnv
     $vsMajor = [int]::Parse($vsVerParts[0])
     $vsMinor = [int]::Parse($vsVerParts[1])
     if ($vsMajor -eq 15) {
-      $msBuild = "$vsPath\MSBuild\$vsMajor.$vsMinor\Bin"
+      $msBuild = "$vsPath\MSBuild\$vsMajor.0\Bin"
     }
     elseif ($vsMajor -eq 14) {
       $msBuild = "c:\Program Files (x86)\MSBuild\$vsMajor\Bin"
