@@ -189,7 +189,8 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            return Mapper.Map<IUser, UserDisplay>(user);
+            var result = Mapper.Map<IUser, UserDisplay>(user);
+            return result;
         }
 
         /// <summary>

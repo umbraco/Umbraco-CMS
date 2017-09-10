@@ -169,10 +169,10 @@ angular.module("umbraco")
            $scope.showPasswordFields = !$scope.showPasswordFields;
         }
 
-        function clearPasswordFields() {
+        function clearPasswordFields() { 
            $scope.changePasswordModel.value.oldPassword = "";
            $scope.changePasswordModel.value.newPassword = "";
            $scope.changePasswordModel.value.confirm = "";
         }
-
+         
     });

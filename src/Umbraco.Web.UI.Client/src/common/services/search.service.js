@@ -44,7 +44,7 @@ angular.module('umbraco.services')
 
                 return entityResource.search(args.term, "Member", args.searchFrom).then(function (data) {
                     _.each(data, function (item) {
-                        configureMemberResult(item);
+                        searchResultFormatter.configureMemberResult(item);
                     });
                     return data;
                 });
@@ -69,7 +69,7 @@ angular.module('umbraco.services')
 
                 return entityResource.search(args.term, "Document", args.searchFrom, args.canceler).then(function (data) {
                     _.each(data, function (item) {
-                        configureContentResult(item);
+                        searchResultFormatter.configureContentResult(item);
                     });
                     return data;
                 });
@@ -94,7 +94,7 @@ angular.module('umbraco.services')
 
                 return entityResource.search(args.term, "Media", args.searchFrom).then(function (data) {
                     _.each(data, function (item) {
-                        configureMediaResult(item);
+                        searchResultFormatter.configureMediaResult(item);
                     });
                     return data;
                 });
