@@ -16,9 +16,24 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
+        [ConfigurationProperty("mediaSearchFields")]
+        internal CommaDelimitedConfigurationElement MediaSearchFields
+        {
+            get
+            {
+                return GetOptionalDelimitedElement("mediaSearchFields", Enumerable.Empty<string>().ToArray());
+
+            }
+        }
+
         IEnumerable<string> IInternalSearchFieldsToSearchSection.ContentSearchFields
         {
             get { return ContentSearchFields; }
+        }
+
+        IEnumerable<string> IInternalSearchFieldsToSearchSection.MediaSearchFields
+        {
+            get { return MediaSearchFields; }
         }
     }
 }

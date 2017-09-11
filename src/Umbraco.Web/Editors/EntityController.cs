@@ -637,6 +637,11 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Media:
                     type = "media";
 
+                    var mediaSearchFieldsSetByUser =
+                        UmbracoConfig.For.UmbracoSettings().InternalSearch.MediaSearchFields;
+
+                    fields = GetAdditionalSearchFields(mediaSearchFieldsSetByUser, fields);
+
                     var mediaSearchFrom = int.MinValue;
 
                     if (Security.CurrentUser.StartMediaId > 0 ||
@@ -653,14 +658,9 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Document:
                     type = "content";
 
-                    var searchFieldsSetByUser = UmbracoConfig.For.UmbracoSettings().InternalSearch.ContentSearchFields;
+                    var contentSearchFieldsSetByUser = UmbracoConfig.For.UmbracoSettings().InternalSearch.ContentSearchFields;
 
-                    if (searchFieldsSetByUser.Any())
-                    {
-                        var tmpList = fields.ToList();
-                        tmpList.AddRange(searchFieldsSetByUser);
-                        fields = tmpList.ToArray();
-                    }
+                    fields = GetAdditionalSearchFields(contentSearchFieldsSetByUser, fields);
 
                     var contentSearchFrom = int.MinValue;
 
@@ -808,6 +808,17 @@ namespace Umbraco.Web.Editors
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);
             }
+        }
+
+        private static string[] GetAdditionalSearchFields(IEnumerable<string> SearchFieldsSetByUser, string[] fields)
+        {
+            if (SearchFieldsSetByUser.Any())
+            {
+                var tmpList = fields.ToList();
+                tmpList.AddRange(SearchFieldsSetByUser);
+                fields = tmpList.ToArray();
+            }
+            return fields;
         }
 
         /// <summary>

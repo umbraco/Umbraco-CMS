@@ -5,5 +5,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
     public interface IInternalSearchFieldsToSearchSection : IUmbracoConfigurationSection
     {
         IEnumerable<string> ContentSearchFields { get; }
+        IEnumerable<string> MediaSearchFields { get; }
     }
 }
