@@ -51,7 +51,7 @@ describe('edit content controller tests', function () {
         
         it('it should have an content object', function() {
             //controller should have a content object
-            expect(scope.content).toNotBe(undefined);
+            expect(scope.content).toBeTruthy();
 
             //if should be the same as the routeParams defined one
             expect(scope.content.id).toBe(1234);
