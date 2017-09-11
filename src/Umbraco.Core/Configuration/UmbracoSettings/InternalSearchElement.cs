@@ -1,16 +1,22 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class InternalSearchElement : UmbracoConfigurationElement, IInternalSearchFieldsToSearchSection
     {
         [ConfigurationProperty("contentSearchFields")]
-        internal InnerTextConfigurationElement<string> ContentSearchFields
+        internal CommaDelimitedConfigurationElement ContentSearchFields
         {
-            get { return GetOptionalTextElement("contentSearchFields", string.Empty);}
+            get
+            {
+                return GetOptionalDelimitedElement("contentSearchFields", Enumerable.Empty<string>().ToArray());
+                
+            }
         }
 
-        string IInternalSearchFieldsToSearchSection.ContentSearchFields
+        IEnumerable<string> IInternalSearchFieldsToSearchSection.ContentSearchFields
         {
             get { return ContentSearchFields; }
         }

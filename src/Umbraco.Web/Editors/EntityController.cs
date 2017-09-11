@@ -653,11 +653,13 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Document:
                     type = "content";
 
-                    var searchFieldsSetByUser = UmbracoConfig.For.UmbracoSettings().InternalSearch.ContentSearchFields.Split(',');
+                    var searchFieldsSetByUser = UmbracoConfig.For.UmbracoSettings().InternalSearch.ContentSearchFields;
 
                     if (searchFieldsSetByUser.Any())
                     {
-                        fields.ToList().AddRange(searchFieldsSetByUser);
+                        var tmpList = fields.ToList();
+                        tmpList.AddRange(searchFieldsSetByUser);
+                        fields = tmpList.ToArray();
                     }
 
                     var contentSearchFrom = int.MinValue;

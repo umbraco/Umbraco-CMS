@@ -9,7 +9,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void Content_Fields_To_Search_Set()
         {
-            int contentFieldCount = SettingsSection.InternalSearch.ContentSearchFields.Split(new char[] {','}).Length;
+            int contentFieldCount = SettingsSection.InternalSearch.ContentSearchFields.Count();
 
             Assert.AreEqual(2,contentFieldCount);
 
