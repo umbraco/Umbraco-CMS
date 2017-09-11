@@ -149,14 +149,10 @@
             <umb-box-header title-key="general_general"></umb-box-header>
             <umb-box-content class="block-form">
                 
-                <umb-control-group label="Created">
+                <umb-control-group label="@template_createdDate">
                     {{node.createDate | amDateFormat:'DD'}} {{ node.createDate | amDateFormat:'MMM'}} {{ node.createDate | amDateFormat:'YYYY'}}, {{node.createDate | amDateFormat:'h:mmA'}} by {{ node.owner.name }}
                 </umb-control-group>
-            <!-- 
-                <umb-control-group label="Created" description="Date/time this document was created">
-                    Created {{ node.createDate }} by {{ node.owner.name }}
-                </umb-control-group>
-             -->
+
                 <umb-control-group label="@content_documentType">
                     <umb-node-preview
                         icon="documentType.icon"
@@ -165,17 +161,6 @@
                         on-open="openDocumentType(documentType)">
                     </umb-node-preview>
                 </umb-control-group>
-
-            <!--                 
-                <umb-control-group label="@content_documentType" description="Description here">
-                    <umb-node-preview
-                        icon="documentType.icon"
-                        name="documentType.linkText"
-                        allow-open="allowOpen"
-                        on-open="openDocumentType(documentType)">
-                    </umb-node-preview>
-                </umb-control-group>
-            -->
 
                 <umb-control-group label="@template_template">
                     <select

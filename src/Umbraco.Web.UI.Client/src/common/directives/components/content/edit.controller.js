@@ -30,6 +30,8 @@
           unPublish: $scope.unPublish
         }
       });
+
+      // Zsolt do some magic with it. swap around
       $scope.defaultButton = buttons.defaultButton;
       $scope.subButtons = buttons.subButtons;
 
