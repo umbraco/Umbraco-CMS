@@ -908,7 +908,11 @@ namespace Umbraco.Web
             UrlHelper url,
             UmbracoContext umbCtx, string canvasdesignerConfigPath, string canvasdesignerPalettesPath)
         {
-            
+
+            // We temporarily disable the canvas designer
+            var disableMessage = "The Umbraco Canvas Designer is no longer available in v7.7+";
+            return new HtmlString(string.Format("<!-- {0} -->\n<script type='text/JavaScript'>\nconsole.log('{0}');\n</script>", disableMessage));
+
             var umbracoPath = url.Content(SystemDirectories.Umbraco);
 
             string previewLink = @"<script src=""{0}/lib/jquery/jquery.min.js"" type=""text/javascript""></script>" +
