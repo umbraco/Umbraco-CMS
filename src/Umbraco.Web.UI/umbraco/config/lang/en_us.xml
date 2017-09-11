@@ -29,10 +29,10 @@
     <key alias="unpublish">Unpublish</key>
     <key alias="refreshNode">Reload</key>
     <key alias="republish">Republish entire site</key>
+    <key alias="restore" version="7.3.0">Restore</key>
     <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
     <key alias="chooseWhereToMove">Choose where to move</key>
     <key alias="toInTheTreeStructureBelow">In the tree structure below</key>
-    <key alias="restore" version="7.3.0">Restore</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -43,6 +43,7 @@
     <key alias="update">Update</key>
     <key alias="setPermissions">Set permissions</key>
     <key alias="unlock">Unlock</key>
+    <key alias="createblueprint">Create Content Template</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Content</key>

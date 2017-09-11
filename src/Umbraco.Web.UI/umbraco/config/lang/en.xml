@@ -12,9 +12,11 @@
     <key alias="copy">Copy</key>
     <key alias="create">Create</key>
     <key alias="createPackage">Create Package</key>
+    <key alias="createGroup">Create group</key>
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
     <key alias="emptyTrashcan">Empty recycle bin</key>
+    <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
     <key alias="importDocumentType">Import Document Type</key>
     <key alias="importPackage">Import Package</key>
@@ -35,9 +37,12 @@
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
     <key alias="sendToTranslate">Send To Translation</key>
+    <key alias="setGroup">Set group</key>
     <key alias="sort">Sort</key>
     <key alias="translate">Translate</key>
     <key alias="update">Update</key>
+    <key alias="setPermissions">Set permissions</key>
+    <key alias="unlock">Unlock</key>
     <key alias="createblueprint">Create Content Template</key>
   </area>
   <area alias="actionCategories">
