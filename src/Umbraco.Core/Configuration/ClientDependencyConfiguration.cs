@@ -57,7 +57,8 @@ namespace Umbraco.Core.Configuration
         /// <summary>
         /// Clears the temporary files stored for the ClientDependency folder
         /// </summary>
-        internal bool ClearTempFiles()
+        /// <param name="currentHttpContext"></param>
+        internal bool ClearTempFiles(HttpContextBase currentHttpContext)
         {
             var cdfTempDirectories = new HashSet<string>();
             foreach (BaseCompositeFileProcessingProvider provider in ClientDependencySettings.Instance
@@ -69,7 +70,7 @@ namespace Umbraco.Core.Configuration
 
             try
             {
-                var relativePath = HttpContext.Current.Server.MapPath(XmlFileMapper.FileMapVirtualFolder);
+                var relativePath = currentHttpContext.Server.MapPath(XmlFileMapper.FileMapVirtualFolder);
                 if (relativePath != null)
                 {
                     var directoryInfo = new DirectoryInfo(relativePath);
