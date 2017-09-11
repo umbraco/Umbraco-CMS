@@ -92,6 +92,10 @@ namespace Umbraco.Core.Services
                 {
                     var container = repo.Get(id);
 
+                    //throw if null, this will be caught by the catch and a failed returned
+                    if (container == null)
+                        throw new InvalidOperationException("No container found with id " + id);
+
                     container.Name = name;
 
                     repo.AddOrUpdate(container);
