@@ -59,19 +59,19 @@ describe('Content picker controller tests', function () {
         };
 
         it('should define the default properties on construction', function () {
-            expect(scope.model.value).toBeTruthy();            
+            expect(scope.model.value).not.toBeUndefined();            
         });
         
         it("should populate scope.renderModel", function(){
-            expect(scope.renderModel).toBeTruthy();
+            expect(scope.renderModel).not.toBeUndefined();
             expect(scope.renderModel.length).toBe(3);
         });
 
         it("Each rendermodel item should contain name, id and icon", function(){
             var item = scope.renderModel[0];
-            expect(item.name).toBeTruthy();
+            expect(item.name).not.toBeUndefined();
             expect(item.id).toBe(1233);
-            expect(item.icon).toBeTruthy();
+            expect(item.icon).not.toBeUndefined();
         });
 
         it("Removing an item should update renderModel, ids and model.value", function(){

@@ -36,7 +36,7 @@ describe('content factory tests', function () {
             $rootScope.$digest();
             $httpBackend.flush();
 
-            expect(doc).toBeTruthy();
+            expect(doc).not.toBeUndefined();
             expect(doc.id).toBe(1234);   
         });
 
