@@ -46,13 +46,7 @@ src/Umbraco.Web.UI/Web.*.config.transformed
 
 umbraco/presentation/umbraco/plugins/uComponents/uComponentsInstaller.ascx
 umbraco/presentation/packages/uComponents/MultiNodePicker/CustomTreeService.asmx
-_BuildOutput/*
 *.ncrunchsolution
-build/UmbracoCms.AllBinaries*zip
-build/UmbracoCms.WebPI*zip
-build/UmbracoCms*zip
-build/UmbracoExamine.PDF*zip
-build/*.nupkg
 src/Umbraco.Tests/config/applications.config
 src/Umbraco.Tests/config/trees.config
 src/Umbraco.Web.UI/web.config
@@ -68,7 +62,6 @@ src/packages/repositories.config
 
 src/Umbraco.Web.UI/[Ww]eb.config
 *.transformed
-webpihash.txt
 
 node_modules
 lib-bower
@@ -96,7 +89,6 @@ src/Umbraco.Web.UI/[Uu]mbraco/[Aa]ssets/*
 src/Umbraco.Web.UI.Client/[Bb]uild/*
 src/Umbraco.Web.UI.Client/[Bb]uild/[Bb]elle/
 src/Umbraco.Web.UI/[Uu]ser[Cc]ontrols/
-build/_BuildOutput/
 src/Umbraco.Web.UI.Client/src/[Ll]ess/*.css
 tools/NDepend/
 
@@ -131,7 +123,6 @@ src/*.boltdata/
 /src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.config.js
 /src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.front.js
 src/umbraco.sln.ide/*
-build/UmbracoCms.*/
 src/.vs/
 src/Umbraco.Web.UI/umbraco/js/install.loader.js
 src/Umbraco.Tests/media
@@ -141,9 +132,11 @@ apidocs/api/*
 build/docs.zip
 build/ui-docs.zip
 build/csharp-docs.zip
-build/msbuild.log
 .vs/
 src/packages/
-build/tools/
 src/PrecompiledWeb/*
-npm-debug.log
+
+
+build.out/
+build.tmp/
+build/Modules/*/temp/
