@@ -32,9 +32,14 @@
       if ($scope.config.requiresQuestionAnswer === undefined) {
         $scope.config.requiresQuestionAnswer = false;
       }
-      if ($scope.config.enableReset === undefined) {
-        $scope.config.enableReset = true;
+      //don't enable reset if it is new - that doesn't make sense
+      if (isNew === "true") {
+          $scope.config.enableReset = false;
       }
+      else if ($scope.config.enableReset === undefined) {
+        $scope.config.enableReset = true;
+      }      
+        
       if ($scope.config.minPasswordLength === undefined) {
         $scope.config.minPasswordLength = 0;
       }
