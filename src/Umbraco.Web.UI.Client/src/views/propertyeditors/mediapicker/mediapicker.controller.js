@@ -8,12 +8,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         var onlyImages = $scope.model.config.onlyImages && $scope.model.config.onlyImages !== '0' ? true : false;
         var disableFolderSelect = $scope.model.config.disableFolderSelect && $scope.model.config.disableFolderSelect !== '0' ? true : false;
 
-        //Stops the editor from braking if will have invalid value, e.g. switching from image cropper to mediapicker2
-        //will render mediapicker2 unusable since it expects a udi but it receives an object 
-        if (angular.isString($scope.model.value) === false) {
-            $scope.model.value = "";
-        }
-
         if (!$scope.model.config.startNodeId) {
             userService.getCurrentUser().then(function (userData) {
                 $scope.model.config.startNodeId = userData.startMediaId;
@@ -24,7 +18,9 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             $scope.images = [];
             $scope.ids = [];
 
-            if ($scope.model.value) {
+          //Stops the editor from braking if will have invalid value, e.g. switching from image cropper to mediapicker2
+          //will render mediapicker2 unusable since it expects a udi but it receives an object 
+            if ($scope.model.value && angular.isString($scope.model.value)) {
                 var ids = $scope.model.value.split(',');
 
                 //NOTE: We need to use the entityResource NOT the mediaResource here because
