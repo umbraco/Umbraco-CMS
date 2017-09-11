@@ -143,7 +143,7 @@ function Compile-Belle
   &npm install -g gulp-cli --quiet >> $tmp\belle.log 2>&1
   write "executing npm install" >> $tmp\belle.log 2>&1
   &npm install >> $tmp\belle.log 2>&1
-  write "executing gulp but for version $version" >> $tmp\belle.log 2>&1
+  write "executing gulp build for version $version" >> $tmp\belle.log 2>&1
   &gulp build --buildversion=$version.Release >> $tmp\belle.log 2>&1
   pop-location
   
@@ -404,11 +404,11 @@ function Package-Zip
   Write-Host "Zip cms"  
   &$uenv.Zip a -r "$out\UmbracoCms.$($version.Semver).zip" `
     "$tmp\WebApp\*" `
-    "-x!dotless.Core.*" "-x!Content_Types.xml" `
+    "-x!dotless.Core.*" "-x!Content_Types.xml" "-x!*.pdb"`
     > $null
 
   Write-Host "Zip WebPI"  
-  &$uenv.Zip a -r "$out\UmbracoCms.WebPI.$($version.Semver).zip" `
+  &$uenv.Zip a -r "$out\UmbracoCms.WebPI.$($version.Semver).zip" "-x!*.pdb"`
     "$tmp\WebPi\*" `
     "-x!dotless.Core.*" `
     > $null
