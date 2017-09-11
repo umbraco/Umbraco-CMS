@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $location) {
+    function ContentNodeInfoDirective($timeout, $location, logResource) {
 
         function link(scope, element, attrs, ctrl) {
             
@@ -22,117 +22,8 @@
                     }
                 };
 
-                scope.auditTrail = [
-                    {
-                        "date": "03 December 2016 17:58PM",
-                        "action": "publish",
-                        "description": "Content was performed today by user",
-                        "user": {
-                            "name": "Zsolt Laszlo",
-                            "avatars": []
-                        }
-                    },
-                    {
-                        "date": "24 December 2016 20:18PM",
-                        "action": "unpublish",
-                        "description": "Content was performed by user",
-                        "user": {
-                            "name": "Mads Rasmussen",
-                            "avatars": [
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=30",
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=60",
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=90",
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=150",
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=300"
-                            ]
-                        }
-                    },
-                    {
-                        "date": "19 November 2016 21:11AM",
-                        "action": "save",
-                        "description": "Content was performed yesteraday by user",
-                        "user": {
-                            "name": "Zsolt Laszlo",
-                            "avatars": []
-                        }
-                    },
-                    {
-                        "date": "10 November 2016 10:41AM",
-                        "action": "save",
-                        "description": "Content was performed last week by user",
-                        "user": {
-                            "name": "Mads Rasmussen",
-                            "avatars": [
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=30",
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=60",
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=90",
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=150",
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=300"
-                            ]
-                        }
-                    },
-                    {
-                        "date": "02 November 2016 03:44PM",
-                        "action": "save",
-                        "description": "Content was performed last week by user",
-                        "user": {
-                            "name": "Zsolt Laszlo",
-                            "avatars": []
-                        }
-                    },
-                    {
-                        "date": "19 September 2016 18:21AM",
-                        "action": "publish",
-                        "description": "Content was performed two weeks ago by user",
-                        "user": {
-                            "name": "Mads Rasmussen",
-                            "avatars": [
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=30",
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=60",
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=90",
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=150",
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=300"
-                            ]
-                        }
-                    },
-                    {
-                        "date": "19 September 2016 08:51AM",
-                        "action": "save",
-                        "description": "Content was performed last month by user",
-                        "user": {
-                            "name": "Mads Rasmussen",
-                            "avatars": [
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=30",
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=60",
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=90",
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=150",
-                                "https://www.gravatar.com/avatar/bc196379513a5efe165b9e1571b8d5a8?d=404&s=300"
-                            ]
-                        }
-                    },
-                    {
-                        "date": "11 September 2016 13:28AM",
-                        "action": "save",
-                        "description": "Content was performed by user",
-                        "user": {
-                            "name": "Zsolt Laszlo",
-                            "avatars": []
-                        }
-                    },
-                    {
-                        "date": "01 September 2016 23:19AM",
-                        "action": "save",
-                        "description": "Content was performed by user",
-                        "user": {
-                            "name": "Zsolt Laszlo",
-                            "avatars": []
-                        }
-                    }
-                ];
-
-                scope.pagination = {
-                    "pageNumber": 1,
-                    "totalPages": 5
+                scope.auditTrailOptions = {
+                    "id": scope.node.id
                 };
 
                 scope.template = {
@@ -149,25 +40,13 @@
                 // get document type details
                 scope.documentType = getDocumentType(scope.node);
 
-                // get the auditTrail - fake loading
-                scope.loadingAuditTrail = true;
-                $timeout(function () {
-                    setAuditTrailActionColor(scope.auditTrail);
-                    scope.loadingAuditTrail = false;
-                }, 2000);
+                loadAuditTrail();
 
             }
 
-            scope.nextPage = function (pageNumber) {
-                alert("next page" + pageNumber);
-            };
-
-            scope.prevPage = function (pageNumber) {
-                alert("previous page" + pageNumber);
-            };
-
-            scope.goToPage = function (pageNumber) {
-                alert("go to page" + pageNumber);
+            scope.auditTrailPageChange = function(pageNumber) {
+                scope.auditTrailOptions.pageNumber = pageNumber;
+                loadAuditTrail();
             };
 
             scope.openDocumentType = function (documentType) {
@@ -207,6 +86,23 @@
             scope.clearUnpublishDate = function () {
                 clearUnpublishDate();
             };
+
+            function loadAuditTrail() {
+
+                scope.loadingAuditTrail = true;
+
+                logResource.getPagedEntityLog(scope.auditTrailOptions)
+                    .then(function (data) {
+                        scope.auditTrail = data.items;
+                        scope.auditTrailOptions.pageNumber = data.pageNumber;
+                        scope.auditTrailOptions.pageSize = data.pageSize;
+                        scope.auditTrailOptions.totalItems = data.totalItems;
+                        scope.auditTrailOptions.totalPages = data.totalPages;
+
+                        scope.loadingAuditTrail = false;
+                    });
+
+            }
 
             function setAuditTrailActionColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {

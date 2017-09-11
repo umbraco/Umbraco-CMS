@@ -73,7 +73,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()
         {
-            var urls = UmbracoContext.Security.CurrentUser.GetCurrentUserAvatarUrls(Services.UserService, ApplicationContext.ApplicationCache.StaticCache);
+            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(ApplicationContext.ApplicationCache.StaticCache);
             if (urls == null)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Could not access Gravatar endpoint"));
 
@@ -141,7 +141,7 @@ namespace Umbraco.Web.Editors
                 });
             }
 
-            return request.CreateResponse(HttpStatusCode.OK, user.GetCurrentUserAvatarUrls(userService, staticCache));
+            return request.CreateResponse(HttpStatusCode.OK, user.GetUserAvatarUrls(staticCache));
         }
 
         [AppendUserModifiedHeader("id")]
@@ -174,7 +174,7 @@ namespace Umbraco.Web.Editors
                     FileSystemProviderManager.Current.MediaFileSystem.DeleteFile(filePath);
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, found.GetCurrentUserAvatarUrls(Services.UserService, ApplicationContext.ApplicationCache.StaticCache));
+            return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(ApplicationContext.ApplicationCache.StaticCache));
         }
 
         /// <summary>
@@ -522,7 +522,7 @@ namespace Umbraco.Web.Editors
             {
                 var passwordChanger = new PasswordChanger(Logger, Services.UserService);
 
-                var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(found, userSave.ChangePassword, ModelState, UserManager);
+                var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, userSave.ChangePassword, UserManager);
                 if (passwordChangeResult.Success)
                 {
                     //depending on how the provider is configured, the password may be reset so let's store that for later
@@ -534,6 +534,11 @@ namespace Umbraco.Web.Editors
                 else
                 {
                     hasErrors = true;
+
+                    foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
+                    {
+                        ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
+                    }
                 }
             }
 

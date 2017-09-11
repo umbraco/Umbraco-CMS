@@ -18,31 +18,32 @@
 
         <umb-box>
             <umb-box-header title-key="general_history"></umb-box-header>
-            <umb-box-content class="block-form" style="position: relative;">
+            <umb-box-content class="block-form">
+                
+                <div style="position: relative;">
 
-                <umb-load-indicator ng-if="loadingAuditTrail"></umb-load-indicator>
-
-                <div ng-if="!loadingAuditTrail">
+                    <div ng-if="loadingAuditTrail" style="background: rgba(255, 255, 255, 0.8); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
+                    <umb-load-indicator ng-if="loadingAuditTrail"></umb-load-indicator>
+                    
                     <div class="history-item" ng-repeat="item in auditTrail" ng-class="{'last-history-item': $last}">
                         <div class="history-row">
                         
+                            <div class="history-item__break">
+                                <div class="history-item__avatar">
+                                    <umb-avatar
+                                        color="secondary"
+                                        size="xs"
+                                        name="{{item.userName}}"
+                                        img-src="{{item.userAvatars[3]}}"
+                                        img-srcset="{{item.userAvatars[4]}} 2x, {{item.userAvatars[4]}} 3x">
+                                    </umb-avatar>
+                                </div>
 
-                        <div class="history-item__break">
-                            <div class="history-item__avatar">
-                                <umb-avatar
-                                    color="secondary"
-                                    size="xs"
-                                    name="{{item.user.name}}"
-                                    img-src="{{item.user.avatars[3]}}"
-                                    img-srcset="{{item.user.avatars[4]}} 2x, {{item.user.avatars[4]}} 3x">
-                                </umb-avatar>
+                                <div class="name-date-container">
+                                    <div>{{ item.userName }}</div>
+                                    <div class="history-item__date">{{ item.timestamp | amDateFormat:'MMMM Do YYYY, HH:mm' }}</div>
+                                </div>
                             </div>
-
-                            <div class="name-date-container">
-                            <div>{{ item.user.name }}</div>
-                            <div class="history-item__date">{{ item.date }}</div>
-                            </div>
-                        </div>
                             
                             <div class="history-item__break">
                                 <umb-badge
@@ -50,22 +51,21 @@
                                     color="{{item.actionColor}}">
                                     {{ item.action }}
                                 </umb-badge>
-                                <span>{{ item.description }}</span>
+                                <span>{{ item.comment }}</span>
                             </div>
                         </div>
                         <div class="history-line"></div>
                     </div>
 
-                    <div class="flex justify-center">
-                        <umb-pagination
-                            page-number="pagination.pageNumber"
-                            total-pages="pagination.totalPages"
-                            on-next="nextPage"
-                            on-prev="prevPage"
-                            on-go-to-page="goToPage">
-                        </umb-pagination>
-                    </div>
+                </div>
 
+                <div class="flex justify-center">
+                    <umb-pagination
+                        ng-if="auditTrailOptions.totalPages > 1"
+                        page-number="auditTrailOptions.pageNumber"
+                        total-pages="auditTrailOptions.totalPages"
+                        on-change="auditTrailPageChange(pageNumber)">
+                    </umb-pagination>
                 </div>
 
             </umb-box-content>    

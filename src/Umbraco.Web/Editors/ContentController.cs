@@ -315,7 +315,7 @@ namespace Umbraco.Web.Editors
         }
 
         [OutgoingEditorModelEvent]
-        public ContentItemDisplay GetEmpty(int blueprintId)
+        public ContentItemDisplay GetEmpty(int blueprintId, int parentId)
         {
             var blueprint = Services.ContentService.GetBlueprintById(blueprintId);
             if (blueprint == null)
@@ -325,6 +325,7 @@ namespace Umbraco.Web.Editors
 
             blueprint.Id = 0;
             blueprint.Name = string.Empty;
+            blueprint.ParentId = parentId;
 
             var mapped = Mapper.Map<ContentItemDisplay>(blueprint);
 
