@@ -1,6 +1,10 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.IO;
+using System.Web;
 using System.Xml.Linq;
+using ClientDependency.Core.CompositeFiles.Providers;
+using ClientDependency.Core.Config;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -48,6 +52,57 @@ namespace Umbraco.Core.Configuration
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Clears the temporary files stored for the ClientDependency folder
+        /// </summary>
+        internal bool ClearTempFiles()
+        {
+            var cdfTempDirectories = new HashSet<string>();
+            foreach (BaseCompositeFileProcessingProvider provider in ClientDependencySettings.Instance
+                .CompositeFileProcessingProviderCollection)
+            {
+                var path = provider.CompositeFilePath.FullName;
+                cdfTempDirectories.Add(path);
+            }
+
+            try
+            {
+                var relativePath = HttpContext.Current.Server.MapPath(XmlFileMapper.FileMapVirtualFolder);
+                if (relativePath != null)
+                {
+                    var directoryInfo = new DirectoryInfo(relativePath);
+                    var path = directoryInfo.FullName;
+                    cdfTempDirectories.Add(path);
+                }
+            }
+            catch (Exception ex)
+            {
+                //invalid path format or something... try/catch to be safe
+                LogHelper.Error<ClientDependencyConfiguration>("Could not get path from ClientDependency.config", ex);
+            }
+
+            var noErrorsDeleting = true;
+            foreach (var directory in cdfTempDirectories)
+            {
+                var directoryInfo = new DirectoryInfo(directory);
+                if (directoryInfo.Exists == false)
+                    continue;
+
+                try
+                {
+                    directoryInfo.Delete(true);
+                }
+                catch (Exception ex)
+                {
+                    // Something could be locking the directory or the was another error, making sure we don't break the upgrade installer
+                    LogHelper.Error<ClientDependencyConfiguration>("Could not clear temp files", ex);
+                    noErrorsDeleting = false;
+                }
+            }
+
+            return noErrorsDeleting;
         }
     }
 }
