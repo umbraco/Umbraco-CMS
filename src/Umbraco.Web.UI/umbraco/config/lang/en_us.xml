@@ -182,6 +182,7 @@
     <key alias="membergroup">Member Group</key>
     <key alias="memberrole">Role</key>
     <key alias="membertype">Member Type</key>
+    <key alias="noChanges">No changes have been made</key>
     <key alias="noDate">No date chosen</key>
     <key alias="nodeName">Link title</key>
     <key alias="otherElements">Properties</key>

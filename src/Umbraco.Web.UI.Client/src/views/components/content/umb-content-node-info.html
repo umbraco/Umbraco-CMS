@@ -25,6 +25,14 @@
                     <div ng-if="loadingAuditTrail" style="background: rgba(255, 255, 255, 0.8); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
                     <umb-load-indicator ng-if="loadingAuditTrail"></umb-load-indicator>
                     
+                    <div ng-if="auditTrail.length === 0" style="padding: 10px;">
+                        <umb-empty-state
+                            position="center"
+                            size="small">
+                            <localize key="content_noChanges"></localize>
+                        </umb-empty-state>
+                    </div>
+                    
                     <div class="history-item" ng-repeat="item in auditTrail" ng-class="{'last-history-item': $last}">
                         <div class="history-row">
                         
