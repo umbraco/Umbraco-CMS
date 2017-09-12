@@ -29,19 +29,18 @@ namespace Umbraco.Core.IO
 
         #region Singleton & Constructor
 
-        //ensures that the construction of the singleton only happens when Current is accessed, otherwise any reference to this class would cause
-        //the ctor to be invoked which can lead to problems outside of a web app.
-        private static readonly Lazy<FileSystemProviderManager> Instance = new Lazy<FileSystemProviderManager>(() => new FileSystemProviderManager());
-
-        private static FileSystemProviderManager _current;
+        private static volatile FileSystemProviderManager _instance;
+        private static readonly object _instanceLocker = new object();
 
         public static FileSystemProviderManager Current
         {
             get
             {
-                if (_current != null) return _current;
-                _current =  Instance.Value;
-                return _current;
+                if (_instance != null) return _instance;
+                lock (_instanceLocker)
+                {
+                    return _instance ?? (_instance = new FileSystemProviderManager());
+                }
             }
         }
 
@@ -51,11 +50,23 @@ namespace Umbraco.Core.IO
         /// <param name="instance"></param>
         public static void SetCurrent(FileSystemProviderManager instance)
         {
-            _current = instance;
+            lock (_instanceLocker)
+            {
+                _instance = instance;
+            }
+        }
+
+        internal static void ResetCurrent()
+        {
+            lock (_instanceLocker)
+            {
+                if (_instance != null)
+                _instance.Reset();                
+            }
         }
 
         // for tests only, totally unsafe
-        internal void Reset()
+        private void Reset()
         {
             _wrappers.Clear();
             _providerLookup.Clear();
