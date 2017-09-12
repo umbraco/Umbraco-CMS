@@ -158,7 +158,7 @@ namespace Umbraco.Core.Services
 
         public Attempt<OperationStatus<EntityContainer, OperationStatusType>> RenameDataTypeContainer(int id, string name, int userId = 0)
         {
-            return RenameTypeContainer(id, name, Constants.ObjectTypes.MediaTypeContainerGuid);
+            return RenameTypeContainer(id, name, Constants.ObjectTypes.DataTypeContainerGuid);
         }
 
         public Attempt<OperationStatus> SaveContentTypeContainer(EntityContainer container, int userId = 0)
