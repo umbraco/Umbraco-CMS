@@ -1187,6 +1187,39 @@ namespace Umbraco.Tests.Services
             Assert.That(published, Is.True);
         }
 
+        /// <summary>
+        /// Try to immitate a new child content item being created through the UI.
+        /// This content item will have no Id, Path or Identity.
+        /// It seems like this is wiped somewhere in the process when creating an item through the UI
+        /// and we need to make sure we handle nullchecks for these properties when creating content.
+        /// This is unfortunately not caught by the normal ContentService tests.
+        /// </summary>
+        [Test]
+        public void Can_Save_And_Publish_Content_And_Child_Without_Identity()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.CreateContent("Home US", -1, "umbTextpage", 0);
+            content.SetValue("author", "Barack Obama");
+
+            // Act
+            var published = contentService.SaveAndPublish(content, 0);
+            var childContent = contentService.CreateContent("Child", content.Id, "umbTextpage", 0);
+            // Reset all identity properties
+            childContent.Id = 0;
+            childContent.Path = null;
+            ((Content)childContent).ResetIdentity();
+            var childPublished = contentService.SaveAndPublish(childContent, 0);
+
+            // Assert
+            Assert.That(content.HasIdentity, Is.True);
+            Assert.That(content.Published, Is.True);
+            Assert.That(childContent.HasIdentity, Is.True);
+            Assert.That(childContent.Published, Is.True);
+            Assert.That(published, Is.True);
+            Assert.That(childPublished, Is.True);
+        }
+
         [Test]
         public void Can_Get_Published_Descendant_Versions()
         {
