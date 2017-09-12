@@ -241,6 +241,8 @@
     <Compile Include="Configuration\Grid\IGridConfig.cs" />
     <Compile Include="Configuration\Grid\IGridEditorConfig.cs" />
     <Compile Include="Configuration\Grid\IGridEditorsConfig.cs" />
+    <Compile Include="Configuration\IFileSystemProviderElement.cs" />
+    <Compile Include="Configuration\IFileSystemProvidersSection.cs" />
     <Compile Include="Configuration\UmbracoConfig.cs" />
     <Compile Include="Configuration\UmbracoConfigurationSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsCollection.cs" />
