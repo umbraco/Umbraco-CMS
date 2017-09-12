@@ -7,7 +7,8 @@
 #   eg 1.2.3, 1.2.3-alpha, 1.2.3-alpha+456
 #
 #   -BuildNumber <buildNumber>
-#   where <buildNumber> is an integer coming from the build server
+#   where <buildNumber> is a string coming from the build server
+#   eg 34, 126, 1
 #
 function Set-UmbracoContinuousVersion
 {
@@ -16,18 +17,14 @@ function Set-UmbracoContinuousVersion
     [string]
     $version,
     [Parameter(Mandatory=$true)]
-    [int]
+    [string]
     $buildNumber
   )
   
-  $uenv = Get-UmbracoBuildEnv
-    
   Write-Host "Version is currently set to $version"
-  
-  $versionComment = $buildNumber
-  $versionComment = $versionComment.ToString().PadLeft(4,"0")
-  $umbracoVersion = "$($version.Trim())-alpha$versionComment"
-  
+
+  $umbracoVersion = "$($version.Trim())-alpha$($buildNumber)"
   Write-Host "Setting Umbraco Version to $umbracoVersion"
+
   Set-UmbracoVersion $umbracoVersion
 }
