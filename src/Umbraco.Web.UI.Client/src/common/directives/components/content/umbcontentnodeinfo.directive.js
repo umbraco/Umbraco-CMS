@@ -26,14 +26,6 @@
                     "id": scope.node.id
                 };
 
-                scope.template = {
-                    "description": "Description for the template section"
-                };
-
-                scope.idSection = {
-                    "name": "Id"
-                };
-
                 // get available templates
                 scope.availableTemplates = getAvailableTemplates(scope.node);
 

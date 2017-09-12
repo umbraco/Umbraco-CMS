@@ -150,11 +150,12 @@
             <umb-box-content class="block-form">
                 
                 <umb-control-group label="@template_createdDate">
-                    {{node.createDate | amDateFormat:'DD'}} {{ node.createDate | amDateFormat:'MMM'}} {{ node.createDate | amDateFormat:'YYYY'}}, {{node.createDate | amDateFormat:'h:mmA'}} by {{ node.owner.name }}
+                    {{node.createDate | amDateFormat:'MMMM Do YYYY, HH:mm'}} by {{ node.owner.name }}
                 </umb-control-group>
 
                 <umb-control-group label="@content_documentType">
                     <umb-node-preview
+                        style="max-width: 100%; margin-bottom: 0;"
                         icon="documentType.icon"
                         name="documentType.linkText"
                         allow-open="allowOpen"
@@ -171,10 +172,11 @@
                     </select>
                 </umb-control-group>
 
-                <umb-control-group label="{{ idSection.name }}">
+                <umb-control-group label="Id">
                     <div>{{ node.id }}</div>
                     <small>{{ node.key }}</small>
                 </umb-control-group>
+                
             </umb-box-content>    
         </umb-box>
     </div>
