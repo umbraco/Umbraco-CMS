@@ -5,4 +5,14 @@
   </content>
   
   <webservices xdt:Transform="Remove" />
+
+  <internalSearch xdt:Transform="InsertIfMissing" />
+  <internalSearch>
+
+    <!-- add csv list of field aliases to search on in content-->
+    <contentSearchFields></contentSearchFields>
+
+    <!-- add csv list of field aliases to search on in media-->
+    <mediaSearchFields></mediaSearchFields>
+  </internalSearch>
 </settings>
