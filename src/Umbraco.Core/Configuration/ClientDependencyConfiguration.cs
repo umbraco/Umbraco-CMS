@@ -10,7 +10,10 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Configuration
 {
-    internal class ClientDependencyConfiguration
+    /// <summary>
+    /// A utility class for working with CDF config and cache files - use sparingly!
+    /// </summary>
+    public class ClientDependencyConfiguration
     {
         private readonly ILogger _logger;
         private readonly string _fileName;
@@ -25,7 +28,7 @@ namespace Umbraco.Core.Configuration
         /// <summary>
         /// Changes the version number in ClientDependency.config to a random value to avoid stale caches
         /// </summary>
-        internal bool IncreaseVersionNumber()
+        public bool IncreaseVersionNumber()
         {
             try
             {
@@ -58,7 +61,7 @@ namespace Umbraco.Core.Configuration
         /// Clears the temporary files stored for the ClientDependency folder
         /// </summary>
         /// <param name="currentHttpContext"></param>
-        internal bool ClearTempFiles(HttpContextBase currentHttpContext)
+        public bool ClearTempFiles(HttpContextBase currentHttpContext)
         {
             var cdfTempDirectories = new HashSet<string>();
             foreach (BaseCompositeFileProcessingProvider provider in ClientDependencySettings.Instance
@@ -70,12 +73,10 @@ namespace Umbraco.Core.Configuration
 
             try
             {
-                var relativePath = currentHttpContext.Server.MapPath(XmlFileMapper.FileMapVirtualFolder);
-                if (relativePath != null)
+                var fullPath = currentHttpContext.Server.MapPath(XmlFileMapper.FileMapVirtualFolder);
+                if (fullPath != null)
                 {
-                    var directoryInfo = new DirectoryInfo(relativePath);
-                    var path = directoryInfo.FullName;
-                    cdfTempDirectories.Add(path);
+                    cdfTempDirectories.Add(fullPath);
                 }
             }
             catch (Exception ex)
@@ -84,7 +85,7 @@ namespace Umbraco.Core.Configuration
                 LogHelper.Error<ClientDependencyConfiguration>("Could not get path from ClientDependency.config", ex);
             }
 
-            var noErrorsDeleting = true;
+            var success = true;
             foreach (var directory in cdfTempDirectories)
             {
                 var directoryInfo = new DirectoryInfo(directory);
@@ -99,11 +100,11 @@ namespace Umbraco.Core.Configuration
                 {
                     // Something could be locking the directory or the was another error, making sure we don't break the upgrade installer
                     LogHelper.Error<ClientDependencyConfiguration>("Could not clear temp files", ex);
-                    noErrorsDeleting = false;
+                    success = false;
                 }
             }
 
-            return noErrorsDeleting;
+            return success;
         }
     }
 }
