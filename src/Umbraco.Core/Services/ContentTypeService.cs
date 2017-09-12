@@ -156,6 +156,11 @@ namespace Umbraco.Core.Services
             return RenameTypeContainer(id, name, Constants.ObjectTypes.MediaTypeContainerGuid);
         }
 
+        public Attempt<OperationStatus<EntityContainer, OperationStatusType>> RenameDataTypeContainer(int id, string name, int userId = 0)
+        {
+            return RenameTypeContainer(id, name, Constants.ObjectTypes.MediaTypeContainerGuid);
+        }
+
         public Attempt<OperationStatus> SaveContentTypeContainer(EntityContainer container, int userId = 0)
         {
             return SaveContainer(
@@ -253,7 +258,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<EntityContainer> GetMediaTypeContainers(IMediaType mediaType)
         {
-            var ancestorIds = mediaType.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+            var ancestorIds = mediaType.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x =>
                 {
                     var asInt = x.TryConvertTo<int>();
@@ -282,7 +287,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<EntityContainer> GetContentTypeContainers(IContentType contentType)
         {
-            var ancestorIds = contentType.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+            var ancestorIds = contentType.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x =>
                 {
                     var asInt = x.TryConvertTo<int>();
@@ -479,7 +484,7 @@ namespace Umbraco.Core.Services
 
             clone.Name = name;
 
-            var compositionAliases = clone.CompositionAliases().Except(new[] {alias}).ToList();
+            var compositionAliases = clone.CompositionAliases().Except(new[] { alias }).ToList();
             //remove all composition that is not it's current alias
             foreach (var a in compositionAliases)
             {
@@ -902,7 +907,7 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    var deleteEventArgs = new DeleteEventArgs<IContentType>(contentType);                    
+                    var deleteEventArgs = new DeleteEventArgs<IContentType>(contentType);
                     if (uow.Events.DispatchCancelable(DeletingContentType, this, deleteEventArgs))
                     {
                         uow.Commit();
@@ -912,7 +917,7 @@ namespace Umbraco.Core.Services
                     var repository = RepositoryFactory.CreateContentTypeRepository(uow);
 
                     //If we are deleting this content type, we are also deleting it's descendents!
-                    var deletedContentTypes = new List<IContentType> {contentType};
+                    var deletedContentTypes = new List<IContentType> { contentType };
                     deletedContentTypes.AddRange(GetDescendants(contentType));
 
                     _contentService.DeleteContentOfTypes(deletedContentTypes.Select(x => x.Id), userId);
