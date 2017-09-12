@@ -21,7 +21,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
             //For some of the migration data inserts we require to use a special MSSQL collate expression since
             //some databases may have a custom collation specified and if that is the case, when we compare strings
             //in dynamic SQL it will try to compare strings in different collations and this will yield errors.
-            _collateSyntax = sqlSyntax is MySqlSyntaxProvider ? string.Empty : "COLLATE DATABASE_DEFAULT";
+            _collateSyntax = (sqlSyntax is MySqlSyntaxProvider || sqlSyntax is SqlCeSyntaxProvider)
+                ? string.Empty
+                : "COLLATE DATABASE_DEFAULT";
         }
 
         public override void Up()
