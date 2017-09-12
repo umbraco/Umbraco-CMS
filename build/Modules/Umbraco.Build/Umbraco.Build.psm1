@@ -520,7 +520,7 @@ function Build-Umbraco
   if ($target -eq "pre-build")
   {
     Prepare-Build $uenv
-    Compile-Belle $uenv $version
+    #Compile-Belle $uenv $version
 
     # set environment variables
     $env:UMBRACO_VERSION=$version.Semver.ToString()
