@@ -54,9 +54,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.Contains(propertyType.PropertyTypeAlias.ToLower(CultureInfo.InvariantCulture))) == false)
             {
                 IPublishedContent content;
-                if (inter is int)
+                if (inter is int id)
                 {
-                    var id = (int) inter;
                     content = _facadeAccessor.Facade.ContentCache.GetById(id);
                     if (content != null)
                         return content;
@@ -64,6 +63,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 else
                 {
                     var udi = inter as GuidUdi;
+                    if (udi == null)
+                        return null;
                     content = _facadeAccessor.Facade.ContentCache.GetById(udi.Guid);
                     if (content != null)
                         return content;

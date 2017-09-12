@@ -14,7 +14,6 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Security.Providers;
 using MPE = global::Umbraco.Core.Security.MembershipProviderExtensions;
 
@@ -27,7 +26,6 @@ namespace Umbraco.Web.Security
     {
         private readonly MembershipProvider _membershipProvider;
         private readonly RoleProvider _roleProvider;
-        //private readonly ApplicationContext _applicationContext;
         private readonly HttpContextBase _httpContext;
         private readonly IPublishedMemberCache _memberCache;
 
@@ -643,130 +641,10 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public virtual Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
-            // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!
-
-            if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
-            if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
-
-            //Are we resetting the password??
-            if (passwordModel.Reset.HasValue && passwordModel.Reset.Value)
-            {
-                var canReset = membershipProvider.CanResetPassword(_userService);
-                if (canReset == false)
-                {
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password reset is not enabled", new[] { "resetPassword" }) });
-                }
-                if (membershipProvider.RequiresQuestionAndAnswer && passwordModel.Answer.IsNullOrWhiteSpace())
-                {
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password reset requires a password answer", new[] { "resetPassword" }) });
-                }
-                //ok, we should be able to reset it
-                try
-                {
-                    var newPass = membershipProvider.ResetPassword(
-                        username,
-                        membershipProvider.RequiresQuestionAndAnswer ? passwordModel.Answer : null);
-
-                    //return the generated pword
-                    return Attempt.Succeed(new PasswordChangedModel { ResetPassword = newPass });
-                }
-                catch (Exception ex)
-                {
-                    Current.Logger.Warn<WebSecurity>(ex, "Could not reset member password");
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not reset password, error: " + ex.Message + " (see log for full details)", new[] { "resetPassword" }) });
-                }
-            }
-
-            //we're not resetting it so we need to try to change it.
-
-            if (passwordModel.NewPassword.IsNullOrWhiteSpace())
-            {
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
-            }
-
-            //This is an edge case and is only necessary for backwards compatibility:
-            var umbracoBaseProvider = membershipProvider as MembershipProviderBase;
-            if (umbracoBaseProvider != null && umbracoBaseProvider.AllowManuallyChangingPassword)
-            {
-                //this provider allows manually changing the password without the old password, so we can just do it
-                try
-                {
-                    var result = umbracoBaseProvider.ChangePassword(username, "", passwordModel.NewPassword);
-                    return result == false
-                        ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "value" }) })
-                        : Attempt.Succeed(new PasswordChangedModel());
-                }
-                catch (Exception ex)
-                {
-                    Current.Logger.Warn<WebSecurity>(ex, "Could not change member password");
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
-                }
-            }
-
-            //The provider does not support manually chaning the password but no old password supplied - need to return an error
-            if (passwordModel.OldPassword.IsNullOrWhiteSpace() && membershipProvider.EnablePasswordRetrieval == false)
-            {
-                //if password retrieval is not enabled but there is no old password we cannot continue
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "value" }) });
-            }
-
-            if (passwordModel.OldPassword.IsNullOrWhiteSpace() == false)
-            {
-                //if an old password is suplied try to change it
-
-                try
-                {
-                    var result = membershipProvider.ChangePassword(username, passwordModel.OldPassword, passwordModel.NewPassword);
-                    return result == false
-                        ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "value" }) })
-                        : Attempt.Succeed(new PasswordChangedModel());
-                }
-                catch (Exception ex)
-                {
-                    Current.Logger.Warn<WebSecurity>(ex, "Could not change member password");
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
-                }
-            }
-
-            if (membershipProvider.EnablePasswordRetrieval == false)
-            {
-                //we cannot continue if we cannot get the current password
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "value" }) });
-            }
-            if (membershipProvider.RequiresQuestionAndAnswer && passwordModel.Answer.IsNullOrWhiteSpace())
-            {
-                //if the question answer is required but there isn't one, we cannot continue
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the password answer", new[] { "value" }) });
-            }
-
-            //lets try to get the old one so we can change it
-            try
-            {
-                var oldPassword = membershipProvider.GetPassword(
-                    username,
-                    membershipProvider.RequiresQuestionAndAnswer ? passwordModel.Answer : null);
-
-                try
-                {
-                    var result = membershipProvider.ChangePassword(username, oldPassword, passwordModel.NewPassword);
-                    return result == false
-                        ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password", new[] { "value" }) })
-                        : Attempt.Succeed(new PasswordChangedModel());
-                }
-                catch (Exception ex1)
-                {
-                    Current.Logger.Warn<WebSecurity>(ex1, "Could not change member password");
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex1.Message + " (see log for full details)", new[] { "value" }) });
-                }
-
-            }
-            catch (Exception ex2)
-            {
-                Current.Logger.Warn<WebSecurity>(ex2, "Could not retrieve member password");
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex2.Message + " (see log for full details)", new[] { "value" }) });
-            }
+            var passwordChanger = new PasswordChanger(_logger, _userService);
+            return passwordChanger.ChangePasswordWithMembershipProvider(username, passwordModel, membershipProvider);            
         }
-
+        
         /// <summary>
         /// Updates a membership user with all of it's writable properties
         /// </summary>

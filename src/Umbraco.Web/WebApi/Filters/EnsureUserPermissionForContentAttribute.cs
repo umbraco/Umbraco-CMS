@@ -39,6 +39,7 @@ namespace Umbraco.Web.WebApi.Filters
             _paramName = paramName;
             _permissionToCheck = ActionBrowse.Instance.Letter;
         }
+
         public EnsureUserPermissionForContentAttribute(string paramName, char permissionToCheck)
             : this(paramName)
         {
@@ -90,7 +91,9 @@ namespace Umbraco.Web.WebApi.Filters
                 actionContext.Request.Properties,
                 UmbracoContext.Current.Security.CurrentUser,
                 Current.Services.UserService,
-                Current.Services.ContentService, nodeId, _permissionToCheck.HasValue ? new[]{_permissionToCheck.Value}: null))
+                Current.Services.ContentService, 
+                Current.Services.EntityService, 
+                nodeId, _permissionToCheck.HasValue ? new[]{_permissionToCheck.Value}: null))
             {
                 base.OnActionExecuting(actionContext);
             }

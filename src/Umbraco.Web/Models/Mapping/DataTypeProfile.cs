@@ -95,6 +95,7 @@ namespace Umbraco.Web.Models.Mapping
 
             CreateMap<DataTypeSave, IDataTypeDefinition>()
                 .ConstructUsing(src => new DataTypeDefinition(src.SelectedEditor) {CreateDate = DateTime.Now})
+                .IgnoreDeletableEntityCommonProperties()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Convert.ToInt32(src.Id)))
                 //we have to ignore the Key otherwise this will reset the UniqueId field which should never change!
                 // http://issues.umbraco.org/issue/U4-3911
@@ -104,10 +105,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.DatabaseType, opt => opt.ResolveUsing(src => databaseTypeResolver.Resolve(src)))
                 .ForMember(dest => dest.CreatorId, opt => opt.Ignore())
                 .ForMember(dest => dest.Level, opt => opt.Ignore())
-                .ForMember(dest => dest.SortOrder, opt => opt.Ignore())
-                .ForMember(dest => dest.CreateDate, opt => opt.Ignore())
-                .ForMember(dest => dest.DeletedDate, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdateDate, opt => opt.Ignore());
+                .ForMember(dest => dest.SortOrder, opt => opt.Ignore());
 
             //Converts a property editor to a new list of pre-value fields - used when creating a new data type or changing a data type with new pre-vals
             CreateMap<PropertyEditor, IEnumerable<PreValueFieldDisplay>>()

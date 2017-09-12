@@ -30,7 +30,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
     [EnableOverrideAuthorization]
-    [MediaTypeControllerControllerConfigurationAttribute]
+    [MediaTypeControllerControllerConfiguration]
     public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     {
         /// <summary>
@@ -213,7 +213,7 @@ namespace Umbraco.Web.Editors
                 basic.Description = TranslateItem(basic.Description);
             }
 
-            return basics;
+            return basics.OrderBy(x => x.Name);
         }
 
         /// <summary>

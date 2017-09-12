@@ -109,7 +109,7 @@ namespace Umbraco.Web.Models.Mapping
             }
 
             //fill in the template config to be passed to the template drop down.
-            var templateItemConfig = new Dictionary<string, string> {{"", "Choose..."}};
+            var templateItemConfig = new Dictionary<string, string> {{"", localizedText.Localize("general/choose") } };
             foreach (var t in content.ContentType.AllowedTemplates
                 .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false))
             {
@@ -125,16 +125,16 @@ namespace Umbraco.Web.Models.Mapping
             {
                 new ContentPropertyDisplay
                 {
-                    Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}doctype",
                     Label = localizedText.Localize("content/documentType"),
                     Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
                     View = Current.PropertyEditors[Constants.PropertyEditors.NoEditAlias].ValueEditor.View
                 },
                 new ContentPropertyDisplay
                 {
-                    Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}releasedate",
                     Label = localizedText.Localize("content/releaseDate"),
-                    Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
+                    Value = display.ReleaseDate?.ToIsoString(),
                     //Not editible for people without publish permission (U4-287)
                     View =  display.AllowedActions.Contains(ActionPublish.Instance.Letter) ? "datepicker"  : Current.PropertyEditors[Constants.PropertyEditors.NoEditAlias].ValueEditor.View,
                     Config = new Dictionary<string, object>

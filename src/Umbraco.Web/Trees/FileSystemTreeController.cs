@@ -106,7 +106,7 @@ namespace Umbraco.Web.Trees
             }
 
             var path = string.IsNullOrEmpty(id) == false && id != Constants.System.Root.ToInvariantString()
-                ? System.Web.HttpUtility.UrlDecode(id).TrimStart("/")
+                ? HttpUtility.UrlDecode(id).TrimStart("/")
                 : "";
             var isFile = FileSystem.FileExists(path);
             var isDirectory = FileSystem.DirectoryExists(path);

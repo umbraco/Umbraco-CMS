@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http.Formatting;
@@ -11,6 +12,8 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -26,13 +29,17 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Media, Constants.Trees.Media)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
-    public class MediaTreeController : ContentTreeControllerBase
+    [SearchableTree("searchResultFormatter", "configureMediaResult")]
+    public class MediaTreeController : ContentTreeControllerBase, ISearchableTree
     {
+        private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
+
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
             var node = base.CreateRootNode(queryStrings);
-            //if the user's start node is not default, then ensure the root doesn't have a menu
-            if (Security.CurrentUser.StartMediaId != Constants.System.Root)
+
+            // if the user's start node is not default, then ensure the root doesn't have a menu
+            if (UserStartNodes.Contains(Constants.System.Root) == false)
             {
                 node.MenuUrl = "";
             }
@@ -44,7 +51,9 @@ namespace Umbraco.Web.Trees
 
         protected override bool RecycleBinSmells => Services.MediaService.RecycleBinSmells();
 
-        protected override int UserStartNode => Security.CurrentUser.StartMediaId;
+        private int[] _userStartNodes;
+        protected override int[] UserStartNodes
+            => _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService));
 
         /// <summary>
         /// Creates a tree node for a content item based on an UmbracoEntity
@@ -88,7 +97,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //if the user's start node is not the root then ensure the root menu is empty/doesn't exist
-                if (Security.CurrentUser.StartMediaId != Constants.System.Root)
+                if (UserStartNodes.Contains(Constants.System.Root) == false)
                 {
                     return menu;
                 }
@@ -144,7 +153,12 @@ namespace Umbraco.Web.Trees
             if (media == null)
                 return false;
 
-            return Security.CurrentUser.HasPathAccess(media);
+            return Security.CurrentUser.HasPathAccess(media, Services.EntityService);
+        }
+
+        public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        {
+            return _treeSearcher.ExamineSearch(Umbraco, query, UmbracoEntityTypes.Media, pageSize, pageIndex, out totalFound, searchFrom);
         }
     }
 }

@@ -11,7 +11,10 @@ using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
+using umbraco.businesslogic.Actions;
 using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -28,13 +31,17 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Content, Constants.Trees.Content)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
-    public class ContentTreeController : ContentTreeControllerBase
+    [SearchableTree("searchResultFormatter", "configureContentResult")]
+    public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
     {
+        private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
+
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
             var node = base.CreateRootNode(queryStrings);
-            //if the user's start node is not default, then ensure the root doesn't have a menu
-            if (Security.CurrentUser.StartContentId != Constants.System.Root)
+
+            // if the user's start node is not default, then ensure the root doesn't have a menu
+            if (UserStartNodes.Contains(Constants.System.Root) == false)
             {
                 node.MenuUrl = "";
             }
@@ -46,7 +53,9 @@ namespace Umbraco.Web.Trees
 
         protected override bool RecycleBinSmells => Services.ContentService.RecycleBinSmells();
 
-        protected override int UserStartNode => Security.CurrentUser.StartContentId;
+        private int[] _userStartNodes;
+        protected override int[] UserStartNodes
+            => _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService));
 
         /// <summary>
         /// Creates a tree node for a content item based on an UmbracoEntity
@@ -57,7 +66,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected override TreeNode GetSingleTreeNode(IUmbracoEntity e, string parentId, FormDataCollection queryStrings)
         {
-            var entity = (UmbracoEntity) e;
+            var entity = (UmbracoEntity)e;
 
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(e);
             if (CanUserAccessNode(e, allowedUserOptions))
@@ -102,9 +111,9 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 var menu = new MenuItemCollection();
-
-                //if the user's start node is not the root then ensure the root menu is empty/doesn't exist
-                if (Security.CurrentUser.StartContentId != Constants.System.Root)
+                
+                // if the user's start node is not the root then ensure the root menu is empty/doesn't exist
+                if (UserStartNodes.Contains(Constants.System.Root) == false)
                 {
                     return menu;
                 }
@@ -155,7 +164,7 @@ namespace Umbraco.Web.Trees
             FilterUserAllowedMenuItems(nodeMenu, allowedMenuItems);
 
             //if the media item is in the recycle bin, don't have a default menu, just show the regular menu
-            if (item.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
+            if (item.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
                 nodeMenu.DefaultMenuAlias = null;
                 nodeMenu.Items.Insert(2, new MenuItem(ActionRestore.Instance, Services.TextService.Localize("actions", ActionRestore.Instance.Alias)));
@@ -191,7 +200,7 @@ namespace Umbraco.Web.Trees
             if (content == null)
                 return false;
 
-            return Security.CurrentUser.HasPathAccess(content);
+            return Security.CurrentUser.HasPathAccess(content, Services.EntityService);
         }
 
         /// <summary>
@@ -204,6 +213,8 @@ namespace Umbraco.Web.Trees
             var menu = new MenuItemCollection();
             AddActionNode<ActionNew>(item, menu);
             AddActionNode<ActionDelete>(item, menu);
+
+            AddActionNode<ActionCreateBlueprintFromContent>(item, menu);
 
             //need to ensure some of these are converted to the legacy system - until we upgrade them all to be angularized.
             AddActionNode<ActionMove>(item, menu, true);
@@ -241,6 +252,11 @@ namespace Umbraco.Web.Trees
         {
             var menuItem = menu.Items.Add<TItem, TAction>(Services.TextService.Localize("actions", Current.Actions.GetAction<TAction>().Alias), hasSeparator);
             if (convert) menuItem.ConvertLegacyMenuItem(item, "content", "content");
+        }
+        
+        public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        {
+            return _treeSearcher.ExamineSearch(Umbraco, query, UmbracoEntityTypes.Document, pageSize, pageIndex, out totalFound, searchFrom);
         }
     }
 }

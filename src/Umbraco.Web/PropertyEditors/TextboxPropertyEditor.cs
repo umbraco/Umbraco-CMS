@@ -18,7 +18,17 @@ namespace Umbraco.Web.PropertyEditors
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
         public TextboxPropertyEditor(ILogger logger) : base(logger)
+        { }
+
+        protected override PreValueEditor CreatePreValueEditor()
         {
+            return new TextboxPreValueEditor();
+        }
+
+        internal class TextboxPreValueEditor : PreValueEditor
+        {
+            [PreValueField("maxChars", "Maximum allowed characters", "number", Description = "If empty - no character limit")]
+            public bool MaxChars { get; set; }
         }
     }
 }

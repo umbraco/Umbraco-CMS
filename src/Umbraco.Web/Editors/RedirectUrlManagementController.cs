@@ -78,7 +78,7 @@ namespace Umbraco.Web.Editors
             var userIsAdmin = Umbraco.UmbracoContext.Security.CurrentUser.IsAdmin();
             if (userIsAdmin == false)
             {
-                var errorMessage = $"User of type {Umbraco.UmbracoContext.Security.CurrentUser.UserType.Alias} is not allowed to toggle the URL tracker.";
+                var errorMessage = "User is not a member of the administrators group and so is not allowed to toggle the URL tracker";
                 _logger.Debug<RedirectUrlManagementController>(errorMessage);
                 throw new SecurityException(errorMessage);
             }

@@ -3,6 +3,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -20,9 +21,9 @@ namespace Umbraco.Web.Models.Mapping
             _userService = userService;
         }
 
-        public UserBasic Resolve(TPersisted source)
+        public UserProfile Resolve(TPersisted source)
         {
-            return Mapper.Map<IProfile, UserBasic>(source.GetCreatorProfile(_userService));
+            return Mapper.Map<IProfile, UserProfile>(source.GetCreatorProfile(_userService));
         }
     }
 }

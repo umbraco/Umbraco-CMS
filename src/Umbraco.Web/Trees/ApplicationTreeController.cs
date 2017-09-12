@@ -52,9 +52,10 @@ namespace Umbraco.Web.Trees
                     queryStrings,
                     application);
 
-                return result;
+                //this will be null if it cannot convert to ta single root section
+                if (result != null)
+                    return result;
             }
-
 
             var collection = new TreeNodeCollection();
             foreach (var apptree in appTrees)
@@ -103,6 +104,7 @@ namespace Umbraco.Web.Trees
         /// <param name="configTree"></param>
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
+        /// <param name="application"></param>
         /// <returns></returns>
         private async Task<SectionRootNode> GetRootForSingleAppTree(ApplicationTree configTree, string id, FormDataCollection queryStrings, string application)
         {
@@ -118,12 +120,26 @@ namespace Umbraco.Web.Trees
                     throw new InvalidOperationException("Could not create root node for tree " + configTree.Alias);
                 }
 
+                //if the root node has a route path, we cannot create a single root section because by specifying the route path this would
+                //override the dashboard route and that means there can be no dashboard for that section which is a breaking change.
+                if (rootNode.Result.RoutePath.IsNullOrWhiteSpace() == false 
+                    && rootNode.Result.RoutePath != "#" 
+                    && rootNode.Result.RoutePath != application)
+                {
+                    //null indicates this cannot be converted
+                    return null;
+                }
+
                 var sectionRoot = SectionRootNode.CreateSingleTreeSectionRoot(
                     rootId,
                     rootNode.Result.ChildNodesUrl,
                     rootNode.Result.MenuUrl,
                     rootNode.Result.Name,
                     byControllerAttempt.Result);
+
+                //This can't be done currently because the root will default to routing to a dashboard and if we disable dashboards for a section
+                //that is really considered a breaking change. See above.
+                //sectionRoot.RoutePath = rootNode.Result.RoutePath;
 
                 foreach (var d in rootNode.Result.AdditionalData)
                 {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -13,6 +14,8 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -26,7 +29,8 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Members, Constants.Trees.Members, null, sortOrder: 0)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
-    public class MemberTreeController : TreeController
+    [SearchableTree("searchResultFormatter", "configureMemberResult")]
+    public class MemberTreeController : TreeController, ISearchableTree
     {
         public MemberTreeController()
         {
@@ -34,6 +38,7 @@ namespace Umbraco.Web.Trees
             _isUmbracoProvider = _provider.IsUmbracoMembershipProvider();
         }
 
+        private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
         private readonly MembershipProvider _provider;
         private readonly bool _isUmbracoProvider;
 
@@ -173,6 +178,11 @@ namespace Umbraco.Web.Trees
             menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
 
             return menu;
+        }
+
+        public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        {
+            return _treeSearcher.ExamineSearch(Umbraco, query, UmbracoEntityTypes.Member, pageSize, pageIndex, out totalFound, searchFrom);
         }
     }
 }

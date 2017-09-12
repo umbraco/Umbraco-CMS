@@ -525,9 +525,11 @@ namespace Umbraco.Web.Macros
                             attributeValue = context?.Request.GetCookieValue(name);
                         break;
                     case '#':
+                        if (pageElements == null) pageElements = GetPageElements();
                         attributeValue = pageElements[name]?.ToString();
                         break;
                     case '$':
+                        if (pageElements == null) pageElements = GetPageElements();
                         attributeValue = pageElements[name]?.ToString();
                         if (string.IsNullOrEmpty(attributeValue))
                             attributeValue = ParseAttributeOnParents(pageElements, name);
@@ -559,6 +561,14 @@ namespace Umbraco.Web.Macros
             }
 
             return value;
+        }
+
+        private static IDictionary GetPageElements()
+        {
+            IDictionary pageElements = null;
+            if (HttpContext.Current.Items["pageElements"] != null)
+                pageElements = (IDictionary)HttpContext.Current.Items["pageElements"];
+            return pageElements;
         }
 
         #endregion

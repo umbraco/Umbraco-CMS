@@ -7,7 +7,6 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.Models.Mapping
 {
     /// <summary>
-    //TODO: This is horribly inneficient
     /// Creates the list of action buttons allowed for this user - Publish, Send to publish, save, unpublish returned as the button's 'letter'
     /// </summary>
     internal class ActionButtonsResolver
@@ -19,12 +18,12 @@ namespace Umbraco.Web.Models.Mapping
             _userService = userService;
         }
 
-        public IEnumerable<char> Resolve(IContent source)
+        public IEnumerable<string> Resolve(IContent source)
         {
             if (UmbracoContext.Current == null)
             {
                 //cannot check permissions without a context
-                return Enumerable.Empty<char>();
+                return Enumerable.Empty<string>();
             }
             var svc = _userService.Value;
 
@@ -36,11 +35,9 @@ namespace Umbraco.Web.Models.Mapping
                     // Here we need to do a special check since this could be new content, in which case we need to get the permissions
                     // from the parent, not the existing one otherwise permissions would be coming from the root since Id is 0.
                     source.HasIdentity ? source.Id : source.ParentId)
-                .FirstOrDefault();
+                .GetAllPermissions();
 
-            return permissions == null
-                ? Enumerable.Empty<char>()
-                : permissions.AssignedPermissions.Where(x => x.Length == 1).Select(x => x.ToUpperInvariant()[0]);
+            return permissions;
         }
     }
 }

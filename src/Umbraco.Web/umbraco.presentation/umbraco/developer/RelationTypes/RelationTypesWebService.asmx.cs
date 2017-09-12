@@ -1,5 +1,6 @@
 ﻿using System.Web.Services;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 
@@ -23,7 +24,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
         {
             var user = UmbracoContext.Current.Security.CurrentUser;
 
-            if (user.UserType.Name == "Administrators")
+			if (user.IsAdmin())
             {
                 var relationService = Current.Services.RelationService;
                 var relationType = relationService.GetRelationTypeById(relationTypeId);

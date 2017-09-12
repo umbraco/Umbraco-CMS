@@ -95,8 +95,8 @@ namespace Umbraco.Web.Security.Identity
             if (request.Uri.AbsolutePath.InvariantEquals(_getRemainingSecondsPath)) return false;
 
             if (//check the explicit flag
-                (checkForceAuthTokens && owinContext.Get<bool?>("umbraco-force-auth") != null)
-                || (checkForceAuthTokens && httpContext.Success && httpContext.Result.Items["umbraco-force-auth"] != null)
+                (checkForceAuthTokens && owinContext.Get<bool?>(Constants.Security.ForceReAuthFlag) != null)
+                || (checkForceAuthTokens && httpContext.Success && httpContext.Result.Items[Constants.Security.ForceReAuthFlag] != null)                
                 //check back office
                 || request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
                 //check installer

@@ -20,16 +20,14 @@ namespace Umbraco.Web.Models.Mapping
 
         public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService)
         {
-            if (localizedTextService == null) throw new ArgumentNullException("localizedTextService");
-            _localizedTextService = localizedTextService;
+            _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             IgnoreProperties = new List<string>();
         }
 
         public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
             : this(localizedTextService)
         {
-            if (ignoreProperties == null) throw new ArgumentNullException("ignoreProperties");
-            IgnoreProperties = ignoreProperties;
+            IgnoreProperties = ignoreProperties ?? throw new ArgumentNullException(nameof(ignoreProperties));
         }
 
         /// <summary>
@@ -65,14 +63,14 @@ namespace Umbraco.Web.Models.Mapping
             {
                 new ContentPropertyDisplay
                 {
-                    Alias = string.Format("{0}id", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}id",
                     Label = "Id",
                     Value = Convert.ToInt32(display.Id).ToInvariantString() + "<br/><small class='muted'>" + display.Key + "</small>",
                     View = labelEditor
                 },
                 new ContentPropertyDisplay
                 {
-                    Alias = string.Format("{0}creator", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}creator",
                     Label = localizedTextService.Localize("content/createBy"),
                     Description = localizedTextService.Localize("content/createByDesc"),
                     Value = display.Owner.Name,
@@ -80,7 +78,7 @@ namespace Umbraco.Web.Models.Mapping
                 },
                 new ContentPropertyDisplay
                 {
-                    Alias = string.Format("{0}createdate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}createdate",
                     Label = localizedTextService.Localize("content/createDate"),
                     Description = localizedTextService.Localize("content/createDateDesc"),
                     Value = display.CreateDate.ToIsoString(),
@@ -88,7 +86,7 @@ namespace Umbraco.Web.Models.Mapping
                 },
                 new ContentPropertyDisplay
                 {
-                    Alias = string.Format("{0}updatedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}updatedate",
                     Label = localizedTextService.Localize("content/updateDate"),
                     Description = localizedTextService.Localize("content/updateDateDesc"),
                     Value = display.UpdateDate.ToIsoString(),
@@ -106,10 +104,7 @@ namespace Umbraco.Web.Models.Mapping
             contentProps.AddRange(currProps);
 
             //callback
-            if (onGenericPropertiesMapped != null)
-            {
-                onGenericPropertiesMapped(contentProps);
-            }
+            onGenericPropertiesMapped?.Invoke(contentProps);
 
             //re-assign
             genericProps.Properties = contentProps;
@@ -161,20 +156,30 @@ namespace Umbraco.Web.Models.Mapping
                 throw new NullReferenceException("The property editor with alias " + dt.PropertyEditorAlias + " does not exist");
             }
 
-            var listViewTab = new Tab<ContentPropertyDisplay>();
-            listViewTab.Alias = Constants.Conventions.PropertyGroups.ListViewGroupName;
-            listViewTab.Label = localizedTextService.Localize("content/childItems");
-            listViewTab.Id = 25;
-            listViewTab.IsActive = true;
+            var listViewTab = new Tab<ContentPropertyDisplay>
+            {
+                Alias = Constants.Conventions.PropertyGroups.ListViewGroupName,
+                Label = localizedTextService.Localize("content/childItems"),
+                Id = display.Tabs.Count() + 1,
+                IsActive = true
+            };
 
             var listViewConfig = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals);
             //add the entity type to the config
             listViewConfig["entityType"] = entityType;
 
+            //Override Tab Label if tabName is provided
+            if (listViewConfig.ContainsKey("tabName"))
+            {
+                var configTabName = listViewConfig["tabName"];
+                if (configTabName != null && string.IsNullOrWhiteSpace(configTabName.ToString()) == false)
+                    listViewTab.Label = configTabName.ToString();
+            }
+
             var listViewProperties = new List<ContentPropertyDisplay>();
             listViewProperties.Add(new ContentPropertyDisplay
             {
-                Alias = string.Format("{0}containerView", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}containerView",
                 Label = "",
                 Value = null,
                 View = editor.ValueEditor.View,

@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
+using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
-using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Trees
 {
@@ -15,7 +17,7 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, null, sortOrder: 0)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
-    public class ContentTypeTreeController : TreeController
+    public class ContentTypeTreeController : TreeController, ISearchableTree
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
@@ -134,6 +136,12 @@ namespace Umbraco.Web.Trees
             }
 
             return menu;
+        }
+
+        public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        {
+            var results = Services.EntityService.GetPagedDescendantsFromRoot(UmbracoObjectTypes.DocumentType, pageIndex, pageSize, out totalFound, filter: query);
+            return Mapper.Map<IEnumerable<SearchResultItem>>(results);
         }
     }
 }

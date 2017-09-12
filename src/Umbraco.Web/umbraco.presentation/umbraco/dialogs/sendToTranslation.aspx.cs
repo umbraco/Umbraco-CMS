@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net.Mail;
 using System.Web;
 using System.Linq;
@@ -74,7 +75,7 @@ namespace umbraco.presentation.dialogs
                 // Translators
                 long totalUsers;
                 foreach (var u in Services.UserService.GetAll(0, int.MaxValue, out totalUsers))
-                    if (u.UserType.Alias.ToLower() == "translator" || UserHasTranslatePermission(u, _currentPage))
+                    if (u.GetGroups().Select(x => x.ToLower()).Contains("translators") || UserHasTranslatePermission(u, _currentPage))
                         translator.Items.Add(new ListItem(u.Name, u.Id.ToString()));
 
                 if (translator.Items.Count == 0) {

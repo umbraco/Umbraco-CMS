@@ -1,6 +1,7 @@
 ﻿using Umbraco.Core.Services;
 using System;
 using System.Collections;
+using System.Globalization;
 using System.Linq;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
@@ -52,7 +53,7 @@ namespace umbraco.dialogs
                 {
 
                     CheckBox c = new CheckBox();
-                    c.ID = a.Letter.ToString();
+                    c.ID = a.Letter.ToString(CultureInfo.InvariantCulture);
 
                     var notifications = Services.NotificationService.GetUserNotifications(Security.CurrentUser, node.Path);
                     if (notifications.Any(x => x.Action == a.Letter.ToString()))

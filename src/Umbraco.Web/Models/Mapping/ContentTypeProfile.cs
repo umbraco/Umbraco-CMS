@@ -33,26 +33,26 @@ namespace Umbraco.Web.Models.Mapping
             /*
             CreateMap<PropertyTypeBasic, PropertyType>()
                 .ConstructUsing(basic => new PropertyType(_dataTypeService.GetDataTypeDefinitionById(basic.DataTypeId)))
-                .ForMember(type => type.ValidationRegExp, expression => expression.ResolveUsing(basic => basic.Validation.Pattern))
-                .ForMember(type => type.Mandatory, expression => expression.ResolveUsing(basic => basic.Validation.Mandatory))
-                .ForMember(type => type.Name, expression => expression.ResolveUsing(basic => basic.Label))
-                .ForMember(type => type.DataTypeDefinitionId, expression => expression.ResolveUsing(basic => basic.DataTypeId))
-                .ForMember(type => type.DataTypeId, expression => expression.Ignore())
-                .ForMember(type => type.PropertyEditorAlias, expression => expression.Ignore())
-                .ForMember(type => type.HelpText, expression => expression.Ignore())
-                .ForMember(type => type.Key, expression => expression.Ignore())
-                .ForMember(type => type.CreateDate, expression => expression.Ignore())
-                .ForMember(type => type.UpdateDate, expression => expression.Ignore())
-                .ForMember(type => type.DeletedDate, expression => expression.Ignore())
-                .ForMember(type => type.HasIdentity, expression => expression.Ignore());
+                .ForMember(type => type.ValidationRegExp, opt => opt.ResolveUsing(basic => basic.Validation.Pattern))
+                .ForMember(type => type.Mandatory, opt => opt.ResolveUsing(basic => basic.Validation.Mandatory))
+                .ForMember(type => type.Name, opt => opt.ResolveUsing(basic => basic.Label))
+                .ForMember(type => type.DataTypeDefinitionId, opt => opt.ResolveUsing(basic => basic.DataTypeId))
+                .ForMember(type => type.DataTypeId, opt => opt.Ignore())
+                .ForMember(type => type.PropertyEditorAlias, opt => opt.Ignore())
+                .ForMember(type => type.HelpText, opt => opt.Ignore())
+                .ForMember(type => type.Key, opt => opt.Ignore())
+                .ForMember(type => type.CreateDate, opt => opt.Ignore())
+                .ForMember(type => type.UpdateDate, opt => opt.Ignore())
+                .ForMember(type => type.DeletedDate, opt => opt.Ignore())
+                .ForMember(type => type.HasIdentity, opt => opt.Ignore());
             */
 
             CreateMap<DocumentTypeSave, IContentType>()
                 //do the base mapping
                 .MapBaseContentTypeSaveToEntity<DocumentTypeSave, PropertyTypeBasic, IContentType>()
                 .ConstructUsing((source) => new ContentType(source.ParentId))
-                .ForMember(source => source.AllowedTemplates, expression => expression.Ignore())
-                .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
+                .ForMember(source => source.AllowedTemplates, opt => opt.Ignore())
+                .ForMember(dto => dto.DefaultTemplate, opt => opt.Ignore())
                 .AfterMap((source, dest) =>
                 {
                     dest.AllowedTemplates = source.AllowedTemplates
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Models.Mapping
                     if (source.DefaultTemplate != null)
                         dest.SetDefaultTemplate(_fileService.GetTemplate(source.DefaultTemplate));
 
-                    ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, _contentTypeService);
+                    ContentTypeProfileExtensions.AfterMapContentTypeSaveToEntity(source, dest, _contentTypeService);
                 });
 
             CreateMap<MediaTypeSave, IMediaType>()
@@ -72,7 +72,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ConstructUsing((source) => new MediaType(source.ParentId))
                 .AfterMap((source, dest) =>
                 {
-                    ContentTypeModelMapperExtensions.AfterMapMediaTypeSaveToEntity(source, dest, _mediaTypeService);
+                    ContentTypeProfileExtensions.AfterMapMediaTypeSaveToEntity(source, dest, _mediaTypeService);
                 });
 
             CreateMap<MemberTypeSave, IMemberType>()
@@ -81,13 +81,13 @@ namespace Umbraco.Web.Models.Mapping
                 .ConstructUsing((source) => new MemberType(source.ParentId))
                 .AfterMap((source, dest) =>
                 {
-                    ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, _contentTypeService);
+                    ContentTypeProfileExtensions.AfterMapContentTypeSaveToEntity(source, dest, _contentTypeService);
 
                     //map the MemberCanEditProperty,MemberCanViewProperty
-                    foreach (var propertyType in source.Groups.SelectMany(x => x.Properties))
+                    foreach (var propertyType in source.Groups.SelectMany(dest => dest.Properties))
                     {
                         var localCopy = propertyType;
-                        var destProp = dest.PropertyTypes.SingleOrDefault(x => x.Alias.InvariantEquals(localCopy.Alias));
+                        var destProp = dest.PropertyTypes.SingleOrDefault(dest => dest.Alias.InvariantEquals(localCopy.Alias));
                         if (destProp != null)
                         {
                             dest.SetMemberCanEditProperty(localCopy.Alias, localCopy.MemberCanEditProperty);
@@ -96,7 +96,7 @@ namespace Umbraco.Web.Models.Mapping
                     }
                 });
 
-            CreateMap<IContentTypeComposition, string>().ConvertUsing(x => x.Alias);
+            CreateMap<IContentTypeComposition, string>().ConvertUsing(dest => dest.Alias);
 
             CreateMap<IMemberType, MemberTypeDisplay>()
                 //map base logic
@@ -107,7 +107,7 @@ namespace Umbraco.Web.Models.Mapping
                     foreach (var propertyType in memberType.PropertyTypes)
                     {
                         var localCopy = propertyType;
-                        var displayProp = display.Groups.SelectMany(x => x.Properties).SingleOrDefault(x => x.Alias.InvariantEquals(localCopy.Alias));
+                        var displayProp = display.Groups.SelectMany(dest => dest.Properties).SingleOrDefault(dest => dest.Alias.InvariantEquals(localCopy.Alias));
                         if (displayProp != null)
                         {
                             displayProp.MemberCanEditProperty = memberType.MemberCanEditProperty(localCopy.Alias);
@@ -135,9 +135,9 @@ namespace Umbraco.Web.Models.Mapping
             CreateMap<IContentType, DocumentTypeDisplay>()
                 //map base logic
                 .MapBaseContentTypeEntityToDisplay<IContentType, DocumentTypeDisplay, PropertyTypeDisplay>(_propertyEditors, _dataTypeService, _contentTypeService)
-                .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
-                .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
-                .ForMember(display => display.Notifications, expression => expression.Ignore())
+                .ForMember(dto => dto.AllowedTemplates, opt => opt.Ignore())
+                .ForMember(dto => dto.DefaultTemplate, opt => opt.Ignore())
+                .ForMember(display => display.Notifications, opt => opt.Ignore())
                 .AfterMap((source, dest) =>
                 {
                     //sync templates
@@ -159,11 +159,14 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             CreateMap<IMemberType, ContentTypeBasic>()
-                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.MemberType, content.Key)));
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(source => Udi.Create(Constants.UdiEntityType.MemberType, source.Key)))
+                .ForMember(dest => dest.Blueprints, opt => opt.Ignore());
             CreateMap<IMediaType, ContentTypeBasic>()
-                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.MediaType, content.Key)));
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(source => Udi.Create(Constants.UdiEntityType.MediaType, source.Key)))
+                .ForMember(dest => dest.Blueprints, opt => opt.Ignore());
             CreateMap<IContentType, ContentTypeBasic>()
-                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.DocumentType, content.Key)));
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(source => Udi.Create(Constants.UdiEntityType.DocumentType, source.Key)))
+                .ForMember(dest => dest.Blueprints, opt => opt.Ignore());
 
             CreateMap<PropertyTypeBasic, PropertyType>()
 
@@ -174,29 +177,29 @@ namespace Umbraco.Web.Models.Mapping
                     return new PropertyType(dataType, propertyTypeBasic.Alias);
                 })
 
+                .IgnoreEntityCommonProperties()
+
                 // see note above - have to do this here?
-                .ForMember(type => type.PropertyEditorAlias, expression => expression.Ignore())
-                .ForMember(type => type.DeletedDate, expression => expression.Ignore())
+                .ForMember(dest => dest.PropertyEditorAlias, opt => opt.Ignore())
+                .ForMember(dest => dest.DeletedDate, opt => opt.Ignore())
 
                 //only map if it is actually set
-                .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
-                .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
-                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
+                .ForMember(dest => dest.Id, opt => opt.Condition(source => source.Id > 0))
                 //only map if it is actually set, if it's  not set, it needs to be handled differently and will be taken care of in the
                 // IContentType.AddPropertyType
-                .ForMember(dest => dest.PropertyGroupId, expression => expression.Condition(source => source.GroupId > 0))
-                .ForMember(type => type.PropertyGroupId, expression => expression.MapFrom(display => new Lazy<int>(() => display.GroupId, false)))
-                .ForMember(type => type.Key, expression => expression.Ignore())
-                .ForMember(type => type.HelpText, expression => expression.Ignore())
-                .ForMember(type => type.HasIdentity, expression => expression.Ignore())
+                .ForMember(dest => dest.PropertyGroupId, opt => opt.Condition(source => source.GroupId > 0))
+                .ForMember(dest => dest.PropertyGroupId, opt => opt.MapFrom(display => new Lazy<int>(() => display.GroupId, false)))
+                .ForMember(dest => dest.Key, opt => opt.Ignore())
+                .ForMember(dest => dest.HelpText, opt => opt.Ignore())
+                .ForMember(dest => dest.HasIdentity, opt => opt.Ignore())
                 //ignore because this is set in the ctor NOT ON UPDATE, STUPID!
-                //.ForMember(type => type.Alias, expression => expression.Ignore())
+                //.ForMember(type => type.Alias, opt => opt.Ignore())
                 //ignore because this is obsolete and shouldn't be used
-                .ForMember(type => type.DataTypeId, expression => expression.Ignore())
-                .ForMember(type => type.Mandatory, expression => expression.MapFrom(display => display.Validation.Mandatory))
-                .ForMember(type => type.ValidationRegExp, expression => expression.MapFrom(display => display.Validation.Pattern))
-                .ForMember(type => type.DataTypeDefinitionId, expression => expression.MapFrom(display => display.DataTypeId))
-                .ForMember(type => type.Name, expression => expression.MapFrom(display => display.Label));
+                .ForMember(dest => dest.DataTypeId, opt => opt.Ignore())
+                .ForMember(dest => dest.Mandatory, opt => opt.MapFrom(source => source.Validation.Mandatory))
+                .ForMember(dest => dest.ValidationRegExp, opt => opt.MapFrom(source => source.Validation.Pattern))
+                .ForMember(dest => dest.DataTypeDefinitionId, opt => opt.MapFrom(source => source.DataTypeId))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(source => source.Label));
 
             #region *** Used for mapping on top of an existing display object from a save object ***
 
@@ -208,12 +211,12 @@ namespace Umbraco.Web.Models.Mapping
 
             CreateMap<DocumentTypeSave, DocumentTypeDisplay>()
                 .MapBaseContentTypeSaveToDisplay<DocumentTypeSave, PropertyTypeBasic, DocumentTypeDisplay, PropertyTypeDisplay>()
-                .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
-                .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
+                .ForMember(dto => dto.AllowedTemplates, opt => opt.Ignore())
+                .ForMember(dto => dto.DefaultTemplate, opt => opt.Ignore())
                 .AfterMap((source, dest) =>
                 {
                     //sync templates
-                    var destAllowedTemplateAliases = dest.AllowedTemplates.Select(x => x.Alias);
+                    var destAllowedTemplateAliases = dest.AllowedTemplates.Select(dest => dest.Alias);
                     //if the dest is set and it's the same as the source, then don't change
                     if (destAllowedTemplateAliases.SequenceEqual(source.AllowedTemplates) == false)
                     {
@@ -256,28 +259,23 @@ namespace Umbraco.Web.Models.Mapping
                 .MapPropertyGroupBasicToPropertyGroupDisplay<PropertyGroupBasic<MemberPropertyTypeBasic>, MemberPropertyTypeBasic, MemberPropertyTypeDisplay>();
 
             CreateMap<PropertyTypeBasic, PropertyTypeDisplay>()
-                .ForMember(g => g.Editor, expression => expression.Ignore())
-                .ForMember(g => g.View, expression => expression.Ignore())
-                .ForMember(g => g.Config, expression => expression.Ignore())
-                .ForMember(g => g.ContentTypeId, expression => expression.Ignore())
-                .ForMember(g => g.ContentTypeName, expression => expression.Ignore())
+                .ForMember(g => g.Editor, opt => opt.Ignore())
+                .ForMember(g => g.View, opt => opt.Ignore())
+                .ForMember(g => g.Config, opt => opt.Ignore())
+                .ForMember(g => g.ContentTypeId, opt => opt.Ignore())
+                .ForMember(g => g.ContentTypeName, opt => opt.Ignore())
                 .ForMember(g => g.Locked, exp => exp.Ignore());
 
             CreateMap<MemberPropertyTypeBasic, MemberPropertyTypeDisplay>()
-                .ForMember(g => g.Editor, expression => expression.Ignore())
-                .ForMember(g => g.View, expression => expression.Ignore())
-                .ForMember(g => g.Config, expression => expression.Ignore())
-                .ForMember(g => g.ContentTypeId, expression => expression.Ignore())
-                .ForMember(g => g.ContentTypeName, expression => expression.Ignore())
+                .ForMember(g => g.Editor, opt => opt.Ignore())
+                .ForMember(g => g.View, opt => opt.Ignore())
+                .ForMember(g => g.Config, opt => opt.Ignore())
+                .ForMember(g => g.ContentTypeId, opt => opt.Ignore())
+                .ForMember(g => g.ContentTypeName, opt => opt.Ignore())
                 .ForMember(g => g.Locked, exp => exp.Ignore());
 
             #endregion
 
-
-
-
         }
-
-
     }
 }

@@ -123,14 +123,22 @@
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="AspNetHttpContextAccessor.cs" />
     <Compile Include="Cache\ContentCacheRefresher.cs" />
+    <Compile Include="Cache\UserGroupCacheRefresher.cs" />
+    <Compile Include="Cache\UserGroupPermissionsCacheRefresher.cs" />
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\Current.cs" />
+    <Compile Include="Editors\BackOfficeServerVariables.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\EditorValidatorCollection.cs" />
     <Compile Include="Editors\EditorValidatorCollectionBuilder.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
+    <Compile Include="Editors\IsCurrentUserModelFilterAttribute.cs" />
     <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
+    <Compile Include="Editors\PasswordChanger.cs" />
     <Compile Include="Editors\TemplateController.cs" />
+    <Compile Include="Editors\UserGroupsController.cs" />
+    <Compile Include="Editors\UserGroupValidateAttribute.cs" />
+    <Compile Include="Editors\UsersController.cs" />
     <Compile Include="HealthCheck\HealthCheckCollection.cs" />
     <Compile Include="HealthCheck\HealthCheckNotificationMethodAttribute.cs" />
     <Compile Include="HealthCheck\HealthCheckNotificationMethodCollection.cs" />
@@ -156,7 +164,6 @@
     <Compile Include="LightInjectExtensions.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
     <Compile Include="Macros\MacroContent.cs" />
-    <Compile Include="Editors\GravatarController.cs" />
     <Compile Include="HealthCheck\Checks\Config\AbstractConfigCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\AcceptableConfiguration.cs" />
     <Compile Include="HealthCheck\Checks\Config\ConfigurationService.cs" />
@@ -198,14 +205,18 @@
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Models\ContentEditing\SnippetDisplay.cs" />
     <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
+    <Compile Include="Models\DetachedPublishedContent.cs" />
+    <Compile Include="Models\DetachedPublishedProperty.cs" />
     <Compile Include="Models\Mapping\ActionButtonsResolver.cs" />
     <Compile Include="Models\Mapping\CodeFileProfile.cs" />
     <Compile Include="Models\Mapping\ContentTypeUdiResolver.cs" />
+    <Compile Include="Models\Mapping\EntityProfileExtensions.cs" />
     <Compile Include="Models\Mapping\MemberDtoPropertiesResolver.cs" />
     <Compile Include="Models\Mapping\MemberProviderFieldResolver.cs" />
     <Compile Include="Models\Mapping\MembershipScenarioResolver.cs" />
     <Compile Include="Models\Mapping\MemberTabsAndPropertiesResolver.cs" />
     <Compile Include="Models\Mapping\TemplateProfile.cs" />
+    <Compile Include="Models\Mapping\UserGroupDefaultPermissionsResolver.cs" />
     <Compile Include="Models\RelatedLink.cs" />
     <Compile Include="Models\RelatedLinkBase.cs" />
     <Compile Include="Models\RelatedLinks.cs" />
@@ -218,13 +229,19 @@
     <Compile Include="PropertyEditors\MediaPicker2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\MemberPicker2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultiNodeTreePicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\NestedContentController.cs" />
+    <Compile Include="PropertyEditors\NestedContentHelper.cs" />
+    <Compile Include="PropertyEditors\NestedContentPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorsComponent.cs" />
     <Compile Include="PropertyEditors\RelatedLinks2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\NestedContentManyValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\NestedContentPublishedPropertyTypeExtensions.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\NestedContentSingleValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\RelatedLinksLegacyValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\MediaPickerPropertyConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\MemberPickerPropertyConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerPropertyConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\MultipleMediaPickerPropertyConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MediaPickerValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MemberPickerValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MediaPickerLegacyValueConverter.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheComponent.cs" />
     <Compile Include="PublishedCache\NuCache\PropertySetProperty.cs" />
     <Compile Include="PublishedCache\PropertySet.cs" />
@@ -381,7 +398,7 @@
     <Compile Include="Models\ContentEditing\PropertyTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
     <Compile Include="Models\LocalPackageInstallModel.cs" />
-    <Compile Include="Models\Mapping\ContentTypeModelMapperExtensions.cs" />
+    <Compile Include="Models\Mapping\ContentTypeProfileExtensions.cs" />
     <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
     <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />
     <Compile Include="Models\PackageInstallResult.cs" />
@@ -469,8 +486,6 @@
     <Compile Include="Cache\PublicAccessCacheRefresher.cs" />
     <Compile Include="Cache\TemplateCacheRefresher.cs" />
     <Compile Include="Cache\UserCacheRefresher.cs" />
-    <Compile Include="Cache\UserPermissionsCacheRefresher.cs" />
-    <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Controllers\UmbProfileController.cs" />
     <Compile Include="Editors\ContentController.cs" />
@@ -486,7 +501,6 @@
     <Compile Include="Editors\PackageInstallController.cs" />
     <Compile Include="Editors\RelationController.cs" />
     <Compile Include="Editors\CanvasDesignerController.cs" />
-    <Compile Include="Editors\UserController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
     <Compile Include="Models\PackageInstallModel.cs" />
     <Compile Include="Models\ContentEditing\DataTypeBasic.cs" />
@@ -698,9 +712,7 @@
     <Compile Include="umbraco.presentation\umbraco\create.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\script.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\create\script.ascx.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\Language.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -711,9 +723,7 @@
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\Installer.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\cruds.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\dialogs\cruds.aspx.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackager.cs" />
     <Compile Include="UmbracoComponentRenderer.cs" />
     <Compile Include="Web References\org.umbraco.our\Reference.cs">
@@ -887,9 +897,7 @@
     <Compile Include="UI\Bundles\JsUmbracoApplicationUI.cs" />
     <Compile Include="UI\Bundles\JsUmbracoTree.cs" />
     <Compile Include="UI\CdfLogger.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\PasswordChanger.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\controls\PasswordChanger.ascx.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -909,9 +917,7 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.designer.cs">
       <DependentUpon>AssignDomain2.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\users\EditUser.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\users\EditUser.aspx.cs" />
     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1115,9 +1121,7 @@
     <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoDialog.master.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\editTemplate.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\settings\editTemplate.aspx.cs" />
     <Compile Include="umbraco.presentation\umbraco\settings\modals\ShowUmbracoTags.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1338,7 +1342,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\autoDoc.aspx.cs">
       <DependentUpon>autoDoc.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\autoDoc.aspx.designer.cs">
       <DependentUpon>autoDoc.aspx</DependentUpon>
@@ -1370,7 +1373,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\about.aspx.cs">
       <DependentUpon>about.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\about.aspx.designer.cs">
       <DependentUpon>about.aspx</DependentUpon>
@@ -1433,7 +1435,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\scripts\editScript.aspx.cs">
       <DependentUpon>editScript.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\ITreeService.cs">
       <SubType>Code</SubType>
@@ -1493,28 +1494,24 @@
     <Compile Include="umbraco.presentation\umbraco\urlRewriter\UrlRewriterFormWriter.cs" />
     <Compile Include="umbraco.presentation\umbraco\users\EditUserType.aspx.cs">
       <DependentUpon>EditUserType.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\EditUserType.aspx.designer.cs">
       <DependentUpon>EditUserType.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\NodePermissions.ascx.cs">
       <DependentUpon>NodePermissions.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\NodePermissions.ascx.designer.cs">
       <DependentUpon>NodePermissions.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx.cs">
       <DependentUpon>PermissionEditor.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx.designer.cs">
       <DependentUpon>PermissionEditor.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\PermissionsHandler.asmx.cs">
       <DependentUpon>PermissionsHandler.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\UserPermissions.cs" />
     <Compile Include="umbraco.presentation\umbraco\users\UserTypeTasks.cs" />
@@ -1533,7 +1530,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\Developer.asmx.cs">
       <DependentUpon>Developer.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\legacyAjaxCalls.asmx.cs">
       <DependentUpon>legacyAjaxCalls.asmx</DependentUpon>
@@ -1545,7 +1541,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\templates.asmx.cs">
       <DependentUpon>templates.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\Web\UI\ContentPage.cs">
       <SubType>ASPXCodeBehind</SubType>

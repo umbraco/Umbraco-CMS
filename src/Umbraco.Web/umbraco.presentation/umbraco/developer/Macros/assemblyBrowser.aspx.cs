@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
+using UserControl = System.Web.UI.UserControl;
 
 namespace umbraco.developer
 {

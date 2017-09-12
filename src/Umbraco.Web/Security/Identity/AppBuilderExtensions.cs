@@ -43,6 +43,7 @@ namespace Umbraco.Web.Security.Identity
                     options,
                     services.UserService,
                     services.MemberTypeService,
+                    services.EntityService,
                     services.ExternalLoginService,
                     userMembershipProvider));
 

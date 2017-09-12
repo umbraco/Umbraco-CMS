@@ -78,6 +78,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                                             if (udiAttempt)
                                             {
                                                 var content = helper.PublishedContent(udiAttempt.Result);
+                                                if (content == null) break;
                                                 a["link"] = helper.NiceUrl(content.Id);
                                             }
                                             break;

@@ -68,19 +68,6 @@ namespace Umbraco.Web.Models.Mapping
                .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
-            //CreateMap<EntityBasic, ITemplate>()
-            //    .ConstructUsing(basic => new Template(basic.Name, basic.Alias)
-            //    {
-            //        Id = Convert.ToInt32(basic.Id),
-            //        Key = basic.Key
-            //    })
-            //   .ForMember(t => t.Path, opt => opt.Ignore())
-            //   .ForMember(t => t.Id, opt => opt.MapFrom(template => Convert.ToInt32(template.Id)))
-            //   .ForMember(dest => dest.VirtualPath, opt => opt.Ignore())
-            //   .ForMember(dest => dest.CreateDate, opt => opt.Ignore())
-            //   .ForMember(dest => dest.UpdateDate, opt => opt.Ignore())
-            //   .ForMember(dest => dest.Content, opt => opt.Ignore());
-
             CreateMap<EntityBasic, ContentTypeSort>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => new Lazy<int>(() => Convert.ToInt32(src.Id))))
                 .ForMember(dest => dest.SortOrder, opt => opt.Ignore());
@@ -92,8 +79,32 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
-            CreateMap<SearchResult, EntityBasic>()
+            CreateMap<UmbracoEntity, SearchResultItem>()
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(src.NodeObjectTypeId), src.Key)))
+                .ForMember(dest => dest.Icon, opt => opt.MapFrom(src=> src.ContentTypeIcon))
+                .ForMember(dest => dest.Trashed, opt => opt.Ignore())
+                .ForMember(dest => dest.Alias, opt => opt.Ignore())
+                .ForMember(dest => dest.Score, opt => opt.Ignore())
+                .AfterMap((entity, basic) =>
+                {
+                    if (basic.Icon.IsNullOrWhiteSpace())
+                    {
+                        if (entity.NodeObjectTypeId == Constants.ObjectTypes.MemberGuid)
+                            basic.Icon = "icon-user";
+                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.DataTypeGuid)
+                            basic.Icon = "icon-autofill";
+                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.DocumentTypeGuid)
+                            basic.Icon = "icon-item-arrangement";
+                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.MediaTypeGuid)
+                            basic.Icon = "icon-thumbnails";
+                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.TemplateTypeGuid)
+                            basic.Icon = "icon-newspaper-alt";
+                    }
+                });
+
+            CreateMap<SearchResult, SearchResultItem>()
                 //default to document icon
+                  .ForMember(dest => dest.Score, opt => opt.MapFrom(result => result.Score))
                   .ForMember(dest => dest.Udi, opt => opt.Ignore())
                   .ForMember(dest => dest.Icon, opt => opt.Ignore())
                   .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
@@ -158,11 +169,11 @@ namespace Umbraco.Web.Models.Mapping
                           }
                       });
 
-            CreateMap<ILuceneSearchResults, IEnumerable<EntityBasic>>()
-                  .ConvertUsing(results => results.Select(Mapper.Map<EntityBasic>).ToList());
+            CreateMap<ILuceneSearchResults, IEnumerable<SearchResultItem>>()
+                  .ConvertUsing(results => results.Select(Mapper.Map<SearchResultItem>).ToList());
 
-            CreateMap<IEnumerable<SearchResult>, IEnumerable<EntityBasic>>()
-                  .ConvertUsing(results => results.Select(Mapper.Map<EntityBasic>).ToList());
+            CreateMap<IEnumerable<SearchResult>, IEnumerable<SearchResultItem>>()
+                  .ConvertUsing(results => results.Select(Mapper.Map<SearchResultItem>).ToList());
         }
     }
 }

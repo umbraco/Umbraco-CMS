@@ -4,14 +4,12 @@ using System.Xml;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Core.Services;
 using Umbraco.Web.Models;
-using Umbraco.Web.Routing;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -21,17 +19,15 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter(typeof(RelatedLinksLegacyValueConverter), typeof(JsonValueConverter))]
     public class RelatedLinksValueConverter : PropertyValueConverterBase
     {
+        private readonly IFacadeAccessor _facadeAccessor;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly ServiceContext _services;
-        private readonly CacheHelper _appCache;
         private readonly ILogger _logger;
 
-        public RelatedLinksValueConverter(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, CacheHelper appCache, ILogger logger)
+        public RelatedLinksValueConverter(IFacadeAccessor facadeAccessor, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
         {
+            _facadeAccessor = facadeAccessor;
             _umbracoContextAccessor = umbracoContextAccessor;
             _logger = logger;
-            _services = services;
-            _appCache = appCache;
         }
 
         /// <summary>
@@ -60,7 +56,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var relatedLinksData = JsonConvert.DeserializeObject<IEnumerable<RelatedLink>>(sourceString);
             var relatedLinks = new List<RelatedLink>();
-            var helper = new UmbracoHelper(_umbracoContextAccessor.UmbracoContext, _services, _appCache);
 
             foreach (var linkData in relatedLinksData)
             {
@@ -82,10 +77,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 else
                 {
                     var strLinkId = linkData.Link;
-                    var udiAttempt = strLinkId.TryConvertTo<Udi>();
+                    var udiAttempt = strLinkId.TryConvertTo<GuidUdi>();
                     if (udiAttempt.Success)
                     {
-                        var content = helper.PublishedContent(udiAttempt.Result);
+                        var content = _facadeAccessor.Facade.ContentCache.GetById(udiAttempt.Result.Guid);
                         if (content != null)
                         {
                             relatedLink.Id = content.Id;

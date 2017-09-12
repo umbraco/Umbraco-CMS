@@ -71,7 +71,7 @@ namespace Umbraco.Web.Security.Identity
 
             var httpCtx = Context.TryGetHttpContext();
             //check for the special flag in either the owin or http context
-            var shouldRenew = Context.Get<bool?>("umbraco-force-auth") != null || (httpCtx.Success && httpCtx.Result.Items["umbraco-force-auth"] != null);
+            var shouldRenew = Context.Get<bool?>(Constants.Security.ForceReAuthFlag) != null || (httpCtx.Success && httpCtx.Result.Items[Constants.Security.ForceReAuthFlag] != null);
 
             if (shouldRenew)
             {

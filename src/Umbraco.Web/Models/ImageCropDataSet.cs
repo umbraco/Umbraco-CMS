@@ -71,7 +71,7 @@ namespace Umbraco.Web.Models
 
         public bool HasImage()
         {
-            return string.IsNullOrEmpty(Src);
+            return ! string.IsNullOrEmpty(Src);
         }
 
         public string ToHtmlString()

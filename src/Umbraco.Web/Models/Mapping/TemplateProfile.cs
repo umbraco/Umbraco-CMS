@@ -9,19 +9,16 @@ namespace Umbraco.Web.Models.Mapping
         public TemplateProfile()
         {
             CreateMap<ITemplate, TemplateDisplay>()
-                .ForMember(x => x.Notifications, exp => exp.Ignore());
+                .ForMember(dest => dest.Notifications, opt => opt.Ignore());
 
             CreateMap<TemplateDisplay, Template>()
-                .ForMember(x => x.DeletedDate, exp => exp.Ignore())
-                .ForMember(x => x.Key, exp => exp.Ignore())
-                .ForMember(x => x.Path, exp => exp.Ignore())
-                .ForMember(x => x.CreateDate, exp => exp.Ignore())
-                .ForMember(x => x.UpdateDate, exp => exp.Ignore())
-                .ForMember(x => x.VirtualPath, exp => exp.Ignore())
-                .ForMember(x => x.Path, exp => exp.Ignore())
-                .ForMember(x => x.MasterTemplateId, exp => exp.Ignore()) // ok, assigned when creating the template
-                .ForMember(x => x.IsMasterTemplate, exp => exp.Ignore())
-                .ForMember(x => x.HasIdentity, exp => exp.Ignore());
+                .IgnoreDeletableEntityCommonProperties()
+                .ForMember(dest => dest.Path, opt => opt.Ignore())
+                .ForMember(dest => dest.VirtualPath, opt => opt.Ignore())
+                .ForMember(dest => dest.Path, opt => opt.Ignore())
+                .ForMember(dest => dest.MasterTemplateId, opt => opt.Ignore()) // ok, assigned when creating the template
+                .ForMember(dest => dest.IsMasterTemplate, opt => opt.Ignore())
+                .ForMember(dest => dest.HasIdentity, opt => opt.Ignore());
         }
     }
 }

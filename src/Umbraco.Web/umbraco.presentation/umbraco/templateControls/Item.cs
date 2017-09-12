@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.ComponentModel;
+using System.Globalization;
 using System.Web;
 using System.Linq;
 using System.Web.UI;
@@ -314,7 +315,7 @@ namespace umbraco.presentation.templateControls
             if (u == null) return false;
             var permission = Current.Services.UserService.GetPermissions(u, PageElements["path"].ToString());
 
-            return permission.AssignedPermissions.Contains(ActionUpdate.Instance.Letter.ToString(), StringComparer.Ordinal);
+            return permission.AssignedPermissions.Contains(ActionUpdate.Instance.Letter.ToString(CultureInfo.InvariantCulture), StringComparer.Ordinal);
         }
 
         #endregion
