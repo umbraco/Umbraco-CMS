@@ -19,6 +19,7 @@
 
 . "$PSScriptRoot\Get-UmbracoBuildEnv.ps1"
 . "$PSScriptRoot\Set-UmbracoVersion.ps1"
+. "$PSScriptRoot\Set-UmbracoContinuousVersion.ps1"
 . "$PSScriptRoot\Get-UmbracoVersion.ps1"
 . "$PSScriptRoot\Verify-NuGet.ps1"
 
@@ -519,7 +520,7 @@ function Build-Umbraco
   if ($target -eq "pre-build")
   {
     Prepare-Build $uenv
-    Compile-Belle $uenv $version
+    #Compile-Belle $uenv $version
 
     # set environment variables
     $env:UMBRACO_VERSION=$version.Semver.ToString()
@@ -595,6 +596,7 @@ function Build-Umbraco
 #
 Export-ModuleMember -function Get-UmbracoBuildEnv
 Export-ModuleMember -function Set-UmbracoVersion
+Export-ModuleMember -function Set-UmbracoContinuousVersion
 Export-ModuleMember -function Get-UmbracoVersion
 Export-ModuleMember -function Build-Umbraco
 Export-ModuleMember -function Build-UmbracoDocs

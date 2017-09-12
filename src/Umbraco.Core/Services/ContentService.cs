@@ -961,10 +961,23 @@ namespace Umbraco.Core.Services
         /// <returns>True if the Content can be published, otherwise False</returns>
         public bool IsPublishable(IContent content)
         {
-            // get ids from path
-            // skip the first one that has to be -1 - and we don't care
-            // skip the last one that has to be "this" - and it's ok to stop at the parent
-            var ids = content.Path.Split(',').Skip(1).SkipLast().Select(int.Parse).ToArray();
+            int[] ids;
+            if (content.HasIdentity)
+            {
+                // get ids from path (we have identity)
+                // skip the first one that has to be -1 - and we don't care
+                // skip the last one that has to be "this" - and it's ok to stop at the parent
+                ids = content.Path.Split(',').Skip(1).SkipLast().Select(int.Parse).ToArray();
+            }
+            else
+            {
+                // no path yet (no identity), have to move up to parent
+                // skip the first one that has to be -1 - and we don't care
+                // don't skip the last one that is "parent"
+                var parent = GetById(content.ParentId);
+                if (parent == null) return false;
+                ids = parent.Path.Split(',').Skip(1).Select(int.Parse).ToArray();
+            }
             if (ids.Length == 0)
                 return false;
 
