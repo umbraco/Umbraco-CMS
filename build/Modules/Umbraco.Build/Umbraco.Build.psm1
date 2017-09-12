@@ -205,10 +205,7 @@ function Compile-Umbraco
     /p:Verbosity=minimal `
     /t:Clean`;Rebuild `
     /tv:$toolsVersion `
-    /p:UmbracoBuild=True `
     > $tmp\msbuild.umbraco.log
-    
-  # /p:UmbracoBuild tells the csproj that we are building from PS
 }
 
 #
@@ -289,11 +286,8 @@ function Compile-Tests
     /p:Verbosity=minimal `
     /t:Build `
     /tv:$toolsVersion `
-    /p:UmbracoBuild=True `
     /p:NugetPackages=$src\packages `
     > $tmp\msbuild.tests.log
-    
-  # /p:UmbracoBuild tells the csproj that we are building from PS
 }
 
 #
