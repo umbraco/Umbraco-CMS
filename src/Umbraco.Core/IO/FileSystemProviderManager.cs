@@ -11,7 +11,7 @@ namespace Umbraco.Core.IO
 {
     public class FileSystemProviderManager
     {
-        private readonly FileSystemProvidersSection _config;
+        private readonly IFileSystemProvidersSection _config;
         private readonly ConcurrentSet<ShadowWrapper> _wrappers = new ConcurrentSet<ShadowWrapper>();
 
         private readonly ConcurrentDictionary<string, ProviderConstructionInfo> _providerLookup = new ConcurrentDictionary<string, ProviderConstructionInfo>();
@@ -29,11 +29,29 @@ namespace Umbraco.Core.IO
 
         #region Singleton & Constructor
 
-        private static readonly FileSystemProviderManager Instance = new FileSystemProviderManager();
+        //ensures that the construction of the singleton only happens when Current is accessed, otherwise any reference to this class would cause
+        //the ctor to be invoked which can lead to problems outside of a web app.
+        private static readonly Lazy<FileSystemProviderManager> Instance = new Lazy<FileSystemProviderManager>(() => new FileSystemProviderManager());
+
+        private static FileSystemProviderManager _current;
 
         public static FileSystemProviderManager Current
         {
-            get { return Instance; }
+            get
+            {
+                if (_current != null) return _current;
+                _current =  Instance.Value;
+                return _current;
+            }
+        }
+
+        /// <summary>
+        /// For tests only, allows setting the value of the singleton "Current" property
+        /// </summary>
+        /// <param name="instance"></param>
+        public static void SetCurrent(FileSystemProviderManager instance)
+        {
+            _current = instance;
         }
 
         // for tests only, totally unsafe
@@ -53,9 +71,23 @@ namespace Umbraco.Core.IO
             get { return ApplicationContext.Current == null ? null : ApplicationContext.Current.ScopeProvider as IScopeProviderInternal; }
         }
 
-        internal FileSystemProviderManager()
+        /// <summary>
+        /// Constructor that can be used for tests
+        /// </summary>
+        /// <param name="configSection"></param>
+        public FileSystemProviderManager(IFileSystemProvidersSection configSection)
         {
-            _config = (FileSystemProvidersSection) ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
+            if (configSection == null) throw new ArgumentNullException("configSection");
+            _config = configSection;
+            CreateWellKnownFileSystems();
+        }
+
+        /// <summary>
+        /// Default constructor that will read the config from the locally found config section
+        /// </summary>
+        public FileSystemProviderManager()
+        {
+            _config = (FileSystemProvidersSection)ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
             CreateWellKnownFileSystems();
         }
 
@@ -166,17 +198,21 @@ namespace Umbraco.Core.IO
             if (providerType.IsAssignableFrom(typeof(IFileSystem)))
                 throw new InvalidOperationException(string.Format("Type {0} does not implement IFileSystem.", providerType.FullName));
 
-            // find a ctor matching the config parameters
+            // find a ctor matching the config parameters            
             var paramCount = providerConfig.Parameters != null ? providerConfig.Parameters.Count : 0;
             var constructor = providerType.GetConstructors().SingleOrDefault(x
-                => x.GetParameters().Length == paramCount && x.GetParameters().All(y => providerConfig.Parameters.AllKeys.Contains(y.Name)));
+                => x.GetParameters().Length == paramCount && x.GetParameters().All(y => providerConfig.Parameters.Keys.Contains(y.Name)));
             if (constructor == null)
                 throw new InvalidOperationException(string.Format("Type {0} has no ctor matching the {1} configuration parameter(s).", providerType.FullName, paramCount));
 
             var parameters = new object[paramCount];
-            if (providerConfig.Parameters != null) // keeps ReSharper happy
+
+            if (providerConfig.Parameters != null)
+            {
+                var allKeys = providerConfig.Parameters.Keys.ToArray();
                 for (var i = 0; i < paramCount; i++)
-                    parameters[i] = providerConfig.Parameters[providerConfig.Parameters.AllKeys[i]].Value;
+                    parameters[i] = providerConfig.Parameters[allKeys[i]];
+            }
 
             return new ProviderConstructionInfo
             {
