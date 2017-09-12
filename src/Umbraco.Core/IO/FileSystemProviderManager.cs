@@ -182,8 +182,9 @@ namespace Umbraco.Core.IO
         private ProviderConstructionInfo GetUnderlyingFileSystemCtor(string alias, Func<IFileSystem> fallback)
         {
             // get config
-            var providerConfig = _config.Providers[alias];
-            if (providerConfig == null)
+            IFileSystemProviderElement providerConfig;
+            
+            if (_config.Providers.TryGetValue(alias, out providerConfig) == false)
             {
                 if (fallback != null) return null;
                 throw new ArgumentException(string.Format("No provider found with alias {0}.", alias));
