@@ -13,14 +13,27 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
     [Migration("7.7.0", 1, Constants.System.UmbracoMigrationName)]
     public class AddUserGroupTables : MigrationBase
     {
+        private readonly string _collateSyntax;
+
         public AddUserGroupTables(ISqlSyntaxProvider sqlSyntax, ILogger logger)
             : base(sqlSyntax, logger)
-        { }
+        {
+            //For some of the migration data inserts we require to use a special MSSQL collate expression since
+            //some databases may have a custom collation specified and if that is the case, when we compare strings
+            //in dynamic SQL it will try to compare strings in different collations and this will yield errors.
+            _collateSyntax = sqlSyntax is MySqlSyntaxProvider ? string.Empty : "COLLATE DATABASE_DEFAULT";
+        }
 
         public override void Up()
         {
-            var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
+            var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToList();
             var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
+            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToArray();
+
+            //In some very rare cases, there might alraedy be user group tables that we'll need to remove first
+            //but of course we don't want to remove the tables we will be creating below if they already exist so
+            //need to do some checks first since these old rare tables have a different schema
+            RemoveOldTablesIfExist(tables, columns);
 
             if (AddNewTables(tables))
             {
@@ -70,6 +83,44 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
             }
         }
 
+        /// <summary>
+        /// In some very rare cases, there might alraedy be user group tables that we'll need to remove first
+        /// but of course we don't want to remove the tables we will be creating below if they already exist so
+        /// need to do some checks first since these old rare tables have a different schema
+        /// </summary>
+        /// <param name="tables"></param>
+        /// <param name="columns"></param>
+        private void RemoveOldTablesIfExist(List<string> tables, ColumnInfo[] columns)
+        {
+            if (tables.Contains("umbracoUser2userGroup", StringComparer.InvariantCultureIgnoreCase))
+            {
+                //this column doesn't exist in the 7.7 schema, so if it's there, then this is a super old table
+                var foundOldColumn = columns
+                    .FirstOrDefault(x =>
+                        x.ColumnName.Equals("user", StringComparison.InvariantCultureIgnoreCase)
+                        && x.TableName.Equals("umbracoUser2userGroup", StringComparison.InvariantCultureIgnoreCase));
+                if (foundOldColumn != null)
+                {
+                    Delete.Table("umbracoUser2userGroup");
+                    //remove from the tables list since this will be re-checked in further logic
+                    tables.Remove("umbracoUser2userGroup");
+                }
+            }
+
+            if (tables.Contains("umbracoUserGroup", StringComparer.InvariantCultureIgnoreCase))
+            {
+                //The new schema has several columns, the super old one for this table only had 2 so if it's 2 get rid of it
+                var countOfCols = columns
+                    .Count(x => x.TableName.Equals("umbracoUserGroup", StringComparison.InvariantCultureIgnoreCase));
+                if (countOfCols == 2)
+                {
+                    Delete.Table("umbracoUserGroup");
+                    //remove from the tables list since this will be re-checked in further logic
+                    tables.Remove("umbracoUserGroup");
+                }
+            }
+        }
+
         private void SetDefaultIcons()
         {
             Execute.Sql(string.Format("UPDATE umbracoUserGroup SET icon = '{0}' WHERE userGroupAlias = '{1}'", "", Constants.Security.AdminGroupAlias));
@@ -78,7 +129,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
             Execute.Sql(string.Format("UPDATE umbracoUserGroup SET icon = '{0}' WHERE userGroupAlias = '{1}'", "icon-globe", "translator"));
         }
 
-        private bool AddNewTables(string[] tables)
+        private bool AddNewTables(List<string> tables)
         {
             var updated = false;
             if (tables.InvariantContains("umbracoUserGroup") == false)
@@ -118,11 +169,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                 FROM umbracoUserType");
 
             // Add each user to the group created from their type
-            Execute.Sql(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
+            Execute.Sql(string.Format(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
                 SELECT u.id, ug.id
                 FROM umbracoUser u
                 INNER JOIN umbracoUserType ut ON ut.id = u.userType
-                INNER JOIN umbracoUserGroup ug ON ug.userGroupAlias = ut.userTypeAlias");
+                INNER JOIN umbracoUserGroup ug ON ug.userGroupAlias {0} = ut.userTypeAlias {0}", _collateSyntax));
 
             // Add the built-in administrator account to all apps
             // this will lookup all of the apps that the admin currently has access to in order to assign the sections
@@ -137,24 +188,24 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
 
             // Add the default section access to the other built-in accounts            
             //  writer:
-            Execute.Sql(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
+            Execute.Sql(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
                 SELECT ug.id, 'content' as app
                 FROM umbracoUserGroup ug
-                WHERE ug.userGroupAlias = 'writer'");
+                WHERE ug.userGroupAlias {0} = 'writer' {0}", _collateSyntax));
             //  editor
-            Execute.Sql(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
+            Execute.Sql(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
                 SELECT ug.id, 'content' as app
                 FROM umbracoUserGroup ug
-                WHERE ug.userGroupAlias = 'editor'");
-            Execute.Sql(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
+                WHERE ug.userGroupAlias {0} = 'editor' {0}", _collateSyntax));
+            Execute.Sql(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
                 SELECT ug.id, 'media' as app
                 FROM umbracoUserGroup ug
-                WHERE ug.userGroupAlias = 'editor'");
+                WHERE ug.userGroupAlias {0} = 'editor' {0}", _collateSyntax));
             //  translator
-            Execute.Sql(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
+            Execute.Sql(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
                 SELECT ug.id, 'translation' as app
                 FROM umbracoUserGroup ug
-                WHERE ug.userGroupAlias = 'translator'");
+                WHERE ug.userGroupAlias {0} = 'translator' {0}", _collateSyntax));
             
             //We need to lookup all distinct combinations of section access and create a group for each distinct collection
             //and assign groups accordingly. We'll perform the lookup 'now' to then create the queued SQL migrations.
@@ -197,10 +248,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                 var distinctApp = distinctApps[i];
                 foreach (var app in distinctApp.appCollection)
                 {
-                    Execute.Sql(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
+                    Execute.Sql(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
                         SELECT ug.id, '" + app + @"' as app
                         FROM umbracoUserGroup ug
-                        WHERE ug.userGroupAlias = '" + alias + "'");
+                        WHERE ug.userGroupAlias {0} = '" + alias + "' {0}", _collateSyntax));
                 }
                 //now assign the corresponding users to this group
                 foreach (var userWithApps in usersWithApps)
@@ -210,10 +261,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                     if (hash == distinctApp.appsHash)
                     {
                         //it matches so assign the user to this group
-                        Execute.Sql(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
+                        Execute.Sql(string.Format(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
                             SELECT " + userWithApps.Key + @", ug.id
                             FROM umbracoUserGroup ug
-                            WHERE ug.userGroupAlias = '" + alias + "'");
+                            WHERE ug.userGroupAlias {0} = '" + alias + "' {0}", _collateSyntax));
                     }
                 }
             }
@@ -246,37 +297,37 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                 AND id > 0");
 
             // Associate those groups with the users
-            Execute.Sql(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
+            Execute.Sql(string.Format(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
                 SELECT u.id, ug.id
                 FROM umbracoUser u
-                INNER JOIN umbracoUserGroup ug ON ug.userGroupAlias = 'permissionGroupFor' + userLogin");
+                INNER JOIN umbracoUserGroup ug ON ug.userGroupAlias {0} = 'permissionGroupFor' + userLogin {0}", _collateSyntax));
 
             // Create node permissions on the groups
-            Execute.Sql(@"INSERT INTO umbracoUserGroup2NodePermission (userGroupId,nodeId,permission)
+            Execute.Sql(string.Format(@"INSERT INTO umbracoUserGroup2NodePermission (userGroupId,nodeId,permission)
                 SELECT ug.id, nodeId, permission
                 FROM umbracoUserGroup ug
                 INNER JOIN umbracoUser2UserGroup u2ug ON u2ug.userGroupId = ug.id
                 INNER JOIN umbracoUser u ON u.id = u2ug.userId
                 INNER JOIN umbracoUser2NodePermission u2np ON u2np.userId = u.id
-				WHERE ug.userGroupAlias NOT IN (
-					SELECT userTypeAlias
+				WHERE ug.userGroupAlias {0} NOT IN (
+					SELECT userTypeAlias {0}
 					FROM umbracoUserType
-				)");
+				)", _collateSyntax));
 
             // Create app permissions on the groups
-            Execute.Sql(@"INSERT INTO umbracoUserGroup2app (userGroupId,app)
+            Execute.Sql(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId,app)
                 SELECT ug.id, app
                 FROM umbracoUserGroup ug
                 INNER JOIN umbracoUser2UserGroup u2ug ON u2ug.userGroupId = ug.id
                 INNER JOIN umbracoUser u ON u.id = u2ug.userId
                 INNER JOIN umbracoUser2app u2a ON u2a." + SqlSyntax.GetQuotedColumnName("user") + @" = u.id
-				WHERE ug.userGroupAlias NOT IN (
-					SELECT userTypeAlias
+				WHERE ug.userGroupAlias {0} NOT IN (
+					SELECT userTypeAlias {0}
 					FROM umbracoUserType
-				)");
+				)", _collateSyntax));
         }
 
-        private void DeleteOldTables(string[] tables, Tuple<string, string, string>[] constraints)
+        private void DeleteOldTables(List<string> tables, Tuple<string, string, string>[] constraints)
         {
             if (tables.InvariantContains("umbracoUser2App"))
             {
@@ -293,6 +344,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                 if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser") && x.Item3.InvariantEquals("FK_umbracoUser_umbracoUserType_id")))
                 {
                     Delete.ForeignKey("FK_umbracoUser_umbracoUserType_id").OnTable("umbracoUser");
+                }
+                //This is the super old constraint name of the FK for user type so check this one too
+                if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser") && x.Item3.InvariantEquals("FK_user_userType")))
+                {
+                    Delete.ForeignKey("FK_user_userType").OnTable("umbracoUser");
                 }
 
                 Delete.Column("userType").FromTable("umbracoUser");
