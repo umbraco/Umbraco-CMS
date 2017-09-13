@@ -7,6 +7,54 @@ angular.module('umbraco')
         var config = angular.copy($scope.model.config);
         $scope.imageIsLoaded = false;
 
+        propertyValueSwap();
+        //restore focalpoint if missing
+        if (!$scope.model.value.focalPoint) {
+            $scope.model.value.focalPoint = { left: 0.5, top: 0.5 };
+        }
+
+        //crop a specific crop
+        $scope.crop = function (crop) {
+            $scope.currentCrop = crop;
+            $scope.currentPoint = undefined;
+        };
+
+        //done cropping
+        $scope.done = function () {
+            $scope.currentCrop = undefined;
+            $scope.currentPoint = undefined;
+        };
+
+        //crop a specific crop
+        $scope.clear = function (crop) {
+            //clear current uploaded files
+            fileManager.setFiles($scope.model.alias, []);
+
+            //clear the ui
+            $scope.imageSrc = undefined;
+            if ($scope.model.value) {
+                $scope.model.value = "";
+            }
+
+            // set form to dirty to tricker discard changes dialog
+            var currForm = angularHelper.getCurrentForm($scope);
+            currForm.$setDirty();
+        };
+
+        //show previews
+        $scope.togglePreviews = function () {
+            if ($scope.showPreviews) {
+                $scope.showPreviews = false;
+                $scope.tempShowPreviews = false;
+            } else {
+                $scope.showPreviews = true;
+            }
+        };
+
+        $scope.imageLoaded = function () {
+            $scope.imageIsLoaded = true;
+        };
+
         function renderImage(img) {
             //move previously saved value to the editor
             if ($scope.model.value) {
@@ -25,56 +73,15 @@ angular.module('umbraco')
                     });
                     $scope.model.value.crops = config.crops;
 
-                    //restore focalpoint if missing
-                    if (!$scope.model.value.focalPoint) {
-                        $scope.model.value.focalPoint = { left: 0.5, top: 0.5 };
-                    }
+
                 }
 
                 $scope.imageSrc = $scope.model.value.src;
             }
 
-            //crop a specific crop
-            $scope.crop = function (crop) {
-                $scope.currentCrop = crop;
-                $scope.currentPoint = undefined;
-            };
 
-            //done cropping
-            $scope.done = function () {
-                $scope.currentCrop = undefined;
-                $scope.currentPoint = undefined;
-            };
 
-            //crop a specific crop
-            $scope.clear = function (crop) {
-                //clear current uploaded files
-                fileManager.setFiles($scope.model.alias, []);
 
-                //clear the ui
-                $scope.imageSrc = undefined;
-                if ($scope.model.value) {
-                    delete $scope.model.value;
-                }
-
-                // set form to dirty to tricker discard changes dialog
-                var currForm = angularHelper.getCurrentForm($scope);
-                currForm.$setDirty();
-            };
-
-            //show previews
-            $scope.togglePreviews = function () {
-                if ($scope.showPreviews) {
-                    $scope.showPreviews = false;
-                    $scope.tempShowPreviews = false;
-                } else {
-                    $scope.showPreviews = true;
-                }
-            };
-
-            $scope.imageLoaded = function () {
-                $scope.imageIsLoaded = true;
-            };
 
             //on image selected, update the cropper
             $scope.$on("filesSelected", function (ev, args) {
@@ -131,9 +138,6 @@ angular.module('umbraco')
                 renderImage($scope.model.value);
             }
         }
-
-        propertyValueSwap();
-
     })
     .run(function (mediaHelper, umbRequestHelper) {
         if (mediaHelper && mediaHelper.registerFileResolver) {
