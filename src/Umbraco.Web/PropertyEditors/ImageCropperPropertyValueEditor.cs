@@ -8,6 +8,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
+using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
@@ -109,14 +110,19 @@ namespace Umbraco.Web.PropertyEditors
 
             if (file == null) // not uploading a file
             {
-                // if editorFile is empty then either there was nothing to begin with,
-                // or it has been cleared and we need to remove the file - else the
-                // value is unchanged.
-                if (string.IsNullOrWhiteSpace(editorFile) && string.IsNullOrWhiteSpace(currentPath) == false)
+                //Check if the current path belongs to a  media object, if it doesn't we can delete it.
+                if (CheckIfItHasMediaObject(currentPath) == false)
                 {
-                    _mediaFileSystem.DeleteFile(currentPath, true);
-                    return null; // clear
+                    // if editorFile is empty then either there was nothing to begin with,
+                    // or it has been cleared and we need to remove the file - else the
+                    // value is unchanged.
+                    if (string.IsNullOrWhiteSpace(editorFile) && string.IsNullOrWhiteSpace(currentPath) == false)
+                    {
+                        _mediaFileSystem.DeleteFile(currentPath, true);
+                        return null; // clear
+                    }
                 }
+                
 
                 return editorJson == null ? null : editorJson.ToString(); // unchanged
             }
@@ -184,6 +190,26 @@ namespace Umbraco.Web.PropertyEditors
             var crops = string.IsNullOrEmpty(config) ? "[]" : config;
             var newVal = "{src: '" + val + "', crops: " + crops + "}";
             return newVal;
+        }
+
+        /// <summary>
+        /// Checks if the the path belongs to a media item.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private bool CheckIfItHasMediaObject(string path)
+        {
+            var hasMedia = true;
+
+            var ms = ApplicationContext.Current.Services.MediaService;
+            var mediaByPath = ms.GetMediaByPath(path);
+
+            if (mediaByPath == null)
+            {
+                hasMedia = false;
+            }
+
+            return hasMedia;
         }
     }
 }
