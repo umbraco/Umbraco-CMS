@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Deploy;
 using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests
@@ -181,16 +183,6 @@ namespace Umbraco.Tests
         }
 
         [Test]
-        public void NotKnownTypeTest()
-        {
-            var udi1 = Udi.Parse("umb://not-known-1/DA845952BE474EE9BD6F6194272AC750");
-            Assert.IsInstanceOf<GuidUdi>(udi1);
-
-            var udi2 = Udi.Parse("umb://not-known-2/this-is-not-a-guid");
-            Assert.IsInstanceOf<StringUdi>(udi2);
-        }
-
-        [Test]
         public void RangeTest()
         {
             // can parse open string udi
@@ -264,6 +256,87 @@ namespace Umbraco.Tests
             }
 
             Assert.AreEqual(0, types.Count, "Error in class Constants.UdiEntityType, GetTypes declares types that don't exist ({0}).", string.Join(",", types.Keys.Select(x => "\"" + x + "\"")));
+        }
+
+        [Test]
+        public void KnownTypes()
+        {
+            Udi udi;
+
+            // cannot parse an unknown type, udi is null
+            // this will scan
+            Assert.IsFalse(Udi.TryParse("umb://whatever/1234", out udi));
+            Assert.IsNull(udi);
+
+            Udi.ResetUdiTypes();
+
+            // unless we want to know
+            Assert.IsFalse(Udi.TryParse("umb://whatever/1234", true, out udi));
+            Assert.AreEqual(Constants.UdiEntityType.Unknown, udi.EntityType);
+            Assert.AreEqual("Umbraco.Core.Udi+UnknownTypeUdi", udi.GetType().FullName);
+
+            Udi.ResetUdiTypes();
+
+            // not known
+            Assert.IsFalse(Udi.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", true, out udi));
+            Assert.AreEqual(Constants.UdiEntityType.Unknown, udi.EntityType);
+            Assert.AreEqual("Umbraco.Core.Udi+UnknownTypeUdi", udi.GetType().FullName);
+
+            // scanned
+            Assert.IsTrue(Udi.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", out udi));
+            Assert.IsInstanceOf<GuidUdi>(udi);
+
+            // known
+            Assert.IsTrue(Udi.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", true, out udi));
+            Assert.IsInstanceOf<GuidUdi>(udi);
+
+            // can get method for Deploy compatibility
+            var method = typeof (Udi).GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof (string), typeof (bool) }, null);
+            Assert.IsNotNull(method);
+        }
+
+        [UdiDefinition("foo", UdiType.GuidUdi)]
+        public class FooConnector : IServiceConnector
+        {
+            public IArtifact GetArtifact(Udi udi)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IArtifact GetArtifact(object entity)
+            {
+                throw new NotImplementedException();
+            }
+
+            public ArtifactDeployState ProcessInit(IArtifact art, IDeployContext context)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Process(ArtifactDeployState dart, IDeployContext context, int pass)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Explode(UdiRange range, List<Udi> udis)
+            {
+                throw new NotImplementedException();
+            }
+
+            public NamedUdiRange GetRange(Udi udi, string selector)
+            {
+                throw new NotImplementedException();
+            }
+
+            public NamedUdiRange GetRange(string entityType, string sid, string selector)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Compare(IArtifact art1, IArtifact art2, ICollection<Difference> differences = null)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Umbraco.Core
 
         private static volatile bool _scanned;
         private static readonly object ScanLocker = new object();
-        private static readonly Lazy<ConcurrentDictionary<string, UdiType>> KnownUdiTypes;
+        private static ConcurrentDictionary<string, UdiType> _udiTypes;
         private static readonly ConcurrentDictionary<string, Udi> RootUdis = new ConcurrentDictionary<string, Udi>();
         internal readonly Uri UriValue; // internal for UdiRange
 
@@ -50,8 +50,15 @@ namespace Umbraco.Core
         static Udi()
         {
             // initialize with known (built-in) Udi types
-            // for non-known Udi types we'll try to parse a GUID and if that doesn't work, we'll decide that it's a string
-            KnownUdiTypes = new Lazy<ConcurrentDictionary<string, UdiType>>(() => new ConcurrentDictionary<string, UdiType>(Constants.UdiEntityType.GetTypes()));
+            // we will add scanned types later on
+            _udiTypes = new ConcurrentDictionary<string, UdiType>(Constants.UdiEntityType.GetTypes());
+        }
+
+        // for tests, totally unsafe
+        internal static void ResetUdiTypes()
+        {
+            _udiTypes = new ConcurrentDictionary<string, UdiType>(Constants.UdiEntityType.GetTypes());
+            _scanned = false;
         }
 
         /// <summary>
@@ -79,46 +86,65 @@ namespace Umbraco.Core
         public static Udi Parse(string s)
         {
             Udi udi;
-            ParseInternal(s, false, out udi);
+            ParseInternal(s, false, false, out udi);
             return udi;
         }
 
+        /// <summary>
+        /// Converts the string representation of an entity identifier into the equivalent Udi instance.
+        /// </summary>
+        /// <param name="s">The string to convert.</param>
+        /// <param name="knownTypes">A value indicating whether to only deal with known types.</param>
+        /// <returns>An Udi instance that contains the value that was parsed.</returns>
+        /// <remarks>
+        /// <para>If <paramref name="knownTypes"/> is <c>true</c>, and the string could not be parsed because
+        /// the entity type was not known, the method succeeds but sets <c>udi</c>to an 
+        /// <see cref="UnknownTypeUdi"/> value.</para>
+        /// <para>If <paramref name="knownTypes"/> is <c>true</c>, assemblies are not scanned for types,
+        /// and therefore only builtin types may be known. Unless scanning already took place.</para>
+        /// </remarks>
+        public static Udi Parse(string s, bool knownTypes)
+        {
+            Udi udi;
+            ParseInternal(s, false, knownTypes, out udi);
+            return udi;
+        }
+
+        /// <summary>
+        /// Converts the string representation of an entity identifier into the equivalent Udi instance.
+        /// </summary>
+        /// <param name="s">The string to convert.</param>
+        /// <param name="udi">An Udi instance that contains the value that was parsed.</param>
+        /// <returns>A boolean value indicating whether the string could be parsed.</returns>
         public static bool TryParse(string s, out Udi udi)
         {
-            return ParseInternal(s, true, out udi);
+            return ParseInternal(s, true, false, out udi);
         }
 
-        private static UdiType GetUdiType(Uri uri, out string path)
+        /// <summary>
+        /// Converts the string representation of an entity identifier into the equivalent Udi instance.
+        /// </summary>
+        /// <param name="s">The string to convert.</param>
+        /// <param name="knownTypes">A value indicating whether to only deal with known types.</param>
+        /// <param name="udi">An Udi instance that contains the value that was parsed.</param>
+        /// <returns>A boolean value indicating whether the string could be parsed.</returns>
+        /// <remarks>
+        /// <para>If <paramref name="knownTypes"/> is <c>true</c>, and the string could not be parsed because
+        /// the entity type was not known, the method returns <c>false</c> but still sets <c>udi</c>
+        /// to an <see cref="UnknownTypeUdi"/> value.</para>
+        /// <para>If <paramref name="knownTypes"/> is <c>true</c>, assemblies are not scanned for types,
+        /// and therefore only builtin types may be known. Unless scanning already took place.</para>
+        /// </remarks>
+        public static bool TryParse(string s, bool knownTypes, out Udi udi)
         {
-            path = uri.AbsolutePath.TrimStart('/');
-
-            UdiType udiType;
-            if (KnownUdiTypes.Value.TryGetValue(uri.Host, out udiType))
-            {
-                return udiType;
-            }
-
-            // if it's empty and it's not in our known list then we don't know
-            if (path.IsNullOrWhiteSpace())
-                return UdiType.Unknown;
-
-            // try to parse into a Guid
-            // (note: root udis use Guid.Empty so this is ok)
-            Guid guidId;
-            if (Guid.TryParse(path, out guidId))
-            {
-                //add it to our known list
-                KnownUdiTypes.Value.TryAdd(uri.Host, UdiType.GuidUdi);
-                return UdiType.GuidUdi;
-            }
-
-            // add it to our known list - if it's not a GUID then it must a string
-            KnownUdiTypes.Value.TryAdd(uri.Host, UdiType.StringUdi);
-            return UdiType.StringUdi;
+            return ParseInternal(s, true, knownTypes, out udi);
         }
 
-        private static bool ParseInternal(string s, bool tryParse, out Udi udi)
+        private static bool ParseInternal(string s, bool tryParse, bool knownTypes, out Udi udi)
         {
+            if (knownTypes == false)
+                EnsureScanForUdiTypes();
+
             udi = null;
             Uri uri;
 
@@ -129,24 +155,30 @@ namespace Umbraco.Core
                 throw new FormatException(string.Format("String \"{0}\" is not a valid udi.", s));
             }
 
-            // if it's a known entity type, GetUdiType will return it
-            // else it will try to guess based on the path, and register the type as known
-            string path;
-            var udiType = GetUdiType(uri, out path);
-
-            if (path.IsNullOrWhiteSpace())
+            var entityType = uri.Host;
+            UdiType udiType;
+            if (_udiTypes.TryGetValue(entityType, out udiType) == false)
             {
-                // path is empty which indicates we need to return the root udi
-                udi = GetRootUdi(uri.Host);
-                return true;
+                if (knownTypes)
+                {
+                    // not knowing the type is not an error
+                    // just return the unknown type udi
+                    udi = UnknownTypeUdi.Instance;
+                    return false;
+                }
+                if (tryParse) return false;
+                throw new FormatException(string.Format("Unknown entity type \"{0}\".", entityType));
             }
 
-            // if the path is not empty, type should not be unknown
-            if (udiType == UdiType.Unknown)
-                throw new FormatException(string.Format("Could not determine the Udi type for string \"{0}\".", s));
+            var path = uri.AbsolutePath.TrimStart('/');
 
             if (udiType == UdiType.GuidUdi)
             {
+                if (path == string.Empty)
+                {
+                    udi = GetRootUdi(uri.Host);
+                    return true;
+                }
                 Guid guid;
                 if (Guid.TryParse(path, out guid) == false)
                 {
@@ -156,23 +188,25 @@ namespace Umbraco.Core
                 udi = new GuidUdi(uri.Host, guid);
                 return true;
             }
+
             if (udiType == UdiType.StringUdi)
             {
-                udi = new StringUdi(uri.Host, Uri.UnescapeDataString(path));
+                udi = path == string.Empty ? GetRootUdi(uri.Host) : new StringUdi(uri.Host, Uri.UnescapeDataString(path));
                 return true;
             }
+
             if (tryParse) return false;
-            throw new InvalidOperationException("Internal error.");
+            throw new InvalidOperationException(string.Format("Invalid udi type \"{0}\".", udiType));
         }
 
         private static Udi GetRootUdi(string entityType)
         {
-            ScanAllUdiTypes();
+            EnsureScanForUdiTypes();
 
             return RootUdis.GetOrAdd(entityType, x =>
             {
                 UdiType udiType;
-                if (KnownUdiTypes.Value.TryGetValue(x, out udiType) == false)
+                if (_udiTypes.TryGetValue(x, out udiType) == false)
                     throw new ArgumentException(string.Format("Unknown entity type \"{0}\".", entityType));
                 return udiType == UdiType.StringUdi
                     ? (Udi)new StringUdi(entityType, string.Empty)
@@ -186,7 +220,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// This is only required when needing to resolve root udis
         /// </remarks>
-        private static void ScanAllUdiTypes()
+        private static void EnsureScanForUdiTypes()
         {
             if (_scanned) return;
 
@@ -212,11 +246,9 @@ namespace Umbraco.Core
                     }
                 }
 
-                //merge these into the known list
+                // merge these into the known list
                 foreach (var item in result)
-                {
-                    KnownUdiTypes.Value.TryAdd(item.Key, item.Value);
-                }
+                    _udiTypes.TryAdd(item.Key, item.Value);
 
                 _scanned = true;
             }
@@ -241,11 +273,13 @@ namespace Umbraco.Core
         public static Udi Create(string entityType, string id)
         {
             UdiType udiType;
-            if (KnownUdiTypes.Value.TryGetValue(entityType, out udiType) && udiType != UdiType.StringUdi)
-                throw new InvalidOperationException(string.Format("Entity type \"{0}\" is not a StringUdi.", entityType));
+            if (_udiTypes.TryGetValue(entityType, out udiType) == false)
+                throw new ArgumentException(string.Format("Unknown entity type \"{0}\".", entityType), "entityType");
 
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentException("Value cannot be null or whitespace.", "id");
+            if (udiType != UdiType.StringUdi)
+                throw new InvalidOperationException(string.Format("Entity type \"{0}\" does not have string udis.", entityType));
 
             return new StringUdi(entityType, id);
         }
@@ -259,11 +293,14 @@ namespace Umbraco.Core
         public static Udi Create(string entityType, Guid id)
         {
             UdiType udiType;
-            if (KnownUdiTypes.Value.TryGetValue(entityType, out udiType) && udiType != UdiType.GuidUdi)
-                throw new InvalidOperationException(string.Format("Entity type \"{0}\" is not a GuidUdi.", entityType));
+            if (_udiTypes.TryGetValue(entityType, out udiType) == false)
+                throw new ArgumentException(string.Format("Unknown entity type \"{0}\".", entityType), "entityType");
 
+            if (udiType != UdiType.GuidUdi)
+                throw new InvalidOperationException(string.Format("Entity type \"{0}\" does not have guid udis.", entityType));            
             if (id == default(Guid))
                 throw new ArgumentException("Cannot be an empty guid.", "id");
+
             return new GuidUdi(entityType, id);
         }
 
@@ -273,13 +310,14 @@ namespace Umbraco.Core
             // else fallback to parsing the string (and guess the type)
 
             UdiType udiType;
-            if (KnownUdiTypes.Value.TryGetValue(uri.Host, out udiType) == false)
-                return Parse(uri.ToString());
+            if (_udiTypes.TryGetValue(uri.Host, out udiType) == false)
+                throw new ArgumentException(string.Format("Unknown entity type \"{0}\".", uri.Host), "uri");
 
             if (udiType == UdiType.GuidUdi)
                 return new GuidUdi(uri);
             if (udiType == UdiType.GuidUdi)
                 return new StringUdi(uri);
+
             throw new ArgumentException(string.Format("Uri \"{0}\" is not a valid udi.", uri));
         }
 
@@ -328,6 +366,19 @@ namespace Umbraco.Core
         {
             return (udi1 == udi2) == false;
         }
-    }
 
+        private class UnknownTypeUdi : Udi
+        {
+            private UnknownTypeUdi()
+                : base("unknown", "umb://unknown/")
+            { }
+
+            public static readonly UnknownTypeUdi Instance = new UnknownTypeUdi();
+
+            public override bool IsRoot
+            {
+                get { return false; }
+            }
+        }
+    }
 }
