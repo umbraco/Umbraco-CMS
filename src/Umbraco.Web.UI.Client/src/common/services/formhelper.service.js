@@ -141,9 +141,7 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
                     dialogService.ysodDialog(err);
                 }
             }
-            else {
-                dialogService.ysodDialog(err);
-            }
+            
         },
 
         /**
