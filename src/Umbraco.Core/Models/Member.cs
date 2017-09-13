@@ -67,7 +67,7 @@ namespace Umbraco.Core.Models
         /// <param name="email"></param>
         /// <param name="username"></param>
         /// <param name="contentType"></param>
-        public Member(string name, string email, string username, IMemberType contentType)
+        public Member(string name, string email, string username, IMemberType contentType, bool isApproved = true)
             : base(name, -1, contentType, new PropertyCollection())
         {
             if (string.IsNullOrWhiteSpace(email)) throw new ArgumentNullOrEmptyException(nameof(email));
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Models
             _contentTypeAlias = contentType.Alias;
             _email = email;
             _username = username;
-            IsApproved = true;
+            IsApproved = isApproved;
 
             //this cannot be null but can be empty
             _rawPasswordValue = "";
@@ -120,10 +120,8 @@ namespace Umbraco.Core.Models
         public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType, bool isApproved)
             : base(name, -1, contentType, new PropertyCollection())
         {
-            Mandate.ParameterNotNull(contentType, "contentType");
-
+            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             _contentTypeAlias = contentType.Alias;
-            _contentType = contentType;
             _email = email;
             _username = username;
             _rawPasswordValue = rawPasswordValue;

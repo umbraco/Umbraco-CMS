@@ -128,7 +128,7 @@ namespace Umbraco.Core.Persistence
         public IQuery<T> Query<T>()
         {
             EnsureConfigured();
-            return new Query<T>(_sqlSyntax, _mappers);
+            return new Query<T>(_sqlContext);
         }
 
         /// <inheritdoc />

@@ -524,6 +524,7 @@
     <Compile Include="Models\DoNotCloneAttribute.cs" />
     <Compile Include="Models\Editors\ContentPropertyData.cs" />
     <Compile Include="Models\EntityBase\Entity.cs" />
+    <Compile Include="Models\EntityBase\EntityPath.cs" />
     <Compile Include="Models\EntityBase\IAggregateRoot.cs" />
     <Compile Include="Models\EntityBase\ICanBeDirty.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
@@ -1093,6 +1094,7 @@
     <Compile Include="Persistence\Repositories\ExternalLoginRepository.cs" />
     <Compile Include="Persistence\Repositories\FileRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IAuditRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IContentBlueprintRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IContentRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IContentTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IContentTypeRepositoryBase.cs" />
@@ -1502,8 +1504,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="FileResources\BlockingWeb.config" />
-    <None Include="Models\Rdbms\UserDto.cs.orig" />
-    <None Include="Models\Rdbms\UserTypeDto.cs.orig" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="FileResources\Files.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

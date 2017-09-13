@@ -307,8 +307,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private IEnumerable<EntityPath> PerformGetAllPaths(Guid objectTypeId, Action<Sql> filter = null)
         {
             var sql = new Sql("SELECT id, path FROM umbracoNode WHERE umbracoNode.nodeObjectType=@type", new { type = objectTypeId });
-            if (filter != null) filter(sql);
-            return _work.Database.Fetch<EntityPath>(sql);
+            filter?.Invoke(sql);
+            return UnitOfWork.Database.Fetch<EntityPath>(sql);
         }
 
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query)

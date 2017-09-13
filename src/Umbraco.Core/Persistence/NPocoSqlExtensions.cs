@@ -49,6 +49,23 @@ namespace Umbraco.Core.Persistence
             return sql;
         }
 
+        public static Sql<SqlContext> WhereIn<T>(this Sql<SqlContext> sql, Expression<Func<T, object>> fieldSelector, Sql<SqlContext> inSql)
+        {
+            return sql.WhereIn(fieldSelector, inSql, false);
+        }
+
+        public static Sql<SqlContext> WhereNotIn<T>(this Sql<SqlContext> sql, Expression<Func<T, object>> fieldSelector, Sql<SqlContext> inSql)
+        {
+            return sql.WhereIn(fieldSelector, inSql, true);
+        }
+
+        private static Sql<SqlContext> WhereIn<T>(this Sql<SqlContext> sql, Expression<Func<T, object>> fieldSelector, Sql<SqlContext> inSql, bool not)
+        {
+            var fieldName = GetFieldName(fieldSelector, sql.SqlContext.SqlSyntax);
+            sql.Where(fieldName + (not ? " NOT" : "") +" IN (" + inSql.SQL + ")"); // fixme what about args?
+            return sql;
+        }
+
         #endregion
 
         #region From
@@ -175,7 +192,7 @@ namespace Umbraco.Core.Persistence
                 x.Value.ColumnName,
                 string.IsNullOrEmpty(x.Value.ColumnAlias) ? x.Value.MemberInfoKey : x.Value.ColumnAlias));
 
-            sql.Select(string.Join(", ", columns));
+            sql.Select(columns);
 
             if (refexpr == null) return sql;
             refexpr(new RefSql(sql, null));
@@ -214,6 +231,13 @@ namespace Umbraco.Core.Persistence
             if (refexpr == null) return refSql;
             refexpr(new RefSql(refSql.Sql, referenceName));
             return refSql;
+        }
+
+        public static Sql<SqlContext> Select<T>(this Sql<SqlContext> sql, params Expression<Func<T, object>>[] columns)
+        {
+            var fieldNames = columns.Select(x => GetFieldName(x, sql.SqlContext.SqlSyntax)).ToArray();
+            sql.Select(fieldNames);
+            return sql;
         }
 
         public class RefSql

@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using System.Text;
+using NPoco;
 
 namespace Umbraco.Core.Persistence.Querying
 {
@@ -14,20 +15,12 @@ namespace Umbraco.Core.Persistence.Querying
     /// <typeparam name="T"></typeparam>
     public class Query<T> : IQuery<T>
     {
-        private readonly ISqlSyntaxProvider _sqlSyntax;
-        private readonly IMapperCollection _mappers;
+        private readonly SqlContext _sqlContext;
         private readonly List<Tuple<string, object[]>> _wheres = new List<Tuple<string, object[]>>();
-
-        public Query(ISqlSyntaxProvider sqlSyntax, IMapperCollection mappers)
-        {
-            _sqlSyntax = sqlSyntax;
-            _mappers = mappers;
-        }
 
         public Query(SqlContext sqlContext)
         {
-            _sqlSyntax = sqlContext.SqlSyntax;
-            _mappers = sqlContext.Mappers;
+            _sqlContext = sqlContext;
         }
 
         /// <summary>
@@ -39,7 +32,7 @@ namespace Umbraco.Core.Persistence.Querying
         {
             if (predicate == null) return this;
 
-            var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlSyntax, _mappers);
+            var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlContext.SqlSyntax, _sqlContext.Mappers);
             var whereExpression = expressionHelper.Visit(predicate);
             _wheres.Add(new Tuple<string, object[]>(whereExpression, expressionHelper.GetSqlParameters()));
             return this;
@@ -49,7 +42,7 @@ namespace Umbraco.Core.Persistence.Querying
         {
             if (fieldSelector == null) return this;
 
-            var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlSyntax, _mappers);
+            var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlContext.SqlSyntax, _sqlContext.Mappers);
             var whereExpression = expressionHelper.Visit(fieldSelector);
             _wheres.Add(new Tuple<string, object[]>(whereExpression + " IN (@values)", new object[] { new { values } }));
             return this;
@@ -66,18 +59,18 @@ namespace Umbraco.Core.Persistence.Querying
 
             StringBuilder sb = null;
             List<object> parameters = null;
-            Sql sql = null;
+            Sql<SqlContext> sql = null;
             foreach (var predicate in predicates)
             {
                 // see notes in Where()
-                var expressionHelper = new ModelToSqlExpressionVisitor<T>();
+                var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlContext.SqlSyntax, _sqlContext.Mappers);
                 var whereExpression = expressionHelper.Visit(predicate);
 
                 if (sb == null)
                 {
                     sb = new StringBuilder("(");
                     parameters = new List<object>();
-                    sql = new Sql();
+                    sql = Sql.BuilderFor(_sqlContext);
                 }
                 else
                 {

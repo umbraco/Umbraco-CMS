@@ -88,7 +88,7 @@ namespace Umbraco.Core.Configuration
             if (_healthChecks == null)
             {
                 var ex = new ConfigurationErrorsException("Could not load the " + typeof(IHealthChecks) + " from config file, ensure the web.config and healthchecks.config files are formatted correctly");
-                LogHelper.Error<UmbracoConfig>("Config error", ex);
+                Current.Logger.Error<UmbracoConfig>("Config error", ex);
                 throw ex;
             }
 

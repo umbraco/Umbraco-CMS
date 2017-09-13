@@ -90,8 +90,6 @@ namespace Umbraco.Core
             [UdiType(UdiType.StringUdi)]
             public const string PartialViewMacro = "partial-view-macro";
             [UdiType(UdiType.StringUdi)]
-            public const string UserControl = "usercontrol";
-            [UdiType(UdiType.StringUdi)]
             public const string Xslt = "xslt";
 
             public static string FromUmbracoObjectType(UmbracoObjectTypes umbracoObjectType)

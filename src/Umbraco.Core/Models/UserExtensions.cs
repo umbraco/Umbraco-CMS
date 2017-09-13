@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
@@ -83,7 +84,7 @@ namespace Umbraco.Core.Models
             }
 
             //use the custom avatar
-            var avatarUrl = FileSystemProviderManager.Current.MediaFileSystem.GetUrl(user.Avatar);
+            var avatarUrl = Current.FileSystems.MediaFileSystem.GetUrl(user.Avatar);
             return new[]
             {
                 avatarUrl  + "?width=30&height=30&mode=crop",

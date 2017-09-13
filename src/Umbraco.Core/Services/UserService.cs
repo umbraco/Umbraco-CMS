@@ -11,9 +11,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
@@ -27,15 +25,12 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class UserService : ScopeRepositoryService, IUserService
     {
-        //TODO: We need to change the isUpgrading flag to use an app state enum as described here: http://issues.umbraco.org/issue/U4-6816
-        // in the meantime, we will use a boolean which we are currently using during upgrades to ensure that a user object is not persisted during this phase, otherwise
-        // exceptions can occur if the db is not in it's correct state.
-        internal bool IsUpgrading { get; set; }
+        private readonly bool _isUpgrading;
 
-        public UserService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        public UserService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IRuntimeState runtimeState)
             : base(provider, logger, eventMessagesFactory)
         {
-            IsUpgrading = false;
+            _isUpgrading = runtimeState.Level == RuntimeLevel.Install || runtimeState.Level == RuntimeLevel.Upgrade;
         }
 
         #region Implementation of IMembershipUserService
@@ -209,7 +204,7 @@ namespace Umbraco.Core.Services
                         //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
                         //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
                         //that method would not be cached.
-                        if (ApplicationContext.Current.IsUpgrading)
+                        if (_isUpgrading)
                         {
                             //NOTE: this will not be cached
                             return repository.GetByUsername(username, includeSecurityData: false);
@@ -335,7 +330,7 @@ namespace Umbraco.Core.Services
                 catch (DbException ex)
                 {
                     // if we are upgrading and an exception occurs, log and swallow it
-                    if (IsUpgrading == false) throw;
+                    if (_isUpgrading == false) throw;
 
                     Logger.Warn<UserService>(ex, "An error occurred attempting to save a user instance during upgrade, normally this warning can be ignored");
 
@@ -586,8 +581,7 @@ namespace Umbraco.Core.Services
                 IQuery<IUser> filterQuery = null;
                 if (filter.IsNullOrWhiteSpace() == false)
                 {
-#error query
-                    filterQuery = Query<IUser>.Builder.Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
+                    filterQuery = uow.Query<IUser>().Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
                 }
 
                 var repository = uow.CreateRepository<IUserRepository>();
@@ -673,7 +667,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IProfile"/></returns>
         public IProfile GetProfileByUserName(string username)
         {
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 return repository.GetProfile(username);
@@ -704,7 +698,7 @@ namespace Umbraco.Core.Services
                         //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
                         //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
                         //that method would not be cached.
-                        if (ApplicationContext.Current.IsUpgrading)
+                        if (_isUpgrading)
                         {
                             //NOTE: this will not be cached
                             return repository.Get(id, includeSecurityData: false);
@@ -964,7 +958,7 @@ namespace Umbraco.Core.Services
             if (groups == null) throw new ArgumentNullException(nameof(groups));
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
-                var repository = uow.CreateRepository<IUserRepository>();
+                var repository = uow.CreateRepository<IUserGroupRepository>();
                 return repository.GetPermissions(groups.Select(x => x.ToReadOnlyGroup()).ToArray(), fallbackToDefaultPermissions, nodeIds);
             }
         }

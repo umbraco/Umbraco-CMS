@@ -7,9 +7,7 @@ using System.Text;
 using System.Web.Security;
 using Newtonsoft.Json;
 using NPoco;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -19,11 +17,9 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Security;
 
-#error the entire clads needs to be refactored for proper NPoco usage
 namespace Umbraco.Core.Persistence.Repositories
 {
     /// <summary>
@@ -33,7 +29,6 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IMapperCollection _mapperCollection;
         private readonly IDictionary<string, string> _passwordConfig;
-        private PermissionRepository<IContent> _permissionRepository;
 
         /// <summary>
         /// Constructor
@@ -44,45 +39,39 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="passwordConfig">
         /// A dictionary specifying the configuration for user passwords. If this is null then no password configuration will be persisted or read.
         /// </param>
-        #error password config, change: null will ???
-        public UserRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection, IDictionary<string, string> passwordConfig = null)
+        public UserRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection)
             : base(work, cacheHelper, logger)
         {
             _mapperCollection = mapperCollection;
 
-            if (passwordConfig == null) // fixme this is bad bc we may want it to remain null?!
-            {
-                var userMembershipProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
-                passwordConfig = userMembershipProvider == null || userMembershipProvider.PasswordFormat != MembershipPasswordFormat.Hashed
-                    ? null
-                    : new Dictionary<string, string> { { "hashAlgorithm", Membership.HashAlgorithmType } };
-            }
-            _passwordConfig = passwordConfig;
+            var userMembershipProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
+            _passwordConfig = userMembershipProvider == null || userMembershipProvider.PasswordFormat != MembershipPasswordFormat.Hashed
+                ? null
+                : new Dictionary<string, string> { { "hashAlgorithm", Membership.HashAlgorithmType } };
         }
 
-        // note: is ok to 'new' the repo here as it's a sub-repo really
-        private PermissionRepository<IContent> PermissionRepository => _permissionRepository
-            ?? (_permissionRepository = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper));
+        // for tests
+        internal UserRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection, IDictionary<string, string> passwordConfig)
+            : base(work, cacheHelper, logger)
+        {
+            _mapperCollection = mapperCollection;
+            _passwordConfig = passwordConfig;
+        }
 
         #region Overrides of RepositoryBase<int,IUser>
 
         protected override IUser PerformGet(int id)
         {
-            var sql = GetQueryWithGroups();
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-            sql //must be included for relator to work
-                .OrderBy<UserDto>(d => d.Id, SqlSyntax)
-                .OrderBy<UserGroupDto>(d => d.Id, SqlSyntax)
-                .OrderBy<UserStartNodeDto>(d => d.Id, SqlSyntax);
+            var sql = Sql()
+                .Select<UserDto>()
+                .From<UserDto>()
+                .Where<UserDto>(x => x.Id == id);
 
-            var dto = Database.Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(new UserGroupRelator().Map, sql)
-                .FirstOrDefault();
+            var dtos = Database.Fetch<UserDto>(sql);
+            if (dtos.Count == 0) return null;
 
-            if (dto == null)
-                return null;
-
-            var user = UserFactory.BuildEntity(dto);
-            return user;
+            PerformGetReferencedDtos(dtos);
+            return UserFactory.BuildEntity(dtos[0]);
         }
 
         /// <summary>
@@ -98,32 +87,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </returns>
         public IUser GetByUsername(string username, bool includeSecurityData)
         {
-            UserDto dto;
-            if (includeSecurityData)
-            {
-                var sql = GetQueryWithGroups();
-                sql.Where<UserDto>(userDto => userDto.Login == username, SqlSyntax);
-                sql //must be included for relator to work
-                    .OrderBy<UserDto>(d => d.Id, SqlSyntax)
-                    .OrderBy<UserGroupDto>(d => d.Id, SqlSyntax)
-                    .OrderBy<UserStartNodeDto>(d => d.Id, SqlSyntax);
-                dto = Database
-                    .Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(
-                        new UserGroupRelator().Map, sql)
-                    .FirstOrDefault();
-            }
-            else
-            {
-                var sql = GetBaseQuery("umbracoUser.*");
-                sql.Where<UserDto>(userDto => userDto.Login == username, SqlSyntax);
-                dto = Database.FirstOrDefault<UserDto>(sql);
-            }
-
-            if (dto == null)
-                return null;
-
-            var user = UserFactory.BuildEntity(dto);
-            return user;
+            return GetWith(sql => sql.Where<UserDto>(x => x.Login == username), includeSecurityData);
         }
 
         /// <summary>
@@ -139,58 +103,19 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </returns>
         public IUser Get(int id, bool includeSecurityData)
         {
-            UserDto dto;
-            if (includeSecurityData)
-            {
-                var sql = GetQueryWithGroups();
-                sql.Where(GetBaseWhereClause(), new { Id = id });
-                sql //must be included for relator to work
-                    .OrderBy<UserDto>(d => d.Id, SqlSyntax)
-                    .OrderBy<UserGroupDto>(d => d.Id, SqlSyntax)
-                    .OrderBy<UserStartNodeDto>(d => d.Id, SqlSyntax);
-                dto = Database
-                    .Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(
-                        new UserGroupRelator().Map, sql)
-                    .FirstOrDefault();
-            }
-            else
-            {
-                var sql = GetBaseQuery("umbracoUser.*");
-                sql.Where(GetBaseWhereClause(), new { Id = id });
-                dto = Database.FirstOrDefault<UserDto>(sql);
-            }
-
-            if (dto == null)
-                return null;
-
-            var user = UserFactory.BuildEntity(dto);
-            return user;
+            return GetWith(sql => sql.Where<UserDto>(x => x.Id == id), includeSecurityData);
         }
 
         public IProfile GetProfile(string username)
         {
-            var sql = GetBaseQuery(false).Where<UserDto>(userDto => userDto.UserName == username, SqlSyntax);
-
-            var dto = Database.Fetch<UserDto>(sql)
-                .FirstOrDefault();
-
-            if (dto == null)
-                return null;
-
-            return new UserProfile(dto.Id, dto.UserName);
+            var dto = GetDtoWith(sql => sql.Where<UserDto>(x => x.UserName == username), false);
+            return dto == null ? null : new UserProfile(dto.Id, dto.UserName);
         }
 
         public IProfile GetProfile(int id)
         {
-            var sql = GetBaseQuery(false).Where<UserDto>(userDto => userDto.Id == id, SqlSyntax);
-
-            var dto = Database.Fetch<UserDto>(sql)
-                .FirstOrDefault();
-
-            if (dto == null)
-                return null;
-
-            return new UserProfile(dto.Id, dto.UserName);
+            var dto = GetDtoWith(sql => sql.Where<UserDto>(x => x.Id == id), false);
+            return dto == null ? null : new UserProfile(dto.Id, dto.UserName);
         }
 
         public IDictionary<UserState, int> GetUserStates()
@@ -220,41 +145,132 @@ ORDER BY colName";
 
         protected override IEnumerable<IUser> PerformGetAll(params int[] ids)
         {
-            var sql = GetQueryWithGroups();
-            if (ids.Any())
-            {
-                sql.Where("umbracoUser.id in (@ids)", new { ids = ids });
-            }
-            #error refactor with FetchOneToMany
-            sql //must be included for relator to work
-                .OrderBy<UserDto>(d => d.Id, SqlSyntax)
-                .OrderBy<UserGroupDto>(d => d.Id, SqlSyntax)
-                .OrderBy<UserStartNodeDto>(d => d.Id, SqlSyntax);
-
-            var users = ConvertFromDtos(Database.Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(new UserGroupRelator().Map, sql))
-                .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.
-
+            var dtos = GetDtosWith(sql => sql.WhereIn<UserDto>(x => x.Id, ids), true);
+            var users = new IUser[dtos.Count];
+            var i = 0;
+            foreach (var dto in dtos)
+                users[i++] = UserFactory.BuildEntity(dto);
             return users;
         }
 
         protected override IEnumerable<IUser> PerformGetByQuery(IQuery<IUser> query)
         {
-            var sqlClause = GetQueryWithGroups();
-            var translator = new SqlTranslator<IUser>(sqlClause, query);
-            var sql = translator.Translate();
-            #error obviously refactor with FetchOneToMany!
-            sql //must be included for relator to work
-                .OrderBy<UserDto>(d => d.Id, SqlSyntax)
-                .OrderBy<UserGroupDto>(d => d.Id, SqlSyntax)
-                .OrderBy<UserStartNodeDto>(d => d.Id, SqlSyntax);
+            var dtos = GetDtosWith(sql => new SqlTranslator<IUser>(sql, query).Translate(), true)
+                .DistinctBy(x => x.Id)
+                .ToList();
 
-            var dtos = Database.Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(new UserGroupRelator().Map, sql)
-                .DistinctBy(x => x.Id);
-
-            var users = ConvertFromDtos(dtos)
-                .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.
-
+            var users = new IUser[dtos.Count];
+            var i = 0;
+            foreach (var dto in dtos)
+                users[i++] = UserFactory.BuildEntity(dto);
             return users;
+        }
+
+        private IUser GetWith(Action<Sql<SqlContext>> with, bool includeReferences)
+        {
+            var dto = GetDtoWith(with, includeReferences);
+            return dto == null ? null : UserFactory.BuildEntity(dto);
+        }
+
+        private UserDto GetDtoWith(Action<Sql<SqlContext>> with, bool includeReferences)
+        {
+            var dtos = GetDtosWith(with, includeReferences);
+            return dtos.FirstOrDefault();
+        }
+
+        private List<UserDto> GetDtosWith(Action<Sql<SqlContext>> with, bool includeReferences)
+        {
+            var sql = Sql()
+                .Select<UserDto>()
+                .From<UserDto>();
+
+            with(sql);
+
+            var dtos = Database.Fetch<UserDto>(sql);
+
+            if (includeReferences)
+                PerformGetReferencedDtos(dtos);
+
+            return dtos;
+        }
+
+        // NPoco cannot fetch 2+ references at a time
+        // plus it creates a combinatorial explosion
+        // better use extra queries
+        // unfortunately, SqlCe and MySql don't support multiple result sets
+        private void PerformGetReferencedDtos(List<UserDto> dtos)
+        {
+            if (dtos.Count == 0) return;
+
+            var userIds = dtos.Count == 1 ? new List<int>(dtos[0].Id) : dtos.Select(x => x.Id).ToList();
+            var xUsers = dtos.Count == 1 ? null : dtos.ToDictionary(x => x.Id, x => x);
+
+            // get users2groups
+
+            var sql = Sql()
+                .Select<User2UserGroupDto>()
+                .From<User2UserGroupDto>()
+                .WhereIn<User2UserGroupReadOnlyDto>(x => x.UserId, userIds);
+
+            var users2groups = Database.Fetch<User2UserGroupDto>(sql);
+            var groupIds = users2groups.Select(x => x.UserGroupId).ToList();            
+
+            // get groups
+
+            sql = Sql()
+                .Select<UserGroupDto>()
+                .From<UserGroupDto>()
+                .WhereIn<UserGroupDto>(x => x.Id, userIds);
+
+            var groups = Database.Fetch<UserGroupDto>(sql)
+                .ToDictionary(x => x.Id, x => x);
+
+            // get groups2apps
+
+            sql = Sql()
+                .Select<UserGroup2AppDto>()
+                .From<UserGroup2AppDto>()
+                .WhereIn<UserGroup2AppDto>(x => x.UserGroupId, groupIds);
+
+            var groups2apps = Database.Fetch<UserGroup2AppDto>(sql)
+                .GroupBy(x => x.UserGroupId)
+                .ToDictionary(x => x.Key, x => x);
+
+            // get start nodes
+
+            sql = Sql()
+                .Select<UserStartNodeDto>()
+                .From<UserStartNodeDto>()
+                .WhereIn<UserStartNodeDto>(x => x.UserId, userIds);
+
+            var startNodes = Database.Fetch<UserStartNodeDto>(sql);
+
+            // map groups
+
+            foreach (var user2group in users2groups)
+            {
+                if (groups.TryGetValue(user2group.UserGroupId, out var group))
+                {
+                    var dto = xUsers == null ? dtos[0] : xUsers[user2group.UserId];
+                    dto.UserGroupDtos.Add(group); // user2group is distinct
+                }
+            }
+
+            // map start nodes
+            
+            foreach (var startNode in startNodes)
+            {
+                var dto = xUsers == null ? dtos[0] : xUsers[startNode.UserId];
+                dto.UserStartNodeDtos.Add(startNode); // hashset = distinct
+            }
+
+            // map apps
+
+            foreach (var group in groups.Values)
+            {
+                if (groups2apps.TryGetValue(group.Id, out var list))
+                    group.UserGroup2AppDtos = list.ToList(); // groups2apps is distinct
+            }
         }
 
         #endregion
@@ -264,26 +280,13 @@ ORDER BY colName";
         protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             if (isCount)
-                return Sql().SelectCount().From<UserDto>();
+                return Sql()
+                    .SelectCount()
+                    .From<UserDto>();
 
             return Sql()
-                .Select<UserDto>(r => r.Select<User2AppDto>(referenceName: "User2AppDtos"))
-                .From<UserDto>()
-                .LeftJoin<User2AppDto>()
-                .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId);
-        }
-
-#error prob needs to be refactored entirely
-        /// <summary>
-        /// A query to return a user with it's groups and with it's groups sections
-        /// </summary>
-        /// <returns></returns>
-        private Sql GetQueryWithGroups()
-        {
-            //base query includes user groups
-            var sql = GetBaseQuery("umbracoUser.*, umbracoUserGroup.*, umbracoUserGroup2App.*, umbracoUserStartNode.*");
-            AddGroupLeftJoin(sql);
-            return sql;
+                .Select<UserDto>()
+                .From<UserDto>();
         }
 
         private static void AddGroupLeftJoin(Sql<SqlContext> sql)
@@ -557,42 +560,21 @@ ORDER BY colName";
 
         private IEnumerable<IUser> GetAllInOrNotInGroup(int groupId, bool include)
         {
-        #error this needs to be rewritten
-            var sql = new Sql();
-            sql.Select("*")
+            var sql = Sql()
+                .Select<UserDto>()
                 .From<UserDto>();
 
-            var innerSql = new Sql();
-            innerSql.Select("umbracoUser.id")
-                .From<UserDto>()
-                .LeftJoin<User2UserGroupDto>()
-                .On<UserDto, User2UserGroupDto>(left => left.Id, right => right.UserId)
-                .Where("umbracoUser2UserGroup.userGroupId = " + groupId);
+            var inSql = Sql()
+                .Select<User2UserGroupDto>(x => x.UserId)
+                .From<User2UserGroupDto>()
+                .Where<User2UserGroupDto>(x => x.UserGroupId == groupId);
 
-            sql.Where(string.Format("umbracoUser.id {0} ({1})",
-                include ? "IN" : "NOT IN",
-                innerSql.SQL));
+            if (include)
+                sql.WhereIn<UserDto>(x => x.Id, inSql);
+            else
+                sql.WhereNotIn<UserDto>(x => x.Id, inSql);
+
             return ConvertFromDtos(Database.Fetch<UserDto>(sql));
-        }
-
-        [Obsolete("Use the overload with long operators instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy)
-        {
-            if (orderBy == null) throw new ArgumentNullException("orderBy");
-
-            // get the referenced column name and find the corresp mapped column name
-            var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
-            var mapper = MappingResolver.Current.ResolveMapperByType(typeof(IUser));
-            var mappedField = mapper.Map(expressionMember.Name);
-
-            if (mappedField.IsNullOrWhiteSpace())
-                throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
-
-            long tr;
-            var results = GetPagedResultsByQuery(query, Convert.ToInt64(pageIndex), pageSize, out tr, mappedField, Direction.Ascending);
-            totalRecords = Convert.ToInt32(tr);
-            return results;
         }
 
         /// <summary>
@@ -611,7 +593,9 @@ ORDER BY colName";
         /// <remarks>
         /// The query supplied will ONLY work with data specifically on the umbracoUser table because we are using NPoco paging (SQL paging)
         /// </remarks>
-        public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, Expression<Func<IUser, object>> orderBy, Direction orderDirection, string[] userGroups = null, UserState[] userState = null, IQuery<IUser> filter = null)
+        public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords,
+            Expression<Func<IUser, object>> orderBy, Direction orderDirection = Direction.Ascending,
+            string[] userGroups = null, UserState[] userState = null, IQuery<IUser> filter = null)
         {
             if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
 
@@ -626,36 +610,33 @@ ORDER BY colName";
             return GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, mappedField, orderDirection, userGroups, userState, filter);
         }
 
-
-
-        private IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection,
-            string[] userGroups = null,
-            UserState[] userState = null,
-            IQuery<IUser> filter = null)
+        private IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection = Direction.Ascending,
+            string[] userGroups = null, UserState[] userState = null, IQuery<IUser> filter = null)
         {
-            if (string.IsNullOrWhiteSpace(orderBy)) throw new ArgumentException("Value cannot be null or whitespace.", "orderBy");
+            if (string.IsNullOrWhiteSpace(orderBy)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(orderBy));
 
-
-            Sql filterSql = null;
-            if (filter != null || (userGroups != null && userGroups.Length > 0) || (userState != null && userState.Length > 0 && userState.Contains(UserState.All) == false))
-                filterSql = new Sql();
+            var filterSql = filter != null
+                || userGroups != null && userGroups.Length > 0
+                || userState != null && userState.Length > 0 && userState.Contains(UserState.All) == false
+                ? Sql() : null;
 
             if (filter != null)
             {
-                foreach (var filterClause in filter.GetWhereClauses())
-                {
-                    filterSql.Append(string.Format("AND ({0})", filterClause.Item1), filterClause.Item2);
-                }
+                foreach (var clause in filter.GetWhereClauses())
+                    filterSql.Append($"AND ({clause.Item1})", clause.Item2);
             }
+
             if (userGroups != null && userGroups.Length > 0)
             {
-                var subQuery = @"AND (umbracoUser.id IN (SELECT DISTINCT umbracoUser.id
+                const string subQuery = @"AND (umbracoUser.id IN (SELECT DISTINCT umbracoUser.id
 		            FROM umbracoUser
 		            INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
 		            INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
 		            WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
-                filterSql.Append(subQuery, new { userGroups = userGroups });
+                filterSql.Append(subQuery, new { userGroups });
             }
+
             if (userState != null && userState.Length > 0)
             {
                 //the "ALL" state doesn't require any filtering so we ignore that, if it exists in the list we don't do any filtering
@@ -686,111 +667,50 @@ ORDER BY colName";
                     }
 
                     sb.Append(")");
-
                     filterSql.Append("AND " + sb);
                 }
             }
 
-            // Get base query for returning IDs
-            var sqlBaseIds = GetBaseQuery("id");
+            // create base query
+            var sql = Sql()
+                .Select<UserDto>()
+                .From<UserDto>();
 
-            if (query == null) query = new Query<IUser>();
-            var translatorIds = new SqlTranslator<IUser>(sqlBaseIds, query);
-            var sqlQueryIds = translatorIds.Translate();
+            // apply query
+            if (query != null)
+                sql = new SqlTranslator<IUser>(sql, query).Translate();
 
-            //get sorted and filtered sql
-            var sqlNodeIdsWithSort = GetSortedSqlForPagedResults(
-                GetFilteredSqlForPagedResults(sqlQueryIds, filterSql),
-                orderDirection, orderBy);
+            // get sorted and filtered sql
+            var sqlNodeIdsWithSort = ApplySort(ApplyFilter(sql, filterSql), orderDirection, orderBy);
 
-            // Get page of results and total count
+            // get a page of results and total count
             var pagedResult = Database.Page<UserDto>(pageIndex + 1, pageSize, sqlNodeIdsWithSort);
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);
 
-            //NOTE: We need to check the actual items returned, not the 'totalRecords', that is because if you request a page number
-            // that doesn't actually have any data on it, the totalRecords will still indicate there are records but there are none in
-            // the pageResult.
-            if (pagedResult.Items.Any())
-            {
-                //Create the inner paged query that was used above to get the paged result, we'll use that as the inner sub query
-                var args = sqlNodeIdsWithSort.Arguments;
-                string sqlStringCount, sqlStringPage;
-                Database.BuildPageQueries<UserDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlStringCount, out sqlStringPage);
-
-                var sqlQueryFull = GetBaseQuery("umbracoUser.*, umbracoUserGroup.*, umbracoUserGroup2App.*, umbracoUserStartNode.*");
-
-                var fullQueryWithPagedInnerJoin = sqlQueryFull
-                    .Append("INNER JOIN (")
-                    //join the paged query with the paged query arguments
-                    .Append(sqlStringPage, args)
-                    .Append(") temp ")
-                    .Append("ON umbracoUser.id = temp.id");
-
-                AddGroupLeftJoin(fullQueryWithPagedInnerJoin);
-
-                //get sorted and filtered sql
-                var fullQuery = GetSortedSqlForPagedResults(
-                    GetFilteredSqlForPagedResults(fullQueryWithPagedInnerJoin, filterSql),
-                    orderDirection, orderBy);
-
-                var users = ConvertFromDtos(Database.Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(new UserGroupRelator().Map, fullQuery))
-                    .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.
-
-                return users;
-            }
-
-            return Enumerable.Empty<IUser>();
+            // map references
+            PerformGetReferencedDtos(pagedResult.Items);
+            return pagedResult.Items.Select(UserFactory.BuildEntity);
         }
 
-        private Sql GetFilteredSqlForPagedResults(Sql sql, Sql filterSql)
+        private Sql<SqlContext> ApplyFilter(Sql<SqlContext> sql, Sql<SqlContext> filterSql)
         {
-            Sql filteredSql;
+            if (filterSql == null) return sql;
 
-            // Apply filter
-            if (filterSql != null)
-            {
-                var sqlFilter = " WHERE " + filterSql.SQL.TrimStart("AND ");
+            sql.Append(Sql(" WHERE " + filterSql.SQL.TrimStart("AND "), filterSql.Arguments));
 
-                //NOTE: this is certainly strange - NPoco handles this much better but we need to re-create the sql
-                // instance a couple of times to get the parameter order correct, for some reason the first
-                // time the arguments don't show up correctly but the SQL argument parameter names are actually updated
-                // accordingly - so we re-create it again. In v8 we don't need to do this and it's already taken care of.
+            return sql;
+        }
 
-                filteredSql = new Sql(sql.SQL, sql.Arguments);
-                var args = filteredSql.Arguments.Concat(filterSql.Arguments).ToArray();
-                filteredSql = new Sql(
-                    string.Format("{0} {1}", filteredSql.SQL, sqlFilter),
-                    args);
-                filteredSql = new Sql(filteredSql.SQL, args);
-            }
+        private static Sql<SqlContext> ApplySort(Sql<SqlContext> sql, Direction orderDirection, string orderBy)
+        {
+            if (string.IsNullOrEmpty(orderBy)) return sql;
+
+            if (orderDirection == Direction.Ascending)
+                sql.OrderBy(orderBy);
             else
-            {
-                //copy to var so that the original isn't changed
-                filteredSql = new Sql(sql.SQL, sql.Arguments);
-            }
-            return filteredSql;
-        }
+                sql.OrderByDescending(orderBy);
 
-        private Sql GetSortedSqlForPagedResults(Sql sql, Direction orderDirection, string orderBy)
-        {
-            //copy to var so that the original isn't changed
-            var sortedSql = new Sql(sql.SQL, sql.Arguments);
-
-            // Apply order according to parameters
-            if (string.IsNullOrEmpty(orderBy) == false)
-            {
-                //each order by param needs to be in a bracket! see: https://github.com/toptensoftware/PetaPoco/issues/177
-                var orderByParams = new[] { string.Format("({0})", orderBy) };
-                if (orderDirection == Direction.Ascending)
-                {
-                    sortedSql.OrderBy(orderByParams);
-                }
-                else
-                {
-                    sortedSql.OrderByDescending(orderByParams);
-                }
-            }
-            return sortedSql;
+            return sql;
         }
 
         internal IEnumerable<IUser> GetNextUsers(int id, int count)

@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
@@ -311,7 +312,7 @@ namespace Umbraco.Core.Models.Membership
                 if (foundBuiltIn != null)
                 {
                     //if the group isn't IUserGroup we'll need to look it up
-                    realGroup = foundBuiltIn as IUserGroup ?? ApplicationContext.Current.Services.UserService.GetUserGroupById(foundBuiltIn.Id);
+                    realGroup = foundBuiltIn as IUserGroup ?? Current.Services.UserService.GetUserGroupById(foundBuiltIn.Id);
 
                     //return a mapped version of the group
                     return new UserType
@@ -329,7 +330,7 @@ namespace Umbraco.Core.Models.Membership
 
                 //otherwise return the first
                 //if the group isn't IUserGroup we'll need to look it up
-                realGroup = groups[0] as IUserGroup ?? ApplicationContext.Current.Services.UserService.GetUserGroupById(groups[0].Id);
+                realGroup = groups[0] as IUserGroup ?? Current.Services.UserService.GetUserGroupById(groups[0].Id);
                 //return a mapped version of the group
                 return new UserType
                 {
@@ -350,7 +351,7 @@ namespace Umbraco.Core.Models.Membership
                     return;
 
                 //the only other option we have here is to lookup the group (and we'll need to use singletons here :( )
-                var found = ApplicationContext.Current.Services.UserService.GetUserGroupByAlias(value.Alias);
+                var found = Current.Services.UserService.GetUserGroupByAlias(value.Alias);
                 if (found == null)
                     throw new InvalidOperationException("No user group was found with the alias " + value.Alias + ", this API (IUser.UserType) is obsolete, use user groups instead");
 
@@ -375,7 +376,7 @@ namespace Umbraco.Core.Models.Membership
             if (customUserGroup != null)
             {
                 //if the group isn't IUserGroup we'll need to look it up
-                var realGroup = customUserGroup as IUserGroup ?? ApplicationContext.Current.Services.UserService.GetUserGroupById(customUserGroup.Id);
+                var realGroup = customUserGroup as IUserGroup ?? Current.Services.UserService.GetUserGroupById(customUserGroup.Id);
                 realGroup.RemoveAllowedSection(sectionAlias);
                 //now we need to flag this for saving (hack!)
                 GroupsToSave.Add(realGroup);
@@ -405,7 +406,7 @@ namespace Umbraco.Core.Models.Membership
             if (admin != null)
             {
                 //if the group isn't IUserGroup we'll need to look it up
-                var realGroup = admin as IUserGroup ?? ApplicationContext.Current.Services.UserService.GetUserGroupById(admin.Id);
+                var realGroup = admin as IUserGroup ?? Current.Services.UserService.GetUserGroupById(admin.Id);
                 realGroup.AddAllowedSection(sectionAlias);
                 //now we need to flag this for saving (hack!)
                 GroupsToSave.Add(realGroup);
@@ -417,7 +418,7 @@ namespace Umbraco.Core.Models.Membership
             if (customUserGroup != null)
             {
                 //if the group isn't IUserGroup we'll need to look it up
-                var realGroup = customUserGroup as IUserGroup ?? ApplicationContext.Current.Services.UserService.GetUserGroupById(customUserGroup.Id);
+                var realGroup = customUserGroup as IUserGroup ?? Current.Services.UserService.GetUserGroupById(customUserGroup.Id);
                 realGroup.AddAllowedSection(sectionAlias);
                 //now we need to flag this for saving (hack!)
                 GroupsToSave.Add(realGroup);

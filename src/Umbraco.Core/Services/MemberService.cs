@@ -9,6 +9,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 using System.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Persistence.Repositories;
@@ -166,10 +167,43 @@ namespace Umbraco.Core.Services
         /// <param name="memberTypeAlias">Alias of the Type</param>
         /// <param name="isApproved">Is the member approved</param>
         /// <returns><see cref="IMember"/></returns>
-        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved)
+        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias)
         {
-            var memberType = FindMemberTypeByAlias(memberTypeAlias);
-            return CreateMemberWithIdentity(username, email, username, passwordValue, memberType, isApproved);
+            return CreateMemberWithIdentity(username, email, username, passwordValue, memberTypeAlias);
+        }
+
+        /// <summary>
+        /// Creates and persists a new <see cref="IMember"/>
+        /// </summary>
+        /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
+        /// <param name="username">Username of the <see cref="IMembershipUser"/> to create</param>
+        /// <param name="email">Email of the <see cref="IMembershipUser"/> to create</param>
+        /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
+        /// <param name="memberTypeAlias">Alias of the Type</param>
+        /// <returns><see cref="IMember"/></returns>
+        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved = true)
+        {
+            return CreateMemberWithIdentity(username, email, username, passwordValue, memberTypeAlias, isApproved);
+        }
+
+        public IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias)
+        {
+            return CreateMemberWithIdentity(username, email, username, "", memberTypeAlias);
+        }
+
+        public IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias, bool isApproved)
+        {
+            return CreateMemberWithIdentity(username, email, username, "", memberTypeAlias, isApproved);
+        }
+
+        public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias)
+        {
+            return CreateMemberWithIdentity(username, email, name, "", memberTypeAlias);
+        }
+
+        public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias, bool isApproved)
+        {
+            return CreateMemberWithIdentity(username, email, name, "", memberTypeAlias, isApproved);
         }
 
         /// <summary>
@@ -183,7 +217,7 @@ namespace Umbraco.Core.Services
         /// <param name="memberTypeAlias">Alias of the MemberType the Member should be based on</param>
         /// <param name="isApproved">Optional IsApproved of the Member to create</param>
         /// <returns><see cref="IMember"/></returns>
-        public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias, bool isApproved = true)
+        public IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, string memberTypeAlias, bool isApproved = true)
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
@@ -194,23 +228,14 @@ namespace Umbraco.Core.Services
                 if (memberType == null)
                     throw new ArgumentException("No member type with that alias.", nameof(memberTypeAlias)); // causes rollback
 
-                var member = new Member(name, email.ToLower().Trim(), username, memberType, isApproved);
-                CreateMember(uow, member, 0, true);
+                var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved);
+                CreateMember(uow, member, -1, true);
 
                 uow.Complete();
                 return member;
             }
         }
 
-        /// <summary>
-        /// Creates and persists a Member
-        /// </summary>
-        /// <remarks>Using this method will persist the Member object before its returned
-        /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
-        /// <param name="username">Username of the Member to create</param>
-        /// <param name="email">Email of the Member to create</param>
-        /// <param name="memberType">MemberType the Member should be based on</param>
-        /// <returns><see cref="IMember"/></returns>
         public IMember CreateMemberWithIdentity(string username, string email, IMemberType memberType)
         {
             return CreateMemberWithIdentity(username, email, username, "", memberType);
@@ -223,40 +248,31 @@ namespace Umbraco.Core.Services
         /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
         /// <param name="username">Username of the Member to create</param>
         /// <param name="email">Email of the Member to create</param>
-        /// <param name="name">Name of the Member to create</param>
         /// <param name="memberType">MemberType the Member should be based on</param>
         /// <returns><see cref="IMember"/></returns>
+        public IMember CreateMemberWithIdentity(string username, string email, IMemberType memberType, bool isApproved)
+        {
+            return CreateMemberWithIdentity(username, email, username, "", memberType, isApproved);
+        }
+
         public IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType)
         {
             return CreateMemberWithIdentity(username, email, name, "", memberType);
         }
 
         /// <summary>
-        /// Creates and persists a new <see cref="IMember"/>
+        /// Creates and persists a Member
         /// </summary>
-        /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
-        /// <param name="username">Username of the <see cref="IMembershipUser"/> to create</param>
-        /// <param name="email">Email of the <see cref="IMembershipUser"/> to create</param>
-        /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
-        /// <param name="memberTypeAlias">Alias of the Type</param>
+        /// <remarks>Using this method will persist the Member object before its returned
+        /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
+        /// <param name="username">Username of the Member to create</param>
+        /// <param name="email">Email of the Member to create</param>
+        /// <param name="name">Name of the Member to create</param>
+        /// <param name="memberType">MemberType the Member should be based on</param>
         /// <returns><see cref="IMember"/></returns>
-        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias)
+        public IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType, bool isApproved)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
-            {
-                uow.WriteLock(Constants.Locks.MemberTree);
-
-                // ensure it all still make sense
-                var memberType = GetMemberType(uow, memberTypeAlias); // + locks
-                if (memberType == null)
-                    throw new ArgumentException("No member type with that alias.", nameof(memberTypeAlias)); // causes rollback
-
-                var member = new Member(username, email.ToLower().Trim(), username, passwordValue, memberType);
-                CreateMember(uow, member, -1, true);
-
-                uow.Complete();
-                return member;
-            }
+            return CreateMemberWithIdentity(username, email, name, "", memberType, isApproved);
         }
 
         /// <summary>
@@ -270,7 +286,7 @@ namespace Umbraco.Core.Services
         /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
         /// <param name="memberType">MemberType the Member should be based on</param>
         /// <returns><see cref="IMember"/></returns>
-        private IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, IMemberType memberType)
+        private IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, IMemberType memberType, bool isApproved = true)
         {
             if (memberType == null) throw new ArgumentNullException(nameof(memberType));
 
@@ -283,7 +299,7 @@ namespace Umbraco.Core.Services
                 if (vrfy == null || vrfy.Id != memberType.Id)
                     throw new ArgumentException($"Member type with alias {memberType.Alias} does not exist or is a different member type."); // causes rollback
 
-                var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType);
+                var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved);
                 CreateMember(uow, member, -1, true);
 
                 uow.Complete();
@@ -1318,6 +1334,12 @@ namespace Umbraco.Core.Services
             {
                 return GetMemberType(uow, memberTypeAlias);
             }
+        }
+
+        // fixme - this should not be here, or???
+        public string GetDefaultMemberType()
+        {
+            return Current.Services.MemberTypeService.GetDefault();
         }
 
         #endregion

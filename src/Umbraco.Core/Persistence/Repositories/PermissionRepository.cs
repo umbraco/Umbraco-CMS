@@ -25,7 +25,6 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class PermissionRepository<TEntity> : NPocoRepositoryBase<int, ContentPermissionSet>
         where TEntity : class, IAggregateRoot
     {
-
         public PermissionRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         { }

@@ -91,15 +91,6 @@ namespace Umbraco.Core
                     var componentTypes = ResolveComponentTypes();
                     _bootLoader = new BootLoader(container);
                     _bootLoader.Boot(componentTypes, _state.Level);
-
-                    // this was done in Complete() right before running the Started event handlers
-                    // "special case for the user service, we need to tell it if it's an upgrade, if so we need to ensure that
-                    // exceptions are bubbled up if a user is attempted to be persisted during an upgrade (i.e. when they auth to login)"
-                    //
-                    // was *always* setting the value to true which is?! so using the runtime level
-                    // and then, it is *never* resetted to false, meaning Umbraco has been running with IsUpgrading being true?
-                    // fixme - this is... bad
-                    ((UserService) Current.Services.UserService).IsUpgrading = _state.Level == RuntimeLevel.Upgrade;
                 }
                 catch (Exception e)
                 {

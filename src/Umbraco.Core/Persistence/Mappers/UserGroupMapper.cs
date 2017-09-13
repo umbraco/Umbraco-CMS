@@ -23,12 +23,9 @@ namespace Umbraco.Core.Persistence.Mappers
 
         #region Overrides of BaseMapper
 
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
+        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
 
-        internal override void BuildMap()
+        protected override void BuildMap()
         {
             CacheMap<UserGroup, UserGroupDto>(src => src.Id, dto => dto.Id);
             CacheMap<UserGroup, UserGroupDto>(src => src.Alias, dto => dto.Alias);

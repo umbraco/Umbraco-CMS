@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IUserGroupRepository : IRepositoryQueryable<int, IUserGroup>
+    public interface IUserGroupRepository : IUnitOfWorkRepository, IQueryRepository<int, IUserGroup>
     {
         /// <summary>
         /// Gets a group by it's alias
@@ -55,6 +56,5 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="permission">Permissions as enumerable list of <see cref="char"/></param>
         /// <param name="entityIds">Specify the nodes to replace permissions for</param>
         void AssignGroupPermission(int groupId, char permission, params int[] entityIds);
-
     }
 }

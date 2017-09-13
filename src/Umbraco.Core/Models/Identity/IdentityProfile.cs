@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Linq;
 using AutoMapper;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models.Identity
 {
@@ -36,7 +34,6 @@ namespace Umbraco.Core.Models.Identity
                 .ForMember(dest => dest.AllowedSections, opt => opt.MapFrom(src => src.AllowedSections.ToArray()))
                 .ForMember(dest => dest.LockoutEnabled, opt => opt.Ignore())
                 .ForMember(dest => dest.Logins, opt => opt.Ignore())
-                .ForMember(dest => dest.LoginsChanged, opt => opt.Ignore())
                 .ForMember(dest => dest.EmailConfirmed, opt => opt.Ignore())
                 .ForMember(dest => dest.PhoneNumber, opt => opt.Ignore())
                 .ForMember(dest => dest.PhoneNumberConfirmed, opt => opt.Ignore())
@@ -53,14 +50,12 @@ namespace Umbraco.Core.Models.Identity
                 .ConstructUsing(source => new UserData(Guid.NewGuid().ToString("N"))) //this is the 'session id'
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.AllowedApplications, opt => opt.MapFrom(src => src.AllowedSections))
+                .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => new[] { src.Roles.Select(x => x.RoleId).ToArray()}))
+                .ForMember(dest => dest.RealName, opt => opt.MapFrom(src => src.Name))
                 //When mapping to UserData which is used in the authcookie we want ALL start nodes including ones defined on the groups
                 .ForMember(dest => dest.StartContentNodes, opt => opt.MapFrom(src => src.CalculatedContentStartNodeIds))
                 //When mapping to UserData which is used in the authcookie we want ALL start nodes including ones defined on the groups
                 .ForMember(dest => dest.StartMediaNodes, opt => opt.MapFrom(src => src.CalculatedMediaStartNodeIds))
-                .ForMember(dest => dest.RealName, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.Roles, opt => opt.MapFrom(user => new[] { user.UserTypeAlias }))
-                .ForMember(dest => dest.StartContentNode, opt => opt.MapFrom(src => src.StartContentId))
-                .ForMember(dest => dest.StartMediaNode, opt => opt.MapFrom(src => src.StartMediaId))
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.UserName))
                 .ForMember(dest => dest.Culture, opt => opt.MapFrom(src => src.Culture))
                 .ForMember(dest => dest.SessionId, opt => opt.MapFrom(src => src.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : src.SecurityStamp));

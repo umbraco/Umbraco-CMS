@@ -8,6 +8,7 @@ using System.Web.Security;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Identity;
@@ -74,7 +75,7 @@ namespace Umbraco.Core.Security
         public Task CreateAsync(BackOfficeIdentityUser user)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
 
             //the password must be 'something' it could be empty if authenticating
             // with an external provider so we'll just generate one and prefix it, the 
@@ -115,7 +116,7 @@ namespace Umbraco.Core.Security
         public async Task UpdateAsync(BackOfficeIdentityUser user)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
 
             var asInt = user.Id.TryConvertTo<int>();
             if (asInt == false)
@@ -147,7 +148,7 @@ namespace Umbraco.Core.Security
         public Task DeleteAsync(BackOfficeIdentityUser user)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
 
             var asInt = user.Id.TryConvertTo<int>();
             if (asInt == false)
@@ -208,7 +209,7 @@ namespace Umbraco.Core.Security
         public Task SetPasswordHashAsync(BackOfficeIdentityUser user, string passwordHash)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             if (string.IsNullOrEmpty(passwordHash)) throw new ArgumentNullOrEmptyException(nameof(passwordHash));
 
             user.PasswordHash = passwordHash;
@@ -224,7 +225,7 @@ namespace Umbraco.Core.Security
         public Task<string> GetPasswordHashAsync(BackOfficeIdentityUser user)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             
             return Task.FromResult(user.PasswordHash);
         }
@@ -237,7 +238,7 @@ namespace Umbraco.Core.Security
         public Task<bool> HasPasswordAsync(BackOfficeIdentityUser user)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
 
             return Task.FromResult(string.IsNullOrEmpty(user.PasswordHash) == false);
         }
@@ -250,7 +251,7 @@ namespace Umbraco.Core.Security
         public Task SetEmailAsync(BackOfficeIdentityUser user, string email)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             if (email.IsNullOrWhiteSpace()) throw new ArgumentNullException("email");
 
             user.Email = email;
@@ -266,7 +267,7 @@ namespace Umbraco.Core.Security
         public Task<string> GetEmailAsync(BackOfficeIdentityUser user)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
 
             return Task.FromResult(user.Email);
         }
@@ -320,7 +321,7 @@ namespace Umbraco.Core.Security
         public Task AddLoginAsync(BackOfficeIdentityUser user, UserLoginInfo login)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             if (login == null) throw new ArgumentNullException("login");
 
             var logins = user.Logins;
@@ -339,7 +340,7 @@ namespace Umbraco.Core.Security
         public Task RemoveLoginAsync(BackOfficeIdentityUser user, UserLoginInfo login)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             if (login == null) throw new ArgumentNullException("login");
 
             var provider = login.LoginProvider;
@@ -359,7 +360,7 @@ namespace Umbraco.Core.Security
         public Task<IList<UserLoginInfo>> GetLoginsAsync(BackOfficeIdentityUser user)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             return Task.FromResult((IList<UserLoginInfo>)
                 user.Logins.Select(l => new UserLoginInfo(l.LoginProvider, l.ProviderKey)).ToList());
         }
@@ -404,7 +405,7 @@ namespace Umbraco.Core.Security
         public Task AddToRoleAsync(BackOfficeIdentityUser user, string roleName)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             if (string.IsNullOrWhiteSpace(roleName)) throw new ArgumentException("Value cannot be null or whitespace.", "roleName");
 
             var userRole = user.Roles.SingleOrDefault(r => r.RoleId == roleName);
@@ -425,7 +426,7 @@ namespace Umbraco.Core.Security
         public Task RemoveFromRoleAsync(BackOfficeIdentityUser user, string roleName)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             if (string.IsNullOrWhiteSpace(roleName)) throw new ArgumentException("Value cannot be null or whitespace.", "roleName");
 
             var userRole = user.Roles.SingleOrDefault(r => r.RoleId == roleName);
@@ -446,7 +447,7 @@ namespace Umbraco.Core.Security
         public Task<IList<string>> GetRolesAsync(BackOfficeIdentityUser user)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             return Task.FromResult((IList<string>)user.Roles.Select(x => x.RoleId).ToList());
         }
 
@@ -458,7 +459,7 @@ namespace Umbraco.Core.Security
         public Task<bool> IsInRoleAsync(BackOfficeIdentityUser user, string roleName)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             return Task.FromResult(user.Roles.Select(x => x.RoleId).InvariantContains(roleName));
         }
 
@@ -470,7 +471,7 @@ namespace Umbraco.Core.Security
         public Task SetSecurityStampAsync(BackOfficeIdentityUser user, string stamp)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
 
             user.SecurityStamp = stamp;
             return Task.FromResult(0);
@@ -484,7 +485,7 @@ namespace Umbraco.Core.Security
         public Task<string> GetSecurityStampAsync(BackOfficeIdentityUser user)
         {
             ThrowIfDisposed();
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
 
             //the stamp cannot be null, so if it is currently null then we'll just return a hash of the password
             return Task.FromResult(user.SecurityStamp.IsNullOrWhiteSpace()
@@ -535,7 +536,7 @@ namespace Umbraco.Core.Security
         /// </remarks>
         public Task<DateTimeOffset> GetLockoutEndDateAsync(BackOfficeIdentityUser user)
         {
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
 
             return user.LockoutEndDateUtc.HasValue
                 ? Task.FromResult(DateTimeOffset.MaxValue)
@@ -549,7 +550,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task SetLockoutEndDateAsync(BackOfficeIdentityUser user, DateTimeOffset lockoutEnd)
         {
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             user.LockoutEndDateUtc = lockoutEnd.UtcDateTime;
             return Task.FromResult(0);
         }
@@ -561,7 +562,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task<int> IncrementAccessFailedCountAsync(BackOfficeIdentityUser user)
         {
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             user.AccessFailedCount++;
             return Task.FromResult(user.AccessFailedCount);
         }
@@ -573,7 +574,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task ResetAccessFailedCountAsync(BackOfficeIdentityUser user)
         {
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             user.AccessFailedCount = 0;
             return Task.FromResult(0);
         }
@@ -586,7 +587,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task<int> GetAccessFailedCountAsync(BackOfficeIdentityUser user)
         {
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             return Task.FromResult(user.AccessFailedCount);
         }
 
@@ -597,7 +598,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task<bool> GetLockoutEnabledAsync(BackOfficeIdentityUser user)
         {
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             return Task.FromResult(user.LockoutEnabled);
         }
 
@@ -608,7 +609,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task SetLockoutEnabledAsync(BackOfficeIdentityUser user, bool enabled)
         {
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             user.LockoutEnabled = enabled;
             return Task.FromResult(0);
         }

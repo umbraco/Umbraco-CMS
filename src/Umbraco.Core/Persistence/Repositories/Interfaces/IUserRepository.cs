@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq.Expressions;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -37,10 +36,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="groupId">Id of group</param>
         IEnumerable<IUser> GetAllNotInGroup(int groupId);
 
-        [Obsolete("Use the overload with long operators instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy);
-
         /// <summary>
         /// Gets paged user results
         /// </summary>
@@ -54,7 +49,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="userGroups">Optional parameter to filter by specified user groups</param>
         /// <param name="userState">Optional parameter to filter by specfied user state</param>
         /// <returns></returns>
-        IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords, Expression<Func<IUser, object>> orderBy, Direction orderDirection, string[] userGroups = null, UserState[] userState = null, IQuery<IUser> filter = null);
+        IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords,
+            Expression<Func<IUser, object>> orderBy, Direction orderDirection = Direction.Ascending,
+            string[] userGroups = null, UserState[] userState = null, IQuery<IUser> filter = null);
 
         /// <summary>
         /// Returns a user by username
@@ -82,7 +79,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
         IProfile GetProfile(string username);
         IProfile GetProfile(int id);
-        IDictionary<UserState, int> GetUserStates();
-        
+        IDictionary<UserState, int> GetUserStates();        
     }
 }

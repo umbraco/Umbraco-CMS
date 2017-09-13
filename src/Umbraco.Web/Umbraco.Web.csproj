@@ -297,6 +297,7 @@
     <Compile Include="Routing\ContentFinderCollectionBuilder.cs" />
     <Compile Include="Routing\Domain.cs" />
     <Compile Include="Routing\IContentLastChanceFinder.cs" />
+    <Compile Include="Routing\RedirectTrackingEventHandler.cs" />
     <Compile Include="Routing\UrlProviderCollection.cs" />
     <Compile Include="Routing\UrlProviderCollectionBuilder.cs" />
     <Compile Include="Scheduling\HealthCheckNotifier.cs" />
@@ -314,6 +315,7 @@
     <Compile Include="Strategies\Migrations\PostMigrationCollection.cs" />
     <Compile Include="Strategies\Migrations\PostMigrationCollectionBuilder.cs" />
     <Compile Include="Strategies\Migrations\PostMigrationComponent.cs" />
+    <Compile Include="Trees\ContentBlueprintTreeController.cs" />
     <Compile Include="Trees\RelationTypeTreeController.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
     <Compile Include="Models\ContentEditing\MemberGroupDisplay.cs" />
@@ -324,12 +326,15 @@
     <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\StylesheetsTreeController.cs" />
     <Compile Include="Trees\UserPermissionsTreeController.cs" />
+    <Compile Include="Trees\UserTreeController.cs" />
     <Compile Include="Trees\UserTypesTreeController.cs" />
     <Compile Include="Trees\XsltTreeController.cs" />
     <Compile Include="Trees\UsersTreeController.cs" />
     <Compile Include="umbraco.presentation\umbraco\endPreview.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />
+    <Compile Include="WebApi\Filters\CheckIfUserTicketDataIsStaleAttribute.cs" />
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
     <Compile Include="WebApi\UmbracoApiControllerTypeCollection.cs" />
     <Compile Include="WebRuntimeComponent.cs" />
@@ -1560,7 +1565,6 @@
     <Compile Include="WebServices\EmbedMediaService.cs" />
     <Compile Include="WebServices\ExamineManagementApiController.cs" />
     <Compile Include="WebServices\TagsController.cs" />
-    <Compile Include="WebServices\ScheduledPublishController.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedHttpHandler.cs" />
     <Compile Include="WebServices\SaveFileController.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedWebService.cs">

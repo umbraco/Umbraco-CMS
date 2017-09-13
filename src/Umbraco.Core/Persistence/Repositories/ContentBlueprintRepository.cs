@@ -2,6 +2,7 @@ using System;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.Repositories.Interfaces;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -15,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories
     ///
     /// TODO: Create a helper method to contain most of the underlying logic for the ContentRepository
     /// </remarks>
-    internal class ContentBlueprintRepository : ContentRepository
+    internal class ContentBlueprintRepository : ContentRepository, IContentBlueprintRepository
     {
         public ContentBlueprintRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection settings)
             : base(work, cacheHelper, logger, contentTypeRepository, templateRepository, tagRepository, settings)
