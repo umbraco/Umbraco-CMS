@@ -33,7 +33,7 @@ angular.module('umbraco')
             //clear the ui
             $scope.imageSrc = undefined;
             if ($scope.model.value) {
-                $scope.model.value = "";
+               delete $scope.model.value;
             }
 
             // set form to dirty to tricker discard changes dialog
@@ -55,7 +55,7 @@ angular.module('umbraco')
             $scope.imageIsLoaded = true;
         };
 
-        function renderImage(img) {
+        function backwardsCompatibility(img) {
             //move previously saved value to the editor
             if ($scope.model.value) {
                 //backwards compat with the old file upload (incase some-one swaps them..)
@@ -72,7 +72,6 @@ angular.module('umbraco')
                         }
                     });
                     $scope.model.value.crops = config.crops;
-
 
                 }
 
@@ -125,17 +124,17 @@ angular.module('umbraco')
             if (angular.isString($scope.model.value)) {
                 if ($scope.model.value.substring(0, 6) === "umb://") {
 
-                    //In case there are multiple udi's, take the first one
+                    //In case there are multiple udi's
                     var udis = $scope.model.value.split(',');
-
+                    //Take the first one
                     entityResource.getById(udis[0], "Media").then(function (media) {
-                        renderImage(mediaHelper.resolveFileFromEntity(media, false));
+                        backwardsCompatibility(mediaHelper.resolveFileFromEntity(media, false));
                     });
                 } else {
-                    renderImage($scope.model.value);
+                    backwardsCompatibility($scope.model.value);
                 }
             } else {
-                renderImage($scope.model.value);
+                backwardsCompatibility($scope.model.value);
             }
         }
     })
