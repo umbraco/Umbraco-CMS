@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -11,7 +12,7 @@ namespace Umbraco.Tests
     public class UdiTests
     {
         [Test]
-        public void StringEntityCtorTest()
+        public void StringUdiCtorTest()
         {
             var udi = new StringUdi(Constants.UdiEntityType.AnyString, "test-id");
             Assert.AreEqual(Constants.UdiEntityType.AnyString, udi.EntityType);
@@ -20,7 +21,7 @@ namespace Umbraco.Tests
         }
 
         [Test]
-        public void StringEntityParseTest()
+        public void StringUdiParseTest()
         {
             var udi = Udi.Parse("umb://" + Constants.UdiEntityType.AnyString + "/test-id");
             Assert.AreEqual(Constants.UdiEntityType.AnyString, udi.EntityType);
@@ -29,6 +30,9 @@ namespace Umbraco.Tests
             Assert.IsNotNull(stringEntityId);
             Assert.AreEqual("test-id", stringEntityId.Id);
             Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/test-id", udi.ToString());
+
+            udi = Udi.Parse("umb://" + Constants.UdiEntityType.AnyString + "/DA845952BE474EE9BD6F6194272AC750");
+            Assert.IsInstanceOf<StringUdi>(udi);
         }
 
         [Test]
@@ -83,7 +87,7 @@ namespace Umbraco.Tests
         }
 
         [Test]
-        public void GuidEntityCtorTest()
+        public void GuidUdiCtorTest()
         {
             var guid = Guid.NewGuid();
             var udi = new GuidUdi(Constants.UdiEntityType.AnyGuid, guid);
@@ -93,7 +97,7 @@ namespace Umbraco.Tests
         }
 
         [Test]
-        public void GuidEntityParseTest()
+        public void GuidUdiParseTest()
         {
             var guid = Guid.NewGuid();
             var s = "umb://" + Constants.UdiEntityType.AnyGuid + "/" + guid.ToString("N");
@@ -147,7 +151,43 @@ namespace Umbraco.Tests
             var udi = Udi.Create(Constants.UdiEntityType.AnyGuid, guid);
             Assert.AreEqual(Constants.UdiEntityType.AnyGuid, udi.EntityType);
             Assert.AreEqual(guid, ((GuidUdi)udi).Guid);
-            
+
+            // *not* testing whether Udi.Create(type, invalidValue) throws
+            // because we don't throw anymore - see U4-10409
+        }
+
+        [Test]
+        public void RootUdiTest()
+        {
+            var stringUdi = new StringUdi(Constants.UdiEntityType.AnyString, string.Empty);
+            Assert.IsTrue(stringUdi.IsRoot);
+            Assert.AreEqual("umb://any-string/", stringUdi.ToString());
+
+            var guidUdi = new GuidUdi(Constants.UdiEntityType.AnyGuid, Guid.Empty);
+            Assert.IsTrue(guidUdi.IsRoot);
+            Assert.AreEqual("umb://any-guid/00000000000000000000000000000000", guidUdi.ToString());
+
+            var udi = Udi.Parse("umb://any-string/");
+            Assert.IsTrue(udi.IsRoot);
+            Assert.IsInstanceOf<StringUdi>(udi);
+
+            udi = Udi.Parse("umb://any-guid/00000000000000000000000000000000");
+            Assert.IsTrue(udi.IsRoot);
+            Assert.IsInstanceOf<GuidUdi>(udi);
+
+            udi = Udi.Parse("umb://any-guid/");
+            Assert.IsTrue(udi.IsRoot);
+            Assert.IsInstanceOf<GuidUdi>(udi);
+        }
+
+        [Test]
+        public void NotKnownTypeTest()
+        {
+            var udi1 = Udi.Parse("umb://not-known-1/DA845952BE474EE9BD6F6194272AC750");
+            Assert.IsInstanceOf<GuidUdi>(udi1);
+
+            var udi2 = Udi.Parse("umb://not-known-2/this-is-not-a-guid");
+            Assert.IsInstanceOf<StringUdi>(udi2);
         }
 
         [Test]
@@ -198,6 +238,32 @@ namespace Umbraco.Tests
             Assert.AreEqual(udi, drange.Udi);
             Assert.AreEqual(string.Format("umb://any-guid/{0:N}", guid), drange.Udi.UriValue.ToString());
             Assert.AreEqual(Constants.DeploySelector.ChildrenOfThis, drange.Selector);
+        }
+
+        [Test]
+        public void ValidateUdiEntityType()
+        {
+            var types = Constants.UdiEntityType.GetTypes();
+
+            foreach (var fi in typeof (Constants.UdiEntityType).GetFields(BindingFlags.Public | BindingFlags.Static))
+            {
+                // IsLiteral determines if its value is written at
+                //   compile time and not changeable
+                // IsInitOnly determine if the field can be set
+                //   in the body of the constructor
+                // for C# a field which is readonly keyword would have both true
+                //   but a const field would have only IsLiteral equal to true
+                if (fi.IsLiteral && fi.IsInitOnly == false)
+                {
+                    var value = fi.GetValue(null).ToString();
+
+                    if (types.ContainsKey(value) == false)
+                        Assert.Fail("Error in class Constants.UdiEntityType, type \"{0}\" is not declared by GetTypes.", value);
+                    types.Remove(value);
+                }
+            }
+
+            Assert.AreEqual(0, types.Count, "Error in class Constants.UdiEntityType, GetTypes declares types that don't exist ({0}).", string.Join(",", types.Keys.Select(x => "\"" + x + "\"")));
         }
     }
 }

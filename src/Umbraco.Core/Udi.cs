@@ -3,8 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
-using System.Threading;
 using Umbraco.Core.Deploy;
 
 namespace Umbraco.Core
@@ -16,9 +14,15 @@ namespace Umbraco.Core
     [TypeConverter(typeof(UdiTypeConverter))]
     public abstract class Udi : IComparable<Udi>
     {
-        private static volatile bool _scanned = false;
+        // notes - see U4-10409
+        // if this class is used during application pre-start it cannot scans the assemblies,
+        // this is addressed by lazily-scanning, with the following caveats:
+        // - parsing a root udi still requires a scan and therefore still breaks
+        // - parsing an invalid udi ("umb://should-be-guid/<not-a-guid>") corrupts KnowUdiTypes
+
+        private static volatile bool _scanned;
         private static readonly object ScanLocker = new object();
-        private static readonly Lazy<ConcurrentDictionary<string, UdiType>> KnownUdiTypes;        
+        private static readonly Lazy<ConcurrentDictionary<string, UdiType>> KnownUdiTypes;
         private static readonly ConcurrentDictionary<string, Udi> RootUdis = new ConcurrentDictionary<string, Udi>();
         internal readonly Uri UriValue; // internal for UdiRange
 
@@ -45,33 +49,9 @@ namespace Umbraco.Core
 
         static Udi()
         {
-            KnownUdiTypes = new Lazy<ConcurrentDictionary<string, UdiType>>(() =>
-            {
-                var result = new Dictionary<string, UdiType>();
-                
-                // known types:
-                foreach (var fi in typeof(Constants.UdiEntityType).GetFields(BindingFlags.Public | BindingFlags.Static))
-                {
-                    // IsLiteral determines if its value is written at 
-                    //   compile time and not changeable
-                    // IsInitOnly determine if the field can be set 
-                    //   in the body of the constructor
-                    // for C# a field which is readonly keyword would have both true 
-                    //   but a const field would have only IsLiteral equal to true
-                    if (fi.IsLiteral && fi.IsInitOnly == false)
-                    {
-                        var udiType = fi.GetCustomAttribute<Constants.UdiTypeAttribute>();
-
-                        if (udiType == null) 
-                            throw new InvalidOperationException("All Constants listed in UdiEntityType must be attributed with " + typeof(Constants.UdiTypeAttribute));
-                        result[fi.GetValue(null).ToString()] = udiType.UdiType;
-                    }                        
-                }
-
-                //For non-known UDI types we'll try to parse a GUID and if that doesn't work, we'll decide that it's a string
-
-                return new ConcurrentDictionary<string, UdiType>(result);
-            });                       
+            // initialize with known (built-in) Udi types
+            // for non-known Udi types we'll try to parse a GUID and if that doesn't work, we'll decide that it's a string
+            KnownUdiTypes = new Lazy<ConcurrentDictionary<string, UdiType>>(() => new ConcurrentDictionary<string, UdiType>(Constants.UdiEntityType.GetTypes()));
         }
 
         /// <summary>
@@ -117,12 +97,13 @@ namespace Umbraco.Core
             {
                 return udiType;
             }
-            
-            //if it's empty and it's not in our known list then we don't know
+
+            // if it's empty and it's not in our known list then we don't know
             if (path.IsNullOrWhiteSpace())
                 return UdiType.Unknown;
 
-            //try to parse into a Guid
+            // try to parse into a Guid
+            // (note: root udis use Guid.Empty so this is ok)
             Guid guidId;
             if (Guid.TryParse(path, out guidId))
             {
@@ -131,7 +112,7 @@ namespace Umbraco.Core
                 return UdiType.GuidUdi;
             }
 
-            //add it to our known list - if it's not a GUID then it must a string
+            // add it to our known list - if it's not a GUID then it must a string
             KnownUdiTypes.Value.TryAdd(uri.Host, UdiType.StringUdi);
             return UdiType.StringUdi;
         }
@@ -148,19 +129,21 @@ namespace Umbraco.Core
                 throw new FormatException(string.Format("String \"{0}\" is not a valid udi.", s));
             }
 
+            // if it's a known entity type, GetUdiType will return it
+            // else it will try to guess based on the path, and register the type as known
             string path;
             var udiType = GetUdiType(uri, out path);
 
             if (path.IsNullOrWhiteSpace())
             {
-                //in this case it's because the path is empty which indicates we need to return the root udi
+                // path is empty which indicates we need to return the root udi
                 udi = GetRootUdi(uri.Host);
                 return true;
             }
 
-            //This should never happen, if it's an empty path that would have been taken care of above
+            // if the path is not empty, type should not be unknown
             if (udiType == UdiType.Unknown)
-                throw new InvalidOperationException("Internal error.");
+                throw new FormatException(string.Format("Could not determine the Udi type for string \"{0}\".", s));
 
             if (udiType == UdiType.GuidUdi)
             {
@@ -256,10 +239,14 @@ namespace Umbraco.Core
         /// <param name="id">The identifier.</param>
         /// <returns>The string Udi for the entity type and identifier.</returns>
         public static Udi Create(string entityType, string id)
-        {            
+        {
+            UdiType udiType;
+            if (KnownUdiTypes.Value.TryGetValue(entityType, out udiType) && udiType != UdiType.StringUdi)
+                throw new InvalidOperationException(string.Format("Entity type \"{0}\" is not a StringUdi.", entityType));
+
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentException("Value cannot be null or whitespace.", "id");
-            
+
             return new StringUdi(entityType, id);
         }
 
@@ -270,7 +257,11 @@ namespace Umbraco.Core
         /// <param name="id">The identifier.</param>
         /// <returns>The Guid Udi for the entity type and identifier.</returns>
         public static Udi Create(string entityType, Guid id)
-        {         
+        {
+            UdiType udiType;
+            if (KnownUdiTypes.Value.TryGetValue(entityType, out udiType) && udiType != UdiType.GuidUdi)
+                throw new InvalidOperationException(string.Format("Entity type \"{0}\" is not a GuidUdi.", entityType));
+
             if (id == default(Guid))
                 throw new ArgumentException("Cannot be an empty guid.", "id");
             return new GuidUdi(entityType, id);
@@ -278,9 +269,13 @@ namespace Umbraco.Core
 
         internal static Udi Create(Uri uri)
         {
+            // if it's a know type go fast and use ctors
+            // else fallback to parsing the string (and guess the type)
+
             UdiType udiType;
             if (KnownUdiTypes.Value.TryGetValue(uri.Host, out udiType) == false)
-                throw new ArgumentException(string.Format("Unknown entity type \"{0}\".", uri.Host), "uri");
+                return Parse(uri.ToString());
+
             if (udiType == UdiType.GuidUdi)
                 return new GuidUdi(uri);
             if (udiType == UdiType.GuidUdi)
