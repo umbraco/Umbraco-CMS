@@ -192,7 +192,7 @@ namespace Umbraco.Core
                 if (File.Exists(filePath) == false) return string.Empty;
 
                 var hash = File.ReadAllText(filePath, Encoding.UTF8);
-                
+
                 _cachedAssembliesHash = hash;
                 return _cachedAssembliesHash;
             }
@@ -245,7 +245,7 @@ namespace Umbraco.Core
         internal static string GetFileHash(IEnumerable<Tuple<FileSystemInfo, bool>> filesAndFolders, ProfilingLogger logger)
         {
             using (logger.TraceDuration<PluginManager>("Determining hash of code files on disk", "Hash determined"))
-            {                
+            {
                 // get the distinct file infos to hash
                 var uniqInfos = new HashSet<string>();
                 var uniqContent = new HashSet<string>();
@@ -275,7 +275,7 @@ namespace Umbraco.Core
                         }
                     }
                     return generator.GenerateHash();
-                }                
+                }
             }
         }
 
@@ -315,9 +315,9 @@ namespace Umbraco.Core
                         generator.AddFileSystemItem(fileOrFolder);
                     }
                     return generator.GenerateHash();
-                }                
+                }
             }
-        }        
+        }
 
         #endregion
 
@@ -439,6 +439,10 @@ namespace Umbraco.Core
 
         internal void WriteCache()
         {
+            // be absolutely sure
+            if (Directory.Exists(_tempFolder) == false)
+                Directory.CreateDirectory(_tempFolder);
+
             var filePath = GetPluginListFilePath();
 
             using (var stream = GetFileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, ListFileOpenWriteTimeout))
