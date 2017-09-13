@@ -155,7 +155,7 @@ namespace Umbraco.Tests.TestHelpers
             // FileSystemProviderManager captures the current ApplicationContext ScopeProvider
             // in its current static instance (yea...) so we need to reset it here to ensure
             // it is using the proper ScopeProvider
-            FileSystemProviderManager.Current.Reset();
+            FileSystemProviderManager.ResetCurrent();
         }
 
         protected virtual ApplicationContext CreateApplicationContext()

@@ -28,10 +28,13 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
                 
                 var localContext = new LocalMigrationContext(Context.CurrentDatabaseProvider, database, SqlSyntax, Logger);
 
-                //if it exists we need to drop it first
-                if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsMember_LoginName")))
+                //if an index exists on this table we need to drop it. Normally we'd check via index name but in some odd cases (i.e. Our)
+                //the index name is something odd (starts with "mi_"). In any case, the index cannot exist if we want to alter the column
+                //so we'll drop whatever index is there and add one with the correct name after.
+                var loginNameIndex = dbIndexes.FirstOrDefault(x => x.TableName.InvariantEquals("cmsMember") && x.ColumnName.InvariantEquals("LoginName"));
+                if (loginNameIndex != null)
                 {
-                    localContext.Delete.Index("IX_cmsMember_LoginName").OnTable("cmsMember");
+                    localContext.Delete.Index(loginNameIndex.IndexName).OnTable("cmsMember");
                 }
 
                 //we can apply the col length change

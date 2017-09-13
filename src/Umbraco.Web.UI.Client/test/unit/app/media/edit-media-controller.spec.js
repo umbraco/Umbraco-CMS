@@ -41,7 +41,7 @@ describe('edit media controller tests', function () {
         it('it should have an media object', function() {
 
             //controller should have a content object
-            expect(scope.content).toBeTruthy();
+            expect(scope.content).not.toBeUndefined();
 
             //if should be the same as the routeParams defined one
             expect(scope.content.id).toBe(1234);

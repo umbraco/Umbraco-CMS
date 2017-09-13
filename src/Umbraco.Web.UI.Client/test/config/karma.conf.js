@@ -1,6 +1,6 @@
-module.exports = function(config) {
+module.exports = function (config) {
 
-   config.set({
+  config.set({
 
     // base path, that will be used to resolve files and exclude
     basePath: '../..',
@@ -10,32 +10,35 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
 
-        //libraries
-        'lib-bower/jquery/jquery.min.js',
-        'lib/angular/1.1.5/angular.js',
-        'lib/angular/1.1.5/angular-cookies.min.js',
-        'lib/angular/1.1.5/angular-mocks.js',
-        'lib/angular/angular-ui-sortable.js',
-        'lib-bower/underscore/underscore-min.js',
-         'lib-bower/moment/moment-with-locales.js',
-         'lib/umbraco/Extensions.js', 
-         'lib-bower/rgrove-lazyload/lazyload.js',
-         'lib-bower//angular-local-storage/angular-local-storage.min.js',
+      //libraries
+      'lib-bower/jquery/jquery.min.js',
+      'lib/angular/1.1.5/angular.js',
+      'lib/angular/1.1.5/angular-cookies.min.js',
+      'lib/angular/1.1.5/angular-mocks.js',
+      'lib/angular/angular-ui-sortable.js',
+      'lib-bower/underscore/underscore-min.js',
+      'lib-bower/moment/moment-with-locales.js',
+      'lib/umbraco/Extensions.js',
+      'lib-bower/rgrove-lazyload/lazyload.js',
+      'lib-bower//angular-local-storage/angular-local-storage.min.js',
 
-         //app bootstrap and loader
-         'test/config/app.unit.js',
+      //app bootstrap and loader
+      'test/config/app.unit.js',
 
-         //application files
-         'src/common/directives/**/*.js',
-         'src/common/filters/*.js',
-         'src/common/services/*.js',
-         'src/common/security/*.js',
-         'src/common/resources/*.js',
-         'src/common/mocks/**/*.js',
-         'src/views/**/*.controller.js',
+      //application files
+      'src/common/directives/*.js',
+      'src/common/filters/*.js',
+      'src/common/services/*.js',
+      'src/common/security/*.js',
+      'src/common/resources/*.js',
+      'src/views/**/*.controller.js',
 
-         //tests
-         'test/unit/**/*.spec.js'     
+      //mocked data and routing
+      'src/common/mocks/umbraco.servervariables.js',
+      'src/common/mocks/**/*.js',
+
+      //tests
+      'test/unit/**/*.spec.js'
     ],
 
     // list of files to exclude
@@ -78,9 +81,10 @@ module.exports = function(config) {
     // CLI --browsers Chrome,Firefox,Safari
     browsers: ['PhantomJS'],
 
-    // If browser does not capture in given timeout [ms], kill it
-    // CLI --capture-timeout 5000
-    captureTimeout: 5000,
+    // allow waiting a bit longer, some machines require this
+	
+    browserNoActivityTimeout: 100000,     // default 10,000ms
+
 
     // Auto run tests on start (when browsers are captured) and exit
     // CLI --single-run --no-single-run
@@ -89,7 +93,7 @@ module.exports = function(config) {
     // report which specs are slower than 500ms
     // CLI --report-slower-than 500
     reportSlowerThan: 500,
-
+    
     plugins: [
       'karma-jasmine',
       'karma-phantomjs-launcher'

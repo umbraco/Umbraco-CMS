@@ -1041,25 +1041,20 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
   </ProjectExtensions>
   <Import Project="$(MSBuildProjectDirectory)\..\umbraco.presentation.targets" Condition="$(BuildingInsideVisualStudio) != true" />
   <Import Project="$(SolutionDir)umbraco.presentation.targets" Condition="$(BuildingInsideVisualStudio) == true" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+  <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
-  <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
-    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-  </PropertyGroup>
-  <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
-    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-  </PropertyGroup>
-  <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
-    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-  </PropertyGroup>
-  <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+  <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
     <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
   </PropertyGroup>
-  <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
-    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
   </PropertyGroup>
   <UsingTask TaskName="TransformXml" AssemblyFile="$(WebPublishingTasks)" Condition="'$(WebPublishingTasks)' != ''" />
   <UsingTask TaskName="TransformXml" AssemblyFile="$(VSWherePath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll" Condition="'$(VSWherePath)' != ''" />
@@ -1073,20 +1068,24 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
     <!-- Always transform the Template file when not in VS (ie: build.bat) -->
     <TransformXml Source="$(ProjectDir)Web.Template.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) != true" />
     <!-- Create ClientDependency.config file from Template if it doesn't exist -->
-    <Copy SourceFiles="$(ProjectDir)Config\ClientDependency.Release.config" DestinationFiles="$(ProjectDir)Config\ClientDependency.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
-    <!-- Only runs if the Belle build folder doesn't yet exist -->
-    <CallTarget Targets="BelleBuild" Condition="!Exists('$(ProjectDir)\..\Umbraco.Web.UI\Umbraco\js\app.js')" />
+    <Copy SourceFiles="$(ProjectDir)Config\ClientDependency.Release.config" DestinationFiles="$(ProjectDir)Config\ClientDependency.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />    
+    
+    <!-- Only runs if the Belle build folder doesn't yet exist -->	
+	<Message Text="Skipping BelleBuild because UmbracoBuild is '$(UmbracoBuild)', " Importance="High" Condition="'$(UmbracoBuild)' != ''" />
+	
+	<Message Text="Running BelleBuild because $(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib does not exist" Importance="High" Condition="!Exists('$(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib')" />
+    <CallTarget Targets="BelleBuild" Condition="!Exists('$(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib') and '$(UmbracoBuild)' == ''" />
+	
+	<Message Text="Skipping BelleBuild because $(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib exists or UmbracoBuild is not set" Importance="High" Condition="Exists('$(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib') and '$(UmbracoBuild)' == ''" />	
   </Target>
+  
   <Target Name="AfterBuild">
     <Copy SourceFiles="$(ProjectDir)Web.$(Configuration).config.transformed" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="$(BuildingInsideVisualStudio) == true" />
+  </Target>  
+  
+  <Target Name="BelleBuild" BeforeTargets="Rebuild" Condition="'$(UmbracoBuild)' == ''">
+    <Exec WorkingDirectory="$(ProjectDir)\..\..\" Command="powershell -ExecutionPolicy RemoteSigned -Command &quot;&amp;{ $env:PSModulePath = \&quot;$pwd\build\Modules\;$env:PSModulePath\&quot; ; Import-Module Umbraco.Build -Force -DisableNameChecking ; build-umbraco compile-belle }&quot;" />
   </Target>
-  <Target Name="BelleBuild" BeforeTargets="Rebuild">
-    <Message Text="Building Belle (due to a rebuild or this being the first build)" Importance="high" />
-    <!-- Only runs when a Rebuild is requested -->
-    <ReadLinesFromFile File="$(ProjectDir)\..\..\build\UmbracoVersion.txt">
-      <Output TaskParameter="Lines" PropertyName="VersionNumber" />
-    </ReadLinesFromFile>
-    <Exec WorkingDirectory="$(ProjectDir)\..\..\build\" Command="BuildBelle.bat $(VersionNumber)" ConsoleToMSBuild="true" IgnoreExitCode="true" ContinueOnError="WarnAndContinue" />
-  </Target>
+  
   <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
 </Project>

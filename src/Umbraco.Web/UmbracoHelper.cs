@@ -1440,17 +1440,57 @@ namespace Umbraco.Web
 		public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
 		{
             return _stringUtilities.Truncate(html, length, addElipsis, treatTagsAsContent);
-		}
+        }
+        #region Truncate by Words
 
+        /// <summary>
+        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// </summary>
+        public IHtmlString TruncateByWords(string html, int words)
+        {
+            int length = _stringUtilities.WordsToLength(html, words);
 
-		#endregion
+            return Truncate(html, length, true, false);
+        }
 
-		#region If
+        /// <summary>
+        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// </summary>
+        public IHtmlString TruncateByWords(string html, int words, bool addElipsis)
+        {
+            int length = _stringUtilities.WordsToLength(html, words);
 
-		/// <summary>
-		/// If the test is true, the string valueIfTrue will be returned, otherwise the valueIfFalse will be returned.
-		/// </summary>
-		public HtmlString If(bool test, string valueIfTrue, string valueIfFalse)
+            return Truncate(html, length, addElipsis, false);
+        }
+
+        /// <summary>
+        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// </summary>
+        public IHtmlString TruncateByWords(IHtmlString html, int words)
+        {
+            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words);
+
+            return Truncate(html, length, true, false);
+        }
+
+        /// <summary>
+        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// </summary>
+        public IHtmlString TruncateByWords(IHtmlString html, int words, bool addElipsis)
+        {
+            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words);
+
+            return Truncate(html, length, addElipsis, false);
+        }
+        #endregion
+        #endregion
+
+        #region If
+
+        /// <summary>
+        /// If the test is true, the string valueIfTrue will be returned, otherwise the valueIfFalse will be returned.
+        /// </summary>
+        public HtmlString If(bool test, string valueIfTrue, string valueIfFalse)
 		{
 			return test ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
 		}
