@@ -20,6 +20,8 @@ namespace Umbraco.Web.WebApi
     [UmbracoAuthorize]
     [DisableBrowserCache]
     [UmbracoWebApiRequireHttps]
+    [UnhandedExceptionLoggerConfiguration]
+    [EnableDetailedErrors]
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
     {
         protected UmbracoAuthorizedApiController()
