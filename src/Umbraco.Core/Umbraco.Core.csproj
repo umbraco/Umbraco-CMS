@@ -644,6 +644,7 @@
     <Compile Include="Security\EmailService.cs" />
     <Compile Include="Security\OwinExtensions.cs" />
     <Compile Include="SemVersionExtensions.cs" />
+    <Compile Include="Serialization\KnownTypeUdiJsonConverter.cs" />
     <Compile Include="Serialization\NoTypeConverterJsonConverter.cs" />
     <Compile Include="Serialization\StreamResultExtensions.cs" />
     <Compile Include="Serialization\UdiJsonConverter.cs" />

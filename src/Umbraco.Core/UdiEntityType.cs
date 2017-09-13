@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core
 {
-
     public static partial class Constants
     {
         /// <summary>
@@ -13,81 +13,93 @@ namespace Umbraco.Core
         /// but entity types are strings and so can be extended beyond what is defined here.</remarks>
         public static class UdiEntityType
         {
-            [UdiType(UdiType.Unknown)]
+            // note: const fields in this class MUST be consistent with what GetTypes returns
+            //  this is validated by UdiTests.ValidateUdiEntityType
+
+            internal static Dictionary<string, UdiType> GetTypes()
+            {
+                return new Dictionary<string,UdiType>
+                {
+                    { Unknown, UdiType.Unknown },
+
+                    { AnyGuid, UdiType.GuidUdi },
+                    { Document, UdiType.GuidUdi },
+                    { Media, UdiType.GuidUdi },
+                    { Member, UdiType.GuidUdi },
+                    { DictionaryItem, UdiType.GuidUdi },
+                    { Macro, UdiType.GuidUdi },
+                    { Template, UdiType.GuidUdi },
+                    { DocumentType, UdiType.GuidUdi },
+                    { DocumentTypeContainer, UdiType.GuidUdi },
+                    { MediaType, UdiType.GuidUdi },
+                    { MediaTypeContainer, UdiType.GuidUdi },
+                    { DataType, UdiType.GuidUdi },
+                    { DataTypeContainer, UdiType.GuidUdi },
+                    { MemberType, UdiType.GuidUdi },
+                    { MemberGroup, UdiType.GuidUdi },
+                    { RelationType, UdiType.GuidUdi },
+                    { FormsForm, UdiType.GuidUdi },
+                    { FormsPreValue, UdiType.GuidUdi },
+                    { FormsDataSource, UdiType.GuidUdi },
+
+                    { AnyString, UdiType.StringUdi},
+                    { Language, UdiType.StringUdi},
+                    { MacroScript, UdiType.StringUdi},
+                    { MediaFile, UdiType.StringUdi},
+                    { TemplateFile, UdiType.StringUdi},
+                    { Script, UdiType.StringUdi},
+                    { PartialView, UdiType.StringUdi},
+                    { PartialViewMacro, UdiType.StringUdi},
+                    { Stylesheet, UdiType.StringUdi},
+                    { UserControl, UdiType.StringUdi},
+                    { Xslt, UdiType.StringUdi},
+                };
+            }
+
             public const string Unknown = "unknown";
 
             // guid entity types
 
-            [UdiType(UdiType.GuidUdi)]
             public const string AnyGuid = "any-guid"; // that one is for tests
 
-            [UdiType(UdiType.GuidUdi)]
             public const string Document = "document";
-            [UdiType(UdiType.GuidUdi)]
             public const string Media = "media";
-            [UdiType(UdiType.GuidUdi)]
             public const string Member = "member";
 
-            [UdiType(UdiType.GuidUdi)]
             public const string DictionaryItem = "dictionary-item";
-            [UdiType(UdiType.GuidUdi)]
             public const string Macro = "macro";
-            [UdiType(UdiType.GuidUdi)]
             public const string Template = "template";
 
-            [UdiType(UdiType.GuidUdi)]
             public const string DocumentType = "document-type";
-            [UdiType(UdiType.GuidUdi)]
             public const string DocumentTypeContainer = "document-type-container";
-            [UdiType(UdiType.GuidUdi)]
             public const string MediaType = "media-type";
-            [UdiType(UdiType.GuidUdi)]
             public const string MediaTypeContainer = "media-type-container";
-            [UdiType(UdiType.GuidUdi)]
             public const string DataType = "data-type";
-            [UdiType(UdiType.GuidUdi)]
             public const string DataTypeContainer = "data-type-container";
-            [UdiType(UdiType.GuidUdi)]
             public const string MemberType = "member-type";
-            [UdiType(UdiType.GuidUdi)]
             public const string MemberGroup = "member-group";
 
-            [UdiType(UdiType.GuidUdi)]
             public const string RelationType = "relation-type";
 
             // forms
 
-            [UdiType(UdiType.GuidUdi)]
             public const string FormsForm = "forms-form";
-            [UdiType(UdiType.GuidUdi)]
             public const string FormsPreValue = "forms-prevalue";
-            [UdiType(UdiType.GuidUdi)]
             public const string FormsDataSource = "forms-datasource";
 
             // string entity types
 
-            [UdiType(UdiType.StringUdi)]
             public const string AnyString = "any-string"; // that one is for tests
 
-            [UdiType(UdiType.StringUdi)]
             public const string Language = "language";
-            [UdiType(UdiType.StringUdi)]
             public const string MacroScript = "macroscript";
-            [UdiType(UdiType.StringUdi)]
             public const string MediaFile = "media-file";
-            [UdiType(UdiType.StringUdi)]
             public const string TemplateFile = "template-file";
-            [UdiType(UdiType.StringUdi)]
             public const string Script = "script";
-            [UdiType(UdiType.StringUdi)]
             public const string Stylesheet = "stylesheet";
-            [UdiType(UdiType.StringUdi)]
             public const string PartialView = "partial-view";
-            [UdiType(UdiType.StringUdi)]
             public const string PartialViewMacro = "partial-view-macro";
-            [UdiType(UdiType.StringUdi)]
             public const string UserControl = "usercontrol";
-            [UdiType(UdiType.StringUdi)]
             public const string Xslt = "xslt";
 
             public static string FromUmbracoObjectType(UmbracoObjectTypes umbracoObjectType)
@@ -177,17 +189,6 @@ namespace Umbraco.Core
                 }
                 throw new NotSupportedException(
                     string.Format("EntityType \"{0}\" does not have a matching UmbracoObjectType.", entityType));
-            }
-        }
-
-        [AttributeUsage(AttributeTargets.Field)]
-        internal class UdiTypeAttribute : Attribute
-        {
-            public UdiType UdiType { get; private set; }
-
-            public UdiTypeAttribute(UdiType udiType)
-            {
-                UdiType = udiType;
             }
         }
     }
