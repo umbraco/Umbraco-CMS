@@ -147,10 +147,7 @@ namespace Umbraco.Tests
             var udi = Udi.Create(Constants.UdiEntityType.AnyGuid, guid);
             Assert.AreEqual(Constants.UdiEntityType.AnyGuid, udi.EntityType);
             Assert.AreEqual(guid, ((GuidUdi)udi).Guid);
-
-            Assert.Throws<InvalidOperationException>(() => Udi.Create(Constants.UdiEntityType.AnyString, guid));
-            Assert.Throws<InvalidOperationException>(() => Udi.Create(Constants.UdiEntityType.AnyGuid, "foo"));
-            Assert.Throws<ArgumentException>(() => Udi.Create("barf", "foo"));
+            
         }
 
         [Test]
