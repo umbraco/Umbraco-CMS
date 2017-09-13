@@ -1264,6 +1264,7 @@
     <Compile Include="PropertyEditors\ValueConverters\UploadPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueValidatorAttribute.cs" />
+    <Compile Include="Publishing\ScheduledPublisher.cs" />
     <Compile Include="ReadLock.cs" />
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="RuntimeLevel.cs" />

@@ -1,5 +1,4 @@
 ﻿using System.Net.Http.Formatting;
-using umbraco;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -10,22 +9,9 @@ namespace Umbraco.Web.Trees
     [UmbracoTreeAuthorize(Constants.Trees.Users)]
     [Tree(Constants.Applications.Users, Constants.Trees.Users, null, sortOrder: 0)]
     [PluginController("UmbracoTrees")]
-    [LegacyBaseTree(typeof(loadUsers))]
     [CoreTree]
     public class UserTreeController : TreeController
     {
-        public UserTreeController()
-        {
-        }
-
-        public UserTreeController(UmbracoContext umbracoContext) : base(umbracoContext)
-        {
-        }
-
-        public UserTreeController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper) : base(umbracoContext, umbracoHelper)
-        {
-        }
-
         /// <summary>
         /// Helper method to create a root model for a tree
         /// </summary>

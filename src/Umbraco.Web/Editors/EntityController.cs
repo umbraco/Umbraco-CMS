@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Net;
-using System.Text;
 using System.Web.Http;
 using AutoMapper;
 using Umbraco.Core;
@@ -16,8 +13,6 @@ using System.Net.Http;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
 using Constants = Umbraco.Core.Constants;
-using Examine;
-using System.Text.RegularExpressions;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
 using Umbraco.Core.Xml;
@@ -36,7 +31,6 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {
-
         /// <summary>
         /// Configures this controller with a custom action selector
         /// </summary>
@@ -56,6 +50,12 @@ namespace Umbraco.Web.Editors
         }
 
         private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
+        private readonly SearchableTreeCollection _searchableTreeCollection;
+
+        public EntityController(SearchableTreeCollection searchableTreeCollection)
+        {
+            _searchableTreeCollection = searchableTreeCollection;
+        }
 
         /// <summary>
         /// Returns an Umbraco alias given a string
@@ -65,7 +65,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public dynamic GetSafeAlias(string value, bool camelCase = true)
         {
-            var returnValue = (string.IsNullOrWhiteSpace(value)) ? string.Empty : value.ToSafeAlias(camelCase);
+            var returnValue = string.IsNullOrWhiteSpace(value) ? string.Empty : value.ToSafeAlias(camelCase);
             dynamic returnObj = new System.Dynamic.ExpandoObject();
             returnObj.alias = returnValue;
             returnObj.original = value;
@@ -107,7 +107,7 @@ namespace Umbraco.Web.Editors
         ///
         /// The reason a user is allowed to search individual entity types that they are not allowed to edit is because those search
         /// methods might be used in things like pickers in the content editor.
-        /// </remarks>        
+        /// </remarks>
         [HttpGet]
         public IDictionary<string, TreeSearchResult> SearchAll(string query)
         {
@@ -115,17 +115,17 @@ namespace Umbraco.Web.Editors
 
             if (string.IsNullOrEmpty(query))
                 return result;
-            
+
             var allowedSections = Security.CurrentUser.AllowedSections.ToArray();
-            var searchableTrees = SearchableTreeResolver.Current.GetSearchableTrees();
-            
+            var searchableTrees = _searchableTreeCollection.AsReadOnlyDictionary();
+
             foreach (var searchableTree in searchableTrees)
             {
                 if (allowedSections.Contains(searchableTree.Value.AppAlias))
                 {
                     var tree = Services.ApplicationTreeService.GetByAlias(searchableTree.Key);
                     if (tree == null) continue; //shouldn't occur
-                    #error why cannot we use a collectino?
+
                     var searchableTreeAttribute = searchableTree.Value.SearchableTree.GetType().GetCustomAttribute<SearchableTreeAttribute>(false);
                     var treeAttribute = tree.GetTreeAttribute();
 
@@ -140,7 +140,7 @@ namespace Umbraco.Web.Editors
                         JsFormatterMethod = searchableTreeAttribute == null ? "" : searchableTreeAttribute.MethodName
                     };
                 }
-            }            
+            }
             return result;
         }
 
@@ -616,7 +616,7 @@ namespace Umbraco.Web.Editors
             return _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, searchFrom);
         }
 
-            
+
 
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)

@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Models.Mapping

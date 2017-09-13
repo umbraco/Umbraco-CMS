@@ -16,7 +16,6 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Developer, Constants.Trees.Packages, null, sortOrder: 0)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
-    [LegacyBaseTree(typeof(loadPackager))]
     public class PackagesTreeController : TreeController
     {
         /// <summary>

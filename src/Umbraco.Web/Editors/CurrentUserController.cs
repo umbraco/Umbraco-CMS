@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
-using Umbraco.Core.Services;
+using AutoMapper;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -8,7 +10,6 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Core.Security;
 using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.Constants;
 
 
 namespace Umbraco.Web.Editors
@@ -66,7 +67,7 @@ namespace Umbraco.Web.Editors
         public async Task<HttpResponseMessage> PostSetAvatar()
         {
             //borrow the logic from the user controller
-            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, ApplicationContext.ApplicationCache.StaticCache, Security.GetUserId());
+            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, Current.ApplicationCache.StaticCache, Security.GetUserId());
         }
 
         /// <summary>

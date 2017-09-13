@@ -3,6 +3,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
+using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 
@@ -50,15 +51,13 @@ namespace Umbraco.Web.Cache
 
             var dataTypeCache = CacheHelper.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
 
-            //clears the prevalue cache
-            if (dataTypeCache)
-                foreach (var payload in payloads)
-                    dataTypeCache.Result.ClearCacheByKeySearch(CacheKeys.DataTypePreValuesCacheKey + "_" + payload.Id);
-
             foreach (var payload in payloads)
             {
+                if (dataTypeCache)
+                    dataTypeCache.Result.ClearCacheByKeySearch(CacheKeys.DataTypePreValuesCacheKey + "_" + payload.Id);
+
                 _idkMap.ClearCache(payload.Id);
-#error also nested content see 7.7
+                NestedContentHelper.ClearCache(payload.Id); // fixme refactor nested content
             }
 
             // fixme - not sure I like these?

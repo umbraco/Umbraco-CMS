@@ -1,52 +1,44 @@
 ﻿using System;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Models
 {
     internal class DetachedPublishedProperty : IPublishedProperty
     {
         private readonly PublishedPropertyType _propertyType;
-        private readonly object _rawValue;
-        private readonly Lazy<object> _sourceValue;
+        private readonly object _sourceValue;
         private readonly Lazy<object> _objectValue;
         private readonly Lazy<object> _xpathValue;
         private readonly bool _isPreview;
 
         public DetachedPublishedProperty(PublishedPropertyType propertyType, object value)
             : this(propertyType, value, false)
-        {
-        }
+        { }
 
         public DetachedPublishedProperty(PublishedPropertyType propertyType, object value, bool isPreview)
         {
             _propertyType = propertyType;
             _isPreview = isPreview;
 
-            _rawValue = value;
+            _sourceValue = value;
 
-            _sourceValue = new Lazy<object>(() => _propertyType.ConvertDataToSource(_rawValue, _isPreview));
-            _objectValue = new Lazy<object>(() => _propertyType.ConvertSourceToObject(_sourceValue.Value, _isPreview));
-            _xpathValue = new Lazy<object>(() => _propertyType.ConvertSourceToXPath(_sourceValue.Value, _isPreview));
+            IPropertySet propertySet = null; // fixme!! nested content needs complete refactoring!
+
+            var interValue = new Lazy<object>(() => _propertyType.ConvertSourceToInter(propertySet, _sourceValue, _isPreview));
+            _objectValue = new Lazy<object>(() => _propertyType.ConvertInterToObject(propertySet, PropertyCacheLevel.None, interValue.Value, _isPreview));
+            _xpathValue = new Lazy<object>(() => _propertyType.ConvertInterToXPath(propertySet, PropertyCacheLevel.None, interValue.Value, _isPreview));
         }
 
-        public string PropertyTypeAlias
-        {
-            get
-            {
-                return _propertyType.PropertyTypeAlias;
-            }
-        }
+        public string PropertyTypeAlias => _propertyType.PropertyTypeAlias;
 
-        public bool HasValue
-        {
-            get { return DataValue != null && DataValue.ToString().Trim().Length > 0; }
-        }
+        public bool HasValue => SourceValue != null && SourceValue.ToString().Trim().Length > 0;
 
-        public object DataValue { get { return _rawValue; } }
+        public object SourceValue => _sourceValue;
 
-        public object Value { get { return _objectValue.Value; } }
+        public object Value => _objectValue.Value;
 
-        public object XPathValue { get { return _xpathValue.Value; } }
+        public object XPathValue => _xpathValue.Value;
     }
 }

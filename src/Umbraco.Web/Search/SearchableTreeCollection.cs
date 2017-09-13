@@ -7,7 +7,7 @@ using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Search
 {
-    internal class SearchableTreeCollection : BuilderCollectionBase<ISearchableTree>
+    public class SearchableTreeCollection : BuilderCollectionBase<ISearchableTree>
     {
         private readonly Dictionary<string, SearchableApplicationTree> _dictionary;
 
