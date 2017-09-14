@@ -45,6 +45,9 @@
       <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.Net4.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ClientDependency.Core, Version=1.9.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClientDependency.1.9.2\lib\net45\ClientDependency.Core.dll</HintPath>
+    </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.9.5, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\Net45\HtmlAgilityPack.dll</HintPath>
       <Private>True</Private>
@@ -238,6 +241,8 @@
     <Compile Include="Configuration\Grid\IGridConfig.cs" />
     <Compile Include="Configuration\Grid\IGridEditorConfig.cs" />
     <Compile Include="Configuration\Grid\IGridEditorsConfig.cs" />
+    <Compile Include="Configuration\IFileSystemProviderElement.cs" />
+    <Compile Include="Configuration\IFileSystemProvidersSection.cs" />
     <Compile Include="Configuration\UmbracoConfig.cs" />
     <Compile Include="Configuration\UmbracoConfigurationSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsCollection.cs" />
@@ -348,14 +353,17 @@
     <Compile Include="Deploy\Direction.cs" />
     <Compile Include="Deploy\IFileType.cs" />
     <Compile Include="Deploy\IFileTypeCollection.cs" />
+    <Compile Include="EmailSender.cs" />
     <Compile Include="Events\EventDefinitionFilter.cs" />
     <Compile Include="Events\IDeletingMediaFilesEventArgs.cs" />
     <Compile Include="Events\ScopeEventDispatcherBase.cs" />
     <Compile Include="Events\ScopeLifespanMessagesFactory.cs" />
+    <Compile Include="Events\SendEmailEventArgs.cs" />
     <Compile Include="Events\SupersedeEventAttribute.cs" />
     <Compile Include="Exceptions\ConnectionException.cs" />
     <Compile Include="HashCodeHelper.cs" />
     <Compile Include="HashGenerator.cs" />
+    <Compile Include="IEmailSender.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Models\EntityBase\EntityPath.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
@@ -528,6 +536,7 @@
     <Compile Include="Persistence\Factories\TaskFactory.cs" />
     <Compile Include="Persistence\Factories\TaskTypeFactory.cs" />
     <Compile Include="Persistence\Factories\UserGroupFactory.cs" />
+    <Compile Include="Persistence\LocalDb.cs" />
     <Compile Include="Persistence\LockedRepository.cs" />
     <Compile Include="Persistence\LockingRepository.cs" />
     <Compile Include="Persistence\Mappers\AccessMapper.cs" />
@@ -690,8 +699,10 @@
     <Compile Include="Security\EmailService.cs" />
     <Compile Include="Security\MembershipProviderPasswordValidator.cs" />
     <Compile Include="Security\OwinExtensions.cs" />
+    <Compile Include="Security\UmbracoEmailMessage.cs" />
     <Compile Include="Security\UserAwareMembershipProviderPasswordHasher.cs" />
     <Compile Include="SemVersionExtensions.cs" />
+    <Compile Include="Serialization\KnownTypeUdiJsonConverter.cs" />
     <Compile Include="Serialization\NoTypeConverterJsonConverter.cs" />
     <Compile Include="Serialization\StreamResultExtensions.cs" />
     <Compile Include="Serialization\UdiJsonConverter.cs" />
@@ -1623,7 +1634,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

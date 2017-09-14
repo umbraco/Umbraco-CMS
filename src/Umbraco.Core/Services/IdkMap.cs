@@ -46,6 +46,10 @@ namespace Umbraco.Core.Services
 
             if (val == null) return Attempt<int>.Fail();
 
+            // cache reservations, when something is saved this cache is cleared anyways
+            //if (umbracoObjectType == UmbracoObjectTypes.IdReservation)
+            //    Attempt.Succeed(val.Value);
+
             try
             {
                 _locker.EnterWriteLock();
@@ -94,6 +98,10 @@ namespace Umbraco.Core.Services
             }
 
             if (val == null) return Attempt<Guid>.Fail();
+
+            // cache reservations, when something is saved this cache is cleared anyways
+            //if (umbracoObjectType == UmbracoObjectTypes.IdReservation)
+            //    Attempt.Succeed(val.Value);
 
             try
             {

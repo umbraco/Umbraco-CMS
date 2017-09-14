@@ -15,7 +15,7 @@
         vm.labels = {};
         vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
         vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
-        vm.emailIsUsername = true;
+        vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail;
 
         //create the initial model for change password
         vm.changePasswordModel = {
@@ -68,7 +68,7 @@
                 setUserDisplayState();
                 formatDatesToLocal(vm.user);
 
-                vm.emailIsUsername = user.email === user.username;
+                vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail && user.email === user.username;
 
                 //go get the config for the membership provider and add it to the model
                 authResource.getMembershipProviderConfig().then(function (data) {
@@ -121,7 +121,9 @@
             vm.user.resetPasswordValue = null;
 
             //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
+            if(vm.user.changePassword) {
             vm.user.changePassword.reset = !vm.user.changePassword.oldPassword && !vm.user.isCurrentUser;
+            }
 
             contentEditingHelper.contentEditorPerformSave({
                 statusMessage: vm.labels.saving,

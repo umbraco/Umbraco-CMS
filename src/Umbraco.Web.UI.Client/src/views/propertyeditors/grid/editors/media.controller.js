@@ -26,6 +26,7 @@ angular.module("umbraco")
                 $scope.control.value = {
                     focalPoint: selectedImage.focalPoint,
                     id: selectedImage.id,
+                    udi: selectedImage.udi,
                     image: selectedImage.image,
                     altText: selectedImage.altText
                 };

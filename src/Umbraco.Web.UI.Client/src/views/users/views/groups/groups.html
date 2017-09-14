@@ -84,6 +84,7 @@
             <a class="umb-list-item" ng-click="vm.clickUserGroup(group)" ng-class="{'umb-list-item--selected': group.selected}" href="" ng-switch-when="true">
                 <div style="margin-right: 25px;">
                     <div class="umb-list-checkbox"
+                         ng-hide="group.group.alias === 'admin' || group.group.alias === 'translator'"
                          ng-class="{'umb-list-checkbox--visible': vm.selection.length > 0}"
                          ng-click="vm.selectUserGroup(group, vm.selection, $event)" >
                         <umb-checkmark checked="group.selected"></umb-checkmark>

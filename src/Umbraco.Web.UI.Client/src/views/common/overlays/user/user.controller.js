@@ -137,6 +137,9 @@ angular.module("umbraco")
 
                 currentUserResource.changePassword($scope.changePasswordModel.value).then(function(data) {
 
+                    //reset old data 
+                    clearPasswordFields();
+
                     //if the password has been reset, then update our model
                     if (data.value) {
                         $scope.changePasswordModel.value.generatedPassword = data.value;
@@ -166,9 +169,10 @@ angular.module("umbraco")
            $scope.showPasswordFields = !$scope.showPasswordFields;
         }
 
-        function clearPasswordFields() {
+        function clearPasswordFields() { 
+           $scope.changePasswordModel.value.oldPassword = "";
            $scope.changePasswordModel.value.newPassword = "";
-           $scope.changePasswordModel.confirm = "";
+           $scope.changePasswordModel.value.confirm = "";
         }
-
+         
     });

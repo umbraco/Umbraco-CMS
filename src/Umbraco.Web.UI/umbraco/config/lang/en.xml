@@ -12,9 +12,11 @@
     <key alias="copy">Copy</key>
     <key alias="create">Create</key>
     <key alias="createPackage">Create Package</key>
+    <key alias="createGroup">Create group</key>
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
     <key alias="emptyTrashcan">Empty recycle bin</key>
+    <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
     <key alias="importDocumentType">Import Document Type</key>
     <key alias="importPackage">Import Package</key>
@@ -27,6 +29,7 @@
     <key alias="unpublish">Unpublish</key>
     <key alias="refreshNode">Reload</key>
     <key alias="republish">Republish entire site</key>
+    <key alias="rename" version="7.3.0">Rename</key>
     <key alias="restore" version="7.3.0">Restore</key>
     <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
     <key alias="chooseWhereToMove">Choose where to move</key>
@@ -35,9 +38,12 @@
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
     <key alias="sendToTranslate">Send To Translation</key>
+    <key alias="setGroup">Set group</key>
     <key alias="sort">Sort</key>
     <key alias="translate">Translate</key>
     <key alias="update">Update</key>
+    <key alias="setPermissions">Set permissions</key>
+    <key alias="unlock">Unlock</key>
     <key alias="createblueprint">Create Content Template</key>
   </area>
   <area alias="actionCategories">
@@ -398,6 +404,8 @@
     <key alias="confirmPassword">Confirm your password</key>
     <key alias="nameentity">Name the %0%...</key>
     <key alias="entername">Enter a name...</key>
+    <key alias="enteremail">Enter an email...</key>
+    <key alias="enterusername">Enter a username...</key>
     <key alias="label">Label...</key>
     <key alias="enterDescription">Enter a description...</key>
     <key alias="search">Type to search...</key>
@@ -423,6 +431,11 @@
     <key alias="currentListViewDesc" version="7.2">The active list view data type</key>
     <key alias="createListView" version="7.2">Create custom list view</key>
     <key alias="removeListView" version="7.2">Remove custom list view</key>
+  </area>
+  <area alias="renamecontainer">
+    <key alias="renamed">Renamed</key>
+    <key alias="enterNewFolderName">Enter a new folder name here</key>
+    <key alias="folderWasRenamed">%0% was renamed to %1%</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Add prevalue</key>

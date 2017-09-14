@@ -286,10 +286,11 @@ namespace Umbraco.Web.Editors
                             GetMaxRequestLength()
                         },
                         {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
+                        {"usernameIsEmail", UmbracoConfig.For.UmbracoSettings().Security.UsernameIsEmail},
                         {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
                         {"allowPasswordReset", UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset},
                         {"loginBackgroundImage",  UmbracoConfig.For.UmbracoSettings().Content.LoginBackgroundImage},
-                        {"emailServerConfigured", GlobalSettings.HasSmtpServerConfigured(_httpContext.Request.ApplicationPath)},
+                        {"showUserInvite", EmailSender.CanSendRequiredEmail},
                     }
                 },
                 {

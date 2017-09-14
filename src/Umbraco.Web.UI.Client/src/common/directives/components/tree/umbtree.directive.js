@@ -31,7 +31,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
             //var showheader = (attrs.showheader !== 'false');
             var hideoptions = (attrs.hideoptions === 'true') ? "hide-options" : "";
             var template = '<ul class="umb-tree ' + hideoptions + '"><li class="root">';
-            template += '<div ng-hide="hideheader" on-right-click="altSelect(tree.root, $event)">' +
+            template += '<div ng-class="getNodeCssClass(tree.root)" ng-hide="hideheader" on-right-click="altSelect(tree.root, $event)">' +
                 '<h5>' +
                 '<a href="#/{{section}}" ng-click="select(tree.root, $event)"  class="root-link"><i ng-if="enablecheckboxes == \'true\'" ng-class="selectEnabledNodeClass(tree.root)"></i> {{tree.name}}</a></h5>' +
                 '<a class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(tree.root, $event)" ng-swipe-right="options(tree.root, $event)"><i></i><i></i><i></i></a>' +
@@ -310,6 +310,25 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
                 }
 
+                /** Returns the css classses assigned to the node (div element) */
+                scope.getNodeCssClass = function (node) {
+                    if (!node) {
+                        return '';
+                    }
+
+                    //TODO: This is called constantly because as a method in a template it's re-evaluated pretty much all the time
+                    // it would be better if we could cache the processing. The problem is that some of these things are dynamic.
+
+                    var css = [];
+                    if (node.cssClasses) {
+                        _.each(node.cssClasses, function (c) {
+                            css.push(c);
+                        });
+                    }
+                    
+                    return css.join(" ");
+                };
+
                 scope.selectEnabledNodeClass = function (node) {
                     return node ?
                         node.selected ?
@@ -383,6 +402,12 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                   defined on the tree
                 */
                 scope.select = function (n, ev) {
+
+                    if (n.metaData && n.metaData.noAccess === true) {
+                        ev.preventDefault();
+                        return;
+                    }
+
                     //on tree select we need to remove the current node -
                     // whoever handles this will need to make sure the correct node is selected
                     //reset current node selection

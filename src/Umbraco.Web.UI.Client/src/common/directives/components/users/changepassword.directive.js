@@ -17,6 +17,8 @@
       }
       */
 
+      $scope.showReset = false;
+
       //set defaults if they are not available
       if ($scope.config.disableToggle === undefined) {
         $scope.config.disableToggle = false;
@@ -30,19 +32,24 @@
       if ($scope.config.requiresQuestionAnswer === undefined) {
         $scope.config.requiresQuestionAnswer = false;
       }
-      if ($scope.config.enableReset === undefined) {
-        $scope.config.enableReset = true;
+      //don't enable reset if it is new - that doesn't make sense
+      if (isNew === "true") {
+          $scope.config.enableReset = false;
       }
+      else if ($scope.config.enableReset === undefined) {
+        $scope.config.enableReset = true;
+      }      
+        
       if ($scope.config.minPasswordLength === undefined) {
         $scope.config.minPasswordLength = 0;
       }
-
+        
       //set the model defaults
       if (!angular.isObject($scope.passwordValues)) {
         //if it's not an object then just create a new one
         $scope.passwordValues = {
           newPassword: null,
-          oldPassword: null,
+          oldPassword: null, 
           reset: null,
           answer: null
         };
@@ -61,11 +68,11 @@
 
       //the value to compare to match passwords
       if (!isNew) {
-        $scope.confirm = "";
+          $scope.passwordValues.confirm = "";
       }
       else if ($scope.passwordValues.newPassword && $scope.passwordValues.newPassword.length > 0) {
         //if it is new and a new password has been set, then set the confirm password too
-        $scope.confirm = $scope.passwordValues.newPassword;
+          $scope.passwordValues.confirm = $scope.passwordValues.newPassword;
       }
 
     }
@@ -86,6 +93,7 @@
       $scope.changing = true;
       //if there was a previously generated password displaying, clear it
       $scope.passwordValues.generatedPassword = null;
+      $scope.passwordValues.confirm = null;
     };
 
     $scope.cancelChange = function () {
@@ -120,25 +128,13 @@
         unsubscribe[u]();
       }
     });
-
-    $scope.showReset = function () {
-      return $scope.config.enableReset;
-    };
-
+      
     $scope.showOldPass = function () {
       return $scope.config.hasPassword &&
         !$scope.config.allowManuallyChangingPassword &&
-        !$scope.config.enablePasswordRetrieval && !$scope.passwordValues.reset;
+        !$scope.config.enablePasswordRetrieval && !$scope.showReset;
     };
-
-    $scope.showNewPass = function () {
-      return !$scope.passwordValues.reset;
-    };
-
-    $scope.showConfirmPass = function () {
-      return !$scope.passwordValues.reset;
-    };
-
+      
     //TODO: I don't think we need this or the cancel button, this can be up to the editor rendering this directive
     $scope.showCancelBtn = function () {
       return $scope.config.disableToggle !== true && $scope.config.hasPassword;

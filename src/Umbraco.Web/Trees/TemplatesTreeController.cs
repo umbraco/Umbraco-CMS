@@ -94,10 +94,7 @@ namespace Umbraco.Web.Trees
             if (template.IsMasterTemplate == false)
             {
                 //add delete option if it doesn't have children
-                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias), true)
-                    //Since we haven't implemented anything for languages in angular, this needs to be converted to 
-                    //use the legacy format
-                    .ConvertLegacyMenuItem(entity, "templates", queryStrings.GetValue<string>("application"));
+                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias), true);
             }
 
             //add refresh

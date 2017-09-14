@@ -29,10 +29,11 @@
     <key alias="unpublish">Unpublish</key>
     <key alias="refreshNode">Reload</key>
     <key alias="republish">Republish entire site</key>
+    <key alias="rename" version="7.3.0">Rename</key>
+    <key alias="restore" version="7.3.0">Restore</key>
     <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
     <key alias="chooseWhereToMove">Choose where to move</key>
     <key alias="toInTheTreeStructureBelow">In the tree structure below</key>
-    <key alias="restore" version="7.3.0">Restore</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -43,6 +44,7 @@
     <key alias="update">Update</key>
     <key alias="setPermissions">Set permissions</key>
     <key alias="unlock">Unlock</key>
+    <key alias="createblueprint">Create Content Template</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Content</key>
@@ -68,7 +70,7 @@
     <key alias="sort">Allow access to change the sort order for nodes</key>
     <key alias="translate">Allow access to translate a node</key>
     <key alias="update">Allow access to save a node</key>
-    <key alias="createblueprint">Allow access to create a content template</key>
+    <key alias="createblueprint">Allow access to create a Content Template</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permission denied.</key>
@@ -134,6 +136,8 @@
     <key alias="tableInsert">Insert table</key>
     <key alias="generateModels">Generate models</key>
     <key alias="saveAndGenerateModels">Save and generate models</key>
+    <key alias="undo">Undo</key>
+    <key alias="redo">Redo</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
@@ -184,7 +188,7 @@
     <key alias="membertype">Member Type</key>
     <key alias="noChanges">No changes have been made</key>
     <key alias="noDate">No date chosen</key>
-    <key alias="nodeName">Link title</key>
+    <key alias="nodeName">Page title</key>
     <key alias="otherElements">Properties</key>
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
     <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
@@ -212,9 +216,20 @@
     <key alias="target" version="7.0">Target</key>
     <key alias="scheduledPublishServerTime">This translates to the following time on the server:</key>
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">What does this mean?</a>]]></key>
+    <key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key>
+    <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
+  </area>
+  <area alias="blueprints">
+      <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
+      <key alias="blankBlueprint">Blank</key>
+      <key alias="selectBlueprint">Select a Content Template</key>
+      <key alias="createdBlueprintHeading">Content Template created</key>
+      <key alias="createdBlueprintMessage">A Content Template was created from '%0%'</key>
+      <key alias="duplicateBlueprintMessage">Another Content Template with the same name already exists</key>
+      <key alias="blueprintDescription">A Content Template is pre-defined content that an editor can select to use as the basis for creating new content</key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
@@ -368,6 +383,7 @@
     <key alias="selectNode">Select node</key>
     <key alias="selectSections">Select sections</key>
     <key alias="selectUsers">Select users</key>
+    <key alias="noIconsFound">No icons were found</key>
     <key alias="noMacroParams">There are no parameters for this macro</key>
     <key alias="noMacros">There are no macros available to insert</key>
     <key alias="externalLoginProviders">External login providers</key>
@@ -401,6 +417,7 @@
     <key alias="nameentity">Name the %0%...</key>
     <key alias="entername">Enter a name...</key>
     <key alias="enteremail">Enter an email...</key>
+    <key alias="enterusername">Enter a username...</key>
     <key alias="label">Label...</key>
     <key alias="enterDescription">Enter a description...</key>
     <key alias="search">Type to search...</key>
@@ -427,6 +444,11 @@
     <key alias="currentListViewDesc" version="7.2">The active list view data type</key>
     <key alias="createListView" version="7.2">Create custom list view</key>
     <key alias="removeListView" version="7.2">Remove custom list view</key>
+  </area>
+  <area alias="renamecontainer">
+    <key alias="renamed">Renamed</key>
+    <key alias="enterNewFolderName">Enter a new folder name here</key>
+    <key alias="folderWasRenamed">%0% was renamed to %1%</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Add prevalue</key>
@@ -587,6 +609,7 @@
     <key alias="scheduledPublishing">Scheduled Publishing</key>
     <key alias="search">Search</key>
     <key alias="searchNoResult">Sorry, we can not find what you are looking for</key>
+    <key alias="noItemsInList">No items have been added</key>
     <key alias="server">Server</key>
     <key alias="show">Show</key>
     <key alias="showPageOnSend">Show page on Send</key>
@@ -1148,6 +1171,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="validationFailedHeader">Validation</key>
     <key alias="validationFailedMessage">Validation errors must be fixed before the item can be saved</key>
     <key alias="operationFailedHeader">Failed</key>
+    <key alias="operationSavedHeader">Saved</key>
     <key alias="invalidUserPermissionsText">Insufficient user permissions, could not complete the operation</key>
     <key alias="operationCancelledHeader">Cancelled</key>
     <key alias="operationCancelledText">Operation was cancelled by a 3rd party add-in</key>
@@ -1213,6 +1237,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="scriptErrorHeader">Script view not saved</key>
     <key alias="scriptErrorText">An error occurred saving the file.</key>
     <key alias="cssErrorText">An error occurred saving the file.</key>
+    <key alias="deleteUserGroupsSuccess">Deleted %0% user groups</key>
+    <key alias="deleteUserGroupSuccess">%0% was deleted</key>
     <key alias="enableUsersSuccess">Enabled %0% users</key>
     <key alias="enableUsersError">An error occurred while enabling the users</key>
     <key alias="disableUsersSuccess">Disabled %0% users</key>
@@ -1549,7 +1575,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="treeHeaders">
     <key alias="content">Content</key>
-    <key alias="contentBlueprints">Content Blueprints</key>
+    <key alias="contentBlueprints">Content Templates</key>
     <key alias="media">Media</key>
     <key alias="cacheBrowser">Cache Browser</key>
     <key alias="contentRecycleBin">Recycle Bin</key>
@@ -1571,6 +1597,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="relationTypes">Relation Types</key>
     <key alias="packager">Packages</key>
     <key alias="packages">Packages</key>
+    <key alias="partialViews">Partial Views</key>
+    <key alias="partialViewMacros">Partial View Macro Files</key>
     <key alias="python">Python Files</key>
     <key alias="repositories">Install from repository</key>
     <key alias="runway">Install Runway</key>
@@ -1666,6 +1694,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="userGroups">User groups</key>
     <key alias="userInvited">has been invited</key>
     <key alias="userInvitedSuccessHelp">An invitation has been sent to the new user with details about how to log in to Umbraco.</key>
+    <key alias="userinviteWelcomeMessage">Hello there and welcome to Umbraco! In just 1 minute you’ll be good to go, we just need you to setup a password and add a picture for your avatar.</key>
+    <key alias="userinviteAvatarMessage">Upload a picture to make it easy for other users to recognize you.</key>
     <key alias="writer">Writer</key>
     <key alias="translator">Translator</key>
     <key alias="change">Change</key>

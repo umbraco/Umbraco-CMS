@@ -46,7 +46,7 @@
         rootScope = $rootScope;
 
         searcher = { search: function() {} };
-        spyOn(location, "path").andReturn(searcher);
+        spyOn(location, "path").and.returnValue(searcher)
         spyOn(searcher, "search");
 
         initialize();

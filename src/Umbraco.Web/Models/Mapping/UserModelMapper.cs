@@ -249,7 +249,7 @@ namespace Umbraco.Web.Models.Mapping
                         user.CalculateMediaStartNodeIds(applicationContext.Services.EntityService),
                         applicationContext.Services.TextService,
                         applicationContext.Services.EntityService,
-                        UmbracoObjectTypes.Document,
+                        UmbracoObjectTypes.Media,
                         "media/mediaRoot")))
                 .ForMember(
                     detail => detail.StartContentIds,
@@ -337,7 +337,7 @@ namespace Umbraco.Web.Models.Mapping
                     }
                     else
                     {
-                        var builtIns = new[] { Constants.Security.AdminGroupAlias, "writer", "editor", "translator" };
+                        var builtIns = new[] { Constants.Security.AdminGroupAlias, "writer", "editor", Constants.Security.TranslatorGroupAlias };
                         var foundBuiltIn = groups.FirstOrDefault(x => builtIns.Contains(x.Alias));
                         if (foundBuiltIn != null)
                         {
