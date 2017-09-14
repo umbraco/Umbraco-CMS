@@ -391,15 +391,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>O usuário padrão foi desabilitado ou não tem acesso à Umbraco!</strong></p><p>Nenhuma ação posterior precisa ser tomada. Clique <b>Próximo</b> para prosseguir.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>A senha do usuário padrão foi alterada com sucesso desde a instalação!</strong></p><p>Nenhuma ação posterior é necessária. Clique <strong>Próximo</strong> para prosseguir.]]></key>
     <key alias="defaultUserPasswordChanged">Senha foi alterada!</key>
-    <key alias="defaultUserText"><![CDATA[
-        <p>
-          Umbraco cria um usuário padrão com o login <strong>('admin')</strong> e senha <strong>('default')</strong>. É <strong>importante</strong> que a senha seja alterada para algo único.
-        </p>
-        <p>
-          Este passo irá checar a senha do usuário padrão e sugerir uma alteração se necessário.
-        </p>
-      
-    ]]></key>
     <key alias="greatStart">Comece com o pé direito, assista nossos vídeos introdutórios</key>
     <key alias="licenseText">Ao clicar no próximo botão (ou modificando o UmbracoConfigurationStatus no web.config), você aceita a licença deste software cmo especificado na caixa abaixo. Note que esta distribuição de Umbraco consiste em duas licenças diferentes, a licença aberta MIT para a framework e a licença de software livre (freeware) Umbraco que cobre o UI.</key>
     <key alias="None">Nenhum instalado ainda.</key>

@@ -567,15 +567,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>デフォルトユーザーは無効化されているかUmbracoにアクセスできない状態になっています！</strong></p><p>これ以上のアクションは必要ありません。<b>次へ</b>をクリックして続行してください。]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>インストール後にデフォルトユーザーのパスワードが変更されています！</strong></p><p>これ以上のアクションは必要ありません。<strong>次へ</strong>をクリックして続行してください。]]></key>
     <key alias="defaultUserPasswordChanged">パスワードは変更されました！</key>
-    <key alias="defaultUserText"><![CDATA[
-        <p>
-          Umbracoはデフォルトユーザーとしてユーザー名 <strong>('admin')</strong> 、パスワード <strong>('default')</strong>を作成します。このパスワードを独自のものに変更する事は<strong>重要</strong>
-          なことです。
-        </p>
-        <p>
-          ここではデフォルトのユーザーのパスワードを確認し、必要ならば変更しておく事をお勧めします。
-        </p>
-      ]]></key>
     <key alias="greatStart">始めに、ビデオによる解説を見ましょう</key>
     <key alias="licenseText">次へボタンをクリック(またはweb.configのumbracoConfigurationStatusを編集)すると、あなたはここに示されるこのソフトウェアのライセンスを承諾したと見做されます。注意として、UmbracoはMITライセンスをフレームワークへ、フリーウェアライセンスをUIへ、それぞれ異なる2つのライセンスを採用しています。</key>
     <key alias="None">まだインストールは完了していません。</key>
