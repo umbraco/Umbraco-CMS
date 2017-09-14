@@ -14,7 +14,6 @@
       scope.sortableOptionsGroup = {};
       scope.sortableOptionsProperty = {};
       scope.sortingButtonKey = "general_reorder";
-      scope.showOrdinalsButtonKey = "general_showOrdinals";
 
       function activate() {
 
@@ -247,11 +246,9 @@
       scope.toggleSortOrderOverride = function (tool) {
           if (scope.showSortOrdinals === true) {
               scope.showSortOrdinals = false;
-              scope.showOrdinalsButtonKey = "general_showOrdinals";
           }
           else {
               scope.showSortOrdinals = true;
-              scope.showOrdinalsButtonKey = "general_hideOrdinals";
           }
       };
 
