@@ -500,7 +500,6 @@ namespace Umbraco.Tests.Persistence
                 var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
                 helper.CreateTable<NodeDto>();
-                helper.CreateTable<UserTypeDto>();
                 helper.CreateTable<UserDto>();
                 helper.CreateTable<TaskTypeDto>();
                 helper.CreateTable<TaskDto>();
@@ -529,7 +528,6 @@ namespace Umbraco.Tests.Persistence
             {
                 var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                helper.CreateTable<UserTypeDto>();
                 helper.CreateTable<UserDto>();
 
                 scope.Complete();
@@ -537,28 +535,13 @@ namespace Umbraco.Tests.Persistence
         }
 
         [Test]
-        public void Can_Create_umbracoUserType_Table()
+        public void Can_Create_umbracoUserGroup_Table()
         {
             using (var scope = ScopeProvider.CreateScope())
             {
                 var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
-                helper.CreateTable<UserTypeDto>();
-
-                scope.Complete();
-            }
-        }
-
-        [Test]
-        public void Can_Create_umbracoUser2app_Table()
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
-
-                helper.CreateTable<UserTypeDto>();
-                helper.CreateTable<UserDto>();
-                helper.CreateTable<User2AppDto>();
+                helper.CreateTable<UserGroupDto>();
 
                 scope.Complete();
             }
@@ -572,7 +555,6 @@ namespace Umbraco.Tests.Persistence
                 var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
                 helper.CreateTable<NodeDto>();
-                helper.CreateTable<UserTypeDto>();
                 helper.CreateTable<UserDto>();
                 helper.CreateTable<User2NodeNotifyDto>();
 
@@ -580,17 +562,30 @@ namespace Umbraco.Tests.Persistence
             }
         }
 
-        [Test]
-        public void Can_Create_umbracoUser2NodePermission_Table()
+        public void Can_Create_umbracoGroupUser2app_Table()
         {
             using (var scope = ScopeProvider.CreateScope())
             {
                 var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
                 helper.CreateTable<NodeDto>();
-                helper.CreateTable<UserTypeDto>();
-                helper.CreateTable<UserDto>();
-                helper.CreateTable<User2NodePermissionDto>();
+                helper.CreateTable<UserGroupDto>();
+                helper.CreateTable<UserGroup2AppDto>();
+
+                scope.Complete();
+            }
+        }
+
+        [Test]
+        public void Can_Create_umbracoUserGroup2NodePermission_Table()
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
+
+                helper.CreateTable<NodeDto>();
+                helper.CreateTable<UserGroupDto>();
+                helper.CreateTable<UserGroup2NodePermissionDto>();
 
                 scope.Complete();
             }

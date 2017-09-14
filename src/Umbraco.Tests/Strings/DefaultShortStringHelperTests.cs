@@ -119,6 +119,33 @@ namespace Umbraco.Tests.Strings
         }
 
         [Test]
+        public void U4_4056_TryAscii()
+        {
+            var settings = SettingsForTests.GenerateMockSettings();
+            var contentMock = Mock.Get(settings.RequestHandler);
+            contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
+            contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
+            SettingsForTests.ConfigureSettings(settings);
+
+            const string input1 = "ÆØÅ and æøå and 中文测试 and  אודות האתר and größer БбДдЖж page";
+            const string input2 = "ÆØÅ and æøå and größer БбДдЖж page";
+
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(settings)); // unicode
+            Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input1));
+            Assert.AreEqual("æøå-and-æøå-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input2));
+
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(settings)
+                .WithConfig(CleanStringType.UrlSegment, new DefaultShortStringHelperConfig.Config
+                {
+                    IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
+                    StringType = CleanStringType.LowerCase | CleanStringType.TryAscii, // try ascii
+                    Separator = '-'
+                }));
+            Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input1));
+            Assert.AreEqual("aeoa-and-aeoa-and-grosser-bbddzhzh-page", helper.CleanStringForUrlSegment(input2));
+        }
+
+        [Test]
         public void CleanStringUnderscoreInTerm()
         {
             var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefault())

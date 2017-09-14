@@ -74,53 +74,6 @@ namespace Umbraco.Tests.TreesAndSections
             Assert.IsNull(ServiceContext.SectionService.GetByAlias(name));
         }
 
-        /// <summary>
-        /// Creates a new user, assigns the user to existing application,
-        /// then deletes the user
-        /// </summary>
-        [Test()]
-        public void Application_Create_New_User_Assign_Application()
-        {
-            var name = Guid.NewGuid().ToString("N");
-
-            //new user
-            var ut = ServiceContext.UserService.GetAllUserTypes().First();
-            var user = ServiceContext.UserService.CreateUserWithIdentity(name, name + "@example.com", ut);
-
-            //assign the app
-            user.AddAllowedSection(Constants.Applications.Content);
-            ServiceContext.UserService.Save(user);
-
-            //ensure it's added
-            Assert.AreEqual(1, user.AllowedSections.Count(x => x == Constants.Applications.Content));
-        }
-
-        /// <summary>
-        /// create a new application and assigne an new user and deletes the application making sure the assignments are removed
-        /// </summary>
-        [Test()]
-        public void Application_Make_New_Assign_User()
-        {
-            var name = Guid.NewGuid().ToString("N");
-
-            //new user
-            var ut = ServiceContext.UserService.GetAllUserTypes().First();
-            var user = ServiceContext.UserService.CreateUserWithIdentity(name, name + "@example.com", ut);
-
-            ServiceContext.SectionService.MakeNew(name, name, "icon.jpg");
-
-            //check if it exists
-            var app = ServiceContext.SectionService.GetByAlias(name);
-            Assert.IsNotNull(app);
-
-            //assign the app
-            user.AddAllowedSection(app.Alias);
-            ServiceContext.UserService.Save(user);
-            //ensure it's added
-            Assert.AreEqual(1, user.AllowedSections.Count(x => x == app.Alias));
-
-        }
-
         #region Tests to write
 
 

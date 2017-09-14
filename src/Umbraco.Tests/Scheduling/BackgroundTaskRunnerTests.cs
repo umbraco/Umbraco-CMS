@@ -258,10 +258,12 @@ namespace Umbraco.Tests.Scheduling
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions
             {
-                AutoStart = true
+                AutoStart = true,
+                KeepAlive = true // else stops!
             }, _logger))
             {
                 Assert.IsTrue(runner.IsRunning); // because AutoStart is true
+                runner.Stop(false); // keepalive = must be stopped
                 await runner.StoppedAwaitable; // runner stops, within test's timeout
             }
         }

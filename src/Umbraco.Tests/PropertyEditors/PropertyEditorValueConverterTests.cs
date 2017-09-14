@@ -99,5 +99,26 @@ namespace Umbraco.Tests.PropertyEditors
 
             Assert.AreEqual(expected, result);
         }
+
+        [TestCase("1", 1)]
+        [TestCase("1", 1)]
+        [TestCase("0", 0)]
+        [TestCase("0", 0)]
+        [TestCase(null, 0)]
+        [TestCase(null, 0)]
+        [TestCase("-1", -1)]
+        [TestCase("-1", -1)]
+        [TestCase("1.65", 1.65)]
+        [TestCase("1.65", 1.65)]
+        [TestCase("-1.65", -1.65)]
+        [TestCase("-1.65", -1.65)]
+        public void CanConvertDecimalAliasPropertyEditor(object value, double expected)
+        {
+            var converter = new DecimalValueConverter();
+            var inter = converter.ConvertSourceToInter(null, null, value, false);
+            var result = converter.ConvertInterToObject(null, null, PropertyCacheLevel.Unknown, inter, false);
+
+            Assert.AreEqual(expected, result);
+        }
     }
 }

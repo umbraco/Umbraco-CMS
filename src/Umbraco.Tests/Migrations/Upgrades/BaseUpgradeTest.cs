@@ -5,11 +5,9 @@ using NPoco;
 using NUnit.Framework;
 using Semver;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
-using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 
@@ -61,20 +59,22 @@ namespace Umbraco.Tests.Migrations.Upgrades
                 logger,
                 configuredVersion,
                 targetVersion,
-                Constants.System.UmbracoMigrationName,
+                Constants.System.UmbracoMigrationName
                 //pass in explicit migrations
-                new Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints(context),
-                new DeleteAppTables(context),
-                new EnsureAppsTreesUpdated(context),
-                new MoveMasterContentTypeData(context),
-                new NewCmsContentType2ContentTypeTable(context),
-                new RemoveMasterContentTypeColumn(context),
-                new RenameCmsTabTable(context),
-                new RenameTabIdColumn(context),
-                new UpdateCmsContentTypeAllowedContentTypeTable(context),
-                new UpdateCmsContentTypeTable(context),
-                new UpdateCmsContentVersionTable(context),
-                new UpdateCmsPropertyTypeGroupTable(context));
+                // fixme - all gone in v8 - migrations need to be refactored anyways
+                //new Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints(context),
+                //new DeleteAppTables(context),
+                //new EnsureAppsTreesUpdated(context),
+                //new MoveMasterContentTypeData(context),
+                //new NewCmsContentType2ContentTypeTable(context),
+                //new RemoveMasterContentTypeColumn(context),
+                //new RenameCmsTabTable(context),
+                //new RenameTabIdColumn(context),
+                //new UpdateCmsContentTypeAllowedContentTypeTable(context),
+                //new UpdateCmsContentTypeTable(context),
+                //new UpdateCmsContentVersionTable(context),
+                //new UpdateCmsPropertyTypeGroupTable(context)
+                );
 
             var upgraded = migrationRunner.Execute(context /*, true*/);
 

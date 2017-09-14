@@ -404,7 +404,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger);
                 var contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository);
-                var contentRepo = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository);
+                var contentRepo = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 var textpage = MockedContent.CreateSimpleContent(contentType);

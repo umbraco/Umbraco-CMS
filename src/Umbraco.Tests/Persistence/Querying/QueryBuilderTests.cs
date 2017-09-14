@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Persistence.Querying
             sql.SelectAll();
             sql.From("umbracoNode");
 
-            var query = new Query<IContent>(SqlContext.SqlSyntax, Mappers).Where(x => x.Path.StartsWith("-1"));
+            var query = new Query<IContent>(SqlContext).Where(x => x.Path.StartsWith("-1"));
 
             // Act
             var translator = new SqlTranslator<IContent>(sql, query);
@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Persistence.Querying
             sql.SelectAll();
             sql.From("umbracoNode");
 
-            var query = new Query<IContent>(SqlContext.SqlSyntax, Mappers).Where(x => x.ParentId == -1);
+            var query = new Query<IContent>(SqlContext).Where(x => x.ParentId == -1);
 
             // Act
             var translator = new SqlTranslator<IContent>(sql, query);
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Persistence.Querying
             sql.SelectAll();
             sql.From("umbracoNode");
 
-            var query = new Query<IContentType>(SqlContext.SqlSyntax, Mappers).Where(x => x.Alias == "umbTextpage");
+            var query = new Query<IContentType>(SqlContext).Where(x => x.Alias == "umbTextpage");
 
             // Act
             var translator = new SqlTranslator<IContentType>(sql, query);
@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == nodeObjectTypeId);
 
-            var query = new Query<IContent>(SqlContext.SqlSyntax, Mappers).Where(x => x.Path.StartsWith(path) && x.Id != id && x.Published == true && x.Trashed == false);
+            var query = new Query<IContent>(SqlContext).Where(x => x.Path.StartsWith(path) && x.Id != id && x.Published == true && x.Trashed == false);
 
             // Act
             var translator = new SqlTranslator<IContent>(sql, query);

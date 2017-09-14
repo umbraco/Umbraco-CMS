@@ -152,14 +152,17 @@ namespace Umbraco.Tests.TestHelpers
                     }),
                     logger));
 
-            var userService = GetLazyService<IUserService>(container, () => new UserService(provider, logger, eventMessagesFactory));
+            var runtimeState = Mock.Of<IRuntimeState>();
+            var idkMap = new IdkMap(provider);
+
+            var userService = GetLazyService<IUserService>(container, () => new UserService(provider, logger, eventMessagesFactory, runtimeState));
             var dataTypeService = GetLazyService<IDataTypeService>(container, () => new DataTypeService(provider, logger, eventMessagesFactory));
-            var contentService = GetLazyService<IContentService>(container, () => new ContentService(provider, logger, eventMessagesFactory, mediaFileSystem));
+            var contentService = GetLazyService<IContentService>(container, () => new ContentService(provider, logger, eventMessagesFactory, mediaFileSystem, idkMap));
             var notificationService = GetLazyService<INotificationService>(container, () => new NotificationService(provider, userService.Value, contentService.Value, logger));
             var serverRegistrationService = GetLazyService<IServerRegistrationService>(container, () => new ServerRegistrationService(provider, logger, eventMessagesFactory));
             var memberGroupService = GetLazyService<IMemberGroupService>(container, () => new MemberGroupService(provider, logger, eventMessagesFactory));
             var memberService = GetLazyService<IMemberService>(container, () => new MemberService(provider, logger, eventMessagesFactory, memberGroupService.Value, mediaFileSystem));
-            var mediaService = GetLazyService<IMediaService>(container, () => new MediaService(provider, mediaFileSystem, logger, eventMessagesFactory));
+            var mediaService = GetLazyService<IMediaService>(container, () => new MediaService(provider, mediaFileSystem, logger, eventMessagesFactory, idkMap));
             var contentTypeService = GetLazyService<IContentTypeService>(container, () => new ContentTypeService(provider, logger, eventMessagesFactory, contentService.Value));
             var mediaTypeService = GetLazyService<IMediaTypeService>(container, () => new MediaTypeService(provider, logger, eventMessagesFactory, mediaService.Value));
             var fileService = GetLazyService<IFileService>(container, () => new FileService(provider, logger, eventMessagesFactory));
@@ -169,6 +172,7 @@ namespace Umbraco.Tests.TestHelpers
             var entityService = GetLazyService<IEntityService>(container, () => new EntityService(
                     provider, logger, eventMessagesFactory,
                     contentService.Value, contentTypeService.Value, mediaService.Value, mediaTypeService.Value, dataTypeService.Value, memberService.Value, memberTypeService.Value,
+                    idkMap,
                     //TODO: Consider making this an isolated cache instead of using the global one
                     cache.RuntimeCache));
 
