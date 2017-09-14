@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
@@ -15,6 +13,17 @@ namespace Umbraco.Core.Models
 {
     public static class UserExtensions
     {
+        public static IEnumerable<string> GetPermissions(this IUser user, string path, IUserService userService)
+        {
+            return userService.GetPermissionsForPath(user, path).GetAllPermissions();
+        }
+
+        public static bool HasSectionAccess(this IUser user, string app)
+        {
+            var apps = user.AllowedSections;
+            return apps.Any(uApp => uApp.InvariantEquals(app));
+        }
+
         /// <summary>
         /// Determines whether this user is an admin.
         /// </summary>
@@ -164,6 +173,19 @@ namespace Umbraco.Core.Models
         internal static bool HasPathAccess(this IUser user, IMedia media, IEntityService entityService)
         {
             return HasPathAccess(media.Path, user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
+        }
+
+        internal static bool HasPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService, int recycleBinId)
+        {
+            switch (recycleBinId)
+            {
+                case Constants.System.RecycleBinMedia:
+                    return HasPathAccess(entity.Path, user.CalculateMediaStartNodeIds(entityService), recycleBinId);
+                case Constants.System.RecycleBinContent:
+                    return HasPathAccess(entity.Path, user.CalculateContentStartNodeIds(entityService), recycleBinId);
+                default:
+                    throw new NotSupportedException("Path access is only determined on content or media");
+            }
         }
 
         internal static bool HasPathAccess(string path, int[] startNodeIds, int recycleBinId)

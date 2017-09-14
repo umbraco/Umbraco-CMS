@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using AutoMapper;
 using Examine;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -42,7 +43,6 @@ namespace Umbraco.Web.Search
             var fields = new[] { "id", "__NodeId" };
 
             var umbracoContext = umbracoHelper.UmbracoContext;
-            var appContext = umbracoContext.Application;
 
             //TODO: WE should really just allow passing in a lucene raw query
             switch (entityType)
@@ -60,13 +60,13 @@ namespace Umbraco.Web.Search
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
-                    var allMediaStartNodes = umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(appContext.Services.EntityService);
-                    AppendPath(sb, UmbracoObjectTypes.Media,  allMediaStartNodes, searchFrom, appContext.Services.EntityService);
+                    var allMediaStartNodes = umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(Current.Services.EntityService);
+                    AppendPath(sb, UmbracoObjectTypes.Media,  allMediaStartNodes, searchFrom, Current.Services.EntityService);
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
-                    var allContentStartNodes = umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(appContext.Services.EntityService);
-                    AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, appContext.Services.EntityService);
+                    var allContentStartNodes = umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(Current.Services.EntityService);
+                    AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, Current.Services.EntityService);
                     break;
                 default:
                     throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);

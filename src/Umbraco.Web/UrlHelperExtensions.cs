@@ -184,8 +184,8 @@ namespace Umbraco.Web
                 return DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture).GenerateHash();
             }
 
-            var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
-            return string.Format("{0}.{1}", version, ClientDependencySettings.Instance.Version).GenerateHash();
+            var version = Current.RuntimeState.SemanticVersion.ToSemanticString();
+            return $"{version}.{ClientDependencySettings.Instance.Version}".GenerateHash();
         }
     }
 }

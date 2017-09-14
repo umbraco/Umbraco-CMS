@@ -105,7 +105,7 @@ namespace Umbraco.Web.PropertyEditors
             }
 
             // find the content type
-            var contentType = Current.Services.ContentTypeService.GetAllContentTypes().FirstOrDefault(c => c.Key == guid);
+            var contentType = Current.Services.ContentTypeService.Get(guid);
             if (contentType == null)
             {
                 return;

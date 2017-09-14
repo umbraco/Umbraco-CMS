@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Globalization;
+using System.Linq;
 using System.Security;
 using System.Web;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core;
+using Umbraco.Core.Exceptions;
+using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.UI.Pages
 {
@@ -25,6 +30,39 @@ namespace Umbraco.Web.UI.Pages
                 if (treeByAlias != null)
                 {
                     CurrentApp = treeByAlias.ApplicationAlias;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Performs an authorization check for the user against the requested entity/path and permission set, this is only relevant to content and media
+        /// </summary>
+        /// <param name="entityId"></param>
+        /// <param name="objectType"></param>
+        /// <param name="actionToCheck"></param>
+        protected void CheckPathAndPermissions(int entityId, UmbracoObjectTypes objectType, IAction actionToCheck)
+        {
+            if (objectType == UmbracoObjectTypes.Document || objectType == UmbracoObjectTypes.Media)
+            {
+                //check path access                    
+
+                var entity = entityId == Constants.System.Root
+                    ? UmbracoEntity.Root
+                    : Services.EntityService.Get(entityId, objectType);
+                var hasAccess = Security.CurrentUser.HasPathAccess(entity, Services.EntityService, objectType == UmbracoObjectTypes.Document ? Constants.System.RecycleBinContent : Constants.System.RecycleBinMedia);
+                if (hasAccess == false)
+                    throw new AuthorizationException($"The current user doesn't have access to the path '{entity.Path}'");
+
+                //only documents have action permissions
+                if (objectType == UmbracoObjectTypes.Document)
+                {
+                    var allActions = Current.Actions;
+                    var perms = Security.CurrentUser.GetPermissions(entity.Path, Services.UserService);
+                    var actions = perms
+                        .Select(x => allActions.FirstOrDefault(y => y.Letter.ToString(CultureInfo.InvariantCulture) == x))
+                        .WhereNotNull();
+                    if (actions.Contains(actionToCheck) == false)
+                        throw new AuthorizationException($"The current user doesn't have permission to {actionToCheck.Alias} on the path '{entity.Path}'");
                 }
             }
         }

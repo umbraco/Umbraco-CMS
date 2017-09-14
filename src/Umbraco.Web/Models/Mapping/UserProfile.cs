@@ -345,7 +345,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 });
 
-            CreateMap<IProfile, UserProfile>()
+            CreateMap<IProfile, ContentEditing.UserProfile>()
                   .ForMember(dest => dest.UserId, opt => opt.MapFrom(profile => GetIntId(profile.Id)));
 
             CreateMap<IUser, UserData>()

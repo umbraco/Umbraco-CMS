@@ -20,6 +20,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -538,7 +539,7 @@ namespace Umbraco.Web.Editors
             ins.InstallFiles(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
 
             //set a restarting marker and reset the app pool
-            ApplicationContext.RestartApplicationPool(Request.TryGetHttpContext().Result);
+            Current.RestartAppPool(Request.TryGetHttpContext().Result);
             
             model.IsRestarting = true;
 

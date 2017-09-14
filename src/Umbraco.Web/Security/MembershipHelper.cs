@@ -12,8 +12,10 @@ using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Web.Editors;
 using Umbraco.Web.Security.Providers;
 using MPE = global::Umbraco.Core.Security.MembershipProviderExtensions;
 
@@ -34,6 +36,7 @@ namespace Umbraco.Web.Security
         private readonly IMemberTypeService _memberTypeService = Current.Services.MemberTypeService;
         private readonly IUserService _userService = Current.Services.UserService;
         private readonly CacheHelper _applicationCache = Current.ApplicationCache;
+        private readonly ILogger _logger = Current.Logger;
 
         #region Constructors
 

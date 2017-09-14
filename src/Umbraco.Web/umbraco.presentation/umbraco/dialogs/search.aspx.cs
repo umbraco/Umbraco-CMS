@@ -80,11 +80,12 @@ namespace umbraco.presentation.dialogs
                     operation = operation.And().GroupedOr(new[] { "__nodeName" }, new[] { word });
 
                 // ensure the user can only find nodes they are allowed to see
-                if (Security.CurrentUser.StartContentId > 0)
+                // fixme BORKED because we don't deal with all start nodes
+                if (Security.CurrentUser.StartContentIds.FirstOrDefault() > 0)
                 {
                     //TODO: This is not correct! This will not filter out seearches 'from' this node, this
                     // query is meant to search 'for' a specific node.
-                    operation = operation.And().Id(Security.CurrentUser.StartContentId);
+                    operation = operation.And().Id(Security.CurrentUser.StartContentIds.FirstOrDefault());
                 }
 
                 results = internalSearcher.Search(operation.Compile());

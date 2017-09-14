@@ -65,15 +65,17 @@ namespace Umbraco.Web.Cache
             Bind(() => SectionService.New += SectionService_New,
                 () => SectionService.New -= SectionService_New);
 
-            // bind to user and user type events
-            Bind(() => UserService.SavedUserType += UserService_SavedUserType,
-                () => UserService.SavedUserType -= UserService_SavedUserType);
-            Bind(() => UserService.DeletedUserType += UserService_DeletedUserType,
-                () => UserService.DeletedUserType -= UserService_DeletedUserType);
+            // bind to user and user group events
+            Bind(() => UserService.SavedUserGroup += UserService_SavedUserGroup,
+                () => UserService.SavedUserGroup -= UserService_SavedUserGroup);
+            Bind(() => UserService.DeletedUserGroup += UserService_DeletedUserGroup,
+                () => UserService.DeletedUserGroup -= UserService_DeletedUserGroup);
             Bind(() => UserService.SavedUser += UserService_SavedUser,
                 () => UserService.SavedUser -= UserService_SavedUser);
             Bind(() => UserService.DeletedUser += UserService_DeletedUser,
                 () => UserService.DeletedUser -= UserService_DeletedUser);
+            Bind(() => UserService.UserGroupPermissionsAssigned += UserService_UserGroupPermissionsAssigned,
+                () => UserService.UserGroupPermissionsAssigned -= UserService_UserGroupPermissionsAssigned);
 
             // bind to dictionary events
             Bind(() => LocalizationService.DeletedDictionaryItem += LocalizationService_DeletedDictionaryItem,
@@ -114,11 +116,6 @@ namespace Umbraco.Web.Cache
             Bind(() => MemberTypeService.Changed += MemberTypeService_Changed,
                 () => MemberTypeService.Changed -= MemberTypeService_Changed);
 
-            // bind to permission events
-            // fixme see v7 events? the PermissionNew/Updated/Deleted are not supported here?
-            Bind(() => PermissionRepository<IContent>.AssignedPermissions += PermissionRepository_AssignedPermissions,
-                () => PermissionRepository<IContent>.AssignedPermissions -= PermissionRepository_AssignedPermissions);
-
             // bind to template events
             Bind(() => FileService.SavedTemplate += FileService_SavedTemplate,
                 () => FileService.SavedTemplate -= FileService_SavedTemplate);
@@ -152,6 +149,12 @@ namespace Umbraco.Web.Cache
                 () => ContentService.Copied -= ContentService_Copied);
             Bind(() => ContentService.TreeChanged += ContentService_Changed,// handles all content changes
                 () => ContentService.TreeChanged -= ContentService_Changed);
+
+            // TreeChanged should also deal with this
+            //Bind(() => ContentService.SavedBlueprint += ContentService_SavedBlueprint,
+            //    () => ContentService.SavedBlueprint -= ContentService_SavedBlueprint);
+            //Bind(() => ContentService.DeletedBlueprint += ContentService_DeletedBlueprint,
+            //    () => ContentService.DeletedBlueprint -= ContentService_DeletedBlueprint);
 
             // bind to public access events
             Bind(() => PublicAccessService.Saved += PublicAccessService_Saved,
@@ -279,14 +282,7 @@ namespace Umbraco.Web.Cache
         /// case then we need to clear all user permissions cache.
         /// </remarks>
         private void ContentService_Copied(IContentService sender, CopyEventArgs<IContent> e)
-        {
-            //check if permissions have changed
-            var permissionsChanged = ((Content)e.Copy).WasPropertyDirty("PermissionsChanged");
-            if (permissionsChanged)
-            {
-                _distributedCache.RefreshAllUserPermissionsCache();
-            }
-        }
+        { }
 
         /// <summary>
         /// Handles cache refreshing for when content is saved (not published)
@@ -296,32 +292,9 @@ namespace Umbraco.Web.Cache
         /// <remarks>
         /// When an entity is saved we need to notify other servers about the change in order for the Examine indexes to
         /// stay up-to-date for unpublished content.
-        ///
-        /// When an entity is created new permissions may be assigned to it based on it's parent, if that is the
-        /// case then we need to clear all user permissions cache.
         /// </remarks>
         private void ContentService_Saved(IContentService sender, SaveEventArgs<IContent> e)
-        {
-            var clearUserPermissions = false;
-            foreach (var entity in e.SavedEntities)
-            {
-                //check if it is new
-                if (entity.IsNewEntity())
-                {
-                    //check if permissions have changed
-                    var permissionsChanged = ((Content)entity).WasPropertyDirty("PermissionsChanged");
-                    if (permissionsChanged)
-                    {
-                        clearUserPermissions = true;
-                    }
-                }
-            }
-
-            if (clearUserPermissions)
-            {
-                _distributedCache.RefreshAllUserPermissionsCache();
-            }
-        }
+        { }
 
         private void ContentService_Changed(IContentService sender, TreeChange<IContent>.EventArgs args)
         {
@@ -335,6 +308,16 @@ namespace Umbraco.Web.Cache
         private void ContentService_EmptiedRecycleBin(IContentService sender, RecycleBinEventArgs e) { }
         private void ContentService_Published(IContentService sender, PublishEventArgs<IContent> e) { }
         private void ContentService_UnPublished(IContentService sender, PublishEventArgs<IContent> e) { }
+
+        //private void ContentService_SavedBlueprint(IContentService sender, SaveEventArgs<IContent> e)
+        //{
+        //    _distributedCache.RefreshUnpublishedPageCache(e.SavedEntities.ToArray());
+        //}
+
+        //private void ContentService_DeletedBlueprint(IContentService sender, DeleteEventArgs<IContent> e)
+        //{
+        //    _distributedCache.RemoveUnpublishedPageCache(e.DeletedEntities.ToArray());
+        //}
 
         #endregion
 
@@ -367,22 +350,6 @@ namespace Umbraco.Web.Cache
         private void SectionService_Deleted(Section sender, EventArgs e)
         {
             _distributedCache.RefreshAllApplicationCache();
-        }
-
-        #endregion
-
-        #region UserService / UserType
-
-        private void UserService_DeletedUserType(IUserService sender, DeleteEventArgs<IUserType> e)
-        {
-            foreach (var entity in e.DeletedEntities)
-                _distributedCache.RemoveUserTypeCache(entity.Id);
-        }
-
-        private void UserService_SavedUserType(IUserService sender, SaveEventArgs<IUserType> e)
-        {
-            foreach (var entity in e.SavedEntities)
-                _distributedCache.RefreshUserTypeCache(entity.Id);
         }
 
         #endregion
@@ -488,13 +455,16 @@ namespace Umbraco.Web.Cache
 
         #endregion
 
-        #region UserService & PermissionRepository
+        #region UserService
 
-        private void PermissionRepository_AssignedPermissions(PermissionRepository<IContent> sender, SaveEventArgs<EntityPermission> e)
+        static void UserService_UserGroupPermissionsAssigned(IUserService sender, SaveEventArgs<EntityPermission> e)
         {
-            var userIds = e.SavedEntities.Select(x => x.UserId).Distinct();
-            foreach (var id in userIds)
-                _distributedCache.RefreshUserPermissionsCache(id);
+            //TODO: Not sure if we need this yet depends if we start caching permissions
+            //var groupIds = e.SavedEntities.Select(x => x.UserGroupId).Distinct();
+            //foreach (var groupId in groupIds)
+            //{
+            //    DistributedCache.Instance.RefreshUserGroupPermissionsCache(groupId);
+            //}
         }
 
         private void UserService_SavedUser(IUserService sender, SaveEventArgs<IUser> e)
@@ -507,6 +477,18 @@ namespace Umbraco.Web.Cache
         {
             foreach (var entity in e.DeletedEntities)
                 _distributedCache.RemoveUserCache(entity.Id);
+        }
+
+        private void UserService_SavedUserGroup(IUserService sender, SaveEventArgs<IUserGroup> e)
+        {
+            foreach (var entity in e.SavedEntities)
+                _distributedCache.RefreshUserGroupCache(entity.Id);
+        }
+
+        private void UserService_DeletedUserGroup(IUserService sender, DeleteEventArgs<IUserGroup> e)
+        {
+            foreach (var entity in e.DeletedEntities)
+                _distributedCache.RemoveUserGroupCache(entity.Id);
         }
 
         #endregion

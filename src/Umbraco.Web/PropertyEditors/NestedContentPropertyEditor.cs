@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
@@ -20,6 +18,8 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.NestedContentAlias, "Nested Content", "nestedcontent", ValueType = "JSON", Group = "lists", Icon = "icon-thumbnail-list")]
     public class NestedContentPropertyEditor : PropertyEditor
     {
+        private readonly PropertyEditorCollection _propertyEditors;
+
         internal const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
         private IDictionary<string, object> _defaultPreValues;
@@ -29,9 +29,11 @@ namespace Umbraco.Web.PropertyEditors
             set => _defaultPreValues = value;
         }
 
-        public NestedContentPropertyEditor(ILogger logger)
+        public NestedContentPropertyEditor(ILogger logger, PropertyEditorCollection propertyEditors)
             : base (logger)
         {
+            _propertyEditors = propertyEditors;
+
             // Setup default values
             _defaultPreValues = new Dictionary<string, object>
             {
@@ -87,21 +89,21 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override PropertyValueEditor CreateValueEditor()
         {
-            return new NestedContentPropertyValueEditor(base.CreateValueEditor());
+            return new NestedContentPropertyValueEditor(base.CreateValueEditor(), _propertyEditors);
         }
 
         internal class NestedContentPropertyValueEditor : PropertyValueEditorWrapper
         {
-            public NestedContentPropertyValueEditor(PropertyValueEditor wrapped)
+            private readonly PropertyEditorCollection _propertyEditors;
+
+            public NestedContentPropertyValueEditor(PropertyValueEditor wrapped, PropertyEditorCollection propertyEditors)
                 : base(wrapped)
             {
-                Validators.Add(new NestedContentValidator());
+                _propertyEditors = propertyEditors;
+                Validators.Add(new NestedContentValidator(propertyEditors));
             }
 
-            internal ServiceContext Services
-            {
-                get { return Current.Services; }
-            }
+            internal ServiceContext Services => Current.Services;
 
             public override void ConfigureForDisplay(PreValueCollection preValues)
             {
@@ -167,7 +169,7 @@ namespace Umbraco.Web.PropertyEditors
                                 var prop = new Property(propType, propValues[propKey] == null ? null : propValues[propKey].ToString());
 
                                 // Lookup the property editor
-                                var propEditor = PropertyEditorResolver.Current.GetByAlias(propType.PropertyEditorAlias);
+                                var propEditor = _propertyEditors[propType.PropertyEditorAlias];
 
                                 // Get the editor to do it's conversion, and store it back
                                 propValues[propKey] = propEditor.ValueEditor.ConvertDbToString(prop, propType, dataTypeService);
@@ -242,7 +244,7 @@ namespace Umbraco.Web.PropertyEditors
                                 var prop = new Property(propType, propValues[propKey] == null ? null : propValues[propKey].ToString());
 
                                 // Lookup the property editor
-                                var propEditor = PropertyEditorResolver.Current.GetByAlias(propType.PropertyEditorAlias);
+                                var propEditor = _propertyEditors[propType.PropertyEditorAlias];
 
                                 // Get the editor to do it's conversion
                                 var newValue = propEditor.ValueEditor.ConvertDbToEditor(prop, propType, dataTypeService);
@@ -319,7 +321,7 @@ namespace Umbraco.Web.PropertyEditors
                                 propType.DataTypeDefinitionId);
 
                             // Lookup the property editor
-                            var propEditor = PropertyEditorResolver.Current.GetByAlias(propType.PropertyEditorAlias);
+                            var propEditor = _propertyEditors[propType.PropertyEditorAlias];
 
                             // Create a fake content property data object
                             var contentPropData = new ContentPropertyData(
@@ -344,17 +346,24 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class NestedContentValidator : IPropertyValidator
         {
+            private readonly PropertyEditorCollection _propertyEditors;
+
+            public NestedContentValidator(PropertyEditorCollection propertyEditors)
+            {
+                _propertyEditors = propertyEditors;
+            }
+
             public IEnumerable<ValidationResult> Validate(object rawValue, PreValueCollection preValues, PropertyEditor editor)
             {
                 var value = JsonConvert.DeserializeObject<List<object>>(rawValue.ToString());
                 if (value == null)
                     yield break;
 
-                IDataTypeService dataTypeService = ApplicationContext.Current.Services.DataTypeService;
+                var dataTypeService = Current.Services.DataTypeService;
                 for (var i = 0; i < value.Count; i++)
                 {
                     var o = value[i];
-                    var propValues = ((JObject)o);
+                    var propValues = (JObject) o;
 
                     var contentType = NestedContentHelper.GetContentTypeFromItem(propValues);
                     if (contentType == null)
@@ -369,12 +378,12 @@ namespace Umbraco.Web.PropertyEditors
                         var propType = contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propKey);
                         if (propType != null)
                         {
-                            PreValueCollection propPrevalues = dataTypeService.GetPreValuesCollectionByDataTypeId(propType.DataTypeDefinitionId);
-                            PropertyEditor propertyEditor = PropertyEditorResolver.Current.GetByAlias(propType.PropertyEditorAlias);
+                            var propPrevalues = dataTypeService.GetPreValuesCollectionByDataTypeId(propType.DataTypeDefinitionId);
+                            PropertyEditor propertyEditor = _propertyEditors[propType.PropertyEditorAlias];
 
-                            foreach (IPropertyValidator validator in propertyEditor.ValueEditor.Validators)
+                            foreach (var validator in propertyEditor.ValueEditor.Validators)
                             {
-                                foreach (ValidationResult result in validator.Validate(propValues[propKey], propPrevalues, propertyEditor))
+                                foreach (var result in validator.Validate(propValues[propKey], propPrevalues, propertyEditor))
                                 {
                                     result.ErrorMessage = "Item " + (i + 1) + " '" + propType.Name + "' " + result.ErrorMessage;
                                     yield return result;

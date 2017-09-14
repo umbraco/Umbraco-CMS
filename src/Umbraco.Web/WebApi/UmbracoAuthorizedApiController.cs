@@ -22,28 +22,9 @@ namespace Umbraco.Web.WebApi
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private bool _userisValidated = false;
         
-        protected UmbracoAuthorizedApiController()
-        { }
-
-        protected UmbracoAuthorizedApiController(UmbracoContext umbracoContext) 
-            : base(umbracoContext)
-        { }
-
-        protected UmbracoAuthorizedApiController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper) 
-            : base(umbracoContext, umbracoHelper)
-        { }
-
-        protected UmbracoAuthorizedApiController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper, BackOfficeUserManager<BackOfficeIdentityUser> backOfficeUserManager) 
-            : base(umbracoContext, umbracoHelper)
-        {
-            _userManager = backOfficeUserManager;
-        }
-
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
-        {
-            get { return _userManager ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager()); }
-        }
-        
+            => _userManager ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager());
+
         /// <summary>
         /// Returns the currently logged in Umbraco User
         /// </summary>

@@ -251,7 +251,7 @@ namespace Umbraco.Web.Editors
         [MinifyJavaScriptResult(Order = 1)]
         public JavaScriptResult ServerVariables()
         {
-            var serverVars = new BackOfficeServerVariables(Url, ApplicationContext, UmbracoConfig.For.UmbracoSettings());
+            var serverVars = new BackOfficeServerVariables(Url, Current.RuntimeState);
 
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled

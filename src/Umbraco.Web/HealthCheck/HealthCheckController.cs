@@ -83,10 +83,10 @@ namespace Umbraco.Web.HealthCheck
         private HealthCheck GetCheckById(Guid id)
         {
             var check = _checks
-                .FirstOrDefault(x => x.Id == action.HealthCheckId)
-                .Where(x => _disabledCheckIds.Contains(x.Id) == false);
+                .Where(x => _disabledCheckIds.Contains(x.Id) == false)
+                .FirstOrDefault(x => x.Id == id);
 
-            if (check == null) throw new InvalidOperationException(string.Format("No health check found with id {0}", id));
+            if (check == null) throw new InvalidOperationException($"No health check found with id {id}");
 
             return check;
         }

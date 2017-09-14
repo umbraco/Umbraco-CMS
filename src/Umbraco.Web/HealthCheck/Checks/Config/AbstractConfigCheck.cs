@@ -54,7 +54,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         protected AbstractConfigCheck(ILocalizedTextService textService)
         {
             TextService = textService;
-            _configurationService = new ConfigurationService(AbsoluteFilePath, XPath, _textService);
+            _configurationService = new ConfigurationService(AbsoluteFilePath, XPath, textService);
         }
 
         /// <summary>

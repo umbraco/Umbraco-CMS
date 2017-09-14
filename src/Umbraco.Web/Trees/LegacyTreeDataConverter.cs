@@ -34,20 +34,23 @@ namespace Umbraco.Web.Trees
             var controllerAttempt = appTree.TryGetControllerTree();
             if (controllerAttempt.Success)
             {
-                var legacyAtt = controllerAttempt.Result.GetCustomAttribute<LegacyBaseTreeAttribute>(false);
-                if (legacyAtt == null)
-                {
-                    Current.Logger.Warn<LegacyTreeDataConverter>("Cannot render tree: " + appTree.Alias + ". Cannot render a " + typeof(TreeController) + " tree type with the legacy web services unless attributed with " + typeof(LegacyBaseTreeAttribute));
-                    return null;
-                }
+                Current.Logger.Warn<LegacyTreeDataConverter>("Cannot render tree: " + appTree.Alias + ". Cannot render a " + typeof(TreeController) + " tree type with the legacy web services.");
+                return null;
 
-                var treeDef = new TreeDefinition(
-                    legacyAtt.BaseTreeType,
-                    new ApplicationTree(true, appTree.SortOrder, appTree.ApplicationAlias, appTree.Alias, appTree.Title, appTree.IconClosed, appTree.IconOpened, legacyAtt.BaseTreeType.GetFullNameWithAssembly()),
-                    new Section(appTree.Alias, appTree.Alias, "", 0));
+                //var legacyAtt = controllerAttempt.Result.GetCustomAttribute<LegacyBaseTreeAttribute>(false);
+                //if (legacyAtt == null)
+                //{
+                //    Current.Logger.Warn<LegacyTreeDataConverter>("Cannot render tree: " + appTree.Alias + ". Cannot render a " + typeof(TreeController) + " tree type with the legacy web services unless attributed with " + typeof(LegacyBaseTreeAttribute));
+                //    return null;
+                //}
 
-                tree = treeDef.CreateInstance();
-                tree.TreeAlias = appTree.Alias;
+                //var treeDef = new TreeDefinition(
+                //    legacyAtt.BaseTreeType,
+                //    new ApplicationTree(true, appTree.SortOrder, appTree.ApplicationAlias, appTree.Alias, appTree.Title, appTree.IconClosed, appTree.IconOpened, legacyAtt.BaseTreeType.GetFullNameWithAssembly()),
+                //    new Section(appTree.Alias, appTree.Alias, "", 0));
+
+                //tree = treeDef.CreateInstance();
+                //tree.TreeAlias = appTree.Alias;
 
             }
             else

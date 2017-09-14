@@ -6,6 +6,7 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
@@ -62,7 +63,7 @@ namespace Umbraco.Web.WebApi.Filters
             var userId = identity.Id.TryConvertTo<int>();
             if (userId == false) return;
 
-            var user = ApplicationContext.Current.Services.UserService.GetUserById(userId.Result);
+            var user = Current.Services.UserService.GetUserById(userId.Result);
             if (user == null) return;
             
             //a list of checks to execute, if any of them pass then we resync
@@ -71,19 +72,19 @@ namespace Umbraco.Web.WebApi.Filters
                 () => user.Username != identity.Username,
                 () =>
                 {
-                    var culture = UserExtensions.GetUserCulture(user, ApplicationContext.Current.Services.TextService);
+                    var culture = UserExtensions.GetUserCulture(user, Current.Services.TextService);
                     return culture != null && culture.ToString() != identity.Culture;
                 }, 
                 () => user.AllowedSections.UnsortedSequenceEqual(identity.AllowedApplications) == false,
                 () => user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.Roles) == false,
                 () =>
                 {
-                    var startContentIds = UserExtensions.CalculateContentStartNodeIds(user, ApplicationContext.Current.Services.EntityService);
+                    var startContentIds = UserExtensions.CalculateContentStartNodeIds(user, Current.Services.EntityService);
                     return startContentIds.UnsortedSequenceEqual(identity.StartContentNodes) == false;
                 },
                 () =>
                 {
-                    var startMediaIds = UserExtensions.CalculateMediaStartNodeIds(user, ApplicationContext.Current.Services.EntityService);
+                    var startMediaIds = UserExtensions.CalculateMediaStartNodeIds(user, Current.Services.EntityService);
                     return startMediaIds.UnsortedSequenceEqual(identity.StartMediaNodes) == false;
                 }
             };

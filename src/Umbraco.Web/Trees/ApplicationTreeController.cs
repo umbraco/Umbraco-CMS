@@ -122,7 +122,7 @@ namespace Umbraco.Web.Trees
 
                 //if the root node has a route path, we cannot create a single root section because by specifying the route path this would
                 //override the dashboard route and that means there can be no dashboard for that section which is a breaking change.
-                if (rootNode.Result.RoutePath.IsNullOrWhiteSpace() == false 
+                if (string.IsNullOrWhiteSpace(rootNode.Result.RoutePath) == false 
                     && rootNode.Result.RoutePath != "#" 
                     && rootNode.Result.RoutePath != application)
                 {

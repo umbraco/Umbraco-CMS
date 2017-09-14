@@ -78,16 +78,16 @@ namespace Umbraco.Web.Models.Mapping
             CreateMap<MemberTypeSave, IMemberType>()
                 //do the base mapping
                 .MapBaseContentTypeSaveToEntity<MemberTypeSave, MemberPropertyTypeBasic, IMemberType>()
-                .ConstructUsing((source) => new MemberType(source.ParentId))
+                .ConstructUsing(source => new MemberType(source.ParentId))
                 .AfterMap((source, dest) =>
                 {
                     ContentTypeProfileExtensions.AfterMapContentTypeSaveToEntity(source, dest, _contentTypeService);
 
                     //map the MemberCanEditProperty,MemberCanViewProperty
-                    foreach (var propertyType in source.Groups.SelectMany(dest => dest.Properties))
+                    foreach (var propertyType in source.Groups.SelectMany(x => x.Properties))
                     {
                         var localCopy = propertyType;
-                        var destProp = dest.PropertyTypes.SingleOrDefault(dest => dest.Alias.InvariantEquals(localCopy.Alias));
+                        var destProp = dest.PropertyTypes.SingleOrDefault(x => x.Alias.InvariantEquals(localCopy.Alias));
                         if (destProp != null)
                         {
                             dest.SetMemberCanEditProperty(localCopy.Alias, localCopy.MemberCanEditProperty);
@@ -216,7 +216,7 @@ namespace Umbraco.Web.Models.Mapping
                 .AfterMap((source, dest) =>
                 {
                     //sync templates
-                    var destAllowedTemplateAliases = dest.AllowedTemplates.Select(dest => dest.Alias);
+                    var destAllowedTemplateAliases = dest.AllowedTemplates.Select(x => x.Alias);
                     //if the dest is set and it's the same as the source, then don't change
                     if (destAllowedTemplateAliases.SequenceEqual(source.AllowedTemplates) == false)
                     {

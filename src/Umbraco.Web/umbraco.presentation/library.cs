@@ -1095,8 +1095,8 @@ namespace umbraco
 
             try
             {
-                var nav = Umbraco.Web.UmbracoContext.Current.ContentCache.CreateNavigator();
-                var pageId = HttpContext.Current.Items["pageID"]?.ToString();
+                var nav = UmbracoContext.Current.ContentCache.CreateNavigator();
+                pageId = HttpContext.Current.Items["pageID"]?.ToString();
 
                 if (pageId == null)
                     throw new NullReferenceException("pageID not found in the current HTTP context");

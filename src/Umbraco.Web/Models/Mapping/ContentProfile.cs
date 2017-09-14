@@ -136,7 +136,7 @@ namespace Umbraco.Web.Models.Mapping
                     Label = localizedText.Localize("content/releaseDate"),
                     Value = display.ReleaseDate?.ToIsoString(),
                     //Not editible for people without publish permission (U4-287)
-                    View =  display.AllowedActions.Contains(ActionPublish.Instance.Letter) ? "datepicker"  : Current.PropertyEditors[Constants.PropertyEditors.NoEditAlias].ValueEditor.View,
+                    View =  display.AllowedActions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)) ? "datepicker"  : Current.PropertyEditors[Constants.PropertyEditors.NoEditAlias].ValueEditor.View,
                     Config = new Dictionary<string, object>
                     {
                         {"offsetTime", "1"}
@@ -149,7 +149,7 @@ namespace Umbraco.Web.Models.Mapping
                     Label = localizedText.Localize("content/unpublishDate"),
                     Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
                     //Not editible for people without publish permission (U4-287)
-                    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter) ? "datepicker"  : Current.PropertyEditors[Constants.PropertyEditors.NoEditAlias].ValueEditor.View,
+                    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)) ? "datepicker"  : Current.PropertyEditors[Constants.PropertyEditors.NoEditAlias].ValueEditor.View,
                     Config = new Dictionary<string, object>
                     {
                         {"offsetTime", "1"}

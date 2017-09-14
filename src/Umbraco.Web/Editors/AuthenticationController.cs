@@ -99,7 +99,7 @@ namespace Umbraco.Web.Editors
 
             await SignInManager.SignInAsync(identityUser, false, false);
 
-            var user = ApplicationContext.Services.UserService.GetUserById(id);
+            var user = Services.UserService.GetUserById(id);
 
             return Mapper.Map<UserDisplay>(user);
         }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -10,21 +9,17 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
-using System.Web.Routing;
-using System.Web.Security;
-using System.Web.WebPages;
 using AutoMapper;
-using ClientDependency.Core;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -43,35 +38,12 @@ namespace Umbraco.Web.Editors
     public class UsersController : UmbracoAuthorizedJsonController
     {
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public UsersController()
-            : this(UmbracoContext.Current)
-        {
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        public UsersController(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {
-        }
-
-        public UsersController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper, BackOfficeUserManager<BackOfficeIdentityUser> backOfficeUserManager) 
-            : base(umbracoContext, umbracoHelper, backOfficeUserManager)
-        {
-        }
-
-
-        /// <summary>
         /// Returns a list of the sizes of gravatar urls for the user or null if the gravatar server cannot be reached
         /// </summary>
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()
         {
-            var urls = UmbracoContext.Security.CurrentUser.GetCurrentUserAvatarUrls(Services.UserService, ApplicationContext.ApplicationCache.StaticCache);
+            var urls = UmbracoContext.Security.CurrentUser.GetCurrentUserAvatarUrls(Services.UserService, ApplicationCache.StaticCache);
             if (urls == null)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Could not access Gravatar endpoint"));
 
@@ -82,7 +54,7 @@ namespace Umbraco.Web.Editors
         [FileUploadCleanupFilter(false)]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
-            return await PostSetAvatarInternal(Request, Services.UserService, ApplicationContext.ApplicationCache.StaticCache, id);
+            return await PostSetAvatarInternal(Request, Services.UserService, ApplicationCache.StaticCache, id);
         }
 
         internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, ICacheProvider staticCache, int id)
@@ -127,7 +99,7 @@ namespace Umbraco.Web.Editors
 
                 using (var fs = System.IO.File.OpenRead(file.LocalFileName))
                 {
-                    FileSystemProviderManager.Current.MediaFileSystem.AddFile(user.Avatar, fs, true);
+                    Current.FileSystems.MediaFileSystem.AddFile(user.Avatar, fs, true);
                 }
 
                 userService.Save(user);
@@ -168,11 +140,11 @@ namespace Umbraco.Web.Editors
 
             if (filePath.IsNullOrWhiteSpace() == false)
             {
-                if (FileSystemProviderManager.Current.MediaFileSystem.FileExists(filePath))
-                    FileSystemProviderManager.Current.MediaFileSystem.DeleteFile(filePath);
+                if (Current.FileSystems.MediaFileSystem.FileExists(filePath))
+                    Current.FileSystems.MediaFileSystem.DeleteFile(filePath);
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, found.GetCurrentUserAvatarUrls(Services.UserService, ApplicationContext.ApplicationCache.StaticCache));
+            return Request.CreateResponse(HttpStatusCode.OK, found.GetCurrentUserAvatarUrls(Services.UserService, ApplicationCache.StaticCache));
         }
 
         /// <summary>
@@ -390,7 +362,7 @@ namespace Umbraco.Web.Editors
                 });
 
             // Construct full URL using configured application URL (which will fall back to request)
-            var applicationUri = new Uri(ApplicationContext.UmbracoApplicationUrl);
+            var applicationUri = RuntimeState.ApplicationUrl;
             var inviteUri = new Uri(applicationUri, action);
 
             var emailSubject = Services.TextService.Localize("user/inviteEmailCopySubject",

@@ -8,7 +8,6 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Composing;
-using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -35,20 +34,14 @@ namespace Umbraco.Web.WebApi.Filters
         /// <summary>
         /// Returns true so that other filters can execute along with this one
         /// </summary>
-        public override bool AllowMultiple
-        {
-            get { return true; }
-        }
+        public override bool AllowMultiple => true;
 
         protected virtual int[] GetUserStartNodes(IUser user)
         {
-            return user.CalculateMediaStartNodeIds(ApplicationContext.Current.Services.EntityService);
+            return user.CalculateMediaStartNodeIds(Current.Services.EntityService);
         }
 
-        protected virtual int RecycleBinId
-        {
-            get { return Constants.System.RecycleBinMedia; }
-        }
+        protected virtual int RecycleBinId => Constants.System.RecycleBinMedia;
 
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {

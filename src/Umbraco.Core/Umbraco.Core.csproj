@@ -385,6 +385,7 @@
     <Compile Include="Events\TypedEventHandler.cs" />
     <Compile Include="Events\UninstallPackageEventArgs.cs" />
     <Compile Include="Exceptions\ArgumentNullOrEmptyException.cs" />
+    <Compile Include="Exceptions\AuthorizationException.cs" />
     <Compile Include="Exceptions\BootFailedException.cs" />
     <Compile Include="Exceptions\ConnectionException.cs" />
     <Compile Include="Exceptions\DataOperationException.cs" />

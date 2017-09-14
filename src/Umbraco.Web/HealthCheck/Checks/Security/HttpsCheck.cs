@@ -61,8 +61,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
             // Attempt to access the site over HTTPS to see if it HTTPS is supported
             // and a valid certificate has been configured
-            var url = _runtime.ApplicationUrl.Replace("http:", "https:");
-            var request = (HttpWebRequest)WebRequest.Create(url);
+            var url = _runtime.ApplicationUrl.ToString().Replace("http:", "https:");
+            var request = (HttpWebRequest) WebRequest.Create(url);
             request.Method = "HEAD";
 
             try
@@ -129,7 +129,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
         private HealthCheckStatus CheckIfCurrentSchemeIsHttps()
         {
-            var uri = new Uri(HealthCheckContext.SiteUrl);
+            var uri = _runtime.ApplicationUrl;
             var success = uri.Scheme == "https";
 
             var actions = new List<HealthCheckAction>();
@@ -145,7 +145,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         private HealthCheckStatus CheckHttpsConfigurationSetting()
         {
             var httpsSettingEnabled = Core.Configuration.GlobalSettings.UseSSL;
-            var uri = new Uri(HealthCheckContext.SiteUrl);
+            var uri = _runtime.ApplicationUrl;
             var actions = new List<HealthCheckAction>();
 
             string resultMessage;
