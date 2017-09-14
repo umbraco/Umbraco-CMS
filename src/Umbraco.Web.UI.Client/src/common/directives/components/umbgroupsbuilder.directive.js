@@ -9,7 +9,6 @@
         var tabNoSortOrderTranslated = "";
 
       scope.sortingMode = false;
-      scope.showSortOrdinals = false;
       scope.toolbar = [];
       scope.sortableOptionsGroup = {};
       scope.sortableOptionsProperty = {};
@@ -241,15 +240,6 @@
 
           }
 
-      };
-        //show sort order input boxes for property sort order
-      scope.toggleSortOrderOverride = function (tool) {
-          if (scope.showSortOrdinals === true) {
-              scope.showSortOrdinals = false;
-          }
-          else {
-              scope.showSortOrdinals = true;
-          }
       };
 
       scope.openCompositionsDialog = function() {
