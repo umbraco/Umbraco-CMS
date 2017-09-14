@@ -41,7 +41,7 @@ function processLess(files, out) {
 
     var processors = [
          autoprefixer,
-         cssnano
+         cssnano({zindex: false}),
     ];
 
     return gulp.src(files)
