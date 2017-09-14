@@ -15,7 +15,7 @@ namespace Umbraco.Web.Mvc
         protected override void HandleNonHttpsRequest(AuthorizationContext filterContext)
         {
             // If umbracoUseSSL is set, let base method handle redirect.  Otherwise, we don't care.
-            if (GlobalSettings.UseSSL)
+            if (GlobalSettings.UseSSL && request.RequestUri.Scheme != Uri.UriSchemeHttps)
             {
                 base.HandleNonHttpsRequest(filterContext);
             }
@@ -33,7 +33,5 @@ namespace Umbraco.Web.Mvc
                 base.OnAuthorization(filterContext);
             }
         }
-
-
     }
 }
