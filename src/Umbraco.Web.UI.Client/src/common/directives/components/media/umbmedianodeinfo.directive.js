@@ -43,7 +43,7 @@
         var directive = {
             restrict: 'E',
             replace: true,
-            templateUrl: 'views/components/umb-media-node-info.html'
+            templateUrl: 'views/components/media/umb-media-node-info.html'
         };
 
         return directive;
