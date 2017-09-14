@@ -15,6 +15,8 @@ namespace Umbraco.Core
         {
             // note: const fields in this class MUST be consistent with what GetTypes returns
             //  this is validated by UdiTests.ValidateUdiEntityType
+            // also, this is used exclusively in Udi static ctor, only once, so there is no
+            //  need to keep it around in a field nor to make it readonly
 
             internal static Dictionary<string, UdiType> GetTypes()
             {
