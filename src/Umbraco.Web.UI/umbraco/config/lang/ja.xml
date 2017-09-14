@@ -489,8 +489,6 @@
     <key alias="searchResults">検索結果</key>
     <key alias="reorder">順序変更</key>
     <key alias="reorderDone">順序変更終了</key>
-    <key alias="showOrdinals">Show Ordinals</key>
-    <key alias="hideOrdinals">Hide Ordinals</key>
 	<key alias="preview">プレビュー</key>
     <key alias="changePassword">パスワードの変更</key>
     <key alias="to">-&gt;　</key>

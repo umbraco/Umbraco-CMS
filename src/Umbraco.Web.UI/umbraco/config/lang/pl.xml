@@ -358,8 +358,6 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="yes">Tak</key>
     <key alias="reorder">Zmień kolejność</key>
     <key alias="reorderDone">Kolejność została zmieniona</key>
-    <key alias="showOrdinals">Show Ordinals</key>
-    <key alias="hideOrdinals">Hide Ordinals</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Kolor tła</key>

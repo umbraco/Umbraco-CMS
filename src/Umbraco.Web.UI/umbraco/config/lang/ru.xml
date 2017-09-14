@@ -557,8 +557,6 @@
     <key alias="yes">Да</key>
     <key alias="reorder">Пересортировать</key>
     <key alias="reorderDone">Пересортировка завершена</key>
-    <key alias="showOrdinals">Show Ordinals</key>
-    <key alias="hideOrdinals">Hide Ordinals</key>
     <key alias="preview">Предпросмотр</key>
     <key alias="changePassword">Сменить пароль</key>
     <key alias="to">к</key>
