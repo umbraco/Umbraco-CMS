@@ -4,18 +4,24 @@
             <umb-box-header title-key="general_links"></umb-box-header>
             <umb-box-content class="block-form">
 
-                <ul class="nav nav-stacked" style="margin-bottom: 0;">
+                <umb-empty-state
+                    ng-if="!nodeUrl"
+                    size="small">
+                    <localize key="content_noMediaLink"></localize>
+                </umb-empty-state>
+                
+                <ul ng-if="nodeUrl" class="nav nav-stacked" style="margin-bottom: 0;">
                     <li>
-                        <a href="{{ content.properties["0"].value.src }}" target="_blank">
+                        <a href="{{nodeUrl}}" target="_blank">
                             <i class="icon icon-window-popin"></i>
-                            <span>{{ content.properties["0"].value.src }}</span>
-                            
+                            <span>{{nodeUrl}}</span>
                         </a>
                     </li>
                 </ul>
-                {{ content.properties[10].value["0"].url }}
+
             </umb-box-content>
         </umb-box>
+
     </div>
 
     <div class="umb-package-details__sidebar">
@@ -23,38 +29,31 @@
             <umb-box-header title-key="general_general"></umb-box-header>
             <umb-box-content class="block-form">
                 
-                <umb-control-group label="@template_createdDate">
-                    <!-- {{node.createDate | amDateFormat:'DD'}} {{ node.createDate | amDateFormat:'MMM'}} {{ node.createDate | amDateFormat:'YYYY'}}, {{node.createDate | amDateFormat:'h:mmA'}} by {{ node.owner.name }} -->
-
+                <umb-control-group label="@content_createDate">
+                    {{node.createDate | amDateFormat:'MMMM Do YYYY, HH:mm'}} by {{ node.owner.name }}
                 </umb-control-group>
 
-                <div ng-repeat="property in content.properties">
-                    <div>{{ property.value | json }}</div>
-                </div>
+                <umb-control-group label="@content_updateDate">
+                    {{node.updateDate | amDateFormat:'MMMM Do YYYY, HH:mm'}}
+                </umb-control-group>
             
-                <umb-control-group label="@content_documentType">
+                <umb-control-group label="@content_mediatype">
                     <umb-node-preview
-                        icon="documentType.icon"
-                        name="documentType.linkText"
-                        allow-open="allowOpen"
-                        on-open="openDocumentType(documentType)">
+                        style="max-width: 100%; margin-bottom: 0px;"
+                        icon="mediaType.icon"
+                        name="mediaType.linkText"
+                        allow-open="allowOpenMediaType"
+                        on-open="openMediaType(mediaType)">
                     </umb-node-preview>
                 </umb-control-group>
 
-                <umb-control-group label="@template_template">
-                    <select
-                        class="input-block-level"
-                        ng-model="node.template"
-                        ng-options="key as value for (key, value) in availableTemplates"
-                        ng-change="updateTemplate(node.template)">
-                    </select>
-                </umb-control-group>
-
-                <umb-control-group label="{{ idSection.name }}">
+                <umb-control-group label="Id">
                     <div>{{ node.id }}</div>
                     <small>{{ node.key }}</small>
                 </umb-control-group>
+
             </umb-box-content>    
         </umb-box>
     </div>
+    
 </div>

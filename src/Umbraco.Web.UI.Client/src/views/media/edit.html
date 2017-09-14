@@ -31,14 +31,11 @@
 
                 <!-- Info tab -->
                 <div ng-if="tab.id === 0">
-                    <umb-media-node-info>
+                    <umb-media-node-info
+                        ng-if="content"
+                        node="content">
                     </umb-media-node-info>
                 </div>
-
-<!--                 <umb-property property="property" ng-repeat="property in tab.properties">
-                    <umb-editor model="property"></umb-editor>
-                </umb-property> -->
-
                 
                </umb-tab>
             </umb-tabs-content>

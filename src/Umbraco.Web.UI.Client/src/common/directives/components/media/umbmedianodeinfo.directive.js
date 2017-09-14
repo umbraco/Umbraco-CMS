@@ -7,43 +7,68 @@
 
             function onInit() {
 
-                scope.allowOpen = true;
+                scope.allowOpenMediaType = true;
 
                 // get document type details
-                scope.documentType = getDocumentType(scope.node);
-                scope.node.createDate = "2017-08-28 15:12:30";
+                scope.mediaType = getMediaType(scope.node);
+
+                // get node url
+                scope.nodeUrl = getNodeUrl(scope.node);
 
             }
 
-            scope.openDocumentType = function (documentType) {
+            scope.openMediaType = function (mediaType) {
                 // remove first "#" from url if it is prefixed else the path won't work
-                var url = documentType.url.replace(/^#/, "");
+                var url = mediaType.url.replace(/^#/, "");
                 $location.path(url);
             };
-            
-/*             function getBla(node) {
-                
-                var bla = {};
 
-                // finding the create date in properties array
-                angular.forEach(node.properties, function (property){
-                    if (property.alias === "_umb_createdate") {
+            function getMediaType(node) {
+
+                var mediaType = {};
+
+                // find the document type in the properties array
+                angular.forEach(node.properties, function (property) {
+                    if (property.alias === "_umb_doctype") {
                         if (property.value && property.value.length > 0) {
-                            bla = property.value[0];
+                            mediaType = property.value[0];
                         }
                     }
                 });
 
-                return bla;
-            } */
+                return mediaType;
+
+            }
+
+            function getNodeUrl(node) {
+
+                var nodeUrl = "";
+
+                // find the document type in the properties array
+                angular.forEach(node.properties, function (property) {
+                    if (property.alias === "_umb_urls") {
+                        if (property.value) {
+                            nodeUrl = property.value;
+                        }
+                    }
+                });
+
+                return nodeUrl;
+
+            }
 
             onInit();
+
         }
 
         var directive = {
             restrict: 'E',
             replace: true,
-            templateUrl: 'views/components/media/umb-media-node-info.html'
+            templateUrl: 'views/components/media/umb-media-node-info.html',
+            scope: {
+                node: "="
+            },
+            link: link
         };
 
         return directive;

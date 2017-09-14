@@ -189,6 +189,7 @@
     <key alias="noChanges">No changes have been made</key>
     <key alias="noDate">No date chosen</key>
     <key alias="nodeName">Page title</key>
+    <key alias="noMediaLink">This media item has no link</key>
     <key alias="otherElements">Properties</key>
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
     <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
