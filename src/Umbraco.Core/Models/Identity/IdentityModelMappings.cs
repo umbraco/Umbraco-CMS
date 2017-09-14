@@ -23,6 +23,7 @@ namespace Umbraco.Core.Models.Identity
                 .ForMember(user => user.EmailConfirmed, expression => expression.MapFrom(user => user.EmailConfirmedDate.HasValue))
                 .ForMember(user => user.Id, expression => expression.MapFrom(user => user.Id))
                 .ForMember(user => user.LockoutEndDateUtc, expression => expression.MapFrom(user => user.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null))                
+                .ForMember(user => user.IsApproved, expression => expression.MapFrom(user => user.IsApproved))
                 .ForMember(user => user.UserName, expression => expression.MapFrom(user => user.Username))
                 .ForMember(user => user.PasswordHash, expression => expression.MapFrom(user => GetPasswordHash(user.RawPasswordValue)))
                 .ForMember(user => user.Culture, expression => expression.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))

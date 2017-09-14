@@ -334,6 +334,24 @@ namespace Umbraco.Core.Security
             return password;
         }
 
+        /// <summary>
+        /// Override to check the user approval value as well as the user lock out date, by default this only checks the user's locked out date
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// In the ASP.NET Identity world, there is only one value for being locked out, in Umbraco we have 2 so when checking this for Umbraco we need to check both values
+        /// </remarks>
+        public override async Task<bool> IsLockedOutAsync(int userId)
+        {
+            var user = await FindByIdAsync(userId);
+            if (user == null)
+                throw new InvalidOperationException("No user found by id " + userId);
+            if (user.IsApproved == false)
+                return true;
+
+            return await base.IsLockedOutAsync(userId);
+        }
 
         #region Overrides for password logic
         
