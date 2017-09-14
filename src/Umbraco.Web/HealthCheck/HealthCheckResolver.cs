@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 
