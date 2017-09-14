@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 
@@ -13,7 +12,7 @@ namespace Umbraco.Web.HealthCheck
     /// <remarks>
     /// Each instance scoped to the lifespan of the http request
     /// </remarks>
-    internal class HealthCheckResolver : LazyManyObjectsResolverBase<HealthCheckResolver, HealthCheck>, IHealthCheckResolver
+    public class HealthCheckResolver : LazyManyObjectsResolverBase<HealthCheckResolver, HealthCheck>, IHealthCheckResolver
     {
         public HealthCheckResolver(ILogger logger, Func<IEnumerable<Type>> lazyTypeList)
             : base(new HealthCheckServiceProvider(), logger, lazyTypeList, ObjectLifetimeScope.Application)
