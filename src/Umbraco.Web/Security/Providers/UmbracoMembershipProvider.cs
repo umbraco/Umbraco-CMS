@@ -2,16 +2,22 @@
 using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
+using System.Web;
 using System.Web.Configuration;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Security;
+
 using Umbraco.Core.Services;
+using Umbraco.Core.Auditing;
+using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security.Providers
 {
@@ -450,22 +456,15 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         public override bool UnlockUser(string username)
         {
-            var member = MemberService.GetByUsername(username);
+            var userManager = GetBackofficeUserManager();
+            return userManager != null && userManager.UnlockUser(username);
+        }
 
-            if (member == null)
-            {
-                throw new ProviderException(string.Format("No member with the username '{0}' found", username));
-            }                
-
-            // Non need to update
-            if (member.IsLockedOut == false) return true;
-
-            member.IsLockedOut = false;
-            member.FailedPasswordAttempts = 0;
-
-            MemberService.Save(member);
-
-            return true;
+        internal BackOfficeUserManager<BackOfficeIdentityUser> GetBackofficeUserManager()
+        {
+            return HttpContext.Current == null
+                ? null
+                : HttpContext.Current.GetOwinContext().GetBackOfficeUserManager();
         }
 
         /// <summary>
@@ -548,6 +547,7 @@ namespace Umbraco.Web.Security.Providers
             }
 
             var authenticated = CheckPassword(password, member.RawPasswordValue);
+            var backofficeUserManager = GetBackofficeUserManager();
 
             if (authenticated == false)
             {
@@ -567,6 +567,9 @@ namespace Umbraco.Web.Security.Providers
                             "Login attempt failed for username {0} from IP address {1}, the user is now locked out, max invalid password attempts exceeded",
                             username,
                             GetCurrentRequestIpAddress()));
+
+                    if(backofficeUserManager != null)
+                        backofficeUserManager.RaiseAccountLockedEvent(member.Id);
                 }
                 else
                 {
@@ -579,7 +582,14 @@ namespace Umbraco.Web.Security.Providers
             }
             else
             {
-                member.FailedPasswordAttempts = 0;
+                if (member.FailedPasswordAttempts > 0)
+                {
+                    //we have successfully logged in, reset the AccessFailedCount
+                    member.FailedPasswordAttempts = 0;
+                    if (backofficeUserManager != null)
+                        backofficeUserManager.RaiseResetAccessFailedCountEvent(member.Id);
+                }
+
                 member.LastLoginDate = DateTime.Now;
 
                 LogHelper.Info<UmbracoMembershipProviderBase>(
@@ -587,6 +597,9 @@ namespace Umbraco.Web.Security.Providers
                             "Login attempt succeeded for username {0} from IP address {1}",
                             username,
                             GetCurrentRequestIpAddress()));
+
+                if (backofficeUserManager != null)
+                    backofficeUserManager.RaiseLoginSuccessEvent(member.Id);
             }
 
             //don't raise events for this! It just sets the member dates, if we do raise events this will
@@ -601,10 +614,5 @@ namespace Umbraco.Web.Security.Providers
 
             return authenticated;
         }
-
-
-
-        
-
     }
 }

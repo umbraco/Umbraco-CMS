@@ -132,13 +132,17 @@ namespace Umbraco.Web.Editors
 
             var result = await SignInManager.PasswordSignInAsync(
                 loginModel.Username, loginModel.Password, isPersistent: true, shouldLockout: true);
-
+            
             switch (result)
             {
                 case SignInStatus.Success:
 
                     //get the user
                     var user = Security.GetBackOfficeUser(loginModel.Username);
+
+                    if (UserManager != null)
+                        UserManager.RaiseLoginSuccessEvent(user.Id);
+
                     return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.RequiresVerification:
 
@@ -173,15 +177,18 @@ namespace Umbraco.Web.Editors
                         userId = attemptedUser.Id
                     });
 
+                    if (UserManager != null)
+                        UserManager.RaiseLoginRequiresVerificationEvent(attemptedUser.Id);
+
                     return verifyResponse;
 
                 case SignInStatus.LockedOut:
                 case SignInStatus.Failure:
                 default:
-                    //return BadRequest (400), we don't want to return a 401 because that get's intercepted 
+                    //return BadRequest (400), we don't want to return a 401 because that get's intercepted
                     // by our angular helper because it thinks that we need to re-perform the request once we are
-                    // authorized and we don't want to return a 403 because angular will show a warning msg indicating 
-                    // that the user doesn't have access to perform this function, we just want to return a normal invalid msg.            
+                    // authorized and we don't want to return a 403 because angular will show a warning msg indicating
+                    // that the user doesn't have access to perform this function, we just want to return a normal invalid msg.
                     throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
         }
@@ -219,6 +226,9 @@ namespace Umbraco.Web.Editors
                             //Ensure the culture of the found user is used for the email!
                             UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService)),
                         message);
+
+                    if(UserManager != null)
+                        UserManager.RaiseForgotPasswordRequestedEvent(user.Id);
                 }
             }
 
@@ -279,13 +289,20 @@ namespace Umbraco.Web.Editors
             }
 
             var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: true, rememberBrowser: false);
+
+            //get the user
+            var user = Security.GetBackOfficeUser(userName);
             switch (result)
             {
                 case SignInStatus.Success:
-                    //get the user
-                    var user = Security.GetBackOfficeUser(userName);
+                    if (UserManager != null)
+                        UserManager.RaiseLoginSuccessEvent(user.Id);
+
                     return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.LockedOut:
+                    if (UserManager != null)
+                            UserManager.RaiseAccountLockedEvent(user.Id);
+
                     return Request.CreateValidationErrorResponse("User is locked out");                    
                 case SignInStatus.Failure:
                 default:
@@ -326,6 +343,8 @@ namespace Umbraco.Web.Editors
                     }
                 }
 
+                if(UserManager != null)
+                    UserManager.RaiseForgotPasswordChangedSuccessEvent(model.UserId);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             return Request.CreateValidationErrorResponse(
@@ -349,9 +368,15 @@ namespace Umbraco.Web.Editors
                             () => User.Identity == null ? "UNKNOWN" : User.Identity.Name,
                             () => TryGetOwinContext().Result.Request.RemoteIpAddress);
 
+            if (UserManager != null)
+            {
+                var userId = -1;
+                int.TryParse(User.Identity.GetUserId(), out userId);
+                UserManager.RaiseLogoutSuccessEvent(userId);
+            }
+
             return Request.CreateResponse(HttpStatusCode.OK);
         }
-
 
         /// <summary>
         /// This is used when the user is auth'd successfully and we need to return an OK with user details along with setting the current Principal in the request
