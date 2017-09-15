@@ -1,12 +1,11 @@
 <div class="umb-drawer-wrapper" ng-controller="Umbraco.Drawers.Help as vm">
 
-    <div class="umb-drawer-header">
-        <div class="umb-drawer-header__title">{{ vm.title }}</div>
-        <div class="umb-drawer-header__subtitle">{{ vm.subtitle }}</div>
-    </div>
-
-    <div class="umb-drawer-content">
-
+    <umb-drawer-header
+        title="{{ vm.title }}"
+        description="{{ vm.subtitle }}">
+    </umb-drawer-header>
+    
+    <umb-drawer-content>
 
         <!--  Help Content here -->
         <div style="margin-bottom: 20px;">
@@ -31,7 +30,6 @@
 
         </div>
 
-        
         <!--  Umbraco tv content -->
         <div>
 
@@ -57,11 +55,10 @@
 
         </div>
 
+    </umb-drawer-content>
 
-    </div>
+    <umb-drawer-footer>
 
-    <div class="umb-drawer-footer">
-        
         <div class="flex justify-end">
             <umb-button
                 type="button"
@@ -71,6 +68,6 @@
             </umb-button>
         </div>
 
-    </div>
+    </umb-drawer-footer>
 
 </div>
