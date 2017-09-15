@@ -289,13 +289,20 @@ namespace Umbraco.Web.Editors
             }
 
             var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: true, rememberBrowser: false);
+
+            //get the user
+            var user = Security.GetBackOfficeUser(userName);
             switch (result)
             {
                 case SignInStatus.Success:
-                    //get the user
-                    var user = Security.GetBackOfficeUser(userName);
+                    if (UserManager != null)
+                        UserManager.RaiseLoginSuccessEvent(user.Id);
+
                     return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.LockedOut:
+                    if (UserManager != null)
+                            UserManager.RaiseAccountLockedEvent(user.Id);
+
                     return Request.CreateValidationErrorResponse("User is locked out");                    
                 case SignInStatus.Failure:
                 default:
