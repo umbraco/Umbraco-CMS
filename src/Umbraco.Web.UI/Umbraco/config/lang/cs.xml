@@ -911,8 +911,6 @@
     <key alias="postContent">Vložit za polem</key>
     <key alias="preContent">Vložit před polem</key>
     <key alias="recursive">Rekurzivní</key>
-    <key alias="removeParagraph">Odstranit tagy odstavce</key>
-    <key alias="removeParagraphHelp">Odstraní jakékoliv &amp;lt;P&amp;gt; na začátku a na konci textu</key>
     <key alias="standardFields">Standardní pole</key>
     <key alias="uppercase">Velká písmena</key>
     <key alias="urlEncode">Kódování URL</key>

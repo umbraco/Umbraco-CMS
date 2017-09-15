@@ -433,7 +433,7 @@ namespace Umbraco.Web
         /// <returns>True if the document object is protected</returns>
         public bool IsProtected(string path)
         {
-            return UmbracoContext.Application.Services.PublicAccessService.IsProtected(path);
+            return MembershipHelper.IsProtected(path);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -450,25 +450,7 @@ namespace Umbraco.Web
         /// <returns>True if the current user has access or if the current document isn't protected</returns>
         public bool MemberHasAccess(string path)
         {
-            if (IsProtected(path))
-            {
-                return MembershipHelper.IsLoggedIn()
-                       && UmbracoContext.Application.Services.PublicAccessService.HasAccess(path, GetCurrentMember(), Roles.Provider);
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Gets (or adds) the current member from the current request cache
-        /// </summary>
-        private MembershipUser GetCurrentMember()
-        {
-            return UmbracoContext.Application.ApplicationCache.RequestCache
-                .GetCacheItem<MembershipUser>("UmbracoHelper.GetCurrentMember", () =>
-                {
-                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-                    return provider.GetCurrentUser();
-                });
+            return MembershipHelper.MemberHasAccess(path);
         }
 
 		/// <summary>
@@ -1317,20 +1299,33 @@ namespace Umbraco.Web
             return _stringUtilities.ReplaceLineBreaksForHtml(text);
 		}
 
-		/// <summary>
-		/// Returns an MD5 hash of the string specified
-		/// </summary>
-		/// <param name="text">The text to create a hash from</param>
-		/// <returns>Md5 has of the string</returns>
-		public string CreateMd5Hash(string text)
-		{
-			return text.ToMd5();
-		}
+        /// <summary>
+        /// Returns an MD5 hash of the string specified
+        /// </summary>
+        /// <param name="text">The text to create a hash from</param>
+        /// <returns>Md5 hash of the string</returns>
+        [Obsolete("Please use the CreateHash method instead. This may be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string CreateMd5Hash(string text)
+        {
+            return text.ToMd5();
+        }
 
-		/// <summary>
-		/// Strips all html tags from a given string, all contents of the tags will remain.
-		/// </summary>
-		public HtmlString StripHtml(IHtmlString html, params string[] tags)
+        /// <summary>
+        /// Generates a hash based on the text string passed in.  This method will detect the 
+        /// security requirements (is FIPS enabled) and return an appropriate hash.
+        /// </summary>
+        /// <param name="text">The text to create a hash from</param>
+        /// <returns>Hash of the text string</returns>
+        public string CreateHash(string text)
+        {
+            return text.GenerateHash();
+        }
+
+        /// <summary>
+        /// Strips all html tags from a given string, all contents of the tags will remain.
+        /// </summary>
+        public HtmlString StripHtml(IHtmlString html, params string[] tags)
 		{
 			return StripHtml(html.ToHtmlString(), tags);
 		}
@@ -1445,17 +1440,57 @@ namespace Umbraco.Web
 		public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
 		{
             return _stringUtilities.Truncate(html, length, addElipsis, treatTagsAsContent);
-		}
+        }
+        #region Truncate by Words
 
+        /// <summary>
+        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// </summary>
+        public IHtmlString TruncateByWords(string html, int words)
+        {
+            int length = _stringUtilities.WordsToLength(html, words);
 
-		#endregion
+            return Truncate(html, length, true, false);
+        }
 
-		#region If
+        /// <summary>
+        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// </summary>
+        public IHtmlString TruncateByWords(string html, int words, bool addElipsis)
+        {
+            int length = _stringUtilities.WordsToLength(html, words);
 
-		/// <summary>
-		/// If the test is true, the string valueIfTrue will be returned, otherwise the valueIfFalse will be returned.
-		/// </summary>
-		public HtmlString If(bool test, string valueIfTrue, string valueIfFalse)
+            return Truncate(html, length, addElipsis, false);
+        }
+
+        /// <summary>
+        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// </summary>
+        public IHtmlString TruncateByWords(IHtmlString html, int words)
+        {
+            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words);
+
+            return Truncate(html, length, true, false);
+        }
+
+        /// <summary>
+        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// </summary>
+        public IHtmlString TruncateByWords(IHtmlString html, int words, bool addElipsis)
+        {
+            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words);
+
+            return Truncate(html, length, addElipsis, false);
+        }
+        #endregion
+        #endregion
+
+        #region If
+
+        /// <summary>
+        /// If the test is true, the string valueIfTrue will be returned, otherwise the valueIfFalse will be returned.
+        /// </summary>
+        public HtmlString If(bool test, string valueIfTrue, string valueIfFalse)
 		{
 			return test ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
 		}

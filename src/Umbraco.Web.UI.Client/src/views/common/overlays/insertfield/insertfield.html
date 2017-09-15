@@ -3,7 +3,7 @@
     <!-- select field -->
     <div class="control-group umb-control-group -no-border">
         <div class="umb-el-wrap">
-            <label class="control-label" for="chooseField">Choose field</label>
+            <label class="control-label" for="chooseField"><localize key="templateEditor_chooseField">Choose field</localize></label>
             <div class="controls">
                 <select ng-model="vm.field">
                     <optgroup localize="label" label="@templateEditor_customFields">
@@ -25,11 +25,11 @@
         <!-- Fallback field -->
         <div>
             <i class="icon icon-add blue" ng-hide="vm.showAltField"></i>
-            <a href="" ng-click="vm.showAltField=true" ng-hide="vm.showAltField">Add fallback field</a>
+            <a href="" ng-click="vm.showAltField=true" ng-hide="vm.showAltField"><localize key="templateEditor_addFallbackField">Add fallback field</localize></a>
 
             <div class="control-group umb-control-group -no-border" ng-hide="!vm.showAltField">
                 <div class="umb-el-wrap">
-                    <label class="control-label" for="altField">Fallback field</label>
+                    <label class="control-label" for="altField"><localize key="templateEditor_fallbackField">Fallback field</localize></label>
                     <div class="controls">
                         <select ng-model="vm.altField" >
                             <optgroup localize="label" label="@templateEditor_customFields">
@@ -48,12 +48,12 @@
         <div>
             <div style="margin-bottom: 20px;">
                 <i class="icon icon-add blue" ng-hide="vm.showAltText"></i>
-                <a href="" ng-click="vm.showAltText=true" ng-hide="vm.showAltText">Add default value</a>
+                <a href="" ng-click="vm.showAltText=true" ng-hide="vm.showAltText"><localize key="templateEditor_addDefaultValue">Add default value</localize></a>
             </div>
 
             <div class="control-group umb-control-group -no-border" ng-hide="!vm.showAltText">
                 <div class="umb-el-wrap">
-                    <label class="control-label" for="altText">Default value</label>
+                    <label class="control-label" for="altText"><localize key="templateEditor_defaultValue">Default value</localize></label>
                     <div class="controls">
                         <input type="text" name="altText" ng-model="vm.altText" umb-auto-focus>
                     </div>
@@ -66,15 +66,15 @@
             <div class="umb-el-wrap">
                 <div class="controls">
                     <label class="control-label" for="recursive">
-                        Recursive
+                        <localize key="templateEditor_recursive">Recursive</localize>
                     </label>
                     <input type="checkbox" name="recursive" ng-model="vm.recursive">
-                    Yes, make it recursive
+                    <localize key="templateEditor_recursiveDescr">Yes, make it recursive</localize>
                 </div>
             </div>
         </div>
 
-        <h5>Format and encoding</h5>
+        <h5><localize key="templateEditor_formatAndEncoding">Format and encoding</localize></h5>
 
         <!-- Format as date -->
         <div class="control-group umb-control-group">
@@ -82,13 +82,13 @@
                 <div class="controls">
                     <div>
                         <label class="control-label">
-                            Format as date
-                            <small>Format the value as a date, or a date with time, accoring to the active culture.</small>
+                            <localize key="templateEditor_formatAsDate">Format as date</localize>
+                            <small><localize key="templateEditor_formatAsDateDescr">Format the value as a date, or a date with time, accoring to the active culture</localize>.</small>
                         </label>
                     </div>
-                    <a href ng-click="vm.setDateOption('date')" class="btn"><i class="icon icon-check" ng-if="vm.date"></i> Date only</a>
-                    <a href ng-click="vm.setDateOption('dateWithTime')" class="btn"><i class="icon icon-check" ng-if="vm.dateTime"></i> Date and time</a>
-                    <input type="text" ng-model="vm.dateTimeSeparator" ng-hide="!vm.dateTime" placeholder="separator">
+                    <a href ng-click="vm.setDateOption('date')" class="btn"><i class="icon icon-check" ng-if="vm.date"></i> <localize key="templateEditor_dateOnly">Date only</localize></a>
+                    <a href ng-click="vm.setDateOption('dateWithTime')" class="btn"><i class="icon icon-check" ng-if="vm.dateTime"></i> <localize key="templateEditor_withTime">Date and time</localize></a>
+                    <input type="text" ng-model="vm.dateTimeSeparator" ng-hide="!vm.dateTime" localize="placeholder" placeholder="@templateEditor_separator">
                 </div>
             </div>
         </div>
@@ -99,11 +99,11 @@
                 <div class="controls">
                     <div>
                         <label class="control-label">
-                            Casing
+                            <localize key="templateEditor_casing">Casing</localize>
                         </label>
                     </div>
-                    <a href ng-click="vm.setCasingOption('uppercase')" class="btn" style="text-transform: uppercase;"><i class="icon icon-check" ng-if="vm.casingUpper"></i> Uppercase</a>
-                    <a href ng-click="vm.setCasingOption('lowercase')" class="btn"style="text-transform: lowercase;"><i class="icon icon-check" ng-if="vm.casingLower"></i> Lowercase</a>
+                    <a href ng-click="vm.setCasingOption('uppercase')" class="btn" style="text-transform: uppercase;"><i class="icon icon-check" ng-if="vm.casingUpper"></i> <localize key="templateEditor_uppercase">Uppercase</localize></a>
+                    <a href ng-click="vm.setCasingOption('lowercase')" class="btn"style="text-transform: lowercase;"><i class="icon icon-check" ng-if="vm.casingLower"></i> <localize key="templateEditor_lowercase">Lowercase</localize></a>
                 </div>
             </div>
         </div>
@@ -114,8 +114,8 @@
                 <div class="controls">
                     <div>
                         <label class="control-label">
-                            Encoding
-                            <small>Will format special characters in URLs</small>
+                            <localize key="templateEditor_encoding">Encoding</localize>
+                            <small><localize key="templateEditor_urlEncodeHelp">Will format special characters in URLs</localize></small>
                         </label>
                     </div>
                     <a href ng-click="vm.setEncodingOption('html')" class="btn"><i class="icon icon-check" ng-if="vm.encodeHtml"></i> HTML</a>
@@ -124,14 +124,14 @@
             </div>
         </div>
 
-        <h5>Modify output</h5>
+        <h5><localize key="templateEditor_modifyOutput">Modify output</localize></h5>
         
         <!-- Insert Before -->
         <div class="control-group umb-control-group -no-border ng-scope">
             <div class="umb-el-wrap">
                 <label class="control-label" for="insertBefore">
-                    Insert before field
-                    <small>Will be inserted before the field value</small>
+                    <localize key="templateEditor_preContent">Insert before field</localize>
+                    <small><localize key="templateEditor_insertedBefore">Will be inserted before the field value</localize></small>
                 </label>
                 <div class="controls">
                     <input type="text" name="insertBefore" class="-full-width-input" ng-model="vm.insertBefore">
@@ -143,8 +143,8 @@
         <div class="control-group umb-control-group">
             <div class="umb-el-wrap">
                 <label class="control-label" for="insertAfter">
-                    Insert after field
-                    <small>Will be inserted after the field value</small>
+                    <localize key="templateEditor_postContent">Insert after field</localize>
+                    <small><localize key="templateEditor_insertedAfter">Will be inserted after the field value</localize></small>
                 </label>
                 <div class="controls">
                     <input type="text" name="insertAfter" class="-full-width-input" ng-model="vm.insertAfter">
@@ -158,28 +158,12 @@
                 <div class="controls">
                     <div>
                         <label class="control-label" for="linebreaks">
-                            Convert line breaks
-                            <small>Replaces line breaks with break html tag</small>
+                            <localize key="templateEditor_convertLineBreaks">Convert line breaks</localize>
+                            <small><localize key="templateEditor_convertLineBreaksHelp">Replaces line breaks with break html tag</localize></small>
                         </label>
                     </div>
                     <input type="checkbox" name="linebreaks" ng-model="vm.convertLinebreaks">
-                    Yes, convert line breaks
-                </div>
-            </div>
-        </div>
-
-        <!-- Remove paragraph tags -->
-        <div class="control-group umb-control-group">
-            <div class="umb-el-wrap">
-                <div class="controls">
-                    <div>
-                        <label class="control-label" for="paragraph">
-                            Remove paragraph tags
-                            <small>Will remove any paragraph tag in the beginning and end of the text</small>
-                        </label>
-                    </div>
-                    <input type="checkbox" name="paragraph" ng-model="vm.removeParagraphTags">
-                    Yes, remove paragraph tags
+                    <localize key="templateEditor_convertLineBreaksDescription">Yes, convert line breaks</localize>
                 </div>
             </div>
         </div>
@@ -188,7 +172,7 @@
         <div class="control-group umb-control-group -no-border">
             <div class="umb-el-wrap">
                 <div class="controls">
-                    <label class="control-label">Output sample</label>
+                    <label class="control-label"><localize key="templateEditor_outputSample">Output sample</localize></label>
                     <pre>{{ vm.generateOutputSample() }}</pre>
                 </div>
             </div>

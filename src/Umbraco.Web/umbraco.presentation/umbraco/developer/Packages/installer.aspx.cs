@@ -134,7 +134,7 @@ namespace umbraco.presentation.developer.packages
         protected void fetchProtectedPackage(object sender, EventArgs e)
         {
             //we auth against the webservice. This key will be used to fetch the protected package.
-            string memberGuid = _repo.Webservice.authenticate(tb_email.Text, library.md5(tb_password.Text));
+            string memberGuid = _repo.Webservice.authenticate(tb_email.Text, library.CreateHash(tb_password.Text));
 
             //if we auth correctly and get a valid key back, we will fetch the file from the repo webservice.
             if (string.IsNullOrEmpty(memberGuid) == false)

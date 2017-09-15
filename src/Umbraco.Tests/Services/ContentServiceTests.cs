@@ -999,6 +999,21 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void IsPublishable()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var parent = contentService.CreateContent("parent", -1, "umbTextpage");
+            contentService.SaveAndPublishWithStatus(parent);
+            var content = contentService.CreateContent("child", parent, "umbTextpage");
+            contentService.Save(content);
+
+            Assert.IsTrue(contentService.IsPublishable(content));
+            contentService.UnPublish(parent);
+            Assert.IsFalse(contentService.IsPublishable(content));
+        }
+
+        [Test]
         public void Can_Publish_Content_WithEvents()
         {
             ContentService.Publishing += ContentServiceOnPublishing;
@@ -1170,6 +1185,39 @@ namespace Umbraco.Tests.Services
             Assert.That(content.HasIdentity, Is.True);
             Assert.That(content.Published, Is.True);
             Assert.That(published, Is.True);
+        }
+
+        /// <summary>
+        /// Try to immitate a new child content item being created through the UI.
+        /// This content item will have no Id, Path or Identity.
+        /// It seems like this is wiped somewhere in the process when creating an item through the UI
+        /// and we need to make sure we handle nullchecks for these properties when creating content.
+        /// This is unfortunately not caught by the normal ContentService tests.
+        /// </summary>
+        [Test]
+        public void Can_Save_And_Publish_Content_And_Child_Without_Identity()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.CreateContent("Home US", -1, "umbTextpage", 0);
+            content.SetValue("author", "Barack Obama");
+
+            // Act
+            var published = contentService.SaveAndPublish(content, 0);
+            var childContent = contentService.CreateContent("Child", content.Id, "umbTextpage", 0);
+            // Reset all identity properties
+            childContent.Id = 0;
+            childContent.Path = null;
+            ((Content)childContent).ResetIdentity();
+            var childPublished = contentService.SaveAndPublish(childContent, 0);
+
+            // Assert
+            Assert.That(content.HasIdentity, Is.True);
+            Assert.That(content.Published, Is.True);
+            Assert.That(childContent.HasIdentity, Is.True);
+            Assert.That(childContent.Published, Is.True);
+            Assert.That(published, Is.True);
+            Assert.That(childPublished, Is.True);
         }
 
         [Test]
@@ -1403,6 +1451,7 @@ namespace Umbraco.Tests.Services
             }));
             Assert.IsTrue(ServiceContext.PublicAccessService.AddRule(content1, "test2", "test2").Success);
 
+            // how is that one even working since "test" is more than 1 char?
             Assert.IsNotNull(ServiceContext.NotificationService.CreateNotification(ServiceContext.UserService.GetUserById(0), content1, "test"));
 
             ServiceContext.ContentService.AssignContentPermission(content1, 'A', new[] {0});
@@ -1411,7 +1460,7 @@ namespace Umbraco.Tests.Services
             {
                 RootContentId = content1.Id
             }).Success);
-            
+
             // Act
             ServiceContext.ContentService.EmptyRecycleBin();
             var contents = ServiceContext.ContentService.GetContentInRecycleBin();
@@ -1814,7 +1863,7 @@ namespace Umbraco.Tests.Services
                 var c1 = MockedContent.CreateSimpleContent(contentType);
                 ServiceContext.ContentService.Save(c1);
             }
-            
+
             long total;
             var entities = service.GetPagedChildren(-1, 0, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(6));
@@ -1834,7 +1883,7 @@ namespace Umbraco.Tests.Services
 
             var contentType = MockedContentTypes.CreateSimpleContentType();
             ServiceContext.ContentTypeService.Save(contentType);
-            // only add 9 as we also add a content with children 
+            // only add 9 as we also add a content with children
             for (int i = 0; i < 9; i++)
             {
                 var c1 = MockedContent.CreateSimpleContent(contentType);

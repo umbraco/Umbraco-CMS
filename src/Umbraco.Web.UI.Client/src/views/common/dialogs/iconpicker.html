@@ -7,7 +7,8 @@
                        style="width: 100%"
                        ng-model="searchTerm"
                        class="umb-search-field search-query input-block-level"
-                       placeholder="Filter..."
+                       localize="placeholder"
+                       placeholder="@placeholders_filter"
                        no-dirty-check>
             </div>
     	</div>
@@ -17,12 +18,12 @@
 
         <div class="umb-control-group">
         	<select ng-model="color" class="input-block-level">
-        		<option value="">Black</option>
-        		<option value="color-green">Green</option>
-        		<option value="color-yellow">Yellow</option>
-        		<option value="color-orange">Orange</option>
-        		<option value="color-blue">Blue</option>
-        		<option value="color-red">Red</option>
+        		<option value=""><localize key="colors_black">Black</localize></option>
+        		<option value="color-green"><localize key="colors_green">Green</localize></option>
+        		<option value="color-yellow"><localize key="colors_yellow">Yellow</localize></option>
+        		<option value="color-orange"><localize key="colors_orange">Orange</localize></option>
+        		<option value="color-blue"><localize key="colors_blue">Blue</localize></option>
+        		<option value="color-red"><localize key="colors_red">Red</localize></option>
         	</select>
         </div>
 

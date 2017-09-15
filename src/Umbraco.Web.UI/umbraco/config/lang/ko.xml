@@ -794,8 +794,6 @@
     <key alias="postContent">필드뒤에 삽입</key>
     <key alias="preContent">필드앞에 삽입</key>
     <key alias="recursive">Recursive</key>
-    <key alias="removeParagraph">단락 태그삭제</key>
-    <key alias="removeParagraphHelp">문서 시작과 끝의 &amp;amp;lt;P&amp;amp;gt; 를 삭제하시겠습니까</key>
     <key alias="uppercase">대문자</key>
     <key alias="urlEncode">URL 인코딩</key>
     <key alias="urlEncodeHelp">URL의 특수문자를 포맷하겠습니까</key>

@@ -178,6 +178,20 @@ namespace Umbraco.Core.Models
         /// </summary>
         [UmbracoObjectType(Constants.ObjectTypes.FormsDataSource)]
         [FriendlyName("DataSource")]
-        FormsDataSource
+        FormsDataSource,
+
+        /// <summary>
+        /// Language
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.Language)]
+        [FriendlyName("Language")]
+        Language,
+
+        /// <summary>
+        /// Reserved Identifier
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.IdReservation)]
+        [FriendlyName("Identifier Reservation")]
+        IdReservation
     }
 }

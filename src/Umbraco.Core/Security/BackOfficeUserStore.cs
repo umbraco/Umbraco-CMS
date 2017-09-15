@@ -93,7 +93,7 @@ namespace Umbraco.Core.Security
             {
                 //this will hash the guid with a salt so should be nicely random
                 var aspHasher = new PasswordHasher();
-                member.RawPasswordValue = "___UIDEMPTYPWORD__" +
+                member.RawPasswordValue = Constants.Security.EmptyPasswordPrefix +
                     aspHasher.HashPassword(Guid.NewGuid().ToString("N"));
 
             }
@@ -494,7 +494,7 @@ namespace Umbraco.Core.Security
 
             //the stamp cannot be null, so if it is currently null then we'll just return a hash of the password
             return Task.FromResult(user.SecurityStamp.IsNullOrWhiteSpace() 
-                ? user.PasswordHash.ToMd5()
+                ? user.PasswordHash.GenerateHash()
                 : user.SecurityStamp);
         }
 

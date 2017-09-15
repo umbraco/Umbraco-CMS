@@ -89,8 +89,8 @@
     <key alias="saveAndPublish">Gem og udgiv</key>
     <key alias="saveToPublish">Gem og send til udgivelse</key>
     <key alias="saveListView">Gem listevisning</key>
-    <key alias="showPage">Se siden</key>
-    <key alias="showPageDisabled">Preview er deaktiveret fordi der ikke er nogen skabelon tildelt</key>
+    <key alias="showPage">Forhåndsvisning</key>
+    <key alias="showPageDisabled">Forhåndsvisning er deaktiveret fordi der ikke er nogen skabelon tildelt</key>
     <key alias="styleChoose">Vælg formattering</key>
     <key alias="styleShow">Vis koder</key>
     <key alias="tableInsert">Indsæt tabel</key>
@@ -263,7 +263,7 @@
     <key alias="recycleBinIsEmpty">Papirkurven er nu tom</key>
     <key alias="recycleBinWarning">Når elementer slettes fra papirkurven, slettes de for altid</key>
     <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webservice oplever i øjeblikket problemer, vi ikke har kontrol over. Beklager ulejligheden. ]]></key>
-    <key alias="regexSearchHelp">Søg efter et regulært udtryk for at tilføje validering til et formularfelt. Eksempel: 'email', 'zip-code', 'url'</key>
+    <key alias="regexSearchHelp">Søg efter et regulært udtryk for at tilføje validering til et formularfelt. Eksempel: 'e-mail', 'postnr.', 'url'</key>
     <key alias="removeMacro">Fjern makro</key>
     <key alias="requiredField">Obligatorisk</key>
     <key alias="sitereindexed">Sitet er genindekseret</key>
@@ -321,7 +321,8 @@
     <key alias="search">Søg...</key>
     <key alias="filter">Filtrer...</key>
     <key alias="enterTags">Indtast nøgleord (tryk på Enter efter hvert nøgleord)...</key>
-    <key alias="usernameHint">Dit brugernavn er typisk din e-mail adresse</key>
+    <key alias="email">Indtast din e-mail</key>
+    <key alias="usernameHint">Dit brugernavn er typisk din e-mailadresse</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Tillad på rodniveau</key>
@@ -421,7 +422,7 @@
     <key alias="edit">Rediger</key>
     <key alias="edited">Redigeret</key>
     <key alias="elements">Elementer</key>
-    <key alias="email">Email</key>
+    <key alias="email">E-mail</key>
     <key alias="error">Fejl</key>
     <key alias="findDocument">Find</key>
     <key alias="height">Højde</key>
@@ -456,7 +457,7 @@
     <key alias="pleasewait">Et øjeblik...</key>
     <key alias="previous">Forrige</key>
     <key alias="properties">Egenskaber</key>
-    <key alias="reciept">Email der skal modtage indhold af formular</key>
+    <key alias="reciept">E-mail der skal modtage indhold af formular</key>
     <key alias="recycleBin">Papirkurv</key>
     <key alias="recycleBinEmpty">Din papirkurv er tom</key>
     <key alias="remaining">Mangler</key>
@@ -1145,8 +1146,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="postContent">Indsæt efter felt</key>
     <key alias="preContent">Indsæt før felt</key>
     <key alias="recursive">Rekursivt</key>
-    <key alias="removeParagraph">Fjern paragraf-tags</key>
-    <key alias="removeParagraphHelp">Fjerner eventuelle &amp;lt;P&amp;gt; omkring teksten</key>
     <key alias="standardFields">Standard felter</key>
     <key alias="uppercase">Uppercase</key>
     <key alias="urlEncode">URL encode</key>
@@ -1202,9 +1201,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="memberTypes">Medlemstype</key>
     <key alias="documentTypes">Dokumenttyper</key>
     <key alias="relationTypes">Relationstyper</key>
-
     <key alias="packager">Pakker</key>
     <key alias="packages">Pakker</key>
+    <key alias="partialViews">Partial Views</key>
+    <key alias="partialViewMacros">Partial View Makro Filer</key>
     <key alias="python">Python</key>
     <key alias="repositories">Installer fra "repository"</key>
     <key alias="runway">Installer Runway</key>
@@ -1269,7 +1269,7 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="validation">
     <key alias="validation">Validation</key>
-    <key alias="validateAsEmail">Valider som email</key>
+    <key alias="validateAsEmail">Valider som e-mail</key>
     <key alias="validateAsNumber">Valider som tal</key>
     <key alias="validateAsUrl">Valider som Url</key>
     <key alias="enterCustomValidation">...eller indtast din egen validering</key>
@@ -1291,5 +1291,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="disableError">Der opstod en fejl under forsøget på at slå URL trackeren fra, der findes mere information i logfilen.</key>
     <key alias="enabledConfirm">URL tracker er nu slået fra.</key>
     <key alias="enableError">Der opstod en fejl under forsøget på at slå URL trackeren til, der findes mere information i logfilen.</key>
+  </area>
+  <area alias="textbox">
+    <key alias="characters_left">Karakterer tilbage</key>
   </area>
 </language>

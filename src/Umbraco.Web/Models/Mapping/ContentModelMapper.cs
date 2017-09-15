@@ -108,7 +108,7 @@ namespace Umbraco.Web.Models.Mapping
             }
 
             //fill in the template config to be passed to the template drop down.
-            var templateItemConfig = new Dictionary<string, string> {{"", "Choose..."}};
+            var templateItemConfig = new Dictionary<string, string> {{"", localizedText.Localize("general/choose")}};
             foreach (var t in content.ContentType.AllowedTemplates
                 .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false))
             {

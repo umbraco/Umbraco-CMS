@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Web.Security.Providers;
+using Umbraco.Core.Services;
 using MPE = global::Umbraco.Core.Security.MembershipProviderExtensions;
 
 namespace Umbraco.Web.Security
@@ -29,13 +31,19 @@ namespace Umbraco.Web.Security
         private readonly RoleProvider _roleProvider;
         private readonly ApplicationContext _applicationContext;
         private readonly HttpContextBase _httpContext;
+        private readonly UmbracoContext _umbracoContext;
 
         #region Constructors
+
+        [Obsolete("Use the constructor specifying an UmbracoContext")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public MembershipHelper(ApplicationContext applicationContext, HttpContextBase httpContext)
             : this(applicationContext, httpContext, MPE.GetMembersMembershipProvider(), Roles.Enabled ? Roles.Provider : new MembersRoleProvider(applicationContext.Services.MemberService))
         {            
         }
 
+        [Obsolete("Use the constructor specifying an UmbracoContext")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public MembershipHelper(ApplicationContext applicationContext, HttpContextBase httpContext, MembershipProvider membershipProvider, RoleProvider roleProvider)
         {
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");
@@ -62,9 +70,58 @@ namespace Umbraco.Web.Security
             _applicationContext = umbracoContext.Application;
             _membershipProvider = membershipProvider;
             _roleProvider = roleProvider;
+            _umbracoContext = umbracoContext;
         }
         #endregion
 
+        /// <summary>
+        /// Check if a document object is protected by the "Protect Pages" functionality in umbraco
+        /// </summary>
+        /// <param name="path">The full path of the document object to check</param>
+        /// <returns>True if the document object is protected</returns>
+        public virtual bool IsProtected(string path)
+        {
+            //this is a cached call
+            return _applicationContext.Services.PublicAccessService.IsProtected(path);
+        }
+
+        /// <summary>
+        /// Check if the current user has access to a document
+        /// </summary>
+        /// <param name="path">The full path of the document object to check</param>
+        /// <returns>True if the current user has access or if the current document isn't protected</returns>
+        public virtual bool MemberHasAccess(string path)
+        {
+            //cache this in the request cache
+            return _applicationContext.ApplicationCache.RequestCache.GetCacheItem<bool>(string.Format("{0}.{1}-{2}", typeof(MembershipHelper), "MemberHasAccess", path), () =>
+            {
+                if (IsProtected(path))
+                {
+                    return IsLoggedIn() && HasAccess(path, Roles.Provider);
+                }
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// This will check if the member has access to this path
+        /// </summary>
+        /// <param name="path"></param>        
+        /// <param name="roleProvider"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is essentially the same as the PublicAccessServiceExtensions.HasAccess however this will use the PCR cache 
+        /// of the already looked up roles for the member so this doesn't need to happen more than once.
+        /// This does a safety check in case of things like unit tests where there is no PCR and if that is the case it will use 
+        /// lookup the roles directly.
+        /// </remarks>
+        private bool HasAccess(string path, RoleProvider roleProvider)
+        {
+            return _umbracoContext.PublishedContentRequest == null 
+                ? _applicationContext.Services.PublicAccessService.HasAccess(path, CurrentUserName, roleProvider.GetRolesForUser) 
+                : _applicationContext.Services.PublicAccessService.HasAccess(path, CurrentUserName, _umbracoContext.PublishedContentRequest.GetRolesForLogin);
+        }
+        
         /// <summary>
         /// Returns true if the current membership provider is the Umbraco built-in one.
         /// </summary>

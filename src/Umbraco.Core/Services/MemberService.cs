@@ -25,8 +25,11 @@ namespace Umbraco.Core.Services
     {
         private readonly IMemberGroupService _memberGroupService;
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
-        private readonly IDataTypeService _dataTypeService;
+        private readonly IDataTypeService _dataTypeService;        
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
+
+        //only for unit tests!
+        internal MembershipProviderBase MembershipProvider { get; set; }
 
         public MemberService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService, IDataTypeService dataTypeService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
@@ -35,7 +38,7 @@ namespace Umbraco.Core.Services
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
             _memberGroupService = memberGroupService;
             _dataTypeService = dataTypeService;
-        }
+        }        
 
         #region IMemberService Implementation
 
@@ -91,7 +94,7 @@ namespace Umbraco.Core.Services
         {
             if (member == null) throw new ArgumentNullException("member");
 
-            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            var provider = MembershipProvider ?? MembershipProviderExtensions.GetMembersMembershipProvider();            
             if (provider.IsUmbracoMembershipProvider())
             {
                 provider.ChangePassword(member.Username, "", password);
@@ -234,7 +237,8 @@ namespace Umbraco.Core.Services
                     var query = Query<IMember>.Builder.Where(x => x.ContentTypeId == memberTypeId);
                     var members = repository.GetByQuery(query).ToArray();
 
-                    if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMember>(members)))
+                    var deleteEventArgs = new DeleteEventArgs<IMember>(members);
+                    if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -827,6 +831,22 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Creates and persists a new <see cref="IMember"/>
+        /// </summary>
+        /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
+        /// <param name="username">Username of the <see cref="IMembershipUser"/> to create</param>
+        /// <param name="email">Email of the <see cref="IMembershipUser"/> to create</param>
+        /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
+        /// <param name="memberTypeAlias">Alias of the Type</param>
+        /// <param name="isApproved">Is the member approved</param>
+        /// <returns><see cref="IMember"/></returns>
+        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved)
+        {
+            var memberType = FindMemberTypeByAlias(memberTypeAlias);
+            return CreateMemberWithIdentity(username, email, username, passwordValue, memberType, isApproved);
+        }
+
+        /// <summary>
         /// Creates and persists a Member
         /// </summary>
         /// <remarks>Using this method will persist the Member object before its returned
@@ -836,16 +856,18 @@ namespace Umbraco.Core.Services
         /// <param name="name">Name of the Member to create</param>
         /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
         /// <param name="memberType">MemberType the Member should be based on</param>
+        /// <param name="isApproved">Optional IsApproved of the Member to create</param>
         /// <returns><see cref="IMember"/></returns>
-        private IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, IMemberType memberType)
+        private IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, IMemberType memberType, bool isApproved = true)
         {
             if (memberType == null) throw new ArgumentNullException("memberType");
 
-            var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType);
+            var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved);
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMember>(member)))
+                var saveEventArgs = new SaveEventArgs<IMember>(member);
+                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Commit();
                     member.WasCancelled = true;
@@ -864,7 +886,8 @@ namespace Umbraco.Core.Services
 
                 uow.Commit();
 
-                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(member, false));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(Saved, this, saveEventArgs);
                 uow.Events.Dispatch(Created, this, new NewEventArgs<IMember>(member, false, memberType.Alias, -1));
             }
 
@@ -941,7 +964,8 @@ namespace Umbraco.Core.Services
 
         private void Delete(IScopeUnitOfWork uow, IMember member)
         {
-            if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMember>(member)))
+            var deleteEventArgs = new DeleteEventArgs<IMember>(member);
+            if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
             {
                 uow.Commit();
                 return;
@@ -951,8 +975,8 @@ namespace Umbraco.Core.Services
             repository.Delete(member);
             uow.Commit();
 
-            var args = new DeleteEventArgs<IMember>(member, false);
-            uow.Events.Dispatch(Deleted, this, args);
+            deleteEventArgs.CanCancel = false;
+            uow.Events.Dispatch(Deleted, this, deleteEventArgs);
         }
 
         /// <summary>
@@ -965,9 +989,10 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                var saveEventArgs = new SaveEventArgs<IMember>(entity);
                 if (raiseEvents)
                 {
-                    if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMember>(entity)))
+                    if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -991,7 +1016,10 @@ namespace Umbraco.Core.Services
                 uow.Commit();
 
                 if (raiseEvents)
-                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(entity, false));
+                {
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(Saved, this, saveEventArgs);
+                }
             }
 
         }
@@ -1010,7 +1038,8 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMember>(asArray)))
+                    var saveEventArgs = new SaveEventArgs<IMember>(asArray);
+                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -1032,7 +1061,10 @@ namespace Umbraco.Core.Services
                     uow.Commit();
 
                     if (raiseEvents)
-                        uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(asArray, false));
+                    {
+                        saveEventArgs.CanCancel = false;
+                        uow.Events.Dispatch(Saved, this, saveEventArgs);
+                    }
                 }
 
 

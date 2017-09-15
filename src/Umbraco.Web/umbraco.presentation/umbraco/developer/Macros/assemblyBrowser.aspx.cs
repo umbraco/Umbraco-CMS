@@ -19,6 +19,7 @@ using Umbraco.Core.PropertyEditors;
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
 using MacroProperty = umbraco.cms.businesslogic.macro.MacroProperty;
+using UserControl = System.Web.UI.UserControl;
 
 namespace umbraco.developer
 {

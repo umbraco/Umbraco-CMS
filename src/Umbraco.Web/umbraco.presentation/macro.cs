@@ -46,6 +46,7 @@ using System.Linq;
 using File = System.IO.File;
 using MacroTypes = umbraco.cms.businesslogic.macro.MacroTypes;
 using Member = umbraco.cms.businesslogic.member.Member;
+using UserControl = System.Web.UI.UserControl;
 
 namespace umbraco
 {
