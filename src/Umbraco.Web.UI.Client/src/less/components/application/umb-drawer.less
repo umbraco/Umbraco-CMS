@@ -1,0 +1,134 @@
+.umb-drawer {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+    width: 400px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.19), 0 0 6px rgba(0,0,0,0.23);
+    background: @gray-9;
+}
+
+.umb-drawer-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Header */
+
+.umb-drawer-header {
+    flex-basis: 100px;
+    padding: 20px 40px;
+    box-sizing: border-box;
+}
+
+.umb-drawer-header__title {
+    font-size: @fontSizeLarge;
+    font-weight: bold;
+    margin-top: 7px;
+    margin-bottom: 7px;
+}
+
+.umb-drawer-header__subtitle {
+    font-size: @fontSizeSmall;
+}
+
+/* Content */
+
+.umb-drawer-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 20px 40px;
+}
+
+/* Footer */
+.umb-drawer-footer {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 31px;
+    padding: 10px 40px;
+}
+
+
+
+/* Lessons - should be moved */
+
+.umb-lesson {
+    //border: 1px solid transparent;
+    padding: 20px;
+    border-radius: 3px;
+    display: flex;
+    background: @white;
+    margin-bottom: 10px;
+}
+
+.umb-lesson:hover {
+    color: @black;
+    text-decoration: none;
+    //border: 1px solid @gray-4;
+}
+
+.umb-lesson__icon {
+    margin-right: 10px;
+    color: @gray-5;
+    font-size: 18px;
+    margin-top: 1px;
+}
+
+.umb-lesson__title {
+    margin-bottom: 5px;
+    display: block;
+    font-weight: bold;
+}
+
+.umb-lesson__content {
+    font-size: 14px;
+    line-height: 1.6em;
+    color: @gray-2;
+}
+
+/* Umbraco tv */
+
+.umb-lesson--tv {
+    padding: 10px;
+}
+
+.umb-lesson--tv .umb-lesson__title {
+    font-weight: normal;
+    margin-bottom: 0;
+}
+
+
+/* Our badge - should be moved */
+
+.umb-our-umbraco-badge {
+    padding: 20px 20px 20px 55px;
+    background: @white;
+    position: relative;
+    overflow: hidden;
+    border-radius: 3px;
+    display: block;
+}
+
+.umb-our-umbraco-badge:hover,
+.umb-our-umbraco-badge:active {
+    text-decoration: none;
+}
+
+.umb-our-umbraco-badge__icon {
+    font-size: 60px;
+    transform: translate(0,-50%);
+    position: absolute;
+    left: -15px;
+    top: 50%;
+    color: @red-l3;
+}
+
+.umb-our-umbraco-badge__title {
+    font-size: 16px;
+    font-weight: bold;
+    color: @black;
+}

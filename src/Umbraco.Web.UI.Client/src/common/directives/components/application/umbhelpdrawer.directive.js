@@ -6,22 +6,31 @@
         replace: true,   // replace the html element with the template
         templateUrl: 'views/components/application/umb-help-drawer.html',
         transclude: true,
-       
+        scope: {
+            view: "=?"
+        },
+
         link: function (scope, element, attr, ctrl) {
 
-            scope.model = {};
-            scope.model.title = localizationService.localize("general_help");
-            scope.model.subtitle = "Umbraco version" + " " + Umbraco.Sys.ServerVariables.application.version + " assembly: " + Umbraco.Sys.ServerVariables.application.assemblyVersion;
-            scope.model.section = $routeParams.section;
-
-            if (!scope.model.section) {
-                scope.model.section = "content";
+            function onInit() {
+                setView();
             }
 
-            
-            dashboardResource.getDashboard("user-help").then(function (dashboard) {
-                scope.model.dashboard = dashboard;
-            });
+            function setView() {
+                if (scope.view) {
+                    //we do this to avoid a hidden dialog to start loading unconfigured views before the first activation
+                    var configuredView = scope.view;
+                    if (scope.view.indexOf(".html") === -1) {
+                        var viewAlias = scope.view.toLowerCase();
+                        configuredView = "views/common/drawers/" + viewAlias + "/" + viewAlias + ".html";
+                    }
+                    if (configuredView !== scope.configuredView) {
+                        scope.configuredView = configuredView;
+                    }
+                }
+            }
+
+            onInit();
            
         }
 

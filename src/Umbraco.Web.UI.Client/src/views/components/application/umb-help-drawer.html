@@ -1,34 +1,3 @@
-﻿<div class="umb-overlay umb-overlay-left-drawer umb-overlay__form umb-help-drawer">
-
-        <div class="umb-overlay-header">
-            <h4 class="umb-overlay__title">{{model.title}}</h4>
-            <p class="umb-overlay__subtitle">{{model.subtitle}}</p>
-        </div>
-
-        <div class="umb-overlay-container form-horizontal" ng-transclude>
-            
-                <div class="umb-control-group">
-                    <div ng-repeat="tab in model.dashboard">
-                        <div ng-repeat="property in tab.properties">
-                            <div>
-                                <h3 ng-if="property.caption">{{property.caption}}</h3>
-                                <div ng-include="property.path"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            
-        </div>
-
-        <div class="umb-overlay-drawer">
-
-            <div class="umb-overlay-drawer__align-right">
-                <umb-button action="closeOverLay(true)"
-                            button-style="link"
-                            label-key="general_close"
-                            label="Close"
-                            type="button">
-                </umb-button>
-            </div>
-        </div> 
+﻿<div class="umb-drawer">
+    <div style="height: 100%;" ng-if="configuredView" ng-include="configuredView"></div>
 </div>
