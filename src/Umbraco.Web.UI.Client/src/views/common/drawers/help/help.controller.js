@@ -20,6 +20,8 @@
                 vm.section = "content";
             }
 
+            setSectionName();
+
             userService.getCurrentUser().then(function (user) {
 
                 vm.userType = user.userType;
@@ -46,14 +48,9 @@
                     vm.section = $routeParams.section;
                     vm.tree = $routeParams.tree;
 
-                    // Get section name
-                    var languageKey = "sections_" + vm.section;
-                    localizationService.localize(languageKey).then(function(value){
-                        vm.sectionName = value;
-                        console.log("sectionName", vm.sectionName);
-                    });
-
+                    setSectionName();
                     findHelp(vm.section, vm.tree, vm.usertype, vm.userLang);
+
                 }
             });
         }
@@ -88,6 +85,14 @@
     	        vm.videos = videos;
             });
             
+        }
+
+        function setSectionName() {
+            // Get section name
+            var languageKey = "sections_" + vm.section;
+            localizationService.localize(languageKey).then(function (value) {
+                vm.sectionName = value;
+            });
         }
 
         oninit();
