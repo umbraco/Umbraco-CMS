@@ -57,17 +57,18 @@ namespace Umbraco.Core
         public new static StringUdi Parse(string s)
         {
             var udi = Udi.Parse(s);
-            if (!(udi is StringUdi))
+            if (udi is StringUdi == false)
                 throw new FormatException("String \"" + s + "\" is not a string entity id.");
-            return (StringUdi)udi;
+
+            return (StringUdi) udi;
         }
 
         public static bool TryParse(string s, out StringUdi udi)
         {
             udi = null;
             Udi tmp;
-            if (!TryParse(s, out tmp) || !(tmp is StringUdi)) return false;
-            udi = (StringUdi)tmp;
+            if (TryParse(s, out tmp) == false || tmp is StringUdi == false) return false;
+            udi = (StringUdi) tmp;
             return true;
         }
 
@@ -77,10 +78,9 @@ namespace Umbraco.Core
             get { return Id == string.Empty; }
         }
 
-        /// <inheritdoc/>
         public StringUdi EnsureClosed()
         {
-            base.EnsureNotRoot();
+            EnsureNotRoot();
             return this;
         }
     }

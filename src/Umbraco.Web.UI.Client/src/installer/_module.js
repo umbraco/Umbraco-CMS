@@ -1,1 +1,1 @@
-angular.module("umbraco.install", ["umbraco.directives"]);
+﻿angular.module("umbraco.install", ["umbraco.directives"]);

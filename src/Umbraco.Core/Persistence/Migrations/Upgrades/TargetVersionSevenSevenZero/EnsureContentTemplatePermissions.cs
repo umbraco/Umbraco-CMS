@@ -1,7 +1,7 @@
 using System.Linq;
 using Umbraco.Core.Models.Rdbms;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.Temp8
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZero
 {
     /// <summary>
     /// Ensures the built-in user groups have the blueprint permission by default on upgrade

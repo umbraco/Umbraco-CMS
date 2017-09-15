@@ -21,11 +21,11 @@
 
                         <div class="umb-package-details__main-content">
 
-                            <div class="umb-box">
-                                <div class="umb-box-header">
-                                    <div class="umb-box-header-title"><localize key="user_access">Access</localize></div>
-                                </div>
-                                <div class="umb-box-content block-form">
+                            <umb-box>
+
+                                <umb-box-header title-key="user_assignAccess"></umb-box-header>
+
+                                <umb-box-content class="block-form">
 
                                     <umb-control-group style="margin-bottom: 20px;" label="@main_sections" description="@user_sectionsHelp">
                                         <umb-node-preview
@@ -93,14 +93,12 @@
 
                                     </umb-control-group>
 
-                                </div>
-                            </div>
+                                </umb-box-content>
+                            </umb-box>
 
-                            <div class="umb-box">
-                                <div class="umb-box-header">
-                                    <div class="umb-box-header-title"><localize key="user_permissionsDefault">Default permissions</localize></div>
-                                </div>
-                                <div class="umb-box-content block-form">
+                            <umb-box>
+                                <umb-box-header title-key="user_permissionsDefault"></umb-box-header>
+                                <umb-box-content class="block-form">
                                     <umb-control-group
                                         ng-repeat="(category, permissions) in vm.userGroup.defaultPermissions"
                                         label="{{ category }}">
@@ -111,14 +109,12 @@
                                             selected="permission.checked">
                                         </umb-permission>
                                     </umb-control-group>
-                                </div>
-                            </div>
+                                </umb-box-content>
+                            </umb-box>
 
-                            <div class="umb-box">
-                                <div class="umb-box-header">
-                                    <div class="umb-box-header-title"><localize key="user_permissionsGranular">Granular permissions</localize></div>
-                                </div>
-                                <div class="umb-box-content block-form">
+                            <umb-box>
+                                <umb-box-header title-key="user_permissionsGranular"></umb-box-header>
+                                <umb-box-content class="block-form">
                                     <umb-control-group label="Nodes" description="@user_permissionsGranularHelp">
                                         
                                         <umb-node-preview
@@ -142,8 +138,8 @@
                                         </a>
                                     </umb-control-group>
                                     
-                                </div>
-                            </div>
+                                </umb-box-content>
+                            </umb-box>
 
                         </div>
 

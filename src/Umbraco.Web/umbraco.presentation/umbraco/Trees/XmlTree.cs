@@ -3,8 +3,11 @@ using System.Collections;
 using System;
 using System.Xml.Schema;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Web.Script.Serialization;
 using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web._Legacy.Actions;
 using Action = Umbraco.Web._Legacy.Actions.Action;
@@ -400,7 +403,9 @@ namespace umbraco.cms.presentation.Trees
                             this.m_action = reader.Value;
                             break;
                         case TreeAttributes.menu:
-                            this.m_menu = (!string.IsNullOrEmpty(reader.Value) ? Umbraco.Web._Legacy.Actions.Action.FromString(reader.Value) : null);
+                            this.m_menu = !string.IsNullOrEmpty(reader.Value)
+                                ? FromActionSymbols(reader.Value.Split(',')).ToList()
+                                : null;
                             break;
                         case TreeAttributes.rootSrc:
                             this.m_rootSrc = reader.Value;
@@ -441,19 +446,19 @@ namespace umbraco.cms.presentation.Trees
 
         public void WriteXml(System.Xml.XmlWriter writer)
         {
-            writer.WriteAttributeString(TreeAttributes.nodeID.ToString(), this.m_nodeID);
-            writer.WriteAttributeString(TreeAttributes.text.ToString(), this.m_text);
-            writer.WriteAttributeString(TreeAttributes.iconClass.ToString(), this.m_iconClass);
-            writer.WriteAttributeString(TreeAttributes.action.ToString(), this.m_action);
-            writer.WriteAttributeString(TreeAttributes.menu.ToString(), (this.m_menu != null && this.m_menu.Count > 0 ? Umbraco.Web._Legacy.Actions.Action.ToString(this.m_menu) : ""));
-            writer.WriteAttributeString(TreeAttributes.rootSrc.ToString(), this.m_rootSrc);
-            writer.WriteAttributeString(TreeAttributes.src.ToString(), this.m_src);
-            writer.WriteAttributeString(TreeAttributes.icon.ToString(), this.m_icon);
-            writer.WriteAttributeString(TreeAttributes.openIcon.ToString(), this.m_openIcon);
-            writer.WriteAttributeString(TreeAttributes.nodeType.ToString(), this.m_nodeType);
+            writer.WriteAttributeString(TreeAttributes.nodeID.ToString(), m_nodeID);
+            writer.WriteAttributeString(TreeAttributes.text.ToString(), m_text);
+            writer.WriteAttributeString(TreeAttributes.iconClass.ToString(), m_iconClass);
+            writer.WriteAttributeString(TreeAttributes.action.ToString(), m_action);
+            writer.WriteAttributeString(TreeAttributes.menu.ToString(), m_menu != null && m_menu.Count > 0 ? string.Join(",", ToActionSymbols(m_menu)) : "");
+            writer.WriteAttributeString(TreeAttributes.rootSrc.ToString(), m_rootSrc);
+            writer.WriteAttributeString(TreeAttributes.src.ToString(), m_src);
+            writer.WriteAttributeString(TreeAttributes.icon.ToString(), m_icon);
+            writer.WriteAttributeString(TreeAttributes.openIcon.ToString(), m_openIcon);
+            writer.WriteAttributeString(TreeAttributes.nodeType.ToString(), m_nodeType);
             writer.WriteAttributeString(TreeAttributes.hasChildren.ToString(), HasChildren.ToString().ToLower());
-            if (m_notPublished.HasValue) writer.WriteAttributeString(TreeAttributes.notPublished.ToString(), this.m_notPublished.Value.ToString().ToLower());
-            if (m_isProtected.HasValue) writer.WriteAttributeString(TreeAttributes.isProtected.ToString(), this.m_isProtected.Value.ToString().ToLower());
+            if (m_notPublished.HasValue) writer.WriteAttributeString(TreeAttributes.notPublished.ToString(), m_notPublished.Value.ToString().ToLower());
+            if (m_isProtected.HasValue) writer.WriteAttributeString(TreeAttributes.isProtected.ToString(), m_isProtected.Value.ToString().ToLower());
         }
 
         internal enum TreeAttributes
@@ -463,6 +468,25 @@ namespace umbraco.cms.presentation.Trees
 
         #endregion
 
+        /// <summary>
+        /// This method will return a list of IAction's based on a string (letter) list. Each character in the list may represent
+        /// an IAction. This will associate any found IActions based on the Letter property of the IAction with the character being referenced.
+        /// </summary>
+        /// <param name="actions"></param>
+        /// <returns>returns a list of actions that have an associated letter found in the action string list</returns>
+        private IEnumerable<IAction> FromActionSymbols(IEnumerable<string> actions)
+        {
+            return Current.Actions.GetByLetters(actions);
+        }
+
+        /// <summary>
+        /// Returns the string (letter) representation of the actions that make up the actions collection
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<string> ToActionSymbols(IEnumerable<IAction> actions)
+        {
+            return actions.Select(x => x.Letter.ToString(CultureInfo.InvariantCulture)).ToArray();
+        }
     }
 
 }

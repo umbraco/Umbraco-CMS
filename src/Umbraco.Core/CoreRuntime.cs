@@ -267,6 +267,7 @@ namespace Umbraco.Core
 
             // else, keep going,
             // anything other than install wants a database - see if we can connect
+            // (since this is an already existing database, assume localdb is ready)
             for (var i = 0; i < 5; i++)
             {
                 connect = databaseFactory.CanConnect;

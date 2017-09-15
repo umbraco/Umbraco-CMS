@@ -1,7 +1,7 @@
 using System.Linq;
 using Umbraco.Core.Persistence.SqlSyntax;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.Temp8
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZero
 {
     [Migration("8.0.0", 4, Constants.System.UmbracoMigrationName)]
     public class ReduceDictionaryKeyColumnsSize : MigrationBase

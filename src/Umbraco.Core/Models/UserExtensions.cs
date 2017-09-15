@@ -4,7 +4,9 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -141,7 +143,7 @@ namespace Umbraco.Core.Models
             catch (CultureNotFoundException)
             {
                 //return the default one
-                return CultureInfo.GetCultureInfo("en");
+                return CultureInfo.GetCultureInfo(GlobalSettings.DefaultUILanguage);
             }
         }
 
@@ -200,15 +202,72 @@ namespace Umbraco.Core.Models
             if (startNodeIds.Contains(Constants.System.Root))
                 return true;
 
-            var formattedPath = "," + path + ",";
+            var formattedPath = string.Concat(",", path, ",");
 
             // only users with root access have access to the recycle bin,
             // if the above check didn't pass then access is denied
-            if (formattedPath.Contains("," + recycleBinId + ","))
+            if (formattedPath.Contains(string.Concat(",", recycleBinId, ",")))
                 return false;
 
             // check for a start node in the path
-            return startNodeIds.Any(x => formattedPath.Contains("," + x + ","));
+            return startNodeIds.Any(x => formattedPath.Contains(string.Concat(",", x, ",")));
+        }
+
+        internal static bool IsInBranchOfStartNode(this IUser user, IUmbracoEntity entity, IEntityService entityService, int recycleBinId, out bool hasPathAccess)
+        {
+            switch (recycleBinId)
+            {
+                case Constants.System.RecycleBinMedia:
+                    return IsInBranchOfStartNode(entity.Path, user.CalculateMediaStartNodeIds(entityService), user.GetMediaStartNodePaths(entityService), out hasPathAccess);
+                case Constants.System.RecycleBinContent:
+                    return IsInBranchOfStartNode(entity.Path, user.CalculateContentStartNodeIds(entityService), user.GetContentStartNodePaths(entityService), out hasPathAccess);
+                default:
+                    throw new NotSupportedException("Path access is only determined on content or media");
+            }
+        }
+
+        internal static bool IsInBranchOfStartNode(string path, int[] startNodeIds, string[] startNodePaths, out bool hasPathAccess)
+        {
+            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", "path");
+
+            hasPathAccess = false;
+
+            // check for no access
+            if (startNodeIds.Length == 0)
+                return false;
+
+            // check for root access
+            if (startNodeIds.Contains(Constants.System.Root))
+            {
+                hasPathAccess = true;
+                return true;
+            }                
+
+            //is it self?
+            var self = startNodePaths.Any(x => x == path);
+            if (self)
+            {
+                hasPathAccess = true;
+                return true;
+            }
+
+            //is it ancestor?
+            var ancestor = startNodePaths.Any(x => x.StartsWith(path));
+            if (ancestor)
+            {
+                hasPathAccess = false;
+                return true;
+            }
+
+            //is it descendant?
+            var descendant = startNodePaths.Any(x => path.StartsWith(x));
+            if (descendant)
+            {
+                hasPathAccess = true;
+                return true;
+            }
+            
+            return false;
         }
 
         // calc. start nodes, combining groups' and user's, and excluding what's in the bin
@@ -216,7 +275,7 @@ namespace Umbraco.Core.Models
         {
             const string cacheKey = "AllContentStartNodes";
             //try to look them up from cache so we don't recalculate
-            var valuesInUserCache = FromUserCache(user, cacheKey);
+            var valuesInUserCache = FromUserCache<int[]>(user, cacheKey);
             if (valuesInUserCache != null) return valuesInUserCache;
 
             var gsn = user.Groups.Where(x => x.StartContentId.HasValue).Select(x => x.StartContentId.Value).Distinct().ToArray();
@@ -231,7 +290,7 @@ namespace Umbraco.Core.Models
         {
             const string cacheKey = "AllMediaStartNodes";
             //try to look them up from cache so we don't recalculate
-            var valuesInUserCache = FromUserCache(user, cacheKey);
+            var valuesInUserCache = FromUserCache<int[]>(user, cacheKey);
             if (valuesInUserCache != null) return valuesInUserCache;
 
             var gsn = user.Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId.Value).Distinct().ToArray();
@@ -241,7 +300,34 @@ namespace Umbraco.Core.Models
             return vals;
         }
 
-        private static int[] FromUserCache(IUser user, string cacheKey)
+        public static string[] GetMediaStartNodePaths(this IUser user, IEntityService entityService)
+        {
+            const string cacheKey = "MediaStartNodePaths";
+            //try to look them up from cache so we don't recalculate
+            var valuesInUserCache = FromUserCache<string[]>(user, cacheKey);
+            if (valuesInUserCache != null) return valuesInUserCache;
+
+            var startNodeIds = user.CalculateMediaStartNodeIds(entityService);
+            var vals = entityService.GetAllPaths(UmbracoObjectTypes.Media, startNodeIds).Select(x => x.Path).ToArray();
+            ToUserCache(user, cacheKey, vals);
+            return vals;
+        }
+
+        public static string[] GetContentStartNodePaths(this IUser user, IEntityService entityService)
+        {
+            const string cacheKey = "ContentStartNodePaths";
+            //try to look them up from cache so we don't recalculate
+            var valuesInUserCache = FromUserCache<string[]>(user, cacheKey);
+            if (valuesInUserCache != null) return valuesInUserCache;
+
+            var startNodeIds = user.CalculateContentStartNodeIds(entityService);
+            var vals = entityService.GetAllPaths(UmbracoObjectTypes.Document, startNodeIds).Select(x => x.Path).ToArray();
+            ToUserCache(user, cacheKey, vals);
+            return vals;
+        }
+
+        private static T FromUserCache<T>(IUser user, string cacheKey)
+            where T: class
         {
             var entityUser = user as User;
             if (entityUser == null) return null;
@@ -250,12 +336,13 @@ namespace Umbraco.Core.Models
             {
                 object allContentStartNodes;
                 return entityUser.AdditionalData.TryGetValue(cacheKey, out allContentStartNodes)
-                    ? allContentStartNodes as int[]
+                    ? allContentStartNodes as T
                     : null;
             }
         }
 
-        private static void ToUserCache(IUser user, string cacheKey, int[] vals)
+        private static void ToUserCache<T>(IUser user, string cacheKey, T vals)
+            where T: class
         {
             var entityUser = user as User;
             if (entityUser == null) return;
@@ -315,8 +402,6 @@ namespace Umbraco.Core.Models
             var usn = new List<int>();
             foreach (var sn in userSn)
             {
-                if (groupSn.Contains(sn)) continue; // ignore, already there
-
                 string snp;
                 if (paths.TryGetValue(sn, out snp) == false) continue; // ignore rogue node (no path)
 

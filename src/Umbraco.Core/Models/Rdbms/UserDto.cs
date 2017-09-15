@@ -102,6 +102,7 @@ namespace Umbraco.Core.Models.Rdbms
         /// </summary>
         [Column("avatar")]
         [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(500)]
         public string Avatar { get; set; }
 
         [ResultColumn]

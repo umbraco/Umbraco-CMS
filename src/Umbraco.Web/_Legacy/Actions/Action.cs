@@ -116,50 +116,12 @@ namespace Umbraco.Web._Legacy.Actions
         }
 
         /// <summary>
-        /// This method will return a list of IAction's based on a string list. Each character in the list may represent
-        /// an IAction. This will associate any found IActions based on the Letter property of the IAction with the character being referenced.
-        /// </summary>
-        /// <param name="actions"></param>
-        /// <returns>returns a list of actions that have an associated letter found in the action string list</returns>
-        public static List<IAction> FromString(string actions)
-        {
-            List<IAction> list = new List<IAction>();
-            foreach (char c in actions.ToCharArray())
-            {
-                IAction action = Current.Actions.ToList().Find(
-                    delegate(IAction a)
-                    {
-                        return a.Letter == c;
-                    }
-                );
-                if (action != null)
-                    list.Add(action);
-            }
-            return list;
-        }
-
-        /// <summary>
-        /// Returns the string representation of the actions that make up the actions collection
-        /// </summary>
-        /// <returns></returns>
-        public static string ToString(List<IAction> actions)
-        {
-            string[] strMenu = Array.ConvertAll<IAction, string>(actions.ToArray(), delegate(IAction a) { return (a.Letter.ToString(CultureInfo.InvariantCulture)); });
-            return string.Join("", strMenu);
-        }
-
-        /// <summary>
         /// Returns a list of IActions that are permission assignable
         /// </summary>
         /// <returns></returns>
         public static List<IAction> GetPermissionAssignable()
         {
-            return Current.Actions.ToList().FindAll(
-                delegate(IAction a)
-                {
-                    return (a.CanBePermissionAssigned);
-                }
-            );
+            return Current.Actions.ToList().FindAll(x => x.CanBePermissionAssigned);
         }
 
         /// <summary>

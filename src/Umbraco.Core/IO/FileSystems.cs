@@ -14,7 +14,7 @@ namespace Umbraco.Core.IO
 {
     public class FileSystems
     {
-        private readonly FileSystemProvidersSection _config;
+        private readonly IFileSystemProvidersSection _config;
         private readonly ConcurrentSet<ShadowWrapper> _wrappers = new ConcurrentSet<ShadowWrapper>();
         private readonly ILogger _logger;
 
@@ -43,7 +43,8 @@ namespace Umbraco.Core.IO
         // but IScopeProviderInternal is not public
         public FileSystems(ILogger logger)
         {
-            _config = (FileSystemProvidersSection)ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
+            // fixme inject config section => can be used by tests
+            _config = (FileSystemProvidersSection) ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
             _logger = logger;
         }
 
@@ -213,8 +214,7 @@ namespace Umbraco.Core.IO
         private ProviderConstructionInfo GetUnderlyingFileSystemCtor(string alias, Func<IFileSystem> fallback)
         {
             // get config
-            var providerConfig = _config.Providers[alias];
-            if (providerConfig == null)
+            if (_config.Providers.TryGetValue(alias, out var providerConfig) == false)
             {
                 if (fallback != null) return null;
                 throw new ArgumentException($"No provider found with alias {alias}.");
@@ -232,14 +232,17 @@ namespace Umbraco.Core.IO
             // find a ctor matching the config parameters
             var paramCount = providerConfig.Parameters?.Count ?? 0;
             var constructor = providerType.GetConstructors().SingleOrDefault(x
-                => x.GetParameters().Length == paramCount && x.GetParameters().All(y => providerConfig.Parameters.AllKeys.Contains(y.Name)));
+                => x.GetParameters().Length == paramCount && x.GetParameters().All(y => providerConfig.Parameters.Keys.Contains(y.Name)));
             if (constructor == null)
                 throw new InvalidOperationException($"Type {providerType.FullName} has no ctor matching the {paramCount} configuration parameter(s).");
 
             var parameters = new object[paramCount];
             if (providerConfig.Parameters != null) // keeps ReSharper happy
+            {
+                var allKeys = providerConfig.Parameters.Keys.ToArray();
                 for (var i = 0; i < paramCount; i++)
-                    parameters[i] = providerConfig.Parameters[providerConfig.Parameters.AllKeys[i]].Value;
+                    parameters[i] = providerConfig.Parameters[allKeys[i]];
+            }
 
             return new ProviderConstructionInfo
             {

@@ -9,7 +9,8 @@ namespace Umbraco.Core
         {
 
             public const string AdminGroupAlias = "admin";
-            
+            public const string TranslatorGroupAlias = "translator";
+
             public const string BackOfficeAuthenticationType = "UmbracoBackOffice";
             public const string BackOfficeExternalAuthenticationType = "UmbracoExternalCookie";
             public const string BackOfficeExternalCookieName = "UMB_EXTLOGIN";
@@ -18,7 +19,7 @@ namespace Umbraco.Core
 
             internal const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
             internal const string ForceReAuthFlag = "umbraco-force-auth";
-
+            
             /// <summary>
             /// The prefix used for external identity providers for their authentication type
             /// </summary>

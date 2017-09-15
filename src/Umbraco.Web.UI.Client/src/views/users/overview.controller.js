@@ -6,9 +6,14 @@
         var vm = this;
         var usersUri = $location.search().subview;
         if (!usersUri) {
-          $location.search("subview", "users")  
+            $location.search("subview", "users");
+            //exit after this, we don't want to initialize anything further since this
+            //is going to change the route
+            return;
         }
 
+        //note on the below, we dont assign a view unless it's the right route since if we did that it will load in that controller
+        //for the view which is unecessary and will cause extra overhead/requests to occur
         vm.page = {};
         vm.page.name = "User Management";
         vm.page.navigation = [
@@ -18,7 +23,7 @@
                 "action": function() {
                   $location.search("subview", "users")
                 },
-                "view": "views/users/views/users/users.html",
+                "view": !usersUri || usersUri === "users" ? "views/users/views/users/users.html" : null,
                 "active": !usersUri || usersUri === "users"
             },
             {
@@ -27,7 +32,7 @@
                 "action": function () {
                   $location.search("subview", "groups")
                 },
-                "view": "views/users/views/groups/groups.html",
+                "view": usersUri === "groups" ? "views/users/views/groups/groups.html" : null,
                 "active": usersUri === "groups"
             }
         ];

@@ -1,5 +1,7 @@
 <div ng-controller="Umbraco.Editors.Users.GroupsController as vm" class="clearfix">
 
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
     <umb-editor-sub-header>
             
         <!-- No selection -->
@@ -65,22 +67,39 @@
         </div>
     </div>
 
-    <div class="umb-list">
-        <a class="umb-list-item" ng-click="vm.clickUserGroup(group)" ng-class="{'umb-list-item--selected': group.selected}" href="" ng-repeat="group in vm.userGroups | filter:vm.filter">
-            <div style="margin-right: 25px;">
-                <div class="umb-list-checkbox" ng-class="{'umb-list-checkbox--visible': vm.selection.length > 0}" ng-click="vm.selectUserGroup(group, vm.selection, $event)" >
-                    <umb-checkmark checked="group.selected"></umb-checkmark>
+    <div class="umb-list" ng-if="!vm.loading" ng-switch="">
+        <div ng-repeat="group in vm.userGroups | filter:vm.filter" ng-switch="group.hasAccess">
+            <div class="umb-list-item umb-list-item--disabled" ng-switch-when="false">
+                <div style="margin-right: 25px;">
+                    <div class="umb-list-checkbox"></div>
                 </div>
+                <umb-user-group-preview style="border-bottom: none; margin-bottom: 0; padding: 0;"
+                                        icon="group.group.icon"
+                                        name="group.group.name"
+                                        sections="group.group.sections"
+                                        content-start-node="group.group.contentStartNode"
+                                        media-start-node="group.group.mediaStartNode">
+                </umb-user-group-preview>
             </div>
-            <umb-user-group-preview
-                style="border-bottom: none; margin-bottom: 0; padding: 0;"
-                icon="group.icon"
-                name="group.name"
-                sections="group.sections"
-                content-start-node="group.contentStartNode"
-                media-start-node="group.mediaStartNode">
-            </umb-user-group-preview>
-        </a>
+            <a class="umb-list-item" ng-click="vm.clickUserGroup(group)" ng-class="{'umb-list-item--selected': group.selected}" href="" ng-switch-when="true">
+                <div style="margin-right: 25px;">
+                    <div class="umb-list-checkbox"
+                         ng-hide="group.group.alias === 'admin' || group.group.alias === 'translator'"
+                         ng-class="{'umb-list-checkbox--visible': vm.selection.length > 0}"
+                         ng-click="vm.selectUserGroup(group, vm.selection, $event)" >
+                        <umb-checkmark checked="group.selected"></umb-checkmark>
+                    </div>
+                </div>
+                <umb-user-group-preview
+                    style="border-bottom: none; margin-bottom: 0; padding: 0;"
+                    icon="group.group.icon"
+                    name="group.group.name"
+                    sections="group.group.sections"
+                    content-start-node="group.group.contentStartNode"
+                    media-start-node="group.group.mediaStartNode">
+                </umb-user-group-preview>
+            </a>
+        </div>
     </div>
 
 </div>

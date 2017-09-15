@@ -388,9 +388,9 @@
                 return null;
             }
 
-            var cookieVal = getCookie("XSRF-TOKEN");
+            var cookieVal = getCookie("UMB-XSRF-TOKEN");
             if (cookieVal) {
-              xhr.setRequestHeader("X-XSRF-TOKEN", cookieVal);  
+              xhr.setRequestHeader("X-UMB-XSRF-TOKEN", cookieVal);  
             }
 
             var queryString = window.location.getParams();

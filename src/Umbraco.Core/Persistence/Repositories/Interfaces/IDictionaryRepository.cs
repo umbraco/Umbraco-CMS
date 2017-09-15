@@ -9,5 +9,6 @@ namespace Umbraco.Core.Persistence.Repositories
         IDictionaryItem Get(Guid uniqueId);
         IDictionaryItem Get(string key);
         IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId);
+        Dictionary<string, Guid> GetDictionaryItemKeyMap();
     }
 }

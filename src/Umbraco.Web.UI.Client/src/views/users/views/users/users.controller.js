@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, usersResource, userGroupsResource, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService) {
+    function UsersController($scope, $timeout, $location, usersResource, userGroupsResource, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -26,8 +26,11 @@
 
         vm.selectedBulkUserGroups = [];
 
+        vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail;
+
         vm.allowDisableUser = true;
         vm.allowEnableUser = true;
+        vm.allowUnlockUser = true;
         vm.allowSetUserGroup = true;
 
         vm.layouts = [
@@ -49,24 +52,31 @@
             "selected": true
         };
 
-        //don't set this if no email is configured
-        if (Umbraco.Sys.ServerVariables.umbracoSettings.emailServerConfigured) {
+        //don't show the invite button if no email is configured
+        if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
             vm.defaultButton = {
                 labelKey: "user_inviteUser",
-                handler: function () {
+                handler: function() {
                     vm.setUsersViewState('inviteUser');
                 }
             };
+            vm.subButtons = [
+                {
+                    labelKey: "user_createUser",
+                    handler: function () {
+                        vm.setUsersViewState('createUser');
+                    }
+                }
+            ];
         }
-
-        vm.subButtons = [
-            {
+        else {
+            vm.defaultButton = {
                 labelKey: "user_createUser",
                 handler: function () {
                     vm.setUsersViewState('createUser');
                 }
-            }
-        ];
+            };
+        }
 
         vm.toggleFilter = toggleFilter;
         vm.setUsersViewState = setUsersViewState;
@@ -76,6 +86,7 @@
         vm.clickUser = clickUser;
         vm.disableUsers = disableUsers;
         vm.enableUsers = enableUsers;
+        vm.unlockUsers = unlockUsers;
         vm.openBulkUserGroupPicker = openBulkUserGroupPicker;
         vm.openUserGroupPicker = openUserGroupPicker;
         vm.removeSelectedUserGroup = removeSelectedUserGroup;
@@ -104,7 +115,7 @@
             getUsers();
 
             // Get user groups
-            userGroupsResource.getUserGroups().then(function (userGroups) {
+            userGroupsResource.getUserGroups({ onlyCurrentUserGroups: false}).then(function (userGroups) {
                 vm.userGroups = userGroups;
             });
 
@@ -237,6 +248,28 @@
                 clearSelection();
             }, function (error) {
                 vm.enableUserButtonState = "error";
+                formHelper.showNotifications(error.data);
+            });
+        }
+
+        function unlockUsers() {
+            vm.unlockUserButtonState = "busy";
+            usersResource.unlockUsers(vm.selection).then(function (data) {
+                // update userState
+                angular.forEach(vm.selection, function (userId) {
+                    var user = getUserFromArrayById(userId, vm.users);
+                    if (user) {
+                        user.userState = 0;
+                    }
+                });
+                // show the correct badges
+                setUserDisplayState(vm.users);
+                // show notification
+                formHelper.showNotifications(data);
+                vm.unlockUserButtonState = "init";
+                clearSelection();
+            }, function (error) {
+                vm.unlockUserButtonState = "error";
                 formHelper.showNotifications(error.data);
             });
         }
@@ -539,7 +572,18 @@
         function formatDates(users) {
             angular.forEach(users, function (user) {
                 if (user.lastLoginDate) {
-                    user.formattedLastLogin = moment(user.lastLoginDate).format("MMMM Do YYYY, HH:mm");
+                    var dateVal;
+                    var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
+                    var localOffset = new Date().getTimezoneOffset();
+                    var serverTimeNeedsOffsetting = (-serverOffset !== localOffset);
+
+                    if(serverTimeNeedsOffsetting) {
+                        dateVal = dateHelper.convertToLocalMomentTime(user.lastLoginDate, serverOffset);
+                    } else {
+                        dateVal = moment(user.lastLoginDate, "YYYY-MM-DD HH:mm:ss");
+                    }
+
+                    user.formattedLastLogin = dateVal.format("MMMM Do YYYY, HH:mm");
                 }
             });
         }
@@ -549,6 +593,7 @@
             // reset all states
             vm.allowDisableUser = true;
             vm.allowEnableUser = true;
+            vm.allowUnlockUser = true;
             vm.allowSetUserGroup = true;
 
             var firstSelectedUserGroups;
@@ -563,6 +608,7 @@
                 if (user.isCurrentUser) {
                     vm.allowDisableUser = false;
                     vm.allowEnableUser = false;
+                    vm.allowUnlockUser = false;
                     vm.allowSetUserGroup = false;
                     return;
                 }
@@ -577,6 +623,14 @@
 
                 if (user.userDisplayState && user.userDisplayState.key === "Invited") {
                     vm.allowEnableUser = false;
+                }
+
+                if (user.userDisplayState && user.userDisplayState.key === "LockedOut") {
+                    vm.allowEnableUser = false;
+                }
+
+                if (user.userDisplayState && user.userDisplayState.key !== "LockedOut") {
+                    vm.allowUnlockUser = false;
                 }
 
                 // store the user group aliases of the first selected user

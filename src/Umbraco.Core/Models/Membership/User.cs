@@ -18,7 +18,7 @@ namespace Umbraco.Core.Models.Membership
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class User : Entity, IUser
+    public class User : Entity, IUser, IProfile
     {
         /// <summary>
         /// Constructor for creating a new/empty user
@@ -411,27 +411,31 @@ namespace Umbraco.Core.Models.Membership
                 //now we need to flag this for saving (hack!)
                 GroupsToSave.Add(realGroup);
             }
-
-            //now we'll check if the user has a special 1:1 user group created for itself. This will occur if this method is used and also during an upgrade.
-            //this comes in the alias form of userName + 'Group'
-            var customUserGroup = groups.FirstOrDefault(x => x.Alias == (Username + "Group"));
-            if (customUserGroup != null)
+            else
             {
-                //if the group isn't IUserGroup we'll need to look it up
-                var realGroup = customUserGroup as IUserGroup ?? Current.Services.UserService.GetUserGroupById(customUserGroup.Id);
-                realGroup.AddAllowedSection(sectionAlias);
-                //now we need to flag this for saving (hack!)
-                GroupsToSave.Add(realGroup);
+                //now we'll check if the user has a special 1:1 user group created for itself. This will occur if this method is used and also during an upgrade.
+                //this comes in the alias form of userName + 'Group'
+                var customUserGroup = groups.FirstOrDefault(x => x.Alias == (Username + "Group"));
+                if (customUserGroup != null)
+                {
+                    //if the group isn't IUserGroup we'll need to look it up
+                    var realGroup = customUserGroup as IUserGroup ?? ApplicationContext.Current.Services.UserService.GetUserGroupById(customUserGroup.Id);
+                    realGroup.AddAllowedSection(sectionAlias);
+                    //now we need to flag this for saving (hack!) 
+                    GroupsToSave.Add(realGroup);
+                }
+
+                //ok, so the user doesn't have a 1:1 group, we'll need to flag it for creation
+                var newUserGroup = new UserGroup
+                {
+                    Alias = Username + "Group",
+                    Name = "Group for " + Username
+                };
+                newUserGroup.AddAllowedSection(sectionAlias);
+                //add this user to this new group
+                AddGroup(newUserGroup);
+                GroupsToSave.Add(newUserGroup);
             }
-
-            //ok, so the user doesn't have a 1:1 group, we'll need to flag it for creation
-            var newUserGroup = new UserGroup
-            {
-                Alias = Username + "Group",
-                Name = "Group for " + Username
-            };
-            newUserGroup.AddAllowedSection(sectionAlias);
-            GroupsToSave.Add(newUserGroup);
         }
 
         /// <summary>

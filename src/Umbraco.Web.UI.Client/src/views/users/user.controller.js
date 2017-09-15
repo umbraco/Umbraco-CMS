@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, $timeout, $location, $routeParams, formHelper, usersResource, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource) {
+    function UserEditController($scope, $timeout, $location, $routeParams, formHelper, usersResource, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper) {
 
         var vm = this;
 
@@ -15,7 +15,7 @@
         vm.labels = {};
         vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
         vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
-        vm.emailIsUsername = true;
+        vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail;
 
         //create the initial model for change password
         vm.changePasswordModel = {
@@ -30,6 +30,7 @@
         vm.removeSelectedItem = removeSelectedItem;
         vm.disableUser = disableUser;
         vm.enableUser = enableUser;
+        vm.unlockUser = unlockUser;
         vm.clearAvatar = clearAvatar;
         vm.save = save;
         vm.toggleChangePassword = toggleChangePassword;
@@ -65,8 +66,9 @@
                 vm.user = user;
                 makeBreadcrumbs(vm.user);
                 setUserDisplayState();
+                formatDatesToLocal(vm.user);
 
-                vm.emailIsUsername = user.email === user.username;
+                vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail && user.email === user.username;
 
                 //go get the config for the membership provider and add it to the model
                 authResource.getMembershipProviderConfig().then(function (data) {
@@ -76,10 +78,35 @@
                   vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
 
                   vm.changePasswordModel.config.disableToggle = true;
+
+                  //this is only relavent for membership providers now (it's basically obsolete)
+                  vm.changePasswordModel.config.enableReset = false;
+
+                  //in the ASP.NET Identity world, this config option will allow an admin user to change another user's password
+                  //if the user has access to the user section. So if this editor is being access, the user of course has access to this section.
+                  //the authorization check is also done on the server side when submitted.
+                  vm.changePasswordModel.config.allowManuallyChangingPassword = !vm.user.isCurrentUser;
                   
                   vm.loading = false;
                 });
             });
+        }
+        
+        function getLocalDate(date, format) {
+            if(date) {
+                var dateVal;
+                var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
+                var localOffset = new Date().getTimezoneOffset();
+                var serverTimeNeedsOffsetting = (-serverOffset !== localOffset);
+
+                if(serverTimeNeedsOffsetting) {
+                    dateVal = dateHelper.convertToLocalMomentTime(date, serverOffset);
+                } else {
+                    dateVal = moment(date, "YYYY-MM-DD HH:mm:ss");
+                }
+
+                return dateVal.format(format);
+            }
         }
 
         function toggleChangePassword() {
@@ -92,6 +119,11 @@
 
             vm.page.saveButtonState = "busy";
             vm.user.resetPasswordValue = null;
+
+            //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
+            if(vm.user.changePassword) {
+            vm.user.changePassword.reset = !vm.user.changePassword.oldPassword && !vm.user.isCurrentUser;
+            }
 
             contentEditingHelper.contentEditorPerformSave({
                 statusMessage: vm.labels.saving,
@@ -107,6 +139,7 @@
 
                 vm.user = saved;
                 setUserDisplayState();
+                formatDatesToLocal(vm.user);
 
                 vm.changePasswordModel.isChanging = false;
                 vm.page.saveButtonState = "success";
@@ -234,11 +267,11 @@
         function disableUser() {
             vm.disableUserButtonState = "busy";
             usersResource.disableUsers([vm.user.id]).then(function (data) {
-              vm.user.userState = 1;
-              setUserDisplayState();
-              vm.disableUserButtonState = "success";
-              formHelper.showNotifications(data);
-            }, function(error){
+                vm.user.userState = 1;
+                setUserDisplayState();
+                vm.disableUserButtonState = "success";
+                formHelper.showNotifications(data);
+            }, function (error) {
                 vm.disableUserButtonState = "error";
                 formHelper.showNotifications(error.data);
             });
@@ -247,16 +280,28 @@
         function enableUser() {
             vm.enableUserButtonState = "busy";
             usersResource.enableUsers([vm.user.id]).then(function (data) {
-              vm.user.userState = 0;
-              setUserDisplayState();
-              vm.enableUserButtonState = "success";
-              formHelper.showNotifications(data);
-            }, function(error){
-                vm.disableUserButtonState = "error";
+                vm.user.userState = 0;
+                setUserDisplayState();
+                vm.enableUserButtonState = "success";
+                formHelper.showNotifications(data);
+            }, function (error) {
+                vm.enableUserButtonState = "error";
                 formHelper.showNotifications(error.data);
             });
         }
-      
+
+        function unlockUser() {
+            vm.unlockUserButtonState = "busy";
+            usersResource.unlockUsers([vm.user.id]).then(function (data) {
+                vm.user.userState = 0;
+                setUserDisplayState();
+                vm.unlockUserButtonState = "success";
+                formHelper.showNotifications(data);
+            }, function (error) {
+                vm.unlockUserButtonState = "error";
+                formHelper.showNotifications(error.data);
+            });
+        }
 
         function clearAvatar() {
             // get user
@@ -345,6 +390,14 @@
 
         function setUserDisplayState() {
             vm.user.userDisplayState = usersHelper.getUserStateFromValue(vm.user.userState);
+        }
+
+        function formatDatesToLocal(user) {
+            user.formattedLastLogin = getLocalDate(user.lastLoginDate, "MMMM Do YYYY, HH:mm");
+            user.formattedLastLockoutDate = getLocalDate(user.lastLockoutDate, "MMMM Do YYYY, HH:mm");
+            user.formattedCreateDate = getLocalDate(user.createDate, "MMMM Do YYYY, HH:mm");
+            user.formattedUpdateDate = getLocalDate(user.updateDate, "MMMM Do YYYY, HH:mm");
+            user.formattedLastPasswordChangeDate = getLocalDate(user.lastPasswordChangeDate, "MMMM Do YYYY, HH:mm");
         }
 
         init();

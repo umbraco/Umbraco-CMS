@@ -219,6 +219,8 @@
     <Compile Include="Configuration\HealthChecks\NotificationMethodsElementCollection.cs" />
     <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElement.cs" />
     <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElementCollection.cs" />
+    <Compile Include="Configuration\IFileSystemProviderElement.cs" />
+    <Compile Include="Configuration\IFileSystemProvidersSection.cs" />
     <Compile Include="Configuration\InnerTextConfigurationElement.cs" />
     <Compile Include="Configuration\OptionalCommaDelimitedConfigurationElement.cs" />
     <Compile Include="Configuration\OptionalInnerTextConfigurationElement.cs" />
@@ -331,6 +333,7 @@
     <Compile Include="Deploy\IMacroParser.cs" />
     <Compile Include="Deploy\IPreValueConnector.cs" />
     <Compile Include="Deploy\IServiceConnector.cs" />
+    <Compile Include="Deploy\IUniqueIdentifyingServiceConnector.cs" />
     <Compile Include="Deploy\IValueConnector.cs" />
     <Compile Include="Diagnostics\MiniDump.cs" />
     <Compile Include="DictionaryExtensions.cs" />
@@ -338,6 +341,7 @@
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="DisposableObject.cs" />
     <Compile Include="DisposableTimer.cs" />
+    <Compile Include="EmailSender.cs" />
     <Compile Include="Enum.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Events\CancellableEventArgs.cs" />
@@ -398,9 +402,11 @@
     <Compile Include="GuidUdi.cs" />
     <Compile Include="HashCodeCombiner.cs" />
     <Compile Include="HashCodeHelper.cs" />
+    <Compile Include="HashGenerator.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="ICompletable.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
+    <Compile Include="IEmailSender.cs" />
     <Compile Include="IfExtensions.cs" />
     <Compile Include="IntExtensions.cs" />
     <Compile Include="IO\FileSecurityException.cs" />
@@ -1040,7 +1046,6 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveStylesheetDataAndTables.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveUmbracoLoginsTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\UpdateUniqueIdToHaveCorrectIndexType.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\AddIndexToUmbracoNodeTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\AddMissingForeignKeyForContentType.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\AlterDataTypePreValueTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\RemoveCmsDocumentAliasColumn.cs" />
@@ -1056,12 +1061,12 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\RemoveCmsMacroPropertyTypeTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateControlIdToPropertyEditorAlias.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateRelatedLinksData.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\Temp8\AddIndexToDictionaryKeyColumn.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\Temp8\AddUserGroupTables.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\Temp8\AddUserStartNodeTable.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\Temp8\EnsureContentTemplatePermissions.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\Temp8\ReduceDictionaryKeyColumnsSize.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\Temp8\UpdateUserTables.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\AddIndexToDictionaryKeyColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\AddUserGroupTables.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\AddUserStartNodeTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\EnsureContentTemplatePermissions.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\ReduceDictionaryKeyColumnsSize.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\UpdateUserTables.cs" />
     <Compile Include="Persistence\NPocoDatabaseExtensions-Bulk.cs" />
     <Compile Include="Persistence\NPocoDatabaseExtensions.cs" />
     <Compile Include="Persistence\NPocoDatabaseTypeExtensions.cs" />

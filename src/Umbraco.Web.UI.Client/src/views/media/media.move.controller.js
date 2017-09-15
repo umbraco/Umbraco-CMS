@@ -1,10 +1,17 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
-	function ($scope, eventsService, mediaResource, appState, treeService, navigationService) {
+    function ($scope, userService, eventsService, mediaResource, appState, treeService, navigationService) {
 	    var dialogOptions = $scope.dialogOptions;
 
 	    $scope.dialogTreeEventHandler = $({});
 	    var node = dialogOptions.currentNode;
+
+        $scope.treeModel = {
+            hideHeader: false
+        }
+        userService.getCurrentUser().then(function (userData) {
+            $scope.treeModel.hideHeader = userData.startMediaIds.length > 0 && userData.startMediaIds.indexOf(-1) == -1;
+        });
 
 	    function nodeSelectHandler(ev, args) {
 

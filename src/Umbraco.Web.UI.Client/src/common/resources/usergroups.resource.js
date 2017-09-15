@@ -50,12 +50,21 @@
 
         }
 
-        function getUserGroups() {
+        function getUserGroups(args) {
+
+            if (!args) {
+                args = { onlyCurrentUserGroups: true };
+            }
+            if (args.onlyCurrentUserGroups === undefined || args.onlyCurrentUserGroups === null) {
+                args.onlyCurrentUserGroups = true;
+            }
+
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "userGroupsApiBaseUrl",
-                        "GetUserGroups")),
+                        "GetUserGroups",
+                        args)),
                 "Failed to retrieve user groups");
         }
 

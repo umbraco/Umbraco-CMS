@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -34,8 +33,8 @@ namespace Umbraco.Core.Composing
         private readonly object _typesLock = new object();
         private readonly Dictionary<TypeListKey, TypeList> _types = new Dictionary<TypeListKey, TypeList>();
 
-        private long _cachedAssembliesHash = -1;
-        private long _currentAssembliesHash = -1;
+        private string _cachedAssembliesHash;
+        private string _currentAssembliesHash;
         private IEnumerable<Assembly> _assemblies;
         private bool _reportedChange;
 
@@ -59,9 +58,9 @@ namespace Umbraco.Core.Composing
 
             if (detectChanges)
             {
-                //first check if the cached hash is 0, if it is then we ne
+                //first check if the cached hash is string.Empty, if it is then we need
                 //do the check if they've changed
-                RequiresRescanning = (CachedAssembliesHash != CurrentAssembliesHash) || CachedAssembliesHash == 0;
+                RequiresRescanning = CachedAssembliesHash != CurrentAssembliesHash || CachedAssembliesHash == string.Empty;
                 //if they have changed, we need to write the new file
                 if (RequiresRescanning)
                 {
@@ -128,23 +127,20 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Gets the currently cached hash value of the scanned assemblies.
         /// </summary>
-        /// <value>The cached hash value, or 0 if no cache is found.</value>
-        private long CachedAssembliesHash
+        /// <value>The cached hash value, or string.Empty if no cache is found.</value>
+        internal string CachedAssembliesHash
         {
             get
             {
-                if (_cachedAssembliesHash != -1)
+                if (_cachedAssembliesHash != null)
                     return _cachedAssembliesHash;
 
                 var filePath = GetTypesHashFilePath();
-                if (File.Exists(filePath) == false) return 0;
+                if (File.Exists(filePath) == false) return string.Empty;
 
                 var hash = File.ReadAllText(filePath, Encoding.UTF8);
 
-                long val;
-                if (long.TryParse(hash, out val) == false) return 0;
-
-                _cachedAssembliesHash = val;
+                _cachedAssembliesHash = hash;
                 return _cachedAssembliesHash;
             }
         }
@@ -153,11 +149,11 @@ namespace Umbraco.Core.Composing
         /// Gets the current assemblies hash based on creating a hash from the assemblies in various places.
         /// </summary>
         /// <value>The current hash.</value>
-        private long CurrentAssembliesHash
+        private string CurrentAssembliesHash
         {
             get
             {
-                if (_currentAssembliesHash != -1)
+                if (_currentAssembliesHash != null)
                     return _currentAssembliesHash;
 
                 _currentAssembliesHash = GetFileHash(new List<Tuple<FileSystemInfo, bool>>
@@ -182,7 +178,7 @@ namespace Umbraco.Core.Composing
         private void WriteCacheTypesHash()
         {
             var filePath = GetTypesHashFilePath();
-            File.WriteAllText(filePath, CurrentAssembliesHash.ToString(), Encoding.UTF8);
+            File.WriteAllText(filePath, CurrentAssembliesHash, Encoding.UTF8);
         }
 
         /// <summary>
@@ -193,41 +189,40 @@ namespace Umbraco.Core.Composing
         /// <returns>The hash.</returns>
         /// <remarks>Each file is a tuple containing the FileInfo object and a boolean which indicates whether to hash the
         /// file properties (false) or the file contents (true).</remarks>
-        private static long GetFileHash(IEnumerable<Tuple<FileSystemInfo, bool>> filesAndFolders, ProfilingLogger logger)
+        private static string GetFileHash(IEnumerable<Tuple<FileSystemInfo, bool>> filesAndFolders, ProfilingLogger logger)
         {
             using (logger.TraceDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
             {
-                var hashCombiner = new HashCodeCombiner();
-
                 // get the distinct file infos to hash
                 var uniqInfos = new HashSet<string>();
                 var uniqContent = new HashSet<string>();
-
-                foreach (var fileOrFolder in filesAndFolders)
+                using (var generator = new HashGenerator())
                 {
-                    var info = fileOrFolder.Item1;
-                    if (fileOrFolder.Item2)
+                    foreach (var fileOrFolder in filesAndFolders)
                     {
-                        // add each unique file's contents to the hash
-                        // normalize the content for cr/lf and case-sensitivity
-
-                        if (uniqContent.Contains(info.FullName)) continue;
-                        uniqContent.Add(info.FullName);
-                        if (File.Exists(info.FullName) == false) continue;
-                        var content = RemoveCrLf(File.ReadAllText(info.FullName));
-                        hashCombiner.AddCaseInsensitiveString(content);
+                        var info = fileOrFolder.Item1;
+                        if (fileOrFolder.Item2)
+                        {
+                            // add each unique file's contents to the hash
+                            // normalize the content for cr/lf and case-sensitivity
+                            if (uniqContent.Add(info.FullName))
+                            {
+                                if (File.Exists(info.FullName) == false) continue;
+                                var content = RemoveCrLf(File.ReadAllText(info.FullName));
+                                generator.AddCaseInsensitiveString(content);
+                            }
+                        }
+                        else
+                        {
+                            // add each unique folder/file to the hash
+                            if (uniqInfos.Add(info.FullName))
+                            {
+                                generator.AddFileSystemItem(info);
+                            }
+                        }
                     }
-                    else
-                    {
-                        // add each unique folder/file to the hash
-
-                        if (uniqInfos.Contains(info.FullName)) continue;
-                        uniqInfos.Add(info.FullName);
-                        hashCombiner.AddFileSystemItem(info);
-                    }
+                    return generator.GenerateHash();
                 }
-
-                return ConvertHashToInt64(hashCombiner.GetCombinedHashCode());
             }
         }
 
@@ -252,34 +247,24 @@ namespace Umbraco.Core.Composing
         /// <param name="logger">A profiling logger.</param>
         /// <returns>The hash.</returns>
         // internal for tests
-        internal static long GetFileHash(IEnumerable<FileSystemInfo> filesAndFolders, ProfilingLogger logger)
+        internal static string GetFileHash(IEnumerable<FileSystemInfo> filesAndFolders, ProfilingLogger logger)
         {
             using (logger.TraceDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
             {
-                var hashCombiner = new HashCodeCombiner();
-
-                // get the distinct file infos to hash
-                var uniqInfos = new HashSet<string>();
-
-                foreach (var fileOrFolder in filesAndFolders)
+                using (var generator = new HashGenerator())
                 {
-                    if (uniqInfos.Contains(fileOrFolder.FullName)) continue;
-                    uniqInfos.Add(fileOrFolder.FullName);
-                    hashCombiner.AddFileSystemItem(fileOrFolder);
+                    // get the distinct file infos to hash
+                    var uniqInfos = new HashSet<string>();
+
+                    foreach (var fileOrFolder in filesAndFolders)
+                    {
+                        if (uniqInfos.Contains(fileOrFolder.FullName)) continue;
+                        uniqInfos.Add(fileOrFolder.FullName);
+                        generator.AddFileSystemItem(fileOrFolder);
+                    }
+                    return generator.GenerateHash();
                 }
-
-                return ConvertHashToInt64(hashCombiner.GetCombinedHashCode());
             }
-        }
-
-        /// <summary>
-        /// Converts a string hash value into an Int64.
-        /// </summary>
-        // internal for tests
-        internal static long ConvertHashToInt64(string val)
-        {
-            long outVal;
-            return long.TryParse(val, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out outVal) ? outVal : 0;
         }
 
         #endregion
@@ -384,6 +369,10 @@ namespace Umbraco.Core.Composing
         // internal for tests
         internal void WriteCache()
         {
+            // be absolutely sure
+            if (Directory.Exists(_tempFolder) == false)
+                Directory.CreateDirectory(_tempFolder);
+
             var filePath = GeTypesListFilePath();
 
             using (var stream = GetFileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, ListFileOpenWriteTimeout))

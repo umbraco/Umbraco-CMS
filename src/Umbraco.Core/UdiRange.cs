@@ -62,8 +62,8 @@ namespace Umbraco.Core
         {
             Uri uri;
 
-            if (!Uri.IsWellFormedUriString(s, UriKind.Absolute)
-                || !Uri.TryCreate(s, UriKind.Absolute, out uri))
+            if (Uri.IsWellFormedUriString(s, UriKind.Absolute) == false
+                || Uri.TryCreate(s, UriKind.Absolute, out uri) == false)
             {
                 //if (tryParse) return false;
                 throw new FormatException(string.Format("String \"{0}\" is not a valid udi range.", s));

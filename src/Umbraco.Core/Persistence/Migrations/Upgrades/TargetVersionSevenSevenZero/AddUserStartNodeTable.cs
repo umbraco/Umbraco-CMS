@@ -1,7 +1,7 @@
 using System.Linq;
 using Umbraco.Core.Models.Rdbms;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.Temp8
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZero
 {
     [Migration("8.0.0", 2, Constants.System.UmbracoMigrationName)]
     public class AddUserStartNodeTable : MigrationBase

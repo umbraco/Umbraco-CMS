@@ -586,7 +586,12 @@ ORDER BY colName";
         /// <param name="totalRecords"></param>
         /// <param name="orderBy"></param>
         /// <param name="orderDirection"></param>
-        /// <param name="userGroups">Optional parameter to filter by specified user groups</param>
+        /// <param name="includeUserGroups">
+        /// A filter to only include user that belong to these user groups
+        /// </param>
+        /// <param name="excludeUserGroups">
+        /// A filter to only include users that do not belong to these user groups
+        /// </param>
         /// <param name="userState">Optional parameter to filter by specfied user state</param>
         /// <param name="filter"></param>
         /// <returns></returns>
@@ -607,34 +612,49 @@ ORDER BY colName";
             if (mappedField.IsNullOrWhiteSpace())
                 throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
 
-            return GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, mappedField, orderDirection, userGroups, userState, filter);
+            return GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, mappedField, orderDirection, includeUserGroups, excludeUserGroups, userState, filter);
         }
 
         private IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection = Direction.Ascending,
-            string[] userGroups = null, UserState[] userState = null, IQuery<IUser> filter = null)
+            string[] includeUserGroups = null, string[] excludeUserGroups = null, UserState[] userState = null, IQuery<IUser> filter = null)
         {
             if (string.IsNullOrWhiteSpace(orderBy)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(orderBy));
 
-            var filterSql = filter != null
-                || userGroups != null && userGroups.Length > 0
-                || userState != null && userState.Length > 0 && userState.Contains(UserState.All) == false
-                ? Sql() : null;
+            Sql<SqlContext> filterSql = null;
+            var customFilterWheres = filter != null ? filter.GetWhereClauses().ToArray() : null;
+            var hasCustomFilter = customFilterWheres != null && customFilterWheres.Length > 0;
+            if (hasCustomFilter
+                || includeUserGroups != null && includeUserGroups.Length > 0
+                || excludeUserGroups != null && excludeUserGroups.Length > 0
+                || userState != null && userState.Length > 0 && userState.Contains(UserState.All) == false)
+                filterSql = Sql();
 
-            if (filter != null)
+            if (hasCustomFilter)
             {
-                foreach (var clause in filter.GetWhereClauses())
+                foreach (var clause in customFilterWheres)
                     filterSql.Append($"AND ({clause.Item1})", clause.Item2);
             }
 
-            if (userGroups != null && userGroups.Length > 0)
+
+            if (includeUserGroups != null && includeUserGroups.Length > 0)
             {
                 const string subQuery = @"AND (umbracoUser.id IN (SELECT DISTINCT umbracoUser.id
 		            FROM umbracoUser
 		            INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
 		            INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
 		            WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
-                filterSql.Append(subQuery, new { userGroups });
+                filterSql.Append(subQuery, new { userGroups = includeUserGroups });
+            }
+
+            if (excludeUserGroups != null && excludeUserGroups.Length > 0)
+            {
+                var subQuery = @"AND (umbracoUser.id NOT IN (SELECT DISTINCT umbracoUser.id
+		            FROM umbracoUser
+		            INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
+		            INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
+		            WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
+                filterSql.Append(subQuery, new { userGroups = excludeUserGroups });
             }
 
             if (userState != null && userState.Length > 0)
@@ -654,16 +674,19 @@ ORDER BY colName";
                     {
                         if (appended) sb.Append(" OR ");
                         sb.Append("(userDisabled = 1)");
+                        appended = true;
                     }
                     if (userState.Contains(UserState.LockedOut))
                     {
                         if (appended) sb.Append(" OR ");
                         sb.Append("(userNoConsole = 1)");
+                        appended = true;
                     }
                     if (userState.Contains(UserState.Invited))
                     {
                         if (appended) sb.Append(" OR ");
                         sb.Append("(lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL)");
+                        appended = true;
                     }
 
                     sb.Append(")");

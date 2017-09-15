@@ -248,6 +248,11 @@ namespace Umbraco.Core.Models.Identity
         }
 
         /// <summary>
+        /// This is a 1:1 mapping with IUser.IsApproved
+        /// </summary>
+        internal bool IsApproved { get; set; }
+
+        /// <summary>
         /// Overridden to make the retrieval lazy
         /// </summary>
         public override ICollection<IIdentityUserLogin> Logins

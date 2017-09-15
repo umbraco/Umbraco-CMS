@@ -1,2 +1,7 @@
 ﻿@model dynamic
-@Html.Raw(Model.value)
+@using Umbraco.Web.Templates
+
+
+<div class="video-wrapper">
+	@Html.Raw(Model.value)
+</div>

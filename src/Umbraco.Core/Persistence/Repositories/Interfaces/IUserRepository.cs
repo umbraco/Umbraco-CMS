@@ -44,9 +44,14 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="pageSize"></param>
         /// <param name="totalRecords"></param>
         /// <param name="orderBy"></param>
-        /// <param name="filter"></param>
+        /// <param name="customFilter"></param>
         /// <param name="orderDirection"></param>
-        /// <param name="userGroups">Optional parameter to filter by specified user groups</param>
+        /// <param name="includeUserGroups">
+        /// A filter to only include user that belong to these user groups
+        /// </param>
+        /// <param name="excludeUserGroups">
+        /// A filter to only include users that do not belong to these user groups
+        /// </param>
         /// <param name="userState">Optional parameter to filter by specfied user state</param>
         /// <returns></returns>
         IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords,

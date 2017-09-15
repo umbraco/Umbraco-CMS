@@ -169,30 +169,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<IMemberGroup> GetMemberGroupsForMember(string username)
         {
-            //find the member by username
-            var memberObjectType = new Guid(Constants.ObjectTypes.Member);
-
-            var memberSql = Sql()
-                .Select("umbracoNode.id")
-                .From<NodeDto>()
-                .InnerJoin<MemberDto>()
-                .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
-                .Where<NodeDto>( x => x.NodeObjectType == memberObjectType)
-                .Where<MemberDto>(x => x.LoginName == username);
-            var memberIdUsername = Database.Fetch<int?>(memberSql).FirstOrDefault();
-            if (memberIdUsername.HasValue == false)
-            {
-                return Enumerable.Empty<IMemberGroup>();
-            }
-
             var sql = Sql()
-                .Select("umbracoNode.*")
-                .From<NodeDto>()
-                .InnerJoin<Member2MemberGroupDto>()
-                .On<NodeDto, Member2MemberGroupDto>( dto => dto.NodeId, dto => dto.MemberGroup)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                .Where<Member2MemberGroupDto>(x => x.Member == memberIdUsername.Value);
-
+                .Select("un.*")
+                .From("umbracoNode AS un")
+                .InnerJoin("cmsMember2MemberGroup")
+                .On("un.id = cmsMember2MemberGroup.MemberGroup")
+                .LeftJoin("(SELECT umbracoNode.id, cmsMember.LoginName FROM umbracoNode INNER JOIN cmsMember ON umbracoNode.id = cmsMember.nodeId) AS member")
+                .On("member.id = cmsMember2MemberGroup.Member")
+                .Where("un.nodeObjectType=@objectType", new {objectType = NodeObjectTypeId })
+                .Where("member.LoginName=@loginName", new {loginName = username});
+            
             return Database.Fetch<NodeDto>(sql)
                 .DistinctBy(dto => dto.NodeId)
                 .Select(x => _modelFactory.BuildEntity(x));

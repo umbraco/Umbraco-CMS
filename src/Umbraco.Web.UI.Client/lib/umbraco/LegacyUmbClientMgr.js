@@ -182,7 +182,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 var injector = getRootInjector();
                 var navService = injector.get("navigationService");
                 var localizationService = injector.get("localizationService");
-                var userResource = injector.get("userResource");                
+                var usersResource = injector.get("usersResource");
                 //var appState = injector.get("appState");
                 var angularHelper = injector.get("angularHelper");
                 var $rootScope = injector.get("$rootScope");

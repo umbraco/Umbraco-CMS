@@ -177,12 +177,21 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
             //Create the first button (primary button)
             //We cannot have the Save or SaveAndPublish buttons if they don't have create permissions when we are creating a new item.
+            //Another tricky rule is if they only have Create + Browse permissions but not Save but if it's being created then they will
+            // require the Save button in order to create.
+            //So this code is going to create the primary button (either Publish, SendToPublish, Save) if we are not in create mode
+            // or if the user has access to create.
             if (!args.create || _.contains(args.content.allowedActions, "C")) {
                 for (var b in buttonOrder) {
                     if (_.contains(args.content.allowedActions, buttonOrder[b])) {
                         buttons.defaultButton = createButtonDefinition(buttonOrder[b]);
                         break;
                     }
+                }
+                //Here's the special check, if the button still isn't set and we are creating and they have create access
+                //we need to add the Save button
+                if (!buttons.defaultButton && args.create && _.contains(args.content.allowedActions, "C")) {
+                    buttons.defaultButton = createButtonDefinition("A");
                 }
             }
 
@@ -449,14 +458,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                     //indicates we've handled the server result
                     return true;
                 }
-                else {
-                    dialogService.ysodDialog(args.err);
-                }
             }
-            else {
-                dialogService.ysodDialog(args.err);
-            }
-
             return false;
         },
 

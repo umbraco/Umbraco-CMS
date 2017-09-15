@@ -467,14 +467,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>Výchozí uživatel byl deaktivován, nebo nemá přístup k umbracu!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <b>Následující</b> pro pokračování.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Heslo výchozího uživatele bylo úspěšně změněno od doby instalace!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <b>Následující</b> pro pokračování.]]></key>
     <key alias="defaultUserPasswordChanged">Heslo je změněno!</key>
-    <key alias="defaultUserText"><![CDATA[
-        <p>
-          umbraco vytváří výchozího uživatele s uživatelským jménem <strong>('admin')</strong> a heslem <strong>('default')</strong>. Je <strong>důležité</strong> změnit toto heslo na jiné.
-        </p>
-        <p>
-          Tento krok zkontroluje heslo výchozího uživatele a doporučí, má-li být změněno.
-        </p>
-      ]]></key>
     <key alias="greatStart">Mějte skvělý start, sledujte naše uváděcí videa</key>
     <key alias="licenseText">Kliknutím na tlačítko následující (nebo modifikováním umbracoConfigurationStatus v souboru web.config) přijímáte licenci tohoto software tak, jak je uvedena v poli níže. Upozorňujeme, že tato distribuce umbraca se skládá ze dvou různých licencí, open source MIT licence pro framework a umbraco freeware licence, která pokrývá UI.</key>
     <key alias="None">Není nainstalováno.</key>

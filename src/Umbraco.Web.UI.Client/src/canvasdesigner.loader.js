@@ -14,7 +14,7 @@ LazyLoad.js([
       '../lib/spectrum/spectrum.js',
       '../lib/signalr/jquery.signalR.js',
       '/umbraco/signalr/hubs',
-      '../js/canvasdesigner.panel.js'
+      '../js/umbraco.canvasdesigner.js'
 ], function () {
     jQuery(document).ready(function () {
         angular.bootstrap(document, ['Umbraco.canvasdesigner']);

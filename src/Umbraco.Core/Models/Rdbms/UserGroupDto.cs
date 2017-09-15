@@ -51,10 +51,12 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("startContentId")]
         [NullSetting(NullSetting = NullSettings.Null)]
+        [ForeignKey(typeof(NodeDto), Name = "FK_startContentId_umbracoNode_id")]
         public int? StartContentId { get; set; }
 
         [Column("startMediaId")]
         [NullSetting(NullSetting = NullSettings.Null)]
+        [ForeignKey(typeof(NodeDto), Name = "FK_startMediaId_umbracoNode_id")]
         public int? StartMediaId { get; set; }
 
         [ResultColumn]

@@ -787,7 +787,7 @@ namespace Umbraco.Core
                 foreach (var b in hashedByteArray)
                 {
                     //append it to our StringBuilder
-                    stringBuilder.Append(b.ToString("x2").ToLower());
+                    stringBuilder.Append(b.ToString("x2"));
                 }
 
                 //return the hashed value
@@ -902,7 +902,7 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Ensures that the folder path endds with a DirectorySeperatorChar
+        /// Ensures that the folder path ends with a DirectorySeperatorChar
         /// </summary>
         /// <param name="currentFolder"></param>
         /// <returns></returns>

@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Security;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.Temp8
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZero
 {
     [Migration("8.0.0", 0, Constants.System.UmbracoMigrationName)]
     public class UpdateUserTables : MigrationBase
