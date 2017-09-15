@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Configuration.Provider;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,9 +8,11 @@ using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.DataProtection;
+using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Security
@@ -43,7 +46,7 @@ namespace Umbraco.Core.Security
             IContentSection contentSectionConfig)
             : base(store)
         {
-            if (options == null) throw new ArgumentNullException("options"); ;
+            if (options == null) throw new ArgumentNullException("options");
             InitUserManager(this, membershipProvider, contentSectionConfig, options);
         }
 
@@ -403,7 +406,10 @@ namespace Umbraco.Core.Security
 
         public override Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
         {
-            return base.ChangePasswordAsync(userId, currentPassword, newPassword);
+            var result = base.ChangePasswordAsync(userId, currentPassword, newPassword);
+            if (result.Result.Succeeded)
+                RaisePasswordChangedEvent(userId);
+            return result;
         }
 
         /// <summary>
@@ -484,5 +490,241 @@ namespace Umbraco.Core.Security
         }
 
         #endregion
+
+        public override Task<IdentityResult> SetLockoutEndDateAsync(int userId, DateTimeOffset lockoutEnd)
+        {
+            var result = base.SetLockoutEndDateAsync(userId, lockoutEnd);
+
+            // The way we unlock is by setting the lockoutEnd date to the current datetime
+            if (result.Result.Succeeded && lockoutEnd >= DateTimeOffset.UtcNow)
+                RaiseAccountLockedEvent(userId);
+            else
+                RaiseAccountUnlockedEvent(userId);
+
+            return result;
+        }
+
+        public override async Task<IdentityResult> ResetAccessFailedCountAsync(int userId)
+        {
+            var user = ApplicationContext.Current.Services.UserService.GetUserById(userId);
+
+            if (user == null)
+            {
+                throw new ProviderException(string.Format("No user with the id {0} found", userId));
+            }
+
+            if (user.FailedPasswordAttempts > 0)
+            {
+                user.FailedPasswordAttempts = 0;
+                ApplicationContext.Current.Services.UserService.Save(user);
+                RaiseResetAccessFailedCountEvent(userId);
+            }
+
+            return await Task.FromResult(IdentityResult.Success);
+        }
+
+        /// <summary>
+        /// Clears a lock so that the membership user can be validated.
+        /// </summary>
+        /// <param name="memberService">The IMemberService to user for unlocking</param>
+        /// <param name="username">The membership user to clear the lock status for.</param>
+        /// <returns>
+        /// true if the membership user was successfully unlocked; otherwise, false.
+        /// </returns>
+        public bool UnlockUser<TEntity>(IMembershipMemberService<TEntity> memberService, string username) where TEntity : class, IMembershipUser
+        {
+            var member = memberService.GetByUsername(username);
+
+            if (member == null)
+            {
+                throw new ProviderException(string.Format("No member with the username '{0}' found", username));
+            }
+
+            // Non need to update
+            if (member.IsLockedOut == false) return true;
+
+            member.IsLockedOut = false;
+            member.FailedPasswordAttempts = 0;
+
+            memberService.Save(member);
+
+            RaiseAccountUnlockedEvent(member.Id);
+
+            return true;
+        }
+
+        public override Task<IdentityResult> AccessFailedAsync(int userId)
+        {
+            var result = base.AccessFailedAsync(userId);
+
+            //Slightly confusing: this will return a Success if we successfully update the AccessFailed count
+            if (result.Result.Succeeded)
+                RaiseLoginFailedEvent(userId);
+
+            return result;
+        }
+
+        internal void RaiseAccountLockedEvent(int userId)
+        {
+            OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaiseAccountUnlockedEvent(int userId)
+        {
+            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaiseForgotPasswordRequestedEvent(int userId)
+        {
+            OnForgotPasswordRequested(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordRequested)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaiseForgotPasswordChangedSuccessEvent(int userId)
+        {
+            OnForgotPasswordChangedSuccess(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordChangedSuccess)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        public void RaiseLoginFailedEvent(int userId)
+        {
+            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        public void RaiseInvalidLoginAttemptEvent(string username)
+        {
+            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed)
+            {
+                Username = username,
+                Comment = string.Format("Attempted login for username '{0}' failed", username)
+            });
+        }
+
+        internal void RaiseLoginRequiresVerificationEvent(int userId)
+        {
+            OnLoginRequiresVerification(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaiseLoginSuccessEvent(int userId)
+        {
+            OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaiseLogoutSuccessEvent(int userId)
+        {
+            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaisePasswordChangedEvent(int userId)
+        {
+            OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        internal void RaisePasswordResetEvent(int userId)
+        {
+            OnPasswordReset(new IdentityAuditEventArgs(AuditEvent.PasswordReset)
+            {
+                AffectedUser = userId
+            });
+        }
+        internal void RaiseResetAccessFailedCountEvent(int userId)
+        {
+            OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount)
+            {
+                AffectedUser = userId
+            });
+        }
+
+        public static event EventHandler AccountLocked;
+        public static event EventHandler AccountUnlocked;
+        public static event EventHandler ForgotPasswordRequested;
+        public static event EventHandler ForgotPasswordChangedSuccess;
+        public static event EventHandler LoginFailed;
+        public static event EventHandler LoginRequiresVerification;
+        public static event EventHandler LoginSuccess;
+        public static event EventHandler LogoutSuccess;
+        public static event EventHandler PasswordChanged;
+        public static event EventHandler PasswordReset;
+        public static event EventHandler ResetAccessFailedCount;
+
+        protected virtual void OnAccountLocked(IdentityAuditEventArgs e)
+        {
+            if (AccountLocked != null) AccountLocked(this, e);
+        }
+
+        protected virtual void OnAccountUnlocked(IdentityAuditEventArgs e)
+        {
+            if (AccountUnlocked != null) AccountUnlocked(this, e);
+        }
+
+        protected virtual void OnForgotPasswordRequested(IdentityAuditEventArgs e)
+        {
+            if (ForgotPasswordRequested != null) ForgotPasswordRequested(this, e);
+        }
+
+        protected virtual void OnForgotPasswordChangedSuccess(IdentityAuditEventArgs e)
+        {
+            if (ForgotPasswordChangedSuccess != null) ForgotPasswordChangedSuccess(this, e);
+        }
+
+        protected virtual void OnLoginFailed(IdentityAuditEventArgs e)
+        {
+            if (LoginFailed != null) LoginFailed(this, e);
+        }
+
+        protected virtual void OnLoginRequiresVerification(IdentityAuditEventArgs e)
+        {
+            if (LoginRequiresVerification != null) LoginRequiresVerification(this, e);
+        }
+
+        protected virtual void OnLoginSuccess(IdentityAuditEventArgs e)
+        {
+            if (LoginSuccess != null) LoginSuccess(this, e);
+        }
+
+        protected virtual void OnLogoutSuccess(IdentityAuditEventArgs e)
+        {
+            if (LogoutSuccess != null) LogoutSuccess(this, e);
+        }
+
+        protected virtual void OnPasswordChanged(IdentityAuditEventArgs e)
+        {
+            if (PasswordChanged != null) PasswordChanged(this, e);
+        }
+
+        protected virtual void OnPasswordReset(IdentityAuditEventArgs e)
+        {
+            if (PasswordReset != null) PasswordReset(this, e);
+        }
+
+        protected virtual void OnResetAccessFailedCount(IdentityAuditEventArgs e)
+        {
+            if (ResetAccessFailedCount != null) ResetAccessFailedCount(this, e);
+        }
     }
 }

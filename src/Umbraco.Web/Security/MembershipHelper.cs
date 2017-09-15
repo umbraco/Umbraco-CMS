@@ -39,7 +39,7 @@ namespace Umbraco.Web.Security
         [EditorBrowsable(EditorBrowsableState.Never)]
         public MembershipHelper(ApplicationContext applicationContext, HttpContextBase httpContext)
             : this(applicationContext, httpContext, MPE.GetMembersMembershipProvider(), Roles.Enabled ? Roles.Provider : new MembersRoleProvider(applicationContext.Services.MemberService))
-        {            
+        {
         }
 
         [Obsolete("Use the constructor specifying an UmbracoContext")]
@@ -54,11 +54,11 @@ namespace Umbraco.Web.Security
             _httpContext = httpContext;
             _membershipProvider = membershipProvider;
             _roleProvider = roleProvider;
-        }   
+        }
 
         public MembershipHelper(UmbracoContext umbracoContext)
-            : this(umbracoContext, MPE.GetMembersMembershipProvider(), Roles.Enabled ? Roles.Provider: new MembersRoleProvider(umbracoContext.Application.Services.MemberService))
-        {            
+            : this(umbracoContext, MPE.GetMembersMembershipProvider(), Roles.Enabled ? Roles.Provider : new MembersRoleProvider(umbracoContext.Application.Services.MemberService))
+        {
         }
 
         public MembershipHelper(UmbracoContext umbracoContext, MembershipProvider membershipProvider, RoleProvider roleProvider)
@@ -117,11 +117,11 @@ namespace Umbraco.Web.Security
         /// </remarks>
         private bool HasAccess(string path, RoleProvider roleProvider)
         {
-            return _umbracoContext.PublishedContentRequest == null 
-                ? _applicationContext.Services.PublicAccessService.HasAccess(path, CurrentUserName, roleProvider.GetRolesForUser) 
+            return _umbracoContext.PublishedContentRequest == null
+                ? _applicationContext.Services.PublicAccessService.HasAccess(path, CurrentUserName, roleProvider.GetRolesForUser)
                 : _applicationContext.Services.PublicAccessService.HasAccess(path, CurrentUserName, _umbracoContext.PublishedContentRequest.GetRolesForLogin);
         }
-        
+
         /// <summary>
         /// Returns true if the current membership provider is the Umbraco built-in one.
         /// </summary>
@@ -253,7 +253,7 @@ namespace Umbraco.Web.Security
             {
                 //Set member online
                 provider.GetUser(model.Username, true);
-    
+
                 //Log them in
                 FormsAuthentication.SetAuthCookie(membershipUser.UserName, model.CreatePersistentLoginCookie);
             }
@@ -280,7 +280,7 @@ namespace Umbraco.Web.Security
             if (member == null)
             {
                 //this should not happen
-                LogHelper.Warn<MembershipHelper>("The member validated but then no member was returned with the username " + username);                
+                LogHelper.Warn<MembershipHelper>("The member validated but then no member was returned with the username " + username);
                 return false;
             }
             //Log them in
@@ -389,7 +389,7 @@ namespace Umbraco.Web.Security
             var result = GetCurrentMember();
             return result == null ? -1 : result.Id;
         }
-        
+
         #endregion
 
         #region Model Creation methods for member data editing on the front-end
@@ -408,7 +408,7 @@ namespace Umbraco.Web.Security
             var provider = _membershipProvider;
 
             if (provider.IsUmbracoMembershipProvider())
-            {                
+            {
                 var membershipUser = provider.GetCurrentUserOnline();
                 var member = GetCurrentPersistedMember();
                 //this shouldn't happen but will if the member is deleted in the back office while the member is trying
@@ -496,7 +496,7 @@ namespace Umbraco.Web.Security
                     if (propValue != null && propValue.Value != null)
                     {
                         value = propValue.Value.ToString();
-                    }    
+                    }
                 }
 
                 var viewProperty = new UmbracoProperty
@@ -636,7 +636,7 @@ namespace Umbraco.Web.Security
 
             // Allow by default
             var allowAction = true;
-            
+
             if (IsLoggedIn() == false)
             {
                 // If not logged on, not allowed
@@ -671,7 +671,7 @@ namespace Umbraco.Web.Security
                     var member = provider.GetCurrentUser();
                     username = member.UserName;
                 }
-                
+
                 // If groups defined, check member is of one of those groups
                 var allowGroupsList = allowGroups as IList<string> ?? allowGroups.ToList();
                 if (allowAction && allowGroupsList.Any(allowGroup => allowGroup != string.Empty))
@@ -681,7 +681,7 @@ namespace Umbraco.Web.Security
                     allowAction = allowGroupsList.Select(s => s.ToLowerInvariant()).Intersect(groups.Select(myGroup => myGroup.ToLowerInvariant())).Any();
                 }
 
-                
+
             }
 
             return allowAction;
@@ -701,6 +701,7 @@ namespace Umbraco.Web.Security
             {
                 throw new InvalidOperationException("Could not find provider with name " + membershipProviderName);
             }
+            
             return ChangePassword(username, passwordModel, provider);
         }
 
@@ -713,10 +714,10 @@ namespace Umbraco.Web.Security
         /// <returns></returns>        
         public virtual Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
-            var passwordChanger = new PasswordChanger(_applicationContext.ProfilingLogger.Logger, _applicationContext.Services.UserService);
-            return passwordChanger.ChangePasswordWithMembershipProvider(username, passwordModel, membershipProvider);            
+            var passwordChanger = new PasswordChanger(_applicationContext.ProfilingLogger.Logger, _applicationContext.Services.UserService, UmbracoContext.Current.HttpContext);
+            return passwordChanger.ChangePasswordWithMembershipProvider(username, passwordModel, membershipProvider);
         }
-        
+
         /// <summary>
         /// Updates a membership user with all of it's writable properties
         /// </summary>
@@ -775,7 +776,7 @@ namespace Umbraco.Web.Security
 
             return Attempt<MembershipUser>.Fail(member);
         }
-        
+
         /// <summary>
         /// Returns the currently logged in IMember object - this should never be exposed to the front-end since it's returning a business logic entity!
         /// </summary>
@@ -799,7 +800,7 @@ namespace Umbraco.Web.Security
 
         private string GetCacheKey(string key, params object[] additional)
         {
-            var sb = new StringBuilder(string.Format("{0}-{1}", typeof (MembershipHelper).Name, key));
+            var sb = new StringBuilder(string.Format("{0}-{1}", typeof(MembershipHelper).Name, key));
             foreach (var s in additional)
             {
                 sb.Append("-");

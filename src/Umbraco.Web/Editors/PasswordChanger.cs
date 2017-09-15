@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http.ModelBinding;
 using System.Web.Security;
 using Microsoft.AspNet.Identity;
@@ -22,11 +23,13 @@ namespace Umbraco.Web.Editors
     {
         private readonly ILogger _logger;
         private readonly IUserService _userService;
+        private readonly HttpContextBase _httpContext;
 
-        public PasswordChanger(ILogger logger, IUserService userService)
+        public PasswordChanger(ILogger logger, IUserService userService, HttpContextBase httpContext)
         {
             _logger = logger;
             _userService = userService;
+            _httpContext = httpContext;
         }
 
         /// <summary>
@@ -148,6 +151,20 @@ namespace Umbraco.Web.Editors
             if (passwordModel == null) throw new ArgumentNullException("passwordModel");
             if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
 
+            BackOfficeUserManager<BackOfficeIdentityUser> backofficeUserManager = null;
+            var userId = -1;
+
+            if (membershipProvider.IsUmbracoUsersProvider())
+            {
+                backofficeUserManager = _httpContext.GetOwinContext().GetBackOfficeUserManager();
+                if (backofficeUserManager != null)
+                {
+                    var profile = _userService.GetProfileByUserName(username);
+                    if (profile != null)
+                        int.TryParse(profile.Id.ToString(), out userId);
+                }
+            }
+
             //Are we resetting the password??
             if (passwordModel.Reset.HasValue && passwordModel.Reset.Value)
             {
@@ -166,6 +183,9 @@ namespace Umbraco.Web.Editors
                     var newPass = membershipProvider.ResetPassword(
                         username,
                         membershipProvider.RequiresQuestionAndAnswer ? passwordModel.Answer : null);
+
+                    if (membershipProvider.IsUmbracoUsersProvider() && backofficeUserManager != null && userId >= 0)
+                        backofficeUserManager.RaisePasswordResetEvent(userId);
 
                     //return the generated pword
                     return Attempt.Succeed(new PasswordChangedModel { ResetPassword = newPass });
@@ -217,6 +237,10 @@ namespace Umbraco.Web.Editors
                 try
                 {
                     var result = membershipProvider.ChangePassword(username, passwordModel.OldPassword, passwordModel.NewPassword);
+
+                    if (result && backofficeUserManager != null && userId >= 0)
+                        backofficeUserManager.RaisePasswordChangedEvent(userId);
+
                     return result == false
                         ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "oldPassword" }) })
                         : Attempt.Succeed(new PasswordChangedModel());
@@ -266,6 +290,5 @@ namespace Umbraco.Web.Editors
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex2.Message + " (see log for full details)", new[] { "value" }) });
             }
         }
-
     }
 }

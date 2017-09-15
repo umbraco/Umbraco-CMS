@@ -557,7 +557,7 @@ namespace Umbraco.Web.Editors
             
             if (userSave.ChangePassword != null)
             {
-                var passwordChanger = new PasswordChanger(Logger, Services.UserService);
+                var passwordChanger = new PasswordChanger(Logger, Services.UserService, UmbracoContext.HttpContext);
 
                 var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, userSave.ChangePassword, UserManager);
                 if (passwordChangeResult.Success)
