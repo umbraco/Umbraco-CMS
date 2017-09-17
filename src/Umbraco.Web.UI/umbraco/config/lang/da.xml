@@ -15,6 +15,7 @@
     <key alias="delete">Slet</key>
     <key alias="disable">Deaktivér</key>
     <key alias="emptyTrashcan">Tøm papirkurv</key>
+    <key alias="enable">Aktivér</key>
     <key alias="exportDocumentType">Eksportér dokumenttype</key>
     <key alias="exportDocumentTypeAsCode">Eksportér til .NET</key>
     <key alias="exportDocumentTypeAsCode-Full">Eksportér til .NET</key>
