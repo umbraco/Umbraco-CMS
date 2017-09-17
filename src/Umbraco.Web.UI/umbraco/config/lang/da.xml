@@ -467,6 +467,7 @@
     <key alias="retry">Prøv igen</key>
     <key alias="rights">Rettigheder</key>
     <key alias="search">Søg</key>
+    <key alias="searchNoResult">Beklager, vi kan ikke finde det, du leder efter.</key>
     <key alias="server">Server</key>
     <key alias="show">Vis</key>
     <key alias="showPageOnSend">Hvilken side skal vises efter at formularen er sendt</key>
