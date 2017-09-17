@@ -461,6 +461,7 @@
     <key alias="recycleBin">Papirkurv</key>
     <key alias="recycleBinEmpty">Din papirkurv er tom</key>
     <key alias="remaining">Mangler</key>
+    <key alias="remove">Fjern</key>
     <key alias="rename">Omdøb</key>
     <key alias="renew">Forny</key>
     <key alias="required" version="7.0">Påkrævet</key>
