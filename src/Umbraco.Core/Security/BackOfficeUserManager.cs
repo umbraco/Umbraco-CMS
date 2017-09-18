@@ -286,7 +286,7 @@ namespace Umbraco.Core.Security
             await lockoutStore.ResetAccessFailedCountAsync(user);
             //raise the event now that it's reset
             RaiseResetAccessFailedCountEvent(userId);
-            return await UpdateAsync(user);            
+            return await UpdateAsync(user);
         }
 
         /// <summary>
@@ -296,7 +296,13 @@ namespace Umbraco.Core.Security
         /// <returns>
         /// true if the membership user was successfully unlocked; otherwise, false.
         /// </returns>
-        public bool UnlockUser(string username)
+        /// <remarks>
+        /// TODO: This is only currently used for membership provider compatibility so that an event is raised when the 
+        /// membership provider's UnlockUser method is called, this functionality changes in 7.7 since we use ASP.NET Identity APIs everwhere
+        /// and the BackOfficeUserManager shouldn't be using singletons or know about the UserService since it should only need to know about
+        /// the UserStore - we will fix this up for 7.7
+        /// </remarks>
+        internal bool UnlockUser(string username)
         {
             var user = ApplicationContext.Current.Services.UserService.GetByUsername(username);
             if (user == null)
