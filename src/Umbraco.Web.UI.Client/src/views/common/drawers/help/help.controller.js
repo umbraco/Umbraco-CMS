@@ -11,10 +11,16 @@
         vm.section = $routeParams.section;
         vm.tree = $routeParams.tree;
         vm.sectionName = "";
+        vm.customDashboard = null;
 
         vm.closeDrawer = closeDrawer;
 
         function oninit() {
+
+            // load custom help dashboard
+            dashboardResource.getDashboard("user-help").then(function (dashboard) {
+                vm.customDashboard = dashboard;
+            });
 
             if (!vm.section) {
                 vm.section = "content";

@@ -7,6 +7,20 @@
     
     <umb-drawer-content>
 
+        <!-- Show in custom help dashboard -->
+        <div style="margin-bottom: 25px;">
+
+            <div ng-repeat="tab in vm.customDashboard">
+                <div ng-repeat="property in tab.properties">
+                    <div>
+                        <h3 ng-if="property.caption">{{property.caption}}</h3>
+                        <div ng-include="property.path"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
         <!--  Help Content here -->
         <div style="margin-bottom: 25px;">
 
