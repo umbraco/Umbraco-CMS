@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration.Provider;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.DataProtection;
@@ -317,99 +318,63 @@ namespace Umbraco.Core.Security
 
         internal void RaiseAccountLockedEvent(int userId)
         {
-            OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked)
-            {
-                AffectedUser = userId
-            });
+            OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked, GetCurrentRequestIpAddress(), userId));
         }
 
         internal void RaiseAccountUnlockedEvent(int userId)
         {
-            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked)
-            {
-                AffectedUser = userId
-            });
+            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked, GetCurrentRequestIpAddress(), userId));
         }
 
         internal void RaiseForgotPasswordRequestedEvent(int userId)
         {
-            OnForgotPasswordRequested(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordRequested)
-            {
-                AffectedUser = userId
-            });
+            OnForgotPasswordRequested(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordRequested, GetCurrentRequestIpAddress(), userId));
         }
 
         internal void RaiseForgotPasswordChangedSuccessEvent(int userId)
         {
-            OnForgotPasswordChangedSuccess(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordChangedSuccess)
-            {
-                AffectedUser = userId
-            });
+            OnForgotPasswordChangedSuccess(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordChangedSuccess, GetCurrentRequestIpAddress(), userId));
         }
 
-        public void RaiseLoginFailedEvent(int userId)
+        internal void RaiseLoginFailedEvent(int userId)
         {
-            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed)
-            {
-                AffectedUser = userId
-            });
+            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, GetCurrentRequestIpAddress(), userId));
         }
 
-        public void RaiseInvalidLoginAttemptEvent(string username)
+        internal void RaiseInvalidLoginAttemptEvent(string username)
         {
-            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed)
-            {
-                Username = username,
-                Comment = string.Format("Attempted login for username '{0}' failed", username)
-            });
+            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, GetCurrentRequestIpAddress(), username, string.Format("Attempted login for username '{0}' failed", username)));
         }
 
         internal void RaiseLoginRequiresVerificationEvent(int userId)
         {
-            OnLoginRequiresVerification(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification)
-            {
-                AffectedUser = userId
-            });
+            OnLoginRequiresVerification(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification, GetCurrentRequestIpAddress(), userId));
         }
 
         internal void RaiseLoginSuccessEvent(int userId)
         {
-            OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces)
-            {
-                AffectedUser = userId
-            });
+            OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces, GetCurrentRequestIpAddress(), userId));
         }
 
         internal void RaiseLogoutSuccessEvent(int userId)
         {
-            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess)
-            {
-                AffectedUser = userId
-            });
+            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess, GetCurrentRequestIpAddress(), userId));
         }
 
         internal void RaisePasswordChangedEvent(int userId)
         {
-            OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged)
-            {
-                AffectedUser = userId
-            });
+            OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged, GetCurrentRequestIpAddress(), userId));
         }
 
         internal void RaisePasswordResetEvent(int userId)
         {
-            OnPasswordReset(new IdentityAuditEventArgs(AuditEvent.PasswordReset)
-            {
-                AffectedUser = userId
-            });
+            OnPasswordReset(new IdentityAuditEventArgs(AuditEvent.PasswordReset, GetCurrentRequestIpAddress(), userId));
         }
         internal void RaiseResetAccessFailedCountEvent(int userId)
         {
-            OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount)
-            {
-                AffectedUser = userId
-            });
+            OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount, GetCurrentRequestIpAddress(), userId));
         }
+
         public static event EventHandler AccountLocked;
         public static event EventHandler AccountUnlocked;
         public static event EventHandler ForgotPasswordRequested;
@@ -475,6 +440,17 @@ namespace Umbraco.Core.Security
         protected virtual void OnResetAccessFailedCount(IdentityAuditEventArgs e)
         {
             if (ResetAccessFailedCount != null) ResetAccessFailedCount(this, e);
+        }
+
+        /// <summary>
+        /// Returns the current request IP address for logging if there is one
+        /// </summary>
+        /// <returns></returns>
+        protected virtual string GetCurrentRequestIpAddress()
+        {
+            //TODO: inject a service to get this value, we should not be relying on the old HttpContext.Current especially in the ASP.NET Identity world.
+            var httpContext = HttpContext.Current == null ? (HttpContextBase)null : new HttpContextWrapper(HttpContext.Current);
+            return httpContext.GetCurrentRequestIpAddress();
         }
     }
 }

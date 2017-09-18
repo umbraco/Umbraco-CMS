@@ -13,7 +13,7 @@ namespace Umbraco.Core.Auditing
         /// <summary>
         /// The action that got triggered from the audit event
         /// </summary>
-        public AuditEvent Action { get; set; }
+        public AuditEvent Action { get; private set; }
 
         /// <summary>
         /// Current date/time in UTC format
@@ -23,27 +23,27 @@ namespace Umbraco.Core.Auditing
         /// <summary>
         /// The source IP address of the user performing the action
         /// </summary>
-        public string IpAddress { get; set; }
+        public string IpAddress { get; private set; }
 
         /// <summary>
         /// The user affected by the event raised
         /// </summary>
-        public int AffectedUser { get; set; }
+        public int AffectedUser { get; private set; }
 
         /// <summary>
         /// If a user is perfoming an action on a different user, then this will be set. Otherwise it will be -1
         /// </summary>
-        public int PerformingUser { get; set; }
+        public int PerformingUser { get; private set; }
 
         /// <summary>
         /// An optional comment about the action being logged
         /// </summary>
-        public string Comment { get; set; }
+        public string Comment { get; private set; }
 
         /// <summary>
         /// This property is always empty except in the LoginFailed event for an unknown user trying to login
         /// </summary>
-        public string Username { get; set; }
+        public string Username { get; private set; }
 
         /// <summary>
         /// Sets the properties on the event being raised, all parameters are optional except for the action being performed
@@ -51,28 +51,26 @@ namespace Umbraco.Core.Auditing
         /// <param name="action">An action based on the AuditEvent enum</param>
         /// <param name="ipAddress">The client's IP address. This is usually automatically set but could be overridden if necessary</param>
         /// <param name="performingUser">The Id of the user performing the action (if different from the user affected by the action)</param>
-        public IdentityAuditEventArgs(AuditEvent action, string ipAddress = "", int performingUser = -1)
+        public IdentityAuditEventArgs(AuditEvent action, string ipAddress, int performingUser = -1)
         {
             DateTimeUtc = DateTime.UtcNow;
             Action = action;
 
-            IpAddress = string.IsNullOrWhiteSpace(ipAddress)
-                ? GetCurrentRequestIpAddress()
-                : ipAddress;
+            IpAddress = ipAddress;
 
             PerformingUser = performingUser == -1
                 ? GetCurrentRequestBackofficeUserId()
                 : performingUser;
         }
 
-        /// <summary>
-        /// Returns the current request IP address for logging if there is one
-        /// </summary>
-        /// <returns></returns>
-        protected string GetCurrentRequestIpAddress()
+        public IdentityAuditEventArgs(AuditEvent action, string ipAddress, string username, string comment)
         {
-            var httpContext = HttpContext.Current == null ? (HttpContextBase)null : new HttpContextWrapper(HttpContext.Current);
-            return httpContext.GetCurrentRequestIpAddress();
+            DateTimeUtc = DateTime.UtcNow;
+            Action = action;
+
+            IpAddress = ipAddress;
+            Username = username;
+            Comment = comment;
         }
 
         /// <summary>
