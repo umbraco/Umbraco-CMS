@@ -25,6 +25,9 @@ namespace Umbraco.Core.Services
         private readonly IMemberGroupService _memberGroupService;
         private readonly MediaFileSystem _mediaFileSystem;
 
+        //only for unit tests!
+        internal MembershipProviderBase MembershipProvider { get; set; }
+
         #region Constructor
 
         public MemberService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService,  MediaFileSystem mediaFileSystem)
@@ -315,7 +318,8 @@ namespace Umbraco.Core.Services
 
             if (withIdentity)
             {
-                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMember>(member)))
+                var saveEventArgs = new SaveEventArgs<IMember>(member);
+                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     member.WasCancelled = true;
                     return;
@@ -324,7 +328,8 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IMemberRepository>();
                 repository.AddOrUpdate(member);
 
-                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(member, false));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(Saved, this, saveEventArgs);
             }
 
             uow.Events.Dispatch(Created, this, new NewEventArgs<IMember>(member, false, member.ContentType.Alias, -1));
@@ -868,7 +873,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMember>(member)))
+                var saveEventArgs = new SaveEventArgs<IMember>(member);
+                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Complete();
                     return;
@@ -885,7 +891,10 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(member);
 
                 if (raiseEvents)
-                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(member, false));
+                {
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(Saved, this, saveEventArgs);
+                }
                 Audit(uow, AuditType.Save, "Save Member performed by user", 0, member.Id);
 
                 uow.Complete();
@@ -904,7 +913,8 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMember>(membersA)))
+                var saveEventArgs = new SaveEventArgs<IMember>(membersA);
+                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Complete();
                     return;
@@ -916,7 +926,10 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(member);
 
                 if (raiseEvents)
-                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(membersA, false));
+                {
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(Saved, this, saveEventArgs);
+                }
                 Audit(uow, AuditType.Save, "Save Member items performed by user", 0, -1);
 
                 uow.Complete();
@@ -935,7 +948,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMember>(member)))
+                var deleteEventArgs = new DeleteEventArgs<IMember>(member);
+                if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                 {
                     uow.Complete();
                     return;
@@ -943,18 +957,21 @@ namespace Umbraco.Core.Services
 
                 uow.WriteLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
-                DeleteLocked(uow, repository, member);
+                DeleteLocked(uow, repository, member, deleteEventArgs);
 
                 Audit(uow, AuditType.Delete, "Delete Member performed by user", 0, member.Id);
                 uow.Complete();
             }
         }
 
-        private void DeleteLocked(IScopeUnitOfWork uow, IMemberRepository repository, IMember member)
+        private void DeleteLocked(IScopeUnitOfWork uow, IMemberRepository repository, IMember member, DeleteEventArgs<IMember> args = null)
         {
             // a member has no descendants
             repository.Delete(member);
-            var args = new DeleteEventArgs<IMember>(member, false); // raise event & get flagged files
+            if (args == null)
+                args = new DeleteEventArgs<IMember>(member, false); // raise event & get flagged files
+            else
+                args.CanCancel = false;
             uow.Events.Dispatch(Deleted, this, args);
 
             // fixme - this is MOOT because the event will not trigger immediately
@@ -1179,7 +1196,7 @@ namespace Umbraco.Core.Services
         {
             if (member == null) throw new ArgumentNullException(nameof(member));
 
-            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            var provider = MembershipProvider ?? MembershipProviderExtensions.GetMembersMembershipProvider();
             if (provider.IsUmbracoMembershipProvider())
                 provider.ChangePassword(member.Username, "", password); // this is actually updating the password
             else
@@ -1294,7 +1311,8 @@ namespace Umbraco.Core.Services
                 var query = uow.Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
                 var members = repository.GetByQuery(query).ToArray();
 
-                if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMember>(members)))
+                var deleteEventArgs = new DeleteEventArgs<IMember>(members);
+                if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                 {
                     uow.Complete();
                     return;

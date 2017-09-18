@@ -374,11 +374,22 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IEntityRepository>();
-
+                
                 var query = repository.Query;
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
-                    query.Where(x => x.Path.SqlContains($",{id},", TextColumnType.NVarchar));
+                {
+                    //lookup the path so we can use it in the prefix query below
+                    var itemPaths = repository.GetAllPaths(objectTypeId, id).ToArray();
+                    if (itemPaths.Length == 0)
+                    {
+                        totalRecords = 0;
+                        return Enumerable.Empty<IUmbracoEntity>();
+                    }
+                    var itemPath = itemPaths[0].Path;
+
+                    query.Where(x => x.Path.SqlStartsWith(itemPath + ",", TextColumnType.NVarchar));
+                }
 
                 IQuery<IUmbracoEntity> filterQuery = null;
                 if (filter.IsNullOrWhiteSpace() == false)
@@ -407,15 +418,30 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IEntityRepository>();
-
+                
                 var query = uow.Query<IUmbracoEntity>();
                 if (idsA.All(x => x != Constants.System.Root))
                 {
+                    //lookup the paths so we can use it in the prefix query below
+                    var itemPaths = repository.GetAllPaths(objectTypeId, idsA).ToArray();
+                    if (itemPaths.Length == 0)
+                    {
+                        totalRecords = 0;
+                        return Enumerable.Empty<IUmbracoEntity>();
+                    }
+
                     var clauses = new List<Expression<Func<IUmbracoEntity, bool>>>();
                     foreach (var id in idsA)
                     {
-                        var qid = id;
-                        clauses.Add(x => x.Path.SqlContains(string.Format(",{0},", qid), TextColumnType.NVarchar) || x.Path.SqlEndsWith(string.Format(",{0}", qid), TextColumnType.NVarchar));
+                        //if the id is root then don't add any clauses
+                        if (id != Constants.System.Root)
+                        {
+                            var itemPath = itemPaths.FirstOrDefault(x => x.Id == id);
+                            if (itemPath == null) continue;
+                            var path = itemPath.Path;
+                            var qid = id;
+                            clauses.Add(x => x.Path.SqlStartsWith(path + ",", TextColumnType.NVarchar) || x.Path.SqlEndsWith("," + qid, TextColumnType.NVarchar));
+                        }                        
                     }
                     query.WhereAny(clauses);
                 }
@@ -468,7 +494,7 @@ namespace Umbraco.Core.Services
                 return contents;
             }
         }
-
+        
         /// <summary>
         /// Gets a collection of the entities at the root, which corresponds to the entities with a Parent Id of -1.
         /// </summary>
@@ -566,13 +592,13 @@ namespace Umbraco.Core.Services
                 return repository.GetAllPaths(objectTypeId, keys);
             }
         }
-
+        
         /// <summary>
-        /// Gets a collection of <see cref="IUmbracoEntity"/>
+        /// Gets a collection of <see cref="T:Umbraco.Core.Models.EntityBase.IUmbracoEntity" />
         /// </summary>
         /// <param name="objectTypeId">Guid id of the UmbracoObjectType</param>
         /// <param name="ids"></param>
-        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
+        /// <returns>An enumerable list of <see cref="T:Umbraco.Core.Models.EntityBase.IUmbracoEntity" /> objects</returns>
         public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids)
         {
             var umbracoObjectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
@@ -691,6 +717,35 @@ namespace Umbraco.Core.Services
                 var exists = repository.Exists(id);
                 return exists;
             }
+        }
+
+        /// <inheritdoc />
+        public int ReserveId(Guid key)
+        {
+            NodeDto node;
+            using (var scope = UowProvider.ScopeProvider.CreateScope())
+            {
+                var sql = new Sql("SELECT * FROM umbracoNode WHERE uniqueID=@0 AND nodeObjectType=@1", key, Constants.ObjectTypes.IdReservationGuid);
+                node = scope.Database.SingleOrDefault<NodeDto>(sql);
+                if (node != null) throw new InvalidOperationException("An identifier has already been reserved for this Udi.");
+                node = new NodeDto
+                {
+                    UniqueId = key,
+                    Text = "RESERVED.ID",
+                    NodeObjectType = Constants.ObjectTypes.IdReservationGuid,
+
+                    CreateDate = DateTime.Now,
+                    UserId = 0,
+                    ParentId = -1,
+                    Level = 1,
+                    Path = "-1",
+                    SortOrder = 0,
+                    Trashed = false
+                };
+                scope.Database.Insert(node);
+                scope.Complete();
+            }
+            return node.NodeId;
         }
     }
 }

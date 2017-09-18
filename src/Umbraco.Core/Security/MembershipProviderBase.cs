@@ -67,6 +67,19 @@ namespace Umbraco.Core.Security
             get { return false; }
         }
 
+        /// <summary>
+        /// Returns the raw password value for a given user
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// By default this will return an invalid attempt, inheritors will need to override this to support it
+        /// </remarks>
+        protected virtual Attempt<string> GetRawPassword(string username)
+        {
+            return Attempt<string>.Fail();
+        }
+
         private string _applicationName;
         private bool _enablePasswordReset;
         private bool _enablePasswordRetrieval;
@@ -301,7 +314,7 @@ namespace Umbraco.Core.Security
         /// Processes a request to update the password for a membership user.
         /// </summary>
         /// <param name="username">The user to update the password for.</param>
-        /// <param name="oldPassword">This property is ignore for this provider</param>
+        /// <param name="oldPassword">Required to change a user password if the user is not new and AllowManuallyChangingPassword is false</param>
         /// <param name="newPassword">The new password for the specified user.</param>
         /// <returns>
         /// true if the password was updated successfully; otherwise, false.
@@ -311,10 +324,17 @@ namespace Umbraco.Core.Security
         /// </remarks>
         public override bool ChangePassword(string username, string oldPassword, string newPassword)
         {
+            string rawPasswordValue = string.Empty;
             if (oldPassword.IsNullOrWhiteSpace() && AllowManuallyChangingPassword == false)
             {
-                //If the old password is empty and AllowManuallyChangingPassword is false, than this provider cannot just arbitrarily change the password
-                throw new NotSupportedException("This provider does not support manually changing the password");
+                //we need to lookup the member since this could be a brand new member without a password set
+                var rawPassword = GetRawPassword(username);
+                rawPasswordValue = rawPassword.Success ? rawPassword.Result : string.Empty;
+                if (rawPassword.Success == false || rawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix) == false)
+                {
+                    //If the old password is empty and AllowManuallyChangingPassword is false, than this provider cannot just arbitrarily change the password
+                    throw new NotSupportedException("This provider does not support manually changing the password");
+                }
             }
 
             var args = new ValidatePasswordEventArgs(username, newPassword, false);
@@ -327,10 +347,12 @@ namespace Umbraco.Core.Security
                 throw new MembershipPasswordException("Change password canceled due to password validation failure.");
             }
 
-            //Special case to allow changing password without validating existing credentials
-            //This is used during installation only
-            var installing = Current.RuntimeState.Level == RuntimeLevel.Install;
-            if (AllowManuallyChangingPassword == false && installing && oldPassword == "default")
+            //Special cases to allow changing password without validating existing credentials
+            // * the member is new and doesn't have a password set
+            // * during installation to set the admin password
+            if (AllowManuallyChangingPassword == false
+                && (rawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix)
+                    || (installing && oldPassword == "default")))
             {
                 return PerformChangePassword(username, oldPassword, newPassword);
             }

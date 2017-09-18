@@ -383,6 +383,7 @@
     <Compile Include="Events\RollbackEventArgs.cs" />
     <Compile Include="Events\SaveEventArgs.cs" />
     <Compile Include="Events\ScopeLifetimeMessagesFactory.cs" />
+    <Compile Include="Events\SendEmailEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
     <Compile Include="Events\SupersedeEventAttribute.cs" />
     <Compile Include="Events\TransientEventMessagesFactory.cs" />
@@ -1166,7 +1167,7 @@
     <Compile Include="Persistence\Repositories\RepositoryBaseOfTIdTEntity.cs" />
     <Compile Include="Persistence\Repositories\ScriptRepository.cs" />
     <Compile Include="Persistence\Repositories\ServerRegistrationRepository.cs" />
-    <Compile Include="Persistence\Repositories\SimilarNodeNameComparer.cs" />
+    <Compile Include="Persistence\Repositories\SimilarNodeName.cs" />
     <Compile Include="Persistence\Repositories\SimpleGetRepository.cs" />
     <Compile Include="Persistence\Repositories\StylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\TagRepository.cs" />
@@ -1323,6 +1324,7 @@
     <Compile Include="Serialization\JsonCreationConverter.cs" />
     <Compile Include="Serialization\JsonNetSerializer.cs" />
     <Compile Include="Serialization\JsonToStringConverter.cs" />
+    <Compile Include="Serialization\KnownTypeUdiJsonConverter.cs" />
     <Compile Include="Serialization\NoTypeConverterJsonConverter.cs" />
     <Compile Include="Serialization\SerializationExtensions.cs" />
     <Compile Include="Serialization\SerializationService.cs" />

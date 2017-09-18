@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
-            _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, work, cache, logger, sqlSyntax);
+            _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, work, cache, logger);
             EnsureUniqueNaming = contentSection.EnsureUniqueNaming;
         }
 
@@ -441,13 +441,13 @@ namespace Umbraco.Core.Persistence.Repositories
         /// TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
         /// Then we can do the same thing with repository instances and we wouldn't need to leave all these methods as not implemented because we wouldn't need to implement them
         /// </remarks>
-        private class MediaByGuidReadRepository : PetaPocoRepositoryBase<Guid, IMedia>
+        private class MediaByGuidReadRepository : NPocoRepositoryBase<Guid, IMedia>
         {
             private readonly MediaRepository _outerRepo;
 
             public MediaByGuidReadRepository(MediaRepository outerRepo,
-                IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-                : base(work, cache, logger, sqlSyntax)
+                IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
+                : base(work, cache, logger)
             {
                 _outerRepo = outerRepo;
             }
@@ -456,14 +456,14 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var sql = GetBaseQuery(false);
                 sql.Where(GetBaseWhereClause(), new { Id = id });
-                sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
+                sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-                var dto = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+                var dto = Database.Fetch<ContentVersionDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
 
                 if (dto == null)
                     return null;
 
-                var content = _outerRepo.CreateMediaFromDto(dto, sql);
+                var content = _outerRepo.CreateMediaFromDto(dto, dto.VersionId);
 
                 return content;
             }
@@ -476,10 +476,10 @@ namespace Umbraco.Core.Persistence.Repositories
                     sql.Where("umbracoNode.uniqueID in (@ids)", new { ids = ids });
                 }
 
-                return _outerRepo.ProcessQuery(sql, new PagingSqlQuery(sql));
+                return _outerRepo.MapQueryDtos(Database.Fetch<ContentVersionDto>(sql));
             }
 
-            protected override Sql GetBaseQuery(bool isCount)
+            protected override Sql<SqlContext> GetBaseQuery(bool isCount)
             {
                 return _outerRepo.GetBaseQuery(isCount);
             }
@@ -489,10 +489,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 return "umbracoNode.uniqueID = @Id";
             }
 
-            protected override Guid NodeObjectTypeId
-            {
-                get { return _outerRepo.NodeObjectTypeId; }
-            }
+            protected override Guid NodeObjectTypeId => _outerRepo.NodeObjectTypeId;
 
             #region Not needed to implement
 

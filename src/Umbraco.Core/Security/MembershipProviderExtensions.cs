@@ -18,6 +18,9 @@ namespace Umbraco.Core.Security
         /// <param name="provider"></param>
         /// <param name="userService"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// An Admin can always reset the password
+        /// </remarks>
         internal static bool CanResetPassword(this MembershipProvider provider, IUserService userService)
         {
             if (provider == null) throw new ArgumentNullException("provider");

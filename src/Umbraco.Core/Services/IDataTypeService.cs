@@ -17,6 +17,7 @@ namespace Umbraco.Core.Services
         IEnumerable<EntityContainer> GetContainers(IDataTypeDefinition dataTypeDefinition);
         IEnumerable<EntityContainer> GetContainers(int[] containerIds);
         Attempt<OperationStatus> DeleteContainer(int containerId, int userId = 0);
+        Attempt<OperationStatus<OperationStatusType, EntityContainer>> RenameContainer(int id, string name, int userId = 0);
 
         /// <summary>
         /// Gets a <see cref="IDataTypeDefinition"/> by its Name

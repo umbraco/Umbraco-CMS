@@ -33,7 +33,8 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IDomain>(domain, evtMsgs)))
+                var deleteEventArgs = new DeleteEventArgs<IDomain>(domain, evtMsgs);
+                if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                 {
                     uow.Complete();
                     return OperationStatus.Attempt.Cancel(evtMsgs);
@@ -43,8 +44,8 @@ namespace Umbraco.Core.Services
                 repository.Delete(domain);
                 uow.Complete();
 
-                var args = new DeleteEventArgs<IDomain>(domain, false, evtMsgs);
-                uow.Events.Dispatch(Deleted, this, args);
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(Deleted, this, deleteEventArgs);
             }
 
             return OperationStatus.Attempt.Succeed(evtMsgs);
@@ -92,7 +93,8 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IDomain>(domainEntity, evtMsgs)))
+                var saveEventArgs = new SaveEventArgs<IDomain>(domainEntity, evtMsgs);
+                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Complete();
                     return OperationStatus.Attempt.Cancel(evtMsgs);
@@ -101,8 +103,8 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IDomainRepository>();
                 repository.AddOrUpdate(domainEntity);
                 uow.Complete();
-
-                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IDomain>(domainEntity, false, evtMsgs));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(Saved, this, saveEventArgs);
             }
 
             return OperationStatus.Attempt.Succeed(evtMsgs);

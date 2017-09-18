@@ -112,6 +112,12 @@ namespace Umbraco.Core.Services
             uow.Events.DispatchCancelable(SavedContainer, This, args);
         }
 
+        protected void OnRenamedContainer(IScopeUnitOfWork uow, SaveEventArgs<EntityContainer> args)
+        {
+            // fixme changing the name of the event?!
+            uow.Events.DispatchCancelable(SavedContainer, This, args, "RenamedContainer");
+        }
+
         // fixme what is this?
         protected void OnDeletingContainer(IScopeUnitOfWork uow,  DeleteEventArgs<EntityContainer> args)
         {

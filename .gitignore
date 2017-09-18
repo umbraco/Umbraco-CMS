@@ -70,6 +70,7 @@ src/Umbraco.Web.UI/[Ww]eb.config
 *.transformed
 
 node_modules
+lib-bower
 
 src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ib/*
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/umbraco.*

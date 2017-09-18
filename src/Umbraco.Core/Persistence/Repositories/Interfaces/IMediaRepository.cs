@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Models;
+﻿using System;
+using System.Xml.Linq;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -22,6 +24,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="content"></param>
         /// <param name="xml"></param>
-        void AddOrUpdatePreviewXml(IMedia content, Func<IMedia, XElement> xml);        
+        void AddOrUpdatePreviewXml(IMedia content, Func<IMedia, XElement> xml);
     }
 }

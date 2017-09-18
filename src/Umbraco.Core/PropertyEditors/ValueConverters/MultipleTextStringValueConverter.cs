@@ -52,7 +52,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
             // fall back on normal behaviour
             return values.Any() == false
-                ? sourceString.Split(Environment.NewLine.ToCharArray())
+                ? sourceString.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)
                 : values.ToArray();
         }
 

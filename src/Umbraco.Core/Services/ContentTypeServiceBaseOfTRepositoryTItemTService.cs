@@ -385,7 +385,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                if (OnSavingCancelled(uow, new SaveEventArgs<TItem>(item)))
+                var saveEventArgs = new SaveEventArgs<TItem>(item);
+                if (OnSavingCancelled(uow, saveEventArgs))
                 {
                     uow.Complete();
                     return;
@@ -412,7 +413,8 @@ namespace Umbraco.Core.Services
                 OnUowRefreshedEntity(args);
 
                 OnChanged(uow, args);
-                OnSaved(uow, new SaveEventArgs<TItem>(item, false));
+                saveEventArgs.CanCancel = false;
+                OnSaved(uow, saveEventArgs);
 
                 Audit(uow, AuditType.Save, $"Save {typeof(TItem).Name} performed by user", userId, item.Id);
                 uow.Complete();
@@ -425,7 +427,8 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                if (OnSavingCancelled(uow, new SaveEventArgs<TItem>(itemsA)))
+                var saveEventArgs = new SaveEventArgs<TItem>(itemsA);
+                if (OnSavingCancelled(uow, saveEventArgs))
                 {
                     uow.Complete();
                     return;
@@ -454,7 +457,8 @@ namespace Umbraco.Core.Services
                 OnUowRefreshedEntity(args);
 
                 OnChanged(uow, args);
-                OnSaved(uow, new SaveEventArgs<TItem>(itemsA, false));
+                saveEventArgs.CanCancel = false;
+                OnSaved(uow, saveEventArgs);
 
                 Audit(uow, AuditType.Save, $"Save {typeof(TItem).Name} performed by user", userId, -1);
                 uow.Complete();
@@ -469,7 +473,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                if (OnDeletingCancelled(uow, new DeleteEventArgs<TItem>(item)))
+                var deleteEventArgs = new DeleteEventArgs<TItem>(item);
+                if (OnDeletingCancelled(uow, deleteEventArgs))
                 {
                     uow.Complete();
                     return;
@@ -511,7 +516,9 @@ namespace Umbraco.Core.Services
                 OnUowRefreshedEntity(args);
 
                 OnChanged(uow, args);
-                OnDeleted(uow, new DeleteEventArgs<TItem>(deleted, false));
+                deleteEventArgs.DeletedEntities = deleted.DistinctBy(x => x.Id);
+                deleteEventArgs.CanCancel = false;
+                OnDeleted(uow, deleteEventArgs);
 
                 Audit(uow, AuditType.Delete, $"Delete {typeof(TItem).Name} performed by user", userId, item.Id);
                 uow.Complete();
@@ -524,7 +531,8 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                if (OnDeletingCancelled(uow, new DeleteEventArgs<TItem>(itemsA)))
+                var deleteEventArgs = new DeleteEventArgs<TItem>(itemsA);
+                if (OnDeletingCancelled(uow, deleteEventArgs))
                 {
                     uow.Complete();
                     return;
@@ -563,7 +571,9 @@ namespace Umbraco.Core.Services
                 OnUowRefreshedEntity(args);
 
                 OnChanged(uow, args);
-                OnDeleted(uow, new DeleteEventArgs<TItem>(deleted, false));
+                deleteEventArgs.DeletedEntities = deleted.DistinctBy(x => x.Id);
+                deleteEventArgs.CanCancel = false;
+                OnDeleted(uow, deleteEventArgs);
 
                 Audit(uow, AuditType.Delete, $"Delete {typeof(TItem).Name} performed by user", userId, -1);
                 uow.Complete();
@@ -692,7 +702,9 @@ namespace Umbraco.Core.Services
             var moveInfo = new List<MoveEventInfo<TItem>>();
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                if (OnMovingCancelled(uow, new MoveEventArgs<TItem>(evtMsgs, new MoveEventInfo<TItem>(moving, moving.Path, containerId))))
+                var moveEventInfo = new MoveEventInfo<TItem>(moving, moving.Path, containerId);
+                var moveEventArgs = new MoveEventArgs<TItem>(evtMsgs, moveEventInfo);
+                if (OnMovingCancelled(uow, moveEventArgs))
                 {
                     uow.Complete();
                     return OperationStatus.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs);
@@ -725,7 +737,9 @@ namespace Umbraco.Core.Services
                 // has no impact on the published content types - would be entirely different if we were to support
                 // moving a content type under another content type.
 
-                OnMoved(uow, new MoveEventArgs<TItem>(false, evtMsgs, moveInfo.ToArray()));
+                moveEventArgs.MoveInfoCollection = moveInfo;
+                moveEventArgs.CanCancel = false;
+                OnMoved(uow, moveEventArgs);
             }
 
             return OperationStatus.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
@@ -756,7 +770,8 @@ namespace Umbraco.Core.Services
                         CreatorId = userId
                     };
 
-                    if (OnSavingContainerCancelled(uow, new SaveEventArgs<EntityContainer>(container, evtMsgs)))
+                    var saveEventArgs = new SaveEventArgs<EntityContainer>(container, evtMsgs);
+                    if (OnSavingContainerCancelled(uow, saveEventArgs))
                     {
                         uow.Complete();
                         return OperationStatus.Attempt.Cancel(evtMsgs, container);
@@ -765,7 +780,8 @@ namespace Umbraco.Core.Services
                     repo.AddOrUpdate(container);
                     uow.Complete();
 
-                    OnSavedContainer(uow, new SaveEventArgs<EntityContainer>(container, evtMsgs));
+                    saveEventArgs.CanCancel = false;
+                    OnSavedContainer(uow, saveEventArgs);
                     //TODO: Audit trail ?
 
                     return OperationStatus.Attempt.Succeed(evtMsgs, container);
@@ -895,7 +911,8 @@ namespace Umbraco.Core.Services
                     return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCannot, evtMsgs));
                 }
 
-                if (OnDeletingContainerCancelled(uow, new DeleteEventArgs<EntityContainer>(container, evtMsgs)))
+                var deleteEventArgs = new DeleteEventArgs<EntityContainer>(container, evtMsgs);
+                if (OnDeletingContainerCancelled(uow, deleteEventArgs))
                 {
                     uow.Complete();
                     return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs));
@@ -904,10 +921,42 @@ namespace Umbraco.Core.Services
                 repo.Delete(container);
                 uow.Complete();
 
-                OnDeletedContainer(uow, new DeleteEventArgs<EntityContainer>(container, evtMsgs));
+                deleteEventArgs.CanCancel = false;
+                OnDeletedContainer(uow, deleteEventArgs);
 
                 return OperationStatus.Attempt.Succeed(evtMsgs);
                 //TODO: Audit trail ?
+            }
+        }
+
+        public Attempt<OperationStatus<OperationStatusType, EntityContainer>> RenameContainer(int id, string name, int userId = 0)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                uow.WriteLock(WriteLockIds); // also for containers
+
+                var repository = uow.CreateContainerRepository(ContainerObjectType);
+                try
+                {
+                    var container = repository.Get(id);
+
+                    //throw if null, this will be caught by the catch and a failed returned
+                    if (container == null)
+                        throw new InvalidOperationException("No container found with id " + id);
+
+                    container.Name = name;
+                    repository.AddOrUpdate(container);
+                    uow.Complete();
+
+                    OnRenamedContainer(uow, new SaveEventArgs<EntityContainer>(container, evtMsgs));
+
+                    return OperationStatus.Attempt.Succeed(OperationStatusType.Success, evtMsgs, container);
+                }
+                catch (Exception ex)
+                {
+                    return OperationStatus.Attempt.Fail<EntityContainer>(evtMsgs, ex);
+                }
             }
         }
 

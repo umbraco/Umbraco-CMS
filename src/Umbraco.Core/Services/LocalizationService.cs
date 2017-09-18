@@ -80,7 +80,8 @@ namespace Umbraco.Core.Services
                     item.Translations = translations;
                 }
 
-                if (uow.Events.DispatchCancelable(SavingDictionaryItem, this, new SaveEventArgs<IDictionaryItem>(item)))
+                var saveEventArgs = new SaveEventArgs<IDictionaryItem>(item);
+                if (uow.Events.DispatchCancelable(SavingDictionaryItem, this, saveEventArgs))
                 {
                     uow.Complete();
                     return item;
@@ -91,8 +92,8 @@ namespace Umbraco.Core.Services
 
                 // ensure the lazy Language callback is assigned
                 EnsureDictionaryItemLanguageCallback(item);
-
-                uow.Events.Dispatch(SavedDictionaryItem, this, new SaveEventArgs<IDictionaryItem>(item));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(SavedDictionaryItem, this, saveEventArgs);
 
                 return item;
             }
@@ -257,7 +258,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(DeletingDictionaryItem, this, new DeleteEventArgs<IDictionaryItem>(dictionaryItem)))
+                var deleteEventArgs = new DeleteEventArgs<IDictionaryItem>(dictionaryItem);
+                if (uow.Events.DispatchCancelable(DeletingDictionaryItem, this, deleteEventArgs))
                 {
                     uow.Complete();
                     return;
@@ -265,8 +267,8 @@ namespace Umbraco.Core.Services
 
                 var repository = uow.CreateRepository<IDictionaryRepository>();
                 repository.Delete(dictionaryItem);
-
-                uow.Events.Dispatch(DeletedDictionaryItem, this, new DeleteEventArgs<IDictionaryItem>(dictionaryItem, false));
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(DeletedDictionaryItem, this, deleteEventArgs);
 
                 Audit(uow, AuditType.Delete, "Delete DictionaryItem performed by user", userId, dictionaryItem.Id);
 
@@ -338,7 +340,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(SavingLanguage, this, new SaveEventArgs<ILanguage>(language)))
+                var saveEventArgs = new SaveEventArgs<ILanguage>(language);
+                if (uow.Events.DispatchCancelable(SavingLanguage, this, saveEventArgs))
                 {
                     uow.Complete();
                     return;
@@ -346,8 +349,8 @@ namespace Umbraco.Core.Services
 
                 var repository = uow.CreateRepository<ILanguageRepository>();
                 repository.AddOrUpdate(language);
-
-                uow.Events.Dispatch(SavedLanguage, this, new SaveEventArgs<ILanguage>(language, false));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(SavedLanguage, this, saveEventArgs);
 
                 Audit(uow, AuditType.Save, "Save Language performed by user", userId, language.Id);
 
@@ -364,7 +367,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(DeletingLanguage, this, new DeleteEventArgs<ILanguage>(language)))
+                var deleteEventArgs = new DeleteEventArgs<ILanguage>(language);
+                if (uow.Events.DispatchCancelable(DeletingLanguage, this, deleteEventArgs))
                 {
                     uow.Complete();
                     return;
@@ -374,7 +378,8 @@ namespace Umbraco.Core.Services
                 //NOTE: There isn't any constraints in the db, so possible references aren't deleted
                 repository.Delete(language);
 
-                uow.Events.Dispatch(DeletedLanguage, this, new DeleteEventArgs<ILanguage>(language, false));
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(DeletedLanguage, this, deleteEventArgs);
 
                 Audit(uow, AuditType.Delete, "Delete Language performed by user", userId, language.Id);
 
@@ -402,6 +407,15 @@ namespace Umbraco.Core.Services
             item.GetLanguage = GetLanguageById;
             foreach (var trans in item.Translations.OfType<DictionaryTranslation>())
                 trans.GetLanguage = GetLanguageById;
+        }
+
+        public Dictionary<string, Guid> GetDictionaryItemKeyMap()
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateDictionaryRepository(uow);
+                return repository.GetDictionaryItemKeyMap();
+            }
         }
 
         #region Event Handlers

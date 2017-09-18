@@ -286,5 +286,13 @@ namespace Umbraco.Core.Services
         /// <param name="umbracoObjectType"><see cref="UmbracoObjectTypes"/></param>
         /// <returns>Type of the entity</returns>
         Type GetEntityType(UmbracoObjectTypes umbracoObjectType);
+
+        /// <summary>
+        /// Reserves an identifier for a key.
+        /// </summary>
+        /// <param name="key">They key.</param>
+        /// <returns>The identifier.</returns>
+        /// <remarks>When a new content or a media is saved with the key, it will have the reserved identifier.</remarks>
+        int ReserveId(Guid key);
     }
 }

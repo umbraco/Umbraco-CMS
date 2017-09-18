@@ -56,7 +56,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords,
             Expression<Func<IUser, object>> orderBy, Direction orderDirection = Direction.Ascending,
-            string[] userGroups = null, UserState[] userState = null, IQuery<IUser> filter = null);
+            string[] includeUserGroups = null, string[] excludeUserGroups = null, UserState[] userState = null,
+            IQuery<IUser> filter = null);
 
         /// <summary>
         /// Returns a user by username

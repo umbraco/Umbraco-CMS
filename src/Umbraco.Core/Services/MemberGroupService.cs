@@ -78,7 +78,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMemberGroup>(memberGroup)))
+                var saveEventArgs = new SaveEventArgs<IMemberGroup>(memberGroup);
+                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Complete();
                     return;
@@ -89,7 +90,10 @@ namespace Umbraco.Core.Services
                 uow.Complete();
 
                 if (raiseEvents)
-                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMemberGroup>(memberGroup, false));
+                {
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(Saved, this, saveEventArgs);
+                }
             }
         }
 
@@ -97,7 +101,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMemberGroup>(memberGroup)))
+                var deleteEventArgs = new DeleteEventArgs<IMemberGroup>(memberGroup);
+                if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                 {
                     uow.Complete();
                     return;
@@ -106,8 +111,8 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IMemberGroupRepository>();
                 repository.Delete(memberGroup);
                 uow.Complete();
-
-                uow.Events.Dispatch(Deleted, this, new DeleteEventArgs<IMemberGroup>(memberGroup, false));
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(Deleted, this, deleteEventArgs);
             }
         }
 

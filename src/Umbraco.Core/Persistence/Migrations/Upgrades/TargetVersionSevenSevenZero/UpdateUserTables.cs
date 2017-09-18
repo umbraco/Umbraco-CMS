@@ -6,6 +6,7 @@ using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZero
 {
+    [Migration("7.7.0", 5, Constants.System.UmbracoMigrationName)]
     [Migration("8.0.0", 0, Constants.System.UmbracoMigrationName)]
     public class UpdateUserTables : MigrationBase
     {
@@ -29,6 +30,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
 
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("invitedDate")) == false)
                 Create.Column("invitedDate").OnTable("umbracoUser").AsDateTime().Nullable();
+
+            if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("avatar")) == false)
+                Create.Column("avatar").OnTable("umbracoUser").AsString(500).Nullable();
 
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("passwordConfig")) == false)
             {

@@ -49,6 +49,7 @@ namespace Umbraco.Core.Services
         IEnumerable<EntityContainer> GetContainers(TItem contentType);
         IEnumerable<EntityContainer> GetContainers(string folderName, int level);
         Attempt<OperationStatus> DeleteContainer(int containerId, int userId = 0);
+        Attempt<OperationStatus<OperationStatusType, EntityContainer>> RenameContainer(int id, string name, int userId = 0);
 
         Attempt<OperationStatus<MoveOperationStatusType>> Move(TItem moving, int containerId);
         Attempt<OperationStatus<MoveOperationStatusType, TItem>> Copy(TItem copying, int containerId);

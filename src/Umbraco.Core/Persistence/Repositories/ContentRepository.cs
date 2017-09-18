@@ -40,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             _publishedQuery =  work.Query<IContent>().Where(x => x.Published); // fixme not used?
 
-            _contentByGuidReadRepository = new ContentByGuidReadRepository(this, work, cacheHelper, logger, syntaxProvider);
+            _contentByGuidReadRepository = new ContentByGuidReadRepository(this, work, cacheHelper, logger);
             EnsureUniqueNaming = settings.EnsureUniqueNaming;
         }
 
@@ -760,21 +760,19 @@ namespace Umbraco.Core.Persistence.Repositories
                 return content.HasPublishedVersion;
 
             var syntaxUmbracoNode = SqlSyntax.GetQuotedTableName("umbracoNode");
-            var syntaxPath = SqlSyntax.GetQuotedColumnName("path");
-            var syntaxConcat = SqlSyntax.GetConcat(syntaxUmbracoNode + "." + syntaxPath, "',%'");
+            var ids = content.Path.Split(',').Skip(1).Select(int.Parse);
 
             var sql = string.Format(@"SELECT COUNT({0}.{1})
 FROM {0}
 JOIN {2} ON ({0}.{1}={2}.{3} AND {2}.{4}=@published)
-WHERE (@path LIKE {5})",
+WHERE {0}.{1} IN (@ids)",
                 syntaxUmbracoNode,
                 SqlSyntax.GetQuotedColumnName("id"),
                 SqlSyntax.GetQuotedTableName("cmsDocument"),
                 SqlSyntax.GetQuotedColumnName("nodeId"),
-                SqlSyntax.GetQuotedColumnName("published"),
-                syntaxConcat);
+                SqlSyntax.GetQuotedColumnName("published"));
 
-            var count = Database.ExecuteScalar<int>(sql, new { @published=true, @path=content.Path });
+            var count = Database.ExecuteScalar<int>(sql, new { published=true, ids });
             count += 1; // because content does not count
             return count == content.Level;
         }
@@ -810,54 +808,51 @@ WHERE (@path LIKE {5})",
         /// TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
         /// Then we can do the same thing with repository instances and we wouldn't need to leave all these methods as not implemented because we wouldn't need to implement them
         /// </remarks>
-        private class ContentByGuidReadRepository : PetaPocoRepositoryBase<Guid, IContent>
+        private class ContentByGuidReadRepository : NPocoRepositoryBase<Guid, IContent>
         {
             private readonly ContentRepository _outerRepo;
 
-            public ContentByGuidReadRepository(ContentRepository outerRepo,
-                IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-                : base(work, cache, logger, sqlSyntax)
+            public ContentByGuidReadRepository(ContentRepository outerRepo, IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
+                : base(work, cache, logger)
             {
                 _outerRepo = outerRepo;
             }
 
             protected override IContent PerformGet(Guid id)
             {
-                var sql = _outerRepo.GetBaseQuery(BaseQueryType.FullSingle)
+                var sql = _outerRepo.GetBaseQuery(QueryType.Single)
                     .Where(GetBaseWhereClause(), new { Id = id })
-                    .Where<DocumentDto>(x => x.Newest, SqlSyntax)
-                    .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
+                    .Where<DocumentDto>(x => x.Newest)
+                    .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-                var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+                var dto = Database.Fetch<DocumentDto>(sql.SelectTop(1)).FirstOrDefault();
 
                 if (dto == null)
                     return null;
 
-                var content = _outerRepo.CreateContentFromDto(dto, sql);
+                var content = _outerRepo.CreateContentFromDto(dto, dto.ContentVersionDto.VersionId);
 
                 return content;
             }
 
             protected override IEnumerable<IContent> PerformGetAll(params Guid[] ids)
             {
-                Func<Sql, Sql> translate = s =>
+                Sql<SqlContext> Translate(Sql<SqlContext> s)
                 {
                     if (ids.Any())
                     {
                         s.Where("umbracoNode.uniqueID in (@ids)", new { ids });
                     }
                     //we only want the newest ones with this method
-                    s.Where<DocumentDto>(x => x.Newest, SqlSyntax);
+                    s.Where<DocumentDto>(x => x.Newest);
                     return s;
-                };
+                }
 
-                var sqlBaseFull = _outerRepo.GetBaseQuery(BaseQueryType.FullMultiple);
-                var sqlBaseIds = _outerRepo.GetBaseQuery(BaseQueryType.Ids);
-
-                return _outerRepo.ProcessQuery(translate(sqlBaseFull), new PagingSqlQuery(translate(sqlBaseIds)));
+                var sql = Translate(GetBaseQuery(false));
+                return _outerRepo.MapQueryDtos(Database.Fetch<DocumentDto>(sql), many: true);
             }
 
-            protected override Sql GetBaseQuery(bool isCount)
+            protected override Sql<SqlContext> GetBaseQuery(bool isCount)
             {
                 return _outerRepo.GetBaseQuery(isCount);
             }
@@ -867,10 +862,7 @@ WHERE (@path LIKE {5})",
                 return "umbracoNode.uniqueID = @Id";
             }
 
-            protected override Guid NodeObjectTypeId
-            {
-                get { return _outerRepo.NodeObjectTypeId; }
-            }
+            protected override Guid NodeObjectTypeId => _outerRepo.NodeObjectTypeId;
 
             #region Not needed to implement
 

@@ -548,6 +548,9 @@ namespace Umbraco.Core.Security
         /// </summary>
         /// <param name="user"/><param name="lockoutEnd"/>
         /// <returns/>
+        /// <remarks>
+        /// Currently we do not suport a timed lock out, when they are locked out, an admin will  have to reset the status
+        /// </remarks>
         public Task SetLockoutEndDateAsync(BackOfficeIdentityUser user, DateTimeOffset lockoutEnd)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));

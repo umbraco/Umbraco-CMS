@@ -17,9 +17,8 @@ namespace Umbraco.Core.Services
         /// <param name="eventMessages">Event messages produced by the operation.</param>
         public OperationStatus(TStatusType statusType, EventMessages eventMessages)
         {
-            if (eventMessages == null) throw new ArgumentNullException(nameof(eventMessages));
             StatusType = statusType;
-            EventMessages = eventMessages;
+            EventMessages = eventMessages ?? throw new ArgumentNullException(nameof(eventMessages));
         }
 
         /// <summary>
@@ -34,6 +33,7 @@ namespace Umbraco.Core.Services
         public EventMessages EventMessages { get; }
     }
 
+    /// <inheritdoc />
     /// <summary>
     /// Represents the status of a service operation that manages (processes, produces...) a value.
     /// </summary>
@@ -42,8 +42,9 @@ namespace Umbraco.Core.Services
     public class OperationStatus<TStatusType, TValue> : OperationStatus<TStatusType>
         where TStatusType : struct
     {
+        /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="OperationStatus{TStatusType, TValue}"/> class with a status type and event messages.
+        /// Initializes a new instance of the <see cref="T:Umbraco.Core.Services.OperationStatus`2" /> class with a status type and event messages.
         /// </summary>
         /// <param name="statusType">The status of the operation.</param>
         /// <param name="eventMessages">Event messages produced by the operation.</param>
@@ -51,8 +52,9 @@ namespace Umbraco.Core.Services
             : base(statusType, eventMessages)
         { }
 
+        /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="OperationStatus{TStatusType, TValue}"/> class with a status type, event messages and a value.
+        /// Initializes a new instance of the <see cref="T:Umbraco.Core.Services.OperationStatus`2" /> class with a status type, event messages and a value.
         /// </summary>
         /// <param name="statusType">The status of the operation.</param>
         /// <param name="eventMessages">Event messages produced by the operation.</param>
@@ -69,14 +71,16 @@ namespace Umbraco.Core.Services
         public TValue Value { get; }
     }
 
+    /// <inheritdoc />
     /// <summary>
     /// Represents the default operation status.
     /// </summary>
     /// <remarks>Also provides static helper methods to create operation statuses.</remarks>
     public class OperationStatus : OperationStatus<OperationStatusType>
     {
+        /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="OperationStatus"/> class with a status and event messages.
+        /// Initializes a new instance of the <see cref="T:Umbraco.Core.Services.OperationStatus" /> class with a status and event messages.
         /// </summary>
         /// <param name="statusType">The status of the operation.</param>
         /// <param name="eventMessages">Event messages produced by the operation.</param>
