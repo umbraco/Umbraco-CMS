@@ -522,6 +522,7 @@ namespace Umbraco.Core.Security
             RaiseResetAccessFailedCountEvent(userId);
             return await UpdateAsync(user);
         }
+        
 
       
 
