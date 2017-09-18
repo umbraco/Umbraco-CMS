@@ -273,21 +273,20 @@ namespace Umbraco.Core.Security
 
         public override async Task<IdentityResult> ResetAccessFailedCountAsync(int userId)
         {
-            var user = ApplicationContext.Current.Services.UserService.GetUserById(userId);
-
+            var lockoutStore = (IUserLockoutStore<BackOfficeIdentityUser, int>)Store;
+            var user = await FindByIdAsync(userId);
             if (user == null)
-            {
-                throw new ProviderException(string.Format("No user with the id {0} found", userId));
-            }
+                throw new InvalidOperationException("No user found by user id " + userId);
 
-            if (user.FailedPasswordAttempts > 0)
-            {
-                user.FailedPasswordAttempts = 0;
-                ApplicationContext.Current.Services.UserService.Save(user);
-                RaiseResetAccessFailedCountEvent(userId);
-            }
+            var accessFailedCount = await GetAccessFailedCountAsync(user.Id);
 
-            return await Task.FromResult(IdentityResult.Success);
+            if (accessFailedCount == 0)
+                return IdentityResult.Success;
+
+            await lockoutStore.ResetAccessFailedCountAsync(user);
+            //raise the event now that it's reset
+            RaiseResetAccessFailedCountEvent(userId);
+            return await UpdateAsync(user);            
         }
 
         /// <summary>
