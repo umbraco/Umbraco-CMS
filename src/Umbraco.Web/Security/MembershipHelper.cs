@@ -717,21 +717,7 @@ namespace Umbraco.Web.Security
 
             if (passwordModel == null) throw new ArgumentNullException("passwordModel");
             if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
-
-            BackOfficeUserManager<BackOfficeIdentityUser> backofficeUserManager = null;
-            var userId = -1;
-
-            if (membershipProvider.IsUmbracoUsersProvider())
-            {
-                backofficeUserManager = _httpContext.GetOwinContext().GetBackOfficeUserManager();
-                if (backofficeUserManager != null)
-                {
-                    var profile = _applicationContext.Services.UserService.GetProfileByUserName(username);
-                    if (profile != null)
-                        int.TryParse(profile.Id.ToString(), out userId);
-                }
-            }
-
+            
             //Are we resetting the password??
             if (passwordModel.Reset.HasValue && passwordModel.Reset.Value)
             {
@@ -750,9 +736,6 @@ namespace Umbraco.Web.Security
                     var newPass = membershipProvider.ResetPassword(
                         username,
                         membershipProvider.RequiresQuestionAndAnswer ? passwordModel.Answer : null);
-
-                    if (membershipProvider.IsUmbracoUsersProvider() && backofficeUserManager != null && userId >= 0)
-                        backofficeUserManager.RaisePasswordResetEvent(userId);
 
                     //return the generated pword
                     return Attempt.Succeed(new PasswordChangedModel { ResetPassword = newPass });
@@ -804,10 +787,7 @@ namespace Umbraco.Web.Security
                 try
                 {
                     var result = membershipProvider.ChangePassword(username, passwordModel.OldPassword, passwordModel.NewPassword);
-
-                    if (result && backofficeUserManager != null && userId >= 0)
-                           backofficeUserManager.RaisePasswordChangedEvent(userId);
-
+                    
                     return result == false
                         ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "value" }) })
                         : Attempt.Succeed(new PasswordChangedModel());

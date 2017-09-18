@@ -481,6 +481,18 @@ namespace umbraco.cms.presentation.user
 
                 if (changePassResult.Success)
                 {
+                    var userMgr = Context.GetOwinContext().GetBackOfficeUserManager();
+
+                    //raise the appropriate event
+                    if (changePasswordModel.Reset.HasValue && changePasswordModel.Reset.Value)
+                    {
+                        userMgr.RaisePasswordResetEvent(UmbracoUser.Id);
+                    }
+                    else
+                    {
+                        userMgr.RaisePasswordChangedEvent(UmbracoUser.Id);
+                    }
+
                     //if it is successful, we need to show the generated password if there was one, so set
                     //that back on the control
                     passwordChangerControl.ChangingPasswordModel.GeneratedPassword = changePassResult.Result.ResetPassword;

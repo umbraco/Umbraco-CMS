@@ -18,6 +18,7 @@ using umbraco;
 using legacyUser = umbraco.BusinessLogic.User;
 using System.Net.Http;
 using System.Collections.Specialized;
+using Umbraco.Core.Security;
 using Constants = Umbraco.Core.Constants;
 
 
@@ -60,6 +61,18 @@ namespace Umbraco.Web.Editors
             var passwordChangeResult = Members.ChangePassword(Security.CurrentUser.Username, data, userProvider);
             if (passwordChangeResult.Success)
             {
+                var userMgr = this.TryGetOwinContext().Result.GetBackOfficeUserManager();
+
+                //raise the appropriate event
+                if (data.Reset.HasValue && data.Reset.Value)
+                {
+                    userMgr.RaisePasswordResetEvent(Security.CurrentUser.Id);
+                }
+                else
+                {
+                    userMgr.RaisePasswordChangedEvent(Security.CurrentUser.Id);
+                }
+
                 //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
                 var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);
                 result.AddSuccessNotification(ui.Text("user", "password"), ui.Text("user", "passwordChanged"));
