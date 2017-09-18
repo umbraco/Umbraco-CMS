@@ -1,7 +1,9 @@
 (function () {
   'use strict';
 
-  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http) {
+  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http, eventsService) {
+
+    var evts = [];
 
     //setup scope vars
     $scope.defaultButton = null;
@@ -20,20 +22,7 @@
 
     function init(content) {
 
-      var buttons = contentEditingHelper.configureContentEditorButtons({
-        create: $scope.page.isNew,
-        content: content,
-        methods: {
-          saveAndPublish: $scope.saveAndPublish,
-          sendToPublish: $scope.sendToPublish,
-          save: $scope.save,
-          unPublish: $scope.unPublish
-        }
-      });
-
-      // Zsolt do some magic with it. swap around
-      $scope.defaultButton = buttons.defaultButton;
-      $scope.subButtons = buttons.subButtons;
+      createButtons(content);
 
       editorState.set($scope.content);
 
@@ -46,6 +35,32 @@
             });
         }
       }
+
+      evts.push(eventsService.on("editors.content.changePublishDate", function (event, args) {
+        createButtons(args.node);
+      }));
+
+      evts.push(eventsService.on("editors.content.changeUnpublishDate", function (event, args) {
+        createButtons(args.node);
+      }));
+
+    }
+
+    function createButtons(content) {
+
+      var buttons = contentEditingHelper.configureContentEditorButtons({
+        create: $scope.page.isNew,
+        content: content,
+        methods: {
+          saveAndPublish: $scope.saveAndPublish,
+          sendToPublish: $scope.sendToPublish,
+          save: $scope.save,
+          unPublish: $scope.unPublish
+        }
+      });
+
+      $scope.defaultButton = buttons.defaultButton;
+      $scope.subButtons = buttons.subButtons;
 
     }
 
@@ -234,6 +249,13 @@
       }
 
     };
+
+    //ensure to unregister from all events!
+    $scope.$on('$destroy', function () {
+      for (var e in evts) {
+        eventsService.unsubscribe(evts[e]);
+      }
+    });
 
   }
 

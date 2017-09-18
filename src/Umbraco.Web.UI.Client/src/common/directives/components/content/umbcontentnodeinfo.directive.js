@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $location, logResource) {
+    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService) {
 
         function link(scope, element, attrs, ctrl) {
             
@@ -159,6 +159,10 @@
                     });
                 });
 
+                // emit event
+                var args = { node: scope.node, date: date };
+                eventsService.emit("editors.content.changePublishDate", args);
+
             }
 
             function clearPublishDate() {
@@ -174,6 +178,10 @@
                         }
                     });
                 });
+
+                // emit event
+                var args = { node: scope.node, date: null };
+                eventsService.emit("editors.content.changePublishDate", args);
 
             }
 
@@ -191,6 +199,10 @@
                     });
                 });
 
+                // emit event
+                var args = { node: scope.node, date: date };
+                eventsService.emit("editors.content.changeUnpublishDate", args);
+
             }
 
             function clearUnpublishDate() {
@@ -206,6 +218,10 @@
                         }
                     });
                 });
+
+                // emit event
+                var args = { node: scope.node, date: null };
+                eventsService.emit("editors.content.changeUnpublishDate", args);
 
             }
 
