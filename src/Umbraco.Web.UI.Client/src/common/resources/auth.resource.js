@@ -217,6 +217,15 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                 });
             }
 
+            var regexValidator = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,}/g);
+            var passwordIsValid = regexValidator.test(password);
+
+            if (!passwordIsValid) {
+                return angularHelper.rejectedPromise({
+                    errorMsg: 'Password must have one lower case and one upper case letter, one digit, a special character, length greater or equal to 8 characters with no spaces'
+                });
+            }
+
             if (password !== confirmPassword) {
                 return angularHelper.rejectedPromise({
                     errorMsg: 'Password and confirmation do not match'

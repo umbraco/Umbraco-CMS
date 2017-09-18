@@ -469,7 +469,12 @@ namespace Umbraco.Core.Security
             }
 
             // Validate password
-            var passwordValidAttempt = IsPasswordValid(password, MinRequiredNonAlphanumericCharacters, PasswordStrengthRegularExpression, MinRequiredPasswordLength);
+            /*
+                When validating new users, it shouldn't validate against regex as the generate password method does
+                not take regex [Membership.GeneratePassword(MinRequiredPasswordLength, MinRequiredNonAlphanumericCharacters)]
+                this will fail if the regex is set on the provider
+            */
+            var passwordValidAttempt = IsPasswordValid(password, MinRequiredNonAlphanumericCharacters, string.Empty, MinRequiredPasswordLength);
             if (passwordValidAttempt.Success == false)
             {
                 return MembershipCreateStatus.InvalidPassword;
