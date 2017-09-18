@@ -7,7 +7,8 @@ function Drawer($location, $routeParams, helpService, userService, localizationS
             templateUrl: 'views/components/application/umbdrawer/umb-drawer.html',
             transclude: true,
             scope: {
-                view: "=?"
+                view: "=?",
+                model: "=?"
             },
     
             link: function (scope, element, attr, ctrl) {

@@ -38,7 +38,7 @@
         }
 
         function closeDrawer() {
-            appState.setGlobalState("showHelp", false);
+            appState.setDrawerState("showDrawer", false);
         }
 
         function handleSectionChange() {

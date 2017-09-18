@@ -44,8 +44,7 @@ function appState(eventsService) {
         stickyNavigation: null,
         navMode: null,
         isReady: null,
-        isTablet: null,
-        showHelp: false
+        isTablet: null
     };
     
     var sectionState = {
@@ -73,6 +72,15 @@ function appState(eventsService) {
         showMenuDialog: null,
         //Whether the context menu is being shown or not
         showMenu: null
+    };
+
+    var drawerState = {
+        //this view to show
+        view: null,
+        // bind custom values to the drawer
+        model: null,
+        //Whether the drawer is being shown or not
+        showDrawer: null
     };
 
     /** function to validate and set the state on a state object */
@@ -212,6 +220,35 @@ function appState(eventsService) {
         setMenuState: function (key, value) {
             setState(menuState, key, value, "menuState");
         },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.angularHelper#getDrawerState
+         * @methodOf umbraco.services.appState
+         * @function
+         *
+         * @description
+         * Returns the current drawer state value by key - we do not return an object here - we do NOT want this
+         * to be publicly mutable and allow setting arbitrary values
+         *
+         */
+        getDrawerState: function (key) {
+            return getState(drawerState, key, "drawerState");
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.angularHelper#setDrawerState
+         * @methodOf umbraco.services.appState
+         * @function
+         *
+         * @description
+         * Sets a drawer state value by key
+         *
+         */
+        setDrawerState: function (key, value) {
+            setState(drawerState, key, value, "drawerState");
+        }
 
     };
 }

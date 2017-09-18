@@ -51,13 +51,13 @@
         new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
 </head>
 <noscript><h5><strong>&nbsp; JavaScript is disabled. Please enable to continue!</strong></h5></noscript>
-<body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':showDrawer}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
+<body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
     
     
     <div ng-hide="!authenticated" ng-cloak id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
 
         <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
-        <umb-drawer ng-if="showDrawer" view="drawer.view"></umb-drawer>
+        <umb-drawer ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
 
         <umb-navigation></umb-navigation>
 
