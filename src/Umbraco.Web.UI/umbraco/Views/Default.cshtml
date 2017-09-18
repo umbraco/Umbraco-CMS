@@ -51,7 +51,7 @@
         new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
 </head>
 <noscript><h5><strong>&nbsp; JavaScript is disabled. Please enable to continue!</strong></h5></noscript>
-<body ng-class="{touch:touchDevice,emptySection:emptySection,helpenabled:showDrawer}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
+<body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':showDrawer}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
     
     
     <div ng-hide="!authenticated" ng-cloak id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">

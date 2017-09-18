@@ -8,21 +8,23 @@
     <umb-drawer-content>
 
         <!--  Help Content here -->
-        <div style="margin-bottom: 20px;">
+        <div style="margin-bottom: 25px;">
 
-            <h5 style="margin-bottom: 15px; margin-top: 0;">Documentation for: {{ vm.sectionName }}</h5>
+            <h5 style="margin-bottom: 10px; margin-top: 0;">Documentation for: {{ vm.sectionName }}</h5>
                     
             <a class="umb-lesson" ng-repeat="topic in vm.topics track by $index" target="_blank" ng-href="{{topic.url}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
-                <!-- <i class="umb-lesson__icon icon-book-alt-2"></i> -->
                 <span>
-                    <span class="umb-lesson__title">{{topic.name}}</span>
+                    <span class="umb-lesson__title">
+                        <span>{{topic.name}}</span>
+                        <span class="umb-lesson__open-icon icon-out"></span>
+                    </span>
                     <span class="umb-lesson__content">{{topic.description}}</span>
                 </span>
             </a>
 
             <a class="umb-our-umbraco-badge" target="_blank" href="http://our.umbraco.org?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=our">
                 <i class="umb-our-umbraco-badge__icon icon-favorite"></i>
-                <div class="umb-our-umbraco-badge__title">Learn more on our.umbraco.org</div>
+                <div class="umb-our-umbraco-badge__title">Visit our.umbraco.org</div>
                 <small>
                     <localize key="defaultdialogs_theFriendliestCommunity">The friendliest community</localize>
                 </small>
@@ -33,21 +35,21 @@
         <!--  Umbraco tv content -->
         <div>
 
-            <h5 style="margin-bottom: 15px; margin-top: 0;">Videos for: {{ vm.sectionName }}</h5>
-
-            <a class="umb-lesson umb-lesson--tv" ng-repeat="video in vm.videos track by $index" target="_blank" ng-href="{{video.link}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
-                <i class="umb-lesson__icon icon-tv-old"></i>
-                <span>
+            <h5 style="margin-bottom: 10px; margin-top: 0;">Videos for: {{ vm.sectionName }}</h5>
+            
+            <div style="margin-bottom: 10px;">
+                <a class="umb-lesson umb-lesson--tv" ng-repeat="video in vm.videos track by $index" target="_blank" ng-href="{{video.link}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
+                    <i class="umb-lesson__icon icon-tv-old"></i>
                     <span class="umb-lesson__title">{{video.title}}</span>
-                    <span class="umb-lesson__content">{{video.description}}</span>
-                </span>
-            </a>
+                    <span class="umb-lesson__open-icon icon-out" style="margin-left: auto;"></span>
+                </a>
+            </div>
             
             <div ng-if="vm.videos.length === 0">No videos found</div>
 
             <a class="umb-our-umbraco-badge" target="_blank" href="http://umbraco.tv?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
                 <i class="umb-our-umbraco-badge__icon icon-tv-old"></i>
-                <div class="umb-our-umbraco-badge__title">Learn more on umbraco.tv</div>
+                <div class="umb-our-umbraco-badge__title">Visit umbraco.tv</div>
                 <small>
                     <localize key="help_theBestUmbracoVideoTutorials">The best Umbraco video tutorials</localize>
                 </small>

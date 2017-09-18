@@ -20,7 +20,7 @@
 
 .umb-drawer-header {
     flex-basis: 100px;
-    padding: 20px 40px;
+    padding: 20px 30px;
     box-sizing: border-box;
 }
 
@@ -41,7 +41,7 @@
     flex: 1 1 auto;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 20px 40px;
+    padding: 20px 30px;
 }
 
 /* Footer */
@@ -49,15 +49,11 @@
     flex-grow: 0;
     flex-shrink: 0;
     flex-basis: 31px;
-    padding: 10px 40px;
+    padding: 10px 30px;
 }
 
-
-
 /* Lessons - should be moved */
-
 .umb-lesson {
-    //border: 1px solid transparent;
     padding: 20px;
     border-radius: 3px;
     display: flex;
@@ -65,23 +61,34 @@
     margin-bottom: 10px;
 }
 
-.umb-lesson:hover {
+.umb-lesson:hover,
+.umb-lesson:active,
+.umb-lesson:focus {
     color: @black;
     text-decoration: none;
-    //border: 1px solid @gray-4;
+    outline: none;
+
+    .umb-lesson__title {
+        text-decoration: underline !important;
+    }
+
 }
 
 .umb-lesson__icon {
     margin-right: 10px;
-    color: @gray-5;
+    color: @gray-4;
     font-size: 18px;
-    margin-top: 1px;
+}
+
+.umb-lesson__open-icon {
+    font-size: 14px;
+    color: @gray-6;
 }
 
 .umb-lesson__title {
     margin-bottom: 5px;
-    display: block;
     font-weight: bold;
+    display: block;
 }
 
 .umb-lesson__content {
@@ -93,19 +100,33 @@
 /* Umbraco tv */
 
 .umb-lesson--tv {
-    padding: 10px;
+    padding: 10px 20px;
+    align-items: center;
+    margin-bottom: 1px;
+    border-radius: 0;
+}
+
+.umb-lesson--tv:first-of-type {
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+.umb-lesson--tv:last-of-type {
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
 }
 
 .umb-lesson--tv .umb-lesson__title {
     font-weight: normal;
     margin-bottom: 0;
+    font-size: 14px;
 }
 
 
 /* Our badge - should be moved */
 
 .umb-our-umbraco-badge {
-    padding: 20px 20px 20px 55px;
+    padding: 15px 20px 15px 55px;
     background: @white;
     position: relative;
     overflow: hidden;
