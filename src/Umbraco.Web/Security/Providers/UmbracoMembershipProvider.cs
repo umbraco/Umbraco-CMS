@@ -447,16 +447,9 @@ namespace Umbraco.Web.Security.Providers
             return generatedPassword;
         }
 
-        /// <summary>
-        /// Clears a lock so that the membership user can be validated.
-        /// </summary>
-        /// <param name="username">The membership user to clear the lock status for.</param>
-        /// <returns>
-        /// true if the membership user was successfully unlocked; otherwise, false.
-        /// </returns>
-        public override bool UnlockUser(string username)
+        internal virtual bool PerformUnlockUser(string username, out TEntity member)
         {
-            var member = MemberService.GetByUsername(username);
+            member = MemberService.GetByUsername(username);
             if (member == null)
             {
                 throw new ProviderException(string.Format("No member with the username '{0}' found", username));
@@ -469,8 +462,22 @@ namespace Umbraco.Web.Security.Providers
             member.FailedPasswordAttempts = 0;
 
             MemberService.Save(member);
-
+            
             return true;
+        }
+
+        /// <summary>
+        /// Clears a lock so that the membership user can be validated.
+        /// </summary>
+        /// <param name="username">The membership user to clear the lock status for.</param>
+        /// <returns>
+        /// true if the membership user was successfully unlocked; otherwise, false.
+        /// </returns>
+        public override bool UnlockUser(string username)
+        {
+            TEntity member;
+            var result = PerformUnlockUser(username, out member);
+            return result;
         }
 
         /// <summary>

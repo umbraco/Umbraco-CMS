@@ -87,16 +87,20 @@ namespace Umbraco.Web.Security.Providers
         /// Overridden in order to call the BackOfficeUserManager.UnlockUser method in order to raise the user audit events
         /// </summary>
         /// <param name="username"></param>
+        /// <param name="member"></param>
         /// <returns></returns>
-        public override bool UnlockUser(string username)
+        internal override bool PerformUnlockUser(string username, out IUser member)
         {
-            var userManager = GetBackofficeUserManager();
-
-            //if this is null it means it's not in a web context so we'll revert to calling the base class 
-            if (userManager == null)
-                return base.UnlockUser(username);
-
-            return userManager.UnlockUser(username);
+            var result = base.PerformUnlockUser(username, out member);
+            if (result)
+            {
+                var userManager = GetBackofficeUserManager();
+                if (userManager != null)
+                {
+                    userManager.RaiseAccountUnlockedEvent(member.Id);
+                }   
+            }
+            return result;
         }
 
         /// <summary>

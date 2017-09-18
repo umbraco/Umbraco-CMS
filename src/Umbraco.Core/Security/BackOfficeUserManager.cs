@@ -288,39 +288,7 @@ namespace Umbraco.Core.Security
             RaiseResetAccessFailedCountEvent(userId);
             return await UpdateAsync(user);
         }
-
-        /// <summary>
-        /// Clears a lock so that the membership user can be validated.
-        /// </summary>
-        /// <param name="username">The membership user to clear the lock status for.</param>
-        /// <returns>
-        /// true if the membership user was successfully unlocked; otherwise, false.
-        /// </returns>
-        /// <remarks>
-        /// TODO: This is only currently used for membership provider compatibility so that an event is raised when the 
-        /// membership provider's UnlockUser method is called, this functionality changes in 7.7 since we use ASP.NET Identity APIs everwhere
-        /// and the BackOfficeUserManager shouldn't be using singletons or know about the UserService since it should only need to know about
-        /// the UserStore - we will fix this up for 7.7
-        /// </remarks>
-        internal bool UnlockUser(string username)
-        {
-            var user = ApplicationContext.Current.Services.UserService.GetByUsername(username);
-            if (user == null)
-                throw new ProviderException(string.Format("No user with the username '{0}' found", username));
-
-            // Non need to update
-            if (user.IsLockedOut == false) return true;
-
-            user.IsLockedOut = false;
-            user.FailedPasswordAttempts = 0;
-
-            ApplicationContext.Current.Services.UserService.Save(user);
-
-            RaiseAccountUnlockedEvent(user.Id);
-
-            return true;
-        }
-
+        
         internal void RaiseAccountLockedEvent(int userId)
         {
             OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked, GetCurrentRequestIpAddress(), userId));
