@@ -217,6 +217,16 @@ gulp.task('dependencies', function () {
             gulp.src("src/canvasdesigner/editors/*.less")
                 .pipe(gulp.dest(root + targets.assets + "/less"))
         );
+		
+	// Todo: check if we need these fileSize
+    stream.add( 
+            gulp.src("src/views/propertyeditors/grid/config/*.*")
+                .pipe(gulp.dest(root + targets.views + "/propertyeditors/grid/config"))
+        );		
+    stream.add( 
+            gulp.src("src/views/dashboard/default/*.jpg")
+                .pipe(gulp.dest(root + targets.views + "/dashboard/default"))
+        );		
 
     return stream;
 });
