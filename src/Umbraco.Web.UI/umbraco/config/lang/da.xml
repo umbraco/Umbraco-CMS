@@ -185,8 +185,10 @@
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokument typer. Du skal tillade disse i indstillinger under <strong>"dokument typer"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.]]></key>
     <key alias="documentTypeWithoutTemplate">Dokumenttype uden skabelon</key>
+    <key alias="newEmptyPartialView">Ny tom partial view</key>
     <key alias="newFolder">Ny mappe</key>
     <key alias="newDataType">Ny datatype</key>
+    <key alias="newPartialViewFromSnippet">Ny partial view fra snippet</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Til dit website</key>
