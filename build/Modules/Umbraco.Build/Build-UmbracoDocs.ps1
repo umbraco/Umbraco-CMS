@@ -20,19 +20,19 @@ function Build-UmbracoDocs
   Write-Host "Executing gulp docs"
   
   push-location "$($uenv.SolutionRoot)\src\Umbraco.Web.UI.Client"
-  write "node version is:" > $tmp\belle.log
-  &node -v >> $tmp\belle.log 2>&1
-  write "npm version is:" >> $tmp\belle.log 2>&1
-  &npm -v >> $tmp\belle.log 2>&1
-  write "executing npm install" >> $tmp\belle.log 2>&1
-  &npm install >> $tmp\belle.log 2>&1
-  write "executing bower install" >> $tmp\belle.log 2>&1
-  &npm install -g bower >> $tmp\belle.log 2>&1
-  write "installing gulp" >> $tmp\belle.log 2>&1
-  &npm install -g gulp >> $tmp\belle.log 2>&1
-  write "installing gulp-cli" >> $tmp\belle.log 2>&1
-  &npm install -g gulp-cli --quiet >> $tmp\belle.log 2>&1
-  write "building docs using gulp" >> $tmp\belle.log 2>&1
+  write "node version is:" > $tmp\belle-docs.log
+  &node -v >> $tmp\belle-docs.log 2>&1
+  write "npm version is:" >> $tmp\belle-docs.log 2>&1
+  &npm -v >> $tmp\belle-docs.log 2>&1
+  write "executing npm install" >> $tmp\belle-docs.log 2>&1
+  &npm install >> $tmp\belle-docs.log 2>&1
+  write "executing bower install" >> $tmp\belle-docs.log 2>&1
+  &npm install -g bower >> $tmp\belle-docs.log 2>&1
+  write "installing gulp" >> $tmp\belle-docs.log 2>&1
+  &npm install -g gulp >> $tmp\belle-docs.log 2>&1
+  write "installing gulp-cli" >> $tmp\belle-docs.log 2>&1
+  &npm install -g gulp-cli --quiet >> $tmp\belle-docs.log 2>&1
+  write "building docs using gulp" >> $tmp\belle-docs.log 2>&1
   &gulp docs >> $tmp\belle-docs.log 2>&1
   pop-location  
 
