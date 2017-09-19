@@ -42,7 +42,7 @@ namespace Umbraco.Core.Strategies
             // check that the relation-type exists, if not, then recreate it
             if (relationType == null)
             {
-                var documentObjectType = new Guid(Constants.ObjectTypes.Document);
+                var documentObjectType = Constants.ObjectTypes.Document;
                 const string relationTypeName = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName;
 
                 relationType = new RelationType(documentObjectType, documentObjectType, relationTypeAlias, relationTypeName);

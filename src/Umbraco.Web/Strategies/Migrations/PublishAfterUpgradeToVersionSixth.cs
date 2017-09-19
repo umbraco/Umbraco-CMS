@@ -32,7 +32,7 @@ namespace Umbraco.Web.Strategies.Migrations
                     .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
                     .InnerJoin<NodeDto>()
                     .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                    .Where<NodeDto>(x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
+                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document)
                     .Where<NodeDto>(x => x.Path.StartsWith("-1"));
 
                 var dtos = args.MigrationContext.Database.Fetch<DocumentDto>(sql);

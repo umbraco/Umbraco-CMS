@@ -58,7 +58,7 @@ namespace Umbraco.Web.Trees
 
             var node = CreateTreeNode(
                 entity,
-                Constants.ObjectTypes.MediaGuid,
+                Constants.ObjectTypes.Media,
                 parentId,
                 queryStrings,
                 entity.HasChildren && (isContainer == false));

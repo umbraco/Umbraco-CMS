@@ -1231,7 +1231,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private void RebuildContentDbCacheLocked(IScopeUnitOfWork uow, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var contentObjectType = Guid.Parse(Constants.ObjectTypes.Document);
+            var contentObjectType = Constants.ObjectTypes.Document;
             var db = uow.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1302,7 +1302,7 @@ WHERE cmsContentNu.nodeId IN (
         public void RebuildMediaDbCacheLocked(IScopeUnitOfWork uow, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
+            var mediaObjectType = Constants.ObjectTypes.Media;
             var db = uow.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1363,7 +1363,7 @@ WHERE cmsContentNu.nodeId IN (
         public void RebuildMemberDbCacheLocked(IScopeUnitOfWork uow, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
+            var memberObjectType = Constants.ObjectTypes.Member;
             var db = uow.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1425,7 +1425,7 @@ WHERE cmsContentNu.nodeId IN (
             // every published content item should have a corresponding row in cmsContentXml
             // every content item should have a corresponding row in cmsPreviewXml
 
-            var contentObjectType = Guid.Parse(Constants.ObjectTypes.Document);
+            var contentObjectType = Constants.ObjectTypes.Document;
             var db = uow.Database;
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
@@ -1455,7 +1455,7 @@ AND cmsContentNu.nodeId IS NULL;"
         {
             // every non-trashed media item should have a corresponding row in cmsContentXml
 
-            var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
+            var mediaObjectType = Constants.ObjectTypes.Media;
             var db = uow.Database;
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
@@ -1485,7 +1485,7 @@ AND cmsContentNu.nodeId IS NULL
         {
             // every member item should have a corresponding row in cmsContentXml
 
-            var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
+            var memberObjectType = Constants.ObjectTypes.Member;
             var db = uow.Database;
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)

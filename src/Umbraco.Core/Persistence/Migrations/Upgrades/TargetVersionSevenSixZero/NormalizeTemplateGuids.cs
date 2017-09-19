@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
 
             var updates = database.Query<dynamic>(@"SELECT umbracoNode.id, cmsTemplate.alias FROM umbracoNode
 JOIN cmsTemplate ON umbracoNode.id=cmsTemplate.nodeId
-WHERE nodeObjectType = @guid", new { guid = Constants.ObjectTypes.TemplateTypeGuid})
+WHERE nodeObjectType = @guid", new { guid = Constants.ObjectTypes.TemplateType })
                 .Select(template => Tuple.Create((int) template.id, ("template____" + (string) template.alias).ToGuid()))
                 .ToList();
 

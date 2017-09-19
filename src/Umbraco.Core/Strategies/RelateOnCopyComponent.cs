@@ -25,8 +25,8 @@ namespace Umbraco.Core.Strategies
 
             if (relationType == null)
             {
-                relationType = new RelationType(new Guid(Constants.ObjectTypes.Document),
-                    new Guid(Constants.ObjectTypes.Document),
+                relationType = new RelationType(Constants.ObjectTypes.Document,
+                    Constants.ObjectTypes.Document,
                     Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
                     Constants.Conventions.RelationTypes.RelateDocumentOnCopyName) { IsBidirectional = true };
 

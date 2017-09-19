@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public MemberGroupFactory()
         {
-            _nodeObjectTypeId = new Guid(Constants.ObjectTypes.MemberGroup);
+            _nodeObjectTypeId = Constants.ObjectTypes.MemberGroup;
         }
 
         #region Implementation of IEntityFactory<ITemplate,TemplateDto>

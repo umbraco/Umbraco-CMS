@@ -186,7 +186,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return l;
         }
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.DocumentTypeGuid;
+        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.DocumentType;
 
         /// <summary>
         /// Deletes a content type

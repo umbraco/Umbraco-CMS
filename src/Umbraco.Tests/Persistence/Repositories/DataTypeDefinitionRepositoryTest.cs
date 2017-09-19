@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private EntityContainerRepository CreateContainerRepository(IScopeUnitOfWork unitOfWork)
         {
-            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Constants.ObjectTypes.DataTypeContainerGuid);
+            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Constants.ObjectTypes.DataTypeContainer);
         }
 
         [Test]
@@ -74,11 +74,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
                 var repository = CreateRepository(unitOfWork);
-                var container1 = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah1" };
+                var container1 = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah1" };
                 containerRepository.AddOrUpdate(container1);
                 unitOfWork.Flush();
 
-                var container2 = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah2", ParentId = container1.Id };
+                var container2 = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.AddOrUpdate(container2);
                 unitOfWork.Flush();
 
@@ -120,7 +120,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
-                var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
+                var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Flush();
                 Assert.That(container.Id, Is.GreaterThan(0));
@@ -137,7 +137,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
-                var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
+                var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Flush();
 
@@ -158,7 +158,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
                 var repository = CreateRepository(unitOfWork);
-                var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
+                var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Flush();
 
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
                 var repository = CreateRepository(unitOfWork);
-                var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid) { Name = "blah" };
+                var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Flush();
 

@@ -32,7 +32,7 @@ LEFT JOIN cmsDocument docPub ON (docPub.nodeId=n.id AND docPub.published=1)
 LEFT JOIN cmsContentNu nuDraft ON (nuDraft.nodeId=n.id AND nuDraft.published=0)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
 WHERE n.nodeObjectType=@objType AND n.id=@id
-", new { objType = Constants.ObjectTypes.DocumentGuid, /*id =*/ id })).FirstOrDefault();
+", new { objType = Constants.ObjectTypes.Document, /*id =*/ id })).FirstOrDefault();
             return dto == null ? new ContentNodeKit() : CreateContentNodeKit(dto);
         }
 
@@ -52,7 +52,7 @@ JOIN cmsContent ON (cmsContent.nodeId=n.id)
 JOIN cmsContentVersion ver ON (ver.contentId=n.id)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
 WHERE n.nodeObjectType=@objType AND n.id=@id
-", new { objType = Constants.ObjectTypes.MediaGuid, /*id =*/ id })).FirstOrDefault();
+", new { objType = Constants.ObjectTypes.Media, /*id =*/ id })).FirstOrDefault();
             return dto == null ? new ContentNodeKit() : CreateMediaNodeKit(dto);
         }
 
@@ -77,7 +77,7 @@ LEFT JOIN cmsContentNu nuDraft ON (nuDraft.nodeId=n.id AND nuDraft.published=0)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
 WHERE n.nodeObjectType=@objType
 ORDER BY n.level, n.sortOrder
-", new { objType = Constants.ObjectTypes.DocumentGuid })).Select(CreateContentNodeKit);
+", new { objType = Constants.ObjectTypes.Document })).Select(CreateContentNodeKit);
         }
 
         public IEnumerable<ContentNodeKit> GetAllMediaSources(IScopeUnitOfWork uow)
@@ -97,7 +97,7 @@ JOIN cmsContentVersion ver ON (ver.contentId=n.id)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
 WHERE n.nodeObjectType=@objType
 ORDER BY n.level, n.sortOrder
-", new { objType = Constants.ObjectTypes.MediaGuid })).Select(CreateMediaNodeKit);
+", new { objType = Constants.ObjectTypes.Media })).Select(CreateMediaNodeKit);
         }
 
         public IEnumerable<ContentNodeKit> GetBranchContentSources(IScopeUnitOfWork uow, int id)
@@ -120,7 +120,7 @@ LEFT JOIN cmsContentNu nuDraft ON (nuDraft.nodeId=n.id AND nuDraft.published=0)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
 WHERE n.nodeObjectType=@objType AND x.id=@id
 ORDER BY n.level, n.sortOrder
-", new { objType = Constants.ObjectTypes.DocumentGuid, /*id =*/ id })).Select(CreateContentNodeKit);
+", new { objType = Constants.ObjectTypes.Document, /*id =*/ id })).Select(CreateContentNodeKit);
         }
 
         public IEnumerable<ContentNodeKit> GetBranchMediaSources(IScopeUnitOfWork uow, int id)
@@ -141,7 +141,7 @@ JOIN cmsContentVersion ver ON (ver.contentId=n.id)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
 WHERE n.nodeObjectType=@objType AND x.id=@id
 ORDER BY n.level, n.sortOrder
-", new { objType = Constants.ObjectTypes.MediaGuid, /*id =*/ id })).Select(CreateMediaNodeKit);
+", new { objType = Constants.ObjectTypes.Media, /*id =*/ id })).Select(CreateMediaNodeKit);
         }
 
         public IEnumerable<ContentNodeKit> GetTypeContentSources(IScopeUnitOfWork uow, IEnumerable<int> ids)
@@ -163,7 +163,7 @@ LEFT JOIN cmsContentNu nuDraft ON (nuDraft.nodeId=n.id AND nuDraft.published=0)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
 WHERE n.nodeObjectType=@objType AND cmsContent.contentType IN (@ids)
 ORDER BY n.level, n.sortOrder
-", new { objType = Constants.ObjectTypes.DocumentGuid, /*id =*/ ids })).Select(CreateContentNodeKit);
+", new { objType = Constants.ObjectTypes.Document, /*id =*/ ids })).Select(CreateContentNodeKit);
         }
 
         public IEnumerable<ContentNodeKit> GetTypeMediaSources(IScopeUnitOfWork uow, IEnumerable<int> ids)
@@ -183,7 +183,7 @@ JOIN cmsContentVersion ver ON (ver.contentId=n.id)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
 WHERE n.nodeObjectType=@objType AND cmsContent.contentType IN (@ids)
 ORDER BY n.level, n.sortOrder
-", new { objType = Constants.ObjectTypes.MediaGuid, /*id =*/ ids })).Select(CreateMediaNodeKit);
+", new { objType = Constants.ObjectTypes.Media, /*id =*/ ids })).Select(CreateMediaNodeKit);
         }
 
         private static ContentNodeKit CreateContentNodeKit(ContentSourceDto dto)

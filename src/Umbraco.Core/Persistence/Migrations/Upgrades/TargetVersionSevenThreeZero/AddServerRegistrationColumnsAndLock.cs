@@ -49,7 +49,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                     sortOrder = 0,
                     uniqueId = new Guid(uniqueId),
                     text = text,
-                    nodeObjectType = Constants.ObjectTypes.LockObjectGuid,
+                    nodeObjectType = Constants.ObjectTypes.LockObject,
                     createDate = DateTime.Now
                 });
         }

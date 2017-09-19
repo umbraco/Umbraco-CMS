@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Persistence.Querying
             // Arrange
             var path = "-1,1046,1076,1089";
             var id = 1046;
-            var nodeObjectTypeId = new Guid(Constants.ObjectTypes.Document);
+            var nodeObjectTypeId = Constants.ObjectTypes.Document;
 
             var sql = Sql();
             sql.SelectAll()

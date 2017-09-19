@@ -32,14 +32,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
             if (tables.InvariantContains("cmsStylesheetProperty"))
             {
                 local.Delete.FromTable("cmsStylesheetProperty").AllRows();
-                local.Delete.FromTable("umbracoNode").Row(new { nodeObjectType = new Guid(Constants.ObjectTypes.StylesheetProperty) });
+                local.Delete.FromTable("umbracoNode").Row(new { nodeObjectType = Constants.ObjectTypes.StylesheetProperty });
 
                 local.Delete.Table("cmsStylesheetProperty");
             }
             if (tables.InvariantContains("cmsStylesheet"))
             {
                 local.Delete.FromTable("cmsStylesheet").AllRows();
-                local.Delete.FromTable("umbracoNode").Row(new { nodeObjectType = new Guid(Constants.ObjectTypes.Stylesheet) });
+                local.Delete.FromTable("umbracoNode").Row(new { nodeObjectType = Constants.ObjectTypes.Stylesheet });
 
                 local.Delete.Table("cmsStylesheet");
             }

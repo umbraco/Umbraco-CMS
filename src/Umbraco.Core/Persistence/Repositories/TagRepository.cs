@@ -516,13 +516,13 @@ namespace Umbraco.Core.Persistence.Repositories
             switch (type)
             {
                 case TaggableObjectTypes.Content:
-                    return new Guid(Constants.ObjectTypes.Document);
+                    return Constants.ObjectTypes.Document;
                 case TaggableObjectTypes.Media:
-                    return new Guid(Constants.ObjectTypes.Media);
+                    return Constants.ObjectTypes.Media;
                 case TaggableObjectTypes.Member:
-                    return new Guid(Constants.ObjectTypes.Member);
+                    return Constants.ObjectTypes.Member;
                 default:
-                    throw new ArgumentOutOfRangeException("type");
+                    throw new ArgumentOutOfRangeException(nameof(type));
             }
         }
 

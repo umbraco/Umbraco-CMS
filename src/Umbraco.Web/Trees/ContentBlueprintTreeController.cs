@@ -57,7 +57,7 @@ namespace Umbraco.Web.Trees
                 nodes.AddRange(docTypeEntities
                     .Select(entity =>
                     {
-                        var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprintGuid, id, queryStrings, "icon-item-arrangement", true);
+                        var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id, queryStrings, "icon-item-arrangement", true);
                         treeNode.Path = string.Format("-1,{0}", entity.Id);
                         treeNode.NodeType = "document-type-blueprints";
                         //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
@@ -77,7 +77,7 @@ namespace Umbraco.Web.Trees
             nodes.AddRange(blueprintsForDocType
                 .Select(entity =>
                 {
-                    var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprintGuid, id, queryStrings, "icon-blueprint", false);
+                    var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id, queryStrings, "icon-blueprint", false);
                     treeNode.Path = $"-1,{ct.Id},{entity.Id}";
                     return treeNode;
                 }));

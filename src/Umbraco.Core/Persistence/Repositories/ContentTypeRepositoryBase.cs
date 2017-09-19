@@ -280,7 +280,7 @@ AND umbracoNode.id <> @id",
                     .SelectAll()
                     .From<ContentDto>()
                     .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                    .Where<NodeDto>(x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
+                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document)
                     .Where<ContentDto>(x => x.ContentTypeId == entity.Id);
                 var contentDtos = Database.Fetch<ContentDto>(sql);
 
@@ -776,7 +776,7 @@ AND umbracoNode.id <> @id",
                         WHERE (umbracoNode.nodeObjectType = @nodeObjectType)
                         ORDER BY ctId";
 
-                var result = db.Fetch<dynamic>(sql, new { nodeObjectType = new Guid(Constants.ObjectTypes.MediaType) });
+                var result = db.Fetch<dynamic>(sql, new { nodeObjectType = Constants.ObjectTypes.MediaType });
 
                 if (result.Any() == false)
                 {
@@ -925,7 +925,7 @@ AND umbracoNode.id <> @id",
                         WHERE (umbracoNode.nodeObjectType = @nodeObjectType)
                         ORDER BY ctId";
 
-                var result = db.Fetch<dynamic>(sql, new { nodeObjectType = new Guid(Constants.ObjectTypes.DocumentType)});
+                var result = db.Fetch<dynamic>(sql, new { nodeObjectType = Constants.ObjectTypes.DocumentType });
 
                 if (result.Any() == false)
                 {

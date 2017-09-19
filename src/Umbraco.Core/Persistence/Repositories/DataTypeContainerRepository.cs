@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Repositories
     class DataTypeContainerRepository : EntityContainerRepository, IDataTypeContainerRepository
     {
         public DataTypeContainerRepository(IScopeUnitOfWork uow, CacheHelper cache, ILogger logger)
-            : base(uow, cache, logger, Constants.ObjectTypes.DataTypeContainerGuid)
+            : base(uow, cache, logger, Constants.ObjectTypes.DataTypeContainer)
         { }
     }
 }

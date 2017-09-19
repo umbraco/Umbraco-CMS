@@ -22,8 +22,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 Insert.IntoTable("umbracoRelationType").Row(new
                 {
                     dual = false,
-                    parentObjectType = Guid.Parse(Constants.ObjectTypes.Document),
-                    childObjectType = Guid.Parse(Constants.ObjectTypes.Document),
+                    parentObjectType = Constants.ObjectTypes.Document,
+                    childObjectType = Constants.ObjectTypes.Document,
                     name = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName,
                     alias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias
                 });

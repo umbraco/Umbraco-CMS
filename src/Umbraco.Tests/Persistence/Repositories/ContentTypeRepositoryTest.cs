@@ -103,13 +103,13 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid);
+                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainer);
                 var repository = CreateRepository(unitOfWork);
-                var container1 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah1" };
+                var container1 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah1" };
                 containerRepository.AddOrUpdate(container1);
                 unitOfWork.Flush();
 
-                var container2 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah2", ParentId = container1.Id };
+                var container2 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.AddOrUpdate(container2);
                 unitOfWork.Flush();
 
@@ -149,8 +149,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid);
-                var container = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah" };
+                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainer);
+                var container = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Flush();
                 Assert.That(container.Id, Is.GreaterThan(0));
@@ -168,13 +168,13 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid);
+                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainer);
 
-                container1 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "container1" };
+                container1 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container1" };
                 containerRepository.AddOrUpdate(container1);
-                container2 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "container2" };
+                container2 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container2" };
                 containerRepository.AddOrUpdate(container2);
-                container3 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "container3" };
+                container3 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container3" };
                 containerRepository.AddOrUpdate(container3);
                 unitOfWork.Flush();
                 Assert.That(container1.Id, Is.GreaterThan(0));
@@ -198,8 +198,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid);
-                var container = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah" };
+                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainer);
+                var container = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Flush();
 
@@ -218,9 +218,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.MediaTypeContainerGuid);
+                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.MediaTypeContainer);
                 var repository = CreateRepository(unitOfWork);
-                var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Flush();
 
@@ -239,9 +239,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.MediaTypeContainerGuid);
+                var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.MediaTypeContainer);
                 var repository = CreateMediaTypeRepository(unitOfWork);
-                var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Flush();
 
@@ -639,7 +639,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 int count =
                     unitOfWork.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
-                        new {NodeObjectType = new Guid(Constants.ObjectTypes.DocumentType)});
+                        new {NodeObjectType = Constants.ObjectTypes.DocumentType});
 
                 // Assert
                 Assert.That(contentTypes.Any(), Is.True);
@@ -662,7 +662,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 int count =
                     unitOfWork.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
-                        new { NodeObjectType = new Guid(Constants.ObjectTypes.DocumentType) });
+                        new { NodeObjectType = Constants.ObjectTypes.DocumentType });
 
                 // Assert
                 Assert.That(contentTypes.Any(), Is.True);

@@ -164,7 +164,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.AssignedPermissions, opt => opt.Ignore())
                 .AfterMap((entity, basic) =>
                 {
-                    if (entity.NodeObjectTypeId == Constants.ObjectTypes.MemberGuid && basic.Icon.IsNullOrWhiteSpace())
+                    if (entity.NodeObjectTypeId == Constants.ObjectTypes.Member && basic.Icon.IsNullOrWhiteSpace())
                     {
                         basic.Icon = "icon-user";
                     }

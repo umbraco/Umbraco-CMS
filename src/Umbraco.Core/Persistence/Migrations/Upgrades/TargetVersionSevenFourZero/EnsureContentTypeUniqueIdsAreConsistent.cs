@@ -23,9 +23,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
         {
             var objectTypes = new[]
             {
-                Constants.ObjectTypes.DocumentTypeGuid,
-                Constants.ObjectTypes.MediaTypeGuid,
-                Constants.ObjectTypes.MemberTypeGuid,
+                Constants.ObjectTypes.DocumentType,
+                Constants.ObjectTypes.MediaType,
+                Constants.ObjectTypes.MemberType
             };
 
             var sql = Context.Sql()

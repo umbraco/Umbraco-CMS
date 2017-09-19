@@ -116,11 +116,11 @@ namespace Umbraco.Core.Persistence.Factories
         {
             Guid nodeObjectType;
             if (entity is IContentType)
-                nodeObjectType = Constants.ObjectTypes.DocumentTypeGuid;
+                nodeObjectType = Constants.ObjectTypes.DocumentType;
             else if (entity is IMediaType)
-                nodeObjectType = Constants.ObjectTypes.MediaTypeGuid;
+                nodeObjectType = Constants.ObjectTypes.MediaType;
             else if (entity is IMemberType)
-                nodeObjectType = Constants.ObjectTypes.MemberTypeGuid;
+                nodeObjectType = Constants.ObjectTypes.MemberType;
             else
                 throw new Exception("Invalid entity.");
 

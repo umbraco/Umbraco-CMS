@@ -634,7 +634,7 @@ namespace Umbraco.Core.Services
                 if (id != Constants.System.Root)
                 {
                     var entityRepository = uow.CreateRepository<IEntityRepository>();
-                    var mediaPath = entityRepository.GetAllPaths(Constants.ObjectTypes.MediaGuid, id).ToArray();
+                    var mediaPath = entityRepository.GetAllPaths(Constants.ObjectTypes.Media, id).ToArray();
                     if (mediaPath.Length == 0)
                     {
                         totalChildren = 0;
@@ -1232,7 +1232,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         public void EmptyRecycleBin()
         {
-            var nodeObjectType = new Guid(Constants.ObjectTypes.Media);
+            var nodeObjectType = Constants.ObjectTypes.Media;
             var deleted = new List<IMedia>();
             var evtMsgs = EventMessagesFactory.Get(); // todo - and then?
 

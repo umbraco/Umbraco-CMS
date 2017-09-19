@@ -88,7 +88,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return list;
         }
 
-        protected override Guid NodeObjectTypeId => new Guid(Constants.ObjectTypes.MemberGroup);
+        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.MemberGroup;
 
         protected override void PersistNewItem(IMemberGroup entity)
         {
@@ -187,7 +187,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public void AssignRoles(string[] usernames, string[] roleNames)
         {
             //first get the member ids based on the usernames
-            var memberObjectType = new Guid(Constants.ObjectTypes.Member);
+            var memberObjectType = Constants.ObjectTypes.Member;
 
             var memberSql = Sql()
                 .Select("umbracoNode.id")
@@ -204,7 +204,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public void DissociateRoles(string[] usernames, string[] roleNames)
         {
             //first get the member ids based on the usernames
-            var memberObjectType = new Guid(Constants.ObjectTypes.Member);
+            var memberObjectType = Constants.ObjectTypes.Member;
 
             var memberSql = Sql()
                 .Select("umbracoNode.id")

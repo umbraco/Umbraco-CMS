@@ -51,7 +51,7 @@ namespace Umbraco.Web.Trees
                 template.IsMasterTemplate ? "icon-newspaper" : "icon-newspaper-alt",
                 template.IsMasterTemplate,
                 GetEditorPath(template, queryStrings),
-                Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(Constants.ObjectTypes.TemplateTypeGuid), template.Key)
+                Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(Constants.ObjectTypes.TemplateType), template.Key)
             )));
 
             return nodes;
@@ -105,7 +105,7 @@ namespace Umbraco.Web.Trees
                 Id = template.Id,
                 Key = template.Key,
                 Name = template.Name,
-                NodeObjectTypeId = new Guid(Constants.ObjectTypes.Template),
+                NodeObjectTypeId = Constants.ObjectTypes.Template,
                 //TODO: Fix parent/paths on templates
                 ParentId = -1,
                 Path = template.Path,

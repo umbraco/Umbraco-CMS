@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Clause()
         {
-            var NodeObjectType = new Guid(Constants.ObjectTypes.Document);
+            var NodeObjectType = Constants.ObjectTypes.Document;
 
             var expected = new Sql();
             expected.Select("*")
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Where_Clause()
         {
-            var NodeObjectType = new Guid(Constants.ObjectTypes.Document);
+            var NodeObjectType = Constants.ObjectTypes.Document;
 
             var expected = Sql();
             expected.SelectAll()
@@ -87,7 +87,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Where_With_Version_Clause()
         {
-            var NodeObjectType = new Guid(Constants.ObjectTypes.Document);
+            var NodeObjectType = Constants.ObjectTypes.Document;
             var versionId = new Guid("2b543516-a944-4ee6-88c6-8813da7aaa07");
 
             var expected = new Sql();

@@ -192,7 +192,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return l;
         }
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.MemberTypeGuid;
+        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.MemberType;
 
         protected override void PersistNewItem(IMemberType entity)
         {

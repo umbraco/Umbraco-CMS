@@ -72,18 +72,18 @@ namespace umbraco.cms.presentation.developer.RelationTypes
         /// <param name="dropDownList">control for which to add the Umbraco object types</param>
         private void AppendUmbracoObjectTypes(ListControl dropDownList)
         {
-            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.Document.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.Document));
-            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.Media.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.Media));
-            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.Member.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.Member));
-            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.MediaType.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.MediaType));
-            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.DocumentType.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.DocumentType));
-            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.MemberType.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.MemberType));
-            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.DataType.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.DataType));
-            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.MemberGroup.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.MemberGroup));
-            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.Stylesheet.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.Stylesheet));
-            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.Template.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.Template));
-            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.ROOT.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.SystemRoot));
-            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.RecycleBin.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.ContentRecycleBin));
+            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.Document.GetFriendlyName(), Constants.ObjectTypes.Strings.Document));
+            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.Media.GetFriendlyName(), Constants.ObjectTypes.Strings.Media));
+            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.Member.GetFriendlyName(), Constants.ObjectTypes.Strings.Member));
+            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.MediaType.GetFriendlyName(), Constants.ObjectTypes.Strings.MediaType));
+            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.DocumentType.GetFriendlyName(), Constants.ObjectTypes.Strings.DocumentType));
+            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.MemberType.GetFriendlyName(), Constants.ObjectTypes.Strings.MemberType));
+            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.DataType.GetFriendlyName(), Constants.ObjectTypes.Strings.DataType));
+            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.MemberGroup.GetFriendlyName(), Constants.ObjectTypes.Strings.MemberGroup));
+            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.Stylesheet.GetFriendlyName(), Constants.ObjectTypes.Strings.Stylesheet));
+            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.Template.GetFriendlyName(), Constants.ObjectTypes.Strings.Template));
+            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.ROOT.GetFriendlyName(), Constants.ObjectTypes.Strings.SystemRoot));
+            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.RecycleBin.GetFriendlyName(), Constants.ObjectTypes.Strings.ContentRecycleBin));
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Umbraco.Core.Services
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
                 try
                 {
-                    var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid)
+                    var container = new EntityContainer(Constants.ObjectTypes.DataType)
                     {
                         Name = name,
                         ParentId = parentId,
@@ -113,9 +113,9 @@ namespace Umbraco.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            if (container.ContainedObjectType != Constants.ObjectTypes.DataTypeGuid)
+            if (container.ContainedObjectType != Constants.ObjectTypes.DataType)
             {
-                var ex = new InvalidOperationException("Not a " + Constants.ObjectTypes.DataTypeGuid + " container.");
+                var ex = new InvalidOperationException("Not a " + Constants.ObjectTypes.DataType + " container.");
                 return OperationStatus.Attempt.Fail(evtMsgs, ex);
             }
 

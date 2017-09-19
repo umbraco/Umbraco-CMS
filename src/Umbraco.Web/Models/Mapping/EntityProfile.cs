@@ -27,7 +27,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .AfterMap((src, dest) =>
                 {
-                    if (src.NodeObjectTypeId == Constants.ObjectTypes.MemberGuid && dest.Icon.IsNullOrWhiteSpace())
+                    if (src.NodeObjectTypeId == Constants.ObjectTypes.Member && dest.Icon.IsNullOrWhiteSpace())
                     {
                         dest.Icon = "icon-user";
                     }
@@ -89,15 +89,15 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     if (basic.Icon.IsNullOrWhiteSpace())
                     {
-                        if (entity.NodeObjectTypeId == Constants.ObjectTypes.MemberGuid)
+                        if (entity.NodeObjectTypeId == Constants.ObjectTypes.Member)
                             basic.Icon = "icon-user";
-                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.DataTypeGuid)
+                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.DataType)
                             basic.Icon = "icon-autofill";
-                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.DocumentTypeGuid)
+                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.DocumentType)
                             basic.Icon = "icon-item-arrangement";
-                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.MediaTypeGuid)
+                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.MediaType)
                             basic.Icon = "icon-thumbnails";
-                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.TemplateTypeGuid)
+                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.TemplateType)
                             basic.Icon = "icon-newspaper-alt";
                     }
                 });

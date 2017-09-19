@@ -82,7 +82,7 @@ namespace Umbraco.Web.Trees
                     "icon-user",
                     false,
                     "",
-                    Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(Constants.ObjectTypes.MemberGuid), member.Key));
+                    Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(Constants.ObjectTypes.Member), member.Key));
 
                 node.AdditionalData.Add("contentType", member.ContentTypeAlias);
                 node.AdditionalData.Add("isContainer", true);

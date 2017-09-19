@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private EntityContainerRepository CreateContainerRepository(IScopeUnitOfWork unitOfWork)
         {
-            return new EntityContainerRepository(unitOfWork, DisabledCache, Logger, Constants.ObjectTypes.MediaTypeContainerGuid);
+            return new EntityContainerRepository(unitOfWork, DisabledCache, Logger, Constants.ObjectTypes.MediaTypeContainer);
 
         }
 
@@ -36,11 +36,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var containerRepository = CreateContainerRepository(unitOfWork);
                 var repository = CreateRepository(unitOfWork);
 
-                var container1 = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah1" };
+                var container1 = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah1" };
                 containerRepository.AddOrUpdate(container1);
                 unitOfWork.Flush();
 
-                var container2 = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah2", ParentId = container1.Id };
+                var container2 = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.AddOrUpdate(container2);
                 unitOfWork.Flush();
 
@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
 
-                var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Flush();
                 Assert.That(container.Id, Is.GreaterThan(0));
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var containerRepository = CreateContainerRepository(unitOfWork);
 
-                var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Flush();
                 Assert.That(container.Id, Is.GreaterThan(0));
@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var containerRepository = CreateContainerRepository(unitOfWork);
                 var repository = CreateRepository(unitOfWork);
 
-                var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Flush();
 
@@ -145,7 +145,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var containerRepository = CreateContainerRepository(unitOfWork);
                 var repository = CreateRepository(unitOfWork);
 
-                var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Flush();
 
@@ -312,7 +312,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 int count =
                     unitOfWork.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
-                        new {NodeObjectType = new Guid(Constants.ObjectTypes.MediaType)});
+                        new { NodeObjectType = Constants.ObjectTypes.MediaType });
 
                 // Assert
                 Assert.That(mediaTypes.Any(), Is.True);
@@ -338,7 +338,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 int count =
                     unitOfWork.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
-                        new { NodeObjectType = new Guid(Constants.ObjectTypes.MediaType) });
+                        new { NodeObjectType = Constants.ObjectTypes.MediaType });
 
                 // Assert
                 Assert.That(mediaTypes.Any(), Is.True);

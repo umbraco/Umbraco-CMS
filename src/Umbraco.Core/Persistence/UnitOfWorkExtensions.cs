@@ -22,9 +22,9 @@ namespace Umbraco.Core.Persistence
 
         public static IEntityContainerRepository CreateContainerRepository(this IUnitOfWork uow, Guid containerObjectType)
         {
-            if (containerObjectType == Constants.ObjectTypes.DocumentTypeContainerGuid)
+            if (containerObjectType == Constants.ObjectTypes.DocumentTypeContainer)
                 return uow.CreateRepository<IDocumentTypeContainerRepository>();
-            if (containerObjectType == Constants.ObjectTypes.MediaTypeContainerGuid)
+            if (containerObjectType == Constants.ObjectTypes.MediaTypeContainer)
                 return uow.CreateRepository<IMediaTypeContainerRepository>();
             throw new ArgumentOutOfRangeException(nameof(containerObjectType));
         }

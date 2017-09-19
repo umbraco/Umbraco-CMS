@@ -538,7 +538,7 @@ namespace Umbraco.Tests.Services
             var cts = ServiceContext.ContentTypeService;
 
             // Act
-            var container = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid);
+            var container = new EntityContainer(Constants.ObjectTypes.DocumentType);
             container.Name = "container1";
             cts.SaveContainer(container);
 
@@ -554,11 +554,11 @@ namespace Umbraco.Tests.Services
             var cts = ServiceContext.ContentTypeService;
 
             // Act
-            var container1 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid);
+            var container1 = new EntityContainer(Constants.ObjectTypes.DocumentType);
             container1.Name = "container1";
             cts.SaveContainer(container1);
 
-            var container2 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid);
+            var container2 = new EntityContainer(Constants.ObjectTypes.DocumentType);
             container2.Name = "container2";
             cts.SaveContainer(container2);
 

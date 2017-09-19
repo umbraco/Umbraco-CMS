@@ -19,14 +19,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             if (tables.InvariantContains("cmsStylesheetProperty"))
             {
                 Delete.FromTable("cmsStylesheetProperty").AllRows();
-                Delete.FromTable("umbracoNode").Row(new { nodeObjectType = new Guid(Constants.ObjectTypes.StylesheetProperty) });
+                Delete.FromTable("umbracoNode").Row(new { nodeObjectType = Constants.ObjectTypes.StylesheetProperty });
 
                 Delete.Table("cmsStylesheetProperty");
             }
             if (tables.InvariantContains("cmsStylesheet"))
             {
                 Delete.FromTable("cmsStylesheet").AllRows();
-                Delete.FromTable("umbracoNode").Row(new { nodeObjectType = new Guid(Constants.ObjectTypes.Stylesheet) });
+                Delete.FromTable("umbracoNode").Row(new { nodeObjectType = Constants.ObjectTypes.Stylesheet });
 
                 Delete.Table("cmsStylesheet");
             }

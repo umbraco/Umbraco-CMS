@@ -449,7 +449,7 @@ AND (umbracoNode.id=@id)";
                 var xmlDtos = uow.Database.Query<XmlDto>(sql,
                     new
                     {
-                        nodeObjectType = new Guid(Constants.ObjectTypes.Media),
+                        nodeObjectType = Constants.ObjectTypes.Media,
                         id = mediaId
                     });
                 xmlDto = xmlDtos.FirstOrDefault();
@@ -481,7 +481,7 @@ AND (umbracoNode.id=@id)";
                 var xmlDtos = uow.Database.Query<XmlDto>(sql,
                     new
                     {
-                        nodeObjectType = new Guid(Constants.ObjectTypes.Member),
+                        nodeObjectType = Constants.ObjectTypes.Member,
                         id = memberId
                     });
                 xmlDto = xmlDtos.FirstOrDefault();
@@ -512,7 +512,7 @@ AND (umbracoNode.id=@id)";
                 var xmlDtos = uow.Database.Query<XmlDto>(sql,
                     new
                     {
-                        nodeObjectType = new Guid(Constants.ObjectTypes.Document),
+                        nodeObjectType = Constants.ObjectTypes.Document,
                         id = contentId
                     });
                 xmlDto = xmlDtos.FirstOrDefault();
@@ -535,7 +535,7 @@ AND (umbracoNode.id=@id)";
             // just here to replicate what uQuery was doing and show it can be done
             // but really - should not be used
 
-            return LoadMoreXmlFromDatabase(new Guid(Constants.ObjectTypes.Media));
+            return LoadMoreXmlFromDatabase(Constants.ObjectTypes.Media);
         }
 
         public XmlDocument GetMemberXml()
@@ -544,7 +544,7 @@ AND (umbracoNode.id=@id)";
             // just here to replicate what uQuery was doing and show it can be done
             // but really - should not be used
 
-            return LoadMoreXmlFromDatabase(new Guid(Constants.ObjectTypes.Member));
+            return LoadMoreXmlFromDatabase(Constants.ObjectTypes.Member);
         }
 
         public XmlDocument GetPreviewXml(int contentId, bool includeSubs)
@@ -567,7 +567,7 @@ AND (umbracoNode.id=@id)";
                 var xmlDtos = uow.Database.Query<XmlDto>(sql,
                     new
                     {
-                        nodeObjectType = new Guid(Constants.ObjectTypes.Document),
+                        nodeObjectType = Constants.ObjectTypes.Document,
                         path = content.Path,
                     });
 
@@ -922,7 +922,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
                 // get xml
                 var xmlDtos = uow.Database.Query<XmlDto>(ReadTreeCmsContentXmlSql,
-                    new { nodeObjectType = new Guid(Constants.ObjectTypes.Document) });
+                    new { nodeObjectType = Constants.ObjectTypes.Document });
 
                 foreach (var xmlDto in xmlDtos)
                 {
@@ -954,11 +954,11 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
-                if (nodeObjectType == Constants.ObjectTypes.DocumentGuid)
+                if (nodeObjectType == Constants.ObjectTypes.Document)
                     uow.ReadLock(Constants.Locks.ContentTree);
-                else if (nodeObjectType == Constants.ObjectTypes.MediaGuid)
+                else if (nodeObjectType == Constants.ObjectTypes.Media)
                     uow.ReadLock(Constants.Locks.MediaTree);
-                else if (nodeObjectType == Constants.ObjectTypes.MemberGuid)
+                else if (nodeObjectType == Constants.ObjectTypes.Member)
                     uow.ReadLock(Constants.Locks.MemberTree);
 
                 var xmlDtos = uow.Database.Query<XmlDto>(ReadMoreCmsContentXmlSql,
@@ -1087,7 +1087,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                         var xmlDtos = uow.Database.Query<XmlDto>(ReadBranchCmsContentXmlSql,
                             new
                             {
-                                nodeObjectType = new Guid(Constants.ObjectTypes.Document),
+                                nodeObjectType = Constants.ObjectTypes.Document,
                                 path = content.Path + ",%",
                                 id = content.Id
                             });
@@ -1262,7 +1262,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var xmlDtos = uow.Database.Query<XmlDto>(ReadCmsContentXmlForContentTypesSql,
-                    new { nodeObjectType = new Guid(Constants.ObjectTypes.Document), /*@ids =*/ ids });
+                    new { nodeObjectType = Constants.ObjectTypes.Document, /*@ids =*/ ids });
 
                 foreach (var xmlDto in xmlDtos)
                 {
@@ -1702,7 +1702,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         private void RebuildContentXmlLocked(IScopeUnitOfWork unitOfWork, IContentRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var contentObjectType = Guid.Parse(Constants.ObjectTypes.Document);
+            var contentObjectType = Constants.ObjectTypes.Document;
             var db = unitOfWork.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1775,7 +1775,7 @@ WHERE cmsContentXml.nodeId IN (
         private void RebuildPreviewXmlLocked(IScopeUnitOfWork unitOfWork, IContentRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var contentObjectType = Guid.Parse(Constants.ObjectTypes.Document);
+            var contentObjectType = Constants.ObjectTypes.Document;
             var db = unitOfWork.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1852,7 +1852,7 @@ WHERE cmsPreviewXml.nodeId IN (
         public void RebuildMediaXmlLocked(IScopeUnitOfWork unitOfWork, IMediaRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
+            var mediaObjectType = Constants.ObjectTypes.Media;
             var db = unitOfWork.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1923,7 +1923,7 @@ WHERE cmsContentXml.nodeId IN (
         public void RebuildMemberXmlLocked(IScopeUnitOfWork unitOfWork, IMemberRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
+            var memberObjectType = Constants.ObjectTypes.Member;
             var db = unitOfWork.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1995,7 +1995,7 @@ WHERE cmsContentXml.nodeId IN (
             // every content item should have a corresponding row in cmsPreviewXml
             // and that row should have the key="..." attribute
 
-            var contentObjectType = Guid.Parse(Constants.ObjectTypes.Document);
+            var contentObjectType = Constants.ObjectTypes.Document;
             var db = unitOfWork.Database;
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
@@ -2037,7 +2037,7 @@ AND cmsPreviewXml.nodeId IS NULL OR cmsPreviewXml.xml NOT LIKE '% key=""'
             // and that row should have the key="..." attribute
             // fixme - where's the trashed test here?
 
-            var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
+            var mediaObjectType = Constants.ObjectTypes.Media;
             var db = unitOfWork.Database;
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
@@ -2068,7 +2068,7 @@ AND cmsContentXml.nodeId IS NULL OR cmsContentXml.xml NOT LIKE '% key=""'
         {
             // every member item should have a corresponding row in cmsContentXml
 
-            var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
+            var memberObjectType = Constants.ObjectTypes.Member;
             var db = unitOfWork.Database;
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)

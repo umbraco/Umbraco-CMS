@@ -41,8 +41,8 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IUmbracoEntity> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, IQuery<IUmbracoEntity> filter = null)
         {
-            var isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
-            var isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
+            var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectTypeId == Constants.ObjectTypes.Media;
             var factory = new UmbracoEntityFactory();
 
             var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, sql =>
@@ -171,8 +171,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IUmbracoEntity GetByKey(Guid key, Guid objectTypeId)
         {
-            var isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
-            var isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
+            var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectTypeId == Constants.ObjectTypes.Media;
 
             var sql = GetFullSqlForEntityType(key, isContent, isMedia, objectTypeId);
 
@@ -223,8 +223,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IUmbracoEntity Get(int id, Guid objectTypeId)
         {
-            var isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
-            var isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
+            var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectTypeId == Constants.ObjectTypes.Media;
 
             var sql = GetFullSqlForEntityType(id, isContent, isMedia, objectTypeId);
 
@@ -267,8 +267,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private IEnumerable<IUmbracoEntity> PerformGetAll(Guid objectTypeId, Action<Sql> filter = null)
         {
-            var isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
-            var isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
+            var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectTypeId == Constants.ObjectTypes.Media;
             var sql = GetFullSqlForEntityType(isContent, isMedia, objectTypeId, filter);
 
             if (isMedia)
@@ -327,8 +327,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId)
         {
-            var isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
-            var isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
+            var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectTypeId == Constants.ObjectTypes.Media;
 
             var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, null, objectTypeId);
 
@@ -417,7 +417,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 : entitySql.Append(GetGroupBy(isContent, false));
         }
 
-        private Sql<SqlContext> GetPropertySql(string nodeObjectType)
+        private Sql<SqlContext> GetPropertySql(Guid nodeObjectType)
         {
             var sql = Sql()
                 .Select("contentNodeId, versionId, dataNvarchar, dataNtext, propertyEditorAlias, alias as propertyTypeAlias")

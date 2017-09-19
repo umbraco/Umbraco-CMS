@@ -725,14 +725,14 @@ namespace Umbraco.Core.Services
             NodeDto node;
             using (var scope = UowProvider.ScopeProvider.CreateScope())
             {
-                var sql = new Sql("SELECT * FROM umbracoNode WHERE uniqueID=@0 AND nodeObjectType=@1", key, Constants.ObjectTypes.IdReservationGuid);
+                var sql = new Sql("SELECT * FROM umbracoNode WHERE uniqueID=@0 AND nodeObjectType=@1", key, Constants.ObjectTypes.IdReservation);
                 node = scope.Database.SingleOrDefault<NodeDto>(sql);
                 if (node != null) throw new InvalidOperationException("An identifier has already been reserved for this Udi.");
                 node = new NodeDto
                 {
                     UniqueId = key,
                     Text = "RESERVED.ID",
-                    NodeObjectType = Constants.ObjectTypes.IdReservationGuid,
+                    NodeObjectType = Constants.ObjectTypes.IdReservation,
 
                     CreateDate = DateTime.Now,
                     UserId = 0,

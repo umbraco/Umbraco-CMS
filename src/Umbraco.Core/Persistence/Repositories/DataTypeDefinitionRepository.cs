@@ -148,10 +148,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return new List<string>();
         }
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { return new Guid(Constants.ObjectTypes.DataType); }
-        }
+        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.DataType;
 
         #endregion
 

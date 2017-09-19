@@ -763,7 +763,7 @@ namespace Umbraco.Core.Services
                 var repo = uow.CreateContainerRepository(ContainerObjectType);
                 try
                 {
-                    var container = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid)
+                    var container = new EntityContainer(Constants.ObjectTypes.DocumentType)
                     {
                         Name = name,
                         ParentId = parentId,

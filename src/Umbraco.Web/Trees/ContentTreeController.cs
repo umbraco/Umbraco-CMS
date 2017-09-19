@@ -64,7 +64,7 @@ namespace Umbraco.Web.Trees
 
                 var node = CreateTreeNode(
                     entity,
-                    Constants.ObjectTypes.DocumentGuid,
+                    Constants.ObjectTypes.Document,
                     parentId,
                     queryStrings,
                     entity.HasChildren && isContainer == false);

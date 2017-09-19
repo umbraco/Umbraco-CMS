@@ -363,9 +363,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             return sql;
         }
 
-        private Guid NodeObjectTypeId
-        {
-            get { return new Guid(Constants.ObjectTypes.Member); }
-        }
+        private Guid NodeObjectTypeId => Constants.ObjectTypes.Member;
     }
 }

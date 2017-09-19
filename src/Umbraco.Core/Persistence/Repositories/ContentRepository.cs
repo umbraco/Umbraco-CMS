@@ -214,7 +214,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return list;
         }
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.DocumentGuid;
+        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Document;
 
         #endregion
 
@@ -349,7 +349,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // we reach that point - removed.
 
             // see if there's a reserved identifier for this unique id
-            var sql = new Sql("SELECT id FROM umbracoNode WHERE uniqueID=@0 AND nodeObjectType=@1", nodeDto.UniqueId, Constants.ObjectTypes.IdReservationGuid);
+            var sql = new Sql("SELECT id FROM umbracoNode WHERE uniqueID=@0 AND nodeObjectType=@1", nodeDto.UniqueId, Constants.ObjectTypes.IdReservation);
             var id = Database.ExecuteScalar<int>(sql);
             if (id > 0)
             {

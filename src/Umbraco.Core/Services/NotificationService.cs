@@ -74,7 +74,7 @@ namespace Umbraco.Core.Services
             {
                 // users are returned ordered by id, notifications are returned ordered by user id
                 var users = ((UserService) _userService).GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
-                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, nodeIds, Constants.ObjectTypes.DocumentGuid).ToList();
+                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, nodeIds, Constants.ObjectTypes.Document).ToList();
                 if (notifications.Count == 0) break;
 
                 var i = 0;
@@ -157,7 +157,7 @@ namespace Umbraco.Core.Services
             {
                 // users are returned ordered by id, notifications are returned ordered by user id
                 var users = ((UserService)_userService).GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
-                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>(), Constants.ObjectTypes.DocumentGuid).ToList();
+                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>(), Constants.ObjectTypes.Document).ToList();
                 if (notifications.Count == 0) break;
 
                 var i = 0;

@@ -24,7 +24,7 @@ namespace Umbraco.Core.Services
 
         private IMediaService MediaService { get; }
 
-        protected override Guid ContainedObjectType => Constants.ObjectTypes.MediaTypeGuid;
+        protected override Guid ContainedObjectType => Constants.ObjectTypes.MediaType;
 
         protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
         {
