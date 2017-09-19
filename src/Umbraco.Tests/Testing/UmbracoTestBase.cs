@@ -113,10 +113,7 @@ namespace Umbraco.Tests.Testing
             TestObjects = new TestObjects(Container);
 
             // get/merge the attributes marking the method and/or the classes
-            var testName = TestContext.CurrentContext.Test.Name;
-            var pos = testName.IndexOf('(');
-            if (pos > 0) testName = testName.Substring(0, pos);
-            Options = UmbracoTestAttribute.Get(GetType().GetMethod(testName));
+            Options = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
 
             Compose();
             Initialize();

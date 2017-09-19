@@ -262,6 +262,7 @@
     <Compile Include="Persistence\NPocoExpressionsTests.cs" />
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
+    <Compile Include="Testing\TestOptionAttributeBase.cs" />
     <Compile Include="Testing\UmbracoTestAttribute.cs" />
     <Compile Include="Testing\UmbracoTestBase.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />

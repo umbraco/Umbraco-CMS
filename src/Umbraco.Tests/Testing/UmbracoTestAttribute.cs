@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
 using Umbraco.Core;
 
 namespace Umbraco.Tests.Testing
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, /*AllowMultiple = false,*/ Inherited = false)]
-    public class UmbracoTestAttribute : Attribute
+    public class UmbracoTestAttribute : TestOptionAttributeBase
     {
-        #region Properties
-
         /// <summary>
         /// Gets or sets a value indicating whether tests are "WithApplication".
         /// </summary>
@@ -55,44 +51,20 @@ namespace Umbraco.Tests.Testing
         public UmbracoTestOptions.PluginManager PluginManager { get => _pluginManager.ValueOrDefault(UmbracoTestOptions.PluginManager.Default); set => _pluginManager.Set(value); }
         private readonly Settable<UmbracoTestOptions.PluginManager> _pluginManager = new Settable<UmbracoTestOptions.PluginManager>();
 
-        #endregion
-
-        #region Get
-
-        public static UmbracoTestAttribute Get(MethodInfo method)
+        protected override TestOptionAttributeBase Merge(TestOptionAttributeBase other)
         {
-            var attr = ((UmbracoTestAttribute[]) method.GetCustomAttributes(typeof (UmbracoTestAttribute), true)).FirstOrDefault();
-            var type = method.DeclaringType;
-            return Get(type, attr);
-        }
+            if (!(other is UmbracoTestAttribute attr))
+                throw new ArgumentException(nameof(other));
 
-        public static UmbracoTestAttribute Get(Type type)
-        {
-            return Get(type, null);
-        }
+            base.Merge(other);
 
-        private static UmbracoTestAttribute Get(Type type, UmbracoTestAttribute attr)
-        {
-            while (type != null && type != typeof(object))
-            {
-                var attr2 = ((UmbracoTestAttribute[]) type.GetCustomAttributes(typeof (UmbracoTestAttribute), true)).FirstOrDefault();
-                if (attr2 != null)
-                    attr = attr == null ? attr2 : attr2.Merge(attr);
-                type = type.BaseType;
-            }
-            return attr ?? new UmbracoTestAttribute();
-        }
+            _autoMapper.Set(attr._autoMapper);
+            _facadeServiceRepositoryEvents.Set(attr._facadeServiceRepositoryEvents);
+            _logger.Set(attr._logger);
+            _database.Set(attr._database);
+            _pluginManager.Set(attr._pluginManager);
 
-        private UmbracoTestAttribute Merge(UmbracoTestAttribute other)
-        {
-            _autoMapper.Set(other._autoMapper);
-            _facadeServiceRepositoryEvents.Set(other._facadeServiceRepositoryEvents);
-            _logger.Set(other._logger);
-            _database.Set(other._database);
-            _pluginManager.Set(other._pluginManager);
             return this;
         }
-
-        #endregion
     }
 }
