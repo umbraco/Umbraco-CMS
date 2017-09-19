@@ -139,9 +139,7 @@ namespace Umbraco.Web.Editors
 
                     //get the user
                     var user = Security.GetBackOfficeUser(loginModel.Username);
-
-                    if (UserManager != null)
-                        UserManager.RaiseLoginSuccessEvent(user.Id);
+                    UserManager.RaiseLoginSuccessEvent(user.Id);
 
                     return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.RequiresVerification:
@@ -177,8 +175,7 @@ namespace Umbraco.Web.Editors
                         userId = attemptedUser.Id
                     });
 
-                    if (UserManager != null)
-                        UserManager.RaiseLoginRequiresVerificationEvent(attemptedUser.Id);
+                    UserManager.RaiseLoginRequiresVerificationEvent(attemptedUser.Id);
 
                     return verifyResponse;
 
@@ -227,8 +224,7 @@ namespace Umbraco.Web.Editors
                             UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService)),
                         message);
 
-                    if(UserManager != null)
-                        UserManager.RaiseForgotPasswordRequestedEvent(user.Id);
+                    UserManager.RaiseForgotPasswordRequestedEvent(user.Id);
                 }
             }
 
@@ -295,14 +291,10 @@ namespace Umbraco.Web.Editors
             switch (result)
             {
                 case SignInStatus.Success:
-                    if (UserManager != null)
-                        UserManager.RaiseLoginSuccessEvent(user.Id);
-
+                    UserManager.RaiseLoginSuccessEvent(user.Id);
                     return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.LockedOut:
-                    if (UserManager != null)
-                            UserManager.RaiseAccountLockedEvent(user.Id);
-
+                    UserManager.RaiseAccountLockedEvent(user.Id);
                     return Request.CreateValidationErrorResponse("User is locked out");                    
                 case SignInStatus.Failure:
                 default:
@@ -343,8 +335,7 @@ namespace Umbraco.Web.Editors
                     }
                 }
 
-                if(UserManager != null)
-                    UserManager.RaiseForgotPasswordChangedSuccessEvent(model.UserId);
+                UserManager.RaiseForgotPasswordChangedSuccessEvent(model.UserId);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             return Request.CreateValidationErrorResponse(
