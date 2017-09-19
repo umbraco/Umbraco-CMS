@@ -51,13 +51,19 @@ function Prepare-Build
 
   if (-not $keep)
   {
-    Remove-Directory "$tmp"
-    mkdir "$tmp" > $null
-    
-    Remove-Directory "$out"
-    mkdir "$out" > $null
+	Remove-Directory "$tmp"
+	Remove-Directory "$out"
   }
 
+  if (-not (Test-Path "$tmp")) 
+  {
+    mkdir "$tmp" > $null
+  }
+  if (-not (Test-Path "$out")) 
+  {
+    mkdir "$out" > $null
+  }
+    
   # ensure proper web.config
   $webUi = "$src\Umbraco.Web.UI"
   Store-WebConfig $webUi
