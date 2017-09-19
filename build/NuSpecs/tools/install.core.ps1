@@ -42,6 +42,7 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\SQLCE4Umbraco.dll) { Remove-Item $umbracoBinFolder\SQLCE4Umbraco.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Data.SqlServerCe.dll) { Remove-Item $umbracoBinFolder\System.Data.SqlServerCe.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Data.SqlServerCe.Entity.dll) { Remove-Item $umbracoBinFolder\System.Data.SqlServerCe.Entity.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\TidyNet.dll) { Remove-Item $umbracoBinFolder\TidyNet.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\umbraco.dll) { Remove-Item $umbracoBinFolder\umbraco.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Umbraco.Core.dll) { Remove-Item $umbracoBinFolder\Umbraco.Core.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\umbraco.DataLayer.dll) { Remove-Item $umbracoBinFolder\umbraco.DataLayer.dll -Force -Confirm:$false }
@@ -70,6 +71,7 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\ImageProcessor.dll) { Remove-Item $umbracoBinFolder\ImageProcessor.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\ImageProcessor.Web.dll) { Remove-Item $umbracoBinFolder\ImageProcessor.Web.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Lucene.Net.dll) { Remove-Item $umbracoBinFolder\Lucene.Net.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Microsoft.IO.RecyclableMemoryStream.dll) { Remove-Item $umbracoBinFolder\Microsoft.IO.RecyclableMemoryStream.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.AspNet.Identity.Core.dll) { Remove-Item $umbracoBinFolder\Microsoft.AspNet.Identity.Core.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.AspNet.Identity.Owin.dll) { Remove-Item $umbracoBinFolder\Microsoft.AspNet.Identity.Owin.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.CodeAnalysis.CSharp.dll) { Remove-Item $umbracoBinFolder\Microsoft.CodeAnalysis.CSharp.dll -Force -Confirm:$false }

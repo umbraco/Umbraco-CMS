@@ -531,11 +531,20 @@ namespace Umbraco.Web.Editors
 
             if (userSave.ChangePassword != null)
             {
-                var passwordChanger = new PasswordChanger(Logger, Services.UserService);
+                var passwordChanger = new PasswordChanger(Logger, Services.UserService, UmbracoContext.HttpContext);
 
                 var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, userSave.ChangePassword, UserManager);
                 if (passwordChangeResult.Success)
                 {
+                    var userMgr = this.TryGetOwinContext().Result.GetBackOfficeUserManager();
+
+                    //raise the event - NOTE that the ChangePassword.Reset value here doesn't mean it's been 'reset', it means
+                    //it's been changed by a back office user
+                    if (userSave.ChangePassword.Reset.HasValue && userSave.ChangePassword.Reset.Value)
+                    {
+                        userMgr.RaisePasswordChangedEvent(intId.Result);
+                    }
+                    
                     //need to re-get the user
                     found = Services.UserService.GetUserById(intId.Result);
                 }

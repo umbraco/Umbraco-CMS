@@ -156,11 +156,11 @@ namespace Umbraco.Web.Security
         /// </remarks>
         private bool HasAccess(string path, RoleProvider roleProvider)
         {
-            return _umbracoContext.PublishedContentRequest == null 
+            return _umbracoContext.PublishedContentRequest == null
                 ? PublicAccessService.HasAccess(path, CurrentUserName, roleProvider.GetRolesForUser) 
                 : PublicAccessService.HasAccess(path, CurrentUserName, Router.GetRolesForLogin);
         }
-        
+
         /// <summary>
         /// Returns true if the current membership provider is the Umbraco built-in one.
         /// </summary>
@@ -712,6 +712,7 @@ namespace Umbraco.Web.Security
             {
                 throw new InvalidOperationException("Could not find provider with name " + membershipProviderName);
             }
+            
             return ChangePassword(username, passwordModel, provider);
         }
 
@@ -724,10 +725,10 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public virtual Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
-            var passwordChanger = new PasswordChanger(Logger, UserService);
-            return passwordChanger.ChangePasswordWithMembershipProvider(username, passwordModel, membershipProvider);            
+            var passwordChanger = new PasswordChanger(Logger, UserService, Current.UmbracoContext.HttpContext));
+            return passwordChanger.ChangePasswordWithMembershipProvider(username, passwordModel, membershipProvider);
         }
-        
+
         /// <summary>
         /// Updates a membership user with all of it's writable properties
         /// </summary>

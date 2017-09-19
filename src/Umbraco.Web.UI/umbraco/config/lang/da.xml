@@ -15,6 +15,7 @@
     <key alias="delete">Slet</key>
     <key alias="disable">Deaktivér</key>
     <key alias="emptyTrashcan">Tøm papirkurv</key>
+    <key alias="enable">Aktivér</key>
     <key alias="exportDocumentType">Eksportér dokumenttype</key>
     <key alias="exportDocumentTypeAsCode">Eksportér til .NET</key>
     <key alias="exportDocumentTypeAsCode-Full">Eksportér til .NET</key>
@@ -185,8 +186,10 @@
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokument typer. Du skal tillade disse i indstillinger under <strong>"dokument typer"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.]]></key>
     <key alias="documentTypeWithoutTemplate">Dokumenttype uden skabelon</key>
+    <key alias="newEmptyPartialView">Ny tom partial view</key>
     <key alias="newFolder">Ny mappe</key>
     <key alias="newDataType">Ny datatype</key>
+    <key alias="newPartialViewFromSnippet">Ny partial view fra snippet</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Til dit website</key>
@@ -460,12 +463,14 @@
     <key alias="recycleBin">Papirkurv</key>
     <key alias="recycleBinEmpty">Din papirkurv er tom</key>
     <key alias="remaining">Mangler</key>
+    <key alias="remove">Fjern</key>
     <key alias="rename">Omdøb</key>
     <key alias="renew">Forny</key>
     <key alias="required" version="7.0">Påkrævet</key>
     <key alias="retry">Prøv igen</key>
     <key alias="rights">Rettigheder</key>
     <key alias="search">Søg</key>
+    <key alias="searchNoResult">Beklager, vi kan ikke finde det, du leder efter.</key>
     <key alias="server">Server</key>
     <key alias="show">Vis</key>
     <key alias="showPageOnSend">Hvilken side skal vises efter at formularen er sendt</key>
@@ -1114,6 +1119,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="updateNoServerError">Der kunne ikke tjekkes for ny opdatering. Se trace for mere info.</key>
   </area>
   <area alias="user">
+    <key alias="access">Adgang</key>
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Kategorifelt</key>
     <key alias="changePassword">Skift dit kodeord</key>
@@ -1121,18 +1127,22 @@ Mange hilsner fra Umbraco robotten
     <key alias="confirmNewPassword">Gentag dit nye kodeord</key>
     <key alias="changePasswordDescription">Du kan ændre dit kodeord, som giver dig adgang til Umbraco Back Office ved at udfylde formularen og klikke på knappen 'Skift dit kodeord'</key>
     <key alias="contentChannel">Indholdskanal</key>
+    <key alias="changePhoto">Skift billede</key>
     <key alias="descriptionField">Beskrivelsesfelt</key>
     <key alias="disabled">Deaktivér bruger</key>
     <key alias="documentType">Dokumenttype</key>
     <key alias="editors">Redaktør</key>
     <key alias="excerptField">Uddragsfelt</key>
     <key alias="language">Sprog</key>
+    <key alias="lastLogin">Sidste login</key>
     <key alias="loginname">Brugernavn</key>
     <key alias="mediastartnode">Startnode i mediearkivet</key>
     <key alias="modules">Moduler</key>
     <key alias="noConsole">Deaktivér adgang til Umbraco</key>
+    <key alias="noLogin">har endnu ikke logget ind</key>
     <key alias="oldPassword">Gammelt kodeord</key>
     <key alias="password">Adgangskode</key>
+    <key alias="removePhoto">Fjern billede</key>
     <key alias="resetPassword">Nulstil kodeord</key>
     <key alias="passwordChanged">Dit kodeord er blevet ændret!</key>
     <key alias="passwordConfirm">Bekræft venligst dit nye kodeord</key>
@@ -1145,6 +1155,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="permissionReplaceChildren">Erstat underelement-rettigheder</key>
     <key alias="permissionSelectedPages">Du ændrer i øjeblikket rettigheder for siderne:</key>
     <key alias="permissionSelectPages">Vælg sider for at ændre deres rettigheder</key>
+    <key alias="profile">Profil</key>
     <key alias="searchAllChildren">Søg alle 'børn'</key>
     <key alias="startnode">Start node</key>
     <key alias="username">Navn</key>

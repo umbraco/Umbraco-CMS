@@ -174,7 +174,7 @@ namespace Umbraco.Web.Editors
         /// <remarks>
         /// We cannot user GetCurrentUser since that requires they are approved, this is the same as GetCurrentUser but doesn't require them to be approved
         /// </remarks>
-        [WebApi.UmbracoAuthorize(requireApproval:false)]
+        [WebApi.UmbracoAuthorize(requireApproval: false)]
         [SetAngularAntiForgeryTokens]
         public UserDetail GetCurrentInvitedUser()
         {
@@ -200,7 +200,7 @@ namespace Umbraco.Web.Editors
         //TODO: This should be on the CurrentUserController?
         [WebApi.UmbracoAuthorize]
         [ValidateAngularAntiForgeryToken]
-        public async Task<Dictionary<string, string>>  GetCurrentUserLinkedLogins()
+        public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
         {
             var identityUser = await UserManager.FindByIdAsync(UmbracoContext.Security.GetUserId());
             return identityUser.Logins.ToDictionary(x => x.LoginProvider, x => x.ProviderKey);
@@ -223,9 +223,11 @@ namespace Umbraco.Web.Editors
             switch (result)
             {
                 case SignInStatus.Success:
-
+                    
                     //get the user
                     var user = Services.UserService.GetByUsername(loginModel.Username);
+                    UserManager.RaiseLoginSuccessEvent(user.Id);
+
                     return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.RequiresVerification:
 
@@ -259,6 +261,8 @@ namespace Umbraco.Web.Editors
                         twoFactorView = twofactorView,
                         userId = attemptedUser.Id
                     });
+
+                    UserManager.RaiseLoginRequiresVerificationEvent(attemptedUser.Id);
 
                     return verifyResponse;
 
@@ -299,13 +303,15 @@ namespace Umbraco.Web.Editors
                     var message = Services.TextService.Localize("resetPasswordEmailCopyFormat",
                         //Ensure the culture of the found user is used for the email!
                         UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService),
-                        new[] {identityUser.UserName, callbackUrl});
+                        new[] { identityUser.UserName, callbackUrl });
 
                     await UserManager.SendEmailAsync(identityUser.Id,
                         Services.TextService.Localize("login/resetPasswordEmailCopySubject",
                             //Ensure the culture of the found user is used for the email!
                             UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService)),
                         message);
+
+                    UserManager.RaiseForgotPasswordRequestedEvent(user.Id);
                 }
             }
 
@@ -366,20 +372,22 @@ namespace Umbraco.Web.Editors
             }
 
             var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: true, rememberBrowser: false);
+
+            var user = Services.UserService.GetByUsername(userName);
             switch (result)
             {
                 case SignInStatus.Success:
-                    //get the user
-                    var user = Services.UserService.GetByUsername(userName);
+                    UserManager.RaiseLoginSuccessEvent(user.Id);
                     return SetPrincipalAndReturnUserDetail(user);
                 case SignInStatus.LockedOut:
+                    UserManager.RaiseAccountLockedEvent(user.Id);
                     return Request.CreateValidationErrorResponse("User is locked out");
                 case SignInStatus.Failure:
                 default:
                     return Request.CreateValidationErrorResponse("Invalid code");
             }
         }
-        
+
         /// <summary>
         /// Processes a set password request.  Validates the request and sets a new password.
         /// </summary>
@@ -399,7 +407,7 @@ namespace Umbraco.Web.Editors
 
                     //var user = await UserManager.FindByIdAsync(model.UserId);
                     var unlockResult = await UserManager.SetLockoutEndDateAsync(model.UserId, DateTimeOffset.Now);
-                    if(unlockResult.Succeeded == false)
+                    if (unlockResult.Succeeded == false)
                     {
                         Logger.Warn<AuthenticationController>("Could not unlock for user {0} - error {1}",
                                         () => model.UserId, () => unlockResult.Errors.First());
@@ -413,6 +421,7 @@ namespace Umbraco.Web.Editors
                     }
                 }
 
+                UserManager.RaiseForgotPasswordChangedSuccessEvent(model.UserId);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             return Request.CreateValidationErrorResponse(
@@ -436,9 +445,15 @@ namespace Umbraco.Web.Editors
                             () => User.Identity == null ? "UNKNOWN" : User.Identity.Name,
                             () => TryGetOwinContext().Result.Request.RemoteIpAddress);
 
+            if (UserManager != null)
+            {
+                var userId = -1;
+                int.TryParse(User.Identity.GetUserId(), out userId);
+                UserManager.RaiseLogoutSuccessEvent(userId);
+            }
+
             return Request.CreateResponse(HttpStatusCode.OK);
         }
-
 
         /// <summary>
         /// This is used when the user is auth'd successfully and we need to return an OK with user details along with setting the current Principal in the request

@@ -15,13 +15,6 @@ function Build-UmbracoDocs
 
   ################ Do the UI docs
 
-  # create Belle build folder, so that we don't cause a Belle rebuild
-  $belleBuildDir = "$src\Umbraco.Web.UI.Client\build"
-  if (-not (Test-Path $belleBuildDir)) 
-  {
-      mkdir $belleBuildDir > $null
-  }
-
   Write-Host "Build UI documentation"
 
   # get a temp clean node env (will restore)
@@ -29,12 +22,22 @@ function Build-UmbracoDocs
  
   push-location "$src\Umbraco.Web.UI.Client"
   write "" > $tmp\belle-docs.log
-  &npm cache clean --quiet >> $tmp\belle-docs.log 2>&1
-  &npm install --quiet >> $tmp\belle-docs.log 2>&1
-  &npm install -g grunt-cli --quiet >> $tmp\belle-docs.log 2>&1
-  #&npm install -g bower --quiet >> $tmp\belle.log 2>&1
-  #&grunt build --buildversion=$version.Release >> $tmp\belle.log 2>&1
-  &grunt --gruntfile "$src/Umbraco.Web.UI.Client/gruntfile.js" docs >> $tmp\belle-docs.log 2>&1
+  write "node version is:" > $tmp\belle.log
+  &node -v >> $tmp\belle.log 2>&1
+  write "npm version is:" >> $tmp\belle.log 2>&1
+  &npm -v >> $tmp\belle.log 2>&1
+  write "clean npm cache" >> $tmp\belle.log 2>&1
+  &npm cache clean >> $tmp\belle.log 2>&1
+  write "npm install" >> $tmp\belle.log 2>&1
+  &npm install >> $tmp\belle.log 2>&1
+  write "installing bower" >> $tmp\belle.log 2>&1
+  &npm install -g bower >> $tmp\belle.log 2>&1
+  write "installing gulp" >> $tmp\belle.log 2>&1
+  &npm install -g gulp >> $tmp\belle.log 2>&1
+  write "installing gulp-cli" >> $tmp\belle.log 2>&1
+  &npm install -g gulp-cli --quiet >> $tmp\belle.log 2>&1
+  write "gulp docs" >> $tmp\belle.log 2>&1
+  &gulp docs >> $tmp\belle.log 2>&1
   pop-location
   
   # fixme - should we filter the log to find errors?
