@@ -33,6 +33,7 @@ using Umbraco.Core.Services;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 using System.Text.RegularExpressions;
 using System.Text;
+using Umbraco.Core.Models.Identity;
 
 namespace umbraco.cms.presentation.user
 {
@@ -480,6 +481,18 @@ namespace umbraco.cms.presentation.user
 
                 if (changePassResult.Success)
                 {
+                    var userMgr = Context.GetOwinContext().GetBackOfficeUserManager();
+
+                    //raise the appropriate event
+                    if (changePasswordModel.Reset.HasValue && changePasswordModel.Reset.Value)
+                    {
+                        userMgr.RaisePasswordResetEvent(UmbracoUser.Id);
+                    }
+                    else
+                    {
+                        userMgr.RaisePasswordChangedEvent(UmbracoUser.Id);
+                    }
+
                     //if it is successful, we need to show the generated password if there was one, so set
                     //that back on the control
                     passwordChangerControl.ChangingPasswordModel.GeneratedPassword = changePassResult.Result.ResetPassword;
@@ -520,6 +533,8 @@ namespace umbraco.cms.presentation.user
                     //update the membership provider
                     UpdateMembershipProvider(membershipUser);
 
+                    var backofficeUserManager = GetBackofficeUserManager();
+
                     //update the Umbraco user properties - even though we are updating some of these properties in the membership provider that is 
                     // ok since the membership provider might be storing these details someplace totally different! But we want to keep our UI in sync.
                     u.Name = uname.Text.Trim();
@@ -528,6 +543,10 @@ namespace umbraco.cms.presentation.user
                     u.Email = email.Text.Trim();
                     u.LoginName = lname.Text;
                     u.Disabled = Disabled.Checked;
+                    if (u.NoConsole && NoConsole.Checked == false && backofficeUserManager != null)
+                        //unlocking the user
+                        backofficeUserManager.RaiseAccountUnlockedEvent(u.Id);
+
                     u.NoConsole = NoConsole.Checked;
 
                     int startNode;
@@ -615,7 +634,7 @@ namespace umbraco.cms.presentation.user
             // update when the AD provider is active.
             if ((BackOfficeProvider is ActiveDirectoryMembershipProvider) == false)
             {
-                var membershipHelper = new MembershipHelper(ApplicationContext, new HttpContextWrapper(Context));
+                var membershipHelper = new MembershipHelper(UmbracoContext.Current);
                 //set the writable properties that we are editing
                 membershipHelper.UpdateMember(membershipUser, BackOfficeProvider,
                                               email.Text.Trim(),
@@ -631,5 +650,13 @@ namespace umbraco.cms.presentation.user
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected TabView UserTabs;
+        
+        internal BackOfficeUserManager<BackOfficeIdentityUser> GetBackofficeUserManager()
+        {
+            return HttpContext.Current == null
+                ? null
+                : HttpContext.Current.GetOwinContext().GetBackOfficeUserManager();
+        }
+
     }
 }

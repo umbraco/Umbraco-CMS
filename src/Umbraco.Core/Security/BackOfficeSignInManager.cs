@@ -49,7 +49,7 @@ namespace Umbraco.Core.Security
         public override async Task<SignInStatus> PasswordSignInAsync(string userName, string password, bool isPersistent, bool shouldLockout)
         {
             var result = await PasswordSignInAsyncImpl(userName, password, isPersistent, shouldLockout);
-            
+
             switch (result)
             {
                 case SignInStatus.Success:
@@ -104,6 +104,14 @@ namespace Umbraco.Core.Security
             var user = await UserManager.FindByNameAsync(userName);
             if (user == null)
             {
+                var requestContext = _request.Context;
+                if (requestContext != null)
+                {
+                    var backofficeUserManager = requestContext.GetBackOfficeUserManager();
+                    if (backofficeUserManager != null)
+                        backofficeUserManager.RaiseInvalidLoginAttemptEvent(userName);
+                }
+
                 return SignInStatus.Failure;
             }
             if (await UserManager.IsLockedOutAsync(user.Id))
@@ -121,6 +129,15 @@ namespace Umbraco.Core.Security
                 await UserManager.AccessFailedAsync(user.Id);
                 if (await UserManager.IsLockedOutAsync(user.Id))
                 {
+                    //at this point we've just locked the user out after too many failed login attempts
+                    var requestContext = _request.Context;
+                    if (requestContext != null)
+                    {
+                        var backofficeUserManager = requestContext.GetBackOfficeUserManager();
+                        if (backofficeUserManager != null)
+                            backofficeUserManager.RaiseAccountLockedEvent(user.Id);
+                    }
+
                     return SignInStatus.LockedOut;
                 }
             }
@@ -176,7 +193,7 @@ namespace Umbraco.Core.Security
                     AllowRefresh = true,
                     IssuedUtc = nowUtc,
                     ExpiresUtc = nowUtc.AddMinutes(GlobalSettings.TimeOutInMinutes)
-                }, userIdentity, rememberBrowserIdentity);                
+                }, userIdentity, rememberBrowserIdentity);
             }
             else
             {
@@ -191,7 +208,9 @@ namespace Umbraco.Core.Security
 
             //track the last login date
             user.LastLoginDateUtc = DateTime.UtcNow;
-            user.AccessFailedCount = 0;
+            if (user.AccessFailedCount > 0)
+                //we have successfully logged in, reset the AccessFailedCount
+                user.AccessFailedCount = 0;
             await UserManager.UpdateAsync(user);
 
             _logger.WriteCore(TraceEventType.Information, 0,

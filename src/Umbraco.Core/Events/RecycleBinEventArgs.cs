@@ -107,7 +107,7 @@ namespace Umbraco.Core.Events
         /// <summary>
         /// Boolean indicating whether the Recycle Bin was emptied successfully
         /// </summary>
-        public bool RecycleBinEmptiedSuccessfully { get; private set; }
+        public bool RecycleBinEmptiedSuccessfully { get; set; }
 
         /// <summary>
         /// Boolean indicating whether this event was fired for the Content's Recycle Bin.

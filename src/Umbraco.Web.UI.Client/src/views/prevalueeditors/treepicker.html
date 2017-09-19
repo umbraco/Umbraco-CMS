@@ -4,7 +4,7 @@
 		ng-model="renderModel">	
 		<li ng-repeat="node in renderModel">
 			
-			<i class="icon icon-delete red hover-show pull-right" ng-click="remove($index)"></i>
+			<i class="icon icon-delete red hover-show pull-right" style="cursor:pointer;" ng-click="remove($index); $event.stopPropagation();"></i>
 
 			<i class="icon {{node.icon}} hover-hide"></i>
 			<a href prevent-default ng-click="openContentPicker()" >{{node.name}}</a>

@@ -670,7 +670,10 @@ namespace Umbraco.Web.Cache
         /// <param name="e"></param>
         static void FileService_DeletedTemplate(IFileService sender, DeleteEventArgs<ITemplate> e)
         {
-            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveTemplateCache(x.Id));
+            foreach (var x in e.DeletedEntities)
+            {
+                DistributedCache.Instance.RemoveTemplateCache(x.Id);
+            }
         }
 
         /// <summary>
@@ -680,7 +683,10 @@ namespace Umbraco.Web.Cache
         /// <param name="e"></param>
         static void FileService_SavedTemplate(IFileService sender, SaveEventArgs<ITemplate> e)
         {
-            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshTemplateCache(x.Id));
+            foreach (var x in e.SavedEntities)
+            {
+                DistributedCache.Instance.RefreshTemplateCache(x.Id);
+            }
         }
 
         #endregion
@@ -816,7 +822,6 @@ namespace Umbraco.Web.Cache
                 {
                     var handler = FindHandler(e);
                     if (handler == null) continue;
-
                     handler.Invoke(null, new[] { e.Sender, e.Args });
                 }
             }
@@ -825,7 +830,7 @@ namespace Umbraco.Web.Cache
                 if (tempContext != null)
                     tempContext.Dispose();
             }
-            
+
         }
 
         /// <summary>

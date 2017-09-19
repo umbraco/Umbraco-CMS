@@ -547,9 +547,11 @@ namespace Umbraco.Tests.Services
         public void EntityService_Cannot_Get_Key_For_Id_With_Incorrect_Object_Type()
         {
             var service = ServiceContext.EntityService;
-            var result = service.GetKeyForId(1060, UmbracoObjectTypes.MediaType);
+            var result1 = service.GetKeyForId(1060, UmbracoObjectTypes.DocumentType);
+            var result2 = service.GetKeyForId(1060, UmbracoObjectTypes.MediaType);
 
-            Assert.IsFalse(result.Success);
+            Assert.IsTrue(result1.Success);
+            Assert.IsFalse(result2.Success);
         }
 
         [Test]
@@ -566,9 +568,11 @@ namespace Umbraco.Tests.Services
         public void EntityService_Cannot_Get_Id_For_Key_With_Incorrect_Object_Type()
         {
             var service = ServiceContext.EntityService;
-            var result = service.GetIdForKey(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.MediaType);
+            var result1 = service.GetIdForKey(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.DocumentType);
+            var result2 = service.GetIdForKey(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.MediaType);
 
-            Assert.IsFalse(result.Success);
+            Assert.IsTrue(result1.Success);
+            Assert.IsFalse(result2.Success);
         }
 
         private static bool _isSetup = false;

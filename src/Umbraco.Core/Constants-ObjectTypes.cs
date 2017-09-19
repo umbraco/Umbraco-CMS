@@ -222,6 +222,16 @@ namespace Umbraco.Core
             /// Guid for a Forms DataSource.
             /// </summary>
             public static readonly Guid LanguageGuid = new Guid(Language);
+
+            /// <summary>
+            /// Guid for an Identifier Reservation.
+            /// </summary>
+            public const string IdReservation = "92849B1E-3904-4713-9356-F646F87C25F4";
+
+            /// <summary>
+            /// Guid for an Identifier Reservation.
+            /// </summary>
+            public static readonly Guid IdReservationGuid = new Guid(IdReservation);
         }
     }
 }

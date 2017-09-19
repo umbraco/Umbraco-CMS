@@ -4,12 +4,11 @@ using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Core.Serialization
 {
-
     public class UdiJsonConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
-            return typeof(Udi).IsAssignableFrom(objectType);
+            return typeof (Udi).IsAssignableFrom(objectType);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

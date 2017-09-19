@@ -143,13 +143,15 @@
     <key alias="lastPublished">Last published</key>
     <key alias="noItemsToShow">There are no items to show</key>
     <key alias="listViewNoItems" version="7.1.5">There are no items to show in the list.</key>
+    <key alias="listViewNoContent">No content has been added</key>
+    <key alias="listViewNoMembers">No members have been added</key>
     <key alias="mediatype">Media Type</key>
     <key alias="mediaLinks">Link to media item(s)</key>
     <key alias="membergroup">Member Group</key>
     <key alias="memberrole">Role</key>
     <key alias="membertype">Member Type</key>
     <key alias="noDate">No date chosen</key>
-    <key alias="nodeName">Link title</key>
+    <key alias="nodeName">Page title</key>
     <key alias="otherElements">Properties</key>
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
     <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
@@ -253,6 +255,8 @@
     <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Link title</key>
+    <key alias="urlLinkPicker">Link</key>
     <key alias="anchorInsert">Name</key>
     <key alias="assignDomain">Manage hostnames</key>
     <key alias="closeThisWindow">Close this window</key>
@@ -514,6 +518,7 @@
     <key alias="rename">Rename</key>
     <key alias="renew">Renew</key>
     <key alias="required" version="7.0">Required</key>
+    <key alias="retrieve">Retrieve</key>
     <key alias="retry">Retry</key>
     <key alias="rights">Permissions</key>
     <key alias="search">Search</key>
@@ -1546,8 +1551,10 @@ To manage your website, simply open the Umbraco back office and start adding con
 	  <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
 	  <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid: %2%</key>
 
-	  <key alias="httpsCheckValidCertificate">Your site certificate was marked as valid.</key>
+	  <key alias="httpsCheckValidCertificate">Your website's certificate is valid.</key>
 	  <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
+    <key alias="httpsCheckExpiredCertificate">Your website's SSL certificate has expired.</key>
+    <key alias="httpsCheckExpiringCertificate">Your website's SSL certificate is expiring in %0% days.</key>
 	  <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
 	  <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
 	  <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'umbracoUseSSL' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
@@ -1626,5 +1633,8 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="emptyStates">
     <key alias="emptyDictionaryTree">No Dictionary items to choose from</key>
+  </area>
+  <area alias="textbox">
+    <key alias="characters_left">characters left</key>
   </area>
 </language>
