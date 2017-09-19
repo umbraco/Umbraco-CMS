@@ -227,6 +227,7 @@
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
     <Compile Include="Models\Mapping\AutoMapper6Tests.cs" />
     <Compile Include="Models\Mapping\UserModelMapperTests.cs" />
+    <Compile Include="NuGet\NPocoTests.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
     <Compile Include="Persistence\Repositories\UserGroupRepositoryTest.cs" />
