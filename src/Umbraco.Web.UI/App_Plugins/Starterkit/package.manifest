@@ -1,5 +1,5 @@
 ﻿{
-	javascript:[
-		"/app_plugins/Starterkit/starterkithelp.controller.js",
+	"javascript":[
+		"~/App_Plugins/Starterkit/starterkithelp.controller.js"
 	]
 }
