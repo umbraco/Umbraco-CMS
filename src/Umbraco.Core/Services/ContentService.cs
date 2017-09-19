@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
@@ -2451,9 +2452,10 @@ namespace Umbraco.Core.Services
                         _publishingStrategy.PublishingFinalized(uow, descendants, false);
                     }
 
-                    Audit(uow, AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
+                    
+                    var user = ApplicationContext.Current.Services.UserService.GetProfileById(userId);
+                    Audit(uow, AuditType.Publish, "Save and Publish performed by user " + user.Name, userId, content.Id);
                     uow.Commit();
-
                     return Attempt.If(publishStatus.StatusType == PublishStatusType.Success, publishStatus);
                 }
             }
