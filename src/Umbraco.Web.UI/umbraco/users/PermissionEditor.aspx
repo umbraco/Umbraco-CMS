@@ -14,7 +14,7 @@
 <asp:Content ContentPlaceHolderID="body" runat="server">
 
 	<ui:UmbracoPanel ID="pnlUmbraco" runat="server" hasMenu="true" Text="Content Tree Permissions" Width="608px">
-		<ui:Pane ID="pnl1" Style="padding: 10px; text-align: left;" runat="server" Text="Select pages to modify their permissions">
+		<ui:Pane ID="pnl1" runat="server" Text="Select pages to modify their permissions">
 			<div id="treeContainer">				
 				<umbraco:TreeControl runat="server" ID="JTree" App="content"
 				    Mode="Checkbox" CssClass="clearfix"></umbraco:TreeControl>				

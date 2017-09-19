@@ -34,6 +34,7 @@ namespace umbraco.cms.presentation.user
             save.ID = "save";
             save.ToolTip = ui.Text("save");
             save.Text = ui.Text("save");
+            save.ButtonType = MenuButtonType.Primary;
 
             pp_alias.Text = umbraco.ui.Text("usertype", base.getUser()) + " " + umbraco.ui.Text("alias", base.getUser());
             pp_name.Text = umbraco.ui.Text("usertype", base.getUser()) + " " + umbraco.ui.Text("name", base.getUser());

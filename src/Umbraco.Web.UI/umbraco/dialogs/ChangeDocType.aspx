@@ -97,7 +97,7 @@
             <asp:Literal ID="PropertiesMappedMessage" runat="server" />
             <asp:Literal ID="ContentPublishedMessage" runat="server" />
             <br /><br />
-            <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("defaultdialogs", "closeThisWindow") %></a>  
+            <a href="#" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("defaultdialogs", "closeThisWindow") %></a>  
         </p>
     </asp:PlaceHolder>
 
@@ -112,7 +112,7 @@
         <asp:PlaceHolder ID="SaveAndCancelPlaceholder" runat="server">
             <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
             <asp:PlaceHolder ID="SavePlaceholder" runat="server">        
-                <asp:Button ID="ValidateAndSave" runat="server" CssClass="btn btn-primary" Text="Create" OnClick="ValidateAndSave_Click"></asp:Button>
+                <asp:Button ID="ValidateAndSave" runat="server" CssClass="btn btn-primary" Text='<%#umbraco.ui.Text("create") %>' OnClick="ValidateAndSave_Click"></asp:Button>
             </asp:PlaceHolder>
         </asp:Placeholder>
     </div>

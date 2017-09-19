@@ -7,7 +7,7 @@
 
     <cc1:UmbracoPanel ID="Panel1" runat="server" Text="Dictionary overview">
     <cc1:Pane ID="pane1" runat="server">
-      <table id="dictionaryItems" style="width: 100%;">
+      <table id="dictionaryItems" class="table">
         <asp:Literal ID="lt_table" runat="server" />
       </table>
       </cc1:Pane>

@@ -4,6 +4,8 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.cms.presentation.Trees;
+using umbraco.uicontrols;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using RelationType = umbraco.cms.businesslogic.relation.RelationType;
@@ -141,7 +143,11 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 
 				    if (!this.IsPostBack)
 				    {
-				        this.EnsureChildControls();
+                        ClientTools
+                            .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadRelationTypes>().Tree.Alias)
+                            .SyncTree("-1,init," + this._relationType.Id, false);
+
+                        this.EnsureChildControls();
 
 				        this.idLiteral.Text = this._relationType.Id.ToString();
 				        this.nameTextBox.Text = this._relationType.Name;
@@ -191,12 +197,14 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 			relationTypeTabPage.Controls.Add(this.directionPane);
 			relationTypeTabPage.Controls.Add(this.objectTypePane);
 
-			var saveMenuImageButton =  tabControl.Menu.NewButton();
-			saveMenuImageButton.ToolTip = "save relation type";
-			saveMenuImageButton.Click +=saveMenuImageButton_Click;
-			saveMenuImageButton.CausesValidation = true;
-            saveMenuImageButton.Text = ui.Text("save");
-			saveMenuImageButton.ValidationGroup = "RelationType";
+			var save =  tabControl.Menu.NewButton();
+
+            save.Click +=saveMenuImageButton_Click;
+            save.CausesValidation = true;
+            save.ToolTip = ui.Text("save");
+            save.Text = ui.Text("save");
+            save.ButtonType = MenuButtonType.Primary;
+            save.ValidationGroup = "RelationType";
 
 			var relationsTabPage = this.tabControl.NewTabPage("Relations");
 			relationsTabPage.Controls.Add(this.relationsCountPane);
@@ -253,9 +261,11 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 
 						this._relationType.Name = this.nameTextBox.Text.Trim();
 
-						// Refresh tree, as the name as changed
-						ClientTools.SyncTree(this._relationType.Id.ToString(), true);
-					}
+                        // Refresh tree, as the name as changed
+                        ClientTools
+                            .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadRelationTypes>().Tree.Alias)
+                            .SyncTree("-1,init," + this._relationType.Id.ToInvariantString(), true); //true forces the reload
+                    }
 
 					if (directionChanged)
 					{

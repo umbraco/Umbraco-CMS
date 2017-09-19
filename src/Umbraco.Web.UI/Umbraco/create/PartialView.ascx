@@ -4,7 +4,7 @@
 
 <cc1:Pane runat="server">
     <cc1:PropertyPanel runat="server" Text="Filename (without .cshtml, use / to make folders)">
-        <asp:TextBox ID="FileName" runat="server" CssClass="bigInput input-large-type input-block-level"></asp:TextBox>
+        <asp:TextBox ID="FileName" runat="server" CssClass="umb-textstring textstring input-block-level"></asp:TextBox>
         <asp:RequiredFieldValidator ID="RequiredFieldValidator1" 
             CssClass="text-error" Display="Dynamic"
             ErrorMessage="*" ControlToValidate="FileName" runat="server">*</asp:RequiredFieldValidator>
@@ -16,7 +16,7 @@
     </cc1:PropertyPanel>
 
     <cc1:PropertyPanel runat="server" Text="Choose a snippet:">
-        <asp:ListBox ID="PartialViewTemplate" runat="server" CssClass="bigInput input-large-type input-block-level" Rows="1" SelectionMode="Single"/>
+        <asp:ListBox ID="PartialViewTemplate" runat="server" CssClass="umb-textstring textstring input-block-level" Rows="1" SelectionMode="Single"/>
     </cc1:PropertyPanel>
 </cc1:Pane>
 
@@ -27,5 +27,5 @@
 
 <cc1:Pane runat="server" CssClass="btn-toolbar umb-btn-toolbar">
     <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
-    <asp:Button ID="sbmt" runat="server" CssClass="btn btn-primary" Text="Create" OnClick="SubmitButton_Click"></asp:Button>
+    <asp:Button ID="sbmt" runat="server" CssClass="btn btn-primary" Text="<%#ui.Text("create") %>" OnClick="SubmitButton_Click"></asp:Button>
 </cc1:Pane>

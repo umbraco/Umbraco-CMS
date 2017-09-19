@@ -28,10 +28,9 @@
 </cc1:Pane>
 
 <asp:Panel ID="pl_buttons" runat="server">
-<p>
-<asp:Button ID="doTranslation" runat="Server" OnClick="doTranslation_Click" />
-&nbsp; <em><%= umbraco.ui.Text("or") %></em> &nbsp;<a href="#" onClick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
-</p>
+    <div class="btn-toolbar umb-btn-toolbar">
+        <a href="#" class="btn btn-link" onClick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
+        <asp:Button ID="doTranslation" runat="Server" OnClick="doTranslation_Click" CssClass="btn btn-primary" />
+    </div>
 </asp:Panel>
 </asp:Content>
-      

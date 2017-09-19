@@ -4,7 +4,7 @@
 
 <cc1:Pane runat="server">
         <cc1:PropertyPanel runat="server" Text="Name">
-             <asp:TextBox id="rename" CssClass="bigInput input-large-type input-block-level" Runat="server"></asp:TextBox><asp:RequiredFieldValidator id="RequiredFieldValidator1" ErrorMessage="*" ControlToValidate="rename" runat="server">*</asp:RequiredFieldValidator>   
+             <asp:TextBox id="rename" CssClass="umb-textstring textstring input-block-level" Runat="server"></asp:TextBox><asp:RequiredFieldValidator id="RequiredFieldValidator1" ErrorMessage="*" ControlToValidate="rename" runat="server">*</asp:RequiredFieldValidator>   
         </cc1:PropertyPanel> 
 </cc1:Pane>
 
