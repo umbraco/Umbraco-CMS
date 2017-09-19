@@ -94,6 +94,7 @@
     <Compile Include="Attempt.cs" />
     <Compile Include="AttemptOfTResult.cs" />
     <Compile Include="AttemptOfTResultTStatus.cs" />
+    <Compile Include="Auditing\IdentityAuditEventArgs.cs" />
     <Compile Include="BindingRedirects.cs" />
     <Compile Include="ByteArrayExtensions.cs" />
     <Compile Include="Cache\CacheHelper.cs" />
