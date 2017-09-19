@@ -97,17 +97,41 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes)
         {
-            var sql = new Sql().Select("cmsContentType.alias")
-                .From<ContentTypeDto>(SqlSyntax)
-                .InnerJoin<NodeDto>(SqlSyntax)
+            var sql = GetBaseQueryForGetAllDocumentTypeAliases(objectTypes);
+            return Database.Fetch<string>(sql);
+        }
+
+        /// <summary>
+        /// Gets all content type aliases with the option to exclude one or more types by Id
+        /// </summary>
+        /// <param name="omitIds">Array of Ids to exclude when retrieving list of aliases</param>
+        /// <param name="objectTypes">
+        /// If this list is empty, it will return all content type aliases for media, members and content, otherwise
+        /// it will only return content type aliases for the object types specified
+        /// </param>
+        /// <returns></returns>
+        public IEnumerable<string> GetAllContentTypeAliases(int[] omitIds, params Guid[] objectTypes)
+        {
+            var sql = GetBaseQueryForGetAllDocumentTypeAliases(objectTypes);
+            if (omitIds != null && omitIds.Any())
+            {
+                sql = sql.Where("umbracoNode.id NOT IN (@omitIds)", new { omitIds });
+            }
+
+            return Database.Fetch<string>(sql);
+        }
+
+        private Sql GetBaseQueryForGetAllDocumentTypeAliases(Guid[] objectTypes)
+        {
+            var sql = new Sql().Select("cmsContentType.alias").From<ContentTypeDto>(SqlSyntax).InnerJoin<NodeDto>(SqlSyntax)
                 .On<ContentTypeDto, NodeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId);
 
             if (objectTypes.Any())
             {
-                sql = sql.Where("umbracoNode.nodeObjectType IN (@objectTypes)", new {objectTypes = objectTypes});
+                sql = sql.Where("umbracoNode.nodeObjectType IN (@objectTypes)", new { objectTypes });
             }
 
-            return Database.Fetch<string>(sql);
+            return sql;
         }
 
         protected override Sql GetBaseQuery(bool isCount)
