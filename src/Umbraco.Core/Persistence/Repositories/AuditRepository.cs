@@ -95,8 +95,16 @@ namespace Umbraco.Core.Persistence.Repositories
             var pagedResult = Database.Page<LogDto>(pageIndex + 1, pageSize, translatedQuery);
             totalRecords = pagedResult.TotalItems;
 
-            return pagedResult.Items.Select(
+            var pages = pagedResult.Items.Select(
                 dto => new AuditItem(dto.Id, dto.Comment, Enum<AuditType>.Parse(dto.Header), dto.UserId)).ToArray();
+
+            //Mapping the DateStamp
+            for (int i = 0; i < pages.Length; i++)
+            {
+                pages[i].CreateDate = pagedResult.Items[i].Datestamp;
+            }
+
+            return pages;
         }
 
         protected override void PersistUpdatedItem(IAuditItem entity)
