@@ -120,6 +120,9 @@ namespace Umbraco.Web.Search
 
         static void MemberCacheRefresherUpdated(MemberCacheRefresher sender, CacheRefresherEventArgs args)
         {
+            if (Suspendable.ExamineEvents.CanIndex == false)
+                return;
+
             switch (args.MessageType)
             {
                 case MessageType.RefreshById:
@@ -162,6 +165,9 @@ namespace Umbraco.Web.Search
 
         static void MediaCacheRefresherUpdated(MediaCacheRefresher sender, CacheRefresherEventArgs args)
         {
+            if (Suspendable.ExamineEvents.CanIndex == false)
+                return;
+
             if (args.MessageType != MessageType.RefreshByPayload)
                 throw new NotSupportedException();
 
@@ -208,6 +214,9 @@ namespace Umbraco.Web.Search
 
         static void ContentCacheRefresherUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
         {
+            if (Suspendable.ExamineEvents.CanIndex == false)
+                return;
+
             if (args.MessageType != MessageType.RefreshByPayload)
                 throw new NotSupportedException();
 

@@ -1317,6 +1317,7 @@ namespace umbraco
         {
             try
             {
+                var mailSender = new EmailSender();
                 using (var mail = new MailMessage())
                 {
                     mail.From = new MailAddress(fromMail.Trim());
@@ -1325,8 +1326,7 @@ namespace umbraco
                     mail.Subject = subject;
                     mail.IsBodyHtml = isHtml;
                     mail.Body = body;
-                    using (var smtpClient = new SmtpClient())
-                        smtpClient.Send(mail);
+                    mailSender.Send(mail);
                 }
             }
             catch (Exception ee)

@@ -129,7 +129,7 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         internal bool EnableSqlCount
         {
-            get { return _enableCount; }
+            get => _enableCount;
             set
             {
                 _enableCount = value;

@@ -62,8 +62,12 @@ namespace Umbraco.Web.Cache
             // content and when the PublishedCachesService is notified of changes it does not see
             // the new content...
 
-            bool draftChanged, publishedChanged;
-            _facadeService.Notify(payloads, out draftChanged, out publishedChanged);
+            // fixme - what about this?
+            // should rename it, and then, this is only for Deploy, and then, ???
+            //if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
+            //  ...
+
+            _facadeService.Notify(payloads, out _, out var publishedChanged);
 
             if (payloads.Any(x => x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll)) || publishedChanged)
             {

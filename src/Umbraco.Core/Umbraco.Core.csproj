@@ -54,6 +54,9 @@
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
     <PackageReference Include="AutoMapper" Version="6.1.1" />
+    <PackageReference Include="ClientDependency">
+      <Version>1.9.2</Version>
+    </PackageReference>
     <!-- do not update -->
     <PackageReference Include="HtmlAgilityPack" Version="1.5.1" />
     <PackageReference Include="ImageProcessor" Version="2.5.4" />
@@ -1311,6 +1314,7 @@
     <Compile Include="Security\MembershipProviderPasswordValidator.cs" />
     <Compile Include="Security\OwinExtensions.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
+    <Compile Include="Security\UmbracoEmailMessage.cs" />
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
     <Compile Include="Security\UserAwareMembershipProviderPasswordHasher.cs" />
     <Compile Include="Security\UserData.cs" />

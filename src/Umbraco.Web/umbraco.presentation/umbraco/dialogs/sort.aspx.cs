@@ -7,6 +7,9 @@ using System.Web.UI;
 using System.Collections.Generic;
 using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
+using Umbraco.Core.Exceptions;
+using Umbraco.Core.Models;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.cms.presentation
 {
@@ -15,6 +18,12 @@ namespace umbraco.cms.presentation
     /// </summary>
     public partial class sort : UmbracoEnsuredPage
     {
+        /// <summary>
+        /// The Parent Id being sorted
+        /// </summary>
+        protected int? ParentIdAsInt { get; private set; }
+        protected string ParentIdAsString { get; private set; }
+
         private readonly List<SortableNode> _nodes = new List<SortableNode>();
 
         protected bool HideDateColumn
@@ -26,6 +35,21 @@ namespace umbraco.cms.presentation
         protected override void OnInit(EventArgs e)
         {
             CurrentApp = Request.GetItemAsString("app");
+
+            ParentIdAsString = Request.GetItemAsString("ID");
+            int parentId;
+            if (int.TryParse(ParentIdAsString, out parentId))
+            {
+                ParentIdAsInt = parentId;
+
+                if (CurrentApp == Constants.Applications.Content || CurrentApp == Constants.Applications.Media)
+                {
+                    CheckPathAndPermissions(
+                        ParentIdAsInt.Value,
+                        CurrentApp == Constants.Applications.Content ? UmbracoObjectTypes.Document : UmbracoObjectTypes.Media,
+                        ActionSort.Instance);
+                }
+            }
 
             base.OnInit(e);
         }
@@ -44,23 +68,22 @@ namespace umbraco.cms.presentation
             var app = Request.GetItemAsString("app");
 
             var icon = "../images/umbraco/doc.gif";
-
-            int parentId;
-            if (int.TryParse(Request.GetItemAsString("ID"), out parentId))
+            
+            if (ParentIdAsInt.HasValue)
             {
                 if (app == Constants.Applications.Media)
                 {
                     icon = "../images/umbraco/mediaPhoto.gif";
                     var mediaService = Current.Services.MediaService;
 
-                    if (parentId == -1)
+                    if (ParentIdAsInt.Value == -1)
                     {
                         foreach (var child in mediaService.GetRootMedia().ToList().OrderBy(x => x.SortOrder))
                             _nodes.Add(CreateNode(child.Id.ToInvariantString(), child.SortOrder, child.Name, child.CreateDate, icon));
                     }
                     else
                     {
-                        var children = mediaService.GetChildren(parentId);
+                        var children = mediaService.GetChildren(ParentIdAsInt.Value);
                         foreach (var child in children.OrderBy(x => x.SortOrder))
                             _nodes.Add(CreateNode(child.Id.ToInvariantString(), child.SortOrder, child.Name, child.CreateDate, icon));
                     }
@@ -70,14 +93,14 @@ namespace umbraco.cms.presentation
                 {
                     var contentService = Current.Services.ContentService;
 
-                    if (parentId == -1)
+                    if (ParentIdAsInt.Value == -1)
                     {
                         foreach (var child in contentService.GetRootContent().ToList().OrderBy(x => x.SortOrder))
                             _nodes.Add(CreateNode(child.Id.ToInvariantString(), child.SortOrder, child.Name, child.CreateDate, icon));
                     }
                     else
                     {
-                        var children = contentService.GetChildren(parentId);
+                        var children = contentService.GetChildren(ParentIdAsInt.Value);
                         foreach (var child in children)
                             _nodes.Add(CreateNode(child.Id.ToInvariantString(), child.SortOrder, child.Name, child.CreateDate, icon));
                     }
@@ -94,7 +117,7 @@ namespace umbraco.cms.presentation
 
                     HideDateColumn = true;
 
-                    var stylesheetName = Request.GetItemAsString("ID");
+                    var stylesheetName = ParentIdAsString;
                     if (stylesheetName.IsNullOrWhiteSpace())throw new NullReferenceException("No Id passed in to editor");
                     var stylesheet = Services.FileService.GetStylesheetByName(stylesheetName.EnsureEndsWith(".css"));
                     if (stylesheet == null) throw new InvalidOperationException("No stylesheet found by name " + stylesheetName);

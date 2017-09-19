@@ -33,20 +33,7 @@ namespace Umbraco.Web.Trees
     public class MediaTreeController : ContentTreeControllerBase, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
-
-        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
-        {
-            var node = base.CreateRootNode(queryStrings);
-
-            // if the user's start node is not default, then ensure the root doesn't have a menu
-            if (UserStartNodes.Contains(Constants.System.Root) == false)
-            {
-                node.MenuUrl = "";
-            }
-            node.Name = Services.TextService.Localize("sections", Constants.Trees.Media);
-            return node;
-        }
-
+        
         protected override int RecycleBinId => Constants.System.RecycleBinMedia;
 
         protected override bool RecycleBinSmells => Services.MediaService.RecycleBinSmells();
@@ -96,9 +83,12 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.Root.ToInvariantString())
             {
-                //if the user's start node is not the root then ensure the root menu is empty/doesn't exist
+                // if the user's start node is not the root then the only menu item to display is refresh
                 if (UserStartNodes.Contains(Constants.System.Root) == false)
                 {
+                    menu.Items.Add<RefreshNode, ActionRefresh>(
+                        Services.TextService.Localize(string.Concat("actions/", ActionRefresh.Instance.Alias)),
+                        true);
                     return menu;
                 }
 
@@ -119,6 +109,16 @@ namespace Umbraco.Web.Trees
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
+
+            //if the user has no path access for this node, all they can do is refresh
+            if (Security.CurrentUser.HasPathAccess(item, Services.EntityService, RecycleBinId) == false)
+            {
+                menu.Items.Add<RefreshNode, ActionRefresh>(
+                    Services.TextService.Localize(string.Concat("actions/", ActionRefresh.Instance.Alias)),
+                    true);
+                return menu;
+            }
+
             //return a normal node menu:
             menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
             menu.Items.Add<ActionMove>(Services.TextService.Localize("actions", ActionMove.Instance.Alias));
@@ -146,14 +146,8 @@ namespace Umbraco.Web.Trees
         protected override bool HasPathAccess(string id, FormDataCollection queryStrings)
         {
             var entity = GetEntityFromId(id);
-            if (entity == null)
-                return false;
 
-            var media = Services.MediaService.GetById(entity.Id);
-            if (media == null)
-                return false;
-
-            return Security.CurrentUser.HasPathAccess(media, Services.EntityService);
+            return HasPathAccess(entity, queryStrings);
         }
 
         public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)

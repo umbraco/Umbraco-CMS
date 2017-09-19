@@ -127,6 +127,7 @@
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Editors\BackOfficeServerVariables.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
+    <Compile Include="Editors\DashboardHelper.cs" />
     <Compile Include="Editors\EditorValidatorCollection.cs" />
     <Compile Include="Editors\EditorValidatorCollectionBuilder.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
@@ -134,6 +135,9 @@
     <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
     <Compile Include="Editors\TemplateController.cs" />
+    <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
+    <Compile Include="Editors\UserGroupAuthorizationAttribute.cs" />
+    <Compile Include="Editors\UserGroupEditorAuthorizationHelper.cs" />
     <Compile Include="Editors\UserGroupsController.cs" />
     <Compile Include="Editors\UserGroupValidateAttribute.cs" />
     <Compile Include="Editors\UsersController.cs" />
@@ -244,6 +248,7 @@
     <Compile Include="PropertyEditors\NestedContentPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorsComponent.cs" />
     <Compile Include="PropertyEditors\RelatedLinks2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\TextOnlyValueEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentManyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentPublishedPropertyTypeExtensions.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentSingleValueConverter.cs" />
@@ -323,6 +328,7 @@
     <Compile Include="Strategies\Migrations\PostMigrationCollection.cs" />
     <Compile Include="Strategies\Migrations\PostMigrationCollectionBuilder.cs" />
     <Compile Include="Strategies\Migrations\PostMigrationComponent.cs" />
+    <Compile Include="Suspendable.cs" />
     <Compile Include="Trees\ContentBlueprintTreeController.cs" />
     <Compile Include="Trees\RelationTypeTreeController.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
@@ -340,10 +346,13 @@
     <Compile Include="umbraco.presentation\umbraco\endPreview.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />
     <Compile Include="WebApi\Filters\CheckIfUserTicketDataIsStaleAttribute.cs" />
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
     <Compile Include="WebApi\UmbracoApiControllerTypeCollection.cs" />
+    <Compile Include="WebApi\UnhandedExceptionLoggerConfigurationAttribute.cs" />
+    <Compile Include="WebApi\UnhandledExceptionLogger.cs" />
     <Compile Include="WebRuntimeComponent.cs" />
     <Compile Include="WebServices\FacadeStatusController.cs" />
     <Compile Include="WebServices\NuCacheStatusController.cs" />

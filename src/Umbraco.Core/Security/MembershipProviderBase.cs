@@ -350,6 +350,7 @@ namespace Umbraco.Core.Security
             //Special cases to allow changing password without validating existing credentials
             // * the member is new and doesn't have a password set
             // * during installation to set the admin password
+            var installing = Current.RuntimeState.Level == RuntimeLevel.Install;
             if (AllowManuallyChangingPassword == false
                 && (rawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix)
                     || (installing && oldPassword == "default")))

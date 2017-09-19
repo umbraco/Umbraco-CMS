@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using HtmlAgilityPack;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web
 {
@@ -20,13 +22,14 @@ namespace Umbraco.Web
         /// <returns>The text with text line breaks replaced with html linebreaks (<br/>)</returns>
         public string ReplaceLineBreaksForHtml(string text)
         {
-            return text.Replace("\n", "<br/>\n");
+            return text.Replace("\r\n", @"<br />").Replace("\n", @"<br />").Replace("\r", @"<br />");
         }
 
         public HtmlString StripHtmlTags(string html, params string[] tags)
         {
             var doc = new HtmlDocument();
             doc.LoadHtml("<p>" + html + "</p>");
+            
             var targets = new List<HtmlNode>();
 
             var nodes = doc.DocumentNode.FirstChild.SelectNodes(".//*");
@@ -52,7 +55,7 @@ namespace Umbraco.Web
             {
                 return new HtmlString(html);
             }
-            return new HtmlString(doc.DocumentNode.FirstChild.InnerHtml);
+            return new HtmlString(doc.DocumentNode.FirstChild.InnerHtml.Replace("  ", " "));
         }
 
         internal string Join(string separator, params object[] args)
@@ -89,6 +92,8 @@ namespace Umbraco.Web
 
         public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
         {
+            const string hellip = "&hellip;";
+
             using (var outputms = new MemoryStream())
             {
                 using (var outputtw = new StreamWriter(outputms))
@@ -110,7 +115,7 @@ namespace Umbraco.Web
                                     isTagClose = false;
 
                                 int ic = 0,
-                                    currentLength = 0,
+                                    //currentLength = 0,
                                     currentTextLength = 0;
 
                                 string currentTag = string.Empty,
@@ -145,6 +150,10 @@ namespace Umbraco.Web
                                             {
                                                 string thisTag = tagStack.Pop();
                                                 outputtw.Write("</" + thisTag + ">");
+                                                if (treatTagsAsContent)
+                                                {
+                                                    currentTextLength++;
+                                                }
                                             }
                                             if (!isTagClose && currentTag.Length > 0)
                                             {
@@ -152,6 +161,10 @@ namespace Umbraco.Web
                                                 {
                                                     tagStack.Push(currentTag);
                                                     outputtw.Write("<" + currentTag);
+                                                    if (treatTagsAsContent)
+                                                    {
+                                                        currentTextLength++;
+                                                    }
                                                     if (!string.IsNullOrEmpty(tagContents))
                                                     {
                                                         if (tagContents.EndsWith("/"))
@@ -209,7 +222,7 @@ namespace Umbraco.Web
                                         {
                                             var charToWrite = (char)ic;
                                             outputtw.Write(charToWrite);
-                                            currentLength++;
+                                            //currentLength++;
                                         }
                                     }
 
@@ -225,7 +238,7 @@ namespace Umbraco.Web
                                         // Reached truncate limit.
                                         if (addElipsis)
                                         {
-                                            outputtw.Write("&hellip;");
+                                            outputtw.Write(hellip);
                                         }
                                         lengthReached = true;
                                     }
@@ -239,10 +252,59 @@ namespace Umbraco.Web
                     outputms.Position = 0;
                     using (TextReader outputtr = new StreamReader(outputms))
                     {
-                        return new HtmlString(outputtr.ReadToEnd().Replace("  ", " ").Trim());
+                        string result = string.Empty;
+
+                        string firstTrim = outputtr.ReadToEnd().Replace("  ", " ").Trim();
+
+                        //Check to see if there is an empty char between the hellip and the output string
+                        //if there is, remove it
+                        if (string.IsNullOrWhiteSpace(firstTrim) == false)
+                        {
+                            result = firstTrim[firstTrim.Length - hellip.Length - 1] == ' ' ? firstTrim.Remove(firstTrim.Length - hellip.Length - 1, 1) : firstTrim;
+                        }
+                        return new HtmlString(result);
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the length of the words from a html block
+        /// </summary>
+        /// <param name="html">Html text</param>
+        /// <param name="words">Amount of words you would like to measure</param>
+        /// <param name="tagsAsContent"></param>
+        /// <returns></returns>
+        public int WordsToLength(string html, int words)
+        {
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(html);
+
+            int wordCount = 0,
+                length = 0,
+                maxWords = words;
+
+            html = StripHtmlTags(html, null).ToString();
+
+            while (length < html.Length)
+            {
+                // Check to see if the current wordCount reached the maxWords allowed
+                if (wordCount.Equals(maxWords)) break;
+                // Check if current char is part of a word
+                while (length < html.Length && char.IsWhiteSpace(html[length]) == false)
+                {
+                    length++;
+                }
+
+                wordCount++;
+
+                // Skip whitespace until the next word
+                while (length < html.Length && char.IsWhiteSpace(html[length]) && wordCount.Equals(maxWords) == false)
+                {
+                    length++;
+                }
+            }
+            return length;
         }
     }
 }

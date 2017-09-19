@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Strings
             var helper = Current.ShortStringHelper;
             Assert.IsInstanceOf<MockShortStringHelper>(helper);
         }
-
+        
         [TestCase("hello", "world", false)]
         [TestCase("hello", "hello", true)]
         [TestCase("hellohellohellohellohellohellohello", "hellohellohellohellohellohellohelloo", false)]

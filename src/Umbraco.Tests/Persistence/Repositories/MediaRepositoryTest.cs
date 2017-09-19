@@ -2,10 +2,12 @@
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
@@ -26,12 +28,63 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData();
         }
 
-        private MediaRepository CreateRepository(IScopeUnitOfWork unitOfWork, out MediaTypeRepository mediaTypeRepository)
+        private MediaRepository CreateRepository(IScopeUnitOfWork unitOfWork, out MediaTypeRepository mediaTypeRepository, CacheHelper cacheHelper = null)
         {
-            mediaTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper, Logger);
-            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger);
-            var repository = new MediaRepository(unitOfWork, CacheHelper, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>());
+            cacheHelper = cacheHelper ?? CacheHelper;
+
+            mediaTypeRepository = new MediaTypeRepository(unitOfWork, cacheHelper, Logger);
+            var tagRepository = new TagRepository(unitOfWork, cacheHelper, Logger);
+            var repository = new MediaRepository(unitOfWork, cacheHelper, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
+        }
+
+        [Test]
+        public void Cache_Active_By_Int_And_Guid()
+        {
+            MediaTypeRepository mediaTypeRepository;
+
+            var realCache = new CacheHelper(
+                new ObjectCacheRuntimeCacheProvider(),
+                new StaticCacheProvider(),
+                new StaticCacheProvider(),
+                new IsolatedRuntimeCache(t => new ObjectCacheRuntimeCacheProvider()));
+
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
+            {
+                var repository = CreateRepository(unitOfWork, out mediaTypeRepository, cacheHelper: realCache);
+
+                var udb = (UmbracoDatabase)unitOfWork.Database;
+
+                udb.EnableSqlCount = false;
+
+                var mediaType = MockedContentTypes.CreateSimpleMediaType("umbTextpage1", "Textpage");
+                var media = MockedMedia.CreateSimpleMedia(mediaType, "hello", -1);
+                mediaTypeRepository.AddOrUpdate(mediaType);
+                repository.AddOrUpdate(media);
+                unitOfWork.Complete();
+
+                udb.EnableSqlCount = true;
+
+                //go get it, this should already be cached since the default repository key is the INT
+                var found = repository.Get(media.Id);
+                Assert.AreEqual(0, udb.SqlCount);
+                //retrieve again, this should use cache
+                found = repository.Get(media.Id);
+                Assert.AreEqual(0, udb.SqlCount);
+
+                //reset counter
+                udb.EnableSqlCount = false;
+                udb.EnableSqlCount = true;
+
+                //now get by GUID, this won't be cached yet because the default repo key is not a GUID 
+                found = repository.Get(media.Key);
+                var sqlCount = udb.SqlCount;
+                Assert.Greater(sqlCount, 0);
+                //retrieve again, this should use cache now
+                found = repository.Get(media.Key);
+                Assert.AreEqual(sqlCount, udb.SqlCount);
+            }
         }
 
         [Test]
@@ -483,6 +536,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var medias = repository.GetAll();
 
                 // Assert
+                Assert.That(medias, Is.Not.Null);
+                Assert.That(medias.Any(), Is.True);
+                Assert.That(medias.Count(), Is.GreaterThanOrEqualTo(3));
+
+                medias = repository.GetAll(medias.Select(x => x.Id).ToArray());
+                Assert.That(medias, Is.Not.Null);
+                Assert.That(medias.Any(), Is.True);
+                Assert.That(medias.Count(), Is.GreaterThanOrEqualTo(3));
+
+                medias = ((IReadRepository<Guid, IMedia>)repository).GetAll(medias.Select(x => x.Key).ToArray());
                 Assert.That(medias, Is.Not.Null);
                 Assert.That(medias.Any(), Is.True);
                 Assert.That(medias.Count(), Is.GreaterThanOrEqualTo(3));

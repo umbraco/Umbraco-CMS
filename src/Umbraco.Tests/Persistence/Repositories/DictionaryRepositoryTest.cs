@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -147,7 +148,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
 
         }
-
 
         [Test]
         public void Can_Perform_GetAll_On_DictionaryRepository()
@@ -352,6 +352,24 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(exists, Is.True);
             }
+        }
+
+        [Test]
+        public void Can_Perform_GetDictionaryItemKeyMap_On_DictionaryRepository()
+        {
+            Dictionary<string, Guid> keyMap;
+
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
+            {
+                var repository = CreateRepository(unitOfWork);
+                keyMap = repository.GetDictionaryItemKeyMap();
+            }
+
+            Assert.IsNotNull(keyMap);
+            Assert.IsNotEmpty(keyMap);
+            foreach (var kvp in keyMap)
+                Console.WriteLine("{0}: {1}", kvp.Key, kvp.Value);
         }
 
         [TearDown]

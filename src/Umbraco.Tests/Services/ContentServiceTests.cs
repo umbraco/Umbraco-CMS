@@ -1146,6 +1146,21 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void IsPublishable()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var parent = contentService.CreateContent("parent", -1, "umbTextpage");
+            contentService.SaveAndPublishWithStatus(parent);
+            var content = contentService.CreateContent("child", parent, "umbTextpage");
+            contentService.Save(content);
+
+            Assert.IsTrue(contentService.IsPublishable(content));
+            contentService.UnPublish(parent);
+            Assert.IsFalse(contentService.IsPublishable(content));
+        }
+
+        [Test]
         public void Can_Publish_Content_WithEvents()
         {
             ContentService.Publishing += ContentServiceOnPublishing;
@@ -1317,6 +1332,39 @@ namespace Umbraco.Tests.Services
             Assert.That(content.HasIdentity, Is.True);
             Assert.That(content.Published, Is.True);
             Assert.That(published, Is.True);
+        }
+
+        /// <summary>
+        /// Try to immitate a new child content item being created through the UI.
+        /// This content item will have no Id, Path or Identity.
+        /// It seems like this is wiped somewhere in the process when creating an item through the UI
+        /// and we need to make sure we handle nullchecks for these properties when creating content.
+        /// This is unfortunately not caught by the normal ContentService tests.
+        /// </summary>
+        [Test]
+        public void Can_Save_And_Publish_Content_And_Child_Without_Identity()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.CreateContent("Home US", -1, "umbTextpage", 0);
+            content.SetValue("author", "Barack Obama");
+
+            // Act
+            var published = contentService.SaveAndPublish(content, 0);
+            var childContent = contentService.CreateContent("Child", content.Id, "umbTextpage", 0);
+            // Reset all identity properties
+            childContent.Id = 0;
+            childContent.Path = null;
+            ((Content)childContent).ResetIdentity();
+            var childPublished = contentService.SaveAndPublish(childContent, 0);
+
+            // Assert
+            Assert.That(content.HasIdentity, Is.True);
+            Assert.That(content.Published, Is.True);
+            Assert.That(childContent.HasIdentity, Is.True);
+            Assert.That(childContent.Published, Is.True);
+            Assert.That(published, Is.True);
+            Assert.That(childPublished, Is.True);
         }
 
         [Test]
@@ -1636,6 +1684,14 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(content2, 0);
             Assert.IsTrue(ServiceContext.ContentService.PublishWithStatus(content2, 0).Success);
 
+            var editorGroup = ServiceContext.UserService.GetUserGroupByAlias("editor");
+            editorGroup.StartContentId = content1.Id;
+            ServiceContext.UserService.Save(editorGroup);
+
+            var admin = ServiceContext.UserService.GetUserById(0);
+            admin.StartContentIds = new[] {content1.Id};
+            ServiceContext.UserService.Save(admin);
+
             ServiceContext.RelationService.Save(new RelationType(Constants.ObjectTypes.DocumentGuid, Constants.ObjectTypes.DocumentGuid, "test"));
             Assert.IsNotNull(ServiceContext.RelationService.Relate(content1, content2, "test"));
 
@@ -1661,6 +1717,7 @@ namespace Umbraco.Tests.Services
             }).Success);
 
             // Act
+            ServiceContext.ContentService.MoveToRecycleBin(content1);
             ServiceContext.ContentService.EmptyRecycleBin();
             var contents = ServiceContext.ContentService.GetContentInRecycleBin();
 

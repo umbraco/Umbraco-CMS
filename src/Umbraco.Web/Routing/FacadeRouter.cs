@@ -61,7 +61,11 @@ namespace Umbraco.Web.Routing
             GetRolesForLogin = getRolesForLogin ?? (s => Roles.Provider.GetRolesForUser(s));
         }
 
-        private Func<string, IEnumerable<string>> GetRolesForLogin { get; }
+        // fixme
+        // in 7.7 this is cached in the PublishedContentRequest, which ... makes little sense
+        // killing it entirely, if we need cache, just implement it properly !!
+        // this is all soooo weird
+        public Func<string, IEnumerable<string>> GetRolesForLogin { get; }
 
         public PublishedContentRequest CreateRequest(UmbracoContext umbracoContext, Uri uri = null)
         {

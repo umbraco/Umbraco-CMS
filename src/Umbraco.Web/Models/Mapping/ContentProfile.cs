@@ -10,8 +10,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Trees;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Trees;
 using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Models.Mapping
@@ -31,7 +31,8 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemDisplay
             CreateMap<IContent, ContentItemDisplay>()
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(Constants.UdiEntityType.Document, src.Key)))
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src =>
+                    Udi.Create(src.IsBlueprint ? Constants.UdiEntityType.DocumentBluePrint : Constants.UdiEntityType.Document, src.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.Updater, opt => opt.ResolveUsing(src => creatorResolver.Resolve(src)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentType.Icon))
@@ -59,7 +60,8 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(Constants.UdiEntityType.Document, src.Key)))
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src =>
+                    Udi.Create(src.IsBlueprint ? Constants.UdiEntityType.DocumentBluePrint : Constants.UdiEntityType.Document, src.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.Updater, opt => opt.ResolveUsing(src => creatorResolver.Resolve(src)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentType.Icon))
@@ -70,7 +72,8 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemDto<IContent>
             CreateMap<IContent, ContentItemDto<IContent>>()
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(Constants.UdiEntityType.Document, src.Key)))
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src =>
+                    Udi.Create(src.IsBlueprint ? Constants.UdiEntityType.DocumentBluePrint : Constants.UdiEntityType.Document, src.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.HasPublishedVersion, opt => opt.MapFrom(src => src.HasPublishedVersion))
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())

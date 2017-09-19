@@ -1,4 +1,7 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Globalization;
+using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Routing;
@@ -62,6 +65,80 @@ namespace Umbraco.Tests.Routing
             SettingsForTests.HideTopLevelNodeFromPath = false;
 
             Assert.IsFalse(Core.Configuration.GlobalSettings.HideTopLevelNodeFromPath);
+
+            var result = lookup.TryFindContent(frequest);
+
+            Assert.IsTrue(result);
+            Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
+        }
+        /// <summary>
+        /// This test handles requests with special characters in the URL.
+        /// </summary>
+        /// <param name="urlString"></param>
+        /// <param name="expectedId"></param>
+        [TestCase("/", 1046)]
+        [TestCase("/home/sub1/custom-sub-3-with-accént-character", 1179)]
+        [TestCase("/home/sub1/custom-sub-4-with-æøå", 1180)]
+        public void Match_Document_By_Url_With_Special_Characters(string urlString, int expectedId)
+        {
+            var umbracoContext = GetUmbracoContext(urlString);
+            var facadeRouter = CreateFacadeRouter();
+            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            var lookup = new ContentFinderByNiceUrl(Logger);
+            SettingsForTests.HideTopLevelNodeFromPath = false;
+
+            var result = lookup.TryFindContent(frequest);
+
+            Assert.IsTrue(result);
+            Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
+        }
+
+        /// <summary>
+        /// This test handles requests with a hostname associated.
+        /// The logic for handling this goes through the DomainHelper and is a bit different
+        /// from what happens in a normal request - so it has a separate test with a mocked
+        /// hostname added.
+        /// </summary>
+        /// <param name="urlString"></param>
+        /// <param name="expectedId"></param>
+        [TestCase("/", 1046)]
+        [TestCase("/home/sub1/custom-sub-3-with-accént-character", 1179)]
+        [TestCase("/home/sub1/custom-sub-4-with-æøå", 1180)]
+        public void Match_Document_By_Url_With_Special_Characters_Using_Hostname(string urlString, int expectedId)
+        {
+            var umbracoContext = GetUmbracoContext(urlString);
+            var facadeRouter = CreateFacadeRouter();
+            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            frequest.Domain = new DomainAndUri(new Domain(1, "mysite", -1, CultureInfo.CurrentCulture, false), new Uri("http://mysite/"));
+            var lookup = new ContentFinderByNiceUrl(Logger);
+            SettingsForTests.HideTopLevelNodeFromPath = false;
+
+            var result = lookup.TryFindContent(frequest);
+
+            Assert.IsTrue(result);
+            Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
+        }
+
+        /// <summary>
+        /// This test handles requests with a hostname with special characters associated.
+        /// The logic for handling this goes through the DomainHelper and is a bit different
+        /// from what happens in a normal request - so it has a separate test with a mocked
+        /// hostname added.
+        /// </summary>
+        /// <param name="urlString"></param>
+        /// <param name="expectedId"></param>
+        [TestCase("/æøå/", 1046)]
+        [TestCase("/æøå/home/sub1", 1173)]
+        [TestCase("/æøå/home/sub1/custom-sub-3-with-accént-character", 1179)]
+        [TestCase("/æøå/home/sub1/custom-sub-4-with-æøå", 1180)]
+        public void Match_Document_By_Url_With_Special_Characters_In_Hostname(string urlString, int expectedId)
+        {
+            var umbracoContext = GetUmbracoContext(urlString);
+            var facadeRouter = CreateFacadeRouter();
+            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            frequest.Domain = new DomainAndUri(new Domain(1, "mysite/æøå", -1, CultureInfo.CurrentCulture, false), new Uri("http://mysite/æøå"));
+            var lookup = new ContentFinderByNiceUrl(Logger);
+            SettingsForTests.HideTopLevelNodeFromPath = false;
 
             var result = lookup.TryFindContent(frequest);
 

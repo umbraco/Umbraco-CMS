@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -36,7 +35,7 @@ namespace Umbraco.Web.Trees
             var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
 
             //find all tree definitions that have the current application alias
-            var appTrees = Current.Services.ApplicationTreeService.GetApplicationTrees(application, onlyInitialized).ToArray();
+            var appTrees = Services.ApplicationTreeService.GetApplicationTrees(application, onlyInitialized).ToArray();
 
             if (appTrees.Length == 1 || string.IsNullOrEmpty(tree) == false )
             {
@@ -122,8 +121,8 @@ namespace Umbraco.Web.Trees
 
                 //if the root node has a route path, we cannot create a single root section because by specifying the route path this would
                 //override the dashboard route and that means there can be no dashboard for that section which is a breaking change.
-                if (string.IsNullOrWhiteSpace(rootNode.Result.RoutePath) == false 
-                    && rootNode.Result.RoutePath != "#" 
+                if (string.IsNullOrWhiteSpace(rootNode.Result.RoutePath) == false
+                    && rootNode.Result.RoutePath != "#"
                     && rootNode.Result.RoutePath != application)
                 {
                     //null indicates this cannot be converted

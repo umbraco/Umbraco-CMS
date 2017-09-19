@@ -1,13 +1,12 @@
-using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -17,8 +16,14 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public TextboxPropertyEditor(ILogger logger) : base(logger)
+        public TextboxPropertyEditor(ILogger logger)
+            : base(logger)
         { }
+        
+        protected override PropertyValueEditor CreateValueEditor()
+        {
+            return new TextOnlyValueEditor(base.CreateValueEditor());
+        }
 
         protected override PreValueEditor CreatePreValueEditor()
         {

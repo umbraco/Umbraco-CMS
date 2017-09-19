@@ -4,7 +4,9 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Filters;
 using AutoMapper;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -25,9 +27,32 @@ namespace Umbraco.Web.Editors
         {
             if (userGroupSave == null) throw new ArgumentNullException(nameof(userGroupSave));
 
+            //authorize that the user has access to save this user group
+            var authHelper = new UserGroupEditorAuthorizationHelper(
+                Services.UserService, Services.ContentService, Services.MediaService, Services.EntityService);
+            var isAuthorized = authHelper.AuthorizeGroupAccess(Security.CurrentUser, userGroupSave.Alias);
+            if (isAuthorized == false)
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
+
+            //if sections were added we need to check that the current user has access to that section
+            isAuthorized = authHelper.AuthorizeSectionChanges(Security.CurrentUser,
+                userGroupSave.PersistedUserGroup.AllowedSections,
+                userGroupSave.Sections);
+            if (isAuthorized == false)
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
+
+            //if start nodes were changed we need to check that the current user has access to them
+            isAuthorized = authHelper.AuthorizeStartNodeChanges(Security.CurrentUser,
+                userGroupSave.PersistedUserGroup.StartContentId,
+                userGroupSave.StartContentId,
+                userGroupSave.PersistedUserGroup.StartMediaId,
+                userGroupSave.StartMediaId);
+            if (isAuthorized == false)
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
+
             //save the group
             Services.UserService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());
-
+            
             //deal with permissions
 
             //remove ones that have been removed
@@ -67,15 +92,31 @@ namespace Umbraco.Web.Editors
         /// Returns all user groups
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<UserGroupBasic> GetUserGroups()
+        public IEnumerable<UserGroupBasic> GetUserGroups(bool onlyCurrentUserGroups = true)
         {
-            return Mapper.Map<IEnumerable<IUserGroup>, IEnumerable<UserGroupBasic>>(Services.UserService.GetAllUserGroups());
+            var allGroups = Mapper.Map<IEnumerable<IUserGroup>, IEnumerable<UserGroupBasic>>(Services.UserService.GetAllUserGroups())
+                .ToList();
+
+            var isAdmin = Security.CurrentUser.IsAdmin();
+            if (isAdmin) return allGroups;
+
+            if (onlyCurrentUserGroups == false)
+            {
+                //this user is not an admin so in that case we need to exlude all admin users
+                allGroups.RemoveAt(allGroups.IndexOf(allGroups.Find(basic => basic.Alias == Constants.Security.AdminGroupAlias)));
+                return allGroups;
+            }
+
+            //we cannot return user groups that this user does not have access to
+            var currentUserGroups = Security.CurrentUser.Groups.Select(x => x.Alias).ToArray();
+            return allGroups.Where(x => currentUserGroups.Contains(x.Alias)).ToArray();
         }
 
         /// <summary>
         /// Return a user group
         /// </summary>
         /// <returns></returns>
+        [UserGroupAuthorization("id")]
         public UserGroupDisplay GetUserGroup(int id)
         {
             var found = Services.UserService.GetUserGroupById(id);
@@ -89,9 +130,13 @@ namespace Umbraco.Web.Editors
 
         [HttpPost]
         [HttpDelete]
+        [UserGroupAuthorization("userGroupIds")]
         public HttpResponseMessage PostDeleteUserGroups([FromUri] int[] userGroupIds)
         {
-            var userGroups = Services.UserService.GetAllUserGroups(userGroupIds).ToArray();
+            var userGroups = Services.UserService.GetAllUserGroups(userGroupIds)
+                //never delete the admin group or translators group
+                .Where(x => x.Alias != Constants.Security.AdminGroupAlias && x.Alias != Constants.Security.TranslatorGroupAlias)
+                .ToArray();
             foreach (var userGroup in userGroups)
             {
                 Services.UserService.DeleteUserGroup(userGroup);

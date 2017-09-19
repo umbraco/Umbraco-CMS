@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web;
@@ -43,6 +44,9 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 var owinContext = request.TryGetOwinContext().Result;
                 
                 var mockedUserService = Mock.Of<IUserService>();
+                var mockedContentService = Mock.Of<IContentService>();
+                var mockedMediaService = Mock.Of<IMediaService>();
+                var mockedEntityService = Mock.Of<IEntityService>();
 
                 var mockedMigrationService = new Mock<IMigrationEntryService>();
                 //set it up to return anything so that the app ctx is 'Configured'
@@ -50,6 +54,9 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 
                 var serviceContext = new ServiceContext(
                     userService: mockedUserService,
+                    contentService: mockedContentService,
+                    mediaService: mockedMediaService,
+                    entityService: mockedEntityService,
                     migrationEntryService: mockedMigrationService.Object,
                     localizedTextService:Mock.Of<ILocalizedTextService>(),
                     sectionService:Mock.Of<ISectionService>());
@@ -86,10 +93,17 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 var webSecurity = new Mock<WebSecurity>(null, null);
 
                 //mock CurrentUser
+                var groups = new List<ReadOnlyUserGroup>();
+                for (var index = 0; index < backofficeIdentity.Roles.Length; index++)
+                {
+                    var role = backofficeIdentity.Roles[index];
+                    groups.Add(new ReadOnlyUserGroup(index + 1, role, "icon-user", null, null, role, new string[0], new string[0]));
+                }
                 webSecurity.Setup(x => x.CurrentUser)
                     .Returns(Mock.Of<IUser>(u => u.IsApproved == true
                                                  && u.IsLockedOut == false
                                                  && u.AllowedSections == backofficeIdentity.AllowedApplications
+                                                 && u.Groups == groups
                                                  && u.Email == "admin@admin.com"
                                                  && u.Id == (int) backofficeIdentity.Id
                                                  && u.Language == "en"
@@ -101,7 +115,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 //mock Validate
                 webSecurity.Setup(x => x.ValidateCurrentUser())
                     .Returns(() => true);               
-                webSecurity.Setup(x => x.UserHasAppAccess(It.IsAny<string>(), It.IsAny<IUser>()))
+                webSecurity.Setup(x => x.UserHasSectionAccess(It.IsAny<string>(), It.IsAny<IUser>()))
                     .Returns(() => true);
 
                 var umbCtx = UmbracoContext.EnsureContext(

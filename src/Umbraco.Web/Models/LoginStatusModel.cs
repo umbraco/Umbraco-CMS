@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models
@@ -22,9 +23,9 @@ namespace Umbraco.Web.Models
 
         private LoginStatusModel(bool doLookup)
         {
-            if (doLookup && HttpContext.Current != null)
+            if (doLookup && Current.UmbracoContext != null)
             {
-                var helper = new MembershipHelper(new HttpContextWrapper(HttpContext.Current));
+                var helper = new MembershipHelper(Current.UmbracoContext);
                 var model = helper.GetCurrentLoginStatus();
                 if (model != null)
                 {

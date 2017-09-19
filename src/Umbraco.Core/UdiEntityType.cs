@@ -55,7 +55,6 @@ namespace Umbraco.Core
                     { PartialView, UdiType.StringUdi},
                     { PartialViewMacro, UdiType.StringUdi},
                     { Stylesheet, UdiType.StringUdi},
-                    { UserControl, UdiType.StringUdi},
                     { Xslt, UdiType.StringUdi},
                 };
             }

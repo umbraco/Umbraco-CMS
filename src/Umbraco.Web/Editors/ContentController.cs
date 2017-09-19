@@ -85,6 +85,8 @@ namespace Umbraco.Web.Editors
         {
             if (saveModel.ContentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
+            //TODO: Should non-admins be alowed to set granular permissions?
+
             var content = Services.ContentService.GetById(saveModel.ContentId);
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             
@@ -146,7 +148,9 @@ namespace Umbraco.Web.Editors
             if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             var content = Services.ContentService.GetById(contentId);
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));            
-            
+
+            //TODO: Should non-admins be able to see detailed permissions?
+
             var allUserGroups = Services.UserService.GetAllUserGroups();
 
             return GetDetailedPermissions(content, allUserGroups);
@@ -232,6 +236,7 @@ namespace Umbraco.Web.Editors
             content.Path = string.Format("-1,{0},{1}", persistedContent.ContentTypeId, content.Id);
 
             content.AllowedActions = new[] {"A"};
+            content.IsBlueprint = true;
 
             var excludeProps = new[] {"_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template"};
             var propsTab = content.Tabs.Last();
@@ -299,7 +304,7 @@ namespace Umbraco.Web.Editors
         }
 
         [OutgoingEditorModelEvent]
-        public ContentItemDisplay GetEmpty(int blueprintId)
+        public ContentItemDisplay GetEmpty(int blueprintId, int parentId)
         {
             var blueprint = Services.ContentService.GetBlueprintById(blueprintId);
             if (blueprint == null)
@@ -309,6 +314,7 @@ namespace Umbraco.Web.Editors
 
             blueprint.Id = 0;
             blueprint.Name = string.Empty;
+            blueprint.ParentId = parentId;
 
             var mapped = Mapper.Map<ContentItemDisplay>(blueprint);
 

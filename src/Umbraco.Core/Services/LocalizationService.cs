@@ -411,9 +411,9 @@ namespace Umbraco.Core.Services
 
         public Dictionary<string, Guid> GetDictionaryItemKeyMap()
         {
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
-                var repository = RepositoryFactory.CreateDictionaryRepository(uow);
+                var repository = uow.CreateRepository<IDictionaryRepository>();
                 return repository.GetDictionaryItemKeyMap();
             }
         }

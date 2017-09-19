@@ -14,9 +14,8 @@ namespace Umbraco.Web.Models.Mapping
             _textService = textService;
 
             CreateMap<Core.Models.Section, Section>()
-                .ForMember(
-                      dto => dto.Name,
-                      expression => expression.MapFrom(section => _textService.Localize("sections/" + section.Alias, (IDictionary<string, string>)null)))
+                .ForMember(dest => dest.RoutePath, opt => opt.Ignore())
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => _textService.Localize("sections/" + src.Alias, (IDictionary<string, string>)null)))
                   .ReverseMap(); //backwards too!
         }
     }

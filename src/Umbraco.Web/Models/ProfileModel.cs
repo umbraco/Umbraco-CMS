@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Web;
 using System.Web.Mvc;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models
@@ -24,9 +25,9 @@ namespace Umbraco.Web.Models
         private ProfileModel(bool doLookup)
         {
             MemberProperties = new List<UmbracoProperty>();
-            if (doLookup)
+            if (doLookup && Current.UmbracoContext != null)
             {
-                var helper = new MembershipHelper(new HttpContextWrapper(HttpContext.Current));
+                var helper = new MembershipHelper(Current.UmbracoContext);
                 var model = helper.GetCurrentMemberProfileModel();
                 MemberProperties = model.MemberProperties;
             }

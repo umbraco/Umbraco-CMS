@@ -2,6 +2,7 @@
 using System.Text;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web;
@@ -14,6 +15,14 @@ namespace umbraco.dialogs
 {
     public partial class AssignDomain2 : UmbracoEnsuredPage
     {
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            var nodeId = GetNodeId();
+            CheckPathAndPermissions(nodeId, UmbracoObjectTypes.Document, ActionAssignDomain.Instance);
+        }
+
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
@@ -28,17 +37,7 @@ namespace umbraco.dialogs
                 pane_domains.Visible = false;
                 p_buttons.Visible = false;
                 return;
-            }
-
-            var permissions = Services.UserService.GetPermissions(Security.CurrentUser, node.Path);
-            if (permissions.AssignedPermissions.Contains(ActionAssignDomain.Instance.Letter.ToString(), StringComparer.Ordinal) == false)
-            {
-                feedback.Text = Services.TextService.Localize("assignDomain/permissionDenied");
-                pane_language.Visible = false;
-                pane_domains.Visible = false;
-                p_buttons.Visible = false;
-                return;
-            }
+            }            
 
             pane_language.Title = Services.TextService.Localize("assignDomain/setLanguage");
             pane_domains.Title = Services.TextService.Localize("assignDomain/setDomains");

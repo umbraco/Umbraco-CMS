@@ -82,7 +82,7 @@ namespace Umbraco.Core.Configuration
             catch (Exception ex)
             {
                 //invalid path format or something... try/catch to be safe
-                LogHelper.Error<ClientDependencyConfiguration>("Could not get path from ClientDependency.config", ex);
+                _logger.Error<ClientDependencyConfiguration>("Could not get path from ClientDependency.config", ex);
             }
 
             var success = true;
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Configuration
                 catch (Exception ex)
                 {
                     // Something could be locking the directory or the was another error, making sure we don't break the upgrade installer
-                    LogHelper.Error<ClientDependencyConfiguration>("Could not clear temp files", ex);
+                    _logger.Error<ClientDependencyConfiguration>("Could not clear temp files", ex);
                     success = false;
                 }
             }

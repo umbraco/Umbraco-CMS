@@ -71,7 +71,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         protected bool UserHasAppAccess(string app, IUser user)
         {
-            return Security.UserHasAppAccess(app, user);
+            return Security.UserHasSectionAccess(app, user);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         protected bool UserHasAppAccess(string app, string username)
         {
-            return Security.UserHasAppAccess(app, username);
+            return Security.UserHasSectionAccess(app, username);
         }
 
         /// <summary>

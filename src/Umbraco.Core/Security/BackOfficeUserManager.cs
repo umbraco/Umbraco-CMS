@@ -7,6 +7,7 @@ using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.DataProtection;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.Identity;
@@ -48,20 +49,6 @@ namespace Umbraco.Core.Security
         }
 
         #region Static Create methods
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the overload specifying all dependencies instead")]
-        public static BackOfficeUserManager Create(
-            IdentityFactoryOptions<BackOfficeUserManager> options,
-            IUserService userService,         
-            IExternalLoginService externalLoginService,
-            MembershipProviderBase membershipProvider)
-        {
-            return Create(options, userService,
-                ApplicationContext.Current.Services.EntityService,
-                externalLoginService, membershipProvider,
-                UmbracoConfig.For.UmbracoSettings().Content);
-        }
 
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager

@@ -26,6 +26,9 @@ namespace Umbraco.Web.Scheduling
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)
         {
+            if (Suspendable.ScheduledPublishing.CanRun == false)
+                return true; // repeat, later
+
             switch (_runtime.ServerRole)
             {
                 case ServerRole.Slave:

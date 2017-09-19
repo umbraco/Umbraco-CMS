@@ -252,7 +252,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public Dictionary<string, Guid> GetDictionaryItemKeyMap()
         {
             var columns = new[] { "key", "id" }.Select(x => (object) SqlSyntax.GetQuotedColumnName(x)).ToArray();
-            var sql = new Sql().Select(columns).From<DictionaryDto>(SqlSyntax);
+            var sql = UnitOfWork.Sql().Select(columns).From<DictionaryDto>();
             return Database.Fetch<DictionaryItemKeyIdDto>(sql).ToDictionary(x => x.Key, x => x.Id);
         }
 

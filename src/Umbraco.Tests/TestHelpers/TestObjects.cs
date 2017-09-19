@@ -157,12 +157,12 @@ namespace Umbraco.Tests.TestHelpers
 
             var userService = GetLazyService<IUserService>(container, () => new UserService(provider, logger, eventMessagesFactory, runtimeState));
             var dataTypeService = GetLazyService<IDataTypeService>(container, () => new DataTypeService(provider, logger, eventMessagesFactory));
-            var contentService = GetLazyService<IContentService>(container, () => new ContentService(provider, logger, eventMessagesFactory, mediaFileSystem, idkMap));
+            var contentService = GetLazyService<IContentService>(container, () => new ContentService(provider, logger, eventMessagesFactory, mediaFileSystem));
             var notificationService = GetLazyService<INotificationService>(container, () => new NotificationService(provider, userService.Value, contentService.Value, logger));
             var serverRegistrationService = GetLazyService<IServerRegistrationService>(container, () => new ServerRegistrationService(provider, logger, eventMessagesFactory));
             var memberGroupService = GetLazyService<IMemberGroupService>(container, () => new MemberGroupService(provider, logger, eventMessagesFactory));
             var memberService = GetLazyService<IMemberService>(container, () => new MemberService(provider, logger, eventMessagesFactory, memberGroupService.Value, mediaFileSystem));
-            var mediaService = GetLazyService<IMediaService>(container, () => new MediaService(provider, mediaFileSystem, logger, eventMessagesFactory, idkMap));
+            var mediaService = GetLazyService<IMediaService>(container, () => new MediaService(provider, mediaFileSystem, logger, eventMessagesFactory));
             var contentTypeService = GetLazyService<IContentTypeService>(container, () => new ContentTypeService(provider, logger, eventMessagesFactory, contentService.Value));
             var mediaTypeService = GetLazyService<IMediaTypeService>(container, () => new MediaTypeService(provider, logger, eventMessagesFactory, mediaService.Value));
             var fileService = GetLazyService<IFileService>(container, () => new FileService(provider, logger, eventMessagesFactory));

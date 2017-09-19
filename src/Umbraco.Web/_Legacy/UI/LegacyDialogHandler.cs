@@ -43,9 +43,9 @@ namespace Umbraco.Web._Legacy.UI
         /// </remarks>
         private static ITask GetTaskForOperation(HttpContextBase httpContext, IUser umbracoUser, Operation op, string nodeType)
         {
-            if (httpContext == null) throw new ArgumentNullException("httpContext");
-            if (umbracoUser == null) throw new ArgumentNullException("umbracoUser");
-            if (nodeType == null) throw new ArgumentNullException("nodeType");
+            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
+            if (umbracoUser == null) throw new ArgumentNullException(nameof(umbracoUser));
+            if (nodeType == null) throw new ArgumentNullException(nameof(nodeType));
 
             var ctxKey = op == Operation.Create ? ContextKeyCreate : ContextKeyDelete;
 
@@ -120,17 +120,37 @@ namespace Umbraco.Web._Legacy.UI
         internal static bool UserHasCreateAccess(HttpContextBase httpContext, IUser umbracoUser, string nodeType)
         {
             var task = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
-            var dialogTask = task as LegacyDialogTask;
-            if (dialogTask != null)
-            {
-                return dialogTask.ValidateUserForApplication();
-            }
-            return true;
+            if (task == null)
+                throw new InvalidOperationException($"Could not task for operation {Operation.Create} for node type {nodeType}.");
+            return task is LegacyDialogTask ltask ? ltask.ValidateUserForApplication() : true;
+        }
+
+        /// <summary>
+        /// Checks if the user has access to launch the ITask that matches the node type based on the app assigned
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="umbracoUser"></param>
+        /// <param name="nodeType"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// If the ITask doesn't implement LegacyDialogTask then we will return 'true' since we cannot validate
+        /// the application assigned.
+        ///
+        /// TODO: Create an API to assign a nodeType to an app so developers can manually secure it
+        /// </remarks>
+        internal static bool UserHasDeleteAccess(HttpContextBase httpContext, User umbracoUser, string nodeType)
+        {
+            var task = GetTaskForOperation(httpContext, umbracoUser, Operation.Delete, nodeType);
+            if (task == null)
+                throw new InvalidOperationException($"Could not task for operation {Operation.Delete} for node type {nodeType}");
+            return task is LegacyDialogTask ltask ? ltask.ValidateUserForApplication() : true;
         }
 
         public static void Delete(HttpContextBase httpContext, IUser umbracoUser, string nodeType, int nodeId, string text)
         {
             var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Delete, nodeType);
+            if (typeInstance == null)
+                throw new InvalidOperationException($"Could not task for operation {Operation.Delete} for node type {nodeType}");
 
             typeInstance.ParentID = nodeId;
             typeInstance.Alias = text;
@@ -141,6 +161,8 @@ namespace Umbraco.Web._Legacy.UI
         public static string Create(HttpContextBase httpContext, IUser umbracoUser, string nodeType, int nodeId, string text, int typeId = 0)
         {
             var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
+            if (typeInstance == null)
+                throw new InvalidOperationException($"Could not task for operation {Operation.Create} for node type {nodeType}");
 
             typeInstance.TypeID = typeId;
             typeInstance.ParentID = nodeId;
@@ -158,6 +180,8 @@ namespace Umbraco.Web._Legacy.UI
         internal static string Create(HttpContextBase httpContext, IUser umbracoUser, string nodeType, int nodeId, string text, IDictionary<string, object> additionalValues, int typeId = 0)
         {
             var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
+            if (typeInstance == null)
+                throw new InvalidOperationException($"Could not task for operation {Operation.Create} for node type {nodeType}");
 
             typeInstance.TypeID = typeId;
             typeInstance.ParentID = nodeId;

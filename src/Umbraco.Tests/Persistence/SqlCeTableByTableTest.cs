@@ -541,6 +541,7 @@ namespace Umbraco.Tests.Persistence
             {
                 var helper = new DatabaseSchemaHelper(scope.Database, Mock.Of<ILogger>());
 
+                helper.CreateTable<NodeDto>();
                 helper.CreateTable<UserGroupDto>();
 
                 scope.Complete();

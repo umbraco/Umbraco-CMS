@@ -30,8 +30,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return TextService.Localize("healthcheck/customErrorsCheckSuccessMessage",
-                    new[] { Values.First(v => v.IsRecommended).Value });
+                return TextService.Localize("healthcheck/customErrorsCheckSuccessMessage", new[] { CurrentValue });
             }
         }
 

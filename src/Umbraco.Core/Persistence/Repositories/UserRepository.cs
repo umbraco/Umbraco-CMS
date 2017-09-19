@@ -600,7 +600,7 @@ ORDER BY colName";
         /// </remarks>
         public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords,
             Expression<Func<IUser, object>> orderBy, Direction orderDirection = Direction.Ascending,
-            string[] userGroups = null, UserState[] userState = null, IQuery<IUser> filter = null)
+            string[] includeUserGroups = null, string[] excludeUserGroups = null, UserState[] userState = null, IQuery<IUser> filter = null)
         {
             if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
 

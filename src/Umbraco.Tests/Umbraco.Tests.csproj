@@ -218,7 +218,8 @@
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
-    <Compile Include="DateTimeExtensionsTests.cs" />
+    <Compile Include="Misc\DateTimeExtensionsTests.cs" />
+    <Compile Include="Misc\HashGeneratorTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="Issues\U9560.cs" />
     <Compile Include="Integration\ContentEventsTests.cs" />
@@ -227,6 +228,7 @@
     <Compile Include="Models\Mapping\AutoMapper6Tests.cs" />
     <Compile Include="Models\Mapping\UserModelMapperTests.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTests.cs" />
+    <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
     <Compile Include="Persistence\Repositories\UserGroupRepositoryTest.cs" />
     <Compile Include="PublishedContent\ModelsAndConvertersTests.cs" />
     <Compile Include="Routing\NiceUrlRoutesTests.cs" />
@@ -285,8 +287,11 @@
     <Compile Include="Collections\DeepCloneableListTests.cs" />
     <Compile Include="Web\Controllers\BackOfficeControllerUnitTests.cs" />
     <Compile Include="CoreThings\DelegateExtensionsTests.cs" />
+    <Compile Include="Web\Controllers\UserEditorAuthorizationHelperTests.cs" />
     <Compile Include="Web\Controllers\UsersControllerTests.cs" />
     <Compile Include="Web\HealthChecks\HealthCheckResultsTests.cs" />
+    <Compile Include="Web\HttpCookieExtensionsTests.cs" />
+    <Compile Include="Web\Mvc\HtmlStringUtilitiesTests.cs" />
     <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
     <Compile Include="Persistence\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />

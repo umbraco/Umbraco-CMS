@@ -12,6 +12,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.ControllerTesting;
@@ -107,7 +108,9 @@ namespace Umbraco.Tests.Web.Controllers
                 var userServiceMock = Mock.Get(Current.Services.UserService);
                 var users = MockedUser.CreateMulipleUsers(10);
                 long outVal = 10;
-                userServiceMock.Setup(service => service.GetAll(It.IsAny<long>(), It.IsAny<int>(), out outVal, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<UserState[]>(), It.IsAny<string[]>(), It.IsAny<string>()))
+                userServiceMock.Setup(service => service.GetAll(
+                    It.IsAny<long>(), It.IsAny<int>(), out outVal, It.IsAny<string>(), It.IsAny<Direction>(),
+                    It.IsAny<UserState[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<IQuery<IUser>>()))
                     .Returns(() => users);
 
                 //we need to manually apply automapper mappings with the mocked applicationcontext

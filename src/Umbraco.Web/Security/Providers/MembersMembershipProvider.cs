@@ -92,6 +92,13 @@ namespace Umbraco.Web.Security.Providers
             }
         }
 
+        protected override Attempt<string> GetRawPassword(string username)
+        {
+            var found = MemberService.GetByUsername(username);
+            if (found == null) return Attempt<string>.Fail();
+            return Attempt.Succeed(found.RawPasswordValue);
+        }
+
         public override string DefaultMemberTypeAlias
         {
             get

@@ -45,7 +45,8 @@ namespace Umbraco.Web.Security.Identity
                     services.MemberTypeService,
                     services.EntityService,
                     services.ExternalLoginService,
-                    userMembershipProvider));
+                    userMembershipProvider,
+                    UmbracoConfig.For.UmbracoSettings().Content));
 
             app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
 
@@ -74,7 +75,8 @@ namespace Umbraco.Web.Security.Identity
                 (options, owinContext) => BackOfficeUserManager.Create(
                     options,
                     customUserStore,
-                    userMembershipProvider));
+                    userMembershipProvider,
+                    UmbracoConfig.For.UmbracoSettings().Content));
 
             app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
 

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Web;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -41,27 +43,80 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
-        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out DataTypeDefinitionRepository dtdRepository)
+        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out DataTypeDefinitionRepository dtdRepository, CacheHelper cacheHelper = null)
         {
+            cacheHelper = cacheHelper ?? CacheHelper;
+
             TemplateRepository tr;
             var ctRepository = CreateRepository(unitOfWork, out contentTypeRepository, out tr);
-            dtdRepository = new DataTypeDefinitionRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository);
+            dtdRepository = new DataTypeDefinitionRepository(unitOfWork, cacheHelper, Logger, contentTypeRepository);
             return ctRepository;
         }
 
-        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
+        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, CacheHelper cacheHelper = null)
         {
             TemplateRepository tr;
-            return CreateRepository(unitOfWork, out contentTypeRepository, out tr);
+            return CreateRepository(unitOfWork, out contentTypeRepository, out tr, cacheHelper);
         }
 
-        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository)
+        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository, CacheHelper cacheHelper = null)
         {
-            templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
-            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, templateRepository);
-            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            cacheHelper = cacheHelper ?? CacheHelper;
+
+            templateRepository = new TemplateRepository(unitOfWork, cacheHelper, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+            var tagRepository = new TagRepository(unitOfWork, cacheHelper, Logger);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, cacheHelper, Logger, templateRepository);
+            var repository = new ContentRepository(unitOfWork, cacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
+        }
+
+        [Test]
+        public void Cache_Active_By_Int_And_Guid()
+        {
+            ContentTypeRepository contentTypeRepository;
+
+            var realCache = new CacheHelper(
+                new ObjectCacheRuntimeCacheProvider(),
+                new StaticCacheProvider(),
+                new StaticCacheProvider(),
+                new IsolatedRuntimeCache(t => new ObjectCacheRuntimeCacheProvider()));
+
+            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
+            using (var unitOfWork = provider.CreateUnitOfWork())
+            {
+                var repository = CreateRepository(unitOfWork, out contentTypeRepository, cacheHelper: realCache);
+
+                var udb = (UmbracoDatabase) unitOfWork.Database;
+
+                udb.EnableSqlCount = false;
+
+                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
+                var content = MockedContent.CreateSimpleContent(contentType);
+                contentTypeRepository.AddOrUpdate(contentType);
+                repository.AddOrUpdate(content);
+                unitOfWork.Complete();
+
+                udb.EnableSqlCount = true;
+
+                //go get it, this should already be cached since the default repository key is the INT
+                var found = repository.Get(content.Id);
+                Assert.AreEqual(0, udb.SqlCount);
+                //retrieve again, this should use cache
+                found = repository.Get(content.Id);
+                Assert.AreEqual(0, udb.SqlCount);
+
+                //reset counter
+                udb.EnableSqlCount = false;
+                udb.EnableSqlCount = true;
+
+                //now get by GUID, this won't be cached yet because the default repo key is not a GUID
+                found = repository.Get(content.Key);
+                var sqlCount = udb.SqlCount;
+                Assert.Greater(sqlCount, 0);
+                //retrieve again, this should use cache now
+                found = repository.Get(content.Key);
+                Assert.AreEqual(sqlCount, udb.SqlCount);
+            }
         }
 
         [Test]
@@ -819,6 +874,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contents = repository.GetAll();
 
                 // Assert
+                Assert.That(contents, Is.Not.Null);
+                Assert.That(contents.Any(), Is.True);
+                Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(4));
+
+                contents = repository.GetAll(contents.Select(x => x.Id).ToArray());
+                Assert.That(contents, Is.Not.Null);
+                Assert.That(contents.Any(), Is.True);
+                Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(4));
+
+                contents = ((IReadRepository<Guid, IContent>)repository).GetAll(contents.Select(x => x.Key).ToArray());
                 Assert.That(contents, Is.Not.Null);
                 Assert.That(contents.Any(), Is.True);
                 Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(4));

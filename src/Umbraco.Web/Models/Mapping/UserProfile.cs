@@ -223,13 +223,33 @@ namespace Umbraco.Web.Models.Mapping
                     display.AssignedPermissions = allAssignedPermissions;
                 });
 
+            //Important! Currently we are never mapping to multiple UserDisplay objects but if we start doing that
+            // this will cause an N+1 and we'll need to change how this works.
             CreateMap<IUser, UserDisplay>()
                 .ForMember(dest => dest.Avatars, opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(userService, runtimeCache)))
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(dest => dest.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?)user.LastLoginDate))
                 .ForMember(dest => dest.UserGroups, opt => opt.MapFrom(user => user.Groups))
-                .ForMember(dest => dest.StartContentIds, opt => opt.UseValue(Enumerable.Empty<EntityBasic>()))
-                .ForMember(dest => dest.StartMediaIds, opt => opt.UseValue(Enumerable.Empty<EntityBasic>()))
+                .ForMember(
+                    dest => dest.CalculatedStartContentIds,
+                    opt => opt.MapFrom(src => GetStartNodeValues(
+                        src.CalculateContentStartNodeIds(entityService),
+                        textService, entityService, UmbracoObjectTypes.Document, "content/contentRoot")))
+                .ForMember(
+                    dest => dest.CalculatedStartMediaIds,
+                    opt => opt.MapFrom(src => GetStartNodeValues(
+                        src.CalculateMediaStartNodeIds(entityService),
+                        textService, entityService, UmbracoObjectTypes.Media, "media/mediaRoot")))
+                .ForMember(
+                    dest => dest.StartContentIds,
+                    opt => opt.MapFrom(src => GetStartNodeValues(
+                        src.StartContentIds.ToArray(),
+                        textService, entityService, UmbracoObjectTypes.Document, "content/contentRoot")))
+                .ForMember(
+                    dest => dest.StartMediaIds,
+                    opt => opt.MapFrom(src => GetStartNodeValues(
+                        src.StartMediaIds.ToArray(),
+                        textService, entityService, UmbracoObjectTypes.Media, "media/mediaRoot")))
                 .ForMember(dest => dest.Culture, opt => opt.MapFrom(user => user.GetUserCulture(textService)))
                 .ForMember(
                     dest => dest.AvailableCultures,
@@ -247,40 +267,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.ResetPasswordValue, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
-                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
-                .AfterMap((user, display) =>
-                {
-                    //Important! Currently we are never mapping to multiple UserDisplay objects but if we start doing that
-                    // this will cause an N+1 and we'll need to change how this works.
-
-                    var startContentIds = user.StartContentIds.ToArray();
-                    if (startContentIds.Length > 0)
-                    {
-                        //TODO: Update GetAll to be able to pass in a parameter like on the normal Get to NOT load in the entire object!
-                        var startNodes = new List<EntityBasic>();
-                        if (startContentIds.Contains(-1))
-                        {
-                            startNodes.Add(RootNode(textService.Localize("content/contentRoot")));
-                        }
-                        var contentItems = entityService.GetAll(UmbracoObjectTypes.Document, startContentIds);
-                        startNodes.AddRange(Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(contentItems));
-                        display.StartContentIds = startNodes;
-
-
-                    }
-                    var startMediaIds = user.StartMediaIds.ToArray();
-                    if (startMediaIds.Length > 0)
-                    {
-                        var startNodes = new List<EntityBasic>();
-                        if (startContentIds.Contains(-1))
-                        {
-                            startNodes.Add(RootNode(textService.Localize("media/mediaRoot")));
-                        }
-                        var mediaItems = entityService.GetAll(UmbracoObjectTypes.Media, startMediaIds);
-                        startNodes.AddRange(Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(mediaItems));
-                        display.StartMediaIds = startNodes;
-                    }
-                });
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
             CreateMap<IUser, UserBasic>()
                 //Loading in the user avatar's requires an external request if they don't have a local file avatar, this means that initial load of paging may incur a cost
@@ -317,20 +304,23 @@ namespace Umbraco.Web.Models.Mapping
                     dest => dest.EmailHash,
                     opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().GenerateHash()))
                 .ForMember(dest => dest.SecondsUntilTimeout, opt => opt.Ignore())
+                .ForMember(dest => dest.UserGroups, opt => opt.Ignore())
                 .AfterMap((user, detail) =>
                 {
                     //we need to map the legacy UserType
                     //the best we can do here is to return the user's first user group as a IUserType object
                     //but we should attempt to return any group that is the built in ones first
                     var groups = user.Groups.ToArray();
+                    detail.UserGroups = user.Groups.Select(x => x.Alias).ToArray();
+
                     if (groups.Length == 0)
                     {
-                        //In backwards compatibility land, a user type cannot be null! so we need to return a fake one. 
+                        //In backwards compatibility land, a user type cannot be null! so we need to return a fake one.
                         detail.UserType = "temp";
                     }
                     else
                     {
-                        var builtIns = new[] { Constants.Security.AdminGroupAlias, "writer", "editor", "translator" };
+                        var builtIns = new[] { Constants.Security.AdminGroupAlias, "writer", "editor", Constants.Security.TranslatorGroupAlias };
                         var foundBuiltIn = groups.FirstOrDefault(x => builtIns.Contains(x.Alias));
                         if (foundBuiltIn != null)
                         {
@@ -359,6 +349,22 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(dest => dest.Culture, opt => opt.MapFrom(user => user.GetUserCulture(textService)))
                 .ForMember(dest => dest.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));
+        }
+
+        private IEnumerable<EntityBasic> GetStartNodeValues(int[] startNodeIds,
+            ILocalizedTextService textService, IEntityService entityService, UmbracoObjectTypes objectType,
+            string localizedKey)
+        {
+            if (startNodeIds.Length <= 0)
+                return Enumerable.Empty<EntityBasic>();
+
+            var startNodes = new List<EntityBasic>();
+            if (startNodeIds.Contains(-1))
+                startNodes.Add(RootNode(textService.Localize(localizedKey)));
+
+            var mediaItems = entityService.GetAll(objectType, startNodeIds);
+            startNodes.AddRange(Mapper.Map<IEnumerable<IUmbracoEntity>, IEnumerable<EntityBasic>>(mediaItems));
+            return startNodes;
         }
 
         private void MapUserGroupBasic(ISectionService sectionService, IEntityService entityService, ILocalizedTextService textService, dynamic group, UserGroupBasic display)

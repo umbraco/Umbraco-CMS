@@ -83,10 +83,10 @@ namespace Umbraco.Web.Editors
                     contentIdToCheck = contentToCheck.Id;
                     break;
                 case ContentSaveAction.SaveNew:
-                    //Save new requires both ActionNew AND ActionUpdate
+                    //Save new requires ActionNew
 
                     permissionToCheck.Add(ActionNew.Instance.Letter);
-                    permissionToCheck.Add(ActionUpdate.Instance.Letter);
+
                     if (contentItem.ParentId != Constants.System.Root)
                     {
                         contentToCheck = ContentService.GetById(contentItem.ParentId);
@@ -98,7 +98,7 @@ namespace Umbraco.Web.Editors
                     }
                     break;
                 case ContentSaveAction.SendPublishNew:
-                    //Send new requires both ActionToPublish AND ActionUpdate
+                    //Send new requires both ActionToPublish AND ActionNew
 
                     permissionToCheck.Add(ActionNew.Instance.Letter);
                     permissionToCheck.Add(ActionToPublish.Instance.Letter);
@@ -114,6 +114,7 @@ namespace Umbraco.Web.Editors
                     break;
                 case ContentSaveAction.PublishNew:
                     //Publish new requires both ActionNew AND ActionPublish
+                    //TODO: Shoudn't publish also require ActionUpdate since it will definitely perform an update to publish but maybe that's just implied
 
                     permissionToCheck.Add(ActionNew.Instance.Letter);
                     permissionToCheck.Add(ActionPublish.Instance.Letter);

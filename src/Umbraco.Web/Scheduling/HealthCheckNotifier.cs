@@ -71,8 +71,8 @@ namespace Umbraco.Web.Scheduling
                 var results = new HealthCheckResults(checks);
                 results.LogResults();
 
-                // Send using registered notification methods
-                foreach (var notificationMethod in _notifications)
+                // Send using registered notification methods that are enabled
+                foreach (var notificationMethod in _notifications.Where(x => x.Enabled))
                     await notificationMethod.SendAsync(results, token);
             }
 

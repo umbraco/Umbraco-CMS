@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models
@@ -29,9 +30,9 @@ namespace Umbraco.Web.Models
             MemberProperties = new List<UmbracoProperty>();
             LoginOnSuccess = true;
             CreatePersistentLoginCookie = true;
-            if (doLookup && HttpContext.Current != null)
+            if (doLookup && Current.UmbracoContext != null)
             {
-                var helper = new MembershipHelper(new HttpContextWrapper(HttpContext.Current));
+                var helper = new MembershipHelper(Current.UmbracoContext);
                 var model = helper.CreateRegistrationModel(MemberTypeAlias);
                 MemberProperties = model.MemberProperties;
             }

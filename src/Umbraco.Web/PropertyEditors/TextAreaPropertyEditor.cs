@@ -10,8 +10,14 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public TextAreaPropertyEditor(ILogger logger) : base(logger)
+        public TextAreaPropertyEditor(ILogger logger)
+            : base(logger)
         { }
+        
+        protected override PropertyValueEditor CreateValueEditor()
+        {
+            return new TextOnlyValueEditor(base.CreateValueEditor());
+        }
 
         protected override PreValueEditor CreatePreValueEditor()
         {

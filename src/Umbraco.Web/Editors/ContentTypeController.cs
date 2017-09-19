@@ -159,6 +159,15 @@ namespace Umbraco.Web.Editors
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
+        public HttpResponseMessage PostRenameContainer(int id, string name)
+        {
+            var result = Services.ContentTypeService.RenameContainer(id, name, Security.CurrentUser.Id);
+
+            return result
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
+                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+        }
+
         public DocumentTypeDisplay PostSave(DocumentTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave<DocumentTypeDisplay, DocumentTypeSave, PropertyTypeBasic>(
