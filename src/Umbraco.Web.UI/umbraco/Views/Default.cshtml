@@ -52,22 +52,24 @@
 </head>
 <noscript><h5><strong>&nbsp; JavaScript is disabled. Please enable to continue!</strong></h5></noscript>
 <body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
-    
-    
-    <div ng-hide="!authenticated" ng-cloak id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
 
+    <div ng-hide="!authenticated" ng-cloak>
+    
         <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
         <umb-drawer ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
+        
+        <div id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
 
-        <umb-navigation></umb-navigation>
+            <umb-navigation></umb-navigation>
 
-        <section id="contentwrapper">
-            <div id="contentcolumn" ng-view>
-            </div>
-        </section>
+            <section id="contentwrapper">
+                <div id="contentcolumn" ng-view></div>
+            </section>
 
-        <umb-notifications></umb-notifications>
+            <umb-notifications></umb-notifications>
 
+        </div>
+        
     </div>
 
     @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))
