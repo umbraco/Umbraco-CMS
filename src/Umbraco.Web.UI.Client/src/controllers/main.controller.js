@@ -136,6 +136,23 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         };
     }));
 
+    // manage the help dialog by subscribing to the showHelp appState
+    $scope.drawer = {};
+    evts.push(eventsService.on("appState.drawerState.changed", function (e, args) {
+        // set view
+        if (args.key === "view") {
+            $scope.drawer.view = args.value;
+        }
+        // set custom model
+        if (args.key === "model") {
+            $scope.drawer.model = args.value;
+        }
+        // show / hide drawer
+        if (args.key === "showDrawer") {
+            $scope.drawer.show = args.value;
+        }
+    }));
+
     //ensure to unregister from all events!
     $scope.$on('$destroy', function () {
         for (var e in evts) {
