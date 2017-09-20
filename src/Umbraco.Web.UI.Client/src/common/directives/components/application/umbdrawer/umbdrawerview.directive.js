@@ -1,11 +1,11 @@
 /**
 @ngdoc directive
-@name umbraco.directives.directive:umbDrawerHeader
+@name umbraco.directives.directive:umbDrawerView
 @restrict E
 @scope
 
 @description
-Use this directive to render a drawer header
+Use this directive to render drawer view
 
 <h3>Markup example</h3>
 <pre>
@@ -30,34 +30,29 @@ Use this directive to render a drawer header
 
 <h3>Use in combination with</h3>
 <ul>
-    <li>{@link umbraco.directives.directive:umbDrawerView umbDrawerView}</li>
+    <li>{@link umbraco.directives.directive:umbDrawerHeader umbDrawerHeader}</li>
     <li>{@link umbraco.directives.directive:umbDrawerContent umbDrawerContent}</li>
     <li>{@link umbraco.directives.directive:umbDrawerFooter umbDrawerFooter}</li>
 </ul>
 
-@param {string} title (<code>attribute</code>): Set a drawer title.
-@param {string} description (<code>attribute</code>): Set a drawer description.
 **/
 
 (function() {
     'use strict';
 
-    function DrawerHeaderDirective() {
+    function DrawerViewDirective() {
 
         var directive = {
             restrict: 'E',
             replace: true,
-            templateUrl: 'views/components/application/umbdrawer/umb-drawer-header.html',
-            scope: {
-                "title": "@?",
-                "description": "@?"
-            }
+            transclude: true,
+            templateUrl: 'views/components/application/umbdrawer/umb-drawer-view.html'
         };
 
         return directive;
 
     }
 
-    angular.module('umbraco.directives').directive('umbDrawerHeader', DrawerHeaderDirective);
+    angular.module('umbraco.directives').directive('umbDrawerView', DrawerViewDirective);
 
 })();
