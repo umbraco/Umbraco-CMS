@@ -175,7 +175,7 @@ angular.module("umbraco")
            $scope.changePasswordModel.value.confirm = "";
         }
 
-        dashboardResource.getDashboard("user-profile").then(function (dashboard) {
+        dashboardResource.getDashboard("user-dialog").then(function (dashboard) {
             $scope.dashboard = dashboard;
         });
     });
