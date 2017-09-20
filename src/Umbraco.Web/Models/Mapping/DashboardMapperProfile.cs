@@ -7,9 +7,9 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// A model mapper used to map models for the various dashboards
     /// </summary>
-    internal class DashboardProfile : Profile
+    internal class DashboardMapperProfile : Profile
     {
-        public DashboardProfile()
+        public DashboardMapperProfile()
         {
             CreateMap<IRedirectUrl, ContentRedirectUrl>()
                 .ForMember(x => x.OriginalUrl, expression => expression.MapFrom(item => UmbracoContext.Current.UrlProvider.GetUrlFromRoute(item.ContentId, item.Url)))

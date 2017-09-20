@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -182,31 +183,74 @@ namespace Umbraco.Core.Persistence
             return sql;
         }
 
+        /// <summary>
+        /// Creates a SELECT Sql statement.
+        /// </summary>
+        /// <typeparam name="T">The type of the DTO to select.</typeparam>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="refexpr">An optional reference Sql expression.</param>
+        /// <returns>The Sql statement.</returns>
+        /// <remarks>
+        /// <para>Use <paramref name="refexpr"/> to select referenced DTOs.</para>
+        /// </remarks>
         public static Sql<SqlContext> Select<T>(this Sql<SqlContext> sql, Func<RefSql, RefSql> refexpr = null)
         {
-            var pd = sql.SqlContext.PocoDataFactory.ForType(typeof (T));
-
-            var tableName = pd.TableInfo.TableName;
-            var columns = pd.QueryColumns.Select(x => GetColumn(sql.SqlContext.DatabaseType,
-                tableName,
-                x.Value.ColumnName,
-                string.IsNullOrEmpty(x.Value.ColumnAlias) ? x.Value.MemberInfoKey : x.Value.ColumnAlias));
-
-            sql.Select(columns);
+            sql.Select(sql.GetColumns<T>());
 
             if (refexpr == null) return sql;
             refexpr(new RefSql(sql, null));
             return sql;
         }
 
+        public static Sql<SqlContext> Zelect<TDto>(this Sql<SqlContext> sql, Func<RefSql<TDto>, RefSql<TDto>> refexpr = null)
+        {
+            sql.Select(sql.GetColumns<TDto>());
+
+            if (refexpr == null) return sql;
+            refexpr(new RefSql<TDto>(sql, null));
+            return sql;
+        }
+
         /// <summary>
-        ///
+        /// Creates a SELECT Sql statement.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="refSql"></param>
-        /// <param name="refexpr"></param>
-        /// <param name="referenceName">The name of the DTO reference.</param>
-        /// <param name="tableAlias">The name of the table alias.</param>
+        /// <typeparam name="T">The type of the DTO to select.</typeparam>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="sqlexpr">A selection Sql expression.</param>
+        /// <param name="refexpr">A reference Sql expression.</param>
+        /// <returns>The Sql statement.</returns>
+        /// <remarks>
+        /// <para>Use <paramref name="sqlexpr"/> to complement the selection..</para>
+        /// <para>Use <paramref name="refexpr"/> to select referenced DTOs.</para>
+        /// </remarks>
+        public static Sql<SqlContext> Select<T>(this Sql<SqlContext> sql, Func<Sql<SqlContext>, Sql<SqlContext>> sqlexpr, Func<RefSql, RefSql> refexpr)
+        {
+            sql.Select(sql.GetColumns<T>());
+
+            sql = sqlexpr(sql);
+
+            refexpr(new RefSql(sql, null));
+            return sql;
+        }
+
+        public static Sql<SqlContext> Zelect<TDto>(this Sql<SqlContext> sql, Func<Sql<SqlContext>, Sql<SqlContext>> sqlexpr, Func<RefSql<TDto>, RefSql<TDto>> refexpr)
+        {
+            sql.Select(sql.GetColumns<TDto>());
+
+            sql = sqlexpr(sql);
+
+            refexpr(new RefSql<TDto>(sql, null));
+            return sql;
+        }
+
+        /// <summary>
+        /// Complements a SELECT Sql statement with a referenced DTO.
+        /// </summary>
+        /// <typeparam name="T">The type of the DTO to select.</typeparam>
+        /// <param name="refSql">The origin sql.</param>
+        /// <param name="refexpr">An optional, nested, reference Sql expression.</param>
+        /// <param name="referenceName">The optional name of the DTO reference.</param>
+        /// <param name="tableAlias">The optional name of the table alias.</param>
         /// <returns></returns>
         /// <remarks>
         /// <para>Select&lt;Foo>() produces: [foo].[value] AS [Foo_Value]</para>
@@ -217,15 +261,8 @@ namespace Umbraco.Core.Persistence
         {
             if (referenceName == null) referenceName = typeof (T).Name;
             if (refSql.Prefix != null) referenceName = refSql.Prefix + PocoData.Separator + referenceName;
-            var pd = refSql.Sql.SqlContext.PocoDataFactory.ForType(typeof (T));
 
-            var tableName = tableAlias ?? pd.TableInfo.TableName;
-            var columns = pd.QueryColumns.Select(x => GetColumn(refSql.Sql.SqlContext.DatabaseType,
-                tableName,
-                x.Value.ColumnName,
-                string.IsNullOrEmpty(x.Value.ColumnAlias) ? x.Value.MemberInfoKey : x.Value.ColumnAlias,
-                referenceName));
-
+            var columns = refSql.Sql.GetColumns<T>(referenceName);
             refSql.Sql.Append(", " + string.Join(", ", columns));
 
             if (refexpr == null) return refSql;
@@ -233,13 +270,27 @@ namespace Umbraco.Core.Persistence
             return refSql;
         }
 
-        public static Sql<SqlContext> Select<T>(this Sql<SqlContext> sql, params Expression<Func<T, object>>[] columns)
+        /// <summary>
+        /// Creates a SELECT Sql statement.
+        /// </summary>
+        /// <typeparam name="T">The type of the DTO to select.</typeparam>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="columnExpressions">Expressions indicating the columns to select.</param>
+        /// <returns>The Sql statement.</returns>
+        /// <remarks>
+        /// <para>If <paramref name="columnExpressions"/> is empty, all columns are selected.</para>
+        /// </remarks>
+        public static Sql<SqlContext> Select<T>(this Sql<SqlContext> sql, params Expression<Func<T, object>>[] columnExpressions)
         {
-            var fieldNames = columns.Select(x => GetFieldName(x, sql.SqlContext.SqlSyntax)).ToArray();
-            sql.Select(fieldNames);
+            var columns = columnExpressions.Length == 0
+                ? sql.GetColumns<T>()
+                : columnExpressions.Select(x => GetFieldName(x, sql.SqlContext.SqlSyntax)).ToArray();
+
+            sql.Select(columns);
             return sql;
         }
 
+        // fixme - obsolete
         public class RefSql
         {
             public RefSql(Sql<SqlContext> sql, string prefix)
@@ -252,6 +303,106 @@ namespace Umbraco.Core.Persistence
             public string Prefix { get; }
         }
 
+        public class RefSql<TDto>
+        {
+            public RefSql(Sql<SqlContext> sql, string prefix)
+            {
+                Sql = sql;
+                Prefix = prefix;
+            }
+
+            public Sql<SqlContext> Sql { get; }
+            public string Prefix { get; }
+
+            public RefSql<TDto> Select<TRefDto>(Func<RefSql<TRefDto>, RefSql<TRefDto>> refexpr = null)
+                => Select(null, null, refexpr);
+
+            //fixme rename duplicate "ref expr"
+
+            public RefSql<TDto> Select<TRefDto>(Expression<Func<TDto, object>> referenceExpression, Func<RefSql<TRefDto>, RefSql<TRefDto>> refexpr = null)
+                => Select(referenceExpression, null, refexpr);
+
+            public RefSql<TDto> Select<TRefDto>(Expression<Func<TDto, List<TRefDto>>> referenceExpression, Func<RefSql<TRefDto>, RefSql<TRefDto>> refexpr = null)
+                => Select(referenceExpression, null, refexpr);
+
+            public RefSql<TDto> Select<TRefDto>(Expression<Func<TDto, object>> referenceExpression, string tableAlias, Func<RefSql<TRefDto>, RefSql<TRefDto>> refexpr = null)
+            {
+                string referenceName = null;
+                if (referenceExpression != null)
+                {
+                    var property = ExpressionHelper.FindProperty(referenceExpression) as PropertyInfo;
+                    if (property == null)
+                        throw new InvalidOperationException("Could not get property specified in expression.");
+                    referenceName = property.Name;
+                }
+                if (referenceName == null) referenceName = typeof(TDto).Name;
+                if (Prefix != null) referenceName = Prefix + PocoData.Separator + referenceName;
+
+                var columns = Sql.GetColumns<TRefDto>(referenceName);
+                Sql.Append(", " + string.Join(", ", columns));
+
+                if (refexpr == null) return this;
+                refexpr(new RefSql<TRefDto>(Sql, referenceName));
+                return this;
+            }
+
+            // fixme - also handle the case... when it's not a List but a single one
+            // fixme - DRY
+            public RefSql<TDto> Select<TRefDto>(Expression<Func<TDto, List<TRefDto>>> referenceExpression, string tableAlias, Func<RefSql<TRefDto>, RefSql<TRefDto>> refexpr = null)
+            {
+                string referenceName = null;
+                if (referenceExpression != null)
+                {
+                    var property = ExpressionHelper.FindProperty(referenceExpression) as PropertyInfo;
+                    if (property == null)
+                        throw new InvalidOperationException("Could not get property specified in expression.");
+                    referenceName = property.Name;
+                }
+                if (referenceName == null) referenceName = typeof(TDto).Name;
+                if (Prefix != null) referenceName = Prefix + PocoData.Separator + referenceName;
+
+                var columns = Sql.GetColumns<TRefDto>(referenceName);
+                Sql.Append(", " + string.Join(", ", columns));
+
+                if (refexpr == null) return this;
+                refexpr(new RefSql<TRefDto>(Sql, referenceName));
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// Gets the column names of a DTO.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the DTO.</typeparam>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="columnExpressions">Expressions indicating the columns to select.</param>
+        /// <returns>The comma-separated list of columns.</returns>
+        /// <remarks>
+        /// <para>If <paramref name="columnExpressions"/> is empty, all columns are selected.</para>
+        /// </remarks>
+        public static string Columns<TDto>(this Sql<SqlContext> sql, params Expression<Func<TDto, object>>[] columnExpressions)
+        {
+            var columns = columnExpressions.Length == 0
+                ? sql.GetColumns<TDto>()
+                : columnExpressions.Select(x => GetFieldName(x, sql.SqlContext.SqlSyntax)).ToArray();
+
+            return string.Join(", ", columns);
+        }
+
+        #endregion
+
+        #region Utilities
+
+        private static object[] GetColumns<TDto>(this Sql<SqlContext> sql, string referenceName = null)
+        {
+            var pd = sql.SqlContext.PocoDataFactory.ForType(typeof (TDto));
+            var tableName = pd.TableInfo.TableName;
+            return pd.QueryColumns.Select(x => (object) GetColumn(sql.SqlContext.DatabaseType,
+                tableName, x.Value.ColumnName,
+                string.IsNullOrEmpty(x.Value.ColumnAlias) ? x.Value.MemberInfoKey : x.Value.ColumnAlias,
+                referenceName)).ToArray();
+        }
+
         private static string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string referenceName = null)
         {
             tableName = dbType.EscapeTableName(tableName);
@@ -259,10 +410,6 @@ namespace Umbraco.Core.Persistence
             columnAlias = dbType.EscapeSqlIdentifier((referenceName == null ? "" : (referenceName + "__")) + columnAlias);
             return tableName + "." + columnName + " AS " + columnAlias;
         }
-
-        #endregion
-
-        #region Helpers
 
         private static string GetTableName(this Type type)
         {
@@ -279,12 +426,12 @@ namespace Umbraco.Core.Persistence
             return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
         }
 
-        private static string GetFieldName<T>(Expression<Func<T, object>> fieldSelector, ISqlSyntaxProvider sqlSyntax)
+        private static string GetFieldName<TDto>(Expression<Func<TDto, object>> fieldSelector, ISqlSyntaxProvider sqlSyntax)
         {
             var field = ExpressionHelper.FindProperty(fieldSelector) as PropertyInfo;
             var fieldName = field.GetColumnName();
 
-            var type = typeof(T);
+            var type = typeof (TDto);
             var tableName = type.GetTableName();
 
             return sqlSyntax.GetQuotedTableName(tableName) + "." + sqlSyntax.GetQuotedColumnName(fieldName);

@@ -12,7 +12,7 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Defines mappings for content/media/members type mappings
     /// </summary>
-    internal class ContentTypeProfile : Profile
+    internal class ContentTypeMapperProfile : Profile
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
@@ -20,7 +20,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IContentTypeService _contentTypeService;
         private readonly IMediaTypeService _mediaTypeService;
 
-        public ContentTypeProfile(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService, IContentTypeService contentTypeService, IMediaTypeService mediaTypeService)
+        public ContentTypeMapperProfile(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService, IContentTypeService contentTypeService, IMediaTypeService mediaTypeService)
         {
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;

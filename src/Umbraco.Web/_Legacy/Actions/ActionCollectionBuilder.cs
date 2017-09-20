@@ -10,15 +10,13 @@ namespace Umbraco.Web._Legacy.Actions
     {
         private static Func<IEnumerable<Type>> _producer;
 
-        public static ActionCollectionBuilder Register(IServiceContainer container)
-        {
-            // register the builder - per container
-            var builderLifetime = new PerContainerLifetime();
-            container.Register<ActionCollectionBuilder>(builderLifetime);
+        // for tests only - does not register the collection
+        public ActionCollectionBuilder()
+        { }
 
-            // get the builder, get the collection lifetime
-            var builder = container.GetInstance<ActionCollectionBuilder>();
-            var collectionLifetime = builder.CollectionLifetime;
+        public ActionCollectionBuilder(IServiceContainer container)
+        {
+            var collectionLifetime = CollectionLifetime;
 
             // register the collection - special lifetime
             // the lifetime here is custom ResettablePerContainerLifetime which will manage one
@@ -29,8 +27,6 @@ namespace Umbraco.Web._Legacy.Actions
             // had frozen. This has been replaced by the possibility here to set the producer at any
             // time - but the builder is internal - and all this will be gone eventually.
             container.Register(factory => factory.GetInstance<ActionCollectionBuilder>().CreateCollection(), collectionLifetime);
-
-            return builder;
         }
 
         public ActionCollection CreateCollection()

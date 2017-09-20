@@ -13,6 +13,7 @@ using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models;
@@ -62,7 +63,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                     sectionService:Mock.Of<ISectionService>());
 
                 //ensure the configuration matches the current version for tests
-                SettingsForTests.ConfigurationStatus = Current.RuntimeState.SemanticVersion.ToSemanticString();
+                SettingsForTests.ConfigurationStatus = UmbracoVersion.SemanticVersion.ToSemanticString();
 
                 // fixme v8?
                 ////new app context

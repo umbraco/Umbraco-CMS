@@ -18,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.NestedContentAlias, "Nested Content", "nestedcontent", ValueType = "JSON", Group = "lists", Icon = "icon-thumbnail-list")]
     public class NestedContentPropertyEditor : PropertyEditor
     {
-        private readonly PropertyEditorCollection _propertyEditors;
+        private readonly Lazy<PropertyEditorCollection> _propertyEditors;
 
         internal const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
@@ -29,7 +29,7 @@ namespace Umbraco.Web.PropertyEditors
             set => _defaultPreValues = value;
         }
 
-        public NestedContentPropertyEditor(ILogger logger, PropertyEditorCollection propertyEditors)
+        public NestedContentPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors)
             : base (logger)
         {
             _propertyEditors = propertyEditors;
@@ -44,6 +44,9 @@ namespace Umbraco.Web.PropertyEditors
                 {"showIcons", "1"}
             };
         }
+
+        // has to be lazy else circular dep in ctor
+        private PropertyEditorCollection PropertyEditors => _propertyEditors.Value;
 
         #region Pre Value Editor
 
@@ -89,7 +92,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override PropertyValueEditor CreateValueEditor()
         {
-            return new NestedContentPropertyValueEditor(base.CreateValueEditor(), _propertyEditors);
+            return new NestedContentPropertyValueEditor(base.CreateValueEditor(), PropertyEditors);
         }
 
         internal class NestedContentPropertyValueEditor : PropertyValueEditorWrapper

@@ -213,7 +213,7 @@ ORDER BY colName";
                 .WhereIn<User2UserGroupReadOnlyDto>(x => x.UserId, userIds);
 
             var users2groups = Database.Fetch<User2UserGroupDto>(sql);
-            var groupIds = users2groups.Select(x => x.UserGroupId).ToList();            
+            var groupIds = users2groups.Select(x => x.UserGroupId).ToList();
 
             // get groups
 
@@ -257,7 +257,7 @@ ORDER BY colName";
             }
 
             // map start nodes
-            
+
             foreach (var startNode in startNodes)
             {
                 var dto = xUsers == null ? dtos[0] : xUsers[startNode.UserId];

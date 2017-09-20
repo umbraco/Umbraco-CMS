@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Web.Controllers
     public class UsersControllerTests : TestWithDatabaseBase
     {
         [Test]
-        public async void Save_User()
+        public async System.Threading.Tasks.Task Save_User()
         {
             var runner = new TestRunner((message, helper) =>
             {
@@ -83,7 +83,7 @@ namespace Umbraco.Tests.Web.Controllers
         
 
         [Test]
-        public async void GetPagedUsers_Empty()
+        public async System.Threading.Tasks.Task GetPagedUsers_Empty()
         {
             var runner = new TestRunner((message, helper) =>
             {
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Web.Controllers
         }
 
         [Test]
-        public async void GetPagedUsers_10()
+        public async System.Threading.Tasks.Task GetPagedUsers_10()
         {
             var runner = new TestRunner((message, helper) =>
             {

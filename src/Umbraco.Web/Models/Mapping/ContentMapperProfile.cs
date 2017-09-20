@@ -19,9 +19,9 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Declares how model mappings for content
     /// </summary>
-    internal class ContentProfile : Profile
+    internal class ContentMapperProfile : Profile
     {
-        public ContentProfile(IUserService userService, ILocalizedTextService textService, IContentService contentService, IContentTypeService contentTypeService, IDataTypeService dataTypeService)
+        public ContentMapperProfile(IUserService userService, ILocalizedTextService textService, IContentService contentService, IContentTypeService contentTypeService, IDataTypeService dataTypeService)
         {
             // create, capture, cache
             var contentOwnerResolver = new OwnerResolver<IContent>(userService);

@@ -31,6 +31,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         }
 
         [Test]
+        [NUnit.Framework.Ignore("remove in v8")] // fixme remove in v8
         public virtual void Can_Upgrade_From_470_To_600()
         {
             var configuredVersion = new SemVersion(4, 7, 0);

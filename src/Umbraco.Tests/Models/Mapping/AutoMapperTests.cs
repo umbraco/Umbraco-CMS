@@ -45,21 +45,23 @@ namespace Umbraco.Tests.Models.Mapping
 
             // validate each profile (better granularity for error reports)
 
+            Console.WriteLine("Validate each profile:");
             foreach (var profile in profiles)
             {
                 try
                 {
                     config.AssertConfigurationIsValid(profile.GetType().FullName);
-                    Console.WriteLine("OK " + profile.GetType().FullName);
+                    //Console.WriteLine("OK " + profile.GetType().FullName);
                 }
-                catch
+                catch (Exception e)
                 {
                     Console.WriteLine("KO " + profile.GetType().FullName);
+                    Console.WriteLine(e);
                 }
             }
 
             Console.WriteLine();
-
+            Console.WriteLine("Validate each profile and throw:");
             foreach (var profile in profiles)
             {
                 try
@@ -74,10 +76,9 @@ namespace Umbraco.Tests.Models.Mapping
             }
 
             // validate the global config
+            Console.WriteLine();
+            Console.WriteLine("Validate global config:");
             config.AssertConfigurationIsValid();
-
-            // validate the static config (should be the same)
-            Mapper.AssertConfigurationIsValid();
         }
     }
 }

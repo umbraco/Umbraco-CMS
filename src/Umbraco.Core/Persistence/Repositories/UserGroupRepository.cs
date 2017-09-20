@@ -79,7 +79,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where($"umbracoUserGroup.id IN ({innerSql.SQL})");
             AppendGroupBy(sql);
 
-            return ConvertFromDtos(Database.Fetch<UserGroupDto>(sql));
+            return Database.Fetch<UserGroupDto>(sql).Select(UserGroupFactory.BuildEntity);
         }
 
         public void AddOrUpdateGroupWithUsers(IUserGroup userGroup, int[] userIds)
@@ -186,14 +186,18 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(QueryType.Many);
 
             if (ids.Any())
-                sql.WhereIn<UserDto>(x => x.Id, ids);
+                sql.WhereIn<UserGroupDto>(x => x.Id, ids);
             else
                 sql.Where<UserGroupDto>(x => x.Id >= 0);
 
             AppendGroupBy(sql);
 
-            var dtos = Database.Fetch<UserGroupDto>(sql);
-            return ConvertFromDtos(dtos);
+            // fixme - required so that Fetch can assemble references
+            sql.OrderBy<UserGroupDto>(x => x.Id);
+
+            Console.WriteLine(sql.SQL);
+            var dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql); // fixme one-to-many!
+            return dtos.Select(UserGroupFactory.BuildEntity);
         }
 
         protected override IEnumerable<IUserGroup> PerformGetByQuery(IQuery<IUserGroup> query)
@@ -204,7 +208,7 @@ namespace Umbraco.Core.Persistence.Repositories
             AppendGroupBy(sql);
 
             var dtos = Database.Fetch<UserGroupDto>(sql);
-            return ConvertFromDtos(dtos);
+            return dtos.Select(UserGroupFactory.BuildEntity);
         }
 
         #endregion
@@ -225,14 +229,15 @@ namespace Umbraco.Core.Persistence.Repositories
                     break;
                 case QueryType.Ids:
                     sql
-                        .Select("umbracoUserGroup.id");
+                        .Select<UserGroupDto>(x => x.Id);
                     addFrom = true;
                     break;
                 case QueryType.Single:
                 case QueryType.Many:
                     sql
-                        .Select<UserGroupDto>(r => r.Select<UserGroup2AppDto>())
-                        .Append(", COUNT(umbracoUser2UserGroup.UserId)"); // vs COUNT(umbracoUser.Id) - removes a JOIN
+                        .Zelect<UserGroupDto>(
+                            s => s.Append($", COUNT({sql.Columns<User2UserGroupDto>(x => x.UserId)}) AS {SqlSyntax.GetQuotedColumnName("UserCount")}"),
+                            r => r.Select(x => x.UserGroup2AppDtos));
                     addFrom = true;
                     break;
                 default:
@@ -245,9 +250,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     .LeftJoin<UserGroup2AppDto>()
                     .On<UserGroupDto, UserGroup2AppDto>(left => left.Id, right => right.UserGroupId)
                     .LeftJoin<User2UserGroupDto>()
-                    .On<User2UserGroupDto, UserGroupDto>(left => left.UserGroupId, right => right.Id)
-                    /*.LeftJoin<UserDto>()
-                    .On<UserDto, User2UserGroupDto>(left => left.Id, right => right.UserId)*/;
+                    .On<User2UserGroupDto, UserGroupDto>(left => left.UserGroupId, right => right.Id);
 
             return sql;
         }
@@ -255,42 +258,14 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             return GetBaseQuery(isCount ? QueryType.Count : QueryType.Many);
-
-//            var sql = Sql();
-
-//            if (isCount)
-//            {
-//                sql.Select("COUNT(*)").From<UserGroupDto>();
-//            }
-//            else
-//            {
-//                return GetBaseQuery(@"umbracoUserGroup.createDate, umbracoUserGroup.icon, umbracoUserGroup.id, umbracoUserGroup.startContentId,
-//umbracoUserGroup.startMediaId, umbracoUserGroup.updateDate, umbracoUserGroup.userGroupAlias, umbracoUserGroup.userGroupDefaultPermissions,
-//umbracoUserGroup.userGroupName, COUNT(umbracoUser.id) AS UserCount, umbracoUserGroup2App.app, umbracoUserGroup2App.userGroupId");
-//            }
-//            return sql;
         }
 
-        //protected Sql<SqlContext> GetBaseQuery(string columns)
-        //{
-        //    var sql = Sql()
-        //        .Select(columns)
-        //        .From<UserGroupDto>()
-        //        .LeftJoin<UserGroup2AppDto>()
-        //        .On<UserGroupDto, UserGroup2AppDto>(left => left.Id, right => right.UserGroupId)
-        //        .LeftJoin<User2UserGroupDto>()
-        //        .On<User2UserGroupDto, UserGroupDto>(left => left.UserGroupId, right => right.Id)
-        //        .LeftJoin<UserDto>()
-        //        .On<UserDto, User2UserGroupDto>(left => left.Id, right => right.UserId);
-
-        //    return sql;
-        //}
-
-        private static void AppendGroupBy(Sql sql)
+        private static void AppendGroupBy(Sql<SqlContext> sql)
         {
-            sql.GroupBy(@"umbracoUserGroup.createDate, umbracoUserGroup.icon, umbracoUserGroup.id, umbracoUserGroup.startContentId,
-umbracoUserGroup.startMediaId, umbracoUserGroup.updateDate, umbracoUserGroup.userGroupAlias, umbracoUserGroup.userGroupDefaultPermissions,
-umbracoUserGroup.userGroupName, umbracoUserGroup2App.app, umbracoUserGroup2App.userGroupId");
+            sql.GroupBy(sql.Columns<UserGroupDto>(x => x.CreateDate, x => x.Icon, x => x.Id, x => x.StartContentId, x => x.StartMediaId,
+                                                    x => x.UpdateDate, x => x.Alias, x => x.DefaultPermissions, x => x.Name)
+                        + ", "
+                        + sql.Columns<UserGroup2AppDto>(x => x.AppAlias, x => x.UserGroupId));
         }
 
         protected override string GetBaseWhereClause()
@@ -317,7 +292,7 @@ umbracoUserGroup.userGroupName, umbracoUserGroup2App.app, umbracoUserGroup2App.u
             ((UserGroup) entity).AddingEntity();
 
             var userGroupDto = UserGroupFactory.BuildDto(entity);
-
+            
             var id = Convert.ToInt32(Database.Insert(userGroupDto));
             entity.Id = id;
 
@@ -355,11 +330,6 @@ umbracoUserGroup.userGroupName, umbracoUserGroup2App.app, umbracoUserGroup2App.u
         }
 
         #endregion
-
-        private static IEnumerable<IUserGroup> ConvertFromDtos(IEnumerable<UserGroupDto> dtos)
-        {
-            return dtos.Select(UserGroupFactory.BuildEntity);
-        }
 
         /// <summary>
         /// used to persist a user group with associated users at once

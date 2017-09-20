@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Security;
-using NPoco;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -15,11 +14,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Security.Providers;
@@ -35,7 +30,7 @@ namespace Umbraco.Tests.Services
             base.SetUp();
 
             //hack! but we have no choice until we remove the SavePassword method from IMemberService
-            var providerMock = new Mock<MembersMembershipProvider>(ServiceContext.MemberService) { CallBase = true };
+            var providerMock = new Mock<MembersMembershipProvider>(ServiceContext.MemberService, ServiceContext.MemberTypeService) { CallBase = true };
             providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
             providerMock.Setup(@base => @base.PasswordFormat).Returns(MembershipPasswordFormat.Hashed);
             var provider = providerMock.Object;

@@ -203,7 +203,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     nodeId = entity.Id,
                     permission = permission.ToString(CultureInfo.InvariantCulture),
-                    groupIdsA
+                    groupIds = groupIdsA
                 });
 
             var actions = groupIdsA.Select(id => new UserGroup2NodePermissionDto

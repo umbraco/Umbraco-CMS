@@ -12,9 +12,9 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Declares model mappings for macros.
     /// </summary>
-    internal class MacroProfile : Profile
+    internal class MacroMapperProfile : Profile
     {
-        public MacroProfile()
+        public MacroMapperProfile()
         {
             //FROM IMacro TO EntityBasic
             CreateMap<IMacro, EntityBasic>()
@@ -41,7 +41,7 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         //we'll just map this to a text box
                         paramEditor = Current.ParameterEditors[Constants.PropertyEditors.TextboxAlias];
-                        Current.Logger.Warn<MacroProfile>("Could not resolve a parameter editor with alias " + property.EditorAlias + ", a textbox will be rendered in it's place");
+                        Current.Logger.Warn<MacroMapperProfile>("Could not resolve a parameter editor with alias " + property.EditorAlias + ", a textbox will be rendered in it's place");
                     }
 
                     parameter.View = paramEditor.ValueEditor.View;

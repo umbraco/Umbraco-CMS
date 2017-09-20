@@ -4,9 +4,9 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    public class CodeFileProfile : Profile
+    public class CodeFileMapperProfile : Profile
     {
-        public CodeFileProfile()
+        public CodeFileMapperProfile()
         {
             CreateMap<IPartialView, CodeFileDisplay>()
                 .ForMember(dest => dest.FileType, opt => opt.Ignore())

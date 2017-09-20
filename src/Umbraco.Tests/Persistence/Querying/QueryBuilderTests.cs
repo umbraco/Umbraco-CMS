@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using NPoco;
+﻿using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -14,8 +12,6 @@ namespace Umbraco.Tests.Persistence.Querying
     [TestFixture]
     public class QueryBuilderTests : BaseUsingSqlCeSyntax
     {
-
-
         [Test]
         public void Can_Build_StartsWith_Query_For_IContent()
         {

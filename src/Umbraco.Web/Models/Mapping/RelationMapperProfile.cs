@@ -5,9 +5,9 @@ using RelationType = Umbraco.Web.Models.ContentEditing.RelationType;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class RelationProfile : Profile
+    internal class RelationMapperProfile : Profile
     {
-        public RelationProfile()
+        public RelationMapperProfile()
         {
             //FROM IRelationType TO RelationType
             CreateMap<IRelationType, RelationType>();

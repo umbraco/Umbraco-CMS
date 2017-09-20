@@ -10,6 +10,7 @@ using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
+using LightInject;
 
 namespace Umbraco.Tests.Misc
 {
@@ -52,7 +53,8 @@ namespace Umbraco.Tests.Misc
             base.Compose();
 
             // required so we can access property.Value
-            Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
+            if (Container.TryGetInstance<PropertyValueConverterCollectionBuilder>() == null)
+                Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
         }
 
         [Test]

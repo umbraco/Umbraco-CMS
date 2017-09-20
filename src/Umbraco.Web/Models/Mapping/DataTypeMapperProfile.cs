@@ -15,9 +15,9 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Configure's model mappings for Data types
     /// </summary>
-    internal class DataTypeProfile : Profile
+    internal class DataTypeMapperProfile : Profile
     {
-        public DataTypeProfile(IDataTypeService dataTypeService)
+        public DataTypeMapperProfile(IDataTypeService dataTypeService)
         {
             var lazyDataTypeService = new Lazy<IDataTypeService>(() => dataTypeService);
 

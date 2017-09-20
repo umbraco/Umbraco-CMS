@@ -30,6 +30,7 @@ using Umbraco.Web;
 using Umbraco.Web.DI;
 using Umbraco.Web.Services;
 using Umbraco.Examine;
+using Umbraco.Web._Legacy.Actions;
 using Current = Umbraco.Core.Composing.Current;
 
 namespace Umbraco.Tests.Testing
@@ -127,6 +128,7 @@ namespace Umbraco.Tests.Testing
             ComposePluginManager(Options.PluginManager);
             ComposeDatabase(Options.Database);
             ComposeApplication(Options.WithApplication);
+
             // etc
             ComposeWtf();
 
@@ -169,6 +171,17 @@ namespace Umbraco.Tests.Testing
             // imported from TestWithSettingsBase
             // which was inherited by TestWithApplicationBase so pretty much used everywhere
             Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
+
+            // what else?
+            var runtimeStateMock = new Mock<IRuntimeState>();
+            runtimeStateMock.Setup(x => x.Level).Returns(RuntimeLevel.Run);
+            Container.RegisterSingleton(f => runtimeStateMock.Object);
+
+            // ah...
+            Container.RegisterCollectionBuilder<ActionCollectionBuilder>()
+                .SetProducer(Enumerable.Empty<Type>);
+
+            Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
         }
 
         protected virtual void ComposeCacheHelper()

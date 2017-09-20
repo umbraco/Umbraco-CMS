@@ -5,17 +5,13 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class SectionProfile : Profile
+    internal class SectionMapperProfile : Profile
     {
-        private readonly ILocalizedTextService _textService;
-
-        public SectionProfile(ILocalizedTextService textService)
+        public SectionMapperProfile(ILocalizedTextService textService)
         {
-            _textService = textService;
-
             CreateMap<Core.Models.Section, Section>()
                 .ForMember(dest => dest.RoutePath, opt => opt.Ignore())
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => _textService.Localize("sections/" + src.Alias, (IDictionary<string, string>)null)))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => textService.Localize("sections/" + src.Alias, (IDictionary<string, string>)null)))
                   .ReverseMap(); //backwards too!
         }
     }

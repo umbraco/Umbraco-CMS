@@ -3,23 +3,20 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
-using NPoco;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Persistence
+namespace Umbraco.Tests.Persistence.NPocoTests
 {
     // fixme.npoco - is this still appropriate?
     //
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class NPocoExtensionsTest : TestWithDatabaseBase
+    public class NPocoBulkInsertTests : TestWithDatabaseBase
     {
         [Test]
         public void Can_Bulk_Insert_One_By_One()
@@ -38,7 +35,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             // Act
-            using (ProfilingLogger.TraceDuration<NPocoExtensionsTest>("starting insert", "finished insert"))
+            using (ProfilingLogger.TraceDuration<NPocoBulkInsertTests>("starting insert", "finished insert"))
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {
@@ -71,7 +68,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             // Act
-            using (ProfilingLogger.TraceDuration<NPocoExtensionsTest>("starting insert", "finished insert"))
+            using (ProfilingLogger.TraceDuration<NPocoBulkInsertTests>("starting insert", "finished insert"))
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {
@@ -154,7 +151,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             // Act
-            using (ProfilingLogger.TraceDuration<NPocoExtensionsTest>("starting insert", "finished insert"))
+            using (ProfilingLogger.TraceDuration<NPocoBulkInsertTests>("starting insert", "finished insert"))
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {
@@ -187,7 +184,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             // Act
-            using (ProfilingLogger.TraceDuration<NPocoExtensionsTest>("starting insert", "finished insert"))
+            using (ProfilingLogger.TraceDuration<NPocoBulkInsertTests>("starting insert", "finished insert"))
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {

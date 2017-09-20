@@ -14,9 +14,9 @@ using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class UserProfile : Profile
+    internal class UserMapperProfile : Profile
     {
-        public UserProfile(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
+        public UserMapperProfile(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
             IRuntimeCacheProvider runtimeCache,
             ActionCollection actions)
         {

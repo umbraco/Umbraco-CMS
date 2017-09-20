@@ -119,7 +119,7 @@ namespace Umbraco.Web
             // set the default RenderMvcController
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
 
-            ActionCollectionBuilder.Register(composition.Container)
+            composition.Container.RegisterCollectionBuilder<ActionCollectionBuilder>()
                 .SetProducer(() => typeLoader.GetActions());
 
             var surfaceControllerTypes = new SurfaceControllerTypeCollection(typeLoader.GetSurfaceControllers());

@@ -4,9 +4,9 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class TemplateProfile : Profile
+    internal class TemplateMapperProfile : Profile
     {
-        public TemplateProfile()
+        public TemplateMapperProfile()
         {
             CreateMap<ITemplate, TemplateDisplay>()
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore());

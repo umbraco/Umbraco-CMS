@@ -3,9 +3,9 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class TabProfile : Profile
+    internal class TagMapperProfile : Profile
     {
-        public TabProfile()
+        public TagMapperProfile()
         {
             CreateMap<ITag, TagModel>();
         }

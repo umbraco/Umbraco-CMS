@@ -248,8 +248,8 @@ AnotherContentFinder
         [Test]
         public void Ensure_Only_One_Type_List_Created()
         {
-            var foundTypes1 = _manager.ResolveFindMeTypes();
-            var foundTypes2 = _manager.ResolveFindMeTypes();
+            _ = _manager.ResolveFindMeTypes();
+            _ = _manager.ResolveFindMeTypes();
             Assert.AreEqual(1, _manager.TypeLists.Count(x => x.BaseType == typeof(IFindMe) && x.AttributeType == null));
         }
 
@@ -257,7 +257,7 @@ AnotherContentFinder
         public void Resolves_Assigned_Mappers()
         {
             var foundTypes1 = _manager.GetAssignedMapperTypes();
-            Assert.AreEqual(29, foundTypes1.Count()); // 29 classes in the solution implement BaseMapper
+            Assert.AreEqual(29, foundTypes1.Count());
         }
 
         [Test]
@@ -271,14 +271,14 @@ AnotherContentFinder
         public void Resolves_Actions()
         {
             var actions = _manager.GetActions();
-            Assert.AreEqual(36, actions.Count()); // 36 classes in the solution implement IAction
+            Assert.AreEqual(37, actions.Count());
         }
 
         [Test]
         public void Resolves_Trees()
         {
             var trees = _manager.GetTrees();
-            Assert.AreEqual(5, trees.Count()); // 5 classes in the solution implement BaseTree
+            Assert.AreEqual(5, trees.Count());
         }
 
         [Test]

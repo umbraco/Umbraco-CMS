@@ -49,6 +49,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void IsDocumentType_Recursive_BaseType_ReturnsTrue()
         {
+            ContentTypesCache.GetPublishedContentTypeByAlias = null; // fixme this is not pretty
             InitializeInheritedContentTypes();
 
             var publishedContent = ctx.ContentCache.GetById(1100);
@@ -70,9 +71,9 @@ namespace Umbraco.Tests.PublishedContent
             if (createContentTypes)
             {
                 var contentTypeService = Current.Services.ContentTypeService;
-                var baseType = new ContentType(-1) {Alias = "base", Name = "Base"};
+                var baseType = new ContentType(-1) { Alias = "base", Name = "Base" };
                 const string contentTypeAlias = "inherited";
-                var inheritedType = new ContentType(baseType, contentTypeAlias) {Alias = contentTypeAlias, Name = "Inherited"};
+                var inheritedType = new ContentType(baseType, contentTypeAlias) { Alias = contentTypeAlias, Name = "Inherited" };
                 contentTypeService.Save(baseType);
                 contentTypeService.Save(inheritedType);
                 createContentTypes = false;

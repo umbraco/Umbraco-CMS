@@ -60,7 +60,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int? StartMediaId { get; set; }
 
         [ResultColumn]
-        [Reference(ReferenceType.Many, ReferenceMemberName = "id")]
+        [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
         public List<UserGroup2AppDto> UserGroup2AppDtos { get; set; }
 
         /// <summary>

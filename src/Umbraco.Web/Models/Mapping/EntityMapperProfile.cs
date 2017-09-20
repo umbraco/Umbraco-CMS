@@ -13,9 +13,9 @@ using Umbraco.Examine;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class EntityProfile : Profile
+    internal class EntityMapperProfile : Profile
     {
-        public EntityProfile()
+        public EntityMapperProfile()
         {
             // create, capture, cache
             var contentTypeUdiResolver = new ContentTypeUdiResolver();

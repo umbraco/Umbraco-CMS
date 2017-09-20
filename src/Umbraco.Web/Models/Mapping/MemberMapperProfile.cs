@@ -19,9 +19,9 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Declares model mappings for members.
     /// </summary>
-    internal class MemberProfile : Profile
+    internal class MemberMapperProfile : Profile
     {
-        public MemberProfile(IUserService userService, ILocalizedTextService textService, IMemberTypeService memberTypeService, IMemberService memberService)
+        public MemberMapperProfile(IUserService userService, ILocalizedTextService textService, IMemberTypeService memberTypeService, IMemberService memberService)
         {
             // create, capture, cache
             var memberOwnerResolver = new OwnerResolver<IMember>(userService);

@@ -227,7 +227,8 @@
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
     <Compile Include="Models\Mapping\AutoMapper6Tests.cs" />
     <Compile Include="Models\Mapping\UserModelMapperTests.cs" />
-    <Compile Include="NuGet\NPocoTests.cs" />
+    <Compile Include="Persistence\NPocoTests\NPocoFetchTests.cs" />
+    <Compile Include="Persistence\NPocoTests\NPocoSqlCacheTests.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
     <Compile Include="Persistence\Repositories\UserGroupRepositoryTest.cs" />
@@ -259,7 +260,7 @@
     <Compile Include="Persistence\LocksTests.cs" />
     <Compile Include="Persistence\BulkDataReaderTests.cs" />
     <Compile Include="Persistence\Migrations\PostMigrationTests.cs" />
-    <Compile Include="Persistence\NPocoExpressionsTests.cs" />
+    <Compile Include="Persistence\NPocoTests\NPocoExpressionsTests.cs" />
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
     <Compile Include="Testing\TestOptionAttributeBase.cs" />
@@ -295,7 +296,7 @@
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
     <Compile Include="Web\Mvc\HtmlStringUtilitiesTests.cs" />
     <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
-    <Compile Include="Persistence\PetaPocoCachesTest.cs" />
+    <Compile Include="Persistence\NPocoTests\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\PartialViewRepositoryTests.cs" />
@@ -390,7 +391,7 @@
     <Compile Include="Models\UserExtensionsTests.cs" />
     <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
-    <Compile Include="Persistence\NPocoExtensionsTest.cs" />
+    <Compile Include="Persistence\NPocoTests\NPocoBulkInsertTests.cs" />
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
     <Compile Include="Persistence\Repositories\MacroRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MemberRepositoryTest.cs" />
@@ -489,7 +490,7 @@
     <Compile Include="Persistence\Mappers\PropertyTypeMapperTest.cs" />
     <Compile Include="Persistence\Mappers\RelationMapperTest.cs" />
     <Compile Include="Persistence\Mappers\RelationTypeMapperTest.cs" />
-    <Compile Include="Persistence\Querying\NPocoSqlTests.cs" />
+    <Compile Include="Persistence\NPocoTests\NPocoSqlTests.cs" />
     <Compile Include="Persistence\Querying\QueryBuilderTests.cs" />
     <Compile Include="Persistence\Repositories\ContentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeRepositoryTest.cs" />

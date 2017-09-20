@@ -5,6 +5,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using LightInject;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -24,7 +25,7 @@ namespace Umbraco.Tests.PublishedContent
                     new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias),
                 };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
-            ContentTypesCache.GetPublishedContentTypeByAlias = (alias) => type;
+            ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
 
             var umbracoContext = GetUmbracoContext("/test");
             Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
@@ -36,7 +37,11 @@ namespace Umbraco.Tests.PublishedContent
 
             // fixme - what about the if (PropertyValueConvertersResolver.HasCurrent == false) ??
             // can we risk double - registering and then, what happens?
-            Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>()
+
+            var builder = Container.TryGetInstance<PropertyValueConverterCollectionBuilder>()
+                ?? Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
+
+            builder.Clear()
                 .Append<DatePickerValueConverter>()
                 .Append<TinyMceValueConverter>()
                 .Append<YesNoValueConverter>();

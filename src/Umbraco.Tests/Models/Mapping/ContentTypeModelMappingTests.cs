@@ -59,9 +59,9 @@ namespace Umbraco.Tests.Models.Mapping
             Mapper.Initialize(configuration =>
             {
                 //initialize our content type mapper
-                var profile1 = new ContentTypeProfile(_editorsMock.Object, _dataTypeService.Object, _fileService.Object, _contentTypeService.Object, Mock.Of<IMediaTypeService>());
+                var profile1 = new ContentTypeMapperProfile(_editorsMock.Object, _dataTypeService.Object, _fileService.Object, _contentTypeService.Object, Mock.Of<IMediaTypeService>());
                 configuration.AddProfile(profile1);
-                var profile2 = new EntityProfile();
+                var profile2 = new EntityMapperProfile();
                 configuration.AddProfile(profile2);
             });
         }

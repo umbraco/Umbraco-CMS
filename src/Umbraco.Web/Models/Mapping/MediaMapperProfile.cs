@@ -17,9 +17,9 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Declares model mappings for media.
     /// </summary>
-    internal class MediaProfile : Profile
+    internal class MediaMapperProfile : Profile
     {
-        public MediaProfile(IUserService userService, ILocalizedTextService textService, IDataTypeService dataTypeService, IMediaService mediaService, ILogger logger)
+        public MediaMapperProfile(IUserService userService, ILocalizedTextService textService, IDataTypeService dataTypeService, IMediaService mediaService, ILogger logger)
         {
             // create, capture, cache
             var mediaOwnerResolver = new OwnerResolver<IMedia>(userService);

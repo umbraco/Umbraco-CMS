@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -860,7 +861,7 @@ namespace Umbraco.Tests.Services
             var userService = ServiceContext.UserService;
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => userService.CreateUserWithIdentity(string.Empty, "john@umbraco.io"));
+            Assert.Throws<ArgumentNullOrEmptyException>(() => userService.CreateUserWithIdentity(string.Empty, "john@umbraco.io"));
         }
 
         [Test]

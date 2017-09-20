@@ -12,7 +12,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Persistence
+namespace Umbraco.Tests.Persistence.NPocoTests
 {
     // fixme.npoco - what shall we do with those tests?
     //

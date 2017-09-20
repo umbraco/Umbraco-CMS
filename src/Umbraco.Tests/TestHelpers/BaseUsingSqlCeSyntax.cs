@@ -48,9 +48,9 @@ namespace Umbraco.Tests.TestHelpers
                 .Add(() => Current.TypeLoader.GetAssignedMapperTypes());
             Mappers = container.GetInstance<IMapperCollection>();
 
-            var mappers = new NPoco.MapperCollection { new PocoMapper() };
-            var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init());
-            SqlContext = new SqlContext(sqlSyntax, pocoDataFactory, DatabaseType.SQLCe);
+            var pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
+            var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init());
+            SqlContext = new SqlContext(sqlSyntax, pocoDataFactory, DatabaseType.SQLCe, Mappers);
 
             SetUp();
         }

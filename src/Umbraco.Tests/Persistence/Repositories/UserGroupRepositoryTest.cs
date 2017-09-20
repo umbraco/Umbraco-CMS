@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Logging;
@@ -17,7 +18,7 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private UserGroupRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
-            return new UserGroupRepository(unitOfWork, Core.Cache.CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());            
+            return new UserGroupRepository(unitOfWork, Core.Cache.CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
         }
 
         [Test]
@@ -336,8 +337,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(groups[2]);
                 unitOfWork.Complete();
 
+                for (var i = 0; i < 3; i++)
+                    Assert.IsNotNull(repository.Get(groups[i].Id));
+
                 // Assert
-                var result = repository.GetAll((int)groups[0].Id, (int)groups[1].Id, (int)groups[2].Id).ToArray();
+                var result = repository.GetAll(groups[0].Id, groups[1].Id, groups[2].Id).ToArray();
+                Assert.AreEqual(3, result.Length);
+
                 Assert.AreEqual(3, result[0].AllowedSections.Count());
                 Assert.IsTrue(result[0].AllowedSections.Contains("content"));
                 Assert.IsTrue(result[0].AllowedSections.Contains("media"));
@@ -396,7 +402,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var groups = repository.GetGroupsAssignedToSection("test1");
 
-                // Assert            
+                // Assert
                 Assert.AreEqual(2, groups.Count());
                 var names = groups.Select(x => x.Name).ToArray();
                 Assert.IsTrue(names.Contains("TestUserGroup1"));
