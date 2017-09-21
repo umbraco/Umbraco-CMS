@@ -32,11 +32,16 @@
                 // get document type details
                 scope.documentType = getDocumentType(scope.node);
 
-                loadAuditTrail();
-
+                // load audit trail on tab change
+                eventsService.on("tab change", function (event, args) {
+                    if (args.context.innerHTML === "Properties" && args.context.hash === "#tab0") {
+                        console.log(args.context.alias);
+                        loadAuditTrail();
+                    }
+                });
             }
 
-            scope.auditTrailPageChange = function(pageNumber) {
+            scope.auditTrailPageChange = function (pageNumber) {
                 scope.auditTrailOptions.pageNumber = pageNumber;
                 loadAuditTrail();
             };
