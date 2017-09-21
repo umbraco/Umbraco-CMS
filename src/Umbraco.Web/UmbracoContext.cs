@@ -259,7 +259,7 @@ namespace Umbraco.Web
 
             var requestUrl = new Uri("http://localhost");
             var request = GetRequestFromContext();
-            if (request != null)
+            if (request != null && request.Url != null)
             {
                 requestUrl = request.Url;
             }

@@ -250,6 +250,13 @@ namespace Umbraco.Web.Editors
         }
 
         #region GetChildren
+
+        private int[] _userStartNodes;
+        protected int[] UserStartNodes
+        {
+            get { return _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService)); }
+        }
+
         /// <summary>
         /// Returns the child media objects - using the entity INT id
         /// </summary>
@@ -262,6 +269,25 @@ namespace Umbraco.Web.Editors
             bool orderBySystemField = true,
             string filter = "")
         {
+            //if a request is made for the root node data but the user's start node is not the default, then
+            // we need to return their start nodes
+            if (id == Constants.System.Root && UserStartNodes.Length > 0 && UserStartNodes.Contains(Constants.System.Root) == false)
+            {
+                if (pageNumber > 0)
+                    return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(0, 0, 0);
+                var nodes = Services.MediaService.GetByIds(UserStartNodes).ToArray();
+                if (nodes.Length == 0)
+                    return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(0, 0, 0);
+                if (pageSize < nodes.Length) pageSize = nodes.Length; // bah
+                var pr = new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(nodes.Length, pageNumber, pageSize)
+                {
+                    Items = nodes.Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>)
+                };
+                return pr;
+            }
+
+            // else proceed as usual
+
             long totalChildren;
             IMedia[] children;
             if (pageNumber > 0 && pageSize > 0)
@@ -654,7 +680,9 @@ namespace Umbraco.Web.Editors
             if (CheckPermissions(
                new Dictionary<string, object>(),
                Security.CurrentUser,
-               Services.MediaService, parentId) == false)
+               Services.MediaService,
+               Services.EntityService,
+               parentId) == false)
             {
                 return Request.CreateResponse(
                     HttpStatusCode.Forbidden,
@@ -866,11 +894,17 @@ namespace Umbraco.Web.Editors
         /// <param name="storage">The storage to add the content item to so it can be reused</param>
         /// <param name="user"></param>
         /// <param name="mediaService"></param>
+        /// <param name="entityService"></param>
         /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
         /// <param name="media">Specifies the already resolved content item to check against, setting this ignores the nodeId</param>
         /// <returns></returns>
-        internal static bool CheckPermissions(IDictionary<string, object> storage, IUser user, IMediaService mediaService, int nodeId, IMedia media = null)
+        internal static bool CheckPermissions(IDictionary<string, object> storage, IUser user, IMediaService mediaService, IEntityService entityService, int nodeId, IMedia media = null)
         {
+            if (storage == null) throw new ArgumentNullException("storage");
+            if (user == null) throw new ArgumentNullException("user");
+            if (mediaService == null) throw new ArgumentNullException("mediaService");
+            if (entityService == null) throw new ArgumentNullException("entityService");
+
             if (media == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinMedia)
             {
                 media = mediaService.GetById(nodeId);
@@ -885,16 +919,10 @@ namespace Umbraco.Web.Editors
             }
 
             var hasPathAccess = (nodeId == Constants.System.Root)
-                                    ? UserExtensions.HasPathAccess(
-                                        Constants.System.Root.ToInvariantString(),
-                                        user.StartMediaId,
-                                        Constants.System.RecycleBinMedia)
-                                    : (nodeId == Constants.System.RecycleBinMedia)
-                                          ? UserExtensions.HasPathAccess(
-                                              Constants.System.RecycleBinMedia.ToInvariantString(),
-                                              user.StartMediaId,
-                                              Constants.System.RecycleBinMedia)
-                                          : user.HasPathAccess(media);
+                ? user.HasMediaRootAccess(entityService)
+                : (nodeId == Constants.System.RecycleBinMedia)
+                    ? user.HasMediaBinAccess(entityService)
+                    : user.HasPathAccess(media, entityService);
 
             return hasPathAccess;
         }

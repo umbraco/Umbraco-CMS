@@ -4,7 +4,8 @@ angular.module("umbraco")
 
         if (!$scope.model.config.startNodeId) {
             userService.getCurrentUser().then(function (userData) {
-                $scope.model.config.startNodeId = userData.startMediaId;
+                $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
             });
         }
 
@@ -12,6 +13,7 @@ angular.module("umbraco")
             $scope.mediaPickerOverlay = {};
             $scope.mediaPickerOverlay.view = "mediapicker";
             $scope.mediaPickerOverlay.startNodeId = $scope.model.config && $scope.model.config.startNodeId ? $scope.model.config.startNodeId : undefined;
+            $scope.mediaPickerOverlay.startNodeIsVirtual = $scope.mediaPickerOverlay.startNodeId ? $scope.model.config.startNodeIsVirtual : undefined;
             $scope.mediaPickerOverlay.cropSize = $scope.control.editor.config && $scope.control.editor.config.size ? $scope.control.editor.config.size : undefined;
             $scope.mediaPickerOverlay.showDetails = true;
             $scope.mediaPickerOverlay.disableFolderSelect = true;
@@ -24,6 +26,7 @@ angular.module("umbraco")
                 $scope.control.value = {
                     focalPoint: selectedImage.focalPoint,
                     id: selectedImage.id,
+                    udi: selectedImage.udi,
                     image: selectedImage.image,
                     altText: selectedImage.altText
                 };

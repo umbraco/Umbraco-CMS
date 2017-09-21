@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 
@@ -15,7 +16,7 @@ namespace Umbraco.Web.HealthCheck
     public class HealthCheckResolver : LazyManyObjectsResolverBase<HealthCheckResolver, HealthCheck>, IHealthCheckResolver
     {
         public HealthCheckResolver(ILogger logger, Func<IEnumerable<Type>> lazyTypeList)
-            : base(new HealthCheckServiceProvider(), logger, lazyTypeList, ObjectLifetimeScope.HttpRequest)
+            : base(new HealthCheckServiceProvider(), logger, lazyTypeList, ObjectLifetimeScope.Application)
         {
         }
 
@@ -41,9 +42,13 @@ namespace Umbraco.Web.HealthCheck
                 var found = serviceType.GetConstructor(normalArgs);
                 if (found != null)
                 {
+                    var gotUmbracoContext = UmbracoContext.Current != null;
+                    var healthCheckContext = gotUmbracoContext
+                        ? new HealthCheckContext(new HttpContextWrapper(HttpContext.Current), UmbracoContext.Current)
+                        : new HealthCheckContext(ApplicationContext.Current);
                     return found.Invoke(new object[]
                     {
-                        new HealthCheckContext(new HttpContextWrapper(HttpContext.Current), UmbracoContext.Current)
+                        healthCheckContext
                     });
                 }
 

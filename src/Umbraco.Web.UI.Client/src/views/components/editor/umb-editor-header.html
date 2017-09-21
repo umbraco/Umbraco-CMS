@@ -5,13 +5,15 @@
         <div class="umb-panel-header-content">
 
             <div class="umb-panel-header-left-side" ng-class="{'-top-position': tabs || !icon && hideDescription}">
-
-               <div class="umb-panel-header-icon" ng-if="!hideIcon" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}" title="{{$parent.icon}}">
-                   <i class="icon {{$parent.icon}}"  ng-if="$parent.icon!=='' && $parent.icon!==null"></i>
-                   <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
-                       <localize key="settings_addIcon"></localize>
-                   </div>
-               </div>
+              
+              <ng-form name="iconForm">
+                 <div class="umb-panel-header-icon" ng-if="!hideIcon" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}" title="{{$parent.icon}}">
+                     <i class="icon {{$parent.icon}}"  ng-if="$parent.icon!=='' && $parent.icon!==null"></i>
+                     <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
+                         <localize key="settings_addIcon"></localize>
+                     </div>
+                 </div>
+              </ng-form>
 
                <div class="umb-panel-header-title-wrapper">
 

@@ -1,0 +1,469 @@
+<div ng-controller="Umbraco.Editors.Users.UserController as vm" class="clearfix">
+
+    <form name="editUserForm" novalidate val-form-manager>
+
+        <umb-editor-view>
+
+            <umb-editor-header
+                name="vm.user.name" 
+                hide-icon="true" 
+                hide-description="true" 
+                hide-alias="true">
+            </umb-editor-header>
+
+            <umb-editor-container>
+
+                <umb-load-indicator
+                    ng-if="vm.loading">
+                </umb-load-indicator>
+
+                <div ng-if="!vm.loading" class="umb-packages-view-wrapper" style="padding: 0;">
+
+                    <div class="umb-package-details">
+
+                        <div class="umb-package-details__main-content">
+                          
+                              <umb-box>
+                                 
+                                <umb-box-header title-key="user_profile"></umb-box-header>
+                                
+                                <umb-box-content class="block-form">
+
+                                    <umb-control-group label="@general_email" required="true">
+                                        <input 
+                                            type="email" 
+                                            localize="placeholder" 
+                                            placeholder="@placeholders_enteremail" 
+                                            class="input-block-level" 
+                                            ng-model="vm.user.email"
+                                            umb-auto-focus name="email" 
+                                            required 
+                                            val-server-field="Email" />
+                                        <span class="help-inline" val-msg-for="email" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
+                                        <span class="help-inline" val-msg-for="email" val-toggle-msg="valServerField"></span>
+                                    </umb-control-group>
+
+                                    <umb-control-group label="@general_username" ng-if="!vm.usernameIsEmail" required="true">
+                                        <input 
+                                            type="text" 
+                                            localize="placeholder" 
+                                            placeholder="@placeholders_enterusername" 
+                                            class="input-block-level" 
+                                            ng-model="vm.user.username"
+                                            umb-auto-focus name="username" 
+                                            required 
+                                            val-server-field="Username" />
+                                        <span class="help-inline" val-msg-for="username" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
+                                        <span class="help-inline" val-msg-for="username" val-toggle-msg="valServerField"></span>
+                                    </umb-control-group>
+
+                                    <umb-control-group label="@user_language" description="@user_languageHelp">
+                                        <select
+                                            class="input-block-level"
+                                            ng-model="vm.user.culture"
+                                            ng-options="key as value for (key, value) in vm.user.availableCultures"
+                                            name="culture"
+                                            required
+                                            val-server-field="Culture">
+                                        </select>
+                                        <span class="help-inline" val-msg-for="culture" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
+                                        <span class="help-inline" val-msg-for="culture" val-toggle-msg="valServerField"></span>
+                                    </umb-control-group>
+                                </umb-box-content> 
+                            </umb-box>
+
+                            <umb-box>
+                                <umb-box-header title-key="user_assignAccess"></umb-box-header>
+                                <umb-box-content class="block-form">
+
+                                    <umb-control-group style="margin-bottom: 25px;" label="@general_groups" description="@user_groupsHelp" required="true">
+
+                                        <umb-user-group-preview
+                                            ng-repeat="userGroup in vm.user.userGroups"
+                                            icon="userGroup.icon"
+                                            name="userGroup.name"
+                                            sections="userGroup.sections"
+                                            content-start-node="userGroup.contentStartNode"
+                                            media-start-node="userGroup.mediaStartNode"
+                                            allow-remove="!vm.user.isCurrentUser"
+                                            on-remove="vm.removeSelectedItem($index, vm.user.userGroups)">
+                                        </umb-user-group-preview>  
+
+                                        <a href=""
+                                            ng-if="!vm.user.isCurrentUser"
+                                            style="max-width: 100%;"
+                                            class="umb-node-preview-add"
+                                            ng-click="vm.openUserGroupPicker()"
+                                            prevent-default>
+                                            <localize key="general_add">Add</localize>
+                                        </a>
+
+                                    </umb-control-group>
+
+                                    <umb-control-group style="margin-bottom: 25px;" label="@user_startnodes" description="@user_startnodeshelp">
+
+                                        <umb-node-preview
+                                            style="max-width: 100%;"
+                                            ng-repeat="node in vm.user.startContentIds"
+                                            icon="node.icon"
+                                            name="node.name"
+                                            allow-remove="!vm.user.isCurrentUser"
+                                            on-remove="vm.removeSelectedItem($index, vm.user.startContentIds)">
+                                        </umb-node-preview>
+
+                                        <umb-node-preview
+                                            ng-if="vm.user.startContentIds.length === 0 && vm.user.isCurrentUser"
+                                            style="max-width: 100%;"
+                                            name="vm.labels.noStartNodes">
+                                        </umb-node-preview>
+
+                                        <a href=""
+                                            ng-if="!vm.user.isCurrentUser"
+                                            style="max-width: 100%;"
+                                            class="umb-node-preview-add"
+                                            ng-click="vm.openContentPicker()"
+                                            prevent-default>
+                                            <localize key="general_add">Add</localize>
+                                        </a>
+
+                                    </umb-control-group>
+
+                                    <umb-control-group label="@user_mediastartnodes" description="@user_mediastartnodeshelp">
+
+                                        <umb-node-preview
+                                            style="max-width: 100%;"
+                                            ng-repeat="node in vm.user.startMediaIds"
+                                            icon="node.icon"
+                                            name="node.name"
+                                            allow-remove="!vm.user.isCurrentUser"
+                                            on-remove="vm.removeSelectedItem($index, vm.user.startMediaIds)">
+                                        </umb-node-preview>
+
+                                        <umb-node-preview
+                                            ng-if="vm.user.startMediaIds.length === 0 && vm.user.isCurrentUser"
+                                            style="max-width: 100%;"
+                                            name="vm.labels.noStartNodes">
+                                        </umb-node-preview>
+
+                                        <a href=""
+                                            ng-if="!vm.user.isCurrentUser"
+                                            style="max-width: 100%;"
+                                            class="umb-node-preview-add"
+                                            ng-click="vm.openMediaPicker()"
+                                            prevent-default>
+                                            <localize key="general_add">Add</localize>
+                                        </a>
+
+                                    </umb-control-group>
+
+                                </umb-box-content>
+                            </umb-box>
+
+                            <umb-box>
+                                <umb-box-header title-key="user_access" description-key="user_accessHelp"></umb-box-header>
+                                <umb-box-content class="block-form" style="padding-bottom: 0;">
+
+                                    <umb-control-group label="@sections_content">
+                                        <umb-node-preview
+                                            style="max-width: 100%;"
+                                            ng-repeat="node in vm.user.calculatedStartContentIds"
+                                            icon="node.icon"
+                                            name="node.name">
+                                        </umb-node-preview>
+                                        <umb-node-preview
+                                            ng-if="vm.user.calculatedStartContentIds.length === 0"
+                                            style="max-width: 100%;"
+                                            name="vm.labels.noStartNodes">
+                                        </umb-node-preview>
+                                    </umb-control-group>
+
+                                    <umb-control-group label="@sections_media">
+                                        <umb-node-preview
+                                            style="max-width: 100%;"
+                                            ng-repeat="node in vm.user.calculatedStartMediaIds"
+                                            icon="node.icon"
+                                            name="node.name">
+                                        </umb-node-preview>
+                                        <umb-node-preview
+                                            ng-if="vm.user.calculatedStartMediaIds.length === 0"
+                                            style="max-width: 100%;"
+                                            name="vm.labels.noStartNodes">
+                                        </umb-node-preview>
+                                    </umb-control-group>
+
+                                </umb-box-content>
+                            </umb-box>
+                        </div>
+
+                        <div class="umb-package-details__sidebar">
+
+                            <div class="umb-package-details__section">
+
+                                <!-- Avatar -->
+                                <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #d8d7d9;">
+                                    <ng-form name="avatarForm" class="flex flex-column justify-center items-center">
+
+                                        <umb-avatar
+                                            style="margin-bottom: 15px;"
+                                            color="secondary"
+                                            size="xxl"
+                                            name="{{vm.user.name}}"
+                                            img-src="{{vm.user.avatars[3]}}"
+                                            img-srcset="{{vm.user.avatars[4]}} 2x, {{vm.user.avatars[4]}} 3x">
+                                        </umb-avatar>
+
+                                        <umb-progress-bar
+                                            style="max-width: 120px;"
+                                            ng-if="vm.avatarFile.uploadStatus === 'uploading'"
+                                            progress="{{ vm.avatarFile.uploadProgress }}"
+                                            size="s">
+                                        </umb-progress-bar>
+
+                                        <div class="flex items-center" ng-if="vm.avatarFile.uploadStatus !== 'uploading'">
+
+                                            <a href=""
+                                                class="umb-user-group-preview__action"
+                                                ngf-select ng-model="filesHolder"
+                                                ngf-change="changeAvatar($files, $event)"
+                                                ngf-multiple="false"
+                                                ngf-pattern="{{vm.acceptedFileTypes}}"
+                                                ngf-max-size="{{ vm.maxFileSize }}">
+                                                <localize key="user_changePhoto">Change photo</localize>
+                                            </a>
+
+                                            <a href=""
+                                                ng-if="vm.user.avatars"
+                                                class="umb-user-group-preview__action umb-user-group-preview__action--red"
+                                                ng-click="vm.clearAvatar()"
+                                                prevent-default>
+                                                <localize key="user_removePhoto">Remove photo</localize>
+                                            </a>
+
+                                        </div>
+
+                                    </ng-form>
+
+                                </div>
+
+                                <!-- Actions -->
+                                <div style="margin-bottom: 20px;">
+
+                                    <div style="margin-bottom: 10px;">
+                                        <umb-button
+                                            ng-if="vm.user.userDisplayState.key === 'Disabled' && !vm.user.isCurrentUser"
+                                            type="button"
+                                            button-style="[success,block]"
+                                            state="vm.enableUserButtonState"
+                                            action="vm.enableUser()"
+                                            label="Enable"
+                                            label-key="actions_enable"
+                                            size="s">
+                                        </umb-button>
+                                    </div>
+
+                                    <div style="margin-bottom: 10px;">
+                                        <umb-button
+                                            ng-if="vm.user.userDisplayState.key === 'LockedOut' && !vm.user.isCurrentUser"
+                                            type="button"
+                                            button-style="[success,block]"
+                                            state="vm.unlockUserButtonState"
+                                            action="vm.unlockUser()"
+                                            label="Unlock"
+                                            label-key="actions_unlock"
+                                            size="s">
+                                        </umb-button>
+                                    </div>
+
+                                    <div style="margin-bottom: 10px;">
+                                        <umb-button
+                                            ng-if="vm.user.userDisplayState.key !== 'Disabled' && !vm.user.isCurrentUser"
+                                            type="button"
+                                            button-style="[info,block]"
+                                            action="vm.disableUser()"
+                                            state="vm.disableUserButtonState"
+                                            label="Disable"
+                                            label-key="actions_disable"
+                                            size="s">
+                                        </umb-button>
+                                    </div>
+
+                                    <umb-button
+                                        type="button"
+                                        button-style="[info,block]"
+                                        action="vm.toggleChangePassword()"
+                                        label="Change password"
+                                        label-key="general_changePassword"
+                                        state="changePasswordButtonState"
+                                        ng-if="vm.changePasswordModel.isChanging === false"
+                                        size="s">
+                                    </umb-button>
+
+                                    <ng-form ng-if="vm.changePasswordModel.isChanging" name="passwordForm" class="block-form" val-form-manager>
+
+                                        <change-password
+                                            password-values="vm.user.changePassword"
+                                            config="vm.changePasswordModel.config">
+                                        </change-password>
+
+                                        <umb-button
+                                            type="button"
+                                            action="vm.toggleChangePassword()"
+                                            label="Cancel"
+                                            label-key="general_cancel"
+                                            button-style="cancel">
+                                        </umb-button>
+
+                                    </ng-form>
+
+                                    <div ng-if="vm.user.resetPasswordValue">
+                                        <p><br />Password reset to value: <strong>{{vm.user.resetPasswordValue}}</strong></p>
+                                    </div>
+
+                                </div>
+
+                                <!-- User stats -->
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">
+                                        <localize key="general_status">Status</localize>:
+                                    </div>
+                                    <div class="umb-package-details__information-item-content">
+                                        <umb-badge style="margin-top: 4px;" size="s" color="{{vm.user.userDisplayState.color}}">
+                                            {{vm.user.userDisplayState.name}}
+                                        </umb-badge>
+                                    </div>
+                                </div>
+
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">
+                                        <localize key="user_lastLogin">Last login</localize>:
+                                    </div>
+                                    <div class="umb-package-details__information-item-content">
+                                        <span ng-if="vm.user.lastLoginDate">{{ vm.user.formattedLastLogin }}</span>
+                                        <span ng-if="!vm.user.lastLoginDate">{{ vm.user.name | umbWordLimit:1 }} <localize key="user_noLogin">has not logged in yet</localize></span>
+                                    </div>
+                                </div>
+
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">
+                                        <localize key="user_failedPasswordAttempts">Failed login attempts</localize>:
+                                    </div>
+                                    <div class="umb-package-details__information-item-content">
+                                        {{ vm.user.failedPasswordAttempts }}
+                                    </div>
+                                </div>
+
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">
+                                        <localize key="user_lastLockoutDate">Last lockout date</localize>:
+                                    </div>
+                                    <div class="umb-package-details__information-item-content">
+                                        <span ng-if="vm.user.lastLockoutDate === '0001-01-01T00:00:00'">
+                                            {{ vm.user.name | umbWordLimit:1 }} <localize key="user_noLockouts">hasn't been locked out</localize>
+                                        </span>
+                                        <span ng-if="vm.user.lastLockoutDate !== '0001-01-01T00:00:00'">{{ vm.user.formattedLastLockoutDate }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">
+                                        <localize key="user_lastPasswordChangeDate">Password is last changed</localize>:
+                                    </div>
+                                    <div class="umb-package-details__information-item-content">
+                                        <span ng-if="vm.user.lastPasswordChangeDate === '0001-01-01T00:00:00'">
+                                            <localize key="user_noPasswordChange">The password hasn't been changed</localize>
+                                        </span>
+                                        <span ng-if="vm.user.lastPasswordChangeDate !== '0001-01-01T00:00:00'">{{ vm.user.formattedLastPasswordChangeDate }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">
+                                        <localize key="user_createDate">User is created</localize>:
+                                    </div>
+                                    <div class="umb-package-details__information-item-content">
+                                        {{ vm.user.formattedCreateDate }}
+                                    </div>
+                                </div>
+
+                                <div class="umb-package-details__information-item">
+                                    <div class="umb-package-details__information-item-label">
+                                        <localize key="user_updateDate">User is last updated</localize>:
+                                    </div>
+                                    <div class="umb-package-details__information-item-content">
+                                        {{ vm.user.formattedUpdateDate }}
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </umb-editor-container>
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-left>
+
+                    <umb-breadcrumbs
+                        ancestors="vm.breadcrumbs"
+                        allow-on-open="true"
+                        on-open="vm.goToPage(ancestor)">
+                    </umb-breadcrumbs>
+
+                </umb-editor-footer-content-left>
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button
+                        type="button"
+                        action="vm.goToPage(vm.breadcrumbs[0])"
+                        label="Return to list"
+                        label-key="buttons_returnToList"
+                        disabled="vm.loading">
+                    </umb-button>
+
+                    <umb-button
+                        type="button"
+                        action="vm.save()"
+                        state="vm.page.saveButtonState"
+                        button-style="success"
+                        shortcut="ctrl+s"
+                        label="Save"
+                        label-key="buttons_save"
+                        disabled="vm.loading">
+                    </umb-button>
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+    </form>
+
+    <umb-overlay
+        ng-if="vm.userGroupPicker.show"
+        model="vm.userGroupPicker"
+        view="vm.userGroupPicker.view"
+        position="right">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.contentPicker.show"
+        model="vm.contentPicker"
+        view="vm.contentPicker.view"
+        position="right">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.mediaPicker.show"
+        model="vm.mediaPicker"
+        view="vm.mediaPicker.view"
+        position="right">
+    </umb-overlay>
+
+</div>

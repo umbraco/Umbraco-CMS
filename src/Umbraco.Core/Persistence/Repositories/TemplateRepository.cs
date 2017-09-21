@@ -126,7 +126,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var list = new List<string>
                            {
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
-                               "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @Id",
                                "UPDATE cmsDocument SET templateId = NULL WHERE templateId = @Id",
                                "DELETE FROM cmsDocumentType WHERE templateNodeId = @Id",
                                "DELETE FROM cmsTemplate WHERE nodeId = @Id",

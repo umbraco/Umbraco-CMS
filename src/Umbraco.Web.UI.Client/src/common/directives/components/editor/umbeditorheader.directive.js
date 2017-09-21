@@ -225,8 +225,8 @@ Use this directive to construct a header inside the main editor window.
                                 scope.icon = model.icon;
                             }
 
-                            // set form to dirty
-                            ctrl.$setDirty();
+                            // set the icon form to dirty
+                            scope.iconForm.$setDirty();
                         }
 
                         scope.dialogModel.show = false;
@@ -237,7 +237,6 @@ Use this directive to construct a header inside the main editor window.
         }
 
         var directive = {
-            require: '^form',
             transclude: true,
             restrict: 'E',
             replace: true,

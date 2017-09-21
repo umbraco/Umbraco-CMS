@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
                     return null;
                 localContext.Delete.Table(umbracoRedirectUrlTableName);
             }
-
+            
             localContext.Create.Table(umbracoRedirectUrlTableName)
                 .WithColumn("id").AsGuid().NotNullable().PrimaryKey("PK_" + umbracoRedirectUrlTableName)
                 .WithColumn("createDateUtc").AsDateTime().NotNullable()

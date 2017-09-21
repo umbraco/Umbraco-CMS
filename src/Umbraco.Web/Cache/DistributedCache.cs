@@ -33,8 +33,8 @@ namespace Umbraco.Web.Cache
         public const string MediaCacheRefresherId = "B29286DD-2D40-4DDB-B325-681226589FEC";
         public const string MacroCacheRefresherId = "7B1E683C-5F34-43dd-803D-9699EA1E98CA";
         public const string UserCacheRefresherId = "E057AF6D-2EE6-41F4-8045-3694010F0AA6";
-        public const string UserPermissionsCacheRefresherId = "840AB9C5-5C0B-48DB-A77E-29FE4B80CD3A";
-        public const string UserTypeCacheRefresherId = "7E707E21-0195-4522-9A3C-658CC1761BD4";
+        public const string UserGroupCacheRefresherId = "45178038-B232-4FE8-AA1A-F2B949C44762";
+        public const string UserGroupPermissionsCacheRefresherId = "840AB9C5-5C0B-48DB-A77E-29FE4B80CD3A";
         public const string ContentTypeCacheRefresherId = "6902E22C-9C10-483C-91F3-66B7CAE9E2F5";
         public const string LanguageCacheRefresherId = "3E0F95D8-0BE5-44B8-8394-2B8750B62654";
         public const string DomainCacheRefresherId = "11290A79-4B57-4C99-AD72-7748A3CF38AF";
@@ -58,8 +58,8 @@ namespace Umbraco.Web.Cache
         public static readonly Guid MediaCacheRefresherGuid = new Guid(MediaCacheRefresherId);
         public static readonly Guid MacroCacheRefresherGuid = new Guid(MacroCacheRefresherId);
         public static readonly Guid UserCacheRefresherGuid = new Guid(UserCacheRefresherId);
-        public static readonly Guid UserPermissionsCacheRefresherGuid = new Guid(UserPermissionsCacheRefresherId);
-        public static readonly Guid UserTypeCacheRefresherGuid = new Guid(UserTypeCacheRefresherId);
+        public static readonly Guid UserGroupCacheRefresherGuid = new Guid(UserGroupCacheRefresherId);
+        public static readonly Guid UserGroupPermissionsCacheRefresherGuid = new Guid(UserGroupPermissionsCacheRefresherId);
         public static readonly Guid ContentTypeCacheRefresherGuid = new Guid(ContentTypeCacheRefresherId);
         public static readonly Guid LanguageCacheRefresherGuid = new Guid(LanguageCacheRefresherId);
         public static readonly Guid DomainCacheRefresherGuid = new Guid(DomainCacheRefresherId);

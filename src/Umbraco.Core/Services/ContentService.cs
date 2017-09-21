@@ -30,7 +30,6 @@ namespace Umbraco.Core.Services
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
-        private readonly IdkMap _idkMap;
 
         //Support recursive locks because some of the methods that require locking call other methods that require locking.
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
@@ -42,8 +41,7 @@ namespace Umbraco.Core.Services
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
             IDataTypeService dataTypeService,
-            IUserService userService,
-            IdkMap idkMap)
+            IUserService userService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
@@ -51,7 +49,6 @@ namespace Umbraco.Core.Services
             _publishingStrategy = new PublishingStrategy(UowProvider.ScopeProvider, eventMessagesFactory, logger);
             _dataTypeService = dataTypeService;
             _userService = userService;
-            _idkMap = idkMap;
         }
 
         #region Static Queries
@@ -112,33 +109,53 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Assigns a single permission to the current content item for the specified user ids
+        /// Assigns a single permission to the current content item for the specified group ids
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="permission"></param>
-        /// <param name="userIds"></param>
-        public void AssignContentPermission(IContent entity, char permission, IEnumerable<int> userIds)
+        /// <param name="groupIds"></param>
+        public void AssignContentPermission(IContent entity, char permission, IEnumerable<int> groupIds)
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateContentRepository(uow);
-                repository.AssignEntityPermission(entity, permission, userIds);
+                repository.AssignEntityPermission(entity, permission, groupIds);
                 uow.Commit();
             }
         }
 
         /// <summary>
-        /// Gets the list of permissions for the content item
+        /// Returns implicit/inherited permissions assigned to the content item for all user groups
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public IEnumerable<EntityPermission> GetPermissionsForEntity(IContent content)
+        public EntityPermissionCollection GetPermissionsForEntity(IContent content)
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateContentRepository(uow);
                 return repository.GetPermissionsForEntity(content.Id);
             }
+        }
+
+        /// <summary>
+        /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content should based on.
+        /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IContent without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new content objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
+        /// <param name="name">Name of the Content object</param>
+        /// <param name="parentId">Id of Parent for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
+        public IContent CreateContent(string name, Guid parentId, string contentTypeAlias, int userId = 0)
+        {
+            var parent = GetById(parentId);
+            return CreateContent(name, parent, contentTypeAlias, userId);
         }
 
         /// <summary>
@@ -177,7 +194,6 @@ namespace Umbraco.Core.Services
                 newEventArgs.CanCancel = false;
                 uow.Events.Dispatch(Created, this, newEventArgs);
 
-                Audit(uow, AuditType.New, string.Format("Content '{0}' was created", name), content.CreatorId, content.Id);
                 uow.Commit();
             }
 
@@ -221,7 +237,6 @@ namespace Umbraco.Core.Services
                 newEventArgs.CanCancel = false;
                 uow.Events.Dispatch(Created, this, newEventArgs);
 
-                Audit(uow, AuditType.New, string.Format("Content '{0}' was created", name), content.CreatorId, content.Id);
                 uow.Commit();
             }
 
@@ -259,7 +274,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var saveEventArgs = new SaveEventArgs<IContent>(content);
-                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 {
                     uow.Commit();
                     content.WasCancelled = true;
@@ -273,7 +288,7 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(content);
                 repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                 saveEventArgs.CanCancel = false;
-                uow.Events.Dispatch(Saved, this, saveEventArgs);
+                uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                 newEventArgs.CanCancel = false;
                 uow.Events.Dispatch(Created, this, newEventArgs);
 
@@ -317,7 +332,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var saveEventArgs = new SaveEventArgs<IContent>(content);
-                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 {
                     uow.Commit();
                     content.WasCancelled = true;
@@ -331,7 +346,7 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(content);
                 repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                 saveEventArgs.CanCancel = false;
-                uow.Events.Dispatch(Saved, this, saveEventArgs);
+                uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                 newEventArgs.CanCancel = false;
                 uow.Events.Dispatch(Created, this, newEventArgs);
 
@@ -357,7 +372,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets an <see cref="IContent"/> object by Id
+        /// Gets <see cref="IContent"/> objects by Ids
         /// </summary>
         /// <param name="ids">Ids of the Content to retrieve</param>
         /// <returns><see cref="IContent"/></returns>
@@ -385,19 +400,45 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets <see cref="IContent"/> objects by Ids
+        /// </summary>
+        /// <param name="ids">Ids of the Content to retrieve</param>
+        /// <returns><see cref="IContent"/></returns>
+        public IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids)
+        {
+            var idsArray = ids.ToArray();
+            if (idsArray.Length == 0) return Enumerable.Empty<IContent>();
+
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentRepository(uow);
+
+                // ensure that the result has the order based on the ids passed in
+                var result = repository.GetAll(idsArray);
+                var content = result.ToDictionary(x => x.Key, x => x);
+
+                var sortedResult = idsArray.Select(x =>
+                {
+                    IContent c;
+                    return content.TryGetValue(x, out c) ? c : null;
+                }).WhereNotNull();
+
+                return sortedResult;
+            }
+        }
+
+        /// <summary>
         /// Gets an <see cref="IContent"/> object by its 'UniqueId'
         /// </summary>
         /// <param name="key">Guid key of the Content to retrieve</param>
         /// <returns><see cref="IContent"/></returns>
         public IContent GetById(Guid key)
         {
-            // the repository implements a cache policy on int identifiers, not guids,
-            // and we are not changing it now, but we still would like to rely on caching
-            // instead of running a full query against the database, so relying on the
-            // id-key map, which is fast.
-
-            var a = _idkMap.GetIdForKey(key, UmbracoObjectTypes.Document);
-            return a.Success ? GetById(a.Result) : null;
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentRepository(uow);
+                return repository.Get(key);
+            }
         }
 
         /// <summary>
@@ -643,7 +684,17 @@ namespace Umbraco.Core.Services
                 // get query - if the id is System Root, then just get all
                 var query = Query<IContent>.Builder;
                 if (id != Constants.System.Root)
-                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
+                {
+                    var entityRepository = RepositoryFactory.CreateEntityRepository(uow);
+                    var contentPath = entityRepository.GetAllPaths(Constants.ObjectTypes.DocumentGuid, id).ToArray();
+                    if (contentPath.Length == 0)
+                    {
+                        totalChildren = 0;
+                        return Enumerable.Empty<IContent>();
+                    }
+                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", contentPath[0]), TextColumnType.NVarchar));
+                }
+                    
 
                 // get filter
                 IQuery<IContent> filterQuery = null;
@@ -678,7 +729,16 @@ namespace Umbraco.Core.Services
                 // get query - if the id is System Root, then just get all
                 var query = Query<IContent>.Builder;
                 if (id != Constants.System.Root)
-                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
+                {
+                    var entityRepository = RepositoryFactory.CreateEntityRepository(uow);
+                    var contentPath = entityRepository.GetAllPaths(Constants.ObjectTypes.DocumentGuid, id).ToArray();
+                    if (contentPath.Length == 0)
+                    {
+                        totalChildren = 0;
+                        return Enumerable.Empty<IContent>();
+                    }
+                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", contentPath[0]), TextColumnType.NVarchar));
+                }
 
                 return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
             }
@@ -1196,6 +1256,95 @@ namespace Umbraco.Core.Services
             return ((IContentServiceOperations)this).SaveAndPublish(content, userId, raiseEvents);
         }
 
+        public IContent GetBlueprintById(int id)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
+                var blueprint = repository.Get(id);
+                if (blueprint != null)
+                    ((Content) blueprint).IsBlueprint = true;
+                return blueprint;
+            }
+        }
+
+        public IContent GetBlueprintById(Guid id)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
+                var blueprint = repository.Get(id);
+                if (blueprint != null)
+                    ((Content)blueprint).IsBlueprint = true;
+                return blueprint;
+            }
+        }
+
+        public void SaveBlueprint(IContent content, int userId = 0)
+        {
+            //always ensure the blueprint is at the root
+            if (content.ParentId != -1)
+                content.ParentId = -1;
+
+            ((Content) content).IsBlueprint = true;
+
+            using (new WriteLock(Locker))
+            {
+                using (var uow = UowProvider.GetUnitOfWork())
+                {
+                    if (string.IsNullOrWhiteSpace(content.Name))
+                    {
+                        throw new ArgumentException("Cannot save content blueprint with empty name.");
+                    }
+
+                    var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
+
+                    if (content.HasIdentity == false)
+                    {
+                        content.CreatorId = userId;
+                    }
+                    content.WriterId = userId;
+
+                    repository.AddOrUpdate(content);
+
+                    uow.Events.Dispatch(SavedBlueprint, this, new SaveEventArgs<IContent>(content), "SavedBlueprint");
+
+                    uow.Commit();
+                }
+            }
+        }
+
+        public void DeleteBlueprint(IContent content, int userId = 0)
+        {
+            using (new WriteLock(Locker))
+            {
+                using (var uow = UowProvider.GetUnitOfWork())
+                {
+                    var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
+                    repository.Delete(content);
+                    uow.Events.Dispatch(DeletedBlueprint, this, new DeleteEventArgs<IContent>(content), "DeletedBlueprint");
+                    uow.Commit();
+                }
+            }
+        }
+
+        public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = 0)
+        {
+            if (blueprint == null) throw new ArgumentNullException("blueprint");
+
+            var contentType = blueprint.ContentType;
+            var content = new Content(name, -1, contentType);
+            content.Path = string.Concat(content.ParentId.ToString(), ",", content.Id);
+
+            content.CreatorId = userId;
+            content.WriterId = userId;
+
+            foreach (var property in blueprint.Properties)
+                content.SetValue(property.Alias, property.Value);
+
+            return content;
+        }
+
         /// <summary>
         /// Saves a single <see cref="IContent"/> object
         /// </summary>
@@ -1222,7 +1371,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var saveEventArgs = new SaveEventArgs<IContent>(asArray, evtMsgs);
-                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 {
                     uow.Commit();
                     return OperationStatus.Cancelled(evtMsgs);
@@ -1265,7 +1414,7 @@ namespace Umbraco.Core.Services
                 if (raiseEvents)
                 {
                     saveEventArgs.CanCancel = false;
-                    uow.Events.Dispatch(Saved, this, saveEventArgs);
+                    uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                 }
 
                 Audit(uow, AuditType.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, Constants.System.Root);
@@ -1565,7 +1714,7 @@ namespace Umbraco.Core.Services
         {
             using (new WriteLock(Locker))
             {
-                var nodeObjectType = new Guid(Constants.ObjectTypes.Document);
+                var nodeObjectType = Constants.ObjectTypes.DocumentGuid;
 
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
@@ -1649,8 +1798,20 @@ namespace Umbraco.Core.Services
                     copy.CreatorId = userId;
                     copy.WriterId = userId;
 
+                    //get the current permissions, if there are any explicit ones they need to be copied
+                    var currentPermissions = GetPermissionsForEntity(content);
+                    currentPermissions.RemoveWhere(p => p.IsDefaultPermissions);
+
                     repository.AddOrUpdate(copy);
                     repository.AddOrUpdatePreviewXml(copy, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+
+                    //add permissions
+                    if (currentPermissions.Count > 0)
+                    {
+                        var permissionSet = new ContentPermissionSet(copy, currentPermissions);
+                        repository.AddOrUpdatePermissions(permissionSet);
+                    }
+
                     uow.Commit(); // todo - this should flush, not commit
 
                     //Special case for the associated tags
@@ -1784,7 +1945,7 @@ namespace Umbraco.Core.Services
                 {
                     var asArray = items.ToArray();
                     var saveEventArgs = new SaveEventArgs<IContent>(asArray);
-                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                     {
                         uow.Commit();
                         return false;
@@ -1831,7 +1992,7 @@ namespace Umbraco.Core.Services
                     if (raiseEvents)
                     {
                         saveEventArgs.CanCancel = false;
-                        uow.Events.Dispatch(Saved, this, saveEventArgs);
+                        uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                     }
 
                     if (shouldBePublished.Any())
@@ -1846,6 +2007,25 @@ namespace Umbraco.Core.Services
             }
 
             return true;
+        }
+
+        public IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] documentTypeIds)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
+
+                var query = new Query<IContent>();
+                if (documentTypeIds.Length > 0)
+                {
+                    query.Where(x => documentTypeIds.Contains(x.ContentTypeId));
+                }
+                return repository.GetByQuery(query).Select(x =>
+                {
+                    ((Content) x).IsBlueprint = true;
+                    return x;
+                });
+            }
         }
 
         /// <summary>
@@ -2197,7 +2377,7 @@ namespace Umbraco.Core.Services
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
                     var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
-                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                     {
                         uow.Commit();
                         return Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent, evtMsgs));
@@ -2254,7 +2434,7 @@ namespace Umbraco.Core.Services
                     if (raiseEvents)
                     {
                         saveEventArgs.CanCancel = false;
-                        uow.Events.Dispatch(Saved, this, saveEventArgs);
+                        uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                     }
 
                     //Save xml to db and call following method to fire event through PublishingStrategy to update cache
@@ -2295,7 +2475,7 @@ namespace Umbraco.Core.Services
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
                     var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
-                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                     {
                         uow.Commit();
                         return OperationStatus.Cancelled(evtMsgs);
@@ -2326,7 +2506,7 @@ namespace Umbraco.Core.Services
                     if (raiseEvents)
                     {
                         saveEventArgs.CanCancel = false;
-                        uow.Events.Dispatch(Saved, this, saveEventArgs);
+                        uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                     }
 
                     Audit(uow, AuditType.Save, "Save Content performed by user", userId, content.Id);
@@ -2556,6 +2736,17 @@ namespace Umbraco.Core.Services
         /// Occurs after the Recycle Bin has been Emptied
         /// </summary>
         public static event TypedEventHandler<IContentService, RecycleBinEventArgs> EmptiedRecycleBin;
+
+        /// <summary>
+        /// Occurs after a blueprint has been saved.
+        /// </summary>
+        public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> SavedBlueprint;
+
+        /// <summary>
+        /// Occurs after a blueprint has been deleted.
+        /// </summary>
+        public static event TypedEventHandler<IContentService, DeleteEventArgs<IContent>> DeletedBlueprint;
+
         #endregion
     }
 }

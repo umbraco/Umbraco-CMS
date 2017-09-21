@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Configuration;
 using System.Linq;
 
@@ -183,6 +184,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return Providers; }
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This is no longer used and will be removed in future versions")]
         IHelpSection IUmbracoSettingsSection.Help
         {
             get { return Help; }

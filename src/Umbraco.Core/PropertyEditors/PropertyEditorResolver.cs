@@ -42,7 +42,16 @@ namespace Umbraco.Core.PropertyEditors
         internal PropertyEditorResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ManifestBuilder builder)
             : base(serviceProvider, logger, typeListProducerList, ObjectLifetimeScope.Application)
         {
-            _unioned = new Lazy<List<PropertyEditor>>(() => Values.Union(builder.PropertyEditors).ToList());
+            _unioned = new Lazy<List<PropertyEditor>>(() => SanitizeNames(Values.Union(builder.PropertyEditors).ToList()));
+        }
+
+        private static List<PropertyEditor> SanitizeNames(List<PropertyEditor> editors)
+        {
+            var nestedContentEditorFromPackage = editors.FirstOrDefault(x => x.Alias == "Our.Umbraco.NestedContent");
+            if (nestedContentEditorFromPackage != null)
+                nestedContentEditorFromPackage.Name = "(Obsolete) " + nestedContentEditorFromPackage.Name;
+            return editors;
+
         }
 
         private readonly Lazy<List<PropertyEditor>> _unioned;

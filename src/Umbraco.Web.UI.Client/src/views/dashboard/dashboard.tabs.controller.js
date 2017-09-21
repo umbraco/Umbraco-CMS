@@ -278,8 +278,8 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, $location, co
 
         currentUser = user;
 
-        // check if the user start node is the dashboard
-        if(currentUser.startMediaId === -1) {
+        // check if the user has access to the root which they will require to see this dashboard
+        if (currentUser.startMediaIds.indexOf(-1) >= 0) {
 
             //get the system media listview
             contentTypeResource.getPropertyTypeScaffold(-96)
@@ -303,9 +303,9 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, $location, co
 
             });
 
-        } else {
+        } else if (currentUser.startMediaIds.length > 0){
             // redirect to start node
-            $location.path("/media/media/edit/" + currentUser.startMediaId);
+            $location.path("/media/media/edit/" + (currentUser.startMediaIds.length === 0 ? -1 : currentUser.startMediaIds[0]));
         }
 
     });

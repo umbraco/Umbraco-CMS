@@ -44,19 +44,54 @@ namespace Umbraco.Web.Security.Providers
             return entity.AsConcreteMembershipUser(Name, true);
         }
 
+        private bool _allowManuallyChangingPassword = false;
+        private bool _enablePasswordReset = false;
+
+        /// <summary>
+        /// Indicates whether the membership provider is configured to allow users to reset their passwords.
+        /// </summary>
+        /// <value></value>
+        /// <returns>true if the membership provider supports password reset; otherwise, false. The default is FALSE for users.</returns>
+        public override bool EnablePasswordReset
+        {
+            get { return _enablePasswordReset; }
+        }
+
+        /// <summary>
+        /// For backwards compatibility, this provider supports this option by default it is FALSE for users
+        /// </summary>
+        public override bool AllowManuallyChangingPassword
+        {
+            get { return _allowManuallyChangingPassword; }
+        }
+
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
             base.Initialize(name, config);
 
+            if (config == null) { throw new ArgumentNullException("config"); }
+            
+            _allowManuallyChangingPassword = config.GetValue("allowManuallyChangingPassword", false);
+            _enablePasswordReset = config.GetValue("enablePasswordReset", false);
+
             // test for membertype (if not specified, choose the first member type available)
+            // We'll support both names for legacy reasons: defaultUserTypeAlias & defaultUserGroupAlias
+
             if (config["defaultUserTypeAlias"] != null)
             {
-                _defaultMemberTypeAlias = config["defaultUserTypeAlias"];
-                if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
+                if (config["defaultUserTypeAlias"].IsNullOrWhiteSpace() == false)
                 {
-                    throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
+                    _defaultMemberTypeAlias = config["defaultUserTypeAlias"];
+                    _hasDefaultMember = true;
                 }
-                _hasDefaultMember = true;
+            }
+            if (_hasDefaultMember == false && config["defaultUserGroupAlias"] != null)
+            {                
+                if (config["defaultUserGroupAlias"].IsNullOrWhiteSpace() == false)
+                {
+                    _defaultMemberTypeAlias = config["defaultUserGroupAlias"];
+                    _hasDefaultMember = true;
+                }
             }
         }
 
@@ -73,7 +108,7 @@ namespace Umbraco.Web.Security.Providers
                             _defaultMemberTypeAlias = MemberService.GetDefaultMemberType();
                             if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
                             {
-                                throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
+                                throw new ProviderException("No default user group alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
                             }
                             _hasDefaultMember = true;
                         }
@@ -82,7 +117,7 @@ namespace Umbraco.Web.Security.Providers
                 return _defaultMemberTypeAlias;
             }
         }
-
+        
         /// <summary>
         /// Overridden in order to call the BackOfficeUserManager.UnlockUser method in order to raise the user audit events
         /// </summary>

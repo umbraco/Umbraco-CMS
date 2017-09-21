@@ -1,12 +1,15 @@
 ﻿using System;
 using umbraco.interfaces;
 using umbraco.BasePages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.BusinessLogic.Actions
 {
     /// <summary>
     /// This action is invoked when the document type of a piece of content is changed
     /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.AdministrationCategory)]
     public class ActionChangeDocType : IAction
     {
         //create singleton
@@ -90,5 +93,6 @@ namespace umbraco.BusinessLogic.Actions
             }
         }
         #endregion
+        
     }
 }

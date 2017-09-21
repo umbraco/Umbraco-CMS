@@ -32,17 +32,13 @@
     <key alias="republish">Genudgiv hele sitet</key>
     <key alias="restore" version="7.3.0">Gendan</key>
     <key alias="SetPermissionsForThePage">Sæt rettigheder for siden %0%</key>
-     <key alias="chooseWhereToMove">Hvor vil du flytte</key>
-    <key alias="toInTheTreeStructureBelow">hen til i træstrukturen?</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
     <key alias="sendtopublish">Send til udgivelse</key>
     <key alias="sendToTranslate">Send til oversættelse</key>
     <key alias="sort">Sortér</key>
-    <key alias="toPublish">Send til udgivelse</key>
     <key alias="translate">Oversæt</key>
     <key alias="update">Opdatér</key>
-    <key alias="defaultValue">Standard værdi</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Tilladelse nægtet.</key>
@@ -579,7 +575,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<p><strong>Normalbrugeren er blevet gjort utjenstdygtig eller har ikke adgang til Umbraco!</strong></p><p>Du behøver ikke foretage yderligere handlinger. Tryk på <strong>Næste</strong> for at fortsætte.</p>]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<p><strong>Normalbrugerens adgangskode er på succesfuld vis blevet ændret siden installationen!</strong></p><p>Du behøver ikke foretage yderligere handlinger. Tryk på <strong>Næste</strong> for at fortsætte.</p>]]></key>
     <key alias="defaultUserPasswordChanged">Adgangskoden er blevet ændret!</key>
-    <key alias="defaultUserText"><![CDATA[<p>Umbraco opretter en normalbruger med et login <strong>('admin')</strong> og en adgangskode <strong>('default')</strong>.</p> Det er <strong>vigtigt</strong> at adgangskoden bliver ændret til noget unikt.</p><p>Dette skridt vil kontrollere normalbrugerens adgangskode og foreslå om det er nødt til at blive ændret.</p>]]></key>
     <key alias="greatStart">Få en fremragende start, se vores videoer</key>
     <key alias="licenseText">Ved at klikke på næste knappen (eller ved at ændre UmbracoConfigurationStatus i web.config filen), accepterer du licensaftalen for denne software, som specificeret i boksen nedenfor. Bemærk venligst at denne Umbraco distribution består af to forskellige licenser, MIT's Open Source Licens for frameworket og Umbraco Freeware Licensen som dækker UI'en.</key>
     <key alias="None">Endnu ikke installeret</key>
@@ -1269,8 +1264,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="startnode">Start node</key>
     <key alias="username">Navn</key>
     <key alias="userPermissions">Brugertilladelser</key>
-    <key alias="usertype">Brugertype</key>
-    <key alias="userTypes">Brugertyper</key>
     <key alias="writer">Forfatter</key>
     <key alias="translator">Oversætter</key>
     <key alias="change">Skift</key>

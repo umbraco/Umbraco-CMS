@@ -41,25 +41,6 @@ namespace Umbraco.Web.Cache
 
         #endregion
 
-        #region User type cache
-
-        public static void RemoveUserTypeCache(this DistributedCache dc, int userTypeId)
-        {
-            dc.Remove(DistributedCache.UserTypeCacheRefresherGuid, userTypeId);
-        }
-
-        public static void RefreshUserTypeCache(this DistributedCache dc, int userTypeId)
-        {
-            dc.Refresh(DistributedCache.UserTypeCacheRefresherGuid, userTypeId);
-        }
-
-        public static void RefreshAllUserTypeCache(this DistributedCache dc)
-        {
-            dc.RefreshAll(DistributedCache.UserTypeCacheRefresherGuid);
-        }
-
-        #endregion
-
         #region User cache
 
         public static void RemoveUserCache(this DistributedCache dc, int userId)
@@ -75,25 +56,45 @@ namespace Umbraco.Web.Cache
         public static void RefreshAllUserCache(this DistributedCache dc)
         {
             dc.RefreshAll(DistributedCache.UserCacheRefresherGuid);
-        } 
+        }
 
         #endregion
 
-        #region User permissions cache
+        #region User group cache
 
-        public static void RemoveUserPermissionsCache(this DistributedCache dc, int userId)
+        public static void RemoveUserGroupCache(this DistributedCache dc, int userId)
         {
-            dc.Remove(DistributedCache.UserPermissionsCacheRefresherGuid, userId);
+            dc.Remove(DistributedCache.UserGroupCacheRefresherGuid, userId);
         }
 
-        public static void RefreshUserPermissionsCache(this DistributedCache dc, int userId)
+        public static void RefreshUserGroupCache(this DistributedCache dc, int userId)
         {
-            dc.Refresh(DistributedCache.UserPermissionsCacheRefresherGuid, userId);
+            dc.Refresh(DistributedCache.UserGroupCacheRefresherGuid, userId);
         }
 
-        public static void RefreshAllUserPermissionsCache(this DistributedCache dc)
+        public static void RefreshAllUserGroupCache(this DistributedCache dc)
         {
-            dc.RefreshAll(DistributedCache.UserPermissionsCacheRefresherGuid);
+            dc.RefreshAll(DistributedCache.UserGroupCacheRefresherGuid);
+        }
+
+        #endregion
+
+        #region User group permissions cache
+
+        public static void RemoveUserGroupPermissionsCache(this DistributedCache dc, int groupId)
+        {
+            dc.Remove(DistributedCache.UserGroupPermissionsCacheRefresherGuid, groupId);
+        }
+
+        public static void RefreshUserGroupPermissionsCache(this DistributedCache dc, int groupId)
+        {
+            //TODO: Not sure if we need this yet depends if we start caching permissions
+            //dc.Refresh(DistributedCache.UserGroupPermissionsCacheRefresherGuid, groupId);
+        }
+
+        public static void RefreshAllUserGroupPermissionsCache(this DistributedCache dc)
+        {
+            dc.RefreshAll(DistributedCache.UserGroupPermissionsCacheRefresherGuid);
         }
 
         #endregion

@@ -26,6 +26,7 @@ namespace Umbraco.Core
 
                     { AnyGuid, UdiType.GuidUdi },
                     { Document, UdiType.GuidUdi },
+                    { DocumentBluePrint, UdiType.GuidUdi },
                     { Media, UdiType.GuidUdi },
                     { Member, UdiType.GuidUdi },
                     { DictionaryItem, UdiType.GuidUdi },
@@ -33,6 +34,7 @@ namespace Umbraco.Core
                     { Template, UdiType.GuidUdi },
                     { DocumentType, UdiType.GuidUdi },
                     { DocumentTypeContainer, UdiType.GuidUdi },
+                    { DocumentTypeBluePrints, UdiType.GuidUdi },
                     { MediaType, UdiType.GuidUdi },
                     { MediaTypeContainer, UdiType.GuidUdi },
                     { DataType, UdiType.GuidUdi },
@@ -65,6 +67,9 @@ namespace Umbraco.Core
             public const string AnyGuid = "any-guid"; // that one is for tests
 
             public const string Document = "document";
+
+            public const string DocumentBluePrint = "document-blueprint";
+
             public const string Media = "media";
             public const string Member = "member";
 
@@ -74,6 +79,8 @@ namespace Umbraco.Core
 
             public const string DocumentType = "document-type";
             public const string DocumentTypeContainer = "document-type-container";
+
+            public const string DocumentTypeBluePrints = "document-type-blueprints";
             public const string MediaType = "media-type";
             public const string MediaTypeContainer = "media-type-container";
             public const string DataType = "data-type";

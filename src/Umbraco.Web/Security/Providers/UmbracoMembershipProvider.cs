@@ -2,7 +2,6 @@
 using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Web;
 using System.Web.Configuration;
@@ -10,14 +9,11 @@ using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
-
-using Umbraco.Core.Services;
-using Umbraco.Core.Auditing;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
+using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Web.Security.Providers
 {
@@ -42,10 +38,10 @@ namespace Umbraco.Web.Security.Providers
 
         protected abstract MembershipUser ConvertToMembershipUser(TEntity entity);
 
-        private bool _allowManuallyChangingPassword = true;
+        private bool _allowManuallyChangingPassword = false;
 
         /// <summary>
-        /// For backwards compatibility, this provider supports this option by default it is true
+        /// For backwards compatibility, this provider supports this option by default it is false
         /// </summary>
         public override bool AllowManuallyChangingPassword
         {
@@ -71,7 +67,7 @@ namespace Umbraco.Web.Security.Providers
             // Initialize base provider class
             base.Initialize(name, config);
 
-            _allowManuallyChangingPassword = config.GetValue("allowManuallyChangingPassword", true);
+            _allowManuallyChangingPassword = config.GetValue("allowManuallyChangingPassword", false);
         }
 
         /// <summary>
@@ -416,7 +412,6 @@ namespace Umbraco.Web.Security.Providers
             //if (answer == null && RequiresQuestionAndAnswer)
             //{
             //    UpdateFailureCount(username, "passwordAnswer");
-
             //    throw new ProviderException("Password answer required for password reset.");
             //}
 

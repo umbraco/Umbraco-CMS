@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace Umbraco.Web.Mvc
 {
@@ -101,15 +102,64 @@ namespace Umbraco.Web.Mvc
 
 			using (var sw = new StringWriter())
 			{
-				var viewResult = !isPartial 
+				var viewResult = isPartial == false 
 					? ViewEngines.Engines.FindView(controller.ControllerContext, viewName, null) 
 					: ViewEngines.Engines.FindPartialView(controller.ControllerContext, viewName);
-				var viewContext = new ViewContext(controller.ControllerContext, viewResult.View, controller.ViewData, controller.TempData, sw);
+			    if (viewResult.View == null)
+			        throw new InvalidOperationException("No view could be found by name " + viewName);
+                var viewContext = new ViewContext(controller.ControllerContext, viewResult.View, controller.ViewData, controller.TempData, sw);
 				viewResult.View.Render(viewContext, sw);
 				viewResult.ViewEngine.ReleaseView(controller.ControllerContext, viewResult.View);				
 				return sw.GetStringBuilder().ToString();
 			}
 		}
+
+        /// <summary>
+        /// Renders the partial view to string.
+        /// </summary>
+        /// <param name="requestContext">The request context.</param>
+        /// <param name="viewData"></param>
+        /// <param name="tempData"></param>
+        /// <param name="viewName">Name of the view.</param>
+        /// <param name="model">The model.</param>
+        /// <param name="isPartial">true if it is a Partial view, otherwise false for a normal view </param>
+        /// <returns></returns>
+        internal static string RenderViewToString(
+            this RequestContext requestContext, 
+            ViewDataDictionary viewData,
+            TempDataDictionary tempData,
+            string viewName, object model, bool isPartial = false)
+        {
+            if (requestContext == null) throw new ArgumentNullException("requestContext");
+            if (viewData == null) throw new ArgumentNullException("viewData");
+            if (tempData == null) throw new ArgumentNullException("tempData");
+
+            var routeData = requestContext.RouteData;
+            if (routeData.Values.ContainsKey("controller") == false)
+                routeData.Values.Add("controller", "Fake");
+            viewData.Model = model;
+            var controllerContext = new ControllerContext(
+                requestContext.HttpContext, routeData,
+                new FakeController
+                {
+                    ViewData = viewData                    
+                });
+            
+            using (var sw = new StringWriter())
+            {
+                var viewResult = isPartial == false
+                    ? ViewEngines.Engines.FindView(controllerContext, viewName, null)
+                    : ViewEngines.Engines.FindPartialView(controllerContext, viewName);
+                if (viewResult.View == null)
+                    throw new InvalidOperationException("No view could be found by name " + viewName);
+                var viewContext = new ViewContext(controllerContext, viewResult.View, viewData, tempData, sw);
+                viewResult.View.Render(viewContext, sw);
+                viewResult.ViewEngine.ReleaseView(controllerContext, viewResult.View);
+                return sw.GetStringBuilder().ToString();
+            }
+        }
+
+        private class FakeController : ControllerBase { protected override void ExecuteCore() { } }
 
         /// <summary>
         /// Normally in MVC the way that the View object gets assigned to the result is to Execute the ViewResult, this however

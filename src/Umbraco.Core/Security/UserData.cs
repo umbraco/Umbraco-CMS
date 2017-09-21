@@ -47,11 +47,17 @@ namespace Umbraco.Core.Security
         [DataMember(Name = "name")]
         public string RealName { get; set; }
 
+        /// <summary>
+        /// The start nodes on the UserData object for the auth ticket contains all of the user's start nodes including ones assigned to their user groups
+        /// </summary>
         [DataMember(Name = "startContent")]
-        public int StartContentNode { get; set; }
+        public int[] StartContentNodes { get; set; }
 
+        /// <summary>
+        /// The start nodes on the UserData object for the auth ticket contains all of the user's start nodes including ones assigned to their user groups
+        /// </summary>
         [DataMember(Name = "startMedia")]
-        public int StartMediaNode { get; set; }
+        public int[] StartMediaNodes { get; set; }
 
         [DataMember(Name = "allowedApps")]
         public string[] AllowedApplications { get; set; }

@@ -188,10 +188,19 @@ namespace Umbraco.Core.Models
         Language,
 
         /// <summary>
+        /// Document
+        /// </summary>
+        [UmbracoObjectType(Constants.ObjectTypes.DocumentBlueprint, typeof(IContent))]
+        [FriendlyName("DocumentBlueprint")]
+        [UmbracoUdiType(Constants.UdiEntityType.DocumentBluePrint)]
+        DocumentBlueprint,
+        
+        /// <summary>
         /// Reserved Identifier
         /// </summary>
         [UmbracoObjectType(Constants.ObjectTypes.IdReservation)]
         [FriendlyName("Identifier Reservation")]
         IdReservation
+
     }
 }

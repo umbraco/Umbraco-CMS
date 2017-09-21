@@ -101,36 +101,37 @@ namespace Umbraco.Core.Security
             {
                 return SignInStatus.Failure;
             }
-            var user = await UserManager.FindByNameAsync(userName);
-            if (user == null)
-            {
-                var requestContext = _request.Context;
-                if (requestContext != null)
-                {
-                    var backofficeUserManager = requestContext.GetBackOfficeUserManager();
-                    if (backofficeUserManager != null)
-                        backofficeUserManager.RaiseInvalidLoginAttemptEvent(userName);
-                }
 
-                return SignInStatus.Failure;
-            }
-            if (await UserManager.IsLockedOutAsync(user.Id))
-            {
-                return SignInStatus.LockedOut;
-            }
+            var user = await UserManager.FindByNameAsync(userName);
+            
+            //if the user is null, create an empty one which can be used for auto-linking
+            if (user == null)            
+                user = BackOfficeIdentityUser.CreateNew(userName, null, GlobalSettings.DefaultUILanguage);            
+            
+            //check the password for the user, this will allow a developer to auto-link 
+            //an account if they have specified an IBackOfficeUserPasswordChecker
             if (await UserManager.CheckPasswordAsync(user, password))
             {
+                //the underlying call to this will query the user by Id which IS cached!
+                if (await UserManager.IsLockedOutAsync(user.Id))
+                {
+                    return SignInStatus.LockedOut;
+                }
+
                 await UserManager.ResetAccessFailedCountAsync(user.Id);
                 return await SignInOrTwoFactor(user, isPersistent);
             }
-            if (shouldLockout)
+
+            var requestContext = _request.Context;
+
+            if (user.HasIdentity && shouldLockout)
             {
                 // If lockout is requested, increment access failed count which might lock out the user
                 await UserManager.AccessFailedAsync(user.Id);
                 if (await UserManager.IsLockedOutAsync(user.Id))
                 {
                     //at this point we've just locked the user out after too many failed login attempts
-                    var requestContext = _request.Context;
+                    
                     if (requestContext != null)
                     {
                         var backofficeUserManager = requestContext.GetBackOfficeUserManager();
@@ -141,8 +142,16 @@ namespace Umbraco.Core.Security
                     return SignInStatus.LockedOut;
                 }
             }
+            
+            if (requestContext != null)
+            {
+                var backofficeUserManager = requestContext.GetBackOfficeUserManager();
+                if (backofficeUserManager != null)
+                    backofficeUserManager.RaiseInvalidLoginAttemptEvent(userName);
+            }
+
             return SignInStatus.Failure;
-        }
+        }        
 
         /// <summary>
         /// Borrowed from Micorosoft's underlying sign in manager which is not flexible enough to tell it to use a different cookie type

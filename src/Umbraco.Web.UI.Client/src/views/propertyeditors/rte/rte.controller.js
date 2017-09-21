@@ -286,7 +286,8 @@ angular.module("umbraco")
                             onlyImages: true,
                             showDetails: true,
                             disableFolderSelect: true,
-                            startNodeId: userData.startMediaId,
+                            startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
+                            startNodeIsVirtual: userData.startMediaIds.length !== 1,
                             view: "mediapicker",
                             show: true,
                             submit: function(model) {
@@ -365,7 +366,7 @@ angular.module("umbraco")
                 var unsubscribe = $scope.$on("formSubmitting", function () {
                     //TODO: Here we should parse out the macro rendered content so we can save on a lot of bytes in data xfer
                     // we do parse it out on the server side but would be nice to do that on the client side before as well.
-                    $scope.model.value = tinyMceEditor.getContent();
+                    $scope.model.value = tinyMceEditor ? tinyMceEditor.getContent() : null;
                 });
 
                 //when the element is disposed we need to unsubscribe!

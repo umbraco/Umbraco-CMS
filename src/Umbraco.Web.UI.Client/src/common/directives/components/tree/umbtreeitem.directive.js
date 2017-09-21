@@ -41,7 +41,7 @@ angular.module("umbraco.directives")
             //'<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' + 
             '<ins ng-class="{\'icon-navigation-right\': !node.expanded || node.metaData.isContainer, \'icon-navigation-down\': node.expanded && !node.metaData.isContainer}" ng-click="load(node)">&nbsp;</ins>' +
             '<i class="icon umb-tree-icon sprTree" ng-click="select(node, $event)"></i>' +
-            '<a href="#/{{node.routePath}}" ng-click="select(node, $event)"></a>' +
+            '<a class="umb-tree-item__label" href="#/{{node.routePath}}" ng-click="select(node, $event)"></a>' +
             //NOTE: These are the 'option' elipses
             '<a class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></a>' +
             '<div ng-show="node.loading" class="l"><div></div></div>' +
@@ -112,6 +112,10 @@ angular.module("umbraco.directives")
                 if (!node) {
                     return '';
                 }
+
+                //TODO: This is called constantly because as a method in a template it's re-evaluated pretty much all the time
+                // it would be better if we could cache the processing. The problem is that some of these things are dynamic.
+
                 var css = [];                
                 if (node.cssClasses) {
                     _.each(node.cssClasses, function(c) {
@@ -121,6 +125,7 @@ angular.module("umbraco.directives")
                 if (node.selected) {
                     css.push("umb-tree-node-checked");
                 }
+                
                 return css.join(" ");
             };
 
@@ -155,6 +160,11 @@ angular.module("umbraco.directives")
                     ev.metaKey || // apple
                     (ev.button && ev.button === 1) // middle click, >IE9 + everyone else
                 ) {
+                    return;
+                }
+
+                if (n.metaData && n.metaData.noAccess === true) {
+                    ev.preventDefault();
                     return;
                 }
 
@@ -228,6 +238,12 @@ angular.module("umbraco.directives")
             //if the current path contains the node id, we will auto-expand the tree item children
 
             setupNodeDom(scope.node, scope.tree);
+
+            // load the children if the current user don't have access to the node
+            // it is used to auto expand the tree to the start nodes the user has access to
+            if(scope.node.hasChildren && scope.node.metaData.noAccess) {
+                scope.loadChildren(scope.node);
+            }
 
             var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" enablelistviewexpand="{{enablelistviewexpand}}" eventhandler="eventhandler" tree="tree" current-node="currentNode" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
             var newElement = angular.element(template);

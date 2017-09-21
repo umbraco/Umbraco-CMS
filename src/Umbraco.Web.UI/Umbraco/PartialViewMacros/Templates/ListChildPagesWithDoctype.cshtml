@@ -1,3 +1,5 @@
+@using Umbraco.Core.Models
+@using Umbraco.Web
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
 @*
@@ -7,9 +9,9 @@
     (You can find the alias of your Document Type by editing it in the Settings section)
 *@
 
-@{  var selection = Model.Content.Children<IPublishedContent>().Where(x => x.IsVisible()); }
+@{  var selection = Model.Content.Children<IPublishedContent>().Where(x => x.IsVisible()).ToArray(); }
 
-@if (selection.Any())
+@if (selection.Length > 0)
 {
     <ul>
         @foreach (var item in selection)

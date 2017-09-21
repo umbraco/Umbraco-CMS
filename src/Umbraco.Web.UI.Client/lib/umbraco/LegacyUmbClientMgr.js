@@ -179,7 +179,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 var injector = getRootInjector();
                 var navService = injector.get("navigationService");
                 var localizationService = injector.get("localizationService");
-                var userResource = injector.get("userResource");                
+                var usersResource = injector.get("usersResource");
                 //var appState = injector.get("appState");
                 var angularHelper = injector.get("angularHelper");
                 var $rootScope = injector.get("$rootScope");
@@ -194,7 +194,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                             if (currentMenuNode) {
                                 if (confirm(txtConfirmDisable + ' "' + UmbClientMgr.mainTree().getActionNode().nodeName + '"?\n\n')) {
                                     angularHelper.safeApply($rootScope, function () {
-                                        userResource.disableUser(currentMenuNode.nodeId).then(function () {
+                                        usersResource.disableUsers(currentMenuNode.nodeId).then(function () {
                                             UmbClientMgr.mainTree().syncTree("-1," + currentMenuNode.nodeId, true);
                                         });
                                     });
