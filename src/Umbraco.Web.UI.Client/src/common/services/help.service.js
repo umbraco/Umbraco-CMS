@@ -58,37 +58,6 @@ angular.module('umbraco.services')
 				return fetchUrl(url);
 			},
 
-			findLessons: function (path, baseurl) {
-
-			    //build request values with optional params
-			    var qs = "?path=" + path;
-                if (baseurl){
-			        qs += "&baseurl=" + encodeURIComponent(baseurl);
-			    }
-			    
-                var url = umbRequestHelper.getApiUrl(
-                        "helpApiBaseUrl",
-                        "GetLessons" + qs);
-                
-			    return  umbRequestHelper.resourcePromise(
-                        $http.get(url), "Failed to get lessons content");
-			},
-
-			getLessonSteps: function (path, baseurl) {
-
-			    var qs = "?path=" + path;
-			    if (baseurl) {
-			        qs += "&baseurl=" + encodeURIComponent(baseurl);
-			    }
-
-			    var url = umbRequestHelper.getApiUrl(
-                        "helpApiBaseUrl",
-                        "GetLessonSteps" + qs);
-    
-			    return umbRequestHelper.resourcePromise(
-                        $http.get(url), "Failed to get lessons content");
-			},
-
 			getContextHelpForPage: function (section, tree, baseurl) {
 
 			    var qs = "?section=" + section + "&tree=" + tree;
