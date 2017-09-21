@@ -20,8 +20,10 @@ angular.module("umbraco.directives")
                 var curr = $(event.target);         // active tab
                 var prev = $(event.relatedTarget);  // previous tab
 
-                //emit tab change event
-                eventsService.emit("tab change", curr);
+                
+                var args = { tabId: curr.context.id, tabHash: curr.context.hash }
+                // emit tab change event
+                eventsService.emit("tab change", args);
 
 				$scope.$apply();
 
