@@ -449,6 +449,24 @@ function Restore-NuGet
 }
 
 #
+# Copies the Azure Gallery script to output
+#
+function Prepare-AzureGallery
+{
+  param (
+    $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
+  )
+  
+  $src = "$($uenv.SolutionRoot)\src"
+  $tmp = "$($uenv.SolutionRoot)\build.tmp"
+  $out = "$($uenv.SolutionRoot)\build.out"
+  $psScript = "$($uenv.SolutionRoot)\build\azuregalleryrelease.ps1"
+  
+  Write-Host ">> Copy azuregalleryrelease.ps1 to output folder"
+  Copy-Item $psScript $out
+}
+
+#
 # Creates the NuGet packages
 #
 function Package-NuGet
@@ -557,6 +575,10 @@ function Build-Umbraco
   {
     Compile-Belle $uenv $version
   }
+  elseif ($target -eq "prepare-azuregallery")
+  {
+    Prepare-AzureGallery $uenv
+  }
   elseif ($target -eq "all")
   {
     Prepare-Build $uenv
@@ -571,6 +593,7 @@ function Build-Umbraco
     Verify-NuGet $uenv
     Prepare-NuGet $uenv
     Package-NuGet $uenv $version
+	Prepare-AzureGallery $uenv
   }
   else
   {
