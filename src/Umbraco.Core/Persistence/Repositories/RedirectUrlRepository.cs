@@ -48,7 +48,7 @@ namespace Umbraco.Core.Persistence.Repositories
             throw new NotSupportedException("This repository does not support this method.");
         }
 
-        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             var sql = Sql();
             if (isCount)

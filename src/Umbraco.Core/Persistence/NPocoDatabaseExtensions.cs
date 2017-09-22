@@ -218,7 +218,7 @@ namespace Umbraco.Core.Persistence
             return transaction?.IsolationLevel ?? IsolationLevel.Unspecified;
         }
 
-        public static IEnumerable<TResult> FetchByGroups<TResult, TSource>(this IDatabase db, IEnumerable<TSource> source, int groupSize, Func<IEnumerable<TSource>, Sql<SqlContext>> sqlFactory)
+        public static IEnumerable<TResult> FetchByGroups<TResult, TSource>(this IDatabase db, IEnumerable<TSource> source, int groupSize, Func<IEnumerable<TSource>, Sql<ISqlContext>> sqlFactory)
         {
             return source.SelectByGroups(x => db.Fetch<TResult>(sqlFactory(x)), groupSize);
         }

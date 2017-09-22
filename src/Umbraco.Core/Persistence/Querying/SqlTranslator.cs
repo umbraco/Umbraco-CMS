@@ -9,21 +9,16 @@ namespace Umbraco.Core.Persistence.Querying
     /// <typeparam name="T"></typeparam>
     internal class SqlTranslator<T>
     {
-        private readonly Sql<SqlContext> _sql;
+        private readonly Sql<ISqlContext> _sql;
 
-        public SqlTranslator(Sql<SqlContext> sql, IQuery<T> query)
+        public SqlTranslator(Sql<ISqlContext> sql, IQuery<T> query)
         {
-            if (sql == null)
-                throw new Exception("Sql cannot be null");
-
-            _sql = sql;
+            _sql = sql ?? throw new ArgumentNullException(nameof(sql));
             foreach (var clause in query.GetWhereClauses())
-            {
                 _sql.Where(clause.Item1, clause.Item2);
-            }
         }
 
-        public Sql<SqlContext> Translate()
+        public Sql<ISqlContext> Translate()
         {
             return _sql;
         }

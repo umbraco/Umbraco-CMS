@@ -13,10 +13,10 @@ namespace Umbraco.Core.Persistence.Querying
     /// <typeparam name="T"></typeparam>
     public class Query<T> : IQuery<T>
     {
-        private readonly SqlContext _sqlContext;
+        private readonly ISqlContext _sqlContext;
         private readonly List<Tuple<string, object[]>> _wheres = new List<Tuple<string, object[]>>();
 
-        public Query(SqlContext sqlContext)
+        public Query(ISqlContext sqlContext)
         {
             _sqlContext = sqlContext;
         }
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Persistence.Querying
 
             StringBuilder sb = null;
             List<object> parameters = null;
-            Sql<SqlContext> sql = null;
+            Sql<ISqlContext> sql = null;
             foreach (var predicate in predicates)
             {
                 // see notes in Where()

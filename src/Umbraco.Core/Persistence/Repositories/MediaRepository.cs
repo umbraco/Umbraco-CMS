@@ -82,12 +82,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of NPocoRepositoryBase<int,IMedia>
 
-        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             return GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
         }
 
-        protected override Sql<SqlContext> GetBaseQuery(QueryType queryType)
+        protected override Sql<ISqlContext> GetBaseQuery(QueryType queryType)
         {
             var sql = Sql();
 
@@ -479,7 +479,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 return _outerRepo.MapQueryDtos(Database.Fetch<ContentVersionDto>(sql));
             }
 
-            protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+            protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
             {
                 return _outerRepo.GetBaseQuery(isCount);
             }
@@ -528,7 +528,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMedia> filter = null, bool newest = true)
         {
-            Sql<SqlContext> filterSql = null;
+            Sql<ISqlContext> filterSql = null;
             if (filter != null)
             {
                 filterSql = Sql();

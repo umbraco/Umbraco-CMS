@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         protected internal IScopeUnitOfWork UnitOfWork { get; }
 
-        protected Sql<SqlContext> Sql() => UnitOfWork.SqlContext.Sql();
+        protected Sql<ISqlContext> Sql() => UnitOfWork.SqlContext.Sql();
 
         #region Query Methods
 
@@ -388,7 +388,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Sql Statements
 
-        protected Sql<SqlContext> GetFullSqlForEntityType(Guid key, bool isContent, bool isMedia, Guid objectTypeId)
+        protected Sql<ISqlContext> GetFullSqlForEntityType(Guid key, bool isContent, bool isMedia, Guid objectTypeId)
         {
             var entitySql = GetBaseWhere(GetBase, isContent, isMedia, objectTypeId, key);
 
@@ -397,7 +397,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 : entitySql.Append(GetGroupBy(isContent, false));
         }
 
-        protected Sql<SqlContext> GetFullSqlForEntityType(int id, bool isContent, bool isMedia, Guid objectTypeId)
+        protected Sql<ISqlContext> GetFullSqlForEntityType(int id, bool isContent, bool isMedia, Guid objectTypeId)
         {
             var entitySql = GetBaseWhere(GetBase, isContent, isMedia, objectTypeId, id);
 
@@ -406,7 +406,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 : entitySql.Append(GetGroupBy(isContent, false));
         }
 
-        protected Sql<SqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, Guid objectTypeId, Action<Sql<SqlContext>> filter)
+        protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, Guid objectTypeId, Action<Sql<ISqlContext>> filter)
         {
             var entitySql = GetBaseWhere(GetBase, isContent, isMedia, filter, objectTypeId);
 
@@ -415,7 +415,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 : entitySql.Append(GetGroupBy(isContent, false));
         }
 
-        private Sql<SqlContext> GetPropertySql(Guid nodeObjectType)
+        private Sql<ISqlContext> GetPropertySql(Guid nodeObjectType)
         {
             var sql = Sql()
                 .Select("contentNodeId, versionId, dataNvarchar, dataNtext, propertyEditorAlias, alias as propertyTypeAlias")
@@ -431,7 +431,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        private Sql<SqlContext> GetFullSqlForMedia(Sql<SqlContext> entitySql, Action<Sql<SqlContext>> filter = null)
+        private Sql<ISqlContext> GetFullSqlForMedia(Sql<ISqlContext> entitySql, Action<Sql<ISqlContext>> filter = null)
         {
             //this will add any dataNvarchar property to the output which can be added to the additional properties
 
@@ -454,12 +454,12 @@ namespace Umbraco.Core.Persistence.Repositories
             return wrappedSql;
         }
 
-        protected virtual Sql<SqlContext> GetBase(bool isContent, bool isMedia, Action<Sql<SqlContext>> customFilter)
+        protected virtual Sql<ISqlContext> GetBase(bool isContent, bool isMedia, Action<Sql<ISqlContext>> customFilter)
         {
             return GetBase(isContent, isMedia, customFilter, false);
         }
 
-        protected virtual Sql<SqlContext> GetBase(bool isContent, bool isMedia, Action<Sql<SqlContext>> customFilter, bool isCount)
+        protected virtual Sql<ISqlContext> GetBase(bool isContent, bool isMedia, Action<Sql<ISqlContext>> customFilter, bool isCount)
         {
             var columns = new List<object>();
 
@@ -536,7 +536,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return entitySql;
         }
 
-        protected virtual Sql<SqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<SqlContext>>, Sql<SqlContext>> baseQuery, bool isContent, bool isMedia, Action<Sql<SqlContext>> filter, Guid nodeObjectType)
+        protected virtual Sql<ISqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<ISqlContext>>, Sql<ISqlContext>> baseQuery, bool isContent, bool isMedia, Action<Sql<ISqlContext>> filter, Guid nodeObjectType)
         {
             var sql = baseQuery(isContent, isMedia, filter)
                 .Where("umbracoNode.nodeObjectType = @nodeObjectType", new { nodeObjectType });
@@ -545,7 +545,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected virtual Sql<SqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<SqlContext>>, Sql<SqlContext>> baseQuery, bool isContent, bool isMedia, int id)
+        protected virtual Sql<ISqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<ISqlContext>>, Sql<ISqlContext>> baseQuery, bool isContent, bool isMedia, int id)
         {
             var sql = baseQuery(isContent, isMedia, null)
                 .Where("umbracoNode.id = @id", new { id });
@@ -555,7 +555,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected virtual Sql<SqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<SqlContext>>, Sql<SqlContext>> baseQuery, bool isContent, bool isMedia, Guid key)
+        protected virtual Sql<ISqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<ISqlContext>>, Sql<ISqlContext>> baseQuery, bool isContent, bool isMedia, Guid key)
         {
             var sql = baseQuery(isContent, isMedia, null)
                 .Where("umbracoNode.uniqueID = @uniqueID", new { uniqueID = key });
@@ -565,7 +565,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected virtual Sql<SqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<SqlContext>>, Sql<SqlContext>> baseQuery, bool isContent, bool isMedia, Guid nodeObjectType, int id)
+        protected virtual Sql<ISqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<ISqlContext>>, Sql<ISqlContext>> baseQuery, bool isContent, bool isMedia, Guid nodeObjectType, int id)
         {
             var sql = baseQuery(isContent, isMedia, null)
                 .Where("umbracoNode.id = @id AND umbracoNode.nodeObjectType = @nodeObjectType", new { id, nodeObjectType});
@@ -574,7 +574,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected virtual Sql<SqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<SqlContext>>, Sql<SqlContext>> baseQuery, bool isContent, bool isMedia, Guid nodeObjectType, Guid key)
+        protected virtual Sql<ISqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<ISqlContext>>, Sql<ISqlContext>> baseQuery, bool isContent, bool isMedia, Guid nodeObjectType, Guid key)
         {
             var sql = baseQuery(isContent, isMedia, null)
                 .Where("umbracoNode.uniqueID = @uniqueID AND umbracoNode.nodeObjectType = @nodeObjectType", new { uniqueID = key, nodeObjectType });
@@ -583,7 +583,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected virtual Sql<SqlContext> GetGroupBy(bool isContent, bool isMedia, bool includeSort = true)
+        protected virtual Sql<ISqlContext> GetGroupBy(bool isContent, bool isMedia, bool includeSort = true)
         {
             var columns = new List<object>
             {

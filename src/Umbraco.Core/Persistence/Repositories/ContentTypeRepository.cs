@@ -153,7 +153,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.Fetch<int>(sql);
         }
 
-        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             var sql = Sql();
 

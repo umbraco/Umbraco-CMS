@@ -69,7 +69,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string FormatColumnRename(string tableName, string oldName, string newName);
         string FormatTableRename(string oldName, string newName);
 
-        Sql<SqlContext> SelectTop(Sql<SqlContext> sql, int top);
+        Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top);
 
         bool SupportsClustered();
         bool SupportsIdentityInsert();

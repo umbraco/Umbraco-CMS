@@ -7,11 +7,11 @@ namespace Umbraco.Core.Persistence
 {
     public class SqlTemplate
     {
-        private readonly SqlContext _sqlContext;
+        private readonly ISqlContext _sqlContext;
         private readonly string _sql;
         private readonly Dictionary<int, string> _args;
 
-        internal SqlTemplate(SqlContext sqlContext, string sql, object[] args)
+        internal SqlTemplate(ISqlContext sqlContext, string sql, object[] args)
         {
             _sqlContext = sqlContext;
             _sql = sql;
@@ -21,20 +21,20 @@ namespace Umbraco.Core.Persistence
                 _args[i] = args[i].ToString();
         }
 
-        public Sql<SqlContext> Sql()
+        public Sql<ISqlContext> Sql()
         {
-            return new Sql<SqlContext>(_sqlContext, _sql);
+            return new Sql<ISqlContext>(_sqlContext, _sql);
         }
 
         // must pass the args in the proper order, faster
-        public Sql<SqlContext> Sql(params object[] args)
+        public Sql<ISqlContext> Sql(params object[] args)
         {
-            return new Sql<SqlContext>(_sqlContext, _sql, args);
+            return new Sql<ISqlContext>(_sqlContext, _sql, args);
         }
 
         // can pass named args, slower
         // so, not much different from what Where(...) does (ie reflection)
-        public Sql<SqlContext> SqlNamed(object nargs)
+        public Sql<ISqlContext> SqlNamed(object nargs)
         {
             var args = new object[_args.Count];
             var properties = nargs.GetType().GetProperties().ToDictionary(x => x.Name, x => x.GetValue(nargs));
@@ -44,7 +44,7 @@ namespace Umbraco.Core.Persistence
                     throw new InvalidOperationException($"Invalid argument name \"{_args[i]}\".");
                 args[i] = value;
             }
-            return new Sql<SqlContext>(_sqlContext, _sql, args);
+            return new Sql<ISqlContext>(_sqlContext, _sql, args);
         }
     }
 }

@@ -43,14 +43,14 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         protected ISqlContext SqlContext=> UnitOfWork.SqlContext;
 
-        protected Sql<SqlContext> Sql() => SqlContext.Sql();
-        protected Sql<SqlContext> Sql(string sql, params object[] args) => SqlContext.Sql(sql, args);
+        protected Sql<ISqlContext> Sql() => SqlContext.Sql();
+        protected Sql<ISqlContext> Sql(string sql, params object[] args) => SqlContext.Sql(sql, args);
         protected ISqlSyntaxProvider SqlSyntax => SqlContext.SqlSyntax;
         protected IQuery<T> Query<T>() => SqlContext.Query<T>();
 
         #region Abstract Methods
 
-        protected abstract Sql<SqlContext> GetBaseQuery(bool isCount); // fixme obsolete, use QueryType instead everywhere
+        protected abstract Sql<ISqlContext> GetBaseQuery(bool isCount); // fixme obsolete, use QueryType instead everywhere
         protected abstract string GetBaseWhereClause();
         protected abstract IEnumerable<string> GetDeleteClauses();
         protected abstract Guid NodeObjectTypeId { get; }

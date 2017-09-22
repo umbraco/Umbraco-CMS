@@ -103,12 +103,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Select(x => Get(x.Id));
         }
 
-        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             return isCount ? Sql().SelectCount().From<MacroDto>() : GetBaseQuery();
         }
 
-        private Sql<SqlContext> GetBaseQuery()
+        private Sql<ISqlContext> GetBaseQuery()
         {
             return Sql()
                 .SelectAll()

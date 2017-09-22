@@ -837,6 +837,7 @@
     <Compile Include="Persistence\FaultHandling\Strategies\NetworkConnectivityErrorDetectionStrategy.cs" />
     <Compile Include="Persistence\FaultHandling\Strategies\SqlAzureTransientErrorDetectionStrategy.cs" />
     <Compile Include="Persistence\FaultHandling\ThrottlingCondition.cs" />
+    <Compile Include="Persistence\ISqlContext.cs" />
     <Compile Include="Persistence\IUmbracoDatabase.cs" />
     <Compile Include="Persistence\IUmbracoDatabaseFactory.cs" />
     <Compile Include="Persistence\LocalDb.cs" />

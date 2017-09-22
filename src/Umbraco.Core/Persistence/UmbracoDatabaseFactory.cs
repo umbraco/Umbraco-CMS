@@ -37,7 +37,7 @@ namespace Umbraco.Core.Persistence
         private DbProviderFactory _dbProviderFactory;
         private DatabaseType _databaseType;
         private ISqlSyntaxProvider _sqlSyntax;
-        private SqlContext _sqlContext;
+        private ISqlContext _sqlContext;
         private RetryPolicy _connectionRetryPolicy;
         private RetryPolicy _commandRetryPolicy;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();

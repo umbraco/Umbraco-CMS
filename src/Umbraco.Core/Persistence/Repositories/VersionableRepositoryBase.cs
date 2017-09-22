@@ -246,12 +246,12 @@ namespace Umbraco.Core.Persistence.Repositories
             return entity.Properties.Any(x => x.TagSupport.Enable);
         }
 
-        private Sql<SqlContext> PrepareSqlForPagedResults(Sql<SqlContext> sql, Sql<SqlContext> filterSql, string orderBy, Direction orderDirection, bool orderBySystemField, string table)
+        private Sql<ISqlContext> PrepareSqlForPagedResults(Sql<ISqlContext> sql, Sql<ISqlContext> filterSql, string orderBy, Direction orderDirection, bool orderBySystemField, string table)
         {
             if (filterSql == null && string.IsNullOrEmpty(orderBy)) return sql;
 
             // preserve original
-            var psql = new Sql<SqlContext>(sql.SqlContext, sql.SQL, sql.Arguments);
+            var psql = new Sql<ISqlContext>(sql.SqlContext, sql.SQL, sql.Arguments);
 
             // apply filter
             if (filterSql != null)
@@ -288,12 +288,12 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             // fixme - temp - for the time being NPoco PagingHelper cannot deal with multiline
-            psql = new Sql<SqlContext>(psql.SqlContext, psql.SQL.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " "), psql.Arguments);
+            psql = new Sql<ISqlContext>(psql.SqlContext, psql.SQL.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " "), psql.Arguments);
 
             return psql;
         }
 
-        private string GetOrderBySystemField(ref Sql<SqlContext> sql, string orderBy)
+        private string GetOrderBySystemField(ref Sql<ISqlContext> sql, string orderBy)
         {
             // get the database field eg "[table].[column]"
             var dbfield = GetDatabaseFieldNameForOrderBy(orderBy);
@@ -318,7 +318,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return dbfield;
         }
 
-        private string GetOrderByNonSystemField(ref Sql<SqlContext> sql, string orderBy, string table)
+        private string GetOrderByNonSystemField(ref Sql<ISqlContext> sql, string orderBy, string table)
         {
             // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through value
             // from most recent content version for the given order by field
@@ -377,7 +377,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (sql.SQL.StartsWith("SELECT ") == false) throw new Exception("Oops, SELECT not found.");
             newSql = newSql.Insert("SELECT ".Length, "CustomPropData.CustomPropVal, ");
 
-            sql = new Sql<SqlContext>(sql.SqlContext, newSql, newArgs.ToArray());
+            sql = new Sql<ISqlContext>(sql.SqlContext, newSql, newArgs.ToArray());
 
             // and order by the custom field
             return "CustomPropData.CustomPropVal";
@@ -411,7 +411,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto>(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
             Func<List<TDto>, IEnumerable<TEntity>> mapper,
             string orderBy, Direction orderDirection, bool orderBySystemField, string table,
-            Sql<SqlContext> filterSql = null)
+            Sql<ISqlContext> filterSql = null)
         {
             if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
 
@@ -960,7 +960,7 @@ ORDER BY contentNodeId, versionId, propertytypeid
         /// </summary>
         /// <param name="queryType"></param>
         /// <returns></returns>
-        protected abstract Sql<SqlContext> GetBaseQuery(QueryType queryType);
+        protected abstract Sql<ISqlContext> GetBaseQuery(QueryType queryType);
 
         /*
         internal class DocumentDefinitionCollection : KeyedCollection<ValueType, DocumentDefinition>

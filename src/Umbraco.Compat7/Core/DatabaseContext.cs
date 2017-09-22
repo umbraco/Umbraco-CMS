@@ -32,12 +32,12 @@ namespace Umbraco.Core
         /// <summary>
         /// Creates a Sql statement.
         /// </summary>
-        public Sql<SqlContext> Sql() => _databaseFactory.SqlContext.Sql();
+        public Sql<ISqlContext> Sql() => _databaseFactory.SqlContext.Sql();
 
         /// <summary>
         /// Creates a Sql statement.
         /// </summary>
-        public Sql<SqlContext> Sql(string sql, params object[] args) => _databaseFactory.SqlContext.Sql(sql, args);
+        public Sql<ISqlContext> Sql(string sql, params object[] args) => _databaseFactory.SqlContext.Sql(sql, args);
 
         /// <summary>
         /// Creates a Query expression.

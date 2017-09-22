@@ -36,6 +36,7 @@ namespace Umbraco.Tests.TestHelpers
             var databaseFactoryMock = new Mock<IUmbracoDatabaseFactory>();
             databaseFactoryMock.Setup(x => x.Configured).Returns(configured);
             databaseFactoryMock.Setup(x => x.CanConnect).Returns(canConnect);
+            databaseFactoryMock.Setup(x => x.SqlContext).Returns(Mock.Of<ISqlContext>());
 
             // can create a database - but don't try to use it!
             if (configured && canConnect)

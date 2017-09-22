@@ -168,19 +168,19 @@ ORDER BY colName";
             return users;
         }
 
-        private IUser GetWith(Action<Sql<SqlContext>> with, bool includeReferences)
+        private IUser GetWith(Action<Sql<ISqlContext>> with, bool includeReferences)
         {
             var dto = GetDtoWith(with, includeReferences);
             return dto == null ? null : UserFactory.BuildEntity(dto);
         }
 
-        private UserDto GetDtoWith(Action<Sql<SqlContext>> with, bool includeReferences)
+        private UserDto GetDtoWith(Action<Sql<ISqlContext>> with, bool includeReferences)
         {
             var dtos = GetDtosWith(with, includeReferences);
             return dtos.FirstOrDefault();
         }
 
-        private List<UserDto> GetDtosWith(Action<Sql<SqlContext>> with, bool includeReferences)
+        private List<UserDto> GetDtosWith(Action<Sql<ISqlContext>> with, bool includeReferences)
         {
             var sql = SqlContext.Sql()
                 .Select<UserDto>()
@@ -279,7 +279,7 @@ ORDER BY colName";
 
         #region Overrides of NPocoRepositoryBase<int,IUser>
 
-        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             if (isCount)
                 return SqlContext.Sql()
@@ -291,7 +291,7 @@ ORDER BY colName";
                 .From<UserDto>();
         }
 
-        private static void AddGroupLeftJoin(Sql<SqlContext> sql)
+        private static void AddGroupLeftJoin(Sql<ISqlContext> sql)
         {
             sql
                 .LeftJoin<User2UserGroupDto>()
@@ -304,7 +304,7 @@ ORDER BY colName";
                 .On<UserStartNodeDto, UserDto>(left => left.UserId, right => right.Id);
         }
 
-        private Sql<SqlContext> GetBaseQuery(string columns)
+        private Sql<ISqlContext> GetBaseQuery(string columns)
         {
             return SqlContext.Sql()
                 .Select(columns)
@@ -623,7 +623,7 @@ ORDER BY colName";
         {
             if (string.IsNullOrWhiteSpace(orderBy)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(orderBy));
 
-            Sql<SqlContext> filterSql = null;
+            Sql<ISqlContext> filterSql = null;
             var customFilterWheres = filter != null ? filter.GetWhereClauses().ToArray() : null;
             var hasCustomFilter = customFilterWheres != null && customFilterWheres.Length > 0;
             if (hasCustomFilter
@@ -717,7 +717,7 @@ ORDER BY colName";
             return pagedResult.Items.Select(UserFactory.BuildEntity);
         }
 
-        private Sql<SqlContext> ApplyFilter(Sql<SqlContext> sql, Sql<SqlContext> filterSql)
+        private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, Sql<ISqlContext> filterSql)
         {
             if (filterSql == null) return sql;
 
@@ -726,7 +726,7 @@ ORDER BY colName";
             return sql;
         }
 
-        private static Sql<SqlContext> ApplySort(Sql<SqlContext> sql, Direction orderDirection, string orderBy)
+        private static Sql<ISqlContext> ApplySort(Sql<ISqlContext> sql, Direction orderDirection, string orderBy)
         {
             if (string.IsNullOrEmpty(orderBy)) return sql;
 

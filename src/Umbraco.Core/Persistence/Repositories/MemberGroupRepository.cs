@@ -53,7 +53,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.Fetch<NodeDto>(sql).Select(x => _modelFactory.BuildEntity(x));
         }
 
-        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             var sql = Sql();
 

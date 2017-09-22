@@ -134,7 +134,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 yield return acc;
         }
 
-        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             if (isCount)
             {
@@ -164,7 +164,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected Sql<SqlContext> GetSubquery()
+        protected Sql<ISqlContext> GetSubquery()
         {
             var sql = Sql()
                 .Select("DISTINCT(umbracoNode.id)")

@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         [Test]
         public void WhereInValueFieldTest()
         {
-            var sql = new Sql<SqlContext>(SqlContext)
+            var sql = new Sql<ISqlContext>(SqlContext)
                 .Select("*")
                 .From<NodeDto>()
                 .WhereIn<NodeDto>(x => x.NodeId, new[] { 1, 2, 3 });
@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             // this test used to fail because x => x.Text was evaluated as a lambda
             // and returned "[umbracoNode].[text] = @0"... had to fix WhereIn.
 
-            var sql = new Sql<SqlContext>(SqlContext)
+            var sql = new Sql<ISqlContext>(SqlContext)
                 .Select("*")
                 .From<NodeDto>()
                 .WhereIn<NodeDto>(x => x.Text, new[] { "a", "b", "c" });

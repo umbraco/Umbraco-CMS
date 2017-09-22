@@ -73,7 +73,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<IContent> PerformGetAll(params int[] ids)
         {
-            Sql<SqlContext> Translate(Sql<SqlContext> tsql)
+            Sql<ISqlContext> Translate(Sql<ISqlContext> tsql)
             {
                 if (ids.Any())
                     tsql.Where("umbracoNode.id in (@ids)", new { /*ids =*/ ids });
@@ -111,7 +111,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of NPocoRepositoryBase<IContent>
 
-        protected override Sql<SqlContext> GetBaseQuery(QueryType queryType)
+        protected override Sql<ISqlContext> GetBaseQuery(QueryType queryType)
         {
             var sql = SqlContext.Sql();
 
@@ -169,7 +169,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         // fixme - move that one up to Versionable!
-        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             return GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
         }
@@ -823,7 +823,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override IEnumerable<IContent> PerformGetAll(params Guid[] ids)
             {
-                Sql<SqlContext> Translate(Sql<SqlContext> s)
+                Sql<ISqlContext> Translate(Sql<ISqlContext> s)
                 {
                     if (ids.Any())
                     {
@@ -838,7 +838,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 return _outerRepo.MapQueryDtos(Database.Fetch<DocumentDto>(sql), many: true);
             }
 
-            protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+            protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
             {
                 return _outerRepo.GetBaseQuery(isCount);
             }

@@ -23,12 +23,12 @@ namespace Umbraco.Core.Persistence
         /// <summary>
         /// Creates a new Sql expression.
         /// </summary>
-        Sql<SqlContext> Sql();
+        Sql<ISqlContext> Sql();
 
         /// <summary>
         /// Creates a new Sql expression.
         /// </summary>
-        Sql<SqlContext> Sql(string sql, params object[] args);
+        Sql<ISqlContext> Sql(string sql, params object[] args);
 
         /// <summary>
         /// Creates a new query expression.

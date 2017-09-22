@@ -307,7 +307,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        private Sql<SqlContext> GetBaseQuery(bool isCount)
+        private Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             if (isCount)
@@ -345,7 +345,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             return sql;
         }
 
-        private Sql<SqlContext> GetSubquery()
+        private Sql<ISqlContext> GetSubquery()
         {
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             var sql = provider.SqlContext.Sql();

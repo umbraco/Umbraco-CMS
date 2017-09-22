@@ -60,7 +60,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return dtos.Select(factory.BuildEntity);
         }
 
-        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             return SqlContext.Sql().SelectAll().From<TaskTypeDto>();
         }

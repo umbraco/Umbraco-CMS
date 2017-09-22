@@ -101,12 +101,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of NPocoRepositoryBase<int,IMembershipUser>
 
-        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             return GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
         }
 
-        protected override Sql<SqlContext> GetBaseQuery(QueryType queryType)
+        protected override Sql<ISqlContext> GetBaseQuery(QueryType queryType)
         {
             var sql = Sql();
 
@@ -149,7 +149,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return "umbracoNode.id = @Id";
         }
 
-        protected Sql<SqlContext> GetNodeIdQueryWithPropertyData()
+        protected Sql<ISqlContext> GetNodeIdQueryWithPropertyData()
         {
             return Sql()
                 .Select("DISTINCT(umbracoNode.id)")
@@ -574,7 +574,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMember> filter = null, bool newest = true)
         {
-            Sql<SqlContext> filterSql = null;
+            Sql<ISqlContext> filterSql = null;
             if (filter != null)
             {
                 filterSql = Sql();

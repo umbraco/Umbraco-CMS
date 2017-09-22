@@ -121,7 +121,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of NPocoRepositoryBase<int,DataTypeDefinition>
 
-        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             var sql = Sql();
 
@@ -498,7 +498,7 @@ AND umbracoNode.id <> @id",
                 throw new NotImplementedException();
             }
 
-            protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+            protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
             {
                 throw new NotImplementedException();
             }

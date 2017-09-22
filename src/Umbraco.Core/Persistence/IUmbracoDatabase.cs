@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence
         /// <summary>
         /// Gets the Sql context.
         /// </summary>
-        SqlContext SqlContext { get; }
+        ISqlContext SqlContext { get; }
 
         /// <summary>
         /// Gets the database instance unique identifier as a string.

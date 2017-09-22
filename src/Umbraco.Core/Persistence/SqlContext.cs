@@ -37,10 +37,10 @@ namespace Umbraco.Core.Persistence
         public DatabaseType DatabaseType { get; }
 
         /// <inheritdoc />
-        public Sql<SqlContext> Sql() => NPoco.Sql.BuilderFor(this);
+        public Sql<ISqlContext> Sql() => NPoco.Sql.BuilderFor((ISqlContext) this);
 
         /// <inheritdoc />
-        public Sql<SqlContext> Sql(string sql, params object[] args) => Sql().Append(sql, args);
+        public Sql<ISqlContext> Sql(string sql, params object[] args) => Sql().Append(sql, args);
 
         /// <inheritdoc />
         public IQuery<T> Query<T>() => new Query<T>(this);

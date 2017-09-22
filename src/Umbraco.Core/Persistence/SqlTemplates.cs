@@ -7,9 +7,9 @@ namespace Umbraco.Core.Persistence
     public class SqlTemplates
     {
         private readonly Dictionary<string, SqlTemplate> _templates = new Dictionary<string, SqlTemplate>();
-        private readonly SqlContext _sqlContext;
+        private readonly ISqlContext _sqlContext;
 
-        public SqlTemplates(SqlContext sqlContext)
+        public SqlTemplates(ISqlContext sqlContext)
         {
             _sqlContext = sqlContext;
         }
@@ -20,10 +20,10 @@ namespace Umbraco.Core.Persistence
             _templates.Clear();
         }
 
-        public SqlTemplate Get(string key, Func<Sql<SqlContext>, Sql<SqlContext>> sqlBuilder)
+        public SqlTemplate Get(string key, Func<Sql<ISqlContext>, Sql<ISqlContext>> sqlBuilder)
         {
             if (_templates.TryGetValue(key, out var template)) return template;
-            var sql = sqlBuilder(new Sql<SqlContext>(_sqlContext));
+            var sql = sqlBuilder(new Sql<ISqlContext>(_sqlContext));
             return _templates[key] = new SqlTemplate(_sqlContext, sql.SQL, sql.Arguments);
         }
     }

@@ -66,7 +66,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of NPocoRepositoryBase<int,Language>
 
-        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             var sql = Sql();
 

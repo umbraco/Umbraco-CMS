@@ -216,7 +216,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of NPocoRepositoryBase<int,IUserGroup>
 
-        protected Sql<SqlContext> GetBaseQuery(QueryType type)
+        protected Sql<ISqlContext> GetBaseQuery(QueryType type)
         {
             var sql = Sql();
             var addFrom = false;
@@ -256,12 +256,12 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             return GetBaseQuery(isCount ? QueryType.Count : QueryType.Many);
         }
 
-        private static void AppendGroupBy(Sql<SqlContext> sql)
+        private static void AppendGroupBy(Sql<ISqlContext> sql)
         {
             sql
                 .GroupBy<UserGroupDto>(x => x.CreateDate, x => x.Icon, x => x.Id, x => x.StartContentId, x => x.StartMediaId,
@@ -293,7 +293,7 @@ namespace Umbraco.Core.Persistence.Repositories
             ((UserGroup) entity).AddingEntity();
 
             var userGroupDto = UserGroupFactory.BuildDto(entity);
-            
+
             var id = Convert.ToInt32(Database.Insert(userGroupDto));
             entity.Id = id;
 
@@ -383,7 +383,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 throw new WontImplementException();
             }
 
-            protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+            protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
             {
                 throw new WontImplementException();
             }

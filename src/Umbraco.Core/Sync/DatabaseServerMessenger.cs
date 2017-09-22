@@ -62,7 +62,7 @@ namespace Umbraco.Core.Sync
 
         protected IScopeProvider ScopeProvider { get; }
 
-        protected Sql<SqlContext> Sql() => _sqlContext.Sql();
+        protected Sql<ISqlContext> Sql() => _sqlContext.Sql();
 
         #region Messenger
 

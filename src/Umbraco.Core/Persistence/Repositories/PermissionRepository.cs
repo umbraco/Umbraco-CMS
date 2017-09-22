@@ -265,7 +265,7 @@ namespace Umbraco.Core.Persistence.Repositories
             throw new WontImplementException();
         }
 
-        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             throw new WontImplementException();
         }

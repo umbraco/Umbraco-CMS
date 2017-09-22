@@ -40,7 +40,7 @@ namespace Umbraco.Core.Persistence
         /// <para>Used by UmbracoDatabaseFactory to create databases.</para>
         /// <para>Also used by DatabaseBuilder for creating databases and installing/upgrading.</para>
         /// </remarks>
-        public UmbracoDatabase(string connectionString, SqlContext sqlContext, DbProviderFactory provider, ILogger logger, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
+        public UmbracoDatabase(string connectionString, ISqlContext sqlContext, DbProviderFactory provider, ILogger logger, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
             : base(connectionString, sqlContext.DatabaseType, provider, DefaultIsolationLevel)
         {
             SqlContext = sqlContext;
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabase"/> class.
         /// </summary>
         /// <remarks>Internal for unit tests only.</remarks>
-        internal UmbracoDatabase(DbConnection connection, SqlContext sqlContext, ILogger logger)
+        internal UmbracoDatabase(DbConnection connection, ISqlContext sqlContext, ILogger logger)
             : base(connection, sqlContext.DatabaseType, DefaultIsolationLevel)
         {
             SqlContext = sqlContext;
@@ -68,7 +68,7 @@ namespace Umbraco.Core.Persistence
         #endregion
 
         /// <inheritdoc />
-        public SqlContext SqlContext { get; }
+        public ISqlContext SqlContext { get; }
 
         #region Testing, Debugging and Troubleshooting
 

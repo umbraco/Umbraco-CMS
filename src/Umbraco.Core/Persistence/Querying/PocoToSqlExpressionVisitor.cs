@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Querying
     {
         private readonly PocoData _pd;
 
-        public PocoToSqlExpressionVisitor(SqlContext sqlContext)
+        public PocoToSqlExpressionVisitor(ISqlContext sqlContext)
             : base(sqlContext.SqlSyntax)
         {
             _pd = sqlContext.PocoDataFactory.ForType(typeof(TDto));
@@ -79,7 +79,7 @@ namespace Umbraco.Core.Persistence.Querying
         private readonly string _alias1, _alias2;
         private string _parameterName1, _parameterName2;
 
-        public PocoToSqlExpressionVisitor(SqlContext sqlContext, string alias1, string alias2)
+        public PocoToSqlExpressionVisitor(ISqlContext sqlContext, string alias1, string alias2)
             : base(sqlContext.SqlSyntax)
         {
             _pocoData1 = sqlContext.PocoDataFactory.ForType(typeof (TDto1));

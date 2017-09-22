@@ -495,15 +495,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         protected abstract string FormatIdentity(ColumnDefinition column);
 
-        public abstract Sql<SqlContext> SelectTop(Sql<SqlContext> sql, int top);
+        public abstract Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top);
 
-        public virtual string DeleteDefaultConstraint
-        {
-            get
-            {
-                throw new NotSupportedException("Default constraints are not supported");
-            }
-        }
+        public virtual string DeleteDefaultConstraint => throw new NotSupportedException("Default constraints are not supported");
 
         public virtual string CreateTable => "CREATE TABLE {0} ({1})";
         public virtual string DropTable => "DROP TABLE {0}";

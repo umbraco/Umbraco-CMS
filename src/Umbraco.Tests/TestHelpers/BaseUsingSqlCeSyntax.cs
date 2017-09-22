@@ -18,11 +18,11 @@ namespace Umbraco.Tests.TestHelpers
     {
         protected IMapperCollection Mappers { get; private set; }
 
-        protected SqlContext SqlContext { get; private set; }
+        protected ISqlContext SqlContext { get; private set; }
 
         internal TestObjects TestObjects = new TestObjects(null);
 
-        protected Sql<SqlContext> Sql()
+        protected Sql<ISqlContext> Sql()
         {
             return NPoco.Sql.BuilderFor(SqlContext);
         }

@@ -52,9 +52,9 @@ namespace Umbraco.Core.Persistence.Migrations
 
         public IUpdateBuilder Update => new UpdateBuilder(Context);
 
-        protected Sql<SqlContext> Sql() => Context.SqlContext.Sql();
+        protected Sql<ISqlContext> Sql() => Context.SqlContext.Sql();
 
-        protected Sql<SqlContext> Sql(string sql, params object[] args) => Context.SqlContext.Sql(sql, args);
+        protected Sql<ISqlContext> Sql(string sql, params object[] args) => Context.SqlContext.Sql(sql, args);
 
         public IIfDatabaseBuilder IfDatabase(params DatabaseType[] supportedDatabaseTypes)
         {

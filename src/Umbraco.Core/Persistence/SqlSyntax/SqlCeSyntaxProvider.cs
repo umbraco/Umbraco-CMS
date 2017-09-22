@@ -14,9 +14,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     [SqlSyntaxProvider(Constants.DbProviderNames.SqlCe)]
     public class SqlCeSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlCeSyntaxProvider>
     {
-        public override Sql<SqlContext> SelectTop(Sql<SqlContext> sql, int top)
+        public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top)
         {
-            return new Sql<SqlContext>(sql.SqlContext, sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
+            return new Sql<ISqlContext>(sql.SqlContext, sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
         }
 
         public override bool SupportsClustered()

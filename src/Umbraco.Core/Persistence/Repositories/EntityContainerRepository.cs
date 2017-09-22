@@ -103,7 +103,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return entity;
         }
 
-        protected override Sql<SqlContext> GetBaseQuery(bool isCount)
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             var sql = Sql();
             if (isCount)
