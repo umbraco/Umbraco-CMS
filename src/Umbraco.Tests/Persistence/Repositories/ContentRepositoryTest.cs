@@ -180,8 +180,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out ContentTypeRepository contentTypeRepository, out DataTypeDefinitionRepository dataTypeDefinitionRepository);
 
                 var hasPropertiesContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
-                IContent content1;
-                content1 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
+                IContent content1 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
 
                 contentTypeRepository.AddOrUpdate(hasPropertiesContentType);
                 repository.AddOrUpdate(content1);

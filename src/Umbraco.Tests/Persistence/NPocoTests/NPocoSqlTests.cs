@@ -225,7 +225,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         public void Can_GroupBy_With_Type()
         {
             var expected = Sql();
-            expected.SelectAll().From("[cmsContent]").GroupBy("[contentType]");
+            expected.SelectAll().From("[cmsContent]").GroupBy("[cmsContent].[contentType]");
 
             var sql = Sql();
             sql.SelectAll().From<ContentDto>().GroupBy<ContentDto>(x => x.ContentTypeId);

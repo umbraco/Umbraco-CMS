@@ -145,7 +145,9 @@ ORDER BY colName";
 
         protected override IEnumerable<IUser> PerformGetAll(params int[] ids)
         {
-            var dtos = GetDtosWith(sql => sql.WhereIn<UserDto>(x => x.Id, ids), true);
+            var dtos = ids.Length == 0
+                ? GetDtosWith(null, true)
+                : GetDtosWith(sql => sql.WhereIn<UserDto>(x => x.Id, ids), true);
             var users = new IUser[dtos.Count];
             var i = 0;
             foreach (var dto in dtos)
@@ -184,7 +186,7 @@ ORDER BY colName";
                 .Select<UserDto>()
                 .From<UserDto>();
 
-            with(sql);
+            with?.Invoke(sql);
 
             var dtos = Database.Fetch<UserDto>(sql);
 
@@ -202,7 +204,7 @@ ORDER BY colName";
         {
             if (dtos.Count == 0) return;
 
-            var userIds = dtos.Count == 1 ? new List<int>(dtos[0].Id) : dtos.Select(x => x.Id).ToList();
+            var userIds = dtos.Count == 1 ? new List<int> { dtos[0].Id } : dtos.Select(x => x.Id).ToList();
             var xUsers = dtos.Count == 1 ? null : dtos.ToDictionary(x => x.Id, x => x);
 
             // get users2groups
@@ -220,7 +222,7 @@ ORDER BY colName";
             sql = Sql()
                 .Select<UserGroupDto>()
                 .From<UserGroupDto>()
-                .WhereIn<UserGroupDto>(x => x.Id, userIds);
+                .WhereIn<UserGroupDto>(x => x.Id, groupIds);
 
             var groups = Database.Fetch<UserGroupDto>(sql)
                 .ToDictionary(x => x.Id, x => x);
@@ -739,7 +741,7 @@ ORDER BY colName";
         internal IEnumerable<IUser> GetNextUsers(int id, int count)
         {
             var idsQuery = Sql()
-                .Select("umbracoUser.id")
+                .Select<UserDto>(x => x.Id)
                 .From<UserDto>()
                 .Where<UserDto>(x => x.Id >= id)
                 .OrderBy<UserDto>(x => x.Id);

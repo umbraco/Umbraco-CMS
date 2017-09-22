@@ -121,9 +121,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 case QueryType.Many:
                 case QueryType.Single:
                     sql = sql.Select<MemberDto>(r =>
-                                r.Select<ContentVersionDto>(rr =>
-                                    rr.Select<ContentDto>(rrr =>
-                                        rrr.Select<NodeDto>())));
+                        r.Select(x => x.ContentVersionDto, r1 =>
+                            r1.Select(x => x.ContentDto, r2 =>
+                                r2.Select(x => x.NodeDto))));
                     break;
             }
 

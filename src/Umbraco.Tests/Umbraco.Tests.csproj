@@ -228,7 +228,8 @@
     <Compile Include="Models\Mapping\AutoMapper6Tests.cs" />
     <Compile Include="Models\Mapping\UserModelMapperTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoFetchTests.cs" />
-    <Compile Include="Persistence\NPocoTests\NPocoSqlCacheTests.cs" />
+    <Compile Include="Persistence\NPocoTests\NPocoSqlTemplateTests.cs" />
+    <Compile Include="Persistence\NPocoTests\SqlTemplate.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
     <Compile Include="Persistence\Repositories\UserGroupRepositoryTest.cs" />

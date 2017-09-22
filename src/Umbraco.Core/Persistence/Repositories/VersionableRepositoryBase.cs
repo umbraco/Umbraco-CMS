@@ -495,7 +495,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 // compositionProperties is the property types for the entire composition
                 // use an index for perfs
-                if (compositionPropertiesIndex.TryGetValue(temp.Composition.Id, out PropertyType[] compositionProperties) == false)
+                if (compositionPropertiesIndex.TryGetValue(temp.Composition.Id, out var compositionProperties) == false)
                     compositionPropertiesIndex[temp.Composition.Id] = compositionProperties = temp.Composition.CompositionPropertyTypes.ToArray();
 
                 // map the list of PropertyDataDto to a list of Property
@@ -509,7 +509,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     // test for support and cache
                     var editor = Current.PropertyEditors[property.PropertyType.PropertyEditorAlias];
-                    if (propertiesWithTagSupport.TryGetValue(property.PropertyType.PropertyEditorAlias, out SupportTagsAttribute tagSupport) == false)
+                    if (propertiesWithTagSupport.TryGetValue(property.PropertyType.PropertyEditorAlias, out var tagSupport) == false)
                         propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias] = tagSupport = TagExtractor.GetAttribute(editor);
                     if (tagSupport == null) continue;
 

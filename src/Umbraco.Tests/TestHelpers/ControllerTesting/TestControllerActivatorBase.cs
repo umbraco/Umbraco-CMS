@@ -27,6 +27,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
+using LightInject;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {
@@ -40,118 +41,126 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
     {
         IHttpController IHttpControllerActivator.Create(HttpRequestMessage request, HttpControllerDescriptor controllerDescriptor, Type controllerType)
         {
-            if (typeof(UmbracoApiControllerBase).IsAssignableFrom(controllerType))
-            {
-                var owinContext = request.TryGetOwinContext().Result;
+            // default
+            if (!typeof (UmbracoApiControllerBase).IsAssignableFrom(controllerType))
+                return base.Create(request, controllerDescriptor, controllerType);
+
+            var owinContext = request.TryGetOwinContext().Result;
                 
-                var mockedUserService = Mock.Of<IUserService>();
-                var mockedContentService = Mock.Of<IContentService>();
-                var mockedMediaService = Mock.Of<IMediaService>();
-                var mockedEntityService = Mock.Of<IEntityService>();
+            var mockedUserService = Mock.Of<IUserService>();
+            var mockedContentService = Mock.Of<IContentService>();
+            var mockedMediaService = Mock.Of<IMediaService>();
+            var mockedEntityService = Mock.Of<IEntityService>();
 
-                var mockedMigrationService = new Mock<IMigrationEntryService>();
-                //set it up to return anything so that the app ctx is 'Configured'
-                mockedMigrationService.Setup(x => x.FindEntry(It.IsAny<string>(), It.IsAny<SemVersion>())).Returns(Mock.Of<IMigrationEntry>());
+            var mockedMigrationService = new Mock<IMigrationEntryService>();
+            //set it up to return anything so that the app ctx is 'Configured'
+            mockedMigrationService.Setup(x => x.FindEntry(It.IsAny<string>(), It.IsAny<SemVersion>())).Returns(Mock.Of<IMigrationEntry>());
 
-                var serviceContext = new ServiceContext(
-                    userService: mockedUserService,
-                    contentService: mockedContentService,
-                    mediaService: mockedMediaService,
-                    entityService: mockedEntityService,
-                    migrationEntryService: mockedMigrationService.Object,
-                    localizedTextService:Mock.Of<ILocalizedTextService>(),
-                    sectionService:Mock.Of<ISectionService>());
+            var serviceContext = new ServiceContext(
+                userService: mockedUserService,
+                contentService: mockedContentService,
+                mediaService: mockedMediaService,
+                entityService: mockedEntityService,
+                migrationEntryService: mockedMigrationService.Object,
+                localizedTextService:Mock.Of<ILocalizedTextService>(),
+                sectionService:Mock.Of<ISectionService>());
 
-                //ensure the configuration matches the current version for tests
-                SettingsForTests.ConfigurationStatus = UmbracoVersion.SemanticVersion.ToSemanticString();
+            //ensure the configuration matches the current version for tests
+            SettingsForTests.ConfigurationStatus = UmbracoVersion.SemanticVersion.ToSemanticString();
 
-                // fixme v8?
-                ////new app context
-                //var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
-                ////ensure these are set so that the appctx is 'Configured'
-                //dbCtx.Setup(x => x.CanConnect).Returns(true);
-                //dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(true);
-                //var appCtx = ApplicationContext.EnsureContext(
-                //    dbCtx.Object,
-                //    //pass in mocked services
-                //    serviceContext,
-                //    CacheHelper.CreateDisabledCacheHelper(),
-                //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),
-                //    true);
+            // fixme v8?
+            ////new app context
+            //var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
+            ////ensure these are set so that the appctx is 'Configured'
+            //dbCtx.Setup(x => x.CanConnect).Returns(true);
+            //dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(true);
+            //var appCtx = ApplicationContext.EnsureContext(
+            //    dbCtx.Object,
+            //    //pass in mocked services
+            //    serviceContext,
+            //    CacheHelper.CreateDisabledCacheHelper(),
+            //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),
+            //    true);
 
-                //httpcontext with an auth'd user
-                var httpContext = Mock.Of<HttpContextBase>(
-                    http => http.User == owinContext.Authentication.User
-                            //ensure the request exists with a cookies collection    
-                            && http.Request == Mock.Of<HttpRequestBase>(r => r.Cookies == new HttpCookieCollection())
-                            //ensure the request exists with an items collection    
-                            && http.Items == Mock.Of<IDictionary>());
-                //chuck it into the props since this is what MS does when hosted and it's needed there
-                request.Properties["MS_HttpContext"] = httpContext;                
+            //httpcontext with an auth'd user
+            var httpContext = Mock.Of<HttpContextBase>(
+                http => http.User == owinContext.Authentication.User
+                        //ensure the request exists with a cookies collection    
+                        && http.Request == Mock.Of<HttpRequestBase>(r => r.Cookies == new HttpCookieCollection())
+                        //ensure the request exists with an items collection    
+                        && http.Items == Mock.Of<IDictionary>());
+            //chuck it into the props since this is what MS does when hosted and it's needed there
+            request.Properties["MS_HttpContext"] = httpContext;                
 
-                var backofficeIdentity = (UmbracoBackOfficeIdentity) owinContext.Authentication.User.Identity;
+            var backofficeIdentity = (UmbracoBackOfficeIdentity) owinContext.Authentication.User.Identity;
 
-                var webSecurity = new Mock<WebSecurity>(null, null);
+            var webSecurity = new Mock<WebSecurity>(null, null);
 
-                //mock CurrentUser
-                var groups = new List<ReadOnlyUserGroup>();
-                for (var index = 0; index < backofficeIdentity.Roles.Length; index++)
-                {
-                    var role = backofficeIdentity.Roles[index];
-                    groups.Add(new ReadOnlyUserGroup(index + 1, role, "icon-user", null, null, role, new string[0], new string[0]));
-                }
-                webSecurity.Setup(x => x.CurrentUser)
-                    .Returns(Mock.Of<IUser>(u => u.IsApproved == true
-                                                 && u.IsLockedOut == false
-                                                 && u.AllowedSections == backofficeIdentity.AllowedApplications
-                                                 && u.Groups == groups
-                                                 && u.Email == "admin@admin.com"
-                                                 && u.Id == (int) backofficeIdentity.Id
-                                                 && u.Language == "en"
-                                                 && u.Name == backofficeIdentity.RealName
-                                                 && u.StartContentIds == backofficeIdentity.StartContentNodes
-                                                 && u.StartMediaIds == backofficeIdentity.StartMediaNodes
-                                                 && u.Username == backofficeIdentity.Username));
-
-                //mock Validate
-                webSecurity.Setup(x => x.ValidateCurrentUser())
-                    .Returns(() => true);               
-                webSecurity.Setup(x => x.UserHasSectionAccess(It.IsAny<string>(), It.IsAny<IUser>()))
-                    .Returns(() => true);
-
-                var umbCtx = UmbracoContext.EnsureContext(
-                    //set the user of the HttpContext
-                    new TestUmbracoContextAccessor(),
-                    httpContext,
-                    Mock.Of<IFacadeService>(),
-                    webSecurity.Object,
-                    Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == UrlProviderMode.Auto.ToString())),
-                    Enumerable.Empty<IUrlProvider>(),
-                    true); //replace it
-
-                var urlHelper = new Mock<IUrlProvider>();
-                urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>()))
-                    .Returns("/hello/world/1234");
-
-                var membershipHelper = new MembershipHelper(umbCtx, Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>());
-
-                var mockedTypedContent = Mock.Of<IPublishedContentQuery>();
-
-                var umbHelper = new UmbracoHelper(umbCtx,
-                    Mock.Of<IPublishedContent>(),
-                    mockedTypedContent,
-                    Mock.Of<ITagQuery>(),
-                    Mock.Of<IDataTypeService>(),
-                    Mock.Of<ICultureDictionary>(),
-                    Mock.Of<IUmbracoComponentRenderer>(),
-                    membershipHelper,
-                    new ServiceContext(), // fixme 'course that won't work
-                    CacheHelper.NoCache);
-
-                return CreateController(controllerType, request, umbHelper);
+            //mock CurrentUser
+            var groups = new List<ReadOnlyUserGroup>();
+            for (var index = 0; index < backofficeIdentity.Roles.Length; index++)
+            {
+                var role = backofficeIdentity.Roles[index];
+                groups.Add(new ReadOnlyUserGroup(index + 1, role, "icon-user", null, null, role, new string[0], new string[0]));
             }
-            //default
-            return base.Create(request, controllerDescriptor, controllerType);
+            webSecurity.Setup(x => x.CurrentUser)
+                .Returns(Mock.Of<IUser>(u => u.IsApproved == true
+                                             && u.IsLockedOut == false
+                                             && u.AllowedSections == backofficeIdentity.AllowedApplications
+                                             && u.Groups == groups
+                                             && u.Email == "admin@admin.com"
+                                             && u.Id == (int) backofficeIdentity.Id
+                                             && u.Language == "en"
+                                             && u.Name == backofficeIdentity.RealName
+                                             && u.StartContentIds == backofficeIdentity.StartContentNodes
+                                             && u.StartMediaIds == backofficeIdentity.StartMediaNodes
+                                             && u.Username == backofficeIdentity.Username));
+
+            //mock Validate
+            webSecurity.Setup(x => x.ValidateCurrentUser())
+                .Returns(() => true);               
+            webSecurity.Setup(x => x.UserHasSectionAccess(It.IsAny<string>(), It.IsAny<IUser>()))
+                .Returns(() => true);
+
+            var facade = new Mock<IFacade>();
+            facade.Setup(x => x.MemberCache).Returns(Mock.Of<IPublishedMemberCache>());
+            var facadeService = new Mock<IFacadeService>();
+            facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade.Object);
+
+            //var umbracoContextAccessor = new TestUmbracoContextAccessor();
+            //Umbraco.Web.Composing.Current.UmbracoContextAccessor = umbracoContextAccessor;
+            var umbracoContextAccessor = Umbraco.Web.Composing.Current.UmbracoContextAccessor;
+            Current.Container.Register(factory => umbracoContextAccessor.UmbracoContext); // but really, should we inject this?!
+
+            var umbCtx = UmbracoContext.EnsureContext(
+                umbracoContextAccessor,
+                httpContext,
+                facadeService.Object,
+                webSecurity.Object,
+                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == UrlProviderMode.Auto.ToString())),
+                Enumerable.Empty<IUrlProvider>(),
+                true); //replace it
+                
+            var urlHelper = new Mock<IUrlProvider>();
+            urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>()))
+                .Returns("/hello/world/1234");
+
+            var membershipHelper = new MembershipHelper(umbCtx, Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>());
+
+            var mockedTypedContent = Mock.Of<IPublishedContentQuery>();
+
+            var umbHelper = new UmbracoHelper(umbCtx,
+                Mock.Of<IPublishedContent>(),
+                mockedTypedContent,
+                Mock.Of<ITagQuery>(),
+                Mock.Of<IDataTypeService>(),
+                Mock.Of<ICultureDictionary>(),
+                Mock.Of<IUmbracoComponentRenderer>(),
+                membershipHelper,
+                serviceContext,
+                CacheHelper.NoCache);
+
+            return CreateController(controllerType, request, umbHelper);
         }
 
         protected abstract ApiController CreateController(Type controllerType, HttpRequestMessage msg, UmbracoHelper helper);

@@ -840,6 +840,7 @@
     <Compile Include="Persistence\IDatabaseContext.cs" />
     <Compile Include="Persistence\IUmbracoDatabase.cs" />
     <Compile Include="Persistence\IUmbracoDatabaseFactory.cs" />
+    <Compile Include="Persistence\LocalDb.cs" />
     <Compile Include="Persistence\Mappers\AccessMapper.cs" />
     <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
     <Compile Include="Persistence\Mappers\BaseMapper.cs" />

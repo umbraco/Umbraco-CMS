@@ -374,7 +374,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Complete();
 
                 // Assert
-                var result = repository.Get((int)groups[0].Id);
+                var result = repository.Get(groups[0].Id);
                 Assert.AreEqual(2, result.AllowedSections.Count());
                 Assert.IsTrue(result.AllowedSections.Contains("settings"));
                 Assert.IsTrue(result.AllowedSections.Contains("media"));

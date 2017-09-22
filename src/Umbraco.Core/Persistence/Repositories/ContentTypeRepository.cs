@@ -74,12 +74,14 @@ namespace Umbraco.Core.Persistence.Repositories
             // use the underlying GetAll which will force cache all content types
             return ids.Any() ? GetAll().Where(x => ids.Contains(x.Key)) : GetAll();
         }
+
         protected override IEnumerable<IContentType> PerformGetByQuery(IQuery<IContentType> query)
         {
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContentType>(sqlClause, query);
             var sql = translator.Translate();
 
+            // fixme - insane! GetBaseQuery does not even return a proper??? oh well...
             var dtos = Database.Fetch<ContentTypeTemplateDto>(sql);
 
             return
@@ -157,9 +159,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             sql = isCount
                 ? sql.SelectCount()
-                : sql.Select<ContentTypeDto>(r =>
-                        r.Select<NodeDto>(rr =>
-                            rr.Select<ContentTypeTemplateDto>()));
+                : sql.Select<ContentTypeTemplateDto>(r => r.Select(x => x.ContentTypeDto, r1 => r1.Select(x => x.NodeDto)));
 
             sql
                 .From<ContentTypeDto>()

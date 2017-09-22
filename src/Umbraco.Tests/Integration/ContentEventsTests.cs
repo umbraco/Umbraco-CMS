@@ -158,7 +158,7 @@ namespace Umbraco.Tests.Integration
 
             public override string ToString()
             {
-                return string.Format("{0:000}: {1}/{2}/{3}", Msg, Sender.Replace(" ", ""), Name, Args);
+                return $"{Msg:000}: {Sender.Replace(" ", "")}/{Name}/{Args}";
             }
         }
 
@@ -235,14 +235,14 @@ namespace Umbraco.Tests.Integration
                         //   figure out whether it is masked or not - what to do exactly in each case
                         //   would depend on the handler implementation - ie is it still updating
                         //   data for masked version or not
-                        var isPathPublished = ((ContentRepository)sender).IsPathPublished(x); // expensive!
+                        var isPathPublished = sender.IsPathPublished(x); // expensive!
                         if (isPathPublished)
                             state += "p"; // refresh (using x)
                         else
                             state += "m"; // masked
                     }
 
-                    return string.Format("{0}-{1}", state, x.Id);
+                    return $"{state}-{x.Id}";
                 }))
             };
             _events.Add(e);
@@ -282,7 +282,7 @@ namespace Umbraco.Tests.Integration
                 EventArgs = args,
                 Name = "RemoveVersion",
                 //Args = string.Join(",", args.Versions.Select(x => string.Format("{0}:{1}", x.Item1, x.Item2)))
-                Args = string.Format("{0}:{1}", args.EntityId, args.VersionId)
+                Args = $"{args.EntityId}:{args.VersionId}"
             };
             _events.Add(e);
         }

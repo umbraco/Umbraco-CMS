@@ -97,13 +97,13 @@ namespace Umbraco.Core.Persistence.Repositories
                     sql = sql.SelectCount();
                     break;
                 case QueryType.Ids:
-                    sql = sql.Select("cmsContentVersion.contentId");
+                    sql = sql.Select<ContentVersionDto>(x => x.NodeId);
                     break;
                 case QueryType.Many:
                 case QueryType.Single:
                     sql = sql.Select<ContentVersionDto>(r =>
-                                r.Select<ContentDto>(rr =>
-                                    rr.Select<NodeDto>()));
+                        r.Select(x => x.ContentDto, r1 =>
+                            r1.Select(x => x.NodeDto)));
                     break;
             }
 

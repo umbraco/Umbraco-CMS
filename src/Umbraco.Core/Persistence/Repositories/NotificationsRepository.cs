@@ -100,11 +100,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<NodeDto>(nodeDto => nodeDto.NodeId == entity.Id);
             var nodeType = _unitOfWork.Database.ExecuteScalar<Guid>(sql);
 
-            var dto = new User2NodeNotifyDto()
+            var dto = new User2NodeNotifyDto
                 {
                     Action = action,
                     NodeId = entity.Id,
-                    UserId = (int)user.Id
+                    UserId = user.Id
                 };
             _unitOfWork.Database.Insert(dto);
             return new Notification(dto.NodeId, dto.UserId, dto.Action, nodeType);

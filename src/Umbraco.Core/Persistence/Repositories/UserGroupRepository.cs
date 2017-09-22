@@ -170,9 +170,11 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(QueryType.Single);
             sql.Where(GetBaseWhereClause(), new { Id = id });
-            AppendGroupBy(sql);
 
-            var dto = Database.Fetch<UserGroupDto>(sql).FirstOrDefault();
+            AppendGroupBy(sql);
+            sql.OrderBy<UserGroupDto>(x => x.Id); // required for references
+
+            var dto = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -191,12 +193,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where<UserGroupDto>(x => x.Id >= 0);
 
             AppendGroupBy(sql);
+            sql.OrderBy<UserGroupDto>(x => x.Id); // required for references
 
-            // fixme - required so that Fetch can assemble references
-            sql.OrderBy<UserGroupDto>(x => x.Id);
-
-            Console.WriteLine(sql.SQL);
-            var dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql); // fixme one-to-many!
+            var dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql);
             return dtos.Select(UserGroupFactory.BuildEntity);
         }
 
@@ -205,9 +204,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(QueryType.Many);
             var translator = new SqlTranslator<IUserGroup>(sqlClause, query);
             var sql = translator.Translate();
-            AppendGroupBy(sql);
 
-            var dtos = Database.Fetch<UserGroupDto>(sql);
+            AppendGroupBy(sql);
+            sql.OrderBy<UserGroupDto>(x => x.Id); // required for references
+
+            var dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql);
             return dtos.Select(UserGroupFactory.BuildEntity);
         }
 
@@ -235,9 +236,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 case QueryType.Single:
                 case QueryType.Many:
                     sql
-                        .Zelect<UserGroupDto>(
-                            s => s.Append($", COUNT({sql.Columns<User2UserGroupDto>(x => x.UserId)}) AS {SqlSyntax.GetQuotedColumnName("UserCount")}"),
-                            r => r.Select(x => x.UserGroup2AppDtos));
+                        .Select<UserGroupDto>(r =>
+                            r.Select(x => x.UserGroup2AppDtos),
+                            s => s.Append($", COUNT({sql.Columns<User2UserGroupDto>(x => x.UserId)}) AS {SqlSyntax.GetQuotedColumnName("UserCount")}"));
                     addFrom = true;
                     break;
                 default:
@@ -262,10 +263,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private static void AppendGroupBy(Sql<SqlContext> sql)
         {
-            sql.GroupBy(sql.Columns<UserGroupDto>(x => x.CreateDate, x => x.Icon, x => x.Id, x => x.StartContentId, x => x.StartMediaId,
-                                                    x => x.UpdateDate, x => x.Alias, x => x.DefaultPermissions, x => x.Name)
-                        + ", "
-                        + sql.Columns<UserGroup2AppDto>(x => x.AppAlias, x => x.UserGroupId));
+            sql
+                .GroupBy<UserGroupDto>(x => x.CreateDate, x => x.Icon, x => x.Id, x => x.StartContentId, x => x.StartMediaId,
+                                       x => x.UpdateDate, x => x.Alias, x => x.DefaultPermissions, x => x.Name)
+                .AndBy<UserGroup2AppDto>(x => x.AppAlias, x => x.UserGroupId);
         }
 
         protected override string GetBaseWhereClause()

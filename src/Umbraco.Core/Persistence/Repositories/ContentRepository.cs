@@ -125,17 +125,17 @@ namespace Umbraco.Core.Persistence.Repositories
                     break;
                 case QueryType.Single:
                     sql = sql.Select<DocumentDto>(r =>
-                                r.Select<ContentVersionDto>(rr =>
-                                        rr.Select<ContentDto>(rrr =>
-                                            rrr.Select<NodeDto>()))
-                                 .Select<DocumentPublishedReadOnlyDto>(tableAlias: "cmsDocument2"));
+                        r.Select(documentDto => documentDto.ContentVersionDto, r1 =>
+                            r1.Select(contentVersionDto => contentVersionDto.ContentDto, r2 =>
+                                r2.Select(contentDto => contentDto.NodeDto)))
+                         .Select(documentDto => documentDto.DocumentPublishedReadOnlyDto, "cmsDocument2"));
                             break;
                 case QueryType.Many:
                     // 'many' does not join on cmsDocument2
                     sql = sql.Select<DocumentDto>(r =>
-                                r.Select<ContentVersionDto>(rr =>
-                                    rr.Select<ContentDto>(rrr =>
-                                        rrr.Select<NodeDto>())));
+                        r.Select(documentDto => documentDto.ContentVersionDto, r1 =>
+                            r1.Select(contentVersionDto => contentVersionDto.ContentDto, r2 =>
+                                r2.Select(contentDto => contentDto.NodeDto))));
                     break;
             }
 
@@ -157,18 +157,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 //We also don't include this outer join when querying for multiple entities since it is much faster to fetch this information
                 //in a separate query. For a single entity this is ok.
 
-                var sqlx = string.Format("LEFT OUTER JOIN {0} {1} ON ({1}.{2}={0}.{2} AND {1}.{3}=1)",
-                    SqlSyntax.GetQuotedTableName("cmsDocument"),
-                    SqlSyntax.GetQuotedTableName("cmsDocument2"),
-                    SqlSyntax.GetQuotedColumnName("nodeId"),
-                    SqlSyntax.GetQuotedColumnName("published"));
-
-                // cannot do this because NPoco does not know how to alias the table
-                //.LeftOuterJoin<DocumentPublishedReadOnlyDto>()
-                //.On<DocumentDto, DocumentPublishedReadOnlyDto>(left => left.NodeId, right => right.NodeId)
-                // so have to rely on writing our own SQL
                 sql
-                    .Append(sqlx /*, new { @published = true }*/);
+                    .LeftJoin<DocumentDto>("cmsDocument2")
+                    .On<DocumentDto, DocumentDto>((x1, x2) => x1.NodeId == x2.NodeId && x2.Published, alias2: "cmsDocument2");
             }
 
             sql
@@ -209,7 +200,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM cmsContentXml WHERE nodeId = @Id",
                                "DELETE FROM cmsContent WHERE nodeId = @Id",
                                "DELETE FROM umbracoAccess WHERE nodeId = @Id",
-                               "DELETE FROM umbracoNode WHERE id = @Id"                               
+                               "DELETE FROM umbracoNode WHERE id = @Id"
                            };
             return list;
         }
@@ -222,11 +213,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override IEnumerable<IContent> GetAllVersions(int id)
         {
-            var sql = GetBaseQuery(false)
+            var sql = GetBaseQuery(QueryType.Many)
                 .Where(GetBaseWhereClause(), new { Id = id })
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            return MapQueryDtos(Database.Fetch<DocumentDto>(sql), true);
+            return MapQueryDtos(Database.Fetch<DocumentDto>(sql), true, true, true);
         }
 
         public override IContent GetByVersion(Guid versionId)
@@ -755,25 +746,20 @@ namespace Umbraco.Core.Persistence.Repositories
             // fail fast
             if (content.Path.StartsWith("-1,-20,"))
                 return false;
+
             // succeed fast
             if (content.ParentId == -1)
                 return content.HasPublishedVersion;
 
-            var syntaxUmbracoNode = SqlSyntax.GetQuotedTableName("umbracoNode");
             var ids = content.Path.Split(',').Skip(1).Select(int.Parse);
 
-            var sql = string.Format(@"SELECT COUNT({0}.{1})
-FROM {0}
-JOIN {2} ON ({0}.{1}={2}.{3} AND {2}.{4}=@published)
-WHERE {0}.{1} IN (@ids)",
-                syntaxUmbracoNode,
-                SqlSyntax.GetQuotedColumnName("id"),
-                SqlSyntax.GetQuotedTableName("cmsDocument"),
-                SqlSyntax.GetQuotedColumnName("nodeId"),
-                SqlSyntax.GetQuotedColumnName("published"));
+            var sql = Sql()
+                .SelectCount<NodeDto>(x => x.NodeId)
+                .From<NodeDto>()
+                .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((n, d) => n.NodeId == d.NodeId && d.Published)
+                .WhereIn<NodeDto>(x => x.NodeId, ids);
 
-            var count = Database.ExecuteScalar<int>(sql, new { published=true, ids });
-            count += 1; // because content does not count
+            var count = Database.ExecuteScalar<int>(sql);
             return count == content.Level;
         }
 
@@ -909,23 +895,39 @@ WHERE {0}.{1} IN (@ids)",
         // "many" corresponds to 7.6 "includeAllVersions"
         // fixme - we are not implementing the double-query thing for pagination from 7.6?
         //
-        private IEnumerable<IContent> MapQueryDtos(List<DocumentDto> dtos, bool withCache = false, bool many = false)
+        private IEnumerable<IContent> MapQueryDtos(List<DocumentDto> dtos, bool withCache = false, bool many = false, bool allVersions = false)
         {
-            var content = new IContent[dtos.Count];
             var temps = new List<TempContent>();
             var contentTypes = new Dictionary<int, IContentType>();
             var templateIds = new List<int>();
 
-            // in case of data corruption we may have more than 1 "newest" - cleanup
-            var ix = new Dictionary<int, DocumentDto>();
+            var newest = new Dictionary<int, DocumentDto>();
+            var remove = allVersions ? null : new List<DocumentDto>();
             foreach (var dto in dtos)
             {
-                if (ix.TryGetValue(dto.NodeId, out DocumentDto ixDto) == false || ixDto.UpdateDate < dto.UpdateDate)
-                    ix[dto.NodeId] = dto;
+                if (dto.Newest == false) continue;
+                if (newest.TryGetValue(dto.NodeId, out var newestDto) == false)
+                {
+                    newest[dto.NodeId] = dto;
+                    continue;
+                }
+                if (dto.UpdateDate < newestDto.UpdateDate)
+                {
+                    if (allVersions) dto.Newest = false;
+                    else remove.Add(dto);
+                }
+                else
+                {
+                    newest[dto.NodeId] = dto;
+                    if (allVersions) newestDto.Newest = false;
+                    else remove.Add(newestDto);
+                }
             }
-            dtos = ix.Values.ToList();
+            if (remove != null)
+                foreach (var removeDto in remove)
+                    dtos.Remove(removeDto);
 
-            // populate published data
+            // populate published data - in case of 'many' it's not there yet
             if (many)
             {
                 var roDtos = Database.FetchByGroups<DocumentPublishedReadOnlyDto, int>(dtos.Select(x => x.NodeId), 2000, batch
@@ -935,21 +937,24 @@ WHERE {0}.{1} IN (@ids)",
                             .WhereIn<DocumentDto>(x => x.NodeId, batch)
                             .Where<DocumentDto>(x => x.Published));
 
-                // in case of data corruption we may have more than 1 "published" - cleanup
+                // in case of data corruption we may have more than 1 "published" - cleanup - keep most recent
                 var publishedDtoIndex = new Dictionary<int, DocumentPublishedReadOnlyDto>();
                 foreach (var roDto in roDtos)
                 {
-                    if (publishedDtoIndex.TryGetValue(roDto.NodeId, out DocumentPublishedReadOnlyDto ixDto) == false || ixDto.VersionDate < roDto.VersionDate)
+                    if (publishedDtoIndex.TryGetValue(roDto.NodeId, out var ixDto) == false || ixDto.VersionDate < roDto.VersionDate)
                         publishedDtoIndex[roDto.NodeId] = roDto;
                 }
 
+                // assign
                 foreach (var dto in dtos)
                 {
-                    if (publishedDtoIndex.TryGetValue(dto.NodeId, out DocumentPublishedReadOnlyDto d) == false)
-                        d = new DocumentPublishedReadOnlyDto();
-                    dto.DocumentPublishedReadOnlyDto = d;
+                    dto.DocumentPublishedReadOnlyDto = publishedDtoIndex.TryGetValue(dto.NodeId, out var d)
+                        ? d
+                        : new DocumentPublishedReadOnlyDto();
                 }
             }
+
+            var content = new IContent[dtos.Count];
 
             for (var i = 0; i < dtos.Count; i++)
             {
@@ -959,9 +964,7 @@ WHERE {0}.{1} IN (@ids)",
                 {
                     // if the cache contains the (proper version of the) item, use it
                     var cached = IsolatedCache.GetCacheItem<IContent>(GetCacheIdKey<IContent>(dto.NodeId));
-                    // fixme - wtf? only published?
-                    if (cached != null && cached.Published)
-                    //if (cached != null && cached.Version == dto.ContentVersionDto.VersionId)
+                    if (cached != null && cached.Version == dto.ContentVersionDto.VersionId)
                     {
                         content[i] = cached;
                         continue;
@@ -972,7 +975,7 @@ WHERE {0}.{1} IN (@ids)",
 
                 // get the content type - the repository is full cache *but* still deep-clones
                 // whatever comes out of it, so use our own local index here to avoid this
-                if (contentTypes.TryGetValue(dto.ContentVersionDto.ContentDto.ContentTypeId, out IContentType contentType) == false)
+                if (contentTypes.TryGetValue(dto.ContentVersionDto.ContentDto.ContentTypeId, out var contentType) == false)
                     contentTypes[dto.ContentVersionDto.ContentDto.ContentTypeId] = contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
                 var c = content[i] = ContentFactory.BuildEntity(dto, contentType, dto.DocumentPublishedReadOnlyDto);
@@ -1003,10 +1006,8 @@ WHERE {0}.{1} IN (@ids)",
             foreach (var temp in temps)
             {
                 // complete the item
-                ITemplate template = null;
-                if (temp.TemplateId.HasValue)
-                    templates.TryGetValue(temp.TemplateId.Value, out template); // else null
-                ((Content) temp.Content).Template = template;
+                if (temp.TemplateId.HasValue && templates.TryGetValue(temp.TemplateId.Value, out var template))
+                    ((Content) temp.Content).Template = template;
                 temp.Content.Properties = propertyData[temp.Version];
 
                 //on initial construction we don't want to have dirty properties tracked

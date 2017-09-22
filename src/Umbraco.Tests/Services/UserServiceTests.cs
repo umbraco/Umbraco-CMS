@@ -929,7 +929,7 @@ namespace Umbraco.Tests.Services
 
             // Act
 
-            var updatedItem = (User)ServiceContext.UserService.GetByUsername(originalUser.Username);
+            var updatedItem = (User) ServiceContext.UserService.GetByUsername(originalUser.Username);
 
             // Assert
             Assert.IsNotNull(updatedItem);
@@ -943,7 +943,7 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(updatedItem.StartMediaIds.UnsortedSequenceEqual(originalUser.StartMediaIds));
             Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));
             Assert.That(updatedItem.Username, Is.EqualTo(originalUser.Username));
-            Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(2));
+            Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(originalUser.AllowedSections.Count()));
         }
 
         private IUser CreateTestUser(out IUserGroup userGroup)

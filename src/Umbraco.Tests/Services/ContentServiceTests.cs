@@ -1707,7 +1707,7 @@ namespace Umbraco.Tests.Services
 
             var user = ServiceContext.UserService.GetUserById(0);
             var userGroup = ServiceContext.UserService.GetUserGroupByAlias(user.Groups.First().Alias);
-            Assert.IsNotNull(ServiceContext.NotificationService.CreateNotification(user, content1, "test"));
+            Assert.IsNotNull(ServiceContext.NotificationService.CreateNotification(user, content1, "X"));
 
             ServiceContext.ContentService.AssignContentPermission(content1, 'A', new[] { userGroup.Id });
 

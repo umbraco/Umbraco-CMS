@@ -20,6 +20,10 @@ namespace Umbraco.Web.WebApi
         /// <returns></returns>
         internal static Attempt<IOwinContext> TryGetOwinContext(this HttpRequestMessage request)
         {
+            // occurs in unit tests?
+            if (request.Properties.TryGetValue("MS_OwinContext", out var o) && o is IOwinContext owinContext)
+                return Attempt.Succeed(owinContext);
+
             var httpContext = request.TryGetHttpContext();
             try
             {

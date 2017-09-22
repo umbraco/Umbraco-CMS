@@ -40,7 +40,7 @@ namespace Umbraco.Web.WebApi
         /// Gets or sets the database context.
         /// </summary>
         [Inject]
-        public IUmbracoDatabaseFactory DatabaseFactory { get; set; }
+        public IDatabaseContext DatabaseContext { get; set; }
 
         /// <summary>
         /// Gets or sets the services context.

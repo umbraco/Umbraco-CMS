@@ -175,12 +175,23 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var dtos = scope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, x => x.Id, @"
-                    SELECT zbThing1.id AS Id, zbThing1.name AS Name,
-                           zbThing2.id AS Things__Id, zbThing2.name AS Things__Name, zbThing2.thingId AS Things__ThingId
-                    FROM zbThing1
-                    JOIN zbThing2 ON zbThing1.id=zbThing2.thingId
-                    WHERE zbThing1.id=1");
+                // this is the raw SQL, but it's better to use expressions and no magic strings!
+                //var dtos = scope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, x => x.Id, @"
+                //    SELECT zbThing1.id AS Id, zbThing1.name AS Name,
+                //           zbThing2.id AS Things__Id, zbThing2.name AS Things__Name, zbThing2.thingId AS Things__ThingId
+                //    FROM zbThing1
+                //    JOIN zbThing2 ON zbThing1.id=zbThing2.thingId
+                //    WHERE zbThing1.id=1");
+
+                var sql = scope.DatabaseContext.Sql()
+                    .Select<Thing3Dto>(r => r.Select(x => x.Things))
+                    .From<Thing3Dto>()
+                    .InnerJoin<Thing2Dto>().On<Thing3Dto, Thing2Dto>(left => left.Id, right => right.ThingId)
+                    .Where<Thing3Dto>(x => x.Id == 1);
+
+                //var dtos = scope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, x => x.Id, sql);
+                var dtos = scope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, sql);
+
                 Assert.AreEqual(1, dtos.Count);
                 var dto1 = dtos.FirstOrDefault(x => x.Id == 1);
                 Assert.IsNotNull(dto1);
@@ -215,10 +226,45 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                 //    ORDER BY zbThing1.id";
 
                 var sql = scope.DatabaseContext.Sql()
-                    .Zelect<Thing3Dto>(r => r.Select(x => x.Things)) // select Thing3Dto, and Thing2Dto for Things
+                    .Select<Thing3Dto>(r => r.Select(x => x.Things)) // select Thing3Dto, and Thing2Dto for Things
                     .From<Thing3Dto>()
                     .InnerJoin<Thing2Dto>().On<Thing3Dto, Thing2Dto>(left => left.Id, right => right.ThingId)
                     .OrderBy<Thing3Dto>(x => x.Id);
+
+                // one-to-many on Things, using Id as the 'one' key - not needed since it's PK
+                //var dtos = scope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, x => x.Id, sql);
+                var dtos = scope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, sql);
+
+                Assert.AreEqual(2, dtos.Count);
+                var dto1 = dtos.FirstOrDefault(x => x.Id == 1);
+                Assert.IsNotNull(dto1);
+                Assert.AreEqual("one", dto1.Name);
+                Assert.IsNotNull(dto1.Things);
+                Assert.AreEqual(2, dto1.Things.Count);
+                var dto2 = dto1.Things.FirstOrDefault(x => x.Id == 1);
+                Assert.IsNotNull(dto2);
+                Assert.AreEqual("uno", dto2.Name);
+            }
+        }
+
+        [Test]
+        public void TestOneToManyOnManyTemplate()
+        {
+            // same as above with a template
+            SqlTemplate.Clear();
+
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                SqlTemplate.SqlContext = scope.DatabaseContext.Sql().SqlContext; // fixme
+
+                var sql = SqlTemplate.Get("xxx", s => s
+                    .Select<Thing3Dto>(r => r.Select(x => x.Things)) // select Thing3Dto, and Thing2Dto for Things
+                    .From<Thing3Dto>()
+                    .InnerJoin<Thing2Dto>().On<Thing3Dto, Thing2Dto>(left => left.Id, right => right.ThingId)
+                    .OrderBy<Thing3Dto>(x => x.Id)).Sql();
+
+                // cached
+                sql = SqlTemplate.Get("xxx", s => throw new InvalidOperationException()).Sql();
 
                 // one-to-many on Things, using Id as the 'one' key - not needed since it's PK
                 //var dtos = scope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, x => x.Id, sql);
@@ -304,7 +350,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                     .Select("*")
                     .From("zbThing1")
                     .Where("id=@id", new { id = 1 });
-                WriteSql(sql);
+                sql.WriteToConsole();
                 var dto = scope.Database.Fetch<Thing1Dto>(sql).FirstOrDefault();
                 Assert.IsNotNull(dto);
                 Assert.AreEqual("one", dto.Name);
@@ -316,20 +362,11 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                 //Assert.AreEqual("one", dto.Name);
 
                 var sql3 = new Sql(sql.SQL, 1);
-                WriteSql(sql3);
+                sql.WriteToConsole();
                 dto = scope.Database.Fetch<Thing1Dto>(sql3).FirstOrDefault();
                 Assert.IsNotNull(dto);
                 Assert.AreEqual("one", dto.Name);
             }
-        }
-
-        private static void WriteSql(Sql sql)
-        {
-            Console.WriteLine();
-            Console.WriteLine(sql.SQL);
-            var i = 0;
-            foreach (var arg in sql.Arguments)
-                Console.WriteLine($"  @{i++}: {arg}");
         }
 
         [TableName("zbThing1")]
