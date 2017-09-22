@@ -284,7 +284,7 @@
             vm.selectedBulkUserGroups = _.clone(firstSelectedUser.userGroups);
 
             vm.userGroupPicker = {
-                title: "Select user groups",
+                title: localizationService.localize("user_selectUserGroups"),
                 view: "usergrouppicker",
                 selection: vm.selectedBulkUserGroups,
                 closeButtonLabel: "Cancel",

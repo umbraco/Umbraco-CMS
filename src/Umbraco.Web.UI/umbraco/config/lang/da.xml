@@ -1470,6 +1470,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="profile">Profil</key>
     <key alias="searchAllChildren">Søg alle 'børn'</key>
     <key alias="sectionsHelp">Tilføj sektioner for at give brugerne adgang</key>
+    <key alias="selectUserGroups">Vælg brugergrupper</key>
     <key alias="noStartNode">Ingen startnode valgt</key>
     <key alias="noStartNodes">Ingen startnoder valgt</key>
     <key alias="startnode">Startnode</key>
