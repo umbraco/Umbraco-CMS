@@ -1479,6 +1479,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="updateDate">Bruger sidst opdateret</key>
     <key alias="userCreated">er blevet oprettet</key>
     <key alias="userCreatedSuccessHelp">Den nye bruger er blevet oprettet. For at logge ind i Umbraco skal du bruge adgangskoden nedenfor.</key>
+    <key alias="userManagement">Brugeradministration</key>
     <key alias="username">Navn</key>
     <key alias="userPermissions">Brugertilladelser</key>
     <key alias="userGroupPermissions">Brugergruppe tilladelser</key>
