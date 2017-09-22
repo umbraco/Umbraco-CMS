@@ -107,7 +107,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = Sql();
+            var sql = SqlContext.Sql();
 
             sql = isCount
                 ? sql.SelectCount()
@@ -324,13 +324,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //look up the simple template definitions that have a master template assigned, this is used
             // later to populate the template item's properties
-            var childIdsSql = Sql()
+            var childIdsSql = SqlContext.Sql()
                 .Select("nodeId,alias,parentID")
                 .From<TemplateDto>()
                 .InnerJoin<NodeDto>()
                 .On<TemplateDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
                 //lookup axis's
-                .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("id") + " IN (@parentIds) OR umbracoNode.parentID IN (@childIds)",
+                .Where("umbracoNode." + SqlContext.SqlSyntax.GetQuotedColumnName("id") + " IN (@parentIds) OR umbracoNode.parentID IN (@childIds)",
                     new {parentIds = templates.Select(x => x.NodeDto.ParentId), childIds = templates.Select(x => x.NodeId)});
 
             var childIds = Database.Fetch<dynamic>(childIdsSql)

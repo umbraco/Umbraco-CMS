@@ -52,7 +52,7 @@ namespace Umbraco.Core.Services
         // lazy-constructed because when the ctor runs, the query factory may not be ready
 
         private IQuery<IUmbracoEntity> QueryRootEntity => _queryRootEntity
-            ?? (_queryRootEntity = UowProvider.DatabaseContext.Query<IUmbracoEntity>().Where(x => x.ParentId == -1));
+            ?? (_queryRootEntity = Query<IUmbracoEntity>().Where(x => x.ParentId == -1));
 
         #endregion
 
@@ -266,7 +266,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IEntityRepository>();
-                var query = repository.Query.Where(x => x.ParentId == parentId);
+                var query = Query<IUmbracoEntity>().Where(x => x.ParentId == parentId);
                 return repository.GetByQuery(query);
             }
         }
@@ -283,7 +283,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IEntityRepository>();
-                var query = repository.Query.Where(x => x.ParentId == parentId);
+                var query = Query<IUmbracoEntity>().Where(x => x.ParentId == parentId);
                 return repository.GetByQuery(query, objectTypeId).ToList(); // run within using!
             }
         }
@@ -300,7 +300,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IEntityRepository>();
                 var entity = repository.Get(id);
                 var pathMatch = entity.Path + ",";
-                var query = repository.Query.Where(x => x.Path.StartsWith(pathMatch) && x.Id != id);
+                var query = Query<IUmbracoEntity>().Where(x => x.Path.StartsWith(pathMatch) && x.Id != id);
                 return repository.GetByQuery(query);
             }
         }
@@ -318,7 +318,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IEntityRepository>();
                 var entity = repository.Get(id);
-                var query = repository.Query.Where(x => x.Path.StartsWith(entity.Path) && x.Id != id);
+                var query = Query<IUmbracoEntity>().Where(x => x.Path.StartsWith(entity.Path) && x.Id != id);
                 return repository.GetByQuery(query, objectTypeId);
             }
         }
@@ -342,12 +342,12 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IEntityRepository>();
-                var query = repository.Query.Where(x => x.ParentId == parentId && x.Trashed == false);
+                var query = Query<IUmbracoEntity>().Where(x => x.ParentId == parentId && x.Trashed == false);
 
                 IQuery<IUmbracoEntity> filterQuery = null;
                 if (filter.IsNullOrWhiteSpace() == false)
                 {
-                    filterQuery = repository.Query.Where(x => x.Name.Contains(filter));
+                    filterQuery = Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter));
                 }
 
                 var contents = repository.GetPagedResultsByQuery(query, objectTypeId, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filterQuery);
@@ -374,8 +374,8 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IEntityRepository>();
-                
-                var query = repository.Query;
+
+                var query = Query<IUmbracoEntity>();
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
@@ -394,7 +394,7 @@ namespace Umbraco.Core.Services
                 IQuery<IUmbracoEntity> filterQuery = null;
                 if (filter.IsNullOrWhiteSpace() == false)
                 {
-                    filterQuery = uow.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter));
+                    filterQuery = Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter));
                 }
 
                 var contents = repository.GetPagedResultsByQuery(query, objectTypeId, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filterQuery);
@@ -418,8 +418,8 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IEntityRepository>();
-                
-                var query = uow.Query<IUmbracoEntity>();
+
+                var query = Query<IUmbracoEntity>();
                 if (idsA.All(x => x != Constants.System.Root))
                 {
                     //lookup the paths so we can use it in the prefix query below
@@ -441,7 +441,7 @@ namespace Umbraco.Core.Services
                             var path = itemPath.Path;
                             var qid = id;
                             clauses.Add(x => x.Path.SqlStartsWith(path + ",", TextColumnType.NVarchar) || x.Path.SqlEndsWith("," + qid, TextColumnType.NVarchar));
-                        }                        
+                        }
                     }
                     query.WhereAny(clauses);
                 }
@@ -449,7 +449,7 @@ namespace Umbraco.Core.Services
                 IQuery<IUmbracoEntity> filterQuery = null;
                 if (filter.IsNullOrWhiteSpace() == false)
                 {
-                    filterQuery = uow.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter));
+                    filterQuery = Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter));
                 }
 
                 var contents = repository.GetPagedResultsByQuery(query, objectTypeId, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filterQuery);
@@ -477,7 +477,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IEntityRepository>();
 
-                var query = repository.Query;
+                var query = Query<IUmbracoEntity>();
                 //don't include trashed if specfied
                 if (includeTrashed == false)
                 {
@@ -487,14 +487,14 @@ namespace Umbraco.Core.Services
                 IQuery<IUmbracoEntity> filterQuery = null;
                 if (filter.IsNullOrWhiteSpace() == false)
                 {
-                    filterQuery = repository.Query.Where(x => x.Name.Contains(filter));
+                    filterQuery = Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter));
                 }
 
                 var contents = repository.GetPagedResultsByQuery(query, objectTypeId, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filterQuery);
                 return contents;
             }
         }
-        
+
         /// <summary>
         /// Gets a collection of the entities at the root, which corresponds to the entities with a Parent Id of -1.
         /// </summary>
@@ -592,7 +592,7 @@ namespace Umbraco.Core.Services
                 return repository.GetAllPaths(objectTypeId, keys);
             }
         }
-        
+
         /// <summary>
         /// Gets a collection of <see cref="T:Umbraco.Core.Models.EntityBase.IUmbracoEntity" />
         /// </summary>
@@ -624,7 +624,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
-                var sql = uow.Sql()
+                var sql = uow.SqlContext.Sql()
                     .Select("nodeObjectType")
                     .From<NodeDto>()
                     .Where<NodeDto>(x => x.NodeId == id);
@@ -643,7 +643,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
-                var sql = uow.Sql()
+                var sql = uow.SqlContext.Sql()
                     .Select("nodeObjectType")
                     .From<NodeDto>()
                     .Where<NodeDto>(x => x.UniqueId == key);

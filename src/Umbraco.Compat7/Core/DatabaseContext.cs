@@ -27,22 +27,22 @@ namespace Umbraco.Core
         /// <summary>
         /// Gets the database Sql syntax.
         /// </summary>
-        public ISqlSyntaxProvider SqlSyntax => _databaseFactory.SqlSyntax;
+        public ISqlSyntaxProvider SqlSyntax => _databaseFactory.SqlContext.SqlSyntax;
 
         /// <summary>
         /// Creates a Sql statement.
         /// </summary>
-        public Sql<SqlContext> Sql() => _databaseFactory.Sql();
+        public Sql<SqlContext> Sql() => _databaseFactory.SqlContext.Sql();
 
         /// <summary>
         /// Creates a Sql statement.
         /// </summary>
-        public Sql<SqlContext> Sql(string sql, params object[] args) => _databaseFactory.Sql(sql, args);
+        public Sql<SqlContext> Sql(string sql, params object[] args) => _databaseFactory.SqlContext.Sql(sql, args);
 
         /// <summary>
         /// Creates a Query expression.
         /// </summary>
-        public IQuery<T> Query<T>() => _databaseFactory.Query<T>();
+        public IQuery<T> Query<T>() => _databaseFactory.SqlContext.Query<T>();
 
         /// <summary>
         /// Gets an ambient database for doing CRUD operations against custom tables that resides in the Umbraco database.

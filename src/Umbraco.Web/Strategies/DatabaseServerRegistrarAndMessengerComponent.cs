@@ -57,10 +57,10 @@ namespace Umbraco.Web.Strategies
                 var logger = factory.GetInstance<ILogger>();
                 var proflog = factory.GetInstance<ProfilingLogger>();
                 var scopeProvider = factory.GetInstance<IScopeProvider>();
-                var databaseContext = factory.GetInstance<IDatabaseContext>();
+                var sqlContext = factory.GetInstance<ISqlContext>();
 
                 return new BatchedDatabaseServerMessenger(
-                    runtime, databaseFactory, scopeProvider, databaseContext, logger, proflog,
+                    runtime, databaseFactory, scopeProvider, sqlContext, logger, proflog,
                     true,
                     //Default options for web including the required callbacks to build caches
                     new DatabaseServerMessengerOptions

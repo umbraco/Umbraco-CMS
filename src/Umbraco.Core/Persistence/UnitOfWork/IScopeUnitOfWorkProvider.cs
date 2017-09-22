@@ -14,9 +14,9 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         IScopeProvider ScopeProvider { get; }
 
         /// <summary>
-        /// Gets the database context.
+        /// Gets the sql context.
         /// </summary>
-        IDatabaseContext DatabaseContext { get; }
+        ISqlContext SqlContext { get; }
 
         /// <summary>
         /// Creates a unit of work.

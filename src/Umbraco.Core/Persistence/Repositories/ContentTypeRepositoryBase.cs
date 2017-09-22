@@ -66,7 +66,7 @@ namespace Umbraco.Core.Persistence.Repositories
             AddOrUpdate(moving);
 
             //update all descendants, update in order of level
-            var descendants = GetByQuery(QueryT.Where(type => type.Path.StartsWith(movingPath)));
+            var descendants = GetByQuery(Query<TEntity>().Where(type => type.Path.StartsWith(movingPath)));
             var paths = new Dictionary<int, string>();
             paths[moving.Id] = moving.Path;
 

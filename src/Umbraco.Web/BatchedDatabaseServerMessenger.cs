@@ -26,9 +26,9 @@ namespace Umbraco.Web
         private readonly IUmbracoDatabaseFactory _databaseFactory;
 
         public BatchedDatabaseServerMessenger(
-            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, IDatabaseContext databaseContext, ILogger logger, ProfilingLogger proflog,
+            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, ILogger logger, ProfilingLogger proflog,
             bool enableDistCalls, DatabaseServerMessengerOptions options)
-            : base(runtime, scopeProvider, databaseContext, logger, proflog, enableDistCalls, options)
+            : base(runtime, scopeProvider, sqlContext, logger, proflog, enableDistCalls, options)
         {
             _databaseFactory = databaseFactory;
         }

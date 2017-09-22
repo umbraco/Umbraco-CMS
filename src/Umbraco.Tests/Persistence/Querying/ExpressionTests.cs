@@ -149,7 +149,7 @@ namespace Umbraco.Tests.Persistence.Querying
         {
             //mysql escapes backslashes, so we'll test with that
             var sqlSyntax = new MySqlSyntaxProvider(Mock.Of<ILogger>());
-            var sqlContext = new SqlContext(sqlSyntax, SqlContext.PocoDataFactory, DatabaseType.MySQL);
+            var sqlContext = new SqlContext(sqlSyntax, DatabaseType.MySQL, SqlContext.PocoDataFactory);
 
             Expression<Func<IUser, bool>> predicate = user => user.Username.Equals("mydomain\\myuser");
             var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IUser>(sqlContext.SqlSyntax, Mappers);
@@ -166,7 +166,7 @@ namespace Umbraco.Tests.Persistence.Querying
         {
             //mysql escapes backslashes, so we'll test with that
             var sqlSyntax = new MySqlSyntaxProvider(Mock.Of<ILogger>());
-            var sqlContext = new SqlContext(sqlSyntax, SqlContext.PocoDataFactory, DatabaseType.MySQL);
+            var sqlContext = new SqlContext(sqlSyntax, DatabaseType.MySQL, SqlContext.PocoDataFactory);
 
             Expression<Func<UserDto, bool>> predicate = user => user.Login.StartsWith("mydomain\\myuser");
             var modelToSqlExpressionHelper = new PocoToSqlExpressionVisitor<UserDto>(sqlContext);

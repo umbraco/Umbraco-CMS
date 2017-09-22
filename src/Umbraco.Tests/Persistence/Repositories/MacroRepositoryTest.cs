@@ -134,7 +134,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
 
                 // Act
-                var query = unitOfWork.Query<IMacro>().Where(x => x.Alias.ToUpper() == "TEST1");
+                var query = unitOfWork.SqlContext.Query<IMacro>().Where(x => x.Alias.ToUpper() == "TEST1");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -152,7 +152,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
 
                 // Act
-                var query = unitOfWork.Query<IMacro>().Where(x => x.Name.StartsWith("Test"));
+                var query = unitOfWork.SqlContext.Query<IMacro>().Where(x => x.Name.StartsWith("Test"));
                 int count = repository.Count(query);
 
                 // Assert

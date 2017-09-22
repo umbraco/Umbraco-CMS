@@ -11,10 +11,10 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <summary>
         /// Initializes a new instance of the <see cref="ScopeUnitOfWorkProvider"/> class.
         /// </summary>
-        public ScopeUnitOfWorkProvider(IScopeProvider scopeProvider, IDatabaseContext databaseContext, RepositoryFactory repositoryFactory)
+        public ScopeUnitOfWorkProvider(IScopeProvider scopeProvider, ISqlContext sqlContext, RepositoryFactory repositoryFactory)
         {
             ScopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
-            DatabaseContext = databaseContext ?? throw new ArgumentNullException(nameof(databaseContext));
+            SqlContext = sqlContext ?? throw new ArgumentNullException(nameof(sqlContext));
             _repositoryFactory = repositoryFactory ?? throw new ArgumentNullException(nameof(repositoryFactory));
         }
 
@@ -22,12 +22,12 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         public IScopeProvider ScopeProvider { get; }
 
         /// <inheritdoc />
-        public IDatabaseContext DatabaseContext { get; }
+        public ISqlContext SqlContext { get; }
 
         /// <inheritdoc />
         public IScopeUnitOfWork CreateUnitOfWork(IsolationLevel isolationLevel = IsolationLevel.Unspecified, bool readOnly = false, bool immediate = false)
         {
-            return new ScopeUnitOfWork(ScopeProvider, DatabaseContext, _repositoryFactory, isolationLevel, readOnly, immediate);
+            return new ScopeUnitOfWork(ScopeProvider, SqlContext, _repositoryFactory, isolationLevel, readOnly, immediate);
         }
     }
 }

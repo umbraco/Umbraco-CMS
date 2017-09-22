@@ -298,7 +298,7 @@ namespace Umbraco.Tests.Services
                 scope.Database.BulkInsertRecordsWithTransaction(nodes);
 
                 //re-get the nodes with ids
-                var sql = Current.DatabaseContext.Sql();
+                var sql = Current.SqlContext.Sql();
                 sql.SelectAll().From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == customObjectType);
                 nodes = scope.Database.Fetch<NodeDto>(sql);
 

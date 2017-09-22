@@ -837,7 +837,6 @@
     <Compile Include="Persistence\FaultHandling\Strategies\NetworkConnectivityErrorDetectionStrategy.cs" />
     <Compile Include="Persistence\FaultHandling\Strategies\SqlAzureTransientErrorDetectionStrategy.cs" />
     <Compile Include="Persistence\FaultHandling\ThrottlingCondition.cs" />
-    <Compile Include="Persistence\IDatabaseContext.cs" />
     <Compile Include="Persistence\IUmbracoDatabase.cs" />
     <Compile Include="Persistence\IUmbracoDatabaseFactory.cs" />
     <Compile Include="Persistence\LocalDb.cs" />
@@ -1198,6 +1197,8 @@
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderAttribute.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderBase.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderExtensions.cs" />
+    <Compile Include="Persistence\SqlTemplate.cs" />
+    <Compile Include="Persistence\SqlTemplates.cs" />
     <Compile Include="Persistence\ThreadStaticDatabaseScopeAccessor.cs" />
     <Compile Include="Persistence\UmbracoDatabase.cs" />
     <Compile Include="Persistence\UmbracoDatabaseExtensions.cs" />

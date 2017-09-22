@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using NPoco;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -23,7 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string action, IEnumerable<int> nodeIds, Guid objectType)
         {
             var nodeIdsA = nodeIds.ToArray();
-            var sql = _unitOfWork.Sql()
+            var sql = _unitOfWork.SqlContext.Sql()
                     .Select("DISTINCT umbracoNode.id nodeId, umbracoUser.id userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
                     .From<User2NodeNotifyDto>()
                     .InnerJoin<NodeDto>().On<User2NodeNotifyDto, NodeDto>(left => left.NodeId, right => right.NodeId)
@@ -42,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<Notification> GetUserNotifications(IUser user)
         {
-            var sql = _unitOfWork.Sql()
+            var sql = _unitOfWork.SqlContext.Sql()
                 .Select("DISTINCT umbracoNode.id, umbracoUser2NodeNotify.userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
                 .From<User2NodeNotifyDto>()
                 .InnerJoin<NodeDto>()
@@ -63,7 +61,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<Notification> GetEntityNotifications(IEntity entity)
         {
-            var sql = _unitOfWork.Sql()
+            var sql = _unitOfWork.SqlContext.Sql()
                 .Select("DISTINCT umbracoNode.id, umbracoUser2NodeNotify.userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
                 .From<User2NodeNotifyDto>()
                 .InnerJoin<NodeDto>()
@@ -94,7 +92,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public Notification CreateNotification(IUser user, IEntity entity, string action)
         {
-            var sql = _unitOfWork.Sql()
+            var sql = _unitOfWork.SqlContext.Sql()
                 .Select("DISTINCT nodeObjectType")
                 .From<NodeDto>()
                 .Where<NodeDto>(nodeDto => nodeDto.NodeId == entity.Id);

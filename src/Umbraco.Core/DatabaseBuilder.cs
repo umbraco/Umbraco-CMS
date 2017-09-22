@@ -406,7 +406,7 @@ namespace Umbraco.Core
         private DatabaseSchemaResult ValidateDatabaseSchema(IScope scope)
         {
             if (_databaseFactory.Configured == false)
-                return new DatabaseSchemaResult(_databaseFactory.SqlSyntax);
+                return new DatabaseSchemaResult(_databaseFactory.SqlContext.SqlSyntax);
 
             if (_databaseSchemaValidationResult != null)
                 return _databaseSchemaValidationResult;

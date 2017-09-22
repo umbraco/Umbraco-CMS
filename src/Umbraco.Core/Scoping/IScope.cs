@@ -16,9 +16,9 @@ namespace Umbraco.Core.Scoping
         IUmbracoDatabase Database { get; }
 
         /// <summary>
-        /// Gets the database context.
+        /// Gets the Sql context.
         /// </summary>
-        IDatabaseContext DatabaseContext { get; }
+        ISqlContext SqlContext { get; }
 
         /// <summary>
         /// Gets the scope event messages.

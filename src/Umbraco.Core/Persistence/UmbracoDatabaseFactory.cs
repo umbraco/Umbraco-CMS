@@ -6,12 +6,10 @@ using System.Linq;
 using System.Threading;
 using NPoco;
 using NPoco.FluentMappings;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
@@ -116,32 +114,13 @@ namespace Umbraco.Core.Persistence
         #region IDatabaseContext
 
         /// <inheritdoc />
-        public ISqlSyntaxProvider SqlSyntax
+        public ISqlContext SqlContext
         {
             get
             {
                 EnsureConfigured();
-                return _sqlSyntax;
+                return _sqlContext;
             }
-        }
-
-        public IQuery<T> Query<T>()
-        {
-            EnsureConfigured();
-            return new Query<T>(_sqlContext);
-        }
-
-        /// <inheritdoc />
-        public Sql<SqlContext> Sql()
-        {
-            EnsureConfigured();
-            return NPoco.Sql.BuilderFor(_sqlContext);
-        }
-
-        /// <inheritdoc />
-        public Sql<SqlContext> Sql(string sql, params object[] args)
-        {
-            return Sql().Append(sql, args);
         }
 
         #endregion
@@ -192,7 +171,7 @@ namespace Umbraco.Core.Persistence
                 // these are created here because it is the UmbracoDatabaseFactory that determines
                 // the sql syntax, poco data factory, and database type - so it "owns" the context
                 // and the query factory
-                _sqlContext = new SqlContext(_sqlSyntax, _pocoDataFactory, _databaseType, _mappers);
+                _sqlContext = new SqlContext(_sqlSyntax, _databaseType, _pocoDataFactory, _mappers);
 
                 _logger.Debug<UmbracoDatabaseFactory>("Configured.");
                 Configured = true;

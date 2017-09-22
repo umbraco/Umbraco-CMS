@@ -287,7 +287,7 @@ namespace Umbraco.Tests.Testing
                 sqlSyntaxProviders,
                 Logger,
                 Mock.Of<IMapperCollection>()));
-            Container.RegisterSingleton<IDatabaseContext>(f => f.TryGetInstance<IUmbracoDatabaseFactory>());
+            Container.RegisterSingleton(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
             Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
             Container.RegisterSingleton(factory => new FileSystems(factory.TryGetInstance<ILogger>()));

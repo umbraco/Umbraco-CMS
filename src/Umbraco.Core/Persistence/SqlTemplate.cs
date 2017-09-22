@@ -2,20 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using NPoco;
-using Umbraco.Core.Persistence;
 
-namespace Umbraco.Tests.Persistence.NPocoTests
+namespace Umbraco.Core.Persistence
 {
     public class SqlTemplate
     {
-        private static readonly Dictionary<string, SqlTemplate> Templates = new Dictionary<string, SqlTemplate>();
-        public static SqlContext SqlContext; // FIXME must initialize somehow? OR have an easy access to templates through DatabaseContext?
-
+        private readonly SqlContext _sqlContext;
         private readonly string _sql;
         private readonly Dictionary<int, string> _args;
 
-        public SqlTemplate(string sql, object[] args)
+        internal SqlTemplate(SqlContext sqlContext, string sql, object[] args)
         {
+            _sqlContext = sqlContext;
             _sql = sql;
             if (args.Length > 0)
                 _args = new Dictionary<int, string>();
@@ -23,28 +21,15 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                 _args[i] = args[i].ToString();
         }
 
-        // for tests
-        internal static void Clear()
-        {
-            Templates.Clear();
-        }
-
-        public static SqlTemplate Get(string key, Func<Sql<SqlContext>, Sql<SqlContext>> sqlBuilder)
-        {
-            if (Templates.TryGetValue(key, out var template)) return template;
-            var sql = sqlBuilder(new Sql<SqlContext>(SqlContext));
-            return Templates[key] = new SqlTemplate(sql.SQL, sql.Arguments);
-        }
-
         public Sql<SqlContext> Sql()
         {
-            return new Sql<SqlContext>(SqlContext, _sql);
+            return new Sql<SqlContext>(_sqlContext, _sql);
         }
 
         // must pass the args in the proper order, faster
         public Sql<SqlContext> Sql(params object[] args)
         {
-            return new Sql<SqlContext>(SqlContext, _sql, args);
+            return new Sql<SqlContext>(_sqlContext, _sql, args);
         }
 
         // can pass named args, slower
@@ -59,7 +44,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                     throw new InvalidOperationException($"Invalid argument name \"{_args[i]}\".");
                 args[i] = value;
             }
-            return new Sql<SqlContext>(SqlContext, _sql, args);
+            return new Sql<SqlContext>(_sqlContext, _sql, args);
         }
     }
 }

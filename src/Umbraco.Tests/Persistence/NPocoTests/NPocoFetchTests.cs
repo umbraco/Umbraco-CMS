@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -137,9 +134,16 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var dtos = scope.Database.Fetch<Thing1Dto>(@"
-                    SELECT zbThing1.id, zbThing1.name
-                    FROM zbThing1");
+                // this is the raw SQL, but it's better to use expressions and no magic strings!
+                //var sql = @"
+                //    SELECT zbThing1.id, zbThing1.name
+                //    FROM zbThing1";
+
+                var sql = scope.SqlContext.Sql()
+                    .Select<Thing1Dto>()
+                    .From<Thing1Dto>();
+
+                var dtos = scope.Database.Fetch<Thing1Dto>(sql);
                 Assert.AreEqual(2, dtos.Count);
                 Assert.AreEqual("one", dtos.First(x => x.Id == 1).Name);
             }
@@ -153,11 +157,19 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var dtos = scope.Database.Fetch<Thing2Dto>(@"
-                    SELECT zbThing2.id, zbThing2.name, zbThing2.thingId,
-                           zbThing1.id Thing__id, zbThing1.name Thing__name
-                    FROM zbThing2
-                    JOIN zbThing1 ON zbThing2.thingId=zbThing1.id");
+                // this is the raw SQL, but it's better to use expressions and no magic strings!
+                //var sql = @"
+                //    SELECT zbThing2.id, zbThing2.name, zbThing2.thingId,
+                //           zbThing1.id Thing__id, zbThing1.name Thing__name
+                //    FROM zbThing2
+                //    JOIN zbThing1 ON zbThing2.thingId=zbThing1.id";
+
+                var sql = scope.SqlContext.Sql()
+                    .Select<Thing2Dto>(r => r.Select(x => x.Thing))
+                    .From<Thing2Dto>()
+                    .InnerJoin<Thing1Dto>().On<Thing2Dto, Thing1Dto>((t2, t1) => t2.ThingId == t1.Id);
+
+                var dtos = scope.Database.Fetch<Thing2Dto>(sql);
                 Assert.AreEqual(3, dtos.Count);
                 Assert.AreEqual("uno", dtos.First(x => x.Id == 1).Name);
                 Assert.IsNotNull(dtos.First(x => x.Id == 1).Thing);
@@ -183,7 +195,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                 //    JOIN zbThing2 ON zbThing1.id=zbThing2.thingId
                 //    WHERE zbThing1.id=1");
 
-                var sql = scope.DatabaseContext.Sql()
+                var sql = scope.SqlContext.Sql()
                     .Select<Thing3Dto>(r => r.Select(x => x.Things))
                     .From<Thing3Dto>()
                     .InnerJoin<Thing2Dto>().On<Thing3Dto, Thing2Dto>(left => left.Id, right => right.ThingId)
@@ -225,15 +237,13 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                 //    JOIN zbThing2 ON zbThing1.id=zbThing2.thingId
                 //    ORDER BY zbThing1.id";
 
-                var sql = scope.DatabaseContext.Sql()
+                var sql = scope.SqlContext.Sql()
                     .Select<Thing3Dto>(r => r.Select(x => x.Things)) // select Thing3Dto, and Thing2Dto for Things
                     .From<Thing3Dto>()
                     .InnerJoin<Thing2Dto>().On<Thing3Dto, Thing2Dto>(left => left.Id, right => right.ThingId)
                     .OrderBy<Thing3Dto>(x => x.Id);
 
-                // one-to-many on Things, using Id as the 'one' key - not needed since it's PK
-                //var dtos = scope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, x => x.Id, sql);
-                var dtos = scope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, sql);
+                var dtos = scope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, /*x => x.Id,*/ sql);
 
                 Assert.AreEqual(2, dtos.Count);
                 var dto1 = dtos.FirstOrDefault(x => x.Id == 1);
@@ -250,25 +260,20 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         [Test]
         public void TestOneToManyOnManyTemplate()
         {
-            // same as above with a template
-            SqlTemplate.Clear();
-
             using (var scope = ScopeProvider.CreateScope())
             {
-                SqlTemplate.SqlContext = scope.DatabaseContext.Sql().SqlContext; // fixme
+                scope.SqlContext.Templates.Clear();
 
-                var sql = SqlTemplate.Get("xxx", s => s
+                var sql = scope.SqlContext.Templates.Get("xxx", s => s
                     .Select<Thing3Dto>(r => r.Select(x => x.Things)) // select Thing3Dto, and Thing2Dto for Things
                     .From<Thing3Dto>()
                     .InnerJoin<Thing2Dto>().On<Thing3Dto, Thing2Dto>(left => left.Id, right => right.ThingId)
                     .OrderBy<Thing3Dto>(x => x.Id)).Sql();
 
                 // cached
-                sql = SqlTemplate.Get("xxx", s => throw new InvalidOperationException()).Sql();
+                sql = scope.SqlContext.Templates.Get("xxx", s => throw new InvalidOperationException()).Sql();
 
-                // one-to-many on Things, using Id as the 'one' key - not needed since it's PK
-                //var dtos = scope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, x => x.Id, sql);
-                var dtos = scope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, sql);
+                var dtos = scope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, /*x => x.Id,*/ sql);
 
                 Assert.AreEqual(2, dtos.Count);
                 var dto1 = dtos.FirstOrDefault(x => x.Id == 1);
@@ -294,12 +299,23 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var dtos = scope.Database.FetchOneToMany<Thing4Dto>(x => x.Groups, x => x.Id, @"
-                    SELECT zbThing1.id, zbThing1.name, zbThingGroup.id, zbThingGroup.name
-                    FROM zbThing1
-                    JOIN zbThing2Group ON zbThing1.id=zbThing2Group.thingId
-                    JOIN zbThingGroup ON zbThing2Group.groupId=zbThingGroup.id
-                    ORDER BY zbThing1.id");
+                // this is the raw SQL, but it's better to use expressions and no magic strings!
+                //var sql = @"
+                //    SELECT zbThing1.id, zbThing1.name, zbThingGroup.id, zbThingGroup.name
+                //    FROM zbThing1
+                //    JOIN zbThing2Group ON zbThing1.id=zbThing2Group.thingId
+                //    JOIN zbThingGroup ON zbThing2Group.groupId=zbThingGroup.id
+                //    ORDER BY zbThing1.id";
+
+                var sql = scope.SqlContext.Sql()
+                    .Select<Thing4Dto>(r => r.Select(x => x.Groups))
+                    .From<Thing4Dto>()
+                    .InnerJoin<Thing2GroupDto>().On<Thing4Dto, Thing2GroupDto>((t, t2g) => t.Id == t2g.ThingId)
+                    .InnerJoin<ThingGroupDto>().On<Thing2GroupDto, ThingGroupDto>((t2g, tg) => t2g.GroupId == tg.Id)
+                    .OrderBy<Thing4Dto>(x => x.Id);
+
+                var dtos = scope.Database.FetchOneToMany<Thing4Dto>(x => x.Groups, /*x => x.Id,*/ sql);
+
                 Assert.AreEqual(2, dtos.Count);
                 var dto1 = dtos.FirstOrDefault(x => x.Id == 1);
                 Assert.IsNotNull(dto1);
@@ -320,11 +336,22 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var dtos = scope.Database.Fetch<Thing5Dto>(@"
-                    SELECT zbThing1.id, zbThing1.name, COUNT(zbThing2Group.groupId) as groupCount
-                    FROM zbThing1
-                    JOIN zbThing2Group ON zbThing1.id=zbThing2Group.thingId
-                    GROUP BY zbThing1.id, zbThing1.name");
+                // this is the raw SQL, but it's better to use expressions and no magic strings!
+                //var sql = @"
+                //    SELECT zbThing1.id, zbThing1.name, COUNT(zbThing2Group.groupId) as groupCount
+                //    FROM zbThing1
+                //    JOIN zbThing2Group ON zbThing1.id=zbThing2Group.thingId
+                //    GROUP BY zbThing1.id, zbThing1.name";
+
+                var sql = scope.SqlContext.Sql()
+                    .Select<Thing1Dto>()
+                    .Append(", COUNT(zbThing2Group.groupId) AS groupCount") // fixme
+                    .From<Thing1Dto>()
+                    .InnerJoin<Thing2GroupDto>().On<Thing1Dto, Thing2GroupDto>((t, t2g) => t.Id == t2g.ThingId)
+                    .GroupBy<Thing1Dto>(x => x.Id, x => x.Name);
+
+                var dtos = scope.Database.Fetch<Thing5Dto>(sql);
+
                 Assert.AreEqual(2, dtos.Count);
                 var dto1 = dtos.FirstOrDefault(x => x.Id == 1);
                 Assert.IsNotNull(dto1);
@@ -346,10 +373,11 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var sql = new Sql()
-                    .Select("*")
-                    .From("zbThing1")
-                    .Where("id=@id", new { id = 1 });
+                var sql = scope.SqlContext.Sql()
+                    .SelectAll()
+                    .From<Thing1Dto>()
+                    .Where<Thing1Dto>(x => x.Id == 1);
+
                 sql.WriteToConsole();
                 var dto = scope.Database.Fetch<Thing1Dto>(sql).FirstOrDefault();
                 Assert.IsNotNull(dto);

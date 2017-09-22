@@ -144,8 +144,8 @@ namespace Umbraco.Core.Composing
         public static IScopeProvider ScopeProvider
             => Container.GetInstance<IScopeProvider>();
 
-        public static IDatabaseContext DatabaseContext
-            => Container.GetInstance<IDatabaseContext>();
+        public static ISqlContext SqlContext
+            => Container.GetInstance<ISqlContext>();
 
         #endregion
     }

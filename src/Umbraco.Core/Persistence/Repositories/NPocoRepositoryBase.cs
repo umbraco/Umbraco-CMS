@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     /// <typeparam name="TId"></typeparam>
     /// <typeparam name="TEntity"></typeparam>
-    internal abstract class NPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>, IDatabaseContext
+    internal abstract class NPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
         /// <summary>
@@ -39,26 +39,14 @@ namespace Umbraco.Core.Persistence.Repositories
         protected IUmbracoDatabase Database => UnitOfWork.Database;
 
         /// <summary>
-        /// Gets the repository's database sql syntax.
+        /// Gets the Sql context.
         /// </summary>
-        public ISqlSyntaxProvider SqlSyntax => UnitOfWork.SqlSyntax;
+        protected ISqlContext SqlContext=> UnitOfWork.SqlContext;
 
-        /// <summary>
-        /// Creates a new query.
-        /// </summary>
-        public override IQuery<T> Query<T>() => UnitOfWork.Query<T>();
-
-        /// <summary>
-        /// Creates a new Sql statement.
-        /// </summary>
-        /// <returns>A new Sql statement.</returns>
-        public Sql<SqlContext> Sql() => UnitOfWork.Sql();
-
-        /// <summary>
-        /// Creates a new Sql statement.
-        /// </summary>
-        /// <returns>A new Sql statement.</returns>
-        public Sql<SqlContext> Sql(string sql, params object[] args) => UnitOfWork.Sql(sql, args);
+        protected Sql<SqlContext> Sql() => SqlContext.Sql();
+        protected Sql<SqlContext> Sql(string sql, params object[] args) => SqlContext.Sql(sql, args);
+        protected ISqlSyntaxProvider SqlSyntax => SqlContext.SqlSyntax;
+        protected IQuery<T> Query<T>() => SqlContext.Query<T>();
 
         #region Abstract Methods
 

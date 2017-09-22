@@ -37,10 +37,10 @@ namespace Umbraco.Web.WebApi
         public virtual UmbracoContext UmbracoContext { get; set; }
 
         /// <summary>
-        /// Gets or sets the database context.
+        /// Gets or sets the sql context.
         /// </summary>
         [Inject]
-        public IDatabaseContext DatabaseContext { get; set; }
+        public ISqlContext SqlContext { get; set; }
 
         /// <summary>
         /// Gets or sets the services context.

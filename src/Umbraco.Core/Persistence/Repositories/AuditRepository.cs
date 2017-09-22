@@ -4,7 +4,6 @@ using System.Linq;
 using LightInject;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionRoots;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -18,8 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         public AuditRepository(IScopeUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
-        {
-        }
+        { }
 
         protected override void PersistNewItem(AuditItem entity)
         {
@@ -68,7 +66,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = Sql();
+            var sql = SqlContext.Sql();
 
             sql = isCount
                 ? sql.SelectCount()

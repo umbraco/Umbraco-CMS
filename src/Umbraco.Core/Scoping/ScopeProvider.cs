@@ -63,7 +63,7 @@ namespace Umbraco.Core.Scoping
 
         public IUmbracoDatabaseFactory DatabaseFactory { get; }
 
-        public IDatabaseContext DatabaseContext => DatabaseFactory;
+        public ISqlContext SqlContext => DatabaseFactory.SqlContext;
 
         #region Context
 

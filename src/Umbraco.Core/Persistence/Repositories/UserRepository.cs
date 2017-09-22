@@ -62,7 +62,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IUser PerformGet(int id)
         {
-            var sql = Sql()
+            var sql = SqlContext.Sql()
                 .Select<UserDto>()
                 .From<UserDto>()
                 .Where<UserDto>(x => x.Id == id);
@@ -182,7 +182,7 @@ ORDER BY colName";
 
         private List<UserDto> GetDtosWith(Action<Sql<SqlContext>> with, bool includeReferences)
         {
-            var sql = Sql()
+            var sql = SqlContext.Sql()
                 .Select<UserDto>()
                 .From<UserDto>();
 
@@ -209,7 +209,7 @@ ORDER BY colName";
 
             // get users2groups
 
-            var sql = Sql()
+            var sql = SqlContext.Sql()
                 .Select<User2UserGroupDto>()
                 .From<User2UserGroupDto>()
                 .WhereIn<User2UserGroupReadOnlyDto>(x => x.UserId, userIds);
@@ -219,7 +219,7 @@ ORDER BY colName";
 
             // get groups
 
-            sql = Sql()
+            sql = SqlContext.Sql()
                 .Select<UserGroupDto>()
                 .From<UserGroupDto>()
                 .WhereIn<UserGroupDto>(x => x.Id, groupIds);
@@ -229,7 +229,7 @@ ORDER BY colName";
 
             // get groups2apps
 
-            sql = Sql()
+            sql = SqlContext.Sql()
                 .Select<UserGroup2AppDto>()
                 .From<UserGroup2AppDto>()
                 .WhereIn<UserGroup2AppDto>(x => x.UserGroupId, groupIds);
@@ -240,7 +240,7 @@ ORDER BY colName";
 
             // get start nodes
 
-            sql = Sql()
+            sql = SqlContext.Sql()
                 .Select<UserStartNodeDto>()
                 .From<UserStartNodeDto>()
                 .WhereIn<UserStartNodeDto>(x => x.UserId, userIds);
@@ -282,11 +282,11 @@ ORDER BY colName";
         protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
             if (isCount)
-                return Sql()
+                return SqlContext.Sql()
                     .SelectCount()
                     .From<UserDto>();
 
-            return Sql()
+            return SqlContext.Sql()
                 .Select<UserDto>()
                 .From<UserDto>();
         }
@@ -306,7 +306,7 @@ ORDER BY colName";
 
         private Sql<SqlContext> GetBaseQuery(string columns)
         {
-            return Sql()
+            return SqlContext.Sql()
                 .Select(columns)
                 .From<UserDto>();
         }
@@ -534,7 +534,7 @@ ORDER BY colName";
 
         public bool Exists(string username)
         {
-            var sql = Sql()
+            var sql = SqlContext.Sql()
                 .SelectCount()
                 .From<UserDto>()
                 .Where<UserDto>(x => x.UserName == username);
@@ -562,11 +562,11 @@ ORDER BY colName";
 
         private IEnumerable<IUser> GetAllInOrNotInGroup(int groupId, bool include)
         {
-            var sql = Sql()
+            var sql = SqlContext.Sql()
                 .Select<UserDto>()
                 .From<UserDto>();
 
-            var inSql = Sql()
+            var inSql = SqlContext.Sql()
                 .Select<User2UserGroupDto>(x => x.UserId)
                 .From<User2UserGroupDto>()
                 .Where<User2UserGroupDto>(x => x.UserGroupId == groupId);
@@ -609,7 +609,7 @@ ORDER BY colName";
             // get the referenced column name and find the corresp mapped column name
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
             var mapper = _mapperCollection[typeof(IUser)];
-            var mappedField = mapper.Map(SqlSyntax, expressionMember.Name);
+            var mappedField = mapper.Map(SqlContext.SqlSyntax, expressionMember.Name);
 
             if (mappedField.IsNullOrWhiteSpace())
                 throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
@@ -630,7 +630,7 @@ ORDER BY colName";
                 || includeUserGroups != null && includeUserGroups.Length > 0
                 || excludeUserGroups != null && excludeUserGroups.Length > 0
                 || userState != null && userState.Length > 0 && userState.Contains(UserState.All) == false)
-                filterSql = Sql();
+                filterSql = SqlContext.Sql();
 
             if (hasCustomFilter)
             {
@@ -697,7 +697,7 @@ ORDER BY colName";
             }
 
             // create base query
-            var sql = Sql()
+            var sql = SqlContext.Sql()
                 .Select<UserDto>()
                 .From<UserDto>();
 
@@ -721,7 +721,7 @@ ORDER BY colName";
         {
             if (filterSql == null) return sql;
 
-            sql.Append(Sql(" WHERE " + filterSql.SQL.TrimStart("AND "), filterSql.Arguments));
+            sql.Append(SqlContext.Sql(" WHERE " + filterSql.SQL.TrimStart("AND "), filterSql.Arguments));
 
             return sql;
         }
@@ -740,7 +740,7 @@ ORDER BY colName";
 
         internal IEnumerable<IUser> GetNextUsers(int id, int count)
         {
-            var idsQuery = Sql()
+            var idsQuery = SqlContext.Sql()
                 .Select<UserDto>(x => x.Id)
                 .From<UserDto>()
                 .Where<UserDto>(x => x.Id >= id)

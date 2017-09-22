@@ -353,8 +353,7 @@ AND umbracoNode.id <> @id",
             AddOrUpdate(toMove);
 
             //update all descendants from the original path, update in order of level
-            var descendants = this.GetByQuery(
-                QueryT.Where(type => type.Path.StartsWith(origPath + ",")));
+            var descendants = GetByQuery(Query<IDataTypeDefinition>().Where(type => type.Path.StartsWith(origPath + ",")));
 
             var lastParent = toMove;
             foreach (var descendant in descendants.OrderBy(x => x.Level))

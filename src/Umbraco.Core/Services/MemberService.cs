@@ -62,21 +62,21 @@ namespace Umbraco.Core.Services
                 switch (countType)
                 {
                     case MemberCountType.All:
-                        query = uow.Query<IMember>();
+                        query = Query<IMember>();
                         break;
                     case MemberCountType.Online:
                         var fromDate = DateTime.Now.AddMinutes(-Membership.UserIsOnlineTimeWindow);
-                        query = uow.Query<IMember>().Where(x =>
+                        query = Query<IMember>().Where(x =>
                             ((Member)x).PropertyTypeAlias == Constants.Conventions.Member.LastLoginDate &&
                             ((Member)x).DateTimePropertyValue > fromDate);
                         break;
                     case MemberCountType.LockedOut:
-                        query = uow.Query<IMember>().Where(x =>
+                        query = Query<IMember>().Where(x =>
                             ((Member)x).PropertyTypeAlias == Constants.Conventions.Member.IsLockedOut &&
                             ((Member)x).BoolPropertyValue);
                         break;
                     case MemberCountType.Approved:
-                        query = uow.Query<IMember>().Where(x =>
+                        query = Query<IMember>().Where(x =>
                             ((Member)x).PropertyTypeAlias == Constants.Conventions.Member.IsApproved &&
                             ((Member)x).BoolPropertyValue);
                         break;
@@ -372,7 +372,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
-                var query = uow.Query<IMember>().Where(x => x.Key == id);
+                var query = Query<IMember>().Where(x => x.Key == id);
                 return repository.GetByQuery(query).FirstOrDefault();
             }
         }
@@ -409,8 +409,8 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
-                var query1 = memberTypeAlias == null ? null : uow.Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
-                var query2 = filter == null ? null : uow.Query<IMember>().Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
+                var query1 = memberTypeAlias == null ? null : Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
+                var query2 = filter == null ? null : Query<IMember>().Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
                 return repository.GetPagedResultsByQuery(query1, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, query2);
             }
         }
@@ -444,7 +444,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
-                var query = uow.Query<IMember>().Where(x => x.Email.Equals(email));
+                var query = Query<IMember>().Where(x => x.Email.Equals(email));
                 return repository.GetByQuery(query).FirstOrDefault();
             }
         }
@@ -464,7 +464,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
-                var query = uow.Query<IMember>().Where(x => x.Username.Equals(username));
+                var query = Query<IMember>().Where(x => x.Username.Equals(username));
                 return repository.GetByQuery(query).FirstOrDefault();
             }
         }
@@ -480,7 +480,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
-                var query = uow.Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
+                var query = Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
                 return repository.GetByQuery(query);
             }
         }
@@ -497,7 +497,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
                 repository.Get(memberTypeId);
-                var query = uow.Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
+                var query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
                 return repository.GetByQuery(query);
             }
         }
@@ -548,7 +548,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
-                var query = uow.Query<IMember>();
+                var query = Query<IMember>();
 
                 switch (matchType)
                 {
@@ -590,7 +590,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
-                var query = uow.Query<IMember>();
+                var query = Query<IMember>();
 
                 switch (matchType)
                 {
@@ -632,7 +632,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
-                var query = uow.Query<IMember>();
+                var query = Query<IMember>();
 
                 switch (matchType)
                 {
@@ -677,25 +677,25 @@ namespace Umbraco.Core.Services
                 switch (matchType)
                 {
                     case StringPropertyMatchType.Exact:
-                        query = uow.Query<IMember>().Where(x =>
+                        query = Query<IMember>().Where(x =>
                             ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
                             (((Member)x).LongStringPropertyValue.SqlEquals(value, TextColumnType.NText) ||
                                 ((Member)x).ShortStringPropertyValue.SqlEquals(value, TextColumnType.NVarchar)));
                         break;
                     case StringPropertyMatchType.Contains:
-                        query = uow.Query<IMember>().Where(x =>
+                        query = Query<IMember>().Where(x =>
                             ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
                             (((Member)x).LongStringPropertyValue.SqlContains(value, TextColumnType.NText) ||
                                 ((Member)x).ShortStringPropertyValue.SqlContains(value, TextColumnType.NVarchar)));
                         break;
                     case StringPropertyMatchType.StartsWith:
-                        query = uow.Query<IMember>().Where(x =>
+                        query = Query<IMember>().Where(x =>
                             ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
                             (((Member)x).LongStringPropertyValue.SqlStartsWith(value, TextColumnType.NText) ||
                                 ((Member)x).ShortStringPropertyValue.SqlStartsWith(value, TextColumnType.NVarchar)));
                         break;
                     case StringPropertyMatchType.EndsWith:
-                        query = uow.Query<IMember>().Where(x =>
+                        query = Query<IMember>().Where(x =>
                             ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
                             (((Member)x).LongStringPropertyValue.SqlEndsWith(value, TextColumnType.NText) ||
                                 ((Member)x).ShortStringPropertyValue.SqlEndsWith(value, TextColumnType.NVarchar)));
@@ -726,27 +726,27 @@ namespace Umbraco.Core.Services
                 switch (matchType)
                 {
                     case ValuePropertyMatchType.Exact:
-                        query = uow.Query<IMember>().Where(x =>
+                        query = Query<IMember>().Where(x =>
                             ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
                             ((Member)x).IntegerPropertyValue == value);
                         break;
                     case ValuePropertyMatchType.GreaterThan:
-                        query = uow.Query<IMember>().Where(x =>
+                        query = Query<IMember>().Where(x =>
                             ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
                             ((Member)x).IntegerPropertyValue > value);
                         break;
                     case ValuePropertyMatchType.LessThan:
-                        query = uow.Query<IMember>().Where(x =>
+                        query = Query<IMember>().Where(x =>
                             ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
                             ((Member)x).IntegerPropertyValue < value);
                         break;
                     case ValuePropertyMatchType.GreaterThanOrEqualTo:
-                        query = uow.Query<IMember>().Where(x =>
+                        query = Query<IMember>().Where(x =>
                             ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
                             ((Member)x).IntegerPropertyValue >= value);
                         break;
                     case ValuePropertyMatchType.LessThanOrEqualTo:
-                        query = uow.Query<IMember>().Where(x =>
+                        query = Query<IMember>().Where(x =>
                             ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
                             ((Member)x).IntegerPropertyValue <= value);
                         break;
@@ -770,7 +770,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
-                var query = uow.Query<IMember>().Where(x =>
+                var query = Query<IMember>().Where(x =>
                     ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
                     ((Member)x).BoolPropertyValue == value);
 
@@ -796,27 +796,27 @@ namespace Umbraco.Core.Services
                 switch (matchType)
                 {
                     case ValuePropertyMatchType.Exact:
-                        query = uow.Query<IMember>().Where( x =>
+                        query = Query<IMember>().Where( x =>
                             ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
                             ((Member)x).DateTimePropertyValue == value);
                         break;
                     case ValuePropertyMatchType.GreaterThan:
-                        query = uow.Query<IMember>().Where(x =>
+                        query = Query<IMember>().Where(x =>
                             ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
                             ((Member)x).DateTimePropertyValue > value);
                         break;
                     case ValuePropertyMatchType.LessThan:
-                        query = uow.Query<IMember>().Where(x =>
+                        query = Query<IMember>().Where(x =>
                             ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
                             ((Member)x).DateTimePropertyValue < value);
                         break;
                     case ValuePropertyMatchType.GreaterThanOrEqualTo:
-                        query = uow.Query<IMember>().Where(x =>
+                        query = Query<IMember>().Where(x =>
                             ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
                             ((Member)x).DateTimePropertyValue >= value);
                         break;
                     case ValuePropertyMatchType.LessThanOrEqualTo:
-                        query = uow.Query<IMember>().Where(x =>
+                        query = Query<IMember>().Where(x =>
                             ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
                             ((Member)x).DateTimePropertyValue <= value);
                         break;
@@ -1063,7 +1063,7 @@ namespace Umbraco.Core.Services
                         throw new InvalidOperationException("The role " + roleName + " is currently assigned to members");
                 }
 
-                var query = uow.Query<IMemberGroup>().Where(g => g.Name == roleName);
+                var query = Query<IMemberGroup>().Where(g => g.Name == roleName);
                 var found = repository.GetByQuery(query).ToArray();
 
                 foreach (var memberGroup in found)
@@ -1308,7 +1308,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IMemberRepository>();
 
                 //TODO: What about content that has the contenttype as part of its composition?
-                var query = uow.Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
+                var query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
                 var members = repository.GetByQuery(query).ToArray();
 
                 var deleteEventArgs = new DeleteEventArgs<IMember>(members);

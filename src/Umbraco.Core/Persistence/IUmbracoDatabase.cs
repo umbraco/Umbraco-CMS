@@ -1,15 +1,9 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
 {
     public interface IUmbracoDatabase : IDatabase
     {
-        /// <summary>
-        /// Gets the database Sql syntax.
-        /// </summary>
-        ISqlSyntaxProvider SqlSyntax { get; } // fixme - kill
-
         /// <summary>
         /// Gets the Sql context.
         /// </summary>

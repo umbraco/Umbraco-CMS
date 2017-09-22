@@ -79,9 +79,9 @@ namespace Umbraco.Core.Scoping
         IScopeContext Context { get; }
 
         /// <summary>
-        /// Gets the database context.
+        /// Gets the sql context.
         /// </summary>
-        IDatabaseContext DatabaseContext { get; }
+        ISqlContext SqlContext { get; }
 
 #if DEBUG_SCOPES
         Dictionary<Guid, object> CallContextObjects { get; }

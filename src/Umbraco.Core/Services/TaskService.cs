@@ -20,7 +20,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repo = uow.CreateRepository<ITaskTypeRepository>();
-                return repo.GetByQuery(uow.Query<TaskType>().Where(x => x.Alias == taskTypeAlias)).FirstOrDefault();
+                return repo.GetByQuery(Query<TaskType>().Where(x => x.Alias == taskTypeAlias)).FirstOrDefault();
             }
         }
 

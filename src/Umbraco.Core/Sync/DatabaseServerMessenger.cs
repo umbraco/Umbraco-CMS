@@ -33,7 +33,7 @@ namespace Umbraco.Core.Sync
         private readonly ManualResetEvent _syncIdle;
         private readonly object _locko = new object();
         private readonly ProfilingLogger _profilingLogger;
-        private readonly IDatabaseContext _databaseContext;
+        private readonly ISqlContext _sqlContext;
         private int _lastId = -1;
         private DateTime _lastSync;
         private DateTime _lastPruned;
@@ -44,13 +44,13 @@ namespace Umbraco.Core.Sync
         protected DatabaseServerMessengerOptions Options { get; }
 
         public DatabaseServerMessenger(
-            IRuntimeState runtime, IScopeProvider scopeProvider, IDatabaseContext databaseContext, ILogger logger, ProfilingLogger proflog,
+            IRuntimeState runtime, IScopeProvider scopeProvider, ISqlContext sqlContext, ILogger logger, ProfilingLogger proflog,
             bool distributedEnabled, DatabaseServerMessengerOptions options)
             : base(distributedEnabled)
         {
             ScopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _databaseContext = databaseContext;
+            _sqlContext = sqlContext;
             _runtime = runtime;
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
             Options = options ?? throw new ArgumentNullException(nameof(options));
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Sync
 
         protected IScopeProvider ScopeProvider { get; }
 
-        protected Sql<SqlContext> Sql() => _databaseContext.Sql();
+        protected Sql<SqlContext> Sql() => _sqlContext.Sql();
 
         #region Messenger
 

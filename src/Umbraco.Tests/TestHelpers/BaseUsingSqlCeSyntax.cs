@@ -50,7 +50,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
             var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init());
-            SqlContext = new SqlContext(sqlSyntax, pocoDataFactory, DatabaseType.SQLCe, Mappers);
+            SqlContext = new SqlContext(sqlSyntax, DatabaseType.SQLCe, pocoDataFactory, Mappers);
 
             SetUp();
         }

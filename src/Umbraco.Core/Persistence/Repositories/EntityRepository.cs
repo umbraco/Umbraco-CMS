@@ -31,11 +31,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         protected internal IScopeUnitOfWork UnitOfWork { get; }
 
+        protected Sql<SqlContext> Sql() => UnitOfWork.SqlContext.Sql();
+
         #region Query Methods
-
-        public IQuery<IUmbracoEntity> Query => UnitOfWork.Query<IUmbracoEntity>();
-
-        public Sql<SqlContext> Sql() => UnitOfWork.Sql();
 
         // fixme need to review that ... one
         public IEnumerable<IUmbracoEntity> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId, long pageIndex, int pageSize, out long totalRecords,

@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
                 Constants.ObjectTypes.MemberType
             };
 
-            var sql = Context.Sql()
+            var sql = Context.SqlContext.Sql()
                 .Select("umbracoNode.id,cmsContentType.alias,umbracoNode.nodeObjectType")
                 .From<NodeDto>()
                 .InnerJoin<ContentTypeDto>()

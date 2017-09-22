@@ -38,7 +38,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _cacheHelper = cacheHelper;
 
-            _publishedQuery =  work.Query<IContent>().Where(x => x.Published); // fixme not used?
+            _publishedQuery =  work.SqlContext.Query<IContent>().Where(x => x.Published); // fixme not used?
 
             _contentByGuidReadRepository = new ContentByGuidReadRepository(this, work, cacheHelper, logger);
             EnsureUniqueNaming = settings.EnsureUniqueNaming;
@@ -113,7 +113,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql<SqlContext> GetBaseQuery(QueryType queryType)
         {
-            var sql = Sql();
+            var sql = SqlContext.Sql();
 
             switch (queryType)
             {
@@ -238,7 +238,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override void DeleteVersion(Guid versionId)
         {
-            var sql = Sql()
+            var sql = SqlContext.Sql()
                 .SelectAll()
                 .From<DocumentDto>()
                 .InnerJoin<ContentVersionDto>().On<ContentVersionDto, DocumentDto>(left => left.VersionId, right => right.VersionId)
@@ -253,7 +253,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override void DeleteVersions(int id, DateTime versionDate)
         {
-            var sql = Sql()
+            var sql = SqlContext.Sql()
                 .SelectAll()
                 .From<DocumentDto>()
                 .InnerJoin<ContentVersionDto>().On<ContentVersionDto, DocumentDto>(left => left.VersionId, right => right.VersionId)
@@ -290,13 +290,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //We need to clear out all access rules but we need to do this in a manual way since
             // nothing in that table is joined to a content id
-            var subQuery = Sql()
+            var subQuery = SqlContext.Sql()
                 .Select("umbracoAccessRule.accessId")
                 .From<AccessRuleDto>()
                 .InnerJoin<AccessDto>()
                 .On<AccessRuleDto, AccessDto>(left => left.AccessId, right => right.Id)
                 .Where<AccessDto>(dto => dto.NodeId == entity.Id);
-            Database.Execute(SqlSyntax.GetDeleteSubquery("umbracoAccessRule", "accessId", subQuery));
+            Database.Execute(SqlContext.SqlSyntax.GetDeleteSubquery("umbracoAccessRule", "accessId", subQuery));
 
             //now let the normal delete clauses take care of everything else
             base.PersistDeletedItem(entity);
@@ -640,7 +640,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public int CountPublished(string contentTypeAlias = null)
         {
-            var sql = Sql();
+            var sql = SqlContext.Sql();
             if (contentTypeAlias.IsNullOrWhiteSpace())
             {
                 sql.SelectCount()
@@ -725,7 +725,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter = null, bool newest = true)
         {
-            var filterSql = Sql();
+            var filterSql = SqlContext.Sql();
             if (newest)
                 filterSql.Append("AND (cmsDocument.newest = 1)");
 
@@ -753,7 +753,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var ids = content.Path.Split(',').Skip(1).Select(int.Parse);
 
-            var sql = Sql()
+            var sql = SqlContext.Sql()
                 .SelectCount<NodeDto>(x => x.NodeId)
                 .From<NodeDto>()
                 .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((n, d) => n.NodeId == d.NodeId && d.Published)
@@ -931,7 +931,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (many)
             {
                 var roDtos = Database.FetchByGroups<DocumentPublishedReadOnlyDto, int>(dtos.Select(x => x.NodeId), 2000, batch
-                        => Sql()
+                        => SqlContext.Sql()
                             .Select<DocumentPublishedReadOnlyDto>()
                             .From<DocumentDto>()
                             .WhereIn<DocumentDto>(x => x.NodeId, batch)

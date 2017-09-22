@@ -233,7 +233,7 @@ namespace Umbraco.Core.Persistence
                 var tTransaction = GetTypedTransaction<SqlTransaction>(command.Transaction);
                 var tableName = pocoData.TableInfo.TableName;
 
-                var syntax = database.SqlSyntax as SqlServerSyntaxProvider;
+                var syntax = database.SqlContext.SqlSyntax as SqlServerSyntaxProvider;
                 if (syntax == null) throw new NotSupportedException("SqlSyntax must be SqlServerSyntaxProvider.");
 
                 using (var copy = new SqlBulkCopy(tConnection, SqlBulkCopyOptions.Default, tTransaction) { BulkCopyTimeout = 10000, DestinationTableName = tableName })

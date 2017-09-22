@@ -46,7 +46,7 @@ namespace Umbraco.Web.Install
                 new NewInstallStep(_httpContext, Current.Services.UserService, _databaseBuilder),
                 new UpgradeStep(_databaseBuilder),
                 new FilePermissionsStep(),
-                new MajorVersion7UpgradeReport(_databaseBuilder, Current.RuntimeState, Current.DatabaseContext, Current.ScopeProvider),
+                new MajorVersion7UpgradeReport(_databaseBuilder, Current.RuntimeState, Current.SqlContext, Current.ScopeProvider),
                 new Version73FileCleanup(_httpContext, _logger),
                 new ConfigureMachineKey(),
                 new DatabaseConfigureStep(_databaseBuilder),
@@ -124,7 +124,7 @@ namespace Umbraco.Web.Install
                 {
                     // we don't have DatabaseProvider anymore... doing it differently
                     //dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
-                    dbProvider = GetDbProviderString(Current.DatabaseContext);
+                    dbProvider = GetDbProviderString(Current.SqlContext);
                 }
 
                 var check = new org.umbraco.update.CheckForUpgrade();
@@ -146,7 +146,7 @@ namespace Umbraco.Web.Install
             }
         }
 
-        internal static string GetDbProviderString(IDatabaseContext databaseContext)
+        internal static string GetDbProviderString(ISqlContext sqlContext)
         {
             var dbProvider = string.Empty;
 
@@ -154,7 +154,7 @@ namespace Umbraco.Web.Install
             //dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
             //
             // doing it differently
-            var syntax = databaseContext.SqlSyntax;
+            var syntax = sqlContext.SqlSyntax;
             if (syntax is SqlCeSyntaxProvider)
                 dbProvider = "SqlServerCE";
             else if (syntax is MySqlSyntaxProvider)

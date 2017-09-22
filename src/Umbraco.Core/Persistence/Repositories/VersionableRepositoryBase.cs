@@ -60,7 +60,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public virtual IEnumerable<Guid> GetVersionIds(int id, int maxRows)
         {
-            var sql = Sql();
+            var sql = SqlContext.Sql();
             sql.Select("cmsDocument.versionId")
                 .From<DocumentDto>()
                 .InnerJoin<ContentDto>()
@@ -71,7 +71,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<NodeDto>(x => x.NodeId == id)
                 .OrderByDescending<DocumentDto>(x => x.UpdateDate);
 
-            return Database.Fetch<Guid>(SqlSyntax.SelectTop(sql, maxRows));
+            return Database.Fetch<Guid>(SqlContext.SqlSyntax.SelectTop(sql, maxRows));
         }
 
         public virtual void DeleteVersion(Guid versionId)
@@ -120,7 +120,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 ? "-1,"
                 : "," + parentId + ",";
 
-            var sql = Sql()
+            var sql = SqlContext.Sql()
                 .SelectCount()
                 .From<NodeDto>();
 
@@ -147,7 +147,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public int CountChildren(int parentId, string contentTypeAlias = null)
         {
-            var sql = Sql()
+            var sql = SqlContext.Sql()
                 .SelectCount()
                 .From<NodeDto>();
 
@@ -179,7 +179,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public int Count(string contentTypeAlias = null)
         {
-            var sql = Sql()
+            var sql = SqlContext.Sql()
                 .SelectCount()
                 .From<NodeDto>();
 
@@ -280,7 +280,7 @@ namespace Umbraco.Core.Persistence.Repositories
             dbfield = GetDatabaseFieldNameForOrderBy("umbracoNode", "id");
             if (orderBySystemField == false || orderBy.InvariantEquals(dbfield) == false)
             {
-                var matches = VersionableRepositoryBaseAliasRegex.For(SqlSyntax).Matches(sql.SQL);
+                var matches = VersionableRepositoryBaseAliasRegex.For(SqlContext.SqlSyntax).Matches(sql.SQL);
                 var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(dbfield));
                 if (match != null)
                     dbfield = match.Groups[2].Value;
@@ -310,7 +310,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // note: ContentTypeAlias is not properly managed because it's not part of the query to begin with!
 
-            var matches = VersionableRepositoryBaseAliasRegex.For(SqlSyntax).Matches(sql.SQL);
+            var matches = VersionableRepositoryBaseAliasRegex.For(SqlContext.SqlSyntax).Matches(sql.SQL);
             var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(dbfield));
             if (match != null)
                 dbfield = match.Groups[2].Value;
@@ -322,10 +322,10 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through value
             // from most recent content version for the given order by field
-            var sortedInt = string.Format(SqlSyntax.ConvertIntegerToOrderableString, "dataInt");
-            var sortedDate = string.Format(SqlSyntax.ConvertDateToOrderableString, "dataDate");
+            var sortedInt = string.Format(SqlContext.SqlSyntax.ConvertIntegerToOrderableString, "dataInt");
+            var sortedDate = string.Format(SqlContext.SqlSyntax.ConvertDateToOrderableString, "dataDate");
             var sortedString = "COALESCE(dataNvarchar,'')"; // assuming COALESCE is ok for all syntaxes
-            var sortedDecimal = string.Format(SqlSyntax.ConvertDecimalToOrderableString, "dataDecimal");
+            var sortedDecimal = string.Format(SqlContext.SqlSyntax.ConvertDecimalToOrderableString, "dataDecimal");
 
             // variable query fragments that depend on what we are querying
             string andVersion, andNewest, idField;
@@ -416,7 +416,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
 
             // start with base query, and apply the supplied IQuery
-            if (query == null) query = QueryT;
+            if (query == null) query = UnitOfWork.SqlContext.Query<TEntity>();
             var sqlNodeIds = new SqlTranslator<TEntity>(GetBaseQuery(QueryType.Many), query).Translate();
 
             // sort and filter
@@ -437,7 +437,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // get all PropertyDataDto for all definitions / versions
             var allPropertyDataDtos = Database.FetchByGroups<PropertyDataDto, Guid>(versions, 2000, batch =>
-                Sql()
+                    SqlContext.Sql()
                     .Select<PropertyDataDto>()
                     .From<PropertyDataDto>()
                     .WhereIn<PropertyDataDto>(x => x.VersionId, batch))
@@ -446,7 +446,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // get PropertyDataDto distinct PropertyTypeDto
             var allPropertyTypeIds = allPropertyDataDtos.Select(x => x.PropertyTypeId).Distinct().ToList();
             var allPropertyTypeDtos = Database.FetchByGroups<PropertyTypeDto, int>(allPropertyTypeIds, 2000, batch =>
-                Sql()
+                SqlContext.Sql()
                     .Select<PropertyTypeDto>()
                     .From<PropertyTypeDto>()
                     .WhereIn<PropertyTypeDto>(x => x.Id, batch));
@@ -460,7 +460,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var pre = new Lazy<IEnumerable<DataTypePreValueDto>>(() =>
             {
                 return Database.FetchByGroups<DataTypePreValueDto, int>(allPropertyTypeIds, 2000, batch =>
-                    Sql()
+                    SqlContext.Sql()
                         .Select<DataTypePreValueDto>()
                         .From<DataTypePreValueDto>()
                         .WhereIn<DataTypePreValueDto>(x => x.DataTypeNodeId, batch));
@@ -876,7 +876,7 @@ ORDER BY contentNodeId, versionId, propertytypeid
 
         protected string GetDatabaseFieldNameForOrderBy(string tableName, string fieldName)
         {
-            return SqlSyntax.GetQuotedTableName(tableName) + "." + SqlSyntax.GetQuotedColumnName(fieldName);
+            return SqlContext.SqlSyntax.GetQuotedTableName(tableName) + "." + SqlContext.SqlSyntax.GetQuotedColumnName(fieldName);
         }
 
         #region UnitOfWork Events

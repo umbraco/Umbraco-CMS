@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IEnumerable<TEntity> GetEntitiesInRecycleBin()
         {
-            return GetByQuery(QueryT.Where(entity => entity.Trashed));
+            return GetByQuery(Query<TEntity>().Where(entity => entity.Trashed));
         }
     }
 }

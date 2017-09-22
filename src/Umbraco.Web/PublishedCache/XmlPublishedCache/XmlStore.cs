@@ -557,7 +557,7 @@ AND (umbracoNode.id=@id)";
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
-                var sqlSyntax = uow.SqlSyntax;
+                var sqlSyntax = uow.SqlContext.SqlSyntax;
 
                 var sql = ReadCmsPreviewXmlSql1;
                 sql += " @path LIKE " + sqlSyntax.GetConcat("umbracoNode.Path", "',%"); // concat(umbracoNode.path, ',%')
@@ -1740,7 +1740,7 @@ WHERE cmsContentXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = _uowProvider.DatabaseContext.Query<IContent>().Where(x => x.Published);
+            var query = _uowProvider.SqlContext.Query<IContent>().Where(x => x.Published);
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1813,7 +1813,7 @@ WHERE cmsPreviewXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = _uowProvider.DatabaseContext.Query<IContent>();
+            var query = _uowProvider.SqlContext.Query<IContent>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1890,7 +1890,7 @@ WHERE cmsContentXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = _uowProvider.DatabaseContext.Query<IMedia>();
+            var query = _uowProvider.SqlContext.Query<IMedia>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1961,7 +1961,7 @@ WHERE cmsContentXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = _uowProvider.DatabaseContext.Query<IMember>();
+            var query = _uowProvider.SqlContext.Query<IMember>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 

@@ -248,7 +248,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<TRepository>();
                 uow.ReadLock(ReadLockIds);
-                var query = uow.Query<TItem>().Where(x => x.ParentId == id);
+                var query = Query<TItem>().Where(x => x.ParentId == id);
                 return repo.GetByQuery(query);
             }
         }
@@ -261,7 +261,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(ReadLockIds);
                 var found = Get(id);
                 if (found == null) return Enumerable.Empty<TItem>();
-                var query = uow.Query<TItem>().Where(x => x.ParentId == found.Id);
+                var query = Query<TItem>().Where(x => x.ParentId == found.Id);
                 return repo.GetByQuery(query);
             }
         }
@@ -272,7 +272,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<TRepository>();
                 uow.ReadLock(ReadLockIds);
-                var query = uow.Query<TItem>().Where(x => x.ParentId == id);
+                var query = Query<TItem>().Where(x => x.ParentId == id);
                 var count = repo.Count(query);
                 return count > 0;
             }
@@ -286,7 +286,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(ReadLockIds);
                 var found = Get(id);
                 if (found == null) return false;
-                var query = uow.Query<TItem>().Where(x => x.ParentId == found.Id);
+                var query = Query<TItem>().Where(x => x.ParentId == found.Id);
                 var count = repo.Count(query);
                 return count > 0;
             }
@@ -322,7 +322,7 @@ namespace Umbraco.Core.Services
                 while (ids.Count > 0)
                 {
                     var i = ids.Pop();
-                    var query = uow.Query<TItem>().Where(x => x.ParentId == i);
+                    var query = Query<TItem>().Where(x => x.ParentId == i);
                     var result = repo.GetByQuery(query).ToArray();
 
                     foreach (var c in result)
@@ -373,7 +373,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<TRepository>();
                 uow.ReadLock(ReadLockIds);
-                return repo.Count(uow.Query<TItem>());
+                return repo.Count(Query<TItem>());
             }
         }
 

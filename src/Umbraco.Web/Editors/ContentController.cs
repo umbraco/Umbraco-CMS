@@ -387,7 +387,7 @@ namespace Umbraco.Web.Editors
                 if (filter.IsNullOrWhiteSpace() == false)
                 {
                     //add the default text filter
-                    queryFilter = DatabaseContext.Query<IContent>()
+                    queryFilter = SqlContext.Query<IContent>()
                         .Where(x => x.Name.Contains(filter));
                 }
 

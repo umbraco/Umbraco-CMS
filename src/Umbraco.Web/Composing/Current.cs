@@ -257,7 +257,7 @@ namespace Umbraco.Web.Composing
 
         public static FileSystems FileSystems => CoreCurrent.FileSystems;
 
-        public static IDatabaseContext DatabaseContext => CoreCurrent.DatabaseContext;
+        public static ISqlContext SqlContext=> CoreCurrent.SqlContext;
 
         #endregion
     }

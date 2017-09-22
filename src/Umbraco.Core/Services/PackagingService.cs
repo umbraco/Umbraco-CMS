@@ -6,13 +6,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Web;
-using System.Web.UI.WebControls;
 using System.Xml.Linq;
-using System.Xml.XPath;
-using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
@@ -23,7 +19,6 @@ using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Packaging.Models;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -81,6 +76,8 @@ namespace Umbraco.Core.Services
             _userService = userService;
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
+
+        protected IQuery<T> Query<T>() => _uowProvider.ScopeProvider.SqlContext.Query<T>();
 
         #region Content
 
@@ -790,7 +787,7 @@ namespace Umbraco.Core.Services
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 var repository = uow.CreateRepository<IContentTypeRepository>();
-                var query = uow.Query<IContentType>().Where(x => x.Alias == contentTypeAlias);
+                var query = Query<IContentType>().Where(x => x.Alias == contentTypeAlias);
                 var contentType = repository.GetByQuery(query).FirstOrDefault();
 
                 if (contentType == null)

@@ -160,7 +160,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IDictionaryRepository>();
-                var query = uow.Query<IDictionaryItem>().Where(x => x.ParentId == parentId);
+                var query = Query<IDictionaryItem>().Where(x => x.ParentId == parentId);
                 var items = repository.GetByQuery(query).ToArray();
                 //ensure the lazy Language callback is assigned
                 foreach (var item in items)
@@ -196,7 +196,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IDictionaryRepository>();
-                var query = uow.Query<IDictionaryItem>().Where(x => x.ParentId == null);
+                var query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
                 var items = repository.GetByQuery(query).ToArray();
                 //ensure the lazy Language callback is assigned
                 foreach (var item in items)

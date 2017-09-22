@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
             Execute.Code(database =>
             {
                 var userGroups = database.Fetch<UserGroupDto>(
-                    Context.Sql().Select("*")
+                    Context.SqlContext.Sql().Select("*")
                         .From<UserGroupDto>()
                         .Where<UserGroupDto>(x => x.Alias == "admin" || x.Alias == "editor"));
 

@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _schemaHelper = new DatabaseSchemaHelper(database, logger);
         }
 
-        private ISqlSyntaxProvider SqlSyntax => _database.SqlSyntax;
+        private ISqlSyntaxProvider SqlSyntax => _database.SqlContext.SqlSyntax;
 
         #region All Ordered Tables
 

@@ -4,7 +4,6 @@ using System.Linq;
 using LightInject;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionRoots;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -27,7 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var taskDto = Database.Fetch<TaskTypeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+            var taskDto = Database.Fetch<TaskTypeDto>(SqlContext.SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             if (taskDto == null)
                 return null;
 
@@ -42,7 +41,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (ids.Any())
             {
-                sql.Where("cmsTaskType.id IN (@ids)", new { ids = ids });
+                sql.Where("cmsTaskType.id IN (@ids)", new { ids });
             }
 
             var factory = new TaskTypeFactory();
@@ -63,7 +62,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            return Sql().SelectAll().From<TaskTypeDto>();
+            return SqlContext.Sql().SelectAll().From<TaskTypeDto>();
         }
 
         protected override string GetBaseWhereClause()
@@ -81,10 +80,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return list;
         }
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
-        }
+        protected override Guid NodeObjectTypeId => throw new NotImplementedException();
 
         protected override void PersistNewItem(TaskType entity)
         {

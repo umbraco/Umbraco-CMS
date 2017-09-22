@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Migrations
 {
     public abstract class MigrationBase : IMigration
     {
-        public ISqlSyntaxProvider SqlSyntax => Context.SqlSyntax;
+        public ISqlSyntaxProvider SqlSyntax => Context.SqlContext.SqlSyntax;
 
         public DatabaseType DatabaseType => Context.Database.DatabaseType;
 
@@ -52,9 +52,9 @@ namespace Umbraco.Core.Persistence.Migrations
 
         public IUpdateBuilder Update => new UpdateBuilder(Context);
 
-        protected Sql<SqlContext> Sql() => Context.Sql();
+        protected Sql<SqlContext> Sql() => Context.SqlContext.Sql();
 
-        protected Sql<SqlContext> Sql(string sql, params object[] args) => Context.Sql(sql, args);
+        protected Sql<SqlContext> Sql(string sql, params object[] args) => Context.SqlContext.Sql(sql, args);
 
         public IIfDatabaseBuilder IfDatabase(params DatabaseType[] supportedDatabaseTypes)
         {

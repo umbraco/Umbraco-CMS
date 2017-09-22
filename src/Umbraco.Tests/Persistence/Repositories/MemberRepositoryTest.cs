@@ -116,7 +116,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var member = CreateTestMember(key: key);
 
                 // Act
-                var query = unitOfWork.Query<IMember>().Where(x => x.Key == key);
+                var query = unitOfWork.SqlContext.Query<IMember>().Where(x => x.Key == key);
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -251,7 +251,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
 
-            var query = provider.DatabaseContext.Query<IMember>().Where(x =>
+            var query = provider.SqlContext.Query<IMember>().Where(x =>
                         ((Member) x).LongStringPropertyValue.Contains("1095") &&
                         ((Member) x).PropertyTypeAlias == "headshot");
 
@@ -312,7 +312,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             if (isCount)
             {
-                var sqlCount = provider.DatabaseContext.Sql()
+                var sqlCount = provider.SqlContext.Sql()
                     .SelectCount()
                     .From<NodeDto>()
                     .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
@@ -323,7 +323,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 return sqlCount;
             }
 
-            var sql = provider.DatabaseContext.Sql();
+            var sql = provider.SqlContext.Sql();
             sql.Select("umbracoNode.*", "cmsContent.contentType", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
                 "cmsContentVersion.VersionDate", "cmsMember.Email",
                 "cmsMember.LoginName", "cmsMember.Password", "cmsPropertyData.id AS PropertyDataId", "cmsPropertyData.propertytypeid",
@@ -348,7 +348,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private Sql<SqlContext> GetSubquery()
         {
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            var sql = provider.DatabaseContext.Sql();
+            var sql = provider.SqlContext.Sql();
             sql.Select("umbracoNode.id")
                 .From<NodeDto>()
                 .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)

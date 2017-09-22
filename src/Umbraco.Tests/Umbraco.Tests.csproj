@@ -229,7 +229,6 @@
     <Compile Include="Models\Mapping\UserModelMapperTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoFetchTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoSqlTemplateTests.cs" />
-    <Compile Include="Persistence\NPocoTests\SqlTemplate.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
     <Compile Include="Persistence\Repositories\UserGroupRepositoryTest.cs" />
@@ -261,7 +260,7 @@
     <Compile Include="Persistence\LocksTests.cs" />
     <Compile Include="Persistence\BulkDataReaderTests.cs" />
     <Compile Include="Persistence\Migrations\PostMigrationTests.cs" />
-    <Compile Include="Persistence\NPocoTests\NPocoExpressionsTests.cs" />
+    <Compile Include="Persistence\NPocoTests\NPocoSqlExtensionsTests.cs" />
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
     <Compile Include="Testing\TestOptionAttributeBase.cs" />

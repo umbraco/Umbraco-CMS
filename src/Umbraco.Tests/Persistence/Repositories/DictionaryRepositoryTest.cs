@@ -200,7 +200,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var query = unitOfWork.Query<IDictionaryItem>().Where(x => x.ItemKey == "Article");
+                var query = unitOfWork.SqlContext.Query<IDictionaryItem>().Where(x => x.ItemKey == "Article");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -220,7 +220,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var query = unitOfWork.Query<IDictionaryItem>().Where(x => x.ItemKey.StartsWith("Read"));
+                var query = unitOfWork.SqlContext.Query<IDictionaryItem>().Where(x => x.ItemKey.StartsWith("Read"));
                 var result = repository.Count(query);
 
                 // Assert

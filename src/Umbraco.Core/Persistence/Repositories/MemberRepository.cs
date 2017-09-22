@@ -464,7 +464,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (memberGroup == null) return Enumerable.Empty<IMember>();
 
             // get the members by username
-            var query = QueryT;
+            var query = Query<IMember>();
             switch (matchType)
             {
                 case StringPropertyMatchType.Exact:

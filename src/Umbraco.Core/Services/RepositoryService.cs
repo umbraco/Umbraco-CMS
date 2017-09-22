@@ -22,6 +22,6 @@ namespace Umbraco.Core.Services
             UowProvider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
 
-        protected IQuery<T> Query<T>() => UowProvider.DatabaseContext.Query<T>();
+        protected IQuery<T> Query<T>() => UowProvider.ScopeProvider.SqlContext.Query<T>();
     }
 }

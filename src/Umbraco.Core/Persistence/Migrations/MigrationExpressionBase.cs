@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Migrations
 
         public virtual DatabaseType[] SupportedDatabaseTypes { get; }
 
-        public ISqlSyntaxProvider SqlSyntax => _context.Database.SqlSyntax;
+        public ISqlSyntaxProvider SqlSyntax => _context.Database.SqlContext.SqlSyntax;
 
         public virtual DatabaseType CurrentDatabaseType => _context.Database.DatabaseType;
 

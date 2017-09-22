@@ -66,7 +66,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repo = uow.CreateRepository<IMigrationEntryRepository>();
-                var query = uow.Query<IMigrationEntry>()
+                var query = Query<IMigrationEntry>()
                     .Where(x => x.MigrationName.ToUpper() == migrationName.ToUpper());
                 return repo.GetByQuery(query);
             }

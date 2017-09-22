@@ -3,7 +3,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
-    public interface IScopeUnitOfWork : IUnitOfWork, IDatabaseContext
+    public interface IScopeUnitOfWork : IUnitOfWork
     {
         /// <summary>
         /// Gets the scope.
@@ -24,6 +24,11 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// Gets the database.
         /// </summary>
         IUmbracoDatabase Database { get; }
+
+        /// <summary>
+        /// Gets the Sql context.
+        /// </summary>
+        ISqlContext SqlContext { get; }
 
         /// <summary>
         /// Read-locks some lock objects.

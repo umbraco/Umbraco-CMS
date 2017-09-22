@@ -8,7 +8,7 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Persistence.NPocoTests
 {
     [TestFixture]
-    public class NPocoExpressionsTests : BaseUsingSqlCeSyntax
+    public class NPocoSqlExtensionsTests : BaseUsingSqlCeSyntax
     {
         [Test]
         public void WhereInValueFieldTest()

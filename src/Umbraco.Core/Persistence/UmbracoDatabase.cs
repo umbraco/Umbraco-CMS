@@ -70,9 +70,6 @@ namespace Umbraco.Core.Persistence
         /// <inheritdoc />
         public SqlContext SqlContext { get; }
 
-        /// <inheritdoc />
-        public ISqlSyntaxProvider SqlSyntax => SqlContext.SqlSyntax;
-
         #region Testing, Debugging and Troubleshooting
 
         private bool _enableCount;

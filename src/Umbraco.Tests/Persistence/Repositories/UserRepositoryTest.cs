@@ -248,7 +248,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
-                var query = unitOfWork.Query<IUser>().Where(x => x.Username == "TestUser1");
+                var query = unitOfWork.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -329,7 +329,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
-                var query = unitOfWork.Query<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+                var query = unitOfWork.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
                 var result = repository.Count(query);
 
                 // Assert

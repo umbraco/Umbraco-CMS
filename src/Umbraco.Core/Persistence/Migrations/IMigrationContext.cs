@@ -3,7 +3,7 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Persistence.Migrations
 {
-    public interface IMigrationContext : IDatabaseContext
+    public interface IMigrationContext
     {
         IUmbracoDatabase Database { get; }
 
@@ -12,5 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations
         ILogger Logger { get; }
 
         ILocalMigration GetLocalMigration();
+
+        ISqlContext SqlContext { get; }
     }
 }

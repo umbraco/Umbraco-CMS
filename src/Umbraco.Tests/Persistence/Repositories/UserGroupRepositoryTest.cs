@@ -179,7 +179,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 CreateAndCommitMultipleUserGroups(repository, unitOfWork);
 
                 // Act
-                var query = unitOfWork.Query<IUserGroup>().Where(x => x.Alias == "testUserGroup1");
+                var query = unitOfWork.SqlContext.Query<IUserGroup>().Where(x => x.Alias == "testUserGroup1");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -260,7 +260,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var userGroups = CreateAndCommitMultipleUserGroups(repository, unitOfWork);
 
                 // Act
-                var query = unitOfWork.Query<IUserGroup>().Where(x => x.Alias == "testUserGroup1" || x.Alias == "testUserGroup2");
+                var query = unitOfWork.SqlContext.Query<IUserGroup>().Where(x => x.Alias == "testUserGroup1" || x.Alias == "testUserGroup2");
                 var result = repository.Count(query);
 
                 // Assert

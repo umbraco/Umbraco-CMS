@@ -200,7 +200,7 @@ namespace Umbraco.Web.Editors
                 excludeUserGroups = new[] {Constants.Security.AdminGroupAlias};
             }
 
-            var filterQuery = Current.DatabaseContext.Query<IUser>();
+            var filterQuery = Current.SqlContext.Query<IUser>();
 
             //if the current user is not the administrator, then don't include this in the results.
             var isAdminUser = Security.CurrentUser.Id == 0;

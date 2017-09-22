@@ -9,8 +9,6 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IEntityRepository : IRepository
     {
-        IQuery<IUmbracoEntity> Query { get; }
-
         IUmbracoEntity GetByKey(Guid key);
         IUmbracoEntity GetByKey(Guid key, Guid objectTypeId);
         IUmbracoEntity Get(int id);

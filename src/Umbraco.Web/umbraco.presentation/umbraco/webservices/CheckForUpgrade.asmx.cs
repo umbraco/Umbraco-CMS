@@ -74,7 +74,7 @@ namespace umbraco.presentation.webservices
 
             string dbProvider = string.Empty;
             if (string.IsNullOrEmpty(global::Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus) == false)
-            dbProvider = InstallHelper.GetDbProviderString(Current.DatabaseContext);
+            dbProvider = InstallHelper.GetDbProviderString(Current.SqlContext);
 
             var check = new global::Umbraco.Web.org.umbraco.update.CheckForUpgrade();
             check.Install(installId,

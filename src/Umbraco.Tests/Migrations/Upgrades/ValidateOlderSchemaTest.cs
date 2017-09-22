@@ -99,7 +99,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         public IUmbracoDatabase GetConfiguredDatabase()
         {
             var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlCe);
-            var sqlContext = new SqlContext(new SqlCeSyntaxProvider(), Mock.Of<IPocoDataFactory>(), DatabaseType.SQLCe);
+            var sqlContext = new SqlContext(new SqlCeSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
             return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;", sqlContext, dbProviderFactory, Mock.Of<ILogger>());
         }
 

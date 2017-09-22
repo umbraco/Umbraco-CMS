@@ -136,7 +136,7 @@ namespace Umbraco.Core.Scoping
 
         public Guid InstanceId { get; } = Guid.NewGuid();
 
-        public IDatabaseContext DatabaseContext => _scopeProvider.DatabaseContext;
+        public ISqlContext SqlContext => _scopeProvider.SqlContext;
 
         // a value indicating whether to force call-context
         public bool CallContext

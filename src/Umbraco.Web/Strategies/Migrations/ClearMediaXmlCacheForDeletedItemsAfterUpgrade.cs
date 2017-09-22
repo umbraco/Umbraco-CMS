@@ -35,7 +35,7 @@ namespace Umbraco.Web.Strategies.Migrations
                 //This query is structured to work with MySql, SQLCE and SqlServer:
                 // http://issues.umbraco.org/issue/U4-3876
 
-                var syntax = args.MigrationContext.SqlSyntax;
+                var syntax = args.MigrationContext.SqlContext.SqlSyntax;
 
                 var sql = @"DELETE FROM cmsContentXml WHERE nodeId IN
     (SELECT nodeId FROM (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml

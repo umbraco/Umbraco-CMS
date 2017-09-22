@@ -94,7 +94,7 @@ namespace Umbraco.Examine
         private void InitializeQueries()
         {
             if (_publishedQuery == null)
-                _publishedQuery = Current.DatabaseContext.Query<IContent>().Where(x => x.Published);
+                _publishedQuery = Current.SqlContext.Query<IContent>().Where(x => x.Published);
         }
 
         #endregion

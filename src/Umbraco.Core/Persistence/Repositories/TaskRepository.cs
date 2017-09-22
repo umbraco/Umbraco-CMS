@@ -4,7 +4,6 @@ using System.Linq;
 using LightInject;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionRoots;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -19,15 +18,14 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         public TaskRepository(IScopeUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
-        {
-        }
+        { }
 
         protected override Task PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var taskDto = Database.Fetch<TaskDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+            var taskDto = Database.Fetch<TaskDto>(SqlContext.SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             if (taskDto == null)
                 return null;
 
@@ -63,13 +61,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql<SqlContext> GetBaseQuery(bool isCount)
         {
-            return isCount ? Sql().SelectCount().From<TaskDto>() : GetBaseQuery();
+            return isCount ? SqlContext.Sql().SelectCount().From<TaskDto>() : GetBaseQuery();
         }
 
         private Sql<SqlContext> GetBaseQuery()
         {
-            return Sql()
-                .Select("cmsTask.closed,cmsTask.id,cmsTask.taskTypeId,cmsTask.nodeId,cmsTask.parentUserId,cmsTask.userId,cmsTask." + SqlSyntax.GetQuotedColumnName("DateTime") + ",cmsTask.Comment,cmsTaskType.id, cmsTaskType.alias")
+            return SqlContext.Sql()
+                .Select("cmsTask.closed,cmsTask.id,cmsTask.taskTypeId,cmsTask.nodeId,cmsTask.parentUserId,cmsTask.userId,cmsTask." + SqlContext.SqlSyntax.GetQuotedColumnName("DateTime") + ",cmsTask.Comment,cmsTaskType.id, cmsTaskType.alias")
                 .From<TaskDto>()
                 .InnerJoin<TaskTypeDto>()
                 .On<TaskDto, TaskTypeDto>(left => left.TaskTypeId, right => right.Id)

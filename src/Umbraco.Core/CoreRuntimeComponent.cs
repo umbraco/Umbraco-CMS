@@ -95,7 +95,7 @@ namespace Umbraco.Core
                 => new DatabaseServerMessenger(
                     factory.GetInstance<IRuntimeState>(),
                     factory.GetInstance<IScopeProvider>(),
-                    factory.GetInstance<IDatabaseContext>(),
+                    factory.GetInstance<ISqlContext>(),
                     factory.GetInstance<ILogger>(),
                     factory.GetInstance<ProfilingLogger>(),
                     true, new DatabaseServerMessengerOptions()));

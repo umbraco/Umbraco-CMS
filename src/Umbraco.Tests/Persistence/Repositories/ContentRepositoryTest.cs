@@ -155,7 +155,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 Assert.AreEqual(2, versions.Distinct().Count());
 
-                var content = repository.GetByQuery(unitOfWork.Query<IContent>().Where(c => c.Id == content1.Id)).ToArray()[0];
+                var content = repository.GetByQuery(unitOfWork.SqlContext.Query<IContent>().Where(c => c.Id == content1.Id)).ToArray()[0];
                 Assert.AreEqual(versions[2], content.Version);
 
                 content = repository.Get(content1.Id);
@@ -214,7 +214,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         TemplateId = content1.Template == null || content1.Template.Id <= 0 ? null : (int?)content1.Template.Id
                     });
 
-                    var content = repository.GetByQuery(unitOfWork.Query<IContent>().Where(c => c.Id == content1.Id)).ToArray();
+                    var content = repository.GetByQuery(unitOfWork.SqlContext.Query<IContent>().Where(c => c.Id == content1.Id)).ToArray();
                     Assert.AreEqual(1, content.Length);
                     Assert.AreEqual(content[0].Version, versionDtos.Single(x => x.Id == versionDtos.Max(y => y.Id)).VersionId);
                     Assert.AreEqual(content[0].UpdateDate.ToString(CultureInfo.InvariantCulture), versionDtos.Single(x => x.Id == versionDtos.Max(y => y.Id)).VersionDate.ToString(CultureInfo.InvariantCulture));
@@ -610,7 +610,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 ContentTypeRepository contentTypeRepository;
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 // Act
-                var query = repository.QueryT.Where(x => x.Level == 2);
+                var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Level == 2);
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -673,7 +673,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 ContentTypeRepository contentTypeRepository;
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 // Act
-                var query = repository.QueryT.Where(x => x.Name.Contains("Text"));
+                var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Name.Contains("Text"));
                 long totalRecords;
 
                 try
@@ -708,7 +708,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 ContentTypeRepository contentTypeRepository;
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 // Act
-                var query = repository.QueryT.Where(x => x.Level == 2);
+                var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Level == 2);
                 long totalRecords;
 
                 try
@@ -740,7 +740,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 ContentTypeRepository contentTypeRepository;
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 // Act
-                var query = repository.QueryT.Where(x => x.Level == 2);
+                var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Level == 2);
                 long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "Name", Direction.Ascending, true);
 
@@ -761,7 +761,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 ContentTypeRepository contentTypeRepository;
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 // Act
-                var query = repository.QueryT.Where(x => x.Level == 2);
+                var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Level == 2);
                 long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 2, out totalRecords, "Name", Direction.Ascending, true);
 
@@ -782,7 +782,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 ContentTypeRepository contentTypeRepository;
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 // Act
-                var query = repository.QueryT.Where(x => x.Level == 2);
+                var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Level == 2);
                 long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Descending, true);
 
@@ -803,11 +803,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 ContentTypeRepository contentTypeRepository;
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 // Act
-                var query = repository.QueryT.Where(x => x.Level == 2);
+                var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Level == 2);
 
                 long totalRecords;
 
-                var filterQuery = unitOfWork.Query<IContent>().Where(x => x.Name.Contains("Page 2"));
+                var filterQuery = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Name.Contains("Page 2"));
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true, filterQuery);
 
                 // Assert
@@ -827,11 +827,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 ContentTypeRepository contentTypeRepository;
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 // Act
-                var query = repository.QueryT.Where(x => x.Level == 2);
+                var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Level == 2);
 
                 long totalRecords;
 
-                var filterQuery = unitOfWork.Query<IContent>().Where(x => x.Name.Contains("text"));
+                var filterQuery = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Name.Contains("text"));
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true, filterQuery);
 
                 // Assert
@@ -921,7 +921,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 // Act
                 int level = 2;
-                var query = repository.QueryT.Where(x => x.Level == level);
+                var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Level == level);
                 var result = repository.Count(query);
 
                 // Assert
@@ -960,7 +960,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 ContentTypeRepository contentTypeRepository;
                 var repository = CreateRepository(unitOfWork, out contentTypeRepository);
                 // Act
-                var query = repository.QueryT.Where(x => x.Key == new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+                var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Key == new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
                 var content = repository.GetByQuery(query).SingleOrDefault();
 
                 // Assert

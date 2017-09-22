@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence
             _baseDataCreation = new BaseDataCreation(database, logger);
         }
 
-        private ISqlSyntaxProvider SqlSyntax => _database.SqlSyntax;
+        private ISqlSyntaxProvider SqlSyntax => _database.SqlContext.SqlSyntax;
 
         public bool TableExist(string tableName)
         {

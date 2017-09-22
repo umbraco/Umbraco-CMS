@@ -217,7 +217,7 @@ namespace Umbraco.Core
             // from the default connection string name, if possible, else will remain non-configured
             // until properly configured (eg when installing)
             container.RegisterSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
-            container.RegisterSingleton<IDatabaseContext>(f => f.GetInstance<IUmbracoDatabaseFactory>());
+            container.RegisterSingleton(f => f.GetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
             // register the scope provider
             container.RegisterSingleton<IScopeProvider, ScopeProvider>();
@@ -330,7 +330,7 @@ namespace Umbraco.Core
             using (var database = databaseFactory.CreateDatabase()) // no scope - just the database
             {
                 var codeVersionString = codeVersion.ToString();
-                var sql = databaseFactory.Sql()
+                var sql = databaseFactory.SqlContext.Sql()
                     .Select<MigrationDto>()
                     .From<MigrationDto>()
                     .Where<MigrationDto>(x => x.Name.InvariantEquals(Constants.System.UmbracoMigrationName) && x.Version == codeVersionString);

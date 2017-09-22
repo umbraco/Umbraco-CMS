@@ -112,7 +112,7 @@ nuDraft.data DraftData,
 docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDate, docPub.documentUser PubWriterId, docPub.templateId PubTemplateId,
 nuPub.data PubData
 FROM umbracoNode n
-JOIN umbracoNode x ON (n.id=x.id OR n.path LIKE " + uow.SqlSyntax.GetConcat("x.path", "',%'") + @")
+JOIN umbracoNode x ON (n.id=x.id OR n.path LIKE " + uow.SqlContext.SqlSyntax.GetConcat("x.path", "',%'") + @")
 JOIN cmsContent ON (cmsContent.nodeId=n.id)
 LEFT JOIN cmsDocument docDraft ON (docDraft.nodeId=n.id AND docDraft.newest=1 AND docDraft.published=0)
 LEFT JOIN cmsDocument docPub ON (docPub.nodeId=n.id AND docPub.published=1)
@@ -135,7 +135,7 @@ n.createDate CreateDate, n.nodeUser CreatorId,
 n.text PubName, ver.versionId PubVersion, ver.versionDate PubVersionDate,
 nuPub.data PubData
 FROM umbracoNode n
-JOIN umbracoNode x ON (n.id=x.id OR n.path LIKE " + uow.SqlSyntax.GetConcat("x.path", "',%'") + @")
+JOIN umbracoNode x ON (n.id=x.id OR n.path LIKE " + uow.SqlContext.SqlSyntax.GetConcat("x.path", "',%'") + @")
 JOIN cmsContent ON (cmsContent.nodeId=n.id)
 JOIN cmsContentVersion ver ON (ver.contentId=n.id)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)

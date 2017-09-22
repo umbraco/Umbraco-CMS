@@ -24,16 +24,6 @@ namespace Umbraco.Core.Persistence.Repositories
             : base(work, cache, logger)
         { }
 
-        /// <summary>
-        /// Creates a new query.
-        /// </summary>
-        public virtual IQuery<TEntity> QueryT => Query<TEntity>();
-
-        /// <summary>
-        /// Creates a new query.
-        /// </summary>
-        public abstract IQuery<T> Query<T>();
-
         #region Static Queries
 
         private IQuery<TEntity> _hasIdQuery;
@@ -106,7 +96,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     // get count of all entities of current type (TEntity) to ensure cached result is correct
                     // create query once if it is needed (no need for locking here) - query is static!
-                    var query = _hasIdQuery ?? (_hasIdQuery = QueryT.Where(x => x.Id != 0));
+                    var query = _hasIdQuery ?? (_hasIdQuery = UnitOfWork.SqlContext.Query<TEntity>().Where(x => x.Id != 0));
                     return PerformCount(query);
                 });
             }

@@ -5,10 +5,10 @@ using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Install.Models;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -17,15 +17,15 @@ namespace Umbraco.Web.Install.InstallSteps
     internal class MajorVersion7UpgradeReport : InstallSetupStep<object>
     {
         private readonly DatabaseBuilder _databaseBuilder;
-        private readonly IDatabaseContext _databaseContext;
+        private readonly ISqlContext _sqlContext;
         private readonly IScopeProvider _scopeProvider;
         private readonly IRuntimeState _runtime;
 
-        public MajorVersion7UpgradeReport(DatabaseBuilder databaseBuilder, IRuntimeState runtime, IDatabaseContext databaseContext, IScopeProvider scopeProvider)
+        public MajorVersion7UpgradeReport(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ISqlContext sqlContext, IScopeProvider scopeProvider)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
-            _databaseContext = databaseContext;
+            _sqlContext = sqlContext;
             _scopeProvider = scopeProvider;
         }
 
@@ -87,7 +87,7 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             var errorReport = new List<string>();
 
-            var sqlSyntax = _databaseContext.SqlSyntax;
+            var sqlSyntax = _sqlContext.SqlSyntax;
 
             var sql = new Sql();
             sql

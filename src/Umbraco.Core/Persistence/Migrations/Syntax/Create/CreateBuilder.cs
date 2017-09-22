@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
             _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
-        private ISqlSyntaxProvider SqlSyntax => _context.Database.SqlSyntax;
+        private ISqlSyntaxProvider SqlSyntax => _context.Database.SqlContext.SqlSyntax;
 
         public void Table<T>()
         {

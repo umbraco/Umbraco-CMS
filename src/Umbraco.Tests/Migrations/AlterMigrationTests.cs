@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Migrations
             _sqlSyntax = new SqlCeSyntaxProvider();
 
             var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlServer);
-            var sqlContext = new SqlContext(_sqlSyntax, Mock.Of<IPocoDataFactory>(), DatabaseType.SqlServer2008);
+            var sqlContext = new SqlContext(_sqlSyntax, DatabaseType.SqlServer2008, Mock.Of<IPocoDataFactory>());
             _database = new UmbracoDatabase("cstr", sqlContext, dbProviderFactory, _logger);
         }
 

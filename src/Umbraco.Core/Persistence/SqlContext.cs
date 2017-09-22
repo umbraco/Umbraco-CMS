@@ -2,29 +2,56 @@
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
 {
-    public class SqlContext
+    /// <summary>
+    /// Implements <see cref="ISqlContext"/>.
+    /// </summary>
+    public class SqlContext : ISqlContext
     {
-        public SqlContext(ISqlSyntaxProvider sqlSyntax, IPocoDataFactory pocoDataFactory, DatabaseType databaseType, IMapperCollection mappers = null)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlContext"/> class.
+        /// </summary>
+        /// <param name="sqlSyntax">The sql syntax provider.</param>
+        /// <param name="pocoDataFactory">The Poco data factory.</param>
+        /// <param name="databaseType">The database type.</param>
+        /// <param name="mappers">The mappers.</param>
+        public SqlContext(ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, IPocoDataFactory pocoDataFactory, IMapperCollection mappers = null)
         {
             // for tests
-            if (mappers == null) mappers = new Mappers.MapperCollection(Enumerable.Empty<BaseMapper>());
-            Mappers = mappers;
+            Mappers = mappers ?? new Mappers.MapperCollection(Enumerable.Empty<BaseMapper>());
 
             SqlSyntax = sqlSyntax ?? throw new ArgumentNullException(nameof(sqlSyntax));
             PocoDataFactory = pocoDataFactory ?? throw new ArgumentNullException(nameof(pocoDataFactory));
             DatabaseType = databaseType ?? throw new ArgumentNullException(nameof(databaseType));
+            Templates = new SqlTemplates(this);
         }
 
+        /// <inheritdoc />
         public ISqlSyntaxProvider SqlSyntax { get; }
 
-        public IPocoDataFactory PocoDataFactory { get; }
-
+        /// <inheritdoc />
         public DatabaseType DatabaseType { get; }
 
+        /// <inheritdoc />
+        public Sql<SqlContext> Sql() => NPoco.Sql.BuilderFor(this);
+
+        /// <inheritdoc />
+        public Sql<SqlContext> Sql(string sql, params object[] args) => Sql().Append(sql, args);
+
+        /// <inheritdoc />
+        public IQuery<T> Query<T>() => new Query<T>(this);
+
+        /// <inheritdoc />
+        public SqlTemplates Templates { get; }
+
+        /// <inheritdoc />
+        public IPocoDataFactory PocoDataFactory { get; }
+
+        /// <inheritdoc />
         public IMapperCollection Mappers { get; }
     }
 }

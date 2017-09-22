@@ -282,7 +282,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
-                var query = unitOfWork.Query<IMedia>().Where(x => x.Level == 2);
+                var query = unitOfWork.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -309,7 +309,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Flush();
 
                 var types = new[] { 1031 };
-                var query = unitOfWork.Query<IMedia>().Where(x => types.Contains(x.ContentTypeId));
+                var query = unitOfWork.SqlContext.Query<IMedia>().Where(x => types.Contains(x.ContentTypeId));
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -337,7 +337,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Flush();
 
                 var types = new[] { "Folder" };
-                var query = unitOfWork.Query<IMedia>().Where(x => types.Contains(x.ContentType.Alias));
+                var query = unitOfWork.SqlContext.Query<IMedia>().Where(x => types.Contains(x.ContentType.Alias));
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -355,7 +355,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                var query = unitOfWork.Query<IMedia>().Where(x => x.Level == 2);
+                var query = unitOfWork.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true);
 
@@ -377,7 +377,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
-                var query = unitOfWork.Query<IMedia>().Where(x => x.Level == 2);
+                var query = unitOfWork.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "SortOrder", Direction.Ascending, true);
 
@@ -399,7 +399,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
-                var query = unitOfWork.Query<IMedia>().Where(x => x.Level == 2);
+                var query = unitOfWork.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 2, out totalRecords, "SortOrder", Direction.Ascending, true);
 
@@ -421,7 +421,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
-                var query = unitOfWork.Query<IMedia>().Where(x => x.Level == 2);
+                var query = unitOfWork.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "SortOrder", Direction.Descending, true);
 
@@ -443,7 +443,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
-                var query = unitOfWork.Query<IMedia>().Where(x => x.Level == 2);
+                var query = unitOfWork.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true);
 
@@ -465,10 +465,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
-                var query = unitOfWork.Query<IMedia>().Where(x => x.Level == 2);
+                var query = unitOfWork.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
 
-                var filter = unitOfWork.Query<IMedia>().Where(x => x.Name.Contains("File"));
+                var filter = unitOfWork.SqlContext.Query<IMedia>().Where(x => x.Name.Contains("File"));
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true, filter);
 
                 // Assert
@@ -489,10 +489,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out mediaTypeRepository);
 
                 // Act
-                var query = unitOfWork.Query<IMedia>().Where(x => x.Level == 2);
+                var query = unitOfWork.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
 
-                var filter = unitOfWork.Query<IMedia>().Where(x => x.Name.Contains("Test"));
+                var filter = unitOfWork.SqlContext.Query<IMedia>().Where(x => x.Name.Contains("Test"));
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true, filter);
 
                 // Assert
@@ -586,7 +586,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 int level = 2;
-                var query = unitOfWork.Query<IMedia>().Where(x => x.Level == level);
+                var query = unitOfWork.SqlContext.Query<IMedia>().Where(x => x.Level == level);
                 var result = repository.Count(query);
 
                 // Assert

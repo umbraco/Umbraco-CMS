@@ -5,7 +5,7 @@ namespace Umbraco.Core.Persistence
     /// <summary>
     /// Creates and manages the "ambient" database.
     /// </summary>
-    public interface IUmbracoDatabaseFactory : IDatabaseContext, IDisposable
+    public interface IUmbracoDatabaseFactory : IDisposable
     {
         /// <summary>
         /// Creates a new database.
@@ -27,5 +27,10 @@ namespace Umbraco.Core.Persistence
         /// Configures the database factory.
         /// </summary>
         void Configure(string connectionString, string providerName);
+
+        /// <summary>
+        /// Gets the Sql context.
+        /// </summary>
+        ISqlContext SqlContext { get; }
     }
 }
