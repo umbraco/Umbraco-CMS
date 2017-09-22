@@ -18,8 +18,6 @@
     <key alias="emptyTrashcan">Tøm papirkurv</key>
     <key alias="enable">Aktivér</key>
     <key alias="exportDocumentType">Eksportér dokumenttype</key>
-    <key alias="exportDocumentTypeAsCode">Eksportér til .NET</key>
-    <key alias="exportDocumentTypeAsCode-Full">Eksportér til .NET</key>
     <key alias="importDocumentType">Importér dokumenttype</key>
     <key alias="importPackage">Importér pakke</key>
     <key alias="liveEdit">Redigér i Canvas</key>

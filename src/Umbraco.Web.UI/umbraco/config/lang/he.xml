@@ -15,8 +15,6 @@
     <key alias="disable">נטרל</key>
     <key alias="emptyTrashcan">רוקן סל מיחזור</key>
     <key alias="exportDocumentType">ייצא סוג קובץ</key>
-    <key alias="exportDocumentTypeAsCode">ייצא אל.NET</key>
-    <key alias="exportDocumentTypeAsCode-Full">ייצא אל .NET</key>
     <key alias="importDocumentType">ייבא סוג מסמך</key>
     <key alias="importPackage">ייבא חבילה</key>
     <key alias="liveEdit">ערוך במצב "קנבס"</key>
