@@ -1,28 +1,3 @@
-# returns a string containing the hash of $file
-function Get-FileHash($file) 
-{
-  try 
-  {
-    $crypto = new-object System.Security.Cryptography.SHA1CryptoServiceProvider
-    $stream = [System.IO.File]::OpenRead($file)
-    $hash = $crypto.ComputeHash($stream)
-    $text = ""
-    $hash | foreach `
-    {
-      $text = $text + $_.ToString("x2")
-    }
-    return $text
-  }
-  finally
-  {
-    if ($stream)
-    {
-      $stream.Dispose()
-    }
-    $crypto.Dispose()
-  }
-}
-
 # returns the full path if $file is relative to $pwd
 function Get-FullPath($file)
 {
