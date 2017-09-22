@@ -287,7 +287,7 @@
                 title: localizationService.localize("user_selectUserGroups"),
                 view: "usergrouppicker",
                 selection: vm.selectedBulkUserGroups,
-                closeButtonLabel: "Cancel",
+                closeButtonLabel: localizationService.localize("general_cancel"),
                 show: true,
                 submit: function (model) {
                     usersResource.setUserGroupsOnUsers(model.selection, vm.selection).then(function (data) {
