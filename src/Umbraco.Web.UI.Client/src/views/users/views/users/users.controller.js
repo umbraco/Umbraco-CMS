@@ -320,10 +320,10 @@
 
         function openUserGroupPicker(event) {
             vm.userGroupPicker = {
-                title: "Select user groups",
+                title: localizationService.localize("user_selectUserGroups"),
                 view: "usergrouppicker",
                 selection: vm.newUser.userGroups,
-                closeButtonLabel: "Cancel",
+                closeButtonLabel: localizationService.localize("general_cancel"),
                 show: true,
                 submit: function (model) {
                     // apply changes
