@@ -120,7 +120,7 @@ namespace Umbraco.Web.WebApi.Filters
                 actionContext.Request.Properties,
                 UmbracoContext.Current.Security.CurrentUser,
                 Current.Services.MediaService,
-                Current.Services.EntityService, 
+                Current.Services.EntityService,
                 nodeId))
             {
                 base.OnActionExecuting(actionContext);

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core.Models;
@@ -10,7 +10,7 @@ namespace Umbraco.Core.Services
     {
         private readonly IScopeUnitOfWorkProvider _uowProvider;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
-        
+
         private readonly Dictionary<int, TypedId<Guid>> _id2Key = new Dictionary<int, TypedId<Guid>>();
         private readonly Dictionary<Guid, TypedId<int>> _key2Id = new Dictionary<Guid, TypedId<int>>();
 
@@ -179,7 +179,7 @@ namespace Umbraco.Core.Services
         {
             private readonly T _id;
             private readonly UmbracoObjectTypes _umbracoObjectType;
-            
+
             public T Id
             {
                 get { return _id; }

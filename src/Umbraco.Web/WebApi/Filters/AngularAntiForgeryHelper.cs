@@ -115,6 +115,6 @@ namespace Umbraco.Web.WebApi.Filters
                 cookieToken == null ? null : cookieToken,
                 out failedReason);
         }
-        
+
     }
 }

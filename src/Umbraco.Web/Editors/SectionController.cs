@@ -40,7 +40,7 @@ namespace Umbraco.Web.Editors
                 IEnumerable<Tab<DashboardControl>> dashboardsForSection;
                 if (dashboards.TryGetValue(section.Alias, out dashboardsForSection))
                 {
-                    if (dashboardsForSection.Any())                    
+                    if (dashboardsForSection.Any())
                         hasDashboards = true;
                 }
 
@@ -48,8 +48,8 @@ namespace Umbraco.Web.Editors
                 {
                     //get the first tree in the section and get it's root node route path
                     var sectionTrees = appTreeController.GetApplicationTrees(section.Alias, null, null).Result;
-                    section.RoutePath = sectionTrees.IsContainer == false 
-                        ? sectionTrees.RoutePath 
+                    section.RoutePath = sectionTrees.IsContainer == false
+                        ? sectionTrees.RoutePath
                         : sectionTrees.Children[0].RoutePath;
                 }
             }

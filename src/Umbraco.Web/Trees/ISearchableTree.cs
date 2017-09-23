@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Trees

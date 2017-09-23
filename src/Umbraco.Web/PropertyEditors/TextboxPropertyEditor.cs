@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -19,7 +19,7 @@ namespace Umbraco.Web.PropertyEditors
         public TextboxPropertyEditor(ILogger logger)
             : base(logger)
         { }
-        
+
         protected override PropertyValueEditor CreateValueEditor()
         {
             return new TextOnlyValueEditor(base.CreateValueEditor());

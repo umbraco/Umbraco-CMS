@@ -102,11 +102,11 @@ namespace Umbraco.Web.Mvc
 
             using (var sw = new StringWriter())
             {
-				var viewResult = isPartial == false 
+                var viewResult = isPartial == false
                     ? ViewEngines.Engines.FindView(controller.ControllerContext, viewName, null)
                     : ViewEngines.Engines.FindPartialView(controller.ControllerContext, viewName);
-			    if (viewResult.View == null)
-			        throw new InvalidOperationException("No view could be found by name " + viewName);
+                if (viewResult.View == null)
+                    throw new InvalidOperationException("No view could be found by name " + viewName);
                 var viewContext = new ViewContext(controller.ControllerContext, viewResult.View, controller.ViewData, controller.TempData, sw);
                 viewResult.View.Render(viewContext, sw);
                 viewResult.ViewEngine.ReleaseView(controller.ControllerContext, viewResult.View);
@@ -125,7 +125,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="isPartial">true if it is a Partial view, otherwise false for a normal view </param>
         /// <returns></returns>
         internal static string RenderViewToString(
-            this RequestContext requestContext, 
+            this RequestContext requestContext,
             ViewDataDictionary viewData,
             TempDataDictionary tempData,
             string viewName, object model, bool isPartial = false)
@@ -142,9 +142,9 @@ namespace Umbraco.Web.Mvc
                 requestContext.HttpContext, routeData,
                 new FakeController
                 {
-                    ViewData = viewData                    
+                    ViewData = viewData
                 });
-            
+
             using (var sw = new StringWriter())
             {
                 var viewResult = isPartial == false

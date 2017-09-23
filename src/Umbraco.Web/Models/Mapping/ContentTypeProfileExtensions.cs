@@ -28,7 +28,7 @@ namespace Umbraco.Web.Models.Mapping
                 .IgnoreEntityCommonProperties()
                 .ForMember(dest => dest.Id, map => map.Condition(src => src.Id > 0))
                 .ForMember(dest => dest.Key, map => map.Ignore())
-                .ForMember(dest => dest.HasIdentity, map => map.Ignore())                
+                .ForMember(dest => dest.HasIdentity, map => map.Ignore())
                 .ForMember(dest => dest.DeletedDate, map => map.Ignore())
                 .ForMember(dest => dest.PropertyTypes, map => map.Ignore());
         }
@@ -164,7 +164,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Convert.ToInt32(src.Id)))
 
                 //These get persisted as part of the saving procedure, nothing to do with the display model
-                .IgnoreDeletableEntityCommonProperties()               
+                .IgnoreDeletableEntityCommonProperties()
 
                 .ForMember(dest => dest.AllowedAsRoot, opt => opt.MapFrom(src => src.AllowAsRoot))
                 .ForMember(dest => dest.CreatorId, opt => opt.Ignore())

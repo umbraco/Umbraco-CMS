@@ -23,7 +23,7 @@ namespace Umbraco.Web
         /// <param name="cookieName"></param>
         /// <returns></returns>
         /// <remarks>
-        /// Adapted from: https://stackoverflow.com/a/29057304/5018 because there's an issue with .NET WebApi cookie parsing logic 
+        /// Adapted from: https://stackoverflow.com/a/29057304/5018 because there's an issue with .NET WebApi cookie parsing logic
         /// when using requestHeaders.GetCookies() when an invalid cookie name is present.
         /// </remarks>
         public static string GetCookieValue(this HttpRequestHeaders requestHeaders, string cookieName)
@@ -32,7 +32,7 @@ namespace Umbraco.Web
             {
                 if (header.Key.Equals("Cookie", StringComparison.InvariantCultureIgnoreCase) == false)
                     continue;
-                
+
                 var cookiesHeaderValue = header.Value.FirstOrDefault();
                 if (cookiesHeaderValue == null)
                     return null;

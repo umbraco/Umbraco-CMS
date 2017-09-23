@@ -104,7 +104,7 @@ namespace Umbraco.Web.Trees
                 }
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
 
-                
+
             }
             else
             {

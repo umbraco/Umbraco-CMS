@@ -99,7 +99,7 @@ namespace Umbraco.Core
         /// <returns>An Udi instance that contains the value that was parsed.</returns>
         /// <remarks>
         /// <para>If <paramref name="knownTypes"/> is <c>true</c>, and the string could not be parsed because
-        /// the entity type was not known, the method succeeds but sets <c>udi</c>to an 
+        /// the entity type was not known, the method succeeds but sets <c>udi</c>to an
         /// <see cref="UnknownTypeUdi"/> value.</para>
         /// <para>If <paramref name="knownTypes"/> is <c>true</c>, assemblies are not scanned for types,
         /// and therefore only builtin types may be known. Unless scanning already took place.</para>
@@ -298,7 +298,7 @@ namespace Umbraco.Core
                 throw new ArgumentException(string.Format("Unknown entity type \"{0}\".", entityType), "entityType");
 
             if (udiType != UdiType.GuidUdi)
-                throw new InvalidOperationException(string.Format("Entity type \"{0}\" does not have guid udis.", entityType));            
+                throw new InvalidOperationException(string.Format("Entity type \"{0}\" does not have guid udis.", entityType));
             if (id == default(Guid))
                 throw new ArgumentException("Cannot be an empty guid.", "id");
 

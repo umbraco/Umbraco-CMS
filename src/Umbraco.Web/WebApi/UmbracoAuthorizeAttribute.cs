@@ -42,7 +42,7 @@ namespace Umbraco.Web.WebApi
 
         public UmbracoAuthorizeAttribute() : this(true)
         { }
-            
+
         public UmbracoAuthorizeAttribute(bool requireApproval)
         {
             _requireApproval = requireApproval;

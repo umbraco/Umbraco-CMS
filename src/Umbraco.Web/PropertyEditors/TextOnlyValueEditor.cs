@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -6,7 +6,7 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
-    /// Custom value editor which ensures that the value stored is just plain text and that 
+    /// Custom value editor which ensures that the value stored is just plain text and that
     /// no magic json formatting occurs when translating it to and from the database values
     /// </summary>
     public class TextOnlyValueEditor : PropertyValueEditorWrapper
@@ -32,11 +32,11 @@ namespace Umbraco.Web.PropertyEditors
             switch (GetDatabaseType())
             {
                 case DataTypeDatabaseType.Ntext:
-                case DataTypeDatabaseType.Nvarchar:                    
+                case DataTypeDatabaseType.Nvarchar:
                     return property.Value.ToString();
                 case DataTypeDatabaseType.Integer:
-                case DataTypeDatabaseType.Decimal:                   
-                case DataTypeDatabaseType.Date:                    
+                case DataTypeDatabaseType.Decimal:
+                case DataTypeDatabaseType.Date:
                 default:
                     throw new InvalidOperationException("The " + typeof(TextOnlyValueEditor) + " can only be used with string based property editors");
             }

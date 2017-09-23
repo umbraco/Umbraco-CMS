@@ -19,14 +19,14 @@ namespace Umbraco.Web.Models.ContentEditing
             StartContentIds = new List<EntityBasic>();
             StartMediaIds = new List<EntityBasic>();
         }
-        
+
         /// <summary>
         /// Gets the available cultures (i.e. to populate a drop down)
         /// The key is the culture stored in the database, the value is the Name
         /// </summary>
         [DataMember(Name = "availableCultures")]
         public IDictionary<string, string> AvailableCultures { get; set; }
-        
+
         [DataMember(Name = "startContentIds")]
         public IEnumerable<EntityBasic> StartContentIds { get; set; }
 

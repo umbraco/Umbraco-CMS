@@ -95,13 +95,13 @@ namespace Umbraco.Core.Services
         IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType);
 
         /// <summary>
-        /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method which can be 
+        /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method which can be
         /// used during Member creation.
         /// </summary>
         /// <remarks>
-        /// <remarks>This method exists so that Umbraco developers can use one entry point to create/update 
+        /// <remarks>This method exists so that Umbraco developers can use one entry point to create/update
         /// this will not work for updating members in most cases (depends on your membership provider settings)
-        /// 
+        ///
         /// It is preferred to use the membership APIs for working with passwords, in the near future this method will be obsoleted
         /// and the ASP.NET Identity APIs should be used instead.
         /// </remarks>

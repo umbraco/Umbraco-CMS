@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Web.Models.Mapping

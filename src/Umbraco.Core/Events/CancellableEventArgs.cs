@@ -36,7 +36,7 @@ namespace Umbraco.Core.Events
             CanCancel = canCancel;
             //create a standalone messages
             Messages = new EventMessages();
-		    AdditionalData = EmptyAdditionalData;
+            AdditionalData = EmptyAdditionalData;
         }
 
         public CancellableEventArgs(EventMessages eventMessages)
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Events
 
         public CancellableEventArgs()
             : this(true)
-		{ }
+        { }
 
         /// <summary>
         /// Flag to determine if this instance will support being cancellable
@@ -120,13 +120,13 @@ namespace Umbraco.Core.Events
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-	        if (obj.GetType() != GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((CancellableEventArgs) obj);
         }
 
         public override int GetHashCode()
         {
-	        return AdditionalData != null ? AdditionalData.GetHashCode() : 0;
+            return AdditionalData != null ? AdditionalData.GetHashCode() : 0;
         }
 
         public static bool operator ==(CancellableEventArgs left, CancellableEventArgs right)
@@ -136,7 +136,7 @@ namespace Umbraco.Core.Events
 
         public static bool operator !=(CancellableEventArgs left, CancellableEventArgs right)
         {
-	        return Equals(left, right) == false;
+            return Equals(left, right) == false;
         }
     }
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
@@ -31,7 +31,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                         Roles = new[] { "admin" },
                         AllowedApplications = new[] { "content", "media", "members" },
                         Culture = "en-US",
-                        RealName = "Admin",                        
+                        RealName = "Admin",
                         Username = "admin"
                     });
 

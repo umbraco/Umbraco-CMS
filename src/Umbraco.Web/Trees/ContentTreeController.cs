@@ -35,7 +35,7 @@ namespace Umbraco.Web.Trees
     public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
-        
+
         protected override int RecycleBinId => Constants.System.RecycleBinContent;
 
         protected override bool RecycleBinSmells => Services.ContentService.RecycleBinSmells();
@@ -98,7 +98,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 var menu = new MenuItemCollection();
-                
+
                 // if the user's start node is not the root then the only menu item to display is refresh
                 if (UserStartNodes.Contains(Constants.System.Root) == false)
                 {
@@ -246,7 +246,7 @@ namespace Umbraco.Web.Trees
             var menuItem = menu.Items.Add<TItem, TAction>(Services.TextService.Localize("actions", Current.Actions.GetAction<TAction>().Alias), hasSeparator);
             if (convert) menuItem.ConvertLegacyMenuItem(item, "content", "content");
         }
-        
+
         public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
             return _treeSearcher.ExamineSearch(Umbraco, query, UmbracoEntityTypes.Document, pageSize, pageIndex, out totalFound, searchFrom);

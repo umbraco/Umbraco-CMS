@@ -627,12 +627,12 @@ namespace Umbraco.Core.Services
                     uow.Complete();
                     return;
                 }
-                
+
                 repository.Delete(template);
 
                 args.CanCancel = false;
                 uow.Events.Dispatch(DeletedTemplate, this, args);
-                
+
                 Audit(uow, AuditType.Delete, "Delete Template performed by user", userId, template.Id);
                 uow.Complete();
             }
@@ -823,7 +823,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreatePartialViewRepository(partialViewType);
                 if (partialViewContent != null) partialView.Content = partialViewContent;
                 repository.AddOrUpdate(partialView);
-                
+
                 newEventArgs.CanCancel = false;
                 uow.Events.Dispatch(CreatedPartialView, this, newEventArgs);
 

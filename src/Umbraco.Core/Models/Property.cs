@@ -53,7 +53,7 @@ namespace Umbraco.Core.Models
                 {
                     if (o == null && o1 == null) return true;
 
-                    //custom comparer for strings.                        
+                    //custom comparer for strings.
                     if (o is string || o1 is string)
                     {
                         //if one is null and another is empty then they are the same

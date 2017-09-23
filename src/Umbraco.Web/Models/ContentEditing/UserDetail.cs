@@ -29,7 +29,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [ReadOnly(true)]
-        [DataMember(Name = "userType")]        
+        [DataMember(Name = "userType")]
         public string UserType { get; set; }
 
         [ReadOnly(true)]

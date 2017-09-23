@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Services
 
             ((MemberService)ServiceContext.MemberService).MembershipProvider = provider;
         }
-        
+
         [Test]
         public void Can_Set_Password_On_New_Member()
         {
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(member.RawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix));
 
             ServiceContext.MemberService.SavePassword(member, "hello123456$!");
-            
+
             var foundMember = ServiceContext.MemberService.GetById(member.Id);
             Assert.IsNotNull(foundMember);
             Assert.AreNotEqual("hello123456$!", foundMember.RawPasswordValue);

@@ -23,7 +23,7 @@ namespace Umbraco.Web.WebApi
     {
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private bool _userisValidated = false;
-        
+
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
             => _userManager ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager());
 
@@ -35,7 +35,7 @@ namespace Umbraco.Web.WebApi
         protected User UmbracoUser
         {
             get
-            {                
+            {
                 //throw exceptions if not valid (true)
                 if (!_userisValidated)
                 {

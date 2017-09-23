@@ -33,7 +33,7 @@ namespace Umbraco.Web.Trees
     public class MediaTreeController : ContentTreeControllerBase, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
-        
+
         protected override int RecycleBinId => Constants.System.RecycleBinMedia;
 
         protected override bool RecycleBinSmells => Services.MediaService.RecycleBinSmells();

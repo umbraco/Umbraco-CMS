@@ -11,13 +11,13 @@ namespace Umbraco.Core
         /// </summary>
         public static class Conventions
         {
-		    internal static class PermissionCategories
-		    {
-		        public const string ContentCategory = "content";
-		        public const string AdministrationCategory = "administration";
-		        public const string StructureCategory = "structure";
-		        public const string OtherCategory = "other";
-		    }
+            internal static class PermissionCategories
+            {
+                public const string ContentCategory = "content";
+                public const string AdministrationCategory = "administration";
+                public const string StructureCategory = "structure";
+                public const string OtherCategory = "other";
+            }
 
             public static class PublicAccess
             {

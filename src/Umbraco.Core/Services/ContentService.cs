@@ -973,7 +973,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var sql = uow.SqlContext.Sql(@"
-                    SELECT id 
+                    SELECT id
                     FROM umbracoNode
                     JOIN cmsDocument ON umbracoNode.id=cmsDocument.nodeId AND cmsDocument.published=@0
                     WHERE umbracoNode.trashed=@1 AND umbracoNode.id IN (@2)",

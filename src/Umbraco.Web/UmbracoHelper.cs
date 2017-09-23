@@ -985,7 +985,7 @@ namespace Umbraco.Web
         {
             return StringUtilities.Truncate(html, length, addElipsis, treatTagsAsContent);
         }
-        
+
         #region Truncate by Words
 
         /// <summary>
@@ -1027,9 +1027,9 @@ namespace Umbraco.Web
 
             return Truncate(html, length, addElipsis, false);
         }
-        
+
         #endregion
-        
+
         #endregion
 
         #region If

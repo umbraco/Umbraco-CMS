@@ -83,7 +83,7 @@ namespace Umbraco.Core.Security
             manager.InitUserManager(manager, membershipProvider, contentSectionConfig, options);
             return manager;
         }
-        
+
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("Use the overload specifying all dependencies instead")]
         public static BackOfficeUserManager Create(
@@ -118,7 +118,7 @@ namespace Umbraco.Core.Security
         [Obsolete("Use the overload specifying all dependencies instead")]
         protected void InitUserManager(
             BackOfficeUserManager manager,
-            MembershipProviderBase membershipProvider,         
+            MembershipProviderBase membershipProvider,
             IdentityFactoryOptions<BackOfficeUserManager> options)
         {
             InitUserManager(manager, membershipProvider, UmbracoConfig.For.UmbracoSettings().Content, options);
@@ -346,7 +346,7 @@ namespace Umbraco.Core.Security
         }
 
         #region Overrides for password logic
-        
+
         /// <summary>
         /// Logic used to validate a username and password
         /// </summary>
@@ -442,7 +442,7 @@ namespace Umbraco.Core.Security
             await UpdateSecurityStampInternal(user);
             return IdentityResult.Success;
 
-            
+
         }
 
         /// <summary>
@@ -510,9 +510,9 @@ namespace Umbraco.Core.Security
             RaiseResetAccessFailedCountEvent(userId);
             return await UpdateAsync(user);
         }
-        
 
-      
+
+
 
         public override Task<IdentityResult> AccessFailedAsync(int userId)
         {

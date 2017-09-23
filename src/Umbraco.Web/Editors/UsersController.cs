@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -544,7 +544,7 @@ namespace Umbraco.Web.Editors
                     {
                         userMgr.RaisePasswordChangedEvent(intId.Result);
                     }
-                    
+
                     //need to re-get the user
                     found = Services.UserService.GetUserById(intId.Result);
                 }

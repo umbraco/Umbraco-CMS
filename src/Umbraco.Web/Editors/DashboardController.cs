@@ -124,7 +124,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<Tab<DashboardControl>> GetDashboard(string section)
         {
             var dashboardHelper = new DashboardHelper(Services.SectionService);
-            return dashboardHelper.GetDashboard(section, Security.CurrentUser);            
+            return dashboardHelper.GetDashboard(section, Security.CurrentUser);
         }
     }
 }

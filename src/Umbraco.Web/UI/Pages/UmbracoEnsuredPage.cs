@@ -45,7 +45,7 @@ namespace Umbraco.Web.UI.Pages
             if (objectType != UmbracoObjectTypes.Document && objectType != UmbracoObjectTypes.Media)
                 return;
 
-            //check path access                    
+            //check path access
 
             var entity = entityId == Constants.System.Root
                 ? UmbracoEntity.Root

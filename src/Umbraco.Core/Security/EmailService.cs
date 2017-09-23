@@ -14,7 +14,7 @@ namespace Umbraco.Core.Security
     {
         private readonly string _notificationEmailAddress;
         private readonly IEmailSender _defaultEmailSender;
-        
+
         public EmailService(string notificationEmailAddress, IEmailSender defaultEmailSender)
         {
             _notificationEmailAddress = notificationEmailAddress;

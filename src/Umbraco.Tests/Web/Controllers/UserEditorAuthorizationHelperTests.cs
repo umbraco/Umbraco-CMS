@@ -127,7 +127,7 @@ namespace Umbraco.Tests.Web.Controllers
 
             var contentService = new Mock<IContentService>();
             contentService.Setup(x => x.GetById(It.IsAny<int>()))
-                .Returns((int id) => Mock.Of<IContent>(content => content.Path == nodePaths[id]));            
+                .Returns((int id) => Mock.Of<IContent>(content => content.Path == nodePaths[id]));
             var mediaService = new Mock<IMediaService>();
             var userService = new Mock<IUserService>();
             var entityService = new Mock<IEntityService>();
@@ -277,8 +277,8 @@ namespace Umbraco.Tests.Web.Controllers
             var currentUser = Mock.Of<IUser>(user => user.StartMediaIds == new[] { 9876 });
             var savingUser = Mock.Of<IUser>();
 
-            var contentService = new Mock<IContentService>();            
-            var mediaService = new Mock<IMediaService>();            
+            var contentService = new Mock<IContentService>();
+            var mediaService = new Mock<IMediaService>();
             mediaService.Setup(x => x.GetById(It.IsAny<int>()))
                 .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
             var userService = new Mock<IUserService>();
@@ -315,7 +315,7 @@ namespace Umbraco.Tests.Web.Controllers
             var currentUser = Mock.Of<IUser>(user => user.StartMediaIds == new[] { 9876 });
             var savingUser = Mock.Of<IUser>();
 
-            var contentService = new Mock<IContentService>();            
+            var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
             mediaService.Setup(x => x.GetById(It.IsAny<int>()))
                 .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
@@ -353,7 +353,7 @@ namespace Umbraco.Tests.Web.Controllers
             var currentUser = Mock.Of<IUser>(user => user.StartMediaIds == new[] { 9876 });
             var savingUser = Mock.Of<IUser>(user => user.StartMediaIds == new[] { 1234 });
 
-            var contentService = new Mock<IContentService>();            
+            var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
             mediaService.Setup(x => x.GetById(It.IsAny<int>()))
                 .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
@@ -391,7 +391,7 @@ namespace Umbraco.Tests.Web.Controllers
             var currentUser = Mock.Of<IUser>(user => user.StartMediaIds == new[] { 9876 });
             var savingUser = Mock.Of<IUser>(user => user.StartMediaIds == new[] { 1234, 4567 });
 
-            var contentService = new Mock<IContentService>();            
+            var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
             mediaService.Setup(x => x.GetById(It.IsAny<int>()))
                 .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));

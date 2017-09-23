@@ -73,7 +73,7 @@ namespace Umbraco.Web.Security.Providers
             base.Initialize(name, config);
 
             if (config == null) { throw new ArgumentNullException("config"); }
-            
+
             _allowManuallyChangingPassword = config.GetValue("allowManuallyChangingPassword", false);
             _enablePasswordReset = config.GetValue("enablePasswordReset", false);
 
@@ -89,7 +89,7 @@ namespace Umbraco.Web.Security.Providers
                 }
             }
             if (_hasDefaultMember == false && config["defaultUserGroupAlias"] != null)
-            {                
+            {
                 if (config["defaultUserGroupAlias"].IsNullOrWhiteSpace() == false)
                 {
                     _defaultMemberTypeAlias = config["defaultUserGroupAlias"];
@@ -120,7 +120,7 @@ namespace Umbraco.Web.Security.Providers
                 return _defaultMemberTypeAlias;
             }
         }
-        
+
         /// <summary>
         /// Overridden in order to call the BackOfficeUserManager.UnlockUser method in order to raise the user audit events
         /// </summary>
@@ -136,7 +136,7 @@ namespace Umbraco.Web.Security.Providers
                 if (userManager != null)
                 {
                     userManager.RaiseAccountUnlockedEvent(member.Id);
-                }   
+                }
             }
             return result;
         }
@@ -169,7 +169,7 @@ namespace Umbraco.Web.Security.Providers
                 {
                     //we have successfully logged in, if the failed password attempts was modified it means it was reset
                     if (result.Member.WasPropertyDirty("FailedPasswordAttempts"))
-                    {                        
+                    {
                         userManager.RaiseResetAccessFailedCountEvent(result.Member.Id);
                     }
                 }

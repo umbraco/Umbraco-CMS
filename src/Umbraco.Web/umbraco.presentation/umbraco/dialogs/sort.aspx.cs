@@ -68,7 +68,7 @@ namespace umbraco.cms.presentation
             var app = Request.GetItemAsString("app");
 
             var icon = "../images/umbraco/doc.gif";
-            
+
             if (ParentIdAsInt.HasValue)
             {
                 if (app == Constants.Applications.Media)

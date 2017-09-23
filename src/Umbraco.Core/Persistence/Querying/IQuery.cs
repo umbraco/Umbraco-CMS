@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Querying
         /// <param name="values"></param>
         /// <returns>This instance so calls to this method are chainable</returns>
         IQuery<T> WhereIn(Expression<Func<T, object>> fieldSelector, IEnumerable values);
-        
+
         /// <summary>
         /// Adds a set of OR-ed where clauses to the query.
         /// </summary>

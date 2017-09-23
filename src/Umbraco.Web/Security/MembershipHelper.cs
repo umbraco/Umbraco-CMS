@@ -89,7 +89,7 @@ namespace Umbraco.Web.Security
             if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
             if (roleProvider == null) throw new ArgumentNullException(nameof(roleProvider));
-            
+
             _httpContext = umbracoContext.HttpContext;
             _umbracoContext = umbracoContext;
             _membershipProvider = membershipProvider;
@@ -145,19 +145,19 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// This will check if the member has access to this path
         /// </summary>
-        /// <param name="path"></param>        
+        /// <param name="path"></param>
         /// <param name="roleProvider"></param>
         /// <returns></returns>
         /// <remarks>
-        /// This is essentially the same as the PublicAccessServiceExtensions.HasAccess however this will use the PCR cache 
+        /// This is essentially the same as the PublicAccessServiceExtensions.HasAccess however this will use the PCR cache
         /// of the already looked up roles for the member so this doesn't need to happen more than once.
-        /// This does a safety check in case of things like unit tests where there is no PCR and if that is the case it will use 
+        /// This does a safety check in case of things like unit tests where there is no PCR and if that is the case it will use
         /// lookup the roles directly.
         /// </remarks>
         private bool HasAccess(string path, RoleProvider roleProvider)
         {
             return _umbracoContext.PublishedContentRequest == null
-                ? PublicAccessService.HasAccess(path, CurrentUserName, roleProvider.GetRolesForUser) 
+                ? PublicAccessService.HasAccess(path, CurrentUserName, roleProvider.GetRolesForUser)
                 : PublicAccessService.HasAccess(path, CurrentUserName, Router.GetRolesForLogin);
         }
 
@@ -712,7 +712,7 @@ namespace Umbraco.Web.Security
             {
                 throw new InvalidOperationException("Could not find provider with name " + membershipProviderName);
             }
-            
+
             return ChangePassword(username, passwordModel, provider);
         }
 

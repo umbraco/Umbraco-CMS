@@ -228,7 +228,7 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "dialogs/sort.aspx?id=" + nodeId + "&nodeType=" + nodeType + "&app=" + currentSection + "&rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/sort")));
-                
+
                 case "UmbClientMgr.appActions().actionProtect()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
@@ -274,7 +274,7 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "dialogs/sendToTranslation.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/sendToTranslate")));
-                
+
                 case "UmbClientMgr.appActions().actionImport()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
@@ -290,7 +290,7 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "dialogs/viewAuditTrail.aspx?nodeId=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/auditTrail")));
-              
+
             }
             return Attempt<LegacyUrlAction>.Fail();
         }

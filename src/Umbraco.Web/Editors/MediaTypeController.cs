@@ -155,7 +155,7 @@ namespace Umbraco.Web.Editors
 
         public HttpResponseMessage PostRenameContainer(int id, string name)
         {
-            
+
             var result = Services.MediaTypeService.RenameContainer(id, name, Security.CurrentUser.Id);
 
             return result

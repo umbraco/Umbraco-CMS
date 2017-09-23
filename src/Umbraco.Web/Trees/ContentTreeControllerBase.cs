@@ -74,7 +74,7 @@ namespace Umbraco.Web.Trees
         protected abstract TreeNode GetSingleTreeNode(IUmbracoEntity e, string parentId, FormDataCollection queryStrings);
 
         /// <summary>
-        /// Returns a <see cref="TreeNode"/> for the <see cref="IUmbracoEntity"/> and 
+        /// Returns a <see cref="TreeNode"/> for the <see cref="IUmbracoEntity"/> and
         /// attaches some meta data to the node if the user doesn't have start node access to it when in dialog mode
         /// </summary>
         /// <param name="e"></param>
@@ -88,7 +88,7 @@ namespace Umbraco.Web.Trees
             if (entityIsAncestorOfStartNodes == false)
                 return null;
 
-            var treeNode = GetSingleTreeNode(e, parentId, queryStrings);            
+            var treeNode = GetSingleTreeNode(e, parentId, queryStrings);
             if (hasPathAccess == false)
             {
                 treeNode.AdditionalData["noAccess"] = true;
@@ -110,7 +110,7 @@ namespace Umbraco.Web.Trees
         /// Returns the user's start node for this tree
         /// </summary>
         protected abstract int[] UserStartNodes { get; }
-        
+
         protected virtual TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
@@ -167,7 +167,7 @@ namespace Umbraco.Web.Trees
                     if (int.TryParse(pathParts[1], out siteNodeId) == false)
                         continue;
 
-                    //we'll look up this                    
+                    //we'll look up this
                     siteNodeIds.Add(siteNodeId);
                 }
                 var siteNodes = Services.EntityService.GetAll(UmbracoObjectType, siteNodeIds.ToArray())
@@ -176,13 +176,13 @@ namespace Umbraco.Web.Trees
 
                 //add site nodes
                 nodes.AddRange(siteNodes.Select(e => GetSingleTreeNodeWithAccessCheck(e, id, queryStrings)).Where(node => node != null));
-                
+
                 return nodes;
             }
 
             nodes.AddRange(entities.Select(e => GetSingleTreeNodeWithAccessCheck(e, id, queryStrings)).Where(node => node != null));
             return nodes;
-        }        
+        }
 
         protected abstract MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings);
 
@@ -353,7 +353,7 @@ namespace Umbraco.Web.Trees
             var permission = Services.UserService.GetPermissions(Security.CurrentUser, dd.Path);
             var actions = global::Umbraco.Web._Legacy.Actions.Action.FromEntityPermission(permission)
                 .ToList();
-            
+
             // A user is allowed to delete their own stuff
             if (dd.CreatorId == Security.GetUserId() && actions.Contains(ActionDelete.Instance) == false)
                 actions.Add(ActionDelete.Instance);
@@ -397,7 +397,7 @@ namespace Umbraco.Web.Trees
             {
                 var guidUdi = idUdi as GuidUdi;
                 if (guidUdi != null)
-                    return new Tuple<Guid?, int?>(guidUdi.Guid, null);                
+                    return new Tuple<Guid?, int?>(guidUdi.Guid, null);
             }
 
             return null;

@@ -30,8 +30,8 @@ namespace Umbraco.Web.WebApi
                 && context.Exception != null)
             {
                 _logger.Error(context.ExceptionContext.ActionContext.ControllerContext.Controller.GetType(), "Unhandled controller exception occurred", context.Exception);
-            }            
+            }
         }
-        
+
     }
 }

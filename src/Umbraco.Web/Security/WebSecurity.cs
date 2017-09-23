@@ -255,7 +255,7 @@ namespace Umbraco.Web.Security
         public virtual bool ValidateCurrentUser()
         {
             return ValidateCurrentUser(false, true) == ValidateRequestAttempt.Success;
-        }        
+        }
 
         /// <summary>
         /// Validates the current user assigned to the request and ensures the stored user data is valid

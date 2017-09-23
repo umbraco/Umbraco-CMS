@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -52,7 +52,7 @@ namespace Umbraco.Web.Editors
 
             //save the group
             Services.UserService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());
-            
+
             //deal with permissions
 
             //remove ones that have been removed

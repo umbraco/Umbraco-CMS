@@ -103,12 +103,12 @@ namespace Umbraco.Core.Security
             }
 
             var user = await UserManager.FindByNameAsync(userName);
-            
+
             //if the user is null, create an empty one which can be used for auto-linking
-            if (user == null)            
-                user = BackOfficeIdentityUser.CreateNew(userName, null, GlobalSettings.DefaultUILanguage);            
-            
-            //check the password for the user, this will allow a developer to auto-link 
+            if (user == null)
+                user = BackOfficeIdentityUser.CreateNew(userName, null, GlobalSettings.DefaultUILanguage);
+
+            //check the password for the user, this will allow a developer to auto-link
             //an account if they have specified an IBackOfficeUserPasswordChecker
             if (await UserManager.CheckPasswordAsync(user, password))
             {
@@ -131,7 +131,7 @@ namespace Umbraco.Core.Security
                 if (await UserManager.IsLockedOutAsync(user.Id))
                 {
                     //at this point we've just locked the user out after too many failed login attempts
-                    
+
                     if (requestContext != null)
                     {
                         var backofficeUserManager = requestContext.GetBackOfficeUserManager();
@@ -142,7 +142,7 @@ namespace Umbraco.Core.Security
                     return SignInStatus.LockedOut;
                 }
             }
-            
+
             if (requestContext != null)
             {
                 var backofficeUserManager = requestContext.GetBackOfficeUserManager();
@@ -151,7 +151,7 @@ namespace Umbraco.Core.Security
             }
 
             return SignInStatus.Failure;
-        }        
+        }
 
         /// <summary>
         /// Borrowed from Micorosoft's underlying sign in manager which is not flexible enough to tell it to use a different cookie type

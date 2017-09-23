@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Web.Security;
 using Newtonsoft.Json;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;

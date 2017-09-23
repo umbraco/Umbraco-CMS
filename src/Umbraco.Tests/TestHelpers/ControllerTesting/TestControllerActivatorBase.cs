@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 return base.Create(request, controllerDescriptor, controllerType);
 
             var owinContext = request.TryGetOwinContext().Result;
-                
+
             var mockedUserService = Mock.Of<IUserService>();
             var mockedContentService = Mock.Of<IContentService>();
             var mockedMediaService = Mock.Of<IMediaService>();
@@ -85,12 +85,12 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             //httpcontext with an auth'd user
             var httpContext = Mock.Of<HttpContextBase>(
                 http => http.User == owinContext.Authentication.User
-                        //ensure the request exists with a cookies collection    
+                        //ensure the request exists with a cookies collection
                         && http.Request == Mock.Of<HttpRequestBase>(r => r.Cookies == new HttpCookieCollection())
-                        //ensure the request exists with an items collection    
+                        //ensure the request exists with an items collection
                         && http.Items == Mock.Of<IDictionary>());
             //chuck it into the props since this is what MS does when hosted and it's needed there
-            request.Properties["MS_HttpContext"] = httpContext;                
+            request.Properties["MS_HttpContext"] = httpContext;
 
             var backofficeIdentity = (UmbracoBackOfficeIdentity) owinContext.Authentication.User.Identity;
 
@@ -118,7 +118,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 
             //mock Validate
             webSecurity.Setup(x => x.ValidateCurrentUser())
-                .Returns(() => true);               
+                .Returns(() => true);
             webSecurity.Setup(x => x.UserHasSectionAccess(It.IsAny<string>(), It.IsAny<IUser>()))
                 .Returns(() => true);
 
@@ -140,7 +140,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == UrlProviderMode.Auto.ToString())),
                 Enumerable.Empty<IUrlProvider>(),
                 true); //replace it
-                
+
             var urlHelper = new Mock<IUrlProvider>();
             urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>()))
                 .Returns("/hello/world/1234");

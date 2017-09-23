@@ -279,8 +279,8 @@ namespace Umbraco.Core.Models
             get { return _allowedContentTypes; }
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, Ps.Value.AllowedContentTypesSelector, 
-                    Ps.Value.ContentTypeSortComparer);                
+                SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, Ps.Value.AllowedContentTypesSelector,
+                    Ps.Value.ContentTypeSortComparer);
             }
         }
 

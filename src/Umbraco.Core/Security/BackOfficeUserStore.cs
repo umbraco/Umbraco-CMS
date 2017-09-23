@@ -78,7 +78,7 @@ namespace Umbraco.Core.Security
             if (user == null) throw new ArgumentNullException(nameof(user));
 
             //the password must be 'something' it could be empty if authenticating
-            // with an external provider so we'll just generate one and prefix it, the 
+            // with an external provider so we'll just generate one and prefix it, the
             // prefix will help us determine if the password hasn't actually been specified yet.
             //this will hash the guid with a salt so should be nicely random
             var aspHasher = new PasswordHasher();
@@ -95,7 +95,7 @@ namespace Umbraco.Core.Security
             };
 
             UpdateMemberProperties(userEntity, user);
-            
+
             //TODO: We should deal with Roles --> User Groups here which we currently are not doing
 
             _userService.Save(userEntity);
@@ -200,7 +200,7 @@ namespace Umbraco.Core.Security
 
             return await Task.FromResult(result);
         }
-        
+
         /// <summary>
         /// Set the user password hash
         /// </summary>
@@ -226,7 +226,7 @@ namespace Umbraco.Core.Security
         {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
-            
+
             return Task.FromResult(user.PasswordHash);
         }
 
@@ -621,7 +621,7 @@ namespace Umbraco.Core.Security
         private bool UpdateMemberProperties(IUser user, BackOfficeIdentityUser identityUser)
         {
             var anythingChanged = false;
-            
+
             //don't assign anything if nothing has changed as this will trigger the track changes of the model
 
             if (identityUser.IsPropertyDirty("LastLoginDateUtc")
@@ -633,7 +633,7 @@ namespace Umbraco.Core.Security
             }
             if (identityUser.IsPropertyDirty("EmailConfirmed")
                 || (user.EmailConfirmedDate.HasValue && user.EmailConfirmedDate.Value != default(DateTime) && identityUser.EmailConfirmed == false)
-                || ((user.EmailConfirmedDate.HasValue == false || user.EmailConfirmedDate.Value == default(DateTime)) && identityUser.EmailConfirmed))                
+                || ((user.EmailConfirmedDate.HasValue == false || user.EmailConfirmedDate.Value == default(DateTime)) && identityUser.EmailConfirmed))
             {
                 anythingChanged = true;
                 user.EmailConfirmedDate = identityUser.EmailConfirmed ? (DateTime?)DateTime.Now : null;
@@ -736,7 +736,7 @@ namespace Umbraco.Core.Security
                     identityUser.Groups = groups;
                 }
             }
-            
+
             //we should re-set the calculated start nodes
             identityUser.CalculatedMediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService);
             identityUser.CalculatedContentStartNodeIds = user.CalculateContentStartNodeIds(_entityService);

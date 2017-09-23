@@ -12,7 +12,7 @@ namespace Umbraco.Core
             /// <summary>
             /// Defines the Umbraco object type unique identifiers as string.
             /// </summary>
-            /// <remarks>Should be used only when it's not possible to use the corresponding 
+            /// <remarks>Should be used only when it's not possible to use the corresponding
             /// readonly Guid value, e.g. in attributes (where only consts can be used).</remarks>
             public static class Strings
             {

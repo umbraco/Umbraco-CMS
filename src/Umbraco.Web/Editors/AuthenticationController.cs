@@ -167,8 +167,8 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// When a user is invited they are not approved but we need to resolve the partially logged on (non approved) 
-        /// user. 
+        /// When a user is invited they are not approved but we need to resolve the partially logged on (non approved)
+        /// user.
         /// </summary>
         /// <returns></returns>
         /// <remarks>
@@ -215,7 +215,7 @@ namespace Umbraco.Web.Editors
         {
             var http = EnsureHttpContext();
 
-            //Sign the user in with username/password, this also gives a chance for developers to 
+            //Sign the user in with username/password, this also gives a chance for developers to
             //custom verify the credentials and auto-link user accounts with a custom IBackOfficePasswordChecker
             var result = await SignInManager.PasswordSignInAsync(
                 loginModel.Username, loginModel.Password, isPersistent: true, shouldLockout: true);
@@ -223,7 +223,7 @@ namespace Umbraco.Web.Editors
             switch (result)
             {
                 case SignInStatus.Success:
-                    
+
                     //get the user
                     var user = Services.UserService.GetByUsername(loginModel.Username);
                     UserManager.RaiseLoginSuccessEvent(user.Id);

@@ -19,11 +19,11 @@ namespace Umbraco.Core.Persistence.Factories
             try
             {
                 userGroup.DisableChangeTracking();
-                userGroup.Id = dto.Id;                
+                userGroup.Id = dto.Id;
                 userGroup.CreateDate = dto.CreateDate;
-                userGroup.UpdateDate = dto.UpdateDate;                
-                userGroup.StartContentId = dto.StartContentId;                
-                userGroup.StartMediaId = dto.StartMediaId;                
+                userGroup.UpdateDate = dto.UpdateDate;
+                userGroup.StartContentId = dto.StartContentId;
+                userGroup.StartMediaId = dto.StartMediaId;
                 if (dto.UserGroup2AppDtos != null)
                 {
                     foreach (var app in dto.UserGroup2AppDtos)

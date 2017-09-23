@@ -91,8 +91,8 @@ namespace Umbraco.Web.WebApi.Filters
                 actionContext.Request.Properties,
                 UmbracoContext.Current.Security.CurrentUser,
                 Current.Services.UserService,
-                Current.Services.ContentService, 
-                Current.Services.EntityService, 
+                Current.Services.ContentService,
+                Current.Services.EntityService,
                 nodeId, _permissionToCheck.HasValue ? new[]{_permissionToCheck.Value}: null))
             {
                 base.OnActionExecuting(actionContext);

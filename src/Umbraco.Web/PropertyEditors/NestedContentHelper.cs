@@ -75,7 +75,7 @@ namespace Umbraco.Web.PropertyEditors
             var preValueContentTypes = JArray.Parse(preValuesAsDictionary[ContentTypesPreValueKey]);
             if (preValueContentTypes.Any())
             {
-                // the only thing we can really do is assume that the item is the first available content type 
+                // the only thing we can really do is assume that the item is the first available content type
                 item[NestedContentPropertyEditor.ContentTypeAliasPropertyKey] = preValueContentTypes.First().Value<string>("ncAlias");
             }
         }

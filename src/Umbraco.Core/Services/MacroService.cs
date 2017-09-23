@@ -127,8 +127,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-	            var saveEventArgs = new SaveEventArgs<IMacro>(macro);
-	            if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                var saveEventArgs = new SaveEventArgs<IMacro>(macro);
+                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Complete();
                     return;
@@ -141,7 +141,7 @@ namespace Umbraco.Core.Services
 
                 var repository = uow.CreateRepository<IMacroRepository>();
                 repository.AddOrUpdate(macro);
-	            saveEventArgs.CanCancel = false;
+                saveEventArgs.CanCancel = false;
                 uow.Events.Dispatch(Saved, this, saveEventArgs);
                 Audit(uow, AuditType.Save, "Save Macro performed by user", userId, -1);
 

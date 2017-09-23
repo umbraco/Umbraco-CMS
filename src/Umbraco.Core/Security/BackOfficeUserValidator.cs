@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Identity;

@@ -1391,14 +1391,14 @@ namespace Umbraco.Core
 
         /// <summary>
         /// The namespace for URLs (from RFC 4122, Appendix C).
-        /// 
+        ///
         /// See <a href="http://www.ietf.org/rfc/rfc4122.txt">RFC 4122</a>
         /// </summary>
         internal static readonly Guid UrlNamespace = new Guid("6ba7b811-9dad-11d1-80b4-00c04fd430c8");
 
         /// <summary>
         /// Creates a name-based UUID using the algorithm from RFC 4122 §4.3.
-        /// 
+        ///
         /// See <a href="https://github.com/LogosBible/Logos.Utility/blob/master/src/Logos.Utility/GuidUtility.cs#L34">GuidUtility.cs</a> for original implementation.
         /// </summary>
         /// <param name="namespaceId">The ID of the namespace.</param>

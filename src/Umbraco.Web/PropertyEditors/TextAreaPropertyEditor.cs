@@ -13,7 +13,7 @@ namespace Umbraco.Web.PropertyEditors
         public TextAreaPropertyEditor(ILogger logger)
             : base(logger)
         { }
-        
+
         protected override PropertyValueEditor CreateValueEditor()
         {
             return new TextOnlyValueEditor(base.CreateValueEditor());

@@ -29,7 +29,7 @@ namespace Umbraco.Web
         {
             var doc = new HtmlDocument();
             doc.LoadHtml("<p>" + html + "</p>");
-            
+
             var targets = new List<HtmlNode>();
 
             var nodes = doc.DocumentNode.FirstChild.SelectNodes(".//*");

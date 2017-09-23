@@ -178,7 +178,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On("member.id = cmsMember2MemberGroup.Member")
                 .Where("un.nodeObjectType=@objectType", new {objectType = NodeObjectTypeId })
                 .Where("member.LoginName=@loginName", new {loginName = username});
-            
+
             return Database.Fetch<NodeDto>(sql)
                 .DistinctBy(dto => dto.NodeId)
                 .Select(x => _modelFactory.BuildEntity(x));

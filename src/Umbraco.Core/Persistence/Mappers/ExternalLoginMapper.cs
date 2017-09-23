@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Rdbms;
 

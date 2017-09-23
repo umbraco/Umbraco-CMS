@@ -241,7 +241,7 @@ namespace Umbraco.Core.Models
             {
                 hasPathAccess = true;
                 return true;
-            }                
+            }
 
             //is it self?
             var self = startNodePaths.Any(x => x == path);
@@ -266,7 +266,7 @@ namespace Umbraco.Core.Models
                 hasPathAccess = true;
                 return true;
             }
-            
+
             return false;
         }
 

@@ -61,7 +61,7 @@ namespace Umbraco.Core.Security
             catch (Exception e)
             {
                 throw new InvalidOperationException("Cannot create a " + typeof(UmbracoBackOfficeIdentity) + " from " + typeof(ClaimsIdentity) + " since the data is not formatted correctly - either content or media start Ids could not be parsed as JSON", e);
-            }           
+            }
 
             var roles = identity.FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToList();
             var allowedApps = identity.FindAll(x => x.Type == Constants.Security.AllowedApplicationsClaimType).Select(app => app.Value).ToList();

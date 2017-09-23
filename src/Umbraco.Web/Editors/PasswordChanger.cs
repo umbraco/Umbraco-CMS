@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using System.Web;
@@ -96,7 +96,7 @@ namespace Umbraco.Web.Editors
                     _logger.Warn<PasswordChanger>($"Could not reset user password {errors}");
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not reset password, errors: " + errors, new[] { "resetPassword" }) });
                 }
-                
+
                 return Attempt.Succeed(new PasswordChangedModel());
             }
 

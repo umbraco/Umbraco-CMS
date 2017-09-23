@@ -413,7 +413,7 @@ namespace umbraco
         }
 
         /// <summary>
-        /// Generates a hash based on the text string passed in.  This method will detect the 
+        /// Generates a hash based on the text string passed in.  This method will detect the
         /// security requirements (is FIPS enabled) and return an appropriate hash.
         /// </summary>
         /// <param name="text">The text to create a hash from</param>

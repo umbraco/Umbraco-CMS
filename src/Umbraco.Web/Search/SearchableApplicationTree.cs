@@ -1,4 +1,4 @@
-using Umbraco.Web.Trees;
+﻿using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Search
 {
@@ -13,6 +13,6 @@ namespace Umbraco.Web.Search
 
         public string AppAlias { get; }
         public string TreeAlias { get; }
-        public ISearchableTree SearchableTree { get; }        
+        public ISearchableTree SearchableTree { get; }
     }
 }

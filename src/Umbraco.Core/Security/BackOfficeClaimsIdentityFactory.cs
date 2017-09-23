@@ -33,7 +33,7 @@ namespace Umbraco.Core.Security
                     Username = user.UserName,
                     RealName = user.Name,
                     AllowedApplications = user.AllowedSections,
-                    Culture = user.Culture,                 
+                    Culture = user.Culture,
                     Roles = user.Roles.Select(x => x.RoleId).ToArray(),
                     StartContentNodes = user.CalculatedContentStartNodeIds,
                     StartMediaNodes = user.CalculatedMediaStartNodeIds,

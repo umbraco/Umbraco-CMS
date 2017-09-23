@@ -88,7 +88,7 @@ namespace umbraco.cms.presentation.developer
         {
             macroName.Text = macro.Name;
             macroAlias.Text = macro.Alias;
-		    macroKey.Text = macro.Key.ToString();
+            macroKey.Text = macro.Key.ToString();
             macroXslt.Text = macro.XsltPath;
             cachePeriod.Text = macro.CacheDuration.ToInvariantString();
             macroRenderContent.Checked = macro.DontRender == false;
@@ -403,14 +403,14 @@ namespace umbraco.cms.presentation.developer
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox macroAlias;
 
-	    /// <summary>
-	    /// macroAlias control.
-	    /// </summary>
-	    /// <remarks>
-	    /// Auto-generated field.
-	    /// To modify move field declaration from designer file to code-behind file.
-	    /// </remarks>
-	    protected global::System.Web.UI.WebControls.Label macroKey;
+        /// <summary>
+        /// macroAlias control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label macroKey;
 
         /// <summary>
         /// Pane1_2 control.

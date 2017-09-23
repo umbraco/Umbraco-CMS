@@ -241,7 +241,7 @@ namespace Umbraco.Web.Editors
             return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.Indented };
         }
 
-        
+
 
         /// <summary>
         /// Returns the JavaScript object representing the static server variables javascript object
@@ -264,7 +264,7 @@ namespace Umbraco.Web.Editors
             return JavaScript(result);
         }
 
-        
+
 
         [HttpPost]
         public ActionResult ExternalLogin(string provider, string redirectUrl = null)
@@ -461,7 +461,7 @@ namespace Umbraco.Web.Editors
                             {
                                 autoLinkUser.AddRole(userGroup.Alias);
                             }
-                            
+
                             //call the callback if one is assigned
                             if (autoLinkOptions.OnAutoLinking != null)
                             {

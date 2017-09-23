@@ -352,7 +352,7 @@ namespace Umbraco.Core
         {
             return contents.Where(x => types.Contains(x.GetType()));
         }
-        
+
         public static IEnumerable<T> SkipLast<T>(this IEnumerable<T> source)
         {
             using (var e = source.GetEnumerator())

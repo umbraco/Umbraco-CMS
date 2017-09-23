@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="username"></param>
         /// <returns></returns>
         bool Exists(string username);
-        
+
         /// <summary>
         /// Gets a list of <see cref="IUser"/> objects associated with a given group
         /// </summary>
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="id"></param>
         /// <param name="includeSecurityData">
-        /// This is only used for a shim in order to upgrade to 7.7 
+        /// This is only used for a shim in order to upgrade to 7.7
         /// </param>
         /// <returns>
         /// A non cached <see cref="IUser"/> instance
@@ -85,6 +85,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
         IProfile GetProfile(string username);
         IProfile GetProfile(int id);
-        IDictionary<UserState, int> GetUserStates();        
+        IDictionary<UserState, int> GetUserStates();
     }
 }

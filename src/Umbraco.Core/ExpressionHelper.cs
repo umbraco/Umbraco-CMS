@@ -218,20 +218,20 @@ namespace Umbraco.Core
         {
             if (fromExpression == null) return null;
 
-		    MemberExpression me;
-		    switch (fromExpression.Body.NodeType)
-		    {
-		        case ExpressionType.Convert:
-		        case ExpressionType.ConvertChecked:
-		            var ue = fromExpression.Body as UnaryExpression;
-		            me = ((ue != null) ? ue.Operand : null) as MemberExpression;
-		            break;
-		        default:
-		            me = fromExpression.Body as MemberExpression;
-		            break;
-		    }
+            MemberExpression me;
+            switch (fromExpression.Body.NodeType)
+            {
+                case ExpressionType.Convert:
+                case ExpressionType.ConvertChecked:
+                    var ue = fromExpression.Body as UnaryExpression;
+                    me = ((ue != null) ? ue.Operand : null) as MemberExpression;
+                    break;
+                default:
+                    me = fromExpression.Body as MemberExpression;
+                    break;
+            }
 
-		    return me != null ? me.Member : null;
+            return me != null ? me.Member : null;
         }
 
         /// <summary>

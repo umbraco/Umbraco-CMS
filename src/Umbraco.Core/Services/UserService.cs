@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Common;
@@ -191,7 +191,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IUserRepository>();
-                
+
                 try
                 {
                     return repository.GetByUsername(username, includeSecurityData: true);
@@ -312,7 +312,7 @@ namespace Umbraco.Core.Services
 
                 //Now we have to check for backwards compat hacks, we'll need to process any groups
                 //to save first before we update the user since these groups might be new groups.
-                var explicitUser = entity as User;                
+                var explicitUser = entity as User;
                 if (explicitUser != null && explicitUser.GroupsToSave.Count > 0)
                 {
                     var groupRepository = uow.CreateRepository<IUserGroupRepository>();
@@ -863,7 +863,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="userGroup">UserGroup to save</param>
         /// <param name="userIds">
-        /// If null than no changes are made to the users who are assigned to this group, however if a value is passed in 
+        /// If null than no changes are made to the users who are assigned to this group, however if a value is passed in
         /// than all users will be removed from this group and only these users will be added
         /// </param>
         /// <param name="raiseEvents">Optional parameter to raise events.
@@ -1083,8 +1083,8 @@ namespace Umbraco.Core.Services
                     if (byGroup.Value.TryGetValue(pathId, out permissionsForNodeAndGroup) == false)
                         continue;
 
-                    //In theory there will only be one EntityPermission in this group 
-                    // but there's nothing stopping the logic of this method 
+                    //In theory there will only be one EntityPermission in this group
+                    // but there's nothing stopping the logic of this method
                     // from having more so we deal with it here
                     foreach (var entityPermission in permissionsForNodeAndGroup)
                     {
@@ -1120,7 +1120,7 @@ namespace Umbraco.Core.Services
         /// Returns the resulting permission set for a group for the path based on all permissions provided for the branch
         /// </summary>
         /// <param name="pathPermissions">
-        /// The collective set of permissions provided to calculate the resulting permissions set for the path 
+        /// The collective set of permissions provided to calculate the resulting permissions set for the path
         /// based on a single group
         /// </param>
         /// <param name="pathIds">Must be ordered deepest to shallowest (right to left)</param>

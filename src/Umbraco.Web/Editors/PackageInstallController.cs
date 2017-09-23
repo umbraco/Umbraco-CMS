@@ -540,7 +540,7 @@ namespace Umbraco.Web.Editors
 
             //set a restarting marker and reset the app pool
             Current.RestartAppPool(Request.TryGetHttpContext().Result);
-            
+
             model.IsRestarting = true;
 
             return model;

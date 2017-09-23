@@ -204,7 +204,7 @@ AnotherContentFinder
             //ensure they are all found
             Assert.IsTrue(plugins.Result.ContainsAll(shouldContain));
         }
-        
+
         [Test]
         public void Get_Plugins_Hash()
         {

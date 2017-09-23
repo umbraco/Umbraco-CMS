@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Web.Http.ExceptionHandling;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting

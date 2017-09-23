@@ -182,7 +182,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                 INNER JOIN umbracoUser2UserGroup u2ug ON u2ug.userGroupId = ug.id
                 INNER JOIN umbracoUser u ON u.id = u2ug.userId
                 INNER JOIN umbracoUser2app u2a ON u2a." + SqlSyntax.GetQuotedColumnName("user") + @" = u.id
-				WHERE u.id = 0");
+                WHERE u.id = 0");
 
             // Add the default section access to the other built-in accounts
             //  writer:
@@ -289,8 +289,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                 SELECT 'permissionGroupFor' + userLogin, 'Migrated Permission Group for ' + userLogin
                 FROM umbracoUser
                 WHERE (id IN (
-	                SELECT userid
-	                FROM umbracoUser2NodePermission
+                    SELECT userid
+                    FROM umbracoUser2NodePermission
                 ))
                 AND id > 0");
 
@@ -307,10 +307,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                 INNER JOIN umbracoUser2UserGroup u2ug ON u2ug.userGroupId = ug.id
                 INNER JOIN umbracoUser u ON u.id = u2ug.userId
                 INNER JOIN umbracoUser2NodePermission u2np ON u2np.userId = u.id
-				WHERE ug.userGroupAlias {0} NOT IN (
-					SELECT userTypeAlias {0}
-					FROM umbracoUserType
-				)", _collateSyntax));
+                WHERE ug.userGroupAlias {0} NOT IN (
+                    SELECT userTypeAlias {0}
+                    FROM umbracoUserType
+                )", _collateSyntax));
 
             // Create app permissions on the groups
             Execute.Sql(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId,app)
@@ -319,10 +319,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                 INNER JOIN umbracoUser2UserGroup u2ug ON u2ug.userGroupId = ug.id
                 INNER JOIN umbracoUser u ON u.id = u2ug.userId
                 INNER JOIN umbracoUser2app u2a ON u2a." + SqlSyntax.GetQuotedColumnName("user") + @" = u.id
-				WHERE ug.userGroupAlias {0} NOT IN (
-					SELECT userTypeAlias {0}
-					FROM umbracoUserType
-				)", _collateSyntax));
+                WHERE ug.userGroupAlias {0} NOT IN (
+                    SELECT userTypeAlias {0}
+                    FROM umbracoUserType
+                )", _collateSyntax));
         }
 
         private void DeleteOldTables(List<string> tables, Tuple<string, string, string>[] constraints)

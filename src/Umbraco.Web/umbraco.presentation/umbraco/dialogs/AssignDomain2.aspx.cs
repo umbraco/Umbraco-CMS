@@ -37,7 +37,7 @@ namespace umbraco.dialogs
                 pane_domains.Visible = false;
                 p_buttons.Visible = false;
                 return;
-            }            
+            }
 
             pane_language.Title = Services.TextService.Localize("assignDomain/setLanguage");
             pane_domains.Title = Services.TextService.Localize("assignDomain/setDomains");

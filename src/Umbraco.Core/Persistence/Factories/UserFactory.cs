@@ -7,13 +7,13 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal static class UserFactory 
+    internal static class UserFactory
     {
         public static IUser BuildEntity(UserDto dto)
         {
             var guidId = dto.Id.ToGuid();
-            
-            var user = new User(dto.Id, dto.UserName, dto.Email, dto.Login,dto.Password, 
+
+            var user = new User(dto.Id, dto.UserName, dto.Email, dto.Login,dto.Password,
                 dto.UserGroupDtos.Select(x => x.ToReadOnlyGroup()).ToArray(),
                 dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Content).Select(x => x.StartNode).ToArray(),
                 dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Media).Select(x => x.StartNode).ToArray());
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Factories
             try
             {
                 user.DisableChangeTracking();
-                
+
                 user.Key = guidId;
                 user.IsLockedOut = dto.NoConsole;
                 user.IsApproved = dto.Disabled == false;
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Persistence.Factories
         public static UserDto BuildDto(IUser entity)
         {
             var dto = new UserDto
-            {                
+            {
                 Disabled = entity.IsApproved == false,
                 Email = entity.Email,
                 Login = entity.Username,
@@ -98,6 +98,6 @@ namespace Umbraco.Core.Persistence.Factories
             }
 
             return dto;
-        }        
+        }
     }
 }

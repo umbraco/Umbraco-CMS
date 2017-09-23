@@ -29,7 +29,7 @@ namespace Umbraco.Core.Services
         /// Returns all content type Ids for the aliases given
         /// </summary>
         /// <param name="aliases"></param>
-        /// <returns></returns>        
+        /// <returns></returns>
         IEnumerable<int> GetAllContentTypeIds(string[] aliases);
     }
 }

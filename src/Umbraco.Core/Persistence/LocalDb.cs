@@ -381,7 +381,7 @@ namespace Umbraco.Core.Persistence
                     // cannot use parameters on CREATE DATABASE
                     // ie "CREATE DATABASE @0 ..." does not work
                     SetCommand(cmd, string.Format(@"
-                        CREATE DATABASE {0} 
+                        CREATE DATABASE {0}
                             ON (NAME=N{1}, FILENAME={2})
                             LOG ON (NAME=N{3}, FILENAME={4})",
                         QuotedName(databaseName),
@@ -691,7 +691,7 @@ namespace Umbraco.Core.Persistence
                 // cannot use parameters on CREATE DATABASE
                 // ie "CREATE DATABASE @0 ..." does not work
                 SetCommand(cmd, string.Format(@"
-                        CREATE DATABASE {0} 
+                        CREATE DATABASE {0}
                             ON (NAME=N{1}, FILENAME={2})
                             LOG ON (NAME=N{3}, FILENAME={4})
                             FOR ATTACH",
@@ -929,7 +929,7 @@ namespace Umbraco.Core.Persistence
         }
 
         /// <summary>
-        /// Returns a Unicode string with the delimiters added to make the input string a valid SQL Server delimited identifier. 
+        /// Returns a Unicode string with the delimiters added to make the input string a valid SQL Server delimited identifier.
         /// </summary>
         /// <param name="name">The name to quote.</param>
         /// <param name="quote">A quote character.</param>

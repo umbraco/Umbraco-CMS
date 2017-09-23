@@ -457,14 +457,14 @@ namespace Umbraco.Web.Security.Providers
                 throw new ProviderException(string.Format("No member with the username '{0}' found", username));
             }
 
-            // Non need to update		
+            // Non need to update
             if (member.IsLockedOut == false) return true;
 
             member.IsLockedOut = false;
             member.FailedPasswordAttempts = 0;
 
             MemberService.Save(member);
-            
+
             return true;
         }
 
@@ -585,7 +585,7 @@ namespace Umbraco.Web.Security.Providers
                         string.Format(
                             "Login attempt failed for username {0} from IP address {1}, the user is now locked out, max invalid password attempts exceeded",
                             username,
-                            GetCurrentRequestIpAddress()));                    
+                            GetCurrentRequestIpAddress()));
                 }
                 else
                 {
@@ -610,7 +610,7 @@ namespace Umbraco.Web.Security.Providers
                         string.Format(
                             "Login attempt succeeded for username {0} from IP address {1}",
                             username,
-                            GetCurrentRequestIpAddress()));                
+                            GetCurrentRequestIpAddress()));
             }
 
             //don't raise events for this! It just sets the member dates, if we do raise events this will

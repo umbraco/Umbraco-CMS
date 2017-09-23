@@ -120,9 +120,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IDictionary<UserState, int> GetUserStates()
         {
-            var sql = @"SELECT '1CountOfAll' AS colName, COUNT(id) AS num FROM umbracoUser 
+            var sql = @"SELECT '1CountOfAll' AS colName, COUNT(id) AS num FROM umbracoUser
 UNION
-SELECT '2CountOfActive' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL 
+SELECT '2CountOfActive' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL
 UNION
 SELECT '3CountOfDisabled' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 1
 UNION
@@ -642,20 +642,20 @@ ORDER BY colName";
             if (includeUserGroups != null && includeUserGroups.Length > 0)
             {
                 const string subQuery = @"AND (umbracoUser.id IN (SELECT DISTINCT umbracoUser.id
-		            FROM umbracoUser
-		            INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
-		            INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
-		            WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
+                    FROM umbracoUser
+                    INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
+                    INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
+                    WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
                 filterSql.Append(subQuery, new { userGroups = includeUserGroups });
             }
 
             if (excludeUserGroups != null && excludeUserGroups.Length > 0)
             {
                 var subQuery = @"AND (umbracoUser.id NOT IN (SELECT DISTINCT umbracoUser.id
-		            FROM umbracoUser
-		            INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
-		            INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
-		            WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
+                    FROM umbracoUser
+                    INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
+                    INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
+                    WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
                 filterSql.Append(subQuery, new { userGroups = excludeUserGroups });
             }
 

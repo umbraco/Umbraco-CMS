@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 udb.EnableSqlCount = false;
                 udb.EnableSqlCount = true;
 
-                //now get by GUID, this won't be cached yet because the default repo key is not a GUID 
+                //now get by GUID, this won't be cached yet because the default repo key is not a GUID
                 found = repository.Get(media.Key);
                 var sqlCount = udb.SqlCount;
                 Assert.Greater(sqlCount, 0);

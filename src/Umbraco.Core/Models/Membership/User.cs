@@ -421,7 +421,7 @@ namespace Umbraco.Core.Models.Membership
                     //if the group isn't IUserGroup we'll need to look it up
                     var realGroup = customUserGroup as IUserGroup ?? Current.Services.UserService.GetUserGroupById(customUserGroup.Id);
                     realGroup.AddAllowedSection(sectionAlias);
-                    //now we need to flag this for saving (hack!) 
+                    //now we need to flag this for saving (hack!)
                     GroupsToSave.Add(realGroup);
                 }
 

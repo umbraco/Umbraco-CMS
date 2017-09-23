@@ -22,7 +22,7 @@ namespace Umbraco.Web.WebApi.Filters
         private readonly IEntityService _entityService;
         private readonly char _permissionToCheck;
 
-        public FilterAllowedOutgoingContentAttribute(Type outgoingType) 
+        public FilterAllowedOutgoingContentAttribute(Type outgoingType)
             : this(outgoingType, Current.Services.UserService, Current.Services.EntityService)
         {
             _permissionToCheck = ActionBrowse.Instance.Letter;

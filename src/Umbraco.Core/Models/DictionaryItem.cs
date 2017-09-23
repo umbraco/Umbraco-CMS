@@ -85,7 +85,7 @@ namespace Umbraco.Core.Models
                 }
 
                 SetPropertyValueAndDetectChanges(asArray, ref _translations, Ps.Value.TranslationsSelector,
-                    Ps.Value.DictionaryTranslationComparer);                
+                    Ps.Value.DictionaryTranslationComparer);
             }
         }
     }

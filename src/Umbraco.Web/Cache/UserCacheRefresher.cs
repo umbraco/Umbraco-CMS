@@ -42,7 +42,7 @@ namespace Umbraco.Web.Cache
             var userCache = CacheHelper.IsolatedRuntimeCache.GetCache<IUser>();
             if (userCache)
                 userCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUser>(id));
-           
+
             base.Remove(id);
         }
         #endregion
