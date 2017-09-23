@@ -1438,7 +1438,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="language">Sprog</key>
     <key alias="languageHelp">Indstil det sprog, du vil se i menuer og dialoger</key>
     <key alias="lastLockoutDate">Seneste låst ude dato</key>
-    <key alias="lastLogin">Sidste login</key>
+    <key alias="lastLogin">Senest login</key>
     <key alias="lastPasswordChangeDate">Kodeord sidst ændret</key>
     <key alias="loginname">Brugernavn</key>
     <key alias="mediastartnode">Startnode i mediearkivet</key>
