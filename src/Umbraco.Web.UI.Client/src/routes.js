@@ -10,10 +10,10 @@ app.config(function ($routeProvider) {
             /** Checks that the user is authenticated, then ensures that are requires assets are loaded */
             isAuthenticatedAndReady: function ($q, userService, $route, assetsService, appState) {
                 var deferred = $q.defer();
+                var routeParams = $route.current.params;
 
                 //don't need to check if we've redirected to login and we've already checked auth
-                if (!$route.current.params.section
-                    && ($route.current.params.check === false || $route.current.params.check === "false")) {
+                if (!routeParams.section && (routeParams.check === false || routeParams.rpcheck === "false")) {
                     deferred.resolve(true);
                     return deferred.promise;
                 }
@@ -31,10 +31,14 @@ app.config(function ($routeProvider) {
                             userService.getCurrentUser({ broadcastEvent: broadcast }).then(function (user) {
                                 //is auth, check if we allow or reject
                                 if (isRequired) {
+                                    if (routeParams.section.toLowerCase() === "default" || routeParams.section.toLowerCase() === "umbraco" || routeParams.section === "") {
+                                        routeParams.section = "content";
+                                    }
+
                                     // U4-5430, Benjamin Howarth
                                     // We need to change the current route params if the user only has access to a single section
                                     // To do this we need to grab the current user's allowed sections, then reject the promise with the correct path.
-                                    if (user.allowedSections.indexOf($route.current.params.section) > -1) {
+                                    if (user.allowedSections.indexOf(routeParams.section) > -1) {
                                         //this will resolve successfully so the route will continue
                                         deferred.resolve(true);
                                     } else {
@@ -102,10 +106,6 @@ app.config(function ($routeProvider) {
             template: "<div ng-include='templateUrl'></div>",
             //This controller will execute for this route, then we can execute some code in order to set the template Url
             controller: function ($scope, $route, $routeParams, $location, sectionService) {
-                if ($routeParams.section.toLowerCase() === "default" || $routeParams.section.toLowerCase() === "umbraco" || $routeParams.section === "") {
-                    $routeParams.section = "content";
-                }
-
                 //We are going to check the currently loaded sections for the user and if the section we are navigating
                 //to has a custom route path we'll use that 
                 sectionService.getSectionsForUser().then(function(sections) {
