@@ -20,6 +20,41 @@ namespace Umbraco.Core.Persistence.Querying
             _pd = sqlContext.PocoDataFactory.ForType(typeof(TDto));
         }
 
+        protected override string VisitMethodCall(MethodCallExpression m)
+        {
+            var declaring = m.Method.DeclaringType;
+            if (declaring != typeof (SqlTemplate))
+                return base.VisitMethodCall(m);
+
+            if (m.Method.Name != "Arg" && m.Method.Name != "ArgIn")
+                throw new NotSupportedException($"Method SqlTemplate.{m.Method.Name} is not supported.");
+
+            var parameters = m.Method.GetParameters();
+            if (parameters.Length != 1 || parameters[0].ParameterType != typeof (string))
+                throw new NotSupportedException($"Method SqlTemplate.{m.Method.Name}({string.Join(", ", parameters.Select(x => x.ParameterType))} is not supported.");
+
+            var arg = m.Arguments[0];
+            string name;
+            if (arg.NodeType == ExpressionType.Constant)
+            {
+                name = arg.ToString();
+            }
+            else
+            {
+                // though... we probably should avoid doing this
+                var member = Expression.Convert(arg, typeof (object));
+                var lambda = Expression.Lambda<Func<object>>(member);
+                var getter = lambda.Compile();
+                name = getter().ToString();
+            }
+
+            SqlParameters.Add(RemoveQuote(name));
+
+            return Visited
+                ? string.Empty
+                : $"@{SqlParameters.Count - 1}";
+        }
+
         protected override string VisitMemberAccess(MemberExpression m)
         {
             if (m.Expression != null && m.Expression.NodeType == ExpressionType.Parameter && m.Expression.Type == typeof(TDto))
@@ -94,6 +129,10 @@ namespace Umbraco.Core.Persistence.Querying
             {
                 _parameterName1 = lambda.Parameters[0].Name;
                 _parameterName2 = lambda.Parameters[1].Name;
+            }
+            else
+            {
+                _parameterName1 = _parameterName2 = null;
             }
             return base.VisitLambda(lambda);
         }

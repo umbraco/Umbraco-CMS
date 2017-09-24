@@ -170,6 +170,7 @@
     <Compile Include="BulkInsertBenchmarks.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqlTemplatesBenchmark.cs" />
     <Compile Include="XmlBenchmarks.cs" />
     <Compile Include="XmlPublishedContentInitBenchmarks.cs" />
   </ItemGroup>

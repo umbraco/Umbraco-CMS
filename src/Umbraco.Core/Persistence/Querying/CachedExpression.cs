@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Querying
         /// </summary>
         public string VisitResult
         {
-            get { return _visitResult; }
+            get => _visitResult;
             set
             {
                 if (Visited)
