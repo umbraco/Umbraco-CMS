@@ -20,6 +20,19 @@
             { label: "Oldest", key: "CreateDate", direction: "Ascending" },
             { label: "Last login", key: "LastLoginDate", direction: "Descending" }
         ];
+
+        angular.forEach(vm.userSortData, function (userSortData) {
+            var key = "user_sort" + userSortData.key + userSortData.direction;
+            localizationService.localize(key).then(function (value) {
+                var reg = /^\[[\S\s]*]$/g;
+                var result = reg.test(value);
+                if (result === false) {
+                    // Only translate if key exists
+                    userSortData.label = value;
+                }
+            });
+        });
+
         vm.userStatesFilter = [];
         vm.newUser.userGroups = [];
         vm.usersViewState = 'overview';
