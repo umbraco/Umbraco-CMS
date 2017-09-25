@@ -10,7 +10,7 @@ namespace Umbraco.Core.Services
     {
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
-        
+
         private readonly Dictionary<int, TypedId<Guid>> _id2Key = new Dictionary<int, TypedId<Guid>>();
         private readonly Dictionary<Guid, TypedId<int>> _key2Id = new Dictionary<Guid, TypedId<int>>();
 
@@ -39,8 +39,8 @@ namespace Umbraco.Core.Services
             int? val;
             using (var uow = _uowProvider.GetUnitOfWork())
             {
-                val = uow.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND nodeObjectType=@nodeObjectType",
-                    new { id = key, nodeObjectType = GetNodeObjectTypeGuid(umbracoObjectType) });
+                val = uow.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
+                    new { id = key, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservationGuid });
                 uow.Commit();
             }
 
@@ -92,8 +92,8 @@ namespace Umbraco.Core.Services
             Guid? val;
             using (var uow = _uowProvider.GetUnitOfWork())
             {
-                val = uow.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND nodeObjectType=@nodeObjectType",
-                    new { id, nodeObjectType = GetNodeObjectTypeGuid(umbracoObjectType) });
+                val = uow.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
+                    new { id, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservationGuid });
                 uow.Commit();
             }
 
@@ -179,7 +179,7 @@ namespace Umbraco.Core.Services
         {
             private readonly T _id;
             private readonly UmbracoObjectTypes _umbracoObjectType;
-            
+
             public T Id
             {
                 get { return _id; }
