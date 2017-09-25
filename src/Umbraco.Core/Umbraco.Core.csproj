@@ -28,6 +28,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Umbraco.Core.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -1280,6 +1281,7 @@
     <Compile Include="PropertyEditors\ValueValidatorAttribute.cs" />
     <Compile Include="Publishing\ScheduledPublisher.cs" />
     <Compile Include="ReadLock.cs" />
+    <Compile Include="ReflectionUtilities.cs" />
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="RuntimeLevel.cs" />
     <Compile Include="RuntimeState.cs" />

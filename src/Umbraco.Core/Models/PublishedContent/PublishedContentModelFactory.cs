@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -39,6 +40,7 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             var ctorArgTypes = new[] { typeof(IPublishedElement) };
             var modelInfos = new Dictionary<string, ModelInfo>(StringComparer.InvariantCultureIgnoreCase);
+            var exprs = new List<Expression<Func<IPublishedElement, IPublishedElement>>>();
 
             ModelTypeMap = new Dictionary<string, Type>(StringComparer.InvariantCultureIgnoreCase);
 
@@ -68,30 +70,15 @@ namespace Umbraco.Core.Models.PublishedContent
                 if (modelInfos.TryGetValue(typeName, out ModelInfo modelInfo))
                     throw new InvalidOperationException($"Both types {type.FullName} and {modelInfo.ModelType.FullName} want to be a model type for content type with alias \"{typeName}\".");
 
-                // see Umbraco.Tests.Benchmarks.CtorInvokeBenchmarks
-                // using ctor.Invoke is horrible, cannot even consider it,
-                // then expressions are 6-10x slower than direct ctor, and
-                // dynamic methods are 2-3x slower than direct ctor = best
-
-                // much faster with a dynamic method but potential MediumTrust issues - which we don't support
-                // here http://stackoverflow.com/questions/16363838/how-do-you-call-a-constructor-via-an-expression-tree-on-an-existing-object
-                var meth = new DynamicMethod(string.Empty, typeof(IPublishedElement), ctorArgTypes, type.Module, true);
-                var gen = meth.GetILGenerator();
-                gen.Emit(OpCodes.Ldarg_0);
-                gen.Emit(OpCodes.Newobj, constructor);
-                gen.Emit(OpCodes.Ret);
-                var func = (Func<IPublishedElement, IPublishedElement>) meth.CreateDelegate(typeof (Func<IPublishedElement, IPublishedElement>));
-
-                // fast enough and works in MediumTrust - but we don't
-                // read http://boxbinary.com/2011/10/how-to-run-a-unit-test-in-medium-trust-with-nunitpart-three-umbraco-framework-testing/
-                //var exprArg = Expression.Parameter(typeof(IPropertySet), "content");
-                //var exprNew = Expression.New(constructor, exprArg);
-                //var expr = Expression.Lambda<Func<IPropertySet, IPropertySet>>(exprNew, exprArg);
-                //var func = expr.Compile();
-
-                modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, Ctor = func, ModelType = type };
+                exprs.Add(Expression.Lambda<Func<IPublishedElement, IPublishedElement>>(Expression.New(constructor)));
+                modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, ModelType = type };
                 ModelTypeMap[typeName] = type;
             }
+
+            var compiled = ReflectionUtilities.CompileToDelegates(exprs.ToArray());
+            var i = 0;
+            foreach (var modelInfo in modelInfos.Values)
+                modelInfo.Ctor = compiled[i++];
 
             _modelInfos = modelInfos.Count > 0 ? modelInfos : null;
         }
