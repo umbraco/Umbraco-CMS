@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models.PublishedContent
         private class ModelInfo
         {
             public Type ParameterType { get; set; }
-            public Func<IPropertySet, IPropertySet> Ctor { get; set; }
+            public Func<IPublishedElement, IPublishedElement> Ctor { get; set; }
             public Type ModelType { get; set; }
         }
 
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </remarks>
         public PublishedContentModelFactory(IEnumerable<Type> types)
         {
-            var ctorArgTypes = new[] { typeof(IPropertySet) };
+            var ctorArgTypes = new[] { typeof(IPublishedElement) };
             var modelInfos = new Dictionary<string, ModelInfo>(StringComparer.InvariantCultureIgnoreCase);
 
             ModelTypeMap = new Dictionary<string, Type>(StringComparer.InvariantCultureIgnoreCase);
@@ -50,17 +50,17 @@ namespace Umbraco.Core.Models.PublishedContent
                 foreach (var ctor in type.GetConstructors())
                 {
                     var parms = ctor.GetParameters();
-                    if (parms.Length == 1 && typeof (IPropertySet).IsAssignableFrom(parms[0].ParameterType))
+                    if (parms.Length == 1 && typeof (IPublishedElement).IsAssignableFrom(parms[0].ParameterType))
                     {
                         if (constructor != null)
-                            throw new InvalidOperationException($"Type {type.FullName} has more than one public constructor with one argument of type, or implementing, IPropertySet.");
+                            throw new InvalidOperationException($"Type {type.FullName} has more than one public constructor with one argument of type, or implementing, IPublishedElement.");
                         constructor = ctor;
                         parameterType = parms[0].ParameterType;
                     }
                 }
 
                 if (constructor == null)
-                    throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type, or implementing, IPropertySet.");
+                    throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type, or implementing, IPublishedElement.");
 
                 var attribute = type.GetCustomAttribute<PublishedContentModelAttribute>(false); // fixme rename FacadeModelAttribute
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
@@ -75,12 +75,12 @@ namespace Umbraco.Core.Models.PublishedContent
 
                 // much faster with a dynamic method but potential MediumTrust issues - which we don't support
                 // here http://stackoverflow.com/questions/16363838/how-do-you-call-a-constructor-via-an-expression-tree-on-an-existing-object
-                var meth = new DynamicMethod(string.Empty, typeof(IPropertySet), ctorArgTypes, type.Module, true);
+                var meth = new DynamicMethod(string.Empty, typeof(IPublishedElement), ctorArgTypes, type.Module, true);
                 var gen = meth.GetILGenerator();
                 gen.Emit(OpCodes.Ldarg_0);
                 gen.Emit(OpCodes.Newobj, constructor);
                 gen.Emit(OpCodes.Ret);
-                var func = (Func<IPropertySet, IPropertySet>) meth.CreateDelegate(typeof (Func<IPropertySet, IPropertySet>));
+                var func = (Func<IPublishedElement, IPublishedElement>) meth.CreateDelegate(typeof (Func<IPublishedElement, IPublishedElement>));
 
                 // fast enough and works in MediumTrust - but we don't
                 // read http://boxbinary.com/2011/10/how-to-run-a-unit-test-in-medium-trust-with-nunitpart-three-umbraco-framework-testing/
@@ -96,7 +96,7 @@ namespace Umbraco.Core.Models.PublishedContent
             _modelInfos = modelInfos.Count > 0 ? modelInfos : null;
         }
 
-        public IPropertySet CreateModel(IPropertySet set)
+        public IPublishedElement CreateModel(IPublishedElement set)
         {
             // fail fast
             if (_modelInfos == null)

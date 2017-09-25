@@ -20,7 +20,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
             => PropertyCacheLevel.Facade;
 
-        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
             var sourceString = source.ToString();
@@ -32,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return sourceString;
         }
 
-        public override object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             // convert markup to html for frontend rendering.
             // source should come from ConvertSource and be a string (or null) already

@@ -4,12 +4,12 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PublishedCache
 {
-    internal abstract class PropertySetPropertyBase : PublishedPropertyBase
+    internal abstract class PublishedElementPropertyBase : PublishedPropertyBase
     {
         private readonly object _locko = new object();
         private readonly object _sourceValue;
 
-        protected readonly IPropertySet Set;
+        protected readonly IPublishedElement Set;
         protected readonly bool IsPreviewing;
         protected readonly bool IsMember;
 
@@ -18,7 +18,7 @@ namespace Umbraco.Web.PublishedCache
         private CacheValues _cacheValues;
 
         // initializes a published item property
-        protected PropertySetPropertyBase(PublishedPropertyType propertyType, IPropertySet set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
+        protected PublishedElementPropertyBase(PublishedPropertyType propertyType, IPublishedElement set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
             : base(propertyType, referenceCacheLevel)
         {
             _sourceValue = sourceValue;

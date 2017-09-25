@@ -24,11 +24,11 @@ namespace Umbraco.Web.Models
 
             _sourceValue = value;
 
-            IPropertySet propertySet = null; // fixme!! nested content needs complete refactoring!
+            IPublishedElement publishedElement = null; // fixme!! nested content needs complete refactoring!
 
-            var interValue = new Lazy<object>(() => _propertyType.ConvertSourceToInter(propertySet, _sourceValue, _isPreview));
-            _objectValue = new Lazy<object>(() => _propertyType.ConvertInterToObject(propertySet, PropertyCacheLevel.None, interValue.Value, _isPreview));
-            _xpathValue = new Lazy<object>(() => _propertyType.ConvertInterToXPath(propertySet, PropertyCacheLevel.None, interValue.Value, _isPreview));
+            var interValue = new Lazy<object>(() => _propertyType.ConvertSourceToInter(publishedElement, _sourceValue, _isPreview));
+            _objectValue = new Lazy<object>(() => _propertyType.ConvertInterToObject(publishedElement, PropertyCacheLevel.None, interValue.Value, _isPreview));
+            _xpathValue = new Lazy<object>(() => _propertyType.ConvertInterToXPath(publishedElement, PropertyCacheLevel.None, interValue.Value, _isPreview));
         }
 
         public string PropertyTypeAlias => _propertyType.PropertyTypeAlias;

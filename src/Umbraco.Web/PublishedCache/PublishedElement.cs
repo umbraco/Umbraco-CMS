@@ -14,11 +14,11 @@ namespace Umbraco.Web.PublishedCache
     // an entirely new models factory + not even sure it makes sense at all since
     // sets are created manually
     //
-    internal class PropertySet : IPropertySet
+    internal class PublishedElement : IPublishedElement
     {
-        // initializes a new instance of the PropertySet class
+        // initializes a new instance of the PublishedElement class
         // within the context of a facade service (eg a published content property value)
-        public PropertySet(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing,
+        public PublishedElement(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing,
             IFacadeService facadeService, PropertyCacheLevel referenceCacheLevel)
         {
             ContentType = contentType;
@@ -36,9 +36,9 @@ namespace Umbraco.Web.PublishedCache
                 .ToArray();
         }
 
-        // initializes a new instance of the PropertySet class
+        // initializes a new instance of the PublishedElement class
         // without any context, so it's purely 'standalone' and should NOT interfere with the facade service
-        public PropertySet(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing)
+        public PublishedElement(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing)
         {
             ContentType = contentType;
             Key = key;
@@ -55,7 +55,7 @@ namespace Umbraco.Web.PublishedCache
                 .Select(propertyType =>
                 {
                     values.TryGetValue(propertyType.PropertyTypeAlias, out object value);
-                    return (IPublishedProperty) new PropertySetProperty(propertyType, this, previewing, cacheLevel, value);
+                    return (IPublishedProperty) new PublishedElementProperty(propertyType, this, previewing, cacheLevel, value);
                 })
                 .ToArray();
         }
@@ -74,7 +74,7 @@ namespace Umbraco.Web.PublishedCache
 
         #endregion
 
-        #region PropertySet
+        #region PublishedElement
 
         public Guid Key { get; }
 

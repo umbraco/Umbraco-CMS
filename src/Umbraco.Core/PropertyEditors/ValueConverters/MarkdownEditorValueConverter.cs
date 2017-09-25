@@ -17,7 +17,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
             => PropertyCacheLevel.Content;
 
-        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             // in xml a string is: string
             // in the database a string is: string
@@ -25,13 +25,13 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             return source;
         }
 
-        public override object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             // source should come from ConvertSource and be a string (or null) already
             return new HtmlString(inter == null ? string.Empty : (string) inter);
         }
 
-        public override object ConvertInterToXPath(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertInterToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             // source should come from ConvertSource and be a string (or null) already
             return inter?.ToString() ?? string.Empty;

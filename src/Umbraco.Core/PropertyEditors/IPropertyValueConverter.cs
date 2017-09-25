@@ -51,7 +51,7 @@ namespace Umbraco.Core.PropertyEditors
         /// strings, and xml-whitespace strings appropriately, ie it should know whether to preserve
         /// whitespaces.</para>
         /// </remarks>
-        object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview);
+        object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview);
 
         /// <summary>
         /// Converts a property intermediate value to an Object value.
@@ -70,7 +70,7 @@ namespace Umbraco.Core.PropertyEditors
         /// passed to eg a PublishedFragment constructor. It is used by the fragment and the properties to manage
         /// the cache levels of property values. It is not meant to be used by the converter.</para>
         /// </remarks>
-        object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview);
+        object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview);
 
         /// <summary>
         /// Converts a property intermediate value to an XPath value.
@@ -94,6 +94,6 @@ namespace Umbraco.Core.PropertyEditors
         /// passed to eg a PublishedFragment constructor. It is used by the fragment and the properties to manage
         /// the cache levels of property values. It is not meant to be used by the converter.</para>
         /// </remarks>
-        object ConvertInterToXPath(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview);
+        object ConvertInterToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview);
     }
 }

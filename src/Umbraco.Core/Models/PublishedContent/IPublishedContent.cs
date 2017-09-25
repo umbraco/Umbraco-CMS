@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// cached preview (so, maybe unpublished) content. A better name would therefore be ICachedContent, as
     /// has been suggested. However, can't change now. Maybe in v7?</para>
     /// </remarks>
-    public interface IPublishedContent : IPropertySet
+    public interface IPublishedContent : IPublishedElement
     {
         #region Content
 

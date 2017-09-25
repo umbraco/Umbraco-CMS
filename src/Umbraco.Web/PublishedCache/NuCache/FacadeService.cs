@@ -1536,9 +1536,9 @@ AND cmsContentNu.nodeId IS NULL
 
         #region Property Set
 
-        public override IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, IPropertySet set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
+        public override IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, IPublishedElement set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
         {
-            return new PropertySetProperty(FacadeAccessor, propertyType, set, previewing, referenceCacheLevel, sourceValue);
+            return new PublishedElementProperty(FacadeAccessor, propertyType, set, previewing, referenceCacheLevel, sourceValue);
         }
 
         #endregion

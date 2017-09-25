@@ -556,7 +556,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var pt = new PublishedPropertyType("detached", Constants.PropertyEditors.IntegerAlias);
             var ct = new PublishedContentType(0, "alias", new[] { pt });
-            var prop = new PropertySetProperty(pt, null, false, PropertyCacheLevel.None, 5548);
+            var prop = new PublishedElementProperty(pt, null, false, PropertyCacheLevel.None, 5548);
             Assert.IsInstanceOf<int>(prop.Value);
             Assert.AreEqual(5548, prop.Value);
         }
@@ -565,7 +565,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var type = ContentTypesCache.Get(PublishedItemType.Content, "detachedSomething");
             var values = new Dictionary<string, object>();
-            var f = new PropertySet(type, Guid.NewGuid(), values, false);
+            var f = new PublishedElement(type, Guid.NewGuid(), values, false);
         }
 
         [Test]
@@ -593,7 +593,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(val3, c.Size);
         }
 
-        class ImageWithLegendModel : PropertySet
+        class ImageWithLegendModel : PublishedElement
         {
             public ImageWithLegendModel(PublishedContentType contentType, Guid fragmentKey, Dictionary<string, object> values, bool previewing)
                 : base(contentType, fragmentKey, values, previewing)

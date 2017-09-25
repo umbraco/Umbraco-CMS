@@ -217,7 +217,7 @@ namespace Umbraco.Core.Models.PublishedContent
         // uses converters, else falls back to dark (& performance-wise expensive) magic
         // source: the property source value
         // preview: whether we are previewing or not
-        public object ConvertSourceToInter(IPropertySet owner, object source, bool preview)
+        public object ConvertSourceToInter(IPublishedElement owner, object source, bool preview)
         {
             if (!_initialized) Initialize();
 
@@ -231,7 +231,7 @@ namespace Umbraco.Core.Models.PublishedContent
         // uses converters, else returns the inter value
         // inter: the property inter value
         // preview: whether we are previewing or not
-        public object ConvertInterToObject(IPropertySet owner, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public object ConvertInterToObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             if (!_initialized) Initialize();
 
@@ -246,7 +246,7 @@ namespace Umbraco.Core.Models.PublishedContent
         // if successful, returns either a string or an XPathNavigator
         // inter: the property inter value
         // preview: whether we are previewing or not
-        public object ConvertInterToXPath(IPropertySet owner, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public object ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             if (!_initialized) Initialize();
 

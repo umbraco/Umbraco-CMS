@@ -18,7 +18,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
             => PropertyCacheLevel.Content;
 
-        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             // data is (both in database and xml):
             // <keyFeatureList>
@@ -56,7 +56,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 : values.ToArray();
         }
 
-        public override object ConvertInterToXPath(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertInterToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             var d = new XmlDocument();
             var e = d.CreateElement("values");

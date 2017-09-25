@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace Umbraco.Core.Models.PublishedContent
 {
     /// <summary>
-    /// Represents a facade property set.
+    /// Represents a published element.
     /// </summary>
-    public interface IPropertySet
+    public interface IPublishedElement
     {
         #region ContentType
 
@@ -17,7 +17,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #endregion
 
-        #region PropertySet
+        #region PublishedElement
 
         /// <summary>
         /// Gets the unique key of the facade item.

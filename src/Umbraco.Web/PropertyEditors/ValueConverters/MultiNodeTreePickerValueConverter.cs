@@ -45,7 +45,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (IEnumerable<IPublishedContent>);
 
-        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePickerAlias))
             {
@@ -66,7 +66,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return null;
         }
 
-        public override object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
+        public override object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
         {
             if (source == null)
             {

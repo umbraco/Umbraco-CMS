@@ -4,9 +4,9 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PublishedCache
 {
-    internal class PropertySetProperty : PropertySetPropertyBase
+    internal class PublishedElementProperty : PublishedElementPropertyBase
     {
-        public PropertySetProperty(PublishedPropertyType propertyType, IPropertySet set, bool previewing, PropertyCacheLevel cacheLevel, object sourceValue = null)
+        public PublishedElementProperty(PublishedPropertyType propertyType, IPublishedElement set, bool previewing, PropertyCacheLevel cacheLevel, object sourceValue = null)
             : base(propertyType, set, previewing, cacheLevel, sourceValue)
         { }
 

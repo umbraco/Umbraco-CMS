@@ -163,7 +163,7 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="previewing">A value indicating whether previewing.</param>
         /// <param name="referenceCacheLevel">The reference cache level.</param>
         /// <returns>A property set.</returns>
-        IPropertySet CreateSet(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing, PropertyCacheLevel referenceCacheLevel);
+        IPublishedElement CreateSet(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing, PropertyCacheLevel referenceCacheLevel);
 
         /// <summary>
         /// Creates a set property.
@@ -174,7 +174,7 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="referenceCacheLevel">The reference cache level.</param>
         /// <param name="sourceValue">The source value.</param>
         /// <returns>A set property.</returns>
-        IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, IPropertySet set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
+        IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, IPublishedElement set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
 
         #endregion
     }

@@ -79,7 +79,7 @@ namespace Umbraco.Tests.PublishedContent
                 new PublishedPropertyType("prop1", "editor1", converters),
             });
 
-            var set1 = new PropertySet(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+            var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
             Assert.AreEqual(1234, set1.Value("prop1"));
         }
@@ -95,13 +95,13 @@ namespace Umbraco.Tests.PublishedContent
             public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
                 => PropertyCacheLevel.Content;
 
-            public object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
+            public object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
                 => int.TryParse(source as string, out int i) ? i : 0;
 
-            public object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            public object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => (int) inter;
 
-            public object ConvertInterToXPath(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            public object ConvertInterToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => ((int) inter).ToString();
         }
 
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.PublishedContent
                 new PublishedPropertyType("prop1", "editor2", converters),
             });
 
-            var set1 = new PropertySet(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+            var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
             var cntType1 = new PublishedContentType(1001, "cnt1", Array.Empty<PublishedPropertyType>());
             var cnt1 = new TestPublishedContent(cntType1, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
@@ -164,13 +164,13 @@ namespace Umbraco.Tests.PublishedContent
             public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
                 => _cacheLevel;
 
-            public object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
+            public object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
                 => int.TryParse(source as string, out int i) ? i : -1;
 
-            public object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            public object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => _facadeAccessor.Facade.ContentCache.GetById((int) inter);
 
-            public object ConvertInterToXPath(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            public object ConvertInterToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => ((int) inter).ToString();
         }
 
@@ -225,8 +225,8 @@ namespace Umbraco.Tests.PublishedContent
                 new PublishedPropertyType("prop2", "editor2"),
             });
 
-            var set1 = new PropertySet(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "val1" } }, false);
-            var set2 = new PropertySet(setType2, Guid.NewGuid(), new Dictionary<string, object> { { "prop2", "1003" } }, false);
+            var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "val1" } }, false);
+            var set2 = new PublishedElement(setType2, Guid.NewGuid(), new Dictionary<string, object> { { "prop2", "1003" } }, false);
             var cnt1 = new TestPublishedContent(contentType1, 1003, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "val1" } }, false);
             var cnt2 = new TestPublishedContent(contentType2, 1004, Guid.NewGuid(), new Dictionary<string, object> { { "prop2", "1003" } }, false);
 
@@ -292,13 +292,13 @@ namespace Umbraco.Tests.PublishedContent
             public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
                 => PropertyCacheLevel.Snapshot;
 
-            public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
+            public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
             {
                 var s = source as string;
                 return s?.Split(',').Select(int.Parse).ToArray() ?? Array.Empty<int>();
             }
 
-            public override object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            public override object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
             {
                 return ((int[]) inter).Select(x => (TestContentModel1) _facadeAccessor.Facade.ContentCache.GetById(x)).ToArray();
             }
@@ -339,7 +339,7 @@ namespace Umbraco.Tests.PublishedContent
             //
             // for standalone property sets, it's only None or Content
 
-            var set1 = new PropertySet(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+            var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
             Assert.AreEqual(1234, set1.Value("prop1"));
             Assert.AreEqual(1, converter.SourceConverts);
@@ -405,11 +405,11 @@ namespace Umbraco.Tests.PublishedContent
 
             var facadeServiceMock = new Mock<IFacadeService>();
             facadeServiceMock
-                .Setup(x => x.CreateSetProperty(It.IsAny<PublishedPropertyType>(), It.IsAny<IPropertySet>(), It.IsAny<bool>(), It.IsAny<PropertyCacheLevel>(), It.IsAny<object>()))
-                .Returns<PublishedPropertyType, IPropertySet, bool, PropertyCacheLevel, object>((propertyType, set, previewing, refCacheLevel, value) =>
+                .Setup(x => x.CreateSetProperty(It.IsAny<PublishedPropertyType>(), It.IsAny<IPublishedElement>(), It.IsAny<bool>(), It.IsAny<PropertyCacheLevel>(), It.IsAny<object>()))
+                .Returns<PublishedPropertyType, IPublishedElement, bool, PropertyCacheLevel, object>((propertyType, set, previewing, refCacheLevel, value) =>
                 {
                     // ReSharper disable AccessToModifiedClosure
-                    return new TestPropertySetProperty(propertyType, set, previewing, refCacheLevel, value, () => snapshotCache, () => facadeCache);
+                    return new TestPublishedElementProperty(propertyType, set, previewing, refCacheLevel, value, () => snapshotCache, () => facadeCache);
                     // ReSharper restore AccessToModifiedClosure
                 });
             var facadeService = facadeServiceMock.Object;
@@ -418,7 +418,7 @@ namespace Umbraco.Tests.PublishedContent
             // referenceCacheLevel is the cache level for this fictious property
             // converterCacheLevel is the cache level specified by the converter
 
-            var set1 = new PropertySet(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, facadeService, referenceCacheLevel);
+            var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, facadeService, referenceCacheLevel);
 
             Assert.AreEqual(1234, set1.Value("prop1"));
             Assert.AreEqual(1, converter.SourceConverts);
@@ -476,7 +476,7 @@ namespace Umbraco.Tests.PublishedContent
 
             Assert.Throws<Exception>(() =>
             {
-                var unused = new PropertySet(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+                var unused = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
             });
         }
 
@@ -501,29 +501,29 @@ namespace Umbraco.Tests.PublishedContent
             public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
                 => _cacheLevel;
 
-            public object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
+            public object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
             {
                 SourceConverts++;
                 return int.TryParse(source as string, out int i) ? i : 0;
             }
 
-            public object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            public object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
             {
                 InterConverts++;
                 return (int) inter;
             }
 
-            public object ConvertInterToXPath(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            public object ConvertInterToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => ((int) inter).ToString();
         }
 
-        private class TestPropertySetProperty : PropertySetPropertyBase
+        private class TestPublishedElementProperty : PublishedElementPropertyBase
         {
             private readonly Func<Dictionary<string, object>> _getSnapshotCache;
             private readonly Func<Dictionary<string, object>> _getFacadeCache;
             private string _valuesCacheKey;
 
-            public TestPropertySetProperty(PublishedPropertyType propertyType, IPropertySet set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue,
+            public TestPublishedElementProperty(PublishedPropertyType propertyType, IPublishedElement set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue,
                 Func<Dictionary<string, object>> getSnapshotCache, Func<Dictionary<string, object>> getFacadeCache)
                 : base(propertyType, set, previewing, referenceCacheLevel, sourceValue)
             {
@@ -557,9 +557,9 @@ namespace Umbraco.Tests.PublishedContent
         #region Model classes
 
         [PublishedContentModel("set1")]
-        public class TestSetModel1 : PropertySetModel
+        public class TestSetModel1 : PublishedElementModel
         {
-            public TestSetModel1(IPropertySet content)
+            public TestSetModel1(IPublishedElement content)
                 : base(content)
             { }
 
@@ -567,9 +567,9 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [PublishedContentModel("set2")]
-        public class TestSetModel2 : PropertySetModel
+        public class TestSetModel2 : PublishedElementModel
         {
-            public TestSetModel2(IPropertySet content)
+            public TestSetModel2(IPublishedElement content)
                 : base(content)
             { }
 
@@ -600,7 +600,7 @@ namespace Umbraco.Tests.PublishedContent
 
         #region Support classes
 
-        internal class TestPublishedContent : PropertySet, IPublishedContent
+        internal class TestPublishedContent : PublishedElement, IPublishedContent
         {
             public TestPublishedContent(PublishedContentType contentType, int id, Guid key, Dictionary<string, object> values, bool previewing)
                 : base(contentType, key, values, previewing)

@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <param name="set">The original property set.</param>
         /// <returns>The strongly-typed model representing the property set, or the property set
         /// itself it the factory has no model for that content type.</returns>
-        IPropertySet CreateModel(IPropertySet set);
+        IPublishedElement CreateModel(IPublishedElement set);
 
         /// <summary>
         /// Gets the model type map.

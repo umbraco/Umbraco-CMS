@@ -4,19 +4,19 @@ using System.Collections.Generic;
 namespace Umbraco.Core.Models.PublishedContent
 {
     /// <summary>
-    /// Provides an abstract base class for <c>IPropertySet</c> implementations that
-    /// wrap and extend another <c>IPropertySet</c>.
+    /// Provides an abstract base class for <c>IPublishedElement</c> implementations that
+    /// wrap and extend another <c>IPublishedElement</c>.
     /// </summary>
-    public abstract class PropertySetWrapped : IPropertySet
+    public abstract class PublishedElementWrapped : IPublishedElement
     {
-        private readonly IPropertySet _content;
+        private readonly IPublishedElement _content;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PropertySetWrapped"/> class
-        /// with an <c>IPropertySet<c> instance to wrap.</c>
+        /// Initializes a new instance of the <see cref="PublishedElementWrapped"/> class
+        /// with an <c>IPublishedElement</c> instance to wrap.
         /// </summary>
         /// <param name="content">The content to wrap.</param>
-        protected PropertySetWrapped(IPropertySet content)
+        protected PublishedElementWrapped(IPublishedElement content)
         {
             _content = content;
         }
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// Gets the wrapped content.
         /// </summary>
         /// <returns>The wrapped content, that was passed as an argument to the constructor.</returns>
-        public IPropertySet Unwrap() => _content;
+        public IPublishedElement Unwrap() => _content;
 
         /// <inheritdoc />
         public PublishedContentType ContentType => _content.ContentType;

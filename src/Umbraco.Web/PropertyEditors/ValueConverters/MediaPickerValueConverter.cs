@@ -73,7 +73,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             });
         }
 
-        public override object ConvertSourceToInter(IPropertySet owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             var nodeIds = source.ToString()
                 .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
@@ -82,7 +82,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return nodeIds;
         }
 
-        public override object ConvertInterToObject(IPropertySet owner, PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
+        public override object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
         {
             if (source == null)
             {
