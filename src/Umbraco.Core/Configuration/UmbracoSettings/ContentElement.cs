@@ -195,6 +195,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return GetOptionalTextElement("loginBackgroundImage", string.Empty); }
         }
 
+        [ConfigurationProperty("emailRegex")]
+        internal InnerTextConfigurationElement<string> EmailRegex
+        {
+            get { return GetOptionalTextElement("emailRegex", "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"); }
+        }
+
         string IContentSection.NotificationEmailAddress
         {
             get { return Notifications.NotificationEmailAddress; }
@@ -357,6 +363,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         string IContentSection.LoginBackgroundImage
         {
             get { return LoginBackgroundImage; }
+        }
+
+        string IContentSection.EmailRegex
+        {
+            get { return EmailRegex; }
         }
     }
 }
