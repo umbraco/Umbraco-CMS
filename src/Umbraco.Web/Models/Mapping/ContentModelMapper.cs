@@ -38,6 +38,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Trashed, expression => expression.MapFrom(content => content.Trashed))
                 .ForMember(display => display.PublishDate, expression => expression.MapFrom(content => GetPublishedDate(content)))
                 .ForMember(display => display.TemplateAlias, expression => expression.MapFrom(content => content.Template.Alias))
+                .ForMember(display => display.TemplateConfig, expression => expression.ResolveUsing(content => AvailableTemplates(content, applicationContext.Services.TextService)))
                 .ForMember(display => display.HasPublishedVersion, expression => expression.MapFrom(content => content.HasPublishedVersion))
                 .ForMember(display => display.Urls,
                     expression => expression.MapFrom(content =>
@@ -106,14 +107,6 @@ namespace Umbraco.Web.Models.Mapping
                 display.TreeNodeUrl = url;
             }
 
-            //fill in the template config to be passed to the template drop down.
-            var templateItemConfig = new Dictionary<string, string> {{"", localizedText.Localize("general/choose")}};
-            foreach (var t in content.ContentType.AllowedTemplates
-                .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false))
-            {
-                templateItemConfig.Add(t.Alias, t.Name);
-            }
-
             if (content.ContentType.IsContainer)
             {
                 TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService, localizedText);
@@ -162,7 +155,7 @@ namespace Umbraco.Web.Models.Mapping
                     View = "dropdown", //TODO: Hard coding until we make a real dropdown property editor to lookup
                     Config = new Dictionary<string, object>
                     {
-                        {"items", templateItemConfig}
+                        {"items", ""}
                     }
                 }
             };
@@ -244,6 +237,20 @@ namespace Umbraco.Web.Models.Mapping
 
                 return permissions;
             }
+        }
+
+
+        private static Dictionary<string, string> AvailableTemplates(IContent content, ILocalizedTextService localizedText)
+        {
+            //fill in the template config to be passed to the template drop down.
+            var templateItemConfig = new Dictionary<string, string> { { "", localizedText.Localize("general/choose") } };
+            foreach (var t in content.ContentType.AllowedTemplates
+                .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false))
+            {
+                templateItemConfig.Add(t.Alias, t.Name);
+            }
+
+            return templateItemConfig;
         }
     }
 }

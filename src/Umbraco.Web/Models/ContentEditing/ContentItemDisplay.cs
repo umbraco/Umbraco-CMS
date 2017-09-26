@@ -29,6 +29,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "template")]
         public string TemplateAlias { get; set; }
 
+        [DataMember(Name = "allowedTemplates")]
+        public object TemplateConfig { get; set; }
+
         [DataMember(Name = "urls")]
         public string[] Urls { get; set; }
 
