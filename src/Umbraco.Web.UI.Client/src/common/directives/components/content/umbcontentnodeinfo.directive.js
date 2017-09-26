@@ -27,10 +27,10 @@
                 };
 
                 // get available templates
-                scope.availableTemplates = getAvailableTemplates(scope.node);
+                scope.availableTemplates = scope.node.allowedTemplates.items;
 
                 // get document type details
-                scope.documentType = getDocumentType(scope.node);
+                scope.documentType = scope.node.docTypeValue[0];
 
                 loadAuditTrail();
 
@@ -109,40 +109,6 @@
                             item.actionColor = "gray";
                     }
                 });
-            }
-
-            function getAvailableTemplates(node) {
-
-                var availableTemplates = {};
-
-                // find the templates in the properties array
-                angular.forEach(node.properties, function (property) {
-                    if (property.alias === "_umb_template") {
-                        if (property.config && property.config.items) {
-                            availableTemplates = property.config.items;
-                        }
-                    }
-                });
-
-                return availableTemplates;
-
-            }
-
-            function getDocumentType(node) {
-
-                var documentType = {};
-
-                // find the document type in the properties array
-                angular.forEach(node.properties, function (property) {
-                    if (property.alias === "_umb_doctype") {
-                        if (property.value && property.value.length > 0) {
-                            documentType = property.value[0];
-                        }
-                    }
-                });
-
-                return documentType;
-
             }
 
             function setPublishDate(date) {

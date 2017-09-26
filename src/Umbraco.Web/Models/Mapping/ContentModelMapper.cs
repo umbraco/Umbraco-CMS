@@ -38,12 +38,11 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Trashed, expression => expression.MapFrom(content => content.Trashed))
                 .ForMember(display => display.PublishDate, expression => expression.MapFrom(content => GetPublishedDate(content)))
                 .ForMember(display => display.TemplateAlias, expression => expression.MapFrom(content => content.Template.Alias))
-                .ForMember(display => display.TemplateConfig, expression => expression.ResolveUsing(content => AvailableTemplates(content, applicationContext.Services.TextService)))
                 .ForMember(display => display.HasPublishedVersion, expression => expression.MapFrom(content => content.HasPublishedVersion))
                 .ForMember(display => display.Urls,
                     expression => expression.MapFrom(content =>
                         UmbracoContext.Current == null
-                            ? new[] {"Cannot generate urls without a current Umbraco Context"}
+                            ? new[] { "Cannot generate urls without a current Umbraco Context" }
                             : content.GetContentUrls(UmbracoContext.Current)))
                 .ForMember(display => display.Properties, expression => expression.Ignore())
                 .ForMember(display => display.AllowPreview, expression => expression.Ignore())
@@ -107,6 +106,15 @@ namespace Umbraco.Web.Models.Mapping
                 display.TreeNodeUrl = url;
             }
 
+            //fill in the template config to be passed to the template drop down.
+            var templateItemConfig = new Dictionary<string, string> { { "", localizedText.Localize("general/choose") } };
+            foreach (var t in content.ContentType.AllowedTemplates
+                .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false))
+            {
+                templateItemConfig.Add(t.Alias, t.Name);
+            }
+
+
             if (content.ContentType.IsContainer)
             {
                 TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService, localizedText);
@@ -114,13 +122,6 @@ namespace Umbraco.Web.Models.Mapping
 
             var properties = new List<ContentPropertyDisplay>
             {
-                new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("content/documentType"),
-                    Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
-                    View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
-                },
                 new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
@@ -147,17 +148,7 @@ namespace Umbraco.Web.Models.Mapping
                     }
                     //TODO: Fix up hard coded datepicker
                 },
-                new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}template", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("template/template"),
-                    Value = display.TemplateAlias,
-                    View = "dropdown", //TODO: Hard coding until we make a real dropdown property editor to lookup
-                    Config = new Dictionary<string, object>
-                    {
-                        {"items", ""}
-                    }
-                }
+                
             };
 
 
@@ -177,8 +168,30 @@ namespace Umbraco.Web.Models.Mapping
                         //TODO: Hard coding this is not good
                         var docTypeLink = string.Format("#/settings/documenttypes/edit/{0}", currentDocumentTypeId);
 
+                        var templateProperty = new ContentPropertyDisplay
+                        {
+                            Alias = string.Format("{0}template",
+                                Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                            Label = localizedText.Localize("template/template"),
+                            Value = display.TemplateAlias,
+                            View =
+                                "dropdown", //TODO: Hard coding until we make a real dropdown property editor to lookup
+                            Config = new Dictionary<string, object>
+                            {
+                                {"items", templateItemConfig}
+                            }
+                        };
+
                         //Replace the doc type property
-                        var docTypeProperty = genericProperties.First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                        var docTypeProperty = new ContentPropertyDisplay
+                        {
+                            Alias = string.Format("{0}doctype",
+                                Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                            Label = localizedText.Localize("content/documentType"),
+                            Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
+                            View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias)
+                                .ValueEditor.View
+                        };
                         docTypeProperty.Value = new List<object>
                         {
                             new
@@ -191,6 +204,10 @@ namespace Umbraco.Web.Models.Mapping
                         };
                         //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                         docTypeProperty.View = "urllist";
+
+                        //Moving template and docType properties to the root node (issue U4-10311)
+                        display.AllowedTemplates = templateProperty.Config;
+                        display.DocTypeValue = docTypeProperty.Value;
                     }
 
                     // inject 'Link to document' as the first generic property
@@ -237,20 +254,6 @@ namespace Umbraco.Web.Models.Mapping
 
                 return permissions;
             }
-        }
-
-
-        private static Dictionary<string, string> AvailableTemplates(IContent content, ILocalizedTextService localizedText)
-        {
-            //fill in the template config to be passed to the template drop down.
-            var templateItemConfig = new Dictionary<string, string> { { "", localizedText.Localize("general/choose") } };
-            foreach (var t in content.ContentType.AllowedTemplates
-                .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false))
-            {
-                templateItemConfig.Add(t.Alias, t.Name);
-            }
-
-            return templateItemConfig;
         }
     }
 }

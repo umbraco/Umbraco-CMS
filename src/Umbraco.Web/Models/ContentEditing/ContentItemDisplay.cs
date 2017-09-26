@@ -30,7 +30,10 @@ namespace Umbraco.Web.Models.ContentEditing
         public string TemplateAlias { get; set; }
 
         [DataMember(Name = "allowedTemplates")]
-        public object TemplateConfig { get; set; }
+        public object AllowedTemplates { get; set; }
+
+        [DataMember(Name = "docTypeValue")]
+        public object DocTypeValue { get; set; }
 
         [DataMember(Name = "urls")]
         public string[] Urls { get; set; }
