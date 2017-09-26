@@ -120,7 +120,7 @@ namespace Umbraco.Core
                 .Append<DefaultUrlSegmentProvider>();
 
             // by default, register a noop factory
-            composition.Container.RegisterSingleton<IPublishedContentModelFactory, NoopPublishedContentModelFactory>();
+            composition.Container.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();
         }
 
         internal void Initialize(IEnumerable<Profile> mapperProfiles)

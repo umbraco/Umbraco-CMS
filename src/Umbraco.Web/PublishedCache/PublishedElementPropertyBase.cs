@@ -9,7 +9,7 @@ namespace Umbraco.Web.PublishedCache
         private readonly object _locko = new object();
         private readonly object _sourceValue;
 
-        protected readonly IPublishedElement Set;
+        protected readonly IPublishedElement Set; // fixme rename
         protected readonly bool IsPreviewing;
         protected readonly bool IsMember;
 

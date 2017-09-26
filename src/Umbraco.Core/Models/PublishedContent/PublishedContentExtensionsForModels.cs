@@ -20,13 +20,12 @@ namespace Umbraco.Core.Models.PublishedContent
 
             // get model
             // if factory returns nothing, throw
-            var model = Current.PublishedContentModelFactory.CreateModel(content);
+            var model = Current.PublishedModelFactory.CreateModel(content);
             if (model == null)
                 throw new Exception("Factory returned null.");
 
             // if factory returns a different type, throw
-            var publishedContent = model as IPublishedContent;
-            if (publishedContent == null)
+            if (!(model is IPublishedContent publishedContent))
                 throw new Exception($"Factory returned model of type {model.GetType().FullName} which does not implement IPublishedContent.");
 
             return publishedContent;

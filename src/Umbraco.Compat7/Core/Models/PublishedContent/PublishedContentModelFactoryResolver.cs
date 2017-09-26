@@ -13,11 +13,11 @@ namespace Umbraco.Core.Models.PublishedContent
 
         public static bool HasCurrent => true;
 
-        public void SetFactory(IPublishedContentModelFactory factory)
+        public void SetFactory(IPublishedModelFactory factory)
         {
             CoreCurrent.Container.RegisterSingleton(_ => factory);
         }
 
-        public IPublishedContentModelFactory Factory => CoreCurrent.PublishedContentModelFactory;
+        public IPublishedModelFactory Factory => CoreCurrent.PublishedModelFactory;
     }
 }

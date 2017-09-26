@@ -142,8 +142,9 @@ namespace Umbraco.Tests.PublishedContent
                     Properties = new Collection<IPublishedProperty>(
                         new List<IPublishedProperty>()
                             {
-                                new PropertyResult("property1", "value" + indexVals, PropertyResultType.UserProperty),
-                                new PropertyResult("property2", "value" + (indexVals + 1), PropertyResultType.UserProperty)
+                                // PropertyResult is gone, this should be done differently
+                                //new PropertyResult("property1", "value" + indexVals, PropertyResultType.UserProperty),
+                                //new PropertyResult("property2", "value" + (indexVals + 1), PropertyResultType.UserProperty)
                             }),
                     Children = new List<IPublishedContent>()
                 };
@@ -156,15 +157,17 @@ namespace Umbraco.Tests.PublishedContent
                         GetContent(false, indexVals + 9)
                     };
             }
-            if (!createChildren)
-            {
-                //create additional columns, used to test the different columns for child nodes
-                ((Collection<IPublishedProperty>)d.Properties).Add(new PropertyResult("property4", "value" + (indexVals + 2), PropertyResultType.UserProperty));
-            }
-            else
-            {
-                ((Collection<IPublishedProperty>)d.Properties).Add(new PropertyResult("property3", "value" + (indexVals + 2), PropertyResultType.UserProperty));
-            }
+
+            // PropertyResult is gone, this should be done differently
+            //if (!createChildren)
+            //{
+            //    //create additional columns, used to test the different columns for child nodes
+            //    ((Collection<IPublishedProperty>)d.Properties).Add(new PropertyResult("property4", "value" + (indexVals + 2), PropertyResultType.UserProperty));
+            //}
+            //else
+            //{
+            //    ((Collection<IPublishedProperty>)d.Properties).Add(new PropertyResult("property3", "value" + (indexVals + 2), PropertyResultType.UserProperty));
+            //}
             return d;
         }
 

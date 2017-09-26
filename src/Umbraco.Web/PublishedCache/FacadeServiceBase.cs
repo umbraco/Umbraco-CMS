@@ -28,13 +28,13 @@ namespace Umbraco.Web.PublishedCache
         public virtual IPublishedElement CreateSet(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing, PropertyCacheLevel referenceCacheLevel)
         {
             var set = new PublishedElement(contentType, key, values, previewing, this, referenceCacheLevel);
-            var model = Current.PublishedContentModelFactory.CreateModel(set);
+            var model = Current.PublishedModelFactory.CreateModel(set);
             if (model == null)
                 throw new Exception("Factory returned null.");
             return model;
         }
 
-        public abstract IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, IPublishedElement set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
+        public abstract IPublishedProperty CreateElementProperty(PublishedPropertyType propertyType, IPublishedElement element, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
 
         public abstract string EnterPreview(IUser user, int contentId);
         public abstract void RefreshPreview(string previewToken, int contentId);

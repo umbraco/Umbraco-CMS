@@ -25,9 +25,9 @@ namespace Umbraco.Web.PublishedCache
             _membershipUser = member;
             _publishedMemberType = publishedMemberType ?? throw new ArgumentNullException(nameof(publishedMemberType));
 
-            _properties = PublishedProperty.MapProperties(_publishedMemberType.PropertyTypes, _member.Properties,
-                (t, v) => new RawValueProperty(t, this, v ?? string.Empty))
-                .ToArray();
+            var properties = PublishedProperty.MapProperties(_publishedMemberType.PropertyTypes, _member.Properties,
+                (t, v) => new RawValueProperty(t, this, v ?? string.Empty));
+            _properties = WithMemberProperties(properties).ToArray();
         }
 
         #region Membership provider member properties
@@ -79,31 +79,36 @@ namespace Umbraco.Web.PublishedCache
 
         public override IPublishedProperty GetProperty(string alias)
         {
-            switch (alias.ToLowerInvariant())
-            {
-                case "Email":
-                    return new PropertyResult("Email", Email, PropertyResultType.CustomProperty);
-                case "UserName":
-                    return new PropertyResult("UserName", UserName, PropertyResultType.CustomProperty);
-                case "PasswordQuestion":
-                    return new PropertyResult("PasswordQuestion", PasswordQuestion, PropertyResultType.CustomProperty);
-                case "Comments":
-                    return new PropertyResult("Comments", Email, PropertyResultType.CustomProperty);
-                case "IsApproved":
-                    return new PropertyResult("IsApproved", IsApproved, PropertyResultType.CustomProperty);
-                case "IsLockedOut":
-                    return new PropertyResult("IsLockedOut", IsLockedOut, PropertyResultType.CustomProperty);
-                case "LastLockoutDate":
-                    return new PropertyResult("LastLockoutDate", LastLockoutDate, PropertyResultType.CustomProperty);
-                case "CreateDate":
-                    return new PropertyResult("CreateDate", CreateDate, PropertyResultType.CustomProperty);
-                case "LastLoginDate":
-                    return new PropertyResult("LastLoginDate", LastLoginDate, PropertyResultType.CustomProperty);
-                case "LastPasswordChangeDate":
-                    return new PropertyResult("LastPasswordChangeDate", LastPasswordChangeDate, PropertyResultType.CustomProperty);
-            }
-
             return _properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
+        }
+
+        private IEnumerable<IPublishedProperty> WithMemberProperties(IEnumerable<IPublishedProperty> properties)
+        {
+            var propertiesList = properties.ToList();
+            var aliases = propertiesList.Select(x => x.PropertyTypeAlias).ToList();
+
+            if (!aliases.Contains("Email"))
+                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("Email"), this, Email));
+            if (!aliases.Contains("UserName"))
+                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("UserName"), this, UserName));
+            if (!aliases.Contains("PasswordQuestion"))
+                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("PasswordQuestion"), this, PasswordQuestion));
+            if (!aliases.Contains("Comments"))
+                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("Comments"), this, Comments));
+            if (!aliases.Contains("IsApproved"))
+                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("IsApproved"), this, IsApproved));
+            if (!aliases.Contains("IsLockedOut"))
+                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("IsLockedOut"), this, IsLockedOut));
+            if (!aliases.Contains("LastLockoutDate"))
+                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("LastLockoutDate"), this, LastLockoutDate));
+            if (!aliases.Contains("CreateDate"))
+                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("CreateDate"), this, CreateDate));
+            if (!aliases.Contains("LastLoginDate"))
+                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("LastLoginDate"), this, LastLoginDate));
+            if (!aliases.Contains("LastPasswordChangeDate"))
+                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("LastPasswordChangeDate"), this, LastPasswordChangeDate));
+
+            return propertiesList;
         }
 
         public override PublishedContentType ContentType => _publishedMemberType;
@@ -112,19 +117,13 @@ namespace Umbraco.Web.PublishedCache
 
         public override Guid Key => _member.Key;
 
-        public override int TemplateId
-        {
-            get { throw new NotSupportedException(); }
-        }
+        public override int TemplateId => throw new NotSupportedException();
 
         public override int SortOrder => 0;
 
         public override string Name => _member.Name;
 
-        public override string UrlName
-        {
-            get { throw new NotSupportedException(); }
-        }
+        public override string UrlName => throw new NotSupportedException();
 
         public override string DocumentTypeAlias => _member.ContentTypeAlias;
 

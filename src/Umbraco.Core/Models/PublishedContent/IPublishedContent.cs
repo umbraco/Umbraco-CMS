@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
+    /// <inheritdoc />
     /// <summary>
     /// Represents a cached content.
     /// </summary>
@@ -17,13 +18,16 @@ namespace Umbraco.Core.Models.PublishedContent
     {
         #region Content
 
+        // fixme - all these are colliding with models => ?
+        // or could we force them to be 'new' in models?
+
         int Id { get; }
         int TemplateId { get; }
         int SortOrder { get; }
         string Name { get; }
-        string UrlName { get; }
-        string DocumentTypeAlias { get; }
-        int DocumentTypeId { get; }
+        string UrlName { get; } // fixme rename
+        string DocumentTypeAlias { get; } // fixme obsolete
+        int DocumentTypeId { get; } // fixme obsolete
         string WriterName { get; }
         string CreatorName { get; }
         int WriterId { get; }

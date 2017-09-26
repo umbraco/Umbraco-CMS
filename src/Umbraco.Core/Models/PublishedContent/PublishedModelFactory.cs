@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Reflection.Emit;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
     /// <summary>
     /// Implements a strongly typed content model factory
     /// </summary>
-    public class PublishedContentModelFactory : IPublishedContentModelFactory
+    public class PublishedModelFactory : IPublishedModelFactory
     {
         private readonly Dictionary<string, ModelInfo> _modelInfos;
 
@@ -23,7 +22,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public Dictionary<string, Type> ModelTypeMap { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PublishedContentModelFactory"/> class with types.
+        /// Initializes a new instance of the <see cref="PublishedModelFactory"/> class with types.
         /// </summary>
         /// <param name="types">The model types.</param>
         /// <remarks>
@@ -36,9 +35,8 @@ namespace Umbraco.Core.Models.PublishedContent
         /// PublishedContentModelFactoryResolver.Current.SetFactory(factory);
         /// </code>
         /// </remarks>
-        public PublishedContentModelFactory(IEnumerable<Type> types)
+        public PublishedModelFactory(IEnumerable<Type> types)
         {
-            var ctorArgTypes = new[] { typeof(IPublishedElement) };
             var modelInfos = new Dictionary<string, ModelInfo>(StringComparer.InvariantCultureIgnoreCase);
             var exprs = new List<Expression<Func<IPublishedElement, IPublishedElement>>>();
 
@@ -83,20 +81,20 @@ namespace Umbraco.Core.Models.PublishedContent
             _modelInfos = modelInfos.Count > 0 ? modelInfos : null;
         }
 
-        public IPublishedElement CreateModel(IPublishedElement set)
+        public IPublishedElement CreateModel(IPublishedElement element)
         {
             // fail fast
             if (_modelInfos == null)
-                return set;
+                return element;
 
-            if (_modelInfos.TryGetValue(set.ContentType.Alias, out ModelInfo modelInfo) == false)
-                return set;
+            if (_modelInfos.TryGetValue(element.ContentType.Alias, out var modelInfo) == false)
+                return element;
 
             // ReSharper disable once UseMethodIsInstanceOfType
-            if (modelInfo.ParameterType.IsAssignableFrom(set.GetType()) == false)
-                throw new InvalidOperationException($"Model {modelInfo.ModelType} expects argument of type {modelInfo.ParameterType.FullName}, but got {set.GetType().FullName}.");
+            if (modelInfo.ParameterType.IsAssignableFrom(element.GetType()) == false)
+                throw new InvalidOperationException($"Model {modelInfo.ModelType} expects argument of type {modelInfo.ParameterType.FullName}, but got {element.GetType().FullName}.");
 
-            return modelInfo.Ctor(set);
+            return modelInfo.Ctor(element);
         }
     }
 }

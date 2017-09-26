@@ -12,35 +12,6 @@ namespace Umbraco.Core
     /// </summary>
     public static class ReflectionUtilities
     {
-        private static Func<TInstance, TValue> GetPropertyGetter<TInstance, TValue>(PropertyInfo property)
-        {
-            var type = typeof(TInstance);
-
-            var getMethod = property.GetMethod;
-            if (getMethod == null)
-                throw new InvalidOperationException($"Property {type}.{property.Name} : {property.PropertyType} does not have a getter.");
-
-            var exprThis = Expression.Parameter(type, "this");
-            var exprCall = Expression.Call(exprThis, getMethod);
-            var expr = Expression.Lambda<Func<TInstance, TValue>>(exprCall, exprThis);
-            return expr.CompileToDelegate();
-        }
-
-        private static Action<TInstance, TValue> GetPropertySetter<TInstance, TValue>(PropertyInfo property)
-        {
-            var type = typeof(TInstance);
-
-            var setMethod = property.SetMethod;
-            if (setMethod == null)
-                throw new InvalidOperationException($"Property {type}.{property.Name} : {property.PropertyType} does not have a setter.");
-
-            var exprThis = Expression.Parameter(type, "this");
-            var exprArg0 = Expression.Parameter(typeof(TValue), "value");
-            var exprCall = Expression.Call(exprThis, setMethod, exprArg0);
-            var expr = Expression.Lambda<Action<TInstance, TValue>>(exprCall, exprThis, exprArg0);
-            return expr.CompileToDelegate();
-        }
-
         public static Func<TInstance, TValue> GetPropertyGetter<TInstance, TValue>(string propertyName)
         {
             var type = typeof(TInstance);
@@ -85,6 +56,20 @@ namespace Umbraco.Core
 
             var exprNew = Expression.New(ctor);
             var expr = Expression.Lambda<Func<TInstance>>(exprNew);
+            return expr.CompileToDelegate();
+        }
+
+        public static Func<object> GetCtor(Type type)
+        {
+            // get the constructor infos
+            var ctor = type.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
+                null, Type.EmptyTypes, null);
+
+            if (ctor == null)
+                throw new InvalidOperationException($"Could not find constructor {type}.ctor().");
+
+            var exprNew = Expression.New(ctor);
+            var expr = Expression.Lambda<Func<object>>(exprNew);
             return expr.CompileToDelegate();
         }
 
@@ -153,6 +138,35 @@ namespace Umbraco.Core
                 null, parameterTypes, null);
 
             return GetMethod<TMethod>(method, methodName, type, parameterTypes, returnType);
+        }
+
+        private static Func<TInstance, TValue> GetPropertyGetter<TInstance, TValue>(PropertyInfo property)
+        {
+            var type = typeof(TInstance);
+
+            var getMethod = property.GetMethod;
+            if (getMethod == null)
+                throw new InvalidOperationException($"Property {type}.{property.Name} : {property.PropertyType} does not have a getter.");
+
+            var exprThis = Expression.Parameter(type, "this");
+            var exprCall = Expression.Call(exprThis, getMethod);
+            var expr = Expression.Lambda<Func<TInstance, TValue>>(exprCall, exprThis);
+            return expr.CompileToDelegate();
+        }
+
+        private static Action<TInstance, TValue> GetPropertySetter<TInstance, TValue>(PropertyInfo property)
+        {
+            var type = typeof(TInstance);
+
+            var setMethod = property.SetMethod;
+            if (setMethod == null)
+                throw new InvalidOperationException($"Property {type}.{property.Name} : {property.PropertyType} does not have a setter.");
+
+            var exprThis = Expression.Parameter(type, "this");
+            var exprArg0 = Expression.Parameter(typeof(TValue), "value");
+            var exprCall = Expression.Call(exprThis, setMethod, exprArg0);
+            var expr = Expression.Lambda<Action<TInstance, TValue>>(exprCall, exprThis, exprArg0);
+            return expr.CompileToDelegate();
         }
 
         private static void GetMethodParms<TMethod>(out Type[] parameterTypes, out Type returnType)
@@ -260,6 +274,9 @@ namespace Umbraco.Core
             return expr.Compile();
         }
 
+        // not sure we want this at all?
+
+        /*
         public static object GetStaticProperty(this Type type, string propertyName, Func<IEnumerable<PropertyInfo>, PropertyInfo> filter = null)
         {
             var propertyInfo = GetPropertyInfo(type, propertyName, filter);
@@ -418,6 +435,7 @@ namespace Umbraco.Core
 
             propInfo.SetValue(obj, val, null);
         }
+        */    
 
         public static Action CompileToDelegate(Expression<Action> expr)
         {

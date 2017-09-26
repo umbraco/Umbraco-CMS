@@ -219,8 +219,6 @@
     <Compile Include="Models\ContentEditing\UserInvite.cs" />
     <Compile Include="Models\ContentEditing\UserProfile.cs" />
     <Compile Include="Models\ContentEditing\UserSave.cs" />
-    <Compile Include="Models\DetachedPublishedContent.cs" />
-    <Compile Include="Models\DetachedPublishedProperty.cs" />
     <Compile Include="Models\Mapping\ActionButtonsResolver.cs" />
     <Compile Include="Models\Mapping\CodeFileMapperProfile.cs" />
     <Compile Include="Models\Mapping\ContentTypeUdiResolver.cs" />
@@ -250,7 +248,7 @@
     <Compile Include="PropertyEditors\RelatedLinks2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\TextOnlyValueEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentManyValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\NestedContentPublishedPropertyTypeExtensions.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\NestedContentValueConverterBase.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentSingleValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\RelatedLinksLegacyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MediaPickerValueConverter.cs" />
@@ -594,7 +592,6 @@
     <Compile Include="PropertyEditors\ValueConverters\MacroContainerValueConverter.cs" />
     <Compile Include="PropertyEditors\TagsDataController.cs" />
     <Compile Include="PublishedCache\PublishedMember.cs" />
-    <Compile Include="PublishedCache\RawValueProperty.cs" />
     <Compile Include="Models\ContentModelOfTContent.cs" />
     <Compile Include="Mvc\JsonNetResult.cs" />
     <Compile Include="Mvc\MinifyJavaScriptResultAttribute.cs" />

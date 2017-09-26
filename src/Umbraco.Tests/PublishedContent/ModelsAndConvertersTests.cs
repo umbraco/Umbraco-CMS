@@ -189,7 +189,7 @@ namespace Umbraco.Tests.PublishedContent
                 .Append<SimpleConverter3A>()
                 .Append<SimpleConverter3B>();
 
-            IPublishedContentModelFactory factory = new PublishedContentModelFactory(new[]
+            IPublishedModelFactory factory = new PublishedModelFactory(new[]
             {
                 typeof(TestSetModel1), typeof(TestSetModel2),
                 typeof(TestContentModel1), typeof(TestContentModel2),
@@ -405,7 +405,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var facadeServiceMock = new Mock<IFacadeService>();
             facadeServiceMock
-                .Setup(x => x.CreateSetProperty(It.IsAny<PublishedPropertyType>(), It.IsAny<IPublishedElement>(), It.IsAny<bool>(), It.IsAny<PropertyCacheLevel>(), It.IsAny<object>()))
+                .Setup(x => x.CreateElementProperty(It.IsAny<PublishedPropertyType>(), It.IsAny<IPublishedElement>(), It.IsAny<bool>(), It.IsAny<PropertyCacheLevel>(), It.IsAny<object>()))
                 .Returns<PublishedPropertyType, IPublishedElement, bool, PropertyCacheLevel, object>((propertyType, set, previewing, refCacheLevel, value) =>
                 {
                     // ReSharper disable AccessToModifiedClosure

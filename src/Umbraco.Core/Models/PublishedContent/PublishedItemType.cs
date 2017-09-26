@@ -1,12 +1,18 @@
 ﻿namespace Umbraco.Core.Models.PublishedContent
 {
     /// <summary>
-    /// The type of published content, ie whether it is a content or a media.
+    /// The type of published element.
     /// </summary>
-    public enum PublishedItemType
+    /// <remarks>Can be a simple element, or a document, a media, a member.</remarks>
+    public enum PublishedItemType // fixme - need to rename to PublishedElementType but then conflicts?
     {
         /// <summary>
-        /// A content, ie what was formerly known as a document.
+        /// Unknown.
+        /// </summary>
+        Unknown = 0,
+
+        /// <summary>
+        /// A document.
         /// </summary>
         Content,
 

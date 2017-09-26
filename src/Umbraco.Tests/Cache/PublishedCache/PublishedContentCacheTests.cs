@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var xmlStore = new XmlStore(() => _xml);
             var cacheProvider = new StaticCacheProvider();
             var domainCache = new DomainCache(ServiceContext.DomainService);
-            var facade = new Facade(
+            var facade = new Umbraco.Web.PublishedCache.XmlPublishedCache.Facade(
                 new PublishedContentCache(xmlStore, domainCache, cacheProvider, ContentTypesCache, null, null),
                 new PublishedMediaCache(xmlStore, ServiceContext.MediaService, ServiceContext.UserService, cacheProvider, ContentTypesCache),
                 new PublishedMemberCache(null, cacheProvider, Current.Services.MemberService, ContentTypesCache),

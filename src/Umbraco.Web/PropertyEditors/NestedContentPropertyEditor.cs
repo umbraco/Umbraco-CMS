@@ -76,14 +76,6 @@ namespace Umbraco.Web.PropertyEditors
 
             [PreValueField("hideLabel", "Hide Label", "boolean", Description = "Set whether to hide the editor label and have the list take up the full width of the editor window.")]
             public string HideLabel { get; set; }
-
-            public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
-            {
-                // re-format old style (v0.1.1) pre values if necessary
-                NestedContentHelper.ConvertPreValueCollectionFromV011(persistedPreVals);
-
-                return base.ConvertDbToEditor(defaultPreVals, persistedPreVals);
-            }
         }
 
         #endregion
@@ -142,10 +134,7 @@ namespace Umbraco.Web.PropertyEditors
                     var o = value[i];
                     var propValues = ((JObject)o);
 
-                    // convert from old style (v0.1.1) data format if necessary
-                    NestedContentHelper.ConvertItemValueFromV011(propValues, propertyType.DataTypeDefinitionId, ref preValues);
-
-                    var contentType = NestedContentHelper.GetContentTypeFromItem(propValues);
+                    var contentType = NestedContentHelper.GetElementType(propValues);
                     if (contentType == null)
                     {
                         continue;
@@ -217,10 +206,7 @@ namespace Umbraco.Web.PropertyEditors
                     var o = value[i];
                     var propValues = ((JObject)o);
 
-                    // convert from old style (v0.1.1) data format if necessary
-                    NestedContentHelper.ConvertItemValueFromV011(propValues, propertyType.DataTypeDefinitionId, ref preValues);
-
-                    var contentType = NestedContentHelper.GetContentTypeFromItem(propValues);
+                    var contentType = NestedContentHelper.GetElementType(propValues);
                     if (contentType == null)
                     {
                         continue;
@@ -298,7 +284,7 @@ namespace Umbraco.Web.PropertyEditors
                     var o = value[i];
                     var propValues = ((JObject)o);
 
-                    var contentType = NestedContentHelper.GetContentTypeFromItem(propValues);
+                    var contentType = NestedContentHelper.GetElementType(propValues);
                     if (contentType == null)
                     {
                         continue;
@@ -368,7 +354,7 @@ namespace Umbraco.Web.PropertyEditors
                     var o = value[i];
                     var propValues = (JObject) o;
 
-                    var contentType = NestedContentHelper.GetContentTypeFromItem(propValues);
+                    var contentType = NestedContentHelper.GetElementType(propValues);
                     if (contentType == null)
                     {
                         continue;

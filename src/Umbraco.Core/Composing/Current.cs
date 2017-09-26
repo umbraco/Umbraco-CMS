@@ -123,8 +123,8 @@ namespace Umbraco.Core.Composing
         internal static PropertyValueConverterCollection PropertyValueConverters
             => Container.GetInstance<PropertyValueConverterCollection>();
 
-        internal static IPublishedContentModelFactory PublishedContentModelFactory
-            => Container.GetInstance<IPublishedContentModelFactory>();
+        internal static IPublishedModelFactory PublishedModelFactory
+            => Container.GetInstance<IPublishedModelFactory>();
 
         public static IServerMessenger ServerMessenger
             => Container.GetInstance<IServerMessenger>();

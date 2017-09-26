@@ -152,10 +152,10 @@ namespace Umbraco.Web.PublishedCache
 
         #endregion
 
-        #region Property Set
+        #region Published Element
 
         /// <summary>
-        /// Creates a property set.
+        /// Creates a published element.
         /// </summary>
         /// <param name="contentType">The content type.</param>
         /// <param name="key">The set key.</param>
@@ -166,15 +166,15 @@ namespace Umbraco.Web.PublishedCache
         IPublishedElement CreateSet(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing, PropertyCacheLevel referenceCacheLevel);
 
         /// <summary>
-        /// Creates a set property.
+        /// Creates a published property for a published element.
         /// </summary>
         /// <param name="propertyType">The property type.</param>
-        /// <param name="set">The set.</param>
+        /// <param name="element">The published element.</param>
         /// <param name="previewing">A value indicating whether previewing.</param>
         /// <param name="referenceCacheLevel">The reference cache level.</param>
         /// <param name="sourceValue">The source value.</param>
         /// <returns>A set property.</returns>
-        IPublishedProperty CreateSetProperty(PublishedPropertyType propertyType, IPublishedElement set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
+        IPublishedProperty CreateElementProperty(PublishedPropertyType propertyType, IPublishedElement element, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
 
         #endregion
     }

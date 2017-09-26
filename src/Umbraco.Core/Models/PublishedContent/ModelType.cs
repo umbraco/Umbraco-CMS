@@ -6,13 +6,15 @@ using System.Reflection;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
-    // create a simple model type:
-    //  ModelType.For("alias")
-    // use in a generic type:
-    //  typeof (IEnumerable<>).MakeGenericType(ModelType.For("alias"))
-    // use in an array:
-    //  ModelType.For("alias").MakeArrayType()
-
+    /// <inheritdoc />
+    /// <summary>
+    /// Represents the Clr type of a model.
+    /// </summary>
+    /// <example>
+    /// ModelType.For("alias")
+    /// typeof (IEnumerable{}).MakeGenericType(ModelType.For("alias"))
+    /// Model.For("alias").MakeArrayType()
+    /// </example>
     public class ModelType : Type
     {
         private ModelType(string contentTypeAlias)
@@ -21,14 +23,29 @@ namespace Umbraco.Core.Models.PublishedContent
             Name = "{" + ContentTypeAlias + "}";
         }
 
+        /// <summary>
+        /// Gets the content type alias.
+        /// </summary>
         public string ContentTypeAlias { get; }
 
+        /// <inheritdoc />
         public override string ToString()
             => Name;
 
+        /// <summary>
+        /// Gets the model type for a published element type.
+        /// </summary>
+        /// <param name="alias">The published element type alias.</param>
+        /// <returns>The model type for the published element type.</returns>
         public static ModelType For(string alias)
             => new ModelType(alias);
 
+        /// <summary>
+        /// Gets the actual Clr type by replacing model types, if any.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="modelTypes">The model types map.</param>
+        /// <returns>The actual Clr type.</returns>
         public static Type Map(Type type, Dictionary<string, Type> modelTypes)
         {
             if (type is ModelType modelType)
@@ -47,12 +64,21 @@ namespace Umbraco.Core.Models.PublishedContent
 
             if (type.IsGenericType == false)
                 return type;
+            var def = type.GetGenericTypeDefinition();
+            if (def == null)
+                throw new InvalidOperationException("panic");
 
             var args = type.GetGenericArguments().Select(x => Map(x, modelTypes)).ToArray();
-
-            return type.GetGenericTypeDefinition().MakeGenericType(args);
+            return def.MakeGenericType(args);
         }
 
+        /// <summary>
+        /// Gets a value indicating whether two <see cref="Type"/> instances are equal.
+        /// </summary>
+        /// <param name="t1">The first instance.</param>
+        /// <param name="t2">The second instance.</param>
+        /// <returns>A value indicating whether the two instances are equal.</returns>
+        /// <remarks>Knows how to compare <see cref="ModelType"/> instances.</remarks>
         public static bool Equals(Type t1, Type t2)
         {
             if (t1 == t2)
@@ -80,104 +106,144 @@ namespace Umbraco.Core.Models.PublishedContent
             return true;
         }
 
+        /// <inheritdoc />
         protected override TypeAttributes GetAttributeFlagsImpl()
             => TypeAttributes.Class;
 
+        /// <inheritdoc />
         public override ConstructorInfo[] GetConstructors(BindingFlags bindingAttr)
             => Array.Empty<ConstructorInfo>();
 
+        /// <inheritdoc />
         protected override ConstructorInfo GetConstructorImpl(BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers)
             => null;
 
+        /// <inheritdoc />
         public override Type[] GetInterfaces()
             => Array.Empty<Type>();
 
+        /// <inheritdoc />
         public override Type GetInterface(string name, bool ignoreCase)
             => null;
 
+        /// <inheritdoc />
         public override EventInfo[] GetEvents(BindingFlags bindingAttr)
             => Array.Empty<EventInfo>();
 
+        /// <inheritdoc />
         public override EventInfo GetEvent(string name, BindingFlags bindingAttr)
             => null;
 
+        /// <inheritdoc />
         public override Type[] GetNestedTypes(BindingFlags bindingAttr)
             => Array.Empty<Type>();
 
+        /// <inheritdoc />
         public override Type GetNestedType(string name, BindingFlags bindingAttr)
             => null;
 
+        /// <inheritdoc />
         public override PropertyInfo[] GetProperties(BindingFlags bindingAttr)
             => Array.Empty<PropertyInfo>();
 
+        /// <inheritdoc />
         protected override PropertyInfo GetPropertyImpl(string name, BindingFlags bindingAttr, Binder binder, Type returnType, Type[] types, ParameterModifier[] modifiers)
             => null;
 
+        /// <inheritdoc />
         public override MethodInfo[] GetMethods(BindingFlags bindingAttr)
             => Array.Empty<MethodInfo>();
 
+        /// <inheritdoc />
         protected override MethodInfo GetMethodImpl(string name, BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers)
             => null;
 
+        /// <inheritdoc />
         public override FieldInfo[] GetFields(BindingFlags bindingAttr)
             => Array.Empty<FieldInfo>();
 
+        /// <inheritdoc />
         public override FieldInfo GetField(string name, BindingFlags bindingAttr)
             => null;
 
+        /// <inheritdoc />
         public override MemberInfo[] GetMembers(BindingFlags bindingAttr)
             => Array.Empty<MemberInfo>();
 
+        /// <inheritdoc />
         public override object[] GetCustomAttributes(Type attributeType, bool inherit)
             => Array.Empty<object>();
 
+        /// <inheritdoc />
         public override object[] GetCustomAttributes(bool inherit)
             => Array.Empty<object>();
 
+        /// <inheritdoc />
         public override bool IsDefined(Type attributeType, bool inherit)
             => false;
 
+        /// <inheritdoc />
         public override Type GetElementType()
             => null;
 
+        /// <inheritdoc />
         protected override bool HasElementTypeImpl()
             => false;
 
+        /// <inheritdoc />
         protected override bool IsArrayImpl()
             => false;
 
+        /// <inheritdoc />
         protected override bool IsByRefImpl()
             => false;
 
+        /// <inheritdoc />
         protected override bool IsPointerImpl()
             => false;
 
+        /// <inheritdoc />
         protected override bool IsPrimitiveImpl()
             => false;
 
+        /// <inheritdoc />
         protected override bool IsCOMObjectImpl()
             => false;
 
+        /// <inheritdoc />
         public override object InvokeMember(string name, BindingFlags invokeAttr, Binder binder, object target, object[] args, ParameterModifier[] modifiers, CultureInfo culture, string[] namedParameters)
-        {
-            throw new NotSupportedException();
-        }
+            => throw new NotSupportedException();
 
+        /// <inheritdoc />
         public override Type UnderlyingSystemType => this;
+
+        /// <inheritdoc />
         public override Type BaseType => null;
 
+        /// <inheritdoc />
         public override string Name { get; }
+
+        /// <inheritdoc />
         public override Guid GUID { get; } = Guid.NewGuid();
+
+        /// <inheritdoc />
         public override Module Module => throw new NotSupportedException();
+
+        /// <inheritdoc />
         public override Assembly Assembly => throw new NotSupportedException();
+
+        /// <inheritdoc />
         public override string FullName => Name;
+
+        /// <inheritdoc />
         public override string Namespace => string.Empty;
+
+        /// <inheritdoc />
         public override string AssemblyQualifiedName => Name;
 
+        /// <inheritdoc />
         public override Type MakeArrayType()
-        {
-            return new ModelTypeArrayType(this);
-        }
+            => new ModelTypeArrayType(this);
     }
 
     internal class ModelTypeArrayType : Type

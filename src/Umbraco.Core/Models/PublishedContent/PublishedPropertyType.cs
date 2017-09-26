@@ -256,8 +256,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
             // else just return the inter value as a string or an XPathNavigator
             if (inter == null) return null;
-            var xElement = inter as XElement;
-            if (xElement != null)
+            if (inter is XElement xElement)
                 return xElement.CreateNavigator();
             return inter.ToString().Trim();
         }
@@ -281,7 +280,7 @@ namespace Umbraco.Core.Models.PublishedContent
             get
             {
                 if (!_initialized) Initialize();
-                return _clrType ?? (_clrType = ModelType.Map(_modelClrType, Current.PublishedContentModelFactory.ModelTypeMap));
+                return _clrType ?? (_clrType = ModelType.Map(_modelClrType, Current.PublishedModelFactory.ModelTypeMap));
             }
         }
 

@@ -8,7 +8,6 @@ namespace Umbraco.Tests.FrontEnd
     [TestFixture]
     public class UmbracoHelperTests
     {
-
         [Test]
         public void Truncate_Simple()
         {

@@ -695,9 +695,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 {
                     if (i.Key.InvariantStartsWith("__"))
                     {
-                        // no type for that one, dunno how to convert
-                        IPublishedProperty property = new PropertyResult(i.Key, i.Value, PropertyResultType.CustomProperty);
-                        _properties.Add(property);
+                        // no type for that one, dunno how to convert, drop it
+                        //IPublishedProperty property = new PropertyResult(i.Key, i.Value, PropertyResultType.CustomProperty);
+                        //_properties.Add(property);
                     }
                     else
                     {

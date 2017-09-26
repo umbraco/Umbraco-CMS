@@ -233,7 +233,7 @@ namespace Umbraco.Web.Composing
 
         internal static PropertyValueConverterCollection PropertyValueConverters => CoreCurrent.PropertyValueConverters;
 
-        internal static IPublishedContentModelFactory PublishedContentModelFactory => CoreCurrent.PublishedContentModelFactory;
+        internal static IPublishedModelFactory PublishedModelFactory => CoreCurrent.PublishedModelFactory;
 
         public static IServerMessenger ServerMessenger => CoreCurrent.ServerMessenger;
 

@@ -125,9 +125,9 @@ namespace Umbraco.Core.Components
         /// <typeparam name="T">The type of the factory.</typeparam>
         /// <param name="composition">The composition.</param>
         public static void SetPublishedContentModelFactory<T>(this Composition composition)
-            where T : IPublishedContentModelFactory
+            where T : IPublishedModelFactory
         {
-            composition.Container.RegisterSingleton<IPublishedContentModelFactory, T>();
+            composition.Container.RegisterSingleton<IPublishedModelFactory, T>();
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a published content model factory.</param>
-        public static void SetPublishedContentModelFactory(this Composition composition, Func<IServiceFactory, IPublishedContentModelFactory> factory)
+        public static void SetPublishedContentModelFactory(this Composition composition, Func<IServiceFactory, IPublishedModelFactory> factory)
         {
             composition.Container.RegisterSingleton(factory);
         }
@@ -145,7 +145,7 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A published content model factory.</param>
-        public static void SetPublishedContentModelFactory(this Composition composition, IPublishedContentModelFactory factory)
+        public static void SetPublishedContentModelFactory(this Composition composition, IPublishedModelFactory factory)
         {
             composition.Container.RegisterSingleton(_ => factory);
         }

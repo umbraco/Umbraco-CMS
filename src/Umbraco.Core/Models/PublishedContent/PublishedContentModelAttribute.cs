@@ -3,6 +3,7 @@ using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
+    /// <inheritdoc />
     /// <summary>
     /// Indicates that the class is a published content model for a specified content type.
     /// </summary>
@@ -11,8 +12,9 @@ namespace Umbraco.Core.Models.PublishedContent
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public sealed class PublishedContentModelAttribute : Attribute
     {
+        /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="PublishedContentModelAttribute"/> class with a content type alias.
+        /// Initializes a new instance of the <see cref="PublishedContentModelAttribute" /> class with a content type alias.
         /// </summary>
         /// <param name="contentTypeAlias">The content type alias.</param>
         public PublishedContentModelAttribute(string contentTypeAlias)
@@ -24,6 +26,6 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets or sets the content type alias.
         /// </summary>
-        public string ContentTypeAlias { get; private set; }
+        public string ContentTypeAlias { get; }
     }
 }

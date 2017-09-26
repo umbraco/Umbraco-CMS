@@ -7,12 +7,12 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Web.PublishedCache
 {
     // notes:
-    // a property set does NOT manage any tree-like elements, neither the
+    // a published element does NOT manage any tree-like elements, neither the
     // original NestedContent (from Lee) nor the DetachedPublishedContent POC did.
     //
     // at the moment we do NOT support models for sets - that would require
     // an entirely new models factory + not even sure it makes sense at all since
-    // sets are created manually
+    // sets are created manually fixme yes it does!
     //
     internal class PublishedElement : IPublishedElement
     {
@@ -31,7 +31,7 @@ namespace Umbraco.Web.PublishedCache
                 .Select(propertyType =>
                 {
                     values.TryGetValue(propertyType.PropertyTypeAlias, out object value);
-                    return facadeService.CreateSetProperty(propertyType, this, previewing, referenceCacheLevel, value);
+                    return facadeService.CreateElementProperty(propertyType, this, previewing, referenceCacheLevel, value);
                 })
                 .ToArray();
         }

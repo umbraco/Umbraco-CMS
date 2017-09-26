@@ -1,7 +1,7 @@
 ﻿namespace Umbraco.Core.Models.PublishedContent
 {
     /// <summary>
-    /// Represents a property of an <c>IPublishedContent</c>.
+    /// Represents a property of an <c>IPublishedElement</c>.
     /// </summary>
     public interface IPublishedProperty
     {

@@ -1,6 +1,4 @@
 ﻿using System;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PublishedCache
 {

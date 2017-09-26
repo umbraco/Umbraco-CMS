@@ -273,7 +273,7 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("MasterPages", "/masterpages"), "MasterpageFileSystem");
 
             // no factory (noop)
-            Container.RegisterSingleton<IPublishedContentModelFactory, NoopPublishedContentModelFactory>();
+            Container.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();
 
             // register application stuff (database factory & context, services...)
             Container.RegisterCollectionBuilder<MapperCollectionBuilder>()
