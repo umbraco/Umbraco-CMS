@@ -71,30 +71,6 @@ namespace Umbraco.Web.Models.Mapping
                     Value = Convert.ToInt32(display.Id).ToInvariantString() + "<br/><small class='muted'>" + display.Key + "</small>",
                     View = labelEditor
                 },
-                new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}creator", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedTextService.Localize("content/createBy"),
-                    Description = localizedTextService.Localize("content/createByDesc"),
-                    Value = display.Owner.Name,
-                    View = labelEditor
-                },
-                new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}createdate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedTextService.Localize("content/createDate"),
-                    Description = localizedTextService.Localize("content/createDateDesc"),
-                    Value = display.CreateDate.ToIsoString(),
-                    View = labelEditor
-                },
-                new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}updatedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedTextService.Localize("content/updateDate"),
-                    Description = localizedTextService.Localize("content/updateDateDesc"),
-                    Value = display.UpdateDate.ToIsoString(),
-                    View = labelEditor
-                }
             };
 
             if (customProperties != null)
