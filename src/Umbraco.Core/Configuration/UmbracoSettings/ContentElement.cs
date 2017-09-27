@@ -195,6 +195,14 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return GetOptionalTextElement("loginBackgroundImage", string.Empty); }
         }
 
+        [ConfigurationProperty("emailRegex")]
+        internal InnerTextConfigurationElement<string> EmailRegex
+        {
+            // If this default needs to be updated then remember to also update
+            // val-email.spec.js - unfortunately the unit test seems to need a hardcoded regex
+            get { return GetOptionalTextElement("emailRegex", "^[a-z0-9!#$%&\'*+\\/=?^_`{|}~.-]+@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$"); }
+        }
+
         string IContentSection.NotificationEmailAddress
         {
             get { return Notifications.NotificationEmailAddress; }
@@ -357,6 +365,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         string IContentSection.LoginBackgroundImage
         {
             get { return LoginBackgroundImage; }
+        }
+
+        string IContentSection.EmailRegex
+        {
+            get { return EmailRegex; }
         }
     }
 }
