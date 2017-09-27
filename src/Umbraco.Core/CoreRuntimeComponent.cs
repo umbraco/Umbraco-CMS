@@ -42,9 +42,6 @@ namespace Umbraco.Core
             // *not* a singleton, don't want to keep it around
             composition.Container.Register<DatabaseBuilder>();
 
-            //TODO: Don't think we'll need this when the resolvers are all container resolvers
-            composition.Container.RegisterSingleton<IServiceProvider, ActivatorServiceProvider>();
-
             // register filesystems
             composition.Container.Register<FileSystems>();
             composition.Container.Register(factory => factory.GetInstance<FileSystems>().MediaFileSystem);

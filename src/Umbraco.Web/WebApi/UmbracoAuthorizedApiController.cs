@@ -22,30 +22,8 @@ namespace Umbraco.Web.WebApi
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
     {
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
-        private bool _userisValidated = false;
 
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
             => _userManager ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager());
-
-        /// <summary>
-        /// Returns the currently logged in Umbraco User
-        /// </summary>
-        /*
-        [Obsolete("This should no longer be used since it returns the legacy user object, use The Security.CurrentUser instead to return the proper user object, or Security.GetUserId() if you want to just get the user id")]
-        protected User UmbracoUser
-        {
-            get
-            {
-                //throw exceptions if not valid (true)
-                if (!_userisValidated)
-                {
-                    Security.ValidateCurrentUser(true);
-                    _userisValidated = true;
-                }
-
-                return new User(Security.CurrentUser);
-            }
-        }
-        */ // fixme v8 remove this code
     }
 }

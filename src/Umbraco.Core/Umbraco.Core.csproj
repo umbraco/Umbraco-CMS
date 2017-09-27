@@ -88,8 +88,6 @@
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     -->
-    <Compile Include="ActivatorHelper.cs" />
-    <Compile Include="ActivatorServiceProvider.cs" />
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="AsyncLock.cs" />
     <Compile Include="Attempt.cs" />
@@ -1199,7 +1197,6 @@
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderExtensions.cs" />
     <Compile Include="Persistence\SqlTemplate.cs" />
     <Compile Include="Persistence\SqlTemplates.cs" />
-    <Compile Include="Persistence\ThreadStaticDatabaseScopeAccessor.cs" />
     <Compile Include="Persistence\UmbracoDatabase.cs" />
     <Compile Include="Persistence\UmbracoDatabaseExtensions.cs" />
     <Compile Include="Persistence\UmbracoDatabaseFactory.cs" />
@@ -1341,7 +1338,6 @@
     <Compile Include="Serialization\UdiJsonConverter.cs" />
     <Compile Include="Serialization\UdiRangeJsonConverter.cs" />
     <Compile Include="ServiceContextExtensions.cs" />
-    <Compile Include="ServiceProviderExtensions.cs" />
     <Compile Include="Services\AuditService.cs" />
     <Compile Include="Services\Changes\ContentTypeChange.cs" />
     <Compile Include="Services\Changes\ContentTypeChangeExtensions.cs" />
@@ -1476,7 +1472,6 @@
     <Compile Include="SystemUtilities.cs" />
     <Compile Include="ThreadExtensions.cs" />
     <Compile Include="TopoGraph.cs" />
-    <Compile Include="TopologicalSorter.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Udi.cs" />
     <Compile Include="UdiDefinitionAttribute.cs" />

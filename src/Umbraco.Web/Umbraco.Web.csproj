@@ -151,13 +151,12 @@
     <Compile Include="HealthCheck\NotificationMethods\IHealthCheckNotificationMethod.cs" />
     <Compile Include="HealthCheck\NotificationMethods\NotificationMethodBase.cs" />
     <Compile Include="HybridAccessorBase.cs" />
-    <Compile Include="HybridDatabaseScopeAccessor.cs" />
     <Compile Include="HybridUmbracoContextAccessor.cs" />
     <Compile Include="HttpContextUmbracoContextAccessor.cs" />
     <Compile Include="HybridEventMessagesAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Cache\RelationTypeCacheRefresher.cs" />
-    <Compile Include="DI\WebMappingProfilesCompositionRoot.cs" />
+    <Compile Include="Composing\CompositionRoots\WebMappingProfilesCompositionRoot.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="Install\InstallSteps\ConfigureMachineKey.cs" />
     <Compile Include="IPublishedContentQuery.cs" />

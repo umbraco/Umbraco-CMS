@@ -12,6 +12,7 @@ namespace Umbraco.Core
     /// <remarks>
     /// Intended as an infrastructure class.
     /// </remarks>
+    [Obsolete("stop using, allocates")]
     public class ReadLock : IDisposable
     {
         private readonly ReaderWriterLockSlim _rwLock;

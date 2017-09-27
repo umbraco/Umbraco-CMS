@@ -585,6 +585,10 @@ function Build-Umbraco
   {
     Package-Zip $uenv
   }
+  elseif ($target -eq "pkg-nuget")
+  {
+    Package-NuGet $uenv $version
+  }
   elseif ($target -eq "compile-belle")
   {
     Compile-Belle $uenv $version

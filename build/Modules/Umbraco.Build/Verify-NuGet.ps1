@@ -382,7 +382,7 @@ function Verify-NuGet
     "Umbraco.Core",
     "Umbraco.Web",
     "Umbraco.Web.UI",
-    "UmbracoExamine",
+    "Umbraco.Examine",
     "Umbraco.Compat7"#,
     #"Umbraco.Tests",
     #"Umbraco.Tests.Benchmarks"

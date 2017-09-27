@@ -27,9 +27,9 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
-using Umbraco.Web.DI;
 using Umbraco.Web.Services;
 using Umbraco.Examine;
+using Umbraco.Web.Composing.CompositionRoots;
 using Umbraco.Web._Legacy.Actions;
 using Current = Umbraco.Core.Composing.Current;
 
@@ -256,7 +256,6 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton(factory => SettingsForTests.GetDefault());
             Container.RegisterSingleton(factory => settings.Content);
             Container.RegisterSingleton(factory => settings.Templates);
-            Container.Register<IServiceProvider, ActivatorServiceProvider>();
             Container.Register(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
             Container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
 

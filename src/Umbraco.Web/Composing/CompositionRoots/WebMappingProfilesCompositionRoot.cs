@@ -1,7 +1,7 @@
 ﻿using LightInject;
 using Umbraco.Web.Models.Mapping;
 
-namespace Umbraco.Web.DI
+namespace Umbraco.Web.Composing.CompositionRoots
 {
     public sealed class WebMappingProfilesCompositionRoot : ICompositionRoot
     {
