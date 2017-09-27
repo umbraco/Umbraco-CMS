@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Specialized;
+using System.ComponentModel.DataAnnotations;
 using System.Configuration.Provider;
 using System.Security.Cryptography;
 using System.Text;
@@ -678,8 +679,7 @@ namespace Umbraco.Core.Security
 
         internal static bool IsEmailValid(string email)
         {
-            var pattern = UmbracoConfig.For.UmbracoSettings().Content.EmailRegex;
-            return Regex.IsMatch(email, pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            return new EmailAddressAttribute().IsValid(email);
         }
 
         protected internal string EncryptOrHashPassword(string pass, string salt)
