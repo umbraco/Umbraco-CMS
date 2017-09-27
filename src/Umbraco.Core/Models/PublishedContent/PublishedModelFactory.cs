@@ -44,13 +44,27 @@ namespace Umbraco.Core.Models.PublishedContent
 
             foreach (var type in types)
             {
+                // fixme - annoying - we want the xpression to be of a give type
+                // fixme - but then do we need ctor(IPublishedElement x) and what about ctor(IPublishedContent x)?
+                //var expr = ReflectionUtilities.GetCtorExpr<Func<IPublishedElement, IPublishedElement>>(type, false);
+                //if (expr == null)
+                //    throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type IPublishedElement.");
+
+                //var ccc = ReflectionUtilities.EmitCtor<IPublishedElement, IPublishedElement>(type, false);
+                //if (ccc == null)
+                //    throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type IPublishedElement.");
+
+                // so... the model type has to implement a ctor with one parameter being, or inheriting from,
+                // IPublishedElement - but it can be IPublishedContent - so we cannot get one precise ctor,
+                // we have to iterate over all ctors and try to find the right one
+
                 ConstructorInfo constructor = null;
                 Type parameterType = null;
 
                 foreach (var ctor in type.GetConstructors())
                 {
                     var parms = ctor.GetParameters();
-                    if (parms.Length == 1 && typeof (IPublishedElement).IsAssignableFrom(parms[0].ParameterType))
+                    if (parms.Length == 1 && typeof(IPublishedElement).IsAssignableFrom(parms[0].ParameterType))
                     {
                         if (constructor != null)
                             throw new InvalidOperationException($"Type {type.FullName} has more than one public constructor with one argument of type, or implementing, IPublishedElement.");
@@ -62,21 +76,21 @@ namespace Umbraco.Core.Models.PublishedContent
                 if (constructor == null)
                     throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type, or implementing, IPublishedElement.");
 
-                var attribute = type.GetCustomAttribute<PublishedContentModelAttribute>(false); // fixme rename FacadeModelAttribute
+                var attribute = type.GetCustomAttribute<PublishedContentModelAttribute>(false);
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
 
-                if (modelInfos.TryGetValue(typeName, out ModelInfo modelInfo))
+                if (modelInfos.TryGetValue(typeName, out var modelInfo))
                     throw new InvalidOperationException($"Both types {type.FullName} and {modelInfo.ModelType.FullName} want to be a model type for content type with alias \"{typeName}\".");
 
-                exprs.Add(Expression.Lambda<Func<IPublishedElement, IPublishedElement>>(Expression.New(constructor)));
-                modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, ModelType = type };
+                //exprs.Add(Expression.Lambda<Func<IPublishedElement, IPublishedElement>>(Expression.New(constructor)));
+                modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, ModelType = type, Ctor = ReflectionUtilities.EmitCtor<Func<IPublishedElement, IPublishedElement>>(constructor) };
                 ModelTypeMap[typeName] = type;
             }
 
-            var compiled = ReflectionUtilities.CompileToDelegates(exprs.ToArray());
-            var i = 0;
-            foreach (var modelInfo in modelInfos.Values)
-                modelInfo.Ctor = compiled[i++];
+            //var compiled = ReflectionUtilities.CompileToDelegates(exprs.ToArray());
+            //var i = 0;
+            //foreach (var modelInfo in modelInfos.Values)
+            //    modelInfo.Ctor = compiled[i++];
 
             _modelInfos = modelInfos.Count > 0 ? modelInfos : null;
         }

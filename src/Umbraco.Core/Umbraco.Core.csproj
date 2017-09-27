@@ -652,7 +652,7 @@
     <Compile Include="Models\PublishedContent\PublishedContentEnumerable.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentExtensionsForModels.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
-    <Compile Include="Models\PublishedContent\PublishedContentModelAttribute.cs" />
+    <Compile Include="Models\PublishedContent\PublishedModelAttribute.cs" />
     <Compile Include="Models\PublishedContent\PublishedModelFactory.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentType.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeConverter.cs" />

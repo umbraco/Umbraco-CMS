@@ -140,6 +140,8 @@ namespace Umbraco.Tests.Benchmarks
             // but, our utilities know how to do it!
             _expressionMethod3 = expr.CompileToDelegate();
             _expressionMethod4 = ReflectionUtilities.GetCtor<Foo, IFoo>();
+
+            // however, unfortunately, the generated "compiled to delegate" code cannot access private stuff :(
         }
 
         public IFoo IlCtor(IFoo foo)

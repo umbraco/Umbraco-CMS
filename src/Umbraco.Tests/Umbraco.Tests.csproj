@@ -217,6 +217,7 @@
     <Compile Include="Cache\CacheRefresherComponentTests.cs" />
     <Compile Include="Cache\RefresherTests.cs" />
     <Compile Include="Cache\SnapDictionaryTests.cs" />
+    <Compile Include="Clr\ReflectionUtilitiesTests.cs" />
     <Compile Include="Collections\OrderedHashSetTests.cs" />
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
@@ -388,7 +389,7 @@
     <Compile Include="Web\Controllers\FilterAllowedOutgoingContentAttributeTests.cs" />
     <Compile Include="Web\Controllers\MediaControllerUnitTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
-    <Compile Include="DynamicsAndReflection\ReflectionTests.cs" />
+    <Compile Include="Clr\ReflectionTests.cs" />
     <Compile Include="Macros\MacroParserTests.cs" />
     <Compile Include="Migrations\Upgrades\ValidateV7UpgradeTest.cs" />
     <Compile Include="Models\ContentExtensionsTests.cs" />

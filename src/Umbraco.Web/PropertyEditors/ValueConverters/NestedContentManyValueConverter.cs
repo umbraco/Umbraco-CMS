@@ -80,7 +80,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     var ctor = _listCtors.GetOrAdd(type, t =>
                     {
                         var listType = typeof(List<>).MakeGenericType(t);
-                        return ReflectionUtilities.GetCtor(listType);
+                        return ReflectionUtilities.GetCtor<Func<object>>(listType);
                     });
 
                     elements = (IList) ctor();

@@ -12,10 +12,13 @@ namespace Umbraco.Core
     /// </summary>
     public static class ReflectionUtilities
     {
+        public const AssemblyBuilderAccess DefaultAssemblyBuilderAccess = AssemblyBuilderAccess.Run;
+        public const AssemblyBuilderAccess NoAssembly = 0;
+
         public static Func<TInstance, TValue> GetPropertyGetter<TInstance, TValue>(string propertyName)
         {
-            var type = typeof(TInstance);
-            var type0 = typeof(TValue);
+            var type = typeof (TInstance);
+            var type0 = typeof (TValue);
             var property = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             if (property == null || property.PropertyType != type0)
                 throw new InvalidOperationException($"Could not get property {type}.{propertyName} : {type0}.");
@@ -24,8 +27,8 @@ namespace Umbraco.Core
 
         public static Action<TInstance, TValue> GetPropertySetter<TInstance, TValue>(string propertyName)
         {
-            var type = typeof(TInstance);
-            var type0 = typeof(TValue);
+            var type = typeof (TInstance);
+            var type0 = typeof (TValue);
             var property = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             if (property == null || property.PropertyType != type0)
                 throw new InvalidOperationException($"Could not get property {type}.{propertyName} : {type0}.");
@@ -34,8 +37,8 @@ namespace Umbraco.Core
 
         public static void GetPropertyGetterSetter<TInstance, TValue>(string propertyName, out Func<TInstance, TValue> getter, out Action<TInstance, TValue> setter)
         {
-            var type = typeof(TInstance);
-            var type0 = typeof(TValue);
+            var type = typeof (TInstance);
+            var type0 = typeof (TValue);
             var property = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             if (property == null || property.PropertyType != type0)
                 throw new InvalidOperationException($"Could not get property {type}.{propertyName} : {type0}.");
@@ -43,40 +46,155 @@ namespace Umbraco.Core
             setter = GetPropertySetter<TInstance, TValue>(property);
         }
 
-        public static Func<TInstance> GetCtor<TInstance>()
+        public static Expression<Func<TInstance>> GetCtorExpr<TInstance>(bool mustExist = true)
         {
-            var type = typeof(TInstance);
+            var type = typeof (TInstance);
 
             // get the constructor infos
             var ctor = type.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
                 null, Type.EmptyTypes, null);
 
             if (ctor == null)
-                throw new InvalidOperationException($"Could not find constructor {type}.ctor().");
+            {
+                if (!mustExist) return null;
+                throw new InvalidOperationException($"Could not find constructor {type}.ctor().");                
+            }
 
             var exprNew = Expression.New(ctor);
-            var expr = Expression.Lambda<Func<TInstance>>(exprNew);
-            return expr.CompileToDelegate();
+            return Expression.Lambda<Func<TInstance>>(exprNew);
         }
 
-        public static Func<object> GetCtor(Type type)
+        public static Expression<TLambda> GetCtorExpr<TLambda>(Type type, bool mustExist = true)
         {
             // get the constructor infos
             var ctor = type.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
                 null, Type.EmptyTypes, null);
 
             if (ctor == null)
+            {
+                if (!mustExist) return null;
                 throw new InvalidOperationException($"Could not find constructor {type}.ctor().");
+            }
 
             var exprNew = Expression.New(ctor);
-            var expr = Expression.Lambda<Func<object>>(exprNew);
-            return expr.CompileToDelegate();
+            return Expression.Lambda<TLambda>(exprNew);
         }
+
+        public static Func<TInstance> GetCtor<TInstance>(bool mustExist = true, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
+        {
+            var expr = GetCtorExpr<TInstance>(mustExist);
+            if (expr == null) return null;
+            return access == NoAssembly ? expr.Compile() : CompileToDelegate(expr, access);
+        }
+
+        public static TLambda GetCtor<TLambda>(Type type, bool mustExist = true, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
+        {
+            var expr = GetCtorExpr<TLambda>(type, mustExist);
+            if (expr == null) return default(TLambda);
+            return access == NoAssembly ? expr.Compile() : CompileToDelegate(expr, access);
+        }
+
+        public static Func<TInstance> EmitCtor<TInstance>(bool mustExist = true)
+        {
+            var type = typeof (TInstance);
+
+            // get the constructor infos
+            var ctor = type.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
+                null, Type.EmptyTypes, null);
+
+            if (ctor == null)
+            {
+                if (!mustExist) return null;
+                throw new InvalidOperationException($"Could not find constructor {type}.ctor().");
+            }
+
+            var dm = new DynamicMethod(string.Empty, type, Array.Empty<Type>(), type.Module, true);
+            var gen = dm.GetILGenerator();
+            gen.Emit(OpCodes.Newobj, ctor);
+            gen.Emit(OpCodes.Ret);
+            return (Func<TInstance>) dm.CreateDelegate(typeof (Func<TInstance>));
+        }
+
+        public static Func<TArg0, TInstance> EmitCtor<TInstance, TArg0>(bool mustExist = true)
+        {
+            var type = typeof (TInstance);
+            var type0 = typeof (TArg0);
+
+            // get the constructor infos
+            var ctor = type.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
+                null, new[] { type0 }, null);
+
+            if (ctor == null)
+            {
+                if (!mustExist) return null;
+                throw new InvalidOperationException($"Could not find constructor {type}.ctor().");
+            }
+
+            var dm = new DynamicMethod(string.Empty, type, new[] { type0 }, type.Module, true);
+            var gen = dm.GetILGenerator();
+            gen.Emit(OpCodes.Ldarg_0);
+            gen.Emit(OpCodes.Newobj, ctor);
+            gen.Emit(OpCodes.Ret);
+            return (Func<TArg0, TInstance>) dm.CreateDelegate(typeof (Func<TArg0, TInstance>));
+        }
+
+        public static Func<TArg0, TInstance> EmitCtor<TArg0, TInstance>(Type type, bool mustExist = true)
+        {
+            var type0 = typeof (TArg0);
+
+            // get the constructor infos
+            var ctor = type.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
+                null, new[] { type0 }, null);
+
+            if (ctor == null)
+            {
+                if (!mustExist) return null;
+                throw new InvalidOperationException($"Could not find constructor {type}.ctor().");
+            }
+
+            var dm = new DynamicMethod(string.Empty, type, new[] { type0 }, type.Module, true);
+            var gen = dm.GetILGenerator();
+            gen.Emit(OpCodes.Ldarg_0);
+            gen.Emit(OpCodes.Newobj, ctor);
+            gen.Emit(OpCodes.Ret);
+            return (Func<TArg0, TInstance>) dm.CreateDelegate(typeof (Func<TArg0, TInstance>));
+        }
+
+        public static TLambda EmitCtor<TLambda>(ConstructorInfo constructorInfo)
+        {
+            var type = constructorInfo.DeclaringType;
+            var args = constructorInfo.GetParameters().Select(x => x.ParameterType).ToArray();
+
+            var dm = new DynamicMethod(string.Empty, type, args, type.Module, true);
+            var gen = dm.GetILGenerator();
+
+            if (args.Length < 5)
+            {
+                if (args.Length > 0)
+                    gen.Emit(OpCodes.Ldarg_0);
+                if (args.Length > 1)
+                    gen.Emit(OpCodes.Ldarg_1);
+                if (args.Length > 2)
+                    gen.Emit(OpCodes.Ldarg_2);
+                if (args.Length > 3)
+                    gen.Emit(OpCodes.Ldarg_3);
+            }
+            else
+            {
+                for (var i = 0; i < args.Length; i++)
+                    gen.Emit(OpCodes.Ldarg, i);
+            }
+            gen.Emit(OpCodes.Newobj, constructorInfo);
+            gen.Emit(OpCodes.Ret);
+            return (TLambda) (object) dm.CreateDelegate(typeof (TLambda));
+        }
+
+        // fixme others need it too?
 
         public static Func<TArg0, TInstance> GetCtor<TInstance, TArg0>()
         {
-            var type = typeof(TInstance);
-            var type0 = typeof(TArg0);
+            var type = typeof (TInstance);
+            var type0 = typeof (TArg0);
 
             // get the constructor infos
             var ctor = type.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
@@ -94,9 +212,9 @@ namespace Umbraco.Core
 
         public static Func<TArg0, TArg1, TInstance> GetCtor<TInstance, TArg0, TArg1>()
         {
-            var type = typeof(TInstance);
-            var type0 = typeof(TArg0);
-            var type1 = typeof(TArg1);
+            var type = typeof (TInstance);
+            var type0 = typeof (TArg0);
+            var type1 = typeof (TArg1);
 
             // get the constructor infos
             var ctor = type.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
@@ -130,7 +248,7 @@ namespace Umbraco.Core
 
         public static TMethod GetMethod<TInstance, TMethod>(string methodName)
         {
-            var type = typeof(TInstance);
+            var type = typeof (TInstance);
 
             GetMethodParms<TInstance, TMethod>(out var parameterTypes, out var returnType);
 
@@ -142,7 +260,7 @@ namespace Umbraco.Core
 
         private static Func<TInstance, TValue> GetPropertyGetter<TInstance, TValue>(PropertyInfo property)
         {
-            var type = typeof(TInstance);
+            var type = typeof (TInstance);
 
             var getMethod = property.GetMethod;
             if (getMethod == null)
@@ -156,14 +274,14 @@ namespace Umbraco.Core
 
         private static Action<TInstance, TValue> GetPropertySetter<TInstance, TValue>(PropertyInfo property)
         {
-            var type = typeof(TInstance);
+            var type = typeof (TInstance);
 
             var setMethod = property.SetMethod;
             if (setMethod == null)
                 throw new InvalidOperationException($"Property {type}.{property.Name} : {property.PropertyType} does not have a setter.");
 
             var exprThis = Expression.Parameter(type, "this");
-            var exprArg0 = Expression.Parameter(typeof(TValue), "value");
+            var exprArg0 = Expression.Parameter(typeof (TValue), "value");
             var exprCall = Expression.Call(exprThis, setMethod, exprArg0);
             var expr = Expression.Lambda<Action<TInstance, TValue>>(exprCall, exprThis, exprArg0);
             return expr.CompileToDelegate();
@@ -171,14 +289,16 @@ namespace Umbraco.Core
 
         private static void GetMethodParms<TMethod>(out Type[] parameterTypes, out Type returnType)
         {
-            var typeM = typeof(TMethod);
+            var typeM = typeof (TMethod);
             var typeList = new List<Type>();
-            returnType = typeof(void);
+            returnType = typeof (void);
 
-            if (!typeof(MulticastDelegate).IsAssignableFrom(typeM) || typeM == typeof(MulticastDelegate))
+            if (!typeof (MulticastDelegate).IsAssignableFrom(typeM) || typeM == typeof (MulticastDelegate))
                 throw new InvalidOperationException("Invalid TMethod, must be a Func or Action.");
 
             var typeName = typeM.FullName;
+            if (typeName == null)
+                throw new InvalidOperationException($"Could not get {typeM} type name.");
             if (typeName.StartsWith("System.Func`"))
             {
                 var i = 0;
@@ -204,20 +324,22 @@ namespace Umbraco.Core
 
         private static void GetMethodParms<TInstance, TMethod>(out Type[] parameterTypes, out Type returnType)
         {
-            var type = typeof(TInstance);
+            var type = typeof (TInstance);
 
-            var typeM = typeof(TMethod);
+            var typeM = typeof (TMethod);
             var typeList = new List<Type>();
-            returnType = typeof(void);
+            returnType = typeof (void);
 
-            if (!typeof(MulticastDelegate).IsAssignableFrom(typeM) || typeM == typeof(MulticastDelegate))
+            if (!typeof (MulticastDelegate).IsAssignableFrom(typeM) || typeM == typeof (MulticastDelegate))
                 throw new InvalidOperationException("Invalid TMethod, must be a Func or Action.");
 
             var typeName = typeM.FullName;
+            if (typeName == null)
+                throw new InvalidOperationException($"Could not get {typeM} type name.");
             if (!typeM.IsGenericType)
-                throw new InvalidOperationException(typeName);
+                throw new InvalidOperationException($"Type {typeName} is not generic.");
             if (typeM.GenericTypeArguments[0] != type)
-                throw new InvalidOperationException("Invalid TMethod, the first generic argument must be TInstance.");
+                throw new InvalidOperationException($"Invalid type {typeName}, the first generic argument must be {type.FullName}.");
             if (typeName.StartsWith("System.Func`"))
             {
                 var i = 1;
@@ -435,11 +557,19 @@ namespace Umbraco.Core
 
             propInfo.SetValue(obj, val, null);
         }
-        */    
+        */
 
-        public static Action CompileToDelegate(Expression<Action> expr)
+        // fixme dont think this can work at all
+        public static TLambda Compile<TLambda>(Expression<TLambda> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
-            var typeBuilder = CreateTypeBuilder();
+            return access == NoAssembly
+                ? expr.Compile()
+                : CompileToDelegate(expr, access);
+        }
+
+        public static Action CompileToDelegate(Expression<Action> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
+        {
+            var typeBuilder = CreateTypeBuilder(access);
 
             var builder = typeBuilder.DefineMethod("Method",
                 MethodAttributes.Public | MethodAttributes.Static); // CompileToMethod requires a static method
@@ -449,9 +579,9 @@ namespace Umbraco.Core
             return (Action) Delegate.CreateDelegate(typeof (Action), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static Action<T1> CompileToDelegate<T1>(Expression<Action<T1>> expr)
+        public static Action<T1> CompileToDelegate<T1>(Expression<Action<T1>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
-            var typeBuilder = CreateTypeBuilder();
+            var typeBuilder = CreateTypeBuilder(access);
 
             var builder = typeBuilder.DefineMethod("Method",
                 MethodAttributes.Public | MethodAttributes.Static, // CompileToMethod requires a static method
@@ -462,35 +592,35 @@ namespace Umbraco.Core
             return (Action<T1>) Delegate.CreateDelegate(typeof (Action<T1>), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static Action<T1, T2> CompileToDelegate<T1, T2>(Expression<Action<T1, T2>> expr)
+        public static Action<T1, T2> CompileToDelegate<T1, T2>(Expression<Action<T1, T2>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
-            var typeBuilder = CreateTypeBuilder();
+            var typeBuilder = CreateTypeBuilder(access);
 
             var builder = typeBuilder.DefineMethod("Method",
                 MethodAttributes.Public | MethodAttributes.Static, // CompileToMethod requires a static method
-                typeof (void), new[] { typeof(T1), typeof (T2) });
+                typeof (void), new[] { typeof (T1), typeof (T2) });
 
             expr.CompileToMethod(builder);
 
             return (Action<T1, T2>) Delegate.CreateDelegate(typeof (Action<T1, T2>), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static Action<T1, T2, T3> CompileToDelegate<T1, T2, T3>(Expression<Action<T1, T2, T3>> expr)
+        public static Action<T1, T2, T3> CompileToDelegate<T1, T2, T3>(Expression<Action<T1, T2, T3>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
-            var typeBuilder = CreateTypeBuilder();
+            var typeBuilder = CreateTypeBuilder(access);
 
             var builder = typeBuilder.DefineMethod("Method",
                 MethodAttributes.Public | MethodAttributes.Static, // CompileToMethod requires a static method
-                typeof (void), new[] { typeof (T1), typeof (T2) , typeof (T3) });
+                typeof (void), new[] { typeof (T1), typeof (T2), typeof (T3) });
 
             expr.CompileToMethod(builder);
 
             return (Action<T1, T2, T3>) Delegate.CreateDelegate(typeof (Action<T1, T2, T3>), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static Func<TResult> CompileToDelegate<TResult>(Expression<Func<TResult>> expr)
+        public static Func<TResult> CompileToDelegate<TResult>(Expression<Func<TResult>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
-            var typeBuilder = CreateTypeBuilder();
+            var typeBuilder = CreateTypeBuilder(access);
 
             var builder = typeBuilder.DefineMethod("Method",
                 MethodAttributes.Public | MethodAttributes.Static,
@@ -501,9 +631,9 @@ namespace Umbraco.Core
             return (Func<TResult>) Delegate.CreateDelegate(typeof (Func<TResult>), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static Func<T1, TResult> CompileToDelegate<T1, TResult>(Expression<Func<T1, TResult>> expr)
+        public static Func<T1, TResult> CompileToDelegate<T1, TResult>(Expression<Func<T1, TResult>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
-            var typeBuilder = CreateTypeBuilder();
+            var typeBuilder = CreateTypeBuilder(access);
 
             var builder = typeBuilder.DefineMethod("Method",
                 MethodAttributes.Public | MethodAttributes.Static, // CompileToMethod requires a static method
@@ -511,25 +641,25 @@ namespace Umbraco.Core
 
             expr.CompileToMethod(builder);
 
-            return (Func<T1,TResult>) Delegate.CreateDelegate(typeof (Func<T1, TResult>), typeBuilder.CreateType().GetMethod("Method"));
+            return (Func<T1, TResult>) Delegate.CreateDelegate(typeof (Func<T1, TResult>), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static Func<T1, T2, TResult> CompileToDelegate<T1, T2, TResult>(Expression<Func<T1, T2, TResult>> expr)
+        public static Func<T1, T2, TResult> CompileToDelegate<T1, T2, TResult>(Expression<Func<T1, T2, TResult>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
-            var typeBuilder = CreateTypeBuilder();
+            var typeBuilder = CreateTypeBuilder(access);
 
             var builder = typeBuilder.DefineMethod("Method",
                 MethodAttributes.Public | MethodAttributes.Static, // CompileToMethod requires a static method
-                typeof(TResult), new[] { typeof (T1), typeof(T2) });
+                typeof (TResult), new[] { typeof (T1), typeof (T2) });
 
             expr.CompileToMethod(builder);
 
             return (Func<T1, T2, TResult>) Delegate.CreateDelegate(typeof (Func<T1, T2, TResult>), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static Func<T1, T2, T3, TResult> CompileToDelegate<T1, T2, T3, TResult>(Expression<Func<T1, T2, T3, TResult>> expr)
+        public static Func<T1, T2, T3, TResult> CompileToDelegate<T1, T2, T3, TResult>(Expression<Func<T1, T2, T3, TResult>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
-            var typeBuilder = CreateTypeBuilder();
+            var typeBuilder = CreateTypeBuilder(access);
 
             var builder = typeBuilder.DefineMethod("Method",
                 MethodAttributes.Public | MethodAttributes.Static, // CompileToMethod requires a static method
@@ -540,9 +670,9 @@ namespace Umbraco.Core
             return (Func<T1, T2, T3, TResult>) Delegate.CreateDelegate(typeof (Func<T1, T2, T3, TResult>), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static TMethod CompileToDelegate<TMethod>(Expression<TMethod> expr)
+        public static TMethod CompileToDelegate<TMethod>(Expression<TMethod> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
-            var typeBuilder = CreateTypeBuilder();
+            var typeBuilder = CreateTypeBuilder(access);
 
             GetMethodParms<TMethod>(out var parameterTypes, out var returnType);
 
@@ -556,8 +686,11 @@ namespace Umbraco.Core
         }
 
         public static TMethod[] CompileToDelegates<TMethod>(params Expression<TMethod>[] exprs)
+            => CompileToDelegates(AssemblyBuilderAccess.RunAndCollect, exprs);
+
+        public static TMethod[] CompileToDelegates<TMethod>(AssemblyBuilderAccess access, params Expression<TMethod>[] exprs)
         {
-            var typeBuilder = CreateTypeBuilder();
+            var typeBuilder = CreateTypeBuilder(access);
 
             GetMethodParms<TMethod>(out var parameterTypes, out var returnType);
 
@@ -579,11 +712,15 @@ namespace Umbraco.Core
             return methods;
         }
 
-        private static TypeBuilder CreateTypeBuilder()
+        private static TypeBuilder CreateTypeBuilder(AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
             var assemblyName = new AssemblyName("Umbraco.Core.DynamicAssemblies." + Guid.NewGuid().ToString("N"));
-            var assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Save);
-            var module = assembly.DefineDynamicModule(assemblyName.Name, assemblyName.Name + ".dll");
+            var assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, access);
+
+            var module = (access & AssemblyBuilderAccess.Save) > 0
+                ? assembly.DefineDynamicModule(assemblyName.Name, assemblyName.Name + ".dll")
+                : assembly.DefineDynamicModule(assemblyName.Name); // has to be transient
+
             return module.DefineType("Class", TypeAttributes.Public | TypeAttributes.Abstract);
         }
     }
