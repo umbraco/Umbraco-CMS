@@ -122,32 +122,32 @@ namespace Umbraco.Web.Models.Mapping
 
             var properties = new List<ContentPropertyDisplay>
             {
-                new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("content/releaseDate"),
-                    Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
-                    //Not editible for people without publish permission (U4-287)
-                    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)) ? "datepicker" : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
-                    Config = new Dictionary<string, object>
-                    {
-                        {"offsetTime", "1"}
-                    }
-                    //TODO: Fix up hard coded datepicker
-                },
-                new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("content/unpublishDate"),
-                    Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
-                    //Not editible for people without publish permission (U4-287)
-                    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)) ? "datepicker" : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
-                    Config = new Dictionary<string, object>
-                    {
-                        {"offsetTime", "1"}
-                    }
-                    //TODO: Fix up hard coded datepicker
-                },
+                //new ContentPropertyDisplay
+                //{
+                //    Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                //    Label = localizedText.Localize("content/releaseDate"),
+                //    Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
+                //    //Not editible for people without publish permission (U4-287)
+                //    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)) ? "datepicker" : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
+                //    Config = new Dictionary<string, object>
+                //    {
+                //        {"offsetTime", "1"}
+                //    }
+                //    //TODO: Fix up hard coded datepicker
+                //},
+                //new ContentPropertyDisplay
+                //{
+                //    Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                //    Label = localizedText.Localize("content/unpublishDate"),
+                //    Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
+                //    //Not editible for people without publish permission (U4-287)
+                //    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)) ? "datepicker" : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
+                //    Config = new Dictionary<string, object>
+                //    {
+                //        {"offsetTime", "1"}
+                //    }
+                //    //TODO: Fix up hard coded datepicker
+                //},
                 
             };
 
@@ -209,15 +209,6 @@ namespace Umbraco.Web.Models.Mapping
                         display.AllowedTemplates = templateProperty.Config;
                         display.DocTypeValue = docTypeProperty.Value;
                     }
-
-                    // inject 'Link to document' as the first generic property
-                    genericProperties.Insert(0, new ContentPropertyDisplay
-                    {
-                        Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = localizedText.Localize("content/urls"),
-                        Value = string.Join(",", display.Urls),
-                        View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                    });
                 });
         }
 
