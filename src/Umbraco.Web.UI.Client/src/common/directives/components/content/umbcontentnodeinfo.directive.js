@@ -91,22 +91,24 @@
                         scope.auditTrailOptions.totalItems = data.totalItems;
                         scope.auditTrailOptions.totalPages = data.totalPages;
 
+                        setAuditTrailLogTypeColor(scope.auditTrail);
+                        
                         scope.loadingAuditTrail = false;
                     });
 
             }
 
-            function setAuditTrailActionColor(auditTrail) {
+            function setAuditTrailLogTypeColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {
-                    switch (item.action) {
-                        case "publish":
-                            item.actionColor = "success";
+                    switch (item.logType) {
+                        case "Publish":
+                            item.logTypeColor = "success";
                             break;
-                        case "unpublish":
-                            item.actionColor = "danger";
+                        case "UnPublish":
+                            item.logTypeColor = "danger";
                             break;
                         default:
-                            item.actionColor = "gray";
+                            item.logTypeColor = "gray";
                     }
                 });
             }
