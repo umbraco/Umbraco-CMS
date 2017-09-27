@@ -13,7 +13,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
     {
         private readonly ILocalizedTextService _textService;
 
-        internal EmailNotificationMethod(ILocalizedTextService textService)
+        public EmailNotificationMethod(ILocalizedTextService textService)
         {
             var recipientEmail = Settings["recipientEmail"]?.Value;
             if (string.IsNullOrWhiteSpace(recipientEmail))

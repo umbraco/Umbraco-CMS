@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
-using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web.Models;
 
@@ -27,15 +27,12 @@ namespace Umbraco.Web.Mvc
         {
             const string templateFolder = Constants.ViewLocation;
 
-            var replaceWithUmbracoFolder = _supplementedViewLocations.ForEach(location => templateFolder + location);
-            var replacePartialWithUmbracoFolder = _supplementedPartialViewLocations.ForEach(location => templateFolder + location);
-
             // the Render view engine doesn't support Area's so make those blank
-            ViewLocationFormats = replaceWithUmbracoFolder.ToArray();
-            PartialViewLocationFormats = replacePartialWithUmbracoFolder.ToArray();
+            ViewLocationFormats = _supplementedViewLocations.Select(x => templateFolder + x).ToArray();
+            PartialViewLocationFormats = _supplementedPartialViewLocations.Select(x => templateFolder + x).ToArray();
 
-            AreaPartialViewLocationFormats = new string[] { };
-            AreaViewLocationFormats = new string[] { };
+            AreaPartialViewLocationFormats = Array.Empty<string>();
+            AreaViewLocationFormats = Array.Empty<string>();
 
             EnsureFoldersAndFiles();
         }
@@ -49,9 +46,10 @@ namespace Umbraco.Web.Mvc
 
             // ensure the web.config file is in the ~/Views folder
             Directory.CreateDirectory(viewFolder);
-            if (File.Exists(Path.Combine(viewFolder, "web.config")) == false)
+            var webConfigPath = Path.Combine(viewFolder, "web.config");
+            if (File.Exists(webConfigPath) == false)
             {
-                using (var writer = File.CreateText(Path.Combine(viewFolder, "web.config")))
+                using (var writer = File.CreateText(webConfigPath))
                 {
                     writer.Write(Strings.WebConfigTemplate);
                 }
@@ -92,12 +90,11 @@ namespace Umbraco.Web.Mvc
 
             // first check if we're rendering a partial view for the back office, or surface controller, etc...
             // anything that is not IUmbracoRenderModel as this should only pertain to Umbraco views.
-            if (isPartial && (umbracoToken is ContentModel == false))
+            if (isPartial && !(umbracoToken is ContentModel))
                 return true;
 
             // only find views if we're rendering the umbraco front end
             return umbracoToken is ContentModel;
         }
-
     }
 }

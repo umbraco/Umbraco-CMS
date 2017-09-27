@@ -6,7 +6,6 @@ using System.Text;
 using LightInject;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Components

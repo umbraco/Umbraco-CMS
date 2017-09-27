@@ -94,13 +94,6 @@ namespace Umbraco.Core
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("Use a normal foreach loop instead, this adds more allocations than necessary")]
-        public static TResult[] ForEach<TItem, TResult>(this IEnumerable<TItem> items, Func<TItem, TResult> func)
-        {
-            return items.Select(func).ToArray();
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use a normal foreach loop instead, this adds more allocations than necessary")]
         public static IEnumerable<TItem> ForEach<TItem>(this IEnumerable<TItem> items, Action<TItem> action)
         {
             if (items != null)

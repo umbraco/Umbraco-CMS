@@ -29,6 +29,8 @@ namespace Umbraco.Core.Persistence
         private readonly ISqlSyntaxProvider[] _sqlSyntaxProviders;
         private readonly IMapperCollection _mappers;
         private readonly ILogger _logger;
+        private readonly SqlContext _sqlContext = new SqlContext();
+        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
         private DatabaseFactory _npocoDatabaseFactory;
         private IPocoDataFactory _pocoDataFactory;
@@ -37,10 +39,8 @@ namespace Umbraco.Core.Persistence
         private DbProviderFactory _dbProviderFactory;
         private DatabaseType _databaseType;
         private ISqlSyntaxProvider _sqlSyntax;
-        private ISqlContext _sqlContext;
         private RetryPolicy _connectionRetryPolicy;
         private RetryPolicy _commandRetryPolicy;
-        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
         #region Ctor
 
@@ -114,14 +114,7 @@ namespace Umbraco.Core.Persistence
         #region IDatabaseContext
 
         /// <inheritdoc />
-        public ISqlContext SqlContext
-        {
-            get
-            {
-                EnsureConfigured();
-                return _sqlContext;
-            }
-        }
+        public ISqlContext SqlContext => _sqlContext;
 
         #endregion
 
@@ -168,10 +161,9 @@ namespace Umbraco.Core.Persistence
 
                 if (_npocoDatabaseFactory == null) throw new NullReferenceException("The call to UmbracoDatabaseFactory.Config yielded a null UmbracoDatabaseFactory instance.");
 
-                // these are created here because it is the UmbracoDatabaseFactory that determines
-                // the sql syntax, poco data factory, and database type - so it "owns" the context
-                // and the query factory
-                _sqlContext = new SqlContext(_sqlSyntax, _databaseType, _pocoDataFactory, _mappers);
+                // can initialize now because it is the UmbracoDatabaseFactory that determines
+                // the sql syntax, poco data factory, and database type
+                _sqlContext.Initialize(_sqlSyntax, _databaseType, _pocoDataFactory, _mappers);
 
                 _logger.Debug<UmbracoDatabaseFactory>("Configured.");
                 Configured = true;
@@ -203,10 +195,16 @@ namespace Umbraco.Core.Persistence
         // ensures that the database is configured, else throws
         private void EnsureConfigured()
         {
-            using (new ReadLock(_lock)) // fixme - bad, allocations!
+            _lock.EnterReadLock();
+            try
             {
                 if (Configured == false)
                     throw new InvalidOperationException("Not configured.");
+            }
+            finally
+            {
+                if (_lock.IsReadLockHeld)
+                    _lock.ExitReadLock();
             }
         }
 

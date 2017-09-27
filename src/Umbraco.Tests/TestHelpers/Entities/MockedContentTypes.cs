@@ -311,7 +311,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
         {
             var contentType = CreateSimpleContentType(alias, name, groupedCollection);
             //now add the non-grouped properties
-            nonGroupedCollection.ForEach(pt => contentType.AddPropertyType(pt));
+            foreach (var x in nonGroupedCollection)
+                contentType.AddPropertyType(x);
 
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);

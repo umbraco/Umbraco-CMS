@@ -225,8 +225,6 @@ namespace Umbraco.Web.Mvc
             }
 
             base.WriteLiteral(value);
-
-
         }
 
         public HelperResult RenderSection(string name, Func<dynamic, HelperResult> defaultContents)

@@ -30,11 +30,26 @@ namespace Umbraco.Core.Persistence
             Templates = new SqlTemplates(this);
         }
 
-        /// <inheritdoc />
-        public ISqlSyntaxProvider SqlSyntax { get; }
+        // fixme
+        internal SqlContext()
+        { }
+
+        internal void Initialize(ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, IPocoDataFactory pocoDataFactory, IMapperCollection mappers = null)
+        {
+            // for tests
+            Mappers = mappers ?? new Mappers.MapperCollection(Enumerable.Empty<BaseMapper>());
+
+            SqlSyntax = sqlSyntax ?? throw new ArgumentNullException(nameof(sqlSyntax));
+            PocoDataFactory = pocoDataFactory ?? throw new ArgumentNullException(nameof(pocoDataFactory));
+            DatabaseType = databaseType ?? throw new ArgumentNullException(nameof(databaseType));
+            Templates = new SqlTemplates(this);
+        }
 
         /// <inheritdoc />
-        public DatabaseType DatabaseType { get; }
+        public ISqlSyntaxProvider SqlSyntax { get; private set; }
+
+        /// <inheritdoc />
+        public DatabaseType DatabaseType { get; private set; }
 
         /// <inheritdoc />
         public Sql<ISqlContext> Sql() => NPoco.Sql.BuilderFor((ISqlContext) this);
@@ -46,12 +61,12 @@ namespace Umbraco.Core.Persistence
         public IQuery<T> Query<T>() => new Query<T>(this);
 
         /// <inheritdoc />
-        public SqlTemplates Templates { get; }
+        public SqlTemplates Templates { get; private set; }
 
         /// <inheritdoc />
-        public IPocoDataFactory PocoDataFactory { get; }
+        public IPocoDataFactory PocoDataFactory { get; private set; }
 
         /// <inheritdoc />
-        public IMapperCollection Mappers { get; }
+        public IMapperCollection Mappers { get; private set; }
     }
 }

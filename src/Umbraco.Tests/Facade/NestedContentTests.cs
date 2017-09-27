@@ -113,10 +113,11 @@ namespace Umbraco.Tests.Facade
                 .Returns((PublishedPropertyType propertyType, IPublishedElement element, bool preview, PropertyCacheLevel referenceCacheLevel, object source)
                     => new TestPublishedProperty(propertyType, element, preview, referenceCacheLevel, source));
 
+            var lazyFacadeService = new Lazy<IFacadeService>(() => facadeService.Object);
             var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
             {
-                new NestedContentSingleValueConverter(facadeAccessor.Object, facadeService.Object, publishedModelFactory.Object, proflog),
-                new NestedContentManyValueConverter(facadeAccessor.Object, facadeService.Object, publishedModelFactory.Object, proflog),
+                new NestedContentSingleValueConverter(facadeAccessor.Object, lazyFacadeService, publishedModelFactory.Object, proflog),
+                new NestedContentManyValueConverter(facadeAccessor.Object, lazyFacadeService, publishedModelFactory.Object, proflog),
             });
 
             var propertyType1 = new PublishedPropertyType("property1", 1, Constants.PropertyEditors.NestedContentAlias, converters);

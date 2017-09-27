@@ -20,7 +20,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// <summary>
         /// Initializes a new instance of the <see cref="NestedContentSingleValueConverter"/> class.
         /// </summary>
-        public NestedContentSingleValueConverter(IFacadeAccessor facadeAccessor, IFacadeService facadeService, IPublishedModelFactory publishedModelFactory, ProfilingLogger proflog)
+        public NestedContentSingleValueConverter(IFacadeAccessor facadeAccessor, Lazy<IFacadeService> facadeService, IPublishedModelFactory publishedModelFactory, ProfilingLogger proflog)
             : base(facadeAccessor, facadeService, publishedModelFactory)
         {
             _proflog = proflog;

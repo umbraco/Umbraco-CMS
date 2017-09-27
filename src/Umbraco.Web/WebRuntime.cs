@@ -6,7 +6,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Persistence;
 
 namespace Umbraco.Web
 {
@@ -46,8 +45,8 @@ namespace Umbraco.Web
             base.Boot(container);
 
             // now (and only now) is the time to switch over to perWebRequest scopes
-            var smp = container.ScopeManagerProvider as MixedLightInjectScopeManagerProvider;
-            if (smp == null) throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
+            if (!(container.ScopeManagerProvider is MixedLightInjectScopeManagerProvider smp))
+                throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
             smp.EnablePerWebRequestScope();
         }
 
@@ -57,7 +56,7 @@ namespace Umbraco.Web
             base.Compose(container);
 
             // replace CoreRuntime's IProfiler registration
-            container.RegisterSingleton<IProfiler>(_ => _webProfiler);
+            container.RegisterSingleton(_ => _webProfiler);
 
             // replace CoreRuntime's CacheHelper registration
             container.RegisterSingleton(_ => new CacheHelper(

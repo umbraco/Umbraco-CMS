@@ -18,15 +18,7 @@ namespace umbraco.cms.businesslogic.packager
     /// </summary>
     public class data
     {
-        private static XmlDocument _source;
-
-        public static XmlDocument Source
-        {
-            get
-            {
-                return _source;
-            }
-        }
+        public static XmlDocument Source { get; private set; }
 
         public static void Reload(string dataSource)
         {
@@ -48,15 +40,15 @@ namespace umbraco.cms.businesslogic.packager
 
                 using (StreamWriter sw = File.CreateText(dataSource))
                 {
-                    sw.Write(umbraco.cms.businesslogic.Packager.FileResources.PackageFiles.Packages);
+                    sw.Write($@"<?xml version=""1.0"" encoding=""utf-8""?>{Environment.NewLine}<packages></packages>{Environment.NewLine}");
                     sw.Flush();
                 }
 
             }
 
-            if (_source == null)
+            if (Source == null)
             {
-                _source = new XmlDocument();
+                Source = new XmlDocument();
             }
 
             //error checking here
@@ -76,7 +68,7 @@ namespace umbraco.cms.businesslogic.packager
                 }
             }
 
-            _source.Load(dataSource);
+            Source.Load(dataSource);
         }
 
         public static XmlNode GetFromId(int Id, string dataSource, bool reload)

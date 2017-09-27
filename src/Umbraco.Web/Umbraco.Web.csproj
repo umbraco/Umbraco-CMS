@@ -305,6 +305,7 @@
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStore.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStoreFilePersister.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
+    <Compile Include="PublishedModels\DummyClassSoThatPublishedModelsNamespaceExists.cs" />
     <Compile Include="RelatedLinksTypeConverter.cs" />
     <Compile Include="Routing\ContentFinderCollection.cs" />
     <Compile Include="Routing\ContentFinderCollectionBuilder.cs" />
@@ -1065,7 +1066,6 @@
     <Compile Include="_Legacy\PackageActions\publishRootDocument.cs" />
     <Compile Include="_Legacy\PackageActions\removeStringFromTemplate.cs" />
     <Compile Include="_Legacy\Packager\data.cs" />
-    <Compile Include="_Legacy\Packager\FileResources\PackageFiles.Designer.cs" />
     <Compile Include="_Legacy\Packager\Installer.cs" />
     <Compile Include="_Legacy\Packager\Package.cs" />
     <Compile Include="_Legacy\Packager\PackageInstance\CreatedPackage.cs" />
@@ -1551,7 +1551,6 @@
     <EmbeddedResource Include="UI\JavaScript\Main.js" />
     <EmbeddedResource Include="UI\JavaScript\JsInitialize.js" />
     <EmbeddedResource Include="UI\JavaScript\ServerVariables.js" />
-    <EmbeddedResource Include="_Legacy\Packager\FileResources\PackageFiles.resx" />
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
@@ -1666,7 +1665,6 @@
       <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
     </None>
     <None Include="umbraco.presentation\umbraco\templateControls\InlineXslt.xsltTemplate" />
-    <Content Include="_Legacy\Packager\FileResources\Packages.config" />
   </ItemGroup>
   <ItemGroup>
     <WebReferenceUrl Include="http://our.umbraco.org/umbraco/webservices/api/repository.asmx">

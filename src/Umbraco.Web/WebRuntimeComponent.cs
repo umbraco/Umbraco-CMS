@@ -98,8 +98,8 @@ namespace Umbraco.Web
 
             // IoC setup for LightInject for MVC/WebApi
             // see comments on MixedLightInjectScopeManagerProvider for explainations of what we are doing here
-            var smp = composition.Container.ScopeManagerProvider as MixedLightInjectScopeManagerProvider;
-            if (smp == null) throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
+            if (!(composition.Container.ScopeManagerProvider is MixedLightInjectScopeManagerProvider smp))
+                throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
             composition.Container.EnableMvc(); // does container.EnablePerWebRequestScope()
             composition.Container.ScopeManagerProvider = smp; // reverts - we will do it last (in WebRuntime)
 
@@ -206,8 +206,7 @@ namespace Umbraco.Web
             ClientDependency.Core.CompositeFiles.Providers.XmlFileMapper.FileMapVirtualFolder = "~/App_Data/TEMP/ClientDependency";
             ClientDependency.Core.CompositeFiles.Providers.BaseCompositeFileProcessingProvider.UrlTypeDefault = ClientDependency.Core.CompositeFiles.Providers.CompositeUrlType.Base64QueryStrings;
 
-            var section = ConfigurationManager.GetSection("system.web/httpRuntime") as HttpRuntimeSection;
-            if (section != null)
+            if (ConfigurationManager.GetSection("system.web/httpRuntime") is HttpRuntimeSection section)
             {
                 //set the max url length for CDF to be the smallest of the max query length, max request length
                 ClientDependency.Core.CompositeFiles.CompositeDependencyHandler.MaxHandlerUrlLength = Math.Min(section.MaxQueryStringLength, section.MaxRequestLength);

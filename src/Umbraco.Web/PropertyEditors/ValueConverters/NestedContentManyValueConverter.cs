@@ -25,7 +25,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// <summary>
         /// Initializes a new instance of the <see cref="NestedContentManyValueConverter"/> class.
         /// </summary>
-        public NestedContentManyValueConverter(IFacadeAccessor facadeAccessor, IFacadeService facadeService, IPublishedModelFactory publishedModelFactory, ProfilingLogger proflog)
+        public NestedContentManyValueConverter(IFacadeAccessor facadeAccessor, Lazy<IFacadeService> facadeService, IPublishedModelFactory publishedModelFactory, ProfilingLogger proflog)
             : base(facadeAccessor, facadeService, publishedModelFactory)
         {
             _proflog = proflog;

@@ -11,14 +11,16 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     public abstract class NestedContentValueConverterBase : PropertyValueConverterBase
     {
         private readonly IFacadeAccessor _facadeAccessor;
-        private readonly IFacadeService _facadeService;
+        private readonly Lazy<IFacadeService> _facadeService;
 
-        protected NestedContentValueConverterBase(IFacadeAccessor facadeAccessor, IFacadeService facadeService, IPublishedModelFactory publishedModelFactory)
+        protected NestedContentValueConverterBase(IFacadeAccessor facadeAccessor, Lazy<IFacadeService> facadeService, IPublishedModelFactory publishedModelFactory)
         {
             _facadeAccessor = facadeAccessor;
             _facadeService = facadeService;
             PublishedModelFactory = publishedModelFactory;
         }
+
+        protected IFacadeService FacadeService => _facadeService.Value;
 
         protected IPublishedModelFactory PublishedModelFactory { get; }
     
@@ -63,7 +65,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 key = Guid.Empty;
 
             // fixme - why does it need a facade service here?
-            IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, _facadeService, referenceCacheLevel);
+            IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, FacadeService, referenceCacheLevel);
 
             element = PublishedModelFactory.CreateModel(element);
             return element;
