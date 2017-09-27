@@ -47,7 +47,7 @@ function valEmail(valEmailExpression) {
 angular.module('umbraco.directives.validation')
     .directive("valEmail", valEmail)
     .factory('valEmailExpression', function () {
-        var emailRegex = new RegExp(Umbraco.Sys.ServerVariables.umbracoSettings.emailRegex, "i");
+        var emailRegex = /^[a-z0-9!#$%&'*+\/=?^_`{|}~.-]+@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/i;
         return {
             EMAIL_REGEXP: emailRegex
         };

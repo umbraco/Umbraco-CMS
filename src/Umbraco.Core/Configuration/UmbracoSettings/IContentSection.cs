@@ -75,7 +75,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool EnablePropertyValueConverters { get; }
 
         string LoginBackgroundImage { get; }
-
-        string EmailRegex { get; }
+        
     }
 }
