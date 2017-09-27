@@ -1,6 +1,6 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" Inherits="umbraco.controls.Tree.TreeControl" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
-<%@ Register TagPrefix="umbClient" Namespace="Umbraco.Web.UI.Bundles" Assembly="umbraco" %>
+<%@ Register TagPrefix="umbClient" Namespace="Umbraco.Web.UI.Bundles" Assembly="Umbraco.Web" %>
 
 <umb:CssInclude ID="CssInclude1" runat="server" FilePath="Tree/Themes/umbraco/style.css" PathNameAlias="UmbracoClient" Priority="12" />
 

@@ -1,7 +1,7 @@
 <%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master" Title="Assembly Browser" Codebehind="assemblyBrowser.aspx.cs" AutoEventWireup="True"
   Inherits="umbraco.developer.assemblyBrowser" %>
-<%@ Register TagPrefix="wc1" Namespace="umbraco.controls" Assembly="umbraco" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="wc1" Namespace="umbraco.controls" Assembly="Umbraco.Web" %>
+<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="Umbraco.Web" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 

@@ -1,10 +1,5 @@
 <%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoDialog.Master" Title="Assembly Browser" Codebehind="assemblyBrowser.aspx.cs" AutoEventWireup="True"
   Inherits="umbraco.developer.assemblyBrowser" %>
-<%@ Register TagPrefix="wc1" Namespace="umbraco.controls" Assembly="umbraco" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
-
-
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
 <h4><asp:Label id="AssemblyName" runat="server"></asp:Label></h4>
