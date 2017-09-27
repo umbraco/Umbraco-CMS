@@ -14,7 +14,7 @@
                 if (!model) {
                     return null;
                 }
-                var trimmed = _.omit(model, ["confirm", "generatedPassword"])
+                var trimmed = _.omit(model, ["confirm", "generatedPassword"]);
 
                 //ensure that the pass value is null if all child properties are null
                 var allNull = true;
