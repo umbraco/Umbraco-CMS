@@ -831,7 +831,8 @@ Mange hilsner fra Umbraco robotten
 
     <key alias="allowAllEditors">Tillad alle editorer</key>
     <key alias="allowAllRowConfigurations">Tillad alle rækkekonfigurationer</key>
-
+    <key alias="maxItems">Maksimalt emner</key>
+    <key alias="maxItemsDescription">Efterlad blank eller sat til 0 ubegrænset for</key>
     <key alias="setAsDefault">Sæt som standard</key>
     <key alias="chooseExtra">Vælg ekstra</key>
     <key alias="chooseDefault">Vælg standard</key>
