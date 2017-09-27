@@ -81,7 +81,7 @@ namespace Umbraco.Web.Models.Mapping
             //re-assign
             genericProps.Properties = contentProps;
 
-            //Show or hide properties tab if it has any properties 
+            //Show or hide properties tab based on wether it has or not any properties 
             if (genericProps.Properties.Any() == false)
             {
                 display.Tabs = display.Tabs.Where(x => x.Id != 0);
