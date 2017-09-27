@@ -52,15 +52,6 @@
                 // update template value
                 scope.node.template = templateAlias;
 
-                // update template value on the correct tab
-                angular.forEach(scope.node.tabs, function (tab) {
-                    angular.forEach(tab.properties, function (property) {
-                        if (property.alias === "_umb_template") {
-                            property.value = templateAlias;
-                        }
-                    });
-                });
-
             };
 
             scope.datePickerChange = function (event, type) {
@@ -138,15 +129,6 @@
                 // update publish value
                 scope.node.removeDate = date;
 
-                // update template value on the correct tab
-                angular.forEach(scope.node.tabs, function (tab) {
-                    angular.forEach(tab.properties, function (property) {
-                        if (property.alias === "_umb_expiredate") {
-                            property.value = date;
-                        }
-                    });
-                });
-
                 // emit event
                 var args = { node: scope.node, date: date };
                 eventsService.emit("editors.content.changeUnpublishDate", args);
@@ -157,15 +139,6 @@
 
                 // update publish value
                 scope.node.removeDate = null;
-
-                // update template value on the correct tab
-                angular.forEach(scope.node.tabs, function (tab) {
-                    angular.forEach(tab.properties, function (property) {
-                        if (property.alias === "_umb_expiredate") {
-                            property.value = null;
-                        }
-                    });
-                });
 
                 // emit event
                 var args = { node: scope.node, date: null };
