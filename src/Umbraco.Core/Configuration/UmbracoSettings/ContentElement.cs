@@ -198,7 +198,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("emailRegex")]
         internal InnerTextConfigurationElement<string> EmailRegex
         {
-            get { return GetOptionalTextElement("emailRegex", "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"); }
+            // If this default needs to be updated then remember to also update
+            // val-email.spec.js - unfortunately the unit test seems to need a hardcoded regex
+            get { return GetOptionalTextElement("emailRegex", "^[a-z0-9!#$%&\'*+\\/=?^_`{|}~.-]+@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$"); }
         }
 
         string IContentSection.NotificationEmailAddress
