@@ -120,37 +120,7 @@ namespace Umbraco.Web.Models.Mapping
                 TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService, localizedText);
             }
 
-            var properties = new List<ContentPropertyDisplay>
-            {
-                //new ContentPropertyDisplay
-                //{
-                //    Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                //    Label = localizedText.Localize("content/releaseDate"),
-                //    Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
-                //    //Not editible for people without publish permission (U4-287)
-                //    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)) ? "datepicker" : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
-                //    Config = new Dictionary<string, object>
-                //    {
-                //        {"offsetTime", "1"}
-                //    }
-                //    //TODO: Fix up hard coded datepicker
-                //},
-                //new ContentPropertyDisplay
-                //{
-                //    Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                //    Label = localizedText.Localize("content/unpublishDate"),
-                //    Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
-                //    //Not editible for people without publish permission (U4-287)
-                //    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)) ? "datepicker" : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
-                //    Config = new Dictionary<string, object>
-                //    {
-                //        {"offsetTime", "1"}
-                //    }
-                //    //TODO: Fix up hard coded datepicker
-                //},
-                
-            };
-
+            var properties = new List<ContentPropertyDisplay>();
 
             TabsAndPropertiesResolver.MapGenericProperties(content, display, localizedText, properties.ToArray(),
                 genericProperties =>
