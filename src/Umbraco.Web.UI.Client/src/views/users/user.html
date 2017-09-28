@@ -18,7 +18,7 @@
                 </umb-load-indicator>
 
                 <div ng-if="!vm.loading" class="umb-packages-view-wrapper" style="padding: 0;">
-
+                
                     <div class="umb-package-details">
 
                         <div class="umb-package-details__main-content">
@@ -30,17 +30,19 @@
                                 <umb-box-content class="block-form">
 
                                     <umb-control-group label="@general_email" required="true">
-                                        <input 
-                                            type="email" 
-                                            localize="placeholder" 
-                                            placeholder="@placeholders_enteremail" 
-                                            class="input-block-level" 
+
+                                        <input
+                                            type="email"
+                                            localize="placeholder"
+                                            placeholder="@placeholders_enteremail"
+                                            class="input-block-level"
                                             ng-model="vm.user.email"
                                             umb-auto-focus name="email" 
-                                            required 
+                                            val-email
+                                            required
                                             val-server-field="Email" />
                                         <span class="help-inline" val-msg-for="email" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                                        <span class="help-inline" val-msg-for="email" val-toggle-msg="valServerField"></span>
+                                        <span class="help-inline" val-msg-for="email" val-toggle-msg="valServerField"></span>                                        
                                     </umb-control-group>
 
                                     <umb-control-group label="@general_username" ng-if="!vm.usernameIsEmail" required="true">
@@ -51,7 +53,7 @@
                                             class="input-block-level" 
                                             ng-model="vm.user.username"
                                             umb-auto-focus name="username" 
-                                            required 
+                                            required
                                             val-server-field="Username" />
                                         <span class="help-inline" val-msg-for="username" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
                                         <span class="help-inline" val-msg-for="username" val-toggle-msg="valServerField"></span>
