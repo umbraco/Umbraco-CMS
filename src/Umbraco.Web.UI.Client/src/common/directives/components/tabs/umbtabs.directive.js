@@ -19,22 +19,20 @@ angular.module("umbraco.directives")
 
                 var curr = $(event.target);         // active tab
                 var prev = $(event.relatedTarget);  // previous tab
-
-                
-                var args = { tabId: curr.context.id, tabHash: curr.context.hash }
-                // emit tab change event
-                eventsService.emit("tab change", args);
+				
+				// emit tab change event
+				var tabId = Number(curr.context.hash.replace("#tab", ""));
+				var args = { id: tabId, hash: curr.context.hash };
+				
+                eventsService.emit("app.tabChange", args);
 
 				$scope.$apply();
 
                 for (var c in callbacks) {
                     callbacks[c].apply(this, [{current: curr, previous: prev}]);
                 }
-
                 
             }
-
-
             
 		    //NOTE: it MUST be done this way - binding to an ancestor element that exists
 		    // in the DOM to bind to the dynamic elements that will be created.

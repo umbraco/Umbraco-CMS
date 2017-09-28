@@ -32,9 +32,9 @@
                 // get document type details
                 scope.documentType = scope.node.documentType;
 
-                // load audit trail on tab change
-                eventsService.on("tab change", function (event, args) {
-                    if (args.tabId === "0" || args.tabHash === "#tab0") {
+                // load audit trail when on the info tab
+                eventsService.on("app.tabChange", function (event, args) {
+                    if (args.id === -1) {
                         loadAuditTrail();
                     }
                 });
