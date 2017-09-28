@@ -14,6 +14,7 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic.Actions;
 using Umbraco.Core.PropertyEditors;
+using Content = Umbraco.Core.Models.Content;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -42,7 +43,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Urls,
                     expression => expression.MapFrom(content =>
                         UmbracoContext.Current == null
-                            ? new[] { "Cannot generate urls without a current Umbraco Context" }
+                            ? new[] {"Cannot generate urls without a current Umbraco Context"}
                             : content.GetContentUrls(UmbracoContext.Current)))
                 .ForMember(display => display.Properties, expression => expression.Ignore())
                 .ForMember(display => display.AllowPreview, expression => expression.Ignore())
@@ -50,6 +51,11 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
                 .ForMember(display => display.Errors, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore())
+                .ForMember(display => display.DocumentType, expression => expression.ResolveUsing<ContentTypeBasicResolver>())
+                .ForMember(display => display.AllowedTemplates, expression =>
+                    expression.MapFrom(content => content.ContentType.AllowedTemplates
+                        .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false)
+                        .ToDictionary(t => t.Alias, t => t.Name)))
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                     new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
@@ -105,77 +111,35 @@ namespace Umbraco.Web.Models.Mapping
                 var url = urlHelper.GetUmbracoApiService<ContentTreeController>(controller => controller.GetTreeNode(display.Id.ToString(), null));
                 display.TreeNodeUrl = url;
             }
-
-            //fill in the template config to be passed to the template drop down.
-            var templateItemConfig = new Dictionary<string, string> { { "", localizedText.Localize("general/choose") } };
-            foreach (var t in content.ContentType.AllowedTemplates
-                .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false))
-            {
-                templateItemConfig.Add(t.Alias, t.Name);
-            }
-
-
+            
             if (content.ContentType.IsContainer)
             {
                 TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService, localizedText);
-            }
-
-            //TODO: This would be much nicer with the IUmbracoContextAccessor so we don't use singletons
-            //If this is a web request and there's a user signed in and the 
-            // user has access to the settings section, we will 
-            if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
-                && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
-            {
-                var currentDocumentType = contentTypeService.GetContentType(display.ContentTypeAlias);
-                var currentDocumentTypeName = currentDocumentType == null ? string.Empty : localizedText.UmbracoDictionaryTranslate(currentDocumentType.Name);
-
-                var currentDocumentTypeId = currentDocumentType == null ? string.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
-                //TODO: Hard coding this is not good
-                var docTypeLink = string.Format("#/settings/documenttypes/edit/{0}", currentDocumentTypeId);
-
-                var templateProperty = new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}template",
-                        Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("template/template"),
-                    Value = display.TemplateAlias,
-                    View =
-                        "dropdown", //TODO: Hard coding until we make a real dropdown property editor to lookup
-                    Config = new Dictionary<string, object>
-                    {
-                        {"items", templateItemConfig}
-                    }
-                };
-
-                //Replace the doc type property
-                var docTypeProperty = new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}doctype",
-                        Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("content/documentType"),
-                    Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
-                    View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias)
-                        .ValueEditor.View
-                };
-                docTypeProperty.Value = new List<object>
-                {
-                    new
-                    {
-                        linkText = currentDocumentTypeName,
-                        url = docTypeLink,
-                        target = "_self",
-                        icon = "icon-item-arrangement"
-                    }
-                };
-                //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                docTypeProperty.View = "urllist";
-
-                //Moving template and docType properties to the root node (issue U4-10311)
-                display.AllowedTemplates = templateProperty.Config;
-                display.DocTypeValue = docTypeProperty.Value;
-            }
+            }            
 
             TabsAndPropertiesResolver.MapGenericProperties(content, display, localizedText);
+        }
+
+        /// <summary>
+        /// Resolves a <see cref="ContentTypeBasic"/> from the <see cref="IContent"/> item and checks if the current user
+        /// has access to see this data
+        /// </summary>
+        private class ContentTypeBasicResolver : ValueResolver<IContent, ContentTypeBasic>
+        {
+            protected override ContentTypeBasic ResolveCore(IContent source)
+            {
+                //TODO: This would be much nicer with the IUmbracoContextAccessor so we don't use singletons
+                //If this is a web request and there's a user signed in and the 
+                // user has access to the settings section, we will 
+                if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
+                    && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
+                {
+                    var contentTypeBasic = Mapper.Map<ContentTypeBasic>(source.ContentType);
+                    return contentTypeBasic;
+                }
+                //no access
+                return null;
+            }
         }
 
         /// <summary>

@@ -30,7 +30,7 @@
                 scope.availableTemplates = scope.node.allowedTemplates.items;
 
                 // get document type details
-                scope.documentType = scope.node.docTypeValue[0];
+                scope.documentType = scope.node.documentType;
 
                 loadAuditTrail();
 
