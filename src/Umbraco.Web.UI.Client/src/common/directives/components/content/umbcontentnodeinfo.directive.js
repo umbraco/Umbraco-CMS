@@ -27,7 +27,7 @@
                 };
 
                 // get available templates
-                scope.availableTemplates = scope.node.allowedTemplates.items;
+                scope.availableTemplates = scope.node.allowedTemplates;
 
                 // get document type details
                 scope.documentType = scope.node.documentType;
@@ -41,9 +41,8 @@
                 loadAuditTrail();
             };
 
-            scope.openDocumentType = function (documentType) {
-                // remove first "#" from url if it is prefixed else the path won't work
-                var url = documentType.url.replace(/^#/, "");
+            scope.openDocumentType = function (documentType) {               
+                var url = "/settings/documenttypes/edit/" + documentType.id;
                 $location.path(url);
             };
 
