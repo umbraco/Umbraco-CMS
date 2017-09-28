@@ -27,7 +27,7 @@ function Set-UmbracoVersion
   }
   
   # validate input
-  $ok = [Regex]::Match($version, "^[0-9]+\.[0-9]+\.[0-9]+(\-[a-z0-9]+)?(\+[0-9]+)?$")
+  $ok = [Regex]::Match($version, "^[0-9]+\.[0-9]+\.[0-9]+(\-[a-z0-9\.]+)?(\+[0-9]+)?$")
   if (-not $ok.Success)
   {
     Write-Error "Invalid version $version"
