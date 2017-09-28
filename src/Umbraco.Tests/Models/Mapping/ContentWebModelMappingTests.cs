@@ -121,8 +121,7 @@ namespace Umbraco.Tests.Models.Mapping
             {
                 AssertDisplayProperty(result, p, ApplicationContext);
             }            
-            Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count() - 1);
-            Assert.IsTrue(result.Tabs.Any(x => x.Label == ui.Text("general", "properties")));
+            Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count());
             Assert.IsTrue(result.Tabs.First().IsActive);
             Assert.IsTrue(result.Tabs.Except(new[] {result.Tabs.First()}).All(x => x.IsActive == false));
         }
