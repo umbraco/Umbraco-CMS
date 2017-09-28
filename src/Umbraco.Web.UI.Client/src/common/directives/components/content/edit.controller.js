@@ -44,10 +44,12 @@
         createButtons(args.node);
       }));
 
+      // We don't get the info tab from the server from version 7.8 so we need to manually add it
+      contentEditingHelper.addInfoTab($scope.content.tabs);
+
     }
 
     function createButtons(content) {
-
       var buttons = contentEditingHelper.configureContentEditorButtons({
         create: $scope.page.isNew,
         content: content,

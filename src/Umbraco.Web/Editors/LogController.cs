@@ -34,10 +34,12 @@ namespace Umbraco.Web.Editors
             var result = Services.AuditService.GetPagedItemsByEntity(id, pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter: dateQuery);
             var mapped = Mapper.Map<IEnumerable<AuditLog>>(result);
             
-            return new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)
+            var page = new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)
             {
-                Items = MapAvatars(mapped)
+                Items = MapAvatarsAndNames(mapped)
             };
+
+            return page;
         }
 
         public PagedResult<AuditLog> GetPagedCurrentUserLog(
@@ -52,7 +54,7 @@ namespace Umbraco.Web.Editors
             var mapped = Mapper.Map<IEnumerable<AuditLog>>(result);
             return new PagedResult<AuditLog>(totalRecords, pageNumber + 1, pageSize)
             {
-                Items = MapAvatars(mapped)
+                Items = MapAvatarsAndNames(mapped)
             };
         }
 
@@ -84,14 +86,16 @@ namespace Umbraco.Web.Editors
                 Log.Instance.GetLogItems(Enum<LogTypes>.Parse(logType.ToString()), sinceDate.Value));
         }
 
-        private IEnumerable<AuditLog> MapAvatars(IEnumerable<AuditLog> items)
+        private IEnumerable<AuditLog> MapAvatarsAndNames(IEnumerable<AuditLog> items)
         {
             var userIds = items.Select(x => x.UserId).ToArray();
             var users = Services.UserService.GetUsersById(userIds)
                 .ToDictionary(x => x.Id, x => x.GetUserAvatarUrls(ApplicationContext.ApplicationCache.RuntimeCache));
+            var userNames = Services.UserService.GetUsersById(userIds).ToDictionary(x => x.Id, x => x.Name);
             foreach (var item in items)
             {
                 item.UserAvatars = users[item.UserId];
+                item.UserName = userNames[item.UserId];
             }
             return items;
         }

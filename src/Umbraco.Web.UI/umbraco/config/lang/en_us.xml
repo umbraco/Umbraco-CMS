@@ -560,6 +560,7 @@
     <key alias="history">History</key>
     <key alias="icon">Icon</key>
     <key alias="import">Import</key>
+    <key alias="info">Info</key>
     <key alias="innerMargin">Inner margin</key>
     <key alias="insert">Insert</key>
     <key alias="install">Install</key>
