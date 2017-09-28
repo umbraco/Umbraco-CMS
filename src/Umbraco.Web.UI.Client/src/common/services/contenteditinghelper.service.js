@@ -5,7 +5,7 @@
 * @description A helper service for most editors, some methods are specific to content/media/member model types but most are used by
 * all editors to share logic and reduce the amount of replicated code among editors.
 **/
-function contentEditingHelper(fileManager, $q, $location, $routeParams, notificationsService, serverValidationManager, dialogService, formHelper, appState) {
+function contentEditingHelper(fileManager, $q, $location, $routeParams, notificationsService, localizationService, serverValidationManager, dialogService, formHelper, appState) {
 
     function isValidIdentifier(id){
         //empty id <= 0
@@ -100,7 +100,35 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
             return deferred.promise;
         },
+        
+        /** Used by the content editor and media editor to add an info tab to the tabs array (normally known as the properties tab) */
+        addInfoTab: function (tabs) {
 
+            var infoTab = {
+                "alias": "_umb_infoTab",
+                "id": -1,
+                "label": "Info",
+                "properties": []
+            };
+
+            // first check if tab is already added
+            var foundInfoTab = false;
+
+            angular.forEach(tabs, function (tab) {
+                if (tab.id === infoTab.id && tab.alias === infoTab.alias) {
+                    foundInfoTab = true;
+                }
+            });
+
+            // add info tab if is is not found
+            if (!foundInfoTab) {
+                localizationService.localize("general_info").then(function (value) {
+                    infoTab.label = value;
+                    tabs.push(infoTab);
+                });
+            }
+
+        },
 
         /** Returns the action button definitions based on what permissions the user has.
         The content.allowedActions parameter contains a list of chars, each represents a button by permission so
