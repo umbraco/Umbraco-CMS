@@ -42,6 +42,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
                 .ForMember(display => display.HasPublishedVersion, expression => expression.Ignore())
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
+                .ForMember(display => display.DocumentType, expression => expression.ResolveUsing<ContentTypeBasicResolver>())
                 .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService, applicationContext.Services.ContentTypeService, applicationContext.ProfilingLogger.Logger));
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
@@ -65,6 +66,20 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.Icon, expression => expression.Ignore())
                 .ForMember(dto => dto.Alias, expression => expression.Ignore())
                 .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore());
+
+            //FROM ContentTypeBasic TO ContentPropertyDisplay
+            config.CreateMap<ContentTypeBasic, ContentPropertyDisplay>()
+                .ForMember(display => display.Value, expresion => expresion.MapFrom(content => content))
+                .ForMember(display =>display.Description, expression =>expression.Ignore())
+                .ForMember(display => display.Config, expression => expression.Ignore())
+                .ForMember(display => display.HideLabel, expression => expression.Ignore())
+                .ForMember(display => display.Label, expression => expression.Ignore())
+                .ForMember(display => display.Validation, expression => expression.Ignore())
+                .ForMember(display => display.View, expression => expression.Ignore())
+                .ForMember(display => display.Alias, expression => expression.Ignore())
+                .ForMember(display => display.Editor, expression => expression.Ignore())
+                .ForMember(display => display.Id, expression => expression.Ignore())
+                .ForMember(display => display.PropertyEditor, expression => expression.Ignore());
         }
 
         private static void AfterMap(IMedia media, MediaItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText, IContentTypeService contentTypeService, ILogger logger)
@@ -87,53 +102,39 @@ namespace Umbraco.Web.Models.Mapping
                 TabsAndPropertiesResolver.AddListView(display, "media", dataTypeService, localizedText);
             }
 
-            var genericProperties = new List<ContentPropertyDisplay>
+            var links = media.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, logger);
+            if (links.Any())
             {
-                new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("content/mediatype"),
-                    Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
-                    View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
-                }
-            };
+                // Media link to root node
+                display.MediaLink = string.Join(",", links);
+            }
 
-            TabsAndPropertiesResolver.MapGenericProperties(media, display, localizedText, genericProperties, properties =>
+            TabsAndPropertiesResolver.MapGenericProperties(media, display, localizedText);
+        }
+
+        /// <summary>
+        /// Resolves a <see cref="ContentTypeBasic"/> from the <see cref="IContent"/> item and checks if the current user
+        /// has access to see this data
+        /// </summary>
+        private class ContentTypeBasicResolver : ValueResolver<IMedia, ContentTypeBasic>
+        {
+            protected override ContentTypeBasic ResolveCore(IMedia source)
             {
-                if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
-                    && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
+                //TODO: This would be much nicer with the IUmbracoContextAccessor so we don't use singletons
+                //If this is a web request and there's a user signed in and the 
+                // user has access to the settings section, we will 
+                if (HttpContext.Current != null && UmbracoContext.Current != null &&
+                    UmbracoContext.Current.Security.CurrentUser != null
+                    && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants
+                        .Applications.Settings)))
                 {
-                    var mediaTypeLink = string.Format("#/settings/mediatypes/edit/{0}", media.ContentTypeId);
-
-                    //Replace the doctype property
-                    var docTypeProperty = properties.First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                    docTypeProperty.Value = new List<object>
-                    {
-                        new
-                        {
-                            linkText = media.ContentType.Name,
-                            url = mediaTypeLink,
-                            target = "_self",
-                            icon = "icon-item-arrangement"
-                        }
-                    };
-                    docTypeProperty.View = "urllist";
+                    var contentTypeBasic = Mapper.Map<ContentTypeBasic>(source.ContentType);
+                    return contentTypeBasic;
                 }
+                //no access
+                return null;
+            }
 
-                // inject 'Link to media' as the first generic property
-                var links = media.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, logger);
-                if (links.Any())
-                {
-                    var link = new ContentPropertyDisplay
-                    {
-                        Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = localizedText.Localize("media/urls"),
-                        Value = string.Join(",", links),
-                        View = "urllist"
-                    };
-                    properties.Insert(0, link);
-                }
-            });
         }
     }
 }

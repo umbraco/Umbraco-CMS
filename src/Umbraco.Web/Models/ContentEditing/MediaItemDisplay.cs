@@ -10,6 +10,10 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "content", Namespace = "")]
     public class MediaItemDisplay : ListViewAwareContentItemDisplayBase<ContentPropertyDisplay, IMedia>
     {
-        
+        [DataMember(Name = "documentType")]
+        public ContentPropertyDisplay DocumentType { get; set; }
+
+        [DataMember(Name = "mediaLink")]
+        public string MediaLink { get; set; }
     }
 }
