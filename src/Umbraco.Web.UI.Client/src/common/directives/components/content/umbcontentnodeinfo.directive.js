@@ -32,11 +32,15 @@
                 // get document type details
                 scope.documentType = scope.node.documentType;
 
-                loadAuditTrail();
-
+                // load audit trail when on the info tab
+                eventsService.on("app.tabChange", function (event, args) {
+                    if (args.id === -1) {
+                        loadAuditTrail();
+                    }
+                });
             }
 
-            scope.auditTrailPageChange = function(pageNumber) {
+            scope.auditTrailPageChange = function (pageNumber) {
                 scope.auditTrailOptions.pageNumber = pageNumber;
                 loadAuditTrail();
             };

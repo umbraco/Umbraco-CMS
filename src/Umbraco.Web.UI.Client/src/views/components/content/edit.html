@@ -31,7 +31,7 @@
                     </div>
                     
                     <!-- Info tab -->
-                    <div ng-show="tab.id === -1 && tab.alias === '_umb_infoTab'">
+                    <div ng-if="tab.id === -1 && tab.alias === '_umb_infoTab'">
                         <umb-content-node-info
                             ng-if="content"
                             node="content">
