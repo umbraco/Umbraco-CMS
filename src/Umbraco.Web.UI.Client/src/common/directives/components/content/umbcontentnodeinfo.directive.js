@@ -27,10 +27,10 @@
                 };
 
                 // get available templates
-                scope.availableTemplates = getAvailableTemplates(scope.node);
+                scope.availableTemplates = scope.node.allowedTemplates;
 
                 // get document type details
-                scope.documentType = getDocumentType(scope.node);
+                scope.documentType = scope.node.documentType;
 
                 loadAuditTrail();
 
@@ -41,9 +41,8 @@
                 loadAuditTrail();
             };
 
-            scope.openDocumentType = function (documentType) {
-                // remove first "#" from url if it is prefixed else the path won't work
-                var url = documentType.url.replace(/^#/, "");
+            scope.openDocumentType = function (documentType) {               
+                var url = "/settings/documenttypes/edit/" + documentType.id;
                 $location.path(url);
             };
 
@@ -51,15 +50,6 @@
 
                 // update template value
                 scope.node.template = templateAlias;
-
-                // update template value on the correct tab
-                angular.forEach(scope.node.tabs, function (tab) {
-                    angular.forEach(tab.properties, function (property) {
-                        if (property.alias === "_umb_template") {
-                            property.value = templateAlias;
-                        }
-                    });
-                });
 
             };
 
@@ -113,53 +103,10 @@
                 });
             }
 
-            function getAvailableTemplates(node) {
-
-                var availableTemplates = {};
-
-                // find the templates in the properties array
-                angular.forEach(node.properties, function (property) {
-                    if (property.alias === "_umb_template") {
-                        if (property.config && property.config.items) {
-                            availableTemplates = property.config.items;
-                        }
-                    }
-                });
-
-                return availableTemplates;
-
-            }
-
-            function getDocumentType(node) {
-
-                var documentType = {};
-
-                // find the document type in the properties array
-                angular.forEach(node.properties, function (property) {
-                    if (property.alias === "_umb_doctype") {
-                        if (property.value && property.value.length > 0) {
-                            documentType = property.value[0];
-                        }
-                    }
-                });
-
-                return documentType;
-
-            }
-
             function setPublishDate(date) {
 
                 // update publish value
                 scope.node.releaseDate = date;
-
-                // update template value on the correct tab
-                angular.forEach(scope.node.tabs, function (tab) {
-                    angular.forEach(tab.properties, function (property) {
-                        if (property.alias === "_umb_releasedate") {
-                            property.value = date;
-                        }
-                    });
-                });
 
                 // emit event
                 var args = { node: scope.node, date: date };
@@ -172,15 +119,6 @@
                 // update publish value
                 scope.node.releaseDate = null;
 
-                // update template value on the correct tab
-                angular.forEach(scope.node.tabs, function (tab) {
-                    angular.forEach(tab.properties, function (property) {
-                        if (property.alias === "_umb_releasedate") {
-                            property.value = null;
-                        }
-                    });
-                });
-
                 // emit event
                 var args = { node: scope.node, date: null };
                 eventsService.emit("editors.content.changePublishDate", args);
@@ -192,15 +130,6 @@
                 // update publish value
                 scope.node.removeDate = date;
 
-                // update template value on the correct tab
-                angular.forEach(scope.node.tabs, function (tab) {
-                    angular.forEach(tab.properties, function (property) {
-                        if (property.alias === "_umb_expiredate") {
-                            property.value = date;
-                        }
-                    });
-                });
-
                 // emit event
                 var args = { node: scope.node, date: date };
                 eventsService.emit("editors.content.changeUnpublishDate", args);
@@ -211,15 +140,6 @@
 
                 // update publish value
                 scope.node.removeDate = null;
-
-                // update template value on the correct tab
-                angular.forEach(scope.node.tabs, function (tab) {
-                    angular.forEach(tab.properties, function (property) {
-                        if (property.alias === "_umb_expiredate") {
-                            property.value = null;
-                        }
-                    });
-                });
 
                 // emit event
                 var args = { node: scope.node, date: null };

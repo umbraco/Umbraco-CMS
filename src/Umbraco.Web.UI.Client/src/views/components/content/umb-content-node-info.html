@@ -165,7 +165,7 @@
                     <umb-node-preview
                         style="max-width: 100%; margin-bottom: 0;"
                         icon="documentType.icon"
-                        name="documentType.linkText"
+                        name="documentType.name"
                         allow-open="allowOpen"
                         on-open="openDocumentType(documentType)">
                     </umb-node-preview>
@@ -177,6 +177,7 @@
                         ng-model="node.template"
                         ng-options="key as value for (key, value) in availableTemplates"
                         ng-change="updateTemplate(node.template)">
+                        <option value=""><localize key="general_choose">Choose</localize>...</option>
                     </select>
                 </umb-control-group>
 
