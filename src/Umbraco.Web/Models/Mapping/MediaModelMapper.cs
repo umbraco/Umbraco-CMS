@@ -43,6 +43,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.HasPublishedVersion, expression => expression.Ignore())
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
                 .ForMember(display => display.DocumentType, expression => expression.ResolveUsing<ContentTypeBasicResolver>())
+                .ForMember(display => display.MediaLink, expression => expression.ResolveUsing(
+                    content => string.Join(",", content.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, applicationContext.ProfilingLogger.Logger))))
                 .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService, applicationContext.Services.ContentTypeService, applicationContext.ProfilingLogger.Logger));
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
@@ -70,7 +72,7 @@ namespace Umbraco.Web.Models.Mapping
             //FROM ContentTypeBasic TO ContentPropertyDisplay
             config.CreateMap<ContentTypeBasic, ContentPropertyDisplay>()
                 .ForMember(display => display.Value, expresion => expresion.MapFrom(content => content))
-                .ForMember(display =>display.Description, expression =>expression.Ignore())
+                .ForMember(display => display.Description, expression => expression.Ignore())
                 .ForMember(display => display.Config, expression => expression.Ignore())
                 .ForMember(display => display.HideLabel, expression => expression.Ignore())
                 .ForMember(display => display.Label, expression => expression.Ignore())
@@ -100,13 +102,6 @@ namespace Umbraco.Web.Models.Mapping
             if (media.ContentType.IsContainer)
             {
                 TabsAndPropertiesResolver.AddListView(display, "media", dataTypeService, localizedText);
-            }
-
-            var links = media.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, logger);
-            if (links.Any())
-            {
-                // Media link to root node
-                display.MediaLink = string.Join(",", links);
             }
 
             TabsAndPropertiesResolver.MapGenericProperties(media, display, localizedText);
