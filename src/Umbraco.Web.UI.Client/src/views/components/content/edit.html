@@ -58,47 +58,33 @@
             </umb-editor-footer-content-left>
             
             
-
-            <umb-editor-footer-content-right>              
+            <umb-editor-footer-content-right>
                 
-                <div class="flex items-center">
+                <umb-button
+                    ng-if="page.listViewPath"
+                    type="link"
+                    href="#{{page.listViewPath}}"
+                    label="Return to list"
+                    label-key="buttons_returnToList">
+                </umb-button>
 
-                    <div class="flex flex-column" style="margin-right: 10px;">
-                        <small ng-if="content.releaseDate != null"><localize key="content_releaseDate"></localize> {{ content.releaseDate | amDateFormat:'MMMM Do YYYY, HH:mm' }}</small>
-                        <small ng-if="content.removeDate != null"><localize key="content_unpublishDate"></localize> {{ content.removeDate | amDateFormat:'MMMM Do YYYY, HH:mm' }}</small>
-                    </div>
-                
-                    <div>
+                <umb-button
+                    ng-if="!page.isNew && content.allowPreview"
+                    type="button"
+                    button-style="info"
+                    action="preview(content)"
+                    label="Preview page"
+                    label-key="buttons_showPage">
+                </umb-button>
 
-                        <umb-button
-                            ng-if="page.listViewPath"
-                            type="link"
-                            href="#{{page.listViewPath}}"
-                            label="Return to list"
-                            label-key="buttons_returnToList">
-                        </umb-button>
-
-                        <umb-button
-                            ng-if="!page.isNew && content.allowPreview"
-                            type="button"
-                            button-style="info"
-                            action="preview(content)"
-                            label="Preview page"
-                            label-key="buttons_showPage">
-                        </umb-button>
-
-                        <umb-button-group
-                            ng-if="defaultButton"
-                            default-button="defaultButton"
-                            sub-buttons="subButtons"
-                            state="page.buttonGroupState"
-                            direction="up"
-                            float="right">
-                        </umb-button-group>
-                    </div>
-
-                </div>
-
+                <umb-button-group
+                    ng-if="defaultButton"
+                    default-button="defaultButton"
+                    sub-buttons="subButtons"
+                    state="page.buttonGroupState"
+                    direction="up"
+                    float="right">
+                </umb-button-group>
 
             </umb-editor-footer-content-right>
 
