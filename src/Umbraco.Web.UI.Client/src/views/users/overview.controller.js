@@ -15,7 +15,7 @@
         //note on the below, we dont assign a view unless it's the right route since if we did that it will load in that controller
         //for the view which is unecessary and will cause extra overhead/requests to occur
         vm.page = {};
-        vm.page.name = "User Management";
+        vm.page.name = localizationService.localize("user_userManagement");
         vm.page.navigation = [
             {
                 "name": localizationService.localize("sections_users"),
