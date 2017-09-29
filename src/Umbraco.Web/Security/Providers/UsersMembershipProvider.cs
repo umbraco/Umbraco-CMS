@@ -2,9 +2,11 @@
 using System.Configuration.Provider;
 using System.Security.Cryptography;
 using System.Text;
+using System.Web;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -114,6 +116,70 @@ namespace Umbraco.Web.Security.Providers
                 }
                 return _defaultMemberTypeAlias;
             }
+        }
+        
+        /// <summary>
+        /// Overridden in order to call the BackOfficeUserManager.UnlockUser method in order to raise the user audit events
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="member"></param>
+        /// <returns></returns>
+        internal override bool PerformUnlockUser(string username, out IUser member)
+        {
+            var result = base.PerformUnlockUser(username, out member);
+            if (result)
+            {
+                var userManager = GetBackofficeUserManager();
+                if (userManager != null)
+                {
+                    userManager.RaiseAccountUnlockedEvent(member.Id);
+                }   
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Override in order to raise appropriate events via the <see cref="BackOfficeUserManager"/>
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        internal override ValidateUserResult PerformValidateUser(string username, string password)
+        {
+            var result = base.PerformValidateUser(username, password);
+
+            var userManager = GetBackofficeUserManager();
+
+            if (userManager == null) return result;
+
+            if (result.Authenticated == false)
+            {
+                var count = result.Member.FailedPasswordAttempts;
+                if (count >= MaxInvalidPasswordAttempts)
+                {
+                    userManager.RaiseAccountLockedEvent(result.Member.Id);
+                }
+            }
+            else
+            {
+                if (result.Member.FailedPasswordAttempts > 0)
+                {
+                    //we have successfully logged in, if the failed password attempts was modified it means it was reset
+                    if (result.Member.WasPropertyDirty("FailedPasswordAttempts"))
+                    {                        
+                        userManager.RaiseResetAccessFailedCountEvent(result.Member.Id);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        internal BackOfficeUserManager<BackOfficeIdentityUser> GetBackofficeUserManager()
+        {
+            return HttpContext.Current == null
+                ? null
+                : HttpContext.Current.GetOwinContext().GetBackOfficeUserManager();
         }
     }
 }

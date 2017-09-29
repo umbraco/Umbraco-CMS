@@ -7,48 +7,40 @@ function Build-UmbracoDocs
   $src = "$($uenv.SolutionRoot)\src"
   $out = "$($uenv.SolutionRoot)\build.out"
   $tmp = "$($uenv.SolutionRoot)\build.tmp"
-
+  
   $buildTemp = "$PSScriptRoot\temp"
   $cache = 2
-
+  
   Prepare-Build -keep $uenv
 
   ################ Do the UI docs
-
-  # create Belle build folder, so that we don't cause a Belle rebuild
-  $belleBuildDir = "$src\Umbraco.Web.UI.Client\build"
-  if (-not (Test-Path $belleBuildDir)) 
-  {
-      mkdir $belleBuildDir > $null
-  }
-
-  Write-Host "Build UI documentation"
-
   # get a temp clean node env (will restore)
   Sandbox-Node $uenv
   
+  Write-Host "Executing gulp docs"
+  
   push-location "$($uenv.SolutionRoot)\src\Umbraco.Web.UI.Client"
-  write "node version is:" > $tmp\belle.log
-  &node -v >> $tmp\belle.log 2>&1
-  write "npm version is:" >> $tmp\belle.log 2>&1
-  &npm -v >> $tmp\belle.log 2>&1
-  write "cleaning npm cache" >> $tmp\belle.log 2>&1
-  &npm cache clean >> $tmp\belle.log 2>&1
-  write "installing bower" >> $tmp\belle.log 2>&1
-  &npm install -g bower >> $tmp\belle.log 2>&1
-  write "installing gulp" >> $tmp\belle.log 2>&1
-  &npm install -g gulp >> $tmp\belle.log 2>&1
-  write "installing gulp-cli" >> $tmp\belle.log 2>&1
-  &npm install -g gulp-cli --quiet >> $tmp\belle.log 2>&1
-  write "executing npm install" >> $tmp\belle.log 2>&1
-  &npm install >> $tmp\belle.log 2>&1
-  write "building docs using gulp" >> $tmp\belle.log 2>&1
-  &gulp docs >> $tmp\belle.log 2>&1
+  write "node version is:" > $tmp\belle-docs.log
+  &node -v >> $tmp\belle-docs.log 2>&1
+  write "npm version is:" >> $tmp\belle-docs.log 2>&1
+  &npm -v >> $tmp\belle-docs.log 2>&1
+  write "executing npm install" >> $tmp\belle-docs.log 2>&1
+  &npm install >> $tmp\belle-docs.log 2>&1
+  write "executing bower install" >> $tmp\belle-docs.log 2>&1
+  &npm install -g bower >> $tmp\belle-docs.log 2>&1
+  write "installing gulp" >> $tmp\belle-docs.log 2>&1
+  &npm install -g gulp >> $tmp\belle-docs.log 2>&1
+  write "installing gulp-cli" >> $tmp\belle-docs.log 2>&1
+  &npm install -g gulp-cli --quiet >> $tmp\belle-docs.log 2>&1
+  write "building docs using gulp" >> $tmp\belle-docs.log 2>&1
+  &gulp docs >> $tmp\belle-docs.log 2>&1
   pop-location  
+
+  Write-Host "Completed gulp docs build"
   
   # fixme - should we filter the log to find errors?
   #get-content .\build.tmp\belle-docs.log | %{ if ($_ -match "build") { write $_}}
-
+  
   # change baseUrl
   $baseUrl = "https://our.umbraco.org/apidocs/ui/"
   $indexPath = "$src/Umbraco.Web.UI.Client/docs/api/index.html"

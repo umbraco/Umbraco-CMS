@@ -358,5 +358,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return LoginBackgroundImage; }
         }
+        
     }
 }

@@ -583,7 +583,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>De default gebruiker is geblokkeerd of heeft geen toegang tot Umbraco!</strong></p><p>Geen verdere actie noodzakelijk. Klik <b>Volgende</b> om verder te gaan.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Het wachtwoord van de default gebruiker is sinds installatie met succes veranderd.</strong></p><p>Geen verdere actie noodzakelijk. Klik <strong>Volgende</strong> om verder te gaan.]]></key>
     <key alias="defaultUserPasswordChanged">Het wachtwoord is veranderd!</key>
-    <key alias="defaultUserText"><![CDATA[<p> Umbraco maakt een default gebruiker aan met login <strong>('admin')</strong> and wachtwoord <strong>('default')</strong>. Het is <strong>belangrijk</strong> dat dit wachtwoord wordt veranderd in iets unieks. </p> <p> Deze stap controleert het password van de default gebruiker en adviseert of het veranderd dient te worden. </p>]]></key>
     <key alias="greatStart">Neem een jumpstart en bekijk onze introductie videos</key>
     <key alias="licenseText"><![CDATA[Door op de 'Volgende' knop te klikken (of door de UmbracoConfigurationStatus in web.config te veranderen), accepteer je de licentie voor deze software zoals in het onderstaande kader is te lezen. Deze Umbraco distributie bevat twee verschillende licensies: de open-source MIT licensie voor het framework en de Umbraco freeware licensie die de gebruikersinterface behelst.
 

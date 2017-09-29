@@ -431,9 +431,17 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
         {
-            return Services.UserService
-                    .GetPermissions(Security.CurrentUser, nodeIds)
-                    .ToDictionary(x => x.EntityId, x => x.AssignedPermissions);
+            var permissions = Services.UserService
+                    .GetPermissions(Security.CurrentUser, nodeIds);
+            
+            var permissionsDictionary = new Dictionary<int, string[]>();
+            foreach (var nodeId in nodeIds)
+            {
+                var aggregatePerms = permissions.GetAllPermissions(nodeId).ToArray();
+                permissionsDictionary.Add(nodeId, aggregatePerms);
+            }
+
+            return permissionsDictionary;
         }
 
         /// <summary>

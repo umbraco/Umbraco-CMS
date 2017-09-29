@@ -24,6 +24,7 @@ namespace Umbraco.Core.Persistence
     {
         private int _version;
         private bool _hasVersion;
+        private string _exe;
 
         #region Availability & Version
 
@@ -84,16 +85,31 @@ namespace Umbraco.Core.Persistence
         {
             _hasVersion = true;
             _version = -1;
+            _exe = null;
 
             var programFiles = Environment.GetEnvironmentVariable("ProgramFiles");
-            if (programFiles == null) return;
+
+            // MS SQL Server installs in e.g. "C:\Program Files\Microsoft SQL Server", so
+            // we want to detect it in "%ProgramFiles%\Microsoft SQL Server" - however, if
+            // Umbraco runs as a 32bits process (e.g. IISExpress configured as 32bits)
+            // on a 64bits system, %ProgramFiles% will point to "C:\Program Files (x86)"
+            // and SQL Server cannot be found. But then, %ProgramW6432% will point to
+            // the original "C:\Program Files". Using it to fix the path.
+            // see also: MSDN doc for WOW64 implementation
+            //
+            var programW6432 = Environment.GetEnvironmentVariable("ProgramW6432");
+            if (string.IsNullOrWhiteSpace(programW6432) == false && programW6432 != programFiles)
+                programFiles = programW6432;
+
+            if (string.IsNullOrWhiteSpace(programFiles)) return;
 
             // detect 14, 13, 12, 11
             for (var i = 14; i > 10; i--)
             {
-                var path = Path.Combine(programFiles, string.Format(@"Microsoft SQL Server\{0}0\Tools\Binn\SqlLocalDB.exe", i));
-                if (File.Exists(path) == false) continue;
+                var exe = Path.Combine(programFiles, string.Format(@"Microsoft SQL Server\{0}0\Tools\Binn\SqlLocalDB.exe", i));
+                if (File.Exists(exe) == false) continue;
                 _version = i;
+                _exe = exe;
                 break;
             }
         }
@@ -897,15 +913,12 @@ namespace Umbraco.Core.Persistence
         /// </remarks>
         private int ExecuteSqlLocalDb(string args, out string output, out string error)
         {
-            var programFiles = Environment.GetEnvironmentVariable("ProgramFiles");
-            if (programFiles == null)
+            if (_exe == null) // should never happen - we should not execute if not available
             {
                 output = string.Empty;
                 error = "SqlLocalDB.exe not found";
                 return -1;
             }
-
-            var path = Path.Combine(programFiles, string.Format(@"Microsoft SQL Server\{0}0\Tools\Binn\SqlLocalDB.exe", _version));
 
             var p = new Process
             {
@@ -914,7 +927,7 @@ namespace Umbraco.Core.Persistence
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    FileName = path,
+                    FileName = _exe,
                     Arguments = args,
                     CreateNoWindow = true,
                     WindowStyle = ProcessWindowStyle.Hidden
@@ -929,7 +942,7 @@ namespace Umbraco.Core.Persistence
         }
 
         /// <summary>
-        /// Returns a Unicode string with the delimiters added to make the input string a valid SQL Server delimited identifier. 
+        /// Returns a Unicode string with the delimiters added to make the input string a valid SQL Server delimited identifier.
         /// </summary>
         /// <param name="name">The name to quote.</param>
         /// <param name="quote">A quote character.</param>

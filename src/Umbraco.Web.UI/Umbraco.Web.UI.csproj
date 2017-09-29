@@ -1027,9 +1027,9 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>7700</DevelopmentServerPort>
+          <DevelopmentServerPort>7720</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:7700</IISUrl>
+          <IISUrl>http://localhost:7720</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
@@ -1068,24 +1068,18 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
     <!-- Always transform the Template file when not in VS (ie: build.bat) -->
     <TransformXml Source="$(ProjectDir)Web.Template.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) != true" />
     <!-- Create ClientDependency.config file from Template if it doesn't exist -->
-    <Copy SourceFiles="$(ProjectDir)Config\ClientDependency.Release.config" DestinationFiles="$(ProjectDir)Config\ClientDependency.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />    
-    
-    <!-- Only runs if the Belle build folder doesn't yet exist -->	
-	<Message Text="Skipping BelleBuild because UmbracoBuild is '$(UmbracoBuild)', " Importance="High" Condition="'$(UmbracoBuild)' != ''" />
-	
-	<Message Text="Running BelleBuild because $(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib does not exist" Importance="High" Condition="!Exists('$(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib')" />
+    <Copy SourceFiles="$(ProjectDir)Config\ClientDependency.Release.config" DestinationFiles="$(ProjectDir)Config\ClientDependency.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
+    <!-- Only runs if the Belle build folder doesn't yet exist -->
+    <Message Text="Skipping BelleBuild because UmbracoBuild is '$(UmbracoBuild)', " Importance="High" Condition="'$(UmbracoBuild)' != ''" />
+    <Message Text="Running BelleBuild because $(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib does not exist" Importance="High" Condition="!Exists('$(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib')" />
     <CallTarget Targets="BelleBuild" Condition="!Exists('$(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib') and '$(UmbracoBuild)' == ''" />
-	
-	<Message Text="Skipping BelleBuild because $(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib exists or UmbracoBuild is not set" Importance="High" Condition="Exists('$(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib') and '$(UmbracoBuild)' == ''" />	
+    <Message Text="Skipping BelleBuild because $(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib exists or UmbracoBuild is not set" Importance="High" Condition="Exists('$(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib') and '$(UmbracoBuild)' == ''" />
   </Target>
-  
   <Target Name="AfterBuild">
     <Copy SourceFiles="$(ProjectDir)Web.$(Configuration).config.transformed" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="$(BuildingInsideVisualStudio) == true" />
-  </Target>  
-  
+  </Target>
   <Target Name="BelleBuild" BeforeTargets="Rebuild" Condition="'$(UmbracoBuild)' == ''">
     <Exec WorkingDirectory="$(ProjectDir)\..\..\" Command="powershell -ExecutionPolicy RemoteSigned -Command &quot;&amp;{ $env:PSModulePath = \&quot;$pwd\build\Modules\;$env:PSModulePath\&quot; ; Import-Module Umbraco.Build -Force -DisableNameChecking ; build-umbraco compile-belle }&quot;" />
   </Target>
-  
   <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
 </Project>

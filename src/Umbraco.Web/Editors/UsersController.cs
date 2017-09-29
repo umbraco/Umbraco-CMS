@@ -550,18 +550,27 @@ namespace Umbraco.Web.Editors
 
             // if the found user has his email for username, we want to keep this synced when changing the email.
             // we have already cross-checked above that the email isn't colliding with anything, so we can safely assign it here.
-            if (found.Username == found.Email && userSave.Username != userSave.Email)
+            if (UmbracoConfig.For.UmbracoSettings().Security.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
             {
                 userSave.Username = userSave.Email;
             }
             
             if (userSave.ChangePassword != null)
             {
-                var passwordChanger = new PasswordChanger(Logger, Services.UserService);
+                var passwordChanger = new PasswordChanger(Logger, Services.UserService, UmbracoContext.HttpContext);
 
                 var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, userSave.ChangePassword, UserManager);
                 if (passwordChangeResult.Success)
                 {
+                    var userMgr = this.TryGetOwinContext().Result.GetBackOfficeUserManager();
+
+                    //raise the event - NOTE that the ChangePassword.Reset value here doesn't mean it's been 'reset', it means
+                    //it's been changed by a back office user
+                    if (userSave.ChangePassword.Reset.HasValue && userSave.ChangePassword.Reset.Value)
+                    {
+                        userMgr.RaisePasswordChangedEvent(intId.Result);
+                    }
+                    
                     //need to re-get the user 
                     found = Services.UserService.GetUserById(intId.Result);
                 }
