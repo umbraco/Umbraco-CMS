@@ -19,14 +19,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// </summary>
     public class NestedContentManyValueConverter : NestedContentValueConverterBase
     {
-        private readonly ConcurrentDictionary<Type, Func<object>> _listCtors = new ConcurrentDictionary<Type, Func<object>>();
+        private readonly ConcurrentDictionary<Type, Func<IList>> _listCtors = new ConcurrentDictionary<Type, Func<IList>>();
         private readonly ProfilingLogger _proflog;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NestedContentManyValueConverter"/> class.
         /// </summary>
-        public NestedContentManyValueConverter(IFacadeAccessor facadeAccessor, Lazy<IFacadeService> facadeService, IPublishedModelFactory publishedModelFactory, ProfilingLogger proflog)
-            : base(facadeAccessor, facadeService, publishedModelFactory)
+        public NestedContentManyValueConverter(IFacadeAccessor facadeAccessor, IPublishedModelFactory publishedModelFactory, ProfilingLogger proflog)
+            : base(facadeAccessor, publishedModelFactory)
         {
             _proflog = proflog;
         }
@@ -67,7 +67,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 if (objects.Count == 0)
                     return Enumerable.Empty<IPublishedElement>();
 
-                // fixme do NOT do it here!
+                // fixme do NOT do it here! + use the facade cache
                 var preValueCollection = NestedContentHelper.GetPreValuesCollectionByDataTypeId(propertyType.DataTypeId);
                 var contentTypes = preValueCollection.PreValuesAsDictionary["contentTypes"].Value;
                 IList elements;
@@ -80,10 +80,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     var ctor = _listCtors.GetOrAdd(type, t =>
                     {
                         var listType = typeof(List<>).MakeGenericType(t);
-                        return ReflectionUtilities.GetCtor<Func<object>>(listType);
+                        return ReflectionUtilities.EmitCtor<Func<IList>>(declaring: listType);
                     });
 
-                    elements = (IList) ctor();
+                    elements = ctor();
                 }
                 else
                 {

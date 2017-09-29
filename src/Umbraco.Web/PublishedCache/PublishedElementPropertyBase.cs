@@ -1,34 +1,49 @@
 ﻿using System;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PublishedCache
 {
-    internal abstract class PublishedElementPropertyBase : PublishedPropertyBase
+    internal class PublishedElementPropertyBase : PublishedPropertyBase
     {
         private readonly object _locko = new object();
         private readonly object _sourceValue;
+        private readonly IFacadeAccessor _facadeAccessor;
 
-        protected readonly IPublishedElement Set; // fixme rename
+        protected readonly IPublishedElement Element;
         protected readonly bool IsPreviewing;
         protected readonly bool IsMember;
 
         private bool _interInitialized;
         private object _interValue;
         private CacheValues _cacheValues;
+        private string _valuesCacheKey;
 
-        // initializes a published item property
-        protected PublishedElementPropertyBase(PublishedPropertyType propertyType, IPublishedElement set, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
+        // define constant - determines whether to use cache when previewing
+        // to store eg routes, property converted values, anything - caching
+        // means faster execution, but uses memory - not sure if we want it
+        // so making it configureable.
+        private const bool FullCacheWhenPreviewing = true;
+
+        public PublishedElementPropertyBase(PublishedPropertyType propertyType, IPublishedElement element, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null, IFacadeAccessor facadeAccessor = null)
             : base(propertyType, referenceCacheLevel)
         {
             _sourceValue = sourceValue;
-            Set = set;
+            _facadeAccessor = facadeAccessor;
+            Element = element;
             IsPreviewing = previewing;
             IsMember = propertyType.ContentType.ItemType == PublishedItemType.Member;
         }
 
-        public override bool HasValue => _sourceValue != null
-            && (!(_sourceValue is string) || string.IsNullOrWhiteSpace((string) _sourceValue) == false);
+        public override bool HasValue
+            => _sourceValue != null && (!(_sourceValue is string s) || !string.IsNullOrWhiteSpace(s));
+
+        // used to cache the CacheValues of this property
+        // ReSharper disable InconsistentlySynchronizedField
+        internal string ValuesCacheKey => _valuesCacheKey
+            ?? (_valuesCacheKey = PropertyCacheValues(Element.Key, PropertyTypeAlias, IsPreviewing));
+        // ReSharper restore InconsistentlySynchronizedField
 
         protected class CacheValues
         {
@@ -36,6 +51,11 @@ namespace Umbraco.Web.PublishedCache
             public object ObjectValue;
             public bool XPathInitialized;
             public object XPathValue;
+        }
+
+        public static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing)
+        {
+            return "Facade.Property.CacheValues[" + (previewing ? "D:" : "P:") + contentUid + ":" + typeAlias + "]";
         }
 
         private void GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
@@ -65,8 +85,18 @@ namespace Umbraco.Web.PublishedCache
             }
         }
 
-        protected abstract CacheValues GetSnapshotCacheValues();
-        protected abstract CacheValues GetFacadeCacheValues();
+        private ICacheProvider GetSnapshotCache()
+        {
+            // cache within the snapshot cache, unless previewing, then use the facade or
+            // snapshot cache (if we don't want to pollute the snapshot cache with short-lived
+            // data) depending on settings
+            // for members, always cache in the facade cache - never pollute snapshot cache
+            var facade = _facadeAccessor?.Facade;
+            if (facade == null) return null;
+            return (IsPreviewing == false || FullCacheWhenPreviewing) && IsMember == false
+                ? facade.SnapshotCache
+                : facade.FacadeCache;
+        }
 
         private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
         {
@@ -83,11 +113,13 @@ namespace Umbraco.Web.PublishedCache
                     break;
                 case PropertyCacheLevel.Snapshot:
                     // cache within the snapshot cache, depending...
-                    cacheValues = GetSnapshotCacheValues();
+                    var snapshotCache = GetSnapshotCache();
+                    cacheValues = (CacheValues) snapshotCache?.GetCacheItem(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
                     break;
                 case PropertyCacheLevel.Facade:
                     // cache within the facade cache
-                    cacheValues = GetFacadeCacheValues();
+                    var facadeCache = _facadeAccessor?.Facade?.FacadeCache;
+                    cacheValues = (CacheValues) facadeCache?.GetCacheItem(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
                     break;
                 default:
                     throw new InvalidOperationException("Invalid cache level.");
@@ -99,7 +131,7 @@ namespace Umbraco.Web.PublishedCache
         {
             if (_interInitialized) return _interValue;
 
-            _interValue = PropertyType.ConvertSourceToInter(Set, _sourceValue, IsPreviewing);
+            _interValue = PropertyType.ConvertSourceToInter(Element, _sourceValue, IsPreviewing);
             _interInitialized = true;
             return _interValue;
         }
@@ -110,14 +142,13 @@ namespace Umbraco.Web.PublishedCache
         {
             get
             {
+                GetCacheLevels(out var cacheLevel, out var referenceCacheLevel);
+
                 lock (_locko)
                 {
-                    GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel);
-
                     var cacheValues = GetCacheValues(cacheLevel);
                     if (cacheValues.ObjectInitialized) return cacheValues.ObjectValue;
-
-                    cacheValues.ObjectValue = PropertyType.ConvertInterToObject(Set, referenceCacheLevel, GetInterValue(), IsPreviewing);
+                    cacheValues.ObjectValue = PropertyType.ConvertInterToObject(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
                     cacheValues.ObjectInitialized = true;
                     return cacheValues.ObjectValue;
                 }
@@ -128,14 +159,13 @@ namespace Umbraco.Web.PublishedCache
         {
             get
             {
+                GetCacheLevels(out var cacheLevel, out var referenceCacheLevel);
+
                 lock (_locko)
                 {
-                    GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel);
-
                     var cacheValues = GetCacheValues(cacheLevel);
                     if (cacheValues.XPathInitialized) return cacheValues.XPathValue;
-
-                    cacheValues.XPathValue = PropertyType.ConvertInterToXPath(Set, referenceCacheLevel, GetInterValue(), IsPreviewing);
+                    cacheValues.XPathValue = PropertyType.ConvertInterToXPath(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
                     cacheValues.XPathInitialized = true;
                     return cacheValues.XPathValue;
                 }

@@ -29,7 +29,7 @@ namespace Umbraco.Core.Models.PublishedContent
         #region Properties
 
         /// <summary>
-        /// Gets the properties of the set.
+        /// Gets the properties of the element.
         /// </summary>
         /// <remarks>Contains one <c>IPublishedProperty</c> for each property defined for the content type, including
         /// inherited properties. Some properties may have no value.</remarks>

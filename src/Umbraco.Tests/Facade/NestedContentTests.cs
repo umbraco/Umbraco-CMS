@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Facade
                 .Setup(x => x.ModelTypeMap)
                 .Returns(new Dictionary<string, Type>
                 {
-                    { "contentN1", typeof (TestModel) }
+                    { "contentN1", typeof (TestElementModel) }
                 });
 
             // mocked model factory creates models
@@ -84,7 +84,7 @@ namespace Umbraco.Tests.Facade
                 .Returns((IPublishedElement element) =>
                 {
                     if (element.ContentType.Alias.InvariantEquals("contentN1"))
-                        return new TestModel(element);
+                        return new TestElementModel(element);
                     return element;
                 });
 
@@ -104,20 +104,10 @@ namespace Umbraco.Tests.Facade
                 .Setup(x => x.Facade)
                 .Returns(facade.Object);
 
-            var facadeService = new Mock<IFacadeService>();
-            //container.RegisterSingleton(f => facadeService.Object);
-
-            // mocked facade service creates element properties
-            facadeService
-                .Setup(x => x.CreateElementProperty(It.IsAny<PublishedPropertyType>(), It.IsAny<IPublishedElement>(), It.IsAny<bool>(), It.IsAny<PropertyCacheLevel>(), It.IsAny<object>()))
-                .Returns((PublishedPropertyType propertyType, IPublishedElement element, bool preview, PropertyCacheLevel referenceCacheLevel, object source)
-                    => new TestPublishedProperty(propertyType, element, preview, referenceCacheLevel, source));
-
-            var lazyFacadeService = new Lazy<IFacadeService>(() => facadeService.Object);
             var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
             {
-                new NestedContentSingleValueConverter(facadeAccessor.Object, lazyFacadeService, publishedModelFactory.Object, proflog),
-                new NestedContentManyValueConverter(facadeAccessor.Object, lazyFacadeService, publishedModelFactory.Object, proflog),
+                new NestedContentSingleValueConverter(facadeAccessor.Object, publishedModelFactory.Object, proflog),
+                new NestedContentManyValueConverter(facadeAccessor.Object, publishedModelFactory.Object, proflog),
             });
 
             var propertyType1 = new PublishedPropertyType("property1", 1, Constants.PropertyEditors.NestedContentAlias, converters);
@@ -146,7 +136,7 @@ namespace Umbraco.Tests.Facade
             (var contentType1, _) = CreateContentTypes();
 
             // nested single converter returns the proper value clr type TestModel, and cache level
-            Assert.AreEqual(typeof (TestModel), contentType1.GetPropertyType("property1").ClrType);
+            Assert.AreEqual(typeof (TestElementModel), contentType1.GetPropertyType("property1").ClrType);
             Assert.AreEqual(PropertyCacheLevel.Content, contentType1.GetPropertyType("property1").CacheLevel);
 
             var key = Guid.NewGuid();
@@ -160,8 +150,8 @@ namespace Umbraco.Tests.Facade
             var value = content.Value("property1");
 
             // nested single converter returns proper TestModel value
-            Assert.IsInstanceOf<TestModel>(value);
-            var valueM = (TestModel) value;
+            Assert.IsInstanceOf<TestElementModel>(value);
+            var valueM = (TestElementModel) value;
             Assert.AreEqual("foo", valueM.PropValue);
             Assert.AreEqual(keyA, valueM.Key);
         }
@@ -172,7 +162,7 @@ namespace Umbraco.Tests.Facade
             (_, var contentType2) = CreateContentTypes();
 
             // nested many converter returns the proper value clr type IEnumerable<TestModel>, and cache level
-            Assert.AreEqual(typeof (IEnumerable<TestModel>), contentType2.GetPropertyType("property2").ClrType);
+            Assert.AreEqual(typeof (IEnumerable<TestElementModel>), contentType2.GetPropertyType("property2").ClrType);
             Assert.AreEqual(PropertyCacheLevel.Content, contentType2.GetPropertyType("property2").CacheLevel);
 
             var key = Guid.NewGuid();
@@ -189,18 +179,17 @@ namespace Umbraco.Tests.Facade
 
             // nested many converter returns proper IEnumerable<TestModel> value
             Assert.IsInstanceOf<IEnumerable<IPublishedElement>>(value);
-            Assert.IsInstanceOf<IEnumerable<TestModel>>(value);
-            var valueM = ((IEnumerable<TestModel>) value).ToArray();
+            Assert.IsInstanceOf<IEnumerable<TestElementModel>>(value);
+            var valueM = ((IEnumerable<TestElementModel>) value).ToArray();
             Assert.AreEqual("foo", valueM[0].PropValue);
             Assert.AreEqual(keyA, valueM[0].Key);
             Assert.AreEqual("bar", valueM[1].PropValue);
             Assert.AreEqual(keyB, valueM[1].Key);
         }
 
-        // note: this class needs to be public enough, for the converters to be able to instanciate it
-        public class TestModel : PublishedElementModel
+        public class TestElementModel : PublishedElementModel
         {
-            public TestModel(IPublishedElement content)
+            public TestElementModel(IPublishedElement content)
                 : base(content)
             { }
 

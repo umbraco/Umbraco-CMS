@@ -214,7 +214,7 @@ namespace Umbraco.Core
             }
 
             // emit
-            return EmitCtor<TLambda>(declaring, args, returned, ctor);
+            return EmitCtor<TLambda>(declaring, args, ctor);
         }
 
         /// <summary>
@@ -249,7 +249,50 @@ namespace Umbraco.Core
                 ThrowInvalidLambda<TLambda>("ctor", declaring, args);
 
             // emit
-            return EmitCtor<TLambda>(declaring, args, declaring, ctor);
+            return EmitCtor<TLambda>(declaring, args, ctor);
+        }
+
+        /// <summary>
+        /// Emits a constructor.
+        /// </summary>
+        /// <typeparam name="TLambda">A lambda representing the constructor.</typeparam>
+        /// <param name="ctor">The constructor info.</param>
+        /// <returns>A constructor function.</returns>
+        /// <remarks>
+        /// <para>The constructor is emitted in an unsafe way, using the lambda arguments without verifying
+        /// them at all. This assumes that the calling code is taking care of all verifications, in order
+        /// to avoid cast errors.</para>
+        /// </remarks>
+        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TLambda"/> is not a Func or when its generic
+        /// arguments do not match those of <paramref name="ctor"/>.</exception>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="ctor"/> is null.</exception>
+        public static TLambda EmitCtorUnsafe<TLambda>(ConstructorInfo ctor)
+        {
+            if (ctor == null)
+                throw new ArgumentNullException(nameof(ctor));
+
+            // get type and args
+            var declaring = ctor.DeclaringType;
+            var module = declaring?.Module;
+            if (module == null)
+                throw new ArgumentException("Failed to get ctor's declaring type module.", nameof(ctor));
+
+            // validate lambda type
+            ValidateCtorLambda<TLambda>();
+
+            // unsafe - use lambda's args and assume they are correct
+            //var args = ctor.GetParameters().Select(x => x.ParameterType).ToArray();
+            var genArgs = typeof(TLambda).GetGenericArguments();
+            var args = new Type[genArgs.Length - 1];
+            Array.Copy(genArgs, 0, args, 0, args.Length);
+
+            // emit
+            var dm = new DynamicMethod(string.Empty, declaring, args, module, true);
+            var ilgen = dm.GetILGenerator();
+            EmitLdargs(ilgen, args.Length);
+            ilgen.Emit(OpCodes.Newobj, ctor); // ok to just return, it's only objects
+            ilgen.Emit(OpCodes.Ret);
+            return (TLambda) (object) dm.CreateDelegate(typeof(TLambda));
         }
 
         private static void ValidateCtorLambda<TLambda>()
@@ -260,9 +303,9 @@ namespace Umbraco.Core
                 throw new ArgumentException($"Lambda {typeLambda} is not a Func.", nameof(TLambda));
         }
 
-        private static TLambda EmitCtor<TLambda>(Type declaring, Type[] args, Type returned, ConstructorInfo ctor)
+        private static TLambda EmitCtor<TLambda>(Type declaring, Type[] args, ConstructorInfo ctor)
         {
-            var dm = new DynamicMethod(string.Empty, returned, args, declaring.Module, true);
+            var dm = new DynamicMethod(string.Empty, declaring, args, declaring.Module, true);
             var ilgen = dm.GetILGenerator();
             EmitLdargs(ilgen, args.Length);
             ilgen.Emit(OpCodes.Newobj, ctor); // ok to just return, it's only objects

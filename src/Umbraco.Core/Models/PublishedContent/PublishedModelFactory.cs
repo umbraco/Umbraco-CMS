@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models.PublishedContent
         private class ModelInfo
         {
             public Type ParameterType { get; set; }
-            public Func<IPublishedElement, IPublishedElement> Ctor { get; set; }
+            public Func<object, object> Ctor { get; set; }
             public Type ModelType { get; set; }
         }
 
@@ -69,8 +69,9 @@ namespace Umbraco.Core.Models.PublishedContent
                 if (modelInfos.TryGetValue(typeName, out var modelInfo))
                     throw new InvalidOperationException($"Both types {type.FullName} and {modelInfo.ModelType.FullName} want to be a model type for content type with alias \"{typeName}\".");
 
-                var ctorFunc = ReflectionUtilities.EmitCtor<Func<IPublishedElement, IPublishedElement>>(constructor);
-                modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, ModelType = type, Ctor = ctorFunc };
+                // have to use an unsafe ctor because we don't know the types, really
+                var modelCtor = ReflectionUtilities.EmitCtorUnsafe<Func<object, object>>(constructor);
+                modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, ModelType = type, Ctor = modelCtor };
                 ModelTypeMap[typeName] = type;
             }
 
@@ -90,7 +91,8 @@ namespace Umbraco.Core.Models.PublishedContent
             if (modelInfo.ParameterType.IsAssignableFrom(element.GetType()) == false)
                 throw new InvalidOperationException($"Model {modelInfo.ModelType} expects argument of type {modelInfo.ParameterType.FullName}, but got {element.GetType().FullName}.");
 
-            return modelInfo.Ctor(element);
+            // can cast, because we checked when creating the ctor
+            return (IPublishedElement) modelInfo.Ctor(element);
         }
     }
 }

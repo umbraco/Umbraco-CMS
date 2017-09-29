@@ -139,15 +139,13 @@ namespace Umbraco.Tests.PublishedContent
                     WriterName = "Shannon",
                     Parent = null,
                     Level = 1,
-                    Properties = new Collection<IPublishedProperty>(
-                        new List<IPublishedProperty>()
-                            {
-                                // PropertyResult is gone, this should be done differently
-                                //new PropertyResult("property1", "value" + indexVals, PropertyResultType.UserProperty),
-                                //new PropertyResult("property2", "value" + (indexVals + 1), PropertyResultType.UserProperty)
-                            }),
                     Children = new List<IPublishedContent>()
                 };
+            d.Properties = new Collection<IPublishedProperty>(new List<IPublishedProperty>
+            {
+                new RawValueProperty(new PublishedPropertyType("property1", ""), d, "value" + indexVals),
+                new RawValueProperty(new PublishedPropertyType("property2", ""), d, "value" + (indexVals + 1))
+            });
             if (createChildren)
             {
                 d.Children = new List<IPublishedContent>()
@@ -158,16 +156,17 @@ namespace Umbraco.Tests.PublishedContent
                     };
             }
 
-            // PropertyResult is gone, this should be done differently
-            //if (!createChildren)
-            //{
-            //    //create additional columns, used to test the different columns for child nodes
-            //    ((Collection<IPublishedProperty>)d.Properties).Add(new PropertyResult("property4", "value" + (indexVals + 2), PropertyResultType.UserProperty));
-            //}
-            //else
-            //{
-            //    ((Collection<IPublishedProperty>)d.Properties).Add(new PropertyResult("property3", "value" + (indexVals + 2), PropertyResultType.UserProperty));
-            //}
+            if (!createChildren)
+            {
+                //create additional columns, used to test the different columns for child nodes
+                ((Collection<IPublishedProperty>) d.Properties).Add(
+                    new RawValueProperty(new PublishedPropertyType("property4", ""), d, "value" + (indexVals + 2)));
+            }
+            else
+            {
+                ((Collection<IPublishedProperty>) d.Properties).Add(
+                    new RawValueProperty(new PublishedPropertyType("property3", ""), d, "value" + (indexVals + 2)));
+            }
             return d;
         }
 

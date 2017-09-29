@@ -151,31 +151,5 @@ namespace Umbraco.Web.PublishedCache
         void Notify(DomainCacheRefresher.JsonPayload[] payloads);
 
         #endregion
-
-        #region Published Element
-
-        /// <summary>
-        /// Creates a published element.
-        /// </summary>
-        /// <param name="contentType">The content type.</param>
-        /// <param name="key">The set key.</param>
-        /// <param name="values">Raw values for properties.</param>
-        /// <param name="previewing">A value indicating whether previewing.</param>
-        /// <param name="referenceCacheLevel">The reference cache level.</param>
-        /// <returns>A property set.</returns>
-        IPublishedElement CreateSet(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing, PropertyCacheLevel referenceCacheLevel);
-
-        /// <summary>
-        /// Creates a published property for a published element.
-        /// </summary>
-        /// <param name="propertyType">The property type.</param>
-        /// <param name="element">The published element.</param>
-        /// <param name="previewing">A value indicating whether previewing.</param>
-        /// <param name="referenceCacheLevel">The reference cache level.</param>
-        /// <param name="sourceValue">The source value.</param>
-        /// <returns>A set property.</returns>
-        IPublishedProperty CreateElementProperty(PublishedPropertyType propertyType, IPublishedElement element, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
-
-        #endregion
     }
 }

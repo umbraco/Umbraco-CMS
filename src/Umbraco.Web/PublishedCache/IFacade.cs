@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Web.PublishedCache
 {
@@ -26,6 +27,16 @@ namespace Umbraco.Web.PublishedCache
         /// Gets the <see cref="IDomainCache"/>.
         /// </summary>
         IDomainCache DomainCache { get; }
+
+        /// <summary>
+        /// Gets the facade cache.
+        /// </summary>
+        ICacheProvider FacadeCache { get; }
+
+        /// <summary>
+        /// Gets the snapshot cache.
+        /// </summary>
+        ICacheProvider SnapshotCache { get; }
 
         /// <summary>
         /// Forces the facade preview mode.

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
@@ -29,6 +30,10 @@ namespace Umbraco.Tests.PublishedContent
 
         public void Resync()
         { }
+
+        public ICacheProvider FacadeCache => null;
+
+        public ICacheProvider SnapshotCache => null;
     }
 
     class SolidPublishedContentCache : PublishedCacheBase, IPublishedContentCache, IPublishedMediaCache

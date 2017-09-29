@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 
@@ -26,26 +27,25 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             DomainCache = domainCache;
         }
 
-        /// <summary>
-        /// Gets the <see cref="IPublishedContentCache"/>.
-        /// </summary>
+        /// <inheritdoc />
         public IPublishedContentCache ContentCache { get; }
 
-        /// <summary>
-        /// Gets the <see cref="IPublishedMediaCache"/>.
-        /// </summary>
+        /// <inheritdoc />
         public IPublishedMediaCache MediaCache { get; }
 
-        /// <summary>
-        /// Gets the <see cref="IPublishedMemberCache"/>.
-        /// </summary>
+        /// <inheritdoc />
         public IPublishedMemberCache MemberCache { get; }
 
-        /// <summary>
-        /// Gets the <see cref="IDomainCache"/>.
-        /// </summary>
+        /// <inheritdoc />
         public IDomainCache DomainCache { get; }
 
+        /// <inheritdoc />
+        public ICacheProvider FacadeCache => null;
+
+        /// <inheritdoc />
+        public ICacheProvider SnapshotCache => null;
+
+        /// <inheritdoc />
         public IDisposable ForcedPreview(bool preview, Action<bool> callback = null)
         {
             // the XML cache does not support forcing preview, really, so, just pretend...

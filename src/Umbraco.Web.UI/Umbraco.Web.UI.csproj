@@ -35,6 +35,7 @@
     <IntermediateOutputPath>..\bin\Debug\</IntermediateOutputPath>
     <PackageAsSingleFile>true</PackageAsSingleFile>
     <DesktopBuildPackageLocation>..\Package\Umbraco.Web.UI.zip</DesktopBuildPackageLocation>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -47,6 +48,7 @@
     <DocumentationFile>bin\Umbraco.Web.UI.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
     <IntermediateOutputPath>..\bin\Release\</IntermediateOutputPath>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AutoMapper, Version=6.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">

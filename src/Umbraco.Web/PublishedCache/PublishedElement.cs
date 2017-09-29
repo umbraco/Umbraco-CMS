@@ -19,9 +19,14 @@ namespace Umbraco.Web.PublishedCache
         // initializes a new instance of the PublishedElement class
         // within the context of a facade service (eg a published content property value)
         public PublishedElement(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing,
-            IFacadeService facadeService, PropertyCacheLevel referenceCacheLevel)
+            PropertyCacheLevel referenceCacheLevel, IFacadeAccessor facadeAccessor)
         {
-            ContentType = contentType;
+            if (key == Guid.Empty) throw new ArgumentException("Empty guid.");
+            if (values == null) throw new ArgumentNullException(nameof(values));
+            if (referenceCacheLevel != PropertyCacheLevel.None && facadeAccessor == null)
+                throw new ArgumentNullException("A facade accessor is required when referenceCacheLevel != None.", nameof(facadeAccessor));
+
+            ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             Key = key;
 
             values = GetCaseInsensitiveValueDictionary(values);
@@ -30,35 +35,20 @@ namespace Umbraco.Web.PublishedCache
                 .PropertyTypes
                 .Select(propertyType =>
                 {
-                    values.TryGetValue(propertyType.PropertyTypeAlias, out object value);
-                    return facadeService.CreateElementProperty(propertyType, this, previewing, referenceCacheLevel, value);
+                    values.TryGetValue(propertyType.PropertyTypeAlias, out var value);
+                    return (IPublishedProperty) new PublishedElementPropertyBase(propertyType, this, previewing, referenceCacheLevel, value, facadeAccessor);
                 })
                 .ToArray();
         }
 
         // initializes a new instance of the PublishedElement class
         // without any context, so it's purely 'standalone' and should NOT interfere with the facade service
+        // + using an initial reference cache level of .None ensures that everything will be
+        // cached at .Content level - and that reference cache level will propagate to all
+        // properties
         public PublishedElement(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing)
-        {
-            ContentType = contentType;
-            Key = key;
-
-            values = GetCaseInsensitiveValueDictionary(values);
-
-            // using an initial reference cache level of .None ensures that everything will be
-            // cached at .Content level - and that reference cache level will propagate to all
-            // properties
-            const PropertyCacheLevel cacheLevel = PropertyCacheLevel.None;
-
-            _propertiesArray = contentType
-                .PropertyTypes
-                .Select(propertyType =>
-                {
-                    values.TryGetValue(propertyType.PropertyTypeAlias, out object value);
-                    return (IPublishedProperty) new PublishedElementProperty(propertyType, this, previewing, cacheLevel, value);
-                })
-                .ToArray();
-        }
+            : this(contentType, key, values, previewing, PropertyCacheLevel.None, null)
+        { }
 
         private static Dictionary<string, object> GetCaseInsensitiveValueDictionary(Dictionary<string, object> values)
         {

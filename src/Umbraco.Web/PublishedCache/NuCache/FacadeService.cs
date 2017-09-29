@@ -18,12 +18,10 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
@@ -1530,15 +1528,6 @@ AND cmsContentNu.nodeId IS NULL
             var contentCollect = _contentStore.CollectAsync();
             var mediaCollect = _mediaStore.CollectAsync();
             System.Threading.Tasks.Task.WaitAll(contentCollect, mediaCollect);
-        }
-
-        #endregion
-
-        #region Published Element
-
-        public override IPublishedProperty CreateElementProperty(PublishedPropertyType propertyType, IPublishedElement element, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
-        {
-            return new PublishedElementProperty(FacadeAccessor, propertyType, element, previewing, referenceCacheLevel, sourceValue);
         }
 
         #endregion

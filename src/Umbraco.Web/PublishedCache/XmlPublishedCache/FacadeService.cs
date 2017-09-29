@@ -237,15 +237,5 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         }
 
         #endregion
-
-        #region Property Set
-
-        public override IPublishedProperty CreateElementProperty(PublishedPropertyType propertyType, IPublishedElement element, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null)
-        {
-            // fixme - ouch?
-            throw new NotImplementedException();
-        }
-
-        #endregion
     }
 }

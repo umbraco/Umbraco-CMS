@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 
@@ -25,14 +23,9 @@ namespace Umbraco.Web.PropertyEditors
                 string.Concat(CacheKeyPrefix, id));
         }
 
-        public static string GetElementTypeAlias(JObject item)
-        {
-            return item[NestedContentPropertyEditor.ContentTypeAliasPropertyKey]?.ToObject<string>();
-        }
-
         public static IContentType GetElementType(JObject item)
         {
-            var contentTypeAlias = GetElementTypeAlias(item);
+            var contentTypeAlias = item[NestedContentPropertyEditor.ContentTypeAliasPropertyKey]?.ToObject<string>();
             return string.IsNullOrEmpty(contentTypeAlias)
                 ? null
                 : Current.Services.ContentTypeService.Get(contentTypeAlias);

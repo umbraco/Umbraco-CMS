@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Umbraco.Core.Composing;
+﻿using System.Collections.Generic;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.PublishedCache
@@ -24,17 +20,6 @@ namespace Umbraco.Web.PublishedCache
         protected IFacade CurrentFacade => FacadeAccessor.Facade;
 
         public abstract bool EnsureEnvironment(out IEnumerable<string> errors);
-
-        public virtual IPublishedElement CreateSet(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing, PropertyCacheLevel referenceCacheLevel)
-        {
-            var set = new PublishedElement(contentType, key, values, previewing, this, referenceCacheLevel);
-            var model = Current.PublishedModelFactory.CreateModel(set);
-            if (model == null)
-                throw new Exception("Factory returned null.");
-            return model;
-        }
-
-        public abstract IPublishedProperty CreateElementProperty(PublishedPropertyType propertyType, IPublishedElement element, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null);
 
         public abstract string EnterPreview(IUser user, int contentId);
         public abstract void RefreshPreview(string previewToken, int contentId);

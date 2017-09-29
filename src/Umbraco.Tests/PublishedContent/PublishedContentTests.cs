@@ -556,7 +556,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var pt = new PublishedPropertyType("detached", Constants.PropertyEditors.IntegerAlias);
             var ct = new PublishedContentType(0, "alias", new[] { pt });
-            var prop = new PublishedElementProperty(pt, null, false, PropertyCacheLevel.None, 5548);
+            var prop = new PublishedElementPropertyBase(pt, null, false, PropertyCacheLevel.None, 5548);
             Assert.IsInstanceOf<int>(prop.Value);
             Assert.AreEqual(5548, prop.Value);
         }

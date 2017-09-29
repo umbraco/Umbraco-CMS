@@ -40,6 +40,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -49,6 +50,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AutoMapper, Version=6.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
@@ -222,7 +224,10 @@
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
+    <Compile Include="Facade\FacadeTestObjects.cs" />
+    <Compile Include="Facade\ModelTypeTests.cs" />
     <Compile Include="Facade\NestedContentTests.cs" />
+    <Compile Include="Facade\PropertyCacheLevelTests.cs" />
     <Compile Include="Misc\DateTimeExtensionsTests.cs" />
     <Compile Include="Misc\HashGeneratorTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
@@ -237,7 +242,7 @@
     <Compile Include="Persistence\Repositories\EntityRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
     <Compile Include="Persistence\Repositories\UserGroupRepositoryTest.cs" />
-    <Compile Include="PublishedContent\ModelsAndConvertersTests.cs" />
+    <Compile Include="Facade\ConvertersTests.cs" />
     <Compile Include="Routing\NiceUrlRoutesTests.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests2.cs" />
     <Compile Include="Scoping\EventNameExtractorTests.cs" />

@@ -20,6 +20,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,6 +31,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Umbraco.Web.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -255,9 +257,7 @@
     <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MediaPickerLegacyValueConverter.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheComponent.cs" />
-    <Compile Include="PublishedCache\NuCache\PublishedElementProperty.cs" />
     <Compile Include="PublishedCache\PublishedElement.cs" />
-    <Compile Include="PublishedCache\PublishedElementProperty.cs" />
     <Compile Include="PublishedCache\PublishedElementPropertyBase.cs" />
     <Compile Include="Models\Trees\DisableUser.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ContentPickerValueConverter.cs" />
