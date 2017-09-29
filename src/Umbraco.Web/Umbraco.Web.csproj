@@ -10,6 +10,7 @@
     <RootNamespace>Umbraco.Web</RootNamespace>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -1690,4 +1691,57 @@
     </WebReferenceUrl>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  
+  <!--
+    copied from Microsoft.CSharp.targets
+    because we have webservices, we need to SGEN
+    but it's getting confused by us referencing System.ValueTuple which it cannot load
+    
+      Name="UmbGenerateSerializationAssemblies"
+      Condition="'$(_SGenGenerateSerializationAssembliesConfig)' == 'On' or ('@(WebReferenceUrl)'!='' and '$(_SGenGenerateSerializationAssembliesConfig)' == 'Auto')"
+  -->
+  <Target
+        Name="AfterBuild"
+        DependsOnTargets="AssignTargetPaths;Compile;ResolveKeySource"
+        Inputs="$(MSBuildAllProjects);@(IntermediateAssembly)"
+        Outputs="$(IntermediateOutputPath)$(_SGenDllName)">
+
+    <PropertyGroup>
+      <SGenMSBuildArchitecture Condition="'$(SGenMSBuildArchitecture)' == ''">$(PlatformTargetAsMSBuildArchitecture)</SGenMSBuildArchitecture>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple'" />
+    </ItemGroup>
+
+    <Delete
+        Files="$(TargetDir)$(TargetName).XmlSerializers.dll"
+        ContinueOnError="true" />
+     
+     <!--
+     ShouldGenerateSerializer="$(SGenShouldGenerateSerializer)"
+     -->
+    <SGen
+        BuildAssemblyName="$(TargetFileName)"
+        BuildAssemblyPath="$(IntermediateOutputPath)"
+        References="@(FixedReferencePath)"
+        ShouldGenerateSerializer="true"
+        UseProxyTypes="$(SGenUseProxyTypes)"
+        UseKeep="$(SGenUseKeep)"
+        KeyContainer="$(KeyContainerName)"
+        KeyFile="$(KeyOriginatorFile)"
+        DelaySign="$(DelaySign)"
+        ToolPath="$(SGenToolPath)"
+        SdkToolsPath="$(TargetFrameworkSDKToolsDirectory)"
+        EnvironmentVariables="$(SGenEnvironment)"
+        MSBuildArchitecture="$(SGenMSBuildArchitecture)"
+        SerializationAssembly="$(IntermediateOutputPath)$(_SGenDllName)"
+        Platform="$(SGenPlatformTarget)"
+        Types="$(SGenSerializationTypes)">
+
+      <Output TaskParameter="SerializationAssembly" ItemName="SerializationAssembly"/>
+
+    </SGen>
+
+  </Target>
 </Project>

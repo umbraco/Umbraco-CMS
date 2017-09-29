@@ -218,12 +218,12 @@ function Compile-Umbraco
     /p:OutDir=$tmp\bin\\ `
     /p:WebProjectOutputDir=$tmp\WebApp\\ `
     /p:Verbosity=minimal `
-    /t:Clean`;Rebuild `
+    /t:Rebuild `
     /tv:$toolsVersion `
     /p:UmbracoBuild=True `
     > $tmp\msbuild.compat7.log
 
-  # /p:UmbracoBuild tells the csproj that we are building from PS
+  # /p:UmbracoBuild tells the csproj that we are building from PS, not VS
 }
 
 #

@@ -23,9 +23,5 @@
     <!--
     <file src="..\_BuildOutput\bin\Umbraco.Compat7.xml" target="lib\Umbraco.Compat7.xml" />
     -->
-
-    <!-- produce symbols package -->
-    <file src="$BuildTmp$\bin\Umbraco.Compat7.pdb" target="lib" />
-    <file src="$BuildTmp$\..\src\Umbraco.Compat7\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.Compat7" />
   </files>
 </package>
