@@ -1469,6 +1469,17 @@ Mange hilsner fra Umbraco robotten
     <key alias="permissionsGranularHelp">Sæt rettigheder for specifikke noder</key>
     <key alias="profile">Profil</key>
     <key alias="searchAllChildren">Søg alle 'børn'</key>
+    <key alias="startnode">Start node</key>
+    <key alias="stateActive">Aktiv</key>
+    <key alias="stateAll">Alle</key>
+    <key alias="stateDisabled">Deaktiveret</key>
+    <key alias="stateLockedOut">Låst ude</key>
+    <key alias="stateInvited">Inviteret</key>
+    <key alias="sortNameAscending">Navn (A-Å)</key>
+    <key alias="sortNameDescending">Navn (Å-A)</key>
+    <key alias="sortCreateDateDescending">Nyeste</key>
+    <key alias="sortCreateDateAscending">Ældste</key>
+    <key alias="sortLastLoginDateDescending">Senest login</key>
     <key alias="sectionsHelp">Tilføj sektioner for at give brugerne adgang</key>
     <key alias="selectUserGroups">Vælg brugergrupper</key>
     <key alias="noStartNode">Ingen startnode valgt</key>
