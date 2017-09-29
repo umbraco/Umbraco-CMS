@@ -1723,6 +1723,16 @@
     <key alias="sectionsHelp">Разделы, доступные пользователю</key>
     <key alias="noStartNode">Начальный узел не задан</key>
     <key alias="noStartNodes">Начальные узлы не заданы</key>
+    <key alias="sortNameAscending">Имя (А-Я)</key>
+    <key alias="sortNameDescending">Имя (Я-А)</key>
+    <key alias="sortCreateDateDescending">Сначала новые</key>
+    <key alias="sortCreateDateAscending">Сначала старые</key>
+    <key alias="sortLastLoginDateDescending">Недавно зашедшие</key>
+    <key alias="stateActive">Активные</key>
+    <key alias="stateAll">Все</key>
+    <key alias="stateDisabled">Отключенные</key>
+    <key alias="stateLockedOut">Заблокированные</key>
+    <key alias="stateInvited">Приглашенные</key>
     <key alias="startnode">Начальный узел содержимого</key>
     <key alias="startnodehelp">Можно ограничить доступ к дереву содержимого (какой-либо его части), задав начальный узел</key>
     <key alias="startnodes">Начальные узлы содержимого</key>
