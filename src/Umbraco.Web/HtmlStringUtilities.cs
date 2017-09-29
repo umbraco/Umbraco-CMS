@@ -92,6 +92,8 @@ namespace Umbraco.Web
 
             using (var outputms = new MemoryStream())
             {
+                bool lengthReached = false;
+
                 using (var outputtw = new StreamWriter(outputms))
                 {
                     using (var ms = new MemoryStream())
@@ -106,7 +108,6 @@ namespace Umbraco.Web
                             using (TextReader tr = new StreamReader(ms))
                             {
                                 bool isInsideElement = false,
-                                    lengthReached = false,
                                     insideTagSpaceEncountered = false,
                                     isTagClose = false;
 
@@ -254,10 +255,15 @@ namespace Umbraco.Web
 
                         //Check to see if there is an empty char between the hellip and the output string
                         //if there is, remove it
-                        if (string.IsNullOrWhiteSpace(firstTrim) == false)
+                        if (addElipsis && lengthReached && string.IsNullOrWhiteSpace(firstTrim) == false)
                         {
                             result = firstTrim[firstTrim.Length - hellip.Length - 1] == ' ' ? firstTrim.Remove(firstTrim.Length - hellip.Length - 1, 1) : firstTrim;
                         }
+                        else
+                        {
+                            result = firstTrim;
+                        }
+
                         return new HtmlString(result);
                     }
                 }
