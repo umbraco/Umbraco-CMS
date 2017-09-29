@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, usersResource, userGroupsResource, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper) {
+    function UsersController($scope, $timeout, $location, usersResource, userGroupsResource, userService, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -596,7 +596,10 @@
                         dateVal = moment(user.lastLoginDate, "YYYY-MM-DD HH:mm:ss");
                     }
 
-                    user.formattedLastLogin = dateVal.format("MMMM Do YYYY, HH:mm");
+                    // get current backoffice user and format date
+                    userService.getCurrentUser().then(function (currentUser) {
+                        user.formattedLastLogin = dateVal.locale(currentUser.locale).format("LLL");
+                    });
                 }
             });
         }

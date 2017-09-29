@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, $timeout, $location, $routeParams, formHelper, usersResource, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper) {
+    function UserEditController($scope, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper) {
 
         var vm = this;
 
@@ -92,7 +92,7 @@
             });
         }
         
-        function getLocalDate(date, format) {
+        function getLocalDate(date, culture, format) {
             if(date) {
                 var dateVal;
                 var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
@@ -105,7 +105,7 @@
                     dateVal = moment(date, "YYYY-MM-DD HH:mm:ss");
                 }
 
-                return dateVal.format(format);
+                return dateVal.locale(culture).format(format);
             }
         }
 
@@ -393,11 +393,14 @@
         }
 
         function formatDatesToLocal(user) {
-            user.formattedLastLogin = getLocalDate(user.lastLoginDate, "MMMM Do YYYY, HH:mm");
-            user.formattedLastLockoutDate = getLocalDate(user.lastLockoutDate, "MMMM Do YYYY, HH:mm");
-            user.formattedCreateDate = getLocalDate(user.createDate, "MMMM Do YYYY, HH:mm");
-            user.formattedUpdateDate = getLocalDate(user.updateDate, "MMMM Do YYYY, HH:mm");
-            user.formattedLastPasswordChangeDate = getLocalDate(user.lastPasswordChangeDate, "MMMM Do YYYY, HH:mm");
+            // get current backoffice user and format dates
+            userService.getCurrentUser().then(function (currentUser) {
+                user.formattedLastLogin = getLocalDate(user.lastLoginDate, currentUser.locale, "LLL");
+                user.formattedLastLockoutDate = getLocalDate(user.lastLockoutDate, currentUser.locale, "LLL");
+                user.formattedCreateDate = getLocalDate(user.createDate, currentUser.locale, "LLL");
+                user.formattedUpdateDate = getLocalDate(user.updateDate, currentUser.locale, "LLL");
+                user.formattedLastPasswordChangeDate = getLocalDate(user.lastPasswordChangeDate, currentUser.locale, "LLL");
+            });
         }
 
         init();
