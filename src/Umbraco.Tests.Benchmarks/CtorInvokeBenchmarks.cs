@@ -38,6 +38,7 @@ namespace Umbraco.Tests.Benchmarks
         private Func<IFoo, IFoo> _expressionMethod2;
         private Func<IFoo, IFoo> _expressionMethod3;
         private Func<IFoo, IFoo> _expressionMethod4;
+        private Func<IFoo, IFoo> _emittedCtor;
 
         [Setup]
         public void Setup()
@@ -138,10 +139,12 @@ namespace Umbraco.Tests.Benchmarks
             //_expressionMethod3 = (Func<IFoo, IFoo>) Delegate.CreateDelegate(typeof (Func<IFoo, IFoo>), _expressionMethod.Method);
 
             // but, our utilities know how to do it!
-            _expressionMethod3 = expr.CompileToDelegate();
+            _expressionMethod3 = ReflectionUtilities.CompileToDelegate(expr);
             _expressionMethod4 = ReflectionUtilities.GetCtor<Foo, IFoo>();
 
             // however, unfortunately, the generated "compiled to delegate" code cannot access private stuff :(
+
+            _emittedCtor = ReflectionUtilities.EmitCtor<Func<IFoo, Foo>>();
         }
 
         public IFoo IlCtor(IFoo foo)
@@ -189,6 +192,12 @@ namespace Umbraco.Tests.Benchmarks
         public void Expression4Ctor()
         {
             var foo = _expressionMethod4(_foo);
+        }
+
+        [Benchmark]
+        public void EmittedCtor()
+        {
+            var foo = _emittedCtor(_foo);
         }
 
         public interface IFoo

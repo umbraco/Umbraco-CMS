@@ -4,194 +4,499 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core
 {
     /// <summary>
     /// Provides utilities to simplify reflection.
     /// </summary>
+    /// <remarks>
+    /// <para>Readings:
+    /// * CIL instructions: https://en.wikipedia.org/wiki/List_of_CIL_instructions
+    /// * ECMA 335: https://www.ecma-international.org/publications/files/ECMA-ST/ECMA-335.pdf
+    /// * MSIL programming: http://www.blackbeltcoder.com/Articles/net/msil-programming-part-1
+    /// </para>
+    /// <para>Supports emitting constructors, instance and static methods, instance property getters and
+    /// setters. Does not support static properties yet.</para>
+    /// </remarks>
     public static class ReflectionUtilities
     {
-        public const AssemblyBuilderAccess DefaultAssemblyBuilderAccess = AssemblyBuilderAccess.Run;
-        public const AssemblyBuilderAccess NoAssembly = 0;
-
-        public static Func<TInstance, TValue> GetPropertyGetter<TInstance, TValue>(string propertyName)
+        /// <summary>
+        /// Emits a property getter.
+        /// </summary>
+        /// <typeparam name="TDeclaring">The declaring type.</typeparam>
+        /// <typeparam name="TValue">The property type.</typeparam>
+        /// <param name="propertyName">The name of the property.</param>
+        /// <param name="mustExist">A value indicating whether the property and its getter must exist.</param>
+        /// <returns>A property getter function. If <paramref name="mustExist"/> is <c>false</c>, returns null when the property or its getter does not exist.</returns>
+        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="propertyName"/> is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Occurs when the property or its getter does not exist.</exception>
+        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TValue"/> does not match the type of the property.</exception>
+        public static Func<TDeclaring, TValue> EmitPropertyGetter<TDeclaring, TValue>(string propertyName, bool mustExist = true)
         {
-            var type = typeof (TInstance);
-            var type0 = typeof (TValue);
-            var property = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (property == null || property.PropertyType != type0)
-                throw new InvalidOperationException($"Could not get property {type}.{propertyName} : {type0}.");
-            return GetPropertyGetter<TInstance, TValue>(property);
+            if (string.IsNullOrWhiteSpace(propertyName))
+                throw new ArgumentNullOrEmptyException(nameof(propertyName));
+
+            var property = typeof (TDeclaring).GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+            if (property == null || property.GetMethod == null)
+            {
+                if (!mustExist) return default;
+                throw new InvalidOperationException($"Could not find getter for {typeof(TDeclaring)}.{propertyName}.");
+            }
+
+            return EmitMethod<Func<TDeclaring, TValue>>(property.GetMethod);
         }
 
-        public static Action<TInstance, TValue> GetPropertySetter<TInstance, TValue>(string propertyName)
+        /// <summary>
+        /// Emits a property setter.
+        /// </summary>
+        /// <typeparam name="TDeclaring">The declaring type.</typeparam>
+        /// <typeparam name="TValue">The property type.</typeparam>
+        /// <param name="propertyName">The name of the property.</param>
+        /// <param name="mustExist">A value indicating whether the property and its setter must exist.</param>
+        /// <returns>A property setter function. If <paramref name="mustExist"/> is <c>false</c>, returns null when the property or its setter does not exist.</returns>
+        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="propertyName"/> is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Occurs when the property or its setter does not exist.</exception>
+        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TValue"/> does not match the type of the property.</exception>
+        public static Action<TDeclaring, TValue> EmitPropertySetter<TDeclaring, TValue>(string propertyName, bool mustExist = true)
         {
-            var type = typeof (TInstance);
-            var type0 = typeof (TValue);
-            var property = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (property == null || property.PropertyType != type0)
-                throw new InvalidOperationException($"Could not get property {type}.{propertyName} : {type0}.");
-            return GetPropertySetter<TInstance, TValue>(property);
+            if (string.IsNullOrWhiteSpace(propertyName))
+                throw new ArgumentNullOrEmptyException(nameof(propertyName));
+
+            var property = typeof(TDeclaring).GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+            if (property == null || property.SetMethod == null)
+            {
+                if (!mustExist) return default;
+                throw new InvalidOperationException($"Could not find setter for {typeof(TDeclaring)}.{propertyName}.");
+            }
+
+            return EmitMethod<Action<TDeclaring, TValue>>(property.SetMethod);
         }
 
-        public static void GetPropertyGetterSetter<TInstance, TValue>(string propertyName, out Func<TInstance, TValue> getter, out Action<TInstance, TValue> setter)
+        /// <summary>
+        /// Emits a property getter and setter.
+        /// </summary>
+        /// <typeparam name="TDeclaring">The declaring type.</typeparam>
+        /// <typeparam name="TValue">The property type.</typeparam>
+        /// <param name="propertyName">The name of the property.</param>
+        /// <param name="mustExist">A value indicating whether the property and its getter and setter must exist.</param>
+        /// <returns>A property getter and setter functions. If <paramref name="mustExist"/> is <c>false</c>, returns null when the property or its getter or setter does not exist.</returns>
+        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="propertyName"/> is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Occurs when the property or its getter or setter does not exist.</exception>
+        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TValue"/> does not match the type of the property.</exception>
+        public static (Func<TDeclaring, TValue>, Action<TDeclaring, TValue>) EmitPropertyGetterAndSetter<TDeclaring, TValue>(string propertyName, bool mustExist = true)
         {
-            var type = typeof (TInstance);
-            var type0 = typeof (TValue);
-            var property = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (property == null || property.PropertyType != type0)
-                throw new InvalidOperationException($"Could not get property {type}.{propertyName} : {type0}.");
-            getter = GetPropertyGetter<TInstance, TValue>(property);
-            setter = GetPropertySetter<TInstance, TValue>(property);
+            if (string.IsNullOrWhiteSpace(propertyName))
+                throw new ArgumentNullOrEmptyException(nameof(propertyName));
+
+            var property = typeof(TDeclaring).GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+            if (property == null || property.GetMethod == null || property.SetMethod == null)
+            {
+                if (!mustExist) return default;
+                throw new InvalidOperationException($"Could not find getter and/or setter for {typeof(TDeclaring)}.{propertyName}.");
+            }
+
+            return (
+                EmitMethod<Func<TDeclaring, TValue>>(property.GetMethod),
+                EmitMethod<Action<TDeclaring, TValue>>(property.SetMethod));
         }
 
-        public static Expression<Func<TInstance>> GetCtorExpr<TInstance>(bool mustExist = true)
+        /// <summary>
+        /// Emits a property getter.
+        /// </summary>
+        /// <typeparam name="TDeclaring">The declaring type.</typeparam>
+        /// <typeparam name="TValue">The property type.</typeparam>
+        /// <param name="propertyInfo">The property info.</param>
+        /// <returns>A property getter function.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="propertyInfo"/> is null.</exception>
+        /// <exception cref="ArgumentException">Occurs when the property has no getter.</exception>
+        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TValue"/> does not match the type of the property.</exception>
+        public static Func<TDeclaring, TValue> EmitPropertyGetter<TDeclaring, TValue>(PropertyInfo propertyInfo)
         {
-            var type = typeof (TInstance);
+            if (propertyInfo == null)
+                throw new ArgumentNullException(nameof(propertyInfo));
+
+            if (propertyInfo.GetMethod == null)
+                throw new ArgumentException("Property has no getter.", nameof(propertyInfo));
+
+            return EmitMethod<Func<TDeclaring, TValue>> (propertyInfo.GetMethod);
+        }
+
+        /// <summary>
+        /// Emits a property setter.
+        /// </summary>
+        /// <typeparam name="TDeclaring">The declaring type.</typeparam>
+        /// <typeparam name="TValue">The property type.</typeparam>
+        /// <param name="propertyInfo">The property info.</param>
+        /// <returns>A property setter function.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="propertyInfo"/> is null.</exception>
+        /// <exception cref="ArgumentException">Occurs when the property has no setter.</exception>
+        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TValue"/> does not match the type of the property.</exception>
+        public static Action<TDeclaring, TValue> EmitPropertySetter<TDeclaring, TValue>(PropertyInfo propertyInfo)
+        {
+            if (propertyInfo == null)
+                throw new ArgumentNullException(nameof(propertyInfo));
+
+            if (propertyInfo.SetMethod == null)
+                throw new ArgumentException("Property has no setter.", nameof(propertyInfo));
+
+            return EmitMethod<Action<TDeclaring, TValue>>(propertyInfo.SetMethod);
+        }
+
+        /// <summary>
+        /// Emits a property getter and setter.
+        /// </summary>
+        /// <typeparam name="TDeclaring">The declaring type.</typeparam>
+        /// <typeparam name="TValue">The property type.</typeparam>
+        /// <param name="propertyInfo">The property info.</param>
+        /// <returns>A property getter and setter functions.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="propertyInfo"/> is null.</exception>
+        /// <exception cref="ArgumentException">Occurs when the property has no getter or no setter.</exception>
+        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TValue"/> does not match the type of the property.</exception>
+        public static (Func<TDeclaring, TValue>, Action<TDeclaring, TValue>) EmitPropertyGetterAndSetter<TDeclaring, TValue>(PropertyInfo propertyInfo)
+        {
+            if (propertyInfo == null)
+                throw new ArgumentNullException(nameof(propertyInfo));
+
+            if (propertyInfo.GetMethod == null || propertyInfo.SetMethod == null)
+                throw new ArgumentException("Property has no getter and/or no setter.", nameof(propertyInfo));
+
+            return (
+                EmitMethod<Func<TDeclaring, TValue>>(propertyInfo.GetMethod),
+                EmitMethod<Action<TDeclaring, TValue>>(propertyInfo.SetMethod));
+        }
+
+        /// <summary>
+        /// Emits a constructor.
+        /// </summary>
+        /// <typeparam name="TLambda">A lambda representing the constructor.</typeparam>
+        /// <param name="mustExist">A value indicating whether the constructor must exist.</param>
+        /// <param name="declaring">The optional type of the class to construct.</param>
+        /// <returns>A constructor function. If <paramref name="mustExist"/> is <c>false</c>, returns null when the constructor does not exist.</returns>
+        /// <remarks>
+        /// <para>When <paramref name="declaring"/> is not specified, it is the type returned by <typeparamref name="TLambda"/>.</para>
+        /// <para>The constructor arguments are determined by <typeparamref name="TLambda"/> generic arguments.</para>
+        /// <para>The type returned by <typeparamref name="TLambda"/> does not need to be exactly <paramref name="declaring"/>,
+        /// when e.g. that type is not known at compile time, but it has to be a parent type (eg an interface, or <c>object</c>).</para>
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">Occurs when the constructor does not exist and <paramref name="mustExist"/> is <c>true</c>.</exception>
+        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TLambda"/> is not a Func or when <paramref name="declaring"/>
+        /// is specified and does not match the function's returned type.</exception>
+        public static TLambda EmitCtor<TLambda>(bool mustExist = true, Type declaring = null)
+        {
+            // validate lambda type
+            ValidateCtorLambda<TLambda>();
+
+            // get instance and arguments types
+            var genericArgs = typeof(TLambda).GetGenericArguments();
+            var args = new Type[genericArgs.Length - 1];
+            for (var i = 0; i < args.Length; i++)
+                args[i] = genericArgs[i];
+            var returned = genericArgs[args.Length];
+
+            if (declaring == null)
+                declaring = returned;
+            else if (!returned.IsAssignableFrom(declaring))
+                throw new ArgumentException($"Type {returned} is not assignable from type {declaring}.", nameof(declaring));
 
             // get the constructor infos
-            var ctor = type.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
-                null, Type.EmptyTypes, null);
+            var ctor = declaring.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
+                null, args, null);
 
             if (ctor == null)
             {
-                if (!mustExist) return null;
-                throw new InvalidOperationException($"Could not find constructor {type}.ctor().");                
+                if (!mustExist) return default;
+                throw new InvalidOperationException($"Could not find constructor {declaring}.ctor({string.Join(", ", (IEnumerable<Type>) args)}).");
             }
 
-            var exprNew = Expression.New(ctor);
-            return Expression.Lambda<Func<TInstance>>(exprNew);
+            // emit
+            return EmitCtor<TLambda>(declaring, args, returned, ctor);
         }
 
-        public static Expression<TLambda> GetCtorExpr<TLambda>(Type type, bool mustExist = true)
+        /// <summary>
+        /// Emits a constructor.
+        /// </summary>
+        /// <typeparam name="TLambda">A lambda representing the constructor.</typeparam>
+        /// <param name="ctor">The constructor info.</param>
+        /// <returns>A constructor function.</returns>
+        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TLambda"/> is not a Func or when its generic
+        /// arguments do not match those of <paramref name="ctor"/>.</exception>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="ctor"/> is null.</exception>
+        public static TLambda EmitCtor<TLambda>(ConstructorInfo ctor)
         {
-            // get the constructor infos
-            var ctor = type.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
-                null, Type.EmptyTypes, null);
-
             if (ctor == null)
+                throw new ArgumentNullException(nameof(ctor));
+
+            // get type and args
+            var declaring = ctor.DeclaringType;
+            var args = ctor.GetParameters().Select(x => x.ParameterType).ToArray();
+
+            // validate lambda type
+            ValidateCtorLambda<TLambda>();
+
+            // validate arguments
+            var genericArgs = typeof(TLambda).GetGenericArguments();
+            if (genericArgs.Length != args.Length + 1)
+                ThrowInvalidLambda<TLambda>("ctor", declaring, args);
+            for (var i = 0; i < args.Length; i++)
+                if (args[i] != genericArgs[i])
+                    ThrowInvalidLambda<TLambda>("ctor", declaring, args);
+            if (!genericArgs[args.Length].IsAssignableFrom(declaring))
+                ThrowInvalidLambda<TLambda>("ctor", declaring, args);
+
+            // emit
+            return EmitCtor<TLambda>(declaring, args, declaring, ctor);
+        }
+
+        private static void ValidateCtorLambda<TLambda>()
+        {
+            var typeLambda = typeof(TLambda);
+            var genericDefinition = typeLambda.IsGenericType ? typeLambda.GetGenericTypeDefinition() : null;
+            if (genericDefinition == null || genericDefinition.FullName == null || !genericDefinition.FullName.StartsWith("System.Func`"))
+                throw new ArgumentException($"Lambda {typeLambda} is not a Func.", nameof(TLambda));
+        }
+
+        private static TLambda EmitCtor<TLambda>(Type declaring, Type[] args, Type returned, ConstructorInfo ctor)
+        {
+            var dm = new DynamicMethod(string.Empty, returned, args, declaring.Module, true);
+            var ilgen = dm.GetILGenerator();
+            EmitLdargs(ilgen, args.Length);
+            ilgen.Emit(OpCodes.Newobj, ctor); // ok to just return, it's only objects
+            ilgen.Emit(OpCodes.Ret);
+            return (TLambda) (object) dm.CreateDelegate(typeof(TLambda));
+        }
+
+        private static void ValidateMethodLambda<TLambda>(out bool isFunction)
+        {
+            isFunction = false;
+
+            var typeLambda = typeof(TLambda);
+            var genericDefinition = typeLambda.IsGenericType ? typeLambda.GetGenericTypeDefinition() : null;
+
+            if (typeLambda.FullName == "System.Action")
+                return;
+
+            if (genericDefinition == null
+                || genericDefinition.FullName == null
+                || !genericDefinition.FullName.StartsWith("System.Func`") && !genericDefinition.FullName.StartsWith("System.Action`"))
+                throw new ArgumentException($"Lambda {typeLambda} is not a Func nor an Action.", nameof(TLambda));
+
+            isFunction = genericDefinition.FullName.StartsWith("System.Func`");
+        }
+
+        /// <summary>
+        /// Emits a method.
+        /// </summary>
+        /// <typeparam name="TLambda">A lambda representing the method.</typeparam>
+        /// <param name="method">The method info.</param>
+        /// <returns>The method.</returns>
+        /// <exception cref="ArgumentNullException">Occurs when <paramref name="method"/> is null.</exception>
+        /// <exception cref="ArgumentException">Occurs when Occurs when <typeparamref name="TLambda"/> does not match the method signature.</exception>
+        public static TLambda EmitMethod<TLambda>(MethodInfo method)
+        {
+            if (method == null)
+                throw new ArgumentNullException(nameof(method));
+
+            // get type and args
+            var type = method.DeclaringType;
+            var returned = method.ReturnType;
+            var args = method.GetParameters().Select(x => x.ParameterType).ToArray();
+
+            // validate lambda type
+            ValidateMethodLambda<TLambda>(out var isFunction);
+
+            var genericArgs = typeof(TLambda).GetGenericArguments();
+            var isStatic = method.IsStatic;
+            var ax = 0;
+            var gx = 0;
+
+            // must match the expected number of args
+            var expectedCount = (isStatic ? 0 : 1) + args.Length + (isFunction ? 1 : 0);
+            if (expectedCount != genericArgs.Length)
+                ThrowInvalidLambda<TLambda>(method.Name, returned, args);
+
+            // if not static then the first generic arg must be the declaring type
+            if (!isStatic && genericArgs[gx++] != type)
+                ThrowInvalidLambda<TLambda>(method.Name, returned, args);
+
+            // all other generic args must match parameters
+            // except the last one, if it's a function, 'cos then its the returned type
+            while (gx < genericArgs.Length - (isFunction ? 1 : 0))
+                if (genericArgs[gx++] != args[ax++])
+                    ThrowInvalidLambda<TLambda>(method.Name, returned, args);
+
+            // if it's a function then the last one must match the returned type
+            if (isFunction && genericArgs[gx] != returned)
+                ThrowInvalidLambda<TLambda>(method.Name, returned, args);
+
+            // emit
+            return EmitMethod<TLambda>(returned, args, method);
+        }
+
+        /// <summary>
+        /// Emits an instance method.
+        /// </summary>
+        /// <typeparam name="TLambda">A lambda representing the method.</typeparam>
+        /// <param name="methodName">The name of the method.</param>
+        /// <param name="mustExist">A value indicating whether the constructor must exist.</param>
+        /// <returns>The method. If <paramref name="mustExist"/> is <c>false</c>, returns null when the method does not exist.</returns>
+        /// <remarks>
+        /// <para>The method arguments are determined by <typeparamref name="TLambda"/> generic arguments.</para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="methodName"/> is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Occurs when no proper method with name <paramref name="methodName"/> could be found.</exception>
+        /// <exception cref="ArgumentException">Occurs when Occurs when <typeparamref name="TLambda"/> does not match the method signature.</exception>
+        public static TLambda EmitMethod<TLambda>(string methodName, bool mustExist = true)
+        {
+            if (string.IsNullOrWhiteSpace(methodName))
+                throw new ArgumentNullOrEmptyException(nameof(methodName));
+
+            // validate lambda type
+            ValidateMethodLambda<TLambda>(out var isFunction);
+
+            // get instance and arguments types
+            var genericArgs = typeof(TLambda).GetGenericArguments();
+            var gx = 0;
+            var declaring = genericArgs[gx++];
+            var args = new Type[genericArgs.Length - 1 - (isFunction ? 1 : 0)];
+            for (var i = 0; i < args.Length; i++)
+                args[i] = genericArgs[gx++];
+            var returned = isFunction ? genericArgs[gx] : typeof (void);
+
+            // get the method infos
+            var method = declaring.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
+                null, args, null);
+
+            if (method == null || isFunction && method.ReturnType != returned)
             {
-                if (!mustExist) return null;
-                throw new InvalidOperationException($"Could not find constructor {type}.ctor().");
+                if (!mustExist) return default;
+                throw new InvalidOperationException($"Could not find method {declaring}.{methodName}({string.Join(", ", (IEnumerable<Type>) args)}).");
             }
 
-            var exprNew = Expression.New(ctor);
-            return Expression.Lambda<TLambda>(exprNew);
+            // emit
+            return EmitMethod<TLambda>(returned, args, method);
         }
 
-        public static Func<TInstance> GetCtor<TInstance>(bool mustExist = true, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
+        /// <summary>
+        /// Emits a static method.
+        /// </summary>
+        /// <typeparam name="TDeclaring">The declaring type.</typeparam>
+        /// <typeparam name="TLambda">A lambda representing the method.</typeparam>
+        /// <param name="methodName">The name of the method.</param>
+        /// <param name="mustExist">A value indicating whether the constructor must exist.</param>
+        /// <returns>The method. If <paramref name="mustExist"/> is <c>false</c>, returns null when the method does not exist.</returns>
+        /// <remarks>
+        /// <para>The method arguments are determined by <typeparamref name="TLambda"/> generic arguments.</para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="methodName"/> is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Occurs when no proper method with name <paramref name="methodName"/> could be found.</exception>
+        /// <exception cref="ArgumentException">Occurs when Occurs when <typeparamref name="TLambda"/> does not match the method signature.</exception>
+        public static TLambda EmitMethod<TDeclaring, TLambda>(string methodName, bool mustExist = true)
         {
-            var expr = GetCtorExpr<TInstance>(mustExist);
-            if (expr == null) return null;
-            return access == NoAssembly ? expr.Compile() : CompileToDelegate(expr, access);
+            return EmitMethod<TLambda>(typeof (TDeclaring), methodName, mustExist);
         }
 
-        public static TLambda GetCtor<TLambda>(Type type, bool mustExist = true, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
+        /// <summary>
+        /// Emits a static method.
+        /// </summary>
+        /// <typeparam name="TLambda">A lambda representing the method.</typeparam>
+        /// <param name="declaring">The declaring type.</param>
+        /// <param name="methodName">The name of the method.</param>
+        /// <param name="mustExist">A value indicating whether the constructor must exist.</param>
+        /// <returns>The method. If <paramref name="mustExist"/> is <c>false</c>, returns null when the method does not exist.</returns>
+        /// <remarks>
+        /// <para>The method arguments are determined by <typeparamref name="TLambda"/> generic arguments.</para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="methodName"/> is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Occurs when no proper method with name <paramref name="methodName"/> could be found.</exception>
+        /// <exception cref="ArgumentException">Occurs when Occurs when <typeparamref name="TLambda"/> does not match the method signature.</exception>
+        public static TLambda EmitMethod<TLambda>(Type declaring, string methodName, bool mustExist = true)
         {
-            var expr = GetCtorExpr<TLambda>(type, mustExist);
-            if (expr == null) return default(TLambda);
-            return access == NoAssembly ? expr.Compile() : CompileToDelegate(expr, access);
-        }
+            if (string.IsNullOrWhiteSpace(methodName))
+                throw new ArgumentNullOrEmptyException(nameof(methodName));
 
-        public static Func<TInstance> EmitCtor<TInstance>(bool mustExist = true)
-        {
-            var type = typeof (TInstance);
+            // validate lambda type
+            ValidateMethodLambda<TLambda>(out var isFunction);
 
-            // get the constructor infos
-            var ctor = type.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
-                null, Type.EmptyTypes, null);
+            // get instance and arguments types
+            var genericArgs = typeof(TLambda).GetGenericArguments();
+            var args = new Type[genericArgs.Length - (isFunction ? 1 : 0)];
+            for (var i = 0; i < args.Length; i++)
+                args[i] = genericArgs[i];
+            var returned = isFunction ? genericArgs[args.Length] : typeof (void);
 
-            if (ctor == null)
+            // get the method infos
+            var method = declaring.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static,
+                null, args, null);
+
+            if (method == null || isFunction && method.ReturnType != returned)
             {
-                if (!mustExist) return null;
-                throw new InvalidOperationException($"Could not find constructor {type}.ctor().");
+                if (!mustExist) return default;
+                throw new InvalidOperationException($"Could not find static method {declaring}.{methodName}({string.Join(", ", (IEnumerable<Type>) args)}).");
             }
 
-            var dm = new DynamicMethod(string.Empty, type, Array.Empty<Type>(), type.Module, true);
-            var gen = dm.GetILGenerator();
-            gen.Emit(OpCodes.Newobj, ctor);
-            gen.Emit(OpCodes.Ret);
-            return (Func<TInstance>) dm.CreateDelegate(typeof (Func<TInstance>));
+            // emit
+            return EmitMethod<TLambda>(returned, args, method);
         }
 
-        public static Func<TArg0, TInstance> EmitCtor<TInstance, TArg0>(bool mustExist = true)
+        private static TLambda EmitMethod<TLambda>(Type returned, Type[] args, MethodInfo method)
         {
-            var type = typeof (TInstance);
-            var type0 = typeof (TArg0);
-
-            // get the constructor infos
-            var ctor = type.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
-                null, new[] { type0 }, null);
-
-            if (ctor == null)
+            var args2 = args;
+            if (!method.IsStatic)
             {
-                if (!mustExist) return null;
-                throw new InvalidOperationException($"Could not find constructor {type}.ctor().");
+                args2 = new Type[args.Length + 1];
+                args2[0] = method.DeclaringType;
+                Array.Copy(args, 0, args2, 1, args.Length);
             }
-
-            var dm = new DynamicMethod(string.Empty, type, new[] { type0 }, type.Module, true);
-            var gen = dm.GetILGenerator();
-            gen.Emit(OpCodes.Ldarg_0);
-            gen.Emit(OpCodes.Newobj, ctor);
-            gen.Emit(OpCodes.Ret);
-            return (Func<TArg0, TInstance>) dm.CreateDelegate(typeof (Func<TArg0, TInstance>));
+            var module = method.DeclaringType?.Module;
+            if (module == null)
+                throw new ArgumentException("Failed to get method's declaring type module.", nameof(method));
+            var dm = new DynamicMethod(string.Empty, returned, args2, module, true);
+            var ilgen = dm.GetILGenerator();
+            EmitLdargs(ilgen, args2.Length);
+            ilgen.Emit(method.IsStatic ? OpCodes.Call : OpCodes.Callvirt, method);
+            ilgen.Emit(OpCodes.Ret);
+            return (TLambda) (object) dm.CreateDelegate(typeof(TLambda));
         }
 
-        public static Func<TArg0, TInstance> EmitCtor<TArg0, TInstance>(Type type, bool mustExist = true)
+        private static void EmitLdargs(ILGenerator ilgen, int count)
         {
-            var type0 = typeof (TArg0);
-
-            // get the constructor infos
-            var ctor = type.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
-                null, new[] { type0 }, null);
-
-            if (ctor == null)
+            if (count < 5)
             {
-                if (!mustExist) return null;
-                throw new InvalidOperationException($"Could not find constructor {type}.ctor().");
-            }
-
-            var dm = new DynamicMethod(string.Empty, type, new[] { type0 }, type.Module, true);
-            var gen = dm.GetILGenerator();
-            gen.Emit(OpCodes.Ldarg_0);
-            gen.Emit(OpCodes.Newobj, ctor);
-            gen.Emit(OpCodes.Ret);
-            return (Func<TArg0, TInstance>) dm.CreateDelegate(typeof (Func<TArg0, TInstance>));
-        }
-
-        public static TLambda EmitCtor<TLambda>(ConstructorInfo constructorInfo)
-        {
-            var type = constructorInfo.DeclaringType;
-            var args = constructorInfo.GetParameters().Select(x => x.ParameterType).ToArray();
-
-            var dm = new DynamicMethod(string.Empty, type, args, type.Module, true);
-            var gen = dm.GetILGenerator();
-
-            if (args.Length < 5)
-            {
-                if (args.Length > 0)
-                    gen.Emit(OpCodes.Ldarg_0);
-                if (args.Length > 1)
-                    gen.Emit(OpCodes.Ldarg_1);
-                if (args.Length > 2)
-                    gen.Emit(OpCodes.Ldarg_2);
-                if (args.Length > 3)
-                    gen.Emit(OpCodes.Ldarg_3);
+                if (count > 0)
+                    ilgen.Emit(OpCodes.Ldarg_0);
+                if (count > 1)
+                    ilgen.Emit(OpCodes.Ldarg_1);
+                if (count > 2)
+                    ilgen.Emit(OpCodes.Ldarg_2);
+                if (count > 3)
+                    ilgen.Emit(OpCodes.Ldarg_3);
             }
             else
             {
-                for (var i = 0; i < args.Length; i++)
-                    gen.Emit(OpCodes.Ldarg, i);
+                for (var i = 0; i < count; i++)
+                    ilgen.Emit(OpCodes.Ldarg, i);
             }
-            gen.Emit(OpCodes.Newobj, constructorInfo);
-            gen.Emit(OpCodes.Ret);
-            return (TLambda) (object) dm.CreateDelegate(typeof (TLambda));
         }
 
-        // fixme others need it too?
+        private static void ThrowInvalidLambda<TLambda>(string methodName, Type returned, Type[] args)
+        {
+            throw new ArgumentException($"Lambda {typeof(TLambda)} does not match {methodName}({string.Join(", ", (IEnumerable<Type>) args)}):{returned}.", nameof(TLambda));
+        }
 
-        public static Func<TArg0, TInstance> GetCtor<TInstance, TArg0>()
+        // the code below should NOT be used
+        //
+        // keeping all this around as a reference for now - building expressions into dynamic assemblies,
+        // the resulting methods are fast (as fast as IL-generated methods) whereas the standard compiled
+        // expressions are slowish - alas, the compiled methods do not have access to eg private members
+        // and anything that would violate access control - we're not using it anymore - still used in a
+        // benchmark
+
+        internal static Func<TArg0, TInstance> GetCtor<TInstance, TArg0>()
         {
             var type = typeof (TInstance);
             var type0 = typeof (TArg0);
@@ -207,10 +512,10 @@ namespace Umbraco.Core
             // ReSharper disable once CoVariantArrayConversion
             var exprNew = Expression.New(ctor, exprArgs);
             var expr = Expression.Lambda<Func<TArg0, TInstance>>(exprNew, exprArgs);
-            return expr.CompileToDelegate();
+            return CompileToDelegate(expr);
         }
 
-        public static Func<TArg0, TArg1, TInstance> GetCtor<TInstance, TArg0, TArg1>()
+        internal static Func<TArg0, TArg1, TInstance> GetCtor<TInstance, TArg0, TArg1>()
         {
             var type = typeof (TInstance);
             var type0 = typeof (TArg0);
@@ -227,10 +532,10 @@ namespace Umbraco.Core
             // ReSharper disable once CoVariantArrayConversion
             var exprNew = Expression.New(ctor, exprArgs);
             var expr = Expression.Lambda<Func<TArg0, TArg1, TInstance>>(exprNew, exprArgs);
-            return expr.CompileToDelegate();
+            return CompileToDelegate(expr);
         }
 
-        public static TMethod GetMethod<TMethod>(MethodInfo method)
+        internal static TMethod GetMethod<TMethod>(MethodInfo method)
         {
             var type = method.DeclaringType;
 
@@ -238,7 +543,7 @@ namespace Umbraco.Core
             return GetStaticMethod<TMethod>(method, method.Name, type, parameterTypes, returnType);
         }
 
-        public static TMethod GetMethod<TInstance, TMethod>(MethodInfo method)
+        internal static TMethod GetMethod<TInstance, TMethod>(MethodInfo method)
         {
             var type = method.DeclaringType;
 
@@ -246,7 +551,7 @@ namespace Umbraco.Core
             return GetMethod<TMethod>(method, method.Name, type, parameterTypes, returnType);
         }
 
-        public static TMethod GetMethod<TInstance, TMethod>(string methodName)
+        internal static TMethod GetMethod<TInstance, TMethod>(string methodName)
         {
             var type = typeof (TInstance);
 
@@ -256,35 +561,6 @@ namespace Umbraco.Core
                 null, parameterTypes, null);
 
             return GetMethod<TMethod>(method, methodName, type, parameterTypes, returnType);
-        }
-
-        private static Func<TInstance, TValue> GetPropertyGetter<TInstance, TValue>(PropertyInfo property)
-        {
-            var type = typeof (TInstance);
-
-            var getMethod = property.GetMethod;
-            if (getMethod == null)
-                throw new InvalidOperationException($"Property {type}.{property.Name} : {property.PropertyType} does not have a getter.");
-
-            var exprThis = Expression.Parameter(type, "this");
-            var exprCall = Expression.Call(exprThis, getMethod);
-            var expr = Expression.Lambda<Func<TInstance, TValue>>(exprCall, exprThis);
-            return expr.CompileToDelegate();
-        }
-
-        private static Action<TInstance, TValue> GetPropertySetter<TInstance, TValue>(PropertyInfo property)
-        {
-            var type = typeof (TInstance);
-
-            var setMethod = property.SetMethod;
-            if (setMethod == null)
-                throw new InvalidOperationException($"Property {type}.{property.Name} : {property.PropertyType} does not have a setter.");
-
-            var exprThis = Expression.Parameter(type, "this");
-            var exprArg0 = Expression.Parameter(typeof (TValue), "value");
-            var exprCall = Expression.Call(exprThis, setMethod, exprArg0);
-            var expr = Expression.Lambda<Action<TInstance, TValue>>(exprCall, exprThis, exprArg0);
-            return expr.CompileToDelegate();
         }
 
         private static void GetMethodParms<TMethod>(out Type[] parameterTypes, out Type returnType)
@@ -373,7 +649,7 @@ namespace Umbraco.Core
             // ReSharper disable once CoVariantArrayConversion
             var exprCall = Expression.Call(method, exprCallArgs);
             var expr = Expression.Lambda<TMethod>(exprCall, exprLambdaArgs);
-            return expr.CompileToDelegate();
+            return CompileToDelegate(expr);
         }
 
         private static TMethod GetMethod<TMethod>(MethodInfo method, string methodName, Type type, Type[] parameterTypes, Type returnType)
@@ -396,178 +672,17 @@ namespace Umbraco.Core
             return expr.Compile();
         }
 
-        // not sure we want this at all?
+        internal const AssemblyBuilderAccess DefaultAssemblyBuilderAccess = AssemblyBuilderAccess.Run;
+        internal const AssemblyBuilderAccess NoAssembly = 0;
 
-        /*
-        public static object GetStaticProperty(this Type type, string propertyName, Func<IEnumerable<PropertyInfo>, PropertyInfo> filter = null)
-        {
-            var propertyInfo = GetPropertyInfo(type, propertyName, filter);
-            if (propertyInfo == null)
-                throw new ArgumentOutOfRangeException(nameof(propertyName),
-                    $"Couldn't find property {propertyName} in type {type.FullName}");
-            return propertyInfo.GetValue(null, null);
-        }
-
-        public static object CallStaticMethod(this Type type, string methodName, params object[] parameters)
-        {
-            var methodInfo = GetMethodInfo(type, methodName);
-            if (methodInfo == null)
-                throw new ArgumentOutOfRangeException(nameof(methodName),
-                    $"Couldn't find method {methodName} in type {type.FullName}");
-            return methodInfo.Invoke(null, parameters);
-        }
-
-        public static object CallMethod(this object obj, string methodName, params object[] parameters)
-        {
-            if (obj == null)
-                throw new ArgumentNullException(nameof(obj));
-            Type type = obj.GetType();
-            var methodInfo = GetMethodInfo(type, methodName);
-            if (methodInfo == null)
-                throw new ArgumentOutOfRangeException(nameof(methodName),
-                    $"Couldn't find method {methodName} in type {type.FullName}");
-            return methodInfo.Invoke(obj, parameters);
-        }
-
-        public static object CallMethod(this object obj, string methodName, Func<IEnumerable<MethodInfo>, MethodInfo> filter = null, params object[] parameters)
-        {
-            if (obj == null)
-                throw new ArgumentNullException(nameof(obj));
-            Type type = obj.GetType();
-            var methodInfo = GetMethodInfo(type, methodName, filter);
-            if (methodInfo == null)
-                throw new ArgumentOutOfRangeException(nameof(methodName),
-                    $"Couldn't find method {methodName} in type {type.FullName}");
-            return methodInfo.Invoke(obj, parameters);
-        }
-
-        private static MethodInfo GetMethodInfo(Type type, string methodName, Func<IEnumerable<MethodInfo>, MethodInfo> filter = null)
-        {
-            MethodInfo methodInfo;
-            do
-            {
-                try
-                {
-                    methodInfo = type.GetMethod(methodName,
-                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-                }
-                catch (AmbiguousMatchException)
-                {
-                    if (filter == null) throw;
-
-                    methodInfo = filter(
-                        type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
-                            .Where(x => x.Name == methodName));
-                }
-                type = type.BaseType;
-            }
-            while (methodInfo == null && type != null);
-            return methodInfo;
-        }
-
-        private static PropertyInfo GetPropertyInfo(Type type, string propertyName, Func<IEnumerable<PropertyInfo>, PropertyInfo> filter = null)
-        {
-            PropertyInfo propInfo;
-            do
-            {
-                try
-                {
-                    propInfo = type.GetProperty(propertyName,
-                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-                }
-                catch (AmbiguousMatchException)
-                {
-                    if (filter == null) throw;
-
-                    propInfo = filter(type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
-                        .Where(x => x.Name == propertyName));
-                }
-                type = type.BaseType;
-            }
-            while (propInfo == null && type != null);
-            return propInfo;
-        }
-
-        public static object GetPropertyValue(this object obj, string propertyName)
-        {
-            if (obj == null)
-                throw new ArgumentNullException(nameof(obj));
-            Type objType = obj.GetType();
-            PropertyInfo propInfo = GetPropertyInfo(objType, propertyName);
-            if (propInfo == null)
-                throw new ArgumentOutOfRangeException(nameof(propertyName),
-                    $"Couldn't find property {propertyName} in type {objType.FullName}");
-            return propInfo.GetValue(obj, null);
-        }
-
-        public static object GetPropertyValue(this object obj, string propertyName, IDictionary<string, PropertyInfo> propCache)
-        {
-            if (obj == null)
-                throw new ArgumentNullException(nameof(obj));
-            Type objType = obj.GetType();
-            PropertyInfo propInfo;
-            if (propCache.ContainsKey(propertyName))
-            {
-                propInfo = propCache[propertyName];
-            }
-            else
-            {
-                propInfo = GetPropertyInfo(objType, propertyName);
-                if (propInfo == null)
-                    throw new ArgumentOutOfRangeException(nameof(propertyName),
-                        $"Couldn't find property {propertyName} in type {objType.FullName}");
-
-                propCache[propertyName] = propInfo;
-            }
-            return propInfo.GetValue(obj, null);
-        }
-
-        public static void SetPropertyValue(this object obj, string propertyName, object val)
-        {
-            if (obj == null)
-                throw new ArgumentNullException(nameof(obj));
-            Type objType = obj.GetType();
-            PropertyInfo propInfo = GetPropertyInfo(objType, propertyName);
-            if (propInfo == null)
-                throw new ArgumentOutOfRangeException(nameof(propertyName),
-                    $"Couldn't find property {propertyName} in type {objType.FullName}");
-            propInfo.SetValue(obj, val, null);
-        }
-
-        public static void SetPropertyValue(this object obj, string propertyName, object val, IDictionary<string, PropertyInfo> propCache)
-        {
-            if (obj == null) throw new ArgumentNullException(nameof(obj));
-            if (propCache == null) throw new ArgumentNullException(nameof(propCache));
-
-            Type objType = obj.GetType();
-            PropertyInfo propInfo;
-            if (propCache.ContainsKey(propertyName))
-            {
-                propInfo = propCache[propertyName];
-            }
-            else
-            {
-                propInfo = GetPropertyInfo(objType, propertyName);
-                if (propInfo == null)
-                    throw new ArgumentOutOfRangeException(nameof(propertyName),
-                        $"Couldn't find property {propertyName} in type {objType.FullName}");
-
-                propCache[propertyName] = propInfo;
-            }
-
-            propInfo.SetValue(obj, val, null);
-        }
-        */
-
-        // fixme dont think this can work at all
-        public static TLambda Compile<TLambda>(Expression<TLambda> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
+        internal static TLambda Compile<TLambda>(Expression<TLambda> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
             return access == NoAssembly
                 ? expr.Compile()
                 : CompileToDelegate(expr, access);
         }
 
-        public static Action CompileToDelegate(Expression<Action> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
+        internal static Action CompileToDelegate(Expression<Action> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
             var typeBuilder = CreateTypeBuilder(access);
 
@@ -579,7 +694,7 @@ namespace Umbraco.Core
             return (Action) Delegate.CreateDelegate(typeof (Action), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static Action<T1> CompileToDelegate<T1>(Expression<Action<T1>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
+        internal static Action<T1> CompileToDelegate<T1>(Expression<Action<T1>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
             var typeBuilder = CreateTypeBuilder(access);
 
@@ -592,7 +707,7 @@ namespace Umbraco.Core
             return (Action<T1>) Delegate.CreateDelegate(typeof (Action<T1>), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static Action<T1, T2> CompileToDelegate<T1, T2>(Expression<Action<T1, T2>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
+        internal static Action<T1, T2> CompileToDelegate<T1, T2>(Expression<Action<T1, T2>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
             var typeBuilder = CreateTypeBuilder(access);
 
@@ -605,7 +720,7 @@ namespace Umbraco.Core
             return (Action<T1, T2>) Delegate.CreateDelegate(typeof (Action<T1, T2>), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static Action<T1, T2, T3> CompileToDelegate<T1, T2, T3>(Expression<Action<T1, T2, T3>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
+        internal static Action<T1, T2, T3> CompileToDelegate<T1, T2, T3>(Expression<Action<T1, T2, T3>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
             var typeBuilder = CreateTypeBuilder(access);
 
@@ -618,7 +733,7 @@ namespace Umbraco.Core
             return (Action<T1, T2, T3>) Delegate.CreateDelegate(typeof (Action<T1, T2, T3>), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static Func<TResult> CompileToDelegate<TResult>(Expression<Func<TResult>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
+        internal static Func<TResult> CompileToDelegate<TResult>(Expression<Func<TResult>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
             var typeBuilder = CreateTypeBuilder(access);
 
@@ -631,7 +746,7 @@ namespace Umbraco.Core
             return (Func<TResult>) Delegate.CreateDelegate(typeof (Func<TResult>), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static Func<T1, TResult> CompileToDelegate<T1, TResult>(Expression<Func<T1, TResult>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
+        internal static Func<T1, TResult> CompileToDelegate<T1, TResult>(Expression<Func<T1, TResult>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
             var typeBuilder = CreateTypeBuilder(access);
 
@@ -644,7 +759,7 @@ namespace Umbraco.Core
             return (Func<T1, TResult>) Delegate.CreateDelegate(typeof (Func<T1, TResult>), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static Func<T1, T2, TResult> CompileToDelegate<T1, T2, TResult>(Expression<Func<T1, T2, TResult>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
+        internal static Func<T1, T2, TResult> CompileToDelegate<T1, T2, TResult>(Expression<Func<T1, T2, TResult>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
             var typeBuilder = CreateTypeBuilder(access);
 
@@ -657,7 +772,7 @@ namespace Umbraco.Core
             return (Func<T1, T2, TResult>) Delegate.CreateDelegate(typeof (Func<T1, T2, TResult>), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static Func<T1, T2, T3, TResult> CompileToDelegate<T1, T2, T3, TResult>(Expression<Func<T1, T2, T3, TResult>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
+        internal static Func<T1, T2, T3, TResult> CompileToDelegate<T1, T2, T3, TResult>(Expression<Func<T1, T2, T3, TResult>> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
             var typeBuilder = CreateTypeBuilder(access);
 
@@ -670,7 +785,7 @@ namespace Umbraco.Core
             return (Func<T1, T2, T3, TResult>) Delegate.CreateDelegate(typeof (Func<T1, T2, T3, TResult>), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static TMethod CompileToDelegate<TMethod>(Expression<TMethod> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
+        internal static TMethod CompileToDelegate<TMethod>(Expression<TMethod> expr, AssemblyBuilderAccess access = DefaultAssemblyBuilderAccess)
         {
             var typeBuilder = CreateTypeBuilder(access);
 
@@ -685,10 +800,10 @@ namespace Umbraco.Core
             return (TMethod) (object) Delegate.CreateDelegate(typeof (TMethod), typeBuilder.CreateType().GetMethod("Method"));
         }
 
-        public static TMethod[] CompileToDelegates<TMethod>(params Expression<TMethod>[] exprs)
+        internal static TMethod[] CompileToDelegates<TMethod>(params Expression<TMethod>[] exprs)
             => CompileToDelegates(AssemblyBuilderAccess.RunAndCollect, exprs);
 
-        public static TMethod[] CompileToDelegates<TMethod>(AssemblyBuilderAccess access, params Expression<TMethod>[] exprs)
+        internal static TMethod[] CompileToDelegates<TMethod>(AssemblyBuilderAccess access, params Expression<TMethod>[] exprs)
         {
             var typeBuilder = CreateTypeBuilder(access);
 

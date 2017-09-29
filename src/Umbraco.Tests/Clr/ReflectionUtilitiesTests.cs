@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reflection;
+using Lucene.Net.Index;
 using NUnit.Framework;
 using Umbraco.Core;
 
@@ -8,119 +10,303 @@ namespace Umbraco.Tests.Clr
     public class ReflectionUtilitiesTests
     {
         [Test]
-        public void Test()
+        public void EmitCtorEmits()
         {
-            // cannot ctor a private class
-            var ctor1 = ReflectionUtilities.GetCtor<PrivateClass>();
-            Assert.Throws<MethodAccessException>(() => _ = ctor1());
-
-            // cannot private ctor a public class
-            var ctor2 = ReflectionUtilities.GetCtor<PublicClass, int>();
-            Assert.Throws<MethodAccessException>(() => _ = ctor2(0));
-
-            // can public ctor a public class
-            var ctor3 = ReflectionUtilities.GetCtor<PublicClass, string>();
-            Assert.IsNotNull(ctor3(string.Empty));
-
-            // works if not a dynamic assembly
-            var ctor4 = ReflectionUtilities.GetCtor<PrivateClass>(false);
-            Assert.IsNotNull(ctor4());
-
-            // we need the dynasm flag everywhere, because in some cases we do not
-            // want to create a dynasm that will stay around - eg when using the
-            // generated stuff only a few times
-
-            // collectible assemblies - created with RunAndCollect...
-            // https://msdn.microsoft.com/en-us/library/dd554932(v=vs.100).aspx
-            // with restrictions, but we could try it?
-
-            // so...
-            // GetCtor<PrivateClass>(ReflectionUtilities.Compile.None)
-
-            // should we find a way for a dynamic assembly to access private stuff?
-        }
-
-        [Test]
-        public void SingleDynAsmTest()
-        {
-            var expr1 = ReflectionUtilities.GetCtorExpr<PrivateClass>();
-            //var ctor2 = ReflectionUtilities.GetCtorExpr<PublicClass, int>();
-            //var ctor3 = ReflectionUtilities.GetCtorExpr<PublicClass, string>();
-
-            // creates one single dynamic assembly containing all methods
-            var ctors = ReflectionUtilities.CompileToDelegates(expr1);
-            var ctor1 = ctors[0];
-
-            // still, cannot access private stuff
-            Assert.Throws<MethodAccessException>(() => _ = ctor1());
-        }
-
-        [Test]
-        public void MoreTest()
-        {
-            // can get a ctor via generic and compile
-            var expr1 = ReflectionUtilities.GetCtorExpr<Class1>();
-            var ctor1 = ReflectionUtilities.Compile(expr1);
+            var ctor1 = ReflectionUtilities.EmitCtor<Func<Class1>>();
             Assert.IsInstanceOf<Class1>(ctor1());
 
-            // direct
-            var ctor1A = ReflectionUtilities.GetCtor<Class1>();
-            Assert.IsInstanceOf<Class1>(ctor1A());
-
-            // can get a ctor via type and compile
-            var expr2 = ReflectionUtilities.GetCtorExpr<Func<Class1>>(typeof (Class1));
-            var ctor2 = ReflectionUtilities.Compile(expr2);
+            var ctor2 = ReflectionUtilities.EmitCtor<Func<object>>(declaring: typeof(Class1));
             Assert.IsInstanceOf<Class1>(ctor2());
 
-            // direct
-            var ctor2A = ReflectionUtilities.GetCtor<Func<Class1>>(typeof (Class1));
-            Assert.IsInstanceOf<Class1>(ctor2A());
+            var ctor3 = ReflectionUtilities.EmitCtor<Func<int, Class3>>();
+            Assert.IsInstanceOf<Class3>(ctor3(42));
 
-            // if type is unknown (in a variable)
-            var ctor2B = ReflectionUtilities.GetCtor<Func<object>>(typeof (Class1));
-            Assert.IsInstanceOf<Class1>(ctor2B());
-
-            // cannot get a ctor for a private class
-            var ctorP1 = ReflectionUtilities.GetCtor<Class1P>();
-            Assert.Throws<MethodAccessException>(() => ctorP1());
-
-            // unless we don't compile to an assembly
-            var ctorP1A = ReflectionUtilities.GetCtor<Class1P>(access: ReflectionUtilities.NoAssembly);
-            Assert.IsInstanceOf<Class1P>(ctorP1A());
-
-            // so...
-            // if I create a dynamic method delegate by writing IL it's fast and I can access private stuff
-            // if I create an expression it's easier than IL but it's slower
-            // if I compile the expression, the speed is same as delegate but then I cannot access private stuff
-            // so ... what should I do?!
+            var ctor4 = ReflectionUtilities.EmitCtor<Func<int, object>>(declaring: typeof(Class3));
+            Assert.IsInstanceOf<Class3>(ctor4(42));
         }
 
-        // todo
-        // - figure out the private/public thing
-        // - implement the dynasm enumeration
-        // - figure out ctors in model factory - ie the casting thing
-
-        // this is how we could indicate what to do?
-        private enum DynAsm
+        [Test]
+        public void EmitCtorEmitsFromInfo()
         {
-            None,
-            Run,
-            RunAndCollect
+            var ctorInfo = typeof(Class1).GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, CallingConventions.Any, Array.Empty<Type>(), null);
+            var ctor1 = ReflectionUtilities.EmitCtor<Func<Class1>>(ctorInfo);
+            Assert.IsInstanceOf<Class1>(ctor1());
+
+            ctorInfo = typeof(Class1).GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, CallingConventions.Any, new[] { typeof(int) }, null);
+            var ctor3 = ReflectionUtilities.EmitCtor<Func<int, object>>(ctorInfo);
+            Assert.IsInstanceOf<Class1>(ctor3(42));
+
+            Assert.Throws<ArgumentException>(() => ReflectionUtilities.EmitCtor<Func<string, object>>(ctorInfo));
         }
 
-        private class PrivateClass { }
-
-        public class PublicClass
+        [Test]
+        public void EmitCtorEmitsPrivateCtor()
         {
-            private PublicClass(int i) { }
-
-            public PublicClass(string s) { }
+            var ctor = ReflectionUtilities.EmitCtor<Func<string, Class3>>();
+            Assert.IsInstanceOf<Class3>(ctor("foo"));
         }
 
-        public class Class1 { }
+        [Test]
+        public void EmitCtorThrowsIfNotFound()
+        {
+            Assert.Throws<InvalidOperationException>(() => ReflectionUtilities.EmitCtor<Func<bool, Class3>>());
+        }
+
+        [Test]
+        public void EmitCtorThrowsIfInvalid()
+        {
+            var ctorInfo = typeof(Class1).GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, CallingConventions.Any, Array.Empty<Type>(), null);
+            Assert.Throws<ArgumentException>(() => ReflectionUtilities.EmitCtor<Func<Class2>>(ctorInfo));
+        }
+
+        [Test]
+        public void EmitCtorReturnsNull()
+        {
+            Assert.IsNull(ReflectionUtilities.EmitCtor<Func<bool, Class3>>(false));
+        }
+
+        [Test]
+        public void EmitMethodEmitsInstance()
+        {
+            var class1 = new Class1();
+
+            var method1 = ReflectionUtilities.EmitMethod<Action<Class1>>("Method1");
+            method1(class1);
+
+            var method2 = ReflectionUtilities.EmitMethod<Action<Class1, int>>("Method2");
+            method2(class1, 42);
+
+            var method3 = ReflectionUtilities.EmitMethod<Func<Class1, int>>("Method3");
+            Assert.AreEqual(42, method3(class1));
+
+            var method4 = ReflectionUtilities.EmitMethod<Func<Class1, string, int>>("Method4");
+            Assert.AreEqual(42, method4(class1, "42"));
+        }
+
+        [Test]
+        public void EmitMethodEmitsStatic()
+        {
+            var method1 = ReflectionUtilities.EmitMethod<Class1, Action>("SMethod1");
+            method1();
+
+            var method2 = ReflectionUtilities.EmitMethod<Class1, Action<int>>("SMethod2");
+            method2(42);
+
+            var method3 = ReflectionUtilities.EmitMethod<Class1, Func<int>>("SMethod3");
+            Assert.AreEqual(42, method3());
+
+            var method4 = ReflectionUtilities.EmitMethod<Class1, Func<string, int>>("SMethod4");
+            Assert.AreEqual(42, method4("42"));
+        }
+
+        [Test]
+        public void EmitMethodEmitsStaticStatic()
+        {
+            // static types cannot be used as type arguments
+            //var method = ReflectionUtilities.EmitMethod<StaticClass1, Action>("Method");
+            var method = ReflectionUtilities.EmitMethod<Action>(typeof (StaticClass1), "Method");
+            method();
+        }
+
+        [Test]
+        public void EmitMethodEmitsFromInfo()
+        {
+            var class1 = new Class1();
+
+            var methodInfo = typeof (Class1).GetMethod("Method1", BindingFlags.Instance | BindingFlags.Public);
+            var method1 = ReflectionUtilities.EmitMethod<Action<Class1>>(methodInfo);
+            method1(class1);
+
+            methodInfo = typeof(Class1).GetMethod("Method2", BindingFlags.Instance | BindingFlags.Public, null, new [] { typeof(int) }, null);
+            var method2 = ReflectionUtilities.EmitMethod<Action<Class1, int>>(methodInfo);
+            method2(class1, 42);
+
+            methodInfo = typeof(Class1).GetMethod("Method3", BindingFlags.Instance | BindingFlags.Public);
+            var method3 = ReflectionUtilities.EmitMethod<Func<Class1, int>>(methodInfo);
+            Assert.AreEqual(42, method3(class1));
+
+            methodInfo = typeof(Class1).GetMethod("Method4", BindingFlags.Instance | BindingFlags.Public, null, new[] { typeof(string) }, null);
+            var method4 = ReflectionUtilities.EmitMethod<Func<Class1, string, int>>(methodInfo);
+            Assert.AreEqual(42, method4(class1, "42"));
+
+            methodInfo = typeof(Class1).GetMethod("SMethod1", BindingFlags.Static | BindingFlags.Public);
+            var smethod1 = ReflectionUtilities.EmitMethod<Action>(methodInfo);
+            smethod1();
+
+            methodInfo = typeof(Class1).GetMethod("SMethod2", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(int) }, null);
+            var smethod2 = ReflectionUtilities.EmitMethod<Action<int>>(methodInfo);
+            smethod2(42);
+
+            methodInfo = typeof(Class1).GetMethod("SMethod3", BindingFlags.Static | BindingFlags.Public);
+            var smethod3 = ReflectionUtilities.EmitMethod<Func<int>>(methodInfo);
+            Assert.AreEqual(42, smethod3());
+
+            methodInfo = typeof(Class1).GetMethod("SMethod4", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string) }, null);
+            var smethod4 = ReflectionUtilities.EmitMethod<Func<string, int>>(methodInfo);
+            Assert.AreEqual(42, smethod4("42"));
+
+            methodInfo = typeof(StaticClass1).GetMethod("Method", BindingFlags.Static | BindingFlags.Public);
+            var method = ReflectionUtilities.EmitMethod<Action>(methodInfo);
+            method();
+        }
+
+        [Test]
+        public void EmitMethodEmitsPrivateMethod()
+        {
+            var class1 = new Class1();
+
+            var method1 = ReflectionUtilities.EmitMethod<Action<Class1>>("MethodP1");
+            method1(class1);
+
+            var method2 = ReflectionUtilities.EmitMethod<Class1, Action>("SMethodP1");
+            method2();
+        }
+
+        [Test]
+        public void EmitMethodThrowsIfNotFound()
+        {
+            Assert.Throws<InvalidOperationException>(() => ReflectionUtilities.EmitMethod<Action<Class1>>("ZZZ"));
+            Assert.Throws<InvalidOperationException>(() => ReflectionUtilities.EmitMethod<Action<Class1, int, int>>("Method1"));
+        }
+
+        [Test]
+        public void EmitMethodThrowsIfInvalid()
+        {
+            var methodInfo = typeof(Class1).GetMethod("Method1", BindingFlags.Instance | BindingFlags.Public);
+            Assert.Throws<ArgumentException>(() => ReflectionUtilities.EmitMethod<Action<Class1, int, int>>(methodInfo));
+        }
+
+        [Test]
+        public void EmitMethodReturnsNull()
+        {
+            Assert.IsNull(ReflectionUtilities.EmitMethod<Action<Class1>>("ZZZ", false));
+            Assert.IsNull(ReflectionUtilities.EmitMethod<Action<Class1, int, int>>("Method1", false));
+        }
+
+        [Test]
+        public void EmitPropertyEmits()
+        {
+            var class1 = new Class1();
+
+            var getter1 = ReflectionUtilities.EmitPropertyGetter<Class1, int>("Value1");
+            Assert.AreEqual(42, getter1(class1));
+
+            var getter2 = ReflectionUtilities.EmitPropertyGetter<Class1, int>("Value3");
+            Assert.AreEqual(42, getter2(class1));
+
+            var setter1 = ReflectionUtilities.EmitPropertySetter<Class1, int>("Value2");
+            setter1(class1, 42);
+
+            var setter2 = ReflectionUtilities.EmitPropertySetter<Class1, int>("Value3");
+            setter2(class1, 42);
+
+            (var getter3, var setter3) = ReflectionUtilities.EmitPropertyGetterAndSetter<Class1, int>("Value3");
+            Assert.AreEqual(42, getter3(class1));
+            setter3(class1, 42);
+
+            // this is not supported yet
+            //var getter4 = ReflectionUtilities.EmitPropertyGetter<Class1, object>("Value1", returned: typeof(int));
+            //Assert.AreEqual(42, getter1(class1));
+        }
+
+        [Test]
+        public void EmitPropertyEmitsFromInfo()
+        {
+            var class1 = new Class1();
+
+            var propertyInfo = typeof (Class1).GetProperty("Value1");
+            var getter1 = ReflectionUtilities.EmitPropertyGetter<Class1, int>(propertyInfo);
+            Assert.AreEqual(42, getter1(class1));
+
+            propertyInfo = typeof(Class1).GetProperty("Value3");
+            var getter2 = ReflectionUtilities.EmitPropertyGetter<Class1, int>(propertyInfo);
+            Assert.AreEqual(42, getter2(class1));
+
+            propertyInfo = typeof(Class1).GetProperty("Value2");
+            var setter1 = ReflectionUtilities.EmitPropertySetter<Class1, int>(propertyInfo);
+            setter1(class1, 42);
+
+            propertyInfo = typeof(Class1).GetProperty("Value3");
+            var setter2 = ReflectionUtilities.EmitPropertySetter<Class1, int>(propertyInfo);
+            setter2(class1, 42);
+
+            (var getter3, var setter3) = ReflectionUtilities.EmitPropertyGetterAndSetter<Class1, int>(propertyInfo);
+            Assert.AreEqual(42, getter3(class1));
+            setter3(class1, 42);
+        }
+
+        [Test]
+        public void EmitPropertyEmitsPrivateProperty()
+        {
+            var class1 = new Class1();
+
+            var getter1 = ReflectionUtilities.EmitPropertyGetter<Class1, int>("ValueP1");
+            Assert.AreEqual(42, getter1(class1));
+        }
+
+        [Test]
+        public void EmitPropertyThrowsIfNotFound()
+        {
+            Assert.Throws<InvalidOperationException>(() => ReflectionUtilities.EmitPropertyGetter<Class1, int>("Zalue1"));
+            Assert.Throws<InvalidOperationException>(() => ReflectionUtilities.EmitPropertyGetter<Class1, int>("Value2"));
+
+            var propertyInfo = typeof(Class1).GetProperty("Value1");
+            Assert.Throws<ArgumentException>(() => ReflectionUtilities.EmitPropertySetter<Class1, int>(propertyInfo));
+        }
+
+        [Test]
+        public void EmitPropertyThrowsIfInvalid()
+        {
+            Assert.Throws<ArgumentException>(() => ReflectionUtilities.EmitPropertyGetter<Class1, string>("Value1"));
+        }
+
+        [Test]
+        public void EmitPropertyReturnsNull()
+        {
+            Assert.IsNull(ReflectionUtilities.EmitPropertyGetter<Class1, int>("Zalue1", false));
+            Assert.IsNull(ReflectionUtilities.EmitPropertyGetter<Class1, int>("Value2", false));
+        }
+
+        // fixme - missing tests specifying 'returned' on method, property
+
+        public static class StaticClass1
+        {
+            public static void Method() { }
+        }
+
+        public class Class1
+        {
+            public Class1() { }
+            public Class1(int i) { }
+
+            public void Method1() { }
+            public void Method2(int i) { }
+            public int Method3() => 42;
+            public int Method4(string s) => int.Parse(s);
+
+            public string Method5() => "foo";
+
+            public static void SMethod1() { }
+            public static void SMethod2(int i) { }
+            public static int SMethod3() => 42;
+            public static int SMethod4(string s) => int.Parse(s);
+
+            private void MethodP1() { }
+            private static void SMethodP1() { }
+
+            public int Value1 => 42;
+            public int Value2 { set { } }
+            public int Value3 { get { return 42; } set { } }
+            private int ValueP1 => 42;
+        }
 
         public class Class2 { }
 
-        private class Class1P { }
+        public class Class3
+        {
+            public Class3(int i) { }
+
+            private Class3(string s) { }
+        }
     }
 }
