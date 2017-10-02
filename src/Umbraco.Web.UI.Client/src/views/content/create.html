@@ -23,27 +23,35 @@
             </li>
 
         </ul>
-        <ul class="umb-actions umb-actions-child" ng-show="selectBlueprint">
 
-            <li ng-repeat="(key, value) in docType.blueprints | orderBy:'name':false">
-                <a ng-click="createFromBlueprint(key)">
-                    <i class="large {{docType.icon}}"></i>
-                    <span class="menu-label">
-                        {{value}}
-                    </span>
-                </a>
-            </li>
-            
-            <li class="sep" ng-show="allowBlank">
-                <a ng-click="createBlank(docType)">
-                    <i class="large {{docType.icon}}"></i>
-                    <span class="menu-label">
-                        <localize key="blueprints_blankBlueprint">Blank</localize>
-                    </span>
-                </a>
-            </li>
+        <div ng-show="selectBlueprint">
 
-        </ul>
+            <div style="margin-bottom: 10px">
+                <input ng-model="createWithName" localize="placeholder" placeholder="@placeholders_entername"/>
+            </div>
+
+            <ul class="umb-actions umb-actions-child">
+
+                <li ng-repeat="(key, value) in docType.blueprints | orderBy:'name':false">
+                    <a ng-click="createFromBlueprint(key)">
+                        <i class="large {{docType.icon}}"></i>
+                        <span class="menu-label">
+                            {{value}}
+                        </span>
+                    </a>
+                </li>
+
+                <li class="sep" ng-show="allowBlank">
+                    <a ng-click="createBlank(docType)">
+                        <i class="large {{docType.icon}}"></i>
+                        <span class="menu-label">
+                            <localize key="blueprints_blankBlueprint">Blank</localize>
+                        </span>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
 
     </div>
 </div>

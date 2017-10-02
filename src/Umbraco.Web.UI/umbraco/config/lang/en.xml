@@ -224,7 +224,7 @@
   <area alias="blueprints">
       <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
       <key alias="blankBlueprint">Blank</key>
-      <key alias="selectBlueprint">Select a Content Template</key>
+      <key alias="selectBlueprint">Enter the Name of the new item and select a Content Template</key>
       <key alias="createdBlueprintHeading">Content Template created</key>
       <key alias="createdBlueprintMessage">A Content Template was created from '%0%'</key>
       <key alias="duplicateBlueprintMessage">Another Content Template with the same name already exists</key>

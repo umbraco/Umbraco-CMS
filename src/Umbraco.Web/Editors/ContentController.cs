@@ -292,12 +292,13 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
+        /// <param name="name"></param>
         /// <returns>
         /// If this is a container type, we'll remove the umbContainerView tab for a new item since
         /// it cannot actually list children if it doesn't exist yet.
         /// </returns>
         [OutgoingEditorModelEvent]
-        public ContentItemDisplay GetEmpty(string contentTypeAlias, int parentId)
+        public ContentItemDisplay GetEmpty(string contentTypeAlias, int parentId, string name)
         {
             var contentType = Services.ContentTypeService.GetContentType(contentTypeAlias);
             if (contentType == null)
@@ -305,17 +306,15 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = Services.ContentService.CreateContent("", parentId, contentType.Alias, UmbracoUser.Id);
+            var emptyContent = Services.ContentService.CreateContent(name ?? string.Empty, parentId, contentType.Alias, UmbracoUser.Id);
             var mapped = Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
 
-            //remove this tab if it exists: umbContainerView
-            var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
-            mapped.Tabs = mapped.Tabs.Except(new[] { containerTab });
+            RemoveContainerTab(mapped);
             return mapped;
         }
 
         [OutgoingEditorModelEvent]
-        public ContentItemDisplay GetEmpty(int blueprintId, int parentId)
+        public ContentItemDisplay GetEmptyFromBlueprint(int blueprintId, int parentId, string name)
         {
             var blueprint = Services.ContentService.GetBlueprintById(blueprintId);
             if (blueprint == null)
@@ -324,15 +323,23 @@ namespace Umbraco.Web.Editors
             }
 
             blueprint.Id = 0;
-            blueprint.Name = string.Empty;
+            blueprint.Name = name;
             blueprint.ParentId = parentId;
 
             var mapped = Mapper.Map<ContentItemDisplay>(blueprint);
 
-            //remove this tab if it exists: umbContainerView
-            var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
-            mapped.Tabs = mapped.Tabs.Except(new[] { containerTab });
+            // TODO: apply tokens
+
+            RemoveContainerTab(mapped);
             return mapped;
+        }
+
+        private static void RemoveContainerTab(ContentItemDisplay mapped)
+        {
+            //remove this tab if it exists: umbContainerView
+            var containerTab = mapped.Tabs
+                .FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
+            mapped.Tabs = mapped.Tabs.Except(new[] { containerTab });
         }
 
         /// <summary>

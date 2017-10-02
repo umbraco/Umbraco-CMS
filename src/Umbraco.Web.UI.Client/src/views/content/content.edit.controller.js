@@ -9,10 +9,11 @@
 function ContentEditController($scope, $routeParams, contentResource) {
 
   function scaffoldEmpty() {
-    return contentResource.getScaffold($routeParams.id, $routeParams.doctype);
+    return contentResource.getScaffold($routeParams.id, $routeParams.doctype, $routeParams.name || '');
   }
+
   function scaffoldBlueprint() {
-      return contentResource.getBlueprintScaffold($routeParams.id, $routeParams.blueprintId);
+      return contentResource.getBlueprintScaffold($routeParams.id, $routeParams.blueprintId, $routeParams.name || '');
   }
 
   $scope.contentId = $routeParams.id;

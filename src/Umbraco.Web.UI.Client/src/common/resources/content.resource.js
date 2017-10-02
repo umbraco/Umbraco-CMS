@@ -407,25 +407,25 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * @returns {Promise} resourcePromise object containing the content scaffold.
           *
           */
-        getScaffold: function (parentId, alias) {
+        getScaffold: function (parentId, alias, name) {
 
             return umbRequestHelper.resourcePromise(
                   $http.get(
                         umbRequestHelper.getApiUrl(
                               "contentApiBaseUrl",
                               "GetEmpty",
-                              [{ contentTypeAlias: alias }, { parentId: parentId }])),
+                              [{ contentTypeAlias: alias }, { parentId: parentId }, { name: name }])),
                   'Failed to retrieve data for empty content item type ' + alias);
         },
 
-        getBlueprintScaffold: function (parentId, blueprintId) {
+        getBlueprintScaffold: function (parentId, blueprintId, name) {
 
           return umbRequestHelper.resourcePromise(
             $http.get(
               umbRequestHelper.getApiUrl(
                 "contentApiBaseUrl",
-                      "GetEmpty",
-                      [{ blueprintId: blueprintId }, { parentId: parentId}])),
+                "GetEmptyFromBlueprint",
+                      [{ blueprintId: blueprintId }, { parentId: parentId}, { name: name }])),
             'Failed to retrieve blueprint for id ' + blueprintId);
         },
 

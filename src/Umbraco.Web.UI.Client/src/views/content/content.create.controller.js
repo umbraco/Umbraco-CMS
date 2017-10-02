@@ -28,33 +28,42 @@ function contentCreateController($scope,
     navigationService.hideMenu();
   }
 
-  function createBlank(docType) {
+  function loadPageForEditing(path, search) {
     $location
-      .path("/content/content/edit/" + $scope.currentNode.id)
-      .search("doctype=" + docType.alias + "&create=true");
+      .path(path)
+      .search(search);
     close();
+  }
+
+  function createBlank(docType) {
+    var path = "/content/content/edit/" + $scope.currentNode.id;
+    var search = "doctype=" + docType.alias + "&create=true";
+    if ($scope.createWithName) {
+      search += "&name=" + $scope.createWithName;
+    }
+
+    loadPageForEditing(path, search);
   }
 
   function createOrSelectBlueprintIfAny(docType) {
     var blueprintIds = _.keys(docType.blueprints || {});
     $scope.docType = docType;
     if (blueprintIds.length) {
-      if (blueprintConfig.skipSelect) {
-        createFromBlueprint(blueprintIds[0]);
-      } else {
         $scope.selectContentType = false;
         $scope.selectBlueprint = true;
-      }
     } else {
       createBlank(docType);
     }
   }
 
   function createFromBlueprint(blueprintId) {
-    $location
-      .path("/content/content/edit/" + $scope.currentNode.id)
-      .search("doctype=" + $scope.docType.alias + "&create=true&blueprintId=" + blueprintId);
-    close();
+    var path = "/content/content/edit/" + $scope.currentNode.id;
+    var search = "doctype=" + $scope.docType.alias + "&create=true&blueprintId=" + blueprintId;
+    if ($scope.createWithName) {
+        search += "&name=" + $scope.createWithName;
+    }
+
+    loadPageForEditing(path, search);
   }
 
   $scope.createBlank = createBlank;
