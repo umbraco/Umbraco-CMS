@@ -42,7 +42,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
                 .ForMember(display => display.HasPublishedVersion, expression => expression.Ignore())
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
-                .ForMember(display => display.DocumentType, expression => expression.ResolveUsing<ContentTypeBasicResolver>())
+                .ForMember(display => display.ContentType, expression => expression.ResolveUsing<MediaTypeBasicResolver>())
                 .ForMember(display => display.MediaLink, expression => expression.ResolveUsing(
                     content => string.Join(",", content.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, applicationContext.ProfilingLogger.Logger))))
                 .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService, applicationContext.Services.ContentTypeService, applicationContext.ProfilingLogger.Logger));
@@ -111,7 +111,7 @@ namespace Umbraco.Web.Models.Mapping
         /// Resolves a <see cref="ContentTypeBasic"/> from the <see cref="IContent"/> item and checks if the current user
         /// has access to see this data
         /// </summary>
-        private class ContentTypeBasicResolver : ValueResolver<IMedia, ContentTypeBasic>
+        private class MediaTypeBasicResolver : ValueResolver<IMedia, ContentTypeBasic>
         {
             protected override ContentTypeBasic ResolveCore(IMedia source)
             {
