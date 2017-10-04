@@ -3,18 +3,34 @@
     top: 50%;
     left: 50%;
     background: @white;
-    padding: 20px;
-    width: 200px;
-    height: 200px;
+    border-radius: 5px;
+    font-size: 18px;
+    padding: 30px;
+    width: 300px;
+    min-height: 100px;
     z-index: 10000;
     transform: translate(-50%, -50%);
+    -webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+}
+
+.umb-tour__step-counter {
+    padding-bottom: 26px;
+    margin-bottom: 23px;
+    border-bottom: solid 1px @gray-8;
 }
 
 .umb-tour__title {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     font-weight: bold;
     color: @black;
-    font-size: 16px;
+    font-size: 20px;
+}
+
+.umb-tour__content {
+    margin-bottom: 20px;
+    line-height: 24px;
 }
 
 .umb-tour__dot {
@@ -23,7 +39,7 @@
     right: 0;
     top: 0;
     bottom: 0;
-    z-index: 2000;
+    z-index: 10000;
     width: 20px;
     height: 20px;
     background: red;
@@ -31,6 +47,25 @@
     transform: translate(-50%, -50%);
 }
 
+.umb-tour__button-container {
+    float: right;
+}
+
+.umb-tour__button-container-center {
+    text-align: center;
+}
+
+.umb-tour__big-title {
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.center {
+    text-align: center;
+}
+
+// SVG Backdrop
 .umb-tour__canvas {
     height: 100%;
     width: 100%;
@@ -44,5 +79,6 @@
 .umb-tour__rect {
     position: absolute;
     pointer-events: all;
+    opacity: 0.5;
     margin: 0;
 }
