@@ -73,8 +73,8 @@
                     
                     var element = $(scope.currentStep.element);
                     var offset = element.offset();
-                    var width = element.width();
-                    var height = element.height();
+                    var width = element.outerWidth(true);
+                    var height = element.outerHeight(true);
     
                     console.log("This element", element);                    
                     console.log("width", width);
