@@ -45,7 +45,8 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
                     element: "#tree [data-element='tree-item-documentTypes']",
                     title: "Let's open the context menu",
                     content: "Hover the document types node and click the three small dots",
-                    event: "click"
+                    event: "click",
+                    clickElement: "#tree [data-element='tree-item-documentTypes'] [data-element='tree-item-options']"
                 },
                 {
                     element: "#dialog [data-element='action-documentType']",
