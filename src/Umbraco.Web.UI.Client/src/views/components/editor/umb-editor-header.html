@@ -1,4 +1,4 @@
-﻿<div id="editor-header" class="umb-editor-header umb-panel-header">
+﻿<div data-element="editor-header" class="umb-editor-header umb-panel-header">
 
     <div class="umb-panel-header-content-wrapper">
 
@@ -6,7 +6,7 @@
 
             <div class="umb-panel-header-left-side" ng-class="{'-top-position': tabs || !icon && hideDescription}">
               
-              <ng-form id="editor-icon" name="iconForm">
+              <ng-form data-element=="editor-icon" name="iconForm">
                  <div class="umb-panel-header-icon" ng-if="!hideIcon" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}" title="{{$parent.icon}}">
                      <i class="icon {{$parent.icon}}"  ng-if="$parent.icon!=='' && $parent.icon!==null"></i>
                      <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
@@ -19,7 +19,7 @@
 
                    <ng-form name="headerNameForm">
                        <input
-                        id="editor-name-field"
+                        data-element="editor-name-field"
                         title="{{key}}"
                         type="text"
                         class="umb-panel-header-name-input"
@@ -37,7 +37,7 @@
                   <div class="umb-panel-header-name" ng-if="nameLocked" title="{{key}}">{{ name }}</div>
 
                   <umb-generate-alias
-                    id="editor-alias"
+                    data-element="editor-alias"
                     class="umb-panel-header-alias"
                     ng-if="!hideAlias"
                     alias="$parent.alias"
@@ -48,7 +48,7 @@
                 
 
                         <input
-                            id="editor-description"
+                            data-element="editor-description"
                             type="text"
                             class="umb-panel-header-description"
                             localize="placeholder"
@@ -63,7 +63,7 @@
 
                <div class="umb-editor-header__actions-menu">
                     <umb-editor-menu
-                        id="editor-actions"
+                        data-element="editor-actions"
                         ng-if="menu.currentNode"
                         current-node="menu.currentNode"
                         current-section="{{menu.currentSection}}">
@@ -73,7 +73,7 @@
             </div>
 
             <umb-editor-navigation
-                id="editor-sub-views"
+                data-element="editor-sub-views"
                 ng-if="navigation"
                 navigation="navigation">
             </umb-editor-navigation>
@@ -81,7 +81,7 @@
         </div>
 
         <umb-tabs-nav
-            id="editor-tabs"
+            data-element="editor-tabs"
             ng-if="tabs"
             model="tabs">
         </umb-tabs-nav>
@@ -89,7 +89,7 @@
     </div>
 
     <umb-overlay
-        id="editor-overlay-icon-picker"
+        data-element="editor-overlay-icon-picker"
         ng-if="dialogModel.show"
         model="dialogModel"
         position="right"

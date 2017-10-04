@@ -120,11 +120,19 @@
             }
 
             function bindEvent() {
-                $(scope.currentStep.element).on(scope.currentStep.event, handleEvent);
+                if(scope.currentStep.clickElement) {
+                    $(scope.currentStep.clickElement).on(scope.currentStep.event, handleEvent);
+                } else {
+                    $(scope.currentStep.element).on(scope.currentStep.event, handleEvent);
+                }
             }
 
             function unbindEvent() {
-                $(scope.currentStep.element).off(scope.currentStep.event);                
+                if(scope.currentStep.clickElement) {
+                    $(scope.currentStep.clickElement).off(scope.currentStep.event);
+                } else {
+                    $(scope.currentStep.element).off(scope.currentStep.event);
+                }
             }
 
             function handleEvent() {
