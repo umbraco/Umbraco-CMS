@@ -89,6 +89,8 @@
                     // Rounding numbers
                     var topDistance = offset.top.toFixed();
                     var topAndHeight = (offset.top + height).toFixed();
+                    var leftDistance = offset.left.toFixed();
+                    var leftAndWidth = (offset.left + width).toFixed();
                     
                     // Convert classes into variables
                     var rectLeft = $(".rect-left")
@@ -97,20 +99,20 @@
                     var rectRight = $(".rect-right")
 
                     // SVG rect at the left side of the canvas
-                    rectLeft.css("width", offset.left);
+                    rectLeft.css("width", leftDistance);
                     
                     // SVG rect at the top of the canvas
-                    rectTop.css("height", offset.top);
-                    rectTop.css("x", offset.left);
+                    rectTop.css("height", topDistance);
+                    rectTop.css("x", leftDistance);
                     
                     // SVG rect at the bottom of the canvas
                     rectBot.css("height", "100%");
                     rectBot.css("y", topAndHeight );
-                    rectBot.css("x", offset.left);
+                    rectBot.css("x", leftDistance);
                     
                     // SVG rect at the right side of the canvas
-                    rectRight.css("x", offset.left + width );
-                    rectRight.css("y", topDistance );
+                    rectRight.css("x", leftAndWidth);
+                    rectRight.css("y", topDistance);
                     rectRight.css("height", height);
 
                 });
