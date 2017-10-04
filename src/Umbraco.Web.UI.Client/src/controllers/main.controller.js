@@ -164,29 +164,34 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
                 element: "#applications #section-settings",
                 title: "Navigate to the settings sections",
                 content: "In the settings section we will find the document types",
+                placement: "top",
                 event: "click"
             },
             {
                 element: "#tree #node-documentTypes",
                 title: "Let's open the context menu",
                 content: "Hover the document types node and click the three small dots",
+                placement: "bottom",
                 event: "click"
             },
             {
                 element: "#dialog #action-documentType",
                 title: "Create document type",
                 content: "Click the option to create a document type with a template",
+                placement: "right",
                 event: "click"
             },
             {
                 element: "#editor-name-field",
                 title: "Enter a name for the document type",
+                placement: "left",
                 content: "Enter a name for the document type"
             },
             {
                 element: "#editor-description",
                 title: "Enter a description for the document type",
-                content: "Enter a description for the document type"
+                content: "Enter a description for the document type",
+                placement: "center"
             },
             {
                 element: "[data-element='group-add']",

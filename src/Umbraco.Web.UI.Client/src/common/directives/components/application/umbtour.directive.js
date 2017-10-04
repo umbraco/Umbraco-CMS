@@ -9,7 +9,7 @@
             scope.currentStepIndex;
             scope.currentStep;
             scope.loadingStep = false;
-            var dot;
+            var popover;
 
             scope.nextStep = function() {
                 nextStep();
@@ -24,7 +24,7 @@
             };
 
             function onInit() {
-                dot = el.find(".umb-tour__dot");
+                popover = el.find(".umb-tour__popover");
                 scope.totalSteps = scope.steps.length;
                 scope.currentStepIndex = 0;
                 
@@ -53,7 +53,7 @@
                         console.log("Everything is DONE JOHN");
                         clearInterval(timer);
                         
-                        positionDot();
+                        positionPopover();
 
                         if(scope.currentStep.event) {
                             bindEvent();
@@ -67,7 +67,7 @@
 
             }
 
-            function positionDot() {
+            function positionPopover() {
 
                 $timeout(function(){
                     
@@ -75,12 +75,36 @@
                     var offset = element.offset();
                     var width = element.outerWidth(true);
                     var height = element.outerHeight(true);
-    
-                    console.log("This element", element);                    
-                    console.log("width", width);
-                    console.log("height", height);
-          
-                    dot.css({top: offset.top + (height / 2), left: offset.left + width});
+
+                    $timeout(function(){
+                    
+                        var popoverBox = $(".umb-tour__popover");
+                        var popoverWidth = popoverBox.outerWidth();
+                        var popoverHeight = popoverBox.outerHeight();
+
+                        console.log("This element", element);                    
+                        console.log("width", width);
+                        console.log("height", height);
+                        console.log(scope.currentStep.placement);
+                        console.log("popoverWidth", popoverWidth);
+                        console.log("popoverHeight", popoverHeight);
+
+                        // Element placements
+                        if (scope.currentStep.placement === "top") {
+                            popover.css({top: offset.top - popoverHeight, left: offset.left});
+                        } else if (scope.currentStep.placement === "bottom") {
+                            popover.css({top: offset.top + height, left: offset.left});
+                        } else if (scope.currentStep.placement === "right") {
+                            popover.css({top: offset.top, left: offset.left + width});
+                        } else if (scope.currentStep.placement === "left") {
+                            popover.css({top: offset.top, left: offset.left - popoverWidth});
+                        } else if (scope.currentStep.placement === "center") {
+                            popover.css({top: "50%", left: "50%", transform: "translate(-50%, -50%)"});
+                        } else {
+                            popover.css({top: "50%", left: "50%", transform: "translate(-50%, -50%)"});
+                        }                        
+                        
+                    });
 
                     // SVG + jQuery backdrop
 
@@ -134,7 +158,7 @@
             }
 
             function resize() {
-                positionDot();
+                positionPopover();
             }
 
             onInit();
