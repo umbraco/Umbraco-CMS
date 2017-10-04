@@ -1,6 +1,30 @@
 <div class="umb-dashboard-grid" ng-controller="Umbraco.Dashboard.StartUpDynamicContentController as vm">
 
     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+    
+    <div>
+
+        <div>
+            <h5>Create a document type</h5>
+            <button ng-click="vm.startTour()">Start tour</button>
+        </div>
+
+        <div>
+            <h5>Create content</h5>
+            <button ng-click="vm.startTour()">Start tour</button>
+        </div>
+        
+        <div>
+            <h5>Render in template</h5>
+            <button ng-click="vm.startTour()">Start tour</button>
+        </div>
+        
+        <div>
+            <h5>Preview website</h5>
+            <button ng-click="vm.startTour()">Start tour</button>
+        </div>
+
+    </div>
 
     <div class="row clearfix" ng-if="vm.dashboard">
         <!-- Sections -->

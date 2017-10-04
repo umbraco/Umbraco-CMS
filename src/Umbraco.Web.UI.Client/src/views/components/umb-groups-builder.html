@@ -1,10 +1,12 @@
-<div class="clearfix">
+<div id="groups-builder" class="clearfix">
 
     <umb-editor-sub-header>
 
         <umb-editor-sub-header-content-right>
 
             <umb-button
+                data-element="button-compositions"
+                id="button-compositions"
                 ng-if="compositions !== false"
                 type="button"
                 button-style="link"
@@ -14,6 +16,7 @@
             </umb-button>
 
             <umb-button
+                id="button-reorder"
                 ng-if="sorting !== false"
                 type="button"
                 button-style="link"
@@ -32,10 +35,10 @@
 
     <ul class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
 
-        <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__group-sortable': sortingMode}">
+        <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__group-sortable': sortingMode}" data-element="group-{{$index}}">
 
             <!-- TAB INIT STATE -->
-            <a href="" class="umb-group-builder__group -placeholder" hotkey="alt+shift+t" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode">
+            <a href="" class="umb-group-builder__group -placeholder" hotkey="alt+shift+t" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode" data-element="group-add">
 
                 <div class="umb-group-builder__group-title-wrapper -placeholder">
                   <div class="umb-group-builder__group-title -placeholder"></div>
@@ -61,7 +64,7 @@
 
                 <div class="umb-group-builder__group-title-wrapper">
 
-                    <ng-form name="groupNameForm">
+                    <ng-form name="groupNameForm" data-element="group-name">
                         <div class="umb-group-builder__group-title control-group -no-margin" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited}">
                             <i class="umb-group-builder__group-title-icon icon-navigation" ng-if="sortingMode && !tab.inherited"></i>
                             <input class="umb-group-builder__group-title-input"
@@ -111,6 +114,7 @@
 
                         <!-- Init property / Property placeholder / add new property -->
                         <a href=""
+                            data-element="property-add"
                             class="umb-group-builder__property -placeholder"
                             ng-if="property.propertyState=='init' && !sortingMode"
                             ng-class="{'-placeholder': property.propertyState=='init'}"

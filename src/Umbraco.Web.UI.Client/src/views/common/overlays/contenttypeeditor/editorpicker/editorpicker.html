@@ -1,4 +1,4 @@
-<div class="umb-overlay-body" ng-controller="Umbraco.Overlays.EditorPickerOverlay as vm">
+<div data-element="overlay-editor-picker" class="umb-overlay-body" ng-controller="Umbraco.Overlays.EditorPickerOverlay as vm">
 
 	<!-- FILTER -->
 	<div class="umb-control-group -no-border">
@@ -31,6 +31,7 @@
 						<h5>{{key}}</h5>
 						<ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
 							<li	ng-repeat="systemDataType in value | orderBy:'name'"
+								data-element="editor-{{systemDataType.alias}}"
 								ng-mouseover="vm.showDetailsOverlay(systemDataType)"
 								ng-click="vm.pickEditor(systemDataType)"
 								class="-four-in-row">
@@ -48,6 +49,7 @@
 						<h5>{{key}}</h5>
 						<ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
 							<li ng-repeat="dataType in value | orderBy:'name'"
+								data-element="editor-{{dataType.alias}}"
 								ng-mouseover="vm.showDetailsOverlay(dataType)"
 								ng-click="vm.pickDataType(dataType)"
 								class="-four-in-row">

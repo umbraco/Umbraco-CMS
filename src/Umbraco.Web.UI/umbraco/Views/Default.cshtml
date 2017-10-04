@@ -65,6 +65,12 @@
 
         <umb-notifications></umb-notifications>
 
+        <umb-tour
+            ng-if="tour.show"
+            options="tour.options"
+            steps="tour.steps">
+        </umb-tour>
+
     </div>
 
     @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))

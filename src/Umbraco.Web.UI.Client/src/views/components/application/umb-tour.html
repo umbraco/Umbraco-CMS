@@ -1,0 +1,33 @@
+<div class="umb-tour">
+
+    <!--
+    <div class="umb-tour__backdrop"></div>
+    -->
+
+    <div class="umb-tour__popover shadow-depth-5">
+        
+        <div ng-if="loadingStep">
+            <umb-load-indicator></umb-load-indicator>
+        </div>
+        
+        <div ng-if="currentStepIndex < steps.length && !loadingStep">
+            <div>step {{ currentStepIndex + 1 }} of {{ steps.length }}</div>
+            <div class="umb-tour__title">{{ currentStep.title }}</div>
+            <div class="umb-tour__content">{{ currentStep.content }}</div>
+            <button ng-click="endTour()">End tour</button>
+            <button ng-click="nextStep()" ng-if="!currentStep.event">Next</button>
+        </div>
+
+        <div ng-if="currentStepIndex === steps.length && !loadingStep">
+            <div>WOOOHOOO</div>
+            <div>Your completed the tour. That is amazing!</div>
+            <button ng-click="completeTour()">Complete</button>
+        </div>
+
+    </div>
+
+    <!-- Dot -->
+    <div class="umb-tour__dot"></div>
+
+
+</div>

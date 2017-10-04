@@ -5,7 +5,7 @@
 
     <div class='umb-modalcolumn-body'>
         <ul class="umb-actions">
-            <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in menuActions">
+            <li id="action-{{action.alias}}" class="action" ng-class="{sep:action.seperator}" ng-repeat="action in menuActions">
                 <a prevent-default
                     ng-click="executeMenuItem(action)">
                     <i class="icon icon-{{action.cssclass}}"></i>

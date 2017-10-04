@@ -18,10 +18,33 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
 
 
-function startUpDynamicContentController(dashboardResource, assetsService) {
+function startUpDynamicContentController(dashboardResource, assetsService, tourService) {
     var vm = this;
     vm.loading = true;
     vm.showDefault = false;
+    
+    vm.startTour = startTour;
+
+    function startTour() {
+
+        var tour = {
+            "options": {
+                "name": "Create document type",
+                "alias": "umbCreateDocType"
+            },
+            "steps": [
+                {
+                    element: "#applications #section-settings",
+                    title: "Navigate to the settings sections",
+                    content: "In the settings section we will find the document types",
+                    event: "click"
+                }
+            ]
+        };
+
+        tourService.startTour(tour);
+        
+    }
 
     // default dashboard content
     vm.defaultDashboard = {
