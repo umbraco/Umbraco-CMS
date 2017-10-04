@@ -263,7 +263,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         ]
     };
 
-    //tourService.startTour(testTour);
+    tourService.startTour(testTour);
 
 }
 

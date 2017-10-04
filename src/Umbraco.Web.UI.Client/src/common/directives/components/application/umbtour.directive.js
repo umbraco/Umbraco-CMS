@@ -82,6 +82,37 @@
           
                     dot.css({top: offset.top + (height / 2), left: offset.left + width});
 
+                    // SVG + jQuery backdrop
+
+                    var target = $(scope.currentStep.element);
+                    
+                    // Rounding numbers
+                    var topDistance = offset.top.toFixed();
+                    var topAndHeight = (offset.top + height).toFixed();
+                    
+                    // Convert classes into variables
+                    var rectLeft = $(".rect-left")
+                    var rectTop = $(".rect-top")
+                    var rectBot = $(".rect-bot")
+                    var rectRight = $(".rect-right")
+
+                    // SVG rect at the left side of the canvas
+                    rectLeft.css("width", offset.left);
+                    
+                    // SVG rect at the top of the canvas
+                    rectTop.css("height", offset.top);
+                    rectTop.css("x", offset.left);
+                    
+                    // SVG rect at the bottom of the canvas
+                    rectBot.css("height", "100%");
+                    rectBot.css("y", topAndHeight );
+                    rectBot.css("x", offset.left);
+                    
+                    // SVG rect at the right side of the canvas
+                    rectRight.css("x", offset.left + width );
+                    rectRight.css("y", topDistance );
+                    rectRight.css("height", height);
+
                 });
 
             }
