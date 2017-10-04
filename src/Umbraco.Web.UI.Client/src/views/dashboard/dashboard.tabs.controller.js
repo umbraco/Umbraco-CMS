@@ -24,19 +24,116 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
     vm.showDefault = false;
     
     vm.startTour = startTour;
+    vm.startTourTwo = startTourTwo;
+    vm.startTourThree = startTourThree;
 
     function startTour() {
 
         var tour = {
             "options": {
                 "name": "Create document type",
-                "alias": "umbCreateDocType"
+                "alias": "umbIntroCreateDocType"
             },
             "steps": [
                 {
-                    element: "#applications #section-settings",
+                    element: "#applications [data-element='section-settings']",
                     title: "Navigate to the settings sections",
                     content: "In the settings section we will find the document types",
+                    event: "click"
+                },
+                {
+                    element: "#tree [data-element='tree-item-documentTypes']",
+                    title: "Let's open the context menu",
+                    content: "Hover the document types node and click the three small dots",
+                    event: "click",
+                    clickElement: "#tree [data-element='tree-item-documentTypes'] [data-element='tree-item-options']"
+                },
+                {
+                    element: "#dialog [data-element='action-documentType']",
+                    title: "Create document type",
+                    content: "Click the option to create a document type with a template",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='editor-name-field']",
+                    title: "Enter a name for the document type",
+                    content: "Enter a name for the document type"
+                },
+                {
+                    element: "[data-element='editor-description']",
+                    title: "Enter a description for the document type",
+                    content: "Enter a description for the document type"
+                },
+                {
+                    element: "[data-element='group-add']",
+                    title: "Add tab",
+                    content: "Add new tab",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='group-name']",
+                    title: "Enter a name",
+                    content: "Enter a name the tab"
+                },
+                {
+                    element: "[data-element='property-add']",
+                    title: "Add a property",
+                    content: "Add a property to the tab",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='overlay-property-settings']",
+                    title: "Property dialog",
+                    content: "Something something something about the dialog"
+                },
+                {
+                    element: "[data-element='overlay-property-settings'] [data-element='property-name']",
+                    title: "Enter a name",
+                    content: "Enter a name for the property editor"
+                },
+                {
+                    element: "[data-element='overlay-property-settings'] [data-element='property-description']",
+                    title: "Enter a description",
+                    content: "Enter a description for the property editor"
+                },
+                {
+                    element: "[data-element='overlay-property-settings'] [data-element='editor-add']",
+                    title: "Add editor",
+                    content: "Something something something",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='overlay-editor-picker']",
+                    title: "Editor picker dialog",
+                    content: "Something something something about the editor picker dialog. This is here you select the type of property bla bla bla."
+                },
+                {
+                    element: "[data-element='overlay-editor-picker'] [data-element='editor-Umbraco.Date']",
+                    title: "Select the Date editor",
+                    content: "Something something something about the editor settings dialog",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='overlay-editor-settings']",
+                    title: "Editor settings dialog",
+                    content: "A loong story about the editor settings dialog...bla bla bla bla bla"
+                },
+                {
+                    element: "[data-element='overlay-submit']",
+                    title: "Submit the editor settings dialog",
+                    content: "Click submit to save your changes",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='overlay-submit']",
+                    title: "Submit the property settings dialog",
+                    content: "Click submit to save your changes",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='overlay-submit']",
+                    title: "Submit the property settings dialog",
+                    content: "Click submit to save your changes",
                     event: "click"
                 }
             ]
@@ -44,6 +141,118 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
 
         tourService.startTour(tour);
         
+    }
+
+    function startTourTwo() {
+
+        var tour = {
+            "options": {
+                "name": "Create Content",
+                "alias": "umbIntroCreateContent"
+            },
+            "steps": [
+                {
+                    element: "[data-element='tree-root']",
+                    title: "Open the content context menu",
+                    content: "Bla bla bla bla bla",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='action-create-home']",
+                    title: "Navigate to the settings sections",
+                    content: "Select the document type Home we have created",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='editor-content'] [data-element='editor-name-field']",
+                    title: "Add name",
+                    content: "Enter name of new document type"
+                },
+                {
+                    element: "[data-element='editor-content'] [data-element='button-group-primary']",
+                    title: "Save and publish",
+                    content: "Save and publish your new page",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='editor-content'] [data-element='button-group-toggle']",
+                    title: "Unpublish",
+                    content: "First open the publish menu",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='editor-content'] [data-element='button-group-secondary-1']",
+                    title: "Unpublish",
+                    content: "Then click the unpublish button",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='editor-content'] [data-element='button-group-toggle']",
+                    title: "Save",
+                    content: "Open the publish menu again",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='editor-content'] [data-element='button-group-secondary-0']",
+                    title: "Save",
+                    content: "click the save button",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='editor-content'] [data-element='button-group-primary']",
+                    title: "Save",
+                    content: "click the save button",
+                    event: "click"
+                }
+            ]
+        };
+
+        tourService.startTour(tour);
+    }
+
+    function startTourThree() {
+
+        var tour = {
+            "options": {
+                "name": "Render in template",
+                "alias": "umbIntroRenderInTemplate"
+            },
+            "steps": [
+                {
+                    element: "#applications [data-element='section-settings']",
+                    title: "Navigate to the settings sections",
+                    content: "In the settings section we will find the templates",
+                    event: "click"
+                },
+                {
+                    element: "#tree [data-element='tree-item-templates']",
+                    title: "Template tree item",
+                    content: "Hover the templates tree item and click the three small dots",
+                    event: "click",
+                    clickElement: "#tree [data-element='tree-item-templates'] [data-element='tree-item-expand']"
+                },
+                {
+                    element: "#tree [data-element='tree-item-templates'] [data-element='tree-item-Home']",
+                    title: "Open Home template",
+                    content: "Click the home template to edit it",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='editor-templates'] [data-element='editor-name-field']",
+                    title: "Give your template a name",
+                    content: "Create a new template"
+                },
+                {
+                    element: "[data-element='editor-templates'] [data-element='button-save']",
+                    title: "Give your template a name",
+                    content: "Create a new template",
+                    event: "click"
+                }
+            ]
+        };
+
+        tourService.startTour(tour);        
+
     }
 
     // default dashboard content
