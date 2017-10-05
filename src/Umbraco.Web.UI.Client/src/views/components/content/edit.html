@@ -24,7 +24,7 @@
             <umb-tabs-content class="form-horizontal" view="true">
                <umb-tab id="tab{{tab.id}}" ng-repeat="tab in content.tabs" rel="{{tab.id}}">
 
-                  <umb-property ng-repeat="property in tab.properties" property="property">
+                  <umb-property data-element="property-{{property.alias}}" ng-repeat="property in tab.properties" property="property">
                      <umb-editor model="property"></umb-editor>
                   </umb-property>
 

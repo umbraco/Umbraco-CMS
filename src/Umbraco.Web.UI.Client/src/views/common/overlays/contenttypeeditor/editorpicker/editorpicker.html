@@ -1,4 +1,4 @@
-<div data-element="overlay-editor-picker" class="umb-overlay-body" ng-controller="Umbraco.Overlays.EditorPickerOverlay as vm">
+<div class="umb-overlay-body" ng-controller="Umbraco.Overlays.EditorPickerOverlay as vm">
 
 	<!-- FILTER -->
 	<div class="umb-control-group -no-border">
@@ -110,6 +110,7 @@
 	</div>
 
 	<umb-overlay
+		data-element="overlay-editor-settings"
 		ng-if="vm.editorSettingsOverlay.show"
 		model="vm.editorSettingsOverlay"
 		position="right"

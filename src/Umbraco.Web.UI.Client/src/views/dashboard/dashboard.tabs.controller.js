@@ -82,56 +82,56 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
                     event: "click"
                 },
                 {
-                    element: "[data-element='overlay-property-settings']",
+                    element: "[data-element~='overlay-property-settings']",
                     title: "Property dialog",
                     content: "Something something something about the dialog"
                 },
                 {
-                    element: "[data-element='overlay-property-settings'] [data-element='property-name']",
+                    element: "[data-element~='overlay-property-settings'] [data-element='property-name']",
                     title: "Enter a name",
                     content: "Enter a name for the property editor"
                 },
                 {
-                    element: "[data-element='overlay-property-settings'] [data-element='property-description']",
+                    element: "[data-element~='overlay-property-settings'] [data-element='property-description']",
                     title: "Enter a description",
                     content: "Enter a description for the property editor"
                 },
                 {
-                    element: "[data-element='overlay-property-settings'] [data-element='editor-add']",
+                    element: "[data-element~='overlay-property-settings'] [data-element='editor-add']",
                     title: "Add editor",
                     content: "Something something something",
                     event: "click"
                 },
                 {
-                    element: "[data-element='overlay-editor-picker']",
+                    element: "[data-element~='overlay-editor-picker']",
                     title: "Editor picker dialog",
                     content: "Something something something about the editor picker dialog. This is here you select the type of property bla bla bla."
                 },
                 {
-                    element: "[data-element='overlay-editor-picker'] [data-element='editor-Umbraco.Date']",
+                    element: "[data-element~='overlay-editor-picker'] [data-element='editor-Umbraco.MediaPicker2']",
                     title: "Select the Date editor",
                     content: "Something something something about the editor settings dialog",
                     event: "click"
                 },
                 {
-                    element: "[data-element='overlay-editor-settings']",
+                    element: "[data-element~='overlay-editor-settings']",
                     title: "Editor settings dialog",
                     content: "A loong story about the editor settings dialog...bla bla bla bla bla"
                 },
                 {
-                    element: "[data-element='overlay-submit']",
+                    element: "[data-element~='overlay-editor-settings'] [data-element='overlay-submit']",
                     title: "Submit the editor settings dialog",
                     content: "Click submit to save your changes",
                     event: "click"
                 },
                 {
-                    element: "[data-element='overlay-submit']",
+                    element: "[data-element~='overlay-property-settings'] [data-element='overlay-submit']",
                     title: "Submit the property settings dialog",
                     content: "Click submit to save your changes",
                     event: "click"
                 },
                 {
-                    element: "[data-element='overlay-submit']",
+                    element: "[data-element='button-group-primary']",
                     title: "Submit the property settings dialog",
                     content: "Click submit to save your changes",
                     event: "click"
@@ -239,6 +239,11 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
                 },
                 {
                     element: "[data-element='editor-templates'] [data-element='editor-name-field']",
+                    title: "Give your template a name",
+                    content: "Create a new template"
+                },
+                {
+                    element: "[data-element='editor-templates'] [data-element='code-editor']",
                     title: "Give your template a name",
                     content: "Create a new template"
                 },

@@ -288,17 +288,19 @@
     </ul>
 
     <umb-overlay
-            ng-if="compositionsDialogModel.show"
-            model="compositionsDialogModel"
-            position="right"
-            view="compositionsDialogModel.view">
+        data-element="overlay-compositions"
+        ng-if="compositionsDialogModel.show"
+        model="compositionsDialogModel"
+        position="right"
+        view="compositionsDialogModel.view">
     </umb-overlay>
 
     <umb-overlay
-            ng-if="propertySettingsDialogModel.show"
-            model="propertySettingsDialogModel"
-            position="right"
-            view="propertySettingsDialogModel.view">
+        data-element="overlay-property-settings"
+        ng-if="propertySettingsDialogModel.show"
+        model="propertySettingsDialogModel"
+        position="right"
+        view="propertySettingsDialogModel.view">
     </umb-overlay>
 
 </div>

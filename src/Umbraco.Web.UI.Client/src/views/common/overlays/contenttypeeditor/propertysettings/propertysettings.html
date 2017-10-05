@@ -1,4 +1,4 @@
-<div data-element="overlay-property-settings" class="content-type-editor-dialog edit-property-settings" ng-controller="Umbraco.Overlay.PropertySettingsOverlay as vm">
+<div class="content-type-editor-dialog edit-property-settings" ng-controller="Umbraco.Overlay.PropertySettingsOverlay as vm">
 
    <div class="umb-control-group">
        <div class="control-group">
@@ -105,6 +105,7 @@
    </div>
 
    <umb-overlay
+      data-element="overlay-editor-picker"
       ng-if="vm.editorPickerOverlay.show"
       model="vm.editorPickerOverlay"
       position="right"
@@ -112,6 +113,7 @@
    </umb-overlay>
 
    <umb-overlay
+      data-element="overlay-editor-settings"
       ng-if="vm.editorSettingsOverlay.show"
       model="vm.editorSettingsOverlay"
       position="right"
