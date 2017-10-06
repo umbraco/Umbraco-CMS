@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Web;
 using System.Web.Compilation;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
@@ -15,6 +16,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using umbraco.interfaces;
+using Umbraco.Core.Configuration;
 using File = System.IO.File;
 
 namespace Umbraco.Core
@@ -426,9 +428,23 @@ namespace Umbraco.Core
         }
 
         private string GetPluginListFilePath()
-        {
-            var filename = "umbraco-plugins." + NetworkHelper.FileSafeMachineName + ".list";
-            return Path.Combine(_tempFolder, filename);
+        {            
+            switch (GlobalSettings.LocalTempStorageLocation)
+            {                
+                case LocalTempStorage.AspNetTemp:
+                    return Path.Combine(HttpRuntime.CodegenDir, "umbraco-plugins.list");
+                case LocalTempStorage.EnvironmentTemp:
+                    var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
+                    var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoPlugins",
+                        //include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                        // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
+                        // utilizing an old path
+                        appDomainHash);
+                    return Path.Combine(cachePath, "umbraco-plugins.list");
+                case LocalTempStorage.Default:                    
+                default:
+                    return Path.Combine(_tempFolder, "umbraco-plugins." + NetworkHelper.FileSafeMachineName + ".list");
+            }
         }
 
         private string GetPluginHashFilePath()
