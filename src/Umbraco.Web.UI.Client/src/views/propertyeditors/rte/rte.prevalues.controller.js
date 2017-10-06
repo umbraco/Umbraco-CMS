@@ -76,6 +76,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                     icon.isCustom = false;
                     break;
                 case "styleselect":
+                case "fontsizeselect":
                     icon.name = "icon-list";
                     icon.isCustom = true;
                     break;
