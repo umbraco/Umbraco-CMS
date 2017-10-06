@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Web;
 using System.Web.Compilation;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
@@ -15,6 +16,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using umbraco.interfaces;
+using Umbraco.Core.Configuration;
 using File = System.IO.File;
 
 namespace Umbraco.Core
@@ -84,7 +86,8 @@ namespace Umbraco.Core
                     // if the hash has changed, clear out the persisted list no matter what, this will force
                     // rescanning of all plugin types including lazy ones.
                     // http://issues.umbraco.org/issue/U4-4789
-                    File.Delete(pluginListFile);
+                    if(File.Exists(pluginListFile))
+                        File.Delete(pluginListFile);
 
                     WriteCachePluginsHash();
                 }
@@ -94,7 +97,8 @@ namespace Umbraco.Core
                 // if the hash has changed, clear out the persisted list no matter what, this will force
                 // rescanning of all plugin types including lazy ones.
                 // http://issues.umbraco.org/issue/U4-4789
-                File.Delete(pluginListFile);
+                if (File.Exists(pluginListFile))
+                    File.Delete(pluginListFile);
 
                 // always set to true if we're not detecting (generally only for testing)
                 RequiresRescanning = true;
@@ -231,6 +235,14 @@ namespace Umbraco.Core
         private void WriteCachePluginsHash()
         {
             var filePath = GetPluginHashFilePath();
+
+            // be absolutely sure the folder exists
+            var folder = Path.GetDirectoryName(filePath);
+            if (folder == null)
+                throw new InvalidOperationException("The folder could not be determined for the file " + filePath);
+            if (Directory.Exists(folder) == false)
+                Directory.CreateDirectory(folder);
+
             File.WriteAllText(filePath, CurrentAssembliesHash.ToString(), Encoding.UTF8);
         }
 
@@ -426,25 +438,56 @@ namespace Umbraco.Core
         }
 
         private string GetPluginListFilePath()
-        {
-            var filename = "umbraco-plugins." + NetworkHelper.FileSafeMachineName + ".list";
-            return Path.Combine(_tempFolder, filename);
+        {            
+            switch (GlobalSettings.LocalTempStorageLocation)
+            {                
+                case LocalTempStorage.AspNetTemp:
+                    return Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco-plugins.list");
+                case LocalTempStorage.EnvironmentTemp:
+                    var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
+                    var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData",
+                        //include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                        // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
+                        // utilizing an old path
+                        appDomainHash);
+                    return Path.Combine(cachePath, "umbraco-plugins.list");
+                case LocalTempStorage.Default:                    
+                default:
+                    return Path.Combine(_tempFolder, "umbraco-plugins." + NetworkHelper.FileSafeMachineName + ".list");
+            }
         }
 
         private string GetPluginHashFilePath()
         {
-            var filename = "umbraco-plugins." + NetworkHelper.FileSafeMachineName + ".hash";
-            return Path.Combine(_tempFolder, filename);
+            switch (GlobalSettings.LocalTempStorageLocation)
+            {
+                case LocalTempStorage.AspNetTemp:
+                    return Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco-plugins.hash");
+                case LocalTempStorage.EnvironmentTemp:
+                    var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
+                    var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData",
+                        //include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                        // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
+                        // utilizing an old path
+                        appDomainHash);
+                    return Path.Combine(cachePath, "umbraco-plugins.hash");
+                case LocalTempStorage.Default:
+                default:
+                    return Path.Combine(_tempFolder, "umbraco-plugins." + NetworkHelper.FileSafeMachineName + ".hash");
+            }
         }
 
         internal void WriteCache()
         {
-            // be absolutely sure
-            if (Directory.Exists(_tempFolder) == false)
-                Directory.CreateDirectory(_tempFolder);
-
             var filePath = GetPluginListFilePath();
 
+            // be absolutely sure the folder exists
+            var folder = Path.GetDirectoryName(filePath);
+            if (folder == null)
+                throw new InvalidOperationException("The folder could not be determined for the file " + filePath);
+            if (Directory.Exists(folder) == false)
+                Directory.CreateDirectory(folder);
+            
             using (var stream = GetFileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, ListFileOpenWriteTimeout))
             using (var writer = new StreamWriter(stream))
             {
