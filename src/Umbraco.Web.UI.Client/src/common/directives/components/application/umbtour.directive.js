@@ -118,12 +118,15 @@
                     var offset = element.offset();
                     var width = element.outerWidth(true);
                     var height = element.outerHeight(true);
+                    var windowWidth = $( window ).width(); 
+                    var windowHeight = $( window ).height(); 
 
                     $timeout(function(){
                     
                         var popoverBox = $(".umb-tour__popover");
                         var popoverWidth = popoverBox.outerWidth();
                         var popoverHeight = popoverBox.outerHeight();
+                        var popoverOffset = popoverBox.offset(); 
 
                         console.log("This element", element);
                         console.log("width", width);
@@ -132,27 +135,144 @@
                         console.log("popoverWidth", popoverWidth);
                         console.log("popoverHeight", popoverHeight);
                         console.log("element offset", offset);
+                        console.log("windowWidth", windowWidth); 
+                        console.log("windowHeight", windowHeight);
 
                         // Element placements
                         if (scope.currentStep.placement === "top") {
-                            popover.css({top: offset.top - popoverHeight, left: offset.left});
-                        } else if (scope.currentStep.placement === "bottom") {
-                            popover.css({top: offset.top + height, left: offset.left});
-                        } else if (scope.currentStep.placement === "right") {
-                            popover.css({top: offset.top, left: offset.left + width});
-                        } else if (scope.currentStep.placement === "left") {
-                            popover.css({top: offset.top, left: offset.left - popoverWidth});
-                        } else if (scope.currentStep.placement === "center") {
+
+                            // Repositioning popover, so it is not in the center anymore 
+                            popover.css({top: offset.top - popoverHeight, left: offset.left, transform: "none"}); 
+            
+                            //refreshing my variables 
+                            popoverOffset = popoverBox.offset(); 
+
+                            // Deciding if the highlight is left or right side 
+                            if (offset.left < windowWidth/2) {
+
+                                //Checking if it is out of the screen 
+                                if (popoverOffset.top < "0") { 
+                                    // placing the popover under the highlighted area, because its off-screen                                     
+                                    popover.css({top: offset.top + height, left: offset.left}); 
+
+                                } else {
+                                    popover.css({top: offset.top - popoverHeight, left: offset.left}); 
+                                }           
+                            
+                            } else { 
+
+                                //Checking if it is out of the screen 
+                                if (popoverOffset.top < "0") { 
+                                    // placing the popover under the highlighted area, because its off-screen 
+                                    popover.css({top: offset.top + height, left: offset.left - popoverWidth + width}); 
+
+                                } else { 
+                                    popover.css({top: offset.top - popoverHeight, left: offset.left - popoverWidth + width}); 
+                                } 
+                            }
+                        }
+                        
+                        else if (scope.currentStep.placement === "bottom") {
+
+                            // Repositioning popover, so it is not in the center anymore 
+                            popover.css({top: offset.top + height, left: offset.left, transform: "none"}); 
+                            
+                            // refreshing my variables 
+                            popoverOffset = popoverBox.offset(); 
+                            console.log("we must have it as a bottom", popoverOffset.top); 
+
+                            // Deciding if the highlight is left or right side 
+                            if (offset.left < windowWidth/2) { 
+
+                                // Checking if it is out of the screen 
+                                if (popoverOffset.top + popoverHeight > windowHeight) { 
+                                    // placing the popover over the highlighted area, because its off-screen 
+                                    popover.css({top: offset.top - popoverHeight, left: offset.left}); 
+
+                                } else { 
+                                    popover.css({top: offset.top + height, left: offset.left}); 
+                                } 
+                                    
+                            } else { 
+
+                                // Checking if it is out of the screen 
+                                if (popoverOffset.top + popoverHeight > windowHeight) { 
+                                    // placing the popover over the highlighted area, because its off-screen 
+                                    popover.css({top: offset.top - popoverHeight, left: offset.left - popoverWidth + width}); 
+
+                                } else { 
+                                    popover.css({top: offset.top + height, left: offset.left - popoverWidth + width}); 
+                                } 
+                                
+                            }
+                        }
+                        
+                        else if (scope.currentStep.placement === "right") {
+
+                            // Repositioning popover, so it is not in the center anymore
+                            popover.css({top: offset.top, left: offset.left + width, transform: "none"});
+
+                            //refreshing my variables
+                            popoverOffset = popoverBox.offset();
+
+                            // Deciding if the highlight is top or bottom side
+                            if (offset.top < windowHeight/2) {
+                                // Checking if it is out of the screen
+                                if (offset.left + width + popoverWidth > windowWidth) {
+                                    popover.css({top: offset.top, left: offset.left - popoverWidth});
+
+                                } else {
+                                    popover.css({top: offset.top, left: offset.left + width});
+                                }
+
+                            } else { 
+                                // Checking if it is out of the screen
+                                if (offset.left + width + popoverWidth > windowWidth) {
+                                    popover.css({top: offset.top - popoverHeight + height, left: offset.left - popoverWidth });
+
+                                } else {
+                                    popover.css({top: offset.top - popoverHeight + height, left: offset.left + width}) 
+                                }
+                            }
+                        }
+                        
+                        else if (scope.currentStep.placement === "left") {
+                            
+                            // Repositioning popover, so it is not in the center anymore 
+                            popover.css({top: offset.top, left: offset.left - popoverWidth}); 
+                        
+                            // Refreshing my variables 
+                            popoverOffset = popoverBox.offset(); 
+
+                            if (offset.top < windowHeight/2) { 
+                                //Checking if it is out of the screen 
+                                if (offset.left - popoverWidth < "0") { 
+                                    popover.css({top: offset.top, left: offset.left + width}); 
+                                    
+                                } else { 
+                                    popover.css({top: offset.top, left: offset.left - popoverWidth}); 
+                                } 
+
+                            } else { 
+                                //Checking if it is out of the screen 
+                                if (offset.left - popoverWidth < "0") { 
+                                    popover.css({top: offset.top + height - popoverHeight, left: offset.left + width}); 
+
+                                } else { 
+                                    popover.css({top: offset.top + height - popoverHeight, left: offset.left - popoverWidth}); 
+                                } 
+                            }
+                        }
+                        
+                        else if (scope.currentStep.placement === "center") {
                             popover.css({top: "50%", left: "50%", transform: "translate(-50%, -50%)"});
-                        } else {
+                        }
+                        
+                        else {
                             popover.css({top: "50%", left: "50%", transform: "translate(-50%, -50%)"});
                         }                        
                         
                     });
-
-                    // SVG + jQuery backdrop
-
-                    var target = $(scope.currentStep.element);
                     
                     // Rounding numbers
                     var topDistance = offset.top.toFixed();

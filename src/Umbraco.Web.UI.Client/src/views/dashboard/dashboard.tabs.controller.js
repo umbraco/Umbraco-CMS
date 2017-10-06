@@ -42,12 +42,14 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
                     element: "#applications [data-element='section-settings']",
                     title: "Navigate to the settings sections",
                     content: "In the settings section we will find the document types",
+                    placement: "right",
                     event: "click"
                 },
                 {
                     element: "#tree [data-element='tree-item-documentTypes']",
                     title: "Let's open the context menu",
                     content: "Hover the document types node and click the three small dots",
+                    placement: "right",
                     event: "click",
                     clickElement: "#tree [data-element='tree-item-documentTypes'] [data-element='tree-item-options']"
                 },
@@ -55,89 +57,106 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
                     element: "#dialog [data-element='action-documentType']",
                     title: "Create document type",
                     content: "Click the option to create a document type with a template",
+                    placement: "right",
                     event: "click"
                 },
                 {
                     element: "[data-element='editor-name-field']",
                     title: "Enter a name for the document type",
-                    content: "Enter a name for the document type"
+                    content: "Enter a name for the document type",
+                    placement: "bottom"
+
                 },
                 {
                     element: "[data-element='editor-description']",
                     title: "Enter a description for the document type",
-                    content: "Enter a description for the document type"
+                    content: "Enter a description for the document type",
+                    placement: "bottom"
                 },
                 {
                     element: "[data-element='group-add']",
                     title: "Add tab",
                     content: "Add new tab",
-                    event: "click"
+                    event: "click",
+                    placement: "bottom"
                 },
                 {
                     element: "[data-element='group-name']",
                     title: "Enter a name",
-                    content: "Enter a name the tab"
+                    content: "Enter a name the tab",
+                    placement: "bottom"
                 },
                 {
                     element: "[data-element='property-add']",
                     title: "Add a property",
                     content: "Add a property to the tab",
-                    event: "click"
+                    event: "click",
+                    placement: "bottom"
                 },
                 {
                     element: "[data-element~='overlay-property-settings']",
                     title: "Property dialog",
-                    content: "Something something something about the dialog"
+                    content: "Something something something about the dialog",
+                    placement: "left"
                 },
                 {
                     element: "[data-element~='overlay-property-settings'] [data-element='property-name']",
                     title: "Enter a name",
-                    content: "Enter a name for the property editor"
+                    content: "Enter a name for the property editor",
+                    placement: "left"
                 },
                 {
                     element: "[data-element~='overlay-property-settings'] [data-element='property-description']",
                     title: "Enter a description",
-                    content: "Enter a description for the property editor"
+                    content: "Enter a description for the property editor",
+                    placement: "left"
                 },
                 {
                     element: "[data-element~='overlay-property-settings'] [data-element='editor-add']",
                     title: "Add editor",
                     content: "Something something something",
-                    event: "click"
+                    event: "click",
+                    placement: "left"
                 },
                 {
                     element: "[data-element~='overlay-editor-picker']",
                     title: "Editor picker dialog",
-                    content: "Something something something about the editor picker dialog. This is here you select the type of property bla bla bla."
+                    content: "Something something something about the editor picker dialog. This is here you select the type of property bla bla bla.",
+                    placement: "left"
                 },
                 {
                     element: "[data-element~='overlay-editor-picker'] [data-element='editor-Umbraco.MediaPicker2']",
                     title: "Select the Date editor",
                     content: "Something something something about the editor settings dialog",
-                    event: "click"
+                    event: "click",
+                    placement: "left"
                 },
                 {
                     element: "[data-element~='overlay-editor-settings']",
                     title: "Editor settings dialog",
-                    content: "A loong story about the editor settings dialog...bla bla bla bla bla"
+                    content: "A loong story about the editor settings dialog...bla bla bla bla bla",
+                    placement: "left"
                 },
                 {
                     element: "[data-element~='overlay-editor-settings'] [data-element='overlay-submit']",
                     title: "Submit the editor settings dialog",
                     content: "Click submit to save your changes",
-                    event: "click"
+                    event: "click",
+                    placement: "top"
                 },
                 {
                     element: "[data-element~='overlay-property-settings'] [data-element='overlay-submit']",
                     title: "Submit the property settings dialog",
                     content: "Click submit to save your changes",
-                    event: "click"
+                    event: "click",
+                    placement: "top"
                 },
                 {
                     element: "[data-element='button-group-primary']",
                     title: "Submit the property settings dialog",
                     content: "Click submit to save your changes",
-                    event: "click"
+                    event: "click",
+                    placement: "top"
                 }
             ]
         };
@@ -249,6 +268,7 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
                     element: "[data-element='editor-templates'] [data-element='code-editor']",
                     title: "Give your template a name",
                     content: "Create a new template"
+
                 },
                 {
                     element: "[data-element='editor-templates'] [data-element='button-save']",
@@ -275,31 +295,36 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
                     element: "#applications [data-element='section-settings']",
                     title: "Navigate to the settings sections",
                     content: "In the settings section we will find the document types",
-                    event: "click"
+                    event: "click",
+                    placement: "right"
                 },
                 {
                     element: "#tree [data-element='tree-item-documentTypes']",
                     title: "Let's open the context menu",
                     content: "Hover the document types node and click the three small dots",
                     event: "click",
-                    clickElement: "#tree [data-element='tree-item-documentTypes'] [data-element='tree-item-options']"
+                    clickElement: "#tree [data-element='tree-item-documentTypes'] [data-element='tree-item-options']",
+                    placement: "bottom"
                 },
                 {
                     element: "#dialog [data-element='action-documentType']",
                     title: "Create document type",
                     content: "Click the option to create a document type with a template",
-                    event: "click"
+                    event: "click",
+                    placement: "bottom"
                 },
                 {
                     element: "[data-element='editor-document-types'] [data-element='editor-name-field']",
                     title: "Enter a name for the document type",
-                    content: "Enter a name for the document type"
+                    content: "Enter a name for the document type",
+                    placement: "bottom"
                 },
                 {
                     element: "[data-element='editor-document-types'] [data-element='sub-view-permissions']",
                     title: "Enter a name for the document type",
                     content: "Enter a name for the document type",
-                    event: "click"
+                    event: "click",
+                    placement: "bottom"
                 }
             ]
         };
@@ -320,23 +345,27 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
                     element: "#tree [data-element='tree-item-Test']",
                     title: "Navigate to the Test node",
                     content: "In the settings section we will find the document types",
-                    event: "click"
+                    event: "click",
+                    placement: "bottom"
                 },
                 {
                     element: "[data-element='editor-content'] [data-element='tab-Tab 2']",
                     title: "Navigate to tab 2",
                     content: "Bla bla bla bla bla",
-                    event: "click"
+                    event: "click",
+                    placement: "bottom"
                 },
                 {
                     element: "[data-element='editor-content'] [data-element='property-prop2']",
                     title: "This is the second date picker",
-                    content: "We have a lot of those"
+                    content: "We have a lot of those",
+                    placement: "bottom"
                 },
                 {
                     element: "[data-element='editor-content'] [data-element='property-andTheLastTextArea']",
                     title: "This is the second date picker",
-                    content: "We have a lot of those"
+                    content: "We have a lot of those",
+                    placement: "bottom"
                 }
             ]
         };
@@ -357,7 +386,8 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
                     element: "#applications [data-element='section-media']",
                     title: "Navigate to the media section",
                     content: "<div>Testing html</div><br/><b>This should be bold</b><pre>We can also make code examples in here</pre>",
-                    event: "click"
+                    event: "click",
+                    placement: "right"
                 },
                 {
                     element: "#tree [data-element='tree-root']",
@@ -365,36 +395,42 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
                     content: "Hover the media root and click the three small dots in the right side",
                     event: "click",
                     clickElement: "#tree [data-element='tree-root'] [data-element='tree-item-options']",
-                    view: "treeOptions"
+                    view: "treeOptions",
+                    placement: "bottom"
                 },
                 {
                     element: "#dialog [data-element='action-Folder']",
                     title: "Select create folder",
                     content: "Bla bla bla bla bla",
-                    event: "click"
+                    event: "click",
+                    placement: "right"
                 },
                 {
                     element: "[data-element='editor-media'] [data-element='editor-name-field']",
                     title: "Give your folder a name",
-                    content: "Call it 'My Folder'"
+                    content: "Call it 'My Folder'",
+                    placement: "bottom"
                 },
                 {
                     element: "[data-element='editor-media'] [data-element='button-save']",
                     title: "Save the new folder",
                     content: "Bla bla bla bla bla",
-                    event: "click"
+                    event: "click",
+                    placement: "top"
                 },
                 {
                     element: "[data-element='editor-media'] [data-element='dropzone']",
                     title: "Upload images",
-                    content: "Bla bla bla bla bla"
+                    content: "Bla bla bla bla bla",
+                    placement: "left"
                 },
                 {
                     element: "[data-element='editor-media'] [data-element='media-grid-item-3']",
                     title: "Select media item",
                     content: "Bla bla bla bla bla",
                     event: "click",
-                    clickElement: "[data-element='editor-media'] [data-element='media-grid-item-3'] [data-element='media-grid-item-edit']"
+                    clickElement: "[data-element='editor-media'] [data-element='media-grid-item-3'] [data-element='media-grid-item-edit']",
+                    placement: "left"
                 },
                 {
                     element: "[data-element='editor-media'] [data-element='property-umbracoFile']",
