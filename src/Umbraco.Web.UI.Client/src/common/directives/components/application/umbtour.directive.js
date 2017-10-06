@@ -27,8 +27,22 @@
                 popover = el.find(".umb-tour__popover");
                 scope.totalSteps = scope.steps.length;
                 scope.currentStepIndex = 0;
-                
                 startStep();
+            }
+
+            function setView() {
+                if (scope.currentStep.view && scope.options.alias) {
+                    //we do this to avoid a hidden dialog to start loading unconfigured views before the first activation
+                    var configuredView = scope.currentStep.view;
+                    if (scope.currentStep.view.indexOf(".html") === -1) {
+                        var viewAlias = scope.currentStep.view.toLowerCase();
+                        var tourAlias = scope.options.alias.toLowerCase();
+                        configuredView = "views/common/tours/" + tourAlias + "/" + viewAlias + "/" + viewAlias + ".html";
+                    }
+                    if (configuredView !== scope.configuredView) {
+                        scope.configuredView = configuredView;
+                    }
+                }
             }
 
             function nextStep() {
@@ -40,8 +54,7 @@
 
             function startStep() {
 
-                scope.currentStep = scope.steps[scope.currentStepIndex];
-
+                // we need to make sure that all requests are done
                 var timer = window.setInterval(function(){
 
                     console.log("pending", $http.pendingRequests.length);
@@ -49,12 +62,19 @@
                     
                     scope.loadingStep = true;
 
+                    // check for pending requests both in angular and on the document
                     if($http.pendingRequests.length === 0 && document.readyState === "complete") {
                         console.log("Everything is DONE JOHN");
+
+                        scope.currentStep = scope.steps[scope.currentStepIndex];
+
                         clearInterval(timer);
+
+                        setView();
                         
                         positionPopover();
 
+                        // if a custom event needs to be bound we do it now
                         if(scope.currentStep.event) {
                             bindEvent();
                         }
@@ -71,6 +91,29 @@
 
                 $timeout(function(){
                     
+                    var element = $(scope.currentStep.element);                    
+                    var scrollParent = element.scrollParent();
+
+                    console.log("scrollParent", scrollParent);
+
+                    // Detect if scroll is needed
+                    if(element[0].offsetTop > scrollParent[0].clientHeight) {
+                        console.log("SCROOOOOOOL");
+                        scrollParent.animate({
+                            scrollTop: element[0].offsetTop
+                        }, function() {
+                            // Animation complete.
+                            console.log("ANIMATION COMPLETE");
+                            _position();
+                        });
+                    } else {
+                        _position();
+                    }
+
+                });
+
+                function _position() {
+
                     var element = $(scope.currentStep.element);
                     var offset = element.offset();
                     var width = element.outerWidth(true);
@@ -82,12 +125,13 @@
                         var popoverWidth = popoverBox.outerWidth();
                         var popoverHeight = popoverBox.outerHeight();
 
-                        console.log("This element", element);                    
+                        console.log("This element", element);
                         console.log("width", width);
                         console.log("height", height);
                         console.log(scope.currentStep.placement);
                         console.log("popoverWidth", popoverWidth);
                         console.log("popoverHeight", popoverHeight);
+                        console.log("element offset", offset);
 
                         // Element placements
                         if (scope.currentStep.placement === "top") {
@@ -139,7 +183,7 @@
                     rectRight.css("y", topDistance);
                     rectRight.css("height", height);
 
-                });
+                }
 
             }
 

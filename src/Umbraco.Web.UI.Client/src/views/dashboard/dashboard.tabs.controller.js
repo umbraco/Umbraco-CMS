@@ -26,6 +26,9 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
     vm.startTour = startTour;
     vm.startTourTwo = startTourTwo;
     vm.startTourThree = startTourThree;
+    vm.startTourFive = startTourFive;
+    vm.startTourSix = startTourSix;
+    vm.startTourSeven = startTourSeven;
 
     function startTour() {
 
@@ -257,6 +260,172 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
         };
 
         tourService.startTour(tour);        
+
+    }
+
+    function startTourFive() {
+
+        var tour = {
+            "options": {
+                "name": "Create a document type for a sub page",
+                "alias": "umbIntroCreateSubPageDocType"
+            },
+            "steps": [
+                {
+                    element: "#applications [data-element='section-settings']",
+                    title: "Navigate to the settings sections",
+                    content: "In the settings section we will find the document types",
+                    event: "click"
+                },
+                {
+                    element: "#tree [data-element='tree-item-documentTypes']",
+                    title: "Let's open the context menu",
+                    content: "Hover the document types node and click the three small dots",
+                    event: "click",
+                    clickElement: "#tree [data-element='tree-item-documentTypes'] [data-element='tree-item-options']"
+                },
+                {
+                    element: "#dialog [data-element='action-documentType']",
+                    title: "Create document type",
+                    content: "Click the option to create a document type with a template",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='editor-document-types'] [data-element='editor-name-field']",
+                    title: "Enter a name for the document type",
+                    content: "Enter a name for the document type"
+                },
+                {
+                    element: "[data-element='editor-document-types'] [data-element='sub-view-permissions']",
+                    title: "Enter a name for the document type",
+                    content: "Enter a name for the document type",
+                    event: "click"
+                }
+            ]
+        };
+
+        tourService.startTour(tour);
+
+    }
+
+    function startTourSix() {
+
+        var tour = {
+            "options": {
+                "name": "Create a document type for a sub page",
+                "alias": "umbIntroCreateSubPageDocType"
+            },
+            "steps": [
+                {
+                    element: "#tree [data-element='tree-item-Test']",
+                    title: "Navigate to the Test node",
+                    content: "In the settings section we will find the document types",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='editor-content'] [data-element='tab-Tab 2']",
+                    title: "Navigate to tab 2",
+                    content: "Bla bla bla bla bla",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='editor-content'] [data-element='property-prop2']",
+                    title: "This is the second date picker",
+                    content: "We have a lot of those"
+                },
+                {
+                    element: "[data-element='editor-content'] [data-element='property-andTheLastTextArea']",
+                    title: "This is the second date picker",
+                    content: "We have a lot of those"
+                }
+            ]
+        };
+
+        tourService.startTour(tour);
+
+    }
+
+    function startTourSeven() {
+
+        var tour = {
+            "options": {
+                "name": "Create a document type for a sub page",
+                "alias": "umbIntroMediaSection"
+            },
+            "steps": [
+                {
+                    element: "#applications [data-element='section-media']",
+                    title: "Navigate to the media section",
+                    content: "<div>Testing html</div><br/><b>This should be bold</b><pre>We can also make code examples in here</pre>",
+                    event: "click"
+                },
+                {
+                    element: "#tree [data-element='tree-root']",
+                    title: "Open context menu",
+                    content: "Hover the media root and click the three small dots in the right side",
+                    event: "click",
+                    clickElement: "#tree [data-element='tree-root'] [data-element='tree-item-options']",
+                    view: "treeOptions"
+                },
+                {
+                    element: "#dialog [data-element='action-Folder']",
+                    title: "Select create folder",
+                    content: "Bla bla bla bla bla",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='editor-media'] [data-element='editor-name-field']",
+                    title: "Give your folder a name",
+                    content: "Call it 'My Folder'"
+                },
+                {
+                    element: "[data-element='editor-media'] [data-element='button-save']",
+                    title: "Save the new folder",
+                    content: "Bla bla bla bla bla",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='editor-media'] [data-element='dropzone']",
+                    title: "Upload images",
+                    content: "Bla bla bla bla bla"
+                },
+                {
+                    element: "[data-element='editor-media'] [data-element='media-grid-item-3']",
+                    title: "Select media item",
+                    content: "Bla bla bla bla bla",
+                    event: "click",
+                    clickElement: "[data-element='editor-media'] [data-element='media-grid-item-3'] [data-element='media-grid-item-edit']"
+                },
+                {
+                    element: "[data-element='editor-media'] [data-element='property-umbracoFile']",
+                    title: "Something about the file",
+                    content: "Bla bla bla bla bla"
+                },
+                {
+                    element: "[data-element='editor-media'] [data-element='property-umbracoBytes']",
+                    title: "Something about the size",
+                    content: "Bla bla bla bla bla"
+                },
+                {
+                    element: "[data-element='editor-media'] [data-element='tab-Generic properties']",
+                    title: "Go to the properties tab",
+                    content: "Bla bla bla bla bla",
+                    event: "click"
+                },
+                {
+                    element: "[data-element='editor-media'] [data-element='property-_umb_urls']",
+                    title: "Something about the path",
+                    content: "Bla bla bla bla bla"
+                },
+                {
+                    element: "[data-element='editor-media'] [data-element='property-_umb_updatedate']",
+                    title: "Something about the when the image is last updated",
+                    content: "Bla bla bla bla bla"
+                }
+            ]
+        };
+
+        tourService.startTour(tour);
 
     }
 
