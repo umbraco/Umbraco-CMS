@@ -86,7 +86,8 @@ namespace Umbraco.Core
                     // if the hash has changed, clear out the persisted list no matter what, this will force
                     // rescanning of all plugin types including lazy ones.
                     // http://issues.umbraco.org/issue/U4-4789
-                    File.Delete(pluginListFile);
+                    if(File.Exists(pluginListFile))
+                        File.Delete(pluginListFile);
 
                     WriteCachePluginsHash();
                 }
@@ -96,7 +97,8 @@ namespace Umbraco.Core
                 // if the hash has changed, clear out the persisted list no matter what, this will force
                 // rescanning of all plugin types including lazy ones.
                 // http://issues.umbraco.org/issue/U4-4789
-                File.Delete(pluginListFile);
+                if (File.Exists(pluginListFile))
+                    File.Delete(pluginListFile);
 
                 // always set to true if we're not detecting (generally only for testing)
                 RequiresRescanning = true;
