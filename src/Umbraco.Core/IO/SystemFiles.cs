@@ -79,7 +79,7 @@ namespace Umbraco.Core.IO
                         return Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco.config");
                     case LocalTempStorage.EnvironmentTemp:
                         var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
-                        var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoXml",
+                        var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData",
                             //include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
                             // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
                             // utilizing an old path
