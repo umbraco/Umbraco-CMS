@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
+using AutoMapper;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
@@ -9,6 +11,8 @@ using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Search;
 
 namespace Umbraco.Web.Trees
 {
@@ -17,7 +21,7 @@ namespace Umbraco.Web.Trees
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
     [LegacyBaseTree(typeof(loadNodeTypes))]
-    public class ContentTypeTreeController : TreeController
+    public class ContentTypeTreeController : TreeController, ISearchableTree
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
@@ -91,12 +95,19 @@ namespace Umbraco.Web.Trees
 
                 menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
 
+                menu.Items.Add(new MenuItem("rename", Services.TextService.Localize(String.Format("actions/{0}", "rename")))
+                {
+                    Icon = "icon icon-edit"
+                });
+
                 if (container.HasChildren() == false)
                 {
                     //can delete doc type
                     menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
                 }
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);    
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+
+                
             }
             else
             {
@@ -136,6 +147,12 @@ namespace Umbraco.Web.Trees
             }
 
             return menu;
+        }
+
+        public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        {
+            var results = Services.EntityService.GetPagedDescendantsFromRoot(UmbracoObjectTypes.DocumentType, pageIndex, pageSize, out totalFound, filter: query);
+            return Mapper.Map<IEnumerable<SearchResultItem>>(results);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Umbraco.Web.WebApi.Filters
                 if (tree == null) return false;
 
                 return UmbracoContext.Current.Security.CurrentUser != null
-                       && UmbracoContext.Current.Security.UserHasAppAccess(tree.ApplicationAlias, UmbracoContext.Current.Security.CurrentUser);
+                       && UmbracoContext.Current.Security.UserHasSectionAccess(tree.ApplicationAlias, UmbracoContext.Current.Security.CurrentUser);
             }
             return false;
 

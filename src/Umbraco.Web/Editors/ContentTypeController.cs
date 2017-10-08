@@ -182,6 +182,15 @@ namespace Umbraco.Web.Editors
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
+        public HttpResponseMessage PostRenameContainer(int id, string name)
+        {
+            var result = Services.ContentTypeService.RenameContentTypeContainer(id, name, Security.CurrentUser.Id);
+
+            return result
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
+                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+        }
+
         public DocumentTypeDisplay PostSave(DocumentTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave<IContentType, DocumentTypeDisplay, DocumentTypeSave, PropertyTypeBasic>(
@@ -302,6 +311,17 @@ namespace Umbraco.Web.Editors
             {
                 basic.Name = localizedTextService.UmbracoDictionaryTranslate(basic.Name);
                 basic.Description = localizedTextService.UmbracoDictionaryTranslate(basic.Description);
+            }
+
+            //map the blueprints
+            var blueprints = Services.ContentService.GetBlueprintsForContentTypes(types.Select(x => x.Id).ToArray()).ToArray();
+            foreach (var basic in basics)
+            {
+                var docTypeBluePrints = blueprints.Where(x => x.ContentTypeId == (int) basic.Id).ToArray();
+                foreach (var blueprint in docTypeBluePrints)
+                {
+                    basic.Blueprints[blueprint.Id] = blueprint.Name;
+                }
             }
 
             return basics;

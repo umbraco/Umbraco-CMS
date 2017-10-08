@@ -276,13 +276,12 @@ namespace umbraco.cms.businesslogic
             {
                 if (_version == Guid.Empty)
                 {
-                    string sql = "Select versionId from cmsContentVersion where contentID = " + this.Id +
-                                 " order by id desc ";
-
+                    var sql = string.Format("SELECT versionId FROM cmsDocument where nodeid={0} AND newest = 1 ORDER BY updateDate desc", this.Id);
+                    
                     using (var sqlHelper = Application.SqlHelper)
                     using (IRecordsReader dr = sqlHelper.ExecuteReader(sql))
                     {
-                        if (!dr.Read())
+                        if (dr.Read() == false)
                             _version = Guid.Empty;
                         else
                             _version = dr.GetGuid("versionId");

@@ -61,45 +61,57 @@ namespace Umbraco.Web.Editors
         {
             var allowedSoFar = false;
 
-            //Check if this item as any grant-by-section arguments, if so check if the user has access to any of the sections approved, if so they will
-            // be allowed to see it (so far)
-            if (grantedBySectionTypes.Any())
+            // if there's no grantBySection or grant rules defined - we allow access so far and skip to checking deny rules
+            if (grantedBySectionTypes.Any() == false && grantedTypes.Any() == false)
             {
-                var allowedApps = sectionService.GetAllowedSections(Convert.ToInt32(user.Id))
-                                                .Select(x => x.Alias)
-                                                .ToArray();
-
-                var allApprovedSections = grantedBySectionTypes.SelectMany(g => g.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)).ToArray();
-                if (allApprovedSections.Any(allowedApps.Contains))
-                {
-                    allowedSoFar = true;
-                }
-            }
-
-            //Check if this item as any grant arguments, if so check if the user is one of the user types approved, if so they will
-            // be allowed to see it (so far)
-            if (grantedTypes.Any())
-            {
-                var allApprovedUserTypes = grantedTypes.SelectMany(g => g.Value.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)).ToArray();
-                if (allApprovedUserTypes.InvariantContains(user.UserType.Alias))
-                {
-                    allowedSoFar = true;
-                }
-            }
-            else
-            {
-                //if there are not explicit grant types then everyone is allowed so far and we'll only disallow on a deny basis
                 allowedSoFar = true;
             }
+            // else we check the rules and only allow if one matches
+            else
+            {
+                // check if this item has any grant-by-section arguments.
+                // if so check if the user has access to any of the sections approved, if so they will be allowed to see it (so far)
+                if (grantedBySectionTypes.Any())
+                {
+                    var allowedApps = sectionService.GetAllowedSections(Convert.ToInt32(user.Id))
+                        .Select(x => x.Alias)
+                        .ToArray();
 
-            //Check if this item as any deny arguments, if so check if the user is one of the user types approved, if so they will
+                    var allApprovedSections = grantedBySectionTypes.SelectMany(g => g.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)).ToArray();
+                    if (allApprovedSections.Any(allowedApps.Contains))
+                    {
+                        allowedSoFar = true;
+                    }
+                }
+
+                // if not already granted access, check if this item as any grant arguments.
+                // if so check if the user is in one of the user groups approved, if so they will be allowed to see it (so far)
+                if (allowedSoFar == false && grantedTypes.Any())
+                {
+                    var allApprovedUserTypes = grantedTypes.SelectMany(g => g.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)).ToArray();
+                    foreach (var userGroup in user.Groups)
+                    {
+                        if (allApprovedUserTypes.InvariantContains(userGroup.Alias))
+                        {
+                            allowedSoFar = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // check if this item has any deny arguments, if so check if the user is in one of the denied user groups, if so they will
             // be denied to see it no matter what
             if (denyTypes.Any())
             {
                 var allDeniedUserTypes = denyTypes.SelectMany(g => g.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)).ToArray();
-                if (allDeniedUserTypes.InvariantContains(user.UserType.Alias))
+                foreach (var userGroup in user.Groups)
                 {
-                    allowedSoFar = false;
+                    if (allDeniedUserTypes.InvariantContains(userGroup.Alias))
+                    {
+                        allowedSoFar = false;
+                        break;
+                    }
                 }
             }
 

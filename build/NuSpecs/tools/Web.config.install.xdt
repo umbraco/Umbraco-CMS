@@ -15,6 +15,7 @@
       <section name="BaseRestExtensions" type="Umbraco.Core.Configuration.BaseRest.BaseRestSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
       <section name="FileSystemProviders" type="Umbraco.Core.Configuration.FileSystemProvidersSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
       <section name="dashBoard" type="Umbraco.Core.Configuration.Dashboard.DashboardSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+      <section name="HealthChecks" type="Umbraco.Core.Configuration.HealthChecks.HealthChecksSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
     </sectionGroup>
   </configSections>
 
@@ -23,6 +24,7 @@
     <add key="owin:appStartup" value="UmbracoDefaultOwinStartup" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
 	<add key="Umbraco.ModelsBuilder.Enable" value="false" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
 	<add key="Umbraco.ModelsBuilder.ModelsMode" value="Nothing" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
+	<add key="umbracoDefaultUILanguage" value="en-US" xdt:Locator="Match(key)" xdt:Transform="SetAttributes(value)" />
   </appSettings>
 
   <umbracoConfiguration xdt:Transform="InsertIfMissing">
@@ -30,6 +32,7 @@
     <BaseRestExtensions configSource="config\BaseRestExtensions.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
     <FileSystemProviders configSource="config\FileSystemProviders.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
     <dashBoard configSource="config\Dashboard.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
+    <HealthChecks configSource="config\HealthChecks.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
   </umbracoConfiguration>
 
   <FileSystemProviders xdt:Transform="Remove" />
@@ -368,19 +371,19 @@
       </dependentAssembly>
       <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="Microsoft.Owin" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-3.0.1.0" newVersion="3.0.1.0" />
+        <bindingRedirect oldVersion="0.0.0.0-3.1.0.0" newVersion="3.1.0.0" />
       </dependentAssembly>
       <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="Microsoft.Owin.Security.OAuth" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-3.0.1.0" newVersion="3.0.1.0" />
+        <bindingRedirect oldVersion="0.0.0.0-3.1.0.0" newVersion="3.1.0.0" />
       </dependentAssembly>
       <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="Microsoft.Owin.Security" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-3.0.1.0" newVersion="3.0.1.0" />
+        <bindingRedirect oldVersion="0.0.0.0-3.1.0.0" newVersion="3.1.0.0" />
       </dependentAssembly>
       <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="Microsoft.Owin.Security.Cookies" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-3.0.1.0" newVersion="3.0.1.0" />
+        <bindingRedirect oldVersion="0.0.0.0-3.1.0.0" newVersion="3.1.0.0" />
       </dependentAssembly>
       <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="System.Net.Http.Formatting" publicKeyToken="31bf3856ad364e35" culture="neutral" />

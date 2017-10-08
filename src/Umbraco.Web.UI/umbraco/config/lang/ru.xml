@@ -11,11 +11,14 @@
     <key alias="changeDocType">Изменить тип документа</key>
     <key alias="copy">Копировать</key>
     <key alias="create">Создать</key>
+    <key alias="createblueprint">Создать шаблон содержимого</key>
+    <key alias="createGroup">Создать группу</key>
     <key alias="createPackage">Создать пакет</key>
     <key alias="defaultValue">Значение по умолчанию</key>
     <key alias="delete">Удалить</key>
     <key alias="disable">Отключить</key>
     <key alias="emptyTrashcan">Очистить корзину</key>
+    <key alias="enable">Включить</key>
     <key alias="exportDocumentType">Экспортировать</key>
     <key alias="importDocumentType">Импортировать</key>
     <key alias="importPackage">Импортировать пакет</key>
@@ -26,20 +29,47 @@
     <key alias="protect">Публичный доступ</key>
     <key alias="publish">Опубликовать</key>
     <key alias="refreshNode">Обновить узлы</key>
+    <key alias="rename" version="7.3.0">Переименовать</key>
     <key alias="republish">Опубликовать весь сайт</key>
     <key alias="SetPermissionsForThePage">Установить разрешения для страницы '%0%'</key>
-    <key alias="chooseWhereToMove">Выберите, куда переместить</key>
-    <key alias="toInTheTreeStructureBelow">В структуре документов ниже</key>
     <key alias="restore" version="7.3.0">Восстановить</key>
     <key alias="rights">Разрешения</key>
     <key alias="rollback">Откатить</key>
     <key alias="sendtopublish">Направить на публикацию</key>
     <key alias="sendToTranslate">Направить на перевод</key>
+    <key alias="setGroup">Задать группу</key>
+    <key alias="setPermissions">Задать права</key>
     <key alias="sort">Сортировать</key>
-    <key alias="toPublish">Направить на публикацию</key>
     <key alias="translate">Перевести</key>
     <key alias="unpublish">Скрыть</key>
+    <key alias="unlock">Разблокировать</key>
     <key alias="update">Обновить</key>
+  </area>
+  <area alias="actionCategories">
+    <key alias="content">Содержимое</key>
+    <key alias="administration">Администрирование</key>
+    <key alias="structure">Структура</key>
+    <key alias="other">Другое</key>
+  </area>
+  <area alias="actionDescriptions">
+    <key alias="assignDomain">Разрешить доступ к назначению языков и доменов</key>
+    <key alias="auditTrail">Разрешить доступ к просмотру журнала истории узла</key>
+    <key alias="browse">Разрешить доступ на просмотр узла</key>
+    <key alias="changeDocType">Разрешить доступ на смену типа документа для узла</key>
+    <key alias="copy">Разрешить доступ к копированию узла</key>
+    <key alias="create">Разрешить доступ к созданию узлов</key>
+    <key alias="delete">Разрешить доступ к удалению узлов</key>
+    <key alias="move">Разрешить доступ к перемещению узла</key>
+    <key alias="protect">Разрешить доступ к установке и изменению правил публичного доступа для узла</key>
+    <key alias="publish">Разрешить доступ к публикации узла</key>
+    <key alias="rights">Разрешить доступ к изменению прав доступа к узлу</key>
+    <key alias="rollback">Разрешить доступ на возврат к предыдущим состояниям узла</key>
+    <key alias="sendtopublish">Разрешить доступ к отправке узла на одобрение перед публикацией</key>
+    <key alias="sendToTranslate">Разрешить доступ к отправке узла на перевод данных</key>
+    <key alias="sort">Разрешить доступ к изменению порядка сортировки узлов</key>
+    <key alias="translate">Разрешить доступ к переводу данных узла</key>
+    <key alias="update">Разрешить доступ к сохранению узла</key>
+    <key alias="createblueprint">Разрешить доступ к созданию шаблона содержимого</key>
   </area>
   <area alias="assignDomain">
     <key alias="addNew">Добавить новый домен</key>
@@ -66,6 +96,15 @@
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Наблюдать за</key>
+  </area>
+  <area alias="blueprints">
+      <key alias="createBlueprintFrom">Создать новый шаблон содержимого из '%0%'</key>
+      <key alias="blankBlueprint">Пустой</key>
+      <key alias="selectBlueprint">Выбрать шаблон содержимого</key>
+      <key alias="createdBlueprintHeading">Шаблон содержимого создан</key>
+      <key alias="createdBlueprintMessage">Создан шаблон содержимого из '%0%'</key>
+      <key alias="duplicateBlueprintMessage">Другой шаблон содержимого с таким же названием уже существует</key>
+      <key alias="blueprintDescription">Шаблон содержимого — это предопределенный набор данных, который редактор может использовать для начального заполнения свойств при создании узлов содержимого</key>
   </area>
   <area alias="bulk">
     <key alias="done">Завершено</key>
@@ -170,6 +209,7 @@
     <key alias="altTextOptional">Альтернативный текст (необязательно)</key>
     <key alias="childItems" version="7.0">Элементы списка</key>
     <key alias="clickToEdit">Нажмите для правки этого элемента</key>
+    <key alias="contentRoot">Начальный узел содержимого</key>
     <key alias="createBy">Создано пользователем</key>
     <key alias="createByDesc" version="7.0">Исходный автор</key>
     <key alias="createDate">Дата создания</key>
@@ -184,14 +224,18 @@
     <key alias="lastPublished">Документ опубликован</key>
     <key alias="noItemsToShow">Здесь еще нет элементов.</key>
     <key alias="listViewNoItems" version="7.1.5">В этом списке пока нет элементов.</key>
+    <key alias="listViewNoContent">Содержимое пока еще не добавлено</key>
+    <key alias="listViewNoMembers">Участники пока еще не добавлены</key>
     <key alias="mediaLinks">Ссылка на медиа-элементы</key>
     <key alias="mediatype">Тип медиа-контента</key>
     <key alias="membergroup">Группа участников</key>
     <key alias="memberof">Включен в группу(ы)</key>
     <key alias="memberrole">Роль участника</key>
     <key alias="membertype">Тип участника</key>
+    <key alias="nestedContentDeleteItem">Вы уверены, что хотите удалить этот элемент?</key>
+    <key alias="nestedContentEditorNotSupported">Свойство '%0%' использует редактор '%1%', который не поддерживается для вложенного содержимого.</key>
     <key alias="noDate">Дата не указана</key>
-    <key alias="nodeName">Заголовок ссылки</key>
+    <key alias="nodeName">Заголовок страницы</key>
     <key alias="notmemberof">Доступные группы</key>
     <key alias="otherElements">Свойства</key>
     <key alias="parentNotPublished">Этот документ опубликован, но скрыт, потому что его родительский документ '%0%' не опубликован</key>
@@ -279,6 +323,7 @@
   </area>
   <area alias="create">
     <key alias="chooseNode">Где вы хотите создать новый %0%</key>
+    <key alias="createContentBlueprint">Выберите тип документов, для которого нужно создать шаблон содержимого</key>
     <key alias="createUnder">Создать в узле</key>
     <key alias="newFolder">Новая папка</key>
     <key alias="newDataType">Новый тип данных</key>
@@ -329,8 +374,12 @@
     <key alias="linknewwindow">Открыть в новом окне?</key>
     <key alias="macroContainerSettings">Свойства макроса</key>
     <key alias="macroDoesNotHaveProperties">Этот макрос не имеет редактируемых свойств</key>
+    <key alias="nodeNameLinkPicker">Заголовок ссылки</key>
     <key alias="paste">Вставить</key>
     <key alias="permissionsEdit">Изменить разрешения для</key>
+    <key alias="permissionsSet">Установить разрешения для</key>
+    <key alias="permissionsSetForGroup">Установить права доступа к '%0%' для группы пользователей '%1%'</key>
+    <key alias="permissionsHelp">Выберите группу(ы) пользователей, для которых нужно установить разрешения</key>
     <key alias="recycleBinDeleting">Все элементы в корзине сейчас удаляются. Пожалуйста, не закрывайте это окно до окончания процесса удаления</key>
     <key alias="recycleBinIsEmpty">Корзина пуста</key>
     <key alias="recycleBinWarning">Вы больше не сможете восстановить элементы, удаленные из корзины</key>
@@ -349,6 +398,7 @@
 		из нижеследующего списка. Список ограничивается идентификаторами, определенными в родительском шаблоне данного шаблона.]]></key>
     <key alias="thumbnailimageclickfororiginal">Кликните на изображении, чтобы увидеть полноразмерную версию</key>
     <key alias="treepicker">Выберите элемент</key>
+    <key alias="urlLinkPicker">Ссылка</key>
     <key alias="viewCacheItem">Просмотр элемента кэша</key>
     <key alias="createFolder">Создать папку...</key>
     <key alias="relateToOriginalLabel">Связать с оригиналом</key>
@@ -359,13 +409,18 @@
     <key alias="linkToMedia">Ссылка на медиа-элемент</key>
     <key alias="linkToFile">Ссылка на файл</key>
     <key alias="selectMedia">Выбрать медиа</key>
+    <key alias="selectMediaStartNode">Выбрать начальный узел медиа-библиотеки</key>
     <key alias="selectIcon">Выбрать значок</key>
     <key alias="selectItem">Выбрать элемент</key>
     <key alias="selectLink">Выбрать ссылку</key>
     <key alias="selectMacro">Выбрать макрос</key>
     <key alias="selectContent">Выбрать содержимое</key>
+    <key alias="selectContentStartNode">Выбрать начальный узел содержимого</key>
     <key alias="selectMember">Выбрать участника</key>
     <key alias="selectMemberGroup">Выбрать группу участников</key>
+    <key alias="selectNode">Выбрать узел</key>
+    <key alias="selectSections">Выбрать разделы</key>
+    <key alias="selectUsers">Выбрать пользователей</key>
     <key alias="noMacroParams">Это макрос без параметров</key>
     <key alias="noMacros">Нет макросов, доступных для вставки в редактор</key>
     <key alias="externalLoginProviders">Провайдеры аутентификации</key>
@@ -511,9 +566,11 @@
     <key alias="error">Ошибка</key>
     <key alias="findDocument">Найти</key>
     <key alias="first">Начало</key>
+    <key alias="groups">Группы</key>
     <key alias="folder">Папка</key>
     <key alias="height">Высота</key>
     <key alias="help">Справка</key>
+    <key alias="hide">Скрыть</key>
     <key alias="icon">Иконка</key>
     <key alias="import">Импорт</key>
     <key alias="innerMargin">Внутренний отступ</key>
@@ -532,6 +589,7 @@
     <key alias="logout">Выход</key>
     <key alias="macro">Макрос</key>
     <key alias="mandatory">Обязательно</key>
+    <key alias="message">Сообщение</key>
     <key alias="more">Больше</key>
     <key alias="move">Переместить</key>
     <key alias="name">Название</key>
@@ -539,9 +597,12 @@
     <key alias="next">След</key>
     <key alias="no">Нет</key>
     <key alias="of">из</key>
+    <key alias="off">Выкл</key>
     <key alias="ok">Ok</key>
     <key alias="open">Открыть</key>
+    <key alias="on">Вкл</key>
     <key alias="or">или</key>
+    <key alias="orderBy">Сортировка по</key>
     <key alias="password">Пароль</key>
     <key alias="path">Путь</key>
     <key alias="placeHolderID">Идентификатор контейнера</key>
@@ -567,6 +628,7 @@
     <key alias="showPageOnSend">Показать страницу при отправке</key>
     <key alias="size">Размер</key>
     <key alias="sort">Сортировать</key>
+    <key alias="status">Состояние</key>
     <key alias="submit">Отправить</key>
     <key alias="type">Тип</key>
     <key alias="typeToSearch">Что искать?</key>
@@ -691,7 +753,7 @@
     <!-- The following keys don't get tokens passed in -->
     <key alias="httpsCheckEnableHttpsButton">Разрешить HTTPS</key>
     <key alias="httpsCheckEnableHttpsDescription">Устанавливает значение параметра 'umbracoSSL' в 'true' в секции 'appSettings' файла web.config.</key>
-    <key alias="httpsCheckEnableHttpsSuccess">Параметр 'umbracoUseSSL' в секции 'appSetting' файлf web.config теперь установлен в 'true', значения cookies будут промаркированы как безопасные.</key>
+    <key alias="httpsCheckEnableHttpsSuccess">Параметр 'umbracoUseSSL' в секции 'appSetting' файла web.config теперь установлен в 'true', значения cookies будут промаркированы как безопасные.</key>
 
     <key alias="rectifyButton">Исправить</key>
     <key alias="cannotRectifyShouldNotEqual">Невозможно исправление по результату проверки значения на 'ShouldNotEqual'.</key>
@@ -740,6 +802,8 @@
 
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Адрес для отправки уведомлений установлен в <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Адрес для отправки уведомлений все еще установлен в значение по-умолчанию <strong>%0%</strong>.]]></key>
+    <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Зафиксированы следующие результаты автоматической проверки состояния Umbraco по расписанию, запущенной на %0% в %1%:</p>%2%</body></html>]]></key>
+    <key alias="scheduledHealthCheckEmailSubject">Результат проверки состояния Umbraco</key>
   </area>
   <area alias="help">
     <key alias="goTo">перейти к</key>
@@ -787,10 +851,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>Пользователь по-умолчанию заблокирован или не имеет доступа к Umbraco!</strong></p><p>Не будет предпринято никаких дальнейших действий. Нажмите кнопку <strong>Далее</strong> для продолжения.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Пароль пользователя по-умолчанию успешно изменен в процессе установки!</strong></p><p>Нет надобности в каких-либо дальнейших действиях. Нажмите кнопку <strong>Далее</strong> для продолжения.]]></key>
     <key alias="defaultUserPasswordChanged">Пароль изменен!</key>
-    <key alias="defaultUserText"><![CDATA[
-		<p>Umbraco создает пользователя по-умолчанию с именем входа <strong>('admin')</strong> и паролем <strong>('default')</strong>.
-		<strong>ОЧЕНЬ ВАЖНО</strong> изменить пароль по-умолчанию на что-либо уникальное.</p>]]>
-    </key>
     <key alias="greatStart">Для начального обзора возможностей системы рекомендуем посмотреть ознакомительные видеоматериалы</key>
     <key alias="licenseText"><![CDATA[Нажимая кнопку <strong>Далее</strong> (или модифицируя вручную ключ "UmbracoConfigurationStatus" в файле "web.config"), Вы принимаете лицензионное соглашение для данного программного обеспечения, расположенное ниже. Пожалуйста, обратите внимание, что установочный пакет Umbraco отвечает двум различным типам лицензий: лицензии MIT на программные продукты с открытым исходным кодом в части ядра системы и свободной лицензии Umbraco в части пользовательского интерфейса.]]></key>
     <key alias="None">Система не установлена.</key>
@@ -898,7 +958,7 @@
     <key alias="resetCodeExpired">Ссылка, по которой Вы попали сюда, неверна или устарела</key>
     <key alias="resetPasswordEmailCopySubject">Umbraco: сброс пароля</key>
     <key alias="resetPasswordEmailCopyFormat">
-      <![CDATA[<p>Ваше имя пользователя для входа в панель администрирования Umbraco: <strong>%0%</strong></p><p>Перейдите по <a href="%1%"><strong>этой ссылке</strong></a> для того, чтобы сбросить Ваш пароль, или скопируйте текст ссылки и вставьте в адресную строку своего браузера:</p><p><em>%1%</em></p>]]>
+      <![CDATA[<html><body><p>Ваше имя пользователя для входа в панель администрирования Umbraco: <strong>%0%</strong></p><p>Перейдите по <a href="%1%"><strong>этой ссылке</strong></a> для того, чтобы сбросить Ваш пароль, или скопируйте текст ссылки и вставьте в адресную строку своего браузера:</p><p><em>%1%</em></p></body></html>]]>
     </key>
   </area>
   <area alias="main">
@@ -914,6 +974,7 @@
     <key alias="orClickHereToUpload">или нажмите сюда, чтобы выбрать файлы</key>
     <key alias="onlyAllowedFiles">Разрешены только типы файлов: </key>
     <key alias="maxFileSize">Максимально допустимый размер файла: </key>
+    <key alias="mediaRoot">Начальный узел медиа</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Создать нового участника</key>
@@ -1068,10 +1129,13 @@
   </area>
   <area alias="placeholders">
     <key alias="confirmPassword">Подтвердите пароль</key>
-    <key alias="email">Укажите Ваш email</key>
+    <key alias="email">Укажите Ваш email...</key>
     <key alias="enterDescription">Укажите описание...</key>
+    <key alias="enteremail">Укажите email...</key>
+    <key alias="enterMessage">Укажите сообщение...</key>
     <key alias="entername">Укажите имя...</key>
     <key alias="enterTags">Укажите теги (нажимайте Enter после каждого тега)...</key>
+    <key alias="enterusername">Укажите имя пользователя...</key>
     <key alias="filter">Укажите фильтр...</key>
     <key alias="label">Метка...</key>
     <key alias="nameentity">Назовите %0%...</key>
@@ -1157,6 +1221,11 @@
     <key alias="externalLinkPlaceholder">Укажите ссылку</key>
     <key alias="link">Ссылка</key>
     <key alias="newWindow">В новом окне</key>
+  </area>
+  <area alias="renamecontainer">
+    <key alias="renamed">Переименована</key>
+    <key alias="enterNewFolderName">Укажите здесь новое название для папки</key>
+    <key alias="folderWasRenamed">'%0%' была переименована в '%1%'</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Текущая версия</key>
@@ -1274,6 +1343,7 @@
     <key alias="editStylesheetSaved">Стиль CSS сохранен</key>
     <key alias="editTemplateSaved">Шаблон сохранен</key>
     <key alias="editUserError">Произошла ошибка при сохранении пользователя (проверьте журналы ошибок)</key>
+    <key alias="editUserGroupSaved">Группа пользователей сохранена</key>
     <key alias="editUserSaved">Пользователь сохранен</key>
     <key alias="editUserTypeSaved">Тип пользователей сохранен</key>
     <key alias="fileErrorHeader">Файл не сохранен</key>
@@ -1287,10 +1357,12 @@
     <key alias="operationCancelledHeader">Отменено</key>
     <key alias="operationCancelledText">Операция отменена установленным сторонним расширением или блоком кода</key>
     <key alias="operationFailedHeader">Ошибка</key>
+    <key alias="operationSavedHeader">Сохранено</key>
     <key alias="partialViewErrorHeader">Представление не сохранено</key>
     <key alias="partialViewErrorText">Произошла ошибка при сохранении файла</key>
     <key alias="partialViewSavedHeader">Представление сохранено</key>
     <key alias="partialViewSavedText">Представление сохранено без ошибок</key>
+    <key alias="permissionsSavedFor">Права доступа сохранены для</key>
     <key alias="pythonErrorHeader">Cкрипт Python не сохранен</key>
     <key alias="pythonErrorText">Cкрипт Python не может быть сохранен в связи с ошибками</key>
     <key alias="pythonSavedHeader">Cкрипт Python сохранен</key>
@@ -1310,6 +1382,23 @@
     <key alias="xsltPermissionErrorText">XSLT-документ не может быть сохранен, проверьте установки файловых разрешений</key>
     <key alias="xsltSavedHeader">XSLT-документ сохранен</key>
     <key alias="xsltSavedText">Ошибок в XSLT-документе нет</key>
+    <key alias="deleteUserGroupsSuccess">Удалено %0% групп пользователей</key>
+    <key alias="deleteUserGroupSuccess">'%0%' была удалена</key>
+    <key alias="enableUsersSuccess">Активировано %0% пользователей</key>
+    <key alias="enableUsersError">При активации пользователей произошла ошибка</key>
+    <key alias="disableUsersSuccess">Заблокировано %0% пользователей</key>
+    <key alias="disableUsersError">При блокировке пользователей произошла ошибка</key>
+    <key alias="enableUserSuccess">'%0%' сейчас активирован</key>
+    <key alias="enableUserError">При активации пользователя произошла ошибка</key>
+    <key alias="disableUserSuccess">'%0%' сейчас заблокирован</key>
+    <key alias="disableUserError">При блокировке пользователя произошла ошибка</key>
+    <key alias="setUserGroupOnUsersSuccess">Группы пользователей установлены</key>
+    <key alias="deleteUserGroupsSuccess">Удалено %0% групп пользователей</key>
+    <key alias="deleteUserGroupSuccess">'%0%' была удалена</key>
+    <key alias="unlockUsersSuccess">Разблокировано %0% пользователей</key>
+    <key alias="unlockUsersError">При разблокировке пользователей произошла ошибка</key>
+    <key alias="unlockUserSuccess">'%0%' сейчас разблокирован</key>
+    <key alias="unlockUserError">При разблокировке пользователя произошла ошибка</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Используется синтаксис селекторов CSS, например: h1, .redHeader, .blueTex</key>
@@ -1462,6 +1551,9 @@
     <key alias="usedIfEmpty">Это значение будет использовано только если первичное поле пусто</key>
     <key alias="withTime">Дата и время</key>
   </area>
+  <area alias="textbox">
+    <key alias="characters_left">символов осталось</key>
+  </area>
   <area alias="translation">
     <key alias="assignedTasks">Задачи, назначенные Вам</key>
     <key alias="assignedTasksHelp"><![CDATA[Список, приведенный ниже, содержит задачи перевода,
@@ -1514,6 +1606,8 @@
   <area alias="treeHeaders">
     <key alias="analytics">Аналитика</key>
     <key alias="cacheBrowser">Обзор кэша</key>
+    <key alias="content">Содержимое</key>
+    <key alias="contentBlueprints">Шаблоны содержимого</key>
     <key alias="contentRecycleBin">Корзина</key>
     <key alias="createdPackages">Созданные пакеты</key>
     <key alias="dataTypes">Типы данных</key>
@@ -1524,6 +1618,7 @@
     <key alias="languages">Языки</key>
     <key alias="localPackage">Установить локальный пакет</key>
     <key alias="macros">Макросы</key>
+    <key alias="media">Медиа-материалы</key>
     <key alias="mediaTypes">Типы медиа-материалов</key>
     <key alias="member">Участники</key>
     <key alias="memberGroups">Группы участников</key>
@@ -1543,6 +1638,7 @@
     <key alias="scripts">Скрипты</key>
     <key alias="stylesheets">Стили CSS</key>
     <key alias="templates">Шаблоны</key>
+    <key alias="users">Пользователи</key>
     <key alias="xslt">Файлы XSLT</key>
   </area>
   <area alias="update">
@@ -1552,24 +1648,53 @@
     <key alias="updateNoServerError">Во время проверки обновлений произошла ошибка. Пожалуйста, просмотрите журнал трассировки для получения дополнительной информации.</key>
   </area>
   <area alias="user">
+    <key alias="access">Доступ</key>
+    <key alias="accessHelp">На основании установленных групп и назначенных начальных узлов, пользователь имеет доступ к следующим узлам</key>
     <key alias="administrators">Администратор</key>
+    <key alias="assignAccess">Назначение доступа</key>
+    <key alias="backToUsers">Вернуться к пользователям</key>
     <key alias="categoryField">Поле категории</key>
     <key alias="change">Изменить</key>
     <key alias="changePassword">Изменить пароль</key>
     <key alias="changePasswordDescription">Вы можете сменить свой пароль для доступа к административной панели Umbraco, заполнив нижеследующие поля и нажав на кнопку 'Изменить пароль'</key>
+    <key alias="changePhoto">Сменить аватар</key>
     <key alias="confirmNewPassword">Подтверждение нового пароля</key>
     <key alias="contentChannel">Канал содержимого</key>
+    <key alias="createAnotherUser">Создать еще одного пользователя</key>
+    <key alias="createDate">Создан</key>
+    <key alias="createUser">Создать пользователя</key>
+    <key alias="createUserHelp">Создавайте новых пользователей, которым нужен доступ к административной панели Umbraco. При создании пользователя для него генерируется новый первичный пароль, который нужно сообщить пользователю.</key>
     <key alias="descriptionField">Поле описания</key>
     <key alias="disabled">Отключить пользователя</key>
     <key alias="documentType">Тип документа</key>
     <key alias="editors">Редактор</key>
     <key alias="excerptField">Исключить поле</key>
+    <key alias="failedPasswordAttempts">Неудачных попыток входа</key>
+    <key alias="goToProfile">К профилю пользователя</key>
+    <key alias="groupsHelp">Добавьте пользователя в группу(ы) для задания прав доступа</key>
+    <key alias="inviteEmailCopySubject">Приглашение в панель администрирования Umbraco</key>
+    <key alias="inviteEmailCopyFormat">
+      <![CDATA[<html><body><p>Здравствуйте, %0%,<br><br>Вы были приглашены пользователем %1%, и Вам предоставлен доступ в панель администрирования Umbraco.</p><p>Сообщение от %1%: <em>%2%</em></p><p>Перейдите по <a href="%3%" target="_blank">этой ссылке</a>, чтобы принять приглашение.</p><p><small>Если Вы не имеете возможности перейти по ссылке, скопируйте нижеследующий текст ссылки и вставьте в адресную строку Вашего браузера.<br/><br/>%3%</small></p></body></html>]]>
+    </key>
+    <key alias="inviteAnotherUser">Пригласить еще одного пользователя</key>
+    <key alias="inviteUser">Пригласить пользователя</key>
+    <key alias="inviteUserHelp">Пригласите новых пользователей, которым нужен доступ к административной панели Umbraco. Приглашенному будет направлено электронное письмо с инструкциями по доступу к Umbraco.</key>
     <key alias="language">Язык</key>
+    <key alias="languageHelp">Установите язык отображения интерфейса администрирования</key>
+    <key alias="lastLockoutDate">Время последней блокировки</key>
+    <key alias="lastLogin">Время последнего входа</key>
+    <key alias="lastPasswordChangeDate">Пароль в последний раз менялся</key>
     <key alias="loginname">Имя входа (логин)</key>
-    <key alias="mediastartnode">Начальный узел в Медиа-библиотеке</key>
+    <key alias="mediastartnode">Начальный узел медиа-библиотеки</key>
+    <key alias="mediastartnodehelp">Можно ограничить доступ к медиа-библиотеке (какой-либо ее части), задав начальный узел</key>
+    <key alias="mediastartnodes">Начальные узлы медиа-библиотеки</key>
+    <key alias="mediastartnodeshelp">Можно ограничить доступ к медиа-библиотеке (каким-либо ее частям), задав перечень начальных узлов</key>
     <key alias="modules">Разделы</key>
     <key alias="newPassword">Новый пароль</key>
     <key alias="noConsole">Отключить доступ к административной панели Umbraco</key>
+    <key alias="noLogin">пока еще не входил</key>
+    <key alias="noLockouts">пока не блокировался</key>
+    <key alias="noPasswordChange">Пароль не менялся</key>
     <key alias="oldPassword">Прежний пароль</key>
     <key alias="password">Пароль</key>
     <key alias="passwordChanged">Ваш пароль доступа изменен!</key>
@@ -1583,15 +1708,35 @@
     <key alias="permissionReplaceChildren">Заменить разрешения для дочерних документов</key>
     <key alias="permissionSelectedPages">Вы изменяете разрешения для следующих документов:</key>
     <key alias="permissionSelectPages">Выберите документы для изменения их разрешений</key>
+    <key alias="removePhoto">Удалить аватар</key>
+    <key alias="permissionsDefault">Права доступа по-умолчанию</key>
+    <key alias="permissionsGranular">Атомарные права доступа</key>
+    <key alias="permissionsGranularHelp">Можно установить права доступа к конкретным узлам</key>
+    <key alias="profile">Профиль</key>
     <key alias="resetPassword">Сбросить пароль</key>
     <key alias="searchAllChildren">Поиск всех дочерних документов</key>
+    <key alias="sendInvite">Отправить приглашение</key>
     <key alias="sessionExpires" version="7.0">Сессия истекает через</key>
-    <key alias="startnode">Начальный узел содержимого </key>
+    <key alias="sectionsHelp">Разделы, доступные пользователю</key>
+    <key alias="noStartNode">Начальный узел не задан</key>
+    <key alias="noStartNodes">Начальные узлы не заданы</key>
+    <key alias="startnode">Начальный узел содержимого</key>
+    <key alias="startnodehelp">Можно ограничить доступ к дереву содержимого (какой-либо его части), задав начальный узел</key>
+    <key alias="startnodes">Начальные узлы содержимого</key>
+    <key alias="startnodeshelp">Можно ограничить доступ к дереву содержимого (каким-либо его частям), задав перечень начальных узлов</key>
+    <key alias="userCreated">Был создан</key>
+    <key alias="userCreatedSuccessHelp">Новый первичный пароль успешно сгенерирован. Для входа используйте пароль, приведенный ниже.</key>
     <key alias="translator">Переводчик</key>
+    <key alias="updateDate">Время последнего изменения</key>
     <key alias="username">Имя пользователя</key>
+    <key alias="usergroup">Группа пользователей</key>
+    <key alias="userGroupPermissions">Права доступа для группы</key>
+    <key alias="userGroups">Группы пользователей</key>
+    <key alias="userInvited"> был приглашен</key>
+    <key alias="userInvitedSuccessHelp">Новому пользователю было отправлено приглашение, в котором содержатся инструкции для входа в панель Umbraco.</key>
+    <key alias="userinviteWelcomeMessage">Здравствуйте и добро пожаловать в Umbraco! Все будет готово в течении пары минут, нам лишь нужно задать Ваш пароль для входа и добавить аватар.</key>
+    <key alias="userinviteAvatarMessage">Загрузите изображение, это поможет другим пользователям идентифицировать Вас.</key>
     <key alias="userPermissions">Разрешения для пользователя</key>
-    <key alias="usertype">Тип пользователя</key>
-    <key alias="userTypes">Типы пользователей</key>
     <key alias="writer">Автор</key>
     <key alias="yourHistory" version="7.0">Ваша недавняя история</key>
     <key alias="yourProfile" version="7.0">Ваш профиль</key>

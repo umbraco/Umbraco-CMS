@@ -33,10 +33,8 @@
     <key alias="sendtopublish">Zur Veröffentlichung einreichen</key>
     <key alias="sendToTranslate">Zur Übersetzung senden</key>
     <key alias="sort">Sortieren</key>
-    <key alias="toPublish">Zur Veröffentlichung einreichen</key>
     <key alias="translate">Übersetzen</key>
     <key alias="update">Aktualisieren</key>
-    <key alias="defaultValue">Standardwert</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Erlaubnis verweigert.</key>
@@ -221,6 +219,8 @@
     <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Name des Link</key>
+    <key alias="urlLinkPicker">Link</key>
     <key alias="anchorInsert">Name</key>
     <key alias="assignDomain">Hostnamen verwalten</key>
     <key alias="closeThisWindow">Fenster schließen</key>
@@ -480,13 +480,6 @@
     <key alias="defaultUserDisabled">&lt;strong&gt;Der Standard-Benutzer wurde deaktiviert oder hat keinen Zugriff auf Umbraco.&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Es sind keine weiteren Aktionen notwendig. Klicken Sie auf &lt;b&gt;Weiter&lt;/b&gt; um fortzufahren.</key>
     <key alias="defaultUserPassChanged">&lt;strong&gt;Das Kennwort des Standard-Benutzers wurde seit der Installation verändert.&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Es sind keine weiteren Aktionen notwendig. Klicken Sie auf &lt;b&gt;Weiter&lt;/b&gt; um fortzufahren.</key>
     <key alias="defaultUserPasswordChanged">Das Kennwort wurde geändert!</key>
-    <key alias="defaultUserText">&lt;p&gt;
-	  Bei der Installation von Umbraco wurde ein Standard-Benutzer mit dem Login-Namen &lt;strong&gt;'admin'&lt;/strong&gt; und dem Kennwort &lt;strong&gt;'default'&lt;/strong&gt; erstellt.
-	  &lt;strong&gt;WICHTIG:&lt;/strong&gt; Das Kennwort sollte auf ein sicheres, eigenes Kennwort geändert werden.
-	&lt;/p&gt;
-	&lt;p&gt;
-	  Das Kennwort des Standard-Benutzers wird jetzt geprüft und im Anschluss werden eventuell notwendige Änderungen vorschlagen.
-	&lt;/p&gt;</key>
     <key alias="greatStart">Schauen Sie sich die Einführungsvideos für einen schnellen und einfachen Start an.</key>
     <key alias="licenseText">Mit der Installation stimmen Sie der angezeigten Lizenz für diese Software zu. Bitte beachten Sie, dass diese Umbraco-Distribution aus zwei Lizenzen besteht. Einer freien Open-Source MIT-Lizenz für das Framework und der Umbraco-Freeware-Lizenz für die Verwaltungsoberfläche.</key>
     <key alias="None">Noch nicht installiert.</key>
@@ -1022,8 +1015,6 @@ Ihr freundlicher Umbraco-Robot
     <key alias="startnode">Startelement in den Inhalten</key>
     <key alias="username">Benutzername</key>
     <key alias="userPermissions">Berechtigungen</key>
-    <key alias="usertype">Rolle</key>
-    <key alias="userTypes">Rollen</key>
     <key alias="writer">Autor</key>
     <key alias="translator">Übersetzer</key>
     <key alias="yourProfile" version="7.0">Ihr Profil</key>

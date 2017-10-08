@@ -12,7 +12,6 @@
     <key alias="copy">Kopiera</key>
     <key alias="create">Skapa</key>
     <key alias="createPackage">Skapa paket</key>
-    <key alias="defaultValue">Standardvärde</key>
     <key alias="delete">Ta bort</key>
     <key alias="disable">Avaktivera</key>
     <key alias="emptyTrashcan">Töm papperskorgen</key>
@@ -32,7 +31,6 @@
     <key alias="sendtopublish">Skicka för publicering</key>
     <key alias="sendToTranslate">Skicka för översättning</key>
     <key alias="sort">Sortera</key>
-    <key alias="toPublish">Skicka för publicering</key>
     <key alias="translate">Översätt</key>
     <key alias="unpublish">Avpublicera</key>
     <key alias="update">Uppdatera</key>
@@ -457,7 +455,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>Standardanvändaren har avaktiverats eller har inte åtkomst till Umbraco!</strong></p><p>Du behöver inte göra något ytterligare här. Klicka <b>Next</b> för att fortsätta.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Standardanvändarens lösenord har ändrats sedan installationen!</strong></p><p>Du behöver inte göra något ytterligare här. Klicka <strong>Nästa</strong> för att fortsätta.]]></key>
     <key alias="defaultUserPasswordChanged">Lösenordet är ändrat!</key>
-    <key alias="defaultUserText"><![CDATA[<p> Umbraco skapar en standardanvändare med login <strong>('admin')</strong> och lösenordet <strong>('default')</strong>. Det är <strong>viktigt</strong> att lösenordet ändras till något unikt. </p> <p> Det här steget kommer kontrollera standardanvändarens lösenord och låta dig vet om det behöver ändras. </p>]]></key>
     <key alias="greatStart">Få en flygande start, kolla på våra introduktionsvideor</key>
     <key alias="licenseText">Genom att klicka på Nästa knappen (eller redigera UmbracoConfigurationStatus i web.config), accepterar du licensavtalet för den här mjukvaran som det är skrivet i rutan nedan. Observera att den här Umbracodistributionen består av två olika licensavtal, "the open source MIT license" för ramverket och "the Umbraco freeware license" som täcker användargränssnittet.</key>
     <key alias="None">Inte installerad än.</key>
@@ -638,8 +635,12 @@
   </area>
   <area alias="imagecropper">
     <key alias="reset">Återställ</key>
+    <key alias="defineCrop">Definiera beskräning</key>
+    <key alias="defineCropDescription">Ge beskärningen ett alias och dess standardbredd och -höjd</key>
+    <key alias="saveCrop">spara beskärning</key>
+    <key alias="addCrop">Lägg till ny beskärning</key>
   </area>
-  <area alias="rollback">
+    <area alias="rollback">
     <key alias="currentVersion">Nuvarande version</key>
     <key alias="diffHelp"><![CDATA[Här visas skillnaderna mellan nuvarande version och vald version<br /><del>Röd</del> text kommer inte att synas i den valda versionen. , <ins>Grön betyder att den har tillkommit</ins>]]></key>
     <key alias="documentRolledBack">Dokumentet har återgått till en tidigare version</key>
@@ -929,8 +930,6 @@
     <key alias="startnode">Startnod i innehåll</key>
     <key alias="username">Användarens namn</key>
     <key alias="userPermissions">Användarrättigheter</key>
-    <key alias="usertype">Användartyp</key>
-    <key alias="userTypes">Användartyper</key>
     <key alias="writer">Skribent</key>
     <key alias="yourHistory">Din nuvarande historik</key>
     <key alias="translator">Översättare</key>

@@ -32,10 +32,8 @@
     <key alias="sendtopublish">Enviar a Publicar</key>
     <key alias="sendToTranslate">Enviar a Traducir</key>
     <key alias="sort">Ordernar</key>
-    <key alias="toPublish">Enviar a publicación</key>
     <key alias="translate">Traducir</key>
     <key alias="update">Actualizar</key>
-    <key alias="defaultValue">Valor por defecto</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permiso denegado.</key>
@@ -220,6 +218,8 @@
     <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Título del vínculo</key>
+    <key alias="urlLinkPicker">Vínculo</key>
     <key alias="anchorInsert">Nombre</key>
     <key alias="assignDomain">Administrar dominios</key>
     <key alias="closeThisWindow">Cerrar esta ventana</key>
@@ -472,7 +472,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>El usuario por defecto ha sido desabilitado o ha perdido el acceso a Umbraco!</strong></p><p>Pinche en <b>Próximo</b> para continuar.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>¡La contraseña del usuario por defecto ha sido cambiada desde que se instaló!</strong></p><p>No hay que realizar ninguna tarea más. Pulsa <strong>Siguiente</strong> para proseguir.]]></key>
     <key alias="defaultUserPasswordChanged">¡La constraseña se ha cambiado!</key>
-    <key alias="defaultUserText"><![CDATA[<p> Umbraco crea un usuario por defecto con un nombre de usuario  <strong>('admin')</strong> y constraseña <strong>('default')</strong>. Es <strong>importante</strong> que la contraseña se cambie a algo único. </p> <p> Este paso comprobará la contraseña del usuario por defecto y sugerirá si debe cambiarse. </p> ]]></key>
     <key alias="greatStart">Ten un buen comienzo, visita nuestros videos de introducción</key>
     <key alias="licenseText">Pulsando el botón de Siguiente (o modificando el UmbracoConfigurationStatus en el web.config), aceptar la licencia de este software tal y como se especifica en el cuadro de debajo. Ten en cuenta que esta distribución de Umbraco consta de dos licencias diferentes, la licencia open source MIT para el framework y la licencia Umbraco freeware que cubre la IU.</key>
     <key alias="None">No ha sido instalado.</key>
@@ -925,8 +924,6 @@
     <key alias="startnode">Nodo de comienzo en contenido</key>
     <key alias="username">Nombre de usuario</key>
     <key alias="userPermissions">Permisos de usuarios</key>
-    <key alias="usertype">Tipo de usuario</key>
-    <key alias="userTypes">Tipos de usuarios</key>
     <key alias="writer">Redactor</key>
     <key alias="yourProfile" version="7.0">Tu perfil</key>
     <key alias="yourHistory" version="7.0">Tu historial reciente</key>

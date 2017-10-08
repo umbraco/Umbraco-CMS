@@ -125,6 +125,10 @@ namespace Umbraco.Web.UI
         internal static bool UserHasCreateAccess(HttpContextBase httpContext, User umbracoUser, string nodeType)
         {
             var task = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
+            if (task == null)
+                throw new InvalidOperationException(
+                    string.Format("Could not task for operation {0} for node type {1}", Operation.Create, nodeType));
+
             var dialogTask = task as LegacyDialogTask;
             if (dialogTask != null)
             {
@@ -149,6 +153,10 @@ namespace Umbraco.Web.UI
         internal static bool UserHasDeleteAccess(HttpContextBase httpContext, User umbracoUser, string nodeType)
         {
             var task = GetTaskForOperation(httpContext, umbracoUser, Operation.Delete, nodeType);
+            if (task == null)
+                throw new InvalidOperationException(
+                    string.Format("Could not task for operation {0} for node type {1}", Operation.Delete, nodeType));
+
             var dialogTask = task as LegacyDialogTask;
             if (dialogTask != null)
             {
@@ -160,7 +168,10 @@ namespace Umbraco.Web.UI
         public static void Delete(HttpContextBase httpContext, User umbracoUser, string nodeType, int nodeId, string text)
         {
             var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Delete, nodeType);
-            
+            if (typeInstance == null)
+                throw new InvalidOperationException(
+                    string.Format("Could not task for operation {0} for node type {1}", Operation.Delete, nodeType));
+
             typeInstance.ParentID = nodeId;
             typeInstance.Alias = text;
 
@@ -170,7 +181,10 @@ namespace Umbraco.Web.UI
         public static string Create(HttpContextBase httpContext, User umbracoUser, string nodeType, int nodeId, string text, int typeId = 0)
         {
             var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
-            
+            if (typeInstance == null)
+                throw new InvalidOperationException(
+                    string.Format("Could not task for operation {0} for node type {1}", Operation.Create, nodeType));
+
             typeInstance.TypeID = typeId;
             typeInstance.ParentID = nodeId;
             typeInstance.Alias = text;
@@ -187,6 +201,9 @@ namespace Umbraco.Web.UI
         internal static string Create(HttpContextBase httpContext, User umbracoUser, string nodeType, int nodeId, string text, IDictionary<string, object> additionalValues, int typeId = 0)
         {
             var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
+            if (typeInstance == null)
+                throw new InvalidOperationException(
+                    string.Format("Could not task for operation {0} for node type {1}", Operation.Create, nodeType));
 
             typeInstance.TypeID = typeId;
             typeInstance.ParentID = nodeId;

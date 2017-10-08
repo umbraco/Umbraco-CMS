@@ -28,18 +28,14 @@
     <key alias="refreshNode">Nodes opnieuw inladen</key>
     <key alias="republish">Herpubliceer de site</key>
     <key alias="SetPermissionsForThePage">Stel rechten voor pagina %0% in</key>
-    <key alias="chooseWhereToMove">Waarheen verplaatsen/</key>
-    <key alias="toInTheTreeStructureBelow">Naar de onderstaande boomstructuur</key>
     <key alias="restore" version="7.3.0">Herstellen</key>
     <key alias="rights">Rechten</key>
     <key alias="rollback">Vorige versies</key>
     <key alias="sendtopublish">Klaar voor publicatie</key>
     <key alias="sendToTranslate">Klaar voor vertalen</key>
     <key alias="sort">Sorteren</key>
-    <key alias="toPublish">Klaar voor publicatie</key>
     <key alias="translate">Vertalen</key>
     <key alias="update">Bijwerken</key>
-    <key alias="defaultValue">Standaardwaarde</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permission denied.</key>
@@ -248,6 +244,8 @@
     <key alias="copiedItemOfItems">item %0% van de %1% gekopieerd</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Link Titel</key>
+    <key alias="urlLinkPicker">Link</key>
     <key alias="anchorInsert">Naam</key>
     <key alias="assignDomain">Beheer domeinnamen</key>
     <key alias="closeThisWindow">Sluit dit venster</key>
@@ -585,7 +583,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>De default gebruiker is geblokkeerd of heeft geen toegang tot Umbraco!</strong></p><p>Geen verdere actie noodzakelijk. Klik <b>Volgende</b> om verder te gaan.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Het wachtwoord van de default gebruiker is sinds installatie met succes veranderd.</strong></p><p>Geen verdere actie noodzakelijk. Klik <strong>Volgende</strong> om verder te gaan.]]></key>
     <key alias="defaultUserPasswordChanged">Het wachtwoord is veranderd!</key>
-    <key alias="defaultUserText"><![CDATA[<p> Umbraco maakt een default gebruiker aan met login <strong>('admin')</strong> and wachtwoord <strong>('default')</strong>. Het is <strong>belangrijk</strong> dat dit wachtwoord wordt veranderd in iets unieks. </p> <p> Deze stap controleert het password van de default gebruiker en adviseert of het veranderd dient te worden. </p>]]></key>
     <key alias="greatStart">Neem een jumpstart en bekijk onze introductie videos</key>
     <key alias="licenseText"><![CDATA[Door op de 'Volgende' knop te klikken (of door de UmbracoConfigurationStatus in web.config te veranderen), accepteer je de licentie voor deze software zoals in het onderstaande kader is te lezen. Deze Umbraco distributie bevat twee verschillende licensies: de open-source MIT licensie voor het framework en de Umbraco freeware licensie die de gebruikersinterface behelst.
 
@@ -1304,8 +1301,6 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="startnode">Startnode in Content</key>
     <key alias="username">Gebruikersnaam</key>
     <key alias="userPermissions">Gebruikersrechten</key>
-    <key alias="usertype">Gebruikerstype</key>
-    <key alias="userTypes">Gebruikerstypes</key>
     <key alias="writer">Auteur</key>
 	<key alias="translator">Vertaler</key>
     <key alias="change">Wijzig</key>

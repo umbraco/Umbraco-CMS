@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Models
 {

@@ -183,6 +183,7 @@
     <Compile Include="Actions\ActionBrowse.cs" />
     <Compile Include="Actions\ActionChangeDocType.cs" />
     <Compile Include="Actions\ActionCopy.cs" />
+    <Compile Include="Actions\ActionCreateBlueprintFromContent.cs" />
     <Compile Include="Actions\ActionDelete.cs" />
     <Compile Include="Actions\ActionDisable.cs" />
     <Compile Include="Actions\ActionEmptyTranscan.cs" />
@@ -443,5 +444,4 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
 </Project>

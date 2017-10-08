@@ -51,6 +51,107 @@ namespace Umbraco.Tests.Services
         //TODO Add test to verify there is only ONE newest document/content in cmsDocument table after updating.
         //TODO Add test to delete specific version (with and without deleting prior versions) and versions by date.
 
+        [Test]
+        public void Create_Blueprint()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            contentTypeService.Save(contentType);
+
+            var blueprint = MockedContent.CreateTextpageContent(contentType, "hello", -1);
+            blueprint.SetValue("title", "blueprint 1");
+            blueprint.SetValue("bodyText", "blueprint 2");
+            blueprint.SetValue("keywords", "blueprint 3");
+            blueprint.SetValue("description", "blueprint 4");
+
+            contentService.SaveBlueprint(blueprint);
+
+            var found = contentService.GetBlueprintsForContentTypes().ToArray();
+            Assert.AreEqual(1, found.Length);
+            
+            //ensures it's not found by normal content
+            var contentFound = contentService.GetById(found[0].Id);
+            Assert.IsNull(contentFound);
+        }
+
+        [Test]
+        public void Delete_Blueprint()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            contentTypeService.Save(contentType);
+
+            var blueprint = MockedContent.CreateTextpageContent(contentType, "hello", -1);
+            blueprint.SetValue("title", "blueprint 1");
+            blueprint.SetValue("bodyText", "blueprint 2");
+            blueprint.SetValue("keywords", "blueprint 3");
+            blueprint.SetValue("description", "blueprint 4");
+
+            contentService.SaveBlueprint(blueprint);
+
+            contentService.DeleteBlueprint(blueprint);
+
+            var found = contentService.GetBlueprintsForContentTypes().ToArray();
+            Assert.AreEqual(0, found.Length);
+        }
+
+        [Test]
+        public void Create_Content_From_Blueprint()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            contentTypeService.Save(contentType);
+
+            var blueprint = MockedContent.CreateTextpageContent(contentType, "hello", -1);
+            blueprint.SetValue("title", "blueprint 1");
+            blueprint.SetValue("bodyText", "blueprint 2");
+            blueprint.SetValue("keywords", "blueprint 3");
+            blueprint.SetValue("description", "blueprint 4");
+
+            contentService.SaveBlueprint(blueprint);
+
+            var fromBlueprint = contentService.CreateContentFromBlueprint(blueprint, "hello world");
+            contentService.Save(fromBlueprint);
+
+            Assert.IsTrue(fromBlueprint.HasIdentity);
+            Assert.AreEqual("blueprint 1", fromBlueprint.Properties["title"].Value);
+            Assert.AreEqual("blueprint 2", fromBlueprint.Properties["bodyText"].Value);
+            Assert.AreEqual("blueprint 3", fromBlueprint.Properties["keywords"].Value);
+            Assert.AreEqual("blueprint 4", fromBlueprint.Properties["description"].Value);
+        }
+
+        [Test]
+        public void Get_All_Blueprints()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var ct1 = MockedContentTypes.CreateTextpageContentType("ct1");
+            contentTypeService.Save(ct1);
+            var ct2 = MockedContentTypes.CreateTextpageContentType("ct2");
+            contentTypeService.Save(ct2);
+
+            for (int i = 0; i < 10; i++)
+            {
+                var blueprint = MockedContent.CreateTextpageContent(i % 2 == 0 ? ct1 : ct2, "hello" + i, -1);
+                contentService.SaveBlueprint(blueprint);
+            }            
+
+            var found = contentService.GetBlueprintsForContentTypes().ToArray();
+            Assert.AreEqual(10, found.Length);
+
+            found = contentService.GetBlueprintsForContentTypes(ct1.Id).ToArray();
+            Assert.AreEqual(5, found.Length);
+
+            found = contentService.GetBlueprintsForContentTypes(ct2.Id).ToArray();
+            Assert.AreEqual(5, found.Length);
+        }
 
         /// <summary>
         /// Ensures that we don't unpublish all nodes when a node is deleted that has an invalid path of -1
@@ -644,7 +745,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Save_New_Content_With_Explicit_User()
         {
-            var user = new User(ServiceContext.UserService.GetUserTypeByAlias("admin"))
+            var user = new User()
             {
                 Name = "Test",
                 Email = "test@test.com",
@@ -999,6 +1100,21 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void IsPublishable()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var parent = contentService.CreateContent("parent", -1, "umbTextpage");
+            contentService.SaveAndPublishWithStatus(parent);
+            var content = contentService.CreateContent("child", parent, "umbTextpage");
+            contentService.Save(content);
+
+            Assert.IsTrue(contentService.IsPublishable(content));
+            contentService.UnPublish(parent);
+            Assert.IsFalse(contentService.IsPublishable(content));
+        }
+
+        [Test]
         public void Can_Publish_Content_WithEvents()
         {
             ContentService.Publishing += ContentServiceOnPublishing;
@@ -1170,6 +1286,39 @@ namespace Umbraco.Tests.Services
             Assert.That(content.HasIdentity, Is.True);
             Assert.That(content.Published, Is.True);
             Assert.That(published, Is.True);
+        }
+
+        /// <summary>
+        /// Try to immitate a new child content item being created through the UI.
+        /// This content item will have no Id, Path or Identity.
+        /// It seems like this is wiped somewhere in the process when creating an item through the UI
+        /// and we need to make sure we handle nullchecks for these properties when creating content.
+        /// This is unfortunately not caught by the normal ContentService tests.
+        /// </summary>
+        [Test]
+        public void Can_Save_And_Publish_Content_And_Child_Without_Identity()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.CreateContent("Home US", -1, "umbTextpage", 0);
+            content.SetValue("author", "Barack Obama");
+
+            // Act
+            var published = contentService.SaveAndPublish(content, 0);
+            var childContent = contentService.CreateContent("Child", content.Id, "umbTextpage", 0);
+            // Reset all identity properties
+            childContent.Id = 0;
+            childContent.Path = null;
+            ((Content)childContent).ResetIdentity();
+            var childPublished = contentService.SaveAndPublish(childContent, 0);
+
+            // Assert
+            Assert.That(content.HasIdentity, Is.True);
+            Assert.That(content.Published, Is.True);
+            Assert.That(childContent.HasIdentity, Is.True);
+            Assert.That(childContent.Published, Is.True);
+            Assert.That(published, Is.True);
+            Assert.That(childPublished, Is.True);
         }
 
         [Test]
@@ -1358,6 +1507,98 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Ensures_Permissions_Are_Retained_For_Copied_Descendants_With_Explicit_Permissions()
+        {
+            // Arrange
+            var userGroup = MockedUserGroup.CreateUserGroup("1");
+            ServiceContext.UserService.Save(userGroup);
+
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
+            contentType.AllowedContentTypes = new List<ContentTypeSort>
+            {
+                new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias)
+            };
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            var parentPage = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(parentPage);            
+
+            var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
+            ServiceContext.ContentService.Save(childPage);
+            //assign explicit permissions to the child
+            ServiceContext.ContentService.AssignContentPermission(childPage, 'A', new[] { userGroup.Id });
+
+            //Ok, now copy, what should happen is the childPage will retain it's own permissions
+            var parentPage2 = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(parentPage2);
+
+            var copy = ServiceContext.ContentService.Copy(childPage, parentPage2.Id, false, true);
+
+            //get the permissions and verify
+            var permissions = ServiceContext.UserService.GetPermissionsForPath(userGroup, copy.Path, fallbackToDefaultPermissions: true);
+            var allPermissions = permissions.GetAllPermissions().ToArray();
+            Assert.AreEqual(1, allPermissions.Length);
+            Assert.AreEqual("A", allPermissions[0]);
+        }
+
+        [Test]
+        public void Ensures_Permissions_Are_Inherited_For_Copied_Descendants()
+        {
+            // Arrange
+            var userGroup = MockedUserGroup.CreateUserGroup("1");
+            ServiceContext.UserService.Save(userGroup);
+
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
+            contentType.AllowedContentTypes = new List<ContentTypeSort>
+            {
+                new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias)
+            };
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            var parentPage = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(parentPage);
+            ServiceContext.ContentService.AssignContentPermission(parentPage, 'A', new[] { userGroup.Id });
+
+            var childPage1 = MockedContent.CreateSimpleContent(contentType, "child1", parentPage);
+            ServiceContext.ContentService.Save(childPage1);
+            var childPage2 = MockedContent.CreateSimpleContent(contentType, "child2", childPage1);
+            ServiceContext.ContentService.Save(childPage2);
+            var childPage3 = MockedContent.CreateSimpleContent(contentType, "child3", childPage2);
+            ServiceContext.ContentService.Save(childPage3);
+
+            //Verify that the children have the inherited permissions
+            var descendants = ServiceContext.ContentService.GetDescendants(parentPage).ToArray();
+            Assert.AreEqual(3, descendants.Length);
+
+            foreach (var descendant in descendants)
+            {
+                var permissions = ServiceContext.UserService.GetPermissionsForPath(userGroup, descendant.Path, fallbackToDefaultPermissions: true);
+                var allPermissions = permissions.GetAllPermissions().ToArray();
+                Assert.AreEqual(1, allPermissions.Length);
+                Assert.AreEqual("A", allPermissions[0]);
+            }
+
+            //create a new parent with a new permission structure
+            var parentPage2 = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(parentPage2);
+            ServiceContext.ContentService.AssignContentPermission(parentPage2, 'B', new[] { userGroup.Id });
+
+            //Now copy, what should happen is the child pages will now have permissions inherited from the new parent
+            var copy = ServiceContext.ContentService.Copy(childPage1, parentPage2.Id, false, true);
+            
+            descendants = ServiceContext.ContentService.GetDescendants(parentPage2).ToArray();
+            Assert.AreEqual(3, descendants.Length);
+
+            foreach (var descendant in descendants)
+            {
+                var permissions = ServiceContext.UserService.GetPermissionsForPath(userGroup, descendant.Path, fallbackToDefaultPermissions: true);
+                var allPermissions = permissions.GetAllPermissions().ToArray();
+                Assert.AreEqual(1, allPermissions.Length);
+                Assert.AreEqual("B", allPermissions[0]);
+            }
+        }
+
+        [Test]
         public void Can_Empty_RecycleBin_With_Content_That_Has_All_Related_Data()
         {
             // Arrange
@@ -1390,6 +1631,14 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(content2, 0);
             Assert.IsTrue(ServiceContext.ContentService.PublishWithStatus(content2, 0).Success);
 
+            var editorGroup = ServiceContext.UserService.GetUserGroupByAlias("editor");
+            editorGroup.StartContentId = content1.Id;
+            ServiceContext.UserService.Save(editorGroup);
+
+            var admin = ServiceContext.UserService.GetUserById(0);
+            admin.StartContentIds = new[] {content1.Id};
+            ServiceContext.UserService.Save(admin);
+
             ServiceContext.RelationService.Save(new RelationType(Constants.ObjectTypes.DocumentGuid, Constants.ObjectTypes.DocumentGuid, "test"));
             Assert.IsNotNull(ServiceContext.RelationService.Relate(content1, content2, "test"));
 
@@ -1403,10 +1652,11 @@ namespace Umbraco.Tests.Services
             }));
             Assert.IsTrue(ServiceContext.PublicAccessService.AddRule(content1, "test2", "test2").Success);
 
-            // how is that one even working since "test" is more than 1 char?
-            Assert.IsNotNull(ServiceContext.NotificationService.CreateNotification(ServiceContext.UserService.GetUserById(0), content1, "test"));
+            var user = ServiceContext.UserService.GetUserById(0);
+            var userGroup = ServiceContext.UserService.GetUserGroupByAlias(user.Groups.First().Alias);
+            Assert.IsNotNull(ServiceContext.NotificationService.CreateNotification(user, content1, "test"));
 
-            ServiceContext.ContentService.AssignContentPermission(content1, 'A', new[] {0});
+            ServiceContext.ContentService.AssignContentPermission(content1, 'A', new[] { userGroup.Id});
 
             Assert.IsTrue(ServiceContext.DomainService.Save(new UmbracoDomain("www.test.com", "en-AU")
             {
@@ -1414,6 +1664,7 @@ namespace Umbraco.Tests.Services
             }).Success);
 
             // Act
+            ServiceContext.ContentService.MoveToRecycleBin(content1);
             ServiceContext.ContentService.EmptyRecycleBin();
             var contents = ServiceContext.ContentService.GetContentInRecycleBin();
 
@@ -1642,9 +1893,9 @@ namespace Umbraco.Tests.Services
             Assert.That(sut.GetValue<DateTime>("date").ToString("G"), Is.EqualTo(content.GetValue<DateTime>("date").ToString("G")));
             Assert.That(sut.GetValue<string>("ddl"), Is.EqualTo("1234"));
             Assert.That(sut.GetValue<string>("chklist"), Is.EqualTo("randomc"));
-            Assert.That(sut.GetValue<int>("contentPicker"), Is.EqualTo(1090));
-            Assert.That(sut.GetValue<int>("mediaPicker"), Is.EqualTo(1091));
-            Assert.That(sut.GetValue<int>("memberPicker"), Is.EqualTo(1092));
+            Assert.That(sut.GetValue<Udi>("contentPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Document, new Guid("74ECA1D4-934E-436A-A7C7-36CC16D4095C"))));
+            Assert.That(sut.GetValue<Udi>("mediaPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Media, new Guid("44CB39C8-01E5-45EB-9CF8-E70AAF2D1691"))));
+            Assert.That(sut.GetValue<Udi>("memberPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Member, new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D"))));
             Assert.That(sut.GetValue<string>("relatedLinks"), Is.EqualTo("<links><link title=\"google\" link=\"http://google.com\" type=\"external\" newwindow=\"0\" /></links>"));
             Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));
         }

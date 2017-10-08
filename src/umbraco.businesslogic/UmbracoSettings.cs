@@ -447,7 +447,7 @@ namespace umbraco
 
         /// <summary>
         /// Gets HelpPage configurations.
-        /// A help page configuration specify language, user type, application, application url and 
+        /// A help page configuration specify language, user groups, application, application url and 
         /// the target help page url.
         /// </summary>
         public static XmlNode HelpPages

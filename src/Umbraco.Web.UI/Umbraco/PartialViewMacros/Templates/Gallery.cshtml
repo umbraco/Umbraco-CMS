@@ -29,12 +29,9 @@
             }
 
             @* a folder with images under it *@
-            if (media.Children<Image>().Any())
+            foreach (var image in media.Children<Image>())
             {
-                foreach (var image in media.Children<Image>())
-                {
-                    @Render(image);
-                }
+                @Render(image);
             }
         }
     </div>

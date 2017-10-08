@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Routing;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -28,7 +27,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemDisplay
             config.CreateMap<IContent, ContentItemDisplay>()
-                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Document, content.Key)))
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(content.IsBlueprint ? Constants.UdiEntityType.DocumentBluePrint : Constants.UdiEntityType.Document, content.Key)))
                 .ForMember(display => display.Owner, expression => expression.ResolveUsing(new OwnerResolver<IContent>()))
                 .ForMember(display => display.Updater, expression => expression.ResolveUsing(new CreatorResolver()))
                 .ForMember(display => display.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -59,7 +58,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
-                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Document, content.Key)))
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(content.IsBlueprint ? Constants.UdiEntityType.DocumentBluePrint : Constants.UdiEntityType.Document, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IContent>()))
                 .ForMember(dto => dto.Updater, expression => expression.ResolveUsing(new CreatorResolver()))
                 .ForMember(dto => dto.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
@@ -70,7 +69,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemDto<IContent>
             config.CreateMap<IContent, ContentItemDto<IContent>>()
-                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Document, content.Key)))
+                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(content.IsBlueprint ? Constants.UdiEntityType.DocumentBluePrint : Constants.UdiEntityType.Document, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IContent>()))
                 .ForMember(dto => dto.HasPublishedVersion, expression => expression.MapFrom(content => content.HasPublishedVersion))
                 .ForMember(dto => dto.Updater, expression => expression.Ignore())
@@ -135,7 +134,7 @@ namespace Umbraco.Web.Models.Mapping
                     Label = localizedText.Localize("content/releaseDate"),
                     Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
                     //Not editible for people without publish permission (U4-287)
-                    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter) ? "datepicker" : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
+                    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)) ? "datepicker" : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
                     Config = new Dictionary<string, object>
                     {
                         {"offsetTime", "1"}
@@ -148,7 +147,7 @@ namespace Umbraco.Web.Models.Mapping
                     Label = localizedText.Localize("content/unpublishDate"),
                     Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
                     //Not editible for people without publish permission (U4-287)
-                    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter) ? "datepicker" : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
+                    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)) ? "datepicker" : PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
                     Config = new Dictionary<string, object>
                     {
                         {"offsetTime", "1"}
@@ -213,10 +212,9 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         /// <summary>
-                //TODO: This is horribly inneficient
         /// Creates the list of action buttons allowed for this user - Publish, Send to publish, save, unpublish returned as the button's 'letter'
         /// </summary>
-        private class ActionButtonsResolver : ValueResolver<IContent, IEnumerable<char>>
+        private class ActionButtonsResolver : ValueResolver<IContent, IEnumerable<string>>
         {
             private readonly Lazy<IUserService> _userService;
 
@@ -225,12 +223,12 @@ namespace Umbraco.Web.Models.Mapping
                 _userService = userService;
             }
 
-            protected override IEnumerable<char> ResolveCore(IContent source)
+            protected override IEnumerable<string> ResolveCore(IContent source)
             {
                 if (UmbracoContext.Current == null)
                 {
                     //cannot check permissions without a context
-                    return Enumerable.Empty<char>();
+                    return Enumerable.Empty<string>();
                 }
                 var svc = _userService.Value;
 
@@ -242,11 +240,9 @@ namespace Umbraco.Web.Models.Mapping
                         // Here we need to do a special check since this could be new content, in which case we need to get the permissions
                         // from the parent, not the existing one otherwise permissions would be coming from the root since Id is 0.
                         source.HasIdentity ? source.Id : source.ParentId)
-                    .FirstOrDefault();
+                    .GetAllPermissions();
 
-                return permissions == null
-                    ? Enumerable.Empty<char>()
-                    : permissions.AssignedPermissions.Where(x => x.Length == 1).Select(x => x.ToUpperInvariant()[0]);
+                return permissions;
             }
         }
     }

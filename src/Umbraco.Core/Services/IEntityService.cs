@@ -170,9 +170,15 @@ namespace Umbraco.Core.Services
         /// <param name="totalRecords"></param>
         /// <param name="orderBy"></param>
         /// <param name="orderDirection"></param>
-        /// <param name="filter"></param>        
+        /// <param name="filter"></param>
         /// <returns></returns>
         IEnumerable<IUmbracoEntity> GetPagedDescendants(int id, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
+
+        /// <summary>
+        /// Returns a paged collection of descendants
+        /// </summary>
+        IEnumerable<IUmbracoEntity> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
             string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
@@ -244,6 +250,16 @@ namespace Umbraco.Core.Services
         IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids);
 
         /// <summary>
+        /// Gets paths for entities.
+        /// </summary>
+        IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params int[] ids);
+
+        /// <summary>
+        /// Gets paths for entities.
+        /// </summary>
+        IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params Guid[] keys);
+
+        /// <summary>
         /// Gets the UmbracoObjectType from the integer id of an IUmbracoEntity.
         /// </summary>
         /// <param name="id">Id of the entity</param>
@@ -270,5 +286,13 @@ namespace Umbraco.Core.Services
         /// <param name="umbracoObjectType"><see cref="UmbracoObjectTypes"/></param>
         /// <returns>Type of the entity</returns>
         Type GetEntityType(UmbracoObjectTypes umbracoObjectType);
+
+        /// <summary>
+        /// Reserves an identifier for a key.
+        /// </summary>
+        /// <param name="key">They key.</param>
+        /// <returns>The identifier.</returns>
+        /// <remarks>When a new content or a media is saved with the key, it will have the reserved identifier.</remarks>
+        int ReserveId(Guid key);
     }
 }

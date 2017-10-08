@@ -1,6 +1,8 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.IO;
+﻿using Umbraco.Core.IO;
 using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi.Filters;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
@@ -8,7 +10,10 @@ namespace Umbraco.Web.Trees
     /// Tree for displaying partial view macros in the developer app
     /// </summary>
     [Tree(Constants.Applications.Developer, "partialViewMacros", null, sortOrder: 6)]
-    public class PartialViewMacrosTreeController : FileSystemTreeController2
+    [UmbracoTreeAuthorize(Constants.Trees.PartialViewMacros)]
+    [PluginController("UmbracoTrees")]
+    [CoreTree]
+    public class PartialViewMacrosTreeController : FileSystemTreeController
     {
         protected override IFileSystem2 FileSystem
         {

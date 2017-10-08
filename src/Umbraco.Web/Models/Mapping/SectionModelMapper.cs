@@ -11,6 +11,7 @@ namespace Umbraco.Web.Models.Mapping
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<Core.Models.Section, Section>()
+                .ForMember(section => section.RoutePath, x => x.Ignore())
                 .ForMember(
                       dto => dto.Name,
                       expression => expression.MapFrom(section => ui.Text("sections", section.Alias)))

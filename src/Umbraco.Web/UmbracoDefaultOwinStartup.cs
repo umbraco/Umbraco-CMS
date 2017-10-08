@@ -37,12 +37,7 @@ namespace Umbraco.Web
         protected virtual void ConfigureServices(IAppBuilder app)
         {
             app.SetUmbracoLoggerFactory();
-
-            //Configure the Identity user manager for use with Umbraco Back office
-            // (EXPERT: an overload accepts a custom BackOfficeUserStore implementation)
-            app.ConfigureUserManagerForUmbracoBackOffice(
-                ApplicationContext,
-                Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());            
+            ConfigureUmbracoUserManager(app);
         }
 
         /// <summary>
@@ -62,7 +57,19 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Raised when the middelware has been configured
+        /// Configure the Identity user manager for use with Umbraco Back office
+        /// </summary>
+        /// <param name="app"></param>
+        protected virtual void ConfigureUmbracoUserManager(IAppBuilder app)
+        {
+            // (EXPERT: an overload accepts a custom BackOfficeUserStore implementation)
+            app.ConfigureUserManagerForUmbracoBackOffice(
+                ApplicationContext,
+                Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());
+        }
+
+        /// <summary>
+        /// Raised when the middleware has been configured
         /// </summary>
         public static event EventHandler<OwinMiddlewareConfiguredEventArgs> MiddlewareConfigured;
 

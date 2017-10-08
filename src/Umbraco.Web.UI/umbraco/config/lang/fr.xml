@@ -36,10 +36,8 @@
     <key alias="sendtopublish">Envoyer pour publication</key>
     <key alias="sendToTranslate">Envoyer pour traduction</key>
     <key alias="sort">Trier</key>
-    <key alias="toPublish">Envoyer pour publication</key>
     <key alias="translate">Traduire</key>
     <key alias="update">Mettre à jour</key>
-    <key alias="defaultValue">Valeur par défaut</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permission refusée.</key>
@@ -253,6 +251,8 @@
     <key alias="copiedItemOfItems">%0% éléments sur %1% copiés</key>
   </area>  
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Titre du lien</key>
+    <key alias="urlLinkPicker">Lien</key>
     <key alias="anchorInsert">Nom</key>
     <key alias="assignDomain">Gérer les noms d'hôtes</key>
     <key alias="closeThisWindow">Fermer cette fenêtre</key>
@@ -634,15 +634,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>L'utilisateur par défaut a été désactivé ou n'a pas accès à Umbraco!</strong></p><p>Aucune autre action n'est requise. Cliquez sur <b>Suivant</b> pour poursuivre.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Le mot de passe par défaut a été modifié avec succès depuis l'installation!</strong></p><p>Aucune autre action n'est requise. Cliquez sur <strong>Suivant</strong> pour poursuivre.]]></key>
     <key alias="defaultUserPasswordChanged">Le mot de passe a été modifié !</key>
-    <key alias="defaultUserText"><![CDATA[
-		<p>
-		Umbraco crée un utilisateur par défaut avec le login <strong>('admin')</strong> et le mot de passe <strong>('default')</strong>. Il est <strong>important</strong> que ce mot de passe soit 
-		modifié en quelque-chose de sécurisé et unique.
-		</p>
-		<p>
-          Cette étape va vérifier le mot de passe utilisateur par défaut et suggèrera de le modifier si nécessaire.
-		</p>
-		]]></key>
     <key alias="greatStart">Pour bien commencer, regardez nos vidéos d'introduction</key>
     <key alias="licenseText">En cliquant sur le bouton "Suivant" (ou en modifiant umbracoConfigurationStatus dans le fichier web.config), vous acceptez la licence de ce logiciel telle que spécifiée dans le champ ci-dessous. Veuillez noter que cette distribution Umbraco consiste en deux licences différentes, la licence open source MIT pour le framework et la licence Umbraco freeware qui couvre l'UI.</key>
     <key alias="None">Pas encore installé.</key>
@@ -1479,8 +1470,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="startnode">Noeud de départ du contenu</key>
     <key alias="username">Nom d'utilisateur</key>
     <key alias="userPermissions">Permissions utilisateur</key>
-    <key alias="usertype">Type d'utilisateur</key>
-    <key alias="userTypes">Types d'utilisateurs</key>
     <key alias="writer">Rédacteur</key>
     <key alias="translator">Traducteur</key>
     <key alias="change">Modifier</key>

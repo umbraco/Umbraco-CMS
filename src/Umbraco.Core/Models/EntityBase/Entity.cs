@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 
 namespace Umbraco.Core.Models.EntityBase
 {
@@ -119,7 +116,7 @@ namespace Umbraco.Core.Models.EntityBase
             if (IsPropertyDirty("CreateDate") == false || _createDate == default(DateTime))
                 CreateDate = DateTime.Now;
             if (IsPropertyDirty("UpdateDate") == false || _updateDate == default(DateTime))
-                UpdateDate = CreateDate;
+                UpdateDate = DateTime.Now;
         }
 
         /// <summary>
@@ -129,6 +126,10 @@ namespace Umbraco.Core.Models.EntityBase
         {
             if (IsPropertyDirty("UpdateDate") == false || _updateDate == default(DateTime))
                 UpdateDate = DateTime.Now;
+
+            //this is just in case
+            if (_createDate == default(DateTime))
+                CreateDate = DateTime.Now;
         }
 
         /// <summary>

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -53,7 +55,47 @@ namespace Umbraco.Web.Trees
 
         #endregion
 
+        /// <summary>
+        /// Ensure the noAccess metadata is applied for the root node if in dialog mode and the user doesn't have path access to it
+        /// </summary>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        {
+            var node = base.CreateRootNode(queryStrings);
+
+            if (IsDialog(queryStrings) && UserStartNodes.Contains(Constants.System.Root) == false)
+            {
+                node.AdditionalData["noAccess"] = true;
+            }
+
+            return node;
+        }
+
         protected abstract TreeNode GetSingleTreeNode(IUmbracoEntity e, string parentId, FormDataCollection queryStrings);
+
+        /// <summary>
+        /// Returns a <see cref="TreeNode"/> for the <see cref="IUmbracoEntity"/> and 
+        /// attaches some meta data to the node if the user doesn't have start node access to it when in dialog mode
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="parentId"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        internal TreeNode GetSingleTreeNodeWithAccessCheck(IUmbracoEntity e, string parentId, FormDataCollection queryStrings)
+        {
+            bool hasPathAccess;
+            var entityIsAncestorOfStartNodes = Security.CurrentUser.IsInBranchOfStartNode(e, Services.EntityService, RecycleBinId, out hasPathAccess);
+            if (entityIsAncestorOfStartNodes == false)
+                return null;
+
+            var treeNode = GetSingleTreeNode(e, parentId, queryStrings);            
+            if (hasPathAccess == false)
+            {
+                treeNode.AdditionalData["noAccess"] = true;
+            }
+            return treeNode;
+        }
 
         /// <summary>
         /// Returns the 
@@ -68,14 +110,8 @@ namespace Umbraco.Web.Trees
         /// <summary>
         /// Returns the user's start node for this tree
         /// </summary>
-        protected abstract int UserStartNode { get; }
-
-        /// <summary>
-        /// Gets the tree nodes for the given id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="queryStrings"></param>
-        /// <returns></returns>        
+        protected abstract int[] UserStartNodes { get; }
+        
         protected virtual TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
@@ -83,9 +119,10 @@ namespace Umbraco.Web.Trees
             var altStartId = string.Empty;
             if (queryStrings.HasKey(TreeQueryStringParameters.StartNodeId))
                 altStartId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
+            var rootIdString = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
 
             //check if a request has been made to render from a specific start node
-            if (string.IsNullOrEmpty(altStartId) == false && altStartId != "undefined" && altStartId != Constants.System.Root.ToString(CultureInfo.InvariantCulture))
+            if (string.IsNullOrEmpty(altStartId) == false && altStartId != "undefined" && altStartId != rootIdString)
             {
                 id = altStartId;
 
@@ -105,16 +142,48 @@ namespace Umbraco.Web.Trees
                 // Therefore, in the latter case, we want to change the id to -1 since we want to render the current user's root node
                 // and the GetChildEntities method will take care of rendering the correct root node.
                 // If it is in dialog mode, then we don't need to change anything and the children will just render as per normal.
-                if (IsDialog(queryStrings) == false && UserStartNode != Constants.System.Root)
+                if (IsDialog(queryStrings) == false && UserStartNodes.Contains(Constants.System.Root) == false)
                 {
                     id = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
                 }
             }
 
-            var entities = GetChildEntities(id);
-            nodes.AddRange(entities.Select(entity => GetSingleTreeNode(entity, id, queryStrings)).Where(node => node != null));
+            var entities = GetChildEntities(id).ToList();
+
+            //If we are looking up the root and there is more than one node ...
+            //then we want to lookup those nodes' 'site' nodes and render those so that the
+            //user has some context of where they are in the tree, this is generally for pickers in a dialog.
+            //for any node they don't have access too, we need to add some metadata
+            if (id == rootIdString && entities.Count > 1)
+            {
+                var siteNodeIds = new List<int>();
+                //put into array since we might modify the list
+                foreach (var e in entities.ToArray())
+                {
+                    var pathParts = e.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+                    if (pathParts.Length < 2)
+                        continue; // this should never happen but better to check
+
+                    int siteNodeId;
+                    if (int.TryParse(pathParts[1], out siteNodeId) == false)
+                        continue;
+
+                    //we'll look up this                    
+                    siteNodeIds.Add(siteNodeId);
+                }
+                var siteNodes = Services.EntityService.GetAll(UmbracoObjectType, siteNodeIds.ToArray())
+                    .DistinctBy(e => e.Id)
+                    .ToArray();
+
+                //add site nodes
+                nodes.AddRange(siteNodes.Select(e => GetSingleTreeNodeWithAccessCheck(e, id, queryStrings)).Where(node => node != null));
+                
+                return nodes;
+            }
+
+            nodes.AddRange(entities.Select(e => GetSingleTreeNodeWithAccessCheck(e, id, queryStrings)).Where(node => node != null));
             return nodes;
-        }
+        }        
 
         protected abstract MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings);
 
@@ -128,7 +197,6 @@ namespace Umbraco.Web.Trees
             // look up from GUID if it's not an integer
             if (int.TryParse(id, out iid) == false)
             {
-
                 var idEntity = GetEntityFromId(id);
                 if (idEntity == null)
                 {
@@ -137,19 +205,13 @@ namespace Umbraco.Web.Trees
                 iid = idEntity.Id;
             }
 
-
-            //if a request is made for the root node data but the user's start node is not the default, then
-            // we need to return their start node data
-            if (iid == Constants.System.Root && UserStartNode != Constants.System.Root)
+            // if a request is made for the root node but user has no access to
+            // root node, return start nodes instead
+            if (iid == Constants.System.Root && UserStartNodes.Contains(Constants.System.Root) == false)
             {
-                //just return their single start node, it will show up under the 'Content' label
-                var startNode = Services.EntityService.Get(UserStartNode, UmbracoObjectType);
-                if (startNode != null)
-                    return new[] { startNode };
-                else
-                {
-                    throw new EntityNotFoundException(UserStartNode, "User's start content node could not be found");
-                }
+                return UserStartNodes.Length > 0
+                    ? Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes)
+                    : Enumerable.Empty<IUmbracoEntity>();
             }
 
             return Services.EntityService.GetChildren(iid, UmbracoObjectType).ToArray();
@@ -161,7 +223,20 @@ namespace Umbraco.Web.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
+        //we should remove this in v8, it's now here for backwards compat only
         protected abstract bool HasPathAccess(string id, FormDataCollection queryStrings);
+
+        /// <summary>
+        /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        protected bool HasPathAccess(IUmbracoEntity entity, FormDataCollection queryStrings)
+        {
+            if (entity == null) return false;
+            return Security.CurrentUser.HasPathAccess(entity, Services.EntityService, RecycleBinId);
+        }
 
         /// <summary>
         /// Ensures the recycle bin is appended when required (i.e. user has access to the root and it's not in dialog mode)
@@ -175,7 +250,7 @@ namespace Umbraco.Web.Trees
         protected sealed override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             //check if we're rendering the root
-            if (id == Constants.System.Root.ToInvariantString() && UserStartNode == Constants.System.Root)
+            if (id == Constants.System.Root.ToInvariantString() && UserStartNodes.Contains(Constants.System.Root))
             {
                 var altStartId = string.Empty;
 
@@ -221,7 +296,7 @@ namespace Umbraco.Web.Trees
         /// </remarks>
         private TreeNodeCollection GetTreeNodesInternal(string id, FormDataCollection queryStrings)
         {
-            IUmbracoEntity current = GetEntityFromId(id);
+            var current = GetEntityFromId(id);
 
             //before we get the children we need to see if this is a container node
 
@@ -250,6 +325,7 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add<ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
+
             return PerformGetMenuForNode(id, queryStrings);
         }
 
@@ -278,10 +354,11 @@ namespace Umbraco.Web.Trees
 
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
-            var actions = global::umbraco.BusinessLogic.Actions.Action.FromString(UmbracoUser.GetPermissions(dd.Path));
-
+            var actions = ActionsResolver.Current.FromActionSymbols(Security.CurrentUser.GetPermissions(dd.Path, Services.UserService))
+                .ToList();
+            
             // A user is allowed to delete their own stuff
-            if (dd.CreatorId == UmbracoUser.Id && actions.Contains(ActionDelete.Instance) == false)
+            if (dd.CreatorId == Security.GetUserId() && actions.Contains(ActionDelete.Instance) == false)
                 actions.Add(ActionDelete.Instance);
 
             return actions.Select(x => new MenuItem(x));
@@ -300,37 +377,76 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// Get an entity via an id that can be either an integer, Guid or UDI
+        /// this will parse the string into either a GUID or INT
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        internal IUmbracoEntity GetEntityFromId(string id)
+        internal Tuple<Guid?, int?> GetIdentifierFromString(string id)
         {
-            IUmbracoEntity entity;
-
             Guid idGuid;
             int idInt;
             Udi idUdi;
 
             if (Guid.TryParse(id, out idGuid))
             {
-                entity = Services.EntityService.GetByKey(idGuid, UmbracoObjectType);
+                return new Tuple<Guid?, int?>(idGuid, null);
             }
-            else if (int.TryParse(id, out idInt))
+            if (int.TryParse(id, out idInt))
             {
-                entity = Services.EntityService.Get(idInt, UmbracoObjectType);
+                return new Tuple<Guid?, int?>(null, idInt);
             }
-            else if (Udi.TryParse(id, out idUdi))
+            if (Udi.TryParse(id, out idUdi))
             {
                 var guidUdi = idUdi as GuidUdi;
-                entity = guidUdi != null ? Services.EntityService.GetByKey(guidUdi.Guid, UmbracoObjectType) : null;
-            }
-            else
-            {
-                return null;
+                if (guidUdi != null)
+                    return new Tuple<Guid?, int?>(guidUdi.Guid, null);                
             }
 
-            return entity;
+            return null;
         }
+
+        /// <summary>
+        /// Get an entity via an id that can be either an integer, Guid or UDI
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This object has it's own contextual cache for these lookups
+        /// </remarks>
+        internal IUmbracoEntity GetEntityFromId(string id)
+        {
+            return _entityCache.GetOrAdd(id, s =>
+            {
+                IUmbracoEntity entity;
+
+                Guid idGuid;
+                int idInt;
+                Udi idUdi;
+
+                if (Guid.TryParse(s, out idGuid))
+                {
+                    entity = Services.EntityService.GetByKey(idGuid, UmbracoObjectType);
+                }
+                else if (int.TryParse(s, out idInt))
+                {
+                    entity = Services.EntityService.Get(idInt, UmbracoObjectType);
+                }
+                else if (Udi.TryParse(s, out idUdi))
+                {
+                    var guidUdi = idUdi as GuidUdi;
+                    entity = guidUdi != null ? Services.EntityService.GetByKey(guidUdi.Guid, UmbracoObjectType) : null;
+                }
+                else
+                {
+                    return null;
+                }
+
+                return entity;
+            });
+
+            
+        }
+
+        private readonly ConcurrentDictionary<string, IUmbracoEntity> _entityCache = new ConcurrentDictionary<string, IUmbracoEntity>();
     }
 }
