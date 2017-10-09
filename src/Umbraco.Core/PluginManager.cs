@@ -41,7 +41,8 @@ namespace Umbraco.Core
         private readonly IServiceProvider _serviceProvider;
         private readonly IRuntimeCacheProvider _runtimeCache;
         private readonly ProfilingLogger _logger;
-        private readonly string _tempFolder;
+        private string _pluginListFilePath;
+        private string _pluginHashFilePath;
 
         private readonly object _typesLock = new object();
         private readonly Dictionary<TypeListKey, TypeList> _types = new Dictionary<TypeListKey, TypeList>();
@@ -67,12 +68,7 @@ namespace Umbraco.Core
             _serviceProvider = serviceProvider;
             _runtimeCache = runtimeCache;
             _logger = logger;
-
-            // the temp folder where the cache file lives
-            _tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
-            if (Directory.Exists(_tempFolder) == false)
-                Directory.CreateDirectory(_tempFolder);
-
+            
             var pluginListFile = GetPluginListFilePath();
 
             if (detectChanges)
@@ -234,16 +230,8 @@ namespace Umbraco.Core
         /// </summary>
         private void WriteCachePluginsHash()
         {
-            var filePath = GetPluginHashFilePath();
-
-            // be absolutely sure the folder exists
-            var folder = Path.GetDirectoryName(filePath);
-            if (folder == null)
-                throw new InvalidOperationException("The folder could not be determined for the file " + filePath);
-            if (Directory.Exists(folder) == false)
-                Directory.CreateDirectory(folder);
-
-            File.WriteAllText(filePath, CurrentAssembliesHash.ToString(), Encoding.UTF8);
+            var filePath = GetPluginHashFilePath();            
+            File.WriteAllText(filePath, CurrentAssembliesHash, Encoding.UTF8);
         }
 
         /// <summary>
@@ -438,11 +426,18 @@ namespace Umbraco.Core
         }
 
         private string GetPluginListFilePath()
-        {            
+        {
+            //if it's already set then return it - we don't care about locking here
+            //if 2 threads do this at the same time it won't hurt
+            if (_pluginListFilePath != null)
+                return _pluginListFilePath;
+
+            string pluginListFilePath;
             switch (GlobalSettings.LocalTempStorageLocation)
             {                
                 case LocalTempStorage.AspNetTemp:
-                    return Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco-plugins.list");
+                    pluginListFilePath = Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco-plugins.list");
+                    break;
                 case LocalTempStorage.EnvironmentTemp:
                     var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
                     var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData",
@@ -450,19 +445,39 @@ namespace Umbraco.Core
                         // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
                         // utilizing an old path
                         appDomainHash);
-                    return Path.Combine(cachePath, "umbraco-plugins.list");
+                    pluginListFilePath = Path.Combine(cachePath, "umbraco-plugins.list");
+                    break;
                 case LocalTempStorage.Default:                    
                 default:
-                    return Path.Combine(_tempFolder, "umbraco-plugins." + NetworkHelper.FileSafeMachineName + ".list");
+                    var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
+                    pluginListFilePath = Path.Combine(tempFolder, "umbraco-plugins." + NetworkHelper.FileSafeMachineName + ".list");
+                    break;
             }
+
+            //ensure the folder exists
+            var folder = Path.GetDirectoryName(pluginListFilePath);
+            if (folder == null)
+                throw new InvalidOperationException("The folder could not be determined for the file " + pluginListFilePath);
+            if (Directory.Exists(folder) == false)
+                Directory.CreateDirectory(folder);
+
+            _pluginListFilePath = pluginListFilePath;
+            return _pluginListFilePath;
         }
 
         private string GetPluginHashFilePath()
         {
+            //if it's already set then return it - we don't care about locking here
+            //if 2 threads do this at the same time it won't hurt
+            if (_pluginHashFilePath != null)
+                return _pluginHashFilePath;
+
+            string pluginHashFilePath;
             switch (GlobalSettings.LocalTempStorageLocation)
             {
                 case LocalTempStorage.AspNetTemp:
-                    return Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco-plugins.hash");
+                    pluginHashFilePath = Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco-plugins.hash");
+                    break;
                 case LocalTempStorage.EnvironmentTemp:
                     var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
                     var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData",
@@ -470,23 +485,28 @@ namespace Umbraco.Core
                         // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
                         // utilizing an old path
                         appDomainHash);
-                    return Path.Combine(cachePath, "umbraco-plugins.hash");
+                    pluginHashFilePath = Path.Combine(cachePath, "umbraco-plugins.hash");
+                    break;
                 case LocalTempStorage.Default:
                 default:
-                    return Path.Combine(_tempFolder, "umbraco-plugins." + NetworkHelper.FileSafeMachineName + ".hash");
+                    pluginHashFilePath =  Path.Combine(_pluginListFilePath, "umbraco-plugins." + NetworkHelper.FileSafeMachineName + ".hash");
+                    break;
             }
+
+            //ensure the folder exists
+            var folder = Path.GetDirectoryName(pluginHashFilePath);
+            if (folder == null)
+                throw new InvalidOperationException("The folder could not be determined for the file " + pluginHashFilePath);
+            if (Directory.Exists(folder) == false)
+                Directory.CreateDirectory(folder);
+
+            _pluginHashFilePath = pluginHashFilePath;
+            return _pluginHashFilePath;
         }
 
         internal void WriteCache()
         {
             var filePath = GetPluginListFilePath();
-
-            // be absolutely sure the folder exists
-            var folder = Path.GetDirectoryName(filePath);
-            if (folder == null)
-                throw new InvalidOperationException("The folder could not be determined for the file " + filePath);
-            if (Directory.Exists(folder) == false)
-                Directory.CreateDirectory(folder);
             
             using (var stream = GetFileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, ListFileOpenWriteTimeout))
             using (var writer = new StreamWriter(stream))
