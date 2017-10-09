@@ -67,21 +67,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.Updater, expression => expression.Ignore())
                 .ForMember(dto => dto.Icon, expression => expression.Ignore())
                 .ForMember(dto => dto.Alias, expression => expression.Ignore())
-                .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore());
-
-            //FROM ContentTypeBasic TO ContentPropertyDisplay
-            config.CreateMap<ContentTypeBasic, ContentPropertyDisplay>()
-                .ForMember(display => display.Value, expresion => expresion.MapFrom(content => content))
-                .ForMember(display => display.Description, expression => expression.Ignore())
-                .ForMember(display => display.Config, expression => expression.Ignore())
-                .ForMember(display => display.HideLabel, expression => expression.Ignore())
-                .ForMember(display => display.Label, expression => expression.Ignore())
-                .ForMember(display => display.Validation, expression => expression.Ignore())
-                .ForMember(display => display.View, expression => expression.Ignore())
-                .ForMember(display => display.Alias, expression => expression.Ignore())
-                .ForMember(display => display.Editor, expression => expression.Ignore())
-                .ForMember(display => display.Id, expression => expression.Ignore())
-                .ForMember(display => display.PropertyEditor, expression => expression.Ignore());
+                .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore());            
         }
 
         private static void AfterMap(IMedia media, MediaItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText, IContentTypeService contentTypeService, ILogger logger)
