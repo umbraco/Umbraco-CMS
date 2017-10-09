@@ -19,10 +19,11 @@
 
                 $timeout(function () {
 
-                    var element = angular.element(scope.element);
-                    var offset = element.offset();
-                    var width = element.outerWidth(true);
-                    var height = element.outerHeight(true);
+                    // The element to highlight
+                    var highlightElement = angular.element(scope.element);
+                    var offset = highlightElement.offset();
+                    var width = highlightElement.outerWidth(true);
+                    var height = highlightElement.outerHeight(true);
 
                     // Rounding numbers
                     var topDistance = offset.top.toFixed();
@@ -30,10 +31,18 @@
                     var leftDistance = offset.left.toFixed();
                     var leftAndWidth = (offset.left + width).toFixed();
 
-                    angular.element(".rect-left").css({ "width": leftDistance });
-                    angular.element(".rect-top").css({ "height": topDistance, "x": leftDistance });
-                    angular.element(".rect-bot").css({ "height": "100%", "y": topAndHeight, "x": leftDistance });
-                    angular.element(".rect-right").css({ "x": leftAndWidth, "y": topDistance, "height": height });
+                    // The four rectangles
+                    var rectTop = el.find(".umb-backdrop__rect--top");
+                    var rectRight = el.find(".umb-backdrop__rect--right");
+                    var rectBottom = el.find(".umb-backdrop__rect--bottom");
+                    var rectLeft = el.find(".umb-backdrop__rect--left");
+                    
+                    // Add the css
+                    rectTop.css({ "height": topDistance, "x": leftDistance });
+                    rectRight.css({ "x": leftAndWidth, "y": topDistance, "height": height });
+                    rectBottom.css({ "height": "100%", "y": topAndHeight, "x": leftDistance });                    
+                    rectLeft.css({ "width": leftDistance });
+
                 });
 
             }
@@ -47,9 +56,13 @@
                 setHighlight();
             }));
 
-            $(window).on('resize.umbBackdrop', resize);
+            $(window).on("resize.umbBackdrop", resize);
 
-            scope.$on('$destroy', function () {
+            scope.$on("$destroy", function () {
+                // unbind watchers
+                for (var e in events) {
+                    events[e]();
+                }
                 $(window).off("resize.umbBackdrop");
             });
 
