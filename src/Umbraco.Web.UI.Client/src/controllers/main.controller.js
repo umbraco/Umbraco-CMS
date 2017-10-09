@@ -146,6 +146,11 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         $scope.tour = { options: null, steps: null, show: false };
     }));
 
+    evts.push(eventsService.on("appState.backdrop", function (name, args) {
+        console.log("BAAAACKDROP", args);
+        $scope.backdrop = args;
+    }));
+
     //ensure to unregister from all events!
     $scope.$on('$destroy', function () {
         for (var e in evts) {

@@ -1,24 +1,30 @@
 <div class="umb-tour">
 
-    <div class="umb-tour__popover">
+    <div class="umb-tour__popover" ng-class="{
+        'umb-tour__popover--top': position === 'top',
+        'umb-tour__popover--right': position ===  'right',
+        'umb-tour__popover--bottom': position ===  'bottom',
+        'umb-tour__popover--left': position ===  'left'}">
         
         <div ng-if="loadingStep">
             <umb-load-indicator></umb-load-indicator>
         </div>
         
         <div ng-if="currentStepIndex < steps.length && !loadingStep">
-            <div class="umb-tour__step-counter">step {{ currentStepIndex + 1 }} of {{ steps.length }}</div>
             <div class="umb-tour__title">{{ currentStep.title }}</div>
             <div class="umb-tour__content" ng-bind-html="currentStep.content"></div>
-            <div class="umb-tour__button-container">
-                <umb-button size="xs" button-style="info" type="button" action="endTour()" label="End tour"></umb-button>
-                <umb-button size="xs" ng-if="!currentStep.event" button-style="success" type="button" action="nextStep()" label="Next"></umb-button>
+            <div class="flex justify-between items-center">
+                <div class="umb-tour__step-counter">Step {{ currentStepIndex + 1 }} of {{ steps.length }}</div>    
+                <div>
+                    <umb-button size="xs" button-style="link" type="button" action="endTour()" label="End tour"></umb-button>
+                    <umb-button size="xs" ng-if="!currentStep.event" button-style="success" type="button" action="nextStep()" label="Next"></umb-button>
+                </div>    
             </div>
         </div>
 
         <div ng-if="currentStepIndex === steps.length && !loadingStep">
-            <div class="umb-tour__big-title center">WOOOHOOO!</div>
-            <div class="umb-tour__content center">Your completed the tour. That is amazing!</div>
+            <div class="umb-tour__title">WOOOHOOO!</div>
+            <div class="umb-tour__content">Your completed the tour. That is amazing!</div>
             <div class="umb-tour__button-container-center">
                 <umb-button type="button" button-style="success" size="xs" action="completeTour()" label="Complete"></umb-button>
             </div>
@@ -27,13 +33,5 @@
         <div ng-if="configuredView" ng-include="configuredView"></div>
 
     </div>
-
-    <!-- SVG Backdrop -->
-    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" class="umb-tour__canvas">
-        <rect class="rect-left umb-tour__rect" height="100%"/>
-        <rect class="rect-top umb-tour__rect" width="100%"/>
-        <rect class="rect-bot umb-tour__rect" width="100%"/>
-        <rect class="rect-right umb-tour__rect" height="100%" width="100%"/>
-    </svg>
 
 </div>

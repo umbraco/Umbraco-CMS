@@ -1,26 +1,31 @@
 (function () {
     'use strict';
 
-    function TourDirective($timeout, $http, tourService) {
+    function TourDirective($timeout, $http, tourService, backdropService) {
 
         function link(scope, el, attr, ctrl) {
+
+            var popover;
 
             scope.totalSteps;
             scope.currentStepIndex;
             scope.currentStep;
             scope.loadingStep = false;
-            var popover;
 
             scope.nextStep = function() {
                 nextStep();
             };
 
             scope.endTour = function() {
+                unbindEvent();                
                 tourService.endTour();
+                backdropService.close();
             };
 
             scope.completeTour = function() {
+                unbindEvent();                
                 tourService.completeTour();
+                backdropService.close();
             };
 
             function onInit() {
@@ -54,6 +59,8 @@
 
             function startStep() {
 
+                backdropService.open();
+
                 // we need to make sure that all requests are done
                 var timer = window.setInterval(function(){
 
@@ -61,6 +68,8 @@
                     console.log("document ready", document.readyState);
                     
                     scope.loadingStep = true;
+
+                    backdropService.setHighlight(null);
 
                     // check for pending requests both in angular and on the document
                     if($http.pendingRequests.length === 0 && document.readyState === "complete") {
@@ -89,25 +98,27 @@
 
             function positionPopover() {
 
-                $timeout(function(){
-                    
-                    var element = $(scope.currentStep.element);                    
+                $timeout(function () {
+
+                    var element = $(scope.currentStep.element);
                     var scrollParent = element.scrollParent();
 
                     console.log("scrollParent", scrollParent);
 
                     // Detect if scroll is needed
-                    if(element[0].offsetTop > scrollParent[0].clientHeight) {
+                    if (element[0].offsetTop > scrollParent[0].clientHeight) {
                         console.log("SCROOOOOOOL");
                         scrollParent.animate({
                             scrollTop: element[0].offsetTop
-                        }, function() {
+                        }, function () {
                             // Animation complete.
                             console.log("ANIMATION COMPLETE");
                             _position();
+                            backdropService.setHighlight(scope.currentStep.element);
                         });
                     } else {
                         _position();
+                        backdropService.setHighlight(scope.currentStep.element);
                     }
 
                 });
@@ -118,193 +129,73 @@
                     var offset = element.offset();
                     var width = element.outerWidth(true);
                     var height = element.outerHeight(true);
-                    var windowWidth = $( window ).width(); 
-                    var windowHeight = $( window ).height(); 
 
-                    $timeout(function(){
-                    
-                        var popoverBox = $(".umb-tour__popover");
-                        var popoverWidth = popoverBox.outerWidth();
-                        var popoverHeight = popoverBox.outerHeight();
-                        var popoverOffset = popoverBox.offset(); 
+                    $timeout(function () {
 
-                        console.log("This element", element);
-                        console.log("width", width);
-                        console.log("height", height);
-                        console.log(scope.currentStep.placement);
-                        console.log("popoverWidth", popoverWidth);
-                        console.log("popoverHeight", popoverHeight);
-                        console.log("element offset", offset);
-                        console.log("windowWidth", windowWidth); 
-                        console.log("windowHeight", windowHeight);
+                        var popoverWidth = popover.outerWidth(true);
+                        var popoverHeight = popover.outerHeight(true);
+                        var popoverOffset = popover.offset();
+                        var documentWidth = $(document).width();
+                        var documentHeight = $(document).height();
+                        var position;
+                        var css = {};
 
-                        // Element placements
-                        if (scope.currentStep.placement === "top") {
+                        console.log("SPACE", space);
 
-                            // Repositioning popover, so it is not in the center anymore 
-                            popover.css({top: offset.top - popoverHeight, left: offset.left, transform: "none"}); 
-            
-                            //refreshing my variables 
-                            popoverOffset = popoverBox.offset(); 
 
-                            // Deciding if the highlight is left or right side 
-                            if (offset.left < windowWidth/2) {
-
-                                //Checking if it is out of the screen 
-                                if (popoverOffset.top < "0") { 
-                                    // placing the popover under the highlighted area, because its off-screen                                     
-                                    popover.css({top: offset.top + height, left: offset.left}); 
-
-                                } else {
-                                    popover.css({top: offset.top - popoverHeight, left: offset.left}); 
-                                }           
+                        // If no specific position is set - find the position with most available space
+                        if(scope.currentStep.placement) {
                             
-                            } else { 
+                            position = scope.currentStep.placement;
 
-                                //Checking if it is out of the screen 
-                                if (popoverOffset.top < "0") { 
-                                    // placing the popover under the highlighted area, because its off-screen 
-                                    popover.css({top: offset.top + height, left: offset.left - popoverWidth + width}); 
+                        } else {
 
-                                } else { 
-                                    popover.css({top: offset.top - popoverHeight, left: offset.left - popoverWidth + width}); 
-                                } 
-                            }
+                            var space = {
+                                "top": offset.top,
+                                "right": documentWidth - (offset.left + width),
+                                "bottom": documentHeight - (offset.top + height),
+                                "left": offset.left
+                            };
+
+                            position = findMax(space);
                         }
-                        
-                        else if (scope.currentStep.placement === "bottom") {
 
-                            // Repositioning popover, so it is not in the center anymore 
-                            popover.css({top: offset.top + height, left: offset.left, transform: "none"}); 
-                            
-                            // refreshing my variables 
-                            popoverOffset = popoverBox.offset(); 
-                            console.log("we must have it as a bottom", popoverOffset.top); 
-
-                            // Deciding if the highlight is left or right side 
-                            if (offset.left < windowWidth/2) { 
-
-                                // Checking if it is out of the screen 
-                                if (popoverOffset.top + popoverHeight > windowHeight) { 
-                                    // placing the popover over the highlighted area, because its off-screen 
-                                    popover.css({top: offset.top - popoverHeight, left: offset.left}); 
-
-                                } else { 
-                                    popover.css({top: offset.top + height, left: offset.left}); 
-                                } 
-                                    
-                            } else { 
-
-                                // Checking if it is out of the screen 
-                                if (popoverOffset.top + popoverHeight > windowHeight) { 
-                                    // placing the popover over the highlighted area, because its off-screen 
-                                    popover.css({top: offset.top - popoverHeight, left: offset.left - popoverWidth + width}); 
-
-                                } else { 
-                                    popover.css({top: offset.top + height, left: offset.left - popoverWidth + width}); 
-                                } 
-                                
-                            }
+                        if(position === "top") {
+                            css = {top: offset.top - popoverHeight, left: offset.left};
                         }
-                        
-                        else if (scope.currentStep.placement === "right") {
 
-                            // Repositioning popover, so it is not in the center anymore
-                            popover.css({top: offset.top, left: offset.left + width, transform: "none"});
-
-                            //refreshing my variables
-                            popoverOffset = popoverBox.offset();
-
-                            // Deciding if the highlight is top or bottom side
-                            if (offset.top < windowHeight/2) {
-                                // Checking if it is out of the screen
-                                if (offset.left + width + popoverWidth > windowWidth) {
-                                    popover.css({top: offset.top, left: offset.left - popoverWidth});
-
-                                } else {
-                                    popover.css({top: offset.top, left: offset.left + width});
-                                }
-
-                            } else { 
-                                // Checking if it is out of the screen
-                                if (offset.left + width + popoverWidth > windowWidth) {
-                                    popover.css({top: offset.top - popoverHeight + height, left: offset.left - popoverWidth });
-
-                                } else {
-                                    popover.css({top: offset.top - popoverHeight + height, left: offset.left + width}) 
-                                }
-                            }
+                        if(position === "right") {
+                            css = {top: offset.top, left: offset.left + width};
                         }
-                        
-                        else if (scope.currentStep.placement === "left") {
-                            
-                            // Repositioning popover, so it is not in the center anymore 
-                            popover.css({top: offset.top, left: offset.left - popoverWidth}); 
-                        
-                            // Refreshing my variables 
-                            popoverOffset = popoverBox.offset(); 
 
-                            if (offset.top < windowHeight/2) { 
-                                //Checking if it is out of the screen 
-                                if (offset.left - popoverWidth < "0") { 
-                                    popover.css({top: offset.top, left: offset.left + width}); 
-                                    
-                                } else { 
-                                    popover.css({top: offset.top, left: offset.left - popoverWidth}); 
-                                } 
-
-                            } else { 
-                                //Checking if it is out of the screen 
-                                if (offset.left - popoverWidth < "0") { 
-                                    popover.css({top: offset.top + height - popoverHeight, left: offset.left + width}); 
-
-                                } else { 
-                                    popover.css({top: offset.top + height - popoverHeight, left: offset.left - popoverWidth}); 
-                                } 
-                            }
+                        if(position === "bottom") {
+                            css = {top: offset.top + height, left: offset.left};
                         }
-                        
-                        else if (scope.currentStep.placement === "center") {
-                            popover.css({top: "50%", left: "50%", transform: "translate(-50%, -50%)"});
+
+                        if(position === "left") {
+                            css = {top: offset.top, left: offset.left - popoverWidth};
                         }
-                        
-                        else {
-                            popover.css({top: "50%", left: "50%", transform: "translate(-50%, -50%)"});
-                        }                        
-                        
+
+                        popover.css(css);
+
+                        scope.position = position;
+
                     });
-                    
-                    // Rounding numbers
-                    var topDistance = offset.top.toFixed();
-                    var topAndHeight = (offset.top + height).toFixed();
-                    var leftDistance = offset.left.toFixed();
-                    var leftAndWidth = (offset.left + width).toFixed();
-                    
-                    // Convert classes into variables
-                    var rectLeft = $(".rect-left")
-                    var rectTop = $(".rect-top")
-                    var rectBot = $(".rect-bot")
-                    var rectRight = $(".rect-right")
-
-                    // SVG rect at the left side of the canvas
-                    rectLeft.css("width", leftDistance);
-                    
-                    // SVG rect at the top of the canvas
-                    rectTop.css("height", topDistance);
-                    rectTop.css("x", leftDistance);
-                    
-                    // SVG rect at the bottom of the canvas
-                    rectBot.css("height", "100%");
-                    rectBot.css("y", topAndHeight );
-                    rectBot.css("x", leftDistance);
-                    
-                    // SVG rect at the right side of the canvas
-                    rectRight.css("x", leftAndWidth);
-                    rectRight.css("y", topDistance);
-                    rectRight.css("height", height);
 
                 }
 
+            }
+
+            function findMax(obj) {
+                var keys = Object.keys(obj);
+                var max = keys[0];
+                for (var i = 1, n = keys.length; i < n; ++i) {
+                    var k = keys[i];
+                    if (obj[k] > obj[max]) {
+                        max = k;
+                    }
+                }
+                return max;
             }
 
             function bindEvent() {
@@ -338,7 +229,7 @@
             $(window).on('resize.umbTour', resize);
 
             scope.$on('$destroy', function () {
-                $(window).off('.resize.umbTour');
+                $(window).off('resize.umbTour');
             });
 
         }

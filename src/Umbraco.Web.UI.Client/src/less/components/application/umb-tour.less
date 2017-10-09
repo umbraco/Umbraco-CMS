@@ -3,50 +3,49 @@
     top: 50%;
     left: 50%;
     background: @white;
-    border-radius: 5px;
-    font-size: 18px;
-    padding: 30px;
-    width: 300px;
+    border-radius: @baseBorderRadius;
+    padding: 20px;
+    max-width: 300px;
+    min-width: 150px;
     z-index: 10000;
-    -webkit-box-shadow: none;
-	-moz-box-shadow: none;
-	box-shadow: none;
+}
+
+.umb-tour__popover--top {
+    margin-bottom: 20px;
+    transform: none;
+}
+
+.umb-tour__popover--right {
+    margin-left: 20px;
+    transform: none;
+}
+
+.umb-tour__popover--bottom {
+    margin-top: 20px;
+    transform: none;
+}
+
+.umb-tour__popover--left {
+    margin-right: 20px;
+    transform: none;
 }
 
 .umb-tour__step-counter {
-    padding-bottom: 26px;
-    margin-bottom: 23px;
-    border-bottom: solid 1px @gray-8;
+    font-size: 13px;
+    color: @gray-5;
 }
 
 .umb-tour__title {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     font-weight: bold;
     color: @black;
-    font-size: 20px;
+    font-size: 16px;
+    margin-top: 10px;
 }
 
 .umb-tour__content {
     margin-bottom: 20px;
     line-height: 24px;
-}
-
-.umb-tour__button-container {
-    float: right;
-}
-
-.umb-tour__button-container-center {
-    text-align: center;
-}
-
-.umb-tour__big-title {
-    font-size: 30px;
-    font-weight: 700;
-    margin-bottom: 20px;
-}
-
-.center {
-    text-align: center;
 }
 
 // SVG Backdrop

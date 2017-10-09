@@ -73,6 +73,18 @@
 
     </div>
 
+    <umb-backdrop
+        ng-if="backdrop.show"
+        element="backdrop.element">
+    </umb-backdrop>
+
+    <umb-overlay
+        ng-if="ysodOverlay.show"
+        model="ysodOverlay"
+        position="right"
+        view="ysodOverlay.view">
+    </umb-overlay>
+
     @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))
 
     <script type="text/javascript">
@@ -93,13 +105,6 @@
         <script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
         @Html.RenderProfiler()
     }
-
-    <umb-overlay
-        ng-if="ysodOverlay.show"
-        model="ysodOverlay"
-        position="right"
-        view="ysodOverlay.view">
-    </umb-overlay>
 
 </body>
 </html>

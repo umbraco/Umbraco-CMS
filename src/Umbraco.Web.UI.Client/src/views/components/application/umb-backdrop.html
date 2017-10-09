@@ -1,0 +1,15 @@
+<div>
+    <!-- Backdrop with highlight -->
+    <svg ng-if="element" class="umb-tour__canvas" xmlns="http://www.w3.org/2000/svg" version="1.1">
+        <rect class="rect-left umb-tour__rect" height="100%"/>
+        <rect class="rect-top umb-tour__rect" width="100%"/>
+        <rect class="rect-bot umb-tour__rect" width="100%"/>
+        <rect class="rect-right umb-tour__rect" height="100%" width="100%"/>
+    </svg>
+
+    <!-- Full screen backdrop -->
+    <svg ng-if="!element" class="umb-tour__canvas" xmlns="http://www.w3.org/2000/svg" version="1.1">
+        <rect  class="umb-tour__rect" height="100%" width="100%"/>
+    </svg>
+
+</div>
