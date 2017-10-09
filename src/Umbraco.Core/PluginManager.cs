@@ -489,7 +489,8 @@ namespace Umbraco.Core
                     break;
                 case LocalTempStorage.Default:
                 default:
-                    pluginHashFilePath =  Path.Combine(_pluginListFilePath, "umbraco-plugins." + NetworkHelper.FileSafeMachineName + ".hash");
+                    var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
+                    pluginHashFilePath =  Path.Combine(tempFolder, "umbraco-plugins." + NetworkHelper.FileSafeMachineName + ".hash");
                     break;
             }
 
