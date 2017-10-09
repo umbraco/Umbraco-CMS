@@ -10,7 +10,7 @@
                 scope.allowOpenMediaType = true;
 
                 // get document type details
-                scope.mediaType = scope.node.contentType.value;
+                scope.mediaType = scope.node.contentType;
 
                 // get node url
                 scope.nodeUrl = scope.node.mediaLink;
