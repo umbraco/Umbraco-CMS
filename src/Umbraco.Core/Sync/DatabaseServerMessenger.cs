@@ -40,7 +40,7 @@ namespace Umbraco.Core.Sync
         private bool _syncing;
         private bool _released;
         private readonly ProfilingLogger _profilingLogger;
-        private string _distCacheFilePath;
+        private Lazy<string> _distCacheFilePath = new Lazy<string>(GetDistCacheFilePath);
 
         protected DatabaseServerMessengerOptions Options { get; private set; }
         protected ApplicationContext ApplicationContext { get { return _appContext; } }
@@ -462,10 +462,9 @@ namespace Umbraco.Core.Sync
         /// </remarks>
         private void ReadLastSynced()
         {
-            var path = SyncFilePath;
-            if (File.Exists(path) == false) return;
+            if (File.Exists(_distCacheFilePath.Value) == false) return;
 
-            var content = File.ReadAllText(path);
+            var content = File.ReadAllText(_distCacheFilePath.Value);
             int last;
             if (int.TryParse(content, out last))
                 _lastId = last;
@@ -480,7 +479,7 @@ namespace Umbraco.Core.Sync
         /// </remarks>
         private void SaveLastSynced(int id)
         {
-            File.WriteAllText(SyncFilePath, id.ToString(CultureInfo.InvariantCulture));
+            File.WriteAllText(_distCacheFilePath.Value, id.ToString(CultureInfo.InvariantCulture));
             _lastId = id;
         }
 
@@ -500,22 +499,8 @@ namespace Umbraco.Core.Sync
             + "/D" + AppDomain.CurrentDomain.Id // eg 22
             + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
 
-        /// <summary>
-        /// Gets the sync file path for the local server.
-        /// </summary>
-        /// <returns>The sync file path for the local server.</returns>
-        private string SyncFilePath
+        private static string GetDistCacheFilePath()
         {
-            get { return GetDistCacheFilePath(); }
-        }
-
-        private string GetDistCacheFilePath()
-        {
-            //if it's already set then return it - we don't care about locking here
-            //if 2 threads do this at the same time it won't hurt
-            if (_distCacheFilePath != null)
-                return _distCacheFilePath;
-
             var fileName = HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty) + "-lastsynced.txt";
 
             string distCacheFilePath;
@@ -547,8 +532,7 @@ namespace Umbraco.Core.Sync
             if (Directory.Exists(folder) == false)
                 Directory.CreateDirectory(folder);
 
-            _distCacheFilePath = distCacheFilePath;
-            return _distCacheFilePath;
+            return distCacheFilePath;
         }
 
         #endregion

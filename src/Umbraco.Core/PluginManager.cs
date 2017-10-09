@@ -41,8 +41,8 @@ namespace Umbraco.Core
         private readonly IServiceProvider _serviceProvider;
         private readonly IRuntimeCacheProvider _runtimeCache;
         private readonly ProfilingLogger _logger;
-        private string _pluginListFilePath;
-        private string _pluginHashFilePath;
+        private readonly Lazy<string> _pluginListFilePath = new Lazy<string>(GetPluginListFilePath);
+        private readonly Lazy<string> _pluginHashFilePath = new Lazy<string>(GetPluginHashFilePath);
 
         private readonly object _typesLock = new object();
         private readonly Dictionary<TypeListKey, TypeList> _types = new Dictionary<TypeListKey, TypeList>();
@@ -69,8 +69,6 @@ namespace Umbraco.Core
             _runtimeCache = runtimeCache;
             _logger = logger;
             
-            var pluginListFile = GetPluginListFilePath();
-
             if (detectChanges)
             {
                 //first check if the cached hash is string.Empty, if it is then we need
@@ -82,8 +80,8 @@ namespace Umbraco.Core
                     // if the hash has changed, clear out the persisted list no matter what, this will force
                     // rescanning of all plugin types including lazy ones.
                     // http://issues.umbraco.org/issue/U4-4789
-                    if(File.Exists(pluginListFile))
-                        File.Delete(pluginListFile);
+                    if(File.Exists(_pluginListFilePath.Value))
+                        File.Delete(_pluginListFilePath.Value);
 
                     WriteCachePluginsHash();
                 }
@@ -93,8 +91,8 @@ namespace Umbraco.Core
                 // if the hash has changed, clear out the persisted list no matter what, this will force
                 // rescanning of all plugin types including lazy ones.
                 // http://issues.umbraco.org/issue/U4-4789
-                if (File.Exists(pluginListFile))
-                    File.Delete(pluginListFile);
+                if (File.Exists(_pluginListFilePath.Value))
+                    File.Delete(_pluginListFilePath.Value);
 
                 // always set to true if we're not detecting (generally only for testing)
                 RequiresRescanning = true;
@@ -187,11 +185,10 @@ namespace Umbraco.Core
             {
                 if (_cachedAssembliesHash != null)
                     return _cachedAssembliesHash;
+                
+                if (File.Exists(_pluginHashFilePath.Value) == false) return string.Empty;
 
-                var filePath = GetPluginHashFilePath();
-                if (File.Exists(filePath) == false) return string.Empty;
-
-                var hash = File.ReadAllText(filePath, Encoding.UTF8);
+                var hash = File.ReadAllText(_pluginHashFilePath.Value, Encoding.UTF8);
 
                 _cachedAssembliesHash = hash;
                 return _cachedAssembliesHash;
@@ -229,9 +226,8 @@ namespace Umbraco.Core
         /// Writes the assembly hash file.
         /// </summary>
         private void WriteCachePluginsHash()
-        {
-            var filePath = GetPluginHashFilePath();            
-            File.WriteAllText(filePath, CurrentAssembliesHash, Encoding.UTF8);
+        {        
+            File.WriteAllText(_pluginHashFilePath.Value, CurrentAssembliesHash, Encoding.UTF8);
         }
 
         /// <summary>
@@ -351,8 +347,7 @@ namespace Umbraco.Core
             {
                 try
                 {
-                    var filePath = GetPluginListFilePath();
-                    File.Delete(filePath);
+                    File.Delete(_pluginListFilePath.Value);
                 }
                 catch
                 {
@@ -366,12 +361,11 @@ namespace Umbraco.Core
         internal Dictionary<Tuple<string, string>, IEnumerable<string>> ReadCache()
         {
             var cache = new Dictionary<Tuple<string, string>, IEnumerable<string>>();
-
-            var filePath = GetPluginListFilePath();
-            if (File.Exists(filePath) == false)
+            
+            if (File.Exists(_pluginListFilePath.Value) == false)
                 return cache;
 
-            using (var stream = GetFileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, ListFileOpenReadTimeout))
+            using (var stream = GetFileStream(_pluginListFilePath.Value, FileMode.Open, FileAccess.Read, FileShare.Read, ListFileOpenReadTimeout))
             using (var reader = new StreamReader(stream))
             {
                 while (true)
@@ -414,24 +408,17 @@ namespace Umbraco.Core
         /// <remarks>Generally only used for resetting cache, for example during the install process.</remarks>
         public void ClearPluginCache()
         {
-            var path = GetPluginListFilePath();
-            if (File.Exists(path))
-                File.Delete(path);
-
-            path = GetPluginHashFilePath();
-            if (File.Exists(path))
-                File.Delete(path);
+            if (File.Exists(_pluginListFilePath.Value))
+                File.Delete(_pluginListFilePath.Value);
+            
+            if (File.Exists(_pluginHashFilePath.Value))
+                File.Delete(_pluginHashFilePath.Value);
 
             _runtimeCache.ClearCacheItem(CacheKey);
         }
 
-        private string GetPluginListFilePath()
+        private static string GetPluginListFilePath()
         {
-            //if it's already set then return it - we don't care about locking here
-            //if 2 threads do this at the same time it won't hurt
-            if (_pluginListFilePath != null)
-                return _pluginListFilePath;
-
             string pluginListFilePath;
             switch (GlobalSettings.LocalTempStorageLocation)
             {                
@@ -461,17 +448,11 @@ namespace Umbraco.Core
             if (Directory.Exists(folder) == false)
                 Directory.CreateDirectory(folder);
 
-            _pluginListFilePath = pluginListFilePath;
-            return _pluginListFilePath;
+            return pluginListFilePath;
         }
 
-        private string GetPluginHashFilePath()
+        private static string GetPluginHashFilePath()
         {
-            //if it's already set then return it - we don't care about locking here
-            //if 2 threads do this at the same time it won't hurt
-            if (_pluginHashFilePath != null)
-                return _pluginHashFilePath;
-
             string pluginHashFilePath;
             switch (GlobalSettings.LocalTempStorageLocation)
             {
@@ -500,16 +481,13 @@ namespace Umbraco.Core
                 throw new InvalidOperationException("The folder could not be determined for the file " + pluginHashFilePath);
             if (Directory.Exists(folder) == false)
                 Directory.CreateDirectory(folder);
-
-            _pluginHashFilePath = pluginHashFilePath;
-            return _pluginHashFilePath;
+            
+            return pluginHashFilePath;
         }
 
         internal void WriteCache()
         {
-            var filePath = GetPluginListFilePath();
-            
-            using (var stream = GetFileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, ListFileOpenWriteTimeout))
+            using (var stream = GetFileStream(_pluginListFilePath.Value, FileMode.Create, FileAccess.Write, FileShare.None, ListFileOpenWriteTimeout))
             using (var writer = new StreamWriter(stream))
             {
                 foreach (var typeList in _types.Values)
@@ -755,7 +733,7 @@ namespace Umbraco.Core
             // else proceed,
             typeList = new TypeList(baseType, attributeType);
 
-            var scan = RequiresRescanning || File.Exists(GetPluginListFilePath()) == false;
+            var scan = RequiresRescanning || File.Exists(_pluginListFilePath.Value) == false;
 
             if (scan)
             {
