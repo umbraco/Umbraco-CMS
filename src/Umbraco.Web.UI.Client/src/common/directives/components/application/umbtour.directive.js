@@ -141,6 +141,9 @@
                         var css = {};
 
                         console.log("SPACE", space);
+                        console.log("document width", documentWidth);
+                        console.log("document height", documentHeight);
+                        
 
 
                         // If no specific position is set - find the position with most available space
@@ -161,19 +164,43 @@
                         }
 
                         if(position === "top") {
-                            css = {top: offset.top - popoverHeight, left: offset.left};
+
+                            if (offset.left < documentWidth/2) {
+                                css = {top: offset.top - popoverHeight, left: offset.left};        
+                         
+                            } else {
+                                css = {top: offset.top - popoverHeight, left: offset.left - popoverWidth + width};
+                            }
                         }
 
                         if(position === "right") {
-                            css = {top: offset.top, left: offset.left + width};
+
+                            if (offset.top < documentHeight/2) {
+                                css = {top: offset.top, left: offset.left + width};        
+                         
+                            } else {
+                                css = {top: offset.top + height - popoverHeight, left: offset.left + width};
+                            }
                         }
 
                         if(position === "bottom") {
-                            css = {top: offset.top + height, left: offset.left};
+
+                            if (offset.left < documentWidth/2) {
+                                css = {top: offset.top + height, left: offset.left};        
+                         
+                            } else {
+                                css = {top: offset.top + height, left: offset.left - popoverWidth + width};
+                            }
                         }
 
                         if(position === "left") {
-                            css = {top: offset.top, left: offset.left - popoverWidth};
+
+                            if (offset.top < documentHeight/2) {
+                                css = {top: offset.top, left: offset.left - popoverWidth};        
+                         
+                            } else {
+                                css = {top: offset.top + height - popoverHeight, left: offset.left - popoverWidth};
+                            }
                         }
 
                         popover.css(css);
