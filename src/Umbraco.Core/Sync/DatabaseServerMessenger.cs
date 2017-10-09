@@ -40,7 +40,7 @@ namespace Umbraco.Core.Sync
         private bool _syncing;
         private bool _released;
         private readonly ProfilingLogger _profilingLogger;
-        private Lazy<string> _distCacheFilePath = new Lazy<string>(GetDistCacheFilePath);
+        private readonly Lazy<string> _distCacheFilePath = new Lazy<string>(GetDistCacheFilePath);
 
         protected DatabaseServerMessengerOptions Options { get; private set; }
         protected ApplicationContext ApplicationContext { get { return _appContext; } }
