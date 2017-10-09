@@ -46,12 +46,11 @@ namespace Umbraco.Web
         /// <param name="app"></param>
         protected virtual void ConfigureMiddleware(IAppBuilder app)
         {
-            //Ensure owin is configured for Umbraco back office authentication. If you have any front-end OWIN
-            // cookie configuration, this must be declared after it.
+
+            // Configure OWIN for authentication. 
+            ConfigureUmbracoAuthentication(app);
+
             app
-                .UseUmbracoBackOfficeCookieAuthentication(ApplicationContext, PipelineStage.Authenticate)
-                .UseUmbracoBackOfficeExternalCookieAuthentication(ApplicationContext, PipelineStage.Authenticate)
-                .UseUmbracoPreviewAuthentication(ApplicationContext, PipelineStage.Authorize)
                 .UseSignalR()
                 .FinalizeMiddlewareConfiguration();
         }
@@ -66,6 +65,20 @@ namespace Umbraco.Web
             app.ConfigureUserManagerForUmbracoBackOffice(
                 ApplicationContext,
                 Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());
+        }
+
+        /// <summary>
+        /// Configure external/OAuth login providers
+        /// </summary>
+        /// <param name="app"></param>
+        protected virtual void ConfigureUmbracoAuthentication(IAppBuilder app)
+        {
+            // Ensure owin is configured for Umbraco back office authentication.
+            // Front-end OWIN cookie configuration must be declared after this code.
+            app
+                .UseUmbracoBackOfficeCookieAuthentication(ApplicationContext, PipelineStage.Authenticate)
+                .UseUmbracoBackOfficeExternalCookieAuthentication(ApplicationContext, PipelineStage.Authenticate)
+                .UseUmbracoPreviewAuthentication(ApplicationContext, PipelineStage.Authorize);
         }
 
         /// <summary>
