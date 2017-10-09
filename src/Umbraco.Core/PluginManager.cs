@@ -343,7 +343,7 @@ namespace Umbraco.Core
             {
                 return ReadCache();
             }
-            catch
+            catch (Exception ex)
             {
                 try
                 {
@@ -503,8 +503,7 @@ namespace Umbraco.Core
 
         internal void UpdateCache()
         {
-            // note
-            // at the moment we write the cache to disk every time we update it. ideally we defer the writing
+            // TODO: at the moment we write the cache to disk every time we update it. ideally we defer the writing
             // since all the updates are going to happen in a row when Umbraco starts. that being said, the
             // file is small enough, so it is not a priority.
             WriteCache();
@@ -520,7 +519,7 @@ namespace Umbraco.Core
                 {
                     return new FileStream(path, fileMode, fileAccess, fileShare);
                 }
-                catch
+                catch (Exception ex)
                 {
                     if (--attempts == 0)
                         throw;
