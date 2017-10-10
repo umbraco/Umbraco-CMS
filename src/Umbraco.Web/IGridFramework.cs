@@ -1,6 +1,8 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core.Models;
+using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web
 {
@@ -12,7 +14,7 @@ namespace Umbraco.Web
         /// <value>
         /// The grid value.
         /// </value>
-        GridValue GridValue { get; set; }
+        GridValue GridValue { get; }
 
         /// <summary>
         /// Gets the grid CSS class.
@@ -71,19 +73,48 @@ namespace Umbraco.Web
         string PartialViewsPath { get; }
 
         /// <summary>
+        /// Gets the grid HTML.
+        /// </summary>
+        /// <param name="html">The HTML.</param>
+        /// <param name="grid">The grid.</param>
+        /// <returns></returns>
+        IHtmlString GetGridHtml(HtmlHelper html, GridValue grid);
+
+        /// <summary>
+        /// Gets the grid HTML.
+        /// </summary>
+        /// <param name="html">The HTML.</param>
+        /// <param name="grid">The grid.</param>
+        /// <param name="beforeRowRender">The before row render.</param>
+        /// <returns></returns>
+        IHtmlString GetGridHtml(HtmlHelper html, GridValue grid, Func<HtmlTagWrapper, HtmlTagWrapper> beforeRowRender);
+
+        /// <summary>
+        /// Gets the grid HTML.
+        /// </summary>
+        /// <param name="html">The HTML.</param>
+        /// <param name="grid">The grid.</param>
+        /// <param name="beforeRowRender">The before row render.</param>
+        /// <param name="beforeGridRender">The before grid render.</param>
+        /// <returns></returns>
+        IHtmlString GetGridHtml(HtmlHelper html, GridValue grid, Func<HtmlTagWrapper, HtmlTagWrapper> beforeRowRender, Func<HtmlTagWrapper, HtmlTagWrapper> beforeGridRender);
+
+        /// <summary>
         /// Gets the section HTML.
         /// </summary>
         /// <param name="html">The HTML.</param>
         /// <param name="sectionIndex">Index of the section.</param>
+        /// <param name="beforeRowRender">The before row render.</param>
         /// <returns></returns>
-        IHtmlString GetSectionHtml(HtmlHelper html, int sectionIndex);
+        IHtmlString GetSectionHtml(HtmlHelper html, int sectionIndex, Func<HtmlTagWrapper, HtmlTagWrapper> beforeRowRender);
 
         /// <summary>
         /// Gets the sections HTML.
         /// </summary>
         /// <param name="html">The HTML.</param>
+        /// <param name="beforeRowRender">The before row render.</param>
         /// <returns></returns>
-        IHtmlString GetSectionsHtml(HtmlHelper html);
+        IHtmlString GetSectionsHtml(HtmlHelper html, Func<HtmlTagWrapper, HtmlTagWrapper> beforeRowRender);
 
         /// <summary>
         /// Gets the row HTML.
@@ -91,8 +122,9 @@ namespace Umbraco.Web
         /// <param name="html">The HTML.</param>
         /// <param name="row">The grid row.</param>
         /// <param name="wrapInContainer">if set to <c>true</c> [wrap in container].</param>
+        /// <param name="beforeRowRender">The before row render.</param>
         /// <returns></returns>
-        IHtmlString GetRowHtml(HtmlHelper html, GridValue.GridRow row, bool wrapInContainer);
+        IHtmlString GetRowHtml(HtmlHelper html, GridValue.GridRow row, bool wrapInContainer, Func<HtmlTagWrapper, HtmlTagWrapper> beforeRowRender);
 
         /// <summary>
         /// Gets the area HTML.

@@ -9,23 +9,15 @@ using System.Web.Mvc.Html;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.GridFrameworks;
+using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web
 {
 
     public static class GridTemplateExtensions
     {
-        public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedProperty property, string framework = "bootstrap3")
-        {
-            var asString = property.Value as string;
-            if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
-
-            var view = "Grid/" + framework;
-            return html.Partial(view, property.Value);
-        }
-
         /// <summary>
-        /// Gets the grid HTML.
+        /// Gets the grid HTML using the specified GridFramework type.
         /// </summary>
         /// <param name="html">The HTML.</param>
         /// <param name="contentItem">The content item.</param>
@@ -39,65 +31,64 @@ namespace Umbraco.Web
             Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
             if (contentItem.HasProperty(propertyAlias) == false)
             {
-                throw new NullReferenceException("No property found with alias " + propertyAlias);
+                throw new NullReferenceException(string.Format("No property found with alias {0}", propertyAlias));
             }
             var gridJson = contentItem.GetPropertyValue<string>(propertyAlias, recursive);
             if (gridJson == null)
             {
-                throw new NullReferenceException("The property with alias " + propertyAlias + ", was null");
+                throw new NullReferenceException(string.Format("The property with alias {0}, was null", propertyAlias));
             }
             return html.GetGridHtml<TGridFramework>(JsonConvert.DeserializeObject<GridValue>(gridJson));
         }
 
         /// <summary>
-        /// Gets the grid HTML.
+        /// Gets the grid HTML using the specified GridFramework type.
         /// </summary>
+        /// <typeparam name="TGridFramework">The type of the grid framework.</typeparam>
         /// <param name="html">The HTML.</param>
         /// <param name="gridToken">The grid as a JToken.</param>
+        /// <param name="beforeRowRendered">The before row rendered.</param>
+        /// <param name="beforeGridRendered">The before grid rendered.</param>
         /// <returns></returns>
-        public static IHtmlString GetGridHtml<TGridFramework>(this HtmlHelper html, JToken gridToken)
+        public static IHtmlString GetGridHtml<TGridFramework>(this HtmlHelper html, JToken gridToken, Func<HtmlTagWrapper, HtmlTagWrapper> beforeRowRendered = null, Func<HtmlTagWrapper, HtmlTagWrapper> beforeGridRendered = null)
             where TGridFramework : IGridFramework, new()
         {
-            return html.GetGridHtml<TGridFramework>(gridToken.ToObject<GridValue>());
+            return html.GetGridHtml<TGridFramework>(gridToken.ToObject<GridValue>(), beforeRowRendered, beforeGridRendered);
         }
 
         /// <summary>
-        /// Renders the grid.
+        /// Renders the grid using the specified GridFramework type.
         /// </summary>
+        /// <typeparam name="TGridFramework">The type of the grid framework.</typeparam>
         /// <param name="html">The HTML.</param>
         /// <param name="grid">The grid.</param>
+        /// <param name="beforeRowRendered">The before row rendered.</param>
+        /// <param name="beforeGridRendered">The before grid rendered.</param>
         /// <returns></returns>
-        public static IHtmlString GetGridHtml<TGridFramework>(this HtmlHelper html, GridValue grid)
+        public static IHtmlString GetGridHtml<TGridFramework>(this HtmlHelper html, GridValue grid, Func<HtmlTagWrapper, HtmlTagWrapper> beforeRowRendered = null, Func<HtmlTagWrapper, HtmlTagWrapper> beforeGridRendered = null)
             where TGridFramework : IGridFramework, new()
         {
-            var framework = new TGridFramework { GridValue = grid };
-
-            var gridDiv = GridHelper.GetDivWrapper(framework.GridCssClass);
-
-            if (grid.Sections.Count() == 1)
-            {
-                gridDiv.AddChild(framework.GetSectionHtml(html, 0).ToHtmlString());
-            }
-            else if (grid.Sections.Count() > 1)
-            {
-                gridDiv.AddChild(framework.GetSectionsHtml(html).ToHtmlString());
-            }
-
-            return gridDiv.ToHtml();
+            return new TGridFramework().GetGridHtml(html, grid, beforeRowRendered, beforeGridRendered);
         }
 
+        public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedProperty property, string framework = "bootstrap3")
+        {
+            var asString = property.Value as string;
+            if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
+
+            var view = "Grid/" + framework;
+            return html.Partial(view, property.Value);
+        }
         public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedContent contentItem)
         {
             return html.GetGridHtml(contentItem, "bodyText", "bootstrap3");
         }
-
         public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedContent contentItem, string propertyAlias)
         {
             Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
 
             return html.GetGridHtml(contentItem, propertyAlias, "bootstrap3");
         }
-
         public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedContent contentItem, string propertyAlias, string framework)
         {
             Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
@@ -145,7 +136,6 @@ namespace Umbraco.Web
 
             return html.Partial(view, model);
         }
-
 
         [Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
         public static MvcHtmlString GetGridHtml(this IPublishedProperty property, string framework = "bootstrap3")

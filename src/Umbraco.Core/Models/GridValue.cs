@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models
         public string Name { get; set; }
 
         [JsonProperty("sections")]
-        public IEnumerable<GridSection> Sections { get; set; }
+        public IList<GridSection> Sections { get; set; }
 
         public class GridSection
         {
