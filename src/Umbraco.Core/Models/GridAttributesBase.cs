@@ -29,7 +29,7 @@ namespace Umbraco.Core.Models
             if (Styles != null)
             {
                 var jObject = Styles.ToObject<JObject>();
-                if (jObject.Properties().Any() == false) return attributes.ToList();
+                if (jObject.Properties().Any() == false) return attributes;
 
                 var cssValues = string.Join(";", jObject.Properties().Select(p => string.Format("{0}:{1}", p.Name, p.Value.ToString())));
                 attributes.Add(new KeyValuePair<string, string>("style", cssValues));
