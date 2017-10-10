@@ -7,29 +7,16 @@ namespace Umbraco.Core.Models
 {
     public abstract class GridAttributesBase : IGridAttributes
     {
-        /// <summary>
-        /// Gets or sets the con dfig.
-        /// </summary>
-        /// <value>
-        /// The con dfig.
-        /// </value>
+        /// <inheritdoc />
         [JsonProperty("config")]
         public JToken Config { get; set; }
 
-        /// <summary>
-        /// Gets or sets the styles.
-        /// </summary>
-        /// <value>
-        /// The styles.
-        /// </value>
+        /// <inheritdoc />
         [JsonProperty("styles")]
         public JToken Styles { get; set; }
 
-        /// <summary>
-        /// Gets the attributes.
-        /// </summary>
-        /// <returns></returns>
-        public Dictionary<string, string> GetAttributes()
+        /// <inheritdoc />
+        public IDictionary<string, string> GetAttributes()
         {
             var attributes = new Dictionary<string, string>();
             if (Config != null)
