@@ -85,19 +85,19 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="html">The HTML.</param>
         /// <param name="grid">The grid.</param>
-        /// <param name="beforeRowRended">The before row render.</param>
+        /// <param name="beforeRowRender">The before row render.</param>
         /// <returns></returns>
-        IHtmlString GetGridHtml(HtmlHelper html, GridValue grid, Func<HtmlTagWrapper, HtmlTagWrapper> beforeRowRended);
+        IHtmlString GetGridHtml(HtmlHelper html, GridValue grid, Func<HtmlTagWrapper, HtmlTagWrapper> beforeRowRender);
 
         /// <summary>
         /// Gets the grid HTML.
         /// </summary>
         /// <param name="html">The HTML.</param>
         /// <param name="grid">The grid.</param>
-        /// <param name="beforeRowRended">The before row render.</param>
-        /// <param name="beforeGridRended">The before grid render.</param>
+        /// <param name="beforeRowRender">The before row render.</param>
+        /// <param name="beforeGridRender">The before grid render.</param>
         /// <returns></returns>
-        IHtmlString GetGridHtml(HtmlHelper html, GridValue grid, Func<HtmlTagWrapper, HtmlTagWrapper> beforeRowRended, Func<HtmlTagWrapper, HtmlTagWrapper> beforeGridRended);
+        IHtmlString GetGridHtml(HtmlHelper html, GridValue grid, Func<HtmlTagWrapper, HtmlTagWrapper> beforeRowRender, Func<HtmlTagWrapper, HtmlTagWrapper> beforeGridRender);
 
         /// <summary>
         /// Gets the section HTML.
