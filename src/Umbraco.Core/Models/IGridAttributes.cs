@@ -28,6 +28,6 @@ namespace Umbraco.Core.Models
         /// Gets the attributes.
         /// </summary>
         /// <returns></returns>
-        IDictionary<string, string> GetAttributes();
+        IEnumerable<KeyValuePair<string, string>> GetAttributes();
     }
 }

@@ -16,21 +16,25 @@ namespace Umbraco.Core.Models
         public JToken Styles { get; set; }
 
         /// <inheritdoc />
-        public IDictionary<string, string> GetAttributes()
+        public IEnumerable<KeyValuePair<string, string>> GetAttributes()
         {
-            var attributes = new Dictionary<string, string>();
+            var attributes = new List<KeyValuePair<string, string>>();
+
             if (Config != null)
             {
-                attributes = Config.ToObject<JObject>().Properties().ToDictionary(p => p.Name, p => p.Value.ToString());
+                attributes = Config.ToObject<JObject>().Properties()
+                    .Select(p => new KeyValuePair<string, string>(p.Name, p.Value.ToString())).ToList();
             }
 
-            if (Styles == null) return attributes;
-
-            var cssValues = Styles.ToObject<JObject>().Properties().Select(p => string.Format("{0}:{1}", p.Name, p.Value.ToString()));
-            if (Styles.ToObject<JObject>().Properties().Any())
+            if (Styles != null)
             {
-                attributes.Add("style", string.Join(";", cssValues));
+                var jObject = Styles.ToObject<JObject>();
+                if (jObject.Properties().Any() == false) return attributes.ToList();
+
+                var cssValues = string.Join(";", jObject.Properties().Select(p => string.Format("{0}:{1}", p.Name, p.Value.ToString())));
+                attributes.Add(new KeyValuePair<string, string>("style", cssValues));
             }
+
             return attributes;
         }
     }

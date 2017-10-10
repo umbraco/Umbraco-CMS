@@ -4,32 +4,30 @@ using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.GridFrameworks
 {
-    internal static class GridHelper
+    public static class GridHelper
     {
         /// <summary>
         /// Gets the div wrapper.
         /// </summary>
         /// <param name="cssClassName">Name of the CSS class.</param>
         /// <returns></returns>
-        internal static HtmlTagWrapper GetDivWrapper(string cssClassName)
+        public static HtmlTagWrapper GetDivWrapper(string cssClassName)
         {
-            var div = new HtmlTagWrapper("div");
-            div.AddClassName(cssClassName);
-            return div;
+            return new HtmlTagWrapper("div").AddClassName(cssClassName);
         }
 
         /// <summary>
         /// Gets the div wrapper.
         /// </summary>
-        /// <param name="element">The attributes.</param>
+        /// <param name="attributes">The attributes.</param>
         /// <returns></returns>
-        internal static HtmlTagWrapper GetDivWrapper(IGridAttributes element)
+        public static HtmlTagWrapper GetDivWrapper(IGridAttributes attributes)
         {
             var tagWrapper = new HtmlTagWrapper("div");
-            var attr = element.GetAttributes();
-            if (attr.Any())
+            var attrs = attributes.GetAttributes();
+            if (attrs.Any())
             {
-                tagWrapper.ReflectAttributesFromAnonymousType(element);
+                tagWrapper.ReflectAttributesFromAnonymousType(attrs);
             }
             return tagWrapper;
         }
