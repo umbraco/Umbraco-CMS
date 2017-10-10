@@ -47,13 +47,13 @@ namespace Umbraco.Web
         /// <typeparam name="TGridFramework">The type of the grid framework.</typeparam>
         /// <param name="html">The HTML.</param>
         /// <param name="gridToken">The grid as a JToken.</param>
-        /// <param name="beforeRowRendered">The before row rendered.</param>
-        /// <param name="beforeGridRendered">The before grid rendered.</param>
+        /// <param name="beforeRowRender">The before row render.</param>
+        /// <param name="beforeGridRender">The before grid render.</param>
         /// <returns></returns>
-        public static IHtmlString GetGridHtml<TGridFramework>(this HtmlHelper html, JToken gridToken, Func<HtmlTagWrapper, HtmlTagWrapper> beforeRowRendered = null, Func<HtmlTagWrapper, HtmlTagWrapper> beforeGridRendered = null)
+        public static IHtmlString GetGridHtml<TGridFramework>(this HtmlHelper html, JToken gridToken, Func<HtmlTagWrapper, HtmlTagWrapper> beforeRowRender = null, Func<HtmlTagWrapper, HtmlTagWrapper> beforeGridRender = null)
             where TGridFramework : IGridFramework, new()
         {
-            return html.GetGridHtml<TGridFramework>(gridToken.ToObject<GridValue>(), beforeRowRendered, beforeGridRendered);
+            return html.GetGridHtml<TGridFramework>(gridToken.ToObject<GridValue>(), beforeRowRender, beforeGridRender);
         }
 
         /// <summary>
@@ -62,13 +62,13 @@ namespace Umbraco.Web
         /// <typeparam name="TGridFramework">The type of the grid framework.</typeparam>
         /// <param name="html">The HTML.</param>
         /// <param name="grid">The grid.</param>
-        /// <param name="beforeRowRendered">The before row rendered.</param>
-        /// <param name="beforeGridRendered">The before grid rendered.</param>
+        /// <param name="beforeRowRender">The before row render.</param>
+        /// <param name="beforeGridRender">The before grid render.</param>
         /// <returns></returns>
-        public static IHtmlString GetGridHtml<TGridFramework>(this HtmlHelper html, GridValue grid, Func<HtmlTagWrapper, HtmlTagWrapper> beforeRowRendered = null, Func<HtmlTagWrapper, HtmlTagWrapper> beforeGridRendered = null)
+        public static IHtmlString GetGridHtml<TGridFramework>(this HtmlHelper html, GridValue grid, Func<HtmlTagWrapper, HtmlTagWrapper> beforeRowRender = null, Func<HtmlTagWrapper, HtmlTagWrapper> beforeGridRender = null)
             where TGridFramework : IGridFramework, new()
         {
-            return new TGridFramework().GetGridHtml(html, grid, beforeRowRendered, beforeGridRendered);
+            return new TGridFramework().GetGridHtml(html, grid, beforeRowRender, beforeGridRender);
         }
 
         public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedProperty property, string framework = "bootstrap3")
