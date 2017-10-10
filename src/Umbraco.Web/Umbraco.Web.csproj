@@ -323,7 +323,6 @@
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
-    <Compile Include="Editors\HelpController.cs" />
     <Compile Include="Editors\IsCurrentUserModelFilterAttribute.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
     <Compile Include="Editors\TemplateController.cs" />
