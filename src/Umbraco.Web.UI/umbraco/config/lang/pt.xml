@@ -15,8 +15,6 @@
     <key alias="disable">Desabilitar</key>
     <key alias="emptyTrashcan">Esvaziar Lixeira</key>
     <key alias="exportDocumentType">Exportar Tipo de Documento</key>
-    <key alias="exportDocumentTypeAsCode">Exportar para .NET</key>
-    <key alias="exportDocumentTypeAsCode-Full">Exportar para .NET</key>
     <key alias="importDocumentType">Importar Tipo de Documento</key>
     <key alias="importPackage">Importar Pacote</key>
     <key alias="liveEdit">Editar na Tela</key>

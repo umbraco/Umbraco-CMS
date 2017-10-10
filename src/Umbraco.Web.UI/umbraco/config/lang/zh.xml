@@ -346,7 +346,7 @@
     <key alias="password">输入您的密码</key>
     <key alias="confirmPassword">确认密码</key>
     <key alias="nameentity">命名 %0%...</key>
-    <key alias="entername">输入用户名...</key>
+    <key alias="entername">输入名称...</key>
     <key alias="label">标签...</key>
     <key alias="enterDescription">输入说明...</key>
     <key alias="search">输入搜索关键字...</key>

@@ -124,12 +124,15 @@ namespace Umbraco.Core.Security
             var found = _userService.GetUserById(asInt.Result);
             if (found != null)
             {
+                // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
+                var isLoginsPropertyDirty = user.IsPropertyDirty("Logins");
+
                 if (UpdateMemberProperties(found, user))
                 {
                     _userService.Save(found);
                 }
 
-                if (user.IsPropertyDirty("Logins"))
+                if (isLoginsPropertyDirty)
                 {
                     var logins = await GetLoginsAsync(user);
                     _externalLoginService.SaveUserLogins(found.Id, logins);

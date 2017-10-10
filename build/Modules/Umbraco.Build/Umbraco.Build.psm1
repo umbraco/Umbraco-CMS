@@ -377,14 +377,6 @@ function Prepare-Packages
   Copy-Files "$src\Umbraco.Web.UI\umbraco\lib" "*" "$tmp\WebApp\umbraco\lib"
   Copy-Files "$src\Umbraco.Web.UI\umbraco\views" "*" "$tmp\WebApp\umbraco\views"
   Copy-Files "$src\Umbraco.Web.UI\umbraco\preview" "*" "$tmp\WebApp\umbraco\preview"
-
-  # prepare WebPI
-  Write-Host "Prepare WebPI"
-  Remove-Directory "$tmp\WebPi"
-  mkdir "$tmp\WebPi" > $null
-  mkdir "$tmp\WebPi\umbraco" > $null
-  Copy-Files "$tmp\WebApp" "*" "$tmp\WebPi\umbraco"
-  Copy-Files "$src\WebPi" "*" "$tmp\WebPi"     
 }
 
 #
@@ -413,17 +405,6 @@ function Package-Zip
     "$tmp\WebApp\*" `
     "-x!dotless.Core.*" "-x!Content_Types.xml" "-x!*.pdb"`
     > $null
-
-  Write-Host "Zip WebPI"  
-  &$uenv.Zip a -r "$out\UmbracoCms.WebPI.$($version.Semver).zip" "-x!*.pdb"`
-    "$tmp\WebPi\*" `
-    "-x!dotless.Core.*" `
-    > $null
-  
-    # hash the webpi file
-  Write-Host "Hash WebPI"
-  $hash = Get-FileHash "$out\UmbracoCms.WebPI.$($version.Semver).zip"
-  Write $hash | out-file "$out\webpihash.txt" -encoding ascii
 }
 
 #
@@ -465,6 +446,24 @@ function Restore-NuGet
   Write-Host "Logging to $tmp\nuget.restore.log" 
   
   &$uenv.NuGet restore "$src\Umbraco.sln" > "$tmp\nuget.restore.log"
+}
+
+#
+# Copies the Azure Gallery script to output
+#
+function Prepare-AzureGallery
+{
+  param (
+    $uenv # an Umbraco build environment (see Get-UmbracoBuildEnv)
+  )
+  
+  $src = "$($uenv.SolutionRoot)\src"
+  $tmp = "$($uenv.SolutionRoot)\build.tmp"
+  $out = "$($uenv.SolutionRoot)\build.out"
+  $psScript = "$($uenv.SolutionRoot)\build\azuregalleryrelease.ps1"
+  
+  Write-Host ">> Copy azuregalleryrelease.ps1 to output folder"
+  Copy-Item $psScript $out
 }
 
 #
@@ -576,6 +575,10 @@ function Build-Umbraco
   {
     Compile-Belle $uenv $version
   }
+  elseif ($target -eq "prepare-azuregallery")
+  {
+    Prepare-AzureGallery $uenv
+  }
   elseif ($target -eq "all")
   {
     Prepare-Build $uenv
@@ -590,6 +593,7 @@ function Build-Umbraco
     Verify-NuGet $uenv
     Prepare-NuGet $uenv
     Package-NuGet $uenv $version
+	Prepare-AzureGallery $uenv
   }
   else
   {
