@@ -17,7 +17,7 @@
             };
 
             scope.endTour = function() {
-                unbindEvent();                
+                unbindEvent();
                 tourService.endTour();
                 backdropService.close();
             };
@@ -47,6 +47,8 @@
                     if (configuredView !== scope.configuredView) {
                         scope.configuredView = configuredView;
                     }
+                } else {
+                    scope.configuredView = null;
                 }
             }
 
