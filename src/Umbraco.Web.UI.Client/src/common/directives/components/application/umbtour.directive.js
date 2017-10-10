@@ -32,6 +32,7 @@
                 popover = el.find(".umb-tour__popover");
                 scope.totalSteps = scope.steps.length;
                 scope.currentStepIndex = 0;
+                backdropService.open({disableEventsOnClick: true});
                 startStep();
             }
 
@@ -60,8 +61,6 @@
             }
 
             function startStep() {
-
-                backdropService.open();
 
                 // we need to make sure that all requests are done
                 var timer = window.setInterval(function(){

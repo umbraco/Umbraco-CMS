@@ -5,13 +5,18 @@
 
         var args = {
             element: null,
+            disableEventsOnClick: false,
             show: false
         };
 
-        function open(backdrop) {
+        function open(options) {
 
-            if(backdrop && backdrop.element) {
-                args.element = backdrop.element;
+            if(options && options.element) {
+                args.element = options.element;
+            }
+
+            if(options && options.disableEventsOnClick) {
+                args.disableEventsOnClick = options.disableEventsOnClick;
             }
 
             args.show = true;

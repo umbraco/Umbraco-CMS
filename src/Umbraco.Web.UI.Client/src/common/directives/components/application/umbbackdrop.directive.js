@@ -7,6 +7,13 @@
 
             var events = [];
 
+            scope.clickBackdrop = function(event) {
+                if(scope.disableEventsOnClick === true) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+            };
+
             function onInit() {
 
                 if (scope.element) {
@@ -77,7 +84,8 @@
             templateUrl: "views/components/application/umb-backdrop.html",
             link: link,
             scope: {
-                element: "="
+                element: "=",
+                disableEventsOnClick: "="
             }
         };
 

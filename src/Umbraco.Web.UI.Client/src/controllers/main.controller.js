@@ -147,7 +147,6 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
     }));
 
     evts.push(eventsService.on("appState.backdrop", function (name, args) {
-        console.log("BAAAACKDROP", args);
         $scope.backdrop = args;
     }));
 
