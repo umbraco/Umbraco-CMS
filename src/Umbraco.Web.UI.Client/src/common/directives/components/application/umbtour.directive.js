@@ -93,7 +93,7 @@
 
                     }
                     
-                }, 100);
+                }, 50);
 
             }
 
@@ -227,18 +227,24 @@
             }
 
             function bindEvent() {
+                var eventName = scope.currentStep.event + ".step-" + scope.currentStepIndex;
                 if(scope.currentStep.clickElement) {
-                    $(scope.currentStep.clickElement).on(scope.currentStep.event, handleEvent);
+                    $(scope.currentStep.clickElement).on(eventName, handleEvent);
+                    console.log("bind", eventName);                    
                 } else {
-                    $(scope.currentStep.element).on(scope.currentStep.event, handleEvent);
+                    $(scope.currentStep.element).on(eventName, handleEvent);
+                    console.log("bind", eventName);                    
                 }
             }
 
             function unbindEvent() {
+                var eventName = scope.currentStep.event + ".step-" + scope.currentStepIndex;                
                 if(scope.currentStep.clickElement) {
-                    $(scope.currentStep.clickElement).off(scope.currentStep.event);
+                    $(scope.currentStep.clickElement).off(eventName);
+                    console.log("unbind", eventName);                    
                 } else {
-                    $(scope.currentStep.element).off(scope.currentStep.event);
+                    $(scope.currentStep.element).off(eventName);
+                    console.log("unbind", eventName);                    
                 }
             }
 
