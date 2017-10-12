@@ -13,6 +13,11 @@
     flex-direction: column;
 }
 
+.umb-drawer-is-visible .umb-lightbox {
+    width: calc(~'100%' - ~'@{drawerWidth}');
+    left: @drawerWidth;
+}
+
 .umb-lightbox__backdrop {
     position: absolute;
     top: 0;
@@ -40,16 +45,13 @@
 .umb-lightbox__images {
     position: relative;
     z-index: 1000;
+    max-width: calc(~'100%' - 200px); // subtract the width of the two arrow buttons
 }
 
 .umb-lightbox__image {
     background: @white;
     border-radius: 3px;
     padding: 10px;
-    img {
-        max-width: 80vw;
-        max-height: 80vh;
-    }
 }
 
 .umb-lightbox__control {

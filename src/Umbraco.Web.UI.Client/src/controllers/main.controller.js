@@ -136,6 +136,23 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         };
     }));
 
+    // manage the help dialog by subscribing to the showHelp appState
+    $scope.drawer = {};
+    evts.push(eventsService.on("appState.drawerState.changed", function (e, args) {
+        // set view
+        if (args.key === "view") {
+            $scope.drawer.view = args.value;
+        }
+        // set custom model
+        if (args.key === "model") {
+            $scope.drawer.model = args.value;
+        }
+        // show / hide drawer
+        if (args.key === "showDrawer") {
+            $scope.drawer.show = args.value;
+        }
+    }));
+
     evts.push(eventsService.on("appState.startTour", function (name, args) {
         console.log("start tour event", args);
         $scope.tour = { options: args.options, steps: args.steps, show: true };
