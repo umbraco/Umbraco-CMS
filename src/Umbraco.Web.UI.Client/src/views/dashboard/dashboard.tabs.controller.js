@@ -303,9 +303,7 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
                 {
                     element: "[data-element='editor-media'] [data-element='dropzone']",
                     title: "Upload images",
-                    content: "<p>In the upload area you can upload your media items.</p><p>Click the <b>Upload button</b> and select some images on your computer and upload them.</p>",
-                    event: "click",
-                    clickElement: "[data-element='editor-media'] [data-element='button-upload-media']"
+                    content: "<p>In the upload area you can upload your media items.</p><p>Click the <b>Upload button</b> and select some images on your computer and upload them.</p>"
                 },
                 {
                     element: "[data-element='editor-media'] [data-element='media-grid-item-0']",
