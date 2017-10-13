@@ -40,6 +40,7 @@ function Get-UmbracoBuildEnv
     &$nuget install 7-Zip.CommandLine -OutputDirectory $path -Verbosity quiet
     $dir = ls "$path\7-Zip.CommandLine.*" | sort -property Name -descending | select -first 1
     $file = ls -path "$dir" -name 7za.exe -recurse
+    $file = ls -path "$dir" -name 7za.exe -recurse | select -first 1 #A select is because there is tools\7za.exe & tools\x64\7za.exe
     mv "$dir\$file" $sevenZip
     Remove-Directory $dir
   }
