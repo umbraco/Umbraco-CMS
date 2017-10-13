@@ -63,7 +63,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     _.each(medias,
                         function(media, i) {
                             // if there is no thumbnail, try getting one if the media is not a placeholder item
-                            if (!media.thumbnail && media.id) {
+                            if (!media.thumbnail && media.id && media.metaData) {
                                 media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
                             }
 
@@ -108,7 +108,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
                    _.each(model.selectedImages, function(media, i) {
                        // if there is no thumbnail, try getting one if the media is not a placeholder item
-                       if (!media.thumbnail && media.id) {
+                       if (!media.thumbnail && media.id && media.metaData) {
                            media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
                        }
 
