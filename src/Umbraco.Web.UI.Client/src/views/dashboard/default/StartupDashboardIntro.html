@@ -2,33 +2,15 @@
 
     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
     
+    <!-- Tours -->
     <div>
-
-        <div>
-            <h5>Create the first document type</h5>
-            <button ng-click="vm.startTour()">Start</button>
+        <div ng-repeat="(key,value) in vm.tours">
+            <h5>{{key}}</h5>
+            <div ng-repeat="tour in value">
+                {{ tour.name }}
+                <button ng-click="vm.startTour(tour)">Start</button>
+            </div>
         </div>
-
-        <div>
-            <h5>Create page</h5>
-            <button ng-click="vm.startTourTwo()">Start</button>
-        </div>
-        
-        <div>
-            <h5>Render content in template</h5>
-            <button ng-click="vm.startTourThree()">Start</button>
-        </div>
-        
-        <div>
-            <h5>View Home page</h5>
-            <button ng-click="vm.startTourFour()">Start</button>
-        </div>
-
-        <div>
-            <h5>The media library</h5>
-            <button ng-click="vm.startTourSeven()">Start</button>
-        </div>
-
     </div>
 
     <div class="row clearfix" ng-if="vm.dashboard">

@@ -30,19 +30,19 @@
 
             function onInit() {
                 popover = el.find(".umb-tour__popover");
-                scope.totalSteps = scope.steps.length;
+                scope.totalSteps = scope.tour.steps.length;
                 scope.currentStepIndex = 0;
                 backdropService.open({disableEventsOnClick: true});
                 startStep();
             }
 
             function setView() {
-                if (scope.currentStep.view && scope.options.alias) {
+                if (scope.currentStep.view && scope.tour.alias) {
                     //we do this to avoid a hidden dialog to start loading unconfigured views before the first activation
                     var configuredView = scope.currentStep.view;
                     if (scope.currentStep.view.indexOf(".html") === -1) {
                         var viewAlias = scope.currentStep.view.toLowerCase();
-                        var tourAlias = scope.options.alias.toLowerCase();
+                        var tourAlias = scope.tour.alias.toLowerCase();
                         configuredView = "views/common/tours/" + tourAlias + "/" + viewAlias + "/" + viewAlias + ".html";
                     }
                     if (configuredView !== scope.configuredView) {
@@ -55,7 +55,7 @@
 
             function nextStep() {
                 scope.currentStepIndex++;
-                if(scope.currentStepIndex !== scope.steps.length) {
+                if(scope.currentStepIndex !== scope.tour.steps.length) {
                     startStep();
                 }
             }
@@ -76,7 +76,7 @@
                     if($http.pendingRequests.length === 0 && document.readyState === "complete") {
                         console.log("Everything is DONE JOHN");
 
-                        scope.currentStep = scope.steps[scope.currentStepIndex];
+                        scope.currentStep = scope.tour.steps[scope.currentStepIndex];
 
                         clearInterval(timer);
 
@@ -275,8 +275,7 @@
             templateUrl: 'views/components/application/umb-tour.html',
             link: link,
             scope: {
-                options: "=",
-                steps: "="
+                tour: "="
             }
         };
 

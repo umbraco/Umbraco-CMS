@@ -66,11 +66,10 @@
                 <div id="contentcolumn" ng-view></div>
             </section>
 
-        <umb-tour
-            ng-if="tour.show"
-            options="tour.options"
-            steps="tour.steps">
-        </umb-tour>
+            <umb-tour
+                ng-if="tour.show"
+                tour="tour">
+            </umb-tour>
 
             <umb-notifications></umb-notifications>
 

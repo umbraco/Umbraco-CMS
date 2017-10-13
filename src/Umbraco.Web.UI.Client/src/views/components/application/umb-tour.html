@@ -10,11 +10,11 @@
             <umb-load-indicator></umb-load-indicator>
         </div>
         
-        <div ng-if="currentStepIndex < steps.length && !loadingStep">
+        <div ng-if="currentStepIndex < tour.steps.length && !loadingStep">
             <div class="umb-tour__title">{{ currentStep.title }}</div>
             <div class="umb-tour__content" ng-bind-html="currentStep.content"></div>
             <div class="flex justify-between items-center">
-                <div class="umb-tour__step-counter">Step {{ currentStepIndex + 1 }} of {{ steps.length }}</div>    
+                <div class="umb-tour__step-counter">Step {{ currentStepIndex + 1 }} of {{ tour.steps.length }}</div>    
                 <div>
                     <umb-button size="xs" button-style="link" type="button" action="endTour()" label="End tour"></umb-button>
                     <umb-button size="xs" ng-if="!currentStep.event" button-style="success" type="button" action="nextStep()" label="Next"></umb-button>
@@ -22,7 +22,7 @@
             </div>
         </div>
 
-        <div ng-if="currentStepIndex === steps.length && !loadingStep">
+        <div ng-if="currentStepIndex === tour.steps.length && !loadingStep">
             <div class="umb-tour__title">WOOOHOOO!</div>
             <div class="umb-tour__content">Your completed the tour. That is amazing!</div>
             <div class="umb-tour__button-container-center">

@@ -155,12 +155,13 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
 
     evts.push(eventsService.on("appState.startTour", function (name, args) {
         console.log("start tour event", args);
-        $scope.tour = { options: args.options, steps: args.steps, show: true };
+        $scope.tour = args;
+        $scope.tour.show = true;
     }));
 
-    evts.push(eventsService.on("appState.endTour", function (name) {
+    evts.push(eventsService.on("appState.endTour", function () {
         console.log("end tour event");
-        $scope.tour = { options: null, steps: null, show: false };
+        $scope.tour = null;
     }));
 
     evts.push(eventsService.on("appState.backdrop", function (name, args) {
