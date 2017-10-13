@@ -126,8 +126,10 @@ namespace Umbraco.Web.UI
         {
             var task = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
             if (task == null)
-                throw new InvalidOperationException(
-                    string.Format("Could not task for operation {0} for node type {1}", Operation.Create, nodeType));
+            {
+                //if no task was found it will use the default task and we cannot validate the application assigned so return true
+                return true;
+            }
 
             var dialogTask = task as LegacyDialogTask;
             if (dialogTask != null)
@@ -154,8 +156,10 @@ namespace Umbraco.Web.UI
         {
             var task = GetTaskForOperation(httpContext, umbracoUser, Operation.Delete, nodeType);
             if (task == null)
-                throw new InvalidOperationException(
-                    string.Format("Could not task for operation {0} for node type {1}", Operation.Delete, nodeType));
+            {
+                //if no task was found it will use the default task and we cannot validate the application assigned so return true
+                return true;
+            }
 
             var dialogTask = task as LegacyDialogTask;
             if (dialogTask != null)
