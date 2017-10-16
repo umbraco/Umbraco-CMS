@@ -333,6 +333,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             "icon": item.icon,
             "path": item.path,
             "url": item.url,
+            "trashed": item.trashed,
             "published": (item.metaData && item.metaData.IsPublished === false && entityType === "Document") ? false : true
             // only content supports published/unpublished content so we set everything else to published so the UI looks correct 
         });
