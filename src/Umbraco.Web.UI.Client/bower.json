@@ -70,7 +70,7 @@
       ],
 
       "angular-moment": [
-        "angular-moment.min.js"
+        "bower_components/angular-moment/angular-moment.min.js"
       ],
 
       "tinymce": [
