@@ -32,7 +32,7 @@
             </li>
 
         </ul>
-        <a href="#" class="add-link" ng-click="add()"  ng-if="showAdd()" prevent-default>
+        <a href="#" class="add-link" ng-click="add()" ng-class="{'add-link-square': images.length === 0}" ng-if="showAdd()" prevent-default>
             <i class="icon icon-add large"></i>
         </a>
     </div>
